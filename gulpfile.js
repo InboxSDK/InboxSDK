@@ -12,7 +12,7 @@ var args = stdio.getopt({
   // 'production': {key: 'p', description: 'Production build'},
 });
 
-gulp.task('default', ['sdk', 'imp']);
+gulp.task('default', ['sdk', 'imp', 'examples']);
 
 gulp.task('sdk', function() {
   var bundler = browserify({
@@ -42,4 +42,9 @@ gulp.task('imp', function() {
     .pipe(streamify(sourcemaps.init({loadMaps: true})))
     .pipe(streamify(sourcemaps.write('.')))
     .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('examples', ['sdk'], function() {
+  return gulp.src('./dist/gmailsdk.js*')
+    .pipe(gulp.dest('./examples/hello-world/'));
 });
