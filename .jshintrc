@@ -1,0 +1,4 @@
+{
+  "node" : true,
+  "-W041": true // Use '===' to compare with 'null'.
+}
