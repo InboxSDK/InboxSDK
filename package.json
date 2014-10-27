@@ -3,17 +3,25 @@
   "private": true,
   "version": "0.0.1",
   "description": "Library for browser extensions to interact with Gmail.",
-  "main": "index.js",
+  "main": "src/sdk/main.js",
   "scripts": {
     "test": "mocha"
   },
   "author": "Streak",
   "license": "All Rights Reserved",
   "devDependencies": {
-    "baconjs": "0.7.25",
     "browserify": "^6.2.0",
     "gulp": "^3.8.9",
     "gulp-sourcemaps": "^1.2.4",
-    "mocha": "^2.0.1"
+    "gulp-streamify": "0.0.5",
+    "mocha": "^2.0.1",
+    "mold-source-map": "^0.3.0",
+    "stdio": "^0.2.3",
+    "vinyl-source-stream": "^1.0.0"
+  },
+  "dependencies": {
+    "baconjs": "0.7.25",
+    "jquery": "^2.1.1",
+    "lodash": "^2.4.1"
   }
 }
