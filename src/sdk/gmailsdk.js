@@ -1,3 +1,6 @@
+require('./error-logging').setup();
+require('./interface').load();
+
 var GmailSDK = {
   Email: require('./email'),
   ComposeManager: require('./composeManager'),

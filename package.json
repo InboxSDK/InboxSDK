@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.1",
   "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/sdk/main.js",
+  "main": "src/sdk/gmailsdk.js",
   "scripts": {
     "test": "mocha",
-    "start": "gulp default server --watch --reloader"
+    "start": "gulp default --dev --watch --reloader"
   },
   "author": "Streak",
   "license": "All Rights Reserved",

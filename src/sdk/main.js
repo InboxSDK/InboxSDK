@@ -1,4 +1,2 @@
-require('./error-logging').setup();
-require('./interface').load();
-
-module.exports = require('./gmailsdk');
+// exposes main as a global for browsers
+window.GmailSDK = require('./gmailsdk');

@@ -13,7 +13,7 @@ var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
   // 'minify': {key: 'm', description: 'Minify build'},
-  // 'production': {key: 'p', description: 'Production build'},
+  'dev': {key: 'd', description: 'Development (single bundle) build'}
 });
 
 function setupExamples() {
@@ -46,7 +46,7 @@ function browserifyTask(name, entry, destname) {
         .pipe(mold.transformSourcesRelativeTo('.'))
         .pipe(source(destname))
         .pipe(streamify(sourcemaps.init({loadMaps: true})))
-        .pipe(streamify(sourcemaps.write(/*'.'*/)))
+        .pipe(streamify(sourcemaps.write('.')))
         .pipe(gulp.dest('./dist/'));
 
       if (isRebuild) {
@@ -74,10 +74,18 @@ function browserifyTask(name, entry, destname) {
   });
 }
 
-gulp.task('default', ['sdk', 'imp', 'examples']);
 
-browserifyTask('sdk', './src/sdk/wrapper.js', 'gmailsdk.js');
-browserifyTask('imp', './src/imp/main.js', 'gmailsdk-imp.js');
+if (args.dev) {
+  gulp.task('default', ['sdk', 'examples']);
+  browserifyTask('sdk', './src/sdk/main-DEV.js', 'gmailsdk.js');
+  gulp.task('imp', function() {
+    throw new Error("No separate imp bundle in dev mode");
+  });
+} else {
+  gulp.task('default', ['sdk', 'imp', 'examples']);
+  browserifyTask('sdk', './src/sdk/main.js', 'gmailsdk.js');
+  browserifyTask('imp', './src/imp/main.js', 'gmailsdk-imp.js');
+}
 
 gulp.task('examples', ['sdk'], setupExamples);
 
