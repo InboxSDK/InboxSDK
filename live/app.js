@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var _ = require('lodash');
 
 function delayFilter(fn) {
   return function() {
@@ -12,10 +13,10 @@ function delayFilter(fn) {
 
 module.exports.run = function() {
   var server = http.createServer(delayFilter(function (req, res) {
-    if (req.url === '/gmailsdk-imp.js') {
+    if (_.contains(['/gmailsdk-imp.js', '/gmailsdk-imp.js.map'], req.url)) {
       if (req.method === 'GET') {
-        var imp = fs.createReadStream(__dirname+'/../dist/gmailsdk-imp.js');
-        imp.on('error', function() {
+        var file = fs.createReadStream(__dirname+'/../dist'+req.url);
+        file.on('error', function() {
           res.writeHead(503);
           res.end();
         });
@@ -24,7 +25,7 @@ module.exports.run = function() {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET'
         });
-        imp.pipe(res);
+        file.pipe(res);
       } else if (req.method === 'OPTIONS') {
         res.writeHead(200, {
           'Access-Control-Allow-Origin': '*',
