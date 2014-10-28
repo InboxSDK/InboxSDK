@@ -7,16 +7,24 @@ var streamify = require('gulp-streamify');
 var sourcemaps = require('gulp-sourcemaps');
 var stdio = require('stdio');
 var gutil = require('gulp-util');
+var extReloader = require('./live/ext-reloader');
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
+  'reloader': {key: 'r', description: 'Automatic extension reloader'},
   // 'minify': {key: 'm', description: 'Minify build'},
   // 'production': {key: 'p', description: 'Production build'},
 });
 
 function setupExamples() {
-  return gulp.src('./dist/gmailsdk.js*')
+  var job = gulp.src('./dist/gmailsdk.js*')
     .pipe(gulp.dest('./examples/hello-world/'));
+  if (args.reloader) {
+    job.on('end', function() {
+      extReloader();
+    });
+  }
+  return job;
 }
 
 function browserifyTask(name, entry, destname) {

@@ -6,12 +6,13 @@
   "main": "src/sdk/main.js",
   "scripts": {
     "test": "mocha",
-    "start": "gulp default server -w"
+    "start": "gulp default server -wr"
   },
   "author": "Streak",
   "license": "All Rights Reserved",
   "devDependencies": {
     "browserify": "^6.2.0",
+    "glob": "^4.0.6",
     "gulp": "^3.8.9",
     "gulp-sourcemaps": "^1.2.4",
     "gulp-streamify": "0.0.5",
