@@ -1,8 +1,17 @@
 var http = require('http');
 var fs = require('fs');
 
+function delayFilter(fn) {
+  return function() {
+    var self = this, args = arguments;
+    setTimeout(function() {
+      fn.apply(self, args);
+    }, 500);
+  };
+}
+
 module.exports.run = function() {
-  var server = http.createServer(function (req, res) {
+  var server = http.createServer(delayFilter(function (req, res) {
     if (req.url === '/gmailsdk-imp.js') {
       if (req.method === 'GET') {
         var imp = fs.createReadStream(__dirname+'/../dist/gmailsdk-imp.js');
@@ -30,7 +39,7 @@ module.exports.run = function() {
       res.writeHead(404);
       res.end();
     }
-  });
+  }));
 
   server.listen(4567, 'localhost');
 };
