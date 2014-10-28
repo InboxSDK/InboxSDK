@@ -1,7 +1,12 @@
-var _ = require('lodash');
-var ElementObserver = require('./element-observer');
+if (global.__GmailSDKImpLoader) {
+  return;
+}
 
-console.log('imp hello world');
-new ElementObserver('imp').hello();
-
-module.exports.getUser = _.constant({emailAddress: 'abc@example.com'});
+global.__GmailSDKImpLoader = {
+  load: function(version) {
+    if (version !== "0.1") {
+      throw new Error("Unsupported GmailSDK version");
+    }
+    return require('./gmailsdk-imp');
+  }
+};

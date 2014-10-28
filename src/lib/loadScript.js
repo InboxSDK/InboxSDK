@@ -2,7 +2,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 var RSVP = require('rsvp');
 
-var isContentScript = _.memoize(function() {
+var isContentScript = _.once(function() {
   if (typeof chrome != 'undefined' && chrome.extension)
     return true;
   if (typeof safari != 'undefined' && safari.application)

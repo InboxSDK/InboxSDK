@@ -46,7 +46,7 @@ function browserifyTask(name, entry, destname) {
         .pipe(mold.transformSourcesRelativeTo('.'))
         .pipe(source(destname))
         .pipe(streamify(sourcemaps.init({loadMaps: true})))
-        .pipe(streamify(sourcemaps.write('.')))
+        .pipe(streamify(sourcemaps.write(/*'.'*/)))
         .pipe(gulp.dest('./dist/'));
 
       if (isRebuild) {

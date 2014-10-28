@@ -1,6 +1,9 @@
 var RSVP = require('RSVP');
-RSVP.on('error', function(err) {
-  process.nextTick(function() {
-    throw err;
+
+module.exports.setup = function() {
+  RSVP.on('error', function(err) {
+    process.nextTick(function() {
+      throw err;
+    });
   });
-});
+};
