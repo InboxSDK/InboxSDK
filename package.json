@@ -6,7 +6,7 @@
   "main": "src/sdk/main.js",
   "scripts": {
     "test": "mocha",
-    "start": "gulp default server -wr"
+    "start": "gulp default server --watch --reloader"
   },
   "author": "Streak",
   "license": "All Rights Reserved",
