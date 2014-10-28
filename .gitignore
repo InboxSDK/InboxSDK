@@ -3,3 +3,4 @@
 /dist
 /examples/*/gmailsdk.js*
 *~
+npm-debug.log
