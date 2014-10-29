@@ -15,7 +15,9 @@ By default, `npm start` simply runs the following command:
 
 which builds the SDK into a single bundle (`--dev`), watches all of its source
 files for changes to trigger rebuilds of the bundle automatically (`--watch`),
-and tells Chrome to reload its extensions after SDK rebuilds (`--reload`).
+and tells Chrome to reload its extensions after SDK rebuilds (`--reload`). (Note
+that in order to run gulp manually, you'll need to install it globally by
+running `npm install -g gulp` first.)
 
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
