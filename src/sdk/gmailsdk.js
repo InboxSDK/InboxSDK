@@ -3,10 +3,10 @@ require('./interface').load();
 
 var GmailSDK = {
   Email: require('./email'),
-  ComposeManager: require('./composeManager'),
+  ComposeManager: require('./compose-manager'),
   Mailbox: require('./mailbox'),
   Util: {
-    loadScript: require('../lib/loadScript')
+    loadScript: require('../lib/load-script')
   }
 };
 

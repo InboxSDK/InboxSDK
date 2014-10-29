@@ -1,5 +1,5 @@
 var RSVP = require('rsvp');
-var loadScript = require('../lib/loadScript');
+var loadScript = require('../lib/load-script');
 
 function loadImpFile() {
   if (global.__GmailSDKImpLoader) {
