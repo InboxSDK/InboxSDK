@@ -1,5 +1,5 @@
 var GmailSDKImp = {
-  ComposeManager: require('./composeManager')
+  ComposeManager: require('./compose-manager')
 };
 
 module.exports = GmailSDKImp;
