@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/sdk/gmailsdk.js",
+  "main": "src/gmailsdk-js/gmailsdk.js",
   "scripts": {
     "test": "mocha",
     "start": "gulp default --dev --watch --reloader"

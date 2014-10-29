@@ -6,7 +6,7 @@ var GmailSDK = {
   ComposeManager: require('./compose-manager'),
   Mailbox: require('./mailbox'),
   Util: {
-    loadScript: require('../lib/load-script')
+    loadScript: require('../common/load-script')
   }
 };
 

@@ -77,14 +77,14 @@ function browserifyTask(name, entry, destname) {
 
 if (args.dev) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', './src/sdk/main-DEV.js', 'gmailsdk.js');
+  browserifyTask('sdk', './src/gmailsdk-js/main-DEV.js', 'gmailsdk.js');
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in dev mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', './src/sdk/main.js', 'gmailsdk.js');
-  browserifyTask('imp', './src/imp/main.js', 'gmailsdk-imp.js');
+  browserifyTask('sdk', './src/gmailsdk-js/main.js', 'gmailsdk.js');
+  browserifyTask('imp', './src/platform-implementation-js/main.js', 'platform-implementation.js');
 }
 
 gulp.task('examples', ['sdk'], setupExamples);
