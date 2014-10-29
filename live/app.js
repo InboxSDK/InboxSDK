@@ -13,7 +13,7 @@ function delayFilter(fn) {
 
 module.exports.run = function() {
   var server = http.createServer(delayFilter(function (req, res) {
-    if (req.url.match(/^\/platform-implementation\.js(\.map)?/)) {
+    if (req.url.match(/^\/platform-implementation\.js(\.map)?$/)) {
       if (req.method === 'GET') {
         var file = fs.createReadStream(__dirname+'/../dist'+req.url);
         file.on('error', function() {
