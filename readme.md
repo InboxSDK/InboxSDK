@@ -25,6 +25,10 @@ which hosts the remote implementation bundle can be started by running:
     gulp default server --watch --reloader
 
 Building separate SDK and implementation bundles represents how the production
-builds will work. The implementation bundle is loaded by eval() and not
+builds will work. When using the local test server to host the
+platform-implementation bundle, you'll need to run Chrome with the
+`--allow-running-insecure-content` flag.
+
+The implementation bundle is loaded by eval() and not
 associated with a file, which Chrome's debugger does not work as easily with, so
 it's not recommended during general development of the GmailSDK.
