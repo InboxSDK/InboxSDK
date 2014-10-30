@@ -2,6 +2,7 @@ var RSVP = require('RSVP');
 var logError = require('./log-error');
 
 function setupGlobalLogger() {
+  RSVP._errorHandlerSetup = true;
   RSVP.on('error', function(err) {
     logError("Possibly uncaught promise rejection", err);
   });

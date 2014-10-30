@@ -1,6 +1,10 @@
+var Interface = require('./interface');
+
 var Email = {
-  getUser: function() {
-    throw new Error("GmailSDK not loaded yet");
+  getUserAsync: function() {
+    return Interface.load().then(function(Imp) {
+      return Imp.Email.getUserAsync();
+    });
   }
 };
 
