@@ -10,7 +10,9 @@ function setupGlobalLogger() {
   window.addEventListener('error', function(event) {
     // Ugh, Chrome makes this useless currently. TODO work around and wrap
     // functions with our own error handling.
-    logError("Uncaught exception", event.error);
+    if (event.error) {
+      logError("Uncaught exception", event.error);
+    }
   });
 }
 

@@ -18,14 +18,20 @@ function logErrorFactory(reporter) {
     // unheard while logging an error in order to make sure to avoid ever
     // getting into an infinite loop of reporting uncaught errors.
     try {
+      if (err) {
+        if (err.__alreadyLoggedBySDK) {
+          return;
+        }
+      }
+
       // Might not have been passed a useful error object with a stack, so get
       // our own current stack just in case.
       var nowStack = getStackTrace();
 
       // Show the error immediately, don't wait on implementation load for that.
-      var stuffToLog = ["Got an error", err];
+      var stuffToLog = ["Got an error:", name, err];
       if (err && err.stack) {
-        stuffToLog = stuffToLog.concat(["\n\nOriginal error stack", err.stack]);
+        stuffToLog = stuffToLog.concat(["\n\nOriginal error stack\n"+err.stack]);
       }
       if (details) {
         stuffToLog = stuffToLog.concat(["\n\nError details", details]);
@@ -45,6 +51,10 @@ function logErrorFactory(reporter) {
       });
     } catch(err2) {
       tooManyErrors(err2, args);
+    } finally {
+      Object.defineProperty(err, '__alreadyLoggedBySDK', {
+        value: true, enumerable: false
+      });
     }
   };
 }
