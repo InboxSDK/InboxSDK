@@ -52,9 +52,15 @@ function logErrorFactory(reporter) {
     } catch(err2) {
       tooManyErrors(err2, args);
     } finally {
-      Object.defineProperty(err, '__alreadyLoggedBySDK', {
-        value: true, enumerable: false
-      });
+      if (err) {
+        try {
+          Object.defineProperty(err, '__alreadyLoggedBySDK', {
+            value: true, enumerable: false
+          });
+        } catch(err3) {
+          // In case some wacko gives us an immutable exception
+        }
+      }
     }
   };
 }
