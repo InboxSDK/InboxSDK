@@ -8,6 +8,6 @@ global.__GmailSDKImpLoader = {
       throw new Error("Unsupported GmailSDK version");
     }
 
-    return new require('./platform-implementation')(appId);
+    return new require('./platform-imp')(appId);
   }
 };

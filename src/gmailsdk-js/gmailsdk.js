@@ -5,7 +5,7 @@ var PlatformImplementationLoader = require('./loading/platform-implementation-lo
 var AttachmentCardManager = require('./api-definitions/attachment-card-manager');
 var Email = require('./api-definitions/email');
 var ComposeManager = require('./api-definitions/compose-manager');
-var MailBox = require('./api-definitions/mailbox');
+var Mailbox = require('./api-definitions/mailbox');
 var MessageManager = require('./api-definitions/message-manager');
 
 
@@ -35,7 +35,7 @@ var niSettings = {
   configurable: false, enumerable:false,
   get:notImplemented, set:notImplemented
 };
-Object.defineProperties(GmailSDK, {
+Object.defineProperties(GmailSDK.prototype, {
   Views: niSettings,
   ButterBar: niSettings,
   ThreadViewManager: niSettings,

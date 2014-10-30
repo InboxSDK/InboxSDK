@@ -9,8 +9,6 @@ var waitFor = require('../../lib/wait-for');
 var GmailComposeView = require('./gmail-compose-view');
 var GmailThreadView = require('./gmail-thread-view');
 
-var IconButtonView = require('./widgets/buttons/icon-button-view');
-
 var GmailDriver = function(){
 	Driver.call(this);
 
@@ -37,10 +35,6 @@ _.extend(GmailDriver.prototype, {
 		{name: '_replyViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
-
-	getIconButtonView: function(options){
-		return new IconButtonView(options);
-	},
 
 	_setupEventStreams: function(){
 		this._setupComposeViewDriverStream();
