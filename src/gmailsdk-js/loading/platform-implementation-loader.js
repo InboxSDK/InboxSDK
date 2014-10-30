@@ -13,7 +13,7 @@ _.extend(PlatformImplementationLoader.prototype, {
         if (global.__GmailSDKImpLoader) {
             return RSVP.resolve();
         }
-        return loadScript('http://localhost:4567/platform-implementation.js').then(function() {
+        return this._loadScript().then(function() {
             if (!global.__GmailSDKImpLoader) {
                 throw new Error("Implementation file did not load correctly");
             }
@@ -22,6 +22,10 @@ _.extend(PlatformImplementationLoader.prototype, {
             Mailbox.emit('example', 'implementation loaded');
             return platformImplementation;
         });
-    })
+    }),
+
+    _loadScript: function(){
+      return loadScript('http://localhost:4567/platform-implementation.js');
+    }
 });
 module.exports = PlatformImplementationLoader;
