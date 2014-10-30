@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
+require('./custom-style');
+
 var Driver = require('../../driver-interfaces/driver');
 var ElementMonitor = require('../../lib/dom/element-monitor');
 var GmailElementGetter = require('./gmail-element-getter');
@@ -8,6 +10,7 @@ var waitFor = require('../../lib/wait-for');
 
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
+
 
 var GmailDriver = function(){
 	Driver.call(this);

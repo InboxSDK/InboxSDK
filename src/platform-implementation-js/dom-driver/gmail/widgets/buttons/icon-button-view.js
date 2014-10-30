@@ -69,10 +69,15 @@ _.extend(IconButtonView.prototype, {
 			this._element.setAttribute('data-tooltip',options.tooltip);
 		}
 
-		this._iconElement.setAttribute('class', this._iconClass);
+		if(this._iconClass){
+			this._iconElement.setAttribute('class', this._iconClass);
+		}
 
 		if(this._iconUrl){
+			this._iconElement.innerHTML = '';
+
 			this._iconImgElement = document.createElement('img');
+			this._iconImgElement.classList.add('gmailsdk__button_iconImg');
 			this._iconImgElement.src = this._iconUrl;
 
 			this._iconElement.appendChild(this._iconImgElement);

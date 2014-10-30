@@ -1,0 +1,26 @@
+{
+  "name": "Dropbox Gmail Extension",
+  "description": "Add Dropbox to Gmail!",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*"
+      ],
+      "js": ["gmailsdk.js","content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "https://mail.google.com/",
+    "https://inbox.google.com/",
+    "https://*.dropbox.com/"
+  ],
+  "web_accessible_resources": [
+    "gmailsdk.js.map",
+    "icon48.png"
+  ],
+
+  "manifest_version": 2
+}
