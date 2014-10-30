@@ -10,6 +10,9 @@
   },
   "author": "Streak",
   "license": "All Rights Reserved",
+  "browserify": {
+    "transform": ["brfs"]
+  },
   "devDependencies": {
     "browserify": "^6.2.0",
     "glob": "^4.0.6",
@@ -26,6 +29,7 @@
   },
   "dependencies": {
     "baconjs": "0.7.25",
+    "brfs": "^1.2.0",
     "jquery": "^2.1.1",
     "lodash": "^2.4.1",
     "rsvp": "^3.0.14"
