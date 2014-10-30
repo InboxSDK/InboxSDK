@@ -6,7 +6,6 @@ GmailSDK.ComposeManager.registerComposeButtonCreator(function(event) {
 
 GmailSDK.Mailbox.on('example', function(obj) {
   console.log("example event received:", obj);
-  //console.log("Current user email address:", GmailSDK.Email.getUser().emailAddress);
 });
 
-//console.log("Current user email address:", GmailSDK.Email.getUser().emailAddress);
+GmailSDK.Utils.track("script started", {d:1,e:"abc"});

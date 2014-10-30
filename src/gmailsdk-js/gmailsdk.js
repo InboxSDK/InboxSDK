@@ -1,12 +1,14 @@
-require('./error-logging').setup();
+require('./error-logging').setupGlobalLogger();
 require('./interface').load();
 
 var GmailSDK = {
   Email: require('./email'),
   ComposeManager: require('./compose-manager'),
   Mailbox: require('./mailbox'),
-  Util: {
-    loadScript: require('../common/load-script')
+  Utils: {
+    loadScript: require('../common/load-script'),
+    logError: require('./log-error'),
+    track: require('./track')
   }
 };
 
