@@ -1,10 +1,10 @@
 var _ = require('lodash');
-var AttachmentCardViewDriver = require('../../driver-interfaces/attachment-card-view-driver');
+var AttachmentCardViewDriver = require('../../../driver-interfaces/attachment-card-view-driver');
 
 var IconButtonView = require('../widgets/buttons/icon-button-view');
-var BasicButtonViewController = require('../../widgets/buttons/basic-button-view-controller');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
-var simulateClick = require('../../lib/dom/simulate-click');
+var simulateClick = require('../../../lib/dom/simulate-click');
 
 var GmailAttachmentCardView = function(options){
 	AttachmentCardViewDriver.call(this);

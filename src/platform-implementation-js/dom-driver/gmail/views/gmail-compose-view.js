@@ -1,12 +1,12 @@
 var _ = require('lodash');
 var $ = require('jquery');
 
-var simulateClick = require('../../lib/dom/simulate-click');
-var setValueAndDispatchEvent = require('../../dom/set-value-and-dispatch-event');
+var simulateClick = require('../../../lib/dom/simulate-click');
+var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
-var ComposeWindowDriver = require('../../driver-interfaces/compose-view-driver');
+var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 var IconButtonView = require('../widgets/buttons/icon-button-view');
-var BasicButtonViewController = require('../../widgets/buttons/basic-button-view-controller');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var GmailComposeWindow = function(element){
 	ComposeWindowDriver.call(this);

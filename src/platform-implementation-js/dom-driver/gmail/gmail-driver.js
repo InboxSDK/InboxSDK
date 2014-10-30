@@ -6,8 +6,8 @@ var ElementMonitor = require('../../lib/dom/element-monitor');
 var GmailElementGetter = require('./gmail-element-getter');
 var waitFor = require('../../lib/wait-for');
 
-var GmailComposeView = require('./gmail-compose-view');
-var GmailThreadView = require('./gmail-thread-view');
+var GmailComposeView = require('./views/gmail-compose-view');
+var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailDriver = function(){
 	Driver.call(this);

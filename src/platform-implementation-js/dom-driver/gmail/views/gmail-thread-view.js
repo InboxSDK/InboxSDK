@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var ThreadViewDriver = require('../../driver-interfaces/thread-view-driver');
+var ThreadViewDriver = require('../../../driver-interfaces/thread-view-driver');
 var GmailMessageView = require('./gmail-message-view');
 
 var GmailThreadView = function(element){

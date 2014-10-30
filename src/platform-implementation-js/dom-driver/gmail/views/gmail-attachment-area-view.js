@@ -1,9 +1,9 @@
 var _ = require('lodash');
-var AttachmentAreaViewDriver = require('../../driver-interfaces/attachment-area-view-driver');
+var AttachmentAreaViewDriver = require('../../../driver-interfaces/attachment-area-view-driver');
 
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 var IconButtonView = require('../widgets/buttons/icon-button-view');
-var BasicButtonViewController = require('../../widgets/buttons/basic-button-view-controller');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var GmailAttachmentAreaView = function(element){
 	AttachmentAreaViewDriver.call(this);

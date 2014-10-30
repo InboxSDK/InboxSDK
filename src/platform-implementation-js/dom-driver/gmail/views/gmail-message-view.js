@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var $ = require('jquery');
 
-var MessageViewDriver = require('../../driver-interfaces/message-view-driver');
+var MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
 
 var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');

@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
-var BasicClass = require('../../../lib/basic-class');
+var BasicClass = require('../../../../lib/basic-class');
 
 
 /*
