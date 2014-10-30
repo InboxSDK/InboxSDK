@@ -1,4 +1,7 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
+
+var BasicClass = require('../basic-class');
 
 /*
  * options = {
@@ -10,15 +13,15 @@ var _ = require('lodash');
  */
 
 var ElementMonitor = function(options){
-	GmailSDK.BasicClass.call(this);
+	BasicClass.call(this);
 	this._domMutationObserver = null;
-	this._eventStreamBus = new Streak.Bacon.Bus();
+	this._eventStreamBus = new Bacon.Bus();
 
 	this._elementMembershipTest = options.elementMembershipTest;
 	this._viewCreationFunction = options.viewCreationFunction;
 };
 
-ElementMonitor.prototype = Object.create(GmailSDK.BasicClass.prototype);
+ElementMonitor.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ElementMonitor.prototype, {
 

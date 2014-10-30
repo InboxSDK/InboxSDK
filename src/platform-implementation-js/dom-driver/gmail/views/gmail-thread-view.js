@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
+
 var ThreadViewDriver = require('../../../driver-interfaces/thread-view-driver');
 var GmailMessageView = require('./gmail-message-view');
 
@@ -7,7 +9,7 @@ var GmailThreadView = function(element){
 
 	this._element = element;
 
-	this._eventStreamBus = new Streak.Bacon.Bus();
+	this._eventStreamBus = new Bacon.Bus();
 	this._setupMessageViewStream();
 };
 

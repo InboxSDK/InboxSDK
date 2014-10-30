@@ -1,12 +1,18 @@
 var _ = require('lodash');
+var BasicClass = require('../lib/basic-class');
+
 var ComposeView = require('../views/compose-view');
 
 var ComposeManager = function(appId, driver){
+	BasicClass.call(this);
+
 	this._appId = appId;
 	this._driver = driver;
 
 	this._bindToStreams();
 };
+
+ComposeManager.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ComposeManager.prototype, {
 
@@ -22,7 +28,7 @@ _.extend(ComposeManager.prototype, {
 
 	_bindToStreams: function(){
 		this._composeWindowViewStream = this._driver.getComposeViewDriverStream().onValue(this, '_handleNewComposeViewDriver');
-		this._replyWindowViewStream = root.GmailSDK.GmailElements.getReplyViewStream().onValue(this, '_handleNewReplyWindow');
+		this._replyWindowViewStream = this._driver.getReplyViewDriverStream().onValue(this, '_handleNewComposeViewDriver');
 	},
 
 	_handleNewComposeViewDriver: function(composeViewDriver){
@@ -39,7 +45,7 @@ _.extend(ComposeManager.prototype, {
 		});
 	},
 
-	_handleNewReplyWindow: function(replyWindow){
+	_handleNewReplyViewDriver: function(replyViewDriver){
 		var self = this;
 		this._buttonDefinitions.forEach(function(buttonDefinition){
 			self._addActionButtonToCompose(buttonDefinition, replyWindow);

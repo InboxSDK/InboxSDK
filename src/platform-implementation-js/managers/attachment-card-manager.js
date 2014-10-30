@@ -20,7 +20,7 @@ _.extend(AttachmentCardManager.prototype, {
 	},
 
 	_bindToStream: function(){
-		this._viewStream = this._driver.getAttachmentCardDriverStream().onValue(this, '_newViewDriver');
+		this._viewStream = this._driver.getAttachmentCardViewDriverStream().onValue(this, '_newViewDriver');
 	},
 
 	_newViewDriver: function(viewDriver){

@@ -5,7 +5,7 @@ var GmailElementGetter = {
 	},
 
 	getMainContentContainer: function(){
-		var mainContentElement = GmailElements.getCurrentMainContentElement();
+		var mainContentElement = GmailElementGetter.getCurrentMainContentElement();
 
 		if(!mainContentElement){
 			return null;

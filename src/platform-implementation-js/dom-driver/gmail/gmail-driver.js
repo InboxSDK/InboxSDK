@@ -12,13 +12,7 @@ var GmailThreadView = require('./views/gmail-thread-view');
 var GmailDriver = function(){
 	Driver.call(this);
 
-	var self = this;
-	setTimeout(
-		function(){
-			self._setupEventStreams();
-		},
-		1
-	);
+	this._setupEventStreams();
 };
 
 GmailDriver.prototype = Object.create(Driver.prototype);
@@ -46,8 +40,8 @@ _.extend(GmailDriver.prototype, {
 
 	_setupComposeViewDriverStream: function(){
 		this._composeElementMonitor = new ElementMonitor({
-			elementMemberShipTest: function(element){
-				return element.classList.contains('nn');
+			elementMembershipTest: function(element){
+				return element.classList.contains('nn') && element.children.length > 0;
 			},
 
 			viewCreationFunction: function(element){
@@ -68,7 +62,7 @@ _.extend(GmailDriver.prototype, {
 
 	_setupThreadViewDriverStream: function(){
 		this._threadElementMonitor = new ElementMonitor({
-			elementMemberShipTest: function(element){
+			elementMembershipTest: function(element){
 				if(element.children.length !== 1){
 					return false;
 				}

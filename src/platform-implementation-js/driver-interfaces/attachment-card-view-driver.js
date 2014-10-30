@@ -5,9 +5,9 @@ var AttachmentCardViewDriver = function(){
 	BasicClass.call(this);
 };
 
-AttachmentCardViewDriver = Object.create(BasicClass.prototype);
+AttachmentCardViewDriver.prototype = Object.create(BasicClass.prototype);
 
-_.extend(AttachmentCardViewDriver, {
+_.extend(AttachmentCardViewDriver.prototype, {
 
 	isStandardAttachment: function(){},
 

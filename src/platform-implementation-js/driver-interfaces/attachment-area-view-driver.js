@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
 var AttachmentAreaViewDriver = function(element){

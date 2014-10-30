@@ -18,9 +18,9 @@ var GmailAttachmentCardView = function(options){
 	}
 };
 
-GmailAttachmentCardView = Object.create(AttachmentCardViewDriver.prototype);
+GmailAttachmentCardView.prototype = Object.create(AttachmentCardViewDriver.prototype);
 
-_.extend(GmailAttachmentCardView, {
+_.extend(GmailAttachmentCardView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},

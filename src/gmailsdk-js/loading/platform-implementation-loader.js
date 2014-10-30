@@ -1,7 +1,6 @@
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var loadScript = require('../../common/load-script');
-var Mailbox = require('../api-definitions/mailbox');
 
 var PlatformImplementationLoader = function(appId) {
     this._appId = appId;
@@ -19,7 +18,6 @@ _.extend(PlatformImplementationLoader.prototype, {
             }
             return global.__GmailSDKImpLoader.load("0.1", appId);
         }).then(function(platformImplementation) {
-            Mailbox.emit('example', 'implementation loaded');
             return platformImplementation;
         });
     }),

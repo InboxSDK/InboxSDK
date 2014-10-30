@@ -8,15 +8,15 @@ var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-drive
 var IconButtonView = require('../widgets/buttons/icon-button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
-var GmailComposeWindow = function(element){
+var GmailComposeView = function(element){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
 };
 
-GmailComposeWindow.prototype = Object.create(ComposeWindowDriver.prototype);
+GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
 
-_.extend(GmailComposeWindow.prototype, {
+_.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
@@ -123,3 +123,6 @@ _.extend(GmailComposeWindow.prototype, {
 	}
 
 });
+
+
+module.exports = GmailComposeView;
