@@ -1,9 +1,9 @@
 var RSVP = require('rsvp');
 var _ = require('lodash');
-var loadScript = require('../common/load-script');
+var loadScript = require('../../common/load-script');
 
 
-var Mailbox = require('./mailbox');
+var Mailbox = require('../api-definitions/mailbox');
 
 var PlatformImplementationLoader = function(appId){
   this._appId = appId;

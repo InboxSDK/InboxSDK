@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Interface = require('./interface');
+//var Interface = require('./interface');
 
 function track(eventName, details) {
   assert.equal(typeof eventName, 'string', 'eventName must be a string');

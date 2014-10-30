@@ -20,9 +20,9 @@ var GmailSDK = function(appId){
   this.MessageManager = new MessageManager(this._platformImplementationLoader);
 
   this.Util = {
-    loadScript: require('../common/load-script'),
-    logError: require('./log-error'),
-    track: require('./track')
+    loadScript: require('../common/load-script')
+    /* logError: require('./log-error'),
+    track: require('./track') */
   };
 
   this._platformImplementationLoader.load();

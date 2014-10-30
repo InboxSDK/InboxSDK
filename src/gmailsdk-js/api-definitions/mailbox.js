@@ -1,9 +1,17 @@
 var EventEmitter = require('events').EventEmitter;
 
-var Mailbox = new EventEmitter();
+var Mailbox = function(platformImplementationLoader){
+	EventEmitter.call(this);
 
-require('./interface').load().then(function() {
-  Mailbox.emit('example', 'implementation loaded');
-});
+	this._platformImplementationLoader = platformImplementationLoader;
+
+	var self = this;
+	this._platformImplementationLoader.load().then(function(){
+		self.emit('example', 'implementation loaded');
+	});
+};
+
+Mailbox.prototype = Object.create(EventEmitter.prototype);
+
 
 module.exports = Mailbox;
