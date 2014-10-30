@@ -17,6 +17,8 @@ var IconButtonView = function(options){
 	BasicClass.call(this);
 
 	this._iconClass = options.iconClass;
+	this._iconUrl = options.iconUrl;
+
 	this._buttonColor = options.buttonColor || this._buttonColor;
 
 	this._createElement(options);
@@ -34,6 +36,7 @@ _.extend(IconButtonView.prototype, {
 		{name: '_element', destroy: true, get: true},
 		{name: '_innerElement', destroy: true},
 		{name: '_iconElement', destroy: true},
+		{name: '_iconImgElement', destroy: true},
 		{name: '_iconClass', destroy: false},
 		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
 		{name: '_eventStream', destroy: false, get: true}
@@ -54,8 +57,6 @@ _.extend(IconButtonView.prototype, {
 
 		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 J-Zh-I G-Ni gmailsdk__button ' + this.colorClasses[this._buttonColor].INACTIVE_CLASS);
 
-		this._iconElement.setAttribute('class', this._iconClass);
-
 		if(options.hasButtonToRight){
 			this._element.classList.add('T-I-Js-IF');
 		}
@@ -66,6 +67,15 @@ _.extend(IconButtonView.prototype, {
 
 		if(options.tooltip){
 			this._element.setAttribute('data-tooltip',options.tooltip);
+		}
+
+		this._iconElement.setAttribute('class', this._iconClass);
+
+		if(this._iconUrl){
+			this._iconImgElement = document.createElement('img');
+			this._iconImgElement.src = this._iconUrl;
+
+			this._iconElement.appendChild(this._iconImgElement);
 		}
 	},
 

@@ -18,7 +18,8 @@ var args = stdio.getopt({
 
 function setupExamples() {
   var job = gulp.src('./dist/gmailsdk.js*')
-    .pipe(gulp.dest('./examples/hello-world/'));
+    .pipe(gulp.dest('./examples/hello-world/'))
+    .pipe(gulp.dest('./examples/dropbox/'));
   if (args.reloader) {
     job.on('end', function() {
       extReloader();

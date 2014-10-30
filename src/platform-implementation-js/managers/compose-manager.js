@@ -55,6 +55,7 @@ _.extend(ComposeManager.prototype, {
 	_addActionButtonToCompose: function(definition, composeViewDriver, composeView){
 		var buttonOptions = {
 			iconClass: definition.iconClass,
+			iconUrl: definition.iconUrl,
 			tooltip: definition.tooltip,
 			activateFunction: function(){
 				definition.onClick({

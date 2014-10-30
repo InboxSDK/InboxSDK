@@ -46,6 +46,7 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	addActionButton: function(buttonOptions){
+		buttonOptions.buttonColor = 'flatIcon';
 		var iconButtonView = new IconButtonView(buttonOptions);
 
 		buttonOptions.buttonView = iconButtonView;

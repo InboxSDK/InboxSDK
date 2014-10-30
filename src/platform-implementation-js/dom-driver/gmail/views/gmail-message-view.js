@@ -178,7 +178,7 @@ _.extend(GmailMessageView.prototype, {
 
 		if(currentClassList.contains('adB')){
 			if(oldValue.indexOf('adB') === -1){
-				this._replyWindowView = new GmailComposeWindow(mutation.target);
+				this._replyWindowView = new GmailComposeView(mutation.target);
 
 				this._eventStreamBus.push({
 					eventName: 'replyOpen',
