@@ -25,7 +25,9 @@ var GmailSDK = function(appId){
     track: require('./track') */
   };
 
-  this._platformImplementationLoader.load();
+  this._platformImplementationLoader.load().catch(function(err) {
+    console.error("Failed to load implementation:", err);
+  });
 };
 
 
