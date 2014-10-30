@@ -23,7 +23,14 @@ function logErrorFactory(reporter) {
       var nowStack = getStackTrace();
 
       // Show the error immediately, don't wait on implementation load for that.
-      console.error("Got an error", nowStack, name, err, details);
+      console.error("Got an error", err);
+      if (err && err.stack) {
+        console.error("Original error stack", err.stack);
+      }
+      if (details) {
+        console.log("Error details", details);
+      }
+      console.error("Error logged from", nowStack);
 
       RSVP.resolve().then(function() {
         // Pass the error on to the implementation which will handle logging it
