@@ -18,6 +18,13 @@ function logErrorFactory(reporter) {
     // unheard while logging an error in order to make sure to avoid ever
     // getting into an infinite loop of reporting uncaught errors.
     try {
+      // Shift the arguments down if first arg was an error.
+      if (name instanceof Error) {
+        details = details || err;
+        err = name;
+        name = err.message;
+      }
+
       if (err) {
         if (err.__alreadyLoggedBySDK) {
           return;
