@@ -1,4 +1,5 @@
-require('./error-logging').setup();
+require('./error-logging').setupGlobalLogger();
+
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 
 var AttachmentCardManager = require('./api-definitions/attachment-card-manager');
@@ -19,7 +20,9 @@ var GmailSDK = function(appId){
   this.MessageManager = new MessageManager(this._platformImplementationLoader);
 
   this.Util = {
-    loadScript: require('../common/load-script')
+    loadScript: require('../common/load-script'),
+    logError: require('./log-error'),
+    track: require('./track')
   };
 
   this._platformImplementationLoader.load();

@@ -10,27 +10,39 @@ function getUserHome() {
   return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
 
-var userHasExtensionsReloaderInstalled = _.memoize(function() {
+// Returns null if no Chrome profiles have the extension installed. If it the
+// extension is installed, it returns the name of Chrome name suffix (such as
+// "", " Canary", etc).
+var getchromeSuffixWithReloaderExtension = _.once(function() {
   var path = getUserHome() +
     '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
   return globp(path).then(function(results) {
-    return results.length > 0;
+    var path = results[0];
+    if (path) {
+      return path.match(/Chrome([^\/]*)\//)[1];
+    }
+    return null;
   });
 });
 
-var getChromeLocation = _.memoize(function() {
+var getChromeLocation = _.memoize(function(chromeSuffix) {
+  if (!chromeSuffix) {
+    chromeSuffix = '';
+  }
   var path =
-    '/Applications/Google Chrome*.app/Contents/MacOS/Google Chrome*';
+    '/Applications/Google Chrome'+chromeSuffix+'.app/Contents/MacOS/Google Chrome*';
   return globp(path).then(function(results) {
     return results[0];
   });
 });
 
 function extensionReload() {
-  return userHasExtensionsReloaderInstalled().then(function(found) {
-    if (found) {
-      return getChromeLocation().then(function(chrome) {
-        cproc.spawn(chrome, ["http://reload.extensions"]);
+  return getchromeSuffixWithReloaderExtension().then(function(chromeSuffix) {
+    if (chromeSuffix != null) {
+      return getChromeLocation(chromeSuffix).then(function(chrome) {
+        if (chrome) {
+          cproc.spawn(chrome, ["http://reload.extensions"]);
+        }
       });
     }
   });

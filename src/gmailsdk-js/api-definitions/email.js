@@ -1,12 +1,16 @@
 var _ = require('lodash');
 
-var Email = function(){};
+var Email = function(platformImplementationLoader){
+	this._platformImplementationLoader = platformImplementationLoader;
+};
 
 _.extend(Email.prototype, {
 
-	getUser: function(){
-		throw new Error("GmailSDK not loaded yet");
-	}
+	getUserAsync: function() {
+		this._platformImplementationLoader.load().then(function(platformImplementation) {
+			return platformImplementation.Email.getUserAsync();
+		});
+  	}
 
 });
 
