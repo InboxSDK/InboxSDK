@@ -3,10 +3,11 @@ if (global.__GmailSDKImpLoader) {
 }
 
 global.__GmailSDKImpLoader = {
-  load: function(version) {
+  load: function(version, appId) {
     if (version !== "0.1") {
       throw new Error("Unsupported GmailSDK version");
     }
-    return require('./gmailsdk-imp');
+
+    return new require('./platform-implementation')(appId);
   }
 };

@@ -1,6 +1,6 @@
-console.log('content.js');
+var gmailSDK = new GmailSDK('simple-example');
 
-GmailSDK.ComposeManager.registerComposeButtonCreator(function(event) {
+gmailSDK.ComposeManager.registerComposeButtonCreator(function(event) {
   console.log("creating compose button", event);
 });
 
