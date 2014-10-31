@@ -8,6 +8,9 @@ var sourcemaps = require('gulp-sourcemaps');
 var stdio = require('stdio');
 var gutil = require('gulp-util');
 var extReloader = require('./live/ext-reloader');
+var RSVP = require('rsvp');
+var globp = RSVP.denodeify(require('glob'));
+var streamToPromise = require('./src/common/stream-to-promise');
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -17,15 +20,16 @@ var args = stdio.getopt({
 });
 
 function setupExamples() {
-  var job = gulp.src('./dist/gmailsdk.js*')
-    .pipe(gulp.dest('./examples/hello-world/'))
-    .pipe(gulp.dest('./examples/dropbox/'));
-  if (args.reloader) {
-    job.on('end', function() {
-      extReloader();
-    });
-  }
-  return job;
+  // Copy gmailsdk.js (and .map) to all subdirs under examples/
+  return globp('./examples/*/').then(function(dirs) {
+    return dirs.reduce(function(stream, dir) {
+      return stream.pipe(gulp.dest(dir));
+    }, gulp.src('./dist/gmailsdk.js*'));
+  }).then(streamToPromise).then(function() {
+    if (args.reloader) {
+      return extReloader();
+    }
+  });
 }
 
 function browserifyTask(name, entry, destname) {

@@ -11,7 +11,9 @@
   "author": "Streak",
   "license": "All Rights Reserved",
   "browserify": {
-    "transform": ["brfs"]
+    "transform": [
+      "brfs"
+    ]
   },
   "devDependencies": {
     "browserify": "^6.2.0",
@@ -20,6 +22,7 @@
     "gulp-sourcemaps": "^1.2.4",
     "gulp-streamify": "0.0.5",
     "gulp-util": "^3.0.1",
+    "jsdom": "^1.1.0",
     "mocha": "^2.0.1",
     "mold-source-map": "^0.3.0",
     "sinon": "^1.11.1",
