@@ -94,6 +94,9 @@ _.extend(IconButtonView.prototype, {
 					eventName: 'click',
 					domEvent: event
 				});
+
+				event.stopPropagation();
+				event.preventDefault();
 			}
 		);
 	},

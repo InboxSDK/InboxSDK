@@ -30,7 +30,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 		{name: '_attachmentId', destroy: false}
 	],
 
-	isGmailAttachment: function(){
+	isStandardAttachment: function(){
 		var downloadUrl = this._element.getAttribute('download_url');
 		if(!downloadUrl){
 			return false;
@@ -41,7 +41,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	addButton: function(options){
 		var iconButtonView = new IconButtonView({
-			iconClass: options.iconClass,
+			iconUrl: options.iconUrl,
 			tooltip: options.tooltip
 		});
 
@@ -56,7 +56,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	},
 
 	_extractAttachmentInfo: function(){
-		if(!this.isGmailAttachment()){
+		if(!this.isStandardAttachment()){
 			return;
 		}
 

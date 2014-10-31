@@ -38,7 +38,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		].join('');
 	},
 
-	getAttachmentCardWidgets: function(){
+	getGmailAttachmentCardViews: function(){
 		var attachments = this._element.querySelectorAll('.aQH > span');
 
 		return Array.prototype.map.call(attachments, function(attachment){
@@ -47,7 +47,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 
 	},
 
-	addAttachmentCardWidget: function(gmailAttachmentCardView){
+	addGmailAttachmentCardView: function(gmailAttachmentCardView){
 		var lastChild = this._element.querySelector('.aZK');
 		lastChild.parentNode.insertBefore(gmailAttachmentCardView.getElement(), lastChild);
 	},
@@ -58,7 +58,8 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		}
 
 		var iconButtonView = new IconButtonView('IconButtonView', {
-			iconClass: options.iconClass + ' T-I-J3',
+			iconClass: 'T-I-J3',
+			iconUrl: iconUrl,
 			tooltip: options.tooltip,
 			hasButtonToLeft: true
 		});
@@ -69,7 +70,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		var self = this;
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
-				options.callback(self.getAttachmentCardWidgets());
+				options.callback(self.getGmailAttachmentCardViews());
 			},
 			buttonView: iconButtonView
 		});

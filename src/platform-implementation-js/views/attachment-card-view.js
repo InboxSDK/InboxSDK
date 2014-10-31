@@ -19,7 +19,7 @@ _.extend(AttachmentCardView.prototype, {
 
 	/*
 	 * options = {
-	 * 	iconClass: ,
+	 * 	iconUrl: ,
 	 * 	tooltip,
 	 * 	callback:
 	 * }

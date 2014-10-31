@@ -12,6 +12,8 @@ _.extend(MessageViewDriver.prototype, {
 
 	getContentsElement: function(){},
 
+	getLinks: function(){},
+
 	isElementInQuotedArea: function(element){},
 
 	addAttachmentCard: function(options){},

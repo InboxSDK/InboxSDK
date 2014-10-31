@@ -19,7 +19,10 @@
   ],
   "web_accessible_resources": [
     "gmailsdk.js.map",
-    "icon48.png"
+    "images/action38.png",
+    "images/action19.png",
+    "images/icon48.png",
+    "images/icon128.png"
   ],
 
   "manifest_version": 2

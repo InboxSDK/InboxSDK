@@ -126,7 +126,7 @@ _.extend(ElementMonitor.prototype, {
 		view.destroy();
 
 		var index = this._views.indexOf(view);
-		this._views.remove(index);
+		this._views.splice(index, 1);
 	},
 
 	_findViewForElement: function(element){
