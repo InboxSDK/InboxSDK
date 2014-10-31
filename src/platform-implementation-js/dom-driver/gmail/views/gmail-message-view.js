@@ -164,7 +164,7 @@ _.extend(GmailMessageView.prototype, {
 		gmailAttachmentCardViews.forEach(function(gmailAttachmentCardView){
 			self._eventStreamBus.push({
 				eventName: 'newAttachmentCard',
-				view: gmailAttachmentAreaView
+				view: gmailAttachmentCardView
 			});
 		});
 	},

@@ -38,7 +38,7 @@ gmailSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
 
 
 			messageView.addButtonToDownloadAllArea({
-				iconClass: 'streak__dropboxDownloadAllIcon',
+				iconUrl: chrome.runtime.getURL('images/action19.png'),
 				tooltip: 'Save all to Dropbox',
 				callback: function(attachmentCards){
 

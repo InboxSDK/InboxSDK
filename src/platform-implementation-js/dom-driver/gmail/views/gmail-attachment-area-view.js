@@ -57,9 +57,9 @@ _.extend(GmailAttachmentAreaView.prototype, {
 			return;
 		}
 
-		var iconButtonView = new IconButtonView('IconButtonView', {
+		var iconButtonView = new IconButtonView({
 			iconClass: 'T-I-J3',
-			iconUrl: iconUrl,
+			iconUrl: options.iconUrl,
 			tooltip: options.tooltip,
 			hasButtonToLeft: true
 		});
