@@ -8,4 +8,5 @@ gmailSDK.Mailbox.on('example', function(obj) {
   console.log("example event received:", obj);
 });
 
-//gmailSDK.Utils.track("script started", {d:1,e:"abc"});
+gmailSDK.Util.track("script started", {d:1,e:"abc"});
+gmailSDK.Util.logError("script started", {d:1,e:"abc"});
