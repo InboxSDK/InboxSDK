@@ -17,6 +17,21 @@ _.extend(MessageView.prototype, {
 		return this._messageViewImplementation.getContentsElement();
 	},
 
+	/*
+	 * returns an array of objects
+	 *
+	 * [{
+	 * 	text: 'foo',
+	 * 	html: '<b>foo</b>',
+	 * 	href: 'http://blah',
+	 * 	element: element,
+	 * 	isInQuotedArea: true/false
+	 * }]
+	 */
+	getLinks: function(){
+		return this._messageViewImplementation.getLinks();
+	},
+
 	// boolean returns if element is in a quoted area of content or not
 	isElementInQuotedArea: function(element){
 		this._messageViewImplementation.isElementInQuotedArea(element);

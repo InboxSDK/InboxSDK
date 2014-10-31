@@ -103,26 +103,30 @@ _.extend(BasicClass.prototype, {
 	},
 
 	_createGettersAndSetters: function() {
-		this._memberVariableIterate(function(memberVariable){
+		this._memberVariableIterate(function(memberVariable, prototype, rootPrototype){
 			var name = memberVariable.name;
 
+			var prototypeProperyNames = Object.getOwnPropertyNames(prototype);
+			var rootPrototypePropertyNames = Object.getOwnPropertyNames(rootPrototype);
+
 			if (memberVariable.get) {
-				this._makeGetterFunction(name);
+				this._makeGetterFunction(name, prototypeProperyNames, rootPrototypePropertyNames);
 			}
 
 			if (memberVariable.set) {
-				this._makeSetterFunction(name);
+				this._makeSetterFunction(name, prototypeProperyNames, rootPrototypePropertyNames);
 			}
 		});
 	},
 
-	_makeGetterFunction: function(name) {
-		var getter = this._getterName(name);
-		if(this[getter]){ //don't overwrite
+	_makeGetterFunction: function(name, prototypeProperyNames, rootPrototypePropertyNames) {
+		var getterName = this._getterName(name);
+
+		if(prototypeProperyNames.indexOf(getterName) > -1 || rootPrototypePropertyNames.indexOf(getterName) > -1){
 			return;
 		}
 
-		this[getter] = function() {
+		this[getterName] = function() {
 			return this[name];
 		};
 	},
@@ -131,13 +135,14 @@ _.extend(BasicClass.prototype, {
 		return 'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2);
 	},
 
-	_makeSetterFunction: function(name) {
-		var setter = this._setterName(name);
-		if(this[setter]){ //don't overwrite
+	_makeSetterFunction: function(name, prototypeProperyNames, rootPrototypePropertyNames) {
+		var setterName = this._setterName(name);
+
+		if(prototypeProperyNames.indexOf(setterName) > -1 || rootPrototypePropertyNames.indexOf(setterName) > -1){
 			return;
 		}
 
-		this[setter] = function(value) {
+		this[setterName] = function(value) {
 			this[name] = value;
 		};
 	},
@@ -157,12 +162,15 @@ _.extend(BasicClass.prototype, {
 	_memberVariableIterate: function(iterateFunction){
 		var object = this;
 		var proto;
+
+		var rootPrototype = Object.getPrototypeOf(this);
+
 		while ((proto = Object.getPrototypeOf(object))) {
 			object = proto;
 			if (object.__memberVariables) {
 				for (var i = 0; i < object.__memberVariables.length; i++) {
 					var memberVariable = object.__memberVariables[i];
-					iterateFunction.call(this, memberVariable);
+					iterateFunction.call(this, memberVariable, proto, rootPrototype);
 				}
 			}
 		}

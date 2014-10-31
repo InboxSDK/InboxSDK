@@ -1,12 +1,18 @@
 var _ = require('lodash');
+var BasicClass = require('../lib/basic-class');
+
 var MessageView = require('../views/message-view');
 
 var MessageManager = function(appId, driver){
+	BasicClass.call(this);
+
 	this._appId = appId;
 	this._driver = driver;
 
 	this._bindToStream();
 };
+
+MessageManager.prototype = Object.create(BasicClass.prototype);
 
 _.extend(MessageManager.prototype, {
 

@@ -20,6 +20,7 @@ var args = stdio.getopt({
 });
 
 function setupExamples() {
+  // Copy gmailsdk.js (and .map) to all subdirs under examples/
   return globp('./examples/*/').then(function(dirs) {
     return dirs.reduce(function(stream, dir) {
       return stream.pipe(gulp.dest(dir));

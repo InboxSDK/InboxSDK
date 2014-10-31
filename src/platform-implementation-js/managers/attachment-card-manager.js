@@ -1,12 +1,19 @@
 var _ = require('lodash');
+var BasicClass = require('../lib/basic-class');
+
 var AttachmentCardView = require('../views/attachment-card-view');
 
+
 var AttachmentCardManager = function(appId, driver){
+	BasicClass.call(this);
+
 	this._appId = appId;
 	this._driver = driver;
 
 	this._bindToStream();
 };
+
+AttachmentCardManager.prototype = Object.create(BasicClass.prototype);
 
 _.extend(AttachmentCardManager.prototype, {
 
@@ -20,7 +27,7 @@ _.extend(AttachmentCardManager.prototype, {
 	},
 
 	_bindToStream: function(){
-		this._viewStream = this._driver.getAttachmentCardDriverStream().onValue(this, '_newViewDriver');
+		this._viewStream = this._driver.getAttachmentCardViewDriverStream().onValue(this, '_newViewDriver');
 	},
 
 	_newViewDriver: function(viewDriver){

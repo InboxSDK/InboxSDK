@@ -36,6 +36,21 @@ _.extend(GmailMessageView.prototype, {
 		return this._element.querySelector('.adP');
 	},
 
+	getLinks: function(){
+		var anchors = this.getContentsElement().querySelectorAll('a');
+
+		var self = this;
+		return _.map(anchors, function(anchor){
+			return {
+				text: anchor.textContent,
+				html: anchor.innerHTML,
+				href: anchor.href,
+				element: anchor,
+				isInQuotedArea: self.isElementInQuotedArea(anchor)
+			};
+		});
+	},
+
 	isElementInQuotedArea: function(element){
 		return $(element).parents().filter('.adL').length > 0;
 	},
@@ -51,22 +66,22 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		var attachmentCardWidget = new GmailAttachmentCardView(options);
-		var attachmentAreaWidget = this._getAttachmentArea();
+		var gmailAttachmentCardView = new GmailAttachmentCardView(options);
+		var gmailAttachmentAreaView = this._getAttachmentArea();
 
-		if(!attachmentAreaWidget){
-			attachmentAreaWidget = this._createAttachmentArea();
+		if(!gmailAttachmentAreaView){
+			gmailAttachmentAreaView = this._createAttachmentArea();
 		}
 
-		attachmentAreaWidget.addAttachmentCardWidget(attachmentCardWidget);
+		gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
 
 		this._addedAttachmentCardOptions[attachmentCardOptionsHash] = true;
 	},
 
 	addButtonToDownloadAllArea: function(options){
-		var attachmentAreaWidget = this._getAttachmentArea();
+		var gmailAttachmentAreaView = this._getAttachmentArea();
 
-		if(!attachmentAreaWidget){
+		if(!gmailAttachmentAreaView){
 			return;
 		}
 
@@ -75,7 +90,7 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		attachmentAreaWidget.addButtonToDownloadAllArea(options);
+		gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
 
 		this._addedDownloadAllAreaButtonOptions[optionsHash] = true;
 	},
@@ -138,18 +153,18 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	_processAttachments: function(){
-		var attachmentAreaWidget = this._getAttachmentArea();
+		var gmailAttachmentAreaView = this._getAttachmentArea();
 
-		if(!attachmentAreaWidget){
+		if(!gmailAttachmentAreaView){
 			return;
 		}
 
 		var self = this;
-		var attachmentCardWidgets = attachmentAreaWidget.getAttachmentCardWidgets();
-		attachmentCardWidgets.forEach(function(attachmentCardWidget){
+		var gmailAttachmentCardViews = gmailAttachmentAreaView.getGmailAttachmentCardViews();
+		gmailAttachmentCardViews.forEach(function(gmailAttachmentCardView){
 			self._eventStreamBus.push({
 				eventName: 'newAttachmentCard',
-				view: attachmentCardWidget
+				view: gmailAttachmentAreaView
 			});
 		});
 	},
@@ -178,7 +193,7 @@ _.extend(GmailMessageView.prototype, {
 
 		if(currentClassList.contains('adB')){
 			if(oldValue.indexOf('adB') === -1){
-				this._replyWindowView = new GmailComposeWindow(mutation.target);
+				this._replyWindowView = new GmailComposeView(mutation.target);
 
 				this._eventStreamBus.push({
 					eventName: 'replyOpen',
@@ -219,12 +234,12 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	_createAttachmentArea: function(){
-		var attachmentAreaWidget = new GmailAttachmentAreaView();
+		var gmailAttachmentAreaView = new GmailAttachmentAreaView();
 
 		var beforeElement = this._element.querySelector('.hi');
-		beforeElement.parentNode.insertBefore(attachmentAreaWidget.getElement(), beforeElement);
+		beforeElement.parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);
 
-		return attachmentAreaWidget;
+		return gmailAttachmentAreaView;
 	}
 
 });
