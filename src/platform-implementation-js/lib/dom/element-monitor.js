@@ -65,7 +65,10 @@ _.extend(ElementMonitor.prototype, {
 	},
 
 	_addDOMMutationObserver: function(){
-		this._domMutationObserver = new MutationObserver(this._handleMutations.bind(this));
+		if(!this._domMutationObserver){
+			this._domMutationObserver = new MutationObserver(this._handleMutations.bind(this));
+		}
+
 		this._domMutationObserver.observe(
 			this._observedElement,
 			{

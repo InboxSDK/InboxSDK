@@ -11,6 +11,8 @@ var waitFor = require('../../lib/wait-for');
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
 
+var GmailStandardThreadViewMonitor = require('./views/thread-view/standard-thread-view-monitor');
+var GmailPreviewPaneThreadViewMonitor = require('./views/thread-view/preview-pane-thread-view-monitor');
 
 var GmailDriver = function(){
 	Driver.call(this);
@@ -23,14 +25,14 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
-		{name: '_composeViewDriverStream', destroy: false, get: true},
-		{name: '_composeElementMonitor', destroy: true},
-		{name: '_threadViewDriverStream', destroy: false, get: true},
-		{name: '_threadElementMonitor', destroy: true},
-		{name: '_previewPaneThreadElementMonitor', destroy: true},
+		{name: '_threadViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
+		{name: '_composeViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_replyViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
+		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_composeElementMonitor', destroy: true},
+		{name: '_standardThreadViewMonitor', destroy: true},
+		{name: '_previewPaneThreadViewMonitor', destroy: true}
 	],
 
 	_setupEventStreams: function(){
@@ -42,6 +44,44 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupComposeViewDriverStream: function(){
+		this._composeViewDriverStream = new Bacon.Bus();
+
+		var self = this;
+
+		GmailElementGetter.waitForGmailModeToSettle().then(function(){
+			if(GmailElementGetter.isStandaloneComposeWindow()){
+				self._setupStandaloneComposeViewDriverStream();
+			}
+			else{
+				self._setupStandardComposeViewDriverStream();
+			}
+
+			self._composeViewDriverStream.plug(self._composeElementMonitor.getViewAddedEventStream());
+		});
+	},
+
+	_setupStandaloneComposeViewDriverStream: function(){
+		this._composeElementMonitor = new ElementMonitor({
+			elementMembershipTest: function(element){
+				return true;
+			},
+
+			viewCreationFunction: function(element){
+				return new GmailComposeView(element);
+			}
+		});
+
+
+		var self = this;
+		waitFor(function(){
+			return !!GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
+		}).then(function(){
+			var composeContainer = GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
+			self._composeElementMonitor.setObservedElement(GmailElementGetter.StandaloneCompose.getComposeWindowContainer());
+		});
+	},
+
+	_setupStandardComposeViewDriverStream: function(){
 		this._composeElementMonitor = new ElementMonitor({
 			elementMembershipTest: function(element){
 				return element.classList.contains('nn') && element.children.length > 0;
@@ -59,42 +99,16 @@ _.extend(GmailDriver.prototype, {
 			var composeContainer = GmailElementGetter.getComposeWindowContainer();
 			self._composeElementMonitor.setObservedElement(composeContainer);
 		});
-
-		this._composeViewDriverStream = this._composeElementMonitor.getViewAddedEventStream();
 	},
 
 	_setupThreadViewDriverStream: function(){
-		this._threadElementMonitor = new ElementMonitor({
-			elementMembershipTest: function(element){
-				if(element.children.length !== 1){
-					return false;
-				}
+		this._threadViewDriverStream = new Bacon.Bus();
 
-				if(!element.children[0].classList.contains('g')){
-					return false;
-				}
+		this._standardThreadViewMonitor = new GmailStandardThreadViewMonitor();
+		this._threadViewDriverStream.plug(this._standardThreadViewMonitor.getThreadViewStream());
 
-				if(!element.children[0].classList.contains('id')){
-					return false;
-				}
-
-				return true;
-			},
-
-			viewCreationFunction: function(element){
-				return new GmailThreadView(element);
-			}
-		});
-
-		var self = this;
-		waitFor(function(){
-			return !!GmailElementGetter.getMainContentContainer();
-		}).then(function(){
-			var threadContainerElement = GmailElementGetter.getMainContentContainer();
-			self._threadElementMonitor.setObservedElement(threadContainerElement);
-		});
-
-		this._threadViewDriverStream = this._threadElementMonitor.getViewAddedEventStream();
+		this._previewPaneThreadViewMonitor = new GmailPreviewPaneThreadViewMonitor();
+		this._threadViewDriverStream.plug(this._previewPaneThreadViewMonitor.getThreadViewStream());
 	},
 
 	_setupMessageViewDriverStream: function(){
