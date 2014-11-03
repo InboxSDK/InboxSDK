@@ -1,4 +1,4 @@
-var gmailSDK = new GmailSDK('dropbox');
+var inboxSDK = new InboxSDK('dropbox');
 
 var script = document.createElement('script');
 script.id = 'dropboxjs';
@@ -7,10 +7,10 @@ script.type = 'text/data';
 
 document.head.appendChild(script);
 
-gmailSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then(function() {
+inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then(function() {
 
-    gmailSDK.ComposeManager.registerComposeButtonCreator(function(e) {
-        return {
+    inboxSDK.Views.on('composeOpen', function(composeView) {
+    	composeView.addButton({
             title: "Add Dropbox File",
             iconUrl: chrome.runtime.getURL('images/icon48.png'),
             onClick: function(event) {
@@ -22,50 +22,46 @@ gmailSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
             	});
 
             }
-        };
+        });
     });
 
 
-	gmailSDK.MessageManager.register({
-		onNewMessageView: function(messageView){
-			var links = messageView.getLinks();
+	inboxSDK.Views.on('messageOpen', function(messageView){
+		var links = messageView.getLinks();
 
-			links.forEach(function(link){
-				if(isEligibleLink(link)){
-					addAttachmentCard(messageView, link);
-				}
-			});
+		links.forEach(function(link){
+			if(isEligibleLink(link)){
+				addAttachmentCard(messageView, link);
+			}
+		});
 
 
-			messageView.addButtonToDownloadAllArea({
-				iconUrl: chrome.runtime.getURL('images/action19.png'),
-				tooltip: 'Save all to Dropbox',
-				callback: function(attachmentCards){
+		messageView.addButtonToDownloadAllArea({
+			iconUrl: chrome.runtime.getURL('images/action19.png'),
+			tooltip: 'Save all to Dropbox',
+			callback: function(attachmentCards){
 
-					alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
-					return;
+				alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
+				return;
 
-				}
-			});
-		}
+			}
+		});
 	});
 
 
-	gmailSDK.AttachmentCardManager.register({
-		onNewAttachmentCard: function(attachmentCardView){
-			if(!attachmentCardView.isStandardAttachment()){
+	inboxSDK.Views.on('attachmentCardOpen', function(attachmentCardView){
+		if(!attachmentCardView.isStandardAttachment()){
+			return;
+		}
+
+		attachmentCardView.addButton({
+			iconUrl: chrome.runtime.getURL('images/action19.png'),
+			tooltip: 'Save to Dropbox',
+			callback: function(){
+				alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
 				return;
 			}
-
-			attachmentCardView.addButton({
-				iconUrl: chrome.runtime.getURL('images/action19.png'),
-				tooltip: 'Save to Dropbox',
-				callback: function(){
-					alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
-					return;
-				}
-			});
-		}
+		});
 	});
 
 });

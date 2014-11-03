@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var BasicClass = require('../../basic-class');
+var BasicClass = require('../lib/basic-class');
 
 var ThreadView = function(){
 	BasicClass.call(this);
@@ -7,7 +7,7 @@ var ThreadView = function(){
 
 ThreadView.prototype = Object.create(BasicClass.prototype);
 
-_extend(ThreadView.prototype, {
+_.extend(ThreadView.prototype, {
 
 	getThread: function(){},
 

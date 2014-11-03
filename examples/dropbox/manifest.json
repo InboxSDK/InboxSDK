@@ -8,7 +8,7 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["gmailsdk.js","content.js"],
+      "js": ["inboxsdk.js","content.js"],
       "run_at": "document_end"
     }
   ],
@@ -18,7 +18,7 @@
     "https://*.dropbox.com/"
   ],
   "web_accessible_resources": [
-    "gmailsdk.js.map",
+    "inboxsdk.js.map",
     "images/action38.png",
     "images/action19.png",
     "images/icon48.png",

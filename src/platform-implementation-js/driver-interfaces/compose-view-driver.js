@@ -12,7 +12,7 @@ _.extend(ComposeWindowDriver.prototype, {
 
 	insertLinkIntoBody: function(text, href){},
 
-	addActionButton: function(buttonOptions){}
+	addButton: function(buttonDescriptor){}
 
 });
 

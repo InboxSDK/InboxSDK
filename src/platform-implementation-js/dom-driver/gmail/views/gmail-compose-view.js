@@ -45,12 +45,21 @@ _.extend(GmailComposeView.prototype, {
 		}
 	},
 
-	addActionButton: function(buttonOptions){
-		buttonOptions.buttonColor = 'flatIcon';
-		var iconButtonView = new IconButtonView(buttonOptions);
+	addButton: function(buttonDescriptor){
+		if(!buttonDescriptor.section || buttonDescriptor.section === 'TRAY_LEFT'){
+			this._addButtonToTrayLeft(buttonDescriptor);
+		}
+		else if(buttonDescriptor.section === 'SEND_RIGHT'){
+			this._addButtonToSendRight(buttonDescriptor);
+		}
+	},
 
-		buttonOptions.buttonView = iconButtonView;
-		var basicButtonViewController = new BasicButtonViewController(buttonOptions);
+	_addButtonToTrayLeft: function(buttonDescriptor){
+		buttonDescriptor.buttonColor = 'flatIcon';
+		var iconButtonView = new IconButtonView(buttonDescriptor);
+
+		buttonDescriptor.buttonView = iconButtonView;
+		var basicButtonViewController = new BasicButtonViewController(buttonDescriptor);
 
 		var formattingAreaOffsetLeft = this._getFormattingAreaOffsetLeft();
 		var element = basicButtonViewController.getView().getElement();
@@ -63,8 +72,6 @@ _.extend(GmailComposeView.prototype, {
 		this._updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
 		this._addedViewControllers.push(basicButtonViewController);
-
-		// this._additionalToolbarAreaSizeCheck();
 	},
 
 	_addActionToolbar: function() {
@@ -82,6 +89,10 @@ _.extend(GmailComposeView.prototype, {
 			.after('<col class="gmailsdk__compose_actionToolbarColumn"></col><col class="gmailsdk__compose_separatorColumn"></col>');
 
 		return $("<div/>").appendTo(td);
+	},
+
+	_addButtonToSendRight: function(buttonDescriptor){
+		//do nothing for now
 	},
 
 	_updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {

@@ -13,6 +13,13 @@ ComposeView.prototype = Object.create(BasicClass.prototype);
 _.extend(ComposeView.prototype, {
 
 	/*
+	 * adds button to the compose
+	 */
+	addButton: function(buttonDescriptor){
+		this._composeViewImplementation.addButton(buttonDescriptor);
+	},
+
+	/*
 	 * inserts link into body
 	 */
 	insertLinkIntoBody: function(text, href){

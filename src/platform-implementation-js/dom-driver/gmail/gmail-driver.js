@@ -28,7 +28,6 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_replyViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
@@ -36,10 +35,9 @@ _.extend(GmailDriver.prototype, {
 	],
 
 	_setupEventStreams: function(){
-		this._setupComposeViewDriverStream();
 		this._setupThreadViewDriverStream();
+		this._setupComposeViewDriverStream();
 		this._setupMessageViewDriverStream();
-		this._setupReplyViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
 	},
 
@@ -57,6 +55,17 @@ _.extend(GmailDriver.prototype, {
 			}
 
 			self._composeViewDriverStream.plug(self._composeElementMonitor.getViewAddedEventStream());
+		});
+
+		this._threadViewDriverStream.onValue(function(gmailThreadView){
+			self._composeViewDriverStream.plug(
+				gmailThreadView.getMessageStateStream().filter(function(event){
+					return event.eventName === 'replyOpen';
+				})
+				.map(function(event){
+					return event.view;
+				})
+			);
 		});
 	},
 
@@ -119,22 +128,6 @@ _.extend(GmailDriver.prototype, {
 			self._messageViewDriverStream.plug(
 				gmailThreadView.getMessageStateStream().filter(function(event){
 					return event.eventName === 'messageOpen';
-				})
-				.map(function(event){
-					return event.view;
-				})
-			);
-		});
-	},
-
-	_setupReplyViewDriverStream: function(){
-		this._replyViewDriverStream = new Bacon.Bus();
-
-		var self = this;
-		this._threadViewDriverStream.onValue(function(gmailThreadView){
-			self._replyViewDriverStream.plug(
-				gmailThreadView.getMessageStateStream().filter(function(event){
-					return event.eventName === 'replyOpen';
 				})
 				.map(function(event){
 					return event.view;

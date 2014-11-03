@@ -20,11 +20,11 @@ var args = stdio.getopt({
 });
 
 function setupExamples() {
-  // Copy gmailsdk.js (and .map) to all subdirs under examples/
+  // Copy inboxsdk.js (and .map) to all subdirs under examples/
   return globp('./examples/*/').then(function(dirs) {
     return dirs.reduce(function(stream, dir) {
       return stream.pipe(gulp.dest(dir));
-    }, gulp.src('./dist/gmailsdk.js*'));
+    }, gulp.src('./dist/inboxsdk.js*'));
   }).then(streamToPromise).then(function() {
     if (args.reloader) {
       return extReloader();
@@ -82,13 +82,13 @@ function browserifyTask(name, entry, destname) {
 
 if (args.dev) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', './src/gmailsdk-js/main-DEV.js', 'gmailsdk.js');
+  browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', 'inboxsdk.js');
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in dev mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', './src/gmailsdk-js/main.js', 'gmailsdk.js');
+  browserifyTask('sdk', './src/inboxsdk-js/main.js', 'inboxsdk.js');
   browserifyTask('imp', './src/platform-implementation-js/main.js', 'platform-implementation.js');
 }
 
