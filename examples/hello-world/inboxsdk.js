@@ -21502,6 +21502,13 @@ _.extend(GmailDriver.prototype, {
 		});
 	},
 
+	getThreadViewDriverStream: function(){
+		// we debounce because preview pane and standard thread watching can throw off
+		// events for the same thread in certain edge cases
+		// (namely preview pane active, but refreshing in thread view)
+		return this._threadViewDriverStream.debounceImmediate(20);
+	},
+
 	_setupThreadViewDriverStream: function(){
 		this._threadViewDriverStream = new Bacon.Bus();
 
@@ -21516,7 +21523,7 @@ _.extend(GmailDriver.prototype, {
 		this._messageViewDriverStream = new Bacon.Bus();
 
 		var self = this;
-		this._threadViewDriverStream.onValue(function(gmailThreadView){
+		this.getThreadViewDriverStream().onValue(function(gmailThreadView){
 			self._messageViewDriverStream.plug(
 				gmailThreadView.getMessageStateStream().filter(function(event){
 					return event.eventName === 'messageOpen';
@@ -21532,7 +21539,7 @@ _.extend(GmailDriver.prototype, {
 		this._attachmentCardViewDriverStream = new Bacon.Bus();
 
 		var self = this;
-		this._threadViewDriverStream.onValue(function(gmailThreadView){
+		this.getThreadViewDriverStream().onValue(function(gmailThreadView){
 			self._attachmentCardViewDriverStream.plug(
 				gmailThreadView.getMessageStateStream().filter(function(event){
 					return event.eventName === 'newAttachmentCard';
@@ -23303,7 +23310,7 @@ _.extend(Views.prototype, {
 		this._setupViewDriverWatcher('getThreadViewDriverStream', ThreadView, 'threadOpen');
 		this._setupViewDriverWatcher('getComposeViewDriverStream', ComposeView, 'composeOpen');
 		this._setupViewDriverWatcher('getMessageViewDriverStream', MessageView, 'messageOpen');
-		this._setupViewDriverWatcher('getAttachmentCardViewDriverStream', ThreadView, 'attachmentCardOpen');
+		this._setupViewDriverWatcher('getAttachmentCardViewDriverStream', AttachmentCardView, 'attachmentCardOpen');
 	},
 
 	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, eventName){

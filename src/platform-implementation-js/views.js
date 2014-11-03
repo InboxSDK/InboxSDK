@@ -23,7 +23,7 @@ _.extend(Views.prototype, {
 		this._setupViewDriverWatcher('getThreadViewDriverStream', ThreadView, 'threadOpen');
 		this._setupViewDriverWatcher('getComposeViewDriverStream', ComposeView, 'composeOpen');
 		this._setupViewDriverWatcher('getMessageViewDriverStream', MessageView, 'messageOpen');
-		this._setupViewDriverWatcher('getAttachmentCardViewDriverStream', ThreadView, 'attachmentCardOpen');
+		this._setupViewDriverWatcher('getAttachmentCardViewDriverStream', AttachmentCardView, 'attachmentCardOpen');
 	},
 
 	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, eventName){
