@@ -4,3 +4,15 @@
 /examples/*/gmailsdk.js*
 *~
 npm-debug.log
+
+examples/compose-dropdown-button/inboxsdk.js
+
+examples/compose-dropdown-button/inboxsdk.js.map
+
+examples/dropbox/inboxsdk.js
+
+examples/dropbox/inboxsdk.js.map
+
+examples/hello-world/inboxsdk.js
+
+examples/hello-world/inboxsdk.js.map

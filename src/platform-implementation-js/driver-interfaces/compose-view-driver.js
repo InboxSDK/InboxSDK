@@ -10,18 +10,52 @@ ComposeWindowDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ComposeWindowDriver.prototype, {
 
+	insertBodyTextAtCursor: function(text){},
+
+	insertBodyHTMLAtCursor: function(html){},
+
 	/*
 	 * returns a promise for when the insert actually happens
 	 */
 	insertLinkIntoBody: function(text, href){},
 
+	setSubject: function(text){},
+
+	setToRecipients: function(emails){},
+
+	setCcRecipients: function(emails){},
+
+	setBccRecipients: function(emails){},
+
+	close: function(){},
+
 	addButton: function(buttonDescriptor){},
+
+	addOuterSidebar: function(options){},
+
+	addInnerSidebar: function(options){},
+
+	addMessageSendModifier: function(modifier){},
 
 	isReply: function(){},
 
-	setIsReply: function(value){}
+	isInlineReplyForm: function(){},
 
+	getBodyElement: function(){},
 
+	getHTMLContent: function(){},
+
+	getTextContent: function(){},
+
+	getSelectedBodyHTML: function(){},
+
+	getSubject: function(){},
+
+	getToRecipients: function(){},
+
+	getCcRecipients: function(){},
+
+	getBccRecipients: function(){}
 
 });
 

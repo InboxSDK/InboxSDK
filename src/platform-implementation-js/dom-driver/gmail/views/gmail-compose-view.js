@@ -26,156 +26,122 @@ _.extend(GmailComposeView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_additionalAreas', destroy: true, defaultValue: {}},
-		{name: '_addedViewControllers', destroy: true, defaultValue: []},
-		{name: '_isReply', destroy: true, set: true, defaultValue: false}
+		{name: '_managedViewControllers', destroy: true, defaultValue: []},
+		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
 
-	insertLinkIntoBody: function(text, href){
-		var self = this;
-
-		return new RSVP.Promise(function(resolve, reject){
-			if(document.hasFocus()){
-				self._insertLinkIntoBody(text, href);
-				resolve();
-			}
-			else{
-				Bacon.fromEventTarget(window, 'focus').take(1).onValue(function(){
-					self._insertLinkIntoBody(text, href);
-					resolve();
-				});
-			}
-		});
+	insertBodyTextAtCursor: function(text){
+		require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
 	},
 
-	_insertLinkIntoBody: function(text, href){
-		this._getEditor().focus();
+	insertBodyHTMLAtCursor: function(html){
+		require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html);
+	},
 
-		simulateClick(this._getInsertLinkButton()[0]);
+	insertLinkIntoBody: function(text, href){
+		require('./compose-view/insert-link-into-body')(this, text, href);
+	},
 
-		if($('#linkdialog-text').length === 0){
-			return;
-		}
+	setSubject: function(text){
+		$(this._element).find('input[name=subjectbox]').val(text);
+		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
+	},
 
-		var originalText = $('#linkdialog-text').val();
-		setValueAndDispatchEvent($('#linkdialog-onweb-tab-input')[0], href, 'input');
+	setToRecipients: function(emails){
+		require('./compose-view/set-recipients')(this, 0, emails);
+	},
 
-		simulateClick($('button[name=ok]')[0]);
+	setCcRecipients: function(emails){
+		require('./compose-view/set-recipients')(this, 1, emails);
+	},
 
-		var $link = this._getEditor().find('a[href="'+href+'"]');
-
-		if(originalText.length === 0){
-			$link.text(text);
-		}
+	setBccRecipients: function(emails){
+		require('./compose-view/set-recipients')(this, 2, emails);
 	},
 
 	addButton: function(buttonDescriptor){
-		if(!buttonDescriptor.section || buttonDescriptor.section === 'TRAY_LEFT'){
-			this._addButtonToTrayLeft(buttonDescriptor);
+		require('./compose-view/add-button')(this, buttonDescriptor);
+	},
+
+	close: function(){
+		if(this.isInlineReplyForm()){
+			console.warn("Trying to close an inline reply which doesn't work.");
+			return;
 		}
-		else if(buttonDescriptor.section === 'SEND_RIGHT'){
-			this._addButtonToSendRight(buttonDescriptor);
-		}
+
+		simulateClick(this.getCloseButton()[0]);
 	},
 
 	isReply: function(){
-		return this._isReply;
+		return this._isInlineReplyForm || !!this._element.querySelector('.HQ');
 	},
 
-	_addButtonToTrayLeft: function(buttonDescriptor){
-		buttonDescriptor.buttonColor = 'flatIcon';
-
-		var buttonViewController = this._getButtonViewController(buttonDescriptor);
-
-		var formattingAreaOffsetLeft = this._getFormattingAreaOffsetLeft();
-		var element = buttonViewController.getView().getElement();
-
-		if (!this._additionalAreas.actionToolbar) {
-			this._additionalAreas.actionToolbar = this._addActionToolbar();
-		}
-
-		this._additionalAreas.actionToolbar.prepend(element);
-		this._updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
-
-		this._addedViewControllers.push(buttonViewController);
+	isInlineReplyForm: function(){
+		return this._isInlineReplyForm;
 	},
 
-	_addActionToolbar: function() {
-		var td = $(document.createElement('td'));
-		td[0].setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
-		this._getFormattingArea().before(td);
-
-		var separator = document.createElement('td');
-		separator.setAttribute('class', 'inboxsdk__compose_separator gU');
-		separator.innerHTML = '<div class="Uz"></div>';
-
-		td.after(separator);
-
-		td.closest('table').find('colgroup col').first()
-			.after('<col class="inboxsdk__compose_actionToolbarColumn"></col><col class="inboxsdk__compose_separatorColumn"></col>');
-
-		return $("<div/>").appendTo(td);
+	getBodyElement: function(){
+		return $(this._element).find('.Ap [g_editable=true]')[0];
 	},
 
-	_addButtonToSendRight: function(buttonDescriptor){
-		//do nothing for now
+	getHTMLContent: function(){
+		return $(this.getBodyElement()).innerHTML;
 	},
 
-	_getButtonViewController: function(buttonDescriptor){
-		var buttonViewController = null;
-
-		var buttonView = new IconButtonView(buttonDescriptor);
-		buttonDescriptor.buttonView = buttonView;
-
-		if(buttonDescriptor.hasDropdown){
-			var menuView = new MenuView();
-			buttonDescriptor.menuView = menuView;
-			buttonDescriptor.menuPositionOptions = {isBottomAligned: true};
-			buttonViewController = new MenuButtonViewController(buttonDescriptor);
-		}
-		else{
-			buttonViewController = new BasicButtonViewController(buttonDescriptor);
-		}
-
-		return buttonViewController;
+	getTextContent: function(){
+		return $(this.getBodyElement()).textContent;
 	},
 
-	_updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {
-		var newFormattingAreaOffsetLeft = this._getFormattingAreaOffsetLeft();
-		var insertMoreAreaLeft = parseInt(this._getInsertMoreArea().css('left'), 10);
+	getSelectedBodyHTML: function(){
+		return require('../../../lib/dom/get-selected-html')(this.getBodyElement());
+	},
 
-		var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
+	getSubject: function(){
+		return $(this._element).find('input[name=subjectbox]').val();
+	},
 
-		this._getInsertMoreArea().css('left', (insertMoreAreaLeft + diff) + 'px');
+	getToRecipients: function(){
+		return require('./compose-view/get-recipients')(this, 0);
+	},
+
+	getCcRecipients: function(){
+		return require('./compose-view/get-recipients')(this, 1);
+	},
+
+	getBccRecipients: function(){
+		return require('./compose-view/get-recipients')(this, 2);
+	},
+
+	getAdditionalActionToolbar: function(){
+		return require('./compose-view/get-additional-action-toolbar')(this);
+	},
+
+	updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {
+		require('./compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
 	},
 
 	_getFormattingAreaOffsetLeft: function() {
-		var formattingArea = this._getFormattingArea();
-		if (!formattingArea) {
-			return 0;
-		}
-
-		var offset = formattingArea.offset();
-		if (!offset) {
-			return 0;
-		}
-
-		return offset.left;
+		return require('./compose-view/get-formatting-area-offset-left')(this);
 	},
 
-	_getFormattingArea: function() {
+	getFormattingArea: function() {
 		return $(this._element).find('.oc');
 	},
 
-	_getInsertMoreArea: function() {
+	getInsertMoreArea: function() {
 		return $(this._element).find('.eq');
 	},
 
-	_getEditor: function(){
-		return $(this._element).find('.Ap [g_editable=true]');
+	getInsertLinkButton: function() {
+		return $(this._element).find('.e5.aaA.aMZ');
 	},
 
-	_getInsertLinkButton: function() {
-		return $(this._element).find('.e5.aaA.aMZ');
+	getCloseButton: function(){
+		return $($(this._element).find('.Hm > img')[2]);
+	},
+
+	addManagedViewController: function(viewController){
+		this._managedViewControllers.push(viewController);
 	}
 
 });

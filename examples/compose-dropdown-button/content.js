@@ -2,6 +2,10 @@ var inboxSDK = new InboxSDK('simple-example');
 
 inboxSDK.Views.on('composeOpen', function(composeView){
 
+	if(composeView.isReply()){
+		return;
+	}
+
 	composeView.addButton({
 		title: 'Monkeys!',
 		iconUrl: chrome.runtime.getURL('monkey.png'),

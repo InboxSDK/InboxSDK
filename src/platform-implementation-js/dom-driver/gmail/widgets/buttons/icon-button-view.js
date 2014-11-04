@@ -44,11 +44,21 @@ _.extend(IconButtonView.prototype, {
 	],
 
 	activate: function(){
-		this.addClass(this.colorClasses[this._buttonColor].ACTIVE_CLASS + ' ' + this.colorClasses[this._buttonColor].HOVER_CLASS);
+		this.addClass(this.colorClasses[this._buttonColor].ACTIVE_CLASS);
+		this.addClass(this.colorClasses[this._buttonColor].HOVER_CLASS);
+	},
+
+	deactivate: function(){
+		this.removeClass(this.colorClasses[this._buttonColor].ACTIVE_CLASS);
+		this.removeClass(this.colorClasses[this._buttonColor].HOVER_CLASS);
 	},
 
 	addClass: function(className){
 		this._element.classList.add(className);
+	},
+
+	removeClass: function(className){
+		this._element.classList.remove(className);
 	},
 
 	simulateHover: function(){

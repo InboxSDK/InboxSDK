@@ -104,6 +104,7 @@ _.extend(MenuButtonViewController.prototype, {
 			this._preMenuShowFunction(this._menuView);
 		}
 
+		this._view.activate();
 		document.body.appendChild(this._menuView.getElement());
 		containByScreen(this._menuView.getElement(), this._view.getElement(), this._menuPositionOptions);
 
@@ -133,6 +134,7 @@ _.extend(MenuButtonViewController.prototype, {
 			this._preMenuHideFunction(this._menuView);
 		}
 
+		this._view.deactivate();
 		document.body.removeChild(this._menuView.getElement());
 
 		if(_.isFunction(this._postMenuHideFunction)){
