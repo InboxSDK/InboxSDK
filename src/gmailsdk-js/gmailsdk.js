@@ -3,14 +3,19 @@ var AttachmentCardManager = require('./api-definitions/attachment-card-manager')
 var Email = require('./api-definitions/email');
 var ComposeManager = require('./api-definitions/compose-manager');
 var Mailbox = require('./api-definitions/mailbox');
+var Tracker = require('./tracker');
 var MessageManager = require('./api-definitions/message-manager');
 
-var GmailSDK = function(appId){
+var GmailSDK = function(appId, opts){
   if (!(this instanceof GmailSDK)) {
     throw new Error("new must be used");
   }
   this._appId = appId;
-  this._platformImplementationLoader =  new PlatformImplementationLoader(this._appId);
+  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId);
+  this._tracker = new Tracker(this._platformImplementationLoader);
+  if (!opts || !opts.noGlobalErrorLogging) {
+    this._tracker.setupGlobalLogger();
+  }
 
   this.AttachmentCardManager = new AttachmentCardManager(this._platformImplementationLoader);
   this.ComposeManager = new ComposeManager(this._platformImplementationLoader);
@@ -20,8 +25,8 @@ var GmailSDK = function(appId){
 
   this.Util = {
     loadScript: require('../common/load-script'),
-    logError: require('./log-error')(this._platformImplementationLoader),
-    track: require('./track')(this._platformImplementationLoader)
+    logError: this._tracker.logError.bind(this._tracker),
+    track: this._tracker.track.bind(this._tracker)
   };
 
   this._platformImplementationLoader.load().catch(function(err) {

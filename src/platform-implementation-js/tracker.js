@@ -1,4 +1,6 @@
+var _ = require('lodash');
 var Ajax = require('../common/ajax');
+var RSVP = require('rsvp');
 var logErrorFactory = require('../common/log-error-factory');
 
 function Tracker(appId) {
@@ -29,6 +31,8 @@ Tracker.prototype.logErrorToServer = function(reporterExtras, name, err, details
     var stringReport = _.map(reporterExtras.stuffToLog, function(piece) {
       if (typeof piece == 'string') {
         return piece;
+      } else if (piece instanceof Error && piece.message) {
+        return piece.message;
       } else {
         try {
           return JSON.stringify(piece);
@@ -49,7 +53,7 @@ Tracker.prototype.logErrorToServer = function(reporterExtras, name, err, details
 };
 
 Tracker.prototype.track = function(eventName, details) {
-  return this._getUserEmailAddressAsync().then(function(user) {
+  this._getUserEmailAddressAsync().then(function(email) {
     details = _.extend({
       'timestamp': new Date().getTime()*1000,
       'screenWidth': screen.width,
