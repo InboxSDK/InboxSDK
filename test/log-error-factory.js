@@ -27,7 +27,9 @@ describe("logErrorFactory", function() {
 
     return RSVP.resolve().then(function() {
       assert(reporter.calledOnce);
-      assert.strictEqual(typeof reporter.firstCall.args[0], 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0], 'object');
+      assert.strictEqual(typeof reporter.firstCall.args[0].nowStack, 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0].stuffToLog, 'object');
       assert.strictEqual(reporter.firstCall.args[1], 'test');
       assert.strictEqual(reporter.firstCall.args[2], errTest);
       assert.strictEqual(reporter.firstCall.args[3], details);
@@ -41,7 +43,9 @@ describe("logErrorFactory", function() {
 
     return RSVP.resolve().then(function() {
       assert(reporter.calledOnce);
-      assert.strictEqual(typeof reporter.firstCall.args[0], 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0], 'object');
+      assert.strictEqual(typeof reporter.firstCall.args[0].nowStack, 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0].stuffToLog, 'object');
       assert.strictEqual(reporter.firstCall.args[1], 'message');
       assert.strictEqual(reporter.firstCall.args[2], undefined);
       assert.strictEqual(reporter.firstCall.args[3], undefined);
@@ -59,7 +63,9 @@ describe("logErrorFactory", function() {
 
     return RSVP.resolve().then(function() {
       assert(reporter.calledOnce);
-      assert.strictEqual(typeof reporter.firstCall.args[0], 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0], 'object');
+      assert.strictEqual(typeof reporter.firstCall.args[0].nowStack, 'string');
+      assert.strictEqual(typeof reporter.firstCall.args[0].stuffToLog, 'object');
       assert.strictEqual(reporter.firstCall.args[1], 'test');
       assert.strictEqual(reporter.firstCall.args[2], errTest);
     });

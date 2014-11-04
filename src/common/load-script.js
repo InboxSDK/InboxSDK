@@ -1,6 +1,6 @@
-var $ = require('jquery');
 var _ = require('lodash');
 var RSVP = require('rsvp');
+var Ajax = require('./ajax');
 
 var isContentScript = _.once(function() {
   if (typeof chrome != 'undefined' && chrome.extension)
@@ -38,13 +38,9 @@ function addScriptToPage(url, cors) {
 
 function loadScript(url) {
   if (isContentScript()) {
-    return RSVP.Promise.cast($.ajax({
+    return Ajax({
       url: url,
       dataType: 'text'
-    })).catch(function(jqXHR) {
-      var err = new Error("Failed to load "+url+": "+ (jqXHR && jqXHR.statusText));
-      err.xhr = jqXHR;
-      throw err;
     }).then(function(code) {
       // jshint evil:true
       var compiled = new Function(code);

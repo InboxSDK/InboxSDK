@@ -1,23 +1,28 @@
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 var Views = require('./api-definitions/views');
 var Mailbox = require('./api-definitions/mailbox');
+var Tracker = require('./tracker');
 
-
-var InboxSDK = function(appId){
+var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
+
   this._appId = appId;
-  this._platformImplementationLoader =  new PlatformImplementationLoader(this._appId);
+  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId);
+  this._tracker = new Tracker(this._platformImplementationLoader);
+  if (!opts || !opts.noGlobalErrorLogging) {
+    this._tracker.setupGlobalLogger();
+  }
 
   this.Views = new Views(this._platformImplementationLoader);
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
 
 
   this.Util = {
-    loadScript: require('../common/load-script')
-    /* logError: require('./log-error'),
-    track: require('./track') */
+    loadScript: require('../common/load-script'),
+    logError: this._tracker.logError.bind(this._tracker),
+    track: this._tracker.track.bind(this._tracker)
   };
 
   this._platformImplementationLoader.load().catch(function(err) {
