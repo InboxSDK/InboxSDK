@@ -1,5 +1,5 @@
-if (!global.__GmailSDKImpLoader) {
-  global.__GmailSDKImpLoader = {
+if (!global.__InboxSDKImpLoader) {
+  global.__InboxSDKImpLoader = {
     load: function(version, appId) {
       if (version !== "0.1") {
         throw new Error("Unsupported GmailSDK version");

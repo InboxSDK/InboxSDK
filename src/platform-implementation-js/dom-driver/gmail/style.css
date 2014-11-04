@@ -1,26 +1,26 @@
-.gmailsdk__compose_actionToolbar {
+.inboxsdk__compose_actionToolbar {
   padding: 0px 0px 0px 10px;
   white-space: nowrap;
 }
 
-.gmailsdk__compose_actionToolbar .gmailsdk__button {
+.inboxsdk__compose_actionToolbar .inboxsdk__button {
   min-width: 27px;
   margin-right: 5px;
   height: 29px;
 }
 
-.gmailsdk__compose_actionToolbar .gmailsdk__button_iconImg {
+.inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
 	height: 19px;
 	width: 19px;
 	vertical-align: middle;
 }
 
-.gmailsdk__compose_actionToolbar .gmailsdk__compose_overflowButton.gmailsdk__button {
+.inboxsdk__compose_actionToolbar .inboxsdk__compose_overflowButton.inboxsdk__button {
   margin: 0 0 0 4px;
   height: 27px;
 }
 
-.gmailsdk__compose_overflowIcon {
+.inboxsdk__compose_overflowIcon {
   background: url('images/composeOverflowToggle.png') center no-repeat;
   opacity: 0.9;
   padding-top: 3px;
@@ -33,7 +33,7 @@
   max-height: 3px;
 }
 
-.gmailsdk__compose_toolbarOverflow {
+.inboxsdk__compose_toolbarOverflow {
   position: absolute;
   bottom: 5px;
   background: #f5f5f5;
@@ -44,7 +44,7 @@
   z-index: 10;
 }
 
-.gmailsdk__compose_toolbarOverflow::before {
+.inboxsdk__compose_toolbarOverflow::before {
   content: " ";
   position: absolute;
   background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;
@@ -54,11 +54,11 @@
   left: 114px;
 }
 
-.aQw .gmailsdk__button_iconImg {
+.aQw .inboxsdk__button_iconImg {
   margin-top: 2px;
 }
 
-.aZi .asa .gmailsdk__button_iconImg {
+.aZi .asa .inboxsdk__button_iconImg {
   display: inline-block;
   vertical-align: middle;
   margin-top: -3px;

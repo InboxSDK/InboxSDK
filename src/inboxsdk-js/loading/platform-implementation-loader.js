@@ -5,15 +5,15 @@ var PlatformImplementationLoader = function(appId) {
     var self = this;
     this.load = _.once(function() {
         return RSVP.resolve().then(function() {
-            if (!global.__GmailSDKImpLoader) {
+            if (!global.__InboxSDKImpLoader) {
                 return self._loadScript().then(function() {
-                    if (!global.__GmailSDKImpLoader) {
+                    if (!global.__InboxSDKImpLoader) {
                         throw new Error("Implementation file did not load correctly");
                     }
                 });
             }
         }).then(function() {
-            return global.__GmailSDKImpLoader.load("0.1", appId);
+            return global.__InboxSDKImpLoader.load("0.1", appId);
         });
     });
 };

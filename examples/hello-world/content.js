@@ -1,11 +1,7 @@
-var gmailSDK = new GmailSDK('simple-example');
+var inboxSDK = new InboxSDK('simple-example');
 
-gmailSDK.ComposeManager.registerComposeButtonCreator(function(event) {
-  console.log("creating compose button", event);
+inboxSDK.Views.on('composeOpen', function(composeView){
+
+	console.log('compose view', composeView);
+
 });
-
-gmailSDK.Mailbox.on('example', function(obj) {
-  console.log("example event received:", obj);
-});
-
-//gmailSDK.Utils.track("script started", {d:1,e:"abc"});

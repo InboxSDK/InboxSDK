@@ -21339,15 +21339,15 @@ var PlatformImplementationLoader = function(appId) {
     var self = this;
     this.load = _.once(function() {
         return RSVP.resolve().then(function() {
-            if (!global.__GmailSDKImpLoader) {
+            if (!global.__InboxSDKImpLoader) {
                 return self._loadScript().then(function() {
-                    if (!global.__GmailSDKImpLoader) {
+                    if (!global.__InboxSDKImpLoader) {
                         throw new Error("Implementation file did not load correctly");
                     }
                 });
             }
         }).then(function() {
-            return global.__GmailSDKImpLoader.load("0.1", appId);
+            return global.__InboxSDKImpLoader.load("0.1", appId);
         });
     });
 };
@@ -21382,7 +21382,7 @@ window.InboxSDK = require('./inboxsdk');
 
 },{"./error-logging":"/Users/oismail/streak/GmailSDK/src/inboxsdk-js/error-logging.js","./inboxsdk":"/Users/oismail/streak/GmailSDK/src/inboxsdk-js/inboxsdk.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/custom-style.js":[function(require,module,exports){
 
-var cssContent = ".gmailsdk__compose_actionToolbar {\n  padding: 0px 0px 0px 10px;\n  white-space: nowrap;\n}\n\n.gmailsdk__compose_actionToolbar .gmailsdk__button {\n  min-width: 27px;\n  margin-right: 5px;\n  height: 29px;\n}\n\n.gmailsdk__compose_actionToolbar .gmailsdk__button_iconImg {\n\theight: 19px;\n\twidth: 19px;\n\tvertical-align: middle;\n}\n\n.gmailsdk__compose_actionToolbar .gmailsdk__compose_overflowButton.gmailsdk__button {\n  margin: 0 0 0 4px;\n  height: 27px;\n}\n\n.gmailsdk__compose_overflowIcon {\n  background: url('images/composeOverflowToggle.png') center no-repeat;\n  opacity: 0.9;\n  padding-top: 3px;\n}\n\n\n/* Work around issue where clicking \"Remove formatting\" in Compose causes this\n * element to become taller and shift the toolbar down. */\n.gU .aWQ {\n  max-height: 3px;\n}\n\n.gmailsdk__compose_toolbarOverflow {\n  position: absolute;\n  bottom: 5px;\n  background: #f5f5f5;\n  margin: 3px;\n  box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);\n  border: 1px solid #cfcfcf;\n  padding: 2px !important;\n  z-index: 10;\n}\n\n.gmailsdk__compose_toolbarOverflow::before {\n  content: \" \";\n  position: absolute;\n  background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;\n  width: 17px;\n  height: 18px;\n  bottom: -16px;\n  left: 114px;\n}\n\n.aQw .gmailsdk__button_iconImg {\n  margin-top: 2px;\n}\n\n.aZi .asa .gmailsdk__button_iconImg {\n  display: inline-block;\n  vertical-align: middle;\n  margin-top: -3px;\n}\n";
+var cssContent = ".inboxsdk__compose_actionToolbar {\n  padding: 0px 0px 0px 10px;\n  white-space: nowrap;\n}\n\n.inboxsdk__compose_actionToolbar .inboxsdk__button {\n  min-width: 27px;\n  margin-right: 5px;\n  height: 29px;\n}\n\n.inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {\n\theight: 19px;\n\twidth: 19px;\n\tvertical-align: middle;\n}\n\n.inboxsdk__compose_actionToolbar .inboxsdk__compose_overflowButton.inboxsdk__button {\n  margin: 0 0 0 4px;\n  height: 27px;\n}\n\n.inboxsdk__compose_overflowIcon {\n  background: url('images/composeOverflowToggle.png') center no-repeat;\n  opacity: 0.9;\n  padding-top: 3px;\n}\n\n\n/* Work around issue where clicking \"Remove formatting\" in Compose causes this\n * element to become taller and shift the toolbar down. */\n.gU .aWQ {\n  max-height: 3px;\n}\n\n.inboxsdk__compose_toolbarOverflow {\n  position: absolute;\n  bottom: 5px;\n  background: #f5f5f5;\n  margin: 3px;\n  box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);\n  border: 1px solid #cfcfcf;\n  padding: 2px !important;\n  z-index: 10;\n}\n\n.inboxsdk__compose_toolbarOverflow::before {\n  content: \" \";\n  position: absolute;\n  background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;\n  width: 17px;\n  height: 18px;\n  bottom: -16px;\n  left: 114px;\n}\n\n.aQw .inboxsdk__button_iconImg {\n  margin-top: 2px;\n}\n\n.aZi .asa .inboxsdk__button_iconImg {\n  display: inline-block;\n  vertical-align: middle;\n  margin-top: -3px;\n}\n";
 
 var style = document.createElement('style');
 style.textContent = cssContent;
@@ -21901,6 +21901,8 @@ module.exports = GmailAttachmentCardView;
 },{"../../../driver-interfaces/attachment-card-view-driver":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/driver-interfaces/attachment-card-view-driver.js","../../../lib/dom/simulate-click":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/simulate-click.js","../../../widgets/buttons/basic-button-view-controller":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/widgets/buttons/basic-button-view-controller.js","../widgets/buttons/icon-button-view":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/widgets/buttons/icon-button-view.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/views/gmail-compose-view.js":[function(require,module,exports){
 var _ = require('lodash');
 var $ = require('jquery');
+var RSVP = require('rsvp');
+var Bacon = require('baconjs');
 
 var simulateClick = require('../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
@@ -21908,6 +21910,9 @@ var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 var IconButtonView = require('../widgets/buttons/icon-button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
+
+var MenuView = require('../widgets/menu-view');
 
 var GmailComposeView = function(element){
 	ComposeWindowDriver.call(this);
@@ -21922,10 +21927,28 @@ _.extend(GmailComposeView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_additionalAreas', destroy: true, defaultValue: {}},
-		{name: '_addedViewControllers', destroy: true, defaultValue: []}
+		{name: '_addedViewControllers', destroy: true, defaultValue: []},
+		{name: '_isReply', destroy: true, set: true, defaultValue: false}
 	],
 
 	insertLinkIntoBody: function(text, href){
+		var self = this;
+
+		return new RSVP.Promise(function(resolve, reject){
+			if(document.hasFocus()){
+				self._insertLinkIntoBody(text, href);
+				resolve();
+			}
+			else{
+				Bacon.fromEventTarget(window, 'focus').take(1).onValue(function(){
+					self._insertLinkIntoBody(text, href);
+					resolve();
+				});
+			}
+		});
+	},
+
+	_insertLinkIntoBody: function(text, href){
 		this._getEditor().focus();
 
 		simulateClick(this._getInsertLinkButton()[0]);
@@ -21955,15 +21978,17 @@ _.extend(GmailComposeView.prototype, {
 		}
 	},
 
+	isReply: function(){
+		return this._isReply;
+	},
+
 	_addButtonToTrayLeft: function(buttonDescriptor){
 		buttonDescriptor.buttonColor = 'flatIcon';
-		var iconButtonView = new IconButtonView(buttonDescriptor);
 
-		buttonDescriptor.buttonView = iconButtonView;
-		var basicButtonViewController = new BasicButtonViewController(buttonDescriptor);
+		var buttonViewController = this._getButtonViewController(buttonDescriptor);
 
 		var formattingAreaOffsetLeft = this._getFormattingAreaOffsetLeft();
-		var element = basicButtonViewController.getView().getElement();
+		var element = buttonViewController.getView().getElement();
 
 		if (!this._additionalAreas.actionToolbar) {
 			this._additionalAreas.actionToolbar = this._addActionToolbar();
@@ -21972,28 +21997,47 @@ _.extend(GmailComposeView.prototype, {
 		this._additionalAreas.actionToolbar.prepend(element);
 		this._updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
-		this._addedViewControllers.push(basicButtonViewController);
+		this._addedViewControllers.push(buttonViewController);
 	},
 
 	_addActionToolbar: function() {
 		var td = $(document.createElement('td'));
-		td[0].setAttribute('class', 'gmailsdk__compose_actionToolbar gU');
+		td[0].setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
 		this._getFormattingArea().before(td);
 
 		var separator = document.createElement('td');
-		separator.setAttribute('class', 'gmailsdk__compose_separator gU');
+		separator.setAttribute('class', 'inboxsdk__compose_separator gU');
 		separator.innerHTML = '<div class="Uz"></div>';
 
 		td.after(separator);
 
 		td.closest('table').find('colgroup col').first()
-			.after('<col class="gmailsdk__compose_actionToolbarColumn"></col><col class="gmailsdk__compose_separatorColumn"></col>');
+			.after('<col class="inboxsdk__compose_actionToolbarColumn"></col><col class="inboxsdk__compose_separatorColumn"></col>');
 
 		return $("<div/>").appendTo(td);
 	},
 
 	_addButtonToSendRight: function(buttonDescriptor){
 		//do nothing for now
+	},
+
+	_getButtonViewController: function(buttonDescriptor){
+		var buttonViewController = null;
+
+		var buttonView = new IconButtonView(buttonDescriptor);
+		buttonDescriptor.buttonView = buttonView;
+
+		if(buttonDescriptor.hasDropdown){
+			var menuView = new MenuView();
+			buttonDescriptor.menuView = menuView;
+			buttonDescriptor.menuPositionOptions = {isBottomAligned: true};
+			buttonViewController = new MenuButtonViewController(buttonDescriptor);
+		}
+		else{
+			buttonViewController = new BasicButtonViewController(buttonDescriptor);
+		}
+
+		return buttonViewController;
 	},
 
 	_updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {
@@ -22040,7 +22084,7 @@ _.extend(GmailComposeView.prototype, {
 
 module.exports = GmailComposeView;
 
-},{"../../../driver-interfaces/compose-view-driver":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/driver-interfaces/compose-view-driver.js","../../../lib/dom/set-value-and-dispatch-event":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/set-value-and-dispatch-event.js","../../../lib/dom/simulate-click":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/simulate-click.js","../../../widgets/buttons/basic-button-view-controller":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/widgets/buttons/basic-button-view-controller.js","../widgets/buttons/icon-button-view":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/widgets/buttons/icon-button-view.js","jquery":"/Users/oismail/streak/GmailSDK/node_modules/jquery/dist/jquery.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/views/gmail-message-view.js":[function(require,module,exports){
+},{"../../../driver-interfaces/compose-view-driver":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/driver-interfaces/compose-view-driver.js","../../../lib/dom/set-value-and-dispatch-event":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/set-value-and-dispatch-event.js","../../../lib/dom/simulate-click":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/simulate-click.js","../../../widgets/buttons/basic-button-view-controller":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/widgets/buttons/basic-button-view-controller.js","../../../widgets/buttons/menu-button-view-controller":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/widgets/buttons/menu-button-view-controller.js","../widgets/buttons/icon-button-view":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/widgets/buttons/icon-button-view.js","../widgets/menu-view":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/widgets/menu-view.js","baconjs":"/Users/oismail/streak/GmailSDK/node_modules/baconjs/dist/Bacon.js","jquery":"/Users/oismail/streak/GmailSDK/node_modules/jquery/dist/jquery.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js","rsvp":"/Users/oismail/streak/GmailSDK/node_modules/rsvp/dist/rsvp.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/views/gmail-message-view.js":[function(require,module,exports){
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var $ = require('jquery');
@@ -22237,6 +22281,7 @@ _.extend(GmailMessageView.prototype, {
 		if(currentClassList.contains('adB')){
 			if(oldValue.indexOf('adB') === -1){
 				this._replyWindowView = new GmailComposeView(mutation.target);
+				this._replyWindowView.setIsReply(true);
 
 				this._eventStreamBus.push({
 					eventName: 'replyOpen',
@@ -22543,6 +22588,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 
 var BasicClass = require('../../../../lib/basic-class');
+var simulateHover = require('../../../../lib/dom/simulate-hover');
 
 
 /*
@@ -22583,8 +22629,16 @@ _.extend(IconButtonView.prototype, {
 		{name: '_eventStream', destroy: false, get: true}
 	],
 
+	activate: function(){
+		this.addClass(this.colorClasses[this._buttonColor].ACTIVE_CLASS + ' ' + this.colorClasses[this._buttonColor].HOVER_CLASS);
+	},
+
 	addClass: function(className){
 		this._element.classList.add(className);
+	},
+
+	simulateHover: function(){
+		simulateHover(element);
 	},
 
 	_createElement: function(options){
@@ -22596,7 +22650,7 @@ _.extend(IconButtonView.prototype, {
 		this._element.appendChild(this._innerElement);
 		this._innerElement.appendChild(this._iconElement);
 
-		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 J-Zh-I G-Ni gmailsdk__button ' + this.colorClasses[this._buttonColor].INACTIVE_CLASS);
+		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 J-Zh-I G-Ni inboxsdk__button ' + this.colorClasses[this._buttonColor].INACTIVE_CLASS);
 
 		if(options.hasButtonToRight){
 			this._element.classList.add('T-I-Js-IF');
@@ -22618,7 +22672,7 @@ _.extend(IconButtonView.prototype, {
 			this._iconElement.innerHTML = '';
 
 			this._iconImgElement = document.createElement('img');
-			this._iconImgElement.classList.add('gmailsdk__button_iconImg');
+			this._iconImgElement.classList.add('inboxsdk__button_iconImg');
 			this._iconImgElement.src = this._iconUrl;
 
 			this._iconElement.appendChild(this._iconImgElement);
@@ -22678,7 +22732,39 @@ _.extend(IconButtonView.prototype, {
 module.exports = IconButtonView;
 
 
-},{"../../../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","baconjs":"/Users/oismail/streak/GmailSDK/node_modules/baconjs/dist/Bacon.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/driver-interfaces/attachment-area-view-driver.js":[function(require,module,exports){
+},{"../../../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","../../../../lib/dom/simulate-hover":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/simulate-hover.js","baconjs":"/Users/oismail/streak/GmailSDK/node_modules/baconjs/dist/Bacon.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/dom-driver/gmail/widgets/menu-view.js":[function(require,module,exports){
+var _ = require('lodash');
+var BasicClass = require('../../../lib/basic-class');
+
+var MenuView = function(){
+	BasicClass.call(this);
+
+	this._setupElement();
+};
+
+MenuView.prototype = Object.create(BasicClass.prototype);
+
+_.extend(MenuView.prototype, {
+
+	__memberVariables: [
+		{name: '_element', destroy: true, get: true},
+		{name: '_contentElement', destroy: true, get: true}
+	],
+
+	_setupElement: function(){
+		this._element = document.createElement('div');
+		this._element.setAttribute('class', 'J-M uEPqDe inboxsdk_menu');
+
+		this._contentElement = document.createElement('div');
+		this._contentElement.setAttribute('class', 'SK AX');
+
+		this._element.appendChild(this._contentElement);
+	}
+});
+
+module.exports = MenuView;
+
+},{"../../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/driver-interfaces/attachment-area-view-driver.js":[function(require,module,exports){
 var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
@@ -22734,9 +22820,18 @@ ComposeWindowDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ComposeWindowDriver.prototype, {
 
+	/*
+	 * returns a promise for when the insert actually happens
+	 */
 	insertLinkIntoBody: function(text, href){},
 
-	addButton: function(buttonDescriptor){}
+	addButton: function(buttonDescriptor){},
+
+	isReply: function(){},
+
+	setIsReply: function(value){}
+
+
 
 });
 
@@ -23015,7 +23110,238 @@ _.extend(BasicClass.prototype, {
 
 module.exports = BasicClass;
 
-},{"lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/element-monitor.js":[function(require,module,exports){
+},{"lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/body-click-binder.js":[function(require,module,exports){
+var _ = require('lodash');
+var BasicClass = require('../basic-class');
+
+var BodyClickBinder = function(clickFunction){
+	BasicClass.call(this);
+
+	this._clickFunction = clickFunction;
+};
+
+BodyClickBinder.prototype = Object.create(BasicClass.prototype);
+
+_.extend(BodyClickBinder.prototype, {
+
+	__memberVariables: [
+		{name: '_clickFunction', destroy: false, set:true}
+	],
+
+	bind: function(){
+		document.body.addEventListener('click', this._clickFunction);
+	},
+
+	unbind: function(){
+		document.body.removeEventListener('click', this._clickFunction);
+	},
+
+	destroy: function(){
+		this.unbind();
+
+		BasicClass.prototype.destroy.call(this);
+	}
+
+});
+
+module.exports = BodyClickBinder;
+
+},{"../basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/contain-by-screen.js":[function(require,module,exports){
+var _ = require('lodash');
+var $ = require('jquery');
+
+module.exports = function(element, anchorPoint, options){
+	if(element.style.position !== 'fixed'){
+		return;
+	}
+
+    options = options || {};
+
+    var $element = $(element);
+    var $anchorPoint = $(anchorPoint);
+
+    var elementOffset = $element.offset();
+    var elementSizeBox = {
+        width: $element.outerWidth(),
+        height: $element.outerHeight(),
+        innerWidth: $element.width()
+    };
+
+    if(options.widthBuffer){
+        elementSizeBox.width += options.widthBuffer;
+    }
+
+    if(options.heightBuffer){
+        elementSizeBox.height += options.heightBuffer;
+    }
+
+    var anchorOffset = $anchorPoint.offset();
+    var anchorSizeBox = {
+        width: $anchorPoint.outerWidth(),
+        height: $anchorPoint.outerHeight()
+    };
+
+    var screenBoundingBox = [
+        {
+            x: 0,
+            y: 0
+        },
+        {
+            x: window.innerWidth,
+            y: window.innerHeight
+        }
+    ];
+
+    var elementLeft = elementOffset.left;
+    var elementTop = elementOffset.top;
+
+    if(options.leftBuffer){
+        elementLeft -= options.leftBuffer;
+    }
+
+    if(options.topBuffer){
+        elementTop += options.topBuffer;
+    }
+
+    var elementBoundingBox = [
+        {
+            x: elementLeft,
+            y: elementTop
+        },
+        {
+            x: elementLeft + elementSizeBox.width,
+            y: elementTop + elementSizeBox.top
+        }
+    ];
+
+    var newTop, newLeft, newBottom, newRight;
+
+
+    if(options.isBottomAligned){
+        newBottom = document.body.clientHeight - anchorOffset.top;
+        elementOffset.top = newBottom - elementSizeBox.height;
+    }
+    else{
+        newTop = anchorOffset.top;
+
+        if(!options.isTopAligned){
+           newTop += anchorSizeBox.height;
+        }
+
+        elementOffset.top = newTop;
+    }
+
+    if(options.isRightAligned){
+        newRight = document.body.clientWidth - anchorOffset.left - anchorSizeBox.width;
+        elementOffset.left = newRight - elementSizeBox.width;
+    }
+    else if(!options.isAligned){
+        newLeft = anchorOffset.left;
+        elementOffset.left = newLeft;
+    }
+
+
+    var trialBoundingBox;
+    //there are four possible "positions" right-aligned above anchor, right-aligned below, left-aligned above anchor, left-aligned below
+    //first let's see if our default position is valid
+    if(elementOffset.top + elementSizeBox.height > screenBoundingBox[1].y){
+        //we are too tall, so let's try moving above
+        trialBoundingBox = _.clone(elementBoundingBox);
+        if(options.isAligned){
+            trialBoundingBox[0].y = anchorOffset.top + anchorSizeBox.height - elementSizeBox.height;
+        }
+        else{
+            trialBoundingBox[0].y = anchorOffset.top - elementSizeBox.height;
+        }
+
+        trialBoundingBox[1].y = trialBoundingBox[0].y + elementSizeBox.height;
+
+        if(isYBounded(screenBoundingBox, trialBoundingBox)){
+            newTop = trialBoundingBox[0].y;
+        }
+    }
+    else if(elementOffset.top < 0){
+        //we are above the rafters, so let's try moving down
+        trialBoundingBox = _.clone(elementBoundingBox);
+        if(options.isAligned){
+            trialBoundingBox[0].y = anchorOffset.top;
+        }
+        else{
+            trialBoundingBox[0].y = anchorOffset.top + anchorSizeBox.height;
+        }
+
+        trialBoundingBox[1].y = trialBoundingBox[0].y + elementSizeBox.height;
+
+        if(isYBounded(screenBoundingBox, trialBoundingBox)){
+            newTop = trialBoundingbox[0].y;
+        }
+    }
+
+    if(newTop == null && options.forceFit){
+        if(elementOffset.top < 0){
+            //how much are we above?
+            newTop = 0;
+        }
+        else if(elementOffset.top + elementSizeBox.height > screenBoundingBox[1].y){
+            newTop = screenBoundingBox[1].y - elementSizeBox.height;
+        }
+    }
+
+    if(elementOffset.left + elementSizeBox.width > screenBoundingBox[1].x){
+        //we are too far to the right
+        trialBoundingBox = _.clone(elementBoundingBox);
+        if(options.isAligned){
+            trialBoundingBox[0].x = anchorOffset.left - elementSizeBox.width;
+        }
+        else{
+            trialBoundingBox[0].x = anchorOffset.left - elementSizeBox.width + anchorSizeBox.width;
+        }
+
+        trialBoundingBox[1].x = trialBoundingBox[0].x + elementSizeBox.width;
+
+        if(isXBounded(screenBoundingBox, trialBoundingBox)){
+            newLeft = trialBoundingBox[0].x;
+        }
+    }
+    else if(elementOffset.left < 0){
+        //too far to the left
+        trialBoundingBox = _.clone(elementBoundingBox);
+        if(options.isAligned){
+            trialBoundingBox[0].x = anchorOffset.left + anchorSizeBox.width + elementSizeBox.width;
+        }
+        else{
+            trialBoundingBox[0].x = anchorOffset.left;
+        }
+
+        trialBoundingBox[1].x = trialBoundingBox[0].x + elementSizeBox.width;
+
+        if(isXBounded(screenBoundingBox, trialBoundingBox)){
+            newLeft = trialBoundingBox[0].x;
+        }
+    }
+
+    if( !(newBottom == null) ){
+        element.style.bottom = newBottom + 'px';
+        element.style.top = '';
+    }
+    else if(!(newTop == null)){
+        element.style.top = newTop + 'px';
+        element.style.bottom = '';
+    }
+
+    if(!(newRight == null)){
+        element.style.right = newRight + 'px';
+        element.style.left = '';
+    }
+    else if( !(newLeft == null)){
+        element.style.left = newLeft + 'px';
+        element.style.right = '';
+    }
+
+    element.style.maxWidth = elementSizeBox.innerWidth + 'px';
+};
+
+},{"jquery":"/Users/oismail/streak/GmailSDK/node_modules/jquery/dist/jquery.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/element-monitor.js":[function(require,module,exports){
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
@@ -23194,6 +23520,16 @@ function simulateClick(element){
 
 module.exports = simulateClick;
 
+},{}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/simulate-hover.js":[function(require,module,exports){
+function simulateHover(element){
+	var event = document.createEvent("MouseEvents");
+    event.initMouseEvent("mouseover", true, true, window,
+        0, element.offsetLeft, element.offsetTop, 0, 0, false, false, false, false, 0, null);
+    element.dispatchEvent(event);
+}
+
+module.exports = simulateHover;
+
 },{}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/wait-for.js":[function(require,module,exports){
 var RSVP = require('RSVP');
 
@@ -23239,8 +23575,8 @@ module.exports = logErrorToServer;
 
 },{}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/main.js":[function(require,module,exports){
 (function (global){
-if (!global.__GmailSDKImpLoader) {
-  global.__GmailSDKImpLoader = {
+if (!global.__InboxSDKImpLoader) {
+  global.__InboxSDKImpLoader = {
     load: function(version, appId) {
       if (version !== "0.1") {
         throw new Error("Unsupported GmailSDK version");
@@ -23379,15 +23715,35 @@ _.extend(ComposeView.prototype, {
 	 * adds button to the compose
 	 */
 	addButton: function(buttonDescriptor){
-		this._composeViewImplementation.addButton(buttonDescriptor);
+		var buttonOptions = _.clone(buttonDescriptor);
+		if(buttonDescriptor.hasDropdown){
+			buttonOptions.preMenuShowFunction = function(menuView){
+				buttonDescriptor.onClick({
+					dropdown: {
+						el: menuView.getElement()
+					}
+				});
+			};
+		}
+		else{
+			buttonOptions.activateFunction = buttonDescriptor.onClick;
+		}
+
+		this._composeViewImplementation.addButton(buttonOptions);
 	},
 
 	/*
 	 * inserts link into body
+	 * returns a promise for when the insert actually happens
 	 */
 	insertLinkIntoBody: function(text, href){
 		this._composeViewImplementation.insertLinkIntoBody(text, href);
+	},
+
+	isReply: function(){
+		return this._composeViewImplementation.isReply();
 	}
+
 
 });
 
@@ -23537,7 +23893,161 @@ _.extend(BasicButtonViewController.prototype, {
 
 module.exports = BasicButtonViewController;
 
-},{"../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}]},{},["./src/inboxsdk-js/main-DEV.js"])
+},{"../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js"}],"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/widgets/buttons/menu-button-view-controller.js":[function(require,module,exports){
+var _ = require('lodash');
+var BasicClass = require('../../lib/basic-class');
+var RSVP = require('rsvp');
+
+var containByScreen = require('../../lib/dom/contain-by-screen');
+var BodyClickBinder = require('../../lib/dom/body-click-binder');
+
+var MenuButtonViewController = function(options){
+	BasicClass.call(this);
+
+	this._preMenuShowFunction = options.preMenuShowFunction;
+	this._postMenuShowFunction = options.postMenuShowFunction;
+	this._preMenuHideFunction = options.preMenuHideFunction;
+	this._postMenuHideFunction = options.postMenuHideFunction;
+
+	this._menuView = options.menuView;
+	this._menuView.getElement().style.position = 'fixed';
+
+	this._view = options.buttonView;
+	this._menuPositionOptions = options.menuPositionOptions;
+
+	this._bindToViewEvents();
+};
+
+MenuButtonViewController.prototype = Object.create(BasicClass.prototype);
+
+_.extend(MenuButtonViewController.prototype, {
+
+	__memberVariables: [
+		{name: '_view', destroy: true, get: true},
+		{name: '_preMenuShowFunction', destroy: false, set: true},
+		{name: '_postMenuShowFunction', destroy: false, set: true},
+		{name: '_preMenuHideFunction', destroy: false, set: true},
+		{name: '_postMenuHideFunction', destroy: false, set: true},
+		{name: '_menuState', destroy: true, defaultValue: 'HIDDEN'},
+		{name: '_transitionPromise', destroy: false},
+		{name: '_menuView', destroy: true},
+		{name: '_bodyClickBinder', destroy: true},
+		{name: '_menuPositionOptions', destroy: true}
+	],
+
+	showMenu: function(){
+		if(this._transitionPromise){
+			var self = this;
+			this._transitionPromise.finally(function(){
+				self.showMenu();
+			});
+		}
+		else{
+			this._showMenu();
+		}
+	},
+
+	hideMenu: function(){
+		if(this._transitionPromise){
+			var self = this;
+			this._transitionPromise.finally(function(){
+				self.hideMenu();
+			});
+		}
+		else{
+			this._hideMenu();
+		}
+	},
+
+	_bindToViewEvents: function(){
+		var self = this;
+		this._view
+			.getEventStream()
+			.filter(function(event){
+				return event.eventName === 'click';
+			})
+			.onValue(function(){
+				self._toggleMenuState();
+			});
+	},
+
+	_toggleMenuState: function(){
+		var self = this;
+
+		if(this._transitionPromise){
+			this._transitionPromise.finally(function(){
+				self._toggleMenuState();
+			});
+			return;
+		}
+
+
+		if(this._menuState === 'HIDDEN'){
+			this._showMenu();
+		}
+		else{
+			this._hideMenu();
+		}
+	},
+
+	_showMenu: function(){
+		var deferred = RSVP.defer();
+		this._transitionPromise = deferred.promise;
+
+		this._menuState = 'VISIBLE';
+
+		if(_.isFunction(this._preMenuShowFunction)){
+			this._preMenuShowFunction(this._menuView);
+		}
+
+		document.body.appendChild(this._menuView.getElement());
+		containByScreen(this._menuView.getElement(), this._view.getElement(), this._menuPositionOptions);
+
+		if(_.isFunction(this._postMenuShowFunction)){
+			this._postMenuShowFunction(this._menuView);
+		}
+
+		if(!this._bodyClickBinder){
+			this._bodyClickBinder = new BodyClickBinder(function(){
+				this.hideMenu();
+			}.bind(this));
+		}
+
+		this._bodyClickBinder.bind();
+		this._transitionPromise = null;
+
+		deferred.resolve();
+	},
+
+	_hideMenu: function(){
+		var deferred = RSVP.defer();
+		this._transitionPromise = deferred.promise;
+
+		this._menuState = 'HIDDEN';
+
+		if(_.isFunction(this._preMenuHideFunction)){
+			this._preMenuHideFunction(this._menuView);
+		}
+
+		document.body.removeChild(this._menuView.getElement());
+
+		if(_.isFunction(this._postMenuHideFunction)){
+			this._postMenuHideFunction(this._menuView);
+		}
+
+		if(this._bodyClickBinder){
+			this._bodyClickBinder.unbind();
+		}
+
+		this._transitionPromise = null;
+		deferred.resolve();
+	}
+
+});
+
+module.exports = MenuButtonViewController;
+
+},{"../../lib/basic-class":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/basic-class.js","../../lib/dom/body-click-binder":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/body-click-binder.js","../../lib/dom/contain-by-screen":"/Users/oismail/streak/GmailSDK/src/platform-implementation-js/lib/dom/contain-by-screen.js","lodash":"/Users/oismail/streak/GmailSDK/node_modules/lodash/dist/lodash.js","rsvp":"/Users/oismail/streak/GmailSDK/node_modules/rsvp/dist/rsvp.js"}]},{},["./src/inboxsdk-js/main-DEV.js"])
 
 
 //# sourceMappingURL=inboxsdk.js.map

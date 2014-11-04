@@ -10,9 +10,18 @@ ComposeWindowDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ComposeWindowDriver.prototype, {
 
+	/*
+	 * returns a promise for when the insert actually happens
+	 */
 	insertLinkIntoBody: function(text, href){},
 
-	addButton: function(buttonDescriptor){}
+	addButton: function(buttonDescriptor){},
+
+	isReply: function(){},
+
+	setIsReply: function(value){}
+
+
 
 });
 

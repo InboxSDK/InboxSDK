@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 
 var BasicClass = require('../../../../lib/basic-class');
+var simulateHover = require('../../../../lib/dom/simulate-hover');
 
 
 /*
@@ -42,8 +43,16 @@ _.extend(IconButtonView.prototype, {
 		{name: '_eventStream', destroy: false, get: true}
 	],
 
+	activate: function(){
+		this.addClass(this.colorClasses[this._buttonColor].ACTIVE_CLASS + ' ' + this.colorClasses[this._buttonColor].HOVER_CLASS);
+	},
+
 	addClass: function(className){
 		this._element.classList.add(className);
+	},
+
+	simulateHover: function(){
+		simulateHover(element);
 	},
 
 	_createElement: function(options){
@@ -55,7 +64,7 @@ _.extend(IconButtonView.prototype, {
 		this._element.appendChild(this._innerElement);
 		this._innerElement.appendChild(this._iconElement);
 
-		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 J-Zh-I G-Ni gmailsdk__button ' + this.colorClasses[this._buttonColor].INACTIVE_CLASS);
+		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 J-Zh-I G-Ni inboxsdk__button ' + this.colorClasses[this._buttonColor].INACTIVE_CLASS);
 
 		if(options.hasButtonToRight){
 			this._element.classList.add('T-I-Js-IF');
@@ -77,7 +86,7 @@ _.extend(IconButtonView.prototype, {
 			this._iconElement.innerHTML = '';
 
 			this._iconImgElement = document.createElement('img');
-			this._iconImgElement.classList.add('gmailsdk__button_iconImg');
+			this._iconImgElement.classList.add('inboxsdk__button_iconImg');
 			this._iconImgElement.src = this._iconUrl;
 
 			this._iconElement.appendChild(this._iconImgElement);
