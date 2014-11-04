@@ -19,8 +19,8 @@ var PlatformImplementation = function(appId){
 	this.Email = new Email(appId, this._driver);
 
 	this.Utils = {
-	    logErrorToServer: require('./log-error-to-server'),
-	    track: require('./track')
+	    logErrorToServer: require('./log-error-to-server')(this.Email),
+	    track: require('./track')(this.Email)
 	};
 };
 

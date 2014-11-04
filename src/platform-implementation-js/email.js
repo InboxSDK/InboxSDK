@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var $ = require('jquery');
+var RSVP = require('rsvp');
 
 var Email = function(appId, driver){
 	this._appId = appId;
@@ -9,8 +10,11 @@ var Email = function(appId, driver){
 _.extend(Email.prototype, {
 
 	getUserAsync: function() {
-		return 'bob@example.com';
-	}
+		return RSVP.Promise.resolve({
+			displayName: 'Bob Example',
+			emailAddress: 'bob@example.com'
+		});
+	},
 
 });
 

@@ -38,21 +38,26 @@ function logErrorFactory(reporter) {
       // Show the error immediately, don't wait on implementation load for that.
       var stuffToLog = ["Got an error:", name, err];
       if (err && err.stack) {
-        stuffToLog = stuffToLog.concat(["\n\nOriginal error stack\n"+err.stack]);
+        stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
       }
       if (details) {
-        stuffToLog = stuffToLog.concat(["\n\nError details", details]);
+        stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
       }
-      stuffToLog = stuffToLog.concat(["\n\nError logged from", nowStack]);
+      stuffToLog = stuffToLog.concat(["\n\nError logged from:", nowStack]);
 
       console.error.apply(console, stuffToLog);
+
+      var reporterExtras = {
+        nowStack: nowStack,
+        stuffToLog: stuffToLog
+      };
 
       RSVP.resolve().then(function() {
         // Pass the error on to the implementation which will handle logging it
         // to the server. It might return a promise, so we need to make sure it
         // has a rejection listener so that it can't cause an uncaught error to
         // be logged recursively.
-        return reporter(nowStack, name, err, details);
+        return reporter(reporterExtras, name, err, details);
       }).catch(function(err2) {
         tooManyErrors(err2, args);
       });
