@@ -5,7 +5,7 @@ var Ajax = require('./ajax');
 var isContentScript = _.once(function() {
   if (typeof chrome != 'undefined' && chrome.extension)
     return true;
-  if (typeof safari != 'undefined' && safari.application)
+  if (typeof safari != 'undefined' && safari.extension)
     return true;
   return false;
 });
