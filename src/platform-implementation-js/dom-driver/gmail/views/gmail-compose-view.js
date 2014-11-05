@@ -25,7 +25,7 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_additionalAreas', destroy: true, defaultValue: {}},
+		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
@@ -61,6 +61,24 @@ _.extend(GmailComposeView.prototype, {
 
 	addButton: function(buttonDescriptor){
 		require('./compose-view/add-button')(this, buttonDescriptor);
+	},
+
+	addOuterSidebar: function(options){
+		if(this.isInlineReplyForm()){
+			console.warn("Trying to add an outer sidebar to an inline reply which doesn't work.");
+			return;
+		}
+
+		require('./compose-view/add-outer-sidebar')(this, options);
+	},
+
+	addInnerSidebar: function(options){
+		if(this.isInlineReplyForm()){
+			console.warn("Trying to add an inner sidebar to an inline reply which doesn't work.");
+			return;
+		}
+
+		require('./compose-view/add-inner-sidebar')(this, options);
 	},
 
 	close: function(){
@@ -142,6 +160,12 @@ _.extend(GmailComposeView.prototype, {
 
 	addManagedViewController: function(viewController){
 		this._managedViewControllers.push(viewController);
+	},
+
+	destroy: function(){
+		ComposeWindowDriver.prototype.destroy.call(this);
+
+
 	}
 
 });

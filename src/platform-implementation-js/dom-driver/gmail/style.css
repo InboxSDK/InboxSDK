@@ -63,3 +63,53 @@
   vertical-align: middle;
   margin-top: -3px;
 }
+
+
+.inboxsdk__compose_outerSidebar_wrapper {
+  position: absolute;
+  left: -401px;
+  top: 0px;
+  background: white;
+  width: 400px;
+  bottom: 0px;
+  border-left: 1px solid silver;
+  box-shadow: -2px 0px 1px #E6E6E6;
+  display: block;
+}
+
+.inboxsdk__outerSidebarActive .aSt .inboxsdk__compose_outerSidebar_wrapper {
+  border-left: 0;
+  box-shadow: none;
+  left: -400px;
+}
+
+.inboxsdk__outerSidebarActive .aSs > div { width: 50% !important; margin-left: 30%; }
+
+.inboxsdk__compose_outerSidebar_header {
+  background: #404040;
+  font-size: 80%;
+  padding: 10px 10px 11px 10px;
+  color: white;
+  border-bottom: 1px solid #C4C4C4;
+}
+
+.inboxsdk__compose_outerSidebar_body {
+  position: absolute;
+  width: 100%;
+  bottom: 43px;
+  top: 36px;
+  left: -1px;
+  overflow: auto;
+}
+
+.inboxsdk__compose_outerSidebar_footer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(206, 206, 206);
+  display: block;
+}
+
+.inboxsdk__compose_innerSidebarActive form, .inboxsdk__compose_innerSidebarActive .GQ {
+  padding-right: 200px;
+}

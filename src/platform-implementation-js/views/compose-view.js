@@ -127,11 +127,11 @@ _.extend(ComposeView.prototype, {
 	},
 
 	addOuterSidebar: function(options){
-		this._composeViewImplementation.makeOuterSidebar(options);
+		this._composeViewImplementation.addOuterSidebar(options);
 	},
 
 	addInnerSidebar: function(options){
-		this._composeViewImplementation.makeInnerSidebar(options);
+		this._composeViewImplementation.addInnerSidebar(options);
 	},
 
 	addMessageSendModifier: function(modifier){
