@@ -60,8 +60,7 @@ Tracker.prototype.track = function(eventName, details) {
       'screenHeight': screen.height,
       'windowWidth': window.innerWidth,
       'windowHeight': window.innerHeight,
-      'location': document.location.href,
-      'referrer': document.referrer,
+      'origin': document.location.origin,
       'email': email
     }, details);
 
