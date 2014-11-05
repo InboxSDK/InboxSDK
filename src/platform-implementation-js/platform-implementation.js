@@ -1,4 +1,4 @@
-
+var Toolbar = require('./toolbar');
 var Views = require('./views');
 var Tracker = require('./tracker');
 
@@ -13,6 +13,7 @@ var PlatformImplementation = function(appId){
 	this._tracker = new Tracker(appId);
 	this._driver = new GmailDriver();
 
+	this.Toolbar = new Toolbar(appId, this._driver);
 	this.Views = new Views(appId, this._driver);
 	this.Email = new Email(appId, this._driver);
 	this._tracker.setEmail(this.Email);
