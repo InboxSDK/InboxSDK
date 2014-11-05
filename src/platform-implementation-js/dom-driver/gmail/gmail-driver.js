@@ -14,6 +14,10 @@ var GmailThreadView = require('./views/gmail-thread-view');
 var GmailStandardThreadViewMonitor = require('./views/thread-view/standard-thread-view-monitor');
 var GmailPreviewPaneThreadViewMonitor = require('./views/thread-view/preview-pane-thread-view-monitor');
 
+var GmailThreadViewToolbarMonitor = require('./views/toolbar-view/thread-view-toolbar-monitor');
+var GmailStandardThreadListToolbarMonitor = require('./views/toolbar-view/standard-thread-list-toolbar-monitor');
+var GmailPreviewPaneThreadListToolbarMonitor = require('./views/toolbar-view/preview-pane-thread-list-toolbar-monitor');
+
 var GmailDriver = function(){
 	Driver.call(this);
 
@@ -29,9 +33,13 @@ _.extend(GmailDriver.prototype, {
 		{name: '_composeViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_toolbarViewDriverStream', destroy: true, destroyFunction: 'end'},
 		{name: '_composeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
-		{name: '_previewPaneThreadViewMonitor', destroy: true}
+		{name: '_previewPaneThreadViewMonitor', destroy: true},
+		{name: '_standardThreadListToolbarMonitor', destroy: true},
+		{name: '_previewPaneThreadListToolbarMonitor', destroy: true},
+		{name: '_threadViewToolbarMonitor', destroy: true}
 	],
 
 	_setupEventStreams: function(){
@@ -39,6 +47,7 @@ _.extend(GmailDriver.prototype, {
 		this._setupComposeViewDriverStream();
 		this._setupMessageViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
+		this._setupToolbarViewDriverStream();
 	},
 
 	_setupComposeViewDriverStream: function(){
@@ -157,6 +166,26 @@ _.extend(GmailDriver.prototype, {
 				})
 			);
 		});
+	},
+
+	getToolbarViewDriverStream: function(){
+		// we debounce because preview pane and standard thread watching can throw off
+		// events for the same thread in certain edge cases
+		// (namely preview pane active, but refreshing in thread view)
+		return this._toolbarViewDriverStream.debounceImmediate(20);
+	},
+
+	_setupToolbarViewDriverStream: function(){
+		this._toolbarViewDriverStream = new Bacon.Bus();
+
+		this._threadViewToolbarMonitor = new GmailThreadViewToolbarMonitor(this.getThreadViewDriverStream());
+		this._toolbarViewDriverStream.plug(this._threadViewToolbarMonitor.getToolbarViewStream());
+
+		this._standardThreadListToolbarMonitor = new GmailStandardThreadListToolbarMonitor();
+		this._toolbarViewDriverStream.plug(this._standardThreadListToolbarMonitor.getToolbarViewStream());
+
+		/* this._previewPaneThreadListToolbarMonitor = new GmailPreviewPaneThreadListToolbarMonitor();
+		this._toolbarViewDriverStream.plug(this._previewPaneThreadListToolbarMonitor.getToolbarViewStream()); */
 	}
 
 });

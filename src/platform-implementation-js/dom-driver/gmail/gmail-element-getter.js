@@ -49,6 +49,18 @@ var GmailElementGetter = {
 
 	getCurrentMainContentElement: function(){
 		return document.querySelector('div[role=main]');
+	},
+
+	getToolbarElementContainer: function(){
+		return document.querySelector('[gh=tm]').parentElement;
+	},
+
+	getToolbarElement: function(){
+		return document.querySelector('[gh=tm]');
+	},
+
+	getThreadToolbarElement: function(){
+		return document.querySelector('[gh=mtb]');
 	}
 
 };
