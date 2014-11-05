@@ -6,7 +6,8 @@ var env = require('jsdom').env;
 var InboxSDK = require('./lib/inboxsdk');
 
 describe('InboxSDK', function() {
-  global.window = global.document = global.__GmailSDKImpLoader = null;
+  global.window = global.document = global.__InboxSDKImpLoader = null;
+  global.MutationObserver = require('./lib/mock-mutation-observer');
 
   before(function() {
     return new RSVP.Promise(function(resolve, reject) {
@@ -17,6 +18,7 @@ describe('InboxSDK', function() {
         }
         window = _window;
         document = window.document;
+        document.body.classList = []; // hack
         resolve();
       });
     });
@@ -26,7 +28,8 @@ describe('InboxSDK', function() {
     window.close();
     delete global.window;
     delete global.document;
-    delete global.__GmailSDKImpLoader;
+    delete global.MutationObserver;
+    delete global.__InboxSDKImpLoader;
   });
 
   it('should load', function() {
