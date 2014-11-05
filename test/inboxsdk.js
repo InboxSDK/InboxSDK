@@ -3,9 +3,9 @@ var sinon = require('sinon');
 var RSVP = require('./lib/rsvp');
 var env = require('jsdom').env;
 
-var GmailSDK = require('./lib/gmailsdk');
+var InboxSDK = require('./lib/inboxsdk');
 
-describe('gmailsdk', function() {
+describe('InboxSDK', function() {
   global.window = global.document = global.__GmailSDKImpLoader = null;
 
   before(function() {
@@ -31,7 +31,7 @@ describe('gmailsdk', function() {
 
   it('should load', function() {
     this.slow();
-    var gmailsdk = new GmailSDK("test");
-    return gmailsdk._platformImplementationLoader.load();
+    var inboxsdk = new InboxSDK("test", {noGlobalErrorLogging: true});
+    return inboxsdk._platformImplementationLoader.load();
   });
 });
