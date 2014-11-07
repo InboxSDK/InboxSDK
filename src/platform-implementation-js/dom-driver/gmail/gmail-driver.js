@@ -11,12 +11,6 @@ var waitFor = require('../../lib/wait-for');
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
 
-var GmailStandardThreadViewMonitor = require('./views/thread-view/standard-thread-view-monitor');
-var GmailPreviewPaneThreadViewMonitor = require('./views/thread-view/preview-pane-thread-view-monitor');
-
-var GmailThreadViewToolbarMonitor = require('./views/toolbar-view/thread-view-toolbar-monitor');
-var GmailStandardThreadListToolbarMonitor = require('./views/toolbar-view/standard-thread-list-toolbar-monitor');
-var GmailPreviewPaneThreadListToolbarMonitor = require('./views/toolbar-view/preview-pane-thread-list-toolbar-monitor');
 
 var GmailDriver = function(){
 	Driver.call(this);
@@ -29,11 +23,13 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
-		{name: '_threadViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
-		{name: '_composeViewDriverStream', destroy: false, get: true, destroyFunction: 'end'},
+		{name: '_fullscreenViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_toolbarViewDriverStream', destroy: true, destroyFunction: 'end'},
 		{name: '_composeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
 		{name: '_previewPaneThreadViewMonitor', destroy: true},
@@ -43,11 +39,104 @@ _.extend(GmailDriver.prototype, {
 	],
 
 	_setupEventStreams: function(){
+		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
+
+		this._setupRowListViewDriverStream();
 		this._setupThreadViewDriverStream();
-		this._setupComposeViewDriverStream();
+		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
-		this._setupToolbarViewDriverStream();
+		this._setupComposeViewDriverStream();
+	},
+
+	_setupRowListViewDriverStream: function(){
+		this._rowListViewDriverStream = new Bacon.Bus();
+
+		this._rowListViewDriverStream.plug(
+			this._fullscreenViewDriverStream.flatMapLatest(function(gmailFullscreenView){
+				return gmailFullscreenView.getEventStream().filter(function(event){
+					return event.eventName === 'newGmailRowListView';
+				})
+				.map(function(event){
+					return event.view;
+				});
+			})
+		);
+	},
+
+	/* getThreadViewDriverStream: function(){
+		// we debounce because preview pane and standard thread watching can throw off
+		// events for the same thread in certain edge cases
+		// (namely preview pane active, but refreshing in thread view)
+		return this._threadViewDriverStream.debounceImmediate(20);
+	},*/
+
+	_setupThreadViewDriverStream: function(){
+		this._threadViewDriverStream = new Bacon.Bus();
+
+		this._threadViewDriverStream.plug(
+			this._fullscreenViewDriverStream.flatMapLatest(function(gmailFullscreenView){
+				return gmailFullscreenView.getEventStream().filter(function(event){
+					return event.eventName === 'newGmailThreadView';
+				})
+				.map(function(event){
+					return event.view;
+				});
+			})
+		);
+	},
+
+	/* getToolbarViewDriverStream: function(){
+		// we debounce because preview pane and standard thread watching can throw off
+		// events for the same thread in certain edge cases
+		// (namely preview pane active, but refreshing in thread view)
+		return this._toolbarViewDriverStream.debounceImmediate(20);
+	}, */
+
+	_setupToolbarViewDriverStream: function(){
+		this._toolbarViewDriverStream = new Bacon.Bus();
+
+		this._toolbarViewDriverStream.plug(
+			this._rowListViewDriverStream.map(function(gmailRowListView){
+				return gmailRowListView.getToolbarView();
+			})
+		);
+
+		this._toolbarViewDriverStream.plug(
+			this._threadViewDriverStream.map(function(gmailThreadView){
+				return gmailThreadView.getToolbarView();
+			})
+		);
+	},
+
+	_setupMessageViewDriverStream: function(){
+		this._messageViewDriverStream = new Bacon.Bus();
+
+		this._messageViewDriverStream.plug(
+			this._threadViewDriverStream.flatMapLatest(function(gmailThreadView){
+				return gmailThreadView.getEventStream().filter(function(event){
+					return event.eventName === 'messageOpen';
+				})
+				.map(function(event){
+					return event.view;
+				});
+			})
+		);
+	},
+
+	_setupAttachmentCardViewDriverStream: function(){
+		this._attachmentCardViewDriverStream = new Bacon.Bus();
+
+		this._attachmentCardViewDriverStream.plug(
+			this._messageViewDriverStream.flatMapLatest(function(gmailMessageView){
+				return gmailMessageView.getEventStream().filter(function(event){
+					return event.eventName === 'newAttachmentCard';
+				})
+				.map(function(event){
+					return event.view;
+				});
+			})
+		);
 	},
 
 	_setupComposeViewDriverStream: function(){
@@ -66,16 +155,17 @@ _.extend(GmailDriver.prototype, {
 			self._composeViewDriverStream.plug(self._composeElementMonitor.getViewAddedEventStream());
 		});
 
-		this._threadViewDriverStream.onValue(function(gmailThreadView){
-			self._composeViewDriverStream.plug(
-				gmailThreadView.getMessageStateStream().filter(function(event){
+
+		this._composeViewDriverStream.plug(
+			this._messageViewDriverStream.flatMapLatest(function(gmailMessageView){
+				return gmailMessageView.getEventStream().filter(function(event){
 					return event.eventName === 'replyOpen';
 				})
 				.map(function(event){
 					return event.view;
-				})
-			);
-		});
+				});
+			})
+		);
 	},
 
 	_setupStandaloneComposeViewDriverStream: function(){
@@ -117,75 +207,6 @@ _.extend(GmailDriver.prototype, {
 			var composeContainer = GmailElementGetter.getComposeWindowContainer();
 			self._composeElementMonitor.setObservedElement(composeContainer);
 		});
-	},
-
-	getThreadViewDriverStream: function(){
-		// we debounce because preview pane and standard thread watching can throw off
-		// events for the same thread in certain edge cases
-		// (namely preview pane active, but refreshing in thread view)
-		return this._threadViewDriverStream.debounceImmediate(20);
-	},
-
-	_setupThreadViewDriverStream: function(){
-		this._threadViewDriverStream = new Bacon.Bus();
-
-		this._standardThreadViewMonitor = new GmailStandardThreadViewMonitor();
-		this._threadViewDriverStream.plug(this._standardThreadViewMonitor.getThreadViewStream());
-
-		this._previewPaneThreadViewMonitor = new GmailPreviewPaneThreadViewMonitor();
-		this._threadViewDriverStream.plug(this._previewPaneThreadViewMonitor.getThreadViewStream());
-	},
-
-	_setupMessageViewDriverStream: function(){
-		this._messageViewDriverStream = new Bacon.Bus();
-
-		var self = this;
-		this.getThreadViewDriverStream().onValue(function(gmailThreadView){
-			self._messageViewDriverStream.plug(
-				gmailThreadView.getMessageStateStream().filter(function(event){
-					return event.eventName === 'messageOpen';
-				})
-				.map(function(event){
-					return event.view;
-				})
-			);
-		});
-	},
-
-	_setupAttachmentCardViewDriverStream: function(){
-		this._attachmentCardViewDriverStream = new Bacon.Bus();
-
-		var self = this;
-		this.getThreadViewDriverStream().onValue(function(gmailThreadView){
-			self._attachmentCardViewDriverStream.plug(
-				gmailThreadView.getMessageStateStream().filter(function(event){
-					return event.eventName === 'newAttachmentCard';
-				})
-				.map(function(event){
-					return event.view;
-				})
-			);
-		});
-	},
-
-	getToolbarViewDriverStream: function(){
-		// we debounce because preview pane and standard thread watching can throw off
-		// events for the same thread in certain edge cases
-		// (namely preview pane active, but refreshing in thread view)
-		return this._toolbarViewDriverStream.debounceImmediate(20);
-	},
-
-	_setupToolbarViewDriverStream: function(){
-		this._toolbarViewDriverStream = new Bacon.Bus();
-
-		this._threadViewToolbarMonitor = new GmailThreadViewToolbarMonitor(this.getThreadViewDriverStream());
-		this._toolbarViewDriverStream.plug(this._threadViewToolbarMonitor.getToolbarViewStream());
-
-		this._standardThreadListToolbarMonitor = new GmailStandardThreadListToolbarMonitor();
-		this._toolbarViewDriverStream.plug(this._standardThreadListToolbarMonitor.getToolbarViewStream());
-
-		/* this._previewPaneThreadListToolbarMonitor = new GmailPreviewPaneThreadListToolbarMonitor();
-		this._toolbarViewDriverStream.plug(this._previewPaneThreadListToolbarMonitor.getToolbarViewStream()); */
 	}
 
 });

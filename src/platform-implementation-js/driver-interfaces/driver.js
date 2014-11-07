@@ -18,7 +18,13 @@ _.extend(Driver.prototype, {
 
 	getReplyViewDriverStream: function(){},
 
-	getAttachmentCardViewDriverStream: function(){}
+	getAttachmentCardViewDriverStream: function(){},
+
+	getToolbarViewDriverStream: function(){},
+
+	getFullscreenViewChangeStream: function(){},
+
+	getNativeViewNames: function(){}
 
 });
 

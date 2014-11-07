@@ -51,6 +51,14 @@ var GmailElementGetter = {
 		return document.querySelector('div[role=main]');
 	},
 
+	isPreviewPane: function(){
+		return !!document.querySelector('.aia');
+	},
+
+	getRowListElements: function(){
+		return document.querySelectorAll('[gh=tl]');
+	},
+
 	getToolbarElementContainer: function(){
 		return document.querySelector('[gh=tm]').parentElement;
 	},
@@ -61,6 +69,15 @@ var GmailElementGetter = {
 
 	getThreadToolbarElement: function(){
 		return document.querySelector('[gh=mtb]');
+	},
+
+	getThreadContainerElement: function(){
+		var threadContainerElement = document.querySelector('.g.id table.Bs > tr');
+		if(!threadContainerElement){
+			return null;
+		}
+
+		return threadContainerElement;
 	}
 
 };
