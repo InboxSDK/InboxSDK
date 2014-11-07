@@ -43,8 +43,21 @@ function loadScript(url) {
       dataType: 'text'
     }).then(function(code) {
       // jshint evil:true
-      var compiled = new Function(code);
-      compiled();
+
+      // Q: Why put the code into a function before executing it instead of
+      //    evaling it immediately?
+      // A: Chrome would execute it before applying any remembered
+      //    breakpoints.
+      // Q: Why not just use `... = new Function(...)`?
+      // A: The sourcemaps would be off by one line in Chrome because of
+      //    https://code.google.com/p/chromium/issues/detail?id=109362
+      // Q: indirectEval?
+      // A: Using the eval value rather than the eval keyword causes the
+      //    code passed to it to be run in the global scope instead of the
+      //    current scope. (Seriously, it's a javascript thing.)
+      var indirectEval = eval;
+      var program = indirectEval("(function(){"+code+"\n});\n//# sourceURL="+url+"\n");
+      program();
     });
   } else {
     // Try to add script as CORS first so we can get error stack data from it.
