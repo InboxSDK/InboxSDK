@@ -13,6 +13,10 @@ var currentUrlObject = {};
 function setupFullscreenViewDriverStream(gmailDriver){
 	gmailDriver._fullscreenViewDriverStream = new Bacon.Bus();
 
+	window.addEventListener('hashchange', function(event){
+		_checkForCustomFullscreenView(gmailDriver, event);
+	});
+
 	waitFor(function(){
 		return !!GmailElementGetter.getMainContentContainer();
 	}).then(function(){
@@ -34,7 +38,23 @@ function setupFullscreenViewDriverStream(gmailDriver){
 			mainContentContainer,
 			{childList: true}
 		);
+
+		_observeVisibilityChangeOnMainElement(gmailDriver, GmailElementGetter.getCurrentMainContentElement());
 	});
+}
+
+function _checkForCustomFullscreenView(gmailDriver, event){
+	var urlObject = _processUrl(event.newURL);
+	if(currentUrlObject.hash === urlObject.hash){
+		return;
+	}
+
+	if(_isGmailView(urlObject.hash) && _isGmailView(currentUrlObject.hash)){
+		return;
+	}
+
+	currentUrlObject = urlObject;
+	_createFullscreenViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.hash));
 }
 
 function _observeVisibilityChangeOnMainElement(gmailDriver, element){

@@ -1,6 +1,8 @@
 var RSVP = require('rsvp');
 var waitFor = require('../../lib/wait-for');
 
+var $ = require('jquery');
+
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle: function(){
@@ -35,6 +37,20 @@ var GmailElementGetter = {
 
 	getComposeWindowContainer: function(){
 		return document.querySelector('.dw .nH > .nH > .no');
+	},
+
+	getContentSectionElement: function(){
+		var mainContentElement = GmailElementGetter.getMainContentContainer();
+		if(!mainContentElement){
+			return null;
+		}
+
+		var sectionParent = $(mainContentElement).parents().filter('.nn');
+		if(sectionParent.length === 0){
+			return null;
+		}
+
+		return sectionParent[0];
 	},
 
 	getMainContentContainer: function(){

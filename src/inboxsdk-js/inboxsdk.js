@@ -2,6 +2,7 @@ var PlatformImplementationLoader = require('./loading/platform-implementation-lo
 var Views = require('./api-definitions/views');
 var Mailbox = require('./api-definitions/mailbox');
 var Tracker = require('./tracker');
+var FullscreenViews = require('./api-definitions/fullscreen-views');
 
 var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
@@ -17,6 +18,7 @@ var InboxSDK = function(appId, opts){
 
   this.Views = new Views(this._platformImplementationLoader);
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
+  this.FullscreenViews = new FullscreenViews(this._platformImplementationLoader);
 
 
   this.Util = {

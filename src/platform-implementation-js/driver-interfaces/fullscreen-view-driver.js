@@ -15,17 +15,7 @@ _.extend(FullscreenViewDriver.prototype, {
 
 	isCustomView: function(){},
 
-	getThreadViewDriver: function(){},
-
-	getThreadListType: function(){},
-
-	getLabelName: function(){},
-
-	getVisibleRowViewDrivers: function(){},
-
-	getSelectedRowViewDrivers: function(){},
-
-	getRowListViewDrivers: function(){}
+	getCustomViewElement: function(){}
 
 });
 

@@ -5,7 +5,7 @@ var FullscreenViewDescriptor = function(options){
 	BasicClass.call(this);
 
 	this._name = options.name;
-	this._isNative = options.isNative;
+	this._isCustomView = options.isCustomView;
 };
 
 FullscreenViewDescriptor.prototype = Object.create(BasicClass.prototype);
@@ -14,7 +14,7 @@ _.extend(FullscreenViewDescriptor.prototype, {
 
 	__memberVariables: [
 		{name: '_name', destroy: false, get: true},
-		{name: '_isNative', destroy: false}
+		{name: '_isCustomView', destroy: false}
 	],
 
 	createLink: function(params){
@@ -25,8 +25,8 @@ _.extend(FullscreenViewDescriptor.prototype, {
 
 	},
 
-	isNative: function(){
-		return this._isNative;
+	isCustomView: function(){
+		return this._isCustomView;
 	}
 
 });

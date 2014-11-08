@@ -16,3 +16,7 @@ examples/dropbox/inboxsdk.js.map
 examples/hello-world/inboxsdk.js
 
 examples/hello-world/inboxsdk.js.map
+
+examples/custom-view/inboxsdk.js
+
+*.map

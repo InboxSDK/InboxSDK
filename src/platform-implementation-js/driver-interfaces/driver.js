@@ -10,6 +10,10 @@ Driver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Driver.prototype, {
 
+	showCustomFullscreenView: function(element){},
+
+	showNativeFullscreenView: function(){},
+
 	getComposeViewDriverStream: function(){},
 
 	getThreadViewDriverStream: function(){},

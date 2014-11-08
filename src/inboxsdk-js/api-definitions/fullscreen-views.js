@@ -9,9 +9,18 @@ var FullscreenViews = function(platformImplementationLoader){
 	this._watchForFullscreenViewChanges();
 };
 
-FullscreenViews.prototype = Object.create(FullscreenViews.prototype);
+FullscreenViews.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(FullscreenViews.prototype, {
+
+	registerCustom: function(options){
+		var self = this;
+		this._platformImplementationLoader.load().then(function(platformImplementation){
+
+			platformImplementation.FullscreenViews.registerCustom(options);
+
+		});
+	},
 
 	_watchForFullscreenViewChanges: function(){
 		var self = this;
@@ -25,3 +34,5 @@ _.extend(FullscreenViews.prototype, {
 	}
 
 });
+
+module.exports = FullscreenViews;

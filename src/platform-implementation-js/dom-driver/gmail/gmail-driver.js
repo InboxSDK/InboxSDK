@@ -4,9 +4,7 @@ var Bacon = require('baconjs');
 require('./custom-style');
 
 var Driver = require('../../driver-interfaces/driver');
-var ElementMonitor = require('../../lib/dom/element-monitor');
 var GmailElementGetter = require('./gmail-element-getter');
-var waitFor = require('../../lib/wait-for');
 
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
@@ -38,6 +36,18 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadViewToolbarMonitor', destroy: true}
 	],
 
+	showCustomFullscreenView: function(element){
+		require('./gmail-driver/show-custom-fullscreen-view')(this, element);
+	},
+
+	showNativeFullscreenView: function(){
+		require('./gmail-driver/show-native-fullscreen-view')(this);
+	},
+
+	getNativeViewNames: function(){
+		return require('./views/gmail-fullscreen-view/gmail-fullscreen-view-names').GMAIL_VIEWS;
+	},
+
 	_setupEventStreams: function(){
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
@@ -46,7 +56,8 @@ _.extend(GmailDriver.prototype, {
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
-		this._setupComposeViewDriverStream();
+
+		require('./gmail-driver/setup-compose-view-driver-stream')(this);
 	},
 
 	_setupRowListViewDriverStream: function(){
@@ -137,76 +148,6 @@ _.extend(GmailDriver.prototype, {
 				});
 			})
 		);
-	},
-
-	_setupComposeViewDriverStream: function(){
-		this._composeViewDriverStream = new Bacon.Bus();
-
-		var self = this;
-
-		GmailElementGetter.waitForGmailModeToSettle().then(function(){
-			if(GmailElementGetter.isStandaloneComposeWindow()){
-				self._setupStandaloneComposeViewDriverStream();
-			}
-			else{
-				self._setupStandardComposeViewDriverStream();
-			}
-
-			self._composeViewDriverStream.plug(self._composeElementMonitor.getViewAddedEventStream());
-		});
-
-
-		this._composeViewDriverStream.plug(
-			this._messageViewDriverStream.flatMapLatest(function(gmailMessageView){
-				return gmailMessageView.getEventStream().filter(function(event){
-					return event.eventName === 'replyOpen';
-				})
-				.map(function(event){
-					return event.view;
-				});
-			})
-		);
-	},
-
-	_setupStandaloneComposeViewDriverStream: function(){
-		this._composeElementMonitor = new ElementMonitor({
-			elementMembershipTest: function(element){
-				return true;
-			},
-
-			viewCreationFunction: function(element){
-				return new GmailComposeView(element);
-			}
-		});
-
-
-		var self = this;
-		waitFor(function(){
-			return !!GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
-		}).then(function(){
-			var composeContainer = GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
-			self._composeElementMonitor.setObservedElement(GmailElementGetter.StandaloneCompose.getComposeWindowContainer());
-		});
-	},
-
-	_setupStandardComposeViewDriverStream: function(){
-		this._composeElementMonitor = new ElementMonitor({
-			elementMembershipTest: function(element){
-				return element.classList.contains('nn') && element.children.length > 0;
-			},
-
-			viewCreationFunction: function(element){
-				return new GmailComposeView(element);
-			}
-		});
-
-		var self = this;
-		waitFor(function(){
-			return !!GmailElementGetter.getComposeWindowContainer();
-		}).then(function(){
-			var composeContainer = GmailElementGetter.getComposeWindowContainer();
-			self._composeElementMonitor.setObservedElement(composeContainer);
-		});
 	}
 
 });

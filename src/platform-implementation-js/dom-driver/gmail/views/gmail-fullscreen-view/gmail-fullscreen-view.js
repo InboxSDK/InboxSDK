@@ -21,10 +21,11 @@ var GmailFullscreenView = function(options){
 	this._eventStreamBus = new Bacon.Bus();
 
 	if(this._isCustomView){
-		return;
+		this._setupCustomViewElement();
 	}
-
-	this._setupSubViews();
+	else{
+		this._setupSubViews();
+	}
 };
 
 GmailFullscreenView.prototype = Object.create(FullscreenViewDriver.prototype);
@@ -36,6 +37,7 @@ _.extend(GmailFullscreenView.prototype, {
 		{name: '_params', get: true, destroy: false},
 		{name: '_hash', get: true, destroy: false},
 		{name: '_isCustomView', destroy: true},
+		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
@@ -47,6 +49,11 @@ _.extend(GmailFullscreenView.prototype, {
 
 	getEventStream: function(){
 		return this._eventStreamBus;
+	},
+
+	_setupCustomViewElement: function(){
+		this._customViewElement = document.createElement('div');
+		this._customViewElement.classList.add('inboxsdk__custom_view_element');
 	},
 
 	_setupSubViews: function(){
