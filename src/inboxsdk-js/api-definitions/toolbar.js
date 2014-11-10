@@ -43,3 +43,5 @@ _.extend(Toolbar.prototype, {
 	}
 
 });
+
+module.exports = Toolbar;

@@ -29,6 +29,10 @@ _.extend(FullscreenViews.prototype,  {
 		});
 	},
 
+	getCurrent: function(){
+		return this._currentFullscreenView;
+	},
+
 	registerCustom: function(options){
 		this._customFullscreenViews.push(options);
 

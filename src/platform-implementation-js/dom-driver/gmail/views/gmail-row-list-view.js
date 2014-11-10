@@ -5,12 +5,13 @@ var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver
 
 var GmailToolbarView = require('./gmail-toolbar-view');
 
-var GmailRowListView = function(rootElement){
+var GmailRowListView = function(rootElement, fullscreenViewDriver){
 	RowListViewDriver.call(this);
 
 	this._eventStreamBus = new Bacon.Bus();
 
 	this._element = rootElement;
+	this._fullscreenViewDriver = fullscreenViewDriver;
 	this._setupToolbarView();
 	this._startWatchingForRowViews();
 };
@@ -21,6 +22,7 @@ _.extend(GmailRowListView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_fullscreenViewDriver', destroy: false, get: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_rowViews', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
@@ -33,12 +35,12 @@ _.extend(GmailRowListView.prototype, {
 	_setupToolbarView: function(){
 		var toolbarElement = this._element.querySelector('[gh=mtb]');
 
-		if(toolbarElement){
-			this._toolbarView = new GmailToolbarView(toolbarElement);
-			return;
+		if(!toolbarElement){
+			toolbarElement = this._findToolbarElement();
 		}
 
-		this._toolbarView = this._findToolbarElement();
+		this._toolbarView = new GmailToolbarView(toolbarElement);
+		this._toolbarView.setRowListViewDriver(this);
 	},
 
 	_findToolbarElement: function(){
@@ -57,7 +59,7 @@ _.extend(GmailRowListView.prototype, {
 			return true;
 		}
 
-		if(toolbarContainerElement.parentElement.classList.contains('aeH') && this._element.parentElement.parentElement.parentElement.classList.contains('aeF')){
+		if(toolbarContainerElement.parentElement.classList.contains('aeH') && this._element.parentElement.parentElement.classList.contains('aeF')){
 			return true;
 		}
 

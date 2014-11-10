@@ -15,7 +15,7 @@ var PlatformImplementation = function(appId){
 	this._driver = new GmailDriver();
 
 	this.FullscreenViews = new FullscreenViews(appId, this._driver);
-	this.Toolbar = new Toolbar(appId, this._driver);
+	this.Toolbar = new Toolbar(appId, this._driver, this);
 	this.Views = new Views(appId, this._driver);
 	this.Email = new Email(appId, this._driver);
 

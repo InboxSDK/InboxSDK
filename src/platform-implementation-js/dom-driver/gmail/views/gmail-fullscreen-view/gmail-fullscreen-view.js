@@ -78,7 +78,7 @@ _.extend(GmailFullscreenView.prototype, {
 
 	_processRowListElement: function(rowListElement){
 		var rootElement = rowListElement.parentElement;
-		var gmailRowListView = new GmailRowListView(rootElement);
+		var gmailRowListView = new GmailRowListView(rootElement, this);
 
 		this._rowListViews.push(gmailRowListView);
 

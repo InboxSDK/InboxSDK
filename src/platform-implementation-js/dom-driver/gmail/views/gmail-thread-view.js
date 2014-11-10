@@ -8,10 +8,11 @@ var ThreadViewDriver = require('../../../driver-interfaces/thread-view-driver');
 var GmailMessageView = require('./gmail-message-view');
 var GmailToolbarView = require('./gmail-toolbar-view');
 
-var GmailThreadView = function(element){
+var GmailThreadView = function(element, fullscreeViewDriver){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
+	this._fullscreenViewDriver = fullscreeViewDriver;
 
 	this._eventStreamBus = new Bacon.Bus();
 
@@ -25,6 +26,7 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_fullscreenViewDriver', destroy: false, get: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: false},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
@@ -42,6 +44,7 @@ _.extend(GmailThreadView.prototype, {
 		}
 
 		this._toolbarView = new GmailToolbarView(toolbarElement);
+		this._toolbarView.setThreadViewDriver(this);
 	},
 
 	_setupMessageViewStream: function(){
