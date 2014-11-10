@@ -20,3 +20,5 @@ examples/hello-world/inboxsdk.js.map
 examples/custom-view/inboxsdk.js
 
 *.map
+
+examples/toolbar-button/inboxsdk.js

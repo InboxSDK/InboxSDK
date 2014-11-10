@@ -2,8 +2,9 @@ var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
 var ElementMonitor = require('../../../lib/dom/element-monitor');
-
 var GmailElementGetter = require('../gmail-element-getter');
+
+var GmailComposeView = require('../views/gmail-compose-view');
 
 function setupComposeViewDriverStream(gmailDriver){
 

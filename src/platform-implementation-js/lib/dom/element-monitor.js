@@ -115,10 +115,6 @@ _.extend(ElementMonitor.prototype, {
 	},
 
 	_handleRemovedElement: function(element){
-		if(!this._elementMembershipTest(element)){
-			return;
-		}
-
 		var view = this._findViewForElement(element);
 		if(!view){
 			return;

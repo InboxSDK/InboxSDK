@@ -3,7 +3,7 @@ var $ = require('jquery');
 
 var ToolbarViewDriver = require('../../../driver-interfaces/toolbar-view-driver');
 
-var IconButtonView = require('../widgets/buttons/icon-button-view');
+var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
 
@@ -66,19 +66,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_getButtonView: function(buttonDescriptor){
-		//TODO figure out which exact button view to return
-		//
-		// if(buttonDescriptor.hasDropdown && buttonDescriptor.iconUrl){
-		//    return IconArrowButtonView;
-		// }
-		// else if(buttonDescriptor.hasDropdown){
-		// 	  return ArrowButtonView
-		// }
-		// else if(buttonDescriptor.iconUrl){
-		// 	  return IconButtonView
-		// }
-
-		var buttonView = new IconButtonView(buttonDescriptor);
+		var buttonView = new ButtonView(buttonDescriptor);
 
 		if(this._rowListViewDriver){
 			buttonView.getElement().setAttribute('data-rowlist-toolbar', 'true');
