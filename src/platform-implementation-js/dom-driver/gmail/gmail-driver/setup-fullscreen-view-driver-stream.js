@@ -7,6 +7,7 @@ var GmailViewNames = require('../views/gmail-fullscreen-view/gmail-fullscreen-vi
 
 var GmailFullscreenView = require('../views/gmail-fullscreen-view/gmail-fullscreen-view');
 
+var getURLObject = require('./get-url-object');
 
 var currentUrlObject = {};
 
@@ -44,7 +45,7 @@ function setupFullscreenViewDriverStream(gmailDriver){
 }
 
 function _checkForCustomFullscreenView(gmailDriver, event){
-	var urlObject = _processUrl(event.newURL);
+	var urlObject = getURLObject(event.newURL);
 	if(currentUrlObject.hash === urlObject.hash){
 		return;
 	}
@@ -75,7 +76,7 @@ function _observeVisibilityChangeOnMainElement(gmailDriver, element){
 
 
 function _handleNewUrl(gmailDriver, newUrl){
-	var urlObject = _processUrl(newUrl);
+	var urlObject = getURLObject(newUrl);
 	currentUrlObject = urlObject;
 
 	if(!_isGmailView(urlObject.name)){
@@ -94,35 +95,6 @@ function _handleNewUrl(gmailDriver, newUrl){
 	}
 
 	_createFullscreenViewDriver(gmailDriver, urlObject, true);
-}
-
-function _processUrl(url){
-	var urlObject = {
-		hash: ''
-	};
-
-	var urlParts = url.split('#');
-	if(urlParts.length !== 2){
-		urlObject.name = 'inbox';
-		urlObject.params = [];
-		return urlObject;
-	}
-
-	var hash = urlParts[1];
-
-	var queryParts = hash.split('?');
-	if(queryParts.length > 1){
-		urlObject.query = queryParts[1];
-		hash = queryParts[0];
-	}
-
-	var hashParts = hash.split('/');
-
-	urlObject.name = hashParts[0];
-	urlObject.params = _.rest(hashParts);
-	urlObject.hash = hash;
-
-	return urlObject;
 }
 
 function _isGmailView(viewName){

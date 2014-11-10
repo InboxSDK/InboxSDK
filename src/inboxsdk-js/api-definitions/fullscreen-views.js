@@ -22,6 +22,15 @@ _.extend(FullscreenViews.prototype, {
 		});
 	},
 
+	getDescriptor: function(name){
+		if(!this._platformImplementationLoader.getPlatformImplementation()){
+			console.warn('You tried calling this function before the SDK was ready. Use InboxSDK.ready().then(callback).')
+			return null;
+		}
+
+		return this._platformImplementationLoader.getPlatformImplementation().FullscreenViews.getDescriptor(name);
+	},
+
 	_watchForFullscreenViewChanges: function(){
 		var self = this;
 		this._platformImplementationLoader.load().then(function(platformImplementation){

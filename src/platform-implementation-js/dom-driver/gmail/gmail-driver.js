@@ -48,6 +48,14 @@ _.extend(GmailDriver.prototype, {
 		return require('./views/gmail-fullscreen-view/gmail-fullscreen-view-names').GMAIL_VIEWS;
 	},
 
+	createLink: function(viewName, params){
+		return require('./gmail-driver/create-link')(this, viewName, params);
+	},
+
+	gotoView: function(viewName, params){
+		return require('./gmail-driver/goto-view')(this, viewName, params);
+	},
+
 	_setupEventStreams: function(){
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 

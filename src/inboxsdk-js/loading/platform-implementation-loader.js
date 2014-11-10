@@ -13,7 +13,9 @@ var PlatformImplementationLoader = function(appId) {
                 });
             }
         }).then(function() {
-            return global.__InboxSDKImpLoader.load("0.1", appId);
+            self._platformImplementation =  global.__InboxSDKImpLoader.load("0.1", appId);
+
+            return self._platformImplementation;
         });
     });
 };
@@ -22,6 +24,10 @@ _.extend(PlatformImplementationLoader.prototype, {
     _loadScript: function(){
         var loadScript = require('../../common/load-script');
         return loadScript('http://localhost:4567/platform-implementation.js');
+    },
+
+    getPlatformImplementation: function(){
+        return this._platformImplementation;
     }
 });
 

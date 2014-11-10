@@ -35,7 +35,8 @@ _.extend(FullscreenViews.prototype,  {
 		this._fullscreenDescriptors.push(
 			new FullscreenViewDescriptor({
 				name: options.name,
-				isCustomView: true
+				isCustomView: true,
+				driver: this._driver
 			})
 		);
 	},
@@ -49,7 +50,8 @@ _.extend(FullscreenViews.prototype,  {
 			self._fullscreenDescriptors.push(
 				new FullscreenViewDescriptor({
 					name: viewName,
-					isCustomView: false
+					isCustomView: false,
+					driver: self._driver
 				})
 			);
 
