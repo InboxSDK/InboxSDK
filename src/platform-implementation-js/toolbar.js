@@ -1,4 +1,4 @@
-	var _ = require('lodash');
+var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
 var Toolbar = function(appId, driver, platformImplementation){
@@ -8,8 +8,7 @@ var Toolbar = function(appId, driver, platformImplementation){
 	this._driver = driver;
 	this._platformImplementation = platformImplementation;
 
-	this._threadListNoSelectionButtonDescriptors = [];
-	this._threadListWithSelectionsButtonDescriptors = [];
+	this._threadListButtonDescriptors = [];
 	this._threadViewButtonDesriptors = [];
 
 	this._threadListNoSelectionsMoreItemDescriptors = [];
@@ -24,11 +23,11 @@ Toolbar.prototype = Object.create(EventEmitter.prototype);
 _.extend(Toolbar.prototype, {
 
 	registerThreadListNoSelectionsButton: function(buttonDescriptor){
-		this._threadListNoSelectionButtonDescriptors.push(this._processButtonDescriptor(buttonDescriptor));
+		this._threadListButtonDescriptors.push(_.merge(this._processButtonDescriptor(buttonDescriptor), {toolbarState: 'COLLASED'}));
 	},
 
 	registerThreadListWithSelectionsButton: function(buttonDescriptor){
-		this._threadListWithSelectionsButtonDescriptors.push(this._processButtonDescriptor(buttonDescriptor));
+		this._threadListButtonDescriptors.push(_.merge(this._processButtonDescriptor(buttonDescriptor), {toolbarState: 'EXPANDED'}));
 	},
 
 	registerThreadViewButton: function(buttonDescriptor){
@@ -61,7 +60,7 @@ _.extend(Toolbar.prototype, {
 		var buttonDescriptors = null;
 
 		if(toolbarViewDriver.getRowListViewDriver()){
-			buttonDescriptors = this._threadListWithSelectionsButtonDescriptors;
+			buttonDescriptors = this._threadListButtonDescriptors;
 		}
 		else if(toolbarViewDriver.getThreadViewDriver()){
 			buttonDescriptors = this._threadViewButtonDesriptors;

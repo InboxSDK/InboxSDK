@@ -26,6 +26,10 @@ function setupFullscreenViewDriverStream(gmailDriver){
 		var mainContentContainer = GmailElementGetter.getMainContentContainer();
 
 		var mainContentObserver = new MutationObserver(function(mutations){
+			if(mutations[0].removedNodes.length > 0){
+				return;
+			}
+
 			_handleNewUrl(gmailDriver, location.href);
 
 			mutations.forEach(function(mutation){
@@ -50,12 +54,12 @@ function _checkForCustomFullscreenView(gmailDriver, event){
 		return;
 	}
 
-	if(_isGmailView(urlObject.hash) && _isGmailView(currentUrlObject.hash)){
+	if(_isGmailView(urlObject.name) && _isGmailView(currentUrlObject.name)){
 		return;
 	}
 
 	currentUrlObject = urlObject;
-	_createFullscreenViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.hash));
+	_createFullscreenViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.name));
 }
 
 function _observeVisibilityChangeOnMainElement(gmailDriver, element){
@@ -136,7 +140,7 @@ function _createThreadFullscreenViewDriver(gmailDriver, urlObject){
 
 		return !!GmailElementGetter.getThreadContainerElement();
 
-	}).then(function(){
+	}, 30*1000, 50).then(function(){
 		_createFullscreenViewDriver(gmailDriver, urlObject, true);
 	});
 }

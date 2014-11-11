@@ -88,7 +88,7 @@ var GmailElementGetter = {
 	},
 
 	getThreadContainerElement: function(){
-		var threadContainerElement = document.querySelector('.g.id table.Bs > tr');
+		var threadContainerElement = document.querySelector('[role=main] .g.id table.Bs > tr');
 		if(!threadContainerElement){
 			return null;
 		}

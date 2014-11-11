@@ -38,13 +38,33 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	_setupToolbarView: function(){
-		var toolbarElement = GmailElementGetter.getThreadToolbarElement();
-		if(GmailElementGetter.isPreviewPane()){
-			toolbarElement = $(this._element).closest('[role=main]').find('[gh=mtb]')[0];
-		}
+		var toolbarElement = this._findToolbarElement();
 
 		this._toolbarView = new GmailToolbarView(toolbarElement);
 		this._toolbarView.setThreadViewDriver(this);
+	},
+
+	_findToolbarElement: function(){
+		var toolbarContainerElements = document.querySelectorAll('[gh=tm]');
+		for(var ii=0; ii<toolbarContainerElements.length; ii++){
+			if(this._isToolbarContainerRelevant(toolbarContainerElements[ii])){
+				return toolbarContainerElements[ii].querySelector('[gh=mtb]');
+			}
+		}
+
+		return null;
+	},
+
+	_isToolbarContainerRelevant: function(toolbarContainerElement){
+		if(toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement){
+			return true;
+		}
+
+		if(toolbarContainerElement.parentElement.getAttribute('role') !== 'main' && this._element.parentElement.getAttribute('role') !== 'main'){
+			return true;
+		}
+
+		return false;
 	},
 
 	_setupMessageViewStream: function(){

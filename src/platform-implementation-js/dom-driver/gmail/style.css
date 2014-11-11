@@ -179,4 +179,12 @@
   display: none;
 }
 
+[data-toolbar-expanded=true] [data-toolbar-expanded=false] {
+  display: none;
+}
+
+[data-toolbar-expanded=false] [data-toolbar-expanded=true] {
+  display: none;
+}
+
 /* end */

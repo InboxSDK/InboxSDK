@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var $ = require('jquery');
+
 var Bacon = require('baconjs');
 
 var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
@@ -59,7 +61,7 @@ _.extend(GmailRowListView.prototype, {
 			return true;
 		}
 
-		if(toolbarContainerElement.parentElement.classList.contains('aeH') && this._element.parentElement.parentElement.classList.contains('aeF')){
+		if(toolbarContainerElement.parentElement.getAttribute('role') !== 'main' && this._element.parentElement.getAttribute('role') !== 'main'){
 			return true;
 		}
 
