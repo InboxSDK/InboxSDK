@@ -27,6 +27,7 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_element', destroy: false, get: true},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
+		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
 
@@ -87,7 +88,7 @@ _.extend(GmailComposeView.prototype, {
 			return;
 		}
 
-		simulateClick(this.getCloseButton()[0]);
+		simulateClick(this.getCloseButton());
 	},
 
 	isReply: function(){
@@ -99,15 +100,15 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getBodyElement: function(){
-		return $(this._element).find('.Ap [g_editable=true]')[0];
+		return this._element.querySelector('.Ap [g_editable=true]')[0];
 	},
 
 	getHTMLContent: function(){
-		return $(this.getBodyElement()).innerHTML;
+		return this.getBodyElement().innerHTML;
 	},
 
 	getTextContent: function(){
-		return $(this.getBodyElement()).textContent;
+		return this.getBodyElement().textContent;
 	},
 
 	getSelectedBodyHTML: function(){
@@ -143,29 +144,27 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getFormattingArea: function() {
-		return $(this._element).find('.oc');
+		return this._element.querySelector('.oc');
 	},
 
 	getInsertMoreArea: function() {
-		return $(this._element).find('.eq');
+		return this._element.querySelector('.eq');
 	},
 
 	getInsertLinkButton: function() {
-		return $(this._element).find('.e5.aaA.aMZ');
+		return this._element.querySelector('.e5.aaA.aMZ');
 	},
 
 	getCloseButton: function(){
-		return $($(this._element).find('.Hm > img')[2]);
+		return this._element.querySelectorAll('.Hm > img')[2];
 	},
 
 	addManagedViewController: function(viewController){
 		this._managedViewControllers.push(viewController);
 	},
 
-	destroy: function(){
-		ComposeWindowDriver.prototype.destroy.call(this);
-
-
+	addUnsubscribeFunction: function(unsubscribeFunction){
+		this._unsubscribeFunctions.push(unsubscribeFunction);
 	}
 
 });

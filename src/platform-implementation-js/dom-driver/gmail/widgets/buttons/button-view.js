@@ -253,6 +253,21 @@ _.extend(ButtonView.prototype, {
 				event.preventDefault();
 			}
 		);
+
+		this._element.addEventListener(
+			'keydown',
+			function(event){
+				if(event.which === 32 /* space */ || event.which === 13 /* enter */){
+					self._eventStream.push({
+						eventName: 'click',
+						domEvent: event
+					});
+
+					event.stopPropagation();
+					event.preventDefault();
+				}
+			}
+		);
 	},
 
 	_setupAestheticEvents: function(){

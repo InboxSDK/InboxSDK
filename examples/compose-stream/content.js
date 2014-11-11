@@ -7,6 +7,8 @@ inboxSDK.Views.on('composeOpen', function(composeView){
 
 	var sinkFunction;
 
+	var stream = new Bacon.Bus();
+
 	var buttonOptions = {
 		title: 'Monkeys!',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
@@ -14,20 +16,12 @@ inboxSDK.Views.on('composeOpen', function(composeView){
 			monkeyIndex = (monkeyIndex + 1)%2;
 			buttonOptions.iconUrl = monkeyImages[monkeyIndex];
 
-			sinkFunction(buttonOptions);
+			stream.push(buttonOptions);
 		},
 		section: 'TRAY_LEFT'
 	};
 
-	var buttonStream = Bacon.fromBinder(function(sink){
-		sinkFunction = sink;
 
-		return function(){
-			//do nothing
-		};
-	});
-
-	composeView.addButton(buttonStream);
-
-	sinkFunction(buttonOptions);
+	composeView.addButton(stream);
+	stream.push(buttonOptions);
 });

@@ -25,7 +25,7 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 	var composeBodyElement = $(gmailComposeView.getBodyElement());
 	composeBodyElement.focus();
 
-	simulateClick(gmailComposeView.getInsertLinkButton()[0]);
+	simulateClick(gmailComposeView.getInsertLinkButton());
 
 	if($('#linkdialog-text').length === 0){
 		return;

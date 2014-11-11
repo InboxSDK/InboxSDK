@@ -18,7 +18,7 @@ function addButton(gmailComposeView, buttonDescriptor){
 function _addButtonStream(gmailComposeView, buttonDescriptorStream){
 	var buttonViewController;
 
-	buttonDescriptorStream.onValue(function(buttonDescriptor){
+	var unsubscribeFunction = buttonDescriptorStream.onValue(function(buttonDescriptor){
 
 		var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 
@@ -28,8 +28,9 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream){
 		else{
 			buttonViewController.getView().update(buttonOptions);
 		}
-
 	});
+
+	gmailComposeView.addUnsubscribeFunction(unsubscribeFunction);
 }
 
 function _addButton(gmailComposeView, buttonDescriptor){
@@ -45,13 +46,15 @@ function _addButton(gmailComposeView, buttonDescriptor){
 
 function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
+	buttonViewController.getView().addClass('wG');
+	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
 
 	var formattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
 	var element = buttonViewController.getView().getElement();
 
 	var actionToolbar = gmailComposeView.getAdditionalActionToolbar();
 
-	actionToolbar.prepend(element);
+	actionToolbar.insertBefore(element, actionToolbar.firstElementChild);
 	gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
 	gmailComposeView.addManagedViewController(buttonViewController);

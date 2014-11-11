@@ -72,6 +72,10 @@
   height: 29px;
 }
 
+.inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
+  margin-top: 0px;
+}
+
 .inboxsdk__compose_actionToolbar .inboxsdk__compose_overflowButton.inboxsdk__button {
   margin: 0 0 0 4px;
   height: 27px;
