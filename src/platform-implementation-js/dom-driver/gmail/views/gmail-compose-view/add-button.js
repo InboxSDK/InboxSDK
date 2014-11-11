@@ -1,6 +1,6 @@
 var $ = require('jquery');
 
-var IconButtonView = require('../../widgets/buttons/icon-button-view');
+var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
 var MenuButtonViewController = require('../../../../widgets/buttons/menu-button-view-controller');
 
@@ -38,7 +38,7 @@ function _addButtonToSendRight(gmailComposeView, buttonDescriptor){
 function _getButtonViewController(buttonDescriptor){
 	var buttonViewController = null;
 
-	var buttonView = new IconButtonView(buttonDescriptor);
+	var buttonView = new ButtonView(buttonDescriptor);
 	buttonDescriptor.buttonView = buttonView;
 
 	if(buttonDescriptor.hasDropdown){

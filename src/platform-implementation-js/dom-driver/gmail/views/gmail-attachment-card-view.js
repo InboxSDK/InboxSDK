@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var AttachmentCardViewDriver = require('../../../driver-interfaces/attachment-card-view-driver');
 
-var IconButtonView = require('../widgets/buttons/icon-button-view');
+var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var simulateClick = require('../../../lib/dom/simulate-click');
@@ -40,7 +40,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	},
 
 	addButton: function(options){
-		var iconButtonView = new IconButtonView({
+		var buttonView = new ButtonView({
 			iconUrl: options.iconUrl,
 			tooltip: options.tooltip
 		});
@@ -49,10 +49,10 @@ _.extend(GmailAttachmentCardView.prototype, {
 			activateFunction: function(){
 				options.callback();
 			},
-			buttonView: iconButtonView
+			buttonView: buttonView
 		});
 
-		this._addButton(iconButtonView);
+		this._addButton(buttonView);
 	},
 
 	_extractAttachmentInfo: function(){
@@ -153,7 +153,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	},
 
 	_addDownloadButton: function(options){
-		var iconButtonView = new IconButtonView({
+		var buttonView = new ButtonView({
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
 
@@ -174,10 +174,10 @@ _.extend(GmailAttachmentCardView.prototype, {
 				simulateClick(downloadLink);
 				downloadLink.remove();
 			},
-			buttonView: iconButtonView
+			buttonView: buttonView
 		});
 
-		this._addButton(iconButtonView);
+		this._addButton(buttonView);
 	},
 
 	_addButton: function(buttonView){

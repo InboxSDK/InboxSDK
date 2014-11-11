@@ -1,6 +1,8 @@
 var RSVP = require('rsvp');
 var waitFor = require('../../lib/wait-for');
 
+var $ = require('jquery');
+
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle: function(){
@@ -37,6 +39,20 @@ var GmailElementGetter = {
 		return document.querySelector('.dw .nH > .nH > .no');
 	},
 
+	getContentSectionElement: function(){
+		var mainContentElement = GmailElementGetter.getMainContentContainer();
+		if(!mainContentElement){
+			return null;
+		}
+
+		var sectionParent = $(mainContentElement).parents().filter('.nn');
+		if(sectionParent.length === 0){
+			return null;
+		}
+
+		return sectionParent[0];
+	},
+
 	getMainContentContainer: function(){
 		var mainContentElement = GmailElementGetter.getCurrentMainContentElement();
 
@@ -49,6 +65,35 @@ var GmailElementGetter = {
 
 	getCurrentMainContentElement: function(){
 		return document.querySelector('div[role=main]');
+	},
+
+	isPreviewPane: function(){
+		return !!document.querySelector('.aia');
+	},
+
+	getRowListElements: function(){
+		return document.querySelectorAll('[gh=tl]');
+	},
+
+	getToolbarElementContainer: function(){
+		return document.querySelector('[gh=tm]').parentElement;
+	},
+
+	getToolbarElement: function(){
+		return document.querySelector('[gh=tm]');
+	},
+
+	getThreadToolbarElement: function(){
+		return document.querySelector('[gh=mtb]');
+	},
+
+	getThreadContainerElement: function(){
+		var threadContainerElement = document.querySelector('[role=main] .g.id table.Bs > tr');
+		if(!threadContainerElement){
+			return null;
+		}
+
+		return threadContainerElement;
 	}
 
 };

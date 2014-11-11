@@ -1,15 +1,22 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var $ = require('jquery');
+
+var GmailElementGetter = require('../gmail-element-getter');
 
 var ThreadViewDriver = require('../../../driver-interfaces/thread-view-driver');
 var GmailMessageView = require('./gmail-message-view');
+var GmailToolbarView = require('./gmail-toolbar-view');
 
-var GmailThreadView = function(element){
+var GmailThreadView = function(element, fullscreeViewDriver){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
+	this._fullscreenViewDriver = fullscreeViewDriver;
 
 	this._eventStreamBus = new Bacon.Bus();
+
+	this._setupToolbarView();
 	this._setupMessageViewStream();
 };
 
@@ -19,13 +26,45 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_fullscreenViewDriver', destroy: false, get: true},
+		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: false},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
 		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
 	],
 
-	getMessageStateStream: function(){
+	getEventStream: function(){
 		return this._eventStreamBus;
+	},
+
+	_setupToolbarView: function(){
+		var toolbarElement = this._findToolbarElement();
+
+		this._toolbarView = new GmailToolbarView(toolbarElement);
+		this._toolbarView.setThreadViewDriver(this);
+	},
+
+	_findToolbarElement: function(){
+		var toolbarContainerElements = document.querySelectorAll('[gh=tm]');
+		for(var ii=0; ii<toolbarContainerElements.length; ii++){
+			if(this._isToolbarContainerRelevant(toolbarContainerElements[ii])){
+				return toolbarContainerElements[ii].querySelector('[gh=mtb]');
+			}
+		}
+
+		return null;
+	},
+
+	_isToolbarContainerRelevant: function(toolbarContainerElement){
+		if(toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement){
+			return true;
+		}
+
+		if(toolbarContainerElement.parentElement.getAttribute('role') !== 'main' && this._element.parentElement.getAttribute('role') !== 'main'){
+			return true;
+		}
+
+		return false;
 	},
 
 	_setupMessageViewStream: function(){
@@ -71,7 +110,7 @@ _.extend(GmailThreadView.prototype, {
 	_createMessageView: function(messageElement) {
 		var messageView = new GmailMessageView(messageElement);
 
-		this._eventStreamBus.plug(messageView.getMessageStateStream());
+		this._eventStreamBus.plug(messageView.getEventStream());
 
 		this._messageViews.push(messageView);
 	}

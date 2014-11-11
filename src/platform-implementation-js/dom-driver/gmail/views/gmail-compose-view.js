@@ -7,7 +7,7 @@ var simulateClick = require('../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
-var IconButtonView = require('../widgets/buttons/icon-button-view');
+
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
 
@@ -39,7 +39,7 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	insertLinkIntoBody: function(text, href){
-		require('./compose-view/insert-link-into-body')(this, text, href);
+		require('./gmail-compose-view/insert-link-into-body')(this, text, href);
 	},
 
 	setSubject: function(text){
@@ -48,19 +48,19 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	setToRecipients: function(emails){
-		require('./compose-view/set-recipients')(this, 0, emails);
+		require('./gmail-compose-view/set-recipients')(this, 0, emails);
 	},
 
 	setCcRecipients: function(emails){
-		require('./compose-view/set-recipients')(this, 1, emails);
+		require('./gmail-compose-view/set-recipients')(this, 1, emails);
 	},
 
 	setBccRecipients: function(emails){
-		require('./compose-view/set-recipients')(this, 2, emails);
+		require('./gmail-compose-view/set-recipients')(this, 2, emails);
 	},
 
 	addButton: function(buttonDescriptor){
-		require('./compose-view/add-button')(this, buttonDescriptor);
+		require('./gmail-compose-view/add-button')(this, buttonDescriptor);
 	},
 
 	addOuterSidebar: function(options){
@@ -69,7 +69,7 @@ _.extend(GmailComposeView.prototype, {
 			return;
 		}
 
-		require('./compose-view/add-outer-sidebar')(this, options);
+		require('./gmail-compose-view/add-outer-sidebar')(this, options);
 	},
 
 	addInnerSidebar: function(options){
@@ -78,7 +78,7 @@ _.extend(GmailComposeView.prototype, {
 			return;
 		}
 
-		require('./compose-view/add-inner-sidebar')(this, options);
+		require('./gmail-compose-view/add-inner-sidebar')(this, options);
 	},
 
 	close: function(){
@@ -119,27 +119,27 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getToRecipients: function(){
-		return require('./compose-view/get-recipients')(this, 0);
+		return require('./gmail-compose-view/get-recipients')(this, 0);
 	},
 
 	getCcRecipients: function(){
-		return require('./compose-view/get-recipients')(this, 1);
+		return require('./gmail-compose-view/get-recipients')(this, 1);
 	},
 
 	getBccRecipients: function(){
-		return require('./compose-view/get-recipients')(this, 2);
+		return require('./gmail-compose-view/get-recipients')(this, 2);
 	},
 
 	getAdditionalActionToolbar: function(){
-		return require('./compose-view/get-additional-action-toolbar')(this);
+		return require('./gmail-compose-view/get-additional-action-toolbar')(this);
 	},
 
 	updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {
-		require('./compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
+		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
 	},
 
 	_getFormattingAreaOffsetLeft: function() {
-		return require('./compose-view/get-formatting-area-offset-left')(this);
+		return require('./gmail-compose-view/get-formatting-area-offset-left')(this);
 	},
 
 	getFormattingArea: function() {

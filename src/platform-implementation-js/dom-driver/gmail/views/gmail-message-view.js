@@ -55,7 +55,7 @@ _.extend(GmailMessageView.prototype, {
 		return $(element).parents().filter('.adL').length > 0;
 	},
 
-	getMessageStateStream: function(){
+	getEventStream: function(){
 		return this._eventStreamBus;
 	},
 

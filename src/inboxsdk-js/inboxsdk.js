@@ -2,6 +2,8 @@ var PlatformImplementationLoader = require('./loading/platform-implementation-lo
 var Views = require('./api-definitions/views');
 var Mailbox = require('./api-definitions/mailbox');
 var Tracker = require('./tracker');
+var FullscreenViews = require('./api-definitions/fullscreen-views');
+var Toolbar = require('./api-definitions/toolbar');
 
 var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
@@ -17,7 +19,8 @@ var InboxSDK = function(appId, opts){
 
   this.Views = new Views(this._platformImplementationLoader);
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
-
+  this.FullscreenViews = new FullscreenViews(this._platformImplementationLoader);
+  this.Toolbar = new Toolbar(this._platformImplementationLoader);
 
   this.Util = {
     loadScript: require('../common/load-script'),
@@ -28,6 +31,10 @@ var InboxSDK = function(appId, opts){
   this._platformImplementationLoader.load().catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
+};
+
+InboxSDK.prototype.ready = function(){
+  return this._platformImplementationLoader.load();
 };
 
 // Place a bunch of poison-pill properties for things that aren't implemented.

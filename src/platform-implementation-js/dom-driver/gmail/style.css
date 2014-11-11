@@ -1,3 +1,66 @@
+/* buttons */
+
+.inboxsdk__button {
+  -webkit-user-select: none;
+}
+
+.inboxsdk__button .inboxsdk__button_icon, .inboxsdk__button .G-asx {
+  opacity: 0.55;
+}
+
+  .inboxsdk__button.inboxsdk__button_hover .G-asx,  .inboxsdk__button.inboxsdk__button_hover .inboxsdk__button_icon {
+    opacity: 1;
+  }
+
+  .inboxsdk__button_icon + .inboxsdk__button_text {
+    margin-left: 5px;
+  }
+
+.inboxsdk__button_icon {
+  display: inline-block;
+}
+
+.inboxsdk__button_iconImg {
+  height: 16px;
+  width: 16px;
+  vertical-align: middle;
+  margin-top: -2px;
+}
+
+.inboxsdk__button_green_inactive {
+  -webkit-box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  background-color: #53a93f;
+  background-image: -webkit-linear-gradient(top,transparent,transparent);
+  background-image: linear-gradient(top,transparent,transparent);
+  border: 1px solid transparent;
+  color: #fff;
+  text-shadow: none;
+}
+
+.inboxsdk__button_green_hover {
+  -webkit-box-shadow: inset 0 -1px 0 #4c8534;
+  box-shadow: inset 0 -1px 0 #4c8534;
+  background-color: #65b045;
+  background-image: -webkit-linear-gradient(top,transparent,transparent);
+  background-image: linear-gradient(top,transparent,transparent);
+  border: 1px solid transparent;
+  border-bottom: 1px solid #4c8534;
+  text-shadow: none;
+}
+
+.inboxsdk__button_green_active {
+  -webkit-box-shadow: inset 0 1px 0 #2f6124;
+  box-shadow: inset 0 1px 0 #2f6124;
+  background: #3e802f;
+  border: 1px solid transparent;
+  border-top: 1px solid #2f6124;
+  color: #fff;
+  text-shadow: none;
+}
+/* end */
+
+/* compose buttons */
 .inboxsdk__compose_actionToolbar {
   padding: 0px 0px 0px 10px;
   white-space: nowrap;
@@ -7,12 +70,6 @@
   min-width: 27px;
   margin-right: 5px;
   height: 29px;
-}
-
-.inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
-	height: 19px;
-	width: 19px;
-	vertical-align: middle;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__compose_overflowButton.inboxsdk__button {
@@ -25,6 +82,7 @@
   opacity: 0.9;
   padding-top: 3px;
 }
+/* end */
 
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this
@@ -113,3 +171,20 @@
 .inboxsdk__compose_innerSidebarActive form, .inboxsdk__compose_innerSidebarActive .GQ {
   padding-right: 200px;
 }
+
+
+/* toolbar visibility */
+
+[data-thread-toolbar=true] [data-rowlist-toolbar=true] {
+  display: none;
+}
+
+[data-toolbar-expanded=true] [data-toolbar-expanded=false] {
+  display: none;
+}
+
+[data-toolbar-expanded=false] [data-toolbar-expanded=true] {
+  display: none;
+}
+
+/* end */

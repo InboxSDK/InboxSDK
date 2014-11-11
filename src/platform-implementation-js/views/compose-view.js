@@ -31,6 +31,10 @@ _.extend(ComposeView.prototype, {
 			buttonOptions.activateFunction = buttonDescriptor.onClick;
 		}
 
+		buttonOptions.noArrow = true;
+		buttonOptions.tooltip = buttonOptions.tooltip || buttonOptions.title;
+		delete buttonOptions.title;
+
 		this._composeViewImplementation.addButton(buttonOptions);
 	},
 

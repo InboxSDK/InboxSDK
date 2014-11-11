@@ -115,11 +115,10 @@ _.extend(ElementMonitor.prototype, {
 	},
 
 	_handleRemovedElement: function(element){
-		if(!this._elementMembershipTest(element)){
+		var view = this._findViewForElement(element);
+		if(!view){
 			return;
 		}
-
-		var view = this._findViewForElement(element);
 
 		this._eventStreamBus.push({
 			eventName: 'viewRemoved',
