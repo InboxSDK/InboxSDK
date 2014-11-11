@@ -63,7 +63,17 @@ function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
 }
 
 function _addButtonToSendRight(gmailComposeView, buttonDescriptor){
-	//do nothing for now
+	var buttonViewController = _getButtonViewController(buttonDescriptor);
+	buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
+	buttonViewController.getView().addClass('aoO');
+	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
+
+	var sendButtonElement = gmailComposeView.getSendButton();
+
+	sendButtonElement.insertAdjacentElement('afterend', buttonViewController.getView().getElement());
+	gmailComposeView.addManagedViewController(buttonViewController);
+
+	return buttonViewController;
 }
 
 function _getButtonViewController(buttonDescriptor){
@@ -106,6 +116,9 @@ function _processButtonDescriptor(buttonDescriptor){
 
 	if(buttonOptions.section === 'TRAY_LEFT'){
 		buttonOptions.buttonColor = 'flatIcon';
+	}
+	else if(buttonOptions.section === 'SEND_RIGHT'){
+		buttonOptions.buttonColor = 'blue';
 	}
 
 	return buttonOptions;

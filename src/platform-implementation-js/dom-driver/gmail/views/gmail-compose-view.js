@@ -155,6 +155,10 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelector('.e5.aaA.aMZ');
 	},
 
+	getSendButton: function(){
+		return this._element.querySelector('.IZ .Up > div > [role=button]');
+	},
+
 	getCloseButton: function(){
 		return this._element.querySelectorAll('.Hm > img')[2];
 	},
