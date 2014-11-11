@@ -19,7 +19,8 @@
   "web_accessible_resources": [
     "inboxsdk.js.map",
     "monkey.png",
-    "monkey-face.jpg"
+    "monkey-face.jpg",
+    "lion.png"
   ],
 
   "manifest_version": 2

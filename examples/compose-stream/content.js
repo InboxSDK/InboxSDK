@@ -5,23 +5,33 @@ inboxSDK.Views.on('composeOpen', function(composeView){
 	var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 	var monkeyIndex = 1;
 
-	var sinkFunction;
+	composeView.addButton(Bacon.fromBinder(function(sinkFunction){
 
-	var stream = new Bacon.Bus();
+		var buttonOptions = {
+			title: 'Monkeys!',
+			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+			onClick: function(){
+				monkeyIndex = (monkeyIndex + 1)%2;
+				buttonOptions.iconUrl = monkeyImages[monkeyIndex];
 
-	var buttonOptions = {
-		title: 'Monkeys!',
-		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+				sinkFunction(buttonOptions);
+			},
+			section: 'TRAY_LEFT'
+		};
+
+		sinkFunction(buttonOptions);
+
+		return function(){};
+
+	}));
+
+	composeView.addButton({
+		title: 'Lion',
+		iconUrl: chrome.runtime.getURL('lion.png'),
 		onClick: function(){
-			monkeyIndex = (monkeyIndex + 1)%2;
-			buttonOptions.iconUrl = monkeyImages[monkeyIndex];
-
-			stream.push(buttonOptions);
+			alert('lions!');
 		},
-		section: 'TRAY_LEFT'
-	};
+		section: 'SEND_RIGHT'
+	});
 
-
-	composeView.addButton(stream);
-	stream.push(buttonOptions);
 });
