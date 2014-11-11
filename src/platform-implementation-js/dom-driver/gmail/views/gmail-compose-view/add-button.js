@@ -1,4 +1,4 @@
-var $ = require('jquery');
+var _ = require('lodash');
 
 var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
@@ -7,17 +7,43 @@ var MenuButtonViewController = require('../../../../widgets/buttons/menu-button-
 var MenuView = require('../../widgets/menu-view');
 
 function addButton(gmailComposeView, buttonDescriptor){
-	if(!buttonDescriptor.section || buttonDescriptor.section === 'TRAY_LEFT'){
-		_addButtonToTrayLeft(gmailComposeView, buttonDescriptor);
+	if(buttonDescriptor.onValue){
+		_addButtonStream(gmailComposeView, buttonDescriptor);
 	}
-	else if(buttonDescriptor.section === 'SEND_RIGHT'){
-		_addButtonToSendRight(gmailComposeView, buttonDescriptor);
+	else{
+		_addButton(gmailComposeView, buttonDescriptor);
+	}
+}
+
+function _addButtonStream(gmailComposeView, buttonDescriptorStream){
+	var buttonViewController;
+
+	buttonDescriptorStream.onValue(function(buttonDescriptor){
+
+		var buttonOptions = _processButtonDescriptor(buttonDescriptor);
+
+		if(!buttonViewController){
+			buttonViewController = _addButton(gmailComposeView, buttonOptions);
+		}
+		else{
+			buttonViewController.getView().update(buttonOptions);
+		}
+
+	});
+}
+
+function _addButton(gmailComposeView, buttonDescriptor){
+	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
+
+	if(!buttonOptions.section || buttonOptions.section === 'TRAY_LEFT'){
+		return _addButtonToTrayLeft(gmailComposeView, buttonOptions);
+	}
+	else if(buttonOptions.section === 'SEND_RIGHT'){
+		return _addButtonToSendRight(gmailComposeView, buttonOptions);
 	}
 }
 
 function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
-	buttonDescriptor.buttonColor = 'flatIcon';
-
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 
 	var formattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
@@ -29,6 +55,8 @@ function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
 	gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
 	gmailComposeView.addManagedViewController(buttonViewController);
+
+	return buttonViewController;
 }
 
 function _addButtonToSendRight(gmailComposeView, buttonDescriptor){
@@ -52,6 +80,32 @@ function _getButtonViewController(buttonDescriptor){
 	}
 
 	return buttonViewController;
+}
+
+function _processButtonDescriptor(buttonDescriptor){
+	var buttonOptions = _.clone(buttonDescriptor);
+	if(buttonDescriptor.hasDropdown){
+		buttonOptions.preMenuShowFunction = function(menuView){
+			buttonDescriptor.onClick({
+				dropdown: {
+					el: menuView.getElement()
+				}
+			});
+		};
+	}
+	else{
+		buttonOptions.activateFunction = buttonDescriptor.onClick;
+	}
+
+	buttonOptions.noArrow = true;
+	buttonOptions.tooltip = buttonOptions.tooltip || buttonOptions.title;
+	delete buttonOptions.title;
+
+	if(buttonOptions.section === 'TRAY_LEFT'){
+		buttonOptions.buttonColor = 'flatIcon';
+	}
+
+	return buttonOptions;
 }
 
 module.exports = addButton;

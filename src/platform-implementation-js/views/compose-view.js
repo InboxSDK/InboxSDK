@@ -17,25 +17,7 @@ _.extend(ComposeView.prototype, {
 	 * adds button to the compose
 	 */
 	addButton: function(buttonDescriptor){
-		var buttonOptions = _.clone(buttonDescriptor);
-		if(buttonDescriptor.hasDropdown){
-			buttonOptions.preMenuShowFunction = function(menuView){
-				buttonDescriptor.onClick({
-					dropdown: {
-						el: menuView.getElement()
-					}
-				});
-			};
-		}
-		else{
-			buttonOptions.activateFunction = buttonDescriptor.onClick;
-		}
-
-		buttonOptions.noArrow = true;
-		buttonOptions.tooltip = buttonOptions.tooltip || buttonOptions.title;
-		delete buttonOptions.title;
-
-		this._composeViewImplementation.addButton(buttonOptions);
+		this._composeViewImplementation.addButton(buttonDescriptor);
 	},
 
 	/*

@@ -75,6 +75,24 @@ _.extend(ButtonView.prototype, {
 		simulateHover(element);
 	},
 
+	update: function(options){
+		if(options.buttonColor != this._buttonColor && this._buttonColor){
+			this._updateButtonColor(options.buttonColor);
+		}
+
+		if(options.title != this._title){
+			this._updateTitle(options.title);
+		}
+
+		if(options.iconUrl != this._iconUrl){
+			this._updateIconUrl(options.iconUrl);
+		}
+
+		if(options.iconClass != this._iconClass){
+			this._updateIconClass(options.iconClass);
+		}
+	},
+
 	_createElement: function(options){
 		this._createMainElement(options);
 
@@ -111,7 +129,7 @@ _.extend(ButtonView.prototype, {
 		this._element.appendChild(this._innerElement);
 	},
 
-	_createTextElement: function(options){
+	_createTextElement: function(){
 		if(!this._title){
 			return;
 		}
@@ -120,7 +138,12 @@ _.extend(ButtonView.prototype, {
 		this._textElement.setAttribute('class', 'inboxsdk__button_text');
 		this._textElement.textContent = this._title;
 
-		this._innerElement.insertBefore(this._textElement, this._innerElement.firstElementChild);
+		if(this._iconElement){
+			this._iconElement.insertAdjacentElement('afterend', this._textElement);
+		}
+		else{
+			this._innerElement.insertBefore(this._textElement, this._innerElement.firstElementChild);
+		}
 	},
 
 	_createIconElement: function(options){
@@ -137,17 +160,82 @@ _.extend(ButtonView.prototype, {
 		}
 
 		if(this._iconUrl){
-			this._iconElement.innerHTML = '';
-
-			this._iconImgElement = document.createElement('img');
-			this._iconImgElement.classList.add('inboxsdk__button_iconImg');
-
-			this._iconImgElement.src = this._iconUrl;
-
-			this._iconElement.appendChild(this._iconImgElement);
+			this._createIconImgElement();
 		}
 
 		this._innerElement.insertBefore(this._iconElement, this._innerElement.firstElementChild);
+	},
+
+	_createIconImgElement: function(){
+		this._iconElement.innerHTML = '';
+
+		this._iconImgElement = document.createElement('img');
+		this._iconImgElement.classList.add('inboxsdk__button_iconImg');
+
+		this._iconImgElement.src = this._iconUrl;
+
+		this._iconElement.appendChild(this._iconImgElement);
+	},
+
+	_updateButtonColor: function(newButtonColor){
+		this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
+		this._buttonColor = newButtonColor;
+
+		this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
+	},
+
+	_updateTitle: function(newTitle){
+		if(!this._title && newTitle){
+			this._title = newTitle;
+			this._createTextElement();
+		}
+		else if(this._title && !newTitle){
+			this._textElement.remove();
+			this._textElement = null;
+			this._title = newTitle;
+		}
+		else{
+			this._textElement.textContent = newTitle;
+			this._title = newTitle;
+		}
+	},
+
+	_updateIconUrl: function(newIconUrl){
+		if(!this._iconUrl && newIconUrl){
+			this._iconUrl = newIconUrl;
+			this._createIconImgElement();
+		}
+		else if(this._iconUrl && !newIconUrl){
+			this._iconImgElement.remove();
+			this._iconImgElement = null;
+			this._iconUrl = newIconUrl;
+		}
+		else{
+			this._iconImgElement.src = newIconUrl;
+			this._iconUrl = newIconUrl;
+		}
+	},
+
+	_updateIconClass: function(newIconClass){
+		if(!this._iconElement && newIconClass){
+			this._createIconElement();
+		}
+		else if(this._iconClass && !newIconClass){
+			if(!this._iconUrl){
+				this._iconElement.remove();
+				this._iconClass = newIconClass;
+			}
+			else{
+				this._iconElement.classList.remove(this._iconClass);
+				this._iconClass = newIconClass;
+			}
+		}
+		else {
+			this._iconElement.classList.remove(this._iconClass);
+			this._iconElement.classList.add(newIconClass);
+
+			this._iconClass = newIconClass;
+		}
 	},
 
 	_setupEventStream: function(){

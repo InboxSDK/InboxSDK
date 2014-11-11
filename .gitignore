@@ -22,3 +22,5 @@ examples/custom-view/inboxsdk.js
 *.map
 
 examples/toolbar-button/inboxsdk.js
+
+examples/compose-stream/inboxsdk.js
