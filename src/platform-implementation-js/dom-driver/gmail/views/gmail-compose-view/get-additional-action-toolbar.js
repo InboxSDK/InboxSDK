@@ -1,6 +1,11 @@
 var $ = require('jquery');
 
 function getAdditionalActionToolbar(gmailComposeView){
+	var groupedActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar > div');
+	if(groupedActionToolbar){
+		return groupedActionToolbar;
+	}
+
 	var actionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar > div');
 	if(actionToolbar){
 		return actionToolbar;

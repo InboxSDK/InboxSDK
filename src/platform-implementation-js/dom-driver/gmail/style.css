@@ -1,7 +1,8 @@
 /* buttons */
 
-.inboxsdk__button {
+div.T-I.inboxsdk__button {
   -webkit-user-select: none;
+  min-width: 27px;
 }
 
 .inboxsdk__button .inboxsdk__button_icon, .inboxsdk__button .G-asx {
@@ -62,14 +63,14 @@
 
 /* compose buttons */
 
-.inboxsdk__button.inboxsdk__compose_sendButton {
+.T-I.inboxsdk__button.inboxsdk__compose_sendButton {
   min-width: 0px;
   margin-right: 0px;
   margin-left: 0px;
 }
 
 .inboxsdk__compose_actionToolbar {
-  padding: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 5px;
   white-space: nowrap;
 }
 
@@ -83,26 +84,7 @@
   margin-top: 0px;
 }
 
-.inboxsdk__compose_actionToolbar .inboxsdk__compose_overflowButton.inboxsdk__button {
-  margin: 0 0 0 4px;
-  height: 27px;
-}
-
-.inboxsdk__compose_overflowIcon {
-  background: url('images/composeOverflowToggle.png') center no-repeat;
-  opacity: 0.9;
-  padding-top: 3px;
-}
-/* end */
-
-
-/* Work around issue where clicking "Remove formatting" in Compose causes this
- * element to become taller and shift the toolbar down. */
-.gU .aWQ {
-  max-height: 3px;
-}
-
-.inboxsdk__compose_toolbarOverflow {
+.inboxsdk__compose_groupedActionToolbar {
   position: absolute;
   bottom: 5px;
   background: #f5f5f5;
@@ -113,14 +95,24 @@
   z-index: 10;
 }
 
-.inboxsdk__compose_toolbarOverflow::before {
+.inboxsdk__compose_groupedActionToolbar::before {
   content: " ";
   position: absolute;
   background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;
   width: 17px;
   height: 18px;
   bottom: -16px;
-  left: 114px;
+  left: 50%;
+  margin-left: -4px;
+}
+
+/* end */
+
+
+/* Work around issue where clicking "Remove formatting" in Compose causes this
+ * element to become taller and shift the toolbar down. */
+.gU .aWQ {
+  max-height: 3px;
 }
 
 .aQw .inboxsdk__button_iconImg {

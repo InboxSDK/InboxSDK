@@ -73,6 +73,13 @@ _.extend(MenuButtonViewController.prototype, {
 			.onValue(function(){
 				self._toggleMenuState();
 			});
+
+		this._view
+			.getEventStream()
+			.filter(function(event){
+				return event.eventName === 'keydown' && event.domEvent.which === 27; //escape
+			})
+			.onValue(this, 'hideMenu');
 	},
 
 	_toggleMenuState: function(){

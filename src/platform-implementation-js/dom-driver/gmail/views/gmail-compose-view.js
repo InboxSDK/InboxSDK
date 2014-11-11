@@ -163,6 +163,10 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelectorAll('.Hm > img')[2];
 	},
 
+	getBottomBarTable: function(){
+		return this._element.querySelector('.aoP .aDh > table');
+	},
+
 	addManagedViewController: function(viewController){
 		this._managedViewControllers.push(viewController);
 	},

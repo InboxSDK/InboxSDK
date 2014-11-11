@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var waitFor = require('../../../../lib/wait-for');
+
 var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
 var MenuButtonViewController = require('../../../../widgets/buttons/menu-button-view-controller');
@@ -35,13 +37,18 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream){
 
 function _addButton(gmailComposeView, buttonDescriptor){
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
+	var buttonViewController;
 
 	if(!buttonOptions.section || buttonOptions.section === 'TRAY_LEFT'){
-		return _addButtonToTrayLeft(gmailComposeView, buttonOptions);
+		buttonViewController = _addButtonToTrayLeft(gmailComposeView, buttonOptions);
 	}
 	else if(buttonOptions.section === 'SEND_RIGHT'){
-		return _addButtonToSendRight(gmailComposeView, buttonOptions);
+		buttonViewController = _addButtonToSendRight(gmailComposeView, buttonOptions);
 	}
+
+	_groupButtonsIfNeeded(gmailComposeView);
+
+	return buttonViewController;
 }
 
 function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
@@ -122,6 +129,105 @@ function _processButtonDescriptor(buttonDescriptor){
 	}
 
 	return buttonOptions;
+}
+
+function _groupButtonsIfNeeded(gmailComposeView){
+	if(!_doButtonsNeedToGroup(gmailComposeView)){
+		return;
+	}
+
+	var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
+	var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+
+
+	_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
+}
+
+function _doButtonsNeedToGroup(gmailComposeView){
+	return !gmailComposeView._additionalAreas.groupedActionToolbarContainer
+			&& gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth
+			&& gmailComposeView.getElement().querySelectorAll('.inboxsdk__button').length > 2;
+}
+
+function _createGroupedActionToolbarContainer(gmailComposeView){
+	var groupedActionToolbarContainer = document.createElement('div');
+	groupedActionToolbarContainer.classList.add('inboxsdk__compose_groupedActionToolbar');
+	groupedActionToolbarContainer.classList.add('pXSFsb');
+
+	gmailComposeView._additionalAreas.groupedActionToolbarContainer = groupedActionToolbarContainer;
+	groupedActionToolbarContainer.style.display = 'none';
+
+	var groupedToolbarArea = gmailComposeView.getElement().querySelector('.aoP .Ur');
+	waitFor(function(){
+		return groupedToolbarArea.children.length > 0;
+	}).then(function(){
+		gmailComposeView.getElement().querySelector('.aoP .Ur').appendChild(groupedActionToolbarContainer);
+	});
+
+	return groupedActionToolbarContainer;
+}
+
+function _createGroupToggleButtonViewController(gmailComposeView){
+	var buttonView = new ButtonView({
+		tooltip: 'More Tools',
+		iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAANUlEQVQ4y2NgGKyAkZCC/1OY/sMV5/zDq56Jmi4bNYyC2ESONZINgcbyEPDmaKIdBoYNXgAA8hYMHFMqIjsAAAAASUVORK5CYII=',
+		buttonColor: 'flatIcon'
+	});
+
+	buttonView.addClass('wG');
+	buttonView.getElement().setAttribute('tabindex', 1);
+
+	var isExpanded = false;
+	var buttonViewController = new BasicButtonViewController({
+		buttonView: buttonView,
+		activateFunction: function(){
+			if(isExpanded){ //collapse
+				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.display = 'none';
+				buttonView.deactivate();
+			}
+			else{ //expand
+				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.display = '';
+				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.left = buttonView.getElement().offsetLeft + 'px';
+				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.marginLeft = (buttonView.getElement().clientWidth/2 - gmailComposeView._additionalAreas.groupedActionToolbarContainer.offsetWidth/2 - 3) + 'px';
+
+				gmailComposeView._additionalAreas.groupedActionToolbarContainer.querySelectorAll('.inboxsdk__button')[0].focus();
+
+				buttonView.activate();
+			}
+
+			isExpanded = !isExpanded;
+		}
+	});
+
+	gmailComposeView._additionalAreas.groupedActionToolbarContainer.addEventListener(
+		'keydown',
+		function(event){
+			if(event.which === 27) { //escape
+				buttonViewController.activate();
+
+				buttonView.getElement().focus();
+
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+	);
+
+	gmailComposeView.addManagedViewController(buttonViewController);
+
+	return buttonViewController;
+}
+
+function _swapToActionToolbar(gmailComposeView, buttonViewController){
+	var actionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar > div');
+	var actionToolbarContainer = actionToolbar.parentElement;
+
+	var newActionToolbar = document.createElement('div');
+	newActionToolbar.appendChild(buttonViewController.getView().getElement());
+
+	actionToolbarContainer.appendChild(newActionToolbar);
+
+	gmailComposeView._additionalAreas.groupedActionToolbarContainer.appendChild(actionToolbar);
 }
 
 module.exports = addButton;

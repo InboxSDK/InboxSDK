@@ -265,7 +265,14 @@ _.extend(ButtonView.prototype, {
 
 					event.stopPropagation();
 					event.preventDefault();
+
+					return;
 				}
+
+				self._eventStream.push({
+					eventName: 'keydown',
+					domEvent: event
+				});
 			}
 		);
 	},
