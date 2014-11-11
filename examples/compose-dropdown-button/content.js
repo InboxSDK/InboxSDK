@@ -11,4 +11,12 @@ inboxSDK.Views.on('composeOpen', function(composeView){
 		section: 'TRAY_LEFT'
 	});
 
+	composeView.addButton({
+		title: 'Monkeys 2',
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		onClick: function(event){
+		},
+		section: 'TRAY_LEFT'
+	});
+
 });
