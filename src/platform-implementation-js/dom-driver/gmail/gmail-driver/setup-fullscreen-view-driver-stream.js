@@ -129,13 +129,11 @@ function _doesUrlContainThreadId(urlObject){
 function _createThreadFullscreenViewDriver(gmailDriver, urlObject){
 	waitFor(function(){
 		var urlHash = location.hash;
-		if(!urlHash){
-			throw new Error('no longer loading a thread');
-		}
-
-		urlHash = urlHash.substring(1);
-		if(urlHash.split('?')[0] !== urlObject.hash){
-			throw new Error('no longer loading a thread');
+		if(urlHash){
+			urlHash = urlHash.substring(1);
+			if(urlHash.split('?')[0] !== urlObject.hash){
+				throw new Error('no longer loading a thread');
+			}
 		}
 
 		return !!GmailElementGetter.getThreadContainerElement();

@@ -56,6 +56,10 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, viewName, params);
 	},
 
+	openComposeWindow: function(){
+		require('./gmail-driver/open-compose-window')(this);
+	},
+
 	_setupEventStreams: function(){
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 

@@ -94,6 +94,10 @@ var GmailElementGetter = {
 		}
 
 		return threadContainerElement;
+	},
+
+	getComposeButton: function(){
+		return document.querySelector('[gh=cm]');
 	}
 
 };

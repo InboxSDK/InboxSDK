@@ -13,6 +13,16 @@ _.extend(Views.prototype, {
 		});
 
 		return this;
+	},
+
+	getComposeView: function(){
+		var self = this;
+		return this._platformImplementationLoader.load().then(function(platformImplementation){
+
+			return platformImplementation.Views.getComposeView();
+
+		});
+
 	}
 
 });
