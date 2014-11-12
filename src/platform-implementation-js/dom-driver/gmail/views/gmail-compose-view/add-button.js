@@ -158,6 +158,13 @@ function _createGroupedActionToolbarContainer(gmailComposeView){
 	groupedActionToolbarContainer.style.display = 'none';
 
 	var groupedToolbarArea = gmailComposeView.getElement().querySelector('.aoP .Ur');
+
+	// we add the groupedActionToolbarContainer twice because we really want the container element
+	// to be a child of groupedToolbarArea, however there is a race condition if the groupedActionToolbarContainer
+	// gets added to the groupedToolbarArea too early, Gmail sets the inner html and we lose the toolbarContainer
+	// so we first add the container as a child of the compose and when the toolbarArea is ready we add it as a child
+	gmailComposeView.getElement().appendChild(groupedActionToolbarContainer);
+
 	waitFor(function(){
 		return groupedToolbarArea.children.length > 0;
 	}).then(function(){
