@@ -24,3 +24,5 @@ examples/custom-view/inboxsdk.js
 examples/toolbar-button/inboxsdk.js
 
 examples/compose-stream/inboxsdk.js
+
+examples/open-compose/inboxsdk.js

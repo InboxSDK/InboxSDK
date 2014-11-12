@@ -1,6 +1,6 @@
 {
-  "name": "Example Gmail Extension",
-  "description": "Example extension showing use of the Streak Gmail SDK",
+  "name": "Example Opening a new Compose Window",
+  "description": "Example extension showing opening a new compose window",
   "version": "0.1",
   "content_scripts": [
     {
