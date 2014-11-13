@@ -3,7 +3,6 @@ var BasicClass = require('../../lib/basic-class');
 var RSVP = require('rsvp');
 
 var containByScreen = require('../../lib/dom/contain-by-screen');
-var BodyClickBinder = require('../../lib/dom/body-click-binder');
 
 var MenuButtonViewController = function(options){
 	BasicClass.call(this);
@@ -35,8 +34,8 @@ _.extend(MenuButtonViewController.prototype, {
 		{name: '_menuState', destroy: true, defaultValue: 'HIDDEN'},
 		{name: '_transitionPromise', destroy: false},
 		{name: '_menuView', destroy: true},
-		{name: '_bodyClickBinder', destroy: true},
-		{name: '_menuPositionOptions', destroy: true}
+		{name: '_menuPositionOptions', destroy: true},
+		{name: '_focusFunction', destroy: false}
 	],
 
 	showMenu: function(){
@@ -61,6 +60,10 @@ _.extend(MenuButtonViewController.prototype, {
 		else{
 			this._hideMenu();
 		}
+	},
+
+	isMenuVisible: function(){
+		return this._menuState === 'VISIBLE';
 	},
 
 	_bindToViewEvents: function(){
@@ -113,19 +116,25 @@ _.extend(MenuButtonViewController.prototype, {
 
 		this._view.activate();
 		document.body.appendChild(this._menuView.getElement());
-		containByScreen(this._menuView.getElement(), this._view.getElement(), this._menuPositionOptions);
+
+		if(isNaN(this._menuView.getElement().getAttribute('tabindex'))){
+			this._menuView.getElement().setAttribute('tabindex', -1);
+		}
+
+		if(this._menuView.focus){
+			this._menuView.focus();
+		}
+		else{
+			this._menuView.getElement().focus();
+		}
+
+		this._startMonitoringFocusEvents();
 
 		if(_.isFunction(this._postMenuShowFunction)){
 			this._postMenuShowFunction(this._menuView);
 		}
 
-		if(!this._bodyClickBinder){
-			this._bodyClickBinder = new BodyClickBinder(function(){
-				this.hideMenu();
-			}.bind(this));
-		}
-
-		this._bodyClickBinder.bind();
+		_.delay(containByScreen, 1, this._menuView.getElement(), this._view.getElement(), this._menuPositionOptions);
 		this._transitionPromise = null;
 
 		deferred.resolve();
@@ -148,12 +157,44 @@ _.extend(MenuButtonViewController.prototype, {
 			this._postMenuHideFunction(this._menuView);
 		}
 
-		if(this._bodyClickBinder){
-			this._bodyClickBinder.unbind();
-		}
-
 		this._transitionPromise = null;
+		this._stopMonitoringFocusEvents();
 		deferred.resolve();
+	},
+
+	_startMonitoringFocusEvents: function(){
+		var self = this;
+
+		var menuElement = this._menuView.getElement();
+		var buttonElement = this._view.getElement();
+
+		this._focusFunction = function(event){
+			var focusedElement = event.target;
+
+			var checkElement = focusedElement;
+			for(var ii=0; ii<100; ii++){
+				if(checkElement === null){
+					self.hideMenu();
+					return;
+				}
+
+				if(checkElement === menuElement || checkElement === buttonElement){
+					return;
+				}
+
+				checkElement = checkElement.parentElement;
+			}
+		};
+
+		document.addEventListener(
+			'focus',
+			this._focusFunction,
+			true
+		);
+	},
+
+	_stopMonitoringFocusEvents: function(){
+		document.removeEventListener('focus', this._focusFunction, true);
 	}
 
 });
