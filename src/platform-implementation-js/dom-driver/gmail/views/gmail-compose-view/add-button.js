@@ -1,6 +1,7 @@
 var _ = require('lodash');
 
 var waitFor = require('../../../../lib/wait-for');
+var simulateClick = require('../../../../lib/dom/simulate-click');
 
 var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
@@ -141,10 +142,12 @@ function _groupButtonsIfNeeded(gmailComposeView){
 
 
 	_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
+	_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
+	_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
 }
 
 function _doButtonsNeedToGroup(gmailComposeView){
-	return !gmailComposeView._additionalAreas.groupedActionToolbarContainer
+	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar')
 			&& gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth
 			&& gmailComposeView.getElement().querySelectorAll('.inboxsdk__button').length > 2;
 }
@@ -152,26 +155,9 @@ function _doButtonsNeedToGroup(gmailComposeView){
 function _createGroupedActionToolbarContainer(gmailComposeView){
 	var groupedActionToolbarContainer = document.createElement('div');
 	groupedActionToolbarContainer.classList.add('inboxsdk__compose_groupedActionToolbar');
-	groupedActionToolbarContainer.classList.add('pXSFsb');
 
 	gmailComposeView._additionalAreas.groupedActionToolbarContainer = groupedActionToolbarContainer;
 	groupedActionToolbarContainer.style.display = 'none';
-
-	var groupedToolbarArea = gmailComposeView.getElement().querySelector('.aoP .Ur');
-
-	// we add the groupedActionToolbarContainer twice because we really want the container element
-	// to be a child of groupedToolbarArea, however there is a race condition if the groupedActionToolbarContainer
-	// gets added to the groupedToolbarArea too early, Gmail sets the inner html and we lose the toolbarContainer
-	// so we first add the container as a child of the compose and when the toolbarArea is ready we add it as a child
-	gmailComposeView.getElement().appendChild(groupedActionToolbarContainer);
-
-	waitFor(function(){
-		return groupedToolbarArea.children.length > 0;
-	}).then(function(){
-		gmailComposeView.getElement().querySelector('.aoP .Ur').appendChild(groupedActionToolbarContainer);
-	});
-
-	return groupedActionToolbarContainer;
 }
 
 function _createGroupToggleButtonViewController(gmailComposeView){
@@ -190,7 +176,10 @@ function _createGroupToggleButtonViewController(gmailComposeView){
 		activateFunction: function(){
 			if(isExpanded){ //collapse
 				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.display = 'none';
+				gmailComposeView.getElement().classList.remove('inboxsdk__compose_groupedActionToolbar_visible');
+
 				buttonView.deactivate();
+				localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
 			}
 			else{ //expand
 				gmailComposeView._additionalAreas.groupedActionToolbarContainer.style.display = '';
@@ -199,7 +188,14 @@ function _createGroupToggleButtonViewController(gmailComposeView){
 
 				gmailComposeView._additionalAreas.groupedActionToolbarContainer.querySelectorAll('.inboxsdk__button')[0].focus();
 
+				gmailComposeView.getElement().classList.add('inboxsdk__compose_groupedActionToolbar_visible');
+
 				buttonView.activate();
+				localStorage['inboxsdk__compose_groupedActionButton_state'] = 'expanded';
+
+				if(gmailComposeView.getFormattingToolbar().style.display === ''){
+					simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
+				}
 			}
 
 			isExpanded = !isExpanded;
@@ -233,8 +229,37 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController){
 	newActionToolbar.appendChild(buttonViewController.getView().getElement());
 
 	actionToolbarContainer.appendChild(newActionToolbar);
-
 	gmailComposeView._additionalAreas.groupedActionToolbarContainer.appendChild(actionToolbar);
+	actionToolbarContainer.appendChild(gmailComposeView._additionalAreas.groupedActionToolbarContainer);
+}
+
+function _checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController){
+	if(localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
+		setTimeout(function(){ //do in timeout so that we wait for all buttons to get added
+			groupToggleButtonViewController.activate();
+		},1);
+	}
+}
+
+function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
+	waitFor(function(){
+		return !! gmailComposeView.getFormattingToolbar();
+	}).then(function(){
+
+		var mutationObserver = new MutationObserver(function(mutations){
+
+			if(mutations[0].target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
+				groupToggleButtonViewController.activate();
+			}
+
+		});
+
+		mutationObserver.observe(
+			gmailComposeView.getFormattingToolbar(),
+			{attributes: true, attributeFilter: ['style']}
+		);
+
+	});
 }
 
 module.exports = addButton;

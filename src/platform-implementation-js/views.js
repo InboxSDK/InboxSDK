@@ -58,6 +58,7 @@ _.extend(Views.prototype, {
 			if(self._requestedComposeViewDeferred){
 				var deferred = self._requestedComposeViewDeferred;
 				self._requestedComposeViewDeferred = null;
+				self._removeIgnoreComposeSignal();
 				deferred.resolve(view);
 			}
 			else if(!self._doesIgnoreComposeSignalExist()){
@@ -85,8 +86,6 @@ _.extend(Views.prototype, {
 
 	_doesIgnoreComposeSignalExist: function(){
 		var signalExists = !!document.getElementById('inboxsdk__ignoreCompose');
-
-		console.log('signal exists', signalExists);
 
 		return signalExists;
 	}

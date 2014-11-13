@@ -147,6 +147,15 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelector('.oc');
 	},
 
+	getFormattingToolbar: function(){
+		return this._element.querySelector('.aX');
+	},
+
+	getFormattingToolbarToggleButton: function(){
+		var innerElement = this._element.querySelector('[role=button] .dv');
+		return $(innerElement).closest('[role=button]')[0];
+	},
+
 	getInsertMoreArea: function() {
 		return this._element.querySelector('.eq');
 	},

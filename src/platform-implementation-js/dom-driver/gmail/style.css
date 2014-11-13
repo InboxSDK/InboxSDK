@@ -86,7 +86,7 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__compose_groupedActionToolbar {
   position: absolute;
-  bottom: 5px;
+  bottom: 44px;
   background: #f5f5f5;
   margin: 3px;
   box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
@@ -104,6 +104,11 @@ div.T-I.inboxsdk__button {
   bottom: -16px;
   left: 50%;
   margin-left: -4px;
+}
+
+.inboxsdk__compose_groupedActionToolbar_visible .aDh {
+  overflow-y: visible;
+  overflow-x: hidden;
 }
 
 /* end */
