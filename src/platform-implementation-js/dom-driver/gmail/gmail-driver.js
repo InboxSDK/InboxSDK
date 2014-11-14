@@ -76,7 +76,7 @@ _.extend(GmailDriver.prototype, {
 		this._rowListViewDriverStream = new Bacon.Bus();
 
 		this._rowListViewDriverStream.plug(
-			this._fullscreenViewDriverStream.flatMapLatest(function(gmailFullscreenView){
+			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
 				return gmailFullscreenView.getEventStream().filter(function(event){
 					return event.eventName === 'newGmailRowListView';
 				})
@@ -98,7 +98,7 @@ _.extend(GmailDriver.prototype, {
 		this._threadViewDriverStream = new Bacon.Bus();
 
 		this._threadViewDriverStream.plug(
-			this._fullscreenViewDriverStream.flatMapLatest(function(gmailFullscreenView){
+			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
 				return gmailFullscreenView.getEventStream().filter(function(event){
 					return event.eventName === 'newGmailThreadView';
 				})
@@ -136,7 +136,7 @@ _.extend(GmailDriver.prototype, {
 		this._messageViewDriverStream = new Bacon.Bus();
 
 		this._messageViewDriverStream.plug(
-			this._threadViewDriverStream.flatMapLatest(function(gmailThreadView){
+			this._threadViewDriverStream.flatMap(function(gmailThreadView){
 				return gmailThreadView.getEventStream().filter(function(event){
 					return event.eventName === 'messageOpen';
 				})
@@ -151,7 +151,7 @@ _.extend(GmailDriver.prototype, {
 		this._attachmentCardViewDriverStream = new Bacon.Bus();
 
 		this._attachmentCardViewDriverStream.plug(
-			this._messageViewDriverStream.flatMapLatest(function(gmailMessageView){
+			this._messageViewDriverStream.flatMap(function(gmailMessageView){
 				return gmailMessageView.getEventStream().filter(function(event){
 					return event.eventName === 'newAttachmentCard';
 				})

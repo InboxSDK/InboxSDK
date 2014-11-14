@@ -29,7 +29,8 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
 		{name: '_replyWindowView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
-		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}}
+		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
+		{name: '_messageOpened', destroy: false, defaultValue: false}
 	],
 
 	getContentsElement: function(){
@@ -120,15 +121,7 @@ _.extend(GmailMessageView.prototype, {
 				}
 			}
 			else {
-				if(currentClassList.contains('h7')){
-					self._processAttachments();
-					self._setupReplyStream();
-
-					self._eventStreamBus.push({
-						eventName: 'messageOpen',
-						view: self
-					});
-				}
+				self._checkMessageOpenState(currentClassList);
 			}
 		});
 	},
@@ -138,18 +131,30 @@ _.extend(GmailMessageView.prototype, {
 
 		setTimeout(
 			function(){
-				if(self._element.classList.contains('h7')){
-					self._setupReplyStream();
-					self._processAttachments();
-
-					self._eventStreamBus.push({
-						eventName: 'messageOpen',
-						view: self
-					});
-				}
+				self._checkMessageOpenState(self._element.classList);
 			},
 			1
 		);
+	},
+
+	_checkMessageOpenState: function(classList){
+		if(!classList.contains('h7')){
+			return;
+		}
+
+		if(this._messageOpened){
+			return;
+		}
+
+		this._eventStreamBus.push({
+			eventName: 'messageOpen',
+			view: this
+		});
+
+		this._messageOpened = true;
+
+		this._setupReplyStream();
+		this._processAttachments();
 	},
 
 	_processAttachments: function(){

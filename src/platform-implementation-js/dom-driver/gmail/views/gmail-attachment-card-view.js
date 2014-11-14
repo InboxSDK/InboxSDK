@@ -5,6 +5,7 @@ var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var simulateClick = require('../../../lib/dom/simulate-click');
+var waitFor = require('../../../lib/wait-for');
 
 var GmailAttachmentCardView = function(options){
 	AttachmentCardViewDriver.call(this);
@@ -182,7 +183,13 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	_addButton: function(buttonView){
 		buttonView.addClass('aQv');
-		this._element.querySelector('.aQw').appendChild(buttonView.getElement());
+
+		var self = this;
+		waitFor(function(){
+			return self._element.querySelector('.aQw').children.length > 0;
+		}).then(function(){
+			self._element.querySelector('.aQw').appendChild(buttonView.getElement());
+		})
 	}
 
 });

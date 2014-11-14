@@ -75,7 +75,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 			buttonView: buttonView
 		});
 
-		this._element.querySelector('.aZi').appendChild(iconButtonView.getElement());
+		this._element.querySelector('.aZi').appendChild(buttonView.getElement());
 	}
 
 });

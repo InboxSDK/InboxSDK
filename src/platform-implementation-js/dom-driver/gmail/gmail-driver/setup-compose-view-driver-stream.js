@@ -23,7 +23,7 @@ function setupComposeViewDriverStream(gmailDriver){
 
 
 	gmailDriver._composeViewDriverStream.plug(
-		gmailDriver._messageViewDriverStream.flatMapLatest(function(gmailMessageView){
+		gmailDriver._messageViewDriverStream.flatMap(function(gmailMessageView){
 			return gmailMessageView.getEventStream().filter(function(event){
 				return event.eventName === 'replyOpen';
 			})
