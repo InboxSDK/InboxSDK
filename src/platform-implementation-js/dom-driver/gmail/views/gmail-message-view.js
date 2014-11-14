@@ -30,7 +30,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_replyWindowView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
-		{name: '_messageOpened', destroy: false, defaultValue: false}
+		{name: '_messageLoaded', destroy: false, defaultValue: false}
 	],
 
 	getContentsElement: function(){
@@ -142,16 +142,21 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		if(this._messageOpened){
-			return;
-		}
-
 		this._eventStreamBus.push({
 			eventName: 'messageOpen',
 			view: this
 		});
 
-		this._messageOpened = true;
+		if(this._messageLoaded){
+			return;
+		}
+
+		this._eventStreamBus.push({
+			eventName: 'messageLoaded',
+			view: this
+		});
+
+		this._messageLoaded = true;
 
 		this._setupReplyStream();
 		this._processAttachments();
@@ -167,9 +172,11 @@ _.extend(GmailMessageView.prototype, {
 		var self = this;
 		var gmailAttachmentCardViews = gmailAttachmentAreaView.getGmailAttachmentCardViews();
 		gmailAttachmentCardViews.forEach(function(gmailAttachmentCardView){
-			self._eventStreamBus.push({
-				eventName: 'newAttachmentCard',
-				view: gmailAttachmentCardView
+			gmailAttachmentCardView.ready().then(function(){
+				self._eventStreamBus.push({
+					eventName: 'newAttachmentCard',
+					view: gmailAttachmentCardView
+				});
 			});
 		});
 	},

@@ -100,7 +100,7 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getBodyElement: function(){
-		return this._element.querySelector('.Ap [g_editable=true]')[0];
+		return this._element.querySelector('.Ap [g_editable=true]');
 	},
 
 	getHTMLContent: function(){

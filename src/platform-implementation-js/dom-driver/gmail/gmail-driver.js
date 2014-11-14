@@ -138,7 +138,7 @@ _.extend(GmailDriver.prototype, {
 		this._messageViewDriverStream.plug(
 			this._threadViewDriverStream.flatMap(function(gmailThreadView){
 				return gmailThreadView.getEventStream().filter(function(event){
-					return event.eventName === 'messageOpen';
+					return event.eventName === 'messageLoaded';
 				})
 				.map(function(event){
 					return event.view;

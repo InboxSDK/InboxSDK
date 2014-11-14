@@ -57,7 +57,7 @@ function _setupStandaloneComposeViewDriverStream(gmailDriver){
 function _setupStandardComposeViewDriverStream(gmailDriver){
 	gmailDriver._composeElementMonitor = new ElementMonitor({
 		elementMembershipTest: function(element){
-			return element.classList.contains('nn') && element.children.length > 0;
+			return element.classList.contains('nn') && !element.classList.contains('aJl') && element.children.length > 0;
 		},
 
 		viewCreationFunction: function(element){

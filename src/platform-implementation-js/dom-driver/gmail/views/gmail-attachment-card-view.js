@@ -12,7 +12,7 @@ var GmailAttachmentCardView = function(options){
 
 	if(options.element){
 		this._element = options.element;
-		this._extractAttachmentInfo();
+		this.ready().then(this._extractAttachmentInfo.bind(this));
 	}
 	else{
 		this._createNewElement(options);
@@ -31,13 +31,33 @@ _.extend(GmailAttachmentCardView.prototype, {
 		{name: '_attachmentId', destroy: false}
 	],
 
+	ready: function(){
+		var self = this;
+		return waitFor(function(){
+			return !self.isStandardAttachment() || (self.isStandardAttachment() && self._element.querySelector('.aQw').children.length > 0);
+		});
+	},
+
 	isStandardAttachment: function(){
-		var downloadUrl = this._element.getAttribute('download_url');
-		if(!downloadUrl){
+		return !this.isDriveAttachment() && !this.isNonNativeAttachment();
+	},
+
+	isDriveAttachment: function(){
+		var previewImageUrl = this._getPreviewImageUrl();
+		if(!previewImageUrl){
 			return false;
 		}
 
-		return downloadUrl.indexOf('mail.google.com') > -1;
+		return !!previewImageUrl.match(/https?:\/\/\w+\.googleusercontent\.com/);
+	},
+
+	isNonNativeAttachment: function(){
+		var previewImageUrl = this._getPreviewImageUrl();
+		if(!previewImageUrl){
+			return true;
+		}
+
+		return !previewImageUrl.match(/https?:\/\/mail\.google\.com/);
 	},
 
 	addButton: function(options){
@@ -62,15 +82,24 @@ _.extend(GmailAttachmentCardView.prototype, {
 		}
 
 		var downloadUrl = this._element.getAttribute('download_url');
+		var imageUrl = this._getPreviewImageUrl();
 
-		var parts = downloadUrl.split(':');
-		if(parts.length === 4){
-			this._mimeType = parts[0];
+		var attachmentUrl = downloadUrl || imageUrl;
+
+		if(downloadUrl){
+			var parts = downloadUrl.split(':');
+			if(parts.length === 4){
+				this._mimeType = parts[0];
+			}
+		}
+		else{
+			this._mimeType = 'unknown';
 		}
 
+
 		this._fileName = this._extractFileNameFromElement();
-		this._messageId = downloadUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
-		this._attachmentId = downloadUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
+		this._messageId = attachmentUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
+		this._attachmentId = attachmentUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
 	},
 
 	_extractFileNameFromElement: function(){
@@ -80,6 +109,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	_createNewElement: function(options){
 		this._element = document.createElement('span');
 		this._element.classList.add('aZo');
+		this._element.classList.add('inboxsdk__attachmentCard');
 
 		this._element.innerHTML = [
 			'<a target="_blank" role="link" class="aQy e" href="">',
@@ -119,7 +149,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 		this._element.querySelector('img.aYB').src = options.documentPreviewImageUrl;
 		this._element.querySelector('img.aSM').src = options.fileIconImageUrl;
 		this._element.querySelector('span .aV3').textContent = options.fileName;
-		this._element.querySelector('div.aYp > span').textContent = options.title;
+		this._element.querySelector('div.aYp > span').textContent = options.title || '';
 		this._element.querySelector('div.aSJ').style.borderColor = options.color;
 
 		this._addHoverEvents();
@@ -155,6 +185,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	_addDownloadButton: function(options){
 		var buttonView = new ButtonView({
+			tooltip: options.tooltip,
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
 
@@ -184,12 +215,20 @@ _.extend(GmailAttachmentCardView.prototype, {
 	_addButton: function(buttonView){
 		buttonView.addClass('aQv');
 
-		var self = this;
-		waitFor(function(){
-			return self._element.querySelector('.aQw').children.length > 0;
-		}).then(function(){
-			self._element.querySelector('.aQw').appendChild(buttonView.getElement());
-		})
+		this._element.querySelector('.aQw').appendChild(buttonView.getElement());
+	},
+
+	_getPreviewImageUrl: function(){
+		var previewImage = this._getPreviewImage();
+		if(!previewImage){
+			return null;
+		}
+
+		return previewImage.src;
+	},
+
+	_getPreviewImage: function(){
+		return this._element.querySelector('img.aQG');
 	}
 
 });
