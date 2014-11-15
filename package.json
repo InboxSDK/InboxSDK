@@ -1,9 +1,9 @@
 {
-  "name": "streakgmailsdk",
+  "name": "inboxsdk",
   "private": true,
   "version": "0.0.1",
   "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/gmailsdk-js/gmailsdk.js",
+  "main": "src/inboxsdk-js/inboxsdk.js",
   "scripts": {
     "test": "mocha",
     "start": "gulp default --dev --watch --reloader"
