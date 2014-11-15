@@ -1,4 +1,4 @@
-var RSVP = require('RSVP');
+var RSVP = require('rsvp');
 
 function waitFor(condition, timeout, steptime) {
 	return new RSVP.Promise(function(resolve, reject) {
