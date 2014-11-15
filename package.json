@@ -16,25 +16,25 @@
     ]
   },
   "devDependencies": {
-    "browserify": "^6.2.0",
+    "browserify": "^6.3.2",
     "glob": "^4.0.6",
-    "gulp": "^3.8.9",
-    "gulp-sourcemaps": "^1.2.4",
+    "gulp": "^3.8.10",
+    "gulp-sourcemaps": "^1.2.8",
     "gulp-streamify": "0.0.5",
     "gulp-util": "^3.0.1",
-    "jsdom": "^1.1.0",
+    "jsdom": "^1.2.1",
     "mocha": "^2.0.1",
     "mold-source-map": "^0.3.0",
     "sinon": "^1.11.1",
     "stdio": "^0.2.3",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.0"
+    "watchify": "^2.1.1"
   },
   "dependencies": {
-    "baconjs": "0.7.25",
+    "baconjs": "0.7.33",
     "brfs": "^1.2.0",
-    "jquery": "^2.1.1",
-    "lodash": "^2.4.1",
-    "rsvp": "^3.0.14"
+    "jquery": "2.1.1",
+    "lodash": "2.4.1",
+    "rsvp": "3.0.14"
   }
 }
