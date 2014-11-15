@@ -23,7 +23,7 @@ var PlatformImplementationLoader = function(appId) {
 _.extend(PlatformImplementationLoader.prototype, {
     _loadScript: function(){
         var loadScript = require('../../common/load-script');
-        return loadScript('http://localhost:4567/platform-implementation.js');
+        return loadScript(process.env.IMPLEMENTATION_URL);
     },
 
     getPlatformImplementation: function(){
