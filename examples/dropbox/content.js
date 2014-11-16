@@ -17,7 +17,11 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
 
             	Dropbox.choose({
             		success: function(files){
-            			composeView.insertLinkIntoBody(files[0].name, files[0].link);
+            			composeView.insertLinkChipIntoBody({
+							text: files[0].name,
+							url: files[0].link,
+							iconUrl: ''
+						});
             		}
             	});
 
@@ -86,9 +90,17 @@ function addAttachmentCard(messageView, link){
 	messageView.addAttachmentCard({
 		fileName: fileName,
 		previewUrl: link.href,
-		downloadUrl: getDownloadUrl(link.href),
 		fileIconImageUrl: chrome.runtime.getURL('images/action38.png'),
 		documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
+        buttons: [
+            {
+                tooltip: 'Download file',
+                iconUrl: chrome.runtime.getURL('images/action38.png'),
+                onClick: function(){
+                    location.href = getDownloadUrl(link.href);
+                }
+            }
+        ],
 		color: 'RGB(21, 129, 226)',
 		callback: function(eventName){
 			console.log(eventName);
