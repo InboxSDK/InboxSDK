@@ -43,6 +43,10 @@ _.extend(GmailComposeView.prototype, {
 		require('./gmail-compose-view/insert-link-into-body')(this, text, href);
 	},
 
+	insertLinkChipIntoBody: function(options){
+		require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
+	},
+
 	setSubject: function(text){
 		$(this._element).find('input[name=subjectbox]').val(text);
 		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);

@@ -66,6 +66,17 @@ _.extend(ComposeView.prototype, {
 	},
 
 	/*
+	 * options = {
+	 *	 text: 'foo',
+	 *   iconUrl: '',
+	 *   url: ''
+	 * }
+	 */
+	insertLinkChipIntoBody: function(options){
+		this._composeViewImplementation.insertLinkChipIntoBody(options);
+	},
+
+	/*
 	 * Returns a string containing any text and elements highlighted by the user inside the email body.
 	 */
 	getSelectedBodyHTML: function(){
