@@ -158,6 +158,10 @@ _.extend(GmailAttachmentCardView.prototype, {
 			this._addDownloadButton(options);
 		}
 
+		if(options.buttons){
+			this._addMoreButtons(options.buttons);
+		}
+
 		this._element.addEventListener('click', function(e){
 			options.callback('previewClicked');
 		});
@@ -210,6 +214,20 @@ _.extend(GmailAttachmentCardView.prototype, {
 		});
 
 		this._addButton(buttonView);
+	},
+
+	_addMoreButtons: function(buttonDescriptors){
+		_.chain(buttonDescriptors)
+			.map(function(buttonDescriptor){
+				var buttonView = new ButtonView(buttonDescriptor);
+				var buttonViewController = new BasicButtonViewController({
+					buttonView: buttonView,
+					activateFunction: buttonDescriptor.onClick
+				});
+
+				return buttonView;
+			})
+			.each(this._addButton.bind(this));
 	},
 
 	_addButton: function(buttonView){
