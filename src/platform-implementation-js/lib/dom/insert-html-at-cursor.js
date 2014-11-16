@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function(element, html){
 	element.focus();
 
@@ -8,10 +10,10 @@ module.exports = function(element, html){
 			element.value = element.value.substring(0, element.selectionStart) + element.value.substring(element.selectionEnd);
 		}
 		// insert into position
-		element.value = element.value.substring(0, oldStart) + text + element.value.substring(oldStart);
+		element.value = element.value.substring(0, oldStart) + html + element.value.substring(oldStart);
 		// set caret
-		element.selectionStart = oldStart + text.length;
-		element.selectionEnd = oldStart + text.length;
+		element.selectionStart = oldStart + html.length;
+		element.selectionEnd = oldStart + html.length;
 	} else {
 		var sel, range, textNode;
 		var editable = null;
@@ -28,7 +30,13 @@ module.exports = function(element, html){
 				range.deleteContents();
 
 				var el = document.createElement('div');
-				el.innerHTML = text;
+				if(_.isString(html)){
+					el.innerHTML = html;
+				}
+				else if(html instanceof HTMLElement){
+					el.appendChild(html);
+				}
+
 				var frag = document.createDocumentFragment(),
 					firstNode = el.firstChild,
 					node, lastNode;
