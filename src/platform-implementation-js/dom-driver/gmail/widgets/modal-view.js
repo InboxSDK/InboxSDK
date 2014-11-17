@@ -85,7 +85,7 @@ _.extend(ModalView.prototype, {
         var eventStream = this._eventStream;
         var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
 
-        closeElement.addEventListener('click', function(event){
+        closeElement.addEventListener('mousedown', function(event){
             eventStream.push({
                 eventName: 'closeClick',
                 domEvent: event
