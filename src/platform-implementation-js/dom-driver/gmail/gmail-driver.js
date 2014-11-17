@@ -9,6 +9,8 @@ var GmailElementGetter = require('./gmail-element-getter');
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
 
+var ModalView = require('./widgets/modal-view');
+
 
 var GmailDriver = function(){
 	Driver.call(this);
@@ -58,6 +60,10 @@ _.extend(GmailDriver.prototype, {
 
 	openComposeWindow: function(){
 		require('./gmail-driver/open-compose-window')(this);
+	},
+
+	createModalView: function(options){
+		return new ModalView(options);		
 	},
 
 	_setupEventStreams: function(){

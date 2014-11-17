@@ -4,6 +4,7 @@ var Mailbox = require('./mailbox');
 var Toolbar = require('./toolbar');
 var Views = require('./views');
 var Tracker = require('./tracker');
+var Widgets = require('./widgets');
 
 var GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
@@ -19,6 +20,7 @@ var PlatformImplementation = function(appId){
 	this.Mailbox = new Mailbox(appId, this._driver, this);
 	this.Toolbar = new Toolbar(appId, this._driver, this);
 	this.Views = new Views(appId, this._driver);
+	this.Widgets = new Widgets(appId, this._driver);
 
 	this._tracker.setEmail(this.Email);
 

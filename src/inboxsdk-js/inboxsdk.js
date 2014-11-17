@@ -4,6 +4,7 @@ var Mailbox = require('./api-definitions/mailbox');
 var Tracker = require('./tracker');
 var FullscreenViews = require('./api-definitions/fullscreen-views');
 var Toolbar = require('./api-definitions/toolbar');
+var Widgets = require('./api-definitions/widgets');
 
 var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
@@ -21,6 +22,7 @@ var InboxSDK = function(appId, opts){
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
   this.FullscreenViews = new FullscreenViews(this._platformImplementationLoader);
   this.Toolbar = new Toolbar(this._platformImplementationLoader);
+  this.Widgets = new Widgets(this._platformImplementationLoader);
 
   this.Util = {
     loadScript: require('../common/load-script'),
@@ -44,8 +46,7 @@ var niSettings = {
   get:notImplemented, set:notImplemented
 };
 Object.defineProperties(InboxSDK.prototype, {
-  ButterBar: niSettings,
-  Widgets: niSettings
+  ButterBar: niSettings
 });
 
 module.exports = InboxSDK;
