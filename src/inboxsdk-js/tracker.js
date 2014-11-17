@@ -1,5 +1,3 @@
-var _ = require('lodash');
-var Ajax = require('../common/ajax');
 var RSVP = require('rsvp');
 var assert = require('assert');
 var logErrorFactory = require('../common/log-error-factory');

@@ -39,8 +39,7 @@ function addScriptToPage(url, cors) {
 function loadScript(url) {
   if (isContentScript()) {
     return Ajax({
-      url: url,
-      dataType: 'text'
+      url: url
     }).then(function(code) {
       // jshint evil:true
 
