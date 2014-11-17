@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
+
 var BasicClass = require('../../../lib/basic-class');
 
 var ModalView = function(options){
@@ -10,6 +12,9 @@ var ModalView = function(options){
     this.setTitle(options.title);
     this.setContentElement(options.el);
     this.setButtons(options.buttons);
+
+    this._eventStream = new Bacon.Bus();
+    this._setupEventStream();
 };
 
 ModalView.prototype = Object.create(BasicClass.prototype);
@@ -18,7 +23,8 @@ _.extend(ModalView.prototype, {
 
     __memberVariables: [
         {name: '_overlayElement', destroy: true, get: true},
-        {name: '_modalContainerElement', destroy: true, get: true}
+        {name: '_modalContainerElement', destroy: true, get: true},
+        {name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'}
     ],
 
     setTitle: function(title){
@@ -57,7 +63,9 @@ _.extend(ModalView.prototype, {
     },
 
     _setupModalContainerElement: function(options){
-        var element = document.createElement('div');
+        this._modalContainerElement = document.createElement('div');
+        this._modalContainerElement.setAttribute('class', 'inboxsdk__modal_fullscreen');
+
         var htmlString = [
             '<div class="Kj-JD inboxsdk__modal_container" tabindex="0" role="alertdialog">',
                 '<div class="Kj-JD-K7 Kj-JD-K7-GIHV4">',
@@ -70,8 +78,19 @@ _.extend(ModalView.prototype, {
             '</div>'
         ].join('');
 
-        element.innerHTML = htmlString;
-        this._modalContainerElement = element.children[0];
+        this._modalContainerElement.innerHTML = htmlString;
+    },
+
+    _setupEventStream: function(){
+        var eventStream = this._eventStream;
+        var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
+
+        closeElement.addEventListener('click', function(event){
+            eventStream.push({
+                eventName: 'closeClick',
+                domEvent: event
+            });
+        });
     }
 });
 

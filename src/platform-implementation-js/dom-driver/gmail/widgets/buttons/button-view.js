@@ -50,7 +50,7 @@ _.extend(ButtonView.prototype, {
 		{name: '_title', destroy: false},
 		{name: '_hasDropdown', destroy: false, defaultValue: false},
 		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
-		{name: '_eventStream', destroy: false, get: true}
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	activate: function(){
@@ -300,4 +300,3 @@ _.extend(ButtonView.prototype, {
 });
 
 module.exports = ButtonView;
-

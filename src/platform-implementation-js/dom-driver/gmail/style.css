@@ -196,3 +196,29 @@ div.T-I.inboxsdk__button {
 }
 
 /* end */
+
+/* modal */
+
+.inboxsdk__modal_overlay {
+  right: 0px;
+  bottom: 0px;
+}
+
+.inboxsdk__modal_fullscreen {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 501;
+  display: -webkit-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inboxsdk__modal_fullscreen .inboxsdk__modal_container {
+  position: relative;
+  margin-top: -100px;
+}
+
+/* end modal */

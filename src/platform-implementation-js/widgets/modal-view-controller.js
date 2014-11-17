@@ -5,6 +5,7 @@ var ModalViewController = function(options){
     BasicClass.call(this);
 
     this._view = options.modalView;
+    this._bindToEvents();
 };
 
 ModalViewController.prototype = Object.create(BasicClass.prototype);
@@ -30,6 +31,12 @@ _.extend(ModalViewController.prototype, {
         this._view.getModalContainerElement().remove();
 
         this.destroy();
+    },
+
+    _bindToEvents: function(){
+        this._view.getEventStream().filter(function(event){
+            return event.eventName === 'closeClick';
+        }).onValue(this, 'close');
     }
 });
 
