@@ -1,21 +1,17 @@
 {
-  "name": "streakgmailsdk",
-  "private": true,
-  "version": "0.0.1",
-  "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/gmailsdk-js/gmailsdk.js",
-  "scripts": {
-    "test": "mocha",
-    "start": "gulp default --dev --watch --reloader"
-  },
-  "author": "Streak",
-  "license": "All Rights Reserved",
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
+  "dependencies": {
+    "rsvp": "^3.0.14",
+    "lodash": "^2.4.1",
+    "jquery": "^2.1.1",
+    "brfs": "^1.2.0",
+    "baconjs": "0.7.25"
   },
   "devDependencies": {
+    "watchify": "^2.1.0",
+    "vinyl-source-stream": "^1.0.0",
+    "stdio": "^0.2.3",
+    "sinon": "^1.11.1",
+    "mold-source-map": "^0.3.0",
     "browserify": "^6.2.0",
     "glob": "^4.0.6",
     "gulp": "^3.8.9",
@@ -23,18 +19,22 @@
     "gulp-streamify": "0.0.5",
     "gulp-util": "^3.0.1",
     "jsdom": "^1.1.0",
-    "mocha": "^2.0.1",
-    "mold-source-map": "^0.3.0",
-    "sinon": "^1.11.1",
-    "stdio": "^0.2.3",
-    "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.0"
+    "mocha": "^2.0.1"
   },
-  "dependencies": {
-    "baconjs": "0.7.25",
-    "brfs": "^1.2.0",
-    "jquery": "^2.1.1",
-    "lodash": "^2.4.1",
-    "rsvp": "^3.0.14"
-  }
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "name": "streakgmailsdk",
+  "private": true,
+  "version": "0.0.2",
+  "description": "Library for browser extensions to interact with Gmail.",
+  "main": "src/gmailsdk-js/gmailsdk.js",
+  "scripts": {
+    "start": "gulp default --dev --watch --reloader",
+    "test": "mocha"
+  },
+  "author": "Streak",
+  "license": "All Rights Reserved"
 }
