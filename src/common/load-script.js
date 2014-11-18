@@ -36,7 +36,7 @@ function addScriptToPage(url, cors) {
   return promise;
 }
 
-function loadScript(url) {
+function loadScript(url, opts) {
   if (isContentScript()) {
     return ajax({
       url: url
@@ -56,8 +56,13 @@ function loadScript(url) {
       //    current scope. (Seriously, it's a javascript thing.)
       var code = response.text;
       var indirectEval = eval;
-      var program = indirectEval("(function(){"+code+"\n});\n//# sourceURL="+url+"\n");
-      program();
+      if (!opts || !opts.nowrap) {
+        code = "(function(){"+code+"\n});";
+      }
+      var program = indirectEval(code+"\n//# sourceURL="+url+"\n");
+      if (!opts || !opts.nowrap) {
+        program();
+      }
     });
   } else {
     // Try to add script as CORS first so we can get error stack data from it.
