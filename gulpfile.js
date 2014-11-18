@@ -4,6 +4,8 @@ var watchify = require('watchify');
 var source = require('vinyl-source-stream');
 var mold = require('mold-source-map');
 var streamify = require('gulp-streamify');
+var gulpif = require('gulp-if');
+var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var stdio = require('stdio');
 var gutil = require('gulp-util');
@@ -16,9 +18,23 @@ var envify = require('envify/custom');
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
-  // 'minify': {key: 'm', description: 'Minify build'},
-  'dev': {key: 'd', description: 'Development (single bundle) build'}
+  'single': {key: 's', description: 'Single bundle build (for development)'},
+  'minify': {key: 'm', description: 'Minify build'},
+  'production': {key: 'p', description: 'Production build'}
 });
+
+// Don't let production be built without minification.
+// Could just make the production flag imply the minify flag, but that seems
+// like it would harm discoverability.
+if (args.production && !args.minify) {
+  throw new Error("--production requires --minify");
+}
+
+// --watch causes Browserify to use full paths in module references. We don't
+// want those visible in production.
+if (args.production && (args.watch || args.single)) {
+  throw new Error("--production can not be used with --watch or --single");
+}
 
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
@@ -40,7 +56,9 @@ function browserifyTask(name, entry, destname) {
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
     }).transform(envify({
-      IMPLEMENTATION_URL: 'http://localhost:4567/platform-implementation.js'
+      IMPLEMENTATION_URL: args.production ?
+        'https://www.inboxsdk.com/build/platform-implementation.js' :
+        'http://localhost:4567/platform-implementation.js'
     }));
 
     if (args.watch) {
@@ -54,6 +72,9 @@ function browserifyTask(name, entry, destname) {
         .pipe(mold.transformSourcesRelativeTo('.'))
         .pipe(source(destname))
         .pipe(streamify(sourcemaps.init({loadMaps: true})))
+        .pipe(gulpif(args.minify, streamify(uglify({
+          preserveComments: 'some'
+        }))))
         .pipe(streamify(sourcemaps.write('.')))
         .pipe(gulp.dest('./dist/'));
 
@@ -83,11 +104,11 @@ function browserifyTask(name, entry, destname) {
 }
 
 
-if (args.dev) {
+if (args.single) {
   gulp.task('default', ['sdk', 'examples']);
   browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', 'inboxsdk.js');
   gulp.task('imp', function() {
-    throw new Error("No separate imp bundle in dev mode");
+    throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
