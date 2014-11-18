@@ -1,7 +1,7 @@
 var RSVP = require('rsvp');
 var _ = require('lodash');
 
-var PlatformImplementationLoader = function(appId) {
+var PlatformImplementationLoader = function(appId, opts) {
     var self = this;
     this.load = _.once(function() {
         return RSVP.resolve().then(function() {
@@ -13,7 +13,7 @@ var PlatformImplementationLoader = function(appId) {
                 });
             }
         }).then(function() {
-            self._platformImplementation =  global.__InboxSDKImpLoader.load("0.1", appId);
+            self._platformImplementation = global.__InboxSDKImpLoader.load("0.1", appId, opts);
 
             return self._platformImplementation;
         });

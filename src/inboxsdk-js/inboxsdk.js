@@ -11,7 +11,7 @@ var InboxSDK = function(appId, opts){
   }
 
   this._appId = appId;
-  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId);
+  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
   this._tracker = new Tracker(this._platformImplementationLoader);
   if (!opts || !opts.noGlobalErrorLogging) {
     this._tracker.setupGlobalLogger();

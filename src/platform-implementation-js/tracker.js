@@ -14,6 +14,18 @@ Tracker.prototype.setEmail = function(email) {
   this._email = email;
 };
 
+Tracker.prototype.setupGlobalLogger = function() {
+  // inboxsdk.js already does most of the work. We just need to make sure our
+  // copy of RSVP logs errors too.
+  var self = this;
+  if (!RSVP._errorHandlerSetup) {
+    RSVP._errorHandlerSetup = true;
+    RSVP.on('error', function(err) {
+      self.logError("Possibly uncaught promise rejection", err);
+    });
+  }
+};
+
 Tracker.prototype._getUserEmailAddressAsync = function() {
   if (this._email) {
     return this._email.getUserAsync().catch(function(err) {
