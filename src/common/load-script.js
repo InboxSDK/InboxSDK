@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
-var Ajax = require('./ajax');
+var ajax = require('./ajax');
 
 var isContentScript = _.once(function() {
   if (typeof chrome != 'undefined' && chrome.extension)
@@ -38,9 +38,9 @@ function addScriptToPage(url, cors) {
 
 function loadScript(url) {
   if (isContentScript()) {
-    return Ajax({
+    return ajax({
       url: url
-    }).then(function(code) {
+    }).then(function(response) {
       // jshint evil:true
 
       // Q: Why put the code into a function before executing it instead of
@@ -54,6 +54,7 @@ function loadScript(url) {
       // A: Using the eval value rather than the eval keyword causes the
       //    code passed to it to be run in the global scope instead of the
       //    current scope. (Seriously, it's a javascript thing.)
+      var code = response.text;
       var indirectEval = eval;
       var program = indirectEval("(function(){"+code+"\n});\n//# sourceURL="+url+"\n");
       program();
