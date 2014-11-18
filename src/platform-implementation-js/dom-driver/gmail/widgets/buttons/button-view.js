@@ -277,7 +277,7 @@ _.extend(ButtonView.prototype, {
 		});
 
 		this._eventStream.plug(
-			clickEventStream.takeWhile(this, 'isEnabled').map(function(event){
+			clickEventStream.filter(this, 'isEnabled').map(function(event){
 				return {
 					eventName: 'click',
 					domEvent: event
@@ -286,7 +286,7 @@ _.extend(ButtonView.prototype, {
 		);
 
 		var isEnterOrSpace = isKeyboardKey.bind(null, 32 /* space */, 13 /* enter */);
-		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').takeWhile(this, 'isEnabled');
+		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').filter(this, 'isEnabled');
 		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 		var nonEnterEventStream = keydownEventStream.filter(_.compose(not, isEnterOrSpace));
 
