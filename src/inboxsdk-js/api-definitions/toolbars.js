@@ -1,47 +1,47 @@
 var _ = require('lodash');
 
-var Toolbar = function(platformImplementationLoader){
+var Toolbars = function(platformImplementationLoader){
 	this._platformImplementationLoader = platformImplementationLoader;
 };
 
-_.extend(Toolbar.prototype, {
+_.extend(Toolbars.prototype, {
 
 	registerThreadListNoSelectionsButton: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadListNoSelectionsButton(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadListNoSelectionsButton(buttonDescriptor);
 		});
 	},
 
 	registerThreadListWithSelectionsButton: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadListWithSelectionsButton(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadListWithSelectionsButton(buttonDescriptor);
 		});
 	},
 
 	registerThreadViewButton: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadViewButton(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadViewButton(buttonDescriptor);
 		});
 	},
 
 	registerThreadListNoSelectionsMoreItem: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadListNoSelectionsMoreItem(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadListNoSelectionsMoreItem(buttonDescriptor);
 		});
 	},
 
 	registerThreadListWithSelectionsMoreItem: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadListWithSelectionsMoreItem(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadListWithSelectionsMoreItem(buttonDescriptor);
 		});
 	},
 
 	registerThreadViewMoreItem: function(buttonDescriptor){
 		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Toolbar.registerThreadViewMoreItem(buttonDescriptor);
+			platformImplementation.Toolbars.registerThreadViewMoreItem(buttonDescriptor);
 		});
 	}
 
 });
 
-module.exports = Toolbar;
+module.exports = Toolbars;

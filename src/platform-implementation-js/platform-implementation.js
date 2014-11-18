@@ -1,10 +1,12 @@
-var Email = require('./email');
-var FullscreenViews = require('./fullscreen-views');
-var Mailbox = require('./mailbox');
-var Toolbar = require('./toolbar');
-var Views = require('./views');
-var Tracker = require('./tracker');
-var Widgets = require('./widgets');
+var Compose = require('./platform-implementation/compose');
+var Conversations = require('./platform-implementation/conversations');
+var Email = require('./platform-implementation/email');
+var Modal = require('./platform-implementation/modal');
+var FullscreenViews = require('./platform-implementation/fullscreen-views');
+var Mailbox = require('./platform-implementation/mailbox');
+var Toolbars = require('./platform-implementation/toolbars');
+
+var Tracker = require('./platform-implementation/tracker');
 
 var GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
@@ -19,12 +21,14 @@ var PlatformImplementation = function(appId, opts){
 
 	this._driver = new GmailDriver();
 
+	this.Compose = new Compose(appId, this._driver);
+	this.Conversations = new Conversations(appId, this._driver);
+
 	this.Email = new Email(appId, this._driver);
 	this.FullscreenViews = new FullscreenViews(appId, this._driver);
 	this.Mailbox = new Mailbox(appId, this._driver, this);
-	this.Toolbar = new Toolbar(appId, this._driver, this);
-	this.Views = new Views(appId, this._driver);
-	this.Widgets = new Widgets(appId, this._driver);
+	this.Toolbars = new Toolbars(appId, this._driver, this);
+	this.Modal = new Modal(appId, this._driver);
 
 	this._tracker.setEmail(this.Email);
 

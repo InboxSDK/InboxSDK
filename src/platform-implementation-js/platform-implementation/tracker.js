@@ -1,7 +1,7 @@
 var _ = require('lodash');
-var Ajax = require('../common/ajax');
+var Ajax = require('../../common/ajax');
 var RSVP = require('rsvp');
-var logErrorFactory = require('../common/log-error-factory');
+var logErrorFactory = require('../../common/log-error-factory');
 
 function Tracker(appId) {
   this._appId = appId;

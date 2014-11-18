@@ -24,6 +24,7 @@ var ButtonView = function(options){
 	this._iconUrl = options.iconUrl;
 
 	this._title = options.title;
+	this._tooltip = options.tooltip;
 
 	this._hasDropdown = options.hasDropdown;
 
@@ -50,6 +51,7 @@ _.extend(ButtonView.prototype, {
 		{name: '_iconClass', destroy: false},
 		{name: '_iconUrl', destroy: false},
 		{name: '_title', destroy: false},
+		{name: '_tooltip', destroy: false},
 		{name: '_hasDropdown', destroy: false, defaultValue: false},
 		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
 		{name: '_isEnabled', destroy: false, defaultValue: true},
@@ -93,6 +95,10 @@ _.extend(ButtonView.prototype, {
 
 		if(options.title != this._title){
 			this._updateTitle(options.title);
+		}
+
+		if(options.tooltip != this._tooltip){
+			this._updateTooltip(options.tooltip);
 		}
 
 		if(options.iconUrl != this._iconUrl){
@@ -216,6 +222,17 @@ _.extend(ButtonView.prototype, {
 		}
 	},
 
+	_updateTooltip: function(newTooltip){
+		this._tooltip = newTooltip;
+
+		if(newTooltip){
+			this._element.setAttribute('data-tooltip', newTooltip);
+		}
+		else{
+			this._element.removeAttribute('data-tooltip');
+		}
+	},
+
 	_updateIconUrl: function(newIconUrl){
 		if(!this._iconUrl && newIconUrl){
 			this._iconUrl = newIconUrl;
@@ -318,7 +335,7 @@ _.extend(ButtonView.prototype, {
 	_setupAestheticEvents: function(){
 		var self = this;
 		Bacon.fromEventTarget(this._element, 'mouseenter')
-			 .takeWhile(this, 'isEnabled')
+			 .filter(this, 'isEnabled')
 			 .onValue(function(event){
 				self._element.classList.add(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
 				self._element.classList.add('inboxsdk__button_hover');
@@ -326,7 +343,7 @@ _.extend(ButtonView.prototype, {
 
 
 		Bacon.fromEventTarget(this._element, 'mouseleave')
-			 .takeWhile(this, 'isEnabled')
+			 .filter(this, 'isEnabled')
 			 .onValue(function(event){
 				self._element.classList.remove(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
 				self._element.classList.remove('inboxsdk__button_hover');

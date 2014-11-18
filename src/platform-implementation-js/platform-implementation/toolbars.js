@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
-var Toolbar = function(appId, driver, platformImplementation){
+var Toolbars = function(appId, driver, platformImplementation){
 	EventEmitter.call(this);
 
 	this._appId = appId;
@@ -18,9 +18,9 @@ var Toolbar = function(appId, driver, platformImplementation){
 	this._setupViewDriverWatchers();
 };
 
-Toolbar.prototype = Object.create(EventEmitter.prototype);
+Toolbars.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(Toolbar.prototype, {
+_.extend(Toolbars.prototype, {
 
 	registerThreadListNoSelectionsButton: function(buttonDescriptor){
 		this._threadListButtonDescriptors.push(_.merge(this._processButtonDescriptor(buttonDescriptor), {toolbarState: 'COLLASED'}));
@@ -83,10 +83,11 @@ _.extend(Toolbar.prototype, {
 	_processButtonDescriptor: function(buttonDescriptor){
 		var buttonOptions = _.clone(buttonDescriptor);
 		if(buttonDescriptor.hasDropdown){
-			buttonOptions.preMenuShowFunction = function(menuView){
+			buttonOptions.preMenuShowFunction = function(menuView, menuButtonViewController){
 				buttonDescriptor.onClick({
 					dropdown: {
-						el: menuView.getElement()
+						el: menuView.getElement(),
+						close: menuButtonViewController.hideMenu.bind(menuButtonViewController)
 					}
 				});
 			};
@@ -100,4 +101,4 @@ _.extend(Toolbar.prototype, {
 
 });
 
-module.exports = Toolbar;
+module.exports = Toolbars;

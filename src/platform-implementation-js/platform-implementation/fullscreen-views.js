@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
-var FullscreenViewDescriptor = require('./views/fullscreen-view/fullscreen-view-descriptor');
-var FullscreenView = require('./views/fullscreen-view/fullscreen-view');
+var FullscreenViewDescriptor = require('../views/fullscreen-view/fullscreen-view-descriptor');
+var FullscreenView = require('../views/fullscreen-view/fullscreen-view');
 
 var FullscreenViews = function(appId, driver){
 	EventEmitter.call(this);

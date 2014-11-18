@@ -1,10 +1,12 @@
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
-var Views = require('./api-definitions/views');
+
+var Compose = require('./api-definitions/compose');
+var Conversations = require('./api-definitions/conversations');
 var Mailbox = require('./api-definitions/mailbox');
 var Tracker = require('./tracker');
 var FullscreenViews = require('./api-definitions/fullscreen-views');
-var Toolbar = require('./api-definitions/toolbar');
-var Widgets = require('./api-definitions/widgets');
+var Toolbars = require('./api-definitions/toolbars');
+var Modal = require('./api-definitions/modal');
 
 var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
@@ -18,11 +20,13 @@ var InboxSDK = function(appId, opts){
     this._tracker.setupGlobalLogger();
   }
 
-  this.Views = new Views(this._platformImplementationLoader);
-  this.Mailbox = new Mailbox(this._platformImplementationLoader);
+  this.Compose = new Compose(this._platformImplementationLoader);
+  this.Conversations = new Conversations(this._platformImplementationLoader);
   this.FullscreenViews = new FullscreenViews(this._platformImplementationLoader);
-  this.Toolbar = new Toolbar(this._platformImplementationLoader);
-  this.Widgets = new Widgets(this._platformImplementationLoader);
+  this.Mailbox = new Mailbox(this._platformImplementationLoader);
+  this.Modal = new Modal(this._platformImplementationLoader);
+  this.Toolbars = new Toolbars(this._platformImplementationLoader);
+
 
   this.Util = {
     loadScript: require('../common/load-script'),

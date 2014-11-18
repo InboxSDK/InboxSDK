@@ -1,20 +1,20 @@
 var _ = require('lodash');
 
-var Widgets = function(platformImplementationLoader){
+var Modal = function(platformImplementationLoader){
     this._platformImplementationLoader = platformImplementationLoader;
 };
 
-_.extend(Widgets.prototype, {
+_.extend(Modal.prototype, {
 
-    createModal: function(options){
+    show: function(options){
         if(!this._platformImplementationLoader.getPlatformImplementation()){
             console.warn('You tried calling this function before the SDK was ready. Use InboxSDK.ready().then(callback).')
             return null;
         }
 
-        return this._platformImplementationLoader.getPlatformImplementation().Widgets.createModal(options);
+        return this._platformImplementationLoader.getPlatformImplementation().Modal.show(options);
     }
 
 });
 
-module.exports = Widgets;
+module.exports = Modal;
