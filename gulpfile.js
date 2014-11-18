@@ -11,6 +11,7 @@ var extReloader = require('./live/ext-reloader');
 var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
+var envify = require('envify/custom');
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -38,7 +39,9 @@ function browserifyTask(name, entry, destname) {
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
-    });
+    }).transform(envify({
+      IMPLEMENTATION_URL: 'http://localhost:4567/platform-implementation.js'
+    }));
 
     if (args.watch) {
       bundler = watchify(bundler);

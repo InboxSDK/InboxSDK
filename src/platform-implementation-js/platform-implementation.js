@@ -9,10 +9,14 @@ var Widgets = require('./widgets');
 var GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
 
-var PlatformImplementation = function(appId){
+var PlatformImplementation = function(appId, opts){
 	this._appId = appId;
 
 	this._tracker = new Tracker(appId);
+	if (!opts || !opts.noGlobalErrorLogging) {
+		this._tracker.setupGlobalLogger();
+	}
+
 	this._driver = new GmailDriver();
 
 	this.Email = new Email(appId, this._driver);

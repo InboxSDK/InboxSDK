@@ -12,7 +12,7 @@ var InboxSDK = function(appId, opts){
   }
 
   this._appId = appId;
-  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId);
+  this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
   this._tracker = new Tracker(this._platformImplementationLoader);
   if (!opts || !opts.noGlobalErrorLogging) {
     this._tracker.setupGlobalLogger();
@@ -36,7 +36,10 @@ var InboxSDK = function(appId, opts){
 };
 
 InboxSDK.prototype.ready = function(){
-  return this._platformImplementationLoader.load();
+  return this._platformImplementationLoader.load().then(function(Imp) {
+    // Don't give the user a reference to the implementation object.
+    return undefined;
+  });
 };
 
 // Place a bunch of poison-pill properties for things that aren't implemented.
