@@ -1,9 +1,9 @@
 {
-  "license": "All Rights Reserved",
   "author": "Streak",
-  "scripts": {
-    "test": "mocha",
-    "start": "gulp default --dev --watch --reloader"
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
   },
   "dependencies": {
     "baconjs": "0.7.33",
@@ -12,6 +12,7 @@
     "lodash": "2.4.1",
     "rsvp": "3.0.14"
   },
+  "description": "Library for browser extensions to interact with Gmail.",
   "devDependencies": {
     "browserify": "^6.3.2",
     "envify": "^3.2.0",
@@ -30,14 +31,13 @@
     "vinyl-source-stream": "^1.0.0",
     "watchify": "^2.1.1"
   },
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
-  },
+  "license": "All Rights Reserved",
+  "main": "src/inboxsdk-js/inboxsdk.js",
   "name": "inboxsdk",
   "private": true,
-  "version": "0.0.3",
-  "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/inboxsdk-js/inboxsdk.js"
+  "scripts": {
+    "start": "gulp default --dev --watch --reloader",
+    "test": "mocha"
+  },
+  "version": "0.0.4"
 }
