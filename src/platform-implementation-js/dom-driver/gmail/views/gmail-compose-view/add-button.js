@@ -106,10 +106,11 @@ function _getButtonViewController(buttonDescriptor){
 function _processButtonDescriptor(buttonDescriptor){
 	var buttonOptions = _.clone(buttonDescriptor);
 	if(buttonDescriptor.hasDropdown){
-		buttonOptions.postMenuShowFunction = function(menuView){
+		buttonOptions.postMenuShowFunction = function(menuView, menuButtonViewController){
 			buttonDescriptor.onClick({
 				dropdown: {
-					el: menuView.getElement()
+					el: menuView.getElement(),
+					close: menuButtonViewController.hideMenu.bind(menuButtonViewController)
 				}
 			});
 		};

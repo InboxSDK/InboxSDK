@@ -55,10 +55,13 @@ _.extend(ComposeWindowDriver.prototype, {
 
 	getCcRecipients: function(){},
 
-	getBccRecipients: function(){}
+	getBccRecipients: function(){},
+
+	getComposeID: function(){},
+
+	getEventStream: function(){}
 
 });
 
 
 module.exports = ComposeWindowDriver;
-

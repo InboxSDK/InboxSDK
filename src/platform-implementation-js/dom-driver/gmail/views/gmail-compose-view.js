@@ -17,6 +17,7 @@ var GmailComposeView = function(element){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
+	this._eventStream = new Bacon.Bus();
 };
 
 GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
@@ -25,6 +26,7 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
@@ -178,6 +180,10 @@ _.extend(GmailComposeView.prototype, {
 
 	getBottomBarTable: function(){
 		return this._element.querySelector('.aoP .aDh > table');
+	},
+
+	getComposeID: function(){
+
 	},
 
 	addManagedViewController: function(viewController){

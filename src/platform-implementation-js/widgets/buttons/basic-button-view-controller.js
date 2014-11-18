@@ -16,16 +16,10 @@ _.extend(BasicButtonViewController.prototype, {
 
 	__memberVariables: [
 		{name: '_view', destroy: true, get: true},
-		{name: '_activateFunction', destroy: false, set: true},
-		{name: '_isDisabled', destroy: false, defaultValue: false}
+		{name: '_activateFunction', destroy: false, set: true}
 	],
 
-	activate: function(){
-		if(this._isDisabled){
-			this._view.simulateHover();
-			return;
-		}
-
+	activate: function(){		
 		if(this._activateFunction){
 			this._activateFunction();
 		}

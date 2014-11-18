@@ -5,6 +5,10 @@ div.T-I.inboxsdk__button {
   min-width: 27px;
 }
 
+.inboxsdk__button.inboxsdk__button_disabled {
+  opacity: 0.55;
+}
+
 .inboxsdk__button .inboxsdk__button_icon, .inboxsdk__button .G-asx {
   opacity: 0.55;
 }
@@ -67,6 +71,7 @@ div.T-I.inboxsdk__button {
   min-width: 0px;
   margin-right: 0px;
   margin-left: 0px;
+  padding:0px;
 }
 
 .inboxsdk__compose_actionToolbar {

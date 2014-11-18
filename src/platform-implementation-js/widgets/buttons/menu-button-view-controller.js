@@ -131,7 +131,7 @@ _.extend(MenuButtonViewController.prototype, {
 		this._startMonitoringFocusEvents();
 
 		if(_.isFunction(this._postMenuShowFunction)){
-			this._postMenuShowFunction(this._menuView);
+			this._postMenuShowFunction(this._menuView, this);
 		}
 
 		_.delay(containByScreen, 1, this._menuView.getElement(), this._view.getElement(), this._menuPositionOptions);

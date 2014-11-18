@@ -3,6 +3,8 @@ var Bacon = require('baconjs');
 
 var BasicClass = require('../../../../lib/basic-class');
 var simulateHover = require('../../../../lib/dom/simulate-hover');
+var isKeyboardKey = require('../../../../lib/dom/is-keyboard-key');
+var not = require('../../../../lib/not');
 
 var BUTTON_COLOR_CLASSES = require('./button-color-classes');
 
@@ -50,6 +52,7 @@ _.extend(ButtonView.prototype, {
 		{name: '_title', destroy: false},
 		{name: '_hasDropdown', destroy: false, defaultValue: false},
 		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
+		{name: '_isEnabled', destroy: false, defaultValue: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
@@ -75,6 +78,14 @@ _.extend(ButtonView.prototype, {
 		simulateHover(element);
 	},
 
+	setEnabled: function(value){
+		this._setEnabled(value);
+	},
+
+	isEnabled: function(){
+		return this._isEnabled;
+	},
+
 	update: function(options){
 		if(options.buttonColor != this._buttonColor && this._buttonColor){
 			this._updateButtonColor(options.buttonColor);
@@ -90,6 +101,10 @@ _.extend(ButtonView.prototype, {
 
 		if(options.iconClass != this._iconClass){
 			this._updateIconClass(options.iconClass);
+		}
+
+		if(options.enabled === false || options.enabled === true){
+			this._setEnabled(options.enabled);
 		}
 	},
 
@@ -227,74 +242,95 @@ _.extend(ButtonView.prototype, {
 				this._iconClass = newIconClass;
 			}
 			else{
-				this._iconElement.classList.remove(this._iconClass);
+				this._iconElement.setAttribute('class', 'inboxsdk__button_icon ');
 				this._iconClass = newIconClass;
 			}
 		}
 		else {
-			this._iconElement.classList.remove(this._iconClass);
-			this._iconElement.classList.add(newIconClass);
-
+			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
 			this._iconClass = newIconClass;
+		}
+	},
+
+	_setEnabled: function(value){
+		if(this._isEnabled === value){
+			return;
+		}
+
+		this._isEnabled = value;
+		if(this._isEnabled){
+			this._element.classList.remove('inboxsdk__button_disabled');
+		}
+		else{
+			this._element.classList.add('inboxsdk__button_disabled');
 		}
 	},
 
 	_setupEventStream: function(){
 		var self = this;
 
-		this._element.addEventListener(
-			'click',
-			function(event){
-				self._eventStream.push({
+		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
+
+		clickEventStream.onValue(function(event){
+			event.stopPropagation();
+			event.preventDefault();
+		});
+
+		this._eventStream.plug(
+			clickEventStream.takeWhile(this, 'isEnabled').map(function(event){
+				return {
 					eventName: 'click',
 					domEvent: event
-				});
-
-				event.stopPropagation();
-				event.preventDefault();
-			}
+				};
+			})
 		);
 
-		this._element.addEventListener(
-			'keydown',
-			function(event){
-				if(event.which === 32 /* space */ || event.which === 13 /* enter */){
-					self._eventStream.push({
-						eventName: 'click',
-						domEvent: event
-					});
+		var isEnterOrSpace = isKeyboardKey.bind(null, 32 /* space */, 13 /* enter */);
+		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').takeWhile(this, 'isEnabled');
+		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
+		var nonEnterEventStream = keydownEventStream.filter(_.compose(not, isEnterOrSpace));
 
-					event.stopPropagation();
-					event.preventDefault();
+		this._eventStream.plug(
+			enterEventStream.map(function(event){
+				return {
+					eventName: 'click',
+					domEvent: event
+				};
+			})
+		);
 
-					return;
-				}
+		enterEventStream.onValue(function(event){
+			event.stopPropagation();
+			event.preventDefault();
+		});
 
-				self._eventStream.push({
+
+		this._eventStream.plug(
+			nonEnterEventStream.map(function(event){
+				return {
 					eventName: 'keydown',
 					domEvent: event
-				});
-			}
+				};
+			})
 		);
 	},
 
 	_setupAestheticEvents: function(){
 		var self = this;
-		this._element.addEventListener(
-			'mouseenter',
-			function(){
+		Bacon.fromEventTarget(this._element, 'mouseenter')
+			 .takeWhile(this, 'isEnabled')
+			 .onValue(function(event){
 				self._element.classList.add(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
 				self._element.classList.add('inboxsdk__button_hover');
-			}
-		);
+			  });
 
-		this._element.addEventListener(
-			'mouseleave',
-			function(){
+
+		Bacon.fromEventTarget(this._element, 'mouseleave')
+			 .takeWhile(this, 'isEnabled')
+			 .onValue(function(event){
 				self._element.classList.remove(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
 				self._element.classList.remove('inboxsdk__button_hover');
-			}
-		);
+			 });
 	}
 
 });

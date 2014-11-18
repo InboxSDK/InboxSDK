@@ -6,7 +6,7 @@ var ComposeView = function(composeViewImplementation){
 	EventEmitter.call(this);
 
 	this._composeViewImplementation = composeViewImplementation;
-	//this._bindToComposeEvents();
+	this._bindToComposeEvents();
 };
 
 ComposeView.prototype = Object.create(EventEmitter.prototype);
@@ -40,7 +40,7 @@ _.extend(ComposeView.prototype, {
 	 * returns true/false if current compose view is an inline reply form
 	 */
 	isInlineReplyForm: function(){
-		return this._composeViewImplementation.getFormType();
+		return this._composeViewImplementation.isInlineReplyForm();
 	},
 
 	/*
@@ -111,6 +111,10 @@ _.extend(ComposeView.prototype, {
 		return this._composeViewImplementation.getBccRecipients();
 	},
 
+	getComposeID: function(){
+		return this._composeViewImplementation.getComposeID();
+	},
+
 	setToRecipients: function(emails){
 		this._composeViewImplementation.setToRecipients(emails);
 	},
@@ -139,8 +143,9 @@ _.extend(ComposeView.prototype, {
 	_bindToComposeEvents: function(){
 		var self = this;
 		this._composeViewImplementation.getEventStream().onValue(function(event){
-
 		});
+
+		this._composeViewImplementation.getEventStream().onEnd(this, 'emit', 'close');
 	}
 });
 

@@ -191,3 +191,31 @@ module.exports = function(element, anchorPoint, options){
 
     element.style.maxWidth = elementSizeBox.innerWidth + 'px';
 };
+
+var CONSTANTS = {
+    BUFFER: 10
+};
+
+function isYBounded(containerBB, containedBB){
+    if(containerBB[0].y - CONSTANTS.BUFFER > containedBB[0].y){
+        return false;
+    }
+
+    if(containerBB[1].y + CONSTANTS.BUFFER < containedBB[1].y){
+        return false;
+    }
+
+    return true;
+}
+
+function isXBounded(containerBB, containedBB){
+    if(containerBB[0].x - CONSTANTS.BUFFER > containedBB[0].x){
+        return false;
+    }
+
+    if(containerBB[1].x + CONSTANTS.BUFFER < containedBB[1].x){
+        return false;
+    }
+
+    return true;
+}
