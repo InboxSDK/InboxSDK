@@ -9,14 +9,6 @@ div.T-I.inboxsdk__button {
   opacity: 0.55;
 }
 
-.inboxsdk__button .inboxsdk__button_icon, .inboxsdk__button .G-asx {
-  opacity: 0.55;
-}
-
-  .inboxsdk__button.inboxsdk__button_hover .G-asx,  .inboxsdk__button.inboxsdk__button_hover .inboxsdk__button_icon {
-    opacity: 1;
-  }
-
   .inboxsdk__button_icon + .inboxsdk__button_text {
     margin-left: 5px;
   }

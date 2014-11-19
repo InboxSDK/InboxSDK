@@ -1,21 +1,21 @@
 var inboxSDK = new InboxSDK('dropbox');
 
+// dropins.js looks for a script element on the page DOM to get the app key, so
+// oblige it. The loadScript() call later doesn't add a script element to the
+// page for it since that wouldn't get executed in the extension's context.
 var script = document.createElement('script');
 script.id = 'dropboxjs';
 script.setAttribute('data-app-key', '28gxvtpcvm1o19s');
 script.type = 'text/data';
-
 document.head.appendChild(script);
 
 inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then(function() {
-
   inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
     composeView.addButton({
       title: "Add Dropbox File",
       iconUrl: chrome.runtime.getURL('images/icon48.png'),
       section: 'MODIFIER',
       onClick: function() {
-
         var hasSelectedText = !!composeView.getSelectedBodyHTML();
 
         Dropbox.choose({
@@ -26,7 +26,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
               composeView.insertLinkChipIntoBody({
                 text: files[0].name,
                 url: files[0].link,
-                iconUrl: ''
+                iconUrl: null
               });
             }
           }
@@ -35,7 +35,6 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
       }
     });
   });
-
 
   inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
     var links = messageView.getLinks();
@@ -50,10 +49,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
       iconUrl: chrome.runtime.getURL('images/action19.png'),
       tooltip: 'Save all to Dropbox',
       callback: function(attachmentCards) {
-
         alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
-        return;
-
       }
     });
 
@@ -67,7 +63,6 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
         tooltip: 'Save to Dropbox',
         callback: function() {
           alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
-          return;
         }
       });
     });
@@ -76,15 +71,9 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
 });
 
 
-
 function isEligibleLink(link) {
-  if ((link.href.indexOf('dropbox.com/s/') === -1 && link.href.indexOf('dropbox.com/sh/') === -1) || link.isInQuotedArea) {
-    return false;
-  }
-
-  return true;
+  return !link.isInQuotedArea && /^https?:\/\/www\.dropbox\.com\/sh?\//.test(link.href);
 }
-
 
 function addAttachmentCard(messageView, link) {
   var parts = link.href.split('/');
@@ -99,15 +88,12 @@ function addAttachmentCard(messageView, link) {
     documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
     buttons: [{
       tooltip: 'Download file',
-      iconUrl: chrome.runtime.getURL('images/action38.png'),
+      iconUrl: chrome.runtime.getURL('images/download.png'),
       onClick: function() {
         location.href = getDownloadUrl(link.href);
       }
     }],
-    color: 'RGB(21, 129, 226)',
-    callback: function(eventName) {
-      console.log(eventName);
-    }
+    color: 'RGB(21, 129, 226)'
   });
 }
 
