@@ -66,7 +66,7 @@ _.extend(GmailMessageView.prototype, {
 			return [];
 		}
 
-		return gmailAttachmentAreaView.getGmailAttachmentCardViews();
+		return this._gmailAttachmentAreaView.getGmailAttachmentCardViews();
 	},
 
 	getEventStream: function(){

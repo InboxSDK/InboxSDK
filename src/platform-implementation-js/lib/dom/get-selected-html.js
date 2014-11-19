@@ -1,4 +1,6 @@
 module.exports = function(element){
+	element.focus();
+
 	var selection = document.getSelection();
 	if(!selection){
 		return null;

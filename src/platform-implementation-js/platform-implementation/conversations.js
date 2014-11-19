@@ -35,11 +35,11 @@ _.extend(Conversations.prototype, {
 	],
 
 	registerThreadViewHandler: function(handler){
-		return this._threadViewHandlerRegistry.addHandler(handler);
+		return this._threadViewHandlerRegistry.registerHandler(handler);
 	},
 
 	registerMessageViewHandler: function(handler){
-		return this._messageViewHandlerRegistry.addHandler(handler);
+		return this._messageViewHandlerRegistry.registerHandler(handler);
 	},
 
 	_setupThreadViewDriverWatcher: function(){
