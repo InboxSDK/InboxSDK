@@ -16,6 +16,8 @@ _.extend(MessageViewDriver.prototype, {
 
 	isElementInQuotedArea: function(element){},
 
+	getAttachmentCardViewDrivers: function(){},
+
 	addAttachmentCard: function(options){},
 
 	addButtonToDownloadAllArea: function(options){}

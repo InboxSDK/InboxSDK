@@ -1,24 +1,33 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
-
-var EventEmitter = require('events').EventEmitter;
+var BasicClass = require('../lib/basic-class');
 
 var ComposeView = require('../views/compose-view');
+var HandlerRegistry = require('../lib/handler-registry');
 
 var Compose = function(appId, driver){
-    EventEmitter.call(this);
+    BasicClass.call(this);
 
     this._appId = appId;
     this._driver = driver;
 
     this._requestedComposeViewDeferred = null;
 
+    this._handlerRegistry = new HandlerRegistry();
     this._setupComposeViewDriverWatcher();
 };
 
-Compose.prototype = Object.create(EventEmitter.prototype);
+Compose.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Compose.prototype, {
+
+    __memberVariables: [
+        {name: '_appId', destroy: false},
+        {name: '_driver', destroy: false},
+        {name: '_requestedComposeViewDeferred', destroy: true, destroyFunction: 'reject'},
+        {name: '_unsubscribeFunction', destroy: true},
+        {name: '_handlerRegistry', destroy: true}
+    ],
 
     getComposeView: function(){
         this._requestedComposeViewDeferred = RSVP.defer();
@@ -30,10 +39,13 @@ _.extend(Compose.prototype, {
         return this._requestedComposeViewDeferred.promise;
     },
 
-    _setupComposeViewDriverWatcher: function(){
+    registerComposeViewHandler: function(handler){
+        this._handlerRegistry.registerHandler(handler);
+    },
 
+    _setupComposeViewDriverWatcher: function(){
         var self = this;
-        this._driver.getComposeViewDriverStream().onValue(function(viewDriver){
+        this._unsubscribeFunction = this._driver.getComposeViewDriverStream().onValue(function(viewDriver){
             var view = new ComposeView(viewDriver);
 
             if(self._requestedComposeViewDeferred){
@@ -43,7 +55,7 @@ _.extend(Compose.prototype, {
                 deferred.resolve(view);
             }
             else if(!self._doesIgnoreComposeSignalExist()){
-                self.emit('composeOpen', view);
+                self._handlerRegistry.addTarget(view);
             }
         });
 

@@ -177,8 +177,7 @@ _.extend(ButtonView.prototype, {
 		this._iconElement.innerHTML = '&nbsp;';
 
 		if(this._iconClass){
-			var classes = this._iconClass.split(' ');
-			classes.forEach(this._iconElement.classList.add.bind(this._iconElement.classList));
+			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);					
 		}
 
 		if(this._iconUrl){

@@ -6,13 +6,12 @@ var Conversations = function(platformImplementationLoader){
 
 _.extend(Conversations.prototype, {
 
-	on: function(event, callback){
-		var self = this;
-		this._platformImplementationLoader.load().then(function(platformImplementation){
-			platformImplementation.Conversations.on(event, callback);
-		});
+	registerThreadViewHandler: function(handler){
+		return this._platformImplementationLoader.registerHandler('Conversations', 'ThreadView', handler);
+	},
 
-		return this;
+	registerMessageViewHandler: function(handler){
+		return this._platformImplementationLoader.registerHandler('Conversations', 'MessageView', handler);		
 	}
 
 });

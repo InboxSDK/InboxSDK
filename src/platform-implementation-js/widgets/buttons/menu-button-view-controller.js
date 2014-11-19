@@ -150,8 +150,8 @@ _.extend(MenuButtonViewController.prototype, {
 			this._preMenuHideFunction(this._menuView);
 		}
 
-		this._view.deactivate();
-		document.body.removeChild(this._menuView.getElement());
+		this._view.deactivate();				
+		this._menuView.getElement().remove();
 
 		if(_.isFunction(this._postMenuHideFunction)){
 			this._postMenuHideFunction(this._menuView);

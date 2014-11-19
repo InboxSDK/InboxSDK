@@ -18,7 +18,7 @@ _.extend(MenuView.prototype, {
 
 	_setupElement: function(){
 		this._element = document.createElement('div');
-		this._element.setAttribute('class', 'J-M uEPqDe inboxsdk_menu');
+		this._element.setAttribute('class', 'J-M uEPqDe inboxsdk__menu');
 
 		this._contentElement = document.createElement('div');
 		this._contentElement.setAttribute('class', 'SK AX');

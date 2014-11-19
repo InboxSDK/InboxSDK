@@ -1,35 +1,60 @@
 var _ = require('lodash');
-var RSVP = require('rsvp');
 
-var EventEmitter = require('events').EventEmitter;
+var BasicClass = require('../lib/basic-class');
+
 
 var ThreadView = require('../views/thread-view');
 var MessageView = require('../views/message-view');
-var AttachmentCardView = require('../views/attachment-card-view');
+
+var HandlerRegistry = require('../lib/handler-registry');
 
 var Conversations = function(appId, driver){
-	EventEmitter.call(this);
+	BasicClass.call(this);
 
 	this._appId = appId;
 	this._driver = driver;
 
-	this._setupViewDriverWatchers();
+	this._threadViewHandlerRegistry = new HandlerRegistry();
+	this._messageViewHandlerRegistry = new HandlerRegistry();
+
+	this._setupThreadViewDriverWatcher();
+	this._setupMessageViewDriverWatcher();
 };
 
-Conversations.prototype = Object.create(EventEmitter.prototype);
+Conversations.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Conversations.prototype, {
 
-	_setupViewDriverWatchers: function(){
-		this._setupViewDriverWatcher('getThreadViewDriverStream', ThreadView, 'threadOpen');
-		this._setupViewDriverWatcher('getMessageViewDriverStream', MessageView, 'messageOpen');
+	__memberVariables:[
+		{name: '_appId', destroy: false},
+		{name: '_driver', destroy: false},
+		{name: '_threadViewUnsubscribeFunction', destroy: true, defaultValue: []},
+		{name: '_messageViewUnsubscribeFunction', destroy: true, defaultValue: []},
+		{name: '_threadViewHandlerRegistry', destroy: true},
+		{name: '_messageViewHandlerRegistry', destroy: true}
+	],
+
+	registerThreadViewHandler: function(handler){
+		return this._threadViewHandlerRegistry.addHandler(handler);
 	},
 
-	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, eventName){
+	registerMessageViewHandler: function(handler){
+		return this._messageViewHandlerRegistry.addHandler(handler);
+	},
+
+	_setupThreadViewDriverWatcher: function(){
+		this._threadViewUnsubscribeFunction = this._setupViewDriverWatcher('getThreadViewDriverStream', ThreadView, this._threadViewHandlerRegistry);
+	},
+
+	_setupMessageViewDriverWatcher: function(){
+		this._messageViewUnsubscribeFunction = this._setupViewDriverWatcher('getMessageViewDriverStream', MessageView, this._messageViewHandlerRegistry);
+	},
+
+	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, handlerRegistry){
 		var self = this;
-		this._driver[driverStreamGetFunction]().onValue(function(viewDriver){
+		return this._driver[driverStreamGetFunction]().onValue(function(viewDriver){
 			var view = new viewClass(viewDriver);
-			self.emit(eventName, view);
+			handlerRegistry.addTarget(view);
 		});
 	}
 

@@ -26,6 +26,26 @@ _.extend(PlatformImplementationLoader.prototype, {
         return loadScript(process.env.IMPLEMENTATION_URL);
     },
 
+    registerHandler: function(namespace, viewType, handler){
+        var unsubscribeFunction = null;
+        var unsubscribedEarly = false;
+
+        this.load().then(function(platformImplementation){
+            if(!unsubscribedEarly){
+                unsubscribeFunction = platformImplementation[namespace]['register' + viewType + 'Handler'](handler);
+            }
+        });
+
+        return function(){
+            if(unsubscribeFunction){
+                unsubscribeFunction();
+            }
+            else{
+                unsubscribedEarly = true;
+            }
+        };
+    },
+
     getPlatformImplementation: function(){
         return this._platformImplementation;
     }

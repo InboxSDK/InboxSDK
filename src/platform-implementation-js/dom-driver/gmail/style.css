@@ -63,6 +63,12 @@ div.T-I.inboxsdk__button {
   color: #fff;
   text-shadow: none;
 }
+
+.inboxsdk__menu {
+  padding: 0px;
+  overflow: visible;
+}
+
 /* end */
 
 /* compose buttons */
@@ -81,7 +87,6 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button {
   min-width: 27px;
-  margin-right: 5px;
   height: 29px;
 }
 
@@ -98,17 +103,16 @@ div.T-I.inboxsdk__button {
   border: 1px solid #cfcfcf;
   padding: 2px !important;
   z-index: 10;
+  left: 0px;
 }
 
-.inboxsdk__compose_groupedActionToolbar::before {
-  content: " ";
+.inboxsdk__compose_groupedActionToolbar_arrow {
   position: absolute;
   background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;
   width: 17px;
   height: 18px;
   bottom: -16px;
-  left: 50%;
-  margin-left: -4px;
+  margin-left: 4px;
 }
 
 .inboxsdk__compose_groupedActionToolbar_visible .aDh {

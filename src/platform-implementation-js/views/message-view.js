@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
+var AttachmentCardView = require('./attachment-card-view');
 
 var MessageView = function(messageViewImplementation){
 	BasicClass.call(this);
@@ -37,6 +38,13 @@ _.extend(MessageView.prototype, {
 		this._messageViewImplementation.isElementInQuotedArea(element);
 	},
 
+	// returns array of attachment card views
+	getAttachmentCardViews: function(){
+		return _.map(this._messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
+			return new AttachmentCardView(attachmentCardViewDriver);
+		});
+	},
+
 	/*
 	 * options = {
 	 * 	title: ,
@@ -70,4 +78,3 @@ _.extend(MessageView.prototype, {
 
 
 module.exports = MessageView;
-

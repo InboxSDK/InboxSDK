@@ -28,6 +28,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_replyAreaStateMutationObserver', destroy: false},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
 		{name: '_replyWindowView', destroy: true},
+		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
 		{name: '_messageLoaded', destroy: false, defaultValue: false}
@@ -56,6 +57,18 @@ _.extend(GmailMessageView.prototype, {
 		return $(element).parents().filter('.adL').length > 0;
 	},
 
+	getAttachmentCardViewDrivers: function(){
+		if(!this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView = this._getAttachmentArea();
+		}
+
+		if(!this._gmailAttachmentAreaView){
+			return [];
+		}
+
+		return gmailAttachmentAreaView.getGmailAttachmentCardViews();
+	},
+
 	getEventStream: function(){
 		return this._eventStreamBus;
 	},
@@ -68,13 +81,16 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options);
-		var gmailAttachmentAreaView = this._getAttachmentArea();
 
-		if(!gmailAttachmentAreaView){
-			gmailAttachmentAreaView = this._createAttachmentArea();
+		if(!this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView = this._getAttachmentArea();
 		}
 
-		gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
+		if(!this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView = this._createAttachmentArea();
+		}
+
+		this._gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
 
 		this._addedAttachmentCardOptions[attachmentCardOptionsHash] = true;
 	},
@@ -159,26 +175,6 @@ _.extend(GmailMessageView.prototype, {
 		this._messageLoaded = true;
 
 		this._setupReplyStream();
-		this._processAttachments();
-	},
-
-	_processAttachments: function(){
-		var gmailAttachmentAreaView = this._getAttachmentArea();
-
-		if(!gmailAttachmentAreaView){
-			return;
-		}
-
-		var self = this;
-		var gmailAttachmentCardViews = gmailAttachmentAreaView.getGmailAttachmentCardViews();
-		gmailAttachmentCardViews.forEach(function(gmailAttachmentCardView){
-			gmailAttachmentCardView.ready().then(function(){
-				self._eventStreamBus.push({
-					eventName: 'newAttachmentCard',
-					view: gmailAttachmentCardView
-				});
-			});
-		});
 	},
 
 	_setupReplyStream: function(){
