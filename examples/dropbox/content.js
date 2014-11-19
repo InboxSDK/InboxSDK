@@ -39,10 +39,8 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
   inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
     var links = messageView.getLinks();
 
-    links.forEach(function(link) {
-      if (isEligibleLink(link)) {
-        addAttachmentCard(messageView, link);
-      }
+    links.filter(isEligibleLink).forEach(function(link) {
+      addAttachmentCard(messageView, link);
     });
 
     messageView.addButtonToDownloadAllArea({
