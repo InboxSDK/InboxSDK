@@ -40,11 +40,11 @@ function _addButton(gmailComposeView, buttonDescriptor){
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
-	if(!buttonOptions.section || buttonOptions.section === 'TRAY_LEFT'){
-		buttonViewController = _addButtonToTrayLeft(gmailComposeView, buttonOptions);
+	if(!buttonOptions.section || buttonOptions.section === 'MODIFIER'){
+		buttonViewController = _addButtonToModifierArea(gmailComposeView, buttonOptions);
 	}
-	else if(buttonOptions.section === 'SEND_RIGHT'){
-		buttonViewController = _addButtonToSendRight(gmailComposeView, buttonOptions);
+	else if(buttonOptions.section === 'SEND_ACTION'){
+		buttonViewController = _addButtonToSendActionArea(gmailComposeView, buttonOptions);
 	}
 
 	_groupButtonsIfNeeded(gmailComposeView);
@@ -53,7 +53,7 @@ function _addButton(gmailComposeView, buttonDescriptor){
 	return buttonViewController;
 }
 
-function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
+function _addButtonToModifierArea(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('wG');
 	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
@@ -71,7 +71,7 @@ function _addButtonToTrayLeft(gmailComposeView, buttonDescriptor){
 	return buttonViewController;
 }
 
-function _addButtonToSendRight(gmailComposeView, buttonDescriptor){
+function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
 	buttonViewController.getView().addClass('aoO');
@@ -124,10 +124,10 @@ function _processButtonDescriptor(buttonDescriptor){
 	buttonOptions.tooltip = buttonOptions.tooltip || buttonOptions.title;
 	delete buttonOptions.title;
 
-	if(buttonOptions.section === 'TRAY_LEFT'){
+	if(buttonOptions.section === 'MODIFIER'){
 		buttonOptions.buttonColor = 'flatIcon';
 	}
-	else if(buttonOptions.section === 'SEND_RIGHT'){
+	else if(buttonOptions.section === 'SEND_ACTION'){
 		buttonOptions.buttonColor = 'blue';
 	}
 

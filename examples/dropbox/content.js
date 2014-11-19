@@ -13,6 +13,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
     	composeView.addButton({
             title: "Add Dropbox File",
             iconUrl: chrome.runtime.getURL('images/icon48.png'),
+            section: 'MODIFIER',
             onClick: function() {
 
                 var hasSelectedText = !!composeView.getSelectedBodyHTML();
