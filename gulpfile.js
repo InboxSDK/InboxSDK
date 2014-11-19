@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var gulp = require('gulp');
 var browserify = require('browserify');
 var watchify = require('watchify');
@@ -14,6 +15,7 @@ var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
+var exec = RSVP.denodeify(require('child_process').exec);
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -49,8 +51,28 @@ function setupExamples() {
   });
 }
 
+var getVersion = function() {
+  throw new Error("Can't access before task has run");
+};
+
+gulp.task('version', function() {
+  return RSVP.Promise.all([
+    exec('git rev-list HEAD --max-count=1'),
+    exec('git status --porcelain')
+  ]).then(function(results) {
+    var commit = results[0].toString().trim().slice(0, 16);
+    var isModified = /^\s*M/m.test(results[1].toString());
+
+    var version = require('./package.json').version+'-'+commit;
+    if (isModified) {
+      version += '-MODIFIED';
+    }
+    getVersion = _.constant(version);
+  });
+});
+
 function browserifyTask(name, entry, destname) {
-  gulp.task(name, function() {
+  gulp.task(name, ['version'], function() {
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -58,7 +80,8 @@ function browserifyTask(name, entry, destname) {
     }).transform(envify({
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
-        'http://localhost:4567/platform-implementation.js'
+        'http://localhost:4567/platform-implementation.js',
+      VERSION: getVersion()
     }));
 
     if (args.watch) {
