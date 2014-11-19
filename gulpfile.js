@@ -10,12 +10,16 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var stdio = require('stdio');
 var gutil = require('gulp-util');
+var rename = require("gulp-rename");
 var extReloader = require('./live/ext-reloader');
+var rimraf = require('rimraf');
 var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
 var exec = RSVP.denodeify(require('child_process').exec);
+
+var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -41,9 +45,13 @@ if (args.production && (args.watch || args.single)) {
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
   return globp('./examples/*/').then(function(dirs) {
-    return dirs.reduce(function(stream, dir) {
-      return stream.pipe(gulp.dest(dir));
-    }, gulp.src('./dist/inboxsdk.js*'));
+    return dirs.reduce(
+      function(stream, dir) {
+        return stream.pipe(gulp.dest(dir));
+      },
+      gulp.src('./dist/'+sdkFilename)
+        .pipe(rename('inboxsdk.js'))
+    );
   }).then(streamToPromise).then(function() {
     if (args.reloader) {
       return extReloader();
@@ -98,7 +106,7 @@ function browserifyTask(name, entry, destname) {
         .pipe(gulpif(args.minify, streamify(uglify({
           preserveComments: 'some'
         }))))
-        .pipe(streamify(sourcemaps.write('.')))
+        .pipe(streamify(sourcemaps.write(args.production ? '.' : null)))
         .pipe(gulp.dest('./dist/'));
 
       if (isRebuild) {
@@ -129,13 +137,13 @@ function browserifyTask(name, entry, destname) {
 
 if (args.single) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', 'inboxsdk.js');
+  browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', sdkFilename);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main.js', 'inboxsdk.js');
+  browserifyTask('sdk', './src/inboxsdk-js/main.js', sdkFilename);
   browserifyTask('imp', './src/platform-implementation-js/main.js', 'platform-implementation.js');
 }
 
@@ -143,4 +151,8 @@ gulp.task('examples', ['sdk'], setupExamples);
 
 gulp.task('server', ['imp'], function() {
   require('./live/app').run();
+});
+
+gulp.task('clean', function(cb) {
+  rimraf('./dist/', cb);
 });
