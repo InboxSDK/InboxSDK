@@ -29,7 +29,7 @@ _.extend(ModalView.prototype, {
      * }
      */
     addButton: function(options){
-        this._attachmentCardImplementation.addButton(options);
+        //this._attachmentCardImplementation.addButton(options);
     }
 
 });

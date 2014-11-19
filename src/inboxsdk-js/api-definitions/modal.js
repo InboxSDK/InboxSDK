@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var ModalView = require('./modal-view');
+
 
 var Modal = function(platformImplementationLoader){
     this._platformImplementationLoader = platformImplementationLoader;
@@ -7,12 +9,10 @@ var Modal = function(platformImplementationLoader){
 _.extend(Modal.prototype, {
 
     show: function(options){
-        if(!this._platformImplementationLoader.getPlatformImplementation()){
-            console.warn('You tried calling this function before the SDK was ready. Use InboxSDK.ready().then(callback).')
-            return null;
-        }
+        var modalView = new ModalView(this._platformImplementationLoader);
+        modalView.show(options);
 
-        return this._platformImplementationLoader.getPlatformImplementation().Modal.show(options);
+        return modalView;
     }
 
 });

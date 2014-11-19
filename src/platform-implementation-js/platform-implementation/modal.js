@@ -12,17 +12,13 @@ var Modal = function(appId, driver){
 
 _.extend(Modal.prototype, {
 
-    show: function(options){
-        //TODO: do some coordination to make sure only one modal is shown at a time
+    createModalView: function(options){        
         var modalView = this._driver.createModalView(options);
         var modalViewController = new ModalViewController({
             modalView: modalView
         });
 
-        var modalView = new ModalView(modalViewController);
-        modalView.show();
-
-        return modalView;
+        return new ModalView(modalViewController);
     }
 
 });
