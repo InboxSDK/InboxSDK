@@ -25,10 +25,8 @@ function logErrorFactory(reporter) {
         name = err.message;
       }
 
-      if (err) {
-        if (err.__alreadyLoggedBySDK) {
-          return;
-        }
+      if (err && err.__alreadyLoggedBySDK) {
+        return;
       }
 
       // Might not have been passed a useful error object with a stack, so get

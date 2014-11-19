@@ -22,8 +22,8 @@ Tracker.prototype.setupGlobalLogger = function() {
   });
 
   window.addEventListener('error', function(event) {
-    // Ugh, Chrome makes this useless currently. TODO work around and wrap
-    // functions with our own error handling.
+    // Ugh, currently Chrome makes this pretty useless. The implementation
+    // script handles setting up more hooks.
     if (event.error) {
       self.logError("Uncaught exception", event.error);
     }

@@ -1,35 +1,9 @@
 {
-  "name": "inboxsdk",
-  "private": true,
-  "version": "0.0.1",
-  "description": "Library for browser extensions to interact with Gmail.",
-  "main": "src/inboxsdk-js/inboxsdk.js",
-  "scripts": {
-    "test": "mocha",
-    "start": "gulp default --dev --watch --reloader"
-  },
   "author": "Streak",
-  "license": "All Rights Reserved",
   "browserify": {
     "transform": [
       "brfs"
     ]
-  },
-  "devDependencies": {
-    "browserify": "^6.3.2",
-    "envify": "^3.2.0",
-    "glob": "^4.0.6",
-    "gulp": "^3.8.10",
-    "gulp-sourcemaps": "^1.2.8",
-    "gulp-streamify": "0.0.5",
-    "gulp-util": "^3.0.1",
-    "jsdom": "^1.2.1",
-    "mocha": "^2.0.1",
-    "mold-source-map": "^0.3.0",
-    "sinon": "^1.11.1",
-    "stdio": "^0.2.3",
-    "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.1"
   },
   "dependencies": {
     "baconjs": "0.7.33",
@@ -37,5 +11,35 @@
     "jquery": "2.1.1",
     "lodash": "2.4.1",
     "rsvp": "3.0.14"
-  }
+  },
+  "description": "Library for browser extensions to interact with Gmail.",
+  "devDependencies": {
+    "browserify": "^6.3.2",
+    "envify": "^3.2.0",
+    "glob": "^4.0.6",
+    "gulp": "^3.8.10",
+    "gulp-if": "^1.2.5",
+    "gulp-rename": "^1.2.0",
+    "gulp-sourcemaps": "^1.2.8",
+    "gulp-streamify": "0.0.5",
+    "gulp-uglify": "^1.0.1",
+    "gulp-util": "^3.0.1",
+    "jsdom": "^1.2.1",
+    "mocha": "^2.0.1",
+    "mold-source-map": "^0.3.0",
+    "rimraf": "^2.2.8",
+    "sinon": "^1.11.1",
+    "stdio": "^0.2.3",
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.1.1"
+  },
+  "license": "All Rights Reserved",
+  "main": "src/inboxsdk-js/inboxsdk.js",
+  "name": "inboxsdk",
+  "private": true,
+  "scripts": {
+    "start": "gulp default --single --watch --reloader",
+    "test": "mocha"
+  },
+  "version": "0.0.5"
 }

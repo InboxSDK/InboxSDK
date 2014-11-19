@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 
 var Compose = require('./api-definitions/compose');
@@ -12,6 +13,7 @@ var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
+  opts = _.extend({}, opts, {VERSION: process.env.VERSION});
 
   this._appId = appId;
   this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
