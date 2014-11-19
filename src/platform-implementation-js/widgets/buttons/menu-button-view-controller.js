@@ -150,7 +150,7 @@ _.extend(MenuButtonViewController.prototype, {
 			this._preMenuHideFunction(this._menuView);
 		}
 
-		this._view.deactivate();				
+		this._view.deactivate();
 		this._menuView.getElement().remove();
 
 		if(_.isFunction(this._postMenuHideFunction)){
@@ -195,6 +195,11 @@ _.extend(MenuButtonViewController.prototype, {
 
 	_stopMonitoringFocusEvents: function(){
 		document.removeEventListener('focus', this._focusFunction, true);
+	},
+
+	destroy: function(){
+		this._stopMonitoringFocusEvents();
+		BasicClass.prototype.destroy.call(this);
 	}
 
 });

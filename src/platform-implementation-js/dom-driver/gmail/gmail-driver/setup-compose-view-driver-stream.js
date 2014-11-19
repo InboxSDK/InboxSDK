@@ -16,9 +16,11 @@ function setupComposeViewDriverStream(gmailDriver){
 		}
 		else{
 			_setupStandardComposeViewDriverStream(gmailDriver);
+			_setupFullscreenComposeViewDriverStream(gmailDriver);
 		}
 
 		gmailDriver._composeViewDriverStream.plug(gmailDriver._composeElementMonitor.getViewAddedEventStream());
+		gmailDriver._composeViewDriverStream.plug(gmailDriver._fullscreenComposeElementMonitor.getViewAddedEventStream());
 	});
 
 
@@ -57,11 +59,24 @@ function _setupStandaloneComposeViewDriverStream(gmailDriver){
 function _setupStandardComposeViewDriverStream(gmailDriver){
 	gmailDriver._composeElementMonitor = new ElementMonitor({
 		elementMembershipTest: function(element){
-			return element.classList.contains('nn') && element.classList.length === 2 && !element.classList.contains('aJl') && element.children.length > 0;
+			if(element.classList.contains('aJl')){
+				return false;
+			}
+
+			var dialog = element.querySelector('[role=dialog]');
+			if(!dialog){
+				return false;
+			}
+
+			return !dialog.classList.contains('inboxsdk__compose');
 		},
 
 		viewCreationFunction: function(element){
-			return new GmailComposeView(element);
+			return new GmailComposeView(element.querySelector('[role=dialog]'));
+		},
+
+		elementMatchTest: function(element, view){
+			return view.getElement() === element.querySelector('[role=dialog]');
 		}
 	});
 
@@ -70,6 +85,34 @@ function _setupStandardComposeViewDriverStream(gmailDriver){
 	}).then(function(){
 		var composeContainer = GmailElementGetter.getComposeWindowContainer();
 		gmailDriver._composeElementMonitor.setObservedElement(composeContainer);
+	});
+}
+
+function _setupFullscreenComposeViewDriverStream(gmailDriver){
+	gmailDriver._fullscreenComposeElementMonitor = new ElementMonitor({
+		elementMembershipTest: function(element){
+			var dialog = element.querySelector('[role=dialog]');
+			if(!dialog){
+				return false;
+			}
+
+			return !dialog.classList.contains('inboxsdk__compose');
+		},
+
+		viewCreationFunction: function(element){
+			return new GmailComposeView(element.querySelector('[role=dialog]'));
+		},
+
+		elementMatchTest: function(element, view){
+			return view.getElement() === element.querySelector('[role=dialog]');
+		}
+	});
+
+	waitFor(function(){
+		return !!GmailElementGetter.getFullscreenComposeWindowContainer();
+	}).then(function(){
+		var fullscreenComposeContainer = GmailElementGetter.getFullscreenComposeWindowContainer();
+		gmailDriver._fullscreenComposeElementMonitor.setObservedElement(fullscreenComposeContainer);
 	});
 }
 

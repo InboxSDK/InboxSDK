@@ -31,6 +31,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeElementMonitor', destroy: true},
+		{name: '_fullscreenComposeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
 		{name: '_previewPaneThreadViewMonitor', destroy: true},
 		{name: '_standardThreadListToolbarMonitor', destroy: true},
@@ -63,7 +64,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	createModalView: function(options){
-		return new ModalView(options);		
+		return new ModalView(options);
 	},
 
 	_setupEventStreams: function(){

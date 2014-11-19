@@ -192,6 +192,17 @@ _.extend(GmailMessageView.prototype, {
 			replyContainer,
 			{attributes: true, attributeFilter: ['class'], attributeOldValue: true}
 		);
+
+		if(replyContainer.classList.contains('adB')){
+			this._replyWindowView = new GmailComposeView(replyContainer);
+			this._replyWindowView.setIsInlineReplyForm(true);
+
+			this._eventStreamBus.push({
+				eventName: 'replyOpen',
+				view: this._replyWindowView,
+				messageView: this
+			});
+		}
 	},
 
 	_handleReplyAreaStateMutations: function(mutations){

@@ -19,6 +19,7 @@ var ElementMonitor = function(options){
 
 	this._elementMembershipTest = options.elementMembershipTest;
 	this._viewCreationFunction = options.viewCreationFunction;
+	this._elementMatchTest = options.elementMatchTest;
 };
 
 ElementMonitor.prototype = Object.create(BasicClass.prototype);
@@ -31,7 +32,8 @@ _.extend(ElementMonitor.prototype, {
 		{name: '_views', destroy: true, get: true, defaultValue: []},
 		{name: '_observedElement', destroy: false},
 		{name: '_viewCreationFunction', destroy: false},
-		{name: '_elementMembershipTest', destroy: false}
+		{name: '_elementMembershipTest', destroy: false},
+		{name: '_elementMatchTest', destroy: false}
 	],
 
 	setObservedElement: function(element){
@@ -133,6 +135,10 @@ _.extend(ElementMonitor.prototype, {
 
 	_findViewForElement: function(element){
 		for(var ii=0; ii<this._views.length; ii++){
+			if(this._elementMatchTest && this._elementMatchTest(element, this._views[ii])){
+				return this._views[ii];
+			}
+
 			if(this._views[ii].getElement() === element){
 				return this._views[ii];
 			}

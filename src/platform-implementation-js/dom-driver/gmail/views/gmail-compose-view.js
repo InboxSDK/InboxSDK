@@ -17,6 +17,7 @@ var GmailComposeView = function(element){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
+	this._element.classList.add('inboxsdk__compose');
 	this._eventStream = new Bacon.Bus();
 };
 

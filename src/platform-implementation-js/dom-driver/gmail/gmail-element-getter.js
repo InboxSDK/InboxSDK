@@ -39,6 +39,10 @@ var GmailElementGetter = {
 		return document.querySelector('.dw .nH > .nH > .no');
 	},
 
+	getFullscreenComposeWindowContainer: function(){
+		return document.querySelector('.aSs .aSt');
+	},
+
 	getContentSectionElement: function(){
 		var mainContentElement = GmailElementGetter.getMainContentContainer();
 		if(!mainContentElement){
