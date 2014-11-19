@@ -12,14 +12,15 @@ var BasicClass = require('../basic-class');
  *
  */
 
+var _markedElementsMap = new Map();
+
 var ElementMonitor = function(options){
 	BasicClass.call(this);
 	this._domMutationObserver = null;
 	this._eventStreamBus = new Bacon.Bus();
 
-	this._elementMembershipTest = options.elementMembershipTest;
+	this._relevantElementExtractor = options.relevantElementExtractor;
 	this._viewCreationFunction = options.viewCreationFunction;
-	this._elementMatchTest = options.elementMatchTest;
 };
 
 ElementMonitor.prototype = Object.create(BasicClass.prototype);
@@ -29,11 +30,9 @@ _.extend(ElementMonitor.prototype, {
 	__memberVariables: [
 		{name: '_domMutationObserver', destroy: false, destroyFunction: 'disconnect'},
 		{name: '_eventStreamBus', destroy: false, destroyFunction: 'end'},
-		{name: '_views', destroy: true, get: true, defaultValue: []},
 		{name: '_observedElement', destroy: false},
 		{name: '_viewCreationFunction', destroy: false},
-		{name: '_elementMembershipTest', destroy: false},
-		{name: '_elementMatchTest', destroy: false}
+		{name: '_relevantElementExtractor', destroy: false}
 	],
 
 	setObservedElement: function(element){
@@ -103,12 +102,17 @@ _.extend(ElementMonitor.prototype, {
 	},
 
 	_handleNewElement: function(element){
-		if(!this._elementMembershipTest(element)){
+		var relevantElement = this._relevantElementExtractor(element);
+		if(!relevantElement){
 			return;
 		}
 
-		var view = this._viewCreationFunction(element);
-		this._views.push(view);
+		if(_markedElementsMap.get(relevantElement)){ //we already saw it
+			return;
+		}
+
+		var view = this._viewCreationFunction(relevantElement);
+		_markedElementsMap.set(relevantElement, view);
 
 		this._eventStreamBus.push({
 			eventName: 'viewAdded',
@@ -117,7 +121,12 @@ _.extend(ElementMonitor.prototype, {
 	},
 
 	_handleRemovedElement: function(element){
-		var view = this._findViewForElement(element);
+		var relevantElement = this._relevantElementExtractor(element);
+		if(!relevantElement){
+			return;
+		}
+
+		var view = _markedElementsMap.get(relevantElement);
 		if(!view){
 			return;
 		}
@@ -128,23 +137,7 @@ _.extend(ElementMonitor.prototype, {
 		});
 
 		view.destroy();
-
-		var index = this._views.indexOf(view);
-		this._views.splice(index, 1);
-	},
-
-	_findViewForElement: function(element){
-		for(var ii=0; ii<this._views.length; ii++){
-			if(this._elementMatchTest && this._elementMatchTest(element, this._views[ii])){
-				return this._views[ii];
-			}
-
-			if(this._views[ii].getElement() === element){
-				return this._views[ii];
-			}
-		}
-
-		return null;
+		_markedElementsMap.delete(element);
 	}
 
 });

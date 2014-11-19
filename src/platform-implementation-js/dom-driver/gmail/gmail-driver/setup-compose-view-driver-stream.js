@@ -38,8 +38,8 @@ function setupComposeViewDriverStream(gmailDriver){
 
 function _setupStandaloneComposeViewDriverStream(gmailDriver){
 	gmailDriver._composeElementMonitor = new ElementMonitor({
-		elementMembershipTest: function(element){
-			return true;
+		relevantElementExtractor: function(element){
+			return element;
 		},
 
 		viewCreationFunction: function(element){
@@ -58,25 +58,16 @@ function _setupStandaloneComposeViewDriverStream(gmailDriver){
 
 function _setupStandardComposeViewDriverStream(gmailDriver){
 	gmailDriver._composeElementMonitor = new ElementMonitor({
-		elementMembershipTest: function(element){
+		relevantElementExtractor: function(element){
 			if(element.classList.contains('aJl')){
-				return false;
+				return null;
 			}
 
-			var dialog = element.querySelector('[role=dialog]');
-			if(!dialog){
-				return false;
-			}
-
-			return !dialog.classList.contains('inboxsdk__compose');
+			return element.querySelector('[role=dialog]');
 		},
 
 		viewCreationFunction: function(element){
-			return new GmailComposeView(element.querySelector('[role=dialog]'));
-		},
-
-		elementMatchTest: function(element, view){
-			return view.getElement() === element.querySelector('[role=dialog]');
+			return new GmailComposeView(element);
 		}
 	});
 
@@ -90,21 +81,12 @@ function _setupStandardComposeViewDriverStream(gmailDriver){
 
 function _setupFullscreenComposeViewDriverStream(gmailDriver){
 	gmailDriver._fullscreenComposeElementMonitor = new ElementMonitor({
-		elementMembershipTest: function(element){
-			var dialog = element.querySelector('[role=dialog]');
-			if(!dialog){
-				return false;
-			}
-
-			return !dialog.classList.contains('inboxsdk__compose');
+		relevantElementExtractor: function(element){
+			return element.querySelector('[role=dialog]');
 		},
 
 		viewCreationFunction: function(element){
-			return new GmailComposeView(element.querySelector('[role=dialog]'));
-		},
-
-		elementMatchTest: function(element, view){
-			return view.getElement() === element.querySelector('[role=dialog]');
+			return new GmailComposeView(element);
 		}
 	});
 

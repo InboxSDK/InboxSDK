@@ -114,12 +114,12 @@ _.extend(GmailFullscreenView.prototype, {
 		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
 		var elementMonitor = new ElementMonitor({
 
-			elementMembershipTest: function(element){
+			relevantElementExtractor: function(element){
 				if(!element.querySelector('.if')){
-					return false;
+					return null;
 				}
 
-				return true;
+				return element;
 			},
 
 			viewCreationFunction: function(element){
