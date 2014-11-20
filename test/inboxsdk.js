@@ -36,6 +36,6 @@ describe('InboxSDK', function() {
   it('should load', function() {
     this.slow();
     var inboxsdk = new InboxSDK("test", {noGlobalErrorLogging: true});
-    return inboxsdk.ready();
+    return inboxsdk._platformImplementationLoader.load();
   });
 });
