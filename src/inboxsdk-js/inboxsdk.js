@@ -41,13 +41,6 @@ var InboxSDK = function(appId, opts){
   });
 };
 
-InboxSDK.prototype.ready = function(){
-  return this._platformImplementationLoader.load().then(function(Imp) {
-    // Don't give the user a reference to the implementation object.
-    return undefined;
-  });
-};
-
 // Place a bunch of poison-pill properties for things that aren't implemented.
 function notImplemented() {throw new Error("Not implemented yet");}
 var niSettings = {
