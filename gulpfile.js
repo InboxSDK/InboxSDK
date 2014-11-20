@@ -181,8 +181,9 @@ gulp.task('docs', function(cb) {
       var parsedComponents = dox.parseComments(code);
       var validComponents = parsedComponents.filter(function(el) {
         return isComponentEligble(el);
-      })
-      .forEach(function(el) {
+      });
+
+      validComponents.forEach(function(el) {
         transformComponent(el);
       });
 
