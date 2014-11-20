@@ -36,7 +36,6 @@ _.extend(ComposeView.prototype, {
 
 	/*
 	* inserts link into body
-	* returns a promise for when the insert actually happens
 	*/
 	insertLinkIntoBodyAtCursor: function(text, href){
 		this._composeViewImplementation.insertLinkIntoBody(text, href);
