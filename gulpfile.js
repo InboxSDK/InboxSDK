@@ -169,7 +169,7 @@ gulp.task('clean', function(cb) {
 
 gulp.task('docs', function(cb) {
   // console.log(dox);
-  dir.paths(__dirname, function(err, paths) {
+  dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
     var fileToParsedComments = {};
 
