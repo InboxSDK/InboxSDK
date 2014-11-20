@@ -106,7 +106,9 @@ function browserifyTask(name, entry, destname) {
         .pipe(gulpif(args.minify, streamify(uglify({
           preserveComments: 'some'
         }))))
-        .pipe(streamify(sourcemaps.write(args.production ? '.' : null)))
+        .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
+          
+        })))
         .pipe(gulp.dest('./dist/'));
 
       if (isRebuild) {

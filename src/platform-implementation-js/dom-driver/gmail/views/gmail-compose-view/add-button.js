@@ -40,10 +40,10 @@ function _addButton(gmailComposeView, buttonDescriptor){
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
-	if(!buttonOptions.section || buttonOptions.section === 'MODIFIER'){
+	if(buttonOptions.type === 'MODIFIER'){
 		buttonViewController = _addButtonToModifierArea(gmailComposeView, buttonOptions);
 	}
-	else if(buttonOptions.section === 'SEND_ACTION'){
+	else if(buttonOptions.type === 'SEND_ACTION'){
 		buttonViewController = _addButtonToSendActionArea(gmailComposeView, buttonOptions);
 	}
 
@@ -105,7 +105,11 @@ function _getButtonViewController(buttonDescriptor){
 }
 
 function _processButtonDescriptor(buttonDescriptor){
-	var buttonOptions = _.clone(buttonDescriptor);
+	// clone the descriptor and set defaults.
+	var buttonOptions = _.extend({
+		type: 'MODIFIER'
+	}, buttonDescriptor);
+
 	if(buttonDescriptor.hasDropdown){
 		buttonOptions.postMenuShowFunction = function(menuView, menuButtonViewController){
 			buttonDescriptor.onClick({
@@ -124,10 +128,10 @@ function _processButtonDescriptor(buttonDescriptor){
 	buttonOptions.tooltip = buttonOptions.tooltip || buttonOptions.title;
 	delete buttonOptions.title;
 
-	if(buttonOptions.section === 'MODIFIER'){
+	if(buttonOptions.type === 'MODIFIER'){
 		buttonOptions.buttonColor = 'flatIcon';
 	}
-	else if(buttonOptions.section === 'SEND_ACTION'){
+	else if(buttonOptions.type === 'SEND_ACTION'){
 		buttonOptions.buttonColor = 'blue';
 	}
 

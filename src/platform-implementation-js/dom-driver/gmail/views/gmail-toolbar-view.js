@@ -65,7 +65,7 @@ _.extend(GmailToolbarView.prototype, {
 		var self = this;
 		this._ready().then(
 			function(){
-				var sectionElement = self._getSectionElement(buttonDescriptor.section);
+				var sectionElement = self._getSectionElement(buttonDescriptor.type);
 
 				var buttonViewController = self._createButtonViewController(buttonDescriptor);
 				self._buttonViewControllers.push(buttonViewController);
