@@ -54,7 +54,7 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	isElementInQuotedArea: function(element){
-		return $(element).parents().filter('.adL').length > 0;
+		return $(element).parents('blockquote').length > 0;
 	},
 
 	getAttachmentCardViewDrivers: function(){

@@ -51,13 +51,8 @@ _.extend(GmailAttachmentCardView.prototype, {
 		return !!previewImageUrl.match(/https?:\/\/\w+\.googleusercontent\.com/);
 	},
 
-	isNonNativeAttachment: function(){
-		var previewImageUrl = this._getPreviewImageUrl();
-		if(!previewImageUrl){
-			return true;
-		}
-
-		return !previewImageUrl.match(/https?:\/\/mail\.google\.com/);
+	isNonNativeAttachment: function() {
+		return _.contains(this._element.classList, 'inboxsdk__attachmentCard');
 	},
 
 	addButton: function(options){

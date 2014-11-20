@@ -19,6 +19,7 @@
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
+    "images/download.png",
     "images/action38.png",
     "images/action19.png",
     "images/icon48.png",
