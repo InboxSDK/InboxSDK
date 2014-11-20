@@ -8,6 +8,7 @@
   "dependencies": {
     "baconjs": "0.7.33",
     "brfs": "^1.2.0",
+    "es6-unweak-collections": "0.4.1",
     "jquery": "2.1.1",
     "lodash": "2.4.1",
     "rsvp": "3.0.14"
@@ -17,7 +18,6 @@
     "browserify": "^6.3.2",
     "dox": "^0.5.3",
     "envify": "^3.2.0",
-    "es6-collections": "^0.4.0",
     "glob": "^4.0.6",
     "gulp": "^3.8.10",
     "gulp-if": "^1.2.5",

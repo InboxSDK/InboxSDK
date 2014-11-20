@@ -1,3 +1,6 @@
+/*jslint node: true */
+'use strict';
+
 var _ = require('lodash');
 var gulp = require('gulp');
 var browserify = require('browserify');

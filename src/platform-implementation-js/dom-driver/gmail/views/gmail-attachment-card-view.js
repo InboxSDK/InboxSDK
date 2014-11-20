@@ -34,7 +34,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	ready: function(){
 		var self = this;
 		return waitFor(function(){
-			return !self._isStandardAttachment() || (self._isStandardAttachment() && self._element.querySelector('.aQw').children.length > 0);
+			return !self._isStandardAttachment() || (self._isStandardAttachment() && self._element.querySelector('.aQw') && self._element.querySelector('.aQw').children.length > 0);
 		});
 	},
 

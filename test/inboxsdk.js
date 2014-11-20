@@ -2,7 +2,6 @@ var assert = require('assert');
 var sinon = require('sinon');
 var RSVP = require('./lib/rsvp');
 var env = require('jsdom').env;
-require('es6-collections');
 
 var InboxSDK = require('./lib/inboxsdk');
 
@@ -35,7 +34,15 @@ describe('InboxSDK', function() {
 
   it('should load', function() {
     this.slow();
+    process.env.VERSION = 'beep';
     var inboxsdk = new InboxSDK("test", {noGlobalErrorLogging: true});
-    return inboxsdk._platformImplementationLoader.load();
+
+    assert.strictEqual(inboxsdk.VERSION, 'beep');
+    assert.strictEqual(inboxsdk.IMPL_VERSION, null);
+
+    return inboxsdk._platformImplementationLoader.load().then(function() {
+      assert.strictEqual(inboxsdk.VERSION, 'beep');
+      assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
+    });
   });
 });

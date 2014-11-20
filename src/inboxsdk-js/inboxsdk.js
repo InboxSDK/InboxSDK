@@ -13,7 +13,9 @@ var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
-  opts = _.extend({}, opts, {VERSION: process.env.VERSION});
+  this.VERSION = process.env.VERSION;
+  this.IMPL_VERSION = null;
+  opts = _.extend({}, opts, {VERSION: this.VERSION});
 
   this._appId = appId;
   this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
@@ -36,7 +38,10 @@ var InboxSDK = function(appId, opts){
     track: this._tracker.track.bind(this._tracker)
   };
 
-  this._platformImplementationLoader.load().catch(function(err) {
+  var self = this;
+  this._platformImplementationLoader.load().then(function(Imp) {
+    self.IMPL_VERSION = Imp.VERSION;
+  }).catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
 };
