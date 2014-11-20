@@ -46,7 +46,7 @@ _.extend(Compose.prototype, {
     _setupComposeViewDriverWatcher: function(){
         var self = this;
         this._unsubscribeFunction = this._driver.getComposeViewDriverStream().onValue(function(viewDriver){
-            var view = new ComposeView(viewDriver);
+            var view = new ComposeView(viewDriver, self._appId);
 
             if(self._requestedComposeViewDeferred){
                 var deferred = self._requestedComposeViewDeferred;

@@ -9,16 +9,16 @@ var MenuButtonViewController = require('../../../../widgets/buttons/menu-button-
 
 var MenuView = require('../../widgets/menu-view');
 
-function addButton(gmailComposeView, buttonDescriptor){
+function addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
 	if(buttonDescriptor.onValue){
-		_addButtonStream(gmailComposeView, buttonDescriptor);
+		_addButtonStream(gmailComposeView, buttonDescriptor, groupOrderHint);
 	}
 	else{
-		_addButton(gmailComposeView, buttonDescriptor);
+		_addButton(gmailComposeView, buttonDescriptor, groupOrderHint);
 	}
 }
 
-function _addButtonStream(gmailComposeView, buttonDescriptorStream){
+function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHint){
 	var buttonViewController;
 
 	var unsubscribeFunction = buttonDescriptorStream.onValue(function(buttonDescriptor){
@@ -26,7 +26,7 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream){
 		var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 
 		if(!buttonViewController){
-			buttonViewController = _addButton(gmailComposeView, buttonOptions);
+			buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint);
 		}
 		else{
 			buttonViewController.getView().update(buttonOptions);
@@ -36,12 +36,12 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream){
 	gmailComposeView.addUnsubscribeFunction(unsubscribeFunction);
 }
 
-function _addButton(gmailComposeView, buttonDescriptor){
+function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
 	if(buttonOptions.type === 'MODIFIER'){
-		buttonViewController = _addButtonToModifierArea(gmailComposeView, buttonOptions);
+		buttonViewController = _addButtonToModifierArea(gmailComposeView, buttonOptions, groupOrderHint);
 	}
 	else if(buttonOptions.type === 'SEND_ACTION'){
 		buttonViewController = _addButtonToSendActionArea(gmailComposeView, buttonOptions);
@@ -53,22 +53,45 @@ function _addButton(gmailComposeView, buttonDescriptor){
 	return buttonViewController;
 }
 
-function _addButtonToModifierArea(gmailComposeView, buttonDescriptor){
+function _addButtonToModifierArea(gmailComposeView, buttonDescriptor, groupOrderHint){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('wG');
 	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
+	buttonViewController.getView().getElement().setAttribute('data-order-hint', buttonDescriptor.orderHint);
+	buttonViewController.getView().getElement().setAttribute('data-group-order-hint', groupOrderHint);
 
 	var formattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
 	var element = buttonViewController.getView().getElement();
-
 	var actionToolbar = gmailComposeView.getAdditionalActionToolbar();
 
-	actionToolbar.insertBefore(element, actionToolbar.firstElementChild);
+	var insertBeforeElement = _getInsertBeforeElement(actionToolbar, buttonDescriptor.orderHint, groupOrderHint);
+
+	actionToolbar.insertBefore(element, insertBeforeElement);
 	gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
 	gmailComposeView.addManagedViewController(buttonViewController);
 
 	return buttonViewController;
+}
+
+
+function _getInsertBeforeElement(containerElement, checkOrderHint, checkGroupOrderHint){
+	var buttonElements = containerElement.querySelectorAll('[data-order-hint]');
+	var insertBeforeElement = null;
+
+
+	for(var ii=0; ii<buttonElements.length; ii++){
+		var buttonElement = buttonElements[ii];
+		var orderHint = buttonElement.getAttribute('data-order-hint');
+		var groupOrderHint = buttonElement.getAttribute('data-group-order-hint');
+
+		if(groupOrderHint > checkGroupOrderHint || (groupOrderHint === checkGroupOrderHint && orderHint > checkOrderHint) ){
+			insertBeforeElement = buttonElement;
+			break;
+		}
+	}
+
+	return insertBeforeElement;
 }
 
 function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){

@@ -86,6 +86,16 @@ div.T-I.inboxsdk__button {
   margin-top: 0px;
 }
 
+.inboxsdk__compose_actionToolbar .inboxsdk__button > div {
+    opacity: 0.55;
+}
+
+
+  .inboxsdk__compose_actionToolbar .inboxsdk__button.inboxsdk__button_hover > div, .inboxsdk__compose_actionToolbar .inboxsdk__button:focus > div {
+    opacity: 1
+  }
+
+
 .inboxsdk__compose_groupedActionToolbar {
   position: absolute;
   bottom: 44px;

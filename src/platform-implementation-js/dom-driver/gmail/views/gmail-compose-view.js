@@ -67,8 +67,8 @@ _.extend(GmailComposeView.prototype, {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
 	},
 
-	addButton: function(buttonDescriptor){
-		require('./gmail-compose-view/add-button')(this, buttonDescriptor);
+	addButton: function(buttonDescriptor, groupOrderHint){
+		require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint);
 	},
 
 	addOuterSidebar: function(options){

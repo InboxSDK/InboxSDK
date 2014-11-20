@@ -2,10 +2,11 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
 
-var ComposeView = function(composeViewImplementation){
+var ComposeView = function(composeViewImplementation, appId){
 	EventEmitter.call(this);
 
 	this._composeViewImplementation = composeViewImplementation;
+	this._appId = appId;
 	this._bindToComposeEvents();
 };
 
@@ -17,7 +18,7 @@ _.extend(ComposeView.prototype, {
 	 * adds button to the compose
 	 */
 	addButton: function(buttonDescriptor){
-		this._composeViewImplementation.addButton(buttonDescriptor);
+		this._composeViewImplementation.addButton(buttonDescriptor, this._appId);
 	},
 
 	/*
