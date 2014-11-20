@@ -29,6 +29,7 @@
     "jsdom": "^1.2.1",
     "mocha": "^2.0.1",
     "mold-source-map": "^0.3.0",
+    "node-dir": "^0.1.6",
     "rimraf": "^2.2.8",
     "sinon": "^1.11.1",
     "stdio": "^0.2.3",
