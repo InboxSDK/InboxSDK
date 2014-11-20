@@ -15,7 +15,6 @@ module.exports = function(element, html){
 		element.selectionStart = oldStart + html.length;
 		element.selectionEnd = oldStart + html.length;
 	} else {
-		var sel, range, textNode;
 		var editable = null;
 		if (element.getSelection) {
 			editable = element;
@@ -24,36 +23,42 @@ module.exports = function(element, html){
 		}
 
 		if (editable) {
-			sel = editable.getSelection();
+			var sel = editable.getSelection();
 			if (sel.getRangeAt && sel.rangeCount) {
-				range = sel.getRangeAt(0);
+				var range = sel.getRangeAt(0);
 				range.deleteContents();
 
-				var el = document.createElement('div');
-				if(_.isString(html)){
-					el.innerHTML = html;
-				}
-				else if(html instanceof HTMLElement){
-					el.appendChild(html);
+				var frag;
+				if (html instanceof DocumentFragment) {
+					frag = html;
+				} else {
+					frag = document.createDocumentFragment();
+					if (html instanceof HTMLElement) {
+						frag.appendChild(html);
+					} else {
+						var el = document.createElement('div');
+						el.innerHTML = html;
+						var node;
+						while ((node = el.firstChild)) {
+							frag.appendChild(node);
+						}
+					}
 				}
 
-				var frag = document.createDocumentFragment(),
-					firstNode = el.firstChild,
-					node, lastNode;
-				while ((node = el.firstChild)) {
-					lastNode = frag.appendChild(node);
-				}
+				var firstChild = frag.firstChild, lastChild = frag.lastChild;
 				range.insertNode(frag);
 
-				// Preserve the selection
-				if (lastNode) {
-					range = range.cloneRange();
-					range.setStartAfter(lastNode);
-					range.collapse(true);
-					sel.removeAllRanges();
-					sel.addRange(range);
-				}
-				return firstNode;
+				// Preserve the cursor position
+				// Doesn't seem to work. TODO
+				// if (lastChild) {
+				// 	range = range.cloneRange();
+				// 	range.setStartAfter(lastChild);
+				// 	range.collapse(true);
+				// 	sel.removeAllRanges();
+				// 	sel.addRange(range);
+				// }
+
+				return firstChild;
 			}
 		}
 	}
