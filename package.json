@@ -42,5 +42,5 @@
     "start": "gulp default --single --watch --reloader",
     "test": "mocha"
   },
-  "version": "0.1.3"
+  "version": "0.2.14"
 }
