@@ -16,7 +16,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
       iconUrl: chrome.runtime.getURL('images/icon48.png'),
       type: 'MODIFIER',
       onClick: function() {
-        var hasSelectedText = !!composeView.getSelectedBodyHTML();
+        var hasSelectedText = !!composeView.getSelectedBodyText();
 
         Dropbox.choose({
           success: function(files) {

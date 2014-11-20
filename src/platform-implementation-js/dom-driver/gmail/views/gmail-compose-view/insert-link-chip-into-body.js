@@ -40,7 +40,7 @@ function _getChipElement(options){
         '<div contenteditable="false" class="gmail_chip gmail_drive_chip inboxsdk__compose_linkChip" style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245); -webkit-user-select: none; user-select: none;">',
             '<a href="' +  _.escape(options.url) + '" target="_blank" style=" display:inline-block; max-width: 366px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-decoration: none; cursor: pointer; padding: 1px 0; border: none; ">',
               options.iconUrl ?
-                '<img style="height: 16px; width: 16px; vertical-align: bottom; border: none;" src="' +  _.escape(options.iconUrl) + '">&nbsp;' :
+                '<img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="' +  _.escape(options.iconUrl) + '">&nbsp;' :
                 '',
                 '<span dir="ltr" style="color: rgb(17, 85, 204); text-decoration: none; vertical-align: bottom;">' + _.escape(options.text) + '</span>',
             '</a>',

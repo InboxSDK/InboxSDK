@@ -89,6 +89,13 @@ _.extend(ComposeView.prototype, {
 		return this._composeViewImplementation.getSelectedBodyHTML();
 	},
 
+	/*
+	 * Returns a string containing any text highlighted by the user inside the email body.
+	 */
+	getSelectedBodyText: function(){
+		return this._composeViewImplementation.getSelectedBodyText();
+	},
+
 	getBodyElement: function(){
 		return this._composeViewImplementation.getBodyElement();
 	},

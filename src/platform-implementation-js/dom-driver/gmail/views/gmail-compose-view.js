@@ -122,6 +122,10 @@ _.extend(GmailComposeView.prototype, {
 		return require('../../../lib/dom/get-selected-html')(this.getBodyElement());
 	},
 
+	getSelectedBodyText: function(){
+		return require('../../../lib/dom/get-selected-text')(this.getBodyElement());
+	},
+
 	getSubject: function(){
 		return $(this._element).find('input[name=subjectbox]').val();
 	},

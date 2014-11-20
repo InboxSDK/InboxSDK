@@ -49,6 +49,8 @@ _.extend(ComposeWindowDriver.prototype, {
 
 	getSelectedBodyHTML: function(){},
 
+	getSelectedBodyText: function(){},
+
 	getSubject: function(){},
 
 	getToRecipients: function(){},
