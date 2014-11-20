@@ -17,12 +17,15 @@ var GmailToolbarView = function(element){
 	this._element = element;
 
 	var self = this;
-	this._ready().then(
-		function(){
-			self._determineToolbarState();
-			self._setupToolbarStateMonitoring();
+	this._ready().then(function(){
+		self._determineToolbarState();
+		self._setupToolbarStateMonitoring();
+	}).catch(function(e) {
+		// swallow error if this object is destroyed before becoming ready.
+		if (!e || e.message !== 'not valid anymore') {
+			throw e;
 		}
-	);
+	});
 };
 
 GmailToolbarView.prototype = Object.create(ToolbarViewDriver.prototype);
