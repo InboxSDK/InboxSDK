@@ -44,7 +44,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
     });
 
     messageView.addButtonToDownloadAllArea({
-      iconUrl: chrome.runtime.getURL('images/dark19.png'),
+      iconUrl: chrome.runtime.getURL('images/black19.png'),
       tooltip: 'Save all to Dropbox',
       callback: function(attachmentCards) {
         alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
