@@ -183,7 +183,7 @@ gulp.task('docs', function(cb) {
         return isComponentEligble(el);
       })
       .forEach(function(el) {
-        el.code = null;
+        transformComponent(el);
       });
 
       if (validComponents) {
@@ -195,6 +195,10 @@ gulp.task('docs', function(cb) {
   });
 
 });
+
+function transformComponent(component) {
+  component.code = null;
+}
 
 function isComponentEligble(component) {
   return !!component.tags;
