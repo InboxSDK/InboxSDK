@@ -13,6 +13,7 @@ var GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
 var PlatformImplementation = function(appId, opts){
 	this._appId = appId;
+	this.VERSION = process.env.VERSION;
 
 	this._tracker = new Tracker(appId);
 	if (!opts || !opts.noGlobalErrorLogging) {
