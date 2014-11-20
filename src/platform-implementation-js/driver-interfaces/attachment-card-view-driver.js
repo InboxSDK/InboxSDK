@@ -9,7 +9,7 @@ AttachmentCardViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(AttachmentCardViewDriver.prototype, {
 
-	isStandardAttachment: function(){},
+	getAttachmentType: function(){},
 
 
 	addButton: function(options){}

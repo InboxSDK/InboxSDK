@@ -47,6 +47,11 @@ _.extend(ComposeView.prototype, {
 	*
 	*/
 	insertLinkChipIntoBodyAtCursor: function(text, url, iconUrl){
+		if(!iconUrl || typeof iconUrl !== 'string' || iconUrl.indexOf('http') !== 0){
+			console.warn('You must provide a publicly accessible iconUrl');
+			return;
+		}
+
 		this._composeViewImplementation.insertLinkChipIntoBody({
 			text: text,
 			url: url,

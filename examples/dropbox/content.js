@@ -26,7 +26,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
               composeView.insertLinkChipIntoBodyAtCursor(
                   files[0].name,
                   files[0].link,
-                  ''
+                  'https://dt8kf6553cww8.cloudfront.net/static/images/icons/blue_dropbox_glyph-vflJ8-C5d.png'
               );
             }
           }
@@ -40,26 +40,26 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
     var links = messageView.getLinks();
 
     links.filter(isEligibleLink).forEach(function(link) {
-      addAttachmentCard(messageView, link);
+      addCustomAttachmentCard(messageView, link);
     });
 
     messageView.addButtonToDownloadAllArea({
       iconUrl: chrome.runtime.getURL('images/black19.png'),
       tooltip: 'Save all to Dropbox',
-      callback: function(attachmentCards) {
+      onClick: function(attachmentCards) {
         alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
       }
     });
 
     messageView.getAttachmentCardViews().forEach(function(attachmentCardView) {
-      if (!attachmentCardView.isStandardAttachment()) {
+      if (attachmentCardView.getAttachmentType() !== 'FILE') {
         return;
       }
 
       attachmentCardView.addButton({
         iconUrl: chrome.runtime.getURL('images/white19.png'),
         tooltip: 'Save to Dropbox',
-        callback: function() {
+        onClick: function() {
           alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
         }
       });
@@ -73,7 +73,7 @@ function isEligibleLink(link) {
   return !link.isInQuotedArea && /^https?:\/\/www\.dropbox\.com\/sh?\//.test(link.href);
 }
 
-function addAttachmentCard(messageView, link) {
+function addCustomAttachmentCard(messageView, link) {
   var parts = link.href.split('/');
   var lastPart = parts[parts.length - 1];
 
@@ -84,14 +84,9 @@ function addAttachmentCard(messageView, link) {
     previewUrl: link.href,
     fileIconImageUrl: chrome.runtime.getURL('images/dark38.png'),
     documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
-    buttons: [{
-      tooltip: 'Download file',
-      iconUrl: chrome.runtime.getURL('images/download.png'),
-      onClick: function() {
-        location.href = getDownloadUrl(link.href);
-      }
-    }],
-    color: 'RGB(21, 129, 226)'
+    downloadUrl: getDownloadUrl(link.href),
+    additionalButtons: [],
+    foldColor: 'RGB(21, 129, 226)'
   });
 }
 

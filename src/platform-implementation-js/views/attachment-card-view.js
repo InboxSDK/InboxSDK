@@ -11,9 +11,9 @@ AttachmentCardView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(AttachmentCardView.prototype, {
 
-	// returns true/false depending on if this attachment card is a regular downloadable attachment
-	isStandardAttachment: function(){
-		return this._attachmentCardImplementation.isStandardAttachment();
+	// returns string indicating the type of attachment ['FILE', 'DRIVE', 'FILE_IMAGE', 'CUSTOM']
+	getAttachmentType: function(){
+		return this._attachmentCardImplementation.getAttachmentType();		
 	},
 
 
