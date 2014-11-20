@@ -2,7 +2,6 @@ var assert = require('assert');
 var sinon = require('sinon');
 var RSVP = require('./lib/rsvp');
 var env = require('jsdom').env;
-require('es6-collections');
 
 var InboxSDK = require('./lib/inboxsdk');
 

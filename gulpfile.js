@@ -1,3 +1,6 @@
+/*jslint node: true */
+'use strict';
+
 var _ = require('lodash');
 var gulp = require('gulp');
 var browserify = require('browserify');
@@ -18,6 +21,7 @@ var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
 var exec = RSVP.denodeify(require('child_process').exec);
+var dox = require('dox');
 
 var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
 
@@ -159,4 +163,8 @@ gulp.task('server', ['imp'], function() {
 
 gulp.task('clean', function(cb) {
   rimraf('./dist/', cb);
+});
+
+gulp.task('docs', function(cb) {
+  // TODO
 });
