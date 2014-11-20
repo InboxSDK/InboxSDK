@@ -44,7 +44,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
     });
 
     messageView.addButtonToDownloadAllArea({
-      iconUrl: chrome.runtime.getURL('images/action19.png'),
+      iconUrl: chrome.runtime.getURL('images/dark19.png'),
       tooltip: 'Save all to Dropbox',
       callback: function(attachmentCards) {
         alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
@@ -57,7 +57,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
       }
 
       attachmentCardView.addButton({
-        iconUrl: chrome.runtime.getURL('images/action19.png'),
+        iconUrl: chrome.runtime.getURL('images/white19.png'),
         tooltip: 'Save to Dropbox',
         callback: function() {
           alert('not yet available - contact email-feedback@dropbox.com if you want this to work');
@@ -82,7 +82,7 @@ function addAttachmentCard(messageView, link) {
   messageView.addAttachmentCard({
     fileName: fileName,
     previewUrl: link.href,
-    fileIconImageUrl: chrome.runtime.getURL('images/action38.png'),
+    fileIconImageUrl: chrome.runtime.getURL('images/dark38.png'),
     documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
     buttons: [{
       tooltip: 'Download file',
