@@ -70,7 +70,9 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		var self = this;
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
-				options.callback(self.getGmailAttachmentCardViews());
+				if(options.onClick){
+					options.onClick(self.getGmailAttachmentCardViews());
+				}
 			},
 			buttonView: buttonView
 		});
