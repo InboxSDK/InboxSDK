@@ -21,14 +21,14 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
             	Dropbox.choose({
             		success: function(files){
                         if(hasSelectedText){
-                            composeView.insertLinkIntoBody(files[0].name, files[0].link);
+                            composeView.insertLinkIntoBodyAtCursor(files[0].name, files[0].link);
                         }
                         else{
-                            composeView.insertLinkChipIntoBody({
-                                text: files[0].name,
-                                url: files[0].link,
-                                iconUrl: ''
-                            });
+                            composeView.insertLinkChipIntoBodyAtCursor(
+                                files[0].name,
+                                files[0].link,
+                                ''
+                            );
                         }
             		}
             	});

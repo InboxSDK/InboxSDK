@@ -21,12 +21,40 @@ _.extend(ComposeView.prototype, {
 	},
 
 	/*
-	 * inserts link into body
-	 * returns a promise for when the insert actually happens
-	 */
-	insertLinkIntoBody: function(text, href){
+	* Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
+	*/
+	insertTextIntoBodyAtCursor: function(text){
+		this._composeViewImplementation.insertBodyTextAtCursor(text);
+	},
+
+	/*
+	* Places html inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
+	*/
+	insertHTMLIntoBodyAtCursor: function(html){
+		this._composeViewImplementation.insertBodyHTMLAtCursor(html);
+	},
+
+	/*
+	* inserts link into body
+	* returns a promise for when the insert actually happens
+	*/
+	insertLinkIntoBodyAtCursor: function(text, href){
 		this._composeViewImplementation.insertLinkIntoBody(text, href);
 	},
+
+	/*
+	*
+	* inserts a drive-like "chip"
+	*
+	*/
+	insertLinkChipIntoBodyAtCursor: function(text, url, iconUrl){
+		this._composeViewImplementation.insertLinkChipIntoBody({
+			text: text,
+			url: url,
+			iconUrl: iconUrl
+		});
+	},
+
 
 	/*
 	 * returns true/false if the current compose view is for a reply. This includes "popped-out" replies
@@ -48,32 +76,6 @@ _.extend(ComposeView.prototype, {
 	 */
 	close: function(){
 		this._composeViewImplementation.close();
-	},
-
-
-	/*
-	 * Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
-	 */
-	insertBodyTextAtCursor: function(text){
-		this._composeViewImplementation.insertBodyTextAtCursor(text);
-	},
-
-	/*
-	 * Places html inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
-	 */
-	insertBodyHTMLAtCursor: function(html){
-		this._composeViewImplementation.insertBodyHTMLAtCursor(html);
-	},
-
-	/*
-	 * options = {
-	 *	 text: 'foo',
-	 *   iconUrl: '',
-	 *   url: ''
-	 * }
-	 */
-	insertLinkChipIntoBody: function(options){
-		this._composeViewImplementation.insertLinkChipIntoBody(options);
 	},
 
 	/*
