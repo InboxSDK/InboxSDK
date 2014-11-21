@@ -28,8 +28,8 @@ ElementMonitor.prototype = Object.create(BasicClass.prototype);
 _.extend(ElementMonitor.prototype, {
 
 	__memberVariables: [
-		{name: '_domMutationObserver', destroy: false, destroyFunction: 'disconnect'},
-		{name: '_eventStreamBus', destroy: false, destroyFunction: 'end'},
+		{name: '_domMutationObserver', destroy: true, destroyFunction: 'disconnect'},
+		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
 		{name: '_observedElement', destroy: false},
 		{name: '_viewCreationFunction', destroy: false},
 		{name: '_relevantElementExtractor', destroy: false}
