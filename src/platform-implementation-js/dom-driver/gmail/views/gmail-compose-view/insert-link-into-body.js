@@ -8,16 +8,8 @@ var setValueAndDispatchEvent = require('../../../../lib/dom/set-value-and-dispat
 
 function insertLinkIntoBody(gmailComposeView, text, href){
 	return new RSVP.Promise(function(resolve, reject){
-		if(document.hasFocus()){
-			_insertLinkIntoBody(gmailComposeView, text, href);
-			resolve();
-		}
-		else{
-			Bacon.fromEventTarget(window, 'focus').take(1).onValue(function(){
-				_insertLinkIntoBody(gmailComposeView, text, href);
-				resolve();
-			});
-		}
+		_insertLinkIntoBody(gmailComposeView, text, href);
+		resolve();
 	});
 }
 

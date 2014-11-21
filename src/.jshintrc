@@ -1,5 +1,6 @@
 {
   "node": true,
+  "browser": true,
   "-W041": true, // Use '===' to compare with 'null'.
   "-W069": true // "better written in dot notation"
 }
