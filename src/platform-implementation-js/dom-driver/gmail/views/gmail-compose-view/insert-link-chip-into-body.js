@@ -4,16 +4,8 @@ var Bacon = require('baconjs');
 
 function insertLinkChipIntoBody(gmailComposeView, options){
     return new RSVP.Promise(function(resolve, reject){
-        if(document.hasFocus()){
-            _insertLinkChipIntoBody(gmailComposeView, options);
-            resolve();
-        }
-        else{
-            Bacon.fromEventTarget(window, 'focus').take(1).onValue(function(){
-                _insertLinkChipIntoBody(gmailComposeView, options);
-                resolve();
-            });
-        }
+        _insertLinkChipIntoBody(gmailComposeView, options);
+        resolve();
     });
 }
 
