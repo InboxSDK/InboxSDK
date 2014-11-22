@@ -19,8 +19,12 @@ function setupComposeViewDriverStream(gmailDriver){
 			_setupFullscreenComposeViewDriverStream(gmailDriver);
 		}
 
-		gmailDriver._composeViewDriverStream.plug(gmailDriver._composeElementMonitor.getViewAddedEventStream());
-		gmailDriver._composeViewDriverStream.plug(gmailDriver._fullscreenComposeElementMonitor.getViewAddedEventStream());
+		gmailDriver._composeViewDriverStream.plug(
+			gmailDriver._composeElementMonitor.getViewAddedEventStream().flatMap(_waitForReady)
+		);
+		gmailDriver._composeViewDriverStream.plug(
+			gmailDriver._fullscreenComposeElementMonitor.getViewAddedEventStream().flatMap(_waitForReady)
+		);
 	});
 
 
@@ -96,6 +100,10 @@ function _setupFullscreenComposeViewDriverStream(gmailDriver){
 		var fullscreenComposeContainer = GmailElementGetter.getFullscreenComposeWindowContainer();
 		gmailDriver._fullscreenComposeElementMonitor.setObservedElement(fullscreenComposeContainer);
 	});
+}
+
+function _waitForReady(composeView){
+	return Bacon.fromPromise(composeView.ready());
 }
 
 

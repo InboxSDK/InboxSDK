@@ -6,6 +6,8 @@ var Bacon = require('baconjs');
 var simulateClick = require('../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
+var waitFor = require('../../../lib/wait-for');
+
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
@@ -18,6 +20,7 @@ var GmailComposeView = function(element){
 
 	this._element = element;
 	this._element.classList.add('inboxsdk__compose');
+
 	this._eventStream = new Bacon.Bus();
 };
 
@@ -33,6 +36,27 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
+
+	ready: function(){
+		var self = this;
+
+		return waitFor(function(){
+			return !!self.getBodyElement();
+		}).then(function(){
+			self._setupStreams();
+			self._setupConsistencyCheckers();
+
+			return self;
+		});
+	},
+
+	_setupStreams: function(){
+		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
+	},
+
+	_setupConsistencyCheckers: function(){
+		require('./gmail-compose-view/ensure-link-chips-work')(this);
+	},
 
 	insertBodyTextAtCursor: function(text){
 		require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
