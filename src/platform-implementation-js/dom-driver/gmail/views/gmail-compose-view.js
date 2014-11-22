@@ -202,7 +202,13 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getComposeID: function(){
+		var input = this._element.querySelector('input[name="composeid"]');
+		return input && input.value;
+	},
 
+	getDraftID: function() {
+		var input = this._element.querySelector('input[name="draft"]');
+		return input && input.value;
 	},
 
 	addManagedViewController: function(viewController){
