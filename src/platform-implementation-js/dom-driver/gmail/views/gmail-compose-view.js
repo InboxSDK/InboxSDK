@@ -27,12 +27,22 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_eventStream', destroy: false, get: true},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
+
+	destroy: function() {
+		if (this._eventStream) {
+			this._eventStream.push({
+				type: 'close'
+			});
+			this._eventStream.end();
+		}
+		ComposeWindowDriver.prototype.destroy.call(this);
+	},
 
 	insertBodyTextAtCursor: function(text){
 		require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);

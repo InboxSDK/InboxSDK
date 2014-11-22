@@ -10,9 +10,10 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	var self = this;
 	this._composeViewImplementation.getEventStream().onValue(function(event){
+		if (_.contains(['sending','sent','close'], event.type)) {
+			self.emit(event.type, event.data);
+		}
 	});
-
-	this._composeViewImplementation.getEventStream().onEnd(this, 'emit', 'close');
 };
 
 ComposeView.prototype = Object.create(EventEmitter.prototype);

@@ -5,7 +5,7 @@ require('./custom-style');
 
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
-
+var makeXhrInterceptorStream = require('./make-xhr-interceptor-stream');
 var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
 
@@ -28,6 +28,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_standardThreadViewMonitor', destroy: true},
@@ -66,6 +67,9 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
+		this._xhrInterceptorStream = new Bacon.Bus();
+		this._xhrInterceptorStream.plug(makeXhrInterceptorStream());
+
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
 		this._setupRowListViewDriverStream();
