@@ -174,33 +174,28 @@ gulp.task('docs', function(cb) {
   parseCommentsInFile('gulpfile.js');
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
-    var fileToParsedComments = {};
 
-    var files = paths.files.filter(function(file) {
-      return isFileEligbleForDocs(file);
-    });
+    var allComments = _.chain(paths.files)
+                        .filter(isFileEligbleForDocs)
+                        .map(parseCommentsInFile)
+                        .filter(isNonEmptyComments)
+                        .value();
 
-    files.forEach(function(file) {
-      var parsedComments = parseCommentsInFile(file);
-      var validComments = transformComments(filterComments(parsedComments));
-      fileToParsedComments[file] = validComments;
-    });
-    console.log(JSON.stringify(fileToParsedComments, null, 2));
-    fs.writeFile('dist/docs.json', JSON.stringify(fileToParsedComments, null, 2));
+    console.log(JSON.stringify(allComments, null, 2));
+    fs.writeFile('dist/docs.json', JSON.stringify(allComments, null, 2));
   });
 
 });
 
 function parseCommentsInFile(file) {
-  return JSON.parse(execSync("jsdoc " + file + ' -t templates/haruki -d console -q format=json'));
-}
-
-function transformComments(comments) {
+  var comments = JSON.parse(execSync("jsdoc " + file + ' -t templates/haruki -d console -q format=json'));
+  comments['filename'] = file;
   return comments;
 }
 
-function filterComments(comments) {
-  return comments;
+function isNonEmptyComments(comments) {
+  // its going to have one property with the filename at minimum because we added it
+  return _.size(comments) > 1;
 }
 
 function isFileEligbleForDocs(filename) {
