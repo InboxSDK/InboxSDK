@@ -1,102 +1,73 @@
 var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
-var ElementMonitor = require('../../../lib/dom/element-monitor');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');
 
-function setupComposeViewDriverStream(gmailDriver){
-
-	gmailDriver._composeViewDriverStream = new Bacon.Bus();
-
-	GmailElementGetter.waitForGmailModeToSettle().then(function(){
-		if(GmailElementGetter.isStandaloneComposeWindow()){
-			_setupStandaloneComposeViewDriverStream(gmailDriver);
-		}
-		else{
-			_setupStandardComposeViewDriverStream(gmailDriver);
-			_setupFullscreenComposeViewDriverStream(gmailDriver);
+function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream){
+	return Bacon.fromPromise(
+		GmailElementGetter.waitForGmailModeToSettle()
+	).flatMap(function() {
+		var elementStream;
+		if (GmailElementGetter.isStandaloneComposeWindow()) {
+			elementStream = _setupStandaloneComposeElementStream();
+		} else {
+			elementStream = _setupStandardComposeElementStream();
 		}
 
-		gmailDriver._composeViewDriverStream.plug(gmailDriver._composeElementMonitor.getViewAddedEventStream());
-		gmailDriver._composeViewDriverStream.plug(gmailDriver._fullscreenComposeElementMonitor.getViewAddedEventStream());
-	});
-
-
-	gmailDriver._composeViewDriverStream.plug(
-		gmailDriver._messageViewDriverStream.flatMap(function(gmailMessageView){
+		return makeElementViewStream({
+			elementStream: elementStream,
+			viewFn: function(el) {
+				return new GmailComposeView(el);
+			}
+		});
+	}).merge(
+		messageViewDriverStream.flatMap(function(gmailMessageView){
 			return gmailMessageView.getEventStream().filter(function(event){
 				return event.eventName === 'replyOpen';
-			})
-			.map(function(event){
-				return event.view;
-			});
+			}).map('.view');
 		})
 	);
 }
 
-function _setupStandaloneComposeViewDriverStream(gmailDriver){
-	gmailDriver._composeElementMonitor = new ElementMonitor({
-		relevantElementExtractor: function(element){
-			return element;
-		},
-
-		viewCreationFunction: function(element){
-			return new GmailComposeView(element);
-		}
-	});
-
-
-	waitFor(function(){
-		return !!GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
-	}).then(function(){
-		var composeContainer = GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
-		gmailDriver._composeElementMonitor.setObservedElement(GmailElementGetter.StandaloneCompose.getComposeWindowContainer());
+function _waitForContainerAndMonitorChildrenStream(containerFn) {
+	var containerEl;
+	return Bacon.fromPromise(
+		waitFor(function() {
+			containerEl = containerFn();
+			return !!containerEl;
+		})
+	).flatMap(function() {
+		return makeElementChildStream(containerEl);
 	});
 }
 
-function _setupStandardComposeViewDriverStream(gmailDriver){
-	gmailDriver._composeElementMonitor = new ElementMonitor({
-		relevantElementExtractor: function(element){
-			if(element.classList.contains('aJl')){
-				return null;
-			}
-
-			return element.querySelector('[role=dialog]');
-		},
-
-		viewCreationFunction: function(element){
-			return new GmailComposeView(element);
-		}
-	});
-
-	waitFor(function(){
-		return !!GmailElementGetter.getComposeWindowContainer();
-	}).then(function(){
-		var composeContainer = GmailElementGetter.getComposeWindowContainer();
-		gmailDriver._composeElementMonitor.setObservedElement(composeContainer);
+function _setupStandardComposeElementStream() {
+	return _waitForContainerAndMonitorChildrenStream(function() {
+		return GmailElementGetter.getComposeWindowContainer();
+	}).merge(
+		_waitForContainerAndMonitorChildrenStream(function() {
+			return GmailElementGetter.getFullscreenComposeWindowContainer();
+		})
+	).filter(function(event) {
+		return !event.el.classList.contains('aJl');
+	}).map(function(event) {
+		return {
+			type: event.type,
+			el: event.el.querySelector('[role=dialog]')
+		};
+	}).filter(function(event) {
+		return event && event.el;
 	});
 }
 
-function _setupFullscreenComposeViewDriverStream(gmailDriver){
-	gmailDriver._fullscreenComposeElementMonitor = new ElementMonitor({
-		relevantElementExtractor: function(element){
-			return element.querySelector('[role=dialog]');
-		},
-
-		viewCreationFunction: function(element){
-			return new GmailComposeView(element);
-		}
-	});
-
-	waitFor(function(){
-		return !!GmailElementGetter.getFullscreenComposeWindowContainer();
-	}).then(function(){
-		var fullscreenComposeContainer = GmailElementGetter.getFullscreenComposeWindowContainer();
-		gmailDriver._fullscreenComposeElementMonitor.setObservedElement(fullscreenComposeContainer);
+function _setupStandaloneComposeElementStream() {
+	return _waitForContainerAndMonitorChildrenStream(function() {
+		return GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
 	});
 }
-
 
 module.exports = setupComposeViewDriverStream;

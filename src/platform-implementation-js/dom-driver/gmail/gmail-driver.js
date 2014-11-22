@@ -30,8 +30,6 @@ _.extend(GmailDriver.prototype, {
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_composeElementMonitor', destroy: true},
-		{name: '_fullscreenComposeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
 		{name: '_previewPaneThreadViewMonitor', destroy: true},
 		{name: '_standardThreadListToolbarMonitor', destroy: true},
@@ -75,8 +73,16 @@ _.extend(GmailDriver.prototype, {
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
+		this._setupComposeViewDriverStream();
+	},
 
-		require('./gmail-driver/setup-compose-view-driver-stream')(this);
+	_setupComposeViewDriverStream: function() {
+		this._composeViewDriverStream = new Bacon.Bus();
+		this._composeViewDriverStream.plug(
+			require('./gmail-driver/setup-compose-view-driver-stream')(
+				this, this._messageViewDriverStream
+			)
+		);
 	},
 
 	_setupRowListViewDriverStream: function(){
