@@ -13,12 +13,30 @@ var MenuButtonViewController = require('../../../widgets/buttons/menu-button-vie
 
 var MenuView = require('../widgets/menu-view');
 
-var GmailComposeView = function(element){
+var GmailComposeView = function(element, xhrInterceptorStream){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
 	this._element.classList.add('inboxsdk__compose');
+	this._composeID = this._element.querySelector('input[name="composeid"]').value;
 	this._eventStream = new Bacon.Bus();
+
+	var self = this;
+	this._eventStream.plug(
+		Bacon.mergeAll(
+			xhrInterceptorStream.filter(function(event) {
+				return event.type === 'emailSending' && event.composeId === self.getComposeID();
+			}).map(function(event) {
+				return {type: 'sending'};
+			}),
+			xhrInterceptorStream.filter(function(event) {
+				return event.type === 'emailSent' && event.composeId === self.getComposeID();
+			}).map(function(event) {
+				// TODO include final message id
+				return {type: 'sent', data: undefined};
+			})
+		)
+	);
 };
 
 GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
@@ -202,8 +220,7 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getComposeID: function(){
-		var input = this._element.querySelector('input[name="composeid"]');
-		return input && input.value;
+		return this._composeID;
 	},
 
 	getDraftID: function() {

@@ -10,6 +10,12 @@ function makeElementViewStream(opts) {
 
   var knownViews = new Map();
 
+  elementStream.onEnd(function() {
+    knownViews.forEach(function(view, el) {
+      view.destroy();
+    });
+  });
+
   return elementStream
     .map(function(event) {
       var view = knownViews.get(event.el);

@@ -1,10 +1,7 @@
 var _ = require('lodash');
-
-function main() {
-  console.log('injected main', _);
-}
+var gmailInterceptor = require('./setup-gmail-interceptor');
 
 if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
-  main();
+  gmailInterceptor();
 }

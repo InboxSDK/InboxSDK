@@ -6,13 +6,16 @@ var MessageViewDriver = require('../../../driver-interfaces/message-view-driver'
 
 var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
-var GmailComposeView = require('./gmail-compose-view');
 
 var GmailMessageView = function(element){
 	MessageViewDriver.call(this);
 
 	this._element = element;
 	this._eventStreamBus = new Bacon.Bus();
+
+	this._replyElementStream = this._eventStreamBus.filter(function(event) {
+		return event.eventName === 'replyElement';
+	}).map('.change');
 
 	this._setupMessageStateStream();
 	this._processInitialState();
@@ -27,7 +30,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_messageStateMutationObserver', destroy: false},
 		{name: '_replyAreaStateMutationObserver', destroy: false},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
-		{name: '_replyWindowView', destroy: true},
+		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
@@ -194,13 +197,11 @@ _.extend(GmailMessageView.prototype, {
 		);
 
 		if(replyContainer.classList.contains('adB')){
-			this._replyWindowView = new GmailComposeView(replyContainer);
-			this._replyWindowView.setIsInlineReplyForm(true);
-
 			this._eventStreamBus.push({
-				eventName: 'replyOpen',
-				view: this._replyWindowView,
-				messageView: this
+				eventName: 'replyElement',
+				change: {
+					type: 'added', el: replyContainer
+				}
 			});
 		}
 	},
@@ -212,28 +213,21 @@ _.extend(GmailMessageView.prototype, {
 
 		if(currentClassList.contains('adB')){
 			if(oldValue.indexOf('adB') === -1){
-				this._replyWindowView = new GmailComposeView(mutation.target);
-				this._replyWindowView.setIsInlineReplyForm(true);
-
 				this._eventStreamBus.push({
-					eventName: 'replyOpen',
-					view: this._replyWindowView,
-					messageView: this
+					eventName: 'replyElement',
+					change: {
+						type: 'added', el: mutation.target
+					}
 				});
 			}
 		}
 		else{
 			this._eventStreamBus.push({
-				eventName: 'replyClosed',
-				view: this._replyWindowView,
-				messageView: this
+				eventName: 'replyElement',
+				change: {
+					type: 'removed', el: mutation.target
+				}
 			});
-
-			if(this._replyWindowView){
-				this._replyWindowView.destroy();
-			}
-
-			this._replyWindowView = null;
 		}
 	},
 

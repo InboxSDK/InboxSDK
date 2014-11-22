@@ -6,7 +6,6 @@ require('./custom-style');
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptorStream = require('./make-xhr-interceptor-stream');
-var GmailComposeView = require('./views/gmail-compose-view');
 var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailModalView = require('./widgets/gmail-modal-view');
@@ -84,7 +83,7 @@ _.extend(GmailDriver.prototype, {
 		this._composeViewDriverStream = new Bacon.Bus();
 		this._composeViewDriverStream.plug(
 			require('./gmail-driver/setup-compose-view-driver-stream')(
-				this, this._messageViewDriverStream
+				this, this._messageViewDriverStream, this._xhrInterceptorStream
 			)
 		);
 	},

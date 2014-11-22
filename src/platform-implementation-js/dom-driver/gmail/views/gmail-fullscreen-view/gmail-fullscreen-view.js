@@ -115,6 +115,7 @@ _.extend(GmailFullscreenView.prototype, {
 		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
 
 		var elementStream = makeElementChildStream(threadContainerTableElement)
+			.takeUntil(this._eventStreamBus.filter(false).mapEnd())
 			.filter(function(event) {
 				return !!event.el.querySelector('.if');
 			});

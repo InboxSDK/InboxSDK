@@ -7,7 +7,7 @@ var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');
 
-function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream){
+function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrInterceptorStream){
 	return Bacon.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(function() {
@@ -21,14 +21,19 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream){
 		return makeElementViewStream({
 			elementStream: elementStream,
 			viewFn: function(el) {
-				return new GmailComposeView(el);
+				return new GmailComposeView(el, xhrInterceptorStream);
 			}
 		});
 	}).merge(
 		messageViewDriverStream.flatMap(function(gmailMessageView){
-			return gmailMessageView.getEventStream().filter(function(event){
-				return event.eventName === 'replyOpen';
-			}).map('.view');
+			return makeElementViewStream({
+				elementStream: gmailMessageView.getReplyElementStream(),
+				viewFn: function(el) {
+					var view = new GmailComposeView(el, xhrInterceptorStream);
+					view.setIsInlineReplyForm(true);
+					return view;
+				}
+			});
 		})
 	);
 }
