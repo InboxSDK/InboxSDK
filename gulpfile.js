@@ -21,9 +21,10 @@ var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
 var exec = RSVP.denodeify(require('child_process').exec);
-var dox = require('dox');
 var fs = require('fs');
 var dir = require('node-dir');
+var sys = require('sys');
+var execSync = require('exec-sync');
 
 var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
 
@@ -167,46 +168,43 @@ gulp.task('clean', function(cb) {
   rimraf('./dist/', cb);
 });
 
+
+
 gulp.task('docs', function(cb) {
-  // console.log(dox);
+  parseCommentsInFile('gulpfile.js');
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
     var fileToParsedComments = {};
 
-    paths.files.filter(function(file) {
+    var files = paths.files.filter(function(file) {
       return isFileEligbleForDocs(file);
-    })
-    .forEach(function(file) {
-      var code = fs.readFileSync(file, {encoding:"utf8"});
-      var parsedComponents = dox.parseComments(code);
-      var validComponents = parsedComponents.filter(function(el) {
-        return isComponentEligble(el);
-      });
-
-      validComponents.forEach(function(el) {
-        transformComponent(el);
-      });
-
-      if (validComponents) {
-        fileToParsedComments[file] = validComponents;
-      }
     });
 
-    fs.writeFile('dist/docs.json', JSON.stringify(fileToParsedComments));
+    files.forEach(function(file) {
+      var parsedComments = parseCommentsInFile(file);
+      var validComments = transformComments(filterComments(parsedComments));
+      fileToParsedComments[file] = validComments;
+    });
+    console.log(JSON.stringify(fileToParsedComments, null, 2));
+    fs.writeFile('dist/docs.json', JSON.stringify(fileToParsedComments, null, 2));
   });
 
 });
 
-function transformComponent(component) {
-  component.code = null;
+function parseCommentsInFile(file) {
+  return JSON.parse(execSync("jsdoc " + file + ' -t templates/haruki -d console -q format=json'));
 }
 
-function isComponentEligble(component) {
-  return !!component.tags;
+function transformComments(comments) {
+  return comments;
+}
+
+function filterComments(comments) {
+  return comments;
 }
 
 function isFileEligbleForDocs(filename) {
-  return endsWith(filename, ".js") && filename.indexOf('node_modules') == -1;
+  return endsWith(filename, ".js") && filename.indexOf('node_modules') == -1 && filename.indexOf('conversations.js') != -1;
 }
 
 function endsWith(str, suffix) {
