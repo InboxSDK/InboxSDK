@@ -86,8 +86,8 @@ gulp.task('version', function() {
   });
 });
 
-function browserifyTask(name, entry, destname) {
-  gulp.task(name, ['version'], function() {
+function browserifyTask(name, deps, entry, destname) {
+  gulp.task(name, ['version'].concat(deps), function() {
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -116,7 +116,9 @@ function browserifyTask(name, entry, destname) {
         .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
           // don't include sourcemap comment in the inboxsdk-x.js file that we
           // distribute to developers since it'd always be broken.
-          addComment: !args.production || name != 'sdk'
+          addComment: !args.production || name != 'sdk',
+          sourceMappingURLPrefix: name == 'injected' ?
+            'https://www.inboxsdk.com/build/' : null
         })))
         .pipe(gulp.dest('./dist/'));
 
@@ -145,18 +147,20 @@ function browserifyTask(name, entry, destname) {
   });
 }
 
-
 if (args.single) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', sdkFilename);
+  browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main.js', sdkFilename);
-  browserifyTask('imp', './src/platform-implementation-js/main.js', 'platform-implementation.js');
+  browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
+  browserifyTask('imp', ['injected'],
+    './src/platform-implementation-js/main.js', 'platform-implementation.js');
 }
+
+browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js');
 
 gulp.task('examples', ['sdk'], setupExamples);
 

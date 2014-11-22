@@ -8,13 +8,16 @@ module.exports = function(gmailComposeView){
 
     gmailComposeView.getEventStream().startWith({eventName: 'bodyChanged'}).filter(function(event){
         return event.eventName === 'bodyChanged';
-    }).debounceImmediate(100).onValue(function(){            
-        var chips = bodyElement.querySelectorAll('.inboxsdk__compose_linkChip');
-        Array.prototype.filter.call(chips, _isNotEnhanced).forEach(_addEnhancements);
+    }).debounceImmediate(100).onValue(function(){
+        var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
+        Array.prototype.map.call(chips, _getChipContainer).filter(_isNotEnhanced).forEach(_addEnhancements);
     });
 
 };
 
+function _getChipContainer(span){
+    return span.parentElement;
+}
 
 function _isNotEnhanced(chipElement){
     return !chipMap.has(chipElement);
@@ -26,9 +29,14 @@ function _addEnhancements(chipElement){
     xElement.innerHTML = '<img src="//ssl.gstatic.com/ui/v1/icons/common/x_8px.png" style="opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;">';
     xElement = xElement.children[0];
 
-    xElement.addEventListener('click', function(e){
+    xElement.addEventListener('mousedown', function(e){
         chipElement.remove();
-    });
+    }, true);
+
+    xElement.addEventListener('click', function(e){
+        e.stopImmediatePropagation();
+        e.preventDefault(); 
+    }, true);
 
 
     chipElement.addEventListener(

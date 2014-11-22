@@ -5,8 +5,7 @@ require('./custom-style');
 
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
-
-var GmailComposeView = require('./views/gmail-compose-view');
+var makeXhrInterceptorStream = require('./make-xhr-interceptor-stream');
 var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailModalView = require('./widgets/gmail-modal-view');
@@ -28,10 +27,9 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_composeElementMonitor', destroy: true},
-		{name: '_fullscreenComposeElementMonitor', destroy: true},
 		{name: '_standardThreadViewMonitor', destroy: true},
 		{name: '_previewPaneThreadViewMonitor', destroy: true},
 		{name: '_standardThreadListToolbarMonitor', destroy: true},
@@ -68,6 +66,9 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
+		this._xhrInterceptorStream = new Bacon.Bus();
+		this._xhrInterceptorStream.plug(makeXhrInterceptorStream());
+
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
 		this._setupRowListViewDriverStream();
@@ -75,8 +76,16 @@ _.extend(GmailDriver.prototype, {
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
 		this._setupAttachmentCardViewDriverStream();
+		this._setupComposeViewDriverStream();
+	},
 
-		require('./gmail-driver/setup-compose-view-driver-stream')(this);
+	_setupComposeViewDriverStream: function() {
+		this._composeViewDriverStream = new Bacon.Bus();
+		this._composeViewDriverStream.plug(
+			require('./gmail-driver/setup-compose-view-driver-stream')(
+				this, this._messageViewDriverStream, this._xhrInterceptorStream
+			)
+		);
 	},
 
 	_setupRowListViewDriverStream: function(){
