@@ -3,29 +3,33 @@ var Bacon = require('baconjs');
 
 var BasicClass = require('../../../lib/basic-class');
 
-var ModalView = function(options){
+var GmailModalView = function(options){
     BasicClass.call(this);
 
     this._setupOverlayElement();
     this._setupModalContainerElement(options);
 
-    this.setTitle(options.title);
-    this.setContentElement(options.el);
-    this.setButtons(options.buttons);
-
+    this._processOptions(options);
     this._eventStream = new Bacon.Bus();
     this._setupEventStream();
 };
 
-ModalView.prototype = Object.create(BasicClass.prototype);
+GmailModalView.prototype = Object.create(BasicClass.prototype);
 
-_.extend(ModalView.prototype, {
+_.extend(GmailModalView.prototype, {
 
     __memberVariables: [
         {name: '_overlayElement', destroy: true, get: true},
         {name: '_modalContainerElement', destroy: true, get: true},
         {name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'}
     ],
+
+    _processOptions: function(options){
+        this.setTitle(options.title);
+        this.setContentElement(options.el);
+        this.setButtons(options.buttons);
+        this.setChrome(options.chrome);
+    },
 
     setTitle: function(title){
         if(!title){
@@ -39,7 +43,10 @@ _.extend(ModalView.prototype, {
 
     setContentElement: function(element){
         this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = '';
-        if(element){
+        if(typeof element === 'string'){
+            this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = element;
+        }
+        else if(element instanceof Element) {
             this._modalContainerElement.querySelector('.inboxsdk__modal_content').appendChild(element);
         }
     },
@@ -57,12 +64,21 @@ _.extend(ModalView.prototype, {
         //iterate and add buttons
     },
 
+    setChrome: function(chrome){
+        if(chrome === false){
+            this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
+        }
+        else{
+            this._modalContainerElement.classList.remove('inboxsdk__modal_chromeless');
+        }
+    },
+
     _setupOverlayElement: function(){
         this._overlayElement = document.createElement('div');
         this._overlayElement.setAttribute('class', 'Kj-JD-Jh inboxsdk__modal_overlay');
     },
 
-    _setupModalContainerElement: function(options){
+    _setupModalContainerElement: function(){
         this._modalContainerElement = document.createElement('div');
         this._modalContainerElement.setAttribute('class', 'inboxsdk__modal_fullscreen');
 
@@ -72,7 +88,7 @@ _.extend(ModalView.prototype, {
                     '<span class="Kj-JD-K7-K0" role="heading"></span>',
                     '<span class="Kj-JD-K7-Jq inboxsdk__modal_close" role="button" tabindex="0"></span>',
                 '</div>',
-                '<div class="Kj-JD-Jz inboxsdk__modal_content" style="margin-top: 30px; margin-bottom: 30px;">',
+                '<div class="Kj-JD-Jz inboxsdk__modal_content">',
                 '</div>',
                 '<div class="Kj-JD-Jl inboxsdk__modal_buttons"></div>',
             '</div>'
@@ -94,4 +110,4 @@ _.extend(ModalView.prototype, {
     }
 });
 
-module.exports = ModalView;
+module.exports = GmailModalView;

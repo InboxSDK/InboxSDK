@@ -68,10 +68,28 @@ function _getChipElement(options){
         }
     );
 
+    if(options.iconUrl){
+        _monitorImageSize(chipElement.querySelector('img'));
+    }
+
 
     return chipElement;
+}
 
+function _monitorImageSize(img){
+    if(img.complete){
+        _checkImageSize(img);
+    }
+    else{
+        img.addEventListener('load', _checkImageSize.bind(null, img));
+    }
+}
 
+function _checkImageSize(img){
+    if(img.naturalHeight !== 16 || img.naturalWidth !== 16){
+        console.error('Chip icon image must be 16px by 16px. This image is: ' + img.naturalWidth + 'px by ' + img.naturalHeight + 'px') ;
+        img.remove();
+    }    
 }
 
 module.exports = insertLinkChipIntoBody;
