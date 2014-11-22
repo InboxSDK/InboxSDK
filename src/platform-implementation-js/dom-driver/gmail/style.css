@@ -225,11 +225,34 @@ div.T-I.inboxsdk__button {
   display: -webkit-flex;
   justify-content: center;
   align-items: center;
+  padding: 110px 50px 50px 50px;
+}
+
+.inboxsdk__modal_content {
+    margin-top: 30px; margin-bottom: 30px;
 }
 
 .inboxsdk__modal_fullscreen .inboxsdk__modal_container {
   position: relative;
-  margin-top: -100px;
+  margin-top: -60px;
+  width: auto;
+  overflow: hidden;
 }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_container {
+    padding: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_close {
+    display: none;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_content {
+    margin: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .Kj-JD-K7 {
+    margin: 0px;
+  }
 
 /* end modal */
