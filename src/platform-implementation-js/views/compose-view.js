@@ -7,7 +7,12 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	this._composeViewImplementation = composeViewImplementation;
 	this._appId = appId;
-	this._bindToComposeEvents();
+
+	var self = this;
+	this._composeViewImplementation.getEventStream().onValue(function(event){
+	});
+
+	this._composeViewImplementation.getEventStream().onEnd(this, 'emit', 'close');
 };
 
 ComposeView.prototype = Object.create(EventEmitter.prototype);
@@ -151,15 +156,6 @@ _.extend(ComposeView.prototype, {
 
 	addMessageSendModifier: function(modifier){
 		this._composeViewImplementation.addMessageSendModifier(modifier);
-	},
-
-
-	_bindToComposeEvents: function(){
-		var self = this;
-		this._composeViewImplementation.getEventStream().onValue(function(event){
-		});
-
-		this._composeViewImplementation.getEventStream().onEnd(this, 'emit', 'close');
 	}
 });
 
