@@ -187,6 +187,10 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelector('.aoP .aDh > table');
 	},
 
+	getBottomToolbarContainer: function(){
+		return this._element.querySelector('.aoP .aDj');
+	},
+
 	getComposeID: function(){
 
 	},
