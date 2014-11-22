@@ -13,11 +13,15 @@ MessageView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(MessageView.prototype, {
 
+	// rename getBodyElement
+
 	// returns root dom element for the message
 	getContentsElement: function(){
 		return this._messageViewImplementation.getContentsElement();
 	},
 
+
+	// rename getLinksInBody
 	/*
 	 * returns an array of objects
 	 *
@@ -56,7 +60,7 @@ _.extend(MessageView.prototype, {
 	 *  documentPreviewImageUrl ,
 	 *  color:
 	 * }
-	 *
+	 * rename addAttachmentCardView
 	 */
 	addAttachmentCard: function(options){
 		this._messageViewImplementation.addAttachmentCard(options);
@@ -68,7 +72,7 @@ _.extend(MessageView.prototype, {
 	 * 	icon: ,
 	 * 	callback: function(attachmentCardObjects)
 	 * }
-	 *
+	 * rename addAttachmentsToolbarButton
 	 */
 	addButtonToDownloadAllArea: function(options){
 		this._messageViewImplementation.addButtonToDownloadAllArea(options);
