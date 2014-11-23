@@ -171,10 +171,10 @@ _.extend(GmailToolbarView.prototype, {
 				buttonSearchClass = 'T-Jo-auh';
 			break;
 			case 'ARCHIVE_GROUP':
-				buttonSearchClass = 'ar9';
+				buttonSearchClass = 'ar9, .aFh, .aFj';
 			break;
 			case 'MOVE_GROUP':
-				buttonSearchClass = 'asb';
+				buttonSearchClass = 'asb, .asa';
 			break;
 			case 'REFRESH_GROUP':
 				buttonSearchClass = 'asf';

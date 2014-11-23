@@ -103,9 +103,13 @@ div.T-I.inboxsdk__button {
   margin: 3px;
   box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
   border: 1px solid #cfcfcf;
-  padding: 2px !important;
+  padding: 1px !important;
   z-index: 10;
   left: 0px;
+}
+
+.inboxsdk__compose_groupedActionButton .inboxsdk__button_iconImg {
+  margin-top: 4px;
 }
 
 .inboxsdk__compose_groupedActionToolbar_arrow {
