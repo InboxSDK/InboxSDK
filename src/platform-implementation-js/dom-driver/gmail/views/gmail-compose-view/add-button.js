@@ -37,6 +37,10 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHi
 }
 
 function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
+	if(!gmailComposeView.getFormattingToolbar()){
+		return;
+	}
+
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
@@ -336,7 +340,7 @@ function _positionFormattingToolbar(gmailComposeView){
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
-		return !! gmailComposeView.getFormattingToolbar();
+		return !!gmailComposeView.getFormattingToolbar();
 	}).then(function(){
 
 		var mutationObserver = new MutationObserver(function(mutations){
@@ -352,6 +356,8 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 			{attributes: true, attributeFilter: ['style']}
 		);
 
+	}).catch(function(){
+		//do nothing
 	});
 }
 
