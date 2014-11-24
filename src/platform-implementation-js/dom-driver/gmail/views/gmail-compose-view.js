@@ -39,6 +39,19 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 			})
 		)
 	);
+
+	this.ready = _.constant(
+		waitFor(function(){
+			return !!self.getBodyElement();
+		}).then(function(){
+			self._composeID = self._element.querySelector('input[name="composeid"]').value;
+
+			self._setupStreams();
+			self._setupConsistencyCheckers();
+
+			return self;
+		})
+	);
 };
 
 GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
@@ -53,21 +66,6 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
 	],
-
-	ready: function(){
-		var self = this;
-
-		return waitFor(function(){
-			return !!self.getBodyElement();
-		}).then(function(){
-			self._composeID = self._element.querySelector('input[name="composeid"]').value;
-
-			self._setupStreams();
-			self._setupConsistencyCheckers();
-
-			return self;
-		});
-	},
 
 	_setupStreams: function(){
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
