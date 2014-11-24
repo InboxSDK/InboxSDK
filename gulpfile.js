@@ -179,14 +179,26 @@ gulp.task('docs', function(cb) {
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
 
-    var allComments = _.chain(paths.files)
+    var classes = _.chain(paths.files)
                         .filter(isFileEligbleForDocs)
+                        .map(logFiles)
                         .map(parseCommentsInFile)
-                        .filter(isNonEmptyComments)
+                        .pluck('classes')
+                        .flatten(true)
+                        .filter(isNonEmptyClass)
                         .value();
 
-    console.log(JSON.stringify(allComments, null, 2));
-    fs.writeFile('dist/docs.json', JSON.stringify(allComments, null, 2));
+    var docsJson = {};
+    docsJson.classes  = _.chain(classes)
+                          .map(function(ele) {
+                            return [ele.name, ele];
+                          })
+                          .object()
+                          .value();
+
+
+    // console.log(JSON.stringify(docsJson, null, 2));
+    fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
   });
 
 });
@@ -197,13 +209,21 @@ function parseCommentsInFile(file) {
   return comments;
 }
 
-function isNonEmptyComments(comments) {
+function isNonEmptyClass(c) {
   // its going to have one property with the filename at minimum because we added it
-  return _.size(comments) > 1;
+  return c != null;
+}
+
+function logFiles(filename) {
+  console.log(filename);
+  return filename;
 }
 
 function isFileEligbleForDocs(filename) {
-  return endsWith(filename, ".js") && filename.indexOf('node_modules') == -1 && filename.indexOf('conversations.js') != -1;
+  return  endsWith(filename, ".js") &&
+          filename.indexOf('/src/') > -1 &&
+          filename.indexOf('/dist/') == -1 &&
+          filename.indexOf('/dom-driver/') == -1;
 }
 
 function endsWith(str, suffix) {
