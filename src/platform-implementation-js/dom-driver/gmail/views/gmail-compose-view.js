@@ -21,8 +21,6 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 	this._element = element;
 	this._element.classList.add('inboxsdk__compose');
 
-	this._composeID = this._element.querySelector('input[name="composeid"]').value;
-
 	this._eventStream = new Bacon.Bus();
 
 	var self = this;
@@ -62,6 +60,8 @@ _.extend(GmailComposeView.prototype, {
 		return waitFor(function(){
 			return !!self.getBodyElement();
 		}).then(function(){
+			self._composeID = self._element.querySelector('input[name="composeid"]').value;
+
 			self._setupStreams();
 			self._setupConsistencyCheckers();
 
