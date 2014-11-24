@@ -35,7 +35,7 @@ describe('InboxSDK', function() {
   it('should load', function() {
     this.slow();
     process.env.VERSION = 'beep';
-    var inboxsdk = new InboxSDK("test", {noGlobalErrorLogging: true});
+    var inboxsdk = new InboxSDK("test", {globalErrorLogging: false});
 
     assert.strictEqual(inboxsdk.VERSION, 'beep');
     assert.strictEqual(inboxsdk.IMPL_VERSION, null);

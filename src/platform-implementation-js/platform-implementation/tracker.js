@@ -3,11 +3,35 @@ var Ajax = require('../../common/ajax');
 var RSVP = require('rsvp');
 var logErrorFactory = require('../../common/log-error-factory');
 
-function Tracker(appId) {
+function Tracker(appId, opts) {
   this._appId = appId;
   this._email = null;
 
   this.logError = logErrorFactory(this.logErrorToServer.bind(this));
+
+  // Set up error logging.
+  // inboxsdk.js already does some of the work. We just need to make sure our
+  // copy of RSVP logs errors too.
+  var self = this;
+  if (opts.globalErrorLogging) {
+    if (!RSVP._errorHandlerSetup) {
+      RSVP._errorHandlerSetup = true;
+      RSVP.on('error', function(err) {
+        self.logError("Possibly uncaught promise rejection", err);
+      });
+    }
+  } else {
+    // Even if we're set not to log errors, we should still avoid letting RSVP
+    // swallow errors entirely.
+    if (!RSVP._errorHandlerSetup) {
+      RSVP._errorHandlerSetup = true;
+      RSVP.on('error', function(err) {
+        setTimeout(function() {
+          throw err;
+        }, 1);
+      });
+    }
+  }
 }
 
 Tracker.prototype.setEmail = function(email) {
@@ -15,15 +39,6 @@ Tracker.prototype.setEmail = function(email) {
 };
 
 Tracker.prototype.setupGlobalLogger = function() {
-  // inboxsdk.js already does most of the work. We just need to make sure our
-  // copy of RSVP logs errors too.
-  var self = this;
-  if (!RSVP._errorHandlerSetup) {
-    RSVP._errorHandlerSetup = true;
-    RSVP.on('error', function(err) {
-      self.logError("Possibly uncaught promise rejection", err);
-    });
-  }
 };
 
 Tracker.prototype._getUserEmailAddressAsync = function() {

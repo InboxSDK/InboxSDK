@@ -1,5 +1,6 @@
 var RSVP = require("rsvp");
 
+RSVP._errorHandlerSetup = true;
 RSVP.on('error', function(e) {
   console.error("Possibly uncaught promise rejection");
 
