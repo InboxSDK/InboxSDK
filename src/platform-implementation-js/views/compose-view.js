@@ -84,7 +84,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getSelectedBodyHTML();
 	},
 
-	/*
+	/**
 	* Returns a plain string containing any text highlighted by the user inside the email body.
 	* @return {string}
 	*/
@@ -104,7 +104,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getToRecipients();
 	},
 
-	/*
+	/**
 	* Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
 	* If anything inside the body is selected, it will be replaced.
 	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element  (HTMLElement)
@@ -114,7 +114,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		this._composeViewImplementation.insertBodyHTMLAtCursor(html);
 	},
 
-	/*
+	/**
 	* Places a link chip inside the body of the message at the cursor or at the beginning of the message if
 	* the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
 	* A link chip is an enhanced link with an icon and a callout. These are typically used by Gmail when inserting
@@ -140,7 +140,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		});
 	},
 
-	/*
+	/**
 	* Places a link inside the body of the message at the cursor or at the beginning of the message
 	* if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
 	*
@@ -153,7 +153,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 
-	/*
+	/**
 	* Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
 	* @param {string} text - the text to insert
 	* @return {void}
