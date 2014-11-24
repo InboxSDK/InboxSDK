@@ -340,7 +340,7 @@ function _positionFormattingToolbar(gmailComposeView){
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
-		return !! gmailComposeView.getFormattingToolbar();
+		return !!gmailComposeView.getFormattingToolbar();
 	}).then(function(){
 
 		var mutationObserver = new MutationObserver(function(mutations){
@@ -356,6 +356,8 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 			{attributes: true, attributeFilter: ['style']}
 		);
 
+	}).catch(function(){
+		//do nothing
 	});
 }
 
