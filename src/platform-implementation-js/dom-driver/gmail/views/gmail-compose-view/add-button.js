@@ -37,6 +37,10 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHi
 }
 
 function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
+	if(!gmailComposeView.getFormattingToolbar()){
+		return;
+	}
+
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
