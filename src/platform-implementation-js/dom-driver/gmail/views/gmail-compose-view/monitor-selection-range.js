@@ -10,7 +10,8 @@ module.exports = function(gmailComposeView){
         gmailComposeView.getEventStream().filter(function(event){
             return event.eventName === 'bodyChanged';
         })
-    ).debounceImmediate(10).onValue(function(){
+    ).takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+    .debounceImmediate(10).onValue(function(){
         if(document.getSelection() && document.getSelection().rangeCount > 0){
             gmailComposeView.setSelectionRange(document.getSelection().getRangeAt(0));
         }
