@@ -186,6 +186,7 @@ gulp.task('docs', function(cb) {
                         .pluck('classes')
                         .flatten(true)
                         .filter(isNonEmptyClass)
+                        .map(transformClass)
                         .value();
 
     var docsJson = {};
@@ -197,7 +198,7 @@ gulp.task('docs', function(cb) {
                           .value();
 
 
-    // console.log(JSON.stringify(docsJson, null, 2));
+    console.log(JSON.stringify(docsJson, null, 2));
     fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
   });
 
@@ -209,19 +210,42 @@ function parseCommentsInFile(file) {
   return comments;
 }
 
+function transformClass(c) {
+  if (!c.properties) {
+    return c;
+  }
+
+  c.properties.forEach(function(prop){
+    var optionalMarker = '\n^optional';
+    var defaultRegex = /\n\^default=(.*)/;
+
+    if (prop.description.indexOf(optionalMarker) > -1) {
+      prop.optional = true;
+      prop.description = prop.description.replace(optionalMarker, '');
+    }
+
+    prop.description = prop.description.replace(defaultRegex, function(m, c) {
+      prop.default = c;
+      return '';
+    });
+  });
+
+  return c;
+}
+
 function isNonEmptyClass(c) {
   // its going to have one property with the filename at minimum because we added it
   return c != null;
 }
 
 function logFiles(filename) {
-  console.log(filename);
   return filename;
 }
 
 function isFileEligbleForDocs(filename) {
   return  endsWith(filename, ".js") &&
           filename.indexOf('/src/') > -1 &&
+          filename.indexOf('compose') > -1 &&
           filename.indexOf('/dist/') == -1 &&
           filename.indexOf('/dom-driver/') == -1;
 }
