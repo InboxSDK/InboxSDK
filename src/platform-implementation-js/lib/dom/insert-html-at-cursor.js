@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
 
 module.exports = function(element, html){
 	element.focus();
@@ -48,15 +49,32 @@ module.exports = function(element, html){
 				var firstChild = frag.firstChild, lastChild = frag.lastChild;
 				range.insertNode(frag);
 
+				// Simulate a mousedown event to kill any existing focus-fixers.
+				var event = document.createEvent('MouseEvents');
+				event.initMouseEvent('mousedown', false, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				event.preventDefault();
+				element.dispatchEvent(event);
+
 				// Preserve the cursor position
-				// Doesn't seem to work. TODO
-				// if (lastChild) {
-				// 	range = range.cloneRange();
-				// 	range.setStartAfter(lastChild);
-				// 	range.collapse(true);
-				// 	sel.removeAllRanges();
-				// 	sel.addRange(range);
-				// }
+				range.collapse(false);
+				sel.removeAllRanges();
+				sel.addRange(range);
+
+				var nextUserCursorMove = Bacon.mergeAll(
+					Bacon.fromEventTarget(element, 'mousedown'),
+					Bacon.fromEventTarget(element, 'keypress')
+				);
+
+				// Whenever the body element gets focus, manually make sure the cursor
+				// is in the right position, because Chrome likes to put it in the
+				// previous location instead because it hates us.
+				var focus = Bacon
+					.fromEventTarget(element, 'focus')
+					.takeUntil(nextUserCursorMove)
+					.onValue(function() {
+						sel.removeAllRanges();
+						sel.addRange(range);
+					});
 
 				return firstChild;
 			}
