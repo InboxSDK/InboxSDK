@@ -1,6 +1,4 @@
-if(WeakMap){
-
-var chipMap = new WeakMap();
+var extId = ''+Math.random();
 
 module.exports = function(gmailComposeView){
 
@@ -10,7 +8,9 @@ module.exports = function(gmailComposeView){
         return event.eventName === 'bodyChanged';
     }).debounceImmediate(100).onValue(function(){
         var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-        Array.prototype.map.call(chips, _getChipContainer).filter(_isNotEnhanced).forEach(_addEnhancements);
+        Array.prototype.map.call(chips, _getChipContainer)
+          .filter(_isNotEnhanced)
+          .forEach(_addEnhancements);
     });
 
 };
@@ -20,11 +20,25 @@ function _getChipContainer(span){
 }
 
 function _isNotEnhanced(chipElement){
-    return !chipMap.has(chipElement);
+    var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
+    if (extId === claim) {
+      return !chipElement._linkChipEnhancedByThisExtension;
+    }
+    return claim == null;
 }
 
 
 function _addEnhancements(chipElement){
+    var anchor = chipElement.querySelector('a');
+    if (anchor) {
+      anchor.addEventListener('mousedown', function(e) {
+        e.stopImmediatePropagation();
+      }, true);
+      anchor.addEventListener('click', function(e) {
+        e.stopImmediatePropagation();
+      }, true);
+    }
+
     var xElement = document.createElement('div');
     xElement.innerHTML = '<img src="//ssl.gstatic.com/ui/v1/icons/common/x_8px.png" style="opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;">';
     xElement = xElement.children[0];
@@ -35,7 +49,7 @@ function _addEnhancements(chipElement){
 
     xElement.addEventListener('click', function(e){
         e.stopImmediatePropagation();
-        e.preventDefault(); 
+        e.preventDefault();
     }, true);
 
 
@@ -55,8 +69,7 @@ function _addEnhancements(chipElement){
         }
     );
 
-    chipMap.set(chipElement, true);
-}
-
-
+    chipElement.contentEditable = false;
+    chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
+    chipElement._linkChipEnhancedByThisExtension = true;
 }
