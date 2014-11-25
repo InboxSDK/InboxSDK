@@ -22,7 +22,7 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
     frag.appendChild(chipElement);
     frag.appendChild(document.createTextNode('\u200b'));
 
-    require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag);
+    require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag, gmailComposeView.getSelectionRange());
 }
 
 function _getChipElement(options){
@@ -43,31 +43,7 @@ function _getChipElement(options){
     chipElement.innerHTML = chipHTML;
     chipElement = chipElement.children[0];
 
-
-
-
-    /*if(options.iconUrl){
-        _monitorImageSize(chipElement.querySelector('img'));
-    }*/
-
-
     return chipElement;
-}
-
-function _monitorImageSize(img){
-    if(img.complete){
-        _checkImageSize(img);
-    }
-    else{
-        img.addEventListener('load', _checkImageSize.bind(null, img));
-    }
-}
-
-function _checkImageSize(img){
-    if(img.naturalHeight !== 16 || img.naturalWidth !== 16){
-        console.error('Chip icon image must be 16px by 16px. This image is: ' + img.naturalWidth + 'px by ' + img.naturalHeight + 'px') ;
-        img.remove();
-    }
 }
 
 module.exports = insertLinkChipIntoBody;

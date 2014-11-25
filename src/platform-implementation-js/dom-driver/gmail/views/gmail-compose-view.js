@@ -64,7 +64,8 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
-		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
+		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
+		{name: '_selectionRange', destroy: false, set: true, get: true}
 	],
 
 	_setupStreams: function(){
@@ -73,6 +74,7 @@ _.extend(GmailComposeView.prototype, {
 
 	_setupConsistencyCheckers: function(){
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
+		require('./gmail-compose-view/monitor-selection-range')(this);
 	},
 
 	destroy: function() {

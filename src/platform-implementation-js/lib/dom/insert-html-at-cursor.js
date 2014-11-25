@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
-module.exports = function(element, html){
+module.exports = function(element, html, oldRange){
 	element.focus();
 
 	if (element.tagName === 'TEXTAREA') {
@@ -26,8 +26,16 @@ module.exports = function(element, html){
 		if (editable) {
 			var sel = editable.getSelection();
 			if (sel.getRangeAt && sel.rangeCount) {
-				var range = sel.getRangeAt(0);
-				range.deleteContents();
+				var range;
+
+				if(oldRange){
+					range = oldRange;
+					range.detach();
+				}
+				else{
+					range = sel.getRangeAt(0);
+					range.deleteContents();
+				}
 
 				var frag;
 				if (html instanceof DocumentFragment) {
