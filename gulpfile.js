@@ -246,7 +246,6 @@ function logFiles(filename) {
 function isFileEligbleForDocs(filename) {
   return  endsWith(filename, ".js") &&
           filename.indexOf('/src/') > -1 &&
-          filename.indexOf('compose') > -1 &&
           filename.indexOf('/dist/') == -1 &&
           filename.indexOf('/dom-driver/') == -1;
 }
