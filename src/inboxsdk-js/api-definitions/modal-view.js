@@ -1,5 +1,9 @@
 var _ = require('lodash');
 
+/**
+* @class
+* Represents a modal dialog.
+*/
 var ModalView = function(platformImplementationLoader){
     this._platformImplementationLoader = platformImplementationLoader;
 
@@ -7,7 +11,7 @@ var ModalView = function(platformImplementationLoader){
     this._closeEarly = false;
 };
 
-_.extend(ModalView.prototype, {
+_.extend(ModalView.prototype, /** @lends ModalView */{
 
     show: function(options){
         var self = this;
@@ -19,6 +23,10 @@ _.extend(ModalView.prototype, {
         });
     },
 
+    /**
+    * This closes the modal. Does nothing if already closed.
+    * @return {void}
+    */
     close: function(){
         if(this._modalViewImplementation && !this._closeEarly){
             this._modalViewImplementation.close();
