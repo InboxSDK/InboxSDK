@@ -219,8 +219,8 @@ module.exports = ComposeView;
 
 
 /**
+* @class
 * This type is passed into the <code>ComposeView.addButton</code> method as a way to configure the button shown.
-* @class ComposeButtonDescriptor
 */
 var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 
