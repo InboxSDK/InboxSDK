@@ -219,6 +219,7 @@ function transformClass(c) {
     var optionalMarker = '\n^optional';
     var defaultRegex = /\n\^default=(.*)/;
 
+    prop.optional = false;
     if (prop.description.indexOf(optionalMarker) > -1) {
       prop.optional = true;
       prop.description = prop.description.replace(optionalMarker, '');
