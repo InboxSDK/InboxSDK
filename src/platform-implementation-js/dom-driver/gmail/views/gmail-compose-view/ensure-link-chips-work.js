@@ -1,6 +1,4 @@
-if(WeakMap){
-
-var chipMap = new WeakMap();
+var extId = ''+Math.random();
 
 module.exports = function(gmailComposeView){
 
@@ -10,7 +8,9 @@ module.exports = function(gmailComposeView){
         return event.eventName === 'bodyChanged';
     }).debounceImmediate(100).onValue(function(){
         var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-        Array.prototype.map.call(chips, _getChipContainer).filter(_isNotEnhanced).forEach(_addEnhancements);
+        Array.prototype.map.call(chips, _getChipContainer)
+          .filter(_isNotEnhanced)
+          .forEach(_addEnhancements);
     });
 
 };
@@ -20,7 +20,11 @@ function _getChipContainer(span){
 }
 
 function _isNotEnhanced(chipElement){
-    return !chipMap.has(chipElement);
+    var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
+    if (extId === claim) {
+      return !chipElement._linkChipEnhancedByThisExtension;
+    }
+    return claim == null;
 }
 
 
@@ -35,7 +39,7 @@ function _addEnhancements(chipElement){
 
     xElement.addEventListener('click', function(e){
         e.stopImmediatePropagation();
-        e.preventDefault(); 
+        e.preventDefault();
     }, true);
 
 
@@ -55,8 +59,7 @@ function _addEnhancements(chipElement){
         }
     );
 
-    chipMap.set(chipElement, true);
-}
-
-
+    chipElement.contentEditable = false;
+    chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
+    chipElement._linkChipEnhancedByThisExtension = true;
 }

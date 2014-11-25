@@ -72,9 +72,7 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	_setupConsistencyCheckers: function(){
-		if(window.WeakMap){
-			require('./gmail-compose-view/ensure-link-chips-work')(this);
-		}
+		require('./gmail-compose-view/ensure-link-chips-work')(this);
 	},
 
 	destroy: function() {
