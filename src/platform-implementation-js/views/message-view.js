@@ -21,17 +21,24 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/*
 	* rename addAttachmentCardView
 	*/
+
+	/**
+	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
+	* preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
+	* @param {AttachmentCardOptions} cardOptions - the configuration of the AttachmentCardView to create
+	* @return {AttachmentCardView}
+	*/
 	addAttachmentCard: function(cardOptions){
 		this._messageViewImplementation.addAttachmentCard(cardOptions);
 	},
 
 	/*
-	* options = {
-	* 	tooltip: ,
-	* 	icon: ,
-	* 	callback: function(attachmentCardObjects)
-	* }
 	* rename addAttachmentsToolbarButton
+	*/
+	/**
+	* Adds a button to the download all area of the attachments tray. <screenshot>
+	* @param {DownloadAllButtonDescriptor} buttonOptions - the configuration of the AttachmentCardView to create
+	* @return {void}
 	*/
 	addButtonToDownloadAllArea: function(buttonOptions){
 		this._messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
@@ -51,6 +58,11 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	// returns array of attachment card views
+	/**
+	* Returns all the attachment card views currently visible for this message. Includes Gmail/Inbox native attachment
+	* cards as well as those added by applications
+	* @return {AttachmentCardView[]}
+	*/
 	getAttachmentCardViews: function(){
 		return _.map(this._messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
 			return new AttachmentCardView(attachmentCardViewDriver);
@@ -140,7 +152,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 	/**
 	* An array of buttons to support functionality in addition to the preview functionality
-	* @type {(DownloadButtonDescriptor|CustomButtonDescriptor)[]}
+	* @type {DownloadButtonDescriptor[]|CustomButtonDescriptor[]}
 	*/
 	buttons:null,
 
@@ -202,7 +214,6 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 
 /**
 * @class
-* This type returned by the <code>MessageView.getLinksInBody</code> describing links found in a message body
 */
 var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 
@@ -235,4 +246,29 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 	* @type {boolean}
 	*/
 	isInQuotedArea:null
+};
+
+/**
+* @class
+*/
+var DownloadAllButtonDescriptor = /** @lends DownloadAllButtonDescriptor */{
+
+	/**
+	* The tooltip of the button
+	* @type {string}
+	*/
+	tooltip:null,
+
+	/**
+	* The url of an icon image to use. A black icon with transparent background is preferred.
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* The callback when the button is clicked. The event object has a property <code>event.attachmentCardViews</code> which is an
+	* array of <code>AttachmentCardView</code>s.
+	* @type {function(event)}
+	*/
+	callback:null
 };
