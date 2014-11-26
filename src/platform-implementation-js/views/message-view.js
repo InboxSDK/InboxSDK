@@ -18,6 +18,36 @@ MessageView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(MessageView.prototype, /** @lends MessageView */{
 
+	/*
+	* options = {
+	* 	title: ,
+	*  fileName: ,
+	*  previewUrl: ,
+	*  downloadUrl: ,
+	*  callback: ,
+	*  fileIconImageUrl: ,
+	*  documentPreviewImageUrl ,
+	*  color:
+	* }
+	* rename addAttachmentCardView
+	*/
+	addAttachmentCard: function(options){
+		this._messageViewImplementation.addAttachmentCard(options);
+	},
+
+	/*
+	* options = {
+	* 	tooltip: ,
+	* 	icon: ,
+	* 	callback: function(attachmentCardObjects)
+	* }
+	* rename addAttachmentsToolbarButton
+	*/
+	addButtonToDownloadAllArea: function(options){
+		this._messageViewImplementation.addButtonToDownloadAllArea(options);
+	},
+
+
 	// rename getBodyElement
 
 	/**
@@ -30,6 +60,14 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return this._messageViewImplementation.getContentsElement();
 	},
 
+	// returns array of attachment card views
+	getAttachmentCardViews: function(){
+		return _.map(this._messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
+			return new AttachmentCardView(attachmentCardViewDriver);
+		});
+	},
+
+
 	/**
 	* Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful
 	* when you want to parse through the contents of the <code>HTMLElement</code> returned by <code>getContentsElement</code>
@@ -39,42 +77,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	isElementInQuotedArea: function(element){
 		this._messageViewImplementation.isElementInQuotedArea(element);
 	},
-
-	// returns array of attachment card views
-	getAttachmentCardViews: function(){
-		return _.map(this._messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
-			return new AttachmentCardView(attachmentCardViewDriver);
-		});
-	},
-
-	/*
-	 * options = {
-	 * 	title: ,
-	 *  fileName: ,
-	 *  previewUrl: ,
-	 *  downloadUrl: ,
-	 *  callback: ,
-	 *  fileIconImageUrl: ,
-	 *  documentPreviewImageUrl ,
-	 *  color:
-	 * }
-	 * rename addAttachmentCardView
-	 */
-	addAttachmentCard: function(options){
-		this._messageViewImplementation.addAttachmentCard(options);
-	},
-
-	/*
-	 * options = {
-	 * 	tooltip: ,
-	 * 	icon: ,
-	 * 	callback: function(attachmentCardObjects)
-	 * }
-	 * rename addAttachmentsToolbarButton
-	 */
-	addButtonToDownloadAllArea: function(options){
-		this._messageViewImplementation.addButtonToDownloadAllArea(options);
-	},
+	
 
 	// rename getLinksInBody
 
