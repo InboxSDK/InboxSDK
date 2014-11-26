@@ -19,20 +19,10 @@ MessageView.prototype = Object.create(BasicClass.prototype);
 _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/*
-	* options = {
-	* 	title: ,
-	*  fileName: ,
-	*  previewUrl: ,
-	*  downloadUrl: ,
-	*  callback: ,
-	*  fileIconImageUrl: ,
-	*  documentPreviewImageUrl ,
-	*  color:
-	* }
 	* rename addAttachmentCardView
 	*/
-	addAttachmentCard: function(options){
-		this._messageViewImplementation.addAttachmentCard(options);
+	addAttachmentCard: function(cardOptions){
+		this._messageViewImplementation.addAttachmentCard(cardOptions);
 	},
 
 	/*
@@ -43,8 +33,8 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* }
 	* rename addAttachmentsToolbarButton
 	*/
-	addButtonToDownloadAllArea: function(options){
-		this._messageViewImplementation.addButtonToDownloadAllArea(options);
+	addButtonToDownloadAllArea: function(buttonOptions){
+		this._messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
 	},
 
 
@@ -77,7 +67,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	isElementInQuotedArea: function(element){
 		this._messageViewImplementation.isElementInQuotedArea(element);
 	},
-	
+
 
 	// rename getLinksInBody
 
@@ -98,6 +88,115 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 module.exports = MessageView;
 
 
+/**
+* @class
+* This type is required by the <code>MessageView.addAttachmentCard</code> method to insert an <code>AttachmentCardView</code>
+* for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
+* 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
+* show you YouTube attachment cards for any YouTube links present in an email.
+*/
+var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
+
+	/**
+	* The title of the attachment card. Typically a filename is set here.
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* A description of the attachment card displayed subtly
+	* @type {string}
+	*/
+	description:null,
+
+	/**
+	* The url of an "open" or "preview" action for this attachment. The attachment cards primary action (clicking on the card)
+	* takes the user in a new window to the URL specified here. This is also the URL used if the user right clicks and copies
+	* the link address
+	* @type {function(event)}
+	*/
+	previewUrl:null,
+
+	/**
+	* A URL to an image representing the thumbnail preview of the attachment card
+	* @type {string}
+	*/
+	previewThumbnailUrl:null,
+
+	/**
+	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
+	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
+	* one property - <code>attachmentCardView</code>. It also has a <code>preventDefault()</code> function. Calling
+	* this function prevents the preview from opening in a new window.
+	* @type {function(event)}
+	*/
+	previewCallback:null,
+
+	/**
+	* The url of the icon of the attachment
+	* @type {boolean}
+	*/
+	fileIconImageUrl:null,
+
+	/**
+	* An array of buttons to support functionality in addition to the preview functionality
+	* @type {(DownloadButtonDescriptor|CustomButtonDescriptor)[]}
+	*/
+	buttons:null,
+
+	/**
+	* The color of the attachment card fold and an accompying accent color
+	* ^optional
+	* ^default=#BEBEBE
+	* @type {string}
+	*/
+	foldColor:null
+};
+
+
+/**
+* @class
+*/
+var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
+
+	/**
+	* The url of the file to download when the user presses the download button.
+	* @type {string}
+	*/
+	downloadUrl:null,
+
+	/**
+	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
+	* actually downloading which happens automatically.
+	* @type {string}
+	*/
+	callback:null,
+};
+
+/**
+* @class
+*/
+var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
+
+	/**
+	* The icon to use. Use a white image with transparent background for consistency
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* The tooltip to show when the user hovers over the button
+	* @type {string}
+	*/
+	tooltip:null,
+
+	/**
+	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
+	* actually downloading which happens automatically.
+	* @type {string}
+	*/
+	callback:null,
+};
 
 
 
