@@ -94,92 +94,171 @@ function _fixupCursor(gmailComposeView){
 
     var streamAction = _checkAndAction.bind(null, keydownStream);
 
-    streamAction(37, 'previousSibling', _moveCursor.bind(null, 'setStart', true)); //left arrow
-    streamAction(39, 'nextSibling', _moveCursor.bind(null, 'setEnd', false)); //right arrow
+    streamAction(37, 'LEFT', _moveCursor); //left arrow
+    streamAction(39, 'RIGHT', _moveCursor); //right arrow
 
-    streamAction(8, 'previousSibling', _delete.bind(null, 'setEndAfter', 'setStartBefore')); //backspace
-    streamAction(46, 'nextSibling', _delete.bind(null, 'setStartBefore', 'setEndAfter')); //"delete"
+    streamAction(8, 'LEFT', _delete); //backspace
+    streamAction(46, 'RIGHT', _delete); //"delete"
 
 }
 
-function _checkAndAction(keyupStream, keyCode, siblingProperty, action){
+function _checkAndAction(keyupStream, keyCode, direction, action){
     keyupStream.filter(function(event){
         return event.which === keyCode;
     }).onValue(function(event){
+
         var range = document.getSelection().getRangeAt(0);
         if(!range.startContainer){
             return;
         }
 
-        var container;
-        if(range.startContainer.nodeType === 3){
-            if(siblingProperty === 'previousSibling' && range.startOffset === 1 && range.startContainer.textContent.charAt(0) === '\u200b'){
-                container = range.startContainer;
-            }
-            else if(siblingProperty === 'nextSibling' && range.startOffset === range.startContainer.length && range.startContainer.textContent.charAt(range.startContainer.length - 1) === '\u200b'){
-                container = range.startContainer;
-            }
-            else if(siblingProperty === 'previousSibling' && range.startOffset === 0 || siblingProperty === 'nextSibling' && range.startOffset === range.startContainer.length){
-                container = range.startContainer;
-            }
+        var siblingProperty = direction === 'LEFT' ? 'previousSibling' : 'nextSibling';
 
-            if(!container || !container[siblingProperty] || !container[siblingProperty]._linkChipEnhancedByThisExtension){
-                return;
-            }
-        }
-        else if(range.startContainer[siblingProperty] && range.startContainer[siblingProperty]._linkChipEnhancedByThisExtension){
+
+        var container;
+        if(direction === 'LEFT'){
             container = range.startContainer;
         }
-        else if(range.startContainer.nodeType !== 3 && range.startOffset){
-            container = range.startContainer.childNodes[range.startOffset-1];
-            if(!container[siblingProperty] || !container[siblingProperty]._linkChipEnhancedByThisExtension){
-                return;
-            }
-        }
         else{
-            if(range.startOffset === 0 && siblingProperty === 'nextSibling' && range.startContainer.childNodes[0].nodeType === 3 && range.startContainer.childNodes[0].textContent === '\u200b'){
-                container = range.startContainer.childNodes[0];
-            }
-            else{
-                return;
-            }
+            container = range.endContainer;
         }
 
-        if(!container[siblingProperty][siblingProperty]){
+        if(!range.collapsed && event.shiftKey){
+
+        }
+
+        var wasCollapsed;
+
+        if(_isNeedToJumpLeftFromTextNode(siblingProperty, range, container)){
+            wasCollapsed = _updateRangeToJumpLeftFromTextNode(range, container);
+        }
+        else if(_isNeedToJumpRightFromTextNode(siblingProperty, range, container)){
+            wasCollapsed =_updateRangeToJumpRightFromTextNode(range, container);
+        }
+        else if(_isNeedToJumpLeftInElement(siblingProperty, range, container)){
+            wasCollapsed = _updateRangeToJumpLeftFromTextNode(range, container.childNodes[range.startOffset-1]);
+        }
+        else{
             return;
         }
 
-
-        action(range, container[siblingProperty][siblingProperty], container, event);
+        action(range, wasCollapsed && !event.shiftKey, siblingProperty === 'previousSibling');
+        event.preventDefault();
     });
 }
 
-function _moveCursor(rangeBoundary, collapseToStart, range, element, startElement, event){
-    var newRange = range.cloneRange();
-
-    if(rangeBoundary === 'setStart'){
-        newRange[rangeBoundary](element, element.length - 1);
-    }
-    else{
-        newRange[rangeBoundary](element, 1);
+function _isNeedToJumpLeftFromTextNode(siblingProperty, range, textNode){
+    if(textNode.nodeType !== 3){
+        return false;
     }
 
+    if(siblingProperty !== 'previousSibling'){
+        return false;
+    }
 
-    if(range.collapsed){
-        newRange.collapse(collapseToStart);
+    if(range.startOffset > 1){
+        return false;
+    }
+
+    if(textNode.textContent.charAt(0) !== '\u200b'){
+        return false;
+    }
+
+    return _siblingCheck(siblingProperty, textNode);
+}
+
+function _isNeedToJumpRightFromTextNode(siblingProperty, range, textNode){
+    if(textNode.nodeType !== 3){
+        return false;
+    }
+
+    if(siblingProperty !== 'nextSibling'){
+        return false;
+    }
+
+    if(range.endOffset < textNode.length - 2){
+        return false;
+    }
+
+    if(textNode.textContent.charAt(textNode.length - 1) !== '\u200b'){
+        return false;
+    }
+
+    return _siblingCheck(siblingProperty, textNode);
+}
+
+function _isNeedToJumpLeftInElement(siblingProperty, range, container){
+    if(siblingProperty !== 'previousSibling'){
+        return false;
+    }
+
+    if(container.nodeType === 3){
+        return false;
+    }
+
+    if(range.startOffset < 3){
+        return false;
+    }
+
+    var textNode = container.childNodes[range.startOffset-1];
+    if(textNode.nodeType !== 3){
+        return false;
+    }
+
+    if(textNode.textContent !== '\u200b'){
+        return false;
+    }
+
+    return _siblingCheck(siblingProperty, textNode);
+}
+
+function _siblingCheck(siblingProperty, node){
+    if(!node[siblingProperty]){
+        return false;
+    }
+
+    if(!node[siblingProperty]._linkChipEnhancedByThisExtension){
+        return false;
+    }
+
+    if(!node[siblingProperty][siblingProperty]){
+        return false;
+    }
+
+    return true;
+}
+
+function _updateRangeToJumpLeftFromTextNode(range, textNode){
+    var newTextNode = textNode.previousSibling.previousSibling;
+    var offset = newTextNode.length - 1;
+
+    return _updateRangeFromTextNode(range, 'setStart', newTextNode, offset, true);
+}
+
+function _updateRangeToJumpRightFromTextNode(range, textNode){
+    var newTextNode = textNode.nextSibling.nextSibling;
+    var offset = 1;
+
+    return _updateRangeFromTextNode(range, 'setEnd', newTextNode, offset);
+}
+
+function _updateRangeFromTextNode(range, boundaryPoint, newTextNode, offset, collapseToStart){
+    var isCollapsed = range.collapsed;
+    range[boundaryPoint](newTextNode, offset);
+
+    return isCollapsed;
+}
+
+
+function _moveCursor(range, shouldCollapse, collapseToStart){
+    if(shouldCollapse){
+        range.collapse(collapseToStart);
     }
 
     document.getSelection().removeAllRanges();
-    document.getSelection().addRange(newRange);
-
-    event.preventDefault();
+    document.getSelection().addRange(range);
 }
 
-function _delete(startElementRangePoint, elementRangePoint, range, element, startElement, event){
-    range[startElementRangePoint](startElement);
-    range[elementRangePoint](element);
-
+function _delete(range){
     range.deleteContents();
-
-    event.preventDefault();
 }
