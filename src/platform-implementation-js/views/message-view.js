@@ -3,6 +3,11 @@ var BasicClass = require('../lib/basic-class');
 
 var AttachmentCardView = require('./attachment-card-view');
 
+/**
+* @class
+* Object that represents a visible message in the UI. There are properties to access data about the message
+* itself as well as change the state of the UI.
+*/
 var MessageView = function(messageViewImplementation){
 	BasicClass.call(this);
 
@@ -11,11 +16,16 @@ var MessageView = function(messageViewImplementation){
 
 MessageView.prototype = Object.create(BasicClass.prototype);
 
-_.extend(MessageView.prototype, {
+_.extend(MessageView.prototype, /** @lends MessageView */{
 
 	// rename getBodyElement
 
-	// returns root dom element for the message
+	/**
+	* Returns the body element of the message as displayed to the user. This element includes any qouted areas.
+	* Use this method when you want to decorate the body of the message,
+	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
+	* @return {HTMLElement}
+	*/
 	getContentsElement: function(){
 		return this._messageViewImplementation.getContentsElement();
 	},
@@ -33,11 +43,24 @@ _.extend(MessageView.prototype, {
 	 * 	isInQuotedArea: true/false
 	 * }]
 	 */
+
+	/**
+	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
+	* This is useful when you want to parse links in a message and take some action on them, this takes care of detecting whether
+	* the link is in the qouted area or not and parsing out the url/anchor text of the link.
+	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
+	* @return {MessageViewLinkDescriptor[]}
+	*/
 	getLinks: function(){
 		return this._messageViewImplementation.getLinks();
 	},
 
-	// boolean returns if element is in a quoted area of content or not
+	/**
+	* Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful
+	* when you want to parse through the contents of the <code>HTMLElement</code> returned by <code>getContentsElement</code>
+	* and test whether one if its children is in the qouted area (because you'll usually ignore those elements).
+	* @return {boolean}
+	*/
 	isElementInQuotedArea: function(element){
 		this._messageViewImplementation.isElementInQuotedArea(element);
 	},
