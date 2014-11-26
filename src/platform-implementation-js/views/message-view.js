@@ -30,31 +30,6 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return this._messageViewImplementation.getContentsElement();
 	},
 
-
-	// rename getLinksInBody
-	/*
-	 * returns an array of objects
-	 *
-	 * [{
-	 * 	text: 'foo',
-	 * 	html: '<b>foo</b>',
-	 * 	href: 'http://blah',
-	 * 	element: element,
-	 * 	isInQuotedArea: true/false
-	 * }]
-	 */
-
-	/**
-	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
-	* This is useful when you want to parse links in a message and take some action on them, this takes care of detecting whether
-	* the link is in the qouted area or not and parsing out the url/anchor text of the link.
-	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
-	* @return {MessageViewLinkDescriptor[]}
-	*/
-	getLinks: function(){
-		return this._messageViewImplementation.getLinks();
-	},
-
 	/**
 	* Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful
 	* when you want to parse through the contents of the <code>HTMLElement</code> returned by <code>getContentsElement</code>
@@ -99,9 +74,63 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	 */
 	addButtonToDownloadAllArea: function(options){
 		this._messageViewImplementation.addButtonToDownloadAllArea(options);
+	},
+
+	// rename getLinksInBody
+
+	/**
+	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
+	* This is useful when you want to parse links in a message and take some action on them, this takes care of detecting whether
+	* the link is in the qouted area or not and parsing out the url/anchor text of the link.
+	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
+	* @return {MessageViewLinkDescriptor[]}
+	*/
+	getLinks: function(){
+		return this._messageViewImplementation.getLinks();
 	}
 
 });
 
 
 module.exports = MessageView;
+
+
+
+
+
+/**
+* @class
+* This type returned by the <code>MessageView.getLinksInBody</code> describing links found in a message body
+*/
+var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
+
+	/**
+	* The anchor text of the link
+	* @type {string}
+	*/
+	text:null,
+
+	/**
+	* The html string of the link found
+	* @type {string}
+	*/
+	html:null,
+
+	/**
+	* The actual <code>HTMLElement</code> of the link found
+	* @type {function(event)}
+	*/
+	element:null,
+
+	/**
+	* The url of the link
+	* @type {string}
+	*/
+	href:null,
+
+	/**
+	* Whether the link was found in the qouted area of the message or not
+	* @type {boolean}
+	*/
+	isInQuotedArea:null
+};
