@@ -1,23 +1,33 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var RSVP = require('RSVP');
+
+var isNodeInRange = require('../../../../lib/dom/is-node-in-range');
 
 var extId = ''+Math.random();
+
+var Z_SPACE_CHAR = '\u200b';
 
 module.exports = function(gmailComposeView){
 
     var bodyElement = gmailComposeView.getBodyElement();
-    var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView))
+    var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
 
-
-    gmailComposeView.getEventStream().startWith({eventName: 'bodyChanged'}).filter(function(event){
+    var bodyChangedStream = gmailComposeView.getEventStream().startWith({eventName: 'bodyChanged'}).filter(function(event){
         return event.eventName === 'bodyChanged';
-    }).debounceImmediate(100).onValue(function(){
+    }).debounceImmediate(100).takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd());
+
+
+    bodyChangedStream.onValue(function(){
         var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-        _.chain(chips)
-            .map(_getChipContainer)
+        var chipContainerChain =  _.chain(chips).map(_getChipContainer);
+
+        chipContainerChain
             .filter(_isNotEnhanced)
             .each(_addEnhancements)
             .each(fixupCursorFunction);
+
+        chipContainerChain.each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView));
     });
 
 };
@@ -89,176 +99,217 @@ function _addEnhancements(chipElement){
 }
 
 function _fixupCursor(gmailComposeView){
+    var keydownStream = Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'keydown')
+                            .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd());
 
-    var keydownStream = Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'keydown');
+    keydownStream
+            .filter(_isBackspaceOrDelete)
+            .delay(1)
+            .filter(_rangeStillExists)
+            .onValue(_checkChipZSpaceSharing.bind(null, gmailComposeView));
 
-    var streamAction = _checkAndAction.bind(null, keydownStream);
-
-    streamAction(37, 'LEFT', _moveCursor); //left arrow
-    streamAction(39, 'RIGHT', _moveCursor); //right arrow
-
-    streamAction(8, 'LEFT', _delete); //backspace
-    streamAction(46, 'RIGHT', _delete); //"delete"
-
+    keydownStream
+            .filter(_isArrowKey)
+            .delay(1)
+            .filter(_rangeStillExists)
+            .map(_getMovementType)
+            .onValue(_fixupRange);
 }
 
-function _checkAndAction(keyupStream, keyCode, direction, action){
-    keyupStream.filter(function(event){
-        return event.which === keyCode;
-    }).onValue(function(event){
+function _isArrowKey(event){
+    return event.which > 36 && event.which < 41;
+}
 
-        var range = document.getSelection().getRangeAt(0);
-        if(!range.startContainer){
-            return;
-        }
+function _isBackspaceOrDelete(event){
+    return event.which === 8 || event.which === 46;
+}
 
-        var siblingProperty = direction === 'LEFT' ? 'previousSibling' : 'nextSibling';
+function _rangeStillExists(){
+    return document.getSelection() && document.getSelection().rangeCount > 0;
+}
+
+function _checkChipZSpaceSharing(gmailComposeView){
+    var range = document.getSelection().getRangeAt(0);
+
+    if(range.startContainer.nodeType !== 3){
+        return;
+    }
+
+    var triggerZone = _getTriggerZone(range.startContainer, range.startOffset);
+
+    if(triggerZone === 'Z_SPACE_0'){
+        _cleanOutBrokenChip(gmailComposeView, range.startContainer.nextSibling, ['MISSING_PREVIOUS_SIBLING']);
+    }
+    else if(triggerZone === 'Z_SPACE_1'){
+        _cleanOutBrokenChip(gmailComposeView, range.startContainer.previousSibling, ['MISSING_NEXT_SIBLING']);
+    }
+}
+
+function _getMovementType(event){
+    var keyCode = event.which;
+    if(keyCode === 38 || keyCode === 40){
+        return 'VERTICAL';
+    }
+    else if(keyCode === 37 || keyCode === 39) {
+        return event.metaKey || event.altKey ? 'VERTICAL' : 'HORIZONTAL';
+    }
+
+    return 'HORIZONTAL';
+}
 
 
-        var container;
-        if(direction === 'LEFT'){
-            container = range.startContainer;
+function _fixupRange(movementType){
+    var range = document.getSelection().getRangeAt(0);
+
+    _checkAndFix(range, range.startContainer, range.startOffset, 'setStart', movementType);
+    _checkAndFix(range, range.endContainer, range.endOffset, 'setEnd', movementType);
+}
+
+function _checkAndFix(range, container, offset, boundaryAction, movementType){
+
+    if(container.nodeType !== 3){
+        return;
+    }
+
+    var triggerZone = _getTriggerZone(container, offset);
+
+    if(!triggerZone){
+        return;
+    }
+
+    _fixRangeOutOfTriggerZone(triggerZone, range, container, boundaryAction, movementType);
+}
+
+function _getTriggerZone(textNode, offset){
+
+    if(textNode.nextSibling && textNode.nextSibling._linkChipEnhancedByThisExtension && offset === textNode.textContent.length && textNode.textContent.charAt(offset - 1) === Z_SPACE_CHAR ){
+        return 'Z_SPACE_0';
+    }
+    else if(textNode.previousSibling && textNode.previousSibling._linkChipEnhancedByThisExtension && offset === 0 && textNode.textContent.charAt(0) === Z_SPACE_CHAR){
+        return 'Z_SPACE_1';
+    }
+    else{
+        return null;
+    }
+}
+
+function _fixRangeOutOfTriggerZone(triggerZone, range, textNode, boundaryAction, movementType){
+    if(triggerZone === 'Z_SPACE_0'){
+        if(movementType === 'VERTICAL'){
+            range[boundaryAction](textNode, textNode.length - 1); //move to just before zSpace char
         }
         else{
-            container = range.endContainer;
+            range[boundaryAction](textNode.nextSibling.nextSibling, 1);
         }
-
-        if(!range.collapsed && event.shiftKey){
-
-        }
-
-        var wasCollapsed;
-
-        if(_isNeedToJumpLeftFromTextNode(siblingProperty, range, container)){
-            wasCollapsed = _updateRangeToJumpLeftFromTextNode(range, container);
-        }
-        else if(_isNeedToJumpRightFromTextNode(siblingProperty, range, container)){
-            wasCollapsed =_updateRangeToJumpRightFromTextNode(range, container);
-        }
-        else if(_isNeedToJumpLeftInElement(siblingProperty, range, container)){
-            wasCollapsed = _updateRangeToJumpLeftFromTextNode(range, container.childNodes[range.startOffset-1]);
+    }
+    else if(triggerZone === 'Z_SPACE_1'){
+        if(movementType === 'VERTICAL'){
+            range[boundaryAction](textNode, 1);
         }
         else{
-            return;
+            range[boundaryAction](textNode.previousSibling.previousSibling, textNode.previousSibling.previousSibling.length - 1);
         }
-
-        action(range, wasCollapsed && !event.shiftKey, siblingProperty === 'previousSibling');
-        event.preventDefault();
-    });
-}
-
-function _isNeedToJumpLeftFromTextNode(siblingProperty, range, textNode){
-    if(textNode.nodeType !== 3){
-        return false;
-    }
-
-    if(siblingProperty !== 'previousSibling'){
-        return false;
-    }
-
-    if(range.startOffset > 1){
-        return false;
-    }
-
-    if(textNode.textContent.charAt(0) !== '\u200b'){
-        return false;
-    }
-
-    return _siblingCheck(siblingProperty, textNode);
-}
-
-function _isNeedToJumpRightFromTextNode(siblingProperty, range, textNode){
-    if(textNode.nodeType !== 3){
-        return false;
-    }
-
-    if(siblingProperty !== 'nextSibling'){
-        return false;
-    }
-
-    if(range.endOffset < textNode.length - 2){
-        return false;
-    }
-
-    if(textNode.textContent.charAt(textNode.length - 1) !== '\u200b'){
-        return false;
-    }
-
-    return _siblingCheck(siblingProperty, textNode);
-}
-
-function _isNeedToJumpLeftInElement(siblingProperty, range, container){
-    if(siblingProperty !== 'previousSibling'){
-        return false;
-    }
-
-    if(container.nodeType === 3){
-        return false;
-    }
-
-    if(range.startOffset < 3){
-        return false;
-    }
-
-    var textNode = container.childNodes[range.startOffset-1];
-    if(textNode.nodeType !== 3){
-        return false;
-    }
-
-    if(textNode.textContent !== '\u200b'){
-        return false;
-    }
-
-    return _siblingCheck(siblingProperty, textNode);
-}
-
-function _siblingCheck(siblingProperty, node){
-    if(!node[siblingProperty]){
-        return false;
-    }
-
-    if(!node[siblingProperty]._linkChipEnhancedByThisExtension){
-        return false;
-    }
-
-    if(!node[siblingProperty][siblingProperty]){
-        return false;
-    }
-
-    return true;
-}
-
-function _updateRangeToJumpLeftFromTextNode(range, textNode){
-    var newTextNode = textNode.previousSibling.previousSibling;
-    var offset = newTextNode.length - 1;
-
-    return _updateRangeFromTextNode(range, 'setStart', newTextNode, offset, true);
-}
-
-function _updateRangeToJumpRightFromTextNode(range, textNode){
-    var newTextNode = textNode.nextSibling.nextSibling;
-    var offset = 1;
-
-    return _updateRangeFromTextNode(range, 'setEnd', newTextNode, offset);
-}
-
-function _updateRangeFromTextNode(range, boundaryPoint, newTextNode, offset, collapseToStart){
-    var isCollapsed = range.collapsed;
-    range[boundaryPoint](newTextNode, offset);
-
-    return isCollapsed;
-}
-
-
-function _moveCursor(range, shouldCollapse, collapseToStart){
-    if(shouldCollapse){
-        range.collapse(collapseToStart);
     }
 
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(range);
 }
 
-function _delete(range){
-    range.deleteContents();
+
+function _checkAndRemoveBrokenChip(gmailComposeView, chipElement){
+    if(!chipElement._linkChipEnhancedByThisExtension){
+        return;
+    }
+
+    var brokenModes = _getBrokenModes(chipElement);
+
+    if(brokenModes.length > 0){
+        _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes);
+    }
+}
+
+function _getBrokenModes(chipElement){
+    var brokenModes = [];
+    if(chipElement.previousSibling){
+        if(chipElement.previousSibling.nodeType === 3){
+            if(chipElement.previousSibling.textContent.charAt(chipElement.previousSibling.length - 1) !== Z_SPACE_CHAR){
+                brokenModes.push('PREVIOUS_SIBLING_MISSING_Z_SPACE_CHAR');
+            }
+        }
+        else{
+            brokenModes.push('PREVIOUS_SIBLING_NOT_TEXT_NODE');
+        }
+    }
+    else{
+        brokenModes.push('MISSING_PREVIOUS_SIBLING');
+    }
+
+    if(chipElement.nextSibling){
+        if(chipElement.nextSibling.nodeType === 3){
+            if(chipElement.nextSibling.textContent.charAt(0) !== Z_SPACE_CHAR){
+                brokenModes.push('NEXT_SIBLING_MISSING_Z_SPACE_CHAR');
+            }
+        }
+        else{
+            brokenModes.push('NEXT_SIBLING_NOT_TEXT_NODE');
+        }
+    }
+    else{
+        brokenModes.push('MISSING_NEXT_SIBLING');
+    }
+
+
+
+    return brokenModes;
+}
+
+function _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes){
+    if(_doesZSpaceZeroExist(brokenModes)){
+        _removeZSpaceZero(chipElement);
+    }
+
+    if(_doesZSpaceOneExist(brokenModes)){
+        _removeZSpaceOne(chipElement);
+    }
+
+    if(isNodeInRange(chipElement, gmailComposeView.getSelectionRange())){
+        _fixRange(chipElement, range);
+    }
+
+    chipElement.remove();
+
+    if(document.getSelection().rangeCount === 0 && gmailComposeView.getSelectionRange()){
+        document.getSelection().addRange(gmailComposeView.getSelectionRange());
+    }
+}
+
+function _doesZSpaceZeroExist(brokenModes){
+    return brokenModes.indexOf('MISSING_PREVIOUS_SIBLING') === -1 &&
+            brokenModes.indexOf('PREVIOUS_SIBLING_NOT_TEXT_NODE') === -1 &&
+            brokenModes.indexOf('PREVIOUS_SIBLING_MISSING_Z_SPACE_CHAR') === -1;
+}
+
+function _removeZSpaceZero(chipElement, range){
+    var textNode = chipElement.previousSibling;
+
+    textNode.textContent = textNode.textContent.substring(0, textNode.textContent.length - 1);
+}
+
+function _doesZSpaceOneExist(brokenModes){
+    return brokenModes.indexOf('MISSING_NEXT_SIBLING') === -1 &&
+            brokenModes.indexOf('NEXT_SIBLING_NOT_TEXT_NODE') === -1 &&
+            brokenModes.indexOf('NEXT_SIBLING_MISSING_Z_SPACE_CHAR') === -1;
+}
+
+function _removeZSpaceOne(chipElement){
+    var textNode = chipElement.nextSibling;
+
+    textNode.textContent = textNode.textContent.substring(1);
+}
+
+function _fixRange(node, range){
+    var parent = node.parentNode;
+    var currentIndex = Array.prototype.indexOf.call(parent.childNodes, node);
+
+    range.setStart(parent, Math.max(currentIndex - 1, 0));
 }

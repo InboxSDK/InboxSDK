@@ -11,7 +11,11 @@ module.exports = function(gmailComposeView){
             return event.eventName === 'bodyChanged';
         })
     ).takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
-    .debounceImmediate(10).onValue(function(){
+    .debounceImmediate(10).onValue(function(event){
+        if(event && event.type === 'input'){
+            return;
+        }
+
         if(document.getSelection() && document.getSelection().rangeCount > 0){
             gmailComposeView.setSelectionRange(document.getSelection().getRangeAt(0));
         }
