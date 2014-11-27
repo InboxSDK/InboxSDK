@@ -1,11 +1,19 @@
+var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
 function makeElementChildStream(element) {
   return Bacon.fromBinder(function(sink) {
-    Array.prototype.forEach.call(element.children, function(node){
-      sink({type:'added', el:node});
+    // We don't want to emit the start children synchronously before all
+    // stream listeners are subscribed.
+    RSVP.Promise.resolve().then(function() {
+      if (observer) {
+        Array.prototype.forEach.call(element.children, function(node) {
+          sink({type:'added', el:node});
+        });
+        observer.observe(element, {childList: true});
+      }
     });
 
     var observer = new MutationObserver(function(mutations) {
@@ -18,9 +26,10 @@ function makeElementChildStream(element) {
         });
       });
     });
-    observer.observe(element, {childList: true});
+
     return function() {
       observer.disconnect();
+      observer = null;
     };
   });
 }
