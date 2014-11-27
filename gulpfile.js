@@ -16,11 +16,12 @@ var gutil = require('gulp-util');
 var rename = require("gulp-rename");
 var extReloader = require('./live/ext-reloader');
 var rimraf = require('rimraf');
+var Bacon = require('baconjs');
 var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
-var exec = RSVP.denodeify(require('child_process').exec);
+var exec = require('./src/build/exec');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
@@ -99,12 +100,7 @@ function browserifyTask(name, deps, entry, destname) {
       VERSION: getVersion()
     }));
 
-    if (args.watch) {
-      bundler = watchify(bundler);
-      bundler.on('update', buildBundle.bind(null, true));
-    }
-
-    function buildBundle(isRebuild) {
+    function buildBundle() {
       var bundle = bundler.bundle();
       var result = bundle
         .pipe(mold.transformSourcesRelativeTo('.'))
@@ -122,25 +118,42 @@ function browserifyTask(name, deps, entry, destname) {
         })))
         .pipe(gulp.dest('./dist/'));
 
-      if (isRebuild) {
-        var wasError = false;
-        gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
-        bundle.on('error', function(err) {
-          wasError = true;
-          gutil.log(gutil.colors.red("Error")+" rebuilding '"+gutil.colors.cyan(name)+"':", err.message);
+      return new RSVP.Promise(function(resolve, reject) {
+        var errCb = _.once(function(err) {
+          reject(err);
           result.end();
         });
-        result.on('end', function() {
-          if (!wasError) {
-            gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
-            if (name == 'sdk') {
-              setupExamples();
-            }
-          }
-        });
-      }
+        bundle.on('error', errCb);
+        result.on('error', errCb);
+        result.on('end', resolve);
+      });
+    }
 
-      return result;
+    if (args.watch) {
+      var rebuilding = new Bacon.Bus();
+      bundler = watchify(bundler);
+      Bacon
+        .fromEventTarget(bundler, 'update')
+        .holdWhen(rebuilding)
+        .throttle(10)
+        .onValue(function() {
+          rebuilding.push(true);
+          gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
+          buildBundle().then(function() {
+            if (name == 'sdk') {
+              return setupExamples();
+            }
+          }).then(function() {
+            gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
+            rebuilding.push(false);
+          }, function(err) {
+            gutil.log(
+              gutil.colors.red("Error")+" rebuilding '"+
+              gutil.colors.cyan(name)+"':", err.message
+            );
+            rebuilding.push(false);
+          });
+        });
     }
 
     return buildBundle();

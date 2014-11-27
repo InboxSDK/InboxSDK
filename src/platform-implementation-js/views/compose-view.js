@@ -149,7 +149,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	insertLinkIntoBodyAtCursor: function(text, url){
-		this._composeViewImplementation.insertLinkIntoBody(text, href);
+		this._composeViewImplementation.insertLinkIntoBody(text, url);
 	},
 
 
