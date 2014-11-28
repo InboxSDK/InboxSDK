@@ -13,7 +13,7 @@ _.extend(AttachmentCardView.prototype, {
 
 	// returns string indicating the type of attachment ['FILE', 'DRIVE', 'FILE_IMAGE', 'CUSTOM']
 	getAttachmentType: function(){
-		return this._attachmentCardImplementation.getAttachmentType();		
+		return this._attachmentCardImplementation.getAttachmentType();
 	},
 
 
@@ -21,7 +21,7 @@ _.extend(AttachmentCardView.prototype, {
 	 * options = {
 	 * 	iconUrl: ,
 	 * 	tooltip,
-	 * 	callback:
+	 * 	onClick:
 	 * }
 	 */
 	addButton: function(options){
