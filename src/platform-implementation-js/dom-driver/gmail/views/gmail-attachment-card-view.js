@@ -25,7 +25,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_fileName', destroy: false, get: true},
+		{name: '_title', destroy: false, get: true},
 		{name: '_mimeType', destroy: false, get: true},
 		{name: '_messageId', destroy: false},
 		{name: '_attachmentId', destroy: false}
@@ -91,13 +91,13 @@ _.extend(GmailAttachmentCardView.prototype, {
 		}
 
 
-		this._fileName = this._extractFileNameFromElement();
+		this._title = this._extractFileNameFromElement();
 		this._messageId = attachmentUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
 		this._attachmentId = attachmentUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
 	},
 
 	_isStandardAttachment: function(){
-		return !this._isDriveAttachment() && !this._isNonNativeAttachment();
+		return !this._isDriveAttachment() && !this._isNonNativeAttachment() && !!this._getButtonContainerElement();
 	},
 
 	_isDriveAttachment: function(){
@@ -157,26 +157,31 @@ _.extend(GmailAttachmentCardView.prototype, {
 		].join('');
 
 		this._element.children[0].href = options.previewUrl;
-		this._element.querySelector('img.aYB').src = options.documentPreviewImageUrl;
+		this._element.querySelector('img.aYB').src = options.previewThumbnailUrl;
 		this._element.querySelector('img.aSM').src = options.fileIconImageUrl;
-		this._element.querySelector('span .aV3').textContent = options.fileName;
-		this._element.querySelector('div.aYp > span').textContent = options.title || '';
+		this._element.querySelector('span .aV3').textContent = options.title;
+		this._element.querySelector('div.aYp > span').textContent = options.description || '';
 		this._element.querySelector('div.aSJ').style.borderColor = options.foldColor;
 
 		this._addHoverEvents();
 
-		if(options.downloadUrl){
-			this._addDownloadButton(options);
-		}
+		if(options.buttons){
+			var downloadButton = _.find(options.buttons, function(button){
+				return button.downloadUrl;
+			});
 
-		if(options.additionalButtons){
-			this._addMoreButtons(options.additionalButtons);
+			if(downloadButton){
+				this._addDownloadButton(downloadButton);
+			}
+
+
+			this._addMoreButtons(options.buttons);
 		}
 
 		var self = this;
 		this._element.addEventListener('click', function(e){
-			if(options.onPreviewClick){
-				options.onPreviewClick({
+			if(options.previewOnClick){
+				options.previewOnClick({
 					attachmentCardView: self,
 					preventDefault: function(){
 						e.preventDefault();
@@ -185,7 +190,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 			}
 		});
 
-		this._fileName = options.fileName;
+		this._title = options.fileName;
 	},
 
 	_addHoverEvents: function(){
@@ -208,14 +213,24 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	_addDownloadButton: function(options){
 		var buttonView = new ButtonView({
-			tooltip: options.tooltip,
+			tooltip: 'Download',
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
 
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
-				if(options.onDownloadButtonClick){
-					options.onDownloadButtonClick();
+				var prevented = false;
+
+				if(options.onClick){
+					options.onClick({
+						preventDefault: function(){
+							prevented = true;
+						}
+					});
+				}
+
+				if(prevented){
+					return;
 				}
 
 				var downloadLink = document.createElement('a');
@@ -239,6 +254,9 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	_addMoreButtons: function(buttonDescriptors){
 		_.chain(buttonDescriptors)
+			.filter(function(buttonDescriptor){
+				return !buttonDescriptor.downloadUrl;
+			})
 			.map(function(buttonDescriptor){
 				var buttonView = new ButtonView(buttonDescriptor);
 				var buttonViewController = new BasicButtonViewController({
@@ -254,7 +272,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 	_addButton: function(buttonView){
 		buttonView.addClass('aQv');
 
-		this._element.querySelector('.aQw').appendChild(buttonView.getElement());
+		this._getButtonContainerElement().appendChild(buttonView.getElement());
 	},
 
 	_getPreviewImageUrl: function(){
@@ -268,6 +286,10 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 	_getPreviewImage: function(){
 		return this._element.querySelector('img.aQG');
+	},
+
+	_getButtonContainerElement: function(){
+		return this._element.querySelector('.aQw');
 	}
 
 });

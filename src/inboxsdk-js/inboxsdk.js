@@ -16,14 +16,18 @@ var InboxSDK = function(appId, opts){
   }
   this.VERSION = process.env.VERSION;
   this.IMPL_VERSION = null;
-  opts = _.extend({}, opts, {VERSION: this.VERSION});
+  opts = _.extend({
+    // defaults
+    globalErrorLogging: true
+  }, opts, {
+    // stuff that can't be overridden, such as extra stuff this file passes to
+    // the implementation script.
+    VERSION: this.VERSION
+  });
 
   this._appId = appId;
   this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
-  this._tracker = new Tracker(this._platformImplementationLoader);
-  if (!opts || !opts.noGlobalErrorLogging) {
-    this._tracker.setupGlobalLogger();
-  }
+  this._tracker = new Tracker(this._platformImplementationLoader, opts);
 
   this.Compose = new Compose(this._platformImplementationLoader);
   this.Conversations = new Conversations(this._platformImplementationLoader);

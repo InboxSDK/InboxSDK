@@ -16,11 +16,12 @@ var gutil = require('gulp-util');
 var rename = require("gulp-rename");
 var extReloader = require('./live/ext-reloader');
 var rimraf = require('rimraf');
+var Bacon = require('baconjs');
 var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
-var exec = RSVP.denodeify(require('child_process').exec);
+var exec = require('./src/build/exec');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
@@ -86,8 +87,8 @@ gulp.task('version', function() {
   });
 });
 
-function browserifyTask(name, entry, destname) {
-  gulp.task(name, ['version'], function() {
+function browserifyTask(name, deps, entry, destname) {
+  gulp.task(name, ['version'].concat(deps), function() {
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -99,12 +100,7 @@ function browserifyTask(name, entry, destname) {
       VERSION: getVersion()
     }));
 
-    if (args.watch) {
-      bundler = watchify(bundler);
-      bundler.on('update', buildBundle.bind(null, true));
-    }
-
-    function buildBundle(isRebuild) {
+    function buildBundle() {
       var bundle = bundler.bundle();
       var result = bundle
         .pipe(mold.transformSourcesRelativeTo('.'))
@@ -116,47 +112,68 @@ function browserifyTask(name, entry, destname) {
         .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
           // don't include sourcemap comment in the inboxsdk-x.js file that we
           // distribute to developers since it'd always be broken.
-          addComment: !args.production || name != 'sdk'
+          addComment: !args.production || name != 'sdk',
+          sourceMappingURLPrefix: name == 'injected' ?
+            'https://www.inboxsdk.com/build/' : null
         })))
         .pipe(gulp.dest('./dist/'));
 
-      if (isRebuild) {
-        var wasError = false;
-        gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
-        bundle.on('error', function(err) {
-          wasError = true;
-          gutil.log(gutil.colors.red("Error")+" rebuilding '"+gutil.colors.cyan(name)+"':", err.message);
+      return new RSVP.Promise(function(resolve, reject) {
+        var errCb = _.once(function(err) {
+          reject(err);
           result.end();
         });
-        result.on('end', function() {
-          if (!wasError) {
-            gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
-            if (name == 'sdk') {
-              setupExamples();
-            }
-          }
-        });
-      }
+        bundle.on('error', errCb);
+        result.on('error', errCb);
+        result.on('end', resolve);
+      });
+    }
 
-      return result;
+    if (args.watch) {
+      var rebuilding = new Bacon.Bus();
+      bundler = watchify(bundler);
+      Bacon
+        .fromEventTarget(bundler, 'update')
+        .holdWhen(rebuilding)
+        .throttle(10)
+        .onValue(function() {
+          rebuilding.push(true);
+          gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
+          buildBundle().then(function() {
+            if (name == 'sdk') {
+              return setupExamples();
+            }
+          }).then(function() {
+            gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
+            rebuilding.push(false);
+          }, function(err) {
+            gutil.log(
+              gutil.colors.red("Error")+" rebuilding '"+
+              gutil.colors.cyan(name)+"':", err.message
+            );
+            rebuilding.push(false);
+          });
+        });
     }
 
     return buildBundle();
   });
 }
 
-
 if (args.single) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main-DEV.js', sdkFilename);
+  browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', './src/inboxsdk-js/main.js', sdkFilename);
-  browserifyTask('imp', './src/platform-implementation-js/main.js', 'platform-implementation.js');
+  browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
+  browserifyTask('imp', ['injected'],
+    './src/platform-implementation-js/main.js', 'platform-implementation.js');
 }
+
+browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js');
 
 gulp.task('examples', ['sdk'], setupExamples);
 
@@ -175,14 +192,27 @@ gulp.task('docs', function(cb) {
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
 
-    var allComments = _.chain(paths.files)
+    var classes = _.chain(paths.files)
                         .filter(isFileEligbleForDocs)
+                        .map(logFiles)
                         .map(parseCommentsInFile)
-                        .filter(isNonEmptyComments)
+                        .pluck('classes')
+                        .flatten(true)
+                        .filter(isNonEmptyClass)
+                        .map(transformClass)
                         .value();
 
-    console.log(JSON.stringify(allComments, null, 2));
-    fs.writeFile('dist/docs.json', JSON.stringify(allComments, null, 2));
+    var docsJson = {};
+    docsJson.classes  = _.chain(classes)
+                          .map(function(ele) {
+                            return [ele.name, ele];
+                          })
+                          .object()
+                          .value();
+
+
+    console.log(JSON.stringify(docsJson, null, 2));
+    fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
   });
 
 });
@@ -193,13 +223,44 @@ function parseCommentsInFile(file) {
   return comments;
 }
 
-function isNonEmptyComments(comments) {
+function transformClass(c) {
+  if (!c.properties) {
+    return c;
+  }
+
+  c.properties.forEach(function(prop){
+    var optionalMarker = '\n^optional';
+    var defaultRegex = /\n\^default=(.*)/;
+
+    prop.optional = false;
+    if (prop.description.indexOf(optionalMarker) > -1) {
+      prop.optional = true;
+      prop.description = prop.description.replace(optionalMarker, '');
+    }
+
+    prop.description = prop.description.replace(defaultRegex, function(m, c) {
+      prop.default = c;
+      return '';
+    });
+  });
+
+  return c;
+}
+
+function isNonEmptyClass(c) {
   // its going to have one property with the filename at minimum because we added it
-  return _.size(comments) > 1;
+  return c != null;
+}
+
+function logFiles(filename) {
+  return filename;
 }
 
 function isFileEligbleForDocs(filename) {
-  return endsWith(filename, ".js") && filename.indexOf('node_modules') == -1 && filename.indexOf('conversations.js') != -1;
+  return  endsWith(filename, ".js") &&
+          filename.indexOf('/src/') > -1 &&
+          filename.indexOf('/dist/') == -1 &&
+          filename.indexOf('/dom-driver/') == -1;
 }
 
 function endsWith(str, suffix) {

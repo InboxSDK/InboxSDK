@@ -37,6 +37,10 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHi
 }
 
 function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
+	if(!gmailComposeView.getElement() || !gmailComposeView.getFormattingToolbar()){
+		return;
+	}
+
 	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
 	var buttonViewController;
 
@@ -329,14 +333,23 @@ function _positionGroupToolbar(gmailComposeView){
 
 function _positionFormattingToolbar(gmailComposeView){
 	if(gmailComposeView.getFormattingToolbar() && gmailComposeView.getFormattingToolbar().style.display === ''){
-		simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
-		simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
+		var arrowElement = gmailComposeView.getFormattingToolbarArrow();
+		var buttonElement = gmailComposeView.getFormattingToolbarToggleButton();
+
+		var left = buttonElement.offsetLeft+buttonElement.clientWidth/2-arrowElement.offsetWidth/2;
+		arrowElement.style.left = left + 'px';
 	}
 }
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
-		return !! gmailComposeView.getFormattingToolbar();
+		try{
+			return !!gmailComposeView.getFormattingToolbar();
+		}
+		catch(err){
+			throw 'skip';
+		}
+
 	}).then(function(){
 
 		var mutationObserver = new MutationObserver(function(mutations){
@@ -352,6 +365,10 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 			{attributes: true, attributeFilter: ['style']}
 		);
 
+	}).catch(function(err){
+		if(err !== 'skip'){
+			throw err;
+		}
 	});
 }
 

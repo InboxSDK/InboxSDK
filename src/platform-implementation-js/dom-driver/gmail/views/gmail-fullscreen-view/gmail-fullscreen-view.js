@@ -1,7 +1,8 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
-var ElementMonitor = require('../../../../lib/dom/element-monitor');
+var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
 
 var FullscreenViewDriver = require('../../../../driver-interfaces/fullscreen-view-driver');
 
@@ -112,35 +113,29 @@ _.extend(GmailFullscreenView.prototype, {
 
 	_startMonitoringPreviewPaneRowListForThread: function(rowListElement){
 		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
-		var elementMonitor = new ElementMonitor({
 
-			relevantElementExtractor: function(element){
-				if(!element.querySelector('.if')){
-					return null;
-				}
-
-				return element;
-			},
-
-			viewCreationFunction: function(element){
-				return new GmailThreadView(element);
-			}
-
-		});
-
+		var elementStream = makeElementChildStream(threadContainerTableElement)
+			.takeUntil(this._eventStreamBus.filter(false).mapEnd())
+			.filter(function(event) {
+				return !!event.el.querySelector('.if');
+			});
 
 		var self = this;
-		elementMonitor.getViewAddedEventStream().onValue(function(view){
-			self._threadView = view;
-
-			self._eventStreamBus.push({
-				eventName: 'newGmailThreadView',
-				view: view
-			});
-		});
-
-		elementMonitor.setObservedElement(threadContainerTableElement);
-
+		this._eventStreamBus.plug(
+			makeElementViewStream({
+				elementStream: elementStream,
+				viewFn: function(element){
+					return new GmailThreadView(element);
+				}
+			}).doAction(function(view) {
+				self._threadView = view;
+			}).map(function(view) {
+				return {
+					eventName: 'newGmailThreadView',
+					view: view
+				};
+			})
+		);
 	}
 
 });

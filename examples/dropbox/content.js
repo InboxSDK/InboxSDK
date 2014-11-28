@@ -1,15 +1,8 @@
 var inboxSDK = new InboxSDK('dropbox');
 
-// dropins.js looks for a script element on the page DOM to get the app key, so
-// oblige it. The loadScript() call later doesn't add a script element to the
-// page for it since that wouldn't get executed in the extension's context.
-var script = document.createElement('script');
-script.id = 'dropboxjs';
-script.setAttribute('data-app-key', '28gxvtpcvm1o19s');
-script.type = 'text/data';
-document.head.appendChild(script);
-
 inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then(function() {
+  Dropbox.init({appKey: "82bgsya5b7h847j"});
+
   inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
     composeView.addButton({
       title: "Add Dropbox File",
@@ -18,32 +11,49 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
       onClick: function() {
         var hasSelectedText = !!composeView.getSelectedBodyText();
 
-        Dropbox.choose({
+        var chooser = Dropbox.createChooserWidget({
           success: function(files) {
+            modal.close();
+
             if (hasSelectedText) {
               composeView.insertLinkIntoBodyAtCursor(files[0].name, files[0].link);
             } else {
+              var thumbnailLink = files[0].thumbnailLink;
+              if (thumbnailLink) {
+                thumbnailLink = thumbnailLink.split("?")[0] + "?bounding_box=75&mode=crop";
+              } else {
+                thumbnailLink = "https://www.dropbox.com/static/images/icons/blue_dropbox_glyph.png";
+              }
               composeView.insertLinkChipIntoBodyAtCursor(
                   files[0].name,
                   files[0].link,
-                  'https://dt8kf6553cww8.cloudfront.net/static/images/icons/blue_dropbox_glyph-vflJ8-C5d.png'
+                  thumbnailLink
               );
             }
+          },
+          cancel: function() {
+            modal.close();
           }
         });
+        chooser.style.width = "660px";
+        chooser.style.height = "440px";
 
+        var modal = inboxSDK.Modal.show({
+          el: chooser,
+          chrome: false
+        });
       }
     });
   });
 
   inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
-    var links = messageView.getLinks();
+    var links = messageView.getLinksInBody();
 
     links.filter(isEligibleLink).forEach(function(link) {
       addCustomAttachmentCard(messageView, link);
     });
 
-    messageView.addButtonToDownloadAllArea({
+    messageView.addAttachmentsToolbarButton({
       iconUrl: chrome.runtime.getURL('images/black19.png'),
       tooltip: 'Save all to Dropbox',
       onClick: function(attachmentCards) {
@@ -79,13 +89,16 @@ function addCustomAttachmentCard(messageView, link) {
 
   var fileName = decodeURIComponent(lastPart.replace(/(.*?)\?.*/, '$1'));
 
-  messageView.addAttachmentCard({
-    fileName: fileName,
+  messageView.addAttachmentCardView({
+    title: fileName,
     previewUrl: link.href,
     fileIconImageUrl: chrome.runtime.getURL('images/dark38.png'),
-    documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
-    downloadUrl: getDownloadUrl(link.href),
-    additionalButtons: [],
+    previewThumbnailUrl: chrome.runtime.getURL('images/icon128.png'),
+    buttons: [
+      {
+        downloadUrl: getDownloadUrl(link.href)
+      }
+    ],
     foldColor: 'RGB(21, 129, 226)'
   });
 }

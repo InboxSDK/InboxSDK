@@ -4,3 +4,4 @@
 /examples/*/inboxsdk.js*
 *~
 npm-debug.log
+.atom-build.json

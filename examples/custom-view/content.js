@@ -12,8 +12,6 @@ inboxSDK.FullscreenViews.on('change', function(event){
 	console.log('params', event.view.getParams());
 });
 
-inboxSDK.ready().then(function(){
-
+inboxSDK.FullscreenViews.once('change', function(event){
 	inboxSDK.FullscreenViews.getDescriptor('example').gotoView();
-
 });

@@ -1,6 +1,7 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
 
-module.exports = function(element, html){
+module.exports = function(element, html, oldRange){
 	element.focus();
 
 	if (element.tagName === 'TEXTAREA') {
@@ -25,8 +26,16 @@ module.exports = function(element, html){
 		if (editable) {
 			var sel = editable.getSelection();
 			if (sel.getRangeAt && sel.rangeCount) {
-				var range = sel.getRangeAt(0);
-				range.deleteContents();
+				var range;
+
+				if(oldRange){
+					range = oldRange;
+					range.detach();
+				}
+				else{
+					range = sel.getRangeAt(0);
+					range.deleteContents();
+				}
 
 				var frag;
 				if (html instanceof DocumentFragment) {
@@ -48,15 +57,32 @@ module.exports = function(element, html){
 				var firstChild = frag.firstChild, lastChild = frag.lastChild;
 				range.insertNode(frag);
 
+				// Simulate a mousedown event to kill any existing focus-fixers.
+				var event = document.createEvent('MouseEvents');
+				event.initMouseEvent('mousedown', false, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				event.preventDefault();
+				element.dispatchEvent(event);
+
 				// Preserve the cursor position
-				// Doesn't seem to work. TODO
-				// if (lastChild) {
-				// 	range = range.cloneRange();
-				// 	range.setStartAfter(lastChild);
-				// 	range.collapse(true);
-				// 	sel.removeAllRanges();
-				// 	sel.addRange(range);
-				// }
+				range.collapse(false);
+				sel.removeAllRanges();
+				sel.addRange(range);
+
+				var nextUserCursorMove = Bacon.mergeAll(
+					Bacon.fromEventTarget(element, 'mousedown'),
+					Bacon.fromEventTarget(element, 'keypress')
+				);
+
+				// Whenever the body element gets focus, manually make sure the cursor
+				// is in the right position, because Chrome likes to put it in the
+				// previous location instead because it hates us.
+				var focus = Bacon
+					.fromEventTarget(element, 'focus')
+					.takeUntil(nextUserCursorMove)
+					.onValue(function() {
+						sel.removeAllRanges();
+						sel.addRange(range);
+					});
 
 				return firstChild;
 			}

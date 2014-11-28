@@ -6,6 +6,8 @@ var Bacon = require('baconjs');
 var simulateClick = require('../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
+var waitFor = require('../../../lib/wait-for');
+
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
@@ -13,12 +15,43 @@ var MenuButtonViewController = require('../../../widgets/buttons/menu-button-vie
 
 var MenuView = require('../widgets/menu-view');
 
-var GmailComposeView = function(element){
+var GmailComposeView = function(element, xhrInterceptorStream){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
 	this._element.classList.add('inboxsdk__compose');
+
 	this._eventStream = new Bacon.Bus();
+
+	var self = this;
+	this._eventStream.plug(
+		Bacon.mergeAll(
+			xhrInterceptorStream.filter(function(event) {
+				return event.type === 'emailSending' && event.composeId === self.getComposeID();
+			}).map(function(event) {
+				return {type: 'sending'};
+			}),
+			xhrInterceptorStream.filter(function(event) {
+				return event.type === 'emailSent' && event.composeId === self.getComposeID();
+			}).map(function(event) {
+				// TODO include final message id
+				return {type: 'sent', data: undefined};
+			})
+		)
+	);
+
+	this.ready = _.constant(
+		waitFor(function(){
+			return !!self.getBodyElement();
+		}).then(function(){
+			self._composeID = self._element.querySelector('input[name="composeid"]').value;
+
+			self._setupStreams();
+			self._setupConsistencyCheckers();
+
+			return self;
+		})
+	);
 };
 
 GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
@@ -27,12 +60,32 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_eventStream', destroy: false, get: true},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
-		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false}
+		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
+		{name: '_selectionRange', destroy: false, set: true, get: true}
 	],
+
+	_setupStreams: function(){
+		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
+	},
+
+	_setupConsistencyCheckers: function(){
+		require('./gmail-compose-view/ensure-link-chips-work')(this);
+		require('./gmail-compose-view/monitor-selection-range')(this);
+	},
+
+	destroy: function() {
+		if (this._eventStream) {
+			this._eventStream.push({
+				type: 'close'
+			});
+			this._eventStream.end();
+		}
+		ComposeWindowDriver.prototype.destroy.call(this);
+	},
 
 	insertBodyTextAtCursor: function(text){
 		require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
@@ -162,6 +215,10 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelector('.aX');
 	},
 
+	getFormattingToolbarArrow: function(){
+		return this.getFormattingToolbar().querySelector('.aA4');
+	},
+
 	getFormattingToolbarToggleButton: function(){
 		var innerElement = this._element.querySelector('[role=button] .dv');
 		return $(innerElement).closest('[role=button]')[0];
@@ -192,7 +249,12 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getComposeID: function(){
+		return this._composeID;
+	},
 
+	getDraftID: function() {
+		var input = this._element.querySelector('input[name="draft"]');
+		return input && input.value;
 	},
 
 	addManagedViewController: function(viewController){

@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Compose = require('./platform-implementation/compose');
 var Conversations = require('./platform-implementation/conversations');
 var Email = require('./platform-implementation/email');
@@ -13,12 +14,13 @@ var GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
 var PlatformImplementation = function(appId, opts){
 	this._appId = appId;
+	opts = _.extend({
+		// defaults
+		globalErrorLogging: true
+	}, opts);
 	this.VERSION = process.env.VERSION;
 
-	this._tracker = new Tracker(appId);
-	if (!opts || !opts.noGlobalErrorLogging) {
-		this._tracker.setupGlobalLogger();
-	}
+	this._tracker = new Tracker(appId, opts);
 
 	this._driver = new GmailDriver();
 
