@@ -215,6 +215,10 @@ _.extend(GmailComposeView.prototype, {
 		return this._element.querySelector('.aX');
 	},
 
+	getFormattingToolbarArrow: function(){
+		return this.getFormattingToolbar().querySelector('.aA4');
+	},
+
 	getFormattingToolbarToggleButton: function(){
 		var innerElement = this._element.querySelector('[role=button] .dv');
 		return $(innerElement).closest('[role=button]')[0];
