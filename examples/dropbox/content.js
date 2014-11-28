@@ -47,13 +47,13 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
   });
 
   inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
-    var links = messageView.getLinks();
+    var links = messageView.getLinksInBody();
 
     links.filter(isEligibleLink).forEach(function(link) {
       addCustomAttachmentCard(messageView, link);
     });
 
-    messageView.addButtonToDownloadAllArea({
+    messageView.addAttachmentsToolbarButton({
       iconUrl: chrome.runtime.getURL('images/black19.png'),
       tooltip: 'Save all to Dropbox',
       onClick: function(attachmentCards) {
@@ -89,13 +89,16 @@ function addCustomAttachmentCard(messageView, link) {
 
   var fileName = decodeURIComponent(lastPart.replace(/(.*?)\?.*/, '$1'));
 
-  messageView.addAttachmentCard({
-    fileName: fileName,
+  messageView.addAttachmentCardView({
+    title: fileName,
     previewUrl: link.href,
     fileIconImageUrl: chrome.runtime.getURL('images/dark38.png'),
-    documentPreviewImageUrl: chrome.runtime.getURL('images/icon128.png'),
-    downloadUrl: getDownloadUrl(link.href),
-    additionalButtons: [],
+    previewThumbnailUrl: chrome.runtime.getURL('images/icon128.png'),
+    buttons: [
+      {
+        downloadUrl: getDownloadUrl(link.href)
+      }
+    ],
     foldColor: 'RGB(21, 129, 226)'
   });
 }
