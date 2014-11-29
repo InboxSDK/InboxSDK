@@ -1,16 +1,16 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
-var ContentPanelView = function(contentPanelViewImplementation){
+var SidebarContentPanelView = function(sidebarContentPanelViewImplementation){
     EventEmitter.call(this);
 
-    this._contentPanelViewImplementation = contentPanelViewImplementation;
+    this._contentPanelViewImplementation = sidebarContentPanelViewImplementation;
     this._bindToStreamEvents();
 };
 
-ContentPanelView.prototype = Object.create(EventEmitter.prototype);
+SidebarContentPanelView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(ContentPanelView.prototype, {
+_.extend(SidebarContentPanelView.prototype, {
 
     remove: function(){
         this._contentPanelViewImplementation.remove();
@@ -26,4 +26,4 @@ _.extend(ContentPanelView.prototype, {
 });
 
 
-module.exports = ContentPanelView;
+module.exports = SidebarContentPanelView;

@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
-var ContentPanelView = require('./content-panel-view');
+var SidebarContentPanelView = require('./sidebar-content-panel-view');
 
 var ThreadSidebarView = function(threadSidebarViewImplementation, driver){
     EventEmitter.call(this);
@@ -16,9 +16,17 @@ ThreadSidebarView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(ThreadSidebarView.prototype, {
 
+    /*
+     * options = {
+     *   title: <string>,
+     *   iconUrl: <string>
+     *   el: element, html string
+     * }
+     */
+
     addContentPanel: function(options){
         var contentPanelImplementation = this._threadSidebarViewImplementation.addContentPanel(options);
-        return new ContentPanelView(contentPanelImplementation);
+        return new SidebarContentPanelView(contentPanelImplementation);
     },
 
     getThread: function(){

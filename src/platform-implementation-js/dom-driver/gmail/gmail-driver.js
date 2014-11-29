@@ -29,12 +29,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_standardThreadViewMonitor', destroy: true},
-		{name: '_previewPaneThreadViewMonitor', destroy: true},
-		{name: '_standardThreadListToolbarMonitor', destroy: true},
-		{name: '_previewPaneThreadListToolbarMonitor', destroy: true},
-		{name: '_threadViewToolbarMonitor', destroy: true}
+		{name: '_threadSidebarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	showCustomFullscreenView: function(element){
@@ -74,8 +69,7 @@ _.extend(GmailDriver.prototype, {
 		this._setupRowListViewDriverStream();
 		this._setupThreadViewDriverStream();
 		this._setupToolbarViewDriverStream();
-		this._setupMessageViewDriverStream();
-		this._setupAttachmentCardViewDriverStream();
+		this._setupMessageViewDriverStream();		
 		this._setupComposeViewDriverStream();
 	},
 
@@ -155,21 +149,6 @@ _.extend(GmailDriver.prototype, {
 			this._threadViewDriverStream.flatMap(function(gmailThreadView){
 				return gmailThreadView.getEventStream().filter(function(event){
 					return event.eventName === 'messageLoaded';
-				})
-				.map(function(event){
-					return event.view;
-				});
-			})
-		);
-	},
-
-	_setupAttachmentCardViewDriverStream: function(){
-		this._attachmentCardViewDriverStream = new Bacon.Bus();
-
-		this._attachmentCardViewDriverStream.plug(
-			this._messageViewDriverStream.flatMap(function(gmailMessageView){
-				return gmailMessageView.getEventStream().filter(function(event){
-					return event.eventName === 'newAttachmentCard';
 				})
 				.map(function(event){
 					return event.view;

@@ -92,12 +92,11 @@ var GmailElementGetter = {
 	},
 
 	getThreadContainerElement: function(){
-		var threadContainerElement = document.querySelector('[role=main] .g.id table.Bs > tr');
-		if(!threadContainerElement){
-			return null;
-		}
+		return document.querySelector('[role=main] .g.id table.Bs > tr');
+	},
 
-		return threadContainerElement;
+	getSidebarContainerElement: function(){
+		return document.querySelector('[role=main] .g.id table.Bs > tr .y3');
 	},
 
 	getComposeButton: function(){
