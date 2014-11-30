@@ -18,34 +18,26 @@ MessageView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(MessageView.prototype, /** @lends MessageView */{
 
-	/*
-	* rename addAttachmentCardView
-	*/
-
 	/**
 	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
 	* preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
 	* @param {AttachmentCardOptions} cardOptions - the configuration of the AttachmentCardView to create
 	* @return {AttachmentCardView}
 	*/
-	addAttachmentCard: function(cardOptions){
+	addAttachmentCardView: function(cardOptions){
 		this._messageViewImplementation.addAttachmentCard(cardOptions);
 	},
 
-	/*
-	* rename addAttachmentsToolbarButton
-	*/
+
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
-	* @param {DownloadAllButtonDescriptor} buttonOptions - the configuration of the AttachmentCardView to create
+	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - the configuration of the AttachmentCardView to create
 	* @return {void}
 	*/
-	addButtonToDownloadAllArea: function(buttonOptions){
+	addAttachmentsToolbarButton: function(buttonOptions){
 		this._messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
 	},
 
-
-	// rename getBodyElement
 
 	/**
 	* Returns the body element of the message as displayed to the user. This element includes any qouted areas.
@@ -53,7 +45,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
 	* @return {HTMLElement}
 	*/
-	getContentsElement: function(){
+	getBodyElement: function(){
 		return this._messageViewImplementation.getContentsElement();
 	},
 
@@ -81,8 +73,6 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 
-	// rename getLinksInBody
-
 	/**
 	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
 	* This is useful when you want to parse links in a message and take some action on them, this takes care of detecting whether
@@ -90,7 +80,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
 	* @return {MessageViewLinkDescriptor[]}
 	*/
-	getLinks: function(){
+	getLinksInBody: function(){
 		return this._messageViewImplementation.getLinks();
 	}
 
@@ -125,7 +115,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* The url of an "open" or "preview" action for this attachment. The attachment cards primary action (clicking on the card)
 	* takes the user in a new window to the URL specified here. This is also the URL used if the user right clicks and copies
 	* the link address
-	* @type {function(event)}
+	* @type {string}
 	*/
 	previewUrl:null,
 
@@ -142,7 +132,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* this function prevents the preview from opening in a new window.
 	* @type {function(event)}
 	*/
-	previewCallback:null,
+	previewOnClick:null,
 
 	/**
 	* The url of the icon of the attachment
@@ -180,9 +170,9 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	/**
 	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
 	* actually downloading which happens automatically.
-	* @type {string}
+	* @type {function(event)}
 	*/
-	callback:null,
+	onClick:null,
 };
 
 /**
@@ -205,9 +195,9 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 	/**
 	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
 	* actually downloading which happens automatically.
-	* @type {string}
+	* @type {function(event)}
 	*/
-	callback:null,
+	onClick:null,
 };
 
 
@@ -251,7 +241,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 /**
 * @class
 */
-var DownloadAllButtonDescriptor = /** @lends DownloadAllButtonDescriptor */{
+var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDescriptor */{
 
 	/**
 	* The tooltip of the button
@@ -270,5 +260,5 @@ var DownloadAllButtonDescriptor = /** @lends DownloadAllButtonDescriptor */{
 	* array of <code>AttachmentCardView</code>s.
 	* @type {function(event)}
 	*/
-	callback:null
+	onClick:null
 };

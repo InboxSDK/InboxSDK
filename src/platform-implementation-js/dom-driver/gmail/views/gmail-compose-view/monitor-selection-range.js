@@ -6,12 +6,11 @@ module.exports = function(gmailComposeView){
     Bacon.mergeAll(
         Bacon.fromEventTarget(body, 'mouseup'),
         Bacon.fromEventTarget(body, 'keyup'),
-        Bacon.fromEventTarget(body, 'input'),
         gmailComposeView.getEventStream().filter(function(event){
             return event.eventName === 'bodyChanged';
         })
     ).takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
-    .debounceImmediate(10).onValue(function(){
+    .debounceImmediate(10).onValue(function(event){
         if(document.getSelection() && document.getSelection().rangeCount > 0){
             gmailComposeView.setSelectionRange(document.getSelection().getRangeAt(0));
         }
