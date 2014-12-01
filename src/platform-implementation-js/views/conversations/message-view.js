@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
+var BasicClass = require('../../lib/basic-class');
 
 var AttachmentCardView = require('./attachment-card-view');
 

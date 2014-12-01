@@ -30,23 +30,23 @@ _.extend(GmailTabContainerView.prototype, {
         {name: '_descriptorToGmailTabViewMap', destroy: false}
      ],
 
-     addTab: function(tabDescriptor){
-          var gmailTabView = new GmailTabView(tabDescriptor);
-          this._gmailTabViewToDescriptorMap.set(gmailTabView, tabDescriptor);
-          this._descriptorToGmailTabViewMap.set(tabDescriptor, gmailTabView);
+     addTab: function(descriptor){
+          var gmailTabView = new GmailTabView(descriptor);
+          this._gmailTabViewToDescriptorMap.set(gmailTabView, descriptor);
+          this._descriptorToGmailTabViewMap.set(descriptor, gmailTabView);
 
           this._gmailTabViews.push(gmailTabView);
 
-          if(tabDescriptor.onValue){
-               tabDescriptor.onValue(this._addTabToDOM.bind(this, gmailTabView));
+          if(descriptor.onValue){
+               descriptor.onValue(this._addTabToDOM.bind(this, gmailTabView));
           }
           else{
                this._addTabToDOM(gmailTabView);
           }
      },
 
-     remove: function(tabDescriptor){
-          var gmailTabView = this._gmailTabViewToDescriptorMap(tabDescriptor);
+     remove: function(descriptor){
+          var gmailTabView = this._gmailTabViewToDescriptorMap(descriptor);
 
           if(!gmailTabView){
                return;
@@ -58,7 +58,7 @@ _.extend(GmailTabContainerView.prototype, {
           _.remove(this._visibleGmailTabViews, gmailTabView);
 
           this._gmailTabViewToDescriptorMap.delete(gmailTabView);
-          this._descriptorToGmailTabViewMap.delete(tabDescriptor);
+          this._descriptorToGmailTabViewMap.delete(descriptor);
 
           if(this._visibleGmailTabViews.length < 2){
                this._element.style.display = 'none';
@@ -105,10 +105,10 @@ _.extend(GmailTabContainerView.prototype, {
                     .filter(_isTabActivateEvent)
                     .doAction(this, '_activateGmailTab')
                     .map(this._gmailTabViewToDescriptorMap, '.get')
-                    .map(function(tabDescriptor){
+                    .map(function(descriptor){
                          return {
                               eventName: 'tabActivate',
-                              tabDescriptor: tabDescriptor
+                              descriptor: descriptor
                          };
                     })
           );
@@ -121,7 +121,7 @@ _.extend(GmailTabContainerView.prototype, {
                this._activateGmailTab.setInactive();
                this._eventStream.push({
                     eventName: 'tabDeactivate',
-                    tabDescriptor: this._gmailTabViewToDescriptorMap.get(this._activeGmailTabView)
+                    descriptor: this._gmailTabViewToDescriptorMap.get(this._activeGmailTabView)
                });
           }
 

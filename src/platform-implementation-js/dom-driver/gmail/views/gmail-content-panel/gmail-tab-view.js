@@ -11,17 +11,17 @@ var TAB_COLOR_CLASSES = [
 	"aHE-aLe"
 ];
 
-var GmailTabView = function(tabDescriptor){
+var GmailTabView = function(descriptor){
      BasicClass.call(this);
 
      this._setupElement();
      this._eventStream = new Bacon.Bus();
 
-     if(tabDescriptor.onValue){
-          this._unsubscribeFunction = tabDescriptor.onValue(this, '_updateValues');
+     if(descriptor.onValue){
+          this._unsubscribeFunction = descriptor.onValue(this, '_updateValues');
      }
      else{
-          this._updateValues(tabDescriptor);
+          this._updateValues(descriptor);
      }
  };
 
@@ -82,10 +82,10 @@ var GmailTabView = function(tabDescriptor){
            this._bindToDOMEvents();
       },
 
-      _updateValues: function(tabDescriptor){
-          this._updateTitle(tabDescriptor.title);
-          this._updateIconClass(tabDescriptor.iconClass);
-          this._updateIconUrl(tabDescriptor.iconUrl);
+      _updateValues: function(descriptor){
+          this._updateTitle(descriptor.title);
+          this._updateIconClass(descriptor.iconClass);
+          this._updateIconUrl(descriptor.iconUrl);
       },
 
       _updateTitle: function(newTitle){

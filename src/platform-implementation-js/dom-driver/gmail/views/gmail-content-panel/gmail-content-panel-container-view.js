@@ -33,24 +33,24 @@ _.extend(GmailContentPanelContainerView.prototype, {
           {name: '_viewToDescriptorMap', destroy: false}
      ],
 
-     addContentPanel: function(contentPanelDescriptor){
-          var gmailContentPanelView = new GmailContentPanel(contentPanelDescriptor, this);
+     addContentPanel: function(descriptor){
+          var gmailContentPanelView = new GmailContentPanel(descriptor, this);
           this._gmailContentPanelViews.push(gmailContentPanelView);
-          this._descriptorToViewMap.set(contentPanelDescriptor, gmailContentPanelView);
-          this._viewToDescriptorMap.set(gmailContentPanelView, contentPanelDescriptor);
-          this._gmailTabContainerView.addTab(contentPanelDescriptor);
+          this._descriptorToViewMap.set(descriptor, gmailContentPanelView);
+          this._viewToDescriptorMap.set(gmailContentPanelView, descriptor);
+          this._gmailTabContainerView.addTab(descriptor);
 
           return gmailContentPanelView;
      },
 
      remove: function(gmailContentPanelView){
           _.remove(this._gmailContentPanelViews, gmailContentPanelView);
-          var contentPanelDescriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
+          var descriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
 
-          this._gmailTabContainerView.remove(contentPanelDescriptor);
+          this._gmailTabContainerView.remove(descriptor);
 
           this._viewToDescriptorMap.delete(gmailContentPanelView);
-          this._descriptorToViewMap.delete(contentPanelDescriptor);
+          this._descriptorToViewMap.delete(descriptor);
      },
 
      _setupElement: function(){
@@ -74,25 +74,18 @@ _.extend(GmailContentPanelContainerView.prototype, {
           this._gmailTabContainerView
                .getEventStream()
                .filter(_isEventName.bind(null, 'tabActivate'))
-               .map('.tabDescriptor')
+               .map('.descriptor')
                .map(this._descriptorToViewMap, '.get')
-               .onValue(this._activateContentPanel);
+               .doAction('.activate')
+               .map('.getElement')
+               .onValue(this._contentContainer, 'appendChild');
 
           this._gmailTabContainerView
                .getEventStream()
                .filter(_isEventName.bind(null, 'tabDeactivate'))
-               .map('.tabDescriptor')
+               .map('.descriptor')
                .map(this._descriptorToViewMap, '.get')
                .doAction('.deactivate');
-     },
-
-     _addContentPanel: function(contentPanelDescriptor, gmailContentPanelView){
-          this._gmailTabContainerView.addTab(contentPanelDescriptor);
-     },
-
-     _activateContentPanel: function(gmailContentPanelView){
-          this._contentContainer.appendChild(gmailContentPanelView.getElement());
-          gmailContentPanelView.activate();
      }
 
  });

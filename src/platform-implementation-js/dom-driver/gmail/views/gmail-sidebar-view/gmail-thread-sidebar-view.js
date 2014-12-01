@@ -2,8 +2,8 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 
 var ThreadSidebarViewDriver = require('../../../../driver-interfaces/thread-sidebar-view-driver');
-var GmailContentPanelView = require('./gmail-content-panel-view');
 
+var GmailContentPanelContainerView = require('../gmail-content-panel/gmail-content-panel-container-view');
 
 
  var GmailThreadSidebarView = function(element, thread){
@@ -29,7 +29,7 @@ var GmailContentPanelView = require('./gmail-content-panel-view');
           {name: '_gmailSidebarTabView', destroy: true}
      ],
 
-     addContentPanel: function(options){
+     addContentPanel: function(contentPanelDescriptor){
           var gmailSidebarContentPanelView = new GmailContentPanelView(options, this);
 
           this._gmailSidebarContentPanelViews.push(gmailContentPanelView);
