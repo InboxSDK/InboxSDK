@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
 var ThreadViewDriver = function(element){
@@ -6,5 +7,10 @@ var ThreadViewDriver = function(element){
 
 ThreadViewDriver.prototype = BasicClass.prototype;
 
+_.extend(ThreadViewDriver.prototype, {
+
+	addSidebarContentPanel: function(descriptor){}
+
+});
 
 module.exports = ThreadViewDriver;

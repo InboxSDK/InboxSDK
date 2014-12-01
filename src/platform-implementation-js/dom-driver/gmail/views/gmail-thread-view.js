@@ -8,13 +8,15 @@ var ThreadViewDriver = require('../../../driver-interfaces/thread-view-driver');
 var GmailMessageView = require('./gmail-message-view');
 var GmailToolbarView = require('./gmail-toolbar-view');
 
+var GmailContentPanelContainerView = require('../widgets/gmail-content-panel/gmail-content-panel-container-view');
+
 var GmailThreadView = function(element, fullscreeViewDriver){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
 	this._fullscreenViewDriver = fullscreeViewDriver;
 
-	this._eventStreamBus = new Bacon.Bus();
+	this._eventStream = new Bacon.Bus();
 
 	this._setupToolbarView();
 	this._setupMessageViewStream();
@@ -27,14 +29,27 @@ _.extend(GmailThreadView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_fullscreenViewDriver', destroy: false, get: true},
+		{name: '_sidebarContentPanelContainerView', destroy: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: false},
-		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
 	],
 
-	getEventStream: function(){
-		return this._eventStreamBus;
+	addSidebarContentPanel: function(descriptor, appId){
+		if(!this._sidebarContentPanelContainerView){
+			var sidebarElement = GmailElementGetter.getSidebarContainerElement();
+
+			if(!sidebarElement){
+				console.warn('This view does not have a sidebar');
+				return;
+			}
+			else{
+				this._setupSidebarView(sidebarElement);
+			}
+		}
+
+		return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
 	},
 
 	_setupToolbarView: function(){
@@ -42,6 +57,12 @@ _.extend(GmailThreadView.prototype, {
 
 		this._toolbarView = new GmailToolbarView(toolbarElement);
 		this._toolbarView.setThreadViewDriver(this);
+	},
+
+	_setupSidebarView: function(sidebarElement){
+		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView();
+		sidebarElement.classList.add('inboxsdk__sidebar');
+		sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
 	},
 
 	_findToolbarElement: function(){
@@ -110,7 +131,7 @@ _.extend(GmailThreadView.prototype, {
 	_createMessageView: function(messageElement) {
 		var messageView = new GmailMessageView(messageElement);
 
-		this._eventStreamBus.plug(messageView.getEventStream());
+		this._eventStream.plug(messageView.getEventStream());
 
 		this._messageViews.push(messageView);
 	}

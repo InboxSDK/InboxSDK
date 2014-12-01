@@ -39,8 +39,15 @@ _.extend(GmailContentPanelView.prototype, {
      },
 
      remove: function(){
-          this._gmailContentPanelContainerView.remove(this);
           this.destroy();
+     },
+
+     destroy: function(){
+          if(this._gmailContentPanelContainerView){
+               this._gmailContentPanelContainerView.remove(this);
+          }
+          
+          ContentPanelViewDriver.prototype.destroy.call(this);
      }
 
 });

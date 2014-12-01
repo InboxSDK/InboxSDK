@@ -53,7 +53,7 @@ _.extend(Conversations.prototype, {
 	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, handlerRegistry){
 		var self = this;
 		return this._driver[driverStreamGetFunction]().onValue(function(viewDriver){
-			var view = new viewClass(viewDriver);
+			var view = new viewClass(viewDriver, self._appId);
 			handlerRegistry.addTarget(view);
 		});
 	}

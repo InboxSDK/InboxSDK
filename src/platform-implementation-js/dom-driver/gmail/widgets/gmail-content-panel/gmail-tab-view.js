@@ -14,8 +14,9 @@ var TAB_COLOR_CLASSES = [
 var GmailTabView = function(descriptor){
      BasicClass.call(this);
 
-     this._setupElement();
      this._eventStream = new Bacon.Bus();
+
+     this._setupElement();
 
      if(descriptor.onValue){
           this._unsubscribeFunction = descriptor.onValue(this, '_updateValues');
@@ -32,7 +33,7 @@ var GmailTabView = function(descriptor){
      __memberVariables: [
           {name: '_element', destroy: true, get: true},
 		{name: '_innerElement', destroy: false},
-          {name: '_eventStream', destroy: true, destroyFunction: 'end'},
+          {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
           {name: '_titleElement', destroy: false},
           {name: '_iconElement', destroy: false},
           {name: '_iconImgElement', destroy: false},
@@ -122,7 +123,7 @@ var GmailTabView = function(descriptor){
            }
            else{
                 if(!this._iconImgElement){
-                     this._iconImgElement = doucment.createElement('img');
+                     this._iconImgElement = document.createElement('img');
                      this._iconElement.appendChild(this._iconImgElement);
                 }
 

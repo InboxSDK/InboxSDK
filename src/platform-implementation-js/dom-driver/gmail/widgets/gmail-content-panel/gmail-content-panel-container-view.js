@@ -33,8 +33,8 @@ _.extend(GmailContentPanelContainerView.prototype, {
           {name: '_viewToDescriptorMap', destroy: false}
      ],
 
-     addContentPanel: function(descriptor){
-          var gmailContentPanelView = new GmailContentPanel(descriptor, this);
+     addContentPanel: function(descriptor, appId){
+          var gmailContentPanelView = new GmailContentPanelView(descriptor, this, appId);
           this._gmailContentPanelViews.push(gmailContentPanelView);
           this._descriptorToViewMap.set(descriptor, gmailContentPanelView);
           this._viewToDescriptorMap.set(gmailContentPanelView, descriptor);
@@ -75,8 +75,8 @@ _.extend(GmailContentPanelContainerView.prototype, {
                .getEventStream()
                .filter(_isEventName.bind(null, 'tabActivate'))
                .map('.descriptor')
-               .map(this._descriptorToViewMap, '.get')
-               .doAction('.activate')
+               .map(this._descriptorToViewMap, 'get')
+               .doAction('activate')
                .map('.getElement')
                .onValue(this._contentContainer, 'appendChild');
 
@@ -84,8 +84,8 @@ _.extend(GmailContentPanelContainerView.prototype, {
                .getEventStream()
                .filter(_isEventName.bind(null, 'tabDeactivate'))
                .map('.descriptor')
-               .map(this._descriptorToViewMap, '.get')
-               .doAction('.deactivate');
+               .map(this._descriptorToViewMap, 'get')
+               .onValue('.deactivate');
      }
 
  });
@@ -93,3 +93,6 @@ _.extend(GmailContentPanelContainerView.prototype, {
 function _isEventName(checkEventName, event){
      return event && event.eventName === checkEventName;
 }
+
+
+module.exports = GmailContentPanelContainerView;
