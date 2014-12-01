@@ -3,23 +3,30 @@ var Bacon = require('baconjs');
 
 var ContentPanelViewDriver = require('../../../../driver-interfaces/content-panel-view-driver');
 
-var GmailContentPanelView = function(options, gmailSidebarContainerView){
-     SidebarContentPanelViewDriver.call(this);
+var GmailContentPanelView = function(contentPanelDescriptor, gmailContentPanelContainerView){
+     ContentPanelViewDriver.call(this);
 
      this._eventStream = new Bacon.Bus();
      this._element = document.createElement('div');
-     this._element.appendChild(options.el);
-     this._gmailSidebarContainerView = gmailSidebarContainerView;
+
+     this._gmailContentPanelContainerView = gmailContentPanelContainerView;
+
+     if(contentPanelDescriptor.onValue){
+          contentPanelDescriptor.map('.el').onValue(this._element, 'appendChild');
+     }
+     else{
+          this._element.appendChild(contentPanelDescriptor.el);
+     }
 };
 
-GmailContentPanelView.prototype = Object.create(SidebarContentPanelViewDriver.prototype);
+GmailContentPanelView.prototype = Object.create(ContentPanelViewDriver.prototype);
 
 _.extend(GmailContentPanelView.prototype, {
 
      __memberVariables: [
           {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
           {name: '_element', destroy: true, get: true},
-          {name: '_gmailSidebarContainerView', destroy: false}
+          {name: '_gmailContentPanelContainerView', destroy: false}
      ],
 
      activate: function(){
@@ -28,11 +35,15 @@ _.extend(GmailContentPanelView.prototype, {
 
      deactivate: function(){
           this._eventStream.push({eventName: 'deactivate'});
+          this._element.remove();
      },
 
      remove: function(){
-          this._gmailSidebarContainerView.remove(this);
+          this._gmailContentPanelContainerView.remove(this);
           this.destroy();
      }
 
 });
+
+
+module.exports = GmailContentPanelView;

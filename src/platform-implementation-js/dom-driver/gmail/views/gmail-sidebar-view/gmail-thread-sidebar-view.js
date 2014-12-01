@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
 
 var ThreadSidebarViewDriver = require('../../../../driver-interfaces/thread-sidebar-view-driver');
 var GmailContentPanelView = require('./gmail-content-panel-view');
@@ -12,8 +13,7 @@ var GmailContentPanelView = require('./gmail-content-panel-view');
      this._thread = thread;
 
 
-
-     this._eventStreamBus = new Bacon.Bus();
+     this._eventStream = new Bacon.Bus();
 };
 
  GmailThreadSidebarView.prototype = Object.create(ThreadSidebarViewDriver.prototype);
@@ -23,7 +23,7 @@ var GmailContentPanelView = require('./gmail-content-panel-view');
      __memberVariables: [
           {name: '_element', destroy: false, get: true},
           {name: '_thread', destroy: false, get: true},
-          {name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
+          {name: '_eventStream', destroy: true, destroyFunction: 'end'},
           {name: '_gmailSidebarContentPanelViews', destroy: true, defaultValue: []},
           {name: '_activeContentPanel', destroy: false, defaultValue: null},
           {name: '_gmailSidebarTabView', destroy: true}

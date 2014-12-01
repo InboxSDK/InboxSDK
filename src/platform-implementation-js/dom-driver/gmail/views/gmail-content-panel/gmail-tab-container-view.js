@@ -23,28 +23,54 @@ _.extend(GmailTabContainerView.prototype, {
      __memberVariables: [
         {name: '_element', destroy: true, get: true},
         {name: '_eventStream', destroy: true, destroyFunction: 'end'},
+        {name: '_activeGmailTabView', destroy: false},
         {name: '_gmailTabViews', destroy: true, defaultValue: []},
+        {name: '_visibleGmailTabViews', destroy: false, defaultValue: []},
         {name: '_gmailTabViewToDescriptorMap', destroy: false},
         {name: '_descriptorToGmailTabViewMap', destroy: false}
      ],
 
      addTab: function(tabDescriptor){
+          var gmailTabView = new GmailTabView(tabDescriptor);
+          this._gmailTabViewToDescriptorMap.set(gmailTabView, tabDescriptor);
+          this._descriptorToGmailTabViewMap.set(tabDescriptor, gmailTabView);
 
+          this._gmailTabViews.push(gmailTabView);
+
+          if(tabDescriptor.onValue){
+               tabDescriptor.onValue(this._addTabToDOM.bind(this, gmailTabView));
+          }
+          else{
+               this._addTabToDOM(gmailTabView);
+          }
      },
 
-     removeTab: function(tabDescriptor){
+     remove: function(tabDescriptor){
           var gmailTabView = this._gmailTabViewToDescriptorMap(tabDescriptor);
 
           if(!gmailTabView){
                return;
           }
 
-          _.remove(this._gmailTabViews, gmailTabView);
-          gmailTabView.destroy();
+          var index = this._visibleGmailTabViews.indexOf(gmailTabView);
 
-          if(this._gmailTabViews.length === 0){
+          _.remove(this._gmailTabViews, gmailTabView);
+          _.remove(this._visibleGmailTabViews, gmailTabView);
+
+          this._gmailTabViewToDescriptorMap.delete(gmailTabView);
+          this._descriptorToGmailTabViewMap.delete(tabDescriptor);
+
+          if(this._visibleGmailTabViews.length < 2){
                this._element.style.display = 'none';
           }
+          else if(index > -1){
+               this._resetColorIndexes();
+               if(this._activeGmailTabView === gmailTabView){
+                    this._activateGmailTab(this._visibleGmailTabViews[index]);
+               }
+          }
+
+          gmailTabView.destroy();
      },
 
      _setupElement: function(){
@@ -56,9 +82,58 @@ _.extend(GmailTabContainerView.prototype, {
                     '</tr>',
                '</tbody>'
           ].join('');
+
+          this._element.style.display = 'none';
+     },
+
+     _addTabToDOM: function(gmailTabView){
+          this._element.querySelector('[role=tablist]').appendChild(gmailTabView.getElement());
+          this._visibleGmailTabViews.push(gmailTabView);
+
+          if(this._visibleGmailTabViews.length > 2){
+               this._element.style.display = '';
+               this._resetColorIndexes();
+          }
+
+          if(this._visibleGmailTabViews.length === 1){
+               this._activateGmailTab(gmailTabView);
+          }
+
+          this._eventStream.plug(
+               gmailTabView
+                    .getEventStream()
+                    .filter(_isTabActivateEvent)
+                    .doAction(this, '_activateGmailTab')
+                    .map(this._gmailTabViewToDescriptorMap, '.get')
+                    .map(function(tabDescriptor){
+                         return {
+                              eventName: 'tabActivate',
+                              tabDescriptor: tabDescriptor
+                         };
+                    })
+          );
+
+     },
+
+
+     _activateGmailTab: function(gmailTabView){
+          if(this._activeGmailTabView){
+               this._activateGmailTab.setInactive();
+               this._eventStream.push({
+                    eventName: 'tabDeactivate',
+                    tabDescriptor: this._gmailTabViewToDescriptorMap.get(this._activeGmailTabView)
+               });
+          }
+
+          this._activeGmailTabView = gmailTabView;
+          this._activeGmailTabView.setActive();
      }
 
 });
+
+function _isTabActivateEvent(event){
+     return event && event.eventName === 'tabActivate';
+}
 
 
 module.exorts = GmailTabContainerView;

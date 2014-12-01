@@ -11,7 +11,7 @@ var TAB_COLOR_CLASSES = [
 	"aHE-aLe"
 ];
 
-var GmailTabView = function(tabDescriptor, colorIndex){
+var GmailTabView = function(tabDescriptor){
      BasicClass.call(this);
 
      this._setupElement();
@@ -31,6 +31,7 @@ var GmailTabView = function(tabDescriptor, colorIndex){
 
      __memberVariables: [
           {name: '_element', destroy: true, get: true},
+		{name: '_innerElement', destroy: false},
           {name: '_eventStream', destroy: true, destroyFunction: 'end'},
           {name: '_titleElement', destroy: false},
           {name: '_iconElement', destroy: false},
@@ -38,8 +39,21 @@ var GmailTabView = function(tabDescriptor, colorIndex){
           {name: '_title', destroy: false},
           {name: '_iconClass', destroy: false},
           {name: '_iconUrl', destroy: false},
+          {name: '_isActive', destroy: false, defaultValue: false},
           {name: '_unsubscribeFunction', destroy: true}
       ],
+
+      setColorIndex: function(colorIndex){
+          this._innerElement.setAttribute('class', 'aAy ' + TAB_COLOR_CLASSES[colorIndex % TAB_COLOR_CLASSES.length] + ' ' + (this._isActive ? 'J-KU-KO' : ''));
+      },
+
+      setInactive: function(){
+           this._innerElement.classList.remove('J-KU-KO');
+      },
+
+      setActive: function(){
+          this._innerElement.classList.add('J-KU-KO');
+      },
 
       _setupElement: function(){
            this._element = document.createElement('td');
@@ -61,6 +75,7 @@ var GmailTabView = function(tabDescriptor, colorIndex){
                 '</div>'
            ].join('');
 
+		 this._innerElement = this._element.querySelector('[role=tab]');
            this._titleElement = this._element.querySelector('.inboxsdk__tab_title');
            this._iconElement = this._element.querySelector('.inboxsdk__tab_icon');
 
@@ -118,6 +133,23 @@ var GmailTabView = function(tabDescriptor, colorIndex){
       },
 
       _bindToDOMEvents: function(){
+           var self = this;
+
+           Bacon.fromEventTarget(this._element, 'mouseenter')
+                .onValue(function(){
+                     self._innerElement.classList.add('J-KU-Je');
+                     self._innerElement.classList.add('J-KU-JW');
+                });
+
+          Bacon.fromEventTarget(this._element, 'mouseleave')
+               .onValue(function(){
+                    self._innerElement.classList.remove('J-KU-Je');
+                    self._innerElement.classList.remove('J-KU-JW');
+               });
+
+          this._eventStream.plug(
+               Bacon.fromEventTarget(this._element, 'click').map({eventName: 'tabActivate', view: this})
+          );
 
       }
 
