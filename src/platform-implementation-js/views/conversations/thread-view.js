@@ -27,7 +27,11 @@ _.extend(ThreadView.prototype, {
 	*/
 	addSidebarContentPanel: function(descriptor){
 		var contentPanelImplementation = this._threadViewImplementation.addSidebarContentPanel(descriptor, this._appId);
-		return new ContentPanelView(contentPanelImplementation);
+		if(contentPanelImplementation){
+			return new ContentPanelView(contentPanelImplementation);
+		}
+
+		return null;
 	},
 
 	enableSelectionMode: function(){},

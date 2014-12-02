@@ -96,7 +96,7 @@ var GmailElementGetter = {
 	},
 
 	getSidebarContainerElement: function(){
-		return document.querySelector('[role=main] .g.id table.Bs > tr .y3');
+		return document.querySelector('[role=main] table.Bs > tr .y3');
 	},
 
 	getComposeButton: function(){

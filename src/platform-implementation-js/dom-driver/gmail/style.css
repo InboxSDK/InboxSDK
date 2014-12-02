@@ -285,7 +285,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   top: 4px;
 }
 
-.inboxsdk__sidebar .adC[role=complementary] {
+.inboxsdk__sidebar [role=complementary] {
   position: static !important;
 }
 

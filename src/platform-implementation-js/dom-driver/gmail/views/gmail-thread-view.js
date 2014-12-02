@@ -85,6 +85,10 @@ _.extend(GmailThreadView.prototype, {
 			return true;
 		}
 
+		if(toolbarContainerElement.parentElement.getAttribute('role') === 'main' && toolbarContainerElement.parentElement.querySelector('.if') && toolbarContainerElement.parentElement.querySelector('.if').parentElement === this._element){
+			return true;
+		}
+
 		return false;
 	},
 
