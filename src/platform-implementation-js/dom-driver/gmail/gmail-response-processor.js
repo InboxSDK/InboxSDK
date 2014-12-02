@@ -12,7 +12,6 @@ function interpretSentEmailResponse(responseString) {
   var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
   var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
   return {
-    // emailMessageId: extractHexGmailThreadIdFromMessageIdSearch(emailSentArray),
     gmailThreadId: gmailThreadId,
     gmailMessageId: gmailMessageId
   };
@@ -54,7 +53,9 @@ function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
 
   var threadResponseArray = this.deserialize(responseString);
   var threadIdArrayMarker = "cs";
-  var threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, _isValidEncodedThreadIdMarkerArray);
+  var threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, function(markerArray){
+    return markerArray.length > 20;
+  });
 
   if(!threadIdArray){
     return;
@@ -187,8 +188,6 @@ function serialize(threadResponseArray, dontIncludeNumbers) {
 exports.serialize = serialize;
 
 function serializeArray(array) {
-  var isThread = _isThreadArray(array);
-
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
@@ -277,10 +276,9 @@ function _extractThreadArraysFromResponseArray(threadResponseArray){
   var threads = [];
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arrayElement = threadResponseArray[ii];
-    if(_isThreadArray(arrayElement)){
+    if(_isThreadArray(arrayElement)) {
       threads.push(arrayElement);
-    }
-    else if(_.isArray(arrayElement)){
+    } else if(_.isArray(arrayElement)) {
       var newThreadArray = _extractThreadArraysFromResponseArray(arrayElement);
       if(newThreadArray) {
         threads = threads.concat(newThreadArray);
@@ -294,7 +292,10 @@ function _extractThreadArraysFromResponseArray(threadResponseArray){
 }
 
 function _isThreadArray(array){
-  return _.isArray(array) && array.length >= 30 && _.isString(array[0]) && array[0].length === 16 && _.isString(array[1]) && array[1].length === 16 && _.isString(array[2]) && array[2].length === 16;
+  return _.isArray(array) && array.length >= 30 &&
+    _.isString(array[0]) && array[0].length === 16 &&
+    _.isString(array[1]) && array[1].length === 16 &&
+    _.isString(array[2]) && array[2].length === 16;
 }
 
 function _doesResponseUseFormatWithSectionNumbers(responseString){
@@ -344,10 +345,6 @@ function _searchObject(element, query, maxDepth) {
     }
   }
   return retVal;
-}
-
-function _isValidEncodedThreadIdMarkerArray(markerArray){
-  return markerArray.length > 20;
 }
 
 function _getArrayValueFromPath(responseArray, path){
