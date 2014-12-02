@@ -49,10 +49,13 @@ var GmailTabView = function(descriptor){
       },
 
       setInactive: function(){
-           this._innerElement.classList.remove('J-KU-KO');
+		this._element.classList.remove('inboxsdk__tab_selected');
+          this._innerElement.classList.remove('J-KU-KO');
+
       },
 
       setActive: function(){
+		this._element.classList.add('inboxsdk__tab_selected');
           this._innerElement.classList.add('J-KU-KO');
       },
 

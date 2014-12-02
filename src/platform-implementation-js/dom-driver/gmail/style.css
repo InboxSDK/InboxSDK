@@ -264,20 +264,28 @@ div.T-I.inboxsdk__button {
 
 /* tabs */
 
+.inboxsdk__tab {
+  width: 30px;
+}
+
+.inboxsdk__tab.inboxsdk__tab_selected {
+  width: auto;
+}
+
 table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   height: 28px;
 }
 
   .aKp.inboxsdk__tab_icon {
     background-image: none;
-    width: 35px;
+    width: 30px;
     height: 25px;
   }
 
     .inboxsdk__tab_icon img {
       height: 16px;
       width: 16px;
-      margin-left: 10px;
+      margin-left: 5px;
       margin-top: 3px;
     }
 
