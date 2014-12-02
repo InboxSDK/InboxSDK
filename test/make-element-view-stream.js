@@ -1,5 +1,6 @@
 var assert = require('assert');
 var RSVP = require('./lib/rsvp');
+var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Symbol = require('./lib/symbol');
 
@@ -19,22 +20,29 @@ describe('makeElementViewStream', function() {
     return new RSVP.Promise(function(resolve, reject) {
       var child1 = Symbol('child1'), child2 = Symbol('child2'), child3 = Symbol('child3');
 
+      var stopper = new Bacon.Bus();
+      var activeViewCount = 0;
+
       var target = new EventEmitter();
       target._emitsMutations = true;
       target.children = [child1, child2];
 
       var call = 0;
       makeElementViewStream({
-        elementStream: makeElementChildStream(target),
+        elementStream: makeElementChildStream(target).takeUntil(stopper),
         viewFn: function(el) {
+          activeViewCount++;
           return {
             el: el,
             destroy: function() {
+              activeViewCount--;
               if (el === child2) {
                 target.emit('mutation', {
                   addedNodes: [child3],
                   removedNodes: []
                 });
+              } else if (activeViewCount === 0) {
+                resolve();
               }
             }
           };
@@ -49,7 +57,7 @@ describe('makeElementViewStream', function() {
             break;
           case 3:
             assert.strictEqual(view.el, child3);
-            resolve();
+            stopper.push('beep');
             break;
           default:
             throw new Error("should not happen");
