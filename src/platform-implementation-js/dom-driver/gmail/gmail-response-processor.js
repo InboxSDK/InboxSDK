@@ -303,14 +303,10 @@ function _doesResponseUseFormatWithSectionNumbers(responseString){
 }
 
 function _searchArray(responseArray, marker, markerArrayValidator){
-  var pathArray = _searchObject(responseArray, marker, 100, false, true);
+  var pathArray = _searchObject(responseArray, marker, 100);
 
-  if(!pathArray){
-    return;
-  }
-
-  for(var ii=0; pathArray.length; ii++){
-    var pathToMarkerArray = _extractPathToMarkerArray(pathArray[ii]);
+  for(var ii=0; ii<pathArray.length; ii++){
+    var pathToMarkerArray = _.initial(pathArray[ii].path);
     var markerArray = _getArrayValueFromPath(responseArray, pathToMarkerArray);
 
     if(markerArrayValidator(markerArray)){
@@ -319,66 +315,35 @@ function _searchArray(responseArray, marker, markerArrayValidator){
   }
 }
 
-function _searchObject(element, query, maxDepth, caseInsensitive, exactMatch) {
+function _searchObject(element, query, maxDepth) {
   var retVal = [];
   var initialNode = {
     el: element,
-    path: "",
-    depth: 0
+    path: []
   };
   var nodeList = [initialNode];
 
-  if (caseInsensitive) {
-    query = query.toLowerCase();
-  }
   while (nodeList.length > 0) {
     var node = nodeList.pop();
-    if (node.depth <= maxDepth) {
-      try {
-        if(node.el !== null && typeof node.el === 'object'){
-          var keys = Object.keys(node.el);
-          if (keys.length > 0) {
-            for (var i = 0; i < keys.length; i++) {
-              var key = keys[i];
-              var newNode = {
-                el: node.el[key],
-                path: (node.path + "/" + key),
-                depth: (node.depth + 1)
-              };
-              nodeList.push(newNode);
-            }
-          }
-        } else if(node.el !== null){
-          var toFind = node.el + "";
-          if (caseInsensitive) {
-            toFind = toFind.toLowerCase();
-          }
-
-          if (exactMatch) {
-            if (toFind === query) {
-              retVal.push(node);
-            }
-          } else {
-            if (toFind.indexOf(query) > -1) {
-              retVal.push(node);
-            }
-          }
+    if (node.path.length <= maxDepth) {
+      if(node.el !== null && typeof node.el === 'object'){
+        var keys = Object.keys(node.el);
+        for (var i = 0; i < keys.length; i++) {
+          var key = keys[i];
+          var newNode = {
+            el: node.el[key],
+            path: node.path.concat([key])
+          };
+          nodeList.push(newNode);
         }
-      } catch (err) {
-
+      } else {
+        if (node.el === query) {
+          retVal.push(node);
+        }
       }
     }
   }
   return retVal;
-}
-
-function _extractPathToMarkerArray(pathObject){
-  var pathToA = _.rest(pathObject.path.split('/'));
-  return _.initial(pathToA);
-}
-
-function _isValidMessageIdMarkerArray(markerArray){
-
 }
 
 function _isValidEncodedThreadIdMarkerArray(markerArray){
@@ -388,9 +353,7 @@ function _isValidEncodedThreadIdMarkerArray(markerArray){
 function _getArrayValueFromPath(responseArray, path){
   var currentArray = responseArray;
   for(var ii=0; ii<path.length; ii++){
-    var currentIndex = path[ii];
-    currentArray = currentArray[currentIndex];
+    currentArray = currentArray[ path[ii] ];
   }
-
   return currentArray;
 }
