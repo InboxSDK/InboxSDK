@@ -150,7 +150,9 @@ _.extend(GmailMessageView.prototype, {
 
 		setTimeout(
 			function(){
-				self._checkMessageOpenState(self._element.classList);
+				if (self._element) {
+					self._checkMessageOpenState(self._element.classList);
+				}
 			},
 			1
 		);
