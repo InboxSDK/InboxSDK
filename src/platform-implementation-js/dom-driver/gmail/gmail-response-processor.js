@@ -6,11 +6,24 @@ function extractThreads(crapFormatThreadString) {
 }
 exports.extractThreads = extractThreads;
 
-function extractMessageIdFromSentEmail(responseString) {
+function interpretSentEmailResponse(responseString) {
   var emailSentArray = this.deserialize(responseString);
 
+  var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
+  var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
+  return {
+    // emailMessageId: extractHexGmailThreadIdFromMessageIdSearch(emailSentArray),
+    gmailThreadId: gmailThreadId,
+    gmailMessageId: gmailMessageId
+  };
+}
+exports.interpretSentEmailResponse = interpretSentEmailResponse;
+
+function extractGmailMessageIdFromSentEmail(emailSentArray) {
   var messageIdArrayMarker = "a";
-  var messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, _isValidMessageIdMarkerArray);
+  var messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, function(markerArray) {
+    return markerArray.length > 3 && _.isArray(markerArray[3]) && markerArray[3].length > 0;
+  });
 
   if(!messageIdArray){
     return null;
@@ -18,7 +31,21 @@ function extractMessageIdFromSentEmail(responseString) {
 
   return messageIdArray[3][0];
 }
-exports.extractMessageIdFromSentEmail = extractMessageIdFromSentEmail;
+exports.extractGmailMessageIdFromSentEmail = extractGmailMessageIdFromSentEmail;
+
+function extractGmailThreadIdFromSentEmail(emailSentArray) {
+  var threadIdArrayMarker = "csd";
+  var threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
+    return markerArray.length == 3 && _.isArray(markerArray[2]) && markerArray[2].length > 5;
+  });
+
+  if(!threadIdArray){
+    return null;
+  }
+
+  return threadIdArray[1];
+}
+exports.extractGmailThreadIdFromSentEmail = extractGmailThreadIdFromSentEmail;
 
 function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
   if(!responseString){
@@ -351,7 +378,7 @@ function _extractPathToMarkerArray(pathObject){
 }
 
 function _isValidMessageIdMarkerArray(markerArray){
-  return markerArray.length > 3 && _.isArray(markerArray[3]) && markerArray[3].length > 0;
+
 }
 
 function _isValidEncodedThreadIdMarkerArray(markerArray){
