@@ -76,7 +76,7 @@ _.extend(GmailContentPanelContainerView.prototype, {
                .filter(_isEventName.bind(null, 'tabActivate'))
                .map('.descriptor')
                .map(this._descriptorToViewMap, 'get')
-               .doAction('activate')
+               .doAction('.activate')
                .map('.getElement')
                .onValue(this._contentContainer, 'appendChild');
 

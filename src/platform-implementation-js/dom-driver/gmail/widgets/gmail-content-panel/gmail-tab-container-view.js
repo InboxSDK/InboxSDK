@@ -38,7 +38,7 @@ _.extend(GmailTabContainerView.prototype, {
           this._gmailTabViews.push(gmailTabView);
 
           if(descriptor.onValue){
-               descriptor.onValue(this._addTab.bind(this, gmailTabView));
+               descriptor.take(1).onValue(this._addTab.bind(this, gmailTabView));
           }
           else{
                this._addTab(gmailTabView, descriptor);
@@ -128,6 +128,7 @@ _.extend(GmailTabContainerView.prototype, {
                     .getEventStream()
                     .filter(_isEventName.bind(null, 'tabActivate'))
                     .map('.view')
+                    .filter(this, '_isNotActiveView')
                     .doAction(this, '_activateGmailTab')
                     .map(this._gmailTabViewToDescriptorMap, 'get')
                     .map(function(descriptor){
@@ -137,6 +138,10 @@ _.extend(GmailTabContainerView.prototype, {
                          };
                     })
           );
+     },
+
+     _isNotActiveView: function(gmailTabView){
+          return this._activeGmailTabView !== gmailTabView;
      },
 
 
