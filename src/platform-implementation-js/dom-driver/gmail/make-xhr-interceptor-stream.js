@@ -42,15 +42,6 @@ function makeXhrInterceptStream() {
         draft: body.draft,
         response: response
       };
-    }),
-    interceptStream.filter(function(detail) {
-      return detail.type === 'emailDiscarded';
-    }).map(function(detail) {
-      var body = deparam(detail.body);
-      return {
-        type: 'emailDiscarded',
-        id: body.m
-      };
     })
   );
 }
