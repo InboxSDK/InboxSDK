@@ -11,8 +11,11 @@ var TAB_COLOR_CLASSES = [
 	"aHE-aLe"
 ];
 
-var GmailTabView = function(descriptor){
+var GmailTabView = function(descriptor, appId){
      BasicClass.call(this);
+
+     this._descriptor = descriptor;
+     this._appId = appId;
 
      this._eventStream = new Bacon.Bus();
 
@@ -31,6 +34,8 @@ var GmailTabView = function(descriptor){
  _.extend(GmailTabView.prototype, {
 
      __memberVariables: [
+          {name: '_descriptor', destroy: false, get: true},
+          {name: '_appId', destroy: false, get: true},
           {name: '_element', destroy: true, get: true},
 		{name: '_innerElement', destroy: false},
           {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -51,13 +56,14 @@ var GmailTabView = function(descriptor){
       setInactive: function(){
 		this._element.classList.remove('inboxsdk__tab_selected');
           this._innerElement.classList.remove('J-KU-KO');
-
+		this._isActive = false;
       },
 
       setActive: function(){
 		this._element.classList.add('inboxsdk__tab_selected');
           this._innerElement.classList.add('J-KU-KO');
-      },
+		this._isActive = true;
+      },      
 
       _setupElement: function(){
            this._element = document.createElement('td');

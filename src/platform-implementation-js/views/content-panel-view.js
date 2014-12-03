@@ -17,10 +17,8 @@ _.extend(ContentPanelView.prototype, {
     },
 
     _bindToStreamEvents: function(){
-        var self = this;
-        this._contentPanelViewImplementation.getEventStream().onValue(function(event){
-            self.emit(event.eventName);
-        });
+        this._contentPanelViewImplementation.getEventStream().map('.eventName').onValue(this, 'emit');
+        this._contentPanelViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
     }
 
 });

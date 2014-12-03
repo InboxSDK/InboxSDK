@@ -65,16 +65,17 @@ _.extend(BasicClass.prototype, {
 		}
 
 		if (_.isArray(value)) {
-			for (var c = 0; c < value.length; c++) {
-				if(!value[c]){
+			var valueClone = _.clone(value);
+			for (var c = 0; c < valueClone.length; c++) {
+				if(!valueClone[c]){
 					continue;
 				}
 
-				if (value[c].destroy) {
-					value[c].destroy();
+				if (valueClone[c].destroy) {
+					valueClone[c].destroy();
 				}
-				else if(value[c].remove){
-					value[c].remove();
+				else if(valueClone[c].remove){
+					valueClone[c].remove();
 				}
 			}
 			value.length = 0;

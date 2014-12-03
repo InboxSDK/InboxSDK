@@ -2,6 +2,8 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var Map = require('es6-unweak-collections').Map;
 
+var multiCompareSort = require('../../../../lib/multi-compare-sort');
+
 var BasicClass = require('../../../../lib/basic-class');
 
 var GmailTabView = require('./gmail-tab-view');
@@ -26,13 +28,12 @@ _.extend(GmailTabContainerView.prototype, {
         {name: '_activeGmailTabView', destroy: false},
         {name: '_gmailTabViews', destroy: true, defaultValue: []},
         {name: '_visibleGmailTabViews', destroy: false, defaultValue: []},
-        {name: '_gmailTabViewToDescriptorMap', destroy: false},
         {name: '_descriptorToGmailTabViewMap', destroy: false}
      ],
 
-     addTab: function(descriptor){
-          var gmailTabView = new GmailTabView(descriptor);
-          this._gmailTabViewToDescriptorMap.set(gmailTabView, descriptor);
+     addTab: function(descriptor, appId){
+          var gmailTabView = new GmailTabView(descriptor, appId);
+
           this._descriptorToGmailTabViewMap.set(descriptor, gmailTabView);
 
           this._gmailTabViews.push(gmailTabView);
@@ -41,12 +42,12 @@ _.extend(GmailTabContainerView.prototype, {
                descriptor.take(1).onValue(this._addTab.bind(this, gmailTabView));
           }
           else{
-               this._addTab(gmailTabView, descriptor);
+               this._addTab(gmailTabView);
           }
      },
 
      remove: function(descriptor){
-          if(!this._gmailTabViewToDescriptorMap){
+          if(!this._descriptorToGmailTabViewMap){
                return;
           }
 
@@ -61,15 +62,8 @@ _.extend(GmailTabContainerView.prototype, {
           _.remove(this._gmailTabViews, gmailTabView);
           _.remove(this._visibleGmailTabViews, gmailTabView);
 
-          this._gmailTabViewToDescriptorMap.delete(gmailTabView);
-          this._descriptorToGmailTabViewMap.delete(descriptor);
-
-          if(this._visibleGmailTabViews.length < 2){
-               this._element.style.display = 'none';
-          }
-          else{
-               this._resetColorIndexes();
-          }
+          this._descriptorToGmailTabViewMap.delete(gmailTabView.getDescriptor());
+          this._resetColorIndexes();
 
           if(index > -1){
                if(this._activeGmailTabView === gmailTabView){
@@ -77,7 +71,7 @@ _.extend(GmailTabContainerView.prototype, {
 
                     this._eventStream.push({
                          eventName: 'tabActivate',
-                         descriptor: this._gmailTabViewToDescriptorMap.get(this._activeGmailTabView)
+                         descriptor: this._activeGmailTabView.getDescriptor()
                     });
                }
           }
@@ -93,33 +87,51 @@ _.extend(GmailTabContainerView.prototype, {
                     '<tr class="aAA J-KU-Jg J-KU-Jg-K9 inboxsdk__contentTabContainer" role="tablist" tabindex="0">',
                     '</tr>',
                '</tbody>'
-          ].join('');
-
-          this._element.style.display = 'none';
+          ].join('');          
      },
 
-     _addTab: function(gmailTabView, descriptor){
+     _addTab: function(gmailTabView){
           this._addTabToDOM(gmailTabView);
           this._bindToGmailTabViewEventStream(gmailTabView);
 
-          if(this._visibleGmailTabViews.length === 1){
+          var index = this._visibleGmailTabViews.indexOf(gmailTabView);
+          if(index === 0){
                this._activateGmailTab(gmailTabView);
 
                this._eventStream.push({
                     eventName: 'tabActivate',
-                    descriptor: descriptor
+                    descriptor: gmailTabView.getDescriptor()
                });
           }
 
-          if(this._visibleGmailTabViews.length > 1){
-               this._element.style.display = '';
-               this._resetColorIndexes();
-          }
+          this._resetColorIndexes();
      },
 
      _addTabToDOM: function(gmailTabView){
-          this._element.querySelector('[role=tablist]').appendChild(gmailTabView.getElement());
           this._visibleGmailTabViews.push(gmailTabView);
+
+          if(this._visibleGmailTabViews.length === 1){
+               this._element.querySelector('[role=tablist]').appendChild(gmailTabView.getElement());
+          }
+          else{
+               multiCompareSort(
+                    this._visibleGmailTabViews,
+                    [
+                         'getAppId',
+                         function(aGmailTabView){
+                              return aGmailTabView.getDescriptor().orderHint;
+                         }
+                    ]
+               );
+
+               var index = this._visibleGmailTabViews.indexOf(gmailTabView);
+               if(index === this._visibleGmailTabViews.length - 1){
+                    this._element.querySelector('[role=tablist]').appendChild(gmailTabView.getElement());
+               }
+               else{
+                    this._element.querySelector('[role=tablist]').insertBefore(gmailTabView.getElement(), this._visibleGmailTabViews[index + 1].getElement());
+               }
+          }
      },
 
      _bindToGmailTabViewEventStream: function(gmailTabView){
@@ -130,7 +142,7 @@ _.extend(GmailTabContainerView.prototype, {
                     .map('.view')
                     .filter(this, '_isNotActiveView')
                     .doAction(this, '_activateGmailTab')
-                    .map(this._gmailTabViewToDescriptorMap, 'get')
+                    .map('.getDescriptor')
                     .map(function(descriptor){
                          return {
                               eventName: 'tabActivate',
@@ -150,7 +162,7 @@ _.extend(GmailTabContainerView.prototype, {
                this._activeGmailTabView.setInactive();
                this._eventStream.push({
                     eventName: 'tabDeactivate',
-                    descriptor: this._gmailTabViewToDescriptorMap.get(this._activeGmailTabView)
+                    descriptor: this._activeGmailTabView.getDescriptor()
                });
           }
 
@@ -159,7 +171,9 @@ _.extend(GmailTabContainerView.prototype, {
      },
 
      _resetColorIndexes: function(){
-          //do nothing for now
+          for(var ii=0; ii<this._visibleGmailTabViews.length; ii++){
+               this._visibleGmailTabViews[ii].setColorIndex(ii);
+          }
      }
 
 });

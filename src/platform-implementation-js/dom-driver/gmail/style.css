@@ -280,6 +280,9 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
     background-image: none;
     width: 30px;
     height: 25px;
+    background-position-x: 7px;
+    background-position-y: 3px;
+    background-size: 16px;
   }
 
     .inboxsdk__tab_icon img {
@@ -297,9 +300,17 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   position: static !important;
 }
 
+table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab]:first-child {
+  border-left-width: 1px;
+}
+
 /* end tabs */
 
 /* sidebar */
+
+.inboxsdk__sidebar .inboxsdk__contentPanelContainer {
+  font: 12px Arial, sans-serif;
+}
 
 .inboxsdk__contentPanelContainer_tabContainer > table {
 

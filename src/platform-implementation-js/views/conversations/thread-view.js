@@ -1,16 +1,18 @@
 var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
+var EventEmitter = require('events').EventEmitter;
 
 var ContentPanelView = require('../content-panel-view');
 
 var ThreadView = function(threadViewImplementation, appId){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._threadViewImplementation = threadViewImplementation;
 	this._appId = appId;
+
+	this._bindToStreamEvents();
 };
 
-ThreadView.prototype = Object.create(BasicClass.prototype);
+ThreadView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(ThreadView.prototype, {
 
@@ -36,7 +38,11 @@ _.extend(ThreadView.prototype, {
 
 	enableSelectionMode: function(){},
 
-	disableSelectionMode: function(){}
+	disableSelectionMode: function(){},
+
+	_bindToStreamEvents: function(){
+		this._threadViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+	}
 
 });
 
