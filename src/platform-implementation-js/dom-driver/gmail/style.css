@@ -280,7 +280,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
     background-image: none;
     width: 30px;
     height: 25px;
-    background-position-x: 7px;
+    background-position-x: 5px;
     background-position-y: 3px;
     background-size: 16px;
     bacgkround-repeat: no-repeat;
@@ -301,7 +301,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   position: static !important;
 }
 
-table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab]:first-child {
+table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=tab] {
   border-left-width: 1px;
 }
 
@@ -311,6 +311,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab]:first-chi
 
 .inboxsdk__sidebar .inboxsdk__contentPanelContainer {
   font: 12px Arial, sans-serif;
+  max-width: 220px;
 }
 
 .inboxsdk__contentPanelContainer_tabContainer > table {

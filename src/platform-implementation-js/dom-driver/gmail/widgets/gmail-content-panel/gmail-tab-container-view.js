@@ -87,7 +87,7 @@ _.extend(GmailTabContainerView.prototype, {
                     '<tr class="aAA J-KU-Jg J-KU-Jg-K9 inboxsdk__contentTabContainer" role="tablist" tabindex="0">',
                     '</tr>',
                '</tbody>'
-          ].join('');          
+          ].join('');
      },
 
      _addTab: function(gmailTabView){
@@ -103,6 +103,13 @@ _.extend(GmailTabContainerView.prototype, {
                     descriptor: gmailTabView.getDescriptor()
                });
           }
+          else{
+               this._eventStream.push({
+                    eventName: 'tabDeactivate',
+                    descriptor: gmailTabView.getDescriptor()
+               });
+          }
+
 
           this._resetColorIndexes();
      },
