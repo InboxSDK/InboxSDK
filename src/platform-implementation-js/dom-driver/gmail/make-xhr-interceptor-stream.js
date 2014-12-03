@@ -7,7 +7,7 @@ var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js');
+    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8');
     document.head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', true);
   }
