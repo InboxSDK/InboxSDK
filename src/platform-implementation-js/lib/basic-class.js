@@ -73,8 +73,7 @@ _.extend(BasicClass.prototype, {
 				if (value[c].destroy) {
 					value[c].destroy();
 				}
-
-				if(value[c].remove){
+				else if(value[c].remove){
 					value[c].remove();
 				}
 			}

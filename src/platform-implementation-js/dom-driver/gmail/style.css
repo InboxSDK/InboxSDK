@@ -260,3 +260,59 @@ div.T-I.inboxsdk__button {
   }
 
 /* end modal */
+
+
+/* tabs */
+
+.inboxsdk__tab {
+  width: 30px;
+}
+
+.inboxsdk__tab.inboxsdk__tab_selected {
+  width: auto;
+}
+
+table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
+  height: 28px;
+}
+
+  .aKp.inboxsdk__tab_icon {
+    background-image: none;
+    width: 30px;
+    height: 25px;
+  }
+
+    .inboxsdk__tab_icon img {
+      height: 16px;
+      width: 16px;
+      margin-left: 5px;
+      margin-top: 3px;
+    }
+
+.inboxsdk__tab .aKx {
+  top: 4px;
+}
+
+.inboxsdk__sidebar [role=complementary] {
+  position: static !important;
+}
+
+/* end tabs */
+
+/* sidebar */
+
+.inboxsdk__contentPanelContainer_tabContainer > table {
+
+}
+
+.inboxsdk__contentPanelContainer_contentContainer {
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #D8D8D8;
+  margin-right: 10px;
+  margin-top: 15px;
+}
+
+
+/* end sidebar */

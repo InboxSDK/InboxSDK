@@ -3,8 +3,8 @@ var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
 
-var ThreadView = require('../views/thread-view');
-var MessageView = require('../views/message-view');
+var ThreadView = require('../views/conversations/thread-view');
+var MessageView = require('../views/conversations/message-view');
 
 var HandlerRegistry = require('../lib/handler-registry');
 
@@ -53,7 +53,7 @@ _.extend(Conversations.prototype, {
 	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, handlerRegistry){
 		var self = this;
 		return this._driver[driverStreamGetFunction]().onValue(function(viewDriver){
-			var view = new viewClass(viewDriver);
+			var view = new viewClass(viewDriver, self._appId);
 			handlerRegistry.addTarget(view);
 		});
 	}

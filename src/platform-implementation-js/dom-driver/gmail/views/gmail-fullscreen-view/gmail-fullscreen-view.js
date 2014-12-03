@@ -9,6 +9,7 @@ var FullscreenViewDriver = require('../../../../driver-interfaces/fullscreen-vie
 var GmailRowListView = require('../gmail-row-list-view');
 var GmailThreadView = require('../gmail-thread-view');
 
+
 var GmailElementGetter = require('../../gmail-element-getter');
 
 var GmailFullscreenView = function(options){
@@ -41,6 +42,9 @@ _.extend(GmailFullscreenView.prototype, {
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
+		{name: '_messageView', destroy: true, get: true},
+		{name: '_threadSidebarView', destroy: true, get: true},
+		{name: '_messageSidebarView', destroy: true, get: true},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
 	],
 
@@ -61,7 +65,7 @@ _.extend(GmailFullscreenView.prototype, {
 		var self = this;
 		setTimeout(function(){
 			self._setupRowListViews();
-			self._setupThreadView();
+			self._setupContentAndSidebarView();
 		}, 1);
 	},
 
@@ -90,7 +94,7 @@ _.extend(GmailFullscreenView.prototype, {
 	},
 
 
-	_setupThreadView: function(){
+	_setupContentAndSidebarView: function(){
 		var previewPaneRowList = document.querySelector('.aia[gh=tl]');
 		if(previewPaneRowList){
 			this._startMonitoringPreviewPaneRowListForThread(previewPaneRowList);
@@ -100,7 +104,7 @@ _.extend(GmailFullscreenView.prototype, {
 
 		var threadContainerElement = GmailElementGetter.getThreadContainerElement();
 		if(threadContainerElement){
-			var gmailThreadView = new GmailThreadView(threadContainerElement);
+			var gmailThreadView = new GmailThreadView(threadContainerElement, this);
 
 			this._threadView = gmailThreadView;
 
@@ -109,6 +113,7 @@ _.extend(GmailFullscreenView.prototype, {
 				view: gmailThreadView
 			});
 		}
+
 	},
 
 	_startMonitoringPreviewPaneRowListForThread: function(rowListElement){

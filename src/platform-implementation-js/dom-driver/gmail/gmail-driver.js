@@ -28,13 +28,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_attachmentCardViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_standardThreadViewMonitor', destroy: true},
-		{name: '_previewPaneThreadViewMonitor', destroy: true},
-		{name: '_standardThreadListToolbarMonitor', destroy: true},
-		{name: '_previewPaneThreadListToolbarMonitor', destroy: true},
-		{name: '_threadViewToolbarMonitor', destroy: true}
+		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	showCustomFullscreenView: function(element){
@@ -71,11 +65,11 @@ _.extend(GmailDriver.prototype, {
 
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
-		this._setupRowListViewDriverStream();
-		this._setupThreadViewDriverStream();
+		this._setupFullscreenSubViewDriver('_rowListViewDriverStream', 'newGmailRowlistView');
+		this._setupFullscreenSubViewDriver('_threadViewDriverStream', 'newGmailThreadView');
+
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
-		this._setupAttachmentCardViewDriverStream();
 		this._setupComposeViewDriverStream();
 	},
 
@@ -88,20 +82,7 @@ _.extend(GmailDriver.prototype, {
 		);
 	},
 
-	_setupRowListViewDriverStream: function(){
-		this._rowListViewDriverStream = new Bacon.Bus();
 
-		this._rowListViewDriverStream.plug(
-			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
-				return gmailFullscreenView.getEventStream().filter(function(event){
-					return event.eventName === 'newGmailRowListView';
-				})
-				.map(function(event){
-					return event.view;
-				});
-			})
-		);
-	},
 
 	/* getThreadViewDriverStream: function(){
 		// we debounce because preview pane and standard thread watching can throw off
@@ -110,13 +91,14 @@ _.extend(GmailDriver.prototype, {
 		return this._threadViewDriverStream.debounceImmediate(20);
 	},*/
 
-	_setupThreadViewDriverStream: function(){
-		this._threadViewDriverStream = new Bacon.Bus();
 
-		this._threadViewDriverStream.plug(
+	_setupFullscreenSubViewDriver: function(streamName, viewName){
+		this[streamName] = new Bacon.Bus();
+
+		this[streamName].plug(
 			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
 				return gmailFullscreenView.getEventStream().filter(function(event){
-					return event.eventName === 'newGmailThreadView';
+					return event.eventName === viewName;
 				})
 				.map(function(event){
 					return event.view;
@@ -155,21 +137,6 @@ _.extend(GmailDriver.prototype, {
 			this._threadViewDriverStream.flatMap(function(gmailThreadView){
 				return gmailThreadView.getEventStream().filter(function(event){
 					return event.eventName === 'messageLoaded';
-				})
-				.map(function(event){
-					return event.view;
-				});
-			})
-		);
-	},
-
-	_setupAttachmentCardViewDriverStream: function(){
-		this._attachmentCardViewDriverStream = new Bacon.Bus();
-
-		this._attachmentCardViewDriverStream.plug(
-			this._messageViewDriverStream.flatMap(function(gmailMessageView){
-				return gmailMessageView.getEventStream().filter(function(event){
-					return event.eventName === 'newAttachmentCard';
 				})
 				.map(function(event){
 					return event.view;

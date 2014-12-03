@@ -20,9 +20,7 @@ _.extend(Driver.prototype, {
 
 	getMessageViewDriverStream: function(){},
 
-	getReplyViewDriverStream: function(){},
-
-	getAttachmentCardViewDriverStream: function(){},
+	getReplyViewDriverStream: function(){},	
 
 	getToolbarViewDriverStream: function(){},
 
