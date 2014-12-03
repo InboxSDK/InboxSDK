@@ -28,18 +28,6 @@ function setupGmailInterceptor() {
       }
     }
   });
-
-  wrappers.push({
-    isRelevantTo: function(connection) {
-      return connection.params.act === 'dr';
-    },
-    originalSendBodyLogger: function(connection, body) {
-      triggerEvent({
-        type: 'emailDiscarded',
-        body: body
-      });
-    }
-  });
 }
 
 function triggerEvent(detail) {
