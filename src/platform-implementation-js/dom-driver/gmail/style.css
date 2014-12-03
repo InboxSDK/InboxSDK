@@ -283,6 +283,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
     background-position-x: 7px;
     background-position-y: 3px;
     background-size: 16px;
+    bacgkround-repeat: no-repeat;
   }
 
     .inboxsdk__tab_icon img {
