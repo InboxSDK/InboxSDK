@@ -8,6 +8,9 @@ global.MutationObserver = require('../lib/mock-mutation-observer');
 global.document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
 global.window = document.parentWindow;
 
+// don't try to inject ajax interceptor
+document.head.setAttribute('data-inboxsdk-script-injected', true);
+
 document.body.classList = []; // hack
 
 process.env.VERSION = 'beep';
