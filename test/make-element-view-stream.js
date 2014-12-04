@@ -2,7 +2,7 @@ var assert = require('assert');
 var RSVP = require('./lib/rsvp');
 var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
-var Symbol = require('./lib/symbol');
+var Symbol = require('../src/common/symbol');
 
 var makeElementViewStream = require('../src/platform-implementation-js/lib/dom/make-element-view-stream.js');
 var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream.js');
