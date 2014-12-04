@@ -126,7 +126,7 @@ _.extend(GmailTabContainerView.prototype, {
                     [
                          'getAppId',
                          function(aGmailTabView){
-                              return aGmailTabView.getDescriptor().orderHint;
+                              return aGmailTabView.getDescriptor().orderHint || 0;
                          }
                     ]
                );
