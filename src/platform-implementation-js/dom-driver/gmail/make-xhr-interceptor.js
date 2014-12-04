@@ -13,15 +13,15 @@ var injectScript = _.once(function() {
   }
 });
 
-function makeXhrInterceptStream() {
+function makeXhrInterceptor() {
   injectScript();
 
-  var interceptStream = Bacon
+  var rawInterceptStream = Bacon
     .fromEventTarget(document, 'inboxSDKajaxIntercept')
     .map('.detail');
 
-  return Bacon.mergeAll(
-    interceptStream.filter(function(detail) {
+  var interceptStream = Bacon.mergeAll(
+    rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSending';
     }).map(function(detail) {
       var body = deparam(detail.body);
@@ -31,7 +31,7 @@ function makeXhrInterceptStream() {
         draft: body.draft
       };
     }),
-    interceptStream.filter(function(detail) {
+    rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSent';
     }).map(function(detail) {
       var body = deparam(detail.originalSendBody);
@@ -44,6 +44,22 @@ function makeXhrInterceptStream() {
       };
     })
   );
+
+  var threadMetadataOracle = {
+    getThreadIdForThreadRow: function(threadRow) {
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
+      threadRow.dispatchEvent(event);
+      var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+      threadRow.removeAttribute('data-inboxsdk-threadid');
+      return threadid;
+    }
+  };
+
+  return {
+    xhrInterceptStream: interceptStream,
+    threadMetadataOracle: threadMetadataOracle
+  };
 }
 
-module.exports = makeXhrInterceptStream;
+module.exports = makeXhrInterceptor;

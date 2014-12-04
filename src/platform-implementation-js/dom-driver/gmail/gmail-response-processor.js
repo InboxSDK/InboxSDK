@@ -1,13 +1,13 @@
 var _ = require('lodash');
 
 function extractThreads(crapFormatThreadString) {
-  var crapFormatThreads = this.deserialize(crapFormatThreadString);
+  var crapFormatThreads = deserialize(crapFormatThreadString);
   return _extractThreadArraysFromResponseArray(crapFormatThreads);
 }
 exports.extractThreads = extractThreads;
 
 function interpretSentEmailResponse(responseString) {
-  var emailSentArray = this.deserialize(responseString);
+  var emailSentArray = deserialize(responseString);
 
   var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
   var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
@@ -51,7 +51,7 @@ function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
     return null;
   }
 
-  var threadResponseArray = this.deserialize(responseString);
+  var threadResponseArray = deserialize(responseString);
   var threadIdArrayMarker = "cs";
   var threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, function(markerArray){
     return markerArray.length > 20;
@@ -127,7 +127,7 @@ function deserialize(threadResponseString) {
   // Change all the singly quoted parts to use double-quotes so that the
   // data can be JSON-decoded instead of eval'd. (Also necessary for the
   // next step.)
-  VIEW_DATA = this.rewriteSingleQuotes(VIEW_DATA);
+  VIEW_DATA = rewriteSingleQuotes(VIEW_DATA);
 
   // Fix some things with the data. (It's in a weird minified JSON-like
   // format). Make sure we don't modify any data inside of strings!
@@ -165,7 +165,7 @@ function serialize(threadResponseArray, dontIncludeNumbers) {
   var response = ")]}'\n\n";
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arraySection = threadResponseArray[ii];
-    var arraySectionString = this.serializeArray(arraySection);
+    var arraySectionString = serializeArray(arraySection);
 
     if(dontIncludeNumbers){
       response += arraySectionString;
@@ -194,7 +194,7 @@ function serializeArray(array) {
 
     var addition = '';
     if(_.isArray(item)){
-      addition = this.serializeArray(item);
+      addition = serializeArray(item);
     }
     else if(item == null){
       addition = '';
@@ -222,11 +222,11 @@ exports.serializeArray = serializeArray;
 function replaceThreadsInResponse(originalResponse, threads) {
   var doesResponseUseFormatWithSectionNumbers = _doesResponseUseFormatWithSectionNumbers(originalResponse);
 
-  var originalResponseArray = this.deserialize(originalResponse);
+  var originalResponseArray = deserialize(originalResponse);
   var modifiedResponseArray = _newReplaceThreads(originalResponseArray, threads);
 
 
-  var modifiedResponse = this.serialize(modifiedResponseArray, !doesResponseUseFormatWithSectionNumbers);
+  var modifiedResponse = serialize(modifiedResponseArray, !doesResponseUseFormatWithSectionNumbers);
 
   return modifiedResponse;
 }
@@ -280,15 +280,13 @@ function _extractThreadArraysFromResponseArray(threadResponseArray){
       threads.push(arrayElement);
     } else if(_.isArray(arrayElement)) {
       var newThreadArray = _extractThreadArraysFromResponseArray(arrayElement);
-      if(newThreadArray) {
+      if (newThreadArray.length) {
         threads = threads.concat(newThreadArray);
       }
     }
   }
 
-  if(threads.length > 0){
-    return threads;
-  }
+  return threads;
 }
 
 function _isThreadArray(array){
