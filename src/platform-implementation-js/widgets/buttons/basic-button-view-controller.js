@@ -4,7 +4,7 @@ var BasicClass = require('../../lib/basic-class');
 var BasicButtonViewController = function(options){
 	BasicClass.call(this);
 
-	this._activateFunction = options.activateFunction;
+	this._activateFunction = options.activateFunction || options.onClick;
 	this._view = options.buttonView;
 
 	this._bindToViewEvents();
@@ -19,10 +19,11 @@ _.extend(BasicButtonViewController.prototype, {
 		{name: '_activateFunction', destroy: false, set: true}
 	],
 
-	activate: function(){		
+	activate: function(){
 		if(this._activateFunction){
 			this._activateFunction();
 		}
+
 	},
 
 	_bindToViewEvents: function(){
