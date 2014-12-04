@@ -4,7 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 
 /**
 * @class
-* This is the object that is returned when you add a sidebar content panel to a thread view.
+* A view representing a panel of your apps content. This is the object that is returned when you add a sidebar content panel to a thread view or similar.
 */
 var ContentPanelView = function(contentPanelViewImplementation){
     EventEmitter.call(this);
@@ -18,7 +18,7 @@ ContentPanelView.prototype = Object.create(EventEmitter.prototype);
 _.extend(ContentPanelView.prototype, /** @lends ContentPanelView */ {
 
     /**
-     * removes the content panel
+     * Removes the content panel from its host
      * @return {void}
      */
     remove: function(){
@@ -31,12 +31,13 @@ _.extend(ContentPanelView.prototype, /** @lends ContentPanelView */ {
     }
 
     /**
-    * Fires when the content panel becomes visisble (user clicks on the tab)
+    * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent
+    * times if the panel is presented in a tabbed interface and the ContentPanels tab is selected
     * @event ContentPanelView#activate
     */
 
     /**
-    * Fires when the content panel gets hidden by another panel
+    * Fires when the content panel is hidden. Typically this occurs when the user switches to another ContentPanel
     * @event ContentPanelView#deactivate
     */
 
