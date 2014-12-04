@@ -65,8 +65,10 @@ _.extend(GmailTabContainerView.prototype, {
           this._descriptorToGmailTabViewMap.delete(gmailTabView.getDescriptor());
           this._resetColorIndexes();
 
-          if(index > -1){
-               if(this._activeGmailTabView === gmailTabView){
+          if(this._activeGmailTabView === gmailTabView){
+               this._activeGmailTabView = null;
+
+               if(index > -1 && this._visibleGmailTabViews.length > 0){
                     this._activateGmailTab(this._visibleGmailTabViews[index]);
 
                     this._eventStream.push({
@@ -75,6 +77,7 @@ _.extend(GmailTabContainerView.prototype, {
                     });
                }
           }
+
 
           gmailTabView.destroy();
      },
