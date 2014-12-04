@@ -2,10 +2,6 @@ var _ = require('lodash');
 var assert = require('assert');
 
 function extractMetadataFromThreadRow(threadRow) {
-  // if(threadRow.type === 'vertical'){
-  //   return this._extractMetadataFromVerticalPreviewPaneRow(threadRow);
-  // }
-
   var threadMetadata = {};
 
   var timeSpan, subjectSpan, peopleDiv;
