@@ -3,6 +3,9 @@ var Bacon = require('baconjs');
 
 var BasicClass = require('../../../lib/basic-class');
 
+var ButtonView = require('./buttons/button-view');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+
 var GmailModalView = function(options){
     BasicClass.call(this);
 
@@ -54,14 +57,17 @@ _.extend(GmailModalView.prototype, {
     setButtons: function(buttons){
         this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').innerHTML = '';
 
-        if(!buttons){
+        if(!buttons || buttons.length === 0){
             this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = 'none';
         }
         else{
             this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = '';
         }
 
-        //iterate and add buttons
+        this._checkForMoreThanOnePrimaryButton(buttons);
+        _.sortBy(buttons, function(button){
+            return button.orderHint || 0
+        }).forEach(this._addButton.bind(this, this._modalContainerElement.querySelector('.inboxsdk__modal_buttons')));
     },
 
     setChrome: function(chrome){
@@ -95,6 +101,34 @@ _.extend(GmailModalView.prototype, {
         ].join('');
 
         this._modalContainerElement.innerHTML = htmlString;
+    },
+
+    _checkForMoreThanOnePrimaryButton: function(buttons){
+        if(
+            _.chain(buttons)
+             .pluck('type')
+             .filter(function(type){return type === 'PRIMARY_BUTTON';})
+             .value().length > 1
+         ){
+             throw new Error('At most one primary button is allowed');
+         }
+    },
+
+    _addButton: function(buttonContainer, buttonDescriptor){
+        var buttonOptions = _.clone(buttonDescriptor);
+        buttonOptions.buttonColor = (buttonDescriptor.type === 'PRIMARY_BUTTON' ? 'blue' : 'default');
+
+        var buttonView = new ButtonView(buttonOptions);
+
+        buttonOptions.buttonView = buttonView;
+        var buttonViewController = new BasicButtonViewController(buttonOptions);
+
+        if(buttonDescriptor.type === 'PRIMARY_BUTTON'){
+            buttonContainer.insertBefore(buttonView.getElement(), buttonContainer.firstElementChild);
+        }
+        else{
+            buttonContainer.appendChild(buttonView.getElement());
+        }
     },
 
     _setupEventStream: function(){
