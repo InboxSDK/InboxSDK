@@ -101,6 +101,10 @@ var GmailElementGetter = {
 
 	getComposeButton: function(){
 		return document.querySelector('[gh=cm]');
+	},
+
+	getLeftNavContainerElement: function(){
+		return document.querySelector('.aeN');
 	}
 
 };
