@@ -5,6 +5,7 @@ var deparam = require('querystring').parse;
 var threadRowParser = require('./thread-row-parser');
 var cleanupPeopleLine = require('./cleanup-people-line');
 var clickAndGetPopupUrl = require('./click-and-get-popup-url');
+var Symbol = require('../../common/symbol');
 
 function setup() {
   processPreloadedThreads();
@@ -25,9 +26,19 @@ function processThreadListResponse(threadListResponse) {
 }
 exports.processThreadListResponse = processThreadListResponse;
 
-var threadMetadatas = {};
+var AMBIGUOUS = Symbol('ABIGUOUS');
+var threadIdsByKey = {};
 function storeThreadMetadata(threadMetadata) {
-  threadMetadatas[threadMetadata.gmailThreadId] = threadMetadata;
+  var key = threadMetadataKey(threadMetadata);
+  if (_.has(threadIdsByKey, key)) {
+    threadIdsByKey[key] = AMBIGUOUS;
+  } else {
+    threadIdsByKey[key] = threadMetadata.gmailThreadId;
+  }
+}
+
+function threadMetadataKey(threadMetadata) {
+  return threadMetadata.subject+':'+threadMetadata.timeString+':'+threadMetadata.peopleHtml;
 }
 
 function convertToThreadMetadata(thread) {
@@ -63,23 +74,18 @@ function processPreloadedThreads() {
 
 function getGmailThreadIdForThreadRow(threadRow){
   var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
-  var threadRowMetadataCandidates = _.filter(threadMetadatas, function(threadMetadata) {
-    return domRowMetadata.subject === threadMetadata.subject &&
-      domRowMetadata.timeString === threadMetadata.timeString &&
-      domRowMetadata.peopleHtml === threadMetadata.peopleHtml;
-  });
-
-  if (threadRowMetadataCandidates.length === 1) {
-    return threadRowMetadataCandidates[0].gmailThreadId;
-  } else {
-    // Simulate a ctrl-click on the thread row to get the thread id, then
-    // simulate a ctrl-click on the previously selected thread row (or the
-    // first thread row) to put the cursor back where it was.
-    var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
-    var threadId = deparam(clickAndGetPopupUrl(threadRow)).th;
-    if (currentRowSelection) {
-      clickAndGetPopupUrl(currentRowSelection);
-    }
-    return threadId;
+  var key = threadMetadataKey(domRowMetadata);
+  if (_.has(threadIdsByKey, key) && threadIdsByKey[key] !== AMBIGUOUS) {
+    return threadIdsByKey[key];
   }
+
+  // Simulate a ctrl-click on the thread row to get the thread id, then
+  // simulate a ctrl-click on the previously selected thread row (or the
+  // first thread row) to put the cursor back where it was.
+  var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
+  var threadId = deparam(clickAndGetPopupUrl(threadRow)).th;
+  if (currentRowSelection) {
+    clickAndGetPopupUrl(currentRowSelection);
+  }
+  return threadId;
 }
