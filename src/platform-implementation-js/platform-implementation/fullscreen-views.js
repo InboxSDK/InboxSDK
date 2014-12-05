@@ -11,7 +11,7 @@ var FullscreenViews = function(appId, driver){
 	this._driver = driver;
 	this._fullscreenDescriptors = [];
 
-	this._currentFullscreenView = null;
+	this._currentFullscreenViewDriver = null;
 	this._customFullscreenViews = [];
 
 	this._setupNativeFullscreenViewDescriptors();
@@ -67,8 +67,8 @@ _.extend(FullscreenViews.prototype,  {
 	},
 
 	_handleFullscreenViewChange: function(fullscreenViewDriver){
-		if(this._currentFullscreenView){
-			this._currentFullscreenView.destroy();
+		if(this._currentFullscreenViewDriver){
+			this._currentFullscreenViewDriver.destroy();
 		}
 
 		var fullscreenViewDescriptor = this.getDescriptor(fullscreenViewDriver.getName());
@@ -77,17 +77,19 @@ _.extend(FullscreenViews.prototype,  {
 			return;
 		}
 
-		this._currentFullscreenView = new FullscreenView(fullscreenViewDriver, fullscreenViewDescriptor);
+		this._currentFullscreenViewDriver = fullscreenViewDriver;
+
+		var fullscreenView = new FullscreenView(fullscreenViewDriver, fullscreenViewDescriptor);
 
 		if(fullscreenViewDescriptor.isCustomView()){
 			this._driver.showCustomFullscreenView(fullscreenViewDriver.getCustomViewElement());
-			this._informRelevantCustomViews(this._currentFullscreenView);
+			this._informRelevantCustomViews(fullscreenView);
 		}
 		else{
 			this._driver.showNativeFullscreenView();
 		}
 
-		this.emit('change', {view: this._currentFullscreenView});
+		this.emit('change', {view: fullscreenView});
 	},
 
 	_informRelevantCustomViews: function(fullscreenView){

@@ -20,7 +20,7 @@ var GmailFullscreenView = function(options){
 	this._params = options.params;
 	this._isCustomView = options.isCustomView;
 
-	this._eventStreamBus = new Bacon.Bus();
+	this._eventStream = new Bacon.Bus();
 
 	if(this._isCustomView){
 		this._setupCustomViewElement();
@@ -45,20 +45,34 @@ _.extend(GmailFullscreenView.prototype, {
 		{name: '_messageView', destroy: true, get: true},
 		{name: '_threadSidebarView', destroy: true, get: true},
 		{name: '_messageSidebarView', destroy: true, get: true},
-		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'}
 	],
 
 	isCustomView: function(){
 		return this._isCustomView;
 	},
 
-	getEventStream: function(){
-		return this._eventStreamBus;
-	},
-
 	_setupCustomViewElement: function(){
 		this._customViewElement = document.createElement('div');
 		this._customViewElement.classList.add('inboxsdk__custom_view_element');
+
+		this._monitorLeftNavHeight();
+		this._setCustomViewElementHeight();
+	},
+
+	_monitorLeftNavHeight: function(){
+		var leftNav = GmailElementGetter.getLeftNavContainerElement();
+		this._leftNavHeightObserver = new MutationObserver(this._setCustomViewElementHeight.bind(this));
+		this._leftNavHeightObserver.observe(
+			leftNav,
+			{attributes: true, attributeFilter: ['style']}
+		);
+	},
+
+	_setCustomViewElementHeight: function(){
+		var leftNav = GmailElementGetter.getLeftNavContainerElement();
+		this._customViewElement.style.height = leftNav.style.height;
 	},
 
 	_setupSubViews: function(){
@@ -87,7 +101,7 @@ _.extend(GmailFullscreenView.prototype, {
 
 		this._rowListViews.push(gmailRowListView);
 
-		this._eventStreamBus.push({
+		this._eventStream.push({
 			eventName: 'newGmailRowListView',
 			view: gmailRowListView
 		});
@@ -108,7 +122,7 @@ _.extend(GmailFullscreenView.prototype, {
 
 			this._threadView = gmailThreadView;
 
-			this._eventStreamBus.push({
+			this._eventStream.push({
 				eventName: 'newGmailThreadView',
 				view: gmailThreadView
 			});
@@ -120,13 +134,13 @@ _.extend(GmailFullscreenView.prototype, {
 		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
 
 		var elementStream = makeElementChildStream(threadContainerTableElement)
-			.takeUntil(this._eventStreamBus.filter(false).mapEnd())
+			.takeUntil(this._eventStream.filter(false).mapEnd())
 			.filter(function(event) {
 				return !!event.el.querySelector('.if');
 			});
 
 		var self = this;
-		this._eventStreamBus.plug(
+		this._eventStream.plug(
 			makeElementViewStream({
 				elementStream: elementStream,
 				viewFn: function(element){

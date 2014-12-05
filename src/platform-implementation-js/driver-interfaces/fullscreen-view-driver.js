@@ -15,7 +15,9 @@ _.extend(FullscreenViewDriver.prototype, {
 
 	isCustomView: function(){},
 
-	getCustomViewElement: function(){}
+	getCustomViewElement: function(){},
+
+	getEventStream: function(){}
 
 });
 

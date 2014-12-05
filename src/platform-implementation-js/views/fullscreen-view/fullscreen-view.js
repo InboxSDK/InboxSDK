@@ -1,14 +1,16 @@
 var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
+var EventEmitter = require('events').EventEmitter;
 
 var FullscreenView = function(fullscreenViewImplementation, fullscreenViewDescriptor){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._fullscreenViewImplementation = fullscreenViewImplementation;
 	this._fullscreenViewDescriptor = fullscreenViewDescriptor;
+
+	this._bindToEventStream();
 };
 
-FullscreenView.prototype = Object.create(BasicClass.prototype);
+FullscreenView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(FullscreenView.prototype, {
 
@@ -27,6 +29,10 @@ _.extend(FullscreenView.prototype, {
 
 	getElement: function(){
 		return this._fullscreenViewImplementation.getCustomViewElement();
+	},
+
+	_bindToEventStream: function(){
+		this._fullscreenViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
 	}
 
 });
