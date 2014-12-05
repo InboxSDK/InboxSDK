@@ -89,13 +89,13 @@ _.extend(FullscreenViews.prototype,  {
 			this._driver.showNativeFullscreenView();
 		}
 
-		this.emit('change', {view: fullscreenView});
+		this.emit('change', {fullscreenView: fullscreenView});
 	},
 
 	_informRelevantCustomViews: function(fullscreenView){
 		this._customFullscreenViews.forEach(function(customFullscreenView){
 			customFullscreenView.onActivate({
-				view: fullscreenView,
+				fullscreenView: fullscreenView,
 				el: fullscreenView.getElement()
 			});
 		});
