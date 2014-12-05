@@ -72,6 +72,19 @@ function processPreloadedThreads() {
   }
 }
 
+function getThreadIdFromUrl(url) {
+  var tid = deparam(url).th;
+  if (!tid) {
+    // Draft URLs have the thread id after the hash
+    var urlHashMatch = url.match(/#(.*)/);
+    if (urlHashMatch) {
+      url = decodeURIComponent(decodeURIComponent(urlHashMatch[1]));
+      tid = deparam(url).th;
+    }
+  }
+  return tid;
+}
+
 function getGmailThreadIdForThreadRow(threadRow){
   var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
   var key = threadMetadataKey(domRowMetadata);
@@ -83,7 +96,7 @@ function getGmailThreadIdForThreadRow(threadRow){
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
   var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
-  var threadId = deparam(clickAndGetPopupUrl(threadRow)).th;
+  var threadId = getThreadIdFromUrl(clickAndGetPopupUrl(threadRow));
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
   }
