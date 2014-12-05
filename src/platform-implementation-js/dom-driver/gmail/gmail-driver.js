@@ -62,11 +62,11 @@ _.extend(GmailDriver.prototype, {
 
 	_setupEventStreams: function(){
 		var result = makeXhrInterceptor();
-		var xhrInterceptorStream = result.xhrInterceptorStream;
+		var xhrInterceptStream = result.xhrInterceptStream;
 		this._threadMetadataOracle = result.threadMetadataOracle;
 
 		this._xhrInterceptorStream = new Bacon.Bus();
-		this._xhrInterceptorStream.plug(xhrInterceptorStream);
+		this._xhrInterceptorStream.plug(xhrInterceptStream);
 
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
