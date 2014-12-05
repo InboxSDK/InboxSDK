@@ -17,7 +17,7 @@ function extractMetadataFromThreadRow(threadRow) {
     subjectSpan = threadRow2.querySelector("td div.xS div.xT div.y6 > span");
     peopleDiv = threadRow.querySelector("td.apy > div.yW");
   } else {
-    timeSpan = threadRow.querySelector("td:last-child > span[title]");
+    timeSpan = threadRow.querySelector("td.xW > span[title]");
 
     var subjectAreaDiv = threadRow.querySelector("td.a4W div[role=link] div.y6");
     if (subjectAreaDiv && subjectAreaDiv.children.length >= 2) {

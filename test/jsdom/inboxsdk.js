@@ -1,6 +1,6 @@
 var assert = require('assert');
 var RSVP = require('../lib/rsvp');
-var jsdom = require('jsdom').jsdom;
+var jsdom = require('../lib/jsdom');
 
 var InboxSDK = require('./lib/inboxsdk');
 
@@ -10,8 +10,6 @@ global.window = document.parentWindow;
 
 // don't try to inject ajax interceptor
 document.head.setAttribute('data-inboxsdk-script-injected', true);
-
-document.body.classList = []; // hack
 
 process.env.VERSION = 'beep';
 var inboxsdk = new InboxSDK("test", {globalErrorLogging: false});
