@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var assert = require('assert');
+var cleanupPeopleLine = require('./cleanup-people-line');
 
 function extractMetadataFromThreadRow(threadRow) {
   var threadMetadata = {};
@@ -34,7 +35,7 @@ function extractMetadataFromThreadRow(threadRow) {
     threadMetadata.subject = subjectSpan.textContent;
   }
   if (peopleDiv) {
-    threadMetadata.peopleHtml = peopleDiv.innerHTML.replace(/(<span[^>]*) class="[^"]*"/g, '$1');
+    threadMetadata.peopleHtml = cleanupPeopleLine(peopleDiv.innerHTML);
   }
 
   return threadMetadata;
