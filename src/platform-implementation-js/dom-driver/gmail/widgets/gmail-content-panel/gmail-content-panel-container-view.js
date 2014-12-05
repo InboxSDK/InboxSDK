@@ -38,7 +38,7 @@ _.extend(GmailContentPanelContainerView.prototype, {
           this._gmailContentPanelViews.push(gmailContentPanelView);
           this._descriptorToViewMap.set(descriptor, gmailContentPanelView);
           this._viewToDescriptorMap.set(gmailContentPanelView, descriptor);
-          this._gmailTabContainerView.addTab(descriptor);
+          this._gmailTabContainerView.addTab(descriptor, appId);
 
           return gmailContentPanelView;
      },

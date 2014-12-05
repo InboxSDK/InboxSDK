@@ -23,8 +23,8 @@ var ButtonView = function(options){
 	this._iconClass = options.iconClass;
 	this._iconUrl = options.iconUrl;
 
-	this._title = options.title;
-	this._tooltip = options.tooltip;
+	this._title = options.text || options.title;
+	this._tooltip = options.tooltip || options.title;
 
 	this._hasDropdown = options.hasDropdown;
 
@@ -177,7 +177,7 @@ _.extend(ButtonView.prototype, {
 		this._iconElement.innerHTML = '&nbsp;';
 
 		if(this._iconClass){
-			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);					
+			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);
 		}
 
 		if(this._iconUrl){
