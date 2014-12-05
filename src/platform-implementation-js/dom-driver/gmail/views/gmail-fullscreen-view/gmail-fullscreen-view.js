@@ -71,9 +71,6 @@ _.extend(GmailFullscreenView.prototype, {
 
 	_setupRowListViews: function(){
 		var rowListElements = GmailElementGetter.getRowListElements();
-		if(rowListElements.length === 0){
-			return;
-		}
 
 		var self = this;
 		Array.prototype.forEach.call(rowListElements, function(rowListElement){
