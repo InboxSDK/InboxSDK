@@ -87,16 +87,6 @@ _.extend(GmailDriver.prototype, {
 		);
 	},
 
-
-
-	/* getThreadViewDriverStream: function(){
-		// we debounce because preview pane and standard thread watching can throw off
-		// events for the same thread in certain edge cases
-		// (namely preview pane active, but refreshing in thread view)
-		return this._threadViewDriverStream.debounceImmediate(20);
-	},*/
-
-
 	_setupFullscreenSubViewDriver: function(streamName, viewName){
 		this[streamName] = new Bacon.Bus();
 
@@ -111,13 +101,6 @@ _.extend(GmailDriver.prototype, {
 			})
 		);
 	},
-
-	/* getToolbarViewDriverStream: function(){
-		// we debounce because preview pane and standard thread watching can throw off
-		// events for the same thread in certain edge cases
-		// (namely preview pane active, but refreshing in thread view)
-		return this._toolbarViewDriverStream.debounceImmediate(20);
-	}, */
 
 	_setupToolbarViewDriverStream: function(){
 		this._toolbarViewDriverStream = new Bacon.Bus();
