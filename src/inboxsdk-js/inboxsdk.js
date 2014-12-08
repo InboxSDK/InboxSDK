@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 
+var checkRequirements = require('./check-requirements');
 var Compose = require('./api-definitions/compose');
 var Conversations = require('./api-definitions/conversations');
 var Mailbox = require('./api-definitions/mailbox');
@@ -24,6 +25,8 @@ var InboxSDK = function(appId, opts){
     // the implementation script.
     VERSION: this.VERSION
   });
+
+  checkRequirements(opts);
 
   this._appId = appId;
   this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);

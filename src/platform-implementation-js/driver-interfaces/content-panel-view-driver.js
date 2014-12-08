@@ -1,19 +1,19 @@
 var _ = require('lodash');
 
- var BasicClass = require('../lib/basic-class');
+var BasicClass = require('../lib/basic-class');
 
- var ContentPanelViewDriver = function(){
-     BasicClass.call(this);
- };
+var ContentPanelViewDriver = function(){
+  BasicClass.call(this);
+};
 
- ContentPanelViewDriver.prototype = Object.create(BasicClass.prototype);
+ContentPanelViewDriver.prototype = Object.create(BasicClass.prototype);
 
- _.extend(ContentPanelViewDriver.prototype, {
+_.extend(ContentPanelViewDriver.prototype, {
 
-     remove: function(){},
+  remove: function(){},
 
-     getEventStream: function(){}
+  getEventStream: function(){}
 
- });
+});
 
 module.exports = ContentPanelViewDriver;
