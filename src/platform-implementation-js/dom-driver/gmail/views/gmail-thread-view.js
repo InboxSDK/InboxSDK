@@ -97,7 +97,11 @@ _.extend(GmailThreadView.prototype, {
 
 		if(!openMessage){
 			var self = this;
-			setTimeout(function(){self._setupMessageViewStream();}, 500);
+			setTimeout(function(){
+				if (self._element) {
+					self._setupMessageViewStream();
+				}
+			}, 500);
 			return;
 		}
 

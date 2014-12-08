@@ -11,7 +11,10 @@ global.window = document.parentWindow;
 document.body.classList = []; // hack
 
 process.env.VERSION = 'beep';
-var inboxsdk = new InboxSDK("test", {globalErrorLogging: false});
+var inboxsdk = new InboxSDK("test", {
+  TEMPORARY_INTERNAL_skipWeakMapRequirement: true,
+  globalErrorLogging: false
+});
 
 assert.strictEqual(inboxsdk.VERSION, 'beep');
 assert.strictEqual(inboxsdk.IMPL_VERSION, null);
