@@ -65,8 +65,8 @@ _.extend(GmailDriver.prototype, {
 
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
-		this._setupFullscreenSubViewDriver('_rowListViewDriverStream', 'newGmailRowlistView');
-		this._setupFullscreenSubViewDriver('_threadViewDriverStream', 'newGmailThreadView');
+		this._rowListViewDriverStream = this._setupFullscreenSubViewDriver('newGmailRowlistView');
+		this._threadViewDriverStream = this._setupFullscreenSubViewDriver('newGmailThreadView');
 
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
@@ -92,10 +92,10 @@ _.extend(GmailDriver.prototype, {
 	},*/
 
 
-	_setupFullscreenSubViewDriver: function(streamName, viewName){
-		this[streamName] = new Bacon.Bus();
+	_setupFullscreenSubViewDriver: function(viewName){
+		var bus = new Bacon.Bus();
 
-		this[streamName].plug(
+		bus.plug(
 			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
 				return gmailFullscreenView.getEventStream().filter(function(event){
 					return event.eventName === viewName;
@@ -105,6 +105,8 @@ _.extend(GmailDriver.prototype, {
 				});
 			})
 		);
+
+		return bus;
 	},
 
 	/* getToolbarViewDriverStream: function(){
