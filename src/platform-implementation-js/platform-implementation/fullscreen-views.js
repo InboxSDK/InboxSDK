@@ -93,12 +93,16 @@ _.extend(FullscreenViews.prototype,  {
 	},
 
 	_informRelevantCustomViews: function(fullscreenView){
-		this._customFullscreenViews.forEach(function(customFullscreenView){
-			customFullscreenView.onActivate({
-				fullscreenView: fullscreenView,
-				el: fullscreenView.getElement()
+		this._customFullscreenViews
+			.filter(function(customFullscreenView){
+				return customFullscreenView.name === fullscreenView.getDescriptor().getName();
+			})
+			.forEach(function(customFullscreenView){
+				customFullscreenView.onActivate({
+					fullscreenView: fullscreenView,
+					el: fullscreenView.getElement()
+				});
 			});
-		});
 	}
 
 });
