@@ -6,6 +6,11 @@ var Bacon = require('baconjs');
 var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
 
 var GmailToolbarView = require('./gmail-toolbar-view');
+var GmailThreadRowView = require('./gmail-thread-row-view');
+
+var waitFor = require('../../../lib/wait-for');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
 var GmailRowListView = function(rootElement, fullscreenViewDriver){
 	RowListViewDriver.call(this);
@@ -68,9 +73,34 @@ _.extend(GmailRowListView.prototype, {
 		return false;
 	},
 
-
 	_startWatchingForRowViews: function(){
+		var self = this;
+		var tbody;
 
+		this._eventStreamBus.plug(
+			Bacon.fromPromise(waitFor(function() {
+				return !self._element ||
+					(tbody = self._element.querySelector('div.Cp > div > table > tbody'));
+			})).flatMap(function() {
+				var elementStream = makeElementChildStream(tbody)
+					.takeUntil(self._eventStreamBus.filter(false).mapEnd())
+					.filter(function(event) {
+						return event.el.classList.contains('zA');
+					});
+
+				return makeElementViewStream({
+					elementStream: elementStream,
+					viewFn: function(element){
+						return new GmailThreadRowView(element);
+					}
+				}).map(function(view) {
+					return {
+						eventName: 'newGmailThreadRowView',
+						view: view
+					};
+				});
+			})
+		);
 	}
 });
 

@@ -25,6 +25,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadMetadataOracle', destroy: false, get: true},
 		{name: '_fullscreenViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_threadRowViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -71,6 +72,7 @@ _.extend(GmailDriver.prototype, {
 		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
 
 		this._rowListViewDriverStream = this._setupFullscreenSubViewDriver('newGmailRowlistView');
+		this._threadRowViewDriverStream = this._setupFullscreenSubViewDriver('newGmailThreadRowView');
 		this._threadViewDriverStream = this._setupFullscreenSubViewDriver('newGmailThreadView');
 
 		this._setupToolbarViewDriverStream();
