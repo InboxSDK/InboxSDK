@@ -69,7 +69,60 @@ describe('makeElementViewStream', function() {
           addedNodes: [],
           removedNodes: [child2]
         });
-      }, 1);
+      }, 0);
+    });
+  });
+
+  it('should be eager', function() {
+    return new RSVP.Promise(function(resolve, reject) {
+      var child1 = Symbol('child1'), child2 = Symbol('child2'), child3 = Symbol('child3');
+
+      var elementStream = new Bacon.Bus();
+      var activeViewCount = 0;
+
+      makeElementViewStream({
+        elementStream: elementStream,
+        viewFn: function(el) {
+          activeViewCount++;
+          if (el === child2) {
+            setTimeout(function() {
+              elementStream.push({
+                type: 'removed', el: child2
+              });
+            }, 0);
+          } else if (el === child3) {
+            setTimeout(function() {
+              elementStream.push({
+                type: 'removed', el: child1
+              });
+            }, 0);
+          }
+          return {
+            el: el,
+            destroy: function() {
+              activeViewCount--;
+              if (el === child2) {
+                setTimeout(function() {
+                  elementStream.push({
+                    type: 'added', el: child3
+                  });
+                }, 0);
+              } else if (el === child1) {
+                elementStream.end();
+              } else if (activeViewCount === 0) {
+                resolve();
+              }
+            }
+          };
+        }
+      });
+
+      elementStream.push({
+        type: 'added', el: child1
+      });
+      elementStream.push({
+        type: 'added', el: child2
+      });
     });
   });
 });
