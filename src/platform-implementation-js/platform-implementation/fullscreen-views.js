@@ -24,7 +24,7 @@ FullscreenViews.prototype = Object.create(EventEmitter.prototype);
 _.extend(FullscreenViews.prototype,  {
 
 	createLink: function(name, paramArray){
-		this._driver.createLink(name, paramArray);
+		return this._driver.createLink(name, paramArray);
 	},
 
 	gotoView: function(name, paramArray){
