@@ -40,7 +40,7 @@ _.extend(Compose.prototype, {
     },
 
     registerComposeViewHandler: function(handler){
-        this._handlerRegistry.registerHandler(handler);
+        return this._handlerRegistry.registerHandler(handler);
     },
 
     _setupComposeViewDriverWatcher: function(){

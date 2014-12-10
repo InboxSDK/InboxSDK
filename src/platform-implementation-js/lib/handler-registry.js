@@ -23,7 +23,7 @@ _.extend(HandlerRegistry.prototype, {
         return function(){
             var index = self._handlers.indexOf(handler);
             if(index > -1){
-                self._handlers.remove(index);
+                self._handlers.splice(index, 1);
             }
         };
     },
@@ -37,7 +37,7 @@ _.extend(HandlerRegistry.prototype, {
     removeTarget: function(target){
         var index = this._targets.indexOf(target);
         if(index > -1){
-            this._targets.remove(index);
+            this._targets.splice(index, 1);
         }
     },
 
