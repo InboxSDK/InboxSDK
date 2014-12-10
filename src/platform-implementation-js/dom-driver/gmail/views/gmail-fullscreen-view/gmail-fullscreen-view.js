@@ -103,7 +103,7 @@ _.extend(GmailFullscreenView.prototype, {
 			view: gmailRowListView
 		});
 
-		this._eventStreamBus.plug(gmailRowListView.getEventStream().filter(function(event) {
+		this._eventStream.plug(gmailRowListView.getEventStream().filter(function(event) {
 			return event.eventName === 'newGmailThreadRowView';
 		}));
 	},
