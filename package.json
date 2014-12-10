@@ -15,7 +15,7 @@
   },
   "description": "Library for browser extensions to interact with Gmail.",
   "devDependencies": {
-    "browserify": "^6.3.2",
+    "browserify": "^6.3.4",
     "envify": "^3.2.0",
     "exec-sync": "^0.1.6",
     "glob": "^4.0.6",
