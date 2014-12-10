@@ -7,9 +7,9 @@ var ToolbarViewDriver = require('../../../driver-interfaces/toolbar-view-driver'
 
 var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
-var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
+var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
 
-var MenuView = require('../widgets/menu-view');
+var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 
 var GmailToolbarView = function(element){
 	ToolbarViewDriver.call(this);
@@ -96,8 +96,8 @@ _.extend(GmailToolbarView.prototype, {
 
 		var buttonViewController = null;
 		if(buttonDescriptor.hasDropdown){
-			buttonDescriptor.menuView = new MenuView();
-			buttonViewController = new MenuButtonViewController(buttonDescriptor);
+			buttonDescriptor.dropdownViewDriver = new GmailDropdownView();
+			buttonViewController = new DropdownButtonViewController(buttonDescriptor);
 		}
 		else{
 			buttonViewController = new BasicButtonViewController(buttonDescriptor);
