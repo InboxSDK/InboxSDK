@@ -10,10 +10,6 @@ var waitFor = require('../../../lib/wait-for');
 
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
-var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
-
-var MenuView = require('../widgets/menu-view');
 
 var GmailComposeView = function(element, xhrInterceptorStream){
 	ComposeWindowDriver.call(this);
