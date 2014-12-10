@@ -329,3 +329,12 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 
 /* end sidebar */
+
+
+/* custom content */
+
+.inboxsdk__custom_view_element {
+  overflow: auto;
+}
+
+/* end custom content */

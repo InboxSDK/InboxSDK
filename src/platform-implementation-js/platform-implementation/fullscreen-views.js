@@ -11,7 +11,7 @@ var FullscreenViews = function(appId, driver){
 	this._driver = driver;
 	this._fullscreenDescriptors = [];
 
-	this._currentFullscreenView = null;
+	this._currentFullscreenViewDriver = null;
 	this._customFullscreenViews = [];
 
 	this._setupNativeFullscreenViewDescriptors();
@@ -23,6 +23,15 @@ FullscreenViews.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(FullscreenViews.prototype,  {
 
+	createLink: function(name, paramArray){
+		return this._driver.createLink(name, paramArray);
+	},
+
+	gotoView: function(name, paramArray){
+		this._driver.gotoView(name, paramArray);
+	},
+
+	/* deprecated */
 	getDescriptor: function(name){
 		return _.find(this._fullscreenDescriptors, function(fullscreenViewDescriptor){
 			return fullscreenViewDescriptor.getName() === name;
@@ -67,8 +76,8 @@ _.extend(FullscreenViews.prototype,  {
 	},
 
 	_handleFullscreenViewChange: function(fullscreenViewDriver){
-		if(this._currentFullscreenView){
-			this._currentFullscreenView.destroy();
+		if(this._currentFullscreenViewDriver){
+			this._currentFullscreenViewDriver.destroy();
 		}
 
 		var fullscreenViewDescriptor = this.getDescriptor(fullscreenViewDriver.getName());
@@ -77,26 +86,32 @@ _.extend(FullscreenViews.prototype,  {
 			return;
 		}
 
-		this._currentFullscreenView = new FullscreenView(fullscreenViewDriver, fullscreenViewDescriptor);
+		this._currentFullscreenViewDriver = fullscreenViewDriver;
+
+		var fullscreenView = new FullscreenView(fullscreenViewDriver, fullscreenViewDescriptor);
 
 		if(fullscreenViewDescriptor.isCustomView()){
 			this._driver.showCustomFullscreenView(fullscreenViewDriver.getCustomViewElement());
-			this._informRelevantCustomViews(this._currentFullscreenView);
+			this._informRelevantCustomViews(fullscreenView);
 		}
 		else{
 			this._driver.showNativeFullscreenView();
 		}
 
-		this.emit('change', {view: this._currentFullscreenView});
+		this.emit('change', {fullscreenView: fullscreenView});
 	},
 
 	_informRelevantCustomViews: function(fullscreenView){
-		this._customFullscreenViews.forEach(function(customFullscreenView){
-			customFullscreenView.onActivate({
-				view: fullscreenView,
-				el: fullscreenView.getElement()
+		this._customFullscreenViews
+			.filter(function(customFullscreenView){
+				return customFullscreenView.name === fullscreenView.getDescriptor().getName();
+			})
+			.forEach(function(customFullscreenView){
+				customFullscreenView.onActivate({
+					fullscreenView: fullscreenView,
+					el: fullscreenView.getElement()
+				});
 			});
-		});
 	}
 
 });
