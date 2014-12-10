@@ -40,7 +40,9 @@ _.extend(HandlerRegistry.prototype, {
     },
 
     _informHandlerOfTargets: function(handler){
-        this._targets.forEach(handler);
+        this._targets.forEach(function(target) {
+          handler(target);
+        });
     },
 
     _informHandlersOfTarget: function(target){
