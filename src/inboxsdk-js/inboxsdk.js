@@ -7,7 +7,7 @@ var Conversations = require('./api-definitions/conversations');
 var Mailbox = require('./api-definitions/mailbox');
 var Sidebar = require('./api-definitions/sidebar');
 var Tracker = require('./tracker');
-var FullscreenViews = require('./api-definitions/fullscreen-views');
+var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
