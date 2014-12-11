@@ -17,12 +17,6 @@ var RouteView = function(routeViewImplementation, route){
 RouteView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(RouteView.prototype, /** @lends RouteView */{
-
-	__memberVariables: [
-		{name: '_route', destroy: false},
-		{name: '_routeViewImplementation', destroy: true}
-	],
-
 	/**
 	 * Get the name of the RouteView
 	 * @return {string}
