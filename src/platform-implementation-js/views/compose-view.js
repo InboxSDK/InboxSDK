@@ -34,6 +34,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){
+		if(!buttonDescriptor.onValue && !buttonDescriptor.onClick){
+			throw new Error('Must have an onClick function defined');
+		}
+
+		if(buttonDescriptor.hasDropdown){
+			var oldOnClick = buttonDescriptor.onClick;
+			buttonDescriptor.onClick = function(event){
+				oldOnClick(_.extend({composeView: this}, event));
+			};
+		}
+
 		this._composeViewImplementation.addButton(buttonDescriptor, this._appId);
 	},
 
