@@ -65,8 +65,8 @@ _.extend(GmailDriver.prototype, {
 
 		require('./gmail-driver/setup-route-view-driver-stream')(this);
 
-		this._rowListViewDriverStream = this._setupFullscreenSubViewDriver('newGmailRowlistView');
-		this._threadViewDriverStream = this._setupFullscreenSubViewDriver('newGmailThreadView');
+		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
+		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView');
 
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
@@ -92,7 +92,7 @@ _.extend(GmailDriver.prototype, {
 	},*/
 
 
-	_setupFullscreenSubViewDriver: function(viewName){
+	_setupRouteSubViewDriver: function(viewName){
 		var bus = new Bacon.Bus();
 
 		bus.plug(
