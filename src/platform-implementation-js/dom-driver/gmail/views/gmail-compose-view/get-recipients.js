@@ -1,6 +1,5 @@
 module.exports = function(gmailComposeView, contactRowIndex){
-
-	var contactRows = _getContactRows(gmailComposeView);
+	var contactRows = gmailComposeView.getRecipientRowElements();
 
 	if(!contactRows || contactRows.length === 0){
 		return [];

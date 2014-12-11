@@ -16,9 +16,7 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	var self = this;
 	this._composeViewImplementation.getEventStream().onValue(function(event){
-		if (_.contains(['sending','sent'], event.type)) {
-			self.emit(event.type, event.data);
-		}
+		self.emit(event.eventName, event.data);
 	});
 
 	this._composeViewImplementation.getEventStream().onEnd(function(){

@@ -25,13 +25,13 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 			xhrInterceptorStream.filter(function(event) {
 				return event.type === 'emailSending' && event.composeId === self.getComposeID();
 			}).map(function(event) {
-				return {type: 'sending'};
+				return {eventName: 'sending'};
 			}),
 			xhrInterceptorStream.filter(function(event) {
 				return event.type === 'emailSent' && event.composeId === self.getComposeID();
 			}).map(function(event) {
 				// TODO include final message id
-				return {type: 'sent', data: undefined};
+				return {eventName: 'sent', data: undefined};
 			})
 		)
 	);
@@ -66,6 +66,7 @@ _.extend(GmailComposeView.prototype, {
 
 	_setupStreams: function(){
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
+		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 	},
 
 	_setupConsistencyCheckers: function(){
@@ -241,6 +242,10 @@ _.extend(GmailComposeView.prototype, {
 	getDraftID: function() {
 		var input = this._element.querySelector('input[name="draft"]');
 		return input && input.value;
+	},
+
+	getRecipientRowElements: function(){
+		return this._element.querySelectorAll('.GS tr');
 	},
 
 	addManagedViewController: function(viewController){

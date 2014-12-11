@@ -1,6 +1,6 @@
 var inboxSDK = new InboxSDK('compose-stream-example');
 
-inboxSDK.Views.on('composeOpen', function(composeView){
+inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 
 	var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 	var monkeyIndex = 1;
@@ -33,5 +33,12 @@ inboxSDK.Views.on('composeOpen', function(composeView){
 		},
 		section: 'SEND_RIGHT'
 	});
+
+	composeView.on('toAddressAdded', console.log.bind(console, 'toAddressAdded'));
+	composeView.on('toAddressRemoved', console.log.bind(console, 'toAddressRemoved'));
+	composeView.on('ccAddressAdded', console.log.bind(console, 'ccAddressAdded'));
+	composeView.on('ccAddressRemoved', console.log.bind(console, 'ccAddressRemoved'));
+	composeView.on('bccAddressAdded', console.log.bind(console, 'bccAddressAdded'));
+	composeView.on('bccAddressRemoved', console.log.bind(console, 'bccAddressRemoved'));
 
 });
