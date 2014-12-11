@@ -22,7 +22,7 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
-		{name: '_fullscreenViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -31,16 +31,16 @@ _.extend(GmailDriver.prototype, {
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
-	showCustomFullscreenView: function(element){
-		require('./gmail-driver/show-custom-fullscreen-view')(this, element);
+	showCustomRouteView: function(element){
+		require('./gmail-driver/show-custom-route-view')(this, element);
 	},
 
-	showNativeFullscreenView: function(){
-		require('./gmail-driver/show-native-fullscreen-view')(this);
+	showNativeRouteView: function(){
+		require('./gmail-driver/show-native-route-view')(this);
 	},
 
-	getNativeViewNames: function(){
-		return require('./views/gmail-fullscreen-view/gmail-fullscreen-view-names').GMAIL_VIEWS;
+	getNativeRouteNames: function(){
+		return require('./views/gmail-route-view/gmail-route-names').GMAIL_VIEWS;
 	},
 
 	createLink: function(viewName, params){
@@ -63,7 +63,7 @@ _.extend(GmailDriver.prototype, {
 		this._xhrInterceptorStream = new Bacon.Bus();
 		this._xhrInterceptorStream.plug(makeXhrInterceptorStream());
 
-		require('./gmail-driver/setup-fullscreen-view-driver-stream')(this);
+		require('./gmail-driver/setup-route-view-driver-stream')(this);
 
 		this._rowListViewDriverStream = this._setupFullscreenSubViewDriver('newGmailRowlistView');
 		this._threadViewDriverStream = this._setupFullscreenSubViewDriver('newGmailThreadView');
@@ -96,8 +96,8 @@ _.extend(GmailDriver.prototype, {
 		var bus = new Bacon.Bus();
 
 		bus.plug(
-			this._fullscreenViewDriverStream.flatMap(function(gmailFullscreenView){
-				return gmailFullscreenView.getEventStream().filter(function(event){
+			this._routeViewDriverStream.flatMap(function(gmailRouteView){
+				return gmailRouteView.getEventStream().filter(function(event){
 					return event.eventName === viewName;
 				})
 				.map(function(event){

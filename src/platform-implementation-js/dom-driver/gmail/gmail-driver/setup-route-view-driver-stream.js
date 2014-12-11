@@ -3,19 +3,19 @@ var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
 var GmailElementGetter = require('../gmail-element-getter');
-var GmailViewNames = require('../views/gmail-fullscreen-view/gmail-fullscreen-view-names');
+var GmailViewNames = require('../views/gmail-route-view/gmail-route-names');
 
-var GmailFullscreenView = require('../views/gmail-fullscreen-view/gmail-fullscreen-view');
+var GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
 
 var getURLObject = require('./get-url-object');
 
 var currentUrlObject = {};
 
-function setupFullscreenViewDriverStream(gmailDriver){
-	gmailDriver._fullscreenViewDriverStream = new Bacon.Bus();
+function setupRouteViewDriverStream(gmailDriver){
+	gmailDriver._routeViewDriverStream = new Bacon.Bus();
 
 	window.addEventListener('hashchange', function(event){
-		_checkForCustomFullscreenView(gmailDriver, event);
+		_checkForCustomRoute(gmailDriver, event);
 	});
 
 	waitFor(function(){
@@ -48,7 +48,7 @@ function setupFullscreenViewDriverStream(gmailDriver){
 	});
 }
 
-function _checkForCustomFullscreenView(gmailDriver, event){
+function _checkForCustomRoute(gmailDriver, event){
 	var urlObject = getURLObject(event.newURL);
 	if(currentUrlObject.hash === urlObject.hash){
 		return;
@@ -59,7 +59,7 @@ function _checkForCustomFullscreenView(gmailDriver, event){
 	}
 
 	currentUrlObject = urlObject;
-	_createFullscreenViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.name));
+	_createRouteViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.name));
 }
 
 function _observeVisibilityChangeOnMainElement(gmailDriver, element){
@@ -84,21 +84,21 @@ function _handleNewUrl(gmailDriver, newUrl){
 	currentUrlObject = urlObject;
 
 	if(!_isGmailView(urlObject.name)){
-		_createFullscreenViewDriver(gmailDriver, urlObject, false);
+		_createRouteViewDriver(gmailDriver, urlObject, false);
 		return;
 	}
 
 	if(!_isThreadListView(urlObject.name)){
-		_createFullscreenViewDriver(gmailDriver, urlObject, true);
+		_createRouteViewDriver(gmailDriver, urlObject, true);
 		return;
 	}
 
 	if(_isThreadView(urlObject)){
-		_createThreadFullscreenViewDriver(gmailDriver, urlObject);
+		_createThreadRouteViewDriver(gmailDriver, urlObject);
 		return;
 	}
 
-	_createFullscreenViewDriver(gmailDriver, urlObject, true);
+	_createRouteViewDriver(gmailDriver, urlObject, true);
 }
 
 function _isGmailView(viewName){
@@ -126,7 +126,7 @@ function _doesUrlContainThreadId(urlObject){
 	return !!potentialThreadId.toLowerCase().match(/^[0-9a-f]+$/); //only contains base16 chars
 }
 
-function _createThreadFullscreenViewDriver(gmailDriver, urlObject){
+function _createThreadRouteViewDriver(gmailDriver, urlObject){
 	waitFor(function(){
 		var urlHash = location.hash;
 		if(urlHash){
@@ -139,18 +139,18 @@ function _createThreadFullscreenViewDriver(gmailDriver, urlObject){
 		return !!GmailElementGetter.getThreadContainerElement();
 
 	}, 30*1000, 50).then(function(){
-		_createFullscreenViewDriver(gmailDriver, urlObject, true);
+		_createRouteViewDriver(gmailDriver, urlObject, true);
 	});
 }
 
 
-function _createFullscreenViewDriver(gmailDriver, urlObject, isGmailView){
+function _createRouteViewDriver(gmailDriver, urlObject, isGmailView){
 	var options = _.clone(urlObject);
 	options.isCustomView = !isGmailView;
 
-	var fullscreenViewDriver = new GmailFullscreenView(options);
+	var routeViewDriver = new GmailRouteView(options);
 
-	gmailDriver._fullscreenViewDriverStream.push(fullscreenViewDriver);
+	gmailDriver._routeViewDriverStream.push(routeViewDriver);
 }
 
-module.exports = setupFullscreenViewDriverStream;
+module.exports = setupRouteViewDriverStream;

@@ -1,34 +1,26 @@
-var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
 
 /**
  * @class
- * This namespace contains methods relevant to the different "fullscreen views" that the client can take on. To be clear "fullscreen"
- * means everything that is not in the top header bar (where search is) or the left navigation bar where the labels are listed.
+ * This namespace contains methods relevant to the different routes that the client can take on. When a new route is activated
+ * the main content of the client is usually replaced.
  */
-
-var FullscreenViews = function(platformImplementationLoader){
-	EventEmitter.call(this);
-
+var Router = function(platformImplementationLoader){
 	this._platformImplementationLoader = platformImplementationLoader;
-
-	this._watchForFullscreenViewChanges();
 };
 
-FullscreenViews.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(FullscreenViews.prototype, /** @lends FullscreenViews */ {
+_.extend(Router.prototype, /** @lends Router */ {
 
 	/**
-	 * Register a custom FullscreenView
-	 * @type {FullscreenViewDescriptor} - options for the custom fullscreen view
+	 * Register a custom Route
+	 * @type {RouteDescriptor} - routeDescriptor for the custom route
 	 */
-	registerCustom: function(options){
+	createNewRoute: function(routeDescriptor){
 		var self = this;
 		this._platformImplementationLoader.load().then(function(platformImplementation){
 
-			platformImplementation.FullscreenViews.registerCustom(options);
+			platformImplementation.Router.createNewRoute(routeDescriptor);
 
 		});
 	},
@@ -44,66 +36,62 @@ _.extend(FullscreenViews.prototype, /** @lends FullscreenViews */ {
 			throw new Error("Called before InboxSDK finished loading");
 		}
 
-		return this._platformImplementationLoader.getPlatformImplementation().FullscreenViews.createLink(name, paramArray);
+		return this._platformImplementationLoader.getPlatformImplementation().Router.createLink(name, paramArray);
 	},
 
 	/**
-	 *  Change the fullscreen view to be the view with the given name and have the given parameters
-	 *  @param {string} name - name of the view to go to
+	 *  Change the route to be the one with the given name and have the given parameters
+	 *  @param {string} name - name of the route to go to
 	 *  @param {array[{string}]} paramArray - array of parameters
 	 */
-	gotoView: function(name, paramArray){
+	goto: function(name, paramArray){
 		if(!this._platformImplementationLoader.getPlatformImplementation()) {
 			throw new Error("Called before InboxSDK finished loading");
 		}
 
-		return this._platformImplementationLoader.getPlatformImplementation().FullscreenViews.gotoView(name, paramArray);
+		return this._platformImplementationLoader.getPlatformImplementation().Router.goto(name, paramArray);
+	},
+
+
+	/**
+	 * Register a handler to be called for every time the current Route changes.
+	 * @param {function(RouteView)} the function to be called
+	 * @return {function} a function to call when you want to unregister this handler
+	 */
+	registerRouteViewHandler: function(handler){
+		return this._platformImplementationLoader.registerHandler('Router', 'RouteView', handler);
 	},
 
 	/* deprecated */
-	getDescriptor: function(name){
-		if(!this._platformImplementationLoader.getPlatformImplementation()) {
-			throw new Error("Called before InboxSDK finished loading");
-		}
-
-		return this._platformImplementationLoader.getPlatformImplementation().FullscreenViews.getDescriptor(name);
+	gotoView: function(name, paramArray){
+		this.goto(name, paramArray);
 	},
 
-	_watchForFullscreenViewChanges: function(){
-		var self = this;
-		this._platformImplementationLoader.load().then(function(platformImplementation){
-
-			platformImplementation.FullscreenViews.on('change', function(event){
-				self.emit('change', event);
-			});
-
-		});
+	/* deprecated */
+	registerCustom: function(routeDescriptor){
+		this.createNewRoute(routeDescriptor);
 	}
-
-	/**
-	 * fires event "change" for when a new FullscreenView is displayed
-	 */
 
 });
 
-module.exports = FullscreenViews;
+module.exports = Router;
 
 
 /**
  * @class
- * This type is passed into FullscreenViews.registerCustom to register a new custom fullscreen view type
+ * This type is passed into Router.createNewRoute to register a new custom route
  */
-var FullscreenViewDescriptor = /** @lends FullscreenViewDescriptor */ {
+var RouteDescriptor = /** @lends RouteDescriptor */ {
 
 /**
- * The name of the custom view.
+ * The name of the custom route.
  * @type {string}
  */
 name: null,
 
 /**
- * The function to call when the custom fullscreen view is showing on screen
- * @type {function({FullscreenView})}
+ * The function to call when the custom route is showing on screen
+ * @type {function({RouteView})}
  */
 onActivate: null
 

@@ -10,11 +10,11 @@ var GmailToolbarView = require('./gmail-toolbar-view');
 
 var GmailContentPanelContainerView = require('../widgets/gmail-content-panel/gmail-content-panel-container-view');
 
-var GmailThreadView = function(element, fullscreeViewDriver){
+var GmailThreadView = function(element, routeViewDriver){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
-	this._fullscreenViewDriver = fullscreeViewDriver;
+	this._routeViewDriver = routeViewDriver;
 
 	this._eventStream = new Bacon.Bus();
 
@@ -28,7 +28,7 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_fullscreenViewDriver', destroy: false, get: true},
+		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_sidebarContentPanelContainerView', destroy: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: false},

@@ -1,15 +1,15 @@
 var _ = require('lodash');
 var BasicClass = require('../../../lib/basic-class');
 
-var DropdownView = function(){
+var GmailDropdownView = function(){
 	BasicClass.call(this);
 
 	this._setupElement();
 };
 
-DropdownView.prototype = Object.create(BasicClass.prototype);
+GmailDropdownView.prototype = Object.create(BasicClass.prototype);
 
-_.extend(DropdownView.prototype, {
+_.extend(GmailDropdownView.prototype, {
 
 	__memberVariables: [
 		{name: '_containerElement', destroy: true, get: true},
@@ -35,4 +35,4 @@ _.extend(DropdownView.prototype, {
 	}
 });
 
-module.exports = DropdownView;
+module.exports = GmailDropdownView;

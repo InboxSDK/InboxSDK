@@ -27,7 +27,7 @@ DropdownView.prototype = Object.create(EventEmitter.prototype);
 _.extend(DropdownView.prototype, {
 
 	close: function(){
-		this.emit('close');
+		this.emit('unload');
 	},
 
 	focus: function(){

@@ -56,7 +56,7 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_eventStream', destroy: false, get: true},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
@@ -71,16 +71,6 @@ _.extend(GmailComposeView.prototype, {
 	_setupConsistencyCheckers: function(){
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
-	},
-
-	destroy: function() {
-		if (this._eventStream) {
-			this._eventStream.push({
-				type: 'close'
-			});
-			this._eventStream.end();
-		}
-		ComposeWindowDriver.prototype.destroy.call(this);
 	},
 
 	insertBodyTextAtCursor: function(text){

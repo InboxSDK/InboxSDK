@@ -11,8 +11,9 @@ _.extend(AttachmentCardViewDriver.prototype, {
 
 	getAttachmentType: function(){},
 
+	addButton: function(options){},
 
-	addButton: function(options){}
+	getEventStream: function(){}
 
 });
 

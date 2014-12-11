@@ -20,7 +20,9 @@ _.extend(MessageViewDriver.prototype, {
 
 	addAttachmentCard: function(options){},
 
-	addButtonToDownloadAllArea: function(options){}
+	addButtonToDownloadAllArea: function(options){},
+
+	getEventStream: function(){}
 
 });
 

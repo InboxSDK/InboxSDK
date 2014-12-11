@@ -1,13 +1,13 @@
 var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 
-var FullscreenViewDriver = function(){
+var RouteViewDriver = function(){
 	BasicClass.call(this);
 };
 
-FullscreenViewDriver.prototype = Object.create(BasicClass.prototype);
+RouteViewDriver.prototype = Object.create(BasicClass.prototype);
 
-_.extend(FullscreenViewDriver.prototype, {
+_.extend(RouteViewDriver.prototype, {
 
 	getName: function(){},
 
@@ -21,4 +21,4 @@ _.extend(FullscreenViewDriver.prototype, {
 
 });
 
-module.exports = FullscreenViewDriver;
+module.exports = RouteViewDriver;
