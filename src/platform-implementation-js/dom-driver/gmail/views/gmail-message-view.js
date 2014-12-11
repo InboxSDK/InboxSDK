@@ -29,7 +29,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_element', destroy: false, get: true},
 		{name: '_messageStateMutationObserver', destroy: false},
 		{name: '_replyAreaStateMutationObserver', destroy: false},
-		{name: '_eventStream', destroy: true, destroyFunction: 'end'},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
