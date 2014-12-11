@@ -18,8 +18,6 @@ function streamWaitFor(condition, timeout, steptime) {
     steptime = 250;
   }
 
-  var waited = 0;
-
   var timeoutStream = Bacon.later(timeout).flatMap(function() {
     setTimeout(function() {
       throw timeoutError;
