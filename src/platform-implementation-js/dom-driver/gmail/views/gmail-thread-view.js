@@ -31,7 +31,7 @@ _.extend(GmailThreadView.prototype, {
 		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_sidebarContentPanelContainerView', destroy: true},
 		{name: '_toolbarView', destroy: true, get: true},
-		{name: '_newMessageMutationObserver', destroy: false},
+		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
 	],
