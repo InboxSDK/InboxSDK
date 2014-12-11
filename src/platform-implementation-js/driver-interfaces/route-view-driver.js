@@ -9,15 +9,15 @@ RouteViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(RouteViewDriver.prototype, {
 
-	getName: function(){},
+	getName: null,
 
-	getParams: function(){},
+	getParams: null,
 
-	isCustomView: function(){},
+	isCustomView: null,
 
-	getCustomViewElement: function(){},
+	getCustomViewElement: null,
 
-	getEventStream: function(){}
+	getEventStream: null
 
 });
 

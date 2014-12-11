@@ -9,11 +9,11 @@ AttachmentAreaViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(AttachmentAreaViewDriver.prototype, {
 
-	getAttachmentCardViewDrivers: function(){},
+	getAttachmentCardViewDrivers: null,
 
-	addAttachmentCardView: function(attachmentCardView){},
+	addAttachmentCardView: null,
 
-	addButtonToDownloadAllArea: function(options){}
+	addButtonToDownloadAllArea: null
 
 });
 

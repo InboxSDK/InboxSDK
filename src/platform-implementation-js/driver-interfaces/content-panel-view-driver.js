@@ -10,9 +10,9 @@ ContentPanelViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ContentPanelViewDriver.prototype, {
 
-  remove: function(){},
+  remove: null,
 
-  getEventStream: function(){}
+  getEventStream: null
 
 });
 

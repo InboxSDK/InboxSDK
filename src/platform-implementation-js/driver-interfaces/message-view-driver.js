@@ -10,19 +10,19 @@ MessageViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(MessageViewDriver.prototype, {
 
-	getContentsElement: function(){},
+	getContentsElement: null,
 
-	getLinks: function(){},
+	getLinks: null,
 
-	isElementInQuotedArea: function(element){},
+	isElementInQuotedArea: null,
 
-	getAttachmentCardViewDrivers: function(){},
+	getAttachmentCardViewDrivers: null,
 
-	addAttachmentCard: function(options){},
+	addAttachmentCard: null,
 
-	addButtonToDownloadAllArea: function(options){},
+	addButtonToDownloadAllArea: null,
 
-	getEventStream: function(){}
+	getEventStream: null
 
 });
 
