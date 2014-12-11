@@ -6,10 +6,8 @@ var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-dr
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
-  this._eventStreamBus = new Bacon.Bus();
+  this._eventStream = new Bacon.Bus();
   this._element = element;
-
-  console.log('GmailThreadRowView constructed', element);
 };
 
 GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
@@ -18,11 +16,35 @@ _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
     {name: '_element', destroy: false},
-    {name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
+    {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
   ],
 
+  destroy: function() {
+    _.each(this._element.getElementsByClassName('inboxSDKlabel'), function(node) {
+      node.remove();
+    });
+    ThreadRowViewDriver.prototype.destroy.call(this);
+  },
+
   addLabel: function(label) {
-    console.log('addLabel unimplemented');
+    var labelParentDiv = this._element.querySelector('td.a4W > div.xS > div.xT');
+
+    var labelDiv = document.createElement('div');
+    labelDiv.className = 'yi inboxSDKlabel';
+    labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
+    var at = labelDiv.querySelector('div.at');
+    var au = labelDiv.querySelector('div.au');
+    var av = labelDiv.querySelector('div.av');
+
+    av.textContent = at.title = label.text;
+    if (label.color) {
+      at.style.backgroundColor = at.style.borderColor = au.style.borderColor = label.color;
+    }
+    if (label.textColor) {
+      av.style.color = label.textColor;
+    }
+
+    labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
   },
 
   addButton: function(buttonDescriptor) {

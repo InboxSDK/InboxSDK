@@ -8,7 +8,7 @@ var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver
 var GmailToolbarView = require('./gmail-toolbar-view');
 var GmailThreadRowView = require('./gmail-thread-row-view');
 
-var waitFor = require('../../../lib/wait-for');
+var streamWaitFor = require('../../../lib/stream-wait-for');
 var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
@@ -37,6 +37,10 @@ _.extend(GmailRowListView.prototype, {
 
 	getEventStream: function(){
 		return this._eventStreamBus;
+	},
+
+	getSelectedThreadRows: function() {
+		throw new Error("getSelectedThreadRows unimplemented");
 	},
 
 	_setupToolbarView: function(){
@@ -75,15 +79,13 @@ _.extend(GmailRowListView.prototype, {
 
 	_startWatchingForRowViews: function(){
 		var self = this;
-		var tbody;
 
 		this._eventStreamBus.plug(
-			Bacon.fromPromise(waitFor(function() {
-				return !self._element ||
-					(tbody = self._element.querySelector('div.Cp > div > table > tbody'));
-			})).flatMap(function() {
+			streamWaitFor(function() {
+				return self._element.querySelector('div.Cp > div > table > tbody');
+			}, 10*1000, 2).flatMap(function(tbody) {
 				var elementStream = makeElementChildStream(tbody)
-					.takeUntil(self._eventStreamBus.filter(false).mapEnd())
+					.takeUntil( self._eventStreamBus.filter(false).mapEnd() )
 					.filter(function(event) {
 						return event.el.classList.contains('zA');
 					});

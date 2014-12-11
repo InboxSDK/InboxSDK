@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
@@ -77,10 +78,10 @@ _.extend(GmailFullscreenView.prototype, {
 
 	_setupSubViews: function(){
 		var self = this;
-		setTimeout(function(){
+		RSVP.resolve().then(function(){
 			self._setupRowListViews();
 			self._setupContentAndSidebarView();
-		}, 1);
+		});
 	},
 
 	_setupRowListViews: function(){
