@@ -32,64 +32,30 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 			}
 		);
 
-	//using a bus here instead of mergeAll because of a bug with mergeAll
-	var bus = new Bacon.Bus();
-
-	bus.plug(
-		mainSubAddressStream
-			.startWith({
-				addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
-			})
-			.map('.addedNodes')
-			.map(_.toArray)
-			.flatMap(Bacon.fromArray)
-			.filter(_isRecipientNode)
-			.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded'))
-	);
-
-	bus.plug(
-		mainSubAddressStream
-			.map('.removedNodes')
-			.map(_.toArray)
-			.flatMap(Bacon.fromArray)
-			.filter(_isRecipientNode)
-			.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
-	);
-
-
-
-	RSVP.Promise.resolve().then(function() {
-		var nodes = rowElements[rowIndex].querySelectorAll('.vR');
-		_.chain(nodes)
-			.filter(_isRecipientNode)
-			.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded'))
-			.each(bus.push.bind(bus));
-	});
-
-	return bus;
-
-	/* what it should be but is broken for some reason
 	return Bacon.mergeAll(
-		mainSubAddressStream
-			.startWith({
-				addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
+		Bacon
+			.later(0)
+			.flatMap(function() {
+				return Bacon.mergeAll(
+					mainSubAddressStream
+						.merge(Bacon.once({
+							addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
+						}))
+						.map('.addedNodes')
+						.map(_.toArray)
+						.flatMap(Bacon.fromArray)
+						.filter(_isRecipientNode)
+						.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded')),
+
+					mainSubAddressStream
+						.map('.removedNodes')
+						.map(_.toArray)
+						.flatMap(Bacon.fromArray)
+						.filter(_isRecipientNode)
+						.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
+				)
 			})
-			.map('.addedNodes')
-			.map(_.toArray)
-			.flatMap(Bacon.fromArray)
-			.filter(_isRecipientNode)
-			.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded')),
-
-		mainSubAddressStream
-			.map('.removedNodes')
-			.map(_.toArray)
-			.flatMap(Bacon.fromArray)
-			.filter(_isRecipientNode)
-			.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
 	);
-*/
-
-
 }
 
 function _isRecipientNode(node){
