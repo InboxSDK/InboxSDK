@@ -10,23 +10,23 @@ Driver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Driver.prototype, {
 
-	showCustomFullscreenView: function(element){},
+	showCustomRouteView: null,
 
-	showNativeFullscreenView: function(){},
+	showNativeRouteView: null,
 
-	getComposeViewDriverStream: function(){},
+	getComposeViewDriverStream: null,
 
-	getThreadViewDriverStream: function(){},
+	getThreadViewDriverStream: null,
 
-	getMessageViewDriverStream: function(){},
+	getMessageViewDriverStream: null,
 
-	getReplyViewDriverStream: function(){},	
+	getReplyViewDriverStream: null,
 
-	getToolbarViewDriverStream: function(){},
+	getToolbarViewDriverStream: null,
 
-	getFullscreenViewChangeStream: function(){},
+	getRouteViewDriverStream: null,
 
-	getNativeViewNames: function(){}
+	getNativeViewNames: null
 
 });
 

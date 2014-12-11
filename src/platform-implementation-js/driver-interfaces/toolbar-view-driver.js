@@ -9,7 +9,7 @@ ToolbarViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ToolbarViewDriver.prototype, {
 
-	addButton: function(buttonDescriptor){}
+	addButton: null
 
 });
 

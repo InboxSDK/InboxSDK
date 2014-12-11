@@ -1,6 +1,6 @@
 var GmailElementGetter = require('../gmail-element-getter');
 
-function showNativeFullscreenView(gmailDriver, element){
+module.exports = function(gmailDriver, element){
 
 	var contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
@@ -17,6 +17,4 @@ function showNativeFullscreenView(gmailDriver, element){
 		child.style.display = '';
 	});
 
-}
-
-module.exports = showNativeFullscreenView;
+};

@@ -11,9 +11,9 @@ var GmailMessageView = function(element){
 	MessageViewDriver.call(this);
 
 	this._element = element;
-	this._eventStreamBus = new Bacon.Bus();
+	this._eventStream = new Bacon.Bus();
 
-	this._replyElementStream = this._eventStreamBus.filter(function(event) {
+	this._replyElementStream = this._eventStream.filter(function(event) {
 		return event.eventName === 'replyElement';
 	}).map('.change');
 
@@ -29,7 +29,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_element', destroy: false, get: true},
 		{name: '_messageStateMutationObserver', destroy: false},
 		{name: '_replyAreaStateMutationObserver', destroy: false},
-		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
@@ -70,10 +70,6 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		return this._gmailAttachmentAreaView.getGmailAttachmentCardViews();
-	},
-
-	getEventStream: function(){
-		return this._eventStreamBus;
 	},
 
 	addAttachmentCard: function(options){
@@ -131,7 +127,7 @@ _.extend(GmailMessageView.prototype, {
 
 			if(mutation.oldValue.indexOf('h7') > -1){ //we were open
 				if(!currentClassList.contains('h7')){
-					self._eventStreamBus.push({
+					self._eventStream.push({
 						eventName: 'messageClosed',
 						view: self
 					});
@@ -163,7 +159,7 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		this._eventStreamBus.push({
+		this._eventStream.push({
 			eventName: 'messageOpen',
 			view: this
 		});
@@ -172,7 +168,7 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		this._eventStreamBus.push({
+		this._eventStream.push({
 			eventName: 'messageLoaded',
 			view: this
 		});
@@ -199,7 +195,7 @@ _.extend(GmailMessageView.prototype, {
 		);
 
 		if(replyContainer.classList.contains('adB')){
-			this._eventStreamBus.push({
+			this._eventStream.push({
 				eventName: 'replyElement',
 				change: {
 					type: 'added', el: replyContainer
@@ -215,7 +211,7 @@ _.extend(GmailMessageView.prototype, {
 
 		if(currentClassList.contains('adB')){
 			if(oldValue.indexOf('adB') === -1){
-				this._eventStreamBus.push({
+				this._eventStream.push({
 					eventName: 'replyElement',
 					change: {
 						type: 'added', el: mutation.target
@@ -224,7 +220,7 @@ _.extend(GmailMessageView.prototype, {
 			}
 		}
 		else{
-			this._eventStreamBus.push({
+			this._eventStream.push({
 				eventName: 'replyElement',
 				change: {
 					type: 'removed', el: mutation.target
