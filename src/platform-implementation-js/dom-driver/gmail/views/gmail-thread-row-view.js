@@ -20,9 +20,8 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    _.each(this._element.getElementsByClassName('inboxSDKlabel'), function(node) {
-      node.remove();
-    });
+    _.each(this._element.getElementsByClassName('inboxSDKlabel'), removeNode);
+    _.each(this._element.getElementsByClassName('inboxSDKattachmentIcon'), removeNode);
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
@@ -54,7 +53,7 @@ _.extend(GmailThreadRowView.prototype, {
   addAttachmentIcon: function(url, title) {
     var attachmentDiv = this._element.querySelector('td.yf.xY');
     var img = document.createElement('img');
-    img.className = 'iP';
+    img.className = 'iP inboxSDKattachmentIcon';
     img.src = 'images/cleardot.gif';
     if (title) {
       img.alt = title;
@@ -66,3 +65,7 @@ _.extend(GmailThreadRowView.prototype, {
 });
 
 module.exports = GmailThreadRowView;
+
+function removeNode(node) {
+  node.remove();
+}
