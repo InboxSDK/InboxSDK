@@ -34,7 +34,7 @@
     "sinon": "^1.11.1",
     "stdio": "^0.2.3",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.1"
+    "watchify": "2.1.1"
   },
   "license": "All Rights Reserved",
   "main": "src/inboxsdk-js/inboxsdk.js",
