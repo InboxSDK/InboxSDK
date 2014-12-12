@@ -108,14 +108,23 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getSelectedBodyText();
 	},
 
+	/**
+	* Returns a plain string containing the subject of the email
+	* @return {string}
+	*/
 	getSubject: function(){
 		return this._composeViewImplementation.getSubject();
 	},
 
+	/**
+	* Returns a plain text string containing all the text of the email body
+	* @return {string}
+	*/
 	getTextContent: function(){
 		return this._composeViewImplementation.getTextContent();
 	},
 
+	
 	getToRecipients: function(){
 		return this._composeViewImplementation.getToRecipients();
 	},
@@ -170,7 +179,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 
 	/**
-	* Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
+	* Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not
+	* in the body of the message. If anything inside the body is selected, it will be replaced.
 	* @param {string} text - the text to insert
 	* @return {void}
 	*/
