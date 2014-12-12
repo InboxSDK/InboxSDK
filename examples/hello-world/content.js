@@ -22,6 +22,13 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
 
 var i = 0;
 inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
-	threadRowView.addLabel({text:'a'+(i++), color:'white', textColor:'blue'});
-	threadRowView.addAttachmentIcon('https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png');
+	threadRowView.addLabel({
+		text:'a'+(i++),
+		color:'white',
+		textColor:'blue'
+	});
+	threadRowView.addAttachmentIcon({
+		iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+		title: 'blah blah'
+	});
 });
