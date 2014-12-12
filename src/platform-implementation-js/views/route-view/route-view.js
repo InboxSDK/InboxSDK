@@ -27,7 +27,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
 	 * Get the URL parameters of this RouteView instance
-	 * @return {array[{string}]}
+	 * @return {stringp[]}
 	 */
 	getParams: function(){
 		return this._routeViewImplementation.getParams();

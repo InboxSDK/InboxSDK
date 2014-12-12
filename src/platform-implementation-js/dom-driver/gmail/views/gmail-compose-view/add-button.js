@@ -9,24 +9,24 @@ var DropdownButtonViewController = require('../../../../widgets/buttons/dropdown
 
 var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 
-function addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
+function addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions){
 	if(buttonDescriptor.onValue){
-		_addButtonStream(gmailComposeView, buttonDescriptor, groupOrderHint);
+		_addButtonStream(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 	else{
-		_addButton(gmailComposeView, buttonDescriptor, groupOrderHint);
+		_addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 }
 
-function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHint){
+function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHint, extraOnClickOptions){
 	var buttonViewController;
 
 	var unsubscribeFunction = buttonDescriptorStream.onValue(function(buttonDescriptor){
 
-		var buttonOptions = _processButtonDescriptor(buttonDescriptor);
+		var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
 
 		if(!buttonViewController){
-			buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint);
+			buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
 		}
 		else{
 			buttonViewController.getView().update(buttonOptions);
@@ -36,12 +36,12 @@ function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHi
 	gmailComposeView.addUnsubscribeFunction(unsubscribeFunction);
 }
 
-function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
+function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions){
 	if(!gmailComposeView.getElement() || !gmailComposeView.getFormattingToolbar()){
 		return;
 	}
 
-	var buttonOptions = _processButtonDescriptor(buttonDescriptor);
+	var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
 	var buttonViewController;
 
 	if(buttonOptions.type === 'MODIFIER'){
@@ -130,11 +130,16 @@ function _getButtonViewController(buttonDescriptor){
 	return buttonViewController;
 }
 
-function _processButtonDescriptor(buttonDescriptor){
+function _processButtonDescriptor(buttonDescriptor, extraOnClickOptions){
 	// clone the descriptor and set defaults.
 	var buttonOptions = _.extend({
 		type: 'MODIFIER'
 	}, buttonDescriptor);
+
+	var oldOnClick = buttonOptions.onClick;
+	buttonOptions.onClick = function(event){
+		oldOnClick(_.extend({}, extraOnClickOptions, event));
+	};
 
 	if(buttonDescriptor.hasDropdown){
 		buttonOptions.dropdownShowFunction = buttonDescriptor.onClick;
@@ -172,9 +177,9 @@ function _groupButtonsIfNeeded(gmailComposeView){
 }
 
 function _doButtonsNeedToGroup(gmailComposeView){
-	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar')
-			&& gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth
-			&& gmailComposeView.getElement().querySelectorAll('.inboxsdk__button').length > 2;
+	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
+			gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth &&
+			gmailComposeView.getElement().querySelectorAll('.inboxsdk__button').length > 2;
 }
 
 function _createGroupedActionToolbarContainer(gmailComposeView){
@@ -298,6 +303,7 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
+	debugger;
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
 
 	if(!groupedActionToolbarContainer){
@@ -320,7 +326,7 @@ function _positionGroupToolbar(gmailComposeView){
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
 
-	groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
+	groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft/2 + 1) + 'px';
 }
 
 function _positionFormattingToolbar(gmailComposeView){

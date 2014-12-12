@@ -35,7 +35,7 @@
     "sinon": "^1.12.1",
     "stdio": "^0.2.6",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.1"
+    "watchify": "2.1.1"
   },
   "license": "All Rights Reserved",
   "main": "src/inboxsdk-js/inboxsdk.js",
@@ -45,5 +45,5 @@
     "start": "gulp default --single --watch --reloader",
     "test": "mocha"
   },
-  "version": "0.5.1"
+  "version": "0.5.2"
 }

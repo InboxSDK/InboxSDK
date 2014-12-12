@@ -1,21 +1,10 @@
-var Bacon = require('baconjs');
+var makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
+
 
 module.exports = function(gmailComposeView){
-
     var bodyElement = gmailComposeView.getBodyElement();
 
-    return Bacon.fromBinder(function(sink){
-
-        var mutationObserver = new MutationObserver(function(){
-            sink({eventName: 'bodyChanged'});
-        });
-
-        mutationObserver.observe(bodyElement, {childList: true, subtree: true, characterData: true});
-
-        return function(){
-            mutationObserver.disconnect();
-        };
-
+    return makeMutationObserverStream(bodyElement, {childList: true, subtree: true, characterData: true}).map(function(){
+        return {eventName: 'bodyChanged'};
     });
-
 };

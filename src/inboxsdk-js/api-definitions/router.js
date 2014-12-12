@@ -14,7 +14,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 
 	/**
 	 * Register a custom Route
-	 * @type {RouteDescriptor} - routeDescriptor for the custom route
+	 * @param {RouteDescriptor} - routeDescriptor for the custom route
 	 */
 	createNewRoute: function(routeDescriptor){
 		var self = this;
@@ -28,7 +28,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	 * Get a URL that can be used to navigate to a view.
 	 * @param {string} name the name of the view you want to create a link to
-	 * @param {array[{string}]} paramArray an array of parameters you want to be included in the URL. The SDK handles some basic url processing to ensure it's compatible with the mail client's address scheme.
+	 * @param {string[]} paramArray an array of parameters you want to be included in the URL. The SDK handles some basic url processing to ensure it's compatible with the mail client's address scheme.
 	 * @return {string} the formatted URL
 	 */
 	createLink: function(name, paramArray){
@@ -42,7 +42,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	 *  Change the route to be the one with the given name and have the given parameters
 	 *  @param {string} name - name of the route to go to
-	 *  @param {array[{string}]} paramArray - array of parameters
+	 *  @param {string[]} paramArray - array of parameters
 	 */
 	goto: function(name, paramArray){
 		if(!this._platformImplementationLoader.getPlatformImplementation()) {
