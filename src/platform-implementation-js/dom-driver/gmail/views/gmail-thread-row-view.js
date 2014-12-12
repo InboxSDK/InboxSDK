@@ -51,8 +51,16 @@ _.extend(GmailThreadRowView.prototype, {
     console.log('addButton unimplemented');
   },
 
-  addAttachmentIcon: function(url) {
-    console.log('addAttachmentIcon unimplemented');
+  addAttachmentIcon: function(url, title) {
+    var attachmentDiv = this._element.querySelector('td.yf.xY');
+    var img = document.createElement('img');
+    img.className = 'iP';
+    img.src = 'images/cleardot.gif';
+    if (title) {
+      img.alt = title;
+    }
+    img.style.background = "url("+url+") no-repeat -2px -2px";
+    attachmentDiv.appendChild(img);
   }
 
 });

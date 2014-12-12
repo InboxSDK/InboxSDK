@@ -33,8 +33,8 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   /**
    * Adds an attachment icon
    */
-  addAttachmentIcon: function(url) {
-    this._threadRowViewDriver.addAttachmentIcon(url);
+  addAttachmentIcon: function(url, title) {
+    this._threadRowViewDriver.addAttachmentIcon(url, title);
   }
 
   /**
