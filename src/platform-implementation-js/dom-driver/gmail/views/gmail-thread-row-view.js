@@ -56,7 +56,7 @@ _.extend(GmailThreadRowView.prototype, {
     img.className = 'iP inboxSDKattachmentIcon';
     img.src = 'images/cleardot.gif';
     if (title) {
-      img.alt = title;
+      img.title = title;
     }
     img.style.background = "url("+url+") no-repeat -2px -2px";
     attachmentDiv.appendChild(img);
