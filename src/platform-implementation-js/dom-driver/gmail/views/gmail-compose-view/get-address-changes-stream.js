@@ -1,26 +1,31 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var RSVP = require('rsvp');
-var makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
 
+var makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
+var getAddressInformationExtractor = require('./get-address-information-extractor');
 
 module.exports = function(gmailComposeView){
 	var recipientRowElements = gmailComposeView.getRecipientRowElements();
 
 	if(!recipientRowElements || recipientRowElements.length === 0){
-		return Bacon.Never();
+		return Bacon.never();
 	}
 
-	return Bacon.mergeAll(
+	var mergedStream = Bacon.mergeAll(
 		_makeSubAddressStream('to', recipientRowElements, 0),
 		_makeSubAddressStream('cc', recipientRowElements, 1),
 		_makeSubAddressStream('bcc', recipientRowElements, 2)
 	);
+
+	var umbrellaStream = mergedStream.bufferWithTime(100).map(_groupChangeEvents);
+
+	return Bacon.mergeAll(mergedStream, umbrellaStream);
 };
 
 function _makeSubAddressStream(addressType, rowElements, rowIndex){
 	if(!rowElements[rowIndex]){
-		return Bacon.Never();
+		return Bacon.never();
 	}
 
 	var mainSubAddressStream =
@@ -42,14 +47,16 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.map(_.toArray)
 				.flatMap(Bacon.fromArray)
 				.filter(_isRecipientNode)
-				.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded')),
+				.map(getAddressInformationExtractor(addressType))
+				.map(_convertToEvent.bind(null, addressType + 'AddressRemoved')),
 
 			mainSubAddressStream
 				.map('.removedNodes')
 				.map(_.toArray)
 				.flatMap(Bacon.fromArray)
 				.filter(_isRecipientNode)
-				.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
+				.map(getAddressInformationExtractor(addressType))
+				.map(_convertToEvent.bind(null, addressType + 'AddressRemoved'))
 		);
 	});
 }
@@ -58,27 +65,36 @@ function _isRecipientNode(node){
 	return node.classList.contains('vR');
 }
 
-function _extractAddressInformation(addressType, eventName, node){
-	var contactNode = node.querySelector('input[name=' + addressType + ']');
-	var contactInfoString = contactNode.value;
-
-	var emailAddress;
-	var name;
-
-	var contactInfoParts = contactInfoString.split('<');
-	if(contactInfoParts.length > 0){
-		name = contactInfoParts[0].trim();
-		emailAddress = contactInfoParts[1].split('>')[0].trim();
-	}
-	else{
-		emailAddress = contactInfoParts[0];
-	}
-
+function _convertToEvent(eventName, addressInfo){
 	return {
 		eventName: eventName,
-		data: {
-			emailAddress: emailAddress,
-			name: name
+		data: addressInfo
+	};
+}
+
+function _groupChangeEvents(events){
+	var grouping = {
+		to: {
+			added: [],
+			removed: []
+		},
+		cc: {
+			added: [],
+			removed: []
+		},
+		bcc: {
+			added: [],
+			removed: []
 		}
+	};
+
+	events.forEach(function(event){
+		var parts = event.eventName.split('Address'); //splits "toAddressAdded" => ["to", "Added"]
+		grouping[parts[0]][parts[1].toLowerCase()].push(event.data);
+	});
+
+	return {
+		eventName: 'recipientsChanged',
+		data: grouping
 	};
 }

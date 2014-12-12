@@ -41,14 +41,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 			throw new Error('Must have an onClick function defined');
 		}
 
-		if(buttonDescriptor.hasDropdown){
-			var oldOnClick = buttonDescriptor.onClick;
-			buttonDescriptor.onClick = function(event){
-				oldOnClick(_.extend({composeView: this}, event));
-			};
-		}
-
-		this._composeViewImplementation.addButton(buttonDescriptor, this._appId);
+		this._composeViewImplementation.addButton(buttonDescriptor, this._appId, {composeView: this});
 	},
 
 	addInnerSidebar: function(options){
@@ -70,16 +63,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		this._composeViewImplementation.close();
 	},
 
-	getBccRecipients: function(){
-		return this._composeViewImplementation.getBccRecipients();
-	},
 
 	getBodyElement: function(){
 		return this._composeViewImplementation.getBodyElement();
-	},
-
-	getCcRecipients: function(){
-		return this._composeViewImplementation.getCcRecipients();
 	},
 
 	getComposeID: function(){
@@ -114,8 +100,28 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getTextContent();
 	},
 
+	/**
+	 * Returns an array of Contacts
+	 * @return {Contact}
+	 */
 	getToRecipients: function(){
 		return this._composeViewImplementation.getToRecipients();
+	},
+
+	/**
+	 * Returns an array of Contacts
+	 * @return {Contact}
+	 */
+	getCcRecipients: function(){
+		return this._composeViewImplementation.getCcRecipients();
+	},
+
+	/**
+	 * Returns an array of Contacts
+	 * @return {Contact}
+	 */
+	getBccRecipients: function(){
+		return this._composeViewImplementation.getBccRecipients();
 	},
 
 	/**
@@ -125,7 +131,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	insertHTMLIntoBodyAtCursor: function(html){
-		this._composeViewImplementation.insertBodyHTMLAtCursor(html);
+		return this._composeViewImplementation.insertBodyHTMLAtCursor(html);
 	},
 
 	/**
@@ -147,7 +153,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 			return;
 		}
 
-		this._composeViewImplementation.insertLinkChipIntoBody({
+		return this._composeViewImplementation.insertLinkChipIntoBody({
 			text: text,
 			url: url,
 			iconUrl: iconUrl
@@ -163,7 +169,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	insertLinkIntoBodyAtCursor: function(text, url){
-		this._composeViewImplementation.insertLinkIntoBody(text, url);
+		return this._composeViewImplementation.insertLinkIntoBody(text, url);
 	},
 
 
@@ -173,7 +179,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	insertTextIntoBodyAtCursor: function(text){
-		this._composeViewImplementation.insertBodyTextAtCursor(text);
+		return this._composeViewImplementation.insertBodyTextAtCursor(text);
 	},
 
 
@@ -221,7 +227,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
-	* Fires when any of the To/Cc/Bcc fields are changed.
+	* Fires when any of the To/Cc/Bcc fields are changed. The passed in callback will receive an object which splits out
+	* what happened. {to: {added: [{Contact}], removed: [{Contact}]}, cc: {added: [{Contact}], removed: [{Contact}]}, bcc: {added: [{Contact}], removed: [{Contact}]}}
 	* @event ComposeView#recipientsChanged
 	*/
 });
@@ -283,4 +290,25 @@ type:null,
 * @type {number}
 */
 orderHint:null
+};
+
+
+/**
+ * @class  Contact
+ * Simple object that contains the email address and full name if it exists
+ */
+var Contact = /** @lends Contact */ {
+
+/**
+ * email address of the contact
+ * @type {string}
+ */
+emailAddress: null,
+
+/**
+ * name of the contact, may be null
+ * @type {string}
+ */
+name: null
+
 };

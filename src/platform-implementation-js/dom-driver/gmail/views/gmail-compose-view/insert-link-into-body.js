@@ -33,6 +33,8 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 	if(originalText.length === 0){
 		$link.text(text);
 	}
+
+	return $link[0];
 }
 
 module.exports = insertLinkIntoBody;

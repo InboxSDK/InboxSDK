@@ -10,11 +10,15 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		var buttonOptions = {
 			title: 'Monkeys!',
 			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-			onClick: function(){
+			onClick: function(event){
 				monkeyIndex = (monkeyIndex + 1)%2;
 				buttonOptions.iconUrl = monkeyImages[monkeyIndex];
 
 				sinkFunction(buttonOptions);
+
+
+				var element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
+				element.textContent = 'monkey time';
 			},
 			section: 'TRAY_LEFT'
 		};
@@ -28,8 +32,8 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 	composeView.addButton({
 		title: 'Lion',
 		iconUrl: chrome.runtime.getURL('lion.png'),
-		onClick: function(){
-			alert('lions!');
+		onClick: function(event){
+			event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
 		},
 		section: 'SEND_RIGHT'
 	});
@@ -40,5 +44,7 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 	composeView.on('ccAddressRemoved', console.log.bind(console, 'ccAddressRemoved'));
 	composeView.on('bccAddressAdded', console.log.bind(console, 'bccAddressAdded'));
 	composeView.on('bccAddressRemoved', console.log.bind(console, 'bccAddressRemoved'));
+	composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
+
 
 });
