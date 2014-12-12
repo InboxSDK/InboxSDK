@@ -303,7 +303,6 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
-	debugger;
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
 
 	if(!groupedActionToolbarContainer){

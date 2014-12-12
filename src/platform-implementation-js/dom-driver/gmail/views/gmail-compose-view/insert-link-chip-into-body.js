@@ -23,6 +23,8 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
     frag.appendChild(document.createTextNode('\u200b'));
 
     require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag, gmailComposeView.getSelectionRange());
+
+    return chipElement;
 }
 
 function _getChipElement(options){
