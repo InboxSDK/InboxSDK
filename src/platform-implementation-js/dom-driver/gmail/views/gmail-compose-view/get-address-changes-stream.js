@@ -32,28 +32,26 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 			}
 		);
 
-	return Bacon.later(0)
-		.flatMap(function() {
-			return Bacon.mergeAll(
-				mainSubAddressStream
-					.merge(Bacon.once({
-						addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
-					}))
-					.map('.addedNodes')
-					.map(_.toArray)
-					.flatMap(Bacon.fromArray)
-					.filter(_isRecipientNode)
-					.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded')),
+	return Bacon.later(0).flatMap(function() {
+		return Bacon.mergeAll(
+			mainSubAddressStream
+				.startWith({
+					addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
+				})
+				.map('.addedNodes')
+				.map(_.toArray)
+				.flatMap(Bacon.fromArray)
+				.filter(_isRecipientNode)
+				.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressAdded')),
 
-				mainSubAddressStream
-					.map('.removedNodes')
-					.map(_.toArray)
-					.flatMap(Bacon.fromArray)
-					.filter(_isRecipientNode)
-					.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
-			)
-		})
-	);
+			mainSubAddressStream
+				.map('.removedNodes')
+				.map(_.toArray)
+				.flatMap(Bacon.fromArray)
+				.filter(_isRecipientNode)
+				.map(_extractAddressInformation.bind(null, addressType, addressType + 'AddressRemoved'))
+		);
+	});
 }
 
 function _isRecipientNode(node){
