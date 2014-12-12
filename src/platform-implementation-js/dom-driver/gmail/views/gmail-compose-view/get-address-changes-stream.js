@@ -48,7 +48,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.flatMap(Bacon.fromArray)
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
-				.map(_convertToEvent.bind(null, addressType + 'AddressRemoved')),
+				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
 
 			mainSubAddressStream
 				.map('.removedNodes')
@@ -56,7 +56,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.flatMap(Bacon.fromArray)
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
-				.map(_convertToEvent.bind(null, addressType + 'AddressRemoved'))
+				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
 		);
 	});
 }
@@ -89,7 +89,7 @@ function _groupChangeEvents(events){
 	};
 
 	events.forEach(function(event){
-		var parts = event.eventName.split('Address'); //splits "toAddressAdded" => ["to", "Added"]
+		var parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
 		grouping[parts[0]][parts[1].toLowerCase()].push(event.data);
 	});
 

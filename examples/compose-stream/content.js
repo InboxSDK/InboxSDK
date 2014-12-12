@@ -38,12 +38,12 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		section: 'SEND_RIGHT'
 	});
 
-	composeView.on('toAddressAdded', console.log.bind(console, 'toAddressAdded'));
-	composeView.on('toAddressRemoved', console.log.bind(console, 'toAddressRemoved'));
-	composeView.on('ccAddressAdded', console.log.bind(console, 'ccAddressAdded'));
-	composeView.on('ccAddressRemoved', console.log.bind(console, 'ccAddressRemoved'));
-	composeView.on('bccAddressAdded', console.log.bind(console, 'bccAddressAdded'));
-	composeView.on('bccAddressRemoved', console.log.bind(console, 'bccAddressRemoved'));
+	composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
+	composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));
+	composeView.on('ccContactAdded', console.log.bind(console, 'ccContactAdded'));
+	composeView.on('ccContactRemoved', console.log.bind(console, 'ccContactRemoved'));
+	composeView.on('bccContactAdded', console.log.bind(console, 'bccContactAdded'));
+	composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
 	composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
 
 
