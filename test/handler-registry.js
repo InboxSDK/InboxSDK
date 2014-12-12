@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Symbol = require('./lib/symbol');
+var Symbol = require('../src/common/symbol');
 var Set = require('es6-unweak-collections').Set;
 
 var HandlerRegistry = require('../src/platform-implementation-js/lib/handler-registry');

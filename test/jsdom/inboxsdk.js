@@ -1,6 +1,6 @@
 var assert = require('assert');
 var RSVP = require('../lib/rsvp');
-var jsdom = require('jsdom').jsdom;
+var jsdom = require('../lib/jsdom');
 
 var InboxSDK = require('./lib/inboxsdk');
 
@@ -8,7 +8,8 @@ global.MutationObserver = require('../lib/mock-mutation-observer');
 global.document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
 global.window = document.parentWindow;
 
-document.body.classList = []; // hack
+// don't try to inject ajax interceptor
+document.head.setAttribute('data-inboxsdk-script-injected', true);
 
 process.env.VERSION = 'beep';
 var inboxsdk = new InboxSDK("test", {

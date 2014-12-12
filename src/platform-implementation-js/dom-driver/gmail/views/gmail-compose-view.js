@@ -6,6 +6,7 @@ var Bacon = require('baconjs');
 var simulateClick = require('../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
+var GmailResponseProcessor = require('../gmail-response-processor');
 var waitFor = require('../../../lib/wait-for');
 
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
@@ -30,8 +31,8 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 			xhrInterceptorStream.filter(function(event) {
 				return event.type === 'emailSent' && event.composeId === self.getComposeID();
 			}).map(function(event) {
-				// TODO include final message id
-				return {eventName: 'sent', data: undefined};
+				var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+				return {eventName: 'sent', data: response};
 			})
 		)
 	);

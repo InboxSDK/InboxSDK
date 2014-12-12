@@ -8,6 +8,7 @@
   "dependencies": {
     "baconjs": "0.7.38",
     "brfs": "^1.2.0",
+    "entities": "1.1.1",
     "es6-unweak-collections": "0.4.3",
     "jquery": "2.1.1",
     "lodash": "2.4.1",
@@ -18,7 +19,7 @@
     "browserify": "^6.3.4",
     "envify": "^3.2.0",
     "exec-sync": "^0.1.6",
-    "glob": "^4.0.6",
+    "glob": "^4.3.1",
     "gulp": "^3.8.10",
     "gulp-if": "^1.2.5",
     "gulp-rename": "^1.2.0",
@@ -31,10 +32,10 @@
     "mold-source-map": "^0.3.0",
     "node-dir": "^0.1.6",
     "rimraf": "^2.2.8",
-    "sinon": "^1.11.1",
-    "stdio": "^0.2.3",
+    "sinon": "^1.12.1",
+    "stdio": "^0.2.6",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.1"
+    "watchify": "2.1.1"
   },
   "license": "All Rights Reserved",
   "main": "src/inboxsdk-js/inboxsdk.js",
@@ -44,5 +45,5 @@
     "start": "gulp default --single --watch --reloader",
     "test": "mocha"
   },
-  "version": "0.5.1"
+  "version": "0.5.2"
 }

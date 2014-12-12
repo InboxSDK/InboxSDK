@@ -1,5 +1,9 @@
+var _ = require('lodash');
+var XHRProxyFactory = require('./xhr-proxy-factory');
+var threadIdentifier = require('./thread-identifier');
+
 function setupGmailInterceptor() {
-  var XHRProxyFactory = require('./xhr-proxy-factory');
+  threadIdentifier.setup();
 
   var win = top.document.getElementById('js_frame').contentDocument.defaultView;
   var originalXHR = win.XMLHttpRequest;
@@ -31,13 +35,21 @@ function setupGmailInterceptor() {
 
   wrappers.push({
     isRelevantTo: function(connection) {
-      return connection.params.act === 'dr';
+      return connection.params.search && connection.params.view === 'tl';
     },
-    originalSendBodyLogger: function(connection, body) {
-      triggerEvent({
-        type: 'emailDiscarded',
-        body: body
-      });
+    // originalSendBodyLogger: function(connection) {
+    //   triggerEvent({
+    //     type: 'threadListStart',
+    //     q: connection.params.q
+    //   });
+    // },
+    afterListeners: function(connection) {
+      if (connection.status === 200) {
+        var search = connection.params.search;
+        var responseText = connection.originalResponseText;
+
+        threadIdentifier.processThreadListResponse(responseText);
+      }
     }
   });
 }
