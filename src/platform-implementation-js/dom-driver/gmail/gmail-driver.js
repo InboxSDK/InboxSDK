@@ -5,7 +5,7 @@ require('./custom-style');
 
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
-var makeXhrInterceptorStream = require('./make-xhr-interceptor-stream');
+var makeXhrInterceptor = require('./make-xhr-interceptor');
 var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailModalView = require('./widgets/gmail-modal-view');
@@ -22,6 +22,7 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
+		{name: '_threadMetadataOracle', destroy: false, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -60,8 +61,12 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
+		var result = makeXhrInterceptor();
+		var xhrInterceptStream = result.xhrInterceptStream;
+		this._threadMetadataOracle = result.threadMetadataOracle;
+
 		this._xhrInterceptorStream = new Bacon.Bus();
-		this._xhrInterceptorStream.plug(makeXhrInterceptorStream());
+		this._xhrInterceptorStream.plug(xhrInterceptStream);
 
 		require('./gmail-driver/setup-route-view-driver-stream')(this);
 

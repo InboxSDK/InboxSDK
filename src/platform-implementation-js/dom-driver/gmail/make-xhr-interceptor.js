@@ -7,21 +7,21 @@ var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js');
+    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8');
     document.head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', true);
   }
 });
 
-function makeXhrInterceptStream() {
+function makeXhrInterceptor() {
   injectScript();
 
-  var interceptStream = Bacon
+  var rawInterceptStream = Bacon
     .fromEventTarget(document, 'inboxSDKajaxIntercept')
     .map('.detail');
 
-  return Bacon.mergeAll(
-    interceptStream.filter(function(detail) {
+  var interceptStream = Bacon.mergeAll(
+    rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSending';
     }).map(function(detail) {
       var body = deparam(detail.body);
@@ -31,7 +31,7 @@ function makeXhrInterceptStream() {
         draft: body.draft
       };
     }),
-    interceptStream.filter(function(detail) {
+    rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSent';
     }).map(function(detail) {
       var body = deparam(detail.originalSendBody);
@@ -42,17 +42,26 @@ function makeXhrInterceptStream() {
         draft: body.draft,
         response: response
       };
-    }),
-    interceptStream.filter(function(detail) {
-      return detail.type === 'emailDiscarded';
-    }).map(function(detail) {
-      var body = deparam(detail.body);
-      return {
-        type: 'emailDiscarded',
-        id: body.m
-      };
     })
   );
+
+  var threadMetadataOracle = {
+    getThreadIdForThreadRow: function(threadRow) {
+      var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+      if (!threadid) {
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
+        threadRow.dispatchEvent(event);
+        threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+      }
+      return threadid;
+    }
+  };
+
+  return {
+    xhrInterceptStream: interceptStream,
+    threadMetadataOracle: threadMetadataOracle
+  };
 }
 
-module.exports = makeXhrInterceptStream;
+module.exports = makeXhrInterceptor;

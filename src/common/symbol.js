@@ -1,10 +1,12 @@
 var _ = require('lodash');
 
 function Symbol(description) {
-  if (this === Symbol) {
-    throw new TypeError("Can't use new with Symbol constructor");
+  if (this instanceof Symbol) {
+    throw new TypeError("Can't use new with Symbol function");
   }
-  var strFnOpts = {value: _.constant('[Symbol'+(description?' '+description:'')+']')};
+  var strFnOpts = {
+    value: Object.freeze(_.constant('[Symbol'+(description?' '+description:'')+']'))
+  };
   return Object.freeze(Object.defineProperties({
     name: description
   }, {

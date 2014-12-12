@@ -230,8 +230,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
-	* Fires when the Gmail server has confirmed receiving the message. An event object
-	* containing the new threadId will be passed to the event listeners.
+	* Fires when the Gmail server has confirmed receiving the message. An event
+	* object containing gmailMessageId and gmailThreadId properties will be
+	* passed to the event listeners.
 	* @event ComposeView#sent
 	*/
 
