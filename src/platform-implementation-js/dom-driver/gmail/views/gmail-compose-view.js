@@ -26,13 +26,13 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 			xhrInterceptorStream.filter(function(event) {
 				return event.type === 'emailSending' && event.composeId === self.getComposeID();
 			}).map(function(event) {
-				return {type: 'sending'};
+				return {eventName: 'sending'};
 			}),
 			xhrInterceptorStream.filter(function(event) {
 				return event.type === 'emailSent' && event.composeId === self.getComposeID();
 			}).map(function(event) {
 				var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-				return {type: 'sent', data: response};
+				return {eventName: 'sent', data: response};
 			})
 		)
 	);
@@ -67,6 +67,7 @@ _.extend(GmailComposeView.prototype, {
 
 	_setupStreams: function(){
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
+		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 	},
 
 	_setupConsistencyCheckers: function(){
@@ -75,19 +76,19 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	insertBodyTextAtCursor: function(text){
-		require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
+		return require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
 	},
 
 	insertBodyHTMLAtCursor: function(html){
-		require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html);
+		return require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html);
 	},
 
 	insertLinkIntoBody: function(text, href){
-		require('./gmail-compose-view/insert-link-into-body')(this, text, href);
+		return require('./gmail-compose-view/insert-link-into-body')(this, text, href);
 	},
 
 	insertLinkChipIntoBody: function(options){
-		require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
+		return require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
 	},
 
 	setSubject: function(text){
@@ -107,8 +108,8 @@ _.extend(GmailComposeView.prototype, {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
 	},
 
-	addButton: function(buttonDescriptor, groupOrderHint){
-		require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint);
+	addButton: function(buttonDescriptor, groupOrderHint, extraOnClickOptions){
+		require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	},
 
 	addOuterSidebar: function(options){
@@ -171,15 +172,15 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getToRecipients: function(){
-		return require('./gmail-compose-view/get-recipients')(this, 0);
+		return require('./gmail-compose-view/get-recipients')(this, 0, "to");
 	},
 
 	getCcRecipients: function(){
-		return require('./gmail-compose-view/get-recipients')(this, 1);
+		return require('./gmail-compose-view/get-recipients')(this, 1, "cc");
 	},
 
 	getBccRecipients: function(){
-		return require('./gmail-compose-view/get-recipients')(this, 2);
+		return require('./gmail-compose-view/get-recipients')(this, 2, "bcc");
 	},
 
 	getAdditionalActionToolbar: function(){
@@ -242,6 +243,10 @@ _.extend(GmailComposeView.prototype, {
 	getDraftID: function() {
 		var input = this._element.querySelector('input[name="draft"]');
 		return input && input.value;
+	},
+
+	getRecipientRowElements: function(){
+		return this._element.querySelectorAll('.GS tr');
 	},
 
 	addManagedViewController: function(viewController){

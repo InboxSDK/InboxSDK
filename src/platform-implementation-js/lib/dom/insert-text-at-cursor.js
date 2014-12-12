@@ -34,6 +34,8 @@ module.exports = function(element, text){
 				range.collapse(true);
 				sel.removeAllRanges();
 				sel.addRange(range);
+
+				return node;
 			}
 		}
 	}
