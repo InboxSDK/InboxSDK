@@ -26,7 +26,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    var labelParentDiv = this._element.querySelector('td.a4W > div.xS > div.xT');
+    var labelParentDiv = this._element.querySelector('td.a4W div.xS div.xT');
 
     var labelDiv = document.createElement('div');
     labelDiv.className = 'yi inboxSDKlabel';
