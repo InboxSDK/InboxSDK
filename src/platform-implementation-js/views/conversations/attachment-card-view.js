@@ -1,17 +1,18 @@
 var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
+var EventEmitter = require('events').EventEmitter;
 
 /**
 * @class
 * Object that represents an Attachment Card visible in a message containing attachments.
 */
 var AttachmentCardView = function(attachmentCardImplementation){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._attachmentCardImplementation = attachmentCardImplementation;
+	this._attachmentCardImplementation.getEventStream().onEnd(this, 'emit', 'unload');
 };
 
-AttachmentCardView.prototype = Object.create(BasicClass.prototype);
+AttachmentCardView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
@@ -36,6 +37,12 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 	addButton: function(buttonOptions){
 		this._attachmentCardImplementation.addButton(buttonOptions);
 	}
+
+
+	/**
+	 * Fires when the view card is destroyed
+	 * @event AttachmentCardView#unload
+	 */
 
 });
 

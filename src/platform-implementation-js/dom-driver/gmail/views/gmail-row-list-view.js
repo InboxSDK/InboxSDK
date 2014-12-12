@@ -12,13 +12,13 @@ var streamWaitFor = require('../../../lib/stream-wait-for');
 var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
-var GmailRowListView = function(rootElement, fullscreenViewDriver){
+var GmailRowListView = function(rootElement, routeViewDriver){
 	RowListViewDriver.call(this);
 
 	this._eventStreamBus = new Bacon.Bus();
 
 	this._element = rootElement;
-	this._fullscreenViewDriver = fullscreenViewDriver;
+	this._routeViewDriver = routeViewDriver;
 	this._setupToolbarView();
 	this._startWatchingForRowViews();
 };
@@ -29,7 +29,7 @@ _.extend(GmailRowListView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_fullscreenViewDriver', destroy: false, get: true},
+		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_rowViews', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}

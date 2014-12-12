@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var BasicClass = require('../../lib/basic-class');
 
-var FullscreenViewDescriptor = function(options){
+var Route = function(options){
 	BasicClass.call(this);
 
 	this._name = options.name;
@@ -9,9 +9,9 @@ var FullscreenViewDescriptor = function(options){
 	this._isCustomView = options.isCustomView;
 };
 
-FullscreenViewDescriptor.prototype = Object.create(BasicClass.prototype);
+Route.prototype = Object.create(BasicClass.prototype);
 
-_.extend(FullscreenViewDescriptor.prototype, {
+_.extend(Route.prototype, {
 
 	__memberVariables: [
 		{name: '_name', destroy: false, get: true},
@@ -33,4 +33,4 @@ _.extend(FullscreenViewDescriptor.prototype, {
 
 });
 
-module.exports = FullscreenViewDescriptor;
+module.exports = Route;

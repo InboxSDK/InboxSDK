@@ -9,7 +9,9 @@ ThreadViewDriver.prototype = BasicClass.prototype;
 
 _.extend(ThreadViewDriver.prototype, {
 
-	addSidebarContentPanel: function(descriptor){}
+	addSidebarContentPanel: null,
+
+	getEventStream: null
 
 });
 

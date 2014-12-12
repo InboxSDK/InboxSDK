@@ -5,7 +5,7 @@ var Bacon = require('baconjs');
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
 
-var FullscreenViewDriver = require('../../../../driver-interfaces/fullscreen-view-driver');
+var FullscreenViewDriver = require('../../../../driver-interfaces/route-view-driver');
 
 var GmailRowListView = require('../gmail-row-list-view');
 var GmailThreadView = require('../gmail-thread-view');
@@ -13,7 +13,7 @@ var GmailThreadView = require('../gmail-thread-view');
 
 var GmailElementGetter = require('../../gmail-element-getter');
 
-var GmailFullscreenView = function(options){
+var GmailRouteView = function(options){
 	FullscreenViewDriver.call(this);
 
 	this._hash = options.hash;
@@ -31,9 +31,9 @@ var GmailFullscreenView = function(options){
 	}
 };
 
-GmailFullscreenView.prototype = Object.create(FullscreenViewDriver.prototype);
+GmailRouteView.prototype = Object.create(FullscreenViewDriver.prototype);
 
-_.extend(GmailFullscreenView.prototype, {
+_.extend(GmailRouteView.prototype, {
 
 	__memberVariables: [
 		{name: '_name', get: true, destroy: false},
@@ -161,4 +161,4 @@ _.extend(GmailFullscreenView.prototype, {
 
 });
 
-module.exports = GmailFullscreenView;
+module.exports = GmailRouteView;

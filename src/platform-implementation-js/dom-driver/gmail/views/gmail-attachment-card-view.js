@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
+
 var AttachmentCardViewDriver = require('../../../driver-interfaces/attachment-card-view-driver');
 
 var ButtonView = require('../widgets/buttons/button-view');
@@ -28,7 +30,8 @@ _.extend(GmailAttachmentCardView.prototype, {
 		{name: '_title', destroy: false, get: true},
 		{name: '_mimeType', destroy: false, get: true},
 		{name: '_messageId', destroy: false},
-		{name: '_attachmentId', destroy: false}
+		{name: '_attachmentId', destroy: false},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	ready: function(){

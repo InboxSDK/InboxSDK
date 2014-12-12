@@ -7,7 +7,7 @@ var Conversations = require('./api-definitions/conversations');
 var Mailbox = require('./api-definitions/mailbox');
 var Sidebar = require('./api-definitions/sidebar');
 var Tracker = require('./tracker');
-var FullscreenViews = require('./api-definitions/fullscreen-views');
+var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
@@ -34,7 +34,8 @@ var InboxSDK = function(appId, opts){
 
   this.Compose = new Compose(this._platformImplementationLoader);
   this.Conversations = new Conversations(this._platformImplementationLoader);
-  this.FullscreenViews = new FullscreenViews(this._platformImplementationLoader);
+  this.Router = new Router(this._platformImplementationLoader);
+  this.FullscreenViews = this.Router; /* deprecated */
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
   this.Modal = new Modal(this._platformImplementationLoader);
   this.Sidebar = new Sidebar(this._platformImplementationLoader);
