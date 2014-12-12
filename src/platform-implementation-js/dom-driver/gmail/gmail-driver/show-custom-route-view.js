@@ -1,6 +1,6 @@
 var GmailElementGetter = require('../gmail-element-getter');
 
-function showCustomFullscreenView(gmailDriver, element){
+function showCustomRouteView(gmailDriver, element){
 
 	var contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
@@ -37,4 +37,4 @@ function _getCustomViewContainerElement(contentSectionElement){
 	return customViewContainerElement;
 }
 
-module.exports = showCustomFullscreenView;
+module.exports = showCustomRouteView;

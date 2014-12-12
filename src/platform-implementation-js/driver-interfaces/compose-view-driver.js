@@ -10,58 +10,58 @@ ComposeWindowDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ComposeWindowDriver.prototype, {
 
-	insertBodyTextAtCursor: function(text){},
+	insertBodyTextAtCursor: null,
 
-	insertBodyHTMLAtCursor: function(html){},
+	insertBodyHTMLAtCursor: null,
 
 	/*
 	 * returns a promise for when the insert actually happens
 	 */
-	insertLinkIntoBody: function(text, href){},
+	insertLinkIntoBody: null,
 
-	setSubject: function(text){},
+	setSubject: null,
 
-	setToRecipients: function(emails){},
+	setToRecipients: null,
 
-	setCcRecipients: function(emails){},
+	setCcRecipients: null,
 
-	setBccRecipients: function(emails){},
+	setBccRecipients: null,
 
-	close: function(){},
+	close: null,
 
-	addButton: function(buttonDescriptor){},
+	addButton: null,
 
-	addOuterSidebar: function(options){},
+	addOuterSidebar: null,
 
-	addInnerSidebar: function(options){},
+	addInnerSidebar: null,
 
-	addMessageSendModifier: function(modifier){},
+	addMessageSendModifier: null,
 
-	isReply: function(){},
+	isReply: null,
 
-	isInlineReplyForm: function(){},
+	isInlineReplyForm: null,
 
-	getBodyElement: function(){},
+	getBodyElement: null,
 
-	getHTMLContent: function(){},
+	getHTMLContent: null,
 
-	getTextContent: function(){},
+	getTextContent: null,
 
-	getSelectedBodyHTML: function(){},
+	getSelectedBodyHTML: null,
 
-	getSelectedBodyText: function(){},
+	getSelectedBodyText: null,
 
-	getSubject: function(){},
+	getSubject: null,
 
-	getToRecipients: function(){},
+	getToRecipients: null,
 
-	getCcRecipients: function(){},
+	getCcRecipients: null,
 
-	getBccRecipients: function(){},
+	getBccRecipients: null,
 
-	getComposeID: function(){},
+	getComposeID: null,
 
-	getEventStream: function(){}
+	getEventStream: null
 
 });
 

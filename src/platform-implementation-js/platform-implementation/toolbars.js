@@ -56,7 +56,7 @@ _.extend(Toolbars.prototype, {
 	},
 
 	_handleNewToolbarViewDriver: function(toolbarViewDriver){
-		var fullscreenView = this._platformImplementation.FullscreenViews.getCurrent();
+		//var fullscreenView = this._platformImplementation.FullscreenViews.getCurrent();
 		var buttonDescriptors = null;
 
 		if(toolbarViewDriver.getRowListViewDriver()){
@@ -68,7 +68,8 @@ _.extend(Toolbars.prototype, {
 
 		_.chain(buttonDescriptors)
 			.filter(function(buttonDescriptor){
-				return buttonDescriptor.showFor(fullscreenView);
+				return true; /* deprecated */
+				//return buttonDescriptor.showFor(fullscreenView);
 			})
 			.each(function(buttonDescriptor){
 				toolbarViewDriver.addButton(buttonDescriptor);

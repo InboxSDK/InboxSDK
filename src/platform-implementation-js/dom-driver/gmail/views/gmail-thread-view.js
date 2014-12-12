@@ -10,11 +10,11 @@ var GmailToolbarView = require('./gmail-toolbar-view');
 
 var GmailContentPanelContainerView = require('../widgets/gmail-content-panel/gmail-content-panel-container-view');
 
-var GmailThreadView = function(element, fullscreeViewDriver){
+var GmailThreadView = function(element, routeViewDriver){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
-	this._fullscreenViewDriver = fullscreeViewDriver;
+	this._routeViewDriver = routeViewDriver;
 
 	this._eventStream = new Bacon.Bus();
 
@@ -28,10 +28,10 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_fullscreenViewDriver', destroy: false, get: true},
+		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_sidebarContentPanelContainerView', destroy: true},
 		{name: '_toolbarView', destroy: true, get: true},
-		{name: '_newMessageMutationObserver', destroy: false},
+		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
 	],
@@ -97,7 +97,11 @@ _.extend(GmailThreadView.prototype, {
 
 		if(!openMessage){
 			var self = this;
-			setTimeout(function(){self._setupMessageViewStream();}, 500);
+			setTimeout(function(){
+				if (self._element) {
+					self._setupMessageViewStream();
+				}
+			}, 500);
 			return;
 		}
 

@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
-var RSVP = require('RSVP');
+var RSVP = require('rsvp');
 
 var extId = ''+Math.random();
 

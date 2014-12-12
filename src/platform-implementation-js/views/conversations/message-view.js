@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
+var EventEmitter = require('events').EventEmitter;
 
 var AttachmentCardView = require('./attachment-card-view');
 
@@ -9,12 +9,13 @@ var AttachmentCardView = require('./attachment-card-view');
 * itself as well as change the state of the UI.
 */
 var MessageView = function(messageViewImplementation){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._messageViewImplementation = messageViewImplementation;
+	this._messageViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
 };
 
-MessageView.prototype = Object.create(BasicClass.prototype);
+MessageView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(MessageView.prototype, /** @lends MessageView */{
 
@@ -83,6 +84,11 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	getLinksInBody: function(){
 		return this._messageViewImplementation.getLinks();
 	}
+
+	/**
+	 * Fires when the view card is destroyed
+	 * @event MessageView#unload
+	 */
 
 });
 

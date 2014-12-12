@@ -12,7 +12,10 @@ global.window = document.parentWindow;
 document.head.setAttribute('data-inboxsdk-script-injected', true);
 
 process.env.VERSION = 'beep';
-var inboxsdk = new InboxSDK("test", {globalErrorLogging: false});
+var inboxsdk = new InboxSDK("test", {
+  TEMPORARY_INTERNAL_skipWeakMapRequirement: true,
+  globalErrorLogging: false
+});
 
 assert.strictEqual(inboxsdk.VERSION, 'beep');
 assert.strictEqual(inboxsdk.IMPL_VERSION, null);

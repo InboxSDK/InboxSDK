@@ -5,9 +5,9 @@ var simulateClick = require('../../../../lib/dom/simulate-click');
 
 var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
-var MenuButtonViewController = require('../../../../widgets/buttons/menu-button-view-controller');
+var DropdownButtonViewController = require('../../../../widgets/buttons/dropdown-button-view-controller');
 
-var MenuView = require('../../widgets/menu-view');
+var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 
 function addButton(gmailComposeView, buttonDescriptor, groupOrderHint){
 	if(buttonDescriptor.onValue){
@@ -119,10 +119,9 @@ function _getButtonViewController(buttonDescriptor){
 	buttonDescriptor.buttonView = buttonView;
 
 	if(buttonDescriptor.hasDropdown){
-		var menuView = new MenuView();
-		buttonDescriptor.menuView = menuView;
-		buttonDescriptor.menuPositionOptions = {isBottomAligned: true};
-		buttonViewController = new MenuButtonViewController(buttonDescriptor);
+		buttonDescriptor.dropdownViewDriverClass = GmailDropdownView;
+		buttonDescriptor.dropdownPositionOptions = {isBottomAligned: true};
+		buttonViewController = new DropdownButtonViewController(buttonDescriptor);
 	}
 	else{
 		buttonViewController = new BasicButtonViewController(buttonDescriptor);
@@ -138,14 +137,7 @@ function _processButtonDescriptor(buttonDescriptor){
 	}, buttonDescriptor);
 
 	if(buttonDescriptor.hasDropdown){
-		buttonOptions.postMenuShowFunction = function(menuView, menuButtonViewController){
-			buttonDescriptor.onClick({
-				dropdown: {
-					el: menuView.getElement(),
-					close: menuButtonViewController.hideMenu.bind(menuButtonViewController)
-				}
-			});
-		};
+		buttonOptions.dropdownShowFunction = buttonDescriptor.onClick;
 	}
 	else{
 		buttonOptions.activateFunction = buttonDescriptor.onClick;

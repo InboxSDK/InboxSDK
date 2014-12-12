@@ -11,10 +11,6 @@ var waitFor = require('../../../lib/wait-for');
 
 var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
-var MenuButtonViewController = require('../../../widgets/buttons/menu-button-view-controller');
-
-var MenuView = require('../widgets/menu-view');
 
 var GmailComposeView = function(element, xhrInterceptorStream){
 	ComposeWindowDriver.call(this);
@@ -61,7 +57,7 @@ _.extend(GmailComposeView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_eventStream', destroy: false, get: true},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
@@ -76,16 +72,6 @@ _.extend(GmailComposeView.prototype, {
 	_setupConsistencyCheckers: function(){
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
-	},
-
-	destroy: function() {
-		if (this._eventStream) {
-			this._eventStream.push({
-				type: 'close'
-			});
-			this._eventStream.end();
-		}
-		ComposeWindowDriver.prototype.destroy.call(this);
 	},
 
 	insertBodyTextAtCursor: function(text){

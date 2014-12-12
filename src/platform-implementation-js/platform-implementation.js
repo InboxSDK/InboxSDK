@@ -3,7 +3,7 @@ var Compose = require('./platform-implementation/compose');
 var Conversations = require('./platform-implementation/conversations');
 var Email = require('./platform-implementation/email');
 var Modal = require('./platform-implementation/modal');
-var FullscreenViews = require('./platform-implementation/fullscreen-views');
+var Router = require('./platform-implementation/router');
 var Mailbox = require('./platform-implementation/mailbox');
 var Toolbars = require('./platform-implementation/toolbars');
 
@@ -28,7 +28,8 @@ var PlatformImplementation = function(appId, opts){
 	this.Conversations = new Conversations(appId, this._driver);
 
 	this.Email = new Email(appId, this._driver);
-	this.FullscreenViews = new FullscreenViews(appId, this._driver);
+	this.Router = new Router(appId, this._driver);
+	this.FullscreenViews = this.Router; /* deprecated */
 	this.Mailbox = new Mailbox(appId, this._driver, this);
 	this.Toolbars = new Toolbars(appId, this._driver, this);
 	this.Modal = new Modal(appId, this._driver);

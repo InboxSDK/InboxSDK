@@ -16,9 +16,14 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	var self = this;
 	this._composeViewImplementation.getEventStream().onValue(function(event){
-		if (_.contains(['sending','sent','close'], event.type)) {
+		if (_.contains(['sending','sent'], event.type)) {
 			self.emit(event.type, event.data);
 		}
+	});
+
+	this._composeViewImplementation.getEventStream().onEnd(function(){
+		self.emit('close'); /* TODO: deprecated */
+		self.emit('unload');
 	});
 };
 
@@ -34,6 +39,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){
+		if(!buttonDescriptor.onValue && !buttonDescriptor.onClick){
+			throw new Error('Must have an onClick function defined');
+		}
+
+		if(buttonDescriptor.hasDropdown){
+			var oldOnClick = buttonDescriptor.onClick;
+			buttonDescriptor.onClick = function(event){
+				oldOnClick(_.extend({composeView: this}, event));
+			};
+		}
+
 		this._composeViewImplementation.addButton(buttonDescriptor, this._appId);
 	},
 
@@ -192,7 +208,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Fires when the compose view is closed. This can be triggered by the .close method, the user
 	* clicking the close or discard buttons, the message being sent, etc.
-	* @event ComposeView#closed
+	* @event ComposeView#unload
 	*/
 
 	/**
