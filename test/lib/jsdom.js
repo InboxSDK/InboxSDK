@@ -8,6 +8,16 @@ jsdom.defaultDocumentFeatures = {
 
 var hasAddedClassList = false;
 
+function notImplemented() {
+  throw new Error("mock classList modifiers not implemented");
+}
+var DOMTokenListPrototype = {
+  contains: function(item) {
+    return Array.prototype.indexOf.call(this, item) !== -1;
+  },
+  add: notImplemented, remove: notImplemented, toggle: notImplemented
+};
+
 function main() {
   var document = jsdom.jsdom.apply(jsdom, arguments);
 
@@ -20,13 +30,9 @@ function main() {
     } while (!_.has(proto, 'className'));
     Object.defineProperty(proto, 'classList', {
       get: function() {
-        var list = this.className.split(' ');
-        list.contains = function(item) {
-          return this.indexOf(item) !== -1;
-        };
-        list.add = list.remove = list.toggle = function() {
-          throw new Error("mock classList modifiers not implemented");
-        };
+        // jshint -W103
+        var list = this.className.split(' ').filter(Boolean);
+        list.__proto__ = DOMTokenListPrototype;
         return Object.freeze(list);
       }
     });
