@@ -56,14 +56,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		this._composeViewImplementation.addOuterSidebar(options);
 	},
 
-	/*
+	/**
 	* closes the compose window
 	*/
 	close: function(){
 		this._composeViewImplementation.close();
 	},
 
-
+	/**
+	* Returns the HTMLElement of the body of the compose view
+	* @return {HTMLElement}
+	*/
 	getBodyElement: function(){
 		return this._composeViewImplementation.getBodyElement();
 	},
@@ -72,6 +75,10 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getComposeID();
 	},
 
+	/**
+	* Returns an html string of the contents of the body of the compose view
+	* @return {string}
+	*/
 	getHTMLContent: function(){
 		return this._composeViewImplementation.getHTMLContent();
 	},
@@ -109,25 +116,25 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	 * Returns an array of Contacts
-	 * @return {Contact}
+	 * Returns an array of objects containing the name and email address of all recipients on the TO line
+	 * @return {object[]}
 	 */
 	getToRecipients: function(){
 		return this._composeViewImplementation.getToRecipients();
 	},
 
 	/**
-	 * Returns an array of Contacts
-	 * @return {Contact}
-	 */
+	* Returns an array of objects containing the name and email address of all recipients on the CC line
+	* @return {object[]}
+	*/
 	getCcRecipients: function(){
 		return this._composeViewImplementation.getCcRecipients();
 	},
 
 	/**
-	 * Returns an array of Contacts
-	 * @return {Contact}
-	 */
+	* Returns an array of objects containing the name and email address of all recipients on the BCC line
+	* @return {object[]}
+	*/
 	getBccRecipients: function(){
 		return this._composeViewImplementation.getBccRecipients();
 	},
@@ -192,15 +199,19 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 
-	/*
-	* returns true/false if current compose view is an inline reply form
+	/**
+	* whether or not this compose view is an inline reply. Inline replies are used by Gmail and Inbox when responding
+	* to a message right underneath the original message. You typically will not need to use this.
+	* @return {boolean}
 	*/
 	isInlineReplyForm: function(){
 		return this._composeViewImplementation.isInlineReplyForm();
 	},
 
-	/*
-	* returns true/false if the current compose view is for a reply. This includes "popped-out" replies
+	/**
+	* whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
+	* You typically will not need to use this.
+	* @return {boolean}
 	*/
 	isReply: function(){
 		return this._composeViewImplementation.isReply();
