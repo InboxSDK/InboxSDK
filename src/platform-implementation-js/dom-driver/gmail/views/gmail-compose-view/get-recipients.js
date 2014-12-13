@@ -21,5 +21,5 @@ function _getContactRows(gmailComposeView){
 
 function _extractPeopleContacts(container, addressType){
 	var peopleSpans = container.querySelectorAll('.vR');
-	return Array.prototype.map.call(peopleSpans.map(getAddressInformationExtractor(addressType)));
+	return Array.prototype.map.call(peopleSpans, getAddressInformationExtractor(addressType));
 }

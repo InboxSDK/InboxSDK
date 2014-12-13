@@ -325,7 +325,7 @@ function _positionGroupToolbar(gmailComposeView){
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
 
-	groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft/2 + 1) + 'px';
+	groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
 }
 
 function _positionFormattingToolbar(gmailComposeView){
