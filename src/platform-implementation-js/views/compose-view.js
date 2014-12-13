@@ -44,14 +44,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		this._composeViewImplementation.addButton(buttonDescriptor, this._appId, {composeView: this});
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addInnerSidebar: function(options){
 		this._composeViewImplementation.addInnerSidebar(options);
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addMessageSendModifier: function(modifier){
 		this._composeViewImplementation.addMessageSendModifier(modifier);
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addOuterSidebar: function(options){
 		this._composeViewImplementation.addOuterSidebar(options);
 	},
@@ -217,14 +220,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.isReply();
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setBccRecipients: function(emails){
 		this._composeViewImplementation.setBccRecipients(emails);
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setCcRecipients: function(emails){
 		this._composeViewImplementation.setCcRecipients(emails);
 	},
 
+	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setToRecipients: function(emails){
 		this._composeViewImplementation.setToRecipients(emails);
 	}
