@@ -27,7 +27,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	 * Register a new named Route. The RouteDescriptor which you pass to this method defines the name, and implicitly, the URL of the route
 	 * as well as a callback for when the route becomes active (the route is navigated to).
-	 * @param {RouteDescriptor} - routeDescriptor for the custom route
+	 * @param {RouteDescriptor} routeDescriptor - routeDescriptor for the custom route
 	 */
 	createNewRoute: function(routeDescriptor){
 		var self = this;
@@ -69,12 +69,13 @@ _.extend(Router.prototype, /** @lends Router */ {
 	 * Register a handler to be called for every time the current Route changes. You typically won't use this for your own routes (because you
 	 * have already passed in an onActivate callback when you create your own route), but you may use it to observe route changes inside Gmail/Inbox.
 	 * For example, you may want to know when the user naviages to their Sent folder or similar.
-	 * @param {function(RouteView)} the function to be called
+	 * @param {function(RouteView)} handler - the function to be called when the Route changes
 	 * @return {function} a function to call when you want to unregister this handler
 	 */
 	registerRouteViewHandler: function(handler){
 		return this._platformImplementationLoader.registerHandler('Router', 'RouteView', handler);
 	},
+
 
 	/* deprecated */
 	gotoView: function(name, paramArray){
@@ -105,7 +106,7 @@ name: null,
 
 /**
  * The function to call when the custom route is navigated to.
- * @type {function({RouteView})}
+ * @type {function({routeView: RouteView})}
  */
 onActivate: null
 
