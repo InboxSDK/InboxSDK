@@ -1,10 +1,9 @@
 var assert = require('assert');
-var RSVP = require('./lib/rsvp');
 var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Symbol = require('../src/common/symbol');
 
-var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream2.js');
+var makeElementChildStream2 = require('../src/platform-implementation-js/lib/dom/make-element-child-stream2.js');
 
 describe('makeElementChildStream2', function() {
   global.MutationObserver = null;
@@ -23,7 +22,7 @@ describe('makeElementChildStream2', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementChildStream(target).onValue(function(event) {
+    makeElementChildStream2(target).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);
@@ -67,7 +66,7 @@ describe('makeElementChildStream2', function() {
     var call = 0;
     var child1Removed = 0, child2Removed = 0;
     var child1Ended = false, child2Ended = false;
-    var stream = makeElementChildStream(target, stopper);
+    var stream = makeElementChildStream2(target, stopper);
     stream.onValue(function(event) {
       switch(++call) {
         case 1:
