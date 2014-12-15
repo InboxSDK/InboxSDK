@@ -13,8 +13,6 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
 
         var chooser = Dropbox.createChooserWidget({
           success: function(files) {
-            modal.close();
-
             if (hasSelectedText) {
               composeView.insertLinkIntoBodyAtCursor(files[0].name, files[0].link);
             } else {
@@ -30,6 +28,7 @@ inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then
                   thumbnailLink
               );
             }
+            modal.close();
           },
           cancel: function() {
             modal.close();
