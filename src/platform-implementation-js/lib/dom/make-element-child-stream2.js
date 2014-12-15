@@ -4,20 +4,9 @@ var Map = require('es6-unweak-collections').Map;
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-function makeElementChildStream2(element, stopper) {
+function makeElementChildStream2(element) {
   return Bacon.fromBinder(function(sink) {
     var removalStreams = new Map();
-
-    var unsubStopper = stopper.subscribe(function(event) {
-      if (event.hasValue()) {
-        removalStreams.forEach(function(removalStream, el) {
-          removalStream.push(null);
-          removalStream.end();
-        });
-        sink(new Bacon.End());
-        return Bacon.noMore;
-      }
-    });
 
     function newEl(el) {
       var removalStream = new Bacon.Bus();
@@ -51,7 +40,10 @@ function makeElementChildStream2(element, stopper) {
     return function() {
       observer.disconnect();
       observer = null;
-      unsubStopper();
+      removalStreams.forEach(function(removalStream, el) {
+        removalStream.push(null);
+        removalStream.end();
+      });
     };
   });
 }

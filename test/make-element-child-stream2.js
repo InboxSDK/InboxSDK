@@ -22,7 +22,7 @@ describe('makeElementChildStream2', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementChildStream2(target, Bacon.never()).onValue(function(event) {
+    makeElementChildStream2(target).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);
@@ -55,7 +55,7 @@ describe('makeElementChildStream2', function() {
     }, 0);
   });
 
-  it('emits removals when stopper emits', function(done) {
+  it('triggers removals when no longer listened on', function(done) {
     var child1 = Symbol('child1'), child2 = Symbol('child2');
     var stopper = new Bacon.Bus();
 
@@ -66,7 +66,7 @@ describe('makeElementChildStream2', function() {
     var call = 0;
     var child1Removed = 0, child2Removed = 0;
     var child1Ended = false, child2Ended = false;
-    var stream = makeElementChildStream2(target, stopper);
+    var stream = makeElementChildStream2(target).takeUntil(stopper);
     stream.onValue(function(event) {
       switch(++call) {
         case 1:
@@ -92,6 +92,11 @@ describe('makeElementChildStream2', function() {
           event.removalStream.onEnd(function() {
             child2Ended = true;
           });
+
+          assert.strictEqual(child1Removed, 0);
+          assert.strictEqual(child2Removed, 0);
+          assert(!child1Ended);
+          assert(!child2Ended);
           stopper.push();
           break;
         default:
@@ -99,11 +104,13 @@ describe('makeElementChildStream2', function() {
       }
     });
     stream.onEnd(function() {
-      assert.strictEqual(child1Removed, 1);
-      assert.strictEqual(child2Removed, 1);
-      assert(child1Ended);
-      assert(child2Ended);
-      done();
+      setTimeout(function() {
+        assert.strictEqual(child1Removed, 1);
+        assert.strictEqual(child2Removed, 1);
+        assert(child1Ended);
+        assert(child2Ended);
+        done();
+      }, 0);
     });
   });
 });

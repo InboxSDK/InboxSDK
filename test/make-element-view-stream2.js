@@ -27,7 +27,7 @@ describe('makeElementViewStream2', function() {
 
     var call = 0;
     makeElementViewStream2({
-      elementStream: makeElementChildStream2(target, stopper),
+      elementStream: makeElementChildStream2(target).takeUntil(stopper),
       viewFn: function(el) {
         activeViewCount++;
         return {
