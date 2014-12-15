@@ -22,7 +22,7 @@ describe('makeElementChildStream2', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementChildStream2(target).onValue(function(event) {
+    makeElementChildStream2(target, Bacon.never()).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);

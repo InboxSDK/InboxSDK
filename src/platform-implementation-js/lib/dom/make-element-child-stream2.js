@@ -8,7 +8,7 @@ function makeElementChildStream2(element, stopper) {
   return Bacon.fromBinder(function(sink) {
     var removalStreams = new Map();
 
-    var unsubStopper = (stopper || Bacon.never()).subscribe(function(event) {
+    var unsubStopper = stopper.subscribe(function(event) {
       if (event.hasValue()) {
         removalStreams.forEach(function(removalStream, el) {
           removalStream.push(null);
