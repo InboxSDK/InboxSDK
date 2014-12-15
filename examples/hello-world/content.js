@@ -1,7 +1,7 @@
 var inboxSDK = new InboxSDK('hello-world');
 
 function log() {
-	console.log.apply(console, ['hello-world'].concat(arguments));
+	console.log.apply(console, ['hello-world'].concat(Array.prototype.slice.call(arguments)));
 }
 
 inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
@@ -22,6 +22,9 @@ inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
 
 var i = 0;
 inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+	threadRowView.addLabel({
+		text:'1'
+	});
 	threadRowView.addLabel({
 		text:'a'+(i++),
 		color:'white',
