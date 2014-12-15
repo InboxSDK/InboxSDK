@@ -20,8 +20,8 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    _.each(this._element.getElementsByClassName('inboxSDKlabel'), removeNode);
-    _.each(this._element.getElementsByClassName('inboxSDKattachmentIcon'), removeNode);
+    _.each(_.toArray(this._element.getElementsByClassName('inboxSDKlabel')), removeNode);
+    _.each(_.toArray(this._element.getElementsByClassName('inboxSDKattachmentIcon')), removeNode);
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
