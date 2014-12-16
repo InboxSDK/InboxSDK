@@ -17,7 +17,10 @@
     "https://inbox.google.com/"
   ],
   "web_accessible_resources": [
-    "inboxsdk.js.map"
+    "inboxsdk.js.map",
+    "monkey-face.jpg",
+    "lion.png",
+    "monkey.png"
   ],
 
   "manifest_version": 2

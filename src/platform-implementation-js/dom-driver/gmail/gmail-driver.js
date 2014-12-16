@@ -10,7 +10,6 @@ var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailModalView = require('./widgets/gmail-modal-view');
 
-
 var GmailDriver = function(){
 	Driver.call(this);
 
@@ -58,6 +57,10 @@ _.extend(GmailDriver.prototype, {
 
 	createModalView: function(options){
 		return new GmailModalView(options);
+	},
+
+	addNavItem: function(appId, navItemDescriptor){
+		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
 	},
 
 	_setupEventStreams: function(){

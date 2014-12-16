@@ -1,17 +1,31 @@
 var inboxSDK = new InboxSDK('custom-view');
 
-inboxSDK.FullscreenViews.registerCustom({
+inboxSDK.Router.createNewRoute({
 	name: 'example',
 	onActivate: function(event){
 		event.el.innerHTML = 'hello world!';
 	}
 });
 
-inboxSDK.FullscreenViews.on('change', function(event){
-	console.log('name', event.view.getDescriptor().getName());
-	console.log('params', event.view.getParams());
+inboxSDK.Router.registerRouteViewHandler(function(routeView){
+	console.log('name', routeView.getName());
+	console.log('params', routeView.getParams());
 });
 
-inboxSDK.FullscreenViews.once('change', function(event){
-	inboxSDK.FullscreenViews.getDescriptor('example').gotoView();
+
+var navItem = inboxSDK.NavMenu.addNavItem({
+	name: 'Monkeys',
+	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+	route: 'example'
+});
+
+
+var lion = navItem.addNavItem({
+	name: 'Lions',
+	iconUrl: chrome.runtime.getURL('lion.png')
+});
+
+var monkey = lion.addNavItem({
+	name: 'Saved View',
+	iconUrl: chrome.runtime.getURL('monkey.png')
 });
