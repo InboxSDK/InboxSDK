@@ -3,6 +3,12 @@ var Bacon = require('baconjs');
 
 var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
 
+var ButtonView = require('../widgets/buttons/button-view');
+var LabelDropdownButtonView = require('../widgets/buttons/label-dropdown-button-view');
+var GmailDropdownView = require('../widgets/gmail-dropdown-view');
+
+var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var GmailNavItemView = function(orderGroup, navItemDescriptor){
 	NavItemViewDriver.call(this);
@@ -36,7 +42,8 @@ _.extend(GmailNavItemView.prototype, {
 		{name: '_name', destroy: false, get: true, defaultValue: ''},
 		{name: '_iconUrl', destroy: false},
 		{name: '_iconClass', destroy: false},
-		{name: '_accessoryCreated', destroy: false, defaultValue: false}
+		{name: '_accessoryCreated', destroy: false, defaultValue: false},
+		{name: '_accessoryViewController', destroy: true}
 	],
 
 	addNavItem: function(orderGroup, navItemDescriptor){
@@ -144,7 +151,76 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	_createAccessory: function(accessoryDescriptor){
+		switch(accessoryDescriptor.type){
+			case 'CREATE':
+				this._createCreateAccessory(accessoryDescriptor);
+			break;
+			case 'ICON_BUTTON':
+				this._createIconButtonAccessory(accessoryDescriptor);
+			break;
+			case 'DROPDOWN_BUTTON':
+				this._createDropdownButtonAccessory(accessoryDescriptor);
+			break;
+		}
 
+		this._accessoryCreated = true;
+	},
+
+	_createCreateAccessory: function(accessoryDescriptor){
+		accessoryDescriptor.name = '+ New';
+		this._createLinkButtonAccessory(accessoryDescriptor);
+	},
+
+	_createLinkButtonAccessory: function(accessoryDescriptor){
+		var linkDiv = document.createElement('div');
+		linkDiv.setAttribute('class', 'CL inboxsdk__navItem_link');
+
+
+		var anchor = document.createElement('a');
+		anchor.classList.add('CK');
+		anchor.textContent = accessoryDescriptor.name;
+
+		linkDiv.appendChild(anchor);
+
+		anchor.href = '#';
+
+		anchor.addEventListener('click', function(e){
+			e.stopPropagation();
+			e.preventDefault();
+
+			accessoryDescriptor.onClick();
+		});
+
+		this._element.querySelector('.aio').appendChild(linkDiv);
+	},
+
+	_createIconButtonAccessory: function(accessoryDescriptor){
+		var buttonOptions = _.clone(accessoryDescriptor);
+		buttonOptions.buttonView  = new ButtonView(buttonOptions);
+
+		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
+
+		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
+	},
+
+	_createDropdownButtonAccessory: function(accessoryDescriptor){
+		var buttonOptions = _.clone(accessoryDescriptor);
+		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
+		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
+		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
+
+		this._accessoryViewController = new DropdownButtonViewController(buttonOptions);
+
+		var innerElement = this._element.querySelector('.TO');
+		innerElement.addEventListener('mouseenter', function(){
+			innerElement.classList.add('inboxsdk__navItem_hover');
+		});
+
+		innerElement.addEventListener('mouseleave', function(){
+			innerElement.classList.remove('inboxsdk__navItem_hover');
+		});
+
+		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
 	},
 
 	_addNavItemElement: function(gmailNavItemView){

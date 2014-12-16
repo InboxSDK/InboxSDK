@@ -338,3 +338,18 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end custom content */
+
+
+/* nav menu */
+
+.inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
+  visibility: visible;
+}
+
+.inboxsdk__navItem_link {
+  position: absolute;
+  top: 0px;
+  right: -4px;
+}
+
+/* end nav menu */

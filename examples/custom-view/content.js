@@ -16,16 +16,35 @@ inboxSDK.Router.registerRouteViewHandler(function(routeView){
 var navItem = inboxSDK.NavMenu.addNavItem({
 	name: 'Monkeys',
 	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-	route: 'example'
+	route: 'example',
+	accessory: {
+		type: 'CREATE',
+		onClick: function(){
+			console.log('create monkeys');
+		}
+	}
 });
 
 
 var lion = navItem.addNavItem({
 	name: 'Lions',
-	iconUrl: chrome.runtime.getURL('lion.png')
+	iconUrl: chrome.runtime.getURL('lion.png'),
+	accessory: {
+		type: 'ICON_BUTTON',
+		iconUrl: chrome.runtime.getURL('lion.png'),
+		onClick: function(){
+			console.log('lions rocks!');
+		}
+	}
 });
 
 var monkey = lion.addNavItem({
 	name: 'Saved View',
-	iconUrl: chrome.runtime.getURL('monkey.png')
+	iconUrl: chrome.runtime.getURL('monkey.png'),
+	accessory: {
+		type: 'DROPDOWN_BUTTON',
+		onClick: function(event){
+			event.dropdown.el.innerHTML = 'Hello world!';
+		}
+	}
 });
