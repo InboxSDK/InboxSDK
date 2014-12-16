@@ -134,6 +134,10 @@ _.extend(GmailThreadRowView.prototype, {
     });
   },
 
+  getSubject: function() {
+    return this._element.querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+  },
+
   getDateString: function() {
     return this._element.querySelector('td.xW > span').title;
   }

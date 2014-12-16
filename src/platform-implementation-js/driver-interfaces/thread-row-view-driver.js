@@ -17,6 +17,8 @@ _.extend(ThreadRowViewDriver.prototype, {
 
   replaceDate: null,
 
+  getSubject: null,
+
   getDateString: null
 
 });
