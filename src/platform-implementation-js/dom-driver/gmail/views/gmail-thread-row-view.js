@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
+var convertForeignInputToBacon = require('../../../lib/convert-foreign-input-to-bacon');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
 var GmailThreadRowView = function(element) {
@@ -27,23 +28,39 @@ _.extend(GmailThreadRowView.prototype, {
 
   addLabel: function(label) {
     var labelParentDiv = this._element.querySelector('td.a4W div.xS div.xT');
-
     var labelDiv = document.createElement('div');
     labelDiv.className = 'yi inboxSDKlabel';
     labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
+
     var at = labelDiv.querySelector('div.at');
     var au = labelDiv.querySelector('div.au');
     var av = labelDiv.querySelector('div.av');
 
-    av.textContent = at.title = label.text;
-    if (label.color) {
-      at.style.backgroundColor = at.style.borderColor = au.style.borderColor = label.color;
-    }
-    if (label.textColor) {
-      av.style.color = label.textColor;
-    }
+    convertForeignInputToBacon(label).takeUntil(
+      this._eventStream.filter(false).mapEnd()
+    ).onValue(function(label) {
+      if (!label) {
+        labelDiv.remove();
+      } else {
+        _.defaults(label, {
+          color: '#ddd', textColor: '#666'
+        });
 
-    labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
+        if (at.title != label.text) {
+          at.title = av.textContent = label.text;
+        }
+        if (at.style.backgroundColor != label.color) {
+          at.style.backgroundColor = at.style.borderColor = au.style.borderColor = label.color;
+        }
+        if (av.style.color != label.textColor) {
+          av.style.color = label.textColor;
+        }
+
+        if (!labelDiv.parentElement) {
+          labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
+        }
+      }
+    });
   },
 
   addButton: function(buttonDescriptor) {
