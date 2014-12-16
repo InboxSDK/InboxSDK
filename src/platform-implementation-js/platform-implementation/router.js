@@ -48,7 +48,7 @@ _.extend(Router.prototype,  {
 	},
 
 	registerRouteViewHandler: function(handler){
-		return this._handlerRegister.registerHandler(handler);
+		return this._handlerRegistry.registerHandler(handler);
 	},
 
 	/* deprecated */
@@ -111,6 +111,8 @@ _.extend(Router.prototype,  {
 		else{
 			this._driver.showNativeRouteView();
 		}
+
+		this._handlerRegistry.addTarget(routeView);
 
 		this.emit('change', {routeView: routeView});
 	},

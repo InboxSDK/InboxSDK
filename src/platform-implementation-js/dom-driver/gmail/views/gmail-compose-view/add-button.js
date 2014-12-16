@@ -303,7 +303,6 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
-	debugger;
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
 
 	if(!groupedActionToolbarContainer){
@@ -326,7 +325,7 @@ function _positionGroupToolbar(gmailComposeView){
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
 
-	groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft/2 + 1) + 'px';
+	groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
 }
 
 function _positionFormattingToolbar(gmailComposeView){

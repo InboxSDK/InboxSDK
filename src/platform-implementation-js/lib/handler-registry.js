@@ -32,6 +32,10 @@ _.extend(HandlerRegistry.prototype, {
     addTarget: function(target){
         this._targets.add(target);
 
+        if(target.on){
+            target.on('unload', this.removeTarget.bind(this, target));
+        }
+
         this._informHandlersOfTarget(target);
     },
 
