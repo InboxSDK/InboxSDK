@@ -13,7 +13,9 @@ _.extend(ThreadRowViewDriver.prototype, {
 
   addButton: function(buttonDescriptor) {},
 
-  addAttachmentIcon: function(url) {}
+  addAttachmentIcon: function(url) {},
+
+  replaceDate: null
 
 });
 

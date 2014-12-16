@@ -21,15 +21,19 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    _.each(_.toArray(this._element.getElementsByClassName('inboxSDKlabel')), removeNode);
-    _.each(_.toArray(this._element.getElementsByClassName('inboxSDKattachmentIcon')), removeNode);
+    _.toArray(this._element.getElementsByClassName('inboxSDKadded')).forEach(function(node) {
+      node.remove();
+    });
+    _.toArray(this._element.getElementsByClassName('inboxSDKhiddenInline')).forEach(function(node) {
+      node.style.display = 'inline';
+    });
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
   addLabel: function(label) {
     var labelParentDiv = this._element.querySelector('td.a4W div.xS div.xT');
     var labelDiv = document.createElement('div');
-    labelDiv.className = 'yi inboxSDKlabel';
+    labelDiv.className = 'yi inboxSDKadded inboxSDKlabel';
     labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
 
     var at = labelDiv.querySelector('div.at');
@@ -71,7 +75,7 @@ _.extend(GmailThreadRowView.prototype, {
     var attachmentDiv = this._element.querySelector('td.yf.xY');
 
     var img = document.createElement('img');
-    img.className = 'iP inboxSDKattachmentIcon';
+    img.className = 'iP inboxSDKadded inboxSDKattachmentIcon';
     img.src = 'images/cleardot.gif';
     var currentIconUrl;
 
@@ -93,12 +97,43 @@ _.extend(GmailThreadRowView.prototype, {
         }
       }
     });
+  },
+
+  replaceDate: function(opts) {
+    var dateContainer = this._element.querySelector('td.xW');
+    var originalDateSpan = dateContainer.firstChild;
+    var customDateSpan = originalDateSpan.nextElementSibling;
+    if (!customDateSpan) {
+      customDateSpan = document.createElement('span');
+      customDateSpan.className = 'inboxSDKadded inboxSDKcustomDate';
+      dateContainer.appendChild(customDateSpan);
+
+      originalDateSpan.classList.add('inboxSDKhiddenInline');
+    }
+
+    convertForeignInputToBacon(opts).takeUntil(
+      this._eventStream.filter(false).mapEnd()
+    ).onValue(function(opts) {
+      if (!opts) {
+        customDateSpan.style.display = 'none';
+        originalDateSpan.style.display = 'inline';
+      } else {
+        customDateSpan.textContent = opts.text;
+        if (opts.title) {
+          customDateSpan.setAttribute('title', opts.title);
+          customDateSpan.setAttribute('aria-label', opts.title);
+        } else {
+          customDateSpan.removeAttribute('title');
+          customDateSpan.removeAttribute('aria-label');
+        }
+        customDateSpan.style.color = opts.textColor || '';
+
+        customDateSpan.style.display = 'inline';
+        originalDateSpan.style.display = 'none';
+      }
+    });
   }
 
 });
 
 module.exports = GmailThreadRowView;
-
-function removeNode(node) {
-  node.remove();
-}

@@ -25,4 +25,5 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 			title: 'blah blah'
 		}
 	]));
+	threadRowView.replaceDate({text: 'aaa', textColor: 'green', title: 'beep'});
 });

@@ -35,6 +35,13 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    */
   addAttachmentIcon: function(opts) {
     this._threadRowViewDriver.addAttachmentIcon(opts);
+  },
+
+  /**
+   * Replaces the text inside the date column
+   */
+  replaceDate: function(opts) {
+    this._threadRowViewDriver.replaceDate(opts);
   }
 
   /**
