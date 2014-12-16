@@ -48,3 +48,19 @@ var monkey = lion.addNavItem({
 		}
 	}
 });
+
+inboxSDK.NavMenu.addNavItem({
+	name: 'Saved View 2',
+	orderHint: -1,
+	accessory: {
+		type: 'DROPDOWN_BUTTON',
+		onClick: function(event){
+			event.dropdown.el.innerHTML = 'Hello world!';
+		}
+	}
+});
+
+
+lion.addNavItem({
+	name: 'aved View 2'
+});

@@ -1,6 +1,9 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
+var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
+var eventNameFilter = require('../../../lib/event-name-filter');
+
 var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
 
 var ButtonView = require('../widgets/buttons/button-view');
@@ -10,11 +13,15 @@ var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
-var GmailNavItemView = function(orderGroup, navItemDescriptor){
+var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
+
+var GmailNavItemView = function(orderGroup,  navItemDescriptor){
 	NavItemViewDriver.call(this);
 
 	this._orderGroup = orderGroup;
 	this._eventStream = new Bacon.Bus();
+
+	this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
 
 	this._setupElement();
 
@@ -39,10 +46,11 @@ _.extend(GmailNavItemView.prototype, {
 		{name: '_itemContainerElement', destroy: true},
 		{name: '_expandoElement', destroy: true},
 		{name: '_orderGroup', destroy: false, get: true},
+		{name: '_orderHint', destroy: false, get: true},
 		{name: '_name', destroy: false, get: true, defaultValue: ''},
 		{name: '_iconUrl', destroy: false},
 		{name: '_iconClass', destroy: false},
-		{name: '_accessoryCreated', destroy: false, defaultValue: false},
+		{name: '_accessory', destroy: false},
 		{name: '_accessoryViewController', destroy: true}
 	],
 
@@ -50,6 +58,11 @@ _.extend(GmailNavItemView.prototype, {
 		var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
 
 		this._addNavItemElement(gmailNavItemView);
+
+		gmailNavItemView
+			.getEventStream()
+			.filter(eventNameFilter('orderChanged'))
+			.onValue(this, '_addNavItemElement', gmailNavItemView);
 
 		return gmailNavItemView;
 	},
@@ -133,9 +146,8 @@ _.extend(GmailNavItemView.prototype, {
 		require('../lib/update-icon/update-icon-class').apply(this, [this._element.querySelector('.aio'), true, navItemDescriptor.iconClass]);
 		require('../lib/update-icon/update-icon-url').apply(this, [this._element.querySelector('.aio'), true, navItemDescriptor.iconUrl]);
 
-		if(navItemDescriptor.accessory && !this._accessoryCreated){
-			this._createAccessory(navItemDescriptor.accessory);
-		}
+		this._updateAccessory(navItemDescriptor.accessory);
+		this._updateOrder(navItemDescriptor);
 	},
 
 	_updateName: function(name){
@@ -145,9 +157,23 @@ _.extend(GmailNavItemView.prototype, {
 
 		this._element.querySelector('.inboxsdk__navItem_name').textContent = name;
 		this._name = name;
+	},
 
-		this._element.setAttribute('data-group-order-hint', this._orderGroup);
-		this._element.setAttribute('data-order-hint', name || '');
+	_updateAccessory: function(accessory){
+		if(this._accessory === accessory){
+			return;
+		}
+
+		if(this._accessoryViewController){
+			this._accessoryViewController.destroy();
+			this._accessoryViewController = null;
+		}
+
+		if(accessory){
+			this._createAccessory(accessory);
+		}
+
+		this._accessory = accessory;
 	},
 
 	_createAccessory: function(accessoryDescriptor){
@@ -196,7 +222,9 @@ _.extend(GmailNavItemView.prototype, {
 
 	_createIconButtonAccessory: function(accessoryDescriptor){
 		var buttonOptions = _.clone(accessoryDescriptor);
+		buttonOptions.buttonColor = 'pureIcon';
 		buttonOptions.buttonView  = new ButtonView(buttonOptions);
+
 
 		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
 
@@ -223,9 +251,27 @@ _.extend(GmailNavItemView.prototype, {
 		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
 	},
 
+	_updateOrder: function(navItemDescriptor){
+		this._element.setAttribute('data-group-order-hint', this._orderGroup);
+		this._element.setAttribute('data-insertion-order-hint', this._navItemNumber);
+
+		if(navItemDescriptor.orderHint !== this._orderHint){
+			navItemDescriptor.orderHint = navItemDescriptor.orderHint || navItemDescriptor.orderHint === 0 ? navItemDescriptor.orderHint : 10000000;
+			this._element.setAttribute('data-order-hint', navItemDescriptor.orderHint);
+
+			this._eventStream.push({
+				eventName: 'orderChanged'
+			});
+		}
+
+		this._orderHint = navItemDescriptor.orderHint;
+	},
+
 	_addNavItemElement: function(gmailNavItemView){
 		var itemContainerElement = this._getItemContainerElement();
-		itemContainerElement.appendChild(gmailNavItemView.getElement());
+
+		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
+		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 	},
 
 	_getItemContainerElement: function(){
@@ -259,6 +305,10 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	_toggleCollapse: function(){
+		if(!this._expandoElement){
+			return;
+		}
+
 		if(this._isExpanded()){
 			this._collapse();
 		}
@@ -298,7 +348,7 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	_isExpanded: function(){
-		return this._expandoElement.classList.contains('aih');
+		return  this._expandoElement.classList.contains('aih');
 	}
 
 });

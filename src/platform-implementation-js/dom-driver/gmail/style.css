@@ -352,4 +352,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   right: -4px;
 }
 
+.inboxsdk__navItem_container .aio .inboxsdk__button {
+  position: absolute;
+  top: 0px;
+  right: -30px;
+}
+
 /* end nav menu */
