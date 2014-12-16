@@ -15,8 +15,14 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 		color:'white',
 		textColor:'blue'
 	});
-	threadRowView.addAttachmentIcon({
-		iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-		title: 'blah blah'
-	});
+	threadRowView.addAttachmentIcon(Bacon.repeatedly(2000, [
+		{
+			iconUrl: 'https://ssl.gstatic.com/mail/sprites/general_black-16bf964ab5b51c4b7462e4429bfa7fe8.png',
+			title: 'thing'
+		},
+		{
+			iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+			title: 'blah blah'
+		}
+	]));
 });

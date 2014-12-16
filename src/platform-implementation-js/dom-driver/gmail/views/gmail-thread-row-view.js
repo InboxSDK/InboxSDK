@@ -68,17 +68,31 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    var iconUrl = opts.iconUrl, title = opts.title;
-
     var attachmentDiv = this._element.querySelector('td.yf.xY');
+
     var img = document.createElement('img');
     img.className = 'iP inboxSDKattachmentIcon';
     img.src = 'images/cleardot.gif';
-    if (title) {
-      img.title = title;
-    }
-    img.style.background = "url("+iconUrl+") no-repeat -2px -2px";
-    attachmentDiv.appendChild(img);
+    var currentIconUrl;
+
+    convertForeignInputToBacon(opts).takeUntil(
+      this._eventStream.filter(false).mapEnd()
+    ).onValue(function(opts) {
+      if (!opts) {
+        img.remove();
+      } else {
+        if (img.title != opts.title) {
+          img.title = opts.title;
+        }
+        if (currentIconUrl != opts.iconUrl) {
+          img.style.background = "url("+opts.iconUrl+") no-repeat 0 0";
+          currentIconUrl = opts.iconUrl;
+        }
+        if (!img.parentElement) {
+          attachmentDiv.appendChild(img);
+        }
+      }
+    });
   }
 
 });
