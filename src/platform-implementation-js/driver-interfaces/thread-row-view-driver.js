@@ -15,7 +15,9 @@ _.extend(ThreadRowViewDriver.prototype, {
 
   addAttachmentIcon: function(url) {},
 
-  replaceDate: null
+  replaceDate: null,
+
+  getDateString: null
 
 });
 

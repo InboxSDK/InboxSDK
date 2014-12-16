@@ -132,6 +132,10 @@ _.extend(GmailThreadRowView.prototype, {
         originalDateSpan.style.display = 'none';
       }
     });
+  },
+
+  getDateString: function() {
+    return this._element.querySelector('td.xW > span').title;
   }
 
 });

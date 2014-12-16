@@ -42,6 +42,10 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    */
   replaceDate: function(opts) {
     this._threadRowViewDriver.replaceDate(opts);
+  },
+
+  getDateString: function() {
+    return this._threadRowViewDriver.getDateString();
   }
 
   /**
