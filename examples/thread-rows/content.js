@@ -25,7 +25,7 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 			title: 'blah blah'
 		}
 	]));
-	threadRowView.replaceDate({text: 'aaa', textColor: 'green', title: 'beep'});
+	threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
 	threadRowView.addButton({
 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
 		// opacity 0.4

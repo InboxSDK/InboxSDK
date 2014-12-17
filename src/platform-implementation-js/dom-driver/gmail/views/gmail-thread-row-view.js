@@ -39,6 +39,14 @@ _.extend(GmailThreadRowView.prototype, {
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
+  _expandColumn: function(colSelector, width) {
+    var col = this._element.parentElement.parentElement.querySelector('colgroup > '+colSelector);
+    var currentWidth = parseInt(col.style.width, 10);
+    if (isNaN(currentWidth) || currentWidth < width) {
+      col.style.width = width+'px';
+    }
+  },
+
   addLabel: function(label) {
     var self = this;
     var labelDiv = document.createElement('div');
@@ -129,6 +137,7 @@ _.extend(GmailThreadRowView.prototype, {
       if (!customDateSpan) {
         customDateSpan = document.createElement('span');
         customDateSpan.className = 'inboxSDKadded inboxSDKcustomDate';
+        customDateSpan.style.marginLeft = '2px';
         dateContainer.appendChild(customDateSpan);
 
         originalDateSpan.classList.add('inboxSDKhiddenInline');
@@ -150,6 +159,8 @@ _.extend(GmailThreadRowView.prototype, {
 
         customDateSpan.style.display = 'inline';
         originalDateSpan.style.display = 'none';
+
+        self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6);
       }
     });
   },
