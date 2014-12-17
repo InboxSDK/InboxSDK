@@ -30,7 +30,6 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    console.log('destroy threadrowview', this.getSubject());
     _.toArray(this._element.getElementsByClassName('inboxSDKadded')).forEach(function(node) {
       node.remove();
     });
