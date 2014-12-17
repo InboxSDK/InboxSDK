@@ -44,7 +44,7 @@ describe('convertForeignInputToBacon', function() {
     testStreamForOneValue(value, value, done);
   });
 
-  it('supports all event types', function(done) {
+  it('supports all Bacon event types', function(done) {
     var s = convertForeignInputToBacon(Bacon.mergeAll(
       Bacon.once('beep'),
       Bacon.once(new Bacon.Error('bad')),
@@ -247,5 +247,97 @@ describe('convertForeignInputToBacon', function() {
           throw new Error("Should not happen");
       }
     });
+  });
+
+  it('can listen on Bacon stream multiple times', function(done) {
+    var bus = new Bacon.Bus();
+
+    var s = convertForeignInputToBacon(bus);
+
+    var calls1 = 0, calls2 = 0;
+    s.take(1).subscribe(function(event) {
+      switch (++calls1) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.End);
+
+          s.subscribe(function(event) {
+            switch (++calls2) {
+              case 1:
+                assert(event instanceof Bacon.Next);
+                assert.strictEqual(event.value(), 2);
+                break;
+              case 2:
+                assert(event instanceof Bacon.End);
+
+                setTimeout(function() {
+                  s.subscribe(function(event) {
+                    assert(event instanceof Bacon.End);
+                    done();
+                  });
+                }, 0);
+
+                break;
+              default:
+                throw new Error("Should not happen");
+            }
+          });
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+    bus.push(1);
+    bus.push(2);
+    bus.end();
+  });
+
+  it('can listen on RxJS stream multiple times', function(done) {
+    var subject = new Rx.Subject();
+
+    var s = convertForeignInputToBacon(subject);
+
+    var calls1 = 0, calls2 = 0;
+    s.take(1).subscribe(function(event) {
+      switch (++calls1) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.End);
+
+          s.subscribe(function(event) {
+            switch (++calls2) {
+              case 1:
+                assert(event instanceof Bacon.Next);
+                assert.strictEqual(event.value(), 2);
+                break;
+              case 2:
+                assert(event instanceof Bacon.End);
+
+                setTimeout(function() {
+                  s.subscribe(function(event) {
+                    assert(event instanceof Bacon.End);
+                    done();
+                  });
+                }, 0);
+
+                break;
+              default:
+                throw new Error("Should not happen");
+            }
+          });
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+    subject.onNext(1);
+    subject.onNext(2);
+    subject.onCompleted();
   });
 });

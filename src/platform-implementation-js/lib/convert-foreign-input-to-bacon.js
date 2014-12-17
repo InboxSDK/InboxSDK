@@ -11,7 +11,10 @@ function convertForeignInputToBacon(input) {
       var unsub;
       input.takeUntil({
         then: function(cb) {
-          unsub = _.once(cb);
+          unsub = _.once(function() {
+            sink = _.noop; // Avoid sinking the End event that cb() will trigger
+            cb();
+          });
         }
       }).subscribe(function onNext(value) {
         if (sink(new Bacon.Next(_.constant(value))) === Bacon.noMore) {
