@@ -2,7 +2,7 @@ var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
 var Bacon = require('baconjs');
 
-var NavItemView = function(appId, driver, navItemViewDriver){
+var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptor){
 	BasicClass.call(this);
 
 	this._appId = appId;
@@ -10,7 +10,18 @@ var NavItemView = function(appId, driver, navItemViewDriver){
 	this._navItemViewDriver = navItemViewDriver;
 	this._eventStream = new Bacon.Bus();
 
+	if(navItemDescriptor.onValue){
+		var self = this;
+		navItemDescriptor.onValue(function(streamNavItemDescriptor){
+			self._navItemDescriptor = streamNavItemDescriptor;
+		});
+	}
+	else{
+		this._navItemDescriptor = navItemDescriptor;
+	}
+
 	this._navItemViewDriver.getEventStream().onValue(this, '_handleStreamEvent');
+	this._driver.getRouteViewDriverStream().onValue(this, '_handleRouteViewChange');
 };
 
 NavItemView.prototype = Object.create(BasicClass.prototype);
@@ -21,13 +32,14 @@ _.extend(NavItemView.prototype, {
 		{name: '_appId', destroy: false},
 		{name: '_driver', destroy: false},
 		{name: '_navItemViewDriver', destroy: true},
+		{name: '_navItemDescriptor', destroy: false},
 		{name: '_navItemViews', destroy: true, defaultValue: []},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	addNavItem: function(navItemDescriptor){
 		var navItemViewDriver = this._navItemViewDriver.addNavItem(this._appId, navItemDescriptor);
-		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver);
+		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver, navItemDescriptor);
 
 		this._navItemViews.push(navItemView);
 
@@ -48,11 +60,10 @@ _.extend(NavItemView.prototype, {
 	},
 
 	_handleStreamEvent: function(event){
-		var navItemDescriptor = event.navItemDescriptor;
 		switch(event.eventName){
 			case 'mouseenter':
 
-				if(navItemDescriptor.route){
+				if(this._navItemDescriptor.route){
 					this._navItemViewDriver.setHighlight(true);
 				}
 
@@ -64,8 +75,8 @@ _.extend(NavItemView.prototype, {
 			break;
 			case 'click':
 
-				if(navItemDescriptor.route){
-					this._driver.gotoView(navItemDescriptor.route);
+				if(this._navItemDescriptor.route){
+					this._driver.gotoView(this._navItemDescriptor.route, this._navItemDescriptor.routeParams);
 				}
 				else{
 					this._navItemViewDriver.toggleCollapse();
@@ -77,6 +88,14 @@ _.extend(NavItemView.prototype, {
 				this._eventStream.push(event);
 			break;
 		}
+	},
+
+	_handleRouteViewChange: function(routeViewDriver){
+		this._navItemViewDriver.setActive(
+			this._navItemDescriptor &&
+			this._navItemDescriptor.route === routeViewDriver.getName() &&
+			_.isEqual(this._navItemDescriptor.routeParams, routeViewDriver.getParams())
+		);
 	}
 
 });

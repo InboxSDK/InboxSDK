@@ -15,7 +15,7 @@ var BasicButtonViewController = require('../../../widgets/buttons/basic-button-v
 
 var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
-var GmailNavItemView = function(orderGroup,  navItemDescriptor){
+var GmailNavItemView = function(orderGroup,  navItemDescriptor, nativeElement){
 	NavItemViewDriver.call(this);
 
 	this._orderGroup = orderGroup;
@@ -23,13 +23,20 @@ var GmailNavItemView = function(orderGroup,  navItemDescriptor){
 
 	this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
 
-	this._setupElement();
 
-	if(navItemDescriptor.onValue){
-		navItemDescriptor.onValue(this, '_updateValues');
+	if(nativeElement){
+		this._element = nativeElement;
+		this._isNative = true;
 	}
 	else{
-		this._updateValues(navItemDescriptor);
+		this._setupElement();
+
+		if(navItemDescriptor.onValue){
+			navItemDescriptor.onValue(this, '_updateValues');
+		}
+		else{
+			this._updateValues(navItemDescriptor);
+		}
 	}
 };
 
@@ -39,12 +46,14 @@ _.extend(GmailNavItemView.prototype, {
 
 	__memberVariables: [
 		{name: '_navItemDescriptor', destroy: false, get: true},
-		{name: '_element', destroy: true, get: true},
+		{name: '_element', destroy: false, get: true},
+		{name: '_isNative', destroy: false, defaultValue: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_iconElement', destroy: true},
 		{name: '_iconImgElement', destroy: true},
 		{name: '_itemContainerElement', destroy: true},
 		{name: '_expandoElement', destroy: true},
+		{name: '_isCollapsed', destroy: false, defaultValue: false},
 		{name: '_orderGroup', destroy: false, get: true},
 		{name: '_orderHint', destroy: false, get: true},
 		{name: '_name', destroy: false, get: true, defaultValue: ''},
@@ -57,7 +66,7 @@ _.extend(GmailNavItemView.prototype, {
 	addNavItem: function(orderGroup, navItemDescriptor){
 		var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
 
-		this._addNavItemElement(gmailNavItemView);
+		//this._addNavItemElement(gmailNavItemView);
 
 		gmailNavItemView
 			.getEventStream()
@@ -80,10 +89,12 @@ _.extend(GmailNavItemView.prototype, {
 		if(value){
 			this._element.classList.add('ain');
 			this._element.querySelector('.TO').classList.add('nZ');
+			this._element.querySelector('.TO').classList.add('aiq');
 		}
 		else{
 			this._element.classList.remove('ain');
 			this._element.querySelector('.TO').classList.remove('nZ');
+			this._element.querySelector('.TO').classList.remove('aiq');
 		}
 	},
 
@@ -92,6 +103,8 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	setCollapsed: function(value){
+		this._isCollapsed = value;
+
 		if(!this._expandoElement){
 			return;
 		}
@@ -102,6 +115,10 @@ _.extend(GmailNavItemView.prototype, {
 		else{
 			this._collapse();
 		}
+	},
+
+	remove: function(){
+		this.destroy();
 	},
 
 	_setupElement: function(){
@@ -302,14 +319,8 @@ _.extend(GmailNavItemView.prototype, {
 		});
 
 		this._element.querySelector('.inboxsdk__navItem_name').insertAdjacentElement('beforebegin', this._expandoElement);
-	},
 
-	_toggleCollapse: function(){
-		if(!this._expandoElement){
-			return;
-		}
-
-		if(this._isExpanded()){
+		if(this._isCollapsed){
 			this._collapse();
 		}
 		else{
@@ -317,15 +328,27 @@ _.extend(GmailNavItemView.prototype, {
 		}
 	},
 
-	_collapse: function(){
-		if(!this._isExpanded()){
+	_toggleCollapse: function(){
+		if(!this._expandoElement){
+			this._isCollapsed = !this._isCollapsed;
 			return;
 		}
 
+		if(this._isCollapsed){
+			this._expand();
+		}
+		else{
+			this._collapse();
+		}
+	},
+
+	_collapse: function(){
 		this._expandoElement.classList.remove('aih');
 		this._expandoElement.classList.add('aii');
 
 		this._itemContainerElement.style.display = 'none';
+
+		this._isCollapsed = true;
 
 		this._eventStream.push({
 			eventName: 'collapsed'
@@ -333,14 +356,12 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	_expand: function(){
-		if(this._isExpanded()){
-			return;
-		}
-
 		this._expandoElement.classList.add('aih');
 		this._expandoElement.classList.remove('aii');
 
 		this._itemContainerElement.style.display = '';
+
+		this._isCollapsed = false;
 
 		this._eventStream.push({
 			eventName: 'expanded'
@@ -349,6 +370,14 @@ _.extend(GmailNavItemView.prototype, {
 
 	_isExpanded: function(){
 		return  this._expandoElement.classList.contains('aih');
+	},
+
+	destroy: function(){
+		if(!this._isNative && this._element){
+			this._element.remove();
+		}
+
+		NavItemViewDriver.prototype.destroy.call(this);
 	}
 
 });

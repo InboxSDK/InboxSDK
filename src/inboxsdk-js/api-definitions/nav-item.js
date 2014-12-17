@@ -56,16 +56,15 @@ _.extend(NavItem.prototype, {
 			subItem.remove();
 		});
 
-		if(self._implementation){
-			self._implementation.remove();
+		if(this._implementation){
+			this._implementation.remove();
 		}
 		else{
 			this._removedEarly = true;
+			this._deferred.reject();
 		}
 
 		this._removed = true;
-
-		this._deferred.reject();
 	},
 
 	isCollapsed: function(){

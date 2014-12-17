@@ -63,6 +63,10 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
 	},
 
+	getCurrentActiveNavItem: function(){
+		return require('./gmail-driver/get-current-active-nav-item')();
+	},
+
 	_setupEventStreams: function(){
 		var result = makeXhrInterceptor();
 		var xhrInterceptStream = result.xhrInterceptStream;

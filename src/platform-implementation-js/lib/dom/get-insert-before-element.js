@@ -5,7 +5,8 @@ module.exports = function(checkElement, childElements, dataAttributes){
 	var insertBeforeElement = null;
 
 	dataAttributes.forEach(function(attribute){
-		checkValues[attribute] = checkElement.getAttribute(attribute);
+		var value = checkElement.getAttribute(attribute);
+		checkValues[attribute] = isNumber(value) ? parseFloat(value) : value;
 	});
 
 	for(var ii=0; ii<childElements.length; ii++){
@@ -24,8 +25,11 @@ module.exports = function(checkElement, childElements, dataAttributes){
 function _isChildAfter(checkValues, child, dataAttributes){
 	for(var ii=0; ii<dataAttributes.length; ii++){
 		var attribute = dataAttributes[ii];
+		var value = child.getAttribute(attribute);
 
-		if(child.getAttribute(attribute) > checkValues[attribute]){
+		value = isNumber(value) ? parseFloat(value) : value;
+
+		if(value > checkValues[attribute]){
 			return true;
 		}
 	}
