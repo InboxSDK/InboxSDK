@@ -15,8 +15,6 @@ var GmailThreadRowView = function(element) {
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM nodes
   this._refresher = makeMutationObserverStream(this._element, {
     childList: true
-  }).doAction(function(x) {
-    console.log('refresher firing for element', element, x);
   }).map(null).takeUntil(this._stopper);
 };
 
