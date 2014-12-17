@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var assert = require('assert');
 var Bacon = require('baconjs');
+var Rx = require('rx');
 
 var convertForeignInputToBacon = require('../src/platform-implementation-js/lib/convert-foreign-input-to-bacon');
 
@@ -82,6 +83,7 @@ describe('convertForeignInputToBacon', function() {
   it('works on non-Bacon object with subscribe method', function(done) {
     var unsubbed = 0;
     var s = convertForeignInputToBacon({
+      onValue: true,
       subscribe: function(sink) {
         sink({
           isInitial: _.constant(true), isNext: _.constant(false),
@@ -145,6 +147,100 @@ describe('convertForeignInputToBacon', function() {
         case 5:
           assert(event instanceof Bacon.End);
           assert.strictEqual(unsubbed, 1);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('supports basic RxJS observable', function(done) {
+    var s = convertForeignInputToBacon(Rx.Observable.fromArray([
+      'beep',
+      shouldNotBeCalled
+    ]));
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 'beep');
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), shouldNotBeCalled);
+          break;
+        case 3:
+          assert(event instanceof Bacon.End);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('supports RxJS observable with error', function(done) {
+    var err = new Error('some err');
+    var s = convertForeignInputToBacon(Rx.Observable.fromArray([
+      'beep',
+      shouldNotBeCalled
+    ]).concat(Rx.Observable.throw(err)));
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 'beep');
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), shouldNotBeCalled);
+          break;
+        case 3:
+          assert(event instanceof Bacon.Error);
+          assert.strictEqual(event.error, err);
+          break;
+        case 4:
+          assert(event instanceof Bacon.End);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('supports RxJS observable unsubscription', function(done) {
+    var i = 0;
+    var s = convertForeignInputToBacon(Rx.Observable.repeat(null).map(function() {
+      if (++i >= 3) {
+        var err = new Error("Should not happen");
+        // The error would be caught by Rx, so also throw it where it will fail the test.
+        setTimeout(function() {
+          throw err;
+        }, 0);
+        throw err;
+      }
+      return i;
+    })).take(2);
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 2);
+          break;
+        case 3:
+          assert(event instanceof Bacon.End);
           done();
           break;
         default:

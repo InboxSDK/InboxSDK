@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Bacon = require('baconjs');
 
 // Bacon doesn't support stream instances from different instances of the
@@ -5,7 +6,25 @@ var Bacon = require('baconjs');
 // into a native Bacon stream. It also converts non-streams into a stream that
 // emits a single value.
 function convertForeignInputToBacon(input) {
-  if (input && input.subscribe) {
+  if (input && input.subscribe && input.subscribeOnNext) { // RxJS
+    return Bacon.fromBinder(function(sink) {
+      var unsub;
+      input.takeUntil({
+        then: function(cb) {
+          unsub = _.once(cb);
+        }
+      }).subscribe(function onNext(value) {
+        if (sink(new Bacon.Next(_.constant(value))) === Bacon.noMore) {
+          unsub();
+        }
+      }, function onError(err) {
+        sink([new Bacon.Error(err), new Bacon.End()]);
+      }, function onCompleted() {
+        sink(new Bacon.End());
+      });
+      return unsub;
+    });
+  } else if (input && input.subscribe && input.onValue) { // Bacon
     return Bacon.fromBinder(function(sink) {
       return input.subscribe(function(event) {
         if (event.isNext()) {
