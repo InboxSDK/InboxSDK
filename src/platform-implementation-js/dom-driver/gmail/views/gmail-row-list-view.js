@@ -1,6 +1,5 @@
 var _ = require('lodash');
-var $ = require('jquery');
-
+var assert = require('assert');
 var Bacon = require('baconjs');
 
 var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
@@ -77,12 +76,29 @@ _.extend(GmailRowListView.prototype, {
 		return false;
 	},
 
+	// When a new table is added to a row list, if an existing table has had its
+	// column widths modified (by GmailThreadRowView), then the new table needs to
+	// match.
+	_fixColumnWidths: function(newTableParent) {
+		var firstTableParent = newTableParent.parentElement.firstElementChild;
+		if (firstTableParent !== newTableParent) {
+			var firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
+			var newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
+			assert.strictEqual(firstCols.length, newCols.length);
+			_.zip(firstCols, newCols).forEach(function(colPair) {
+				var firstCol = colPair[0], newCol = colPair[1];
+				newCol.style.width = firstCol.style.width;
+			});
+		}
+	},
+
 	_startWatchingForRowViews: function(){
 		var self = this;
 
 		var tableDivParent = self._element.querySelector('div.Cp');
 
 		var elementStream = makeElementChildStream2(tableDivParent).flatMap(function(event) {
+			self._fixColumnWidths(event.el);
 			var tbody = event.el.querySelector('table > tbody');
 			return makeElementChildStream2(tbody).takeUntil(event.removalStream).filter(function(event) {
 				return event.el.classList.contains('zA');

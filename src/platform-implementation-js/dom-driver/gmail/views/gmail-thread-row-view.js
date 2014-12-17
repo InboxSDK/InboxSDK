@@ -40,11 +40,13 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _expandColumn: function(colSelector, width) {
-    var col = this._element.parentElement.parentElement.querySelector('colgroup > '+colSelector);
-    var currentWidth = parseInt(col.style.width, 10);
-    if (isNaN(currentWidth) || currentWidth < width) {
-      col.style.width = width+'px';
-    }
+    var tableParent = this._element.parentElement.parentElement.parentElement.parentElement;
+    _.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), function(col) {
+      var currentWidth = parseInt(col.style.width, 10);
+      if (isNaN(currentWidth) || currentWidth < width) {
+        col.style.width = width+'px';
+      }
+    });
   },
 
   addLabel: function(label) {
