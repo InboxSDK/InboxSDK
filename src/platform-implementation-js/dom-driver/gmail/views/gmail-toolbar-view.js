@@ -155,31 +155,30 @@ _.extend(GmailToolbarView.prototype, {
 		}
 
 		var sectionElements = this._element.querySelectorAll('.G-Ni');
-		var buttonSearchClass = null;
+		var buttonSelector = null;
 
 		switch(sectionName){
 			case 'CHECKBOX_GROUP':
-				buttonSearchClass = 'T-Jo-auh';
-			break;
+				buttonSelector = '.T-Jo-auh';
+				break;
 			case 'ARCHIVE_GROUP':
-				buttonSearchClass = 'ar9, .aFh, .aFj';
-			break;
+				buttonSelector = '.ar9, .aFh, .aFj';
+				break;
 			case 'MOVE_GROUP':
-				buttonSearchClass = 'asb, .asa';
-			break;
+				buttonSelector = '.asb, .asa';
+				break;
 			case 'REFRESH_GROUP':
-				buttonSearchClass = 'asf';
-			break;
+				buttonSelector = '.asf';
+				break;
 			case 'MORE_GROUP':
-				buttonSearchClass = 'Ykrj7b';
-			break;
+				buttonSelector = '.Ykrj7b';
+				break;
 			default:
 				return null;
-			break;
 		}
 
 		for(var ii=0; ii<sectionElements.length; ii++){
-			if(!!sectionElements[ii].querySelector('.' + buttonSearchClass)){
+			if(!!sectionElements[ii].querySelector(buttonSelector)){
 				return sectionElements[ii];
 			}
 		}
