@@ -26,4 +26,12 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 		}
 	]));
 	threadRowView.replaceDate({text: 'aaa', textColor: 'green', title: 'beep'});
+	threadRowView.addButton({
+		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+		// opacity 0.4
+		// https://mailfoogae.appspot.com/build/images/listIndicator.png
+		onClick: function(event) {
+			console.log('threadrow got click event', event, threadRowView);
+		}
+	});
 });

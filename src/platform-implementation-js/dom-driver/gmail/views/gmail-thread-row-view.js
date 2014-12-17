@@ -30,6 +30,7 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
+    console.log('destroy threadrowview', this.getSubject());
     _.toArray(this._element.getElementsByClassName('inboxSDKadded')).forEach(function(node) {
       node.remove();
     });
@@ -77,7 +78,17 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
-    console.log('addButton unimplemented');
+    var self = this;
+    var buttonSpan = document.createElement('span');
+    buttonSpan.className = 'inboxSDKadded';
+    this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
+
+    var prop = convertForeignInputToBacon(buttonDescriptor).takeUntil(this._stopper).toProperty();
+    prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(buttonDescriptor) {
+      var starGroup = self._element.querySelector('td.apU.xY');
+      buttonSpan.textContent = 'blah';
+      starGroup.appendChild(buttonSpan);
+    });
   },
 
   addAttachmentIcon: function(opts) {
