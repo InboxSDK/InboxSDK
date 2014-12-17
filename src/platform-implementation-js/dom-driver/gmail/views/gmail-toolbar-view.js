@@ -17,14 +17,15 @@ var GmailToolbarView = function(element){
 	this._element = element;
 
 	var self = this;
-	this._ready().then(function(){
+	this._ready = waitFor(function(){
+		// Resolve if we're destroyed, so that this waitFor doesn't ever wait forever.
+		return !self._element || !!self._getSectionElement('ARCHIVE_GROUP');
+	});
+
+	this._ready.then(function(){
+		if (!self._element) return;
 		self._determineToolbarState();
 		self._setupToolbarStateMonitoring();
-	}).catch(function(e) {
-		// swallow error if this object is destroyed before becoming ready.
-		if (!e || e.message !== 'not valid anymore') {
-			throw e;
-		}
 	});
 };
 
@@ -46,7 +47,8 @@ _.extend(GmailToolbarView.prototype, {
 		this._threadViewDriver = threadViewDriver;
 
 		var self = this;
-		this._ready().then(function(){
+		this._ready.then(function(){
+			if (!self._element) return;
 			self._element.setAttribute('data-thread-toolbar', 'true');
 		});
 	},
@@ -55,7 +57,8 @@ _.extend(GmailToolbarView.prototype, {
 		this._rowListViewDriver = rowListViewDriver;
 
 		var self = this;
-		this._ready().then(function(){
+		this._ready.then(function(){
+			if (!self._element) return;
 			self._element.setAttribute('data-rowlist-toolbar', 'true');
 		});
 	},
@@ -63,8 +66,9 @@ _.extend(GmailToolbarView.prototype, {
 
 	addButton: function(buttonDescriptor){
 		var self = this;
-		this._ready().then(
+		this._ready.then(
 			function(){
+				if (!self._element) return;
 				var sectionElement = self._getSectionElement(buttonDescriptor.type);
 
 				var buttonViewController = self._createButtonViewController(buttonDescriptor);
@@ -73,19 +77,6 @@ _.extend(GmailToolbarView.prototype, {
 				sectionElement.appendChild(buttonViewController.getView().getElement());
 
 				self._updateButtonClasses(self._element);
-			}
-		);
-	},
-
-	_ready: function(){
-		var self = this;
-		return waitFor(
-			function(){
-				if(!self._element){
-					throw new Error('not valid anymore');
-				}
-
-				return !!self._getSectionElement('ARCHIVE_GROUP');
 			}
 		);
 	},
