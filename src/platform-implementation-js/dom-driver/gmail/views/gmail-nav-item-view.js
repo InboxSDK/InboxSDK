@@ -273,7 +273,7 @@ _.extend(GmailNavItemView.prototype, {
 		this._element.setAttribute('data-insertion-order-hint', this._navItemNumber);
 
 		if(navItemDescriptor.orderHint !== this._orderHint){
-			navItemDescriptor.orderHint = navItemDescriptor.orderHint || navItemDescriptor.orderHint === 0 ? navItemDescriptor.orderHint : 10000000;
+			navItemDescriptor.orderHint = navItemDescriptor.orderHint || navItemDescriptor.orderHint === 0 ? navItemDescriptor.orderHint : Number.MAX_SAFE_INTEGER;
 			this._element.setAttribute('data-order-hint', navItemDescriptor.orderHint);
 
 			this._eventStream.push({
@@ -384,13 +384,4 @@ _.extend(GmailNavItemView.prototype, {
 
 
 module.exports = GmailNavItemView;
-
-/*
-
-16, 06, 68, 88, _, 98
-
-16066888_98
-
-*/
-
 

@@ -3,6 +3,10 @@ var EventEmitter = require('events').EventEmitter;
 
 var RSVP = require('rsvp');
 
+
+/**
+ * NavItemView this lets you interact with a nav item on the left menu
+ */
 var NavItem = function(platformImplementationLoader){
 	EventEmitter.call(this);
 
@@ -20,18 +24,11 @@ NavItem.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(NavItem.prototype, {
 
-	setImplementation: function(implementation){
-		if(this._removedEarly){
-			implementation.remove();
-			return;
-		}
-
-		this._implementation = implementation;
-		this._bindToImplementationEvents();
-
-		this._deferred.resolve();
-	},
-
+	/**
+	 * Add a child nav item
+	 * @param {NavItemDescriptor}
+	 * @returns {NavItemView}
+	 */
 	addNavItem: function(navItemDescriptor){
 		if(this._removed){
 			console.warn('This nav item is removed so nothing will happen');
@@ -51,6 +48,9 @@ _.extend(NavItem.prototype, {
 		return navItem;
 	},
 
+	/**
+	 * remove the nav item
+	 */
 	remove: function(){
 		this._subItems.forEach(function(subItem){
 			subItem.remove();
@@ -67,6 +67,10 @@ _.extend(NavItem.prototype, {
 		this._removed = true;
 	},
 
+	/**
+	 * Tells if the nav item is in a collapsed state or not
+	 * @returns {Boolean}
+	 */
 	isCollapsed: function(){
 		if(this._removed){
 			console.warn('This nav item is removed');
@@ -81,11 +85,28 @@ _.extend(NavItem.prototype, {
 		return this._implementation.isCollapsed();
 	},
 
+	/**
+	 * Set the collapsed state
+	 * @param {boolean}
+	 */
 	setCollapsed: function(collapseValue){
 		var self = this;
 		this._deferred.promise.then(function(){
 			self._implementation.setCollapsed(collapseValue);
 		});
+	},
+
+	/* internal */
+	setImplementation: function(implementation){
+		if(this._removedEarly){
+			implementation.remove();
+			return;
+		}
+
+		this._implementation = implementation;
+		this._bindToImplementationEvents();
+
+		this._deferred.resolve();
 	},
 
 	_bindToImplementationEvents: function(){
