@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var assert = require('assert');
 var Bacon = require('baconjs');
+var Rx = require('rx');
 
 var convertForeignInputToBacon = require('../src/platform-implementation-js/lib/convert-foreign-input-to-bacon');
 
@@ -43,7 +44,7 @@ describe('convertForeignInputToBacon', function() {
     testStreamForOneValue(value, value, done);
   });
 
-  it('supports all event types', function(done) {
+  it('supports all Bacon event types', function(done) {
     var s = convertForeignInputToBacon(Bacon.mergeAll(
       Bacon.once('beep'),
       Bacon.once(new Bacon.Error('bad')),
@@ -82,6 +83,7 @@ describe('convertForeignInputToBacon', function() {
   it('works on non-Bacon object with subscribe method', function(done) {
     var unsubbed = 0;
     var s = convertForeignInputToBacon({
+      onValue: true,
       subscribe: function(sink) {
         sink({
           isInitial: _.constant(true), isNext: _.constant(false),
@@ -151,5 +153,191 @@ describe('convertForeignInputToBacon', function() {
           throw new Error("Should not happen");
       }
     });
+  });
+
+  it('supports basic RxJS observable', function(done) {
+    var s = convertForeignInputToBacon(Rx.Observable.fromArray([
+      'beep',
+      shouldNotBeCalled
+    ]));
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 'beep');
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), shouldNotBeCalled);
+          break;
+        case 3:
+          assert(event instanceof Bacon.End);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('supports RxJS observable with error', function(done) {
+    var err = new Error('some err');
+    var s = convertForeignInputToBacon(Rx.Observable.fromArray([
+      'beep',
+      shouldNotBeCalled
+    ]).concat(Rx.Observable.throw(err)));
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 'beep');
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), shouldNotBeCalled);
+          break;
+        case 3:
+          assert(event instanceof Bacon.Error);
+          assert.strictEqual(event.error, err);
+          break;
+        case 4:
+          assert(event instanceof Bacon.End);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('supports RxJS observable unsubscription', function(done) {
+    var i = 0;
+    var s = convertForeignInputToBacon(Rx.Observable.repeat(null).map(function() {
+      if (++i >= 3) {
+        var err = new Error("Should not happen");
+        // The error would be caught by Rx, so also throw it where it will fail the test.
+        setTimeout(function() {
+          throw err;
+        }, 0);
+        throw err;
+      }
+      return i;
+    })).take(2);
+
+    var calls = 0;
+    s.subscribe(function(event) {
+      switch(++calls) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 2);
+          break;
+        case 3:
+          assert(event instanceof Bacon.End);
+          done();
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+  });
+
+  it('can listen on Bacon stream multiple times', function(done) {
+    var bus = new Bacon.Bus();
+
+    var s = convertForeignInputToBacon(bus);
+
+    var calls1 = 0, calls2 = 0;
+    s.take(1).subscribe(function(event) {
+      switch (++calls1) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.End);
+
+          s.subscribe(function(event) {
+            switch (++calls2) {
+              case 1:
+                assert(event instanceof Bacon.Next);
+                assert.strictEqual(event.value(), 2);
+                break;
+              case 2:
+                assert(event instanceof Bacon.End);
+
+                setTimeout(function() {
+                  s.subscribe(function(event) {
+                    assert(event instanceof Bacon.End);
+                    done();
+                  });
+                }, 0);
+
+                break;
+              default:
+                throw new Error("Should not happen");
+            }
+          });
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+    bus.push(1);
+    bus.push(2);
+    bus.end();
+  });
+
+  it('can listen on RxJS stream multiple times', function(done) {
+    var subject = new Rx.Subject();
+
+    var s = convertForeignInputToBacon(subject);
+
+    var calls1 = 0, calls2 = 0;
+    s.take(1).subscribe(function(event) {
+      switch (++calls1) {
+        case 1:
+          assert(event instanceof Bacon.Next);
+          assert.strictEqual(event.value(), 1);
+          break;
+        case 2:
+          assert(event instanceof Bacon.End);
+
+          s.subscribe(function(event) {
+            switch (++calls2) {
+              case 1:
+                assert(event instanceof Bacon.Next);
+                assert.strictEqual(event.value(), 2);
+                break;
+              case 2:
+                assert(event instanceof Bacon.End);
+
+                setTimeout(function() {
+                  s.subscribe(function(event) {
+                    assert(event instanceof Bacon.End);
+                    done();
+                  });
+                }, 0);
+
+                break;
+              default:
+                throw new Error("Should not happen");
+            }
+          });
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
+    subject.onNext(1);
+    subject.onNext(2);
+    subject.onCompleted();
   });
 });

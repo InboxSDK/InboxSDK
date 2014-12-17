@@ -17,14 +17,15 @@ var GmailToolbarView = function(element){
 	this._element = element;
 
 	var self = this;
-	this._ready().then(function(){
+	this._ready = waitFor(function(){
+		// Resolve if we're destroyed, so that this waitFor doesn't ever wait forever.
+		return !self._element || !!self._getSectionElement('ARCHIVE_GROUP');
+	});
+
+	this._ready.then(function(){
+		if (!self._element) return;
 		self._determineToolbarState();
 		self._setupToolbarStateMonitoring();
-	}).catch(function(e) {
-		// swallow error if this object is destroyed before becoming ready.
-		if (!e || e.message !== 'not valid anymore') {
-			throw e;
-		}
 	});
 };
 
@@ -46,7 +47,8 @@ _.extend(GmailToolbarView.prototype, {
 		this._threadViewDriver = threadViewDriver;
 
 		var self = this;
-		this._ready().then(function(){
+		this._ready.then(function(){
+			if (!self._element) return;
 			self._element.setAttribute('data-thread-toolbar', 'true');
 		});
 	},
@@ -55,7 +57,8 @@ _.extend(GmailToolbarView.prototype, {
 		this._rowListViewDriver = rowListViewDriver;
 
 		var self = this;
-		this._ready().then(function(){
+		this._ready.then(function(){
+			if (!self._element) return;
 			self._element.setAttribute('data-rowlist-toolbar', 'true');
 		});
 	},
@@ -63,8 +66,9 @@ _.extend(GmailToolbarView.prototype, {
 
 	addButton: function(buttonDescriptor){
 		var self = this;
-		this._ready().then(
+		this._ready.then(
 			function(){
+				if (!self._element) return;
 				var sectionElement = self._getSectionElement(buttonDescriptor.type);
 
 				var buttonViewController = self._createButtonViewController(buttonDescriptor);
@@ -73,19 +77,6 @@ _.extend(GmailToolbarView.prototype, {
 				sectionElement.appendChild(buttonViewController.getView().getElement());
 
 				self._updateButtonClasses(self._element);
-			}
-		);
-	},
-
-	_ready: function(){
-		var self = this;
-		return waitFor(
-			function(){
-				if(!self._element){
-					throw new Error('not valid anymore');
-				}
-
-				return !!self._getSectionElement('ARCHIVE_GROUP');
 			}
 		);
 	},
@@ -164,31 +155,30 @@ _.extend(GmailToolbarView.prototype, {
 		}
 
 		var sectionElements = this._element.querySelectorAll('.G-Ni');
-		var buttonSearchClass = null;
+		var buttonSelector = null;
 
 		switch(sectionName){
 			case 'CHECKBOX_GROUP':
-				buttonSearchClass = 'T-Jo-auh';
-			break;
+				buttonSelector = '.T-Jo-auh';
+				break;
 			case 'ARCHIVE_GROUP':
-				buttonSearchClass = 'ar9, .aFh, .aFj';
-			break;
+				buttonSelector = '.ar9, .aFh, .aFj';
+				break;
 			case 'MOVE_GROUP':
-				buttonSearchClass = 'asb, .asa';
-			break;
+				buttonSelector = '.asb, .asa';
+				break;
 			case 'REFRESH_GROUP':
-				buttonSearchClass = 'asf';
-			break;
+				buttonSelector = '.asf';
+				break;
 			case 'MORE_GROUP':
-				buttonSearchClass = 'Ykrj7b';
-			break;
+				buttonSelector = '.Ykrj7b';
+				break;
 			default:
 				return null;
-			break;
 		}
 
 		for(var ii=0; ii<sectionElements.length; ii++){
-			if(!!sectionElements[ii].querySelector('.' + buttonSearchClass)){
+			if(!!sectionElements[ii].querySelector(buttonSelector)){
 				return sectionElements[ii];
 			}
 		}
