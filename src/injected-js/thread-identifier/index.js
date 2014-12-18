@@ -11,10 +11,10 @@ function setup() {
   processPreloadedThreads();
 
   document.addEventListener('inboxSDKtellMeThisThreadId', function(event) {
-    event.target.setAttribute(
-      'data-inboxsdk-threadid',
-      getGmailThreadIdForThreadRow(event.target)
-    );
+    var threadId = getGmailThreadIdForThreadRow(event.target);
+    if (threadId) {
+      event.target.setAttribute('data-inboxsdk-threadid', threadId);
+    }
   });
 }
 exports.setup = setup;
@@ -96,7 +96,8 @@ function getGmailThreadIdForThreadRow(threadRow){
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
   var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
-  var threadId = getThreadIdFromUrl(clickAndGetPopupUrl(threadRow));
+  var url = clickAndGetPopupUrl(threadRow);
+  var threadId = url && getThreadIdFromUrl(url);
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
   }

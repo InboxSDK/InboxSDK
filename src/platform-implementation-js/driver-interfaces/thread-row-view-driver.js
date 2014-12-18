@@ -19,7 +19,9 @@ _.extend(ThreadRowViewDriver.prototype, {
 
   getSubject: null,
 
-  getDateString: null
+  getDateString: null,
+
+  getThreadId: null
 
 });
 

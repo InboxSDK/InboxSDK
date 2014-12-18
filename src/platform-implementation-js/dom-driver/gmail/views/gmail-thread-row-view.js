@@ -8,11 +8,15 @@ var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-dr
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
-  this._eventStream = new Bacon.Bus();
   this._element = element;
+
+  this._eventStream = new Bacon.Bus();
   this._stopper = this._eventStream.filter(false).mapEnd();
 
-  // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM nodes
+  // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
+  // nodes. Important: This stream is only listened on if some modifier method
+  // (like addLabel) is called. If none of those methods are called, then the
+  // stream is not listened on and no MutationObserver ever gets made.
   this._refresher = makeMutationObserverStream(this._element, {
     childList: true
   }).map(null).takeUntil(this._stopper);
@@ -24,6 +28,7 @@ _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
     {name: '_element', destroy: false},
+    {name: '_threadMetadataOracle', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
     {name: '_refresher', destroy: false}
@@ -37,6 +42,10 @@ _.extend(GmailThreadRowView.prototype, {
       node.style.display = 'inline';
     });
     ThreadRowViewDriver.prototype.destroy.call(this);
+  },
+
+  setThreadMetadataOracle: function(threadMetadataOracle) {
+    this._threadMetadataOracle = threadMetadataOracle;
   },
 
   _expandColumn: function(colSelector, width) {
@@ -173,6 +182,14 @@ _.extend(GmailThreadRowView.prototype, {
 
   getDateString: function() {
     return this._element.querySelector('td.xW > span').title;
+  },
+
+  threadIdReady: function() {
+    return !!this.getThreadId();
+  },
+
+  getThreadId: function() {
+    return this._threadMetadataOracle.getThreadIdForThreadRow(this._element);
   }
 
 });

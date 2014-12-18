@@ -62,6 +62,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
+		var self = this;
 		var result = makeXhrInterceptor();
 		var xhrInterceptStream = result.xhrInterceptStream;
 		this._threadMetadataOracle = result.threadMetadataOracle;
@@ -72,7 +73,18 @@ _.extend(GmailDriver.prototype, {
 		require('./gmail-driver/setup-route-view-driver-stream')(this);
 
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
-		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView');
+
+		// Each ThreadRowView may be delayed if the thread id is not known yet.
+		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
+			.flatMap(function(viewDriver) {
+				viewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
+				if (viewDriver.threadIdReady()) {
+					return Bacon.once(viewDriver);
+				} else {
+					return Bacon.later(0, viewDriver).filter('._element');
+				}
+			});
+
 		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView');
 
 		this._setupToolbarViewDriverStream();

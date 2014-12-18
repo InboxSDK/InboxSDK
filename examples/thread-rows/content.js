@@ -6,6 +6,7 @@ function log() {
 
 var i = 0;
 inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+	console.log('threadRowView', threadRowView.getThreadId(), threadRowView.getSubject());
 	threadRowView.addLabel(Bacon.repeatedly(10000, [
 		{text:'A'},
 		{text:'B', textColor: 'blue'}

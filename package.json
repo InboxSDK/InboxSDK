@@ -6,6 +6,7 @@
     ]
   },
   "dependencies": {
+    "asap": "^2.0.0",
     "baconjs": "0.7.38",
     "brfs": "^1.2.0",
     "entities": "1.1.1",

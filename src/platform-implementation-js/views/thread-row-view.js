@@ -50,6 +50,13 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   getDateString: function() {
     return this._threadRowViewDriver.getDateString();
+  },
+
+  /**
+   * Gets the Gmail Thread Id
+   */
+  getThreadId: function() {
+    return this._threadRowViewDriver.getThreadId();
   }
 
   /**
