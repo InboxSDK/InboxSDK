@@ -31,14 +31,16 @@ var threadIdsByKey = {};
 function storeThreadMetadata(threadMetadata) {
   var key = threadMetadataKey(threadMetadata);
   if (_.has(threadIdsByKey, key)) {
-    threadIdsByKey[key] = AMBIGUOUS;
+    if (threadIdsByKey[key] !== threadMetadata.gmailThreadId) {
+      threadIdsByKey[key] = AMBIGUOUS;
+    }
   } else {
     threadIdsByKey[key] = threadMetadata.gmailThreadId;
   }
 }
 
 function threadMetadataKey(threadMetadata) {
-  return threadMetadata.subject+':'+threadMetadata.timeString+':'+threadMetadata.peopleHtml;
+  return threadMetadata.subject.trim()+':'+threadMetadata.timeString.trim()+':'+threadMetadata.peopleHtml.trim();
 }
 
 function convertToThreadMetadata(thread) {
@@ -98,6 +100,9 @@ function getGmailThreadIdForThreadRow(threadRow){
   var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
   var url = clickAndGetPopupUrl(threadRow);
   var threadId = url && getThreadIdFromUrl(url);
+  if (threadId && !_.has(threadIdsByKey, key)) {
+    threadIdsByKey[key] = threadId;
+  }
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
   }

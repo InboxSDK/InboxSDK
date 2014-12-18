@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var jsdom = require('jsdom');
+var assert = require('assert');
 
 jsdom.defaultDocumentFeatures = {
   FetchExternalResources: false,
@@ -37,6 +38,21 @@ function main() {
       }
     });
   }
+
+  var originalCreateEvent = document.createEvent;
+  document.createEvent = function(type) {
+    var event = originalCreateEvent.apply(this, arguments);
+    if (type == 'CustomEvent') {
+      assert(!event.initCustomEvent);
+      event.initCustomEvent = function(type, bubbles, cancelable, detail) {
+        if (detail) {
+          throw new Error("mock initCustomEvent doesn't support detail parameter");
+        }
+        event.initEvent(type, bubbles, cancelable);
+      };
+    }
+    return event;
+  };
 
   return document;
 }
