@@ -1,6 +1,6 @@
 var inboxSDK = new InboxSDK('toolbar-example');
 
-inboxSDK.Toolbar.registerThreadViewButton({
+inboxSDK.Toolbars.registerThreadViewButton({
 	iconUrl: chrome.runtime.getURL('monkey.png'),
 	title: 'Monkeys',
 	section: 'MOVE_GROUP',
@@ -14,7 +14,7 @@ inboxSDK.Toolbar.registerThreadViewButton({
 });
 
 
-inboxSDK.Toolbar.registerThreadListWithSelectionsButton({
+inboxSDK.Toolbars.registerThreadListWithSelectionsButton({
 	iconUrl: chrome.runtime.getURL('monkey.png'),
 	title: 'Monkeys 2',
 	section: 'ARCHIVE_GROUP',
@@ -27,7 +27,7 @@ inboxSDK.Toolbar.registerThreadListWithSelectionsButton({
 });
 
 
-inboxSDK.Toolbar.registerThreadListNoSelectionsButton({
+inboxSDK.Toolbars.registerThreadListNoSelectionsButton({
 	iconUrl: chrome.runtime.getURL('monkey.png'),
 	title: 'Monkeys 3',
 	section: 'CHECKBOX_GROUP',

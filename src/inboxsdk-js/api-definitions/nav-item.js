@@ -7,16 +7,14 @@ var RSVP = require('rsvp');
 /**
  * NavItemView this lets you interact with a nav item on the left menu
  */
-var NavItem = function(platformImplementationLoader){
+var NavItem = function(platformImplementation){
 	EventEmitter.call(this);
 
-	this._platformImplementationLoader = platformImplementationLoader;
+	this._platformImplementation = platformImplementation;
 
-	this._removedEarly = false;
 	this._removed = false;
 
 	this._implementation = null;
-	this._deferred = RSVP.defer();
 	this._subItems = [];
 };
 
@@ -32,16 +30,13 @@ _.extend(NavItem.prototype, {
 	addNavItem: function(navItemDescriptor){
 		if(this._removed){
 			console.warn('This nav item is removed so nothing will happen');
-			return new NavItem(navItemDescriptor);
+			return new NavItem(this._platformImplementation);
 		}
 
-		var navItem = new NavItem(navItemDescriptor);
+		var navItem = new NavItem(this._platformImplementation);
 
-		var self = this;
-		this._deferred.promise.then(function(){
-			var implementation = self._implementation.addNavItem(navItemDescriptor);
-			navItem.setImplementation(implementation);
-		});
+		var implementation = this._implementation.addNavItem(navItemDescriptor);
+		navItem.setImplementation(implementation);
 
 		this._subItems.push(navItem);
 
@@ -56,14 +51,7 @@ _.extend(NavItem.prototype, {
 			subItem.remove();
 		});
 
-		if(this._implementation){
-			this._implementation.remove();
-		}
-		else{
-			this._removedEarly = true;
-			this._deferred.reject();
-		}
-
+		this._implementation.remove();
 		this._removed = true;
 	},
 
@@ -77,11 +65,6 @@ _.extend(NavItem.prototype, {
 			return null;
 		}
 
-		if(!this._implementation){
-			console.warn('NavItem is not yet loaded, so collapse state is unknown');
-			return null;
-		}
-
 		return this._implementation.isCollapsed();
 	},
 
@@ -90,23 +73,13 @@ _.extend(NavItem.prototype, {
 	 * @param {boolean}
 	 */
 	setCollapsed: function(collapseValue){
-		var self = this;
-		this._deferred.promise.then(function(){
-			self._implementation.setCollapsed(collapseValue);
-		});
+		this._implementation.setCollapsed(collapseValue);
 	},
 
 	/* internal */
 	setImplementation: function(implementation){
-		if(this._removedEarly){
-			implementation.remove();
-			return;
-		}
-
 		this._implementation = implementation;
 		this._bindToImplementationEvents();
-
-		this._deferred.resolve();
 	},
 
 	_bindToImplementationEvents: function(){

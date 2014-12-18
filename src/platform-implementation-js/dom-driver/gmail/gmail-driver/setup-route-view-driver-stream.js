@@ -11,17 +11,18 @@ var getURLObject = require('./get-url-object');
 
 var currentUrlObject = {};
 
-function setupRouteViewDriverStream(gmailDriver){
-	gmailDriver._routeViewDriverStream = new Bacon.Bus();
+function setupRouteViewDriverStream(){
+	// TODO return a stream that handles unsubscription instead of a bus
+	var routeViewDriverStream = new Bacon.Bus();
 
 	window.addEventListener('hashchange', function(event){
-		_checkForCustomRoute(gmailDriver, event);
+		_checkForCustomRoute(routeViewDriverStream, event);
 	});
 
 	waitFor(function(){
 		return !!GmailElementGetter.getMainContentContainer();
 	}).then(function(){
-		_handleNewUrl(gmailDriver, location.href);
+		_handleNewUrl(routeViewDriverStream, location.href);
 
 		var mainContentContainer = GmailElementGetter.getMainContentContainer();
 
@@ -30,11 +31,11 @@ function setupRouteViewDriverStream(gmailDriver){
 				return;
 			}
 
-			_handleNewUrl(gmailDriver, location.href);
+			_handleNewUrl(routeViewDriverStream, location.href);
 
 			mutations.forEach(function(mutation){
 				Array.prototype.forEach.call(mutation.addedNodes, function(element){
-					_observeVisibilityChangeOnMainElement(gmailDriver, element);
+					_observeVisibilityChangeOnMainElement(routeViewDriverStream, element);
 				});
 			});
 		});
@@ -44,11 +45,13 @@ function setupRouteViewDriverStream(gmailDriver){
 			{childList: true}
 		);
 
-		_observeVisibilityChangeOnMainElement(gmailDriver, GmailElementGetter.getCurrentMainContentElement());
+		_observeVisibilityChangeOnMainElement(routeViewDriverStream, GmailElementGetter.getCurrentMainContentElement());
 	});
+
+	return routeViewDriverStream;
 }
 
-function _checkForCustomRoute(gmailDriver, event){
+function _checkForCustomRoute(routeViewDriverStream, event){
 	var urlObject = getURLObject(event.newURL);
 	if(currentUrlObject.hash === urlObject.hash){
 		return;
@@ -59,16 +62,16 @@ function _checkForCustomRoute(gmailDriver, event){
 	}
 
 	currentUrlObject = urlObject;
-	_createRouteViewDriver(gmailDriver, urlObject, _isGmailView(urlObject.name));
+	_createRouteViewDriver(routeViewDriverStream, urlObject, _isGmailView(urlObject.name));
 }
 
-function _observeVisibilityChangeOnMainElement(gmailDriver, element){
+function _observeVisibilityChangeOnMainElement(routeViewDriverStream, element){
 	var observer = new MutationObserver(function(mutations){
 		var oldValue = mutations[0].oldValue;
 		var newValue = mutations[0].target.getAttribute('role');
 
 		if(!oldValue && newValue === 'main'){
-			_handleNewUrl(gmailDriver, location.href);
+			_handleNewUrl(routeViewDriverStream, location.href);
 		}
 	});
 
@@ -79,26 +82,26 @@ function _observeVisibilityChangeOnMainElement(gmailDriver, element){
 }
 
 
-function _handleNewUrl(gmailDriver, newUrl){
+function _handleNewUrl(routeViewDriverStream, newUrl){
 	var urlObject = getURLObject(newUrl);
 	currentUrlObject = urlObject;
 
 	if(!_isGmailView(urlObject.name)){
-		_createRouteViewDriver(gmailDriver, urlObject, false);
+		_createRouteViewDriver(routeViewDriverStream, urlObject, false);
 		return;
 	}
 
 	if(!_isThreadListView(urlObject.name)){
-		_createRouteViewDriver(gmailDriver, urlObject, true);
+		_createRouteViewDriver(routeViewDriverStream, urlObject, true);
 		return;
 	}
 
 	if(_isThreadView(urlObject)){
-		_createThreadRouteViewDriver(gmailDriver, urlObject);
+		_createThreadRouteViewDriver(routeViewDriverStream, urlObject);
 		return;
 	}
 
-	_createRouteViewDriver(gmailDriver, urlObject, true);
+	_createRouteViewDriver(routeViewDriverStream, urlObject, true);
 }
 
 function _isGmailView(viewName){
@@ -126,7 +129,7 @@ function _doesUrlContainThreadId(urlObject){
 	return !!potentialThreadId.toLowerCase().match(/^[0-9a-f]+$/); //only contains base16 chars
 }
 
-function _createThreadRouteViewDriver(gmailDriver, urlObject){
+function _createThreadRouteViewDriver(routeViewDriverStream, urlObject){
 	waitFor(function(){
 		var urlHash = location.hash;
 		if(urlHash){
@@ -139,18 +142,18 @@ function _createThreadRouteViewDriver(gmailDriver, urlObject){
 		return !!GmailElementGetter.getThreadContainerElement();
 
 	}, 30*1000, 50).then(function(){
-		_createRouteViewDriver(gmailDriver, urlObject, true);
+		_createRouteViewDriver(routeViewDriverStream, urlObject, true);
 	});
 }
 
 
-function _createRouteViewDriver(gmailDriver, urlObject, isGmailView){
+function _createRouteViewDriver(routeViewDriverStream, urlObject, isGmailView){
 	var options = _.clone(urlObject);
 	options.isCustomView = !isGmailView;
 
 	var routeViewDriver = new GmailRouteView(options);
 
-	gmailDriver._routeViewDriverStream.push(routeViewDriver);
+	routeViewDriverStream.push(routeViewDriver);
 }
 
 module.exports = setupRouteViewDriverStream;

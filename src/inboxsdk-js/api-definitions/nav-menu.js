@@ -15,14 +15,10 @@ _.extend(NavMenu.prototype, {
 	 * @returns {NavItemView}
 	 */
 	addNavItem: function(navItemDescriptor){
-		var navItem = new NavItem(this._platformImplementationLoader, navItemDescriptor);
+		var navItem = new NavItem(this._platformImplementationLoader.getPlatformImplementation(), navItemDescriptor);
 
-		this._platformImplementationLoader.load().then(function(platformImplementation){
-
-			var implementation = platformImplementation.NavMenu.addNavItem(navItemDescriptor);
-			navItem.setImplementation(implementation);
-
-		});
+		var implementation = this._platformImplementationLoader.getPlatformImplementation().NavMenu.addNavItem(navItemDescriptor);
+		navItem.setImplementation(implementation);
 
 		return navItem;
 	},
