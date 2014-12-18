@@ -78,11 +78,7 @@ _.extend(GmailDriver.prototype, {
 		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
 			.flatMap(function(viewDriver) {
 				viewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
-				if (viewDriver.threadIdReady()) {
-					return Bacon.once(viewDriver);
-				} else {
-					return Bacon.later(0, viewDriver).filter('._element');
-				}
+				return viewDriver.waitForReady();
 			});
 
 		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView');

@@ -9,6 +9,7 @@ var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
   this._element = element;
+  this._threadMetadataOracle = null; // supplied by GmailDriver later
 
   this._eventStream = new Bacon.Bus();
   this._stopper = this._eventStream.filter(false).mapEnd();
@@ -44,8 +45,32 @@ _.extend(GmailThreadRowView.prototype, {
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
+  // Called by GmailDriver
   setThreadMetadataOracle: function(threadMetadataOracle) {
     this._threadMetadataOracle = threadMetadataOracle;
+  },
+
+  // Returns a stream that emits this object once this object is ready for the
+  // user. It should almost always synchronously ready immediately, but there's
+  // a few cases such as with multiple inbox that it needs a moment.
+  waitForReady: function() {
+    var self = this;
+    var time = [0,10,100];
+    function step() {
+      if (self._threadIdReady()) {
+        return Bacon.once(self);
+      } else {
+        var stepTime = time.shift();
+        if (stepTime == undefined) {
+          console.log('ThreadRowViewDriver never became ready', self);
+          return Bacon.never();
+        } else {
+          return Bacon.later(stepTime).flatMap(step);
+        }
+      }
+    }
+
+    return step().takeUntil(this._stopper);
   },
 
   _expandColumn: function(colSelector, width) {
@@ -184,7 +209,7 @@ _.extend(GmailThreadRowView.prototype, {
     return this._element.querySelector('td.xW > span').title;
   },
 
-  threadIdReady: function() {
+  _threadIdReady: function() {
     return !!this.getThreadId();
   },
 
