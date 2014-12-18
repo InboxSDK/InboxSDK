@@ -5,9 +5,11 @@ var deparam = require('querystring').parse;
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
+    var url = 'https://www.inboxsdk.com/build/injected.js';
+
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8');
+    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8')+'\n//# sourceURL='+url+'\n';
     document.head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', true);
   }
