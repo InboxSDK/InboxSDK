@@ -28,7 +28,7 @@ _.extend(NavMenu.prototype, {
 	},
 
 	_setupSentItem: function(){
-		this.SENT_ITEM = new NavItem(this._platformImplementationLoader, null, "SENT");
+		//this.SENT_ITEM = new NavItem(this._platformImplementationLoader, "SENT");
 	}
 
 	/**

@@ -31,8 +31,15 @@ _.extend(NavMenu.prototype, {
 	},
 
 	removeNativeNavItemActive: function(){
+		if(this._modifiedNavItem){
+			this._modifiedNavItem.destroy(); //make sure there is only one active at a time;
+		}
+
 		this._modifiedNavItem = this._driver.getCurrentActiveNavItem();
-		this._modifiedNavItem.setActive(false);
+
+		if(this._modifiedNavItem){
+			this._modifiedNavItem.setActive(false);
+		}
 	},
 
 	restoreNativeNavItemActive: function(){
@@ -41,7 +48,15 @@ _.extend(NavMenu.prototype, {
 		}
 
 		this._modifiedNavItem.setActive(true);
+		this._modifiedNavItem.destroy();
 		this._modifiedNavItem = null;
+	},
+
+	unhandleNativeNavItem: function(){
+		if(this._modifiedNavItem){
+			this._modifiedNavItem.destroy();
+			this._modifiedNavItem = null;
+		}
 	}
 
 });

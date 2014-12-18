@@ -137,25 +137,23 @@ _.extend(Router.prototype,  {
 			});
 	},
 
-	_updateNavMenu: function(routeViewDriver){
-		if(!this._currentRouteViewDriver){
-			if(!routeViewDriver.isCustomView()){
-				this._lastNativeRouteName = routeViewDriver.getName();
+	_updateNavMenu: function(newRouteViewDriver){
+		var oldRouteViewDriver = this._currentRouteViewDriver;
+
+		if(oldRouteViewDriver && !oldRouteViewDriver.isCustomView()){
+			if(newRouteViewDriver.isCustomView()){
+				this._lastNativeRouteName = oldRouteViewDriver.getName();
+				this._navMenu.removeNativeNavItemActive();
+				return;
 			}
-			return;
 		}
-
-		if( this._currentRouteViewDriver.isCustomView() &&
-			this._lastNativeRouteName &&
-			routeViewDriver.getName() === this._lastNativeRouteName ){
-
-			this._navMenu.restoreNativeNavItemActive();
-
-		}
-		else if( !this._currentRouteViewDriver.isCustomView() &&
-					routeViewDriver.isCustomView() ){
-
-			this._navMenu.removeNativeNavItemActive();
+		else if(this._lastNativeRouteName && !newRouteViewDriver.isCustomView()){
+			if(this._lastNativeRouteName === newRouteViewDriver.getName()){
+				this._navMenu.restoreNativeNavItemActive();
+			}
+			else{
+				this._navMenu.unhandleNativeNavItem();
+			}
 		}
 	}
 

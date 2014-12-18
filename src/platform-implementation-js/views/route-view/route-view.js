@@ -34,20 +34,25 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	},
 
 	/**
-	 * Indicates whether this RouteView is a custom view, or native to the web client
+	 * Indicates whether this RouteView is a custom route, or native to the web client
 	 * @return {Boolean}
 	 */
-	isCustomView: function(){
+	isCustomRoute: function(){
 		return this._routeViewImplementation.isCustomView();
+	},
+
+	getElement: function(){
+		return this._routeViewImplementation.getCustomViewElement();
+	},
+
+	/* deprecated */
+	isCustomView: function(){
+		return this.isCustomRoute();
 	},
 
 	/* deprecated */
 	getDescriptor: function(){
 		return this._route;
-	},
-
-	getElement: function(){
-		return this._routeViewImplementation.getCustomViewElement();
 	},
 
 	_bindToEventStream: function(){

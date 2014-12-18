@@ -32,6 +32,9 @@ function _isChildAfter(checkValues, child, dataAttributes){
 		if(value > checkValues[attribute]){
 			return true;
 		}
+		else if(value < checkValues[attribute]){
+			return false;
+		}
 	}
 
 	return false;

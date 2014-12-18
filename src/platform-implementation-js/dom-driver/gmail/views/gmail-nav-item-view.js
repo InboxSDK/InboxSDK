@@ -24,19 +24,13 @@ var GmailNavItemView = function(orderGroup,  navItemDescriptor, nativeElement){
 	this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
 
 
-	if(nativeElement){
-		this._element = nativeElement;
-		this._isNative = true;
+	this._setupElement();
+
+	if(navItemDescriptor.onValue){
+		navItemDescriptor.onValue(this, '_updateValues');
 	}
 	else{
-		this._setupElement();
-
-		if(navItemDescriptor.onValue){
-			navItemDescriptor.onValue(this, '_updateValues');
-		}
-		else{
-			this._updateValues(navItemDescriptor);
-		}
+		this._updateValues(navItemDescriptor);
 	}
 };
 
@@ -46,8 +40,8 @@ _.extend(GmailNavItemView.prototype, {
 
 	__memberVariables: [
 		{name: '_navItemDescriptor', destroy: false, get: true},
-		{name: '_element', destroy: false, get: true},
-		{name: '_isNative', destroy: false, defaultValue: false},
+		{name: '_element', destroy: true, get: true},
+		{name: '_activeMarkerElement', destroy: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_iconElement', destroy: true},
 		{name: '_iconImgElement', destroy: true},
@@ -65,8 +59,6 @@ _.extend(GmailNavItemView.prototype, {
 
 	addNavItem: function(orderGroup, navItemDescriptor){
 		var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
-
-		//this._addNavItemElement(gmailNavItemView);
 
 		gmailNavItemView
 			.getEventStream()
@@ -87,12 +79,17 @@ _.extend(GmailNavItemView.prototype, {
 
 	setActive: function(value){
 		if(value){
-			this._element.classList.add('ain');
+			this._createActiveMarkerElement();
+			this._element.classList.add('inboxsdk__navItem_active');
 			this._element.querySelector('.TO').classList.add('nZ');
 			this._element.querySelector('.TO').classList.add('aiq');
 		}
 		else{
-			this._element.classList.remove('ain');
+			if(this._activeMarkerElement){
+				this._activeMarkerElement.remove();
+			}
+
+			this._element.classList.remove('inboxsdk__navItem_active');
 			this._element.querySelector('.TO').classList.remove('nZ');
 			this._element.querySelector('.TO').classList.remove('aiq');
 		}
@@ -123,7 +120,7 @@ _.extend(GmailNavItemView.prototype, {
 
 	_setupElement: function(){
 		this._element = document.createElement('div');
-		this._element.setAttribute('class', 'aim');
+		this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
 		this._element.innerHTML = [
 			'<div class="TO">',
@@ -372,12 +369,17 @@ _.extend(GmailNavItemView.prototype, {
 		return  this._expandoElement.classList.contains('aih');
 	},
 
-	destroy: function(){
-		if(!this._isNative && this._element){
-			this._element.remove();
+	_createActiveMarkerElement: function(){
+		if(this._activeMarkerElement){
+			this._activeMarkerElement.remove();
 		}
 
-		NavItemViewDriver.prototype.destroy.call(this);
+		this._activeMarkerElement = document.createElement('div');
+		this._activeMarkerElement.classList.add('inboxsdk__navItem_marker');
+		this._activeMarkerElement.classList.add('ain');
+		this._activeMarkerElement.innerHTML = '&nbsp;';
+
+		this._element.insertBefore(this._activeMarkerElement, this._element.firstElementChild);
 	}
 
 });
