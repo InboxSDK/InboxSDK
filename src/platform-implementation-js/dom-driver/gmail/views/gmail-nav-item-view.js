@@ -15,7 +15,7 @@ var BasicButtonViewController = require('../../../widgets/buttons/basic-button-v
 
 var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
-var GmailNavItemView = function(orderGroup,  navItemDescriptor, nativeElement){
+var GmailNavItemView = function(orderGroup){
 	NavItemViewDriver.call(this);
 
 	this._orderGroup = orderGroup;
@@ -25,13 +25,6 @@ var GmailNavItemView = function(orderGroup,  navItemDescriptor, nativeElement){
 
 
 	this._setupElement();
-
-	if(navItemDescriptor.onValue){
-		navItemDescriptor.onValue(this, '_updateValues');
-	}
-	else{
-		this._updateValues(navItemDescriptor);
-	}
 };
 
 GmailNavItemView.prototype = Object.create(NavItemViewDriver.prototype);
@@ -57,13 +50,19 @@ _.extend(GmailNavItemView.prototype, {
 		{name: '_accessoryViewController', destroy: true}
 	],
 
+	setNavItemDescriptor: function(navItemDescriptorPropertyStream){
+		navItemDescriptorPropertyStream.onValue(this, '_updateValues');
+	},
+
 	addNavItem: function(orderGroup, navItemDescriptor){
-		var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
+		var gmailNavItemView = new GmailNavItemView(orderGroup);
 
 		gmailNavItemView
 			.getEventStream()
 			.filter(eventNameFilter('orderChanged'))
 			.onValue(this, '_addNavItemElement', gmailNavItemView);
+
+		gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
 		return gmailNavItemView;
 	},

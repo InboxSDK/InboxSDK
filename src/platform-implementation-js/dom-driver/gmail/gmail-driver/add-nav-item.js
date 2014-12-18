@@ -6,7 +6,7 @@ var eventNameFilter = require('../../../lib/event-name-filter');
 var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
 
 module.exports = function(orderGroup, navItemDescriptor){
-	var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
+	var gmailNavItemView = new GmailNavItemView(orderGroup);
 
 	var attacher = _attachNavItemView(gmailNavItemView);
 
@@ -19,6 +19,8 @@ module.exports = function(orderGroup, navItemDescriptor){
 		.getEventStream()
 		.filter(eventNameFilter('orderChanged'))
 		.onValue(attacher);
+
+	gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
 	return gmailNavItemView;
 };

@@ -1,5 +1,7 @@
 var _ = require('lodash');
 var BasicClass = require('../lib/basic-class');
+var makeMutationObserverStream = require('../lib/dom/make-mutation-observer-stream');
+var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 
 var NavItemView = require('../views/nav-item-view');
 
@@ -22,8 +24,10 @@ _.extend(NavMenu.prototype, {
 	],
 
 	addNavItem: function(navItemDescriptor){
-		var navItemViewDriver = this._driver.addNavItem(this._appId, navItemDescriptor);
-		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver, navItemDescriptor);
+		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
+
+		var navItemViewDriver = this._driver.addNavItem(this._appId, navItemDescriptorPropertyStream);
+		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver, navItemDescriptorPropertyStream);
 
 		this._navItemViews.push(navItemView);
 
@@ -40,6 +44,23 @@ _.extend(NavMenu.prototype, {
 		if(this._modifiedNavItem){
 			this._modifiedNavItem.setActive(false);
 		}
+
+		var modifiedNavItem;
+		var self = this;
+		makeMutationObserverStream(this._modifiedNavItem.getElement().parentElement, {childList: true})
+			.takeWhile(function(){
+				return modifiedNavItem === self._modifiedNavItem;
+			})
+			.flatMap(function(mutations){
+				return Bacon.fromArray(mutations);
+			})
+			.flatMap(function(mutation){
+				return Bacon.fromArray(_.toArray(mutation.removedNodes));
+			})
+			.filter(function(removedNode){
+				return removedNode === modifiedNavItem.getElement();
+			})
+			.onValue(this, 'removeNativeNavItemActive'); //reset ourselves
 	},
 
 	restoreNativeNavItemActive: function(){
