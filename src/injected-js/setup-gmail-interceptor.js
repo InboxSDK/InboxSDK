@@ -43,7 +43,13 @@ function setupGmailInterceptor() {
     //     q: connection.params.q
     //   });
     // },
-    afterListeners: function(connection) {
+    responseTextChanger: function(connection) {
+      // Presence of a responseTextChanger blocks Gmail from getting the partial
+      // values as this loads. We want our originalResponseTextLogger to run
+      // before Gmail has seen any of the response.
+      return connection.originalResponseText;
+    },
+    originalResponseTextLogger: function(connection) {
       if (connection.status === 200) {
         var search = connection.params.search;
         var responseText = connection.originalResponseText;
