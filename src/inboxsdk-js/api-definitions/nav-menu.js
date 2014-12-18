@@ -80,7 +80,7 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	 * The name of the route to navigate to when the NavItemView is clicked on
 	 * @type {string}
 	 */
-	route: null,
+	routeName: null,
 
 	/**
 	 * The parameters of the route being navigated to when the NavItemView is clicked on

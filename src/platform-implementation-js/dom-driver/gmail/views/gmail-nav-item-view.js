@@ -15,11 +15,12 @@ var BasicButtonViewController = require('../../../widgets/buttons/basic-button-v
 
 var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
-var GmailNavItemView = function(orderGroup){
+var GmailNavItemView = function(orderGroup, level){
 	NavItemViewDriver.call(this);
 
 	this._orderGroup = orderGroup;
 	this._eventStream = new Bacon.Bus();
+	this._level = level || 0;
 
 	this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
 
@@ -55,7 +56,7 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	addNavItem: function(orderGroup, navItemDescriptor){
-		var gmailNavItemView = new GmailNavItemView(orderGroup);
+		var gmailNavItemView = new GmailNavItemView(orderGroup, this._level + 1);
 
 		gmailNavItemView
 			.getEventStream()
@@ -77,7 +78,23 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	setActive: function(value){
+		var toElement = this._element.querySelector('.TO');
+
 		if(value){
+			this._element.classList.add('ain');
+			toElement.classList.add('nZ');
+			toElement.classList.add('aiq');
+		}
+		else{
+			this._element.classList.remove('ain');
+			toElement.classList.remove('nZ');
+			toElement.classList.remove('aiq');
+		}
+
+		this._setHeights();
+
+
+		/*if(value){
 			this._createActiveMarkerElement();
 			this._element.classList.add('inboxsdk__navItem_active');
 			this._element.querySelector('.TO').classList.add('nZ');
@@ -91,7 +108,7 @@ _.extend(GmailNavItemView.prototype, {
 			this._element.classList.remove('inboxsdk__navItem_active');
 			this._element.querySelector('.TO').classList.remove('nZ');
 			this._element.querySelector('.TO').classList.remove('aiq');
-		}
+		}*/
 	},
 
 	toggleCollapse: function(){
@@ -285,6 +302,31 @@ _.extend(GmailNavItemView.prototype, {
 
 		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
+
+		var element = gmailNavItemView.getElement();
+		var left = this._element.querySelector('.TO').offsetLeft;
+
+		element.querySelector('.TO').style.paddingLeft = (left * this._level) + 'px';
+
+		this._setHeights();
+	},
+
+	_setHeights: function(){
+		var toElement = this._element.querySelector('.TO');
+
+		if(this._element.classList.contains('ain') && this._itemContainerElement){
+			var totalHeight = this._element.clientHeight;
+			var itemHeight = toElement.clientHeight;
+
+			this._element.style.height = itemHeight + 'px';
+			this._element.style.overflow = 'visible';
+			this._element.style.marginBottom = (totalHeight - itemHeight) + 'px';
+		}
+		else{
+			this._element.style.height = '';
+			this._element.style.overflow = '';
+			this._element.style.marginBottom = '';
+		}
 	},
 
 	_getItemContainerElement: function(){
@@ -377,6 +419,9 @@ _.extend(GmailNavItemView.prototype, {
 		this._activeMarkerElement.classList.add('inboxsdk__navItem_marker');
 		this._activeMarkerElement.classList.add('ain');
 		this._activeMarkerElement.innerHTML = '&nbsp;';
+
+		var position = $(this._element).position();
+		this._activeMarkerElement.style.top = position.top + 'px';
 
 		this._element.insertBefore(this._activeMarkerElement, this._element.firstElementChild);
 	}

@@ -342,9 +342,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* nav menu */
 
-.inboxsdk__navItem.inboxsdk__navItem_active {
-  padding-left: 18px;
-}
 
 .inboxsdk__navItem_claimed.ain {
   border-left-color: transparent;
@@ -372,8 +369,12 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   padding-bottom: 2px;
 }
 
-.inboxsdk__navItem_active .inboxsdk__navItem_container {
-  margin-left: -4px;
+.ain .inboxsdk__navItem_container {
+  margin-left: -18px;
+}
+
+.inboxsdk__navItem_container {
+  margin-left: -14px;
 }
 
 /* end nav menu */

@@ -8,7 +8,7 @@ var LabelDropdownButtonView = function(options){
 
 	this._eventStream = new Bacon.Bus();
 
-	this._setupElement(options.backgroundColor, options.foregroundColor);
+	this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
 	this._setupEventStream();
 };
 

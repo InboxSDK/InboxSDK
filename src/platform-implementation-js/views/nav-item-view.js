@@ -71,7 +71,7 @@ _.extend(NavItemView.prototype, {
 		switch(event.eventName){
 			case 'mouseenter':
 
-				if(this._navItemDescriptor.route){
+				if(this._navItemDescriptor.routeName){
 					this._navItemViewDriver.setHighlight(true);
 				}
 
@@ -87,8 +87,8 @@ _.extend(NavItemView.prototype, {
 					this._navItemDescriptor.onClick();
 				}
 
-				if(this._navItemDescriptor.route){
-					this._driver.gotoView(this._navItemDescriptor.route, this._navItemDescriptor.routeParams);
+				if(this._navItemDescriptor.routeName){
+					this._driver.gotoView(this._navItemDescriptor.routeName, this._navItemDescriptor.routeParams);
 				}
 				else{
 					this._navItemViewDriver.toggleCollapse();
@@ -108,7 +108,7 @@ _.extend(NavItemView.prototype, {
 
 		this._navItemViewDriver.setActive(
 			navItemDescriptor &&
-			navItemDescriptor.route === routeViewDriver.getName() &&
+			navItemDescriptor.routeName === routeViewDriver.getName() &&
 			_.isEqual(navItemDescriptor.routeParams, routeViewDriver.getParams())
 		);
 	}
