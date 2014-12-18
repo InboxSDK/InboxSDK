@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
+var threadMetadataOracle = require('./thread-metadata-oracle');
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
@@ -46,19 +47,6 @@ function makeXhrInterceptor() {
       };
     })
   );
-
-  var threadMetadataOracle = {
-    getThreadIdForThreadRow: function(threadRow) {
-      var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
-      if (!threadid) {
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
-        threadRow.dispatchEvent(event);
-        threadid = threadRow.getAttribute('data-inboxsdk-threadid');
-      }
-      return threadid;
-    }
-  };
 
   return {
     xhrInterceptStream: interceptStream,
