@@ -70,7 +70,8 @@ _.extend(GmailDriver.prototype, {
 		this._xhrInterceptorStream = new Bacon.Bus();
 		this._xhrInterceptorStream.plug(xhrInterceptStream);
 
-		require('./gmail-driver/setup-route-view-driver-stream')(this);
+		this._routeViewDriverStream = new Bacon.Bus();
+		this._routeViewDriverStream.plug(require('./gmail-driver/setup-route-view-driver-stream')());
 
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
 

@@ -1,6 +1,6 @@
 var inboxSDK = new InboxSDK('simple-example');
 
-inboxSDK.Views.on('composeOpen', function(composeView){
+inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 	composeView.addButton({
 		title: 'Monkeys!',
 		iconUrl: chrome.runtime.getURL('monkey.png'),
