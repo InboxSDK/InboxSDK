@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
+
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 
 var checkRequirements = require('./check-requirements');
@@ -56,6 +58,33 @@ var InboxSDK = function(appId, opts){
   }).catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
+};
+
+InboxSDK.newApp = function(appId, options){
+
+  InboxSDK.VERSION = process.env.VERSION;
+  InboxSDK.IMPL_VERSION = null;
+
+  opts = _.extend({
+    // defaults
+    globalErrorLogging: true
+  }, options, {
+    // stuff that can't be overridden, such as extra stuff this file passes to
+    // the implementation script.
+    VERSION: InboxSDK.VERSION
+  });
+
+  checkRequirements(opts);
+
+  if(!InboxSDK.platformImplementationLoader){
+    InboxSDK.platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
+  }
+
+  return InboxSDK.platformImplementationLoader.load();
+};
+
+InboxSDK.Util = {
+  loadScript: require('../common/load-script')
 };
 
 // Place a bunch of poison-pill properties for things that aren't implemented.

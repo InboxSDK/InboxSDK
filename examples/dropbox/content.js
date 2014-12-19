@@ -1,6 +1,9 @@
-var inboxSDK = new InboxSDK('dropbox');
+Promise.all([
+  InboxSDK.newApp('dropbox'),
+  InboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js')
+]).then(function(results){
+  var inboxSDK = results[0];
 
-inboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js').then(function() {
   Dropbox.init({appKey: "82bgsya5b7h847j"});
 
   inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
