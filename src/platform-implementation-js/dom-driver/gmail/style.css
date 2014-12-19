@@ -130,7 +130,13 @@ div.T-I.inboxsdk__button {
 
 /* thread rows */
 
+.inboxsdk__thread_row_button {
+  display: inline-block;
+}
 
+.inboxsdk__thread_row_custom_date {
+  margin-left: 2px;
+}
 
 /* end thread rows */
 

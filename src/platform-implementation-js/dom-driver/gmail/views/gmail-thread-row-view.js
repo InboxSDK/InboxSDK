@@ -42,10 +42,10 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    _.toArray(this._element.getElementsByClassName('inboxSDKadded')).forEach(function(node) {
+    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_addition')).forEach(function(node) {
       node.remove();
     });
-    _.toArray(this._element.getElementsByClassName('inboxSDKhiddenInline')).forEach(function(node) {
+    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_hidden_inline')).forEach(function(node) {
       node.style.display = 'inline';
     });
     ThreadRowViewDriver.prototype.destroy.call(this);
@@ -96,7 +96,7 @@ _.extend(GmailThreadRowView.prototype, {
   addLabel: function(label) {
     var self = this;
     var labelDiv = document.createElement('div');
-    labelDiv.className = 'yi inboxSDKadded inboxSDKlabel';
+    labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
     labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
 
     var at = labelDiv.querySelector('div.at');
@@ -133,7 +133,6 @@ _.extend(GmailThreadRowView.prototype, {
   addButton: function(buttonDescriptor) {
     var self = this;
     var buttonSpan = document.createElement('span');
-    buttonSpan.style.display = 'inline-block';
     var buttonImg = document.createElement('img');
     buttonSpan.appendChild(buttonImg);
     this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
@@ -171,7 +170,7 @@ _.extend(GmailThreadRowView.prototype, {
       if (!buttonDescriptor) {
         buttonSpan.remove();
       } else {
-        buttonSpan.className = 'inboxSDKadded inboxSDKthreadRowButton ' + (buttonDescriptor.className || '');
+        buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
         buttonImg.src = buttonDescriptor.iconUrl;
         buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
           buttonDescriptor.onClick.call(null, {
@@ -189,7 +188,8 @@ _.extend(GmailThreadRowView.prototype, {
   addAttachmentIcon: function(opts) {
     var self = this;
     var img = document.createElement('img');
-    img.className = 'iP inboxSDKadded inboxSDKattachmentIcon';
+    // The gmail iP css class sets width:16, height:16, opacity: 0.8
+    img.className = 'iP inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon';
     img.src = 'images/cleardot.gif';
     var currentIconUrl;
 
@@ -224,11 +224,10 @@ _.extend(GmailThreadRowView.prototype, {
       var customDateSpan = originalDateSpan.nextElementSibling;
       if (!customDateSpan) {
         customDateSpan = document.createElement('span');
-        customDateSpan.className = 'inboxSDKadded inboxSDKcustomDate';
-        customDateSpan.style.marginLeft = '2px';
+        customDateSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_custom_date';
         dateContainer.appendChild(customDateSpan);
 
-        originalDateSpan.classList.add('inboxSDKhiddenInline');
+        originalDateSpan.classList.add('inboxsdk__thread_row_hidden_inline');
       }
 
       if (!opts) {
