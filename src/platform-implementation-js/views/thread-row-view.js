@@ -10,6 +10,7 @@ var ThreadRowView = function(threadRowViewDriver){
 
   this._threadRowViewDriver = threadRowViewDriver;
   this._threadRowViewDriver.getEventStream().onEnd(this, 'emit', 'unload');
+  this._threadRowViewDriver.setUserView(this);
 };
 
 ThreadRowView.prototype = Object.create(EventEmitter.prototype);

@@ -128,6 +128,11 @@ div.T-I.inboxsdk__button {
 
 /* end */
 
+/* thread rows */
+
+
+
+/* end thread rows */
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this
  * element to become taller and shift the toolbar down. */

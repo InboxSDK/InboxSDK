@@ -10,6 +10,7 @@ var GmailThreadRowView = function(element) {
 
   this._element = element;
   this._threadMetadataOracle = null; // supplied by GmailDriver later
+  this._userView = null; // supplied by ThreadRowView
 
   this._eventStream = new Bacon.Bus();
   this._stopper = this._eventStream.filter(false).mapEnd();
@@ -30,6 +31,7 @@ _.extend(GmailThreadRowView.prototype, {
   __memberVariables: [
     {name: '_element', destroy: false},
     {name: '_threadMetadataOracle', destroy: false},
+    {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
     {name: '_refresher', destroy: false}
@@ -71,6 +73,10 @@ _.extend(GmailThreadRowView.prototype, {
     }
 
     return step().takeUntil(this._stopper);
+  },
+
+  setUserView: function(userView) {
+    this._userView = userView;
   },
 
   _expandColumn: function(colSelector, width) {
@@ -123,13 +129,30 @@ _.extend(GmailThreadRowView.prototype, {
   addButton: function(buttonDescriptor) {
     var self = this;
     var buttonSpan = document.createElement('span');
-    buttonSpan.className = 'inboxSDKadded';
+    buttonSpan.style.display = 'inline-block';
+    var buttonImg = document.createElement('img');
+    buttonSpan.appendChild(buttonImg);
     this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
 
     var prop = convertForeignInputToBacon(buttonDescriptor).takeUntil(this._stopper).toProperty();
     prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(buttonDescriptor) {
-      var starGroup = self._element.querySelector('td.apU.xY');
-      buttonSpan.textContent = 'blah';
+      var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+
+      // Don't let the whole column count as the star for click and mouse over purposes.
+      starGroup.onmouseover = starGroup.onmouseenter = starGroup.onclick = function(event) {
+        if (!this.firstElementChild.contains(event.target)) {
+          event.stopImmediatePropagation();
+        }
+      };
+
+      buttonSpan.className = 'inboxSDKadded inboxSDKthreadRowButton ' + (buttonDescriptor.className || '');
+      buttonImg.src = buttonDescriptor.iconUrl;
+      buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
+        buttonDescriptor.onClick({
+          target: self._userView
+        });
+      };
+
       starGroup.appendChild(buttonSpan);
     });
   },
