@@ -139,9 +139,28 @@ _.extend(GmailThreadRowView.prototype, {
       var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
 
       // Don't let the whole column count as the star for click and mouse over purposes.
-      starGroup.onmouseover = starGroup.onmouseenter = starGroup.onclick = function(event) {
-        if (!this.firstElementChild.contains(event.target)) {
-          event.stopImmediatePropagation();
+      // Click events that aren't directly on the star should be stopped.
+      // Mouseover events that aren't directly on the star should be stopped and
+      // re-emitted from the thread row, so the thread row still has the mouseover
+      // appearance.
+      // Click events that are on one of our buttons should be stopped. Click events
+      // that aren't on the star button or our buttons should be re-emitted from the
+      // thread row so it counts as clicking on the thread.
+      starGroup.onmouseover = starGroup.onclick = function(event) {
+        var isOnStar = this.firstElementChild.contains(event.target);
+        var isOnSDKButton = !isOnStar && this !== event.target;
+        if (!isOnStar) {
+          event.stopPropagation();
+          if (!isOnSDKButton || event.type == 'mouseover') {
+            var newEvent = document.createEvent('MouseEvents');
+            newEvent.initMouseEvent(
+              event.type, event.bubbles, event.cancelable, event.view,
+              event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
+              event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
+              event.button, event.relatedTarget
+            );
+            this.parentElement.dispatchEvent(newEvent);
+          }
         }
       };
 
