@@ -168,15 +168,21 @@ _.extend(GmailThreadRowView.prototype, {
         }
       };
 
-      buttonSpan.className = 'inboxSDKadded inboxSDKthreadRowButton ' + (buttonDescriptor.className || '');
-      buttonImg.src = buttonDescriptor.iconUrl;
-      buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
-        buttonDescriptor.onClick({
-          target: self._userView
-        });
-      };
+      if (!buttonDescriptor) {
+        buttonSpan.remove();
+      } else {
+        buttonSpan.className = 'inboxSDKadded inboxSDKthreadRowButton ' + (buttonDescriptor.className || '');
+        buttonImg.src = buttonDescriptor.iconUrl;
+        buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
+          buttonDescriptor.onClick.call(null, {
+            target: self._userView
+          });
+        };
 
-      starGroup.appendChild(buttonSpan);
+        if (!starGroup.contains(buttonSpan)) {
+          starGroup.appendChild(buttonSpan);
+        }
+      }
     });
   },
 

@@ -27,12 +27,19 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 		}
 	]));
 	threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
-	threadRowView.addButton({
+
+	var buttonBus = new Bacon.Bus();
+	threadRowView.addButton(buttonBus.toProperty());
+	var item = {
 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
 		className: 'buttonLight',
-		// https://mailfoogae.appspot.com/build/images/listIndicator.png
 		onClick: function(event) {
+			delete item.className;
+			item.iconUrl = 'https://mailfoogae.appspot.com/build/images/listIndicator.png';
 			console.log('threadrow got click event', event, threadRowView);
+			buttonBus.push(null);
+			buttonBus.plug(Bacon.later(1000, item));
 		}
-	});
+	};
+	buttonBus.push(item);
 });
