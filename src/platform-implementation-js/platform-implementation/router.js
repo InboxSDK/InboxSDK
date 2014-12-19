@@ -6,17 +6,21 @@ var HandlerRegistry = require('../lib/handler-registry');
 var Route = require('../views/route-view/route');
 var RouteView = require('../views/route-view/route-view');
 
-var Router = function(appId, driver){
+var Router = function(appId, driver, navMenu){
 	EventEmitter.call(this);
 
 	this._appId = appId;
 	this._driver = driver;
+	this._navMenu = navMenu;
+
 	this._routes = [];
 
 	this._currentRouteViewDriver = null;
 	this._handlerRegistry = new HandlerRegistry();
 
 	this._customRoutes = [];
+
+	this._lastNativeRouteName = null;
 
 	this._setupNativeRoutes();
 	this._watchForRouteViewChanges();
@@ -90,6 +94,8 @@ _.extend(Router.prototype,  {
 	},
 
 	_handleRouteViewChange: function(routeViewDriver){
+		this._updateNavMenu(routeViewDriver);
+
 		if(this._currentRouteViewDriver){
 			this._currentRouteViewDriver.destroy();
 		}
@@ -129,6 +135,26 @@ _.extend(Router.prototype,  {
 					el: routeView.getElement()
 				});
 			});
+	},
+
+	_updateNavMenu: function(newRouteViewDriver){
+		var oldRouteViewDriver = this._currentRouteViewDriver;
+
+		if(oldRouteViewDriver && !oldRouteViewDriver.isCustomView()){
+			if(newRouteViewDriver.isCustomView()){
+				this._lastNativeRouteName = oldRouteViewDriver.getName();
+				this._navMenu.removeNativeNavItemActive();
+				return;
+			}
+		}
+		else if(this._lastNativeRouteName && !newRouteViewDriver.isCustomView()){
+			if(this._lastNativeRouteName === newRouteViewDriver.getName()){
+				this._navMenu.restoreNativeNavItemActive();
+			}
+			else{
+				this._navMenu.unhandleNativeNavItem();
+			}
+		}
 	}
 
 });

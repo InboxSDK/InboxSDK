@@ -338,3 +338,43 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end custom content */
+
+
+/* nav menu */
+
+
+.inboxsdk__navItem_claimed.ain {
+  border-left-color: transparent;
+}
+
+.inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
+  visibility: visible;
+}
+
+.inboxsdk__navItem_link {
+  position: absolute;
+  top: 0px;
+  right: -4px;
+}
+
+.inboxsdk__navItem_container .aio .inboxsdk__button {
+  position: absolute;
+  top: 0px;
+  right: -30px;
+}
+
+.inboxsdk__navItem_marker {
+  position: absolute;
+  left: 0px;
+  padding-bottom: 2px;
+}
+
+.ain .inboxsdk__navItem_container {
+  margin-left: -18px;
+}
+
+.inboxsdk__navItem_container {
+  margin-left: -14px;
+}
+
+/* end nav menu */

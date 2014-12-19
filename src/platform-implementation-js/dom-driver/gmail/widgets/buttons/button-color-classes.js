@@ -11,6 +11,12 @@ module.exports = {
 		ACTIVE_CLASS: 'J-Z-I-KO'
 	},
 
+	pureIcon: {
+		INACTIVE_CLASS: 'inboxsdk__button_pureIcon_inactive',
+		HOVER_CLASS: 'inboxsdk__button_pureIcon_hover',
+		ACTIVE_CLASS: 'inboxsdk__button_pureIcon_active'
+	},
+
 	blue: {
 		INACTIVE_CLASS: 'T-I-atl',
 		HOVER_CLASS: 'T-I-JW',

@@ -27,6 +27,10 @@ var GmailElementGetter = {
 		});
 	},
 
+	isStandalone: function(){
+		return GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow();
+	},
+
 	isStandaloneComposeWindow: function(){
 		return document.body.classList.contains('xE') && document.body.classList.contains('xp');
 	},
@@ -105,6 +109,11 @@ var GmailElementGetter = {
 
 	getLeftNavContainerElement: function(){
 		return document.querySelector('.aeN');
+	},
+
+	getNavItemMenuInjectionContainer: function(){
+		return document.querySelectorAll('.aeN .n3')[0];
+
 	}
 
 };
