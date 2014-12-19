@@ -10,8 +10,6 @@ function Tracker(appId, opts) {
   this.logError = logErrorFactory(this.logErrorToServer.bind(this));
 
   // Set up error logging.
-  // inboxsdk.js already does some of the work. We just need to make sure our
-  // copy of RSVP logs errors too.
   var self = this;
   if (opts.globalErrorLogging) {
     if (!RSVP._errorHandlerSetup) {
@@ -20,6 +18,14 @@ function Tracker(appId, opts) {
         self.logError("Possibly uncaught promise rejection", err);
       });
     }
+
+    window.addEventListener('error', function(event) {
+      // Ugh, currently Chrome makes this pretty useless. TODO copy a bunch of
+      // Streak's error-tracking code into this file.
+      if (event.error) {
+        self.logError("Uncaught exception", event.error);
+      }
+    });
   } else {
     // Even if we're set not to log errors, we should still avoid letting RSVP
     // swallow errors entirely.
@@ -36,9 +42,6 @@ function Tracker(appId, opts) {
 
 Tracker.prototype.setEmail = function(email) {
   this._email = email;
-};
-
-Tracker.prototype.setupGlobalLogger = function() {
 };
 
 Tracker.prototype._getUserEmailAddressAsync = function() {
