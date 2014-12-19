@@ -111,8 +111,9 @@ var GmailElementGetter = {
 		return document.querySelector('.aeN');
 	},
 
-	getNavItemHolders: function(){
-		return document.querySelector('.aeN').querySelectorAll('.LrBjie');
+	getNavItemMenuInjectionContainer: function(){
+		return document.querySelectorAll('.aeN .n3')[0];
+
 	}
 
 };

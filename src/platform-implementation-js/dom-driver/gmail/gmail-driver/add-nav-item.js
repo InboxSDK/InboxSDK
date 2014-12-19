@@ -31,7 +31,7 @@ function _waitForNavItemsHolder(){
 	}
 
 	return waitFor(function(){
-		return GmailElementGetter.getNavItemHolders().length > 0;
+		return !!GmailElementGetter.getNavItemMenuInjectionContainer();
 	});
 }
 
@@ -60,8 +60,8 @@ function _createNavItemsHolder(){
 	holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
 	holder.innerHTML = '<div class="TK"></div>';
 
-	var gmailNavItemHolders = GmailElementGetter.getNavItemHolders();
-	gmailNavItemHolders[1].insertAdjacentElement('beforebegin', holder);
+	var navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
+	navMenuInjectionContainer.children[2].insertAdjacentElement('beforebegin', holder);
 
 	return holder.querySelector('.TK');
 }
