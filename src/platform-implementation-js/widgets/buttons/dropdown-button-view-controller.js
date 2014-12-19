@@ -8,7 +8,7 @@ var DropdownButtonViewController = function(options){
 	BasicClass.call(this);
 
 	this._dropdownShowFunction = options.dropdownShowFunction;
-	this._dropdownViewDriverClass = options.dropdownViewDriverClass;
+	this._DropdownViewDriverClass = options.dropdownViewDriverClass;
 
 	this._view = options.buttonView;
 	this._dropdownPositionOptions = options.dropdownPositionOptions;
@@ -23,12 +23,9 @@ _.extend(DropdownButtonViewController.prototype, {
 	__memberVariables: [
 		{name: '_view', destroy: true, get: true},
 		{name: '_dropdownShowFunction', destroy: false, set: true},
-		{name: '_dropdownElement', destroy: false},
-		{name: '_dropdownView', destroy: true},
-		{name: '_dropdownViewDriverClass', destroy: true},
-		{name: '_dropdownPositionOptions', destroy: true},
-		{name: '_focusFunction', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
+		{name: '_dropdownView', destroy: true, destroyFunction: 'close'},
+		{name: '_DropdownViewDriverClass', destroy: false},
+		{name: '_dropdownPositionOptions', destroy: true}
 	],
 
 	showDropdown: function(){
@@ -73,20 +70,13 @@ _.extend(DropdownButtonViewController.prototype, {
 
 	_showDropdown: function(){
 		this._view.activate();
-		this._dropdownView = new DropdownView(new this._dropdownViewDriverClass(), this._view.getElement());
+		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), this._dropdownPositionOptions);
 
-		this._dropdownView.focus();
 		this._dropdownView.on('unload', this._dropdownClosed.bind(this));
 
 		if(this._dropdownShowFunction){
 			this._dropdownShowFunction({dropdown: this._dropdownView});
 		}
-
-		if(!this._dropdownView){
-			return;
-		}
-
-		this._dropdownView.containByScreen(this._view.getElement(), this._dropdownPositionOptions);
 	},
 
 	_hideDropdown: function(){
@@ -97,7 +87,6 @@ _.extend(DropdownButtonViewController.prototype, {
 
 	_dropdownClosed: function(){
 		this._view.deactivate();
-		this._dropdownView.destroy();
 		this._dropdownView = null;
 	}
 
