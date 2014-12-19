@@ -21,7 +21,7 @@ var GmailThreadRowView = function(element) {
   // stream is not listened on and no MutationObserver ever gets made.
   this._refresher = makeMutationObserverStream(this._element, {
     childList: true
-  }).map(null).takeUntil(this._stopper);
+  }).map(null).takeUntil(this._stopper).toProperty(null);
 };
 
 GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
@@ -99,8 +99,8 @@ _.extend(GmailThreadRowView.prototype, {
     var au = labelDiv.querySelector('div.au');
     var av = labelDiv.querySelector('div.av');
 
-    var prop = convertForeignInputToBacon(label).takeUntil(this._stopper).toProperty();
-    prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(label) {
+    var prop = convertForeignInputToBacon(label).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(label) {
       if (!label) {
         labelDiv.remove();
       } else {
@@ -134,8 +134,8 @@ _.extend(GmailThreadRowView.prototype, {
     buttonSpan.appendChild(buttonImg);
     this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
 
-    var prop = convertForeignInputToBacon(buttonDescriptor).takeUntil(this._stopper).toProperty();
-    prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(buttonDescriptor) {
+    var prop = convertForeignInputToBacon(buttonDescriptor).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(buttonDescriptor) {
       var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
 
       // Don't let the whole column count as the star for click and mouse over purposes.
@@ -183,8 +183,8 @@ _.extend(GmailThreadRowView.prototype, {
     img.src = 'images/cleardot.gif';
     var currentIconUrl;
 
-    var prop = convertForeignInputToBacon(opts).takeUntil(this._stopper).toProperty();
-    prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(opts) {
+    var prop = convertForeignInputToBacon(opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
       if (!opts) {
         img.remove();
       } else {
@@ -207,8 +207,8 @@ _.extend(GmailThreadRowView.prototype, {
   replaceDate: function(opts) {
     var self = this;
 
-    var prop = convertForeignInputToBacon(opts).takeUntil(this._stopper).toProperty();
-    prop.sampledBy(this._refresher.merge(prop.toEventStream())).onValue(function(opts) {
+    var prop = convertForeignInputToBacon(opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
       var dateContainer = self._element.querySelector('td.xW');
       var originalDateSpan = dateContainer.firstChild;
       var customDateSpan = originalDateSpan.nextElementSibling;
