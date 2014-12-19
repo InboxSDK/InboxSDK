@@ -162,8 +162,7 @@ _.extend(GmailNavItemView.prototype, {
 
 			return {
 				eventName: eventName,
-				domEvent: domEvent,
-				navItemDescriptor: self._navItemDescriptor
+				domEvent: domEvent
 			};
 		};
 	},

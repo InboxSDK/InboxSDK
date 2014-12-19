@@ -12,12 +12,10 @@ var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptorPr
 	this._navItemViewDriver = navItemViewDriver;
 	this._eventStream = new Bacon.Bus();
 
-	var self = this;
-	navItemDescriptorPropertyStream.onValue(function(navItemDescriptor){
-		self._navItemDescriptor = navItemDescriptor;
-	});
-
-	this._navItemViewDriver.getEventStream().onValue(this, '_handleStreamEvent');
+	Bacon.combineAsArray(
+		navItemDescriptorPropertyStream,
+		this._navItemViewDriver.getEventStream().toProperty()
+	).onValue(this, '_handleViewDriverStreamEvent');
 
 	Bacon.combineAsArray(
 		this._driver
@@ -67,11 +65,14 @@ _.extend(NavItemView.prototype, {
 		this._navItemViewDriver.setCollapsed(collapseValue);
 	},
 
-	_handleStreamEvent: function(event){
+	_handleViewDriverStreamEvent: function(params){
+		var navItemDescriptor = params[0];
+		var event = params[1];
+
 		switch(event.eventName){
 			case 'mouseenter':
 
-				if(this._navItemDescriptor.routeName){
+				if(navItemDescriptor.routeName){
 					this._navItemViewDriver.setHighlight(true);
 				}
 
@@ -83,12 +84,12 @@ _.extend(NavItemView.prototype, {
 			break;
 			case 'click':
 
-				if(this._navItemDescriptor.onClick){
-					this._navItemDescriptor.onClick();
+				if(navItemDescriptor.onClick){
+					navItemDescriptor.onClick();
 				}
 
-				if(this._navItemDescriptor.routeName){
-					this._driver.gotoView(this._navItemDescriptor.routeName, this._navItemDescriptor.routeParams);
+				if(navItemDescriptor.routeName){
+					this._driver.gotoView(navItemDescriptor.routeName, navItemDescriptor.routeParams);
 				}
 				else{
 					this._navItemViewDriver.toggleCollapse();
