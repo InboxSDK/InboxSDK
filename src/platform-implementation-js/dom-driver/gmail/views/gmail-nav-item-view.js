@@ -310,24 +310,6 @@ _.extend(GmailNavItemView.prototype, {
 		this._setHeights();
 	},
 
-	_setHeights: function(){
-		var toElement = this._element.querySelector('.TO');
-
-		if(this._element.classList.contains('ain') && this._itemContainerElement){
-			var totalHeight = this._element.clientHeight;
-			var itemHeight = toElement.clientHeight;
-
-			this._element.style.height = itemHeight + 'px';
-			this._element.style.overflow = 'visible';
-			this._element.style.marginBottom = (totalHeight - itemHeight) + 'px';
-		}
-		else{
-			this._element.style.height = '';
-			this._element.style.overflow = '';
-			this._element.style.marginBottom = '';
-		}
-	},
-
 	_getItemContainerElement: function(){
 		if(!this._itemContainerElement){
 			this._createItemContainerElement();
@@ -387,6 +369,8 @@ _.extend(GmailNavItemView.prototype, {
 
 		this._isCollapsed = true;
 
+		this._setHeights();
+
 		this._eventStream.push({
 			eventName: 'collapsed'
 		});
@@ -403,10 +387,32 @@ _.extend(GmailNavItemView.prototype, {
 		this._eventStream.push({
 			eventName: 'expanded'
 		});
+
+		this._setHeights();
 	},
 
 	_isExpanded: function(){
 		return  this._expandoElement.classList.contains('aih');
+	},
+
+	_setHeights: function(){
+		var toElement = this._element.querySelector('.TO');
+
+		if(this._element.classList.contains('ain') && this._itemContainerElement){
+			this._element.style.height = '';
+
+			var totalHeight = this._element.clientHeight;
+			var itemHeight = toElement.clientHeight;
+
+			this._element.style.height = itemHeight + 'px';
+			this._element.style.overflow = 'visible';
+			this._element.style.marginBottom = (totalHeight - itemHeight) + 'px';
+		}
+		else{
+			this._element.style.height = '';
+			this._element.style.overflow = '';
+			this._element.style.marginBottom = '';
+		}
 	},
 
 	_createActiveMarkerElement: function(){
