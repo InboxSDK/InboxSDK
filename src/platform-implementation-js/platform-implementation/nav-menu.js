@@ -41,9 +41,12 @@ _.extend(NavMenu.prototype, {
 
 		this._modifiedNavItem = this._driver.getCurrentActiveNavItem();
 
-		if(this._modifiedNavItem){
-			this._modifiedNavItem.setActive(false);
+		if(!this._modifiedNavItem){
+			return;
 		}
+
+
+		this._modifiedNavItem.setActive(false);
 
 		var modifiedNavItem;
 		var self = this;

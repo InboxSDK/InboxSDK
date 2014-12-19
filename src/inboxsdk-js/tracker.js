@@ -11,35 +11,16 @@ function Tracker(platformImplementationLoader, opts) {
       return Imp.Utils.logErrorToServer.apply(Imp.Utils, args);
     });
   }
-  this.logError = require('../common/log-error-factory')(reporter);
+  this.logError = logErrorFactory(reporter);
 
-  var self = this;
-  if (opts.globalErrorLogging) {
-    if (!RSVP._errorHandlerSetup) {
-      RSVP._errorHandlerSetup = true;
-      RSVP.on('error', function(err) {
-        self.logError("Possibly uncaught promise rejection", err);
-      });
-    }
-
-    window.addEventListener('error', function(event) {
-      // Ugh, currently Chrome makes this pretty useless. The implementation
-      // script handles setting up more hooks.
-      if (event.error) {
-        self.logError("Uncaught exception", event.error);
-      }
+  // Rethrow any RSVP errors.
+  if (!RSVP._errorHandlerSetup) {
+    RSVP._errorHandlerSetup = true;
+    RSVP.on('error', function(err) {
+      setTimeout(function() {
+        throw err;
+      }, 1);
     });
-  } else {
-    // Even if we're set not to log errors, we should still avoid letting RSVP
-    // swallow errors entirely.
-    if (!RSVP._errorHandlerSetup) {
-      RSVP._errorHandlerSetup = true;
-      RSVP.on('error', function(err) {
-        setTimeout(function() {
-          throw err;
-        }, 1);
-      });
-    }
   }
 }
 
