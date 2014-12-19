@@ -24,14 +24,6 @@ _.extend(GmailDropdownView.prototype, {
 		this._contentElement.setAttribute('class', 'SK AX');
 
 		this._containerElement.appendChild(this._contentElement);
-	},
-
-	empty: function(){
-		this._contentElement.innerHTML = '';
-	},
-
-	focus: function(){
-		this._containerElement.focus();
 	}
 });
 

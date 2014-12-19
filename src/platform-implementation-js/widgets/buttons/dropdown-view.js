@@ -1,17 +1,19 @@
 var _ = require('lodash');
+var asap = require('asap');
 var EventEmitter = require('events').EventEmitter;
 
+var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
 
-var DropdownView = function(dropdownViewDriver, anchorElement){
+var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	EventEmitter.call(this);
 
+	var self = this;
+
 	this._dropdownViewDriver = dropdownViewDriver;
-	this._anchorElement = anchorElement;
 	this.el = dropdownViewDriver.getContentElement();
+	this.closed = false;
 
-
-	this._dropdownViewDriver.empty();
 	this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
 	document.body.appendChild(this._dropdownViewDriver.getContainerElement());
 
@@ -19,63 +21,30 @@ var DropdownView = function(dropdownViewDriver, anchorElement){
 		this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', -1);
 	}
 
-	this._startMonitoringFocusEvents();
+	this._focusUnsub = fromEventTargetCapture(document, 'focus').filter(function(event) {
+		return !anchorElement.contains(event.target) &&
+			!self._dropdownViewDriver.getContainerElement().contains(event.target);
+	}).onValue(self, 'close');
+
+	asap(function() {
+		if (!self.closed) {
+			containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, options);
+		}
+	});
 };
 
 DropdownView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(DropdownView.prototype, {
 
-	close: function(){
-		this.emit('unload');
-	},
-
-	focus: function(){
-		this._dropdownViewDriver.focus();
-	},
-
-	containByScreen: function(anchorElement, positionOptions){
-		containByScreen(this._dropdownViewDriver.getContainerElement(), anchorElement, positionOptions);
-	},
-
-	_startMonitoringFocusEvents: function(){
-		var self = this;
-
-		this._focusFunction = function(event){
-			var focusedElement = event.target;
-
-			var checkElement = focusedElement;
-			for(var ii=0; ii<100; ii++){
-				if(checkElement === null){
-					self.close();
-					return;
-				}
-
-				if(checkElement === self._dropdownViewDriver.getContainerElement() || checkElement === self._anchorElement){
-					return;
-				}
-
-				checkElement = checkElement.parentElement;
-			}
-		};
-
-		document.addEventListener(
-			'focus',
-			this._focusFunction,
-			true
-		);
-	},
-
-	_stopMonitoringFocusEvents: function(){
-		document.removeEventListener('focus', this._focusFunction, true);
-	},
-
-	destroy: function(){
-		this._dropdownViewDriver.destroy();
-		this.removeAllListeners();
-		this._stopMonitoringFocusEvents();
-
-		this.el = null;
+	close: function() {
+		if (!this.closed) {
+			this.closed = true;
+			this.el = null;
+			this._focusUnsub();
+			this._dropdownViewDriver.destroy();
+			this.emit('unload');
+		}
 	}
 
 });

@@ -14,6 +14,12 @@ _.extend(Driver.prototype, {
 
 	showNativeRouteView: null,
 
+	createLink: null,
+
+	gotoView: null,
+
+	addNavItem: null,
+
 	getComposeViewDriverStream: null,
 
 	getThreadViewDriverStream: null,
