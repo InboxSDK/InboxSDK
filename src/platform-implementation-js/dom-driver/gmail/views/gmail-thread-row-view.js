@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var $ = require('jquery');
 var Bacon = require('baconjs');
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
@@ -87,7 +88,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _expandColumn: function(colSelector, width) {
-    var tableParent = this._element.parentElement.parentElement.parentElement.parentElement;
+    var tableParent = $(this._element).closest('div > table.cf').get(0);
     _.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), function(col) {
       var currentWidth = parseInt(col.style.width, 10);
       if (isNaN(currentWidth) || currentWidth < width) {
