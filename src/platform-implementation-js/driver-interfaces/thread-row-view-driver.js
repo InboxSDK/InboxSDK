@@ -9,11 +9,11 @@ ThreadRowViewDriver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(ThreadRowViewDriver.prototype, {
 
-  addLabel: function(label) {},
+  addLabel: null,
 
-  addButton: function(buttonDescriptor) {},
+  addButton: null,
 
-  addAttachmentIcon: function(url) {},
+  addAttachmentIcon: null,
 
   replaceDate: null,
 
