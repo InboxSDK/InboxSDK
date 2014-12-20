@@ -26,7 +26,7 @@ _.extend(NavMenu.prototype, {
 		var navItemViewDriver = members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream);
 		var navItemView = new NavItemView(members.appId, members.driver, navItemViewDriver, navItemDescriptorPropertyStream);
 
-		this._navItemViews.push(navItemView);
+		members.navItemViews.push(navItemView);
 
 		return navItemView;
 	}

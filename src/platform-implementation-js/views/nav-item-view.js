@@ -49,6 +49,10 @@ _.extend(NavItemView.prototype, {
 	},
 
 	remove: function(){
+		if(!this._navItemViews){
+			return;
+		}
+
 		this._navItemViews.forEach(function(navItemView){
 			navItemView.remove();
 		});

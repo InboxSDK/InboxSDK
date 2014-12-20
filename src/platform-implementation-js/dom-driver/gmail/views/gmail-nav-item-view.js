@@ -14,6 +14,7 @@ var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-bu
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
+var LEFT_INDENTATION_PADDING = 14;
 
 var GmailNavItemView = function(orderGroup, level){
 	NavItemViewDriver.call(this);
@@ -92,23 +93,6 @@ _.extend(GmailNavItemView.prototype, {
 		}
 
 		this._setHeights();
-
-
-		/*if(value){
-			this._createActiveMarkerElement();
-			this._element.classList.add('inboxsdk__navItem_active');
-			this._element.querySelector('.TO').classList.add('nZ');
-			this._element.querySelector('.TO').classList.add('aiq');
-		}
-		else{
-			if(this._activeMarkerElement){
-				this._activeMarkerElement.remove();
-			}
-
-			this._element.classList.remove('inboxsdk__navItem_active');
-			this._element.querySelector('.TO').classList.remove('nZ');
-			this._element.querySelector('.TO').classList.remove('aiq');
-		}*/
 	},
 
 	toggleCollapse: function(){
@@ -305,7 +289,7 @@ _.extend(GmailNavItemView.prototype, {
 		var element = gmailNavItemView.getElement();
 		var left = this._element.querySelector('.TO').offsetLeft;
 
-		element.querySelector('.TO').style.paddingLeft = (left * this._level) + 'px';
+		element.querySelector('.TO').style.paddingLeft = (LEFT_INDENTATION_PADDING * this._level) + 'px';
 
 		this._setHeights();
 	},
