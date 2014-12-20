@@ -57,6 +57,8 @@ div.T-I.inboxsdk__button {
 }
 
 .J-M.inboxsdk__menu {
+  min-width: 1em;
+  min-height: 1em;
   padding: 0px;
   overflow: visible;
 }
