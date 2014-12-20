@@ -17,11 +17,10 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
 	document.body.appendChild(this._dropdownViewDriver.getContainerElement());
 
-	if(isNaN(this._dropdownViewDriver.getContainerElement().getAttribute('tabindex'))){
-		this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', -1);
-	}
-
-	this._focusUnsub = fromEventTargetCapture(document, 'focus').filter(function(event) {
+	this._focusUnsub = Bacon.mergeAll(
+		fromEventTargetCapture(document, 'focus'),
+		fromEventTargetCapture(document, 'click')
+	).filter(function(event) {
 		return !anchorElement.contains(event.target) &&
 			!self._dropdownViewDriver.getContainerElement().contains(event.target);
 	}).onValue(self, 'close');
