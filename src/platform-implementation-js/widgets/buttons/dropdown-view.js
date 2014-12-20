@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var asap = require('asap');
 var EventEmitter = require('events').EventEmitter;
+var Bacon = require('baconjs');
 
 var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
@@ -16,6 +17,11 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 
 	this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
 	document.body.appendChild(this._dropdownViewDriver.getContainerElement());
+
+	if(this._dropdownViewDriver.getContainerElement().getAttribute('tabindex') == null){
+		this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', -1);
+	}
+	this._dropdownViewDriver.getContainerElement().focus();
 
 	this._focusUnsub = Bacon.mergeAll(
 		fromEventTargetCapture(document, 'focus'),
