@@ -33,13 +33,33 @@ inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 	var item = {
 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
 		className: 'buttonLight',
+		hasDropdown: true,
 		onClick: function(event) {
 			delete item.className;
 			item.iconUrl = 'https://mailfoogae.appspot.com/build/images/listIndicator.png';
+			item.hasDropdown = false;
+
+			if (event.dropdown) {
+				event.dropdown.el.textContent = 'aaaaaaaa';
+			}
+
 			console.log('threadrow got click event', event, threadRowView);
-			buttonBus.push(null);
-			buttonBus.plug(Bacon.later(1000, item));
+			buttonBus.plug(Bacon.later(1000, null));
+			buttonBus.plug(Bacon.later(2000, item));
 		}
 	};
 	buttonBus.push(item);
+	threadRowView.addButton({
+		iconUrl: 'https://mailfoogae.appspot.com/build/images/reminder.png',
+		hasDropdown: true,
+		onClick: function(event) {
+			event.dropdown.el.innerHTML += 'beep <b>beep</b><br>aaa<br>aaaaaa';
+			event.dropdown.on('unload', function() {
+				console.log('thread row button dropdown closed');
+			});
+			setTimeout(function() {
+				event.dropdown.close();
+			}, 10000);
+		}
+	});
 });

@@ -5,6 +5,9 @@ var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observe
 var convertForeignInputToBacon = require('../../../lib/convert-foreign-input-to-bacon');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
+var GmailDropdownView = require('../widgets/gmail-dropdown-view');
+var DropdownView = require('../../../widgets/buttons/dropdown-view');
+
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
@@ -132,50 +135,67 @@ _.extend(GmailThreadRowView.prototype, {
 
   addButton: function(buttonDescriptor) {
     var self = this;
+    var activeDropdown = null;
     var buttonSpan = document.createElement('span');
     var buttonImg = document.createElement('img');
     buttonSpan.appendChild(buttonImg);
     this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
 
     var prop = convertForeignInputToBacon(buttonDescriptor).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(buttonDescriptor) {
-      var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
-
-      // Don't let the whole column count as the star for click and mouse over purposes.
-      // Click events that aren't directly on the star should be stopped.
-      // Mouseover events that aren't directly on the star should be stopped and
-      // re-emitted from the thread row, so the thread row still has the mouseover
-      // appearance.
-      // Click events that are on one of our buttons should be stopped. Click events
-      // that aren't on the star button or our buttons should be re-emitted from the
-      // thread row so it counts as clicking on the thread.
-      starGroup.onmouseover = starGroup.onclick = function(event) {
-        var isOnStar = this.firstElementChild.contains(event.target);
-        var isOnSDKButton = !isOnStar && this !== event.target;
-        if (!isOnStar) {
-          event.stopPropagation();
-          if (!isOnSDKButton || event.type == 'mouseover') {
-            var newEvent = document.createEvent('MouseEvents');
-            newEvent.initMouseEvent(
-              event.type, event.bubbles, event.cancelable, event.view,
-              event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
-              event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-              event.button, event.relatedTarget
-            );
-            this.parentElement.dispatchEvent(newEvent);
-          }
-        }
-      };
-
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue(function(buttonDescriptor) {
       if (!buttonDescriptor) {
+        if (activeDropdown) {
+          activeDropdown.close();
+          activeDropdown = null;
+        }
         buttonSpan.remove();
       } else {
+        var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+
+        // Don't let the whole column count as the star for click and mouse over purposes.
+        // Click events that aren't directly on the star should be stopped.
+        // Mouseover events that aren't directly on the star should be stopped and
+        // re-emitted from the thread row, so the thread row still has the mouseover
+        // appearance.
+        // Click events that are on one of our buttons should be stopped. Click events
+        // that aren't on the star button or our buttons should be re-emitted from the
+        // thread row so it counts as clicking on the thread.
+        starGroup.onmouseover = starGroup.onclick = function(event) {
+          var isOnStar = this.firstElementChild.contains(event.target);
+          var isOnSDKButton = !isOnStar && this !== event.target;
+          if (!isOnStar) {
+            event.stopPropagation();
+            if (!isOnSDKButton || event.type == 'mouseover') {
+              var newEvent = document.createEvent('MouseEvents');
+              newEvent.initMouseEvent(
+                event.type, event.bubbles, event.cancelable, event.view,
+                event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
+                event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
+                event.button, event.relatedTarget
+              );
+              this.parentElement.dispatchEvent(newEvent);
+            }
+          }
+        };
+
         buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
         buttonImg.src = buttonDescriptor.iconUrl;
         buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
-          buttonDescriptor.onClick.call(null, {
-            target: self._userView
-          });
+          var appEvent = {
+            threadRowView: self._userView
+          };
+          if (buttonDescriptor.hasDropdown) {
+            if (activeDropdown) {
+              self._element.classList.remove('inboxsdk__dropdown_active');
+              activeDropdown.close();
+              activeDropdown = null;
+              return;
+            } else {
+              self._element.classList.add('inboxsdk__dropdown_active');
+              appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
+            }
+          }
+          buttonDescriptor.onClick.call(null, appEvent);
         };
 
         if (!starGroup.contains(buttonSpan)) {
