@@ -1,88 +1,86 @@
+'use strict';
+
 var _ = require('lodash');
 var RSVP = require('rsvp');
-var BasicClass = require('../lib/basic-class');
+
+var Map = require('es6-unweak-collections').Map;
 
 var ComposeView = require('../views/compose-view');
 var HandlerRegistry = require('../lib/handler-registry');
 
+var memberMap = new Map();
+
 var Compose = function(appId, driver){
-    BasicClass.call(this);
+    var members = {};
+    memberMap.set(this, members);
 
-    this._appId = appId;
-    this._driver = driver;
+    members.appId = appId;
+    members.driver = driver;
 
-    this._requestedComposeViewDeferred = null;
+    members.requestedComposeViewDeferred = null;
 
-    this._handlerRegistry = new HandlerRegistry();
-    this._setupComposeViewDriverWatcher();
+    members.handlerRegistry = new HandlerRegistry();
+    _setupComposeViewDriverWatcher(members);
 };
-
-Compose.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Compose.prototype, {
 
-    __memberVariables: [
-        {name: '_appId', destroy: false},
-        {name: '_driver', destroy: false},
-        {name: '_requestedComposeViewDeferred', destroy: true, destroyFunction: 'reject'},
-        {name: '_unsubscribeFunction', destroy: true},
-        {name: '_handlerRegistry', destroy: true}
-    ],
+    registerComposeViewHandler: function(handler){
+        return memberMap.get(this).handlerRegistry.registerHandler(handler);
+    },
 
     getComposeView: function(){
-        this._requestedComposeViewDeferred = RSVP.defer();
+        var members = memberMap.get(this);
+        members.requestedComposeViewDeferred = RSVP.defer();
 
-        this._driver.openComposeWindow();
+        members.driver.openComposeWindow();
 
-        this._createIgnoreComposeSignal();
+        _createIgnoreComposeSignal();
 
-        return this._requestedComposeViewDeferred.promise;
-    },
-
-    registerComposeViewHandler: function(handler){
-        return this._handlerRegistry.registerHandler(handler);
-    },
-
-    _setupComposeViewDriverWatcher: function(){
-        var self = this;
-        this._unsubscribeFunction = this._driver.getComposeViewDriverStream().onValue(function(viewDriver){
-            var view = new ComposeView(viewDriver, self._appId);
-
-            if(self._requestedComposeViewDeferred){
-                var deferred = self._requestedComposeViewDeferred;
-                self._requestedComposeViewDeferred = null;
-                self._removeIgnoreComposeSignal();
-                deferred.resolve(view);
-            }
-            else if(!self._doesIgnoreComposeSignalExist()){
-                self._handlerRegistry.addTarget(view);
-            }
-        });
-
-    },
-
-    _createIgnoreComposeSignal: function(){
-        var signalDiv = document.createElement('div');
-        signalDiv.id = 'inboxsdk__ignoreCompose';
-
-        document.body.appendChild(signalDiv);
-    },
-
-    _removeIgnoreComposeSignal: function(){
-        setTimeout(function(){
-            var signalDiv = document.getElementById('inboxsdk__ignoreCompose');
-            if(signalDiv){
-                signalDiv.remove();
-            }
-        }, 1);
-    },
-
-    _doesIgnoreComposeSignalExist: function(){
-        var signalExists = !!document.getElementById('inboxsdk__ignoreCompose');
-
-        return signalExists;
+        return members.requestedComposeViewDeferred.promise;
     }
 
 });
+
+
+function _setupComposeViewDriverWatcher(members){
+    members.driver.getComposeViewDriverStream().onValue(function(viewDriver){
+        var view = new ComposeView(viewDriver, members.appId);
+
+        if(members.requestedComposeViewDeferred){
+            var deferred = members.requestedComposeViewDeferred;
+            members.requestedComposeViewDeferred = null;
+            _removeIgnoreComposeSignal();
+            deferred.resolve(view);
+        }
+        else if(!_doesIgnoreComposeSignalExist()){
+            members.handlerRegistry.addTarget(view);
+        }
+    });
+
+}
+
+function _createIgnoreComposeSignal(){
+    var signalDiv = document.createElement('div');
+    signalDiv.id = 'inboxsdk__ignoreCompose';
+
+    document.body.appendChild(signalDiv);
+}
+
+function _removeIgnoreComposeSignal(){
+    setTimeout(function(){
+        var signalDiv = document.getElementById('inboxsdk__ignoreCompose');
+        if(signalDiv){
+            signalDiv.remove();
+        }
+    }, 1);
+}
+
+function _doesIgnoreComposeSignalExist(){
+    var signalExists = !!document.getElementById('inboxsdk__ignoreCompose');
+
+    return signalExists;
+}
+
 
 module.exports = Compose;

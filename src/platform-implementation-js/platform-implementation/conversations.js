@@ -1,63 +1,48 @@
+'use strict';
+
 var _ = require('lodash');
 
-var BasicClass = require('../lib/basic-class');
-
+var Map = require('es6-unweak-collections').Map;
 
 var ThreadView = require('../views/conversations/thread-view');
 var MessageView = require('../views/conversations/message-view');
 
 var HandlerRegistry = require('../lib/handler-registry');
 
+var memberMap = new Map();
+
 var Conversations = function(appId, driver){
-	BasicClass.call(this);
+	var members = {};
+	memberMap.set(this, members);
 
-	this._appId = appId;
-	this._driver = driver;
+	members.appId = appId;
+	members.driver = driver;
 
-	this._threadViewHandlerRegistry = new HandlerRegistry();
-	this._messageViewHandlerRegistry = new HandlerRegistry();
+	members.threadViewHandlerRegistry = new HandlerRegistry();
+	members.messageViewHandlerRegistry = new HandlerRegistry();
 
-	this._setupThreadViewDriverWatcher();
-	this._setupMessageViewDriverWatcher();
+	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry);
+	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistry);
 };
-
-Conversations.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Conversations.prototype, {
 
-	__memberVariables:[
-		{name: '_appId', destroy: false},
-		{name: '_driver', destroy: false},
-		{name: '_threadViewUnsubscribeFunction', destroy: true, defaultValue: []},
-		{name: '_messageViewUnsubscribeFunction', destroy: true, defaultValue: []},
-		{name: '_threadViewHandlerRegistry', destroy: true},
-		{name: '_messageViewHandlerRegistry', destroy: true}
-	],
-
 	registerThreadViewHandler: function(handler){
-		return this._threadViewHandlerRegistry.registerHandler(handler);
+		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(handler);
 	},
 
 	registerMessageViewHandler: function(handler){
-		return this._messageViewHandlerRegistry.registerHandler(handler);
-	},
-
-	_setupThreadViewDriverWatcher: function(){
-		this._threadViewUnsubscribeFunction = this._setupViewDriverWatcher('getThreadViewDriverStream', ThreadView, this._threadViewHandlerRegistry);
-	},
-
-	_setupMessageViewDriverWatcher: function(){
-		this._messageViewUnsubscribeFunction = this._setupViewDriverWatcher('getMessageViewDriverStream', MessageView, this._messageViewHandlerRegistry);
-	},
-
-	_setupViewDriverWatcher: function(driverStreamGetFunction, viewClass, handlerRegistry){
-		var self = this;
-		return this._driver[driverStreamGetFunction]().onValue(function(viewDriver){
-			var view = new viewClass(viewDriver, self._appId);
-			handlerRegistry.addTarget(view);
-		});
+		return memberMap.get(this).messageViewHandlerRegistry.registerHandler(handler);
 	}
 
 });
+
+function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
+	return stream.onValue(function(viewDriver){
+		var view = new ViewClass(viewDriver, appId);
+		handlerRegistry.addTarget(view);
+	});
+}
+
 
 module.exports = Conversations;

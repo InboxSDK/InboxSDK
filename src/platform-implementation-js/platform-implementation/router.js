@@ -1,162 +1,198 @@
+'use strict';
+
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var Bacon = require('baconjs');
+var Map = require('es6-unweak-collections').Map;
+
+var makeMutationObserverStream = require('../lib/dom/make-mutation-observer-stream');
 
 var HandlerRegistry = require('../lib/handler-registry');
 
 var Route = require('../views/route-view/route');
 var RouteView = require('../views/route-view/route-view');
 
-var Router = function(appId, driver, navMenu){
-	EventEmitter.call(this);
+var memberMap = new Map();
 
-	this._appId = appId;
-	this._driver = driver;
-	this._navMenu = navMenu;
+var Router = function(appId, driver){
+	var members = {};
+	memberMap.set(this, members);
 
-	this._routes = [];
+	members.appId = appId;
+	members.driver = driver;
 
-	this._currentRouteViewDriver = null;
-	this._handlerRegistry = new HandlerRegistry();
+	members.currentRouteViewDriver = null;
+	members.handlerRegistry = new HandlerRegistry();
 
-	this._customRoutes = [];
+	members.routes = [];
+	members.customRoutes = [];
 
-	this._lastNativeRouteName = null;
+	members.lastNativeRouteName = null;
+	members.modifiedNativeNavItem = null;
 
-	this._setupNativeRoutes();
-	this._watchForRouteViewChanges();
+	_setupNativeRoutes(members);
+	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, members);
 };
-
-Router.prototype = Object.create(EventEmitter.prototype);
 
 
 _.extend(Router.prototype,  {
 
 	createLink: function(name, paramArray){
-		return this._driver.createLink(name, paramArray);
+		return memberMap.get(this).driver.createLink(name, paramArray);
 	},
 
 	goto: function(name, paramArray){
-		this._driver.gotoView(name, paramArray);
+		memberMap.get(this).driver.gotoView(name, paramArray);
 	},
 
 	createNewRoute: function(routerDescription){
-		this._customRoutes.push(routerDescription);
+		var members = memberMap.get(this);
+		members.customRoutes.push(routerDescription);
 
-		this._routes.push(
+		members.routes.push(
 			new Route({
 				name: routerDescription.name,
 				isCustomView: true,
-				driver: this._driver
+				driver: members.driver
 			})
 		);
 	},
 
 	registerRouteViewHandler: function(handler){
-		return this._handlerRegistry.registerHandler(handler);
-	},
-
-	/* deprecated */
-	gotoView: function(name, paramArray){
-		this.goto(name, paramArray);
-	},
-
-	/* deprecated */
-	getDescriptor: function(name){
-		return _.find(this._routes, function(route){
-			return route.getName() === name;
-		});
-	},
-
-	/* deprecated */
-	registerCustom: function(routerDescription){
-		this.createNewRoute(routerDescription);
-	},
-
-	_setupNativeRoutes: function(){
-		var nativeViewNames = this._driver.getNativeRouteNames();
-
-		var self = this;
-		nativeViewNames.forEach(function(viewName){
-
-			self._routes.push(
-				new Route({
-					name: viewName,
-					isCustomView: false,
-					driver: self._driver
-				})
-			);
-
-		});
-	},
-
-	_watchForRouteViewChanges: function(){
-		this._driver.getRouteViewDriverStream().onValue(this, '_handleRouteViewChange');
-	},
-
-	_handleRouteViewChange: function(routeViewDriver){
-		this._updateNavMenu(routeViewDriver);
-
-		if(this._currentRouteViewDriver){
-			this._currentRouteViewDriver.destroy();
-		}
-
-		var route = this.getDescriptor(routeViewDriver.getName());
-		if(!route){
-			routeViewDriver.destroy();
-			return;
-		}
-
-		this._currentRouteViewDriver = routeViewDriver;
-
-		var routeView = new RouteView(routeViewDriver, route);
-
-		if(route.isCustomView()){
-			this._driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
-			this._informRelevantCustomRoutes(routeView);
-		}
-		else{
-			this._driver.showNativeRouteView();
-		}
-
-		this._handlerRegistry.addTarget(routeView);
-
-		this.emit('change', {routeView: routeView});
-	},
-
-	_informRelevantCustomRoutes: function(routeView){
-		this._customRoutes
-			.filter(function(customRoute){
-				return customRoute.name === routeView.getName();
-			})
-			.forEach(function(customRoute){
-				customRoute.onActivate({
-					routeView: routeView,
-					fullscreenView: routeView, /* deprecated */
-					el: routeView.getElement()
-				});
-			});
-	},
-
-	_updateNavMenu: function(newRouteViewDriver){
-		var oldRouteViewDriver = this._currentRouteViewDriver;
-
-		if(oldRouteViewDriver && !oldRouteViewDriver.isCustomView()){
-			if(newRouteViewDriver.isCustomView()){
-				this._lastNativeRouteName = oldRouteViewDriver.getName();
-				this._navMenu.removeNativeNavItemActive();
-				return;
-			}
-		}
-		else if(this._lastNativeRouteName && !newRouteViewDriver.isCustomView()){
-			if(this._lastNativeRouteName === newRouteViewDriver.getName()){
-				this._navMenu.restoreNativeNavItemActive();
-			}
-			else{
-				this._navMenu.unhandleNativeNavItem();
-			}
-		}
+		return memberMap.get(this).handlerRegistry.registerHandler(handler);
 	}
 
 });
+
+function _setupNativeRoutes(members){
+	var nativeViewNames = members.driver.getNativeRouteNames();
+
+	nativeViewNames.forEach(function(viewName){
+		members.routes.push(
+			new Route({
+				name: viewName,
+				isCustomView: false,
+				driver: members.driver
+			})
+		);
+
+	});
+}
+
+
+function _handleRouteViewChange(members, routeViewDriver){
+	_updateNavMenu(members, routeViewDriver);
+
+	if(members.currentRouteViewDriver){
+		members.currentRouteViewDriver.destroy();
+	}
+
+	var route = _.find(members.routes, function(route){
+		return route.getName() === routeViewDriver.getName();
+	});
+
+	if(!route){
+		routeViewDriver.destroy();
+		return;
+	}
+
+	members.currentRouteViewDriver = routeViewDriver;
+
+	var routeView = new RouteView(routeViewDriver, route);
+
+	if(route.isCustomView()){
+		members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
+		_informRelevantCustomRoutes(members.customRoutes, routeView);
+	}
+	else{
+		members.driver.showNativeRouteView();
+	}
+
+	members.handlerRegistry.addTarget(routeView);
+}
+
+function _informRelevantCustomRoutes(customRoutes, routeView){
+	customRoutes
+		.filter(function(customRoute){
+			return customRoute.name === routeView.getName();
+		})
+		.forEach(function(customRoute){
+			customRoute.onActivate({
+				routeView: routeView,
+				fullscreenView: routeView, /* deprecated */
+				el: routeView.getElement()
+			});
+		});
+}
+
+
+function _updateNavMenu(members, newRouteViewDriver){
+	var oldRouteViewDriver = members.currentRouteViewDriver;
+
+	if(oldRouteViewDriver && !oldRouteViewDriver.isCustomView()){
+		if(newRouteViewDriver.isCustomView()){
+			members.lastNativeRouteName = oldRouteViewDriver.getName();
+			_removeNativeNavItemActive(members);
+			return;
+		}
+	}
+	else if(members.lastNativeRouteName && !newRouteViewDriver.isCustomView()){
+		if(members.lastNativeRouteName === newRouteViewDriver.getName()){
+			_restoreNativeNavItemActive(members);
+		}
+		else{
+			_unhandleNativeNavItem(members);
+		}
+	}
+}
+
+
+function _removeNativeNavItemActive(members){
+	if(members.modifiedNativeNavItem){
+		members.modifiedNativeNavItem.destroy(); //make sure there is only one active at a time;
+	}
+
+	members.modifiedNativeNavItem = members.driver.getCurrentActiveNavItem();
+
+	if(!members.modifiedNativeNavItem){
+		return;
+	}
+
+
+	members.modifiedNativeNavItem.setActive(false);
+
+	var modifiedNavItem = members.modifiedNativeNavItem;
+	makeMutationObserverStream(members.modifiedNativeNavItem.getElement().parentElement, {childList: true})
+		.takeWhile(function(){
+			return modifiedNavItem === members.modifiedNativeNavItem;
+		})
+		.flatMap(function(mutations){
+			return Bacon.fromArray(mutations);
+		})
+		.flatMap(function(mutation){
+			return Bacon.fromArray(_.toArray(mutation.removedNodes));
+		})
+		.filter(function(removedNode){
+			return removedNode === modifiedNavItem.getElement();
+		})
+		.onValue(_removeNativeNavItemActive, members); //reset ourselves
+}
+
+function _restoreNativeNavItemActive(members){
+	if(!members.modifiedNativeNavItem){
+		return;
+	}
+
+	members.modifiedNativeNavItem.setActive(true);
+	members.modifiedNativeNavItem.destroy();
+	members.modifiedNativeNavItem = null;
+}
+
+function _unhandleNativeNavItem(members){
+	if(members.modifiedNativeNavItem){
+		members.modifiedNativeNavItem.destroy();
+		members.modifiedNativeNavItem = null;
+	}
+}
+
 
 module.exports = Router;

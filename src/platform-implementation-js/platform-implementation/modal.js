@@ -1,26 +1,34 @@
+'use strict';
+
 var _ = require('lodash');
+
+var Map = require('es6-unweak-collections').Map;
 
 var ModalViewController = require('../widgets/modal-view-controller');
 var ModalView = require('../views/modal-view');
 
-var Modal = function(appId, driver){
+var memberMap = new Map();
 
-    this._appId = appId;
-    this._driver = driver;
+var Modal = function(appId, driver){
+    var members = {};
+    memberMap.set(this, members);
+
+    members.appId = appId;
+    members.driver = driver;
 
 };
 
 _.extend(Modal.prototype, {
 
 	show: function(options){
-		var modalView = _createModalView(this._driver, options);
+		var modalView = _createModalView(memberMap.get(this).driver, options);
 		modalView.show();
 
 		return modalView;
 	},
 
     createModalView: function(options){
-        var modalView = this._driver.createModalView(options);
+        var modalView = memberMap.get(this).driver.createModalView(options);
         var modalViewController = new ModalViewController({
             modalView: modalView
         });

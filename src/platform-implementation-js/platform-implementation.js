@@ -27,12 +27,10 @@ var PlatformImplementation = function(appId, opts){
 
 	this.Compose = new Compose(appId, this._driver);
 	this.Conversations = new Conversations(appId, this._driver);
-
 	this.Email = new Email(appId, this._driver);
-	this.FullscreenViews = this.Router; /* deprecated */
 	this.Mailbox = new Mailbox(appId, this._driver, this);
 	this.NavMenu = new NavMenu(appId, this._driver);
-	this.Router = new Router(appId, this._driver, this.NavMenu);
+	this.Router = new Router(appId, this._driver);
 	this.Toolbars = new Toolbars(appId, this._driver, this);
 	this.Modal = new Modal(appId, this._driver);
 

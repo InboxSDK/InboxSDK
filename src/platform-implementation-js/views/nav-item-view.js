@@ -1,21 +1,26 @@
 var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
 var Bacon = require('baconjs');
+
+var EventEmitter = require('events').EventEmitter;
+
+var BasicClass = require('../lib/basic-class');
+
 
 var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 
 var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptorPropertyStream){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._appId = appId;
 	this._driver = driver;
 	this._navItemViewDriver = navItemViewDriver;
-	this._eventStream = new Bacon.Bus();
+	this._navItemViews = [];
+
 
 	Bacon.combineAsArray(
 		navItemDescriptorPropertyStream,
 		this._navItemViewDriver.getEventStream().toProperty()
-	).onValue(this, '_handleViewDriverStreamEvent');
+	).onValue(_handleViewDriverStreamEvent, this, this._navItemViewDriver, this._driver);
 
 	Bacon.combineAsArray(
 		this._driver
@@ -25,21 +30,12 @@ var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptorPr
 			.toProperty(),
 
 		navItemDescriptorPropertyStream
-	).onValue(this, '_handleRouteViewChange');
+	).onValue(_handleRouteViewChange, this._navItemViewDriver);
 };
 
-NavItemView.prototype = Object.create(BasicClass.prototype);
+NavItemView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(NavItemView.prototype, {
-
-	__memberVariables:[
-		{name: '_appId', destroy: false},
-		{name: '_driver', destroy: false},
-		{name: '_navItemViewDriver', destroy: true},
-		{name: '_navItemDescriptor', destroy: false},
-		{name: '_navItemViews', destroy: true, defaultValue: []},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
 
 	addNavItem: function(navItemDescriptor){
 		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
@@ -53,8 +49,17 @@ _.extend(NavItemView.prototype, {
 	},
 
 	remove: function(){
-		this._navItemViewDriver.remove();
-		this.destroy();
+		this._navItemViews.forEach(function(navItemView){
+			navItemView.remove();
+		});
+
+		this._navItemViews = null;
+
+		this._navItemViewDriver.destroy();
+		this._navItemViewDriver = null;
+
+		this._appId = null;
+		this._driver = null;
 	},
 
 	isCollapsed: function(){
@@ -63,57 +68,58 @@ _.extend(NavItemView.prototype, {
 
 	setCollapsed: function(collapseValue){
 		this._navItemViewDriver.setCollapsed(collapseValue);
-	},
-
-	_handleViewDriverStreamEvent: function(params){
-		var navItemDescriptor = params[0];
-		var event = params[1];
-
-		switch(event.eventName){
-			case 'mouseenter':
-
-				if(navItemDescriptor.routeName){
-					this._navItemViewDriver.setHighlight(true);
-				}
-
-			break;
-			case 'mouseleave':
-
-				this._navItemViewDriver.setHighlight(false);
-
-			break;
-			case 'click':
-
-				if(navItemDescriptor.onClick){
-					navItemDescriptor.onClick();
-				}
-
-				if(navItemDescriptor.routeName){
-					this._driver.gotoView(navItemDescriptor.routeName, navItemDescriptor.routeParams);
-				}
-				else{
-					this._navItemViewDriver.toggleCollapse();
-				}
-
-			break;
-			case 'expanded':
-			case 'collapsed':
-				this._eventStream.push(event);
-			break;
-		}
-	},
-
-	_handleRouteViewChange: function(paramHolder){
-		var routeViewDriver = paramHolder[0];
-		var navItemDescriptor = paramHolder[1];
-
-		this._navItemViewDriver.setActive(
-			navItemDescriptor &&
-			navItemDescriptor.routeName === routeViewDriver.getName() &&
-			_.isEqual(navItemDescriptor.routeParams, routeViewDriver.getParams())
-		);
 	}
 
 });
+
+
+function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, params){
+	var navItemDescriptor = params[0];
+	var event = params[1];
+
+	switch(event.eventName){
+		case 'mouseenter':
+
+			if(navItemDescriptor.routeName){
+				navItemViewDriver.setHighlight(true);
+			}
+
+		break;
+		case 'mouseleave':
+
+			navItemViewDriver.setHighlight(false);
+
+		break;
+		case 'click':
+
+			if(navItemDescriptor.onClick){
+				navItemDescriptor.onClick();
+			}
+
+			if(navItemDescriptor.routeName){
+				driver.gotoView(navItemDescriptor.routeName, navItemDescriptor.routeParams);
+			}
+			else{
+				navItemViewDriver.toggleCollapse();
+			}
+
+		break;
+		case 'expanded':
+		case 'collapsed':
+			eventEmitter.emit(event.eventName);
+		break;
+	}
+}
+
+function _handleRouteViewChange(navItemViewDriver, paramHolder){
+	var routeViewDriver = paramHolder[0];
+	var navItemDescriptor = paramHolder[1];
+
+	navItemViewDriver.setActive(
+		navItemDescriptor &&
+		navItemDescriptor.routeName === routeViewDriver.getName() &&
+		_.isEqual(navItemDescriptor.routeParams, routeViewDriver.getParams())
+	);
+}
 
 module.exports = NavItemView;
