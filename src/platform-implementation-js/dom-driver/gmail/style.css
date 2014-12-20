@@ -140,6 +140,12 @@ div.T-I.inboxsdk__button {
   margin-left: 2px;
 }
 
+.inboxsdk__thread_row_button {
+  padding: 0 5px;
+  position: relative;
+  top: 2px;
+}
+
 /* end thread rows */
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this

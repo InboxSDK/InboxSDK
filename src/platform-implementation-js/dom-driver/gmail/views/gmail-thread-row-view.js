@@ -139,7 +139,6 @@ _.extend(GmailThreadRowView.prototype, {
     var buttonSpan = document.createElement('span');
     var buttonImg = document.createElement('img');
     buttonSpan.appendChild(buttonImg);
-    this._element.parentElement.parentElement.querySelector('colgroup > col.y5').style.width = '52px';
 
     var prop = convertForeignInputToBacon(buttonDescriptor).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue(function(buttonDescriptor) {
@@ -200,6 +199,7 @@ _.extend(GmailThreadRowView.prototype, {
 
         if (!starGroup.contains(buttonSpan)) {
           starGroup.appendChild(buttonSpan);
+          self._expandColumn('col.y5', 26*starGroup.children.length);
         }
       }
     });
