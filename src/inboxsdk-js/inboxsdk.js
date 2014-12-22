@@ -18,15 +18,13 @@ var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
-  this.VERSION = process.env.VERSION;
-  this.IMPL_VERSION = null;
   opts = _.extend({
     // defaults
     globalErrorLogging: true
   }, opts, {
     // stuff that can't be overridden, such as extra stuff this file passes to
     // the implementation script.
-    VERSION: this.VERSION
+    VERSION: InboxSDK.LOADER_VERSION
   });
 
   checkRequirements(opts);
@@ -54,47 +52,40 @@ var InboxSDK = function(appId, opts){
 
   var self = this;
   this._platformImplementationLoader.load().then(function(Imp) {
-    self.IMPL_VERSION = Imp.VERSION;
+    InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
   }).catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
 };
 
-InboxSDK.newApp = function(appId, options){
-
-  InboxSDK.VERSION = process.env.VERSION;
-  InboxSDK.IMPL_VERSION = null;
-
+InboxSDK.newApp = function(appId, opts){
   opts = _.extend({
     // defaults
     globalErrorLogging: true
-  }, options, {
+  }, opts, {
     // stuff that can't be overridden, such as extra stuff this file passes to
     // the implementation script.
-    VERSION: InboxSDK.VERSION
+    VERSION: InboxSDK.LOADER_VERSION
   });
 
   checkRequirements(opts);
 
-  if(!InboxSDK.platformImplementationLoader){
-    InboxSDK.platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
-  }
-
-  return InboxSDK.platformImplementationLoader.load();
+  var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
+  var loadPromise = platformImplementationLoader.load().then(function(Imp) {
+    InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
+    return Imp;
+  });
+  loadPromise.catch(function(err) {
+    console.error("Failed to load implementation:", err);
+  });
+  return loadPromise;
 };
+
+InboxSDK.LOADER_VERSION = InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
+InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
 
 InboxSDK.Util = {
   loadScript: require('../common/load-script')
 };
-
-// Place a bunch of poison-pill properties for things that aren't implemented.
-function notImplemented() {throw new Error("Not implemented yet");}
-var niSettings = {
-  configurable: false, enumerable:false,
-  get:notImplemented, set:notImplemented
-};
-Object.defineProperties(InboxSDK.prototype, {
-  ButterBar: niSettings
-});
 
 module.exports = InboxSDK;

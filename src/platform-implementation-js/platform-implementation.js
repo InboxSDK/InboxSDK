@@ -19,7 +19,8 @@ var PlatformImplementation = function(appId, opts){
 		// defaults
 		globalErrorLogging: true
 	}, opts);
-	this.VERSION = process.env.VERSION;
+	this.LOADER_VERSION = opts.VERSION;
+	this.IMPL_VERSION = process.env.VERSION;
 
 	this._tracker = new Tracker(appId, opts);
 
