@@ -29,11 +29,20 @@ _.extend(DropdownButtonViewController.prototype, {
 	],
 
 	showDropdown: function(){
-		this._showDropdown();
+		this._view.activate();
+		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), this._dropdownPositionOptions);
+
+		this._dropdownView.on('unload', this._dropdownClosed.bind(this));
+
+		if(this._dropdownShowFunction){
+			this._dropdownShowFunction({dropdown: this._dropdownView});
+		}
 	},
 
 	hideDropdown: function(){
-		this._hideDropdown();
+		if(this._dropdownView){
+			this._dropdownView.close();
+		}
 	},
 
 	isDropdownVisible: function(){
@@ -50,13 +59,6 @@ _.extend(DropdownButtonViewController.prototype, {
 			.onValue(function(){
 				self._toggleDropdownState();
 			});
-
-		this._view
-			.getEventStream()
-			.filter(function(event){
-				return event.eventName === 'keydown' && event.domEvent.which === 27; //escape
-			})
-			.onValue(this, '_hideDropdown');
 	},
 
 	_toggleDropdownState: function(){
@@ -64,24 +66,7 @@ _.extend(DropdownButtonViewController.prototype, {
 			this._dropdownView.close();
 		}
 		else{
-			this._showDropdown();
-		}
-	},
-
-	_showDropdown: function(){
-		this._view.activate();
-		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), this._dropdownPositionOptions);
-
-		this._dropdownView.on('unload', this._dropdownClosed.bind(this));
-
-		if(this._dropdownShowFunction){
-			this._dropdownShowFunction({dropdown: this._dropdownView});
-		}
-	},
-
-	_hideDropdown: function(){
-		if(this._dropdownView){
-			this._dropdownView.close();
+			this.showDropdown();
 		}
 	},
 

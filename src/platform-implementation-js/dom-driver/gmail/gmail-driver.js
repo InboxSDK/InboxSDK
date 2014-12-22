@@ -24,6 +24,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_threadMetadataOracle', destroy: false, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_threadRowViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -68,6 +69,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
+		var self = this;
 		var result = makeXhrInterceptor();
 		var xhrInterceptStream = result.xhrInterceptStream;
 		this._threadMetadataOracle = result.threadMetadataOracle;
@@ -79,6 +81,14 @@ _.extend(GmailDriver.prototype, {
 		this._routeViewDriverStream.plug(require('./gmail-driver/setup-route-view-driver-stream')());
 
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
+
+		// Each ThreadRowView may be delayed if the thread id is not known yet.
+		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
+			.flatMap(function(viewDriver) {
+				viewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
+				return viewDriver.waitForReady();
+			});
+
 		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView');
 
 		this._setupToolbarViewDriverStream();

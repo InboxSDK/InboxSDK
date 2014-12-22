@@ -20,8 +20,10 @@ function extractMetadataFromThreadRow(threadRow) {
     timeSpan = threadRow.querySelector("td.xW > span[title]");
 
     var subjectAreaDiv = threadRow.querySelector("td.a4W div[role=link] div.y6");
-    if (subjectAreaDiv && subjectAreaDiv.children.length >= 2) {
+    if (subjectAreaDiv && subjectAreaDiv.children.length >= 1) {
       subjectSpan = subjectAreaDiv.children[0];
+
+      // body snippet is not always present.
       //var bodySnippetSpan = subjectAreaDiv.children[1];
     }
 

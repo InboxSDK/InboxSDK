@@ -20,7 +20,7 @@ var inboxsdk = new InboxSDK("test", {
 assert.strictEqual(inboxsdk.VERSION, 'beep');
 assert.strictEqual(inboxsdk.IMPL_VERSION, null);
 
-return inboxsdk._platformImplementationLoader.load().then(function() {
+inboxsdk._platformImplementationLoader.load().then(function() {
   assert.strictEqual(inboxsdk.VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
 

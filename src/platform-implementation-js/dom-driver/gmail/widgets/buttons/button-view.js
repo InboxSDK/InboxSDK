@@ -304,7 +304,6 @@ _.extend(ButtonView.prototype, {
 		var isEnterOrSpace = isKeyboardKey.bind(null, 32 /* space */, 13 /* enter */);
 		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').filter(this, 'isEnabled');
 		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
-		var nonEnterEventStream = keydownEventStream.filter(_.compose(not, isEnterOrSpace));
 
 		this._eventStream.plug(
 			enterEventStream.map(function(event){
@@ -319,16 +318,6 @@ _.extend(ButtonView.prototype, {
 			event.stopPropagation();
 			event.preventDefault();
 		});
-
-
-		this._eventStream.plug(
-			nonEnterEventStream.map(function(event){
-				return {
-					eventName: 'keydown',
-					domEvent: event
-				};
-			})
-		);
 	},
 
 	_setupAestheticEvents: function(){

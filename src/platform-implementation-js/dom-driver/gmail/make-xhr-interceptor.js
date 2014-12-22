@@ -2,12 +2,15 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
+var threadMetadataOracle = require('./thread-metadata-oracle');
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
+    var url = 'https://www.inboxsdk.com/build/injected.js';
+
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8');
+    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8')+'\n//# sourceURL='+url+'\n';
     document.head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', true);
   }
@@ -44,19 +47,6 @@ function makeXhrInterceptor() {
       };
     })
   );
-
-  var threadMetadataOracle = {
-    getThreadIdForThreadRow: function(threadRow) {
-      var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
-      if (!threadid) {
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
-        threadRow.dispatchEvent(event);
-        threadid = threadRow.getAttribute('data-inboxsdk-threadid');
-      }
-      return threadid;
-    }
-  };
 
   return {
     xhrInterceptStream: interceptStream,

@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
@@ -77,17 +78,14 @@ _.extend(GmailRouteView.prototype, {
 
 	_setupSubViews: function(){
 		var self = this;
-		setTimeout(function(){
+		RSVP.resolve().then(function(){
 			self._setupRowListViews();
 			self._setupContentAndSidebarView();
-		}, 1);
+		});
 	},
 
 	_setupRowListViews: function(){
 		var rowListElements = GmailElementGetter.getRowListElements();
-		if(rowListElements.length === 0){
-			return;
-		}
 
 		var self = this;
 		Array.prototype.forEach.call(rowListElements, function(rowListElement){
@@ -105,6 +103,10 @@ _.extend(GmailRouteView.prototype, {
 			eventName: 'newGmailRowListView',
 			view: gmailRowListView
 		});
+
+		this._eventStream.plug(gmailRowListView.getEventStream().filter(function(event) {
+			return event.eventName === 'newGmailThreadRowView';
+		}));
 	},
 
 
