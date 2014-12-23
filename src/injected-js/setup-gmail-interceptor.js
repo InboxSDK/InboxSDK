@@ -38,12 +38,6 @@ function setupGmailInterceptor() {
     isRelevantTo: function(connection) {
       return connection.params.search && connection.params.view === 'tl';
     },
-    // originalSendBodyLogger: function(connection) {
-    //   triggerEvent({
-    //     type: 'threadListStart',
-    //     q: connection.params.q
-    //   });
-    // },
     responseTextChanger: function(connection) {
       // Presence of a responseTextChanger blocks Gmail from getting the partial
       // values as this loads. We want our originalResponseTextLogger to run
