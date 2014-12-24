@@ -1,5 +1,5 @@
 module.exports = {
-	GMAIL_VIEWS: [
+	GMAIL_ROUTE_NAMES: [
 		'compose',
 	    'inbox',
 	    'section_query',
@@ -22,7 +22,7 @@ module.exports = {
 		'chats'
 	],
 
-	GMAIL_THREAD_LIST_VIEWS: [
+	GMAIL_THREAD_LIST_ROUTE_NAMES: [
 	    'inbox',
 	    'section_query',
 		'all',
@@ -38,5 +38,11 @@ module.exports = {
 		'apps',
 		'circle',
 		'chats'
+	],
+
+	GMAIL_SEARCH_RESULT_ROUTE_NAMES: [
+		'search',
+		'apps',
+		'advanced-search'
 	]
 };

@@ -45,6 +45,10 @@ function makeXhrInterceptor() {
         draft: body.draft,
         response: response
       };
+    }),
+    //search
+    rawInterceptStream.filter(function(detail){
+      return detail.type === 'sendingSearchRequest';
     })
   );
 

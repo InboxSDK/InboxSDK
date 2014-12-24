@@ -397,3 +397,42 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end nav menu */
+
+
+
+/* search results section */
+
+.inboxsdk__resultsSection_title {
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inboxsdk__resultsSection_title .Wp {
+  float: left;
+  height: 10px;
+  width: 16px;
+  margin-top: 3px;
+}
+
+.inboxsdk__resultsSection_title h3 {
+  margin-bottom: 10px;
+  margin-top: 20px;
+  display: inline;
+  float: none;
+}
+
+.inboxsdk__resultsSection .TB.TC {
+  text-align: center;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_loading {
+  font-style: italic;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_result_icon {
+  height: 15px;
+  width: 15px;
+  margin-left: 9px;
+}
+
+/* end search results section */

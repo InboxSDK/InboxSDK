@@ -1,6 +1,9 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
+var Map = require('es6-unweak-collections').Map;
+var membersMap = new Map();
+
 /**
  * @class
  * RouteViews are created when the user navigates to a specific url or page. RouteViews can be "custom", those
@@ -16,10 +19,13 @@ var EventEmitter = require('events').EventEmitter;
 var RouteView = function(routeViewImplementation, route){
 	EventEmitter.call(this);
 
-	this._routeViewImplementation = routeViewImplementation;
-	this._route = route;
+	var members = {};
+	membersMap.set(this, members);
 
-	this._bindToEventStream();
+	members.routeViewImplementation = routeViewImplementation;
+	members.route = route;
+
+	_bindToEventStream(routeViewImplementation, this);
 };
 
 RouteView.prototype = Object.create(EventEmitter.prototype);
@@ -30,7 +36,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	 * @return {string}
 	 */
 	getName: function(){
-		return this._routeViewImplementation.getName();
+		return membersMap.get(this).routeViewImplementation.getName();
 	},
 
 	/**
@@ -38,7 +44,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	 * @return {stringp[]}
 	 */
 	getParams: function(){
-		return this._routeViewImplementation.getParams();
+		return membersMap.get(this).routeViewImplementation.getParams();
 	},
 
 	/**
@@ -46,12 +52,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	 * @return {Boolean}
 	 */
 	isCustomRoute: function(){
-		return this._routeViewImplementation.isCustomView();
-	},
-
-	/* deprecated */
-	isCustomView: function(){
-		return this.isCustomRoute();
+		return membersMap.get(this).routeViewImplementation.isCustomRoute();
 	},
 
 	/**
@@ -59,13 +60,11 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	* @return {HTMLElement}
 	*/
 	getElement: function(){
-		return this._routeViewImplementation.getCustomViewElement();
+		return membersMap.get(this).routeViewImplementation.getCustomViewElement();
 	},
 
-
-
-	_bindToEventStream: function(){
-		this._routeViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+	destroy: function(){
+		membersMap.delete(this);
 	}
 
 	/**
@@ -74,5 +73,10 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	*/
 
 });
+
+
+function _bindToEventStream(routeViewImplementation, routeView){
+	routeViewImplementation.getEventStream().onEnd(routeView, 'emit', 'unload');
+}
 
 module.exports = RouteView;
