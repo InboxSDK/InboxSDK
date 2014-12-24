@@ -5,7 +5,10 @@ var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element
 var eventNameFilter = require('../../../lib/event-name-filter');
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 
+var GmailElementGetter = require('../gmail-element-getter');
+
 var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
+
 
 var NativeGmailNavItemView = function(nativeElement){
 	NavItemViewDriver.call(this);
@@ -78,8 +81,8 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_monitorElementForActiveChanges: function(){
-		var self = this;
-		var classChangeStream = makeMutationObserverStream(this._element, {attributes: true, attributeFilter: ['class']});
+		var element = this._element;
+		var classChangeStream = makeMutationObserverStream(element, {attributes: true, attributeFilter: ['class']});
 
 		classChangeStream
 			.filter(function(mutation){
@@ -95,6 +98,19 @@ _.extend(NativeGmailNavItemView.prototype, {
 			.takeUntil(this._eventStream.filter(false).mapEnd())
 			.onValue(this, '_removeActiveMarkerElement');
 
+
+		makeMutationObserverStream(element.parentElement, {childList: true})
+					.takeUntil(this._eventStream.filter(false).mapEnd())
+					.flatMap(function(mutations){
+						return Bacon.fromArray(mutations);
+					})
+					.flatMap(function(mutation){
+						return Bacon.fromArray(_.toArray(mutation.removedNodes));
+					})
+					.filter(function(removedNode){
+						return removedNode === element;
+					})
+					.onValue(this._eventStream, 'push', {eventName: 'invalidated'});
 	},
 
 	_addNavItemElement: function(gmailNavItemView){

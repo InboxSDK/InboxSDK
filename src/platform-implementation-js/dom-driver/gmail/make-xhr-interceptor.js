@@ -42,7 +42,9 @@ function makeXhrInterceptor() {
         draft: body.draft,
         response: response
       };
-    })
+    }),
+    //search
+    rawInterceptStream.filter({type: 'sendingSearchRequest'})
   );
 
   var threadMetadataOracle = {

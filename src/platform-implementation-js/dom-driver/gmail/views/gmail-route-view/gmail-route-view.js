@@ -4,25 +4,28 @@ var Bacon = require('baconjs');
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
 
-var FullscreenViewDriver = require('../../../../driver-interfaces/route-view-driver');
+var RouteViewDriver = require('../../../../driver-interfaces/route-view-driver');
 
 var GmailRowListView = require('../gmail-row-list-view');
 var GmailThreadView = require('../gmail-thread-view');
 
+var GmailResultsSectionView = require('../gmail-results-section-view');
 
 var GmailElementGetter = require('../../gmail-element-getter');
+var GmailRouteNames = require('./gmail-route-names');
+
 
 var GmailRouteView = function(options){
-	FullscreenViewDriver.call(this);
+	RouteViewDriver.call(this);
 
 	this._hash = options.hash;
 	this._name = options.name;
-	this._params = options.params;
-	this._isCustomView = options.isCustomView;
+	this._params = options.params || [];
+	this._isCustomRoute = options.isCustomRoute;
 
 	this._eventStream = new Bacon.Bus();
 
-	if(this._isCustomView){
+	if(this._isCustomRoute){
 		this._setupCustomViewElement();
 	}
 	else{
@@ -30,7 +33,7 @@ var GmailRouteView = function(options){
 	}
 };
 
-GmailRouteView.prototype = Object.create(FullscreenViewDriver.prototype);
+GmailRouteView.prototype = Object.create(RouteViewDriver.prototype);
 
 _.extend(GmailRouteView.prototype, {
 
@@ -38,19 +41,27 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_name', get: true, destroy: false},
 		{name: '_params', get: true, destroy: false},
 		{name: '_hash', get: true, destroy: false},
-		{name: '_isCustomView', destroy: true},
+		{name: '_isCustomRoute', destroy: true},
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
-		{name: '_messageView', destroy: true, get: true},
-		{name: '_threadSidebarView', destroy: true, get: true},
-		{name: '_messageSidebarView', destroy: true, get: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'}
 	],
 
-	isCustomView: function(){
-		return this._isCustomView;
+	isCustomRoute: function(){
+		return this._isCustomRoute;
+	},
+
+	isSearchResultsView: function(){
+		return this._threadView === null && GmailRouteNames.GMAIL_SEARCH_RESULT_ROUTE_NAMES.indexOf(this._name) > -1;
+	},
+
+	addResultsSection: function(resultsDescriptor){
+		var gmailResultsSectionView = new GmailResultsSectionView(resultsDescriptor);
+		GmailElementGetter.getCurrentMainContentElement().insertAdjacentElement('beforeBegin', gmailResultsSectionView.getElement());
+
+		return gmailResultsSectionView;
 	},
 
 	_setupCustomViewElement: function(){

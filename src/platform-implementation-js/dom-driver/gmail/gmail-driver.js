@@ -40,7 +40,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	getNativeRouteNames: function(){
-		return require('./views/gmail-route-view/gmail-route-names').GMAIL_VIEWS;
+		return require('./views/gmail-route-view/gmail-route-names').GMAIL_ROUTE_NAMES;
 	},
 
 	createLink: function(viewName, params){

@@ -13,7 +13,7 @@ _.extend(RouteViewDriver.prototype, {
 
 	getParams: null,
 
-	isCustomView: null,
+	isCustomRoute: null,
 
 	getCustomViewElement: null,
 

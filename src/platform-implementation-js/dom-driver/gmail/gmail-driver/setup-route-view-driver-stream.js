@@ -31,13 +31,22 @@ function setupRouteViewDriverStream(){
 				return;
 			}
 
-			_handleNewUrl(routeViewDriverStream, location.href);
 
+			var shouldHandleNewUrl = false;
 			mutations.forEach(function(mutation){
 				Array.prototype.forEach.call(mutation.addedNodes, function(element){
+					if(!element.classList.contains('nH')){
+						return;
+					}
+
+					shouldHandleNewUrl = true;
 					_observeVisibilityChangeOnMainElement(routeViewDriverStream, element);
 				});
 			});
+
+			if(shouldHandleNewUrl){
+				_handleNewUrl(routeViewDriverStream, location.href);
+			}
 		});
 
 		mainContentObserver.observe(
@@ -57,12 +66,12 @@ function _checkForCustomRoute(routeViewDriverStream, event){
 		return;
 	}
 
-	if(_isGmailView(urlObject.name) && _isGmailView(currentUrlObject.name)){
+	if(_isGmailRoute(urlObject.name) && _isGmailRoute(currentUrlObject.name)){
 		return;
 	}
 
 	currentUrlObject = urlObject;
-	_createRouteViewDriver(routeViewDriverStream, urlObject, _isGmailView(urlObject.name));
+	_createRouteViewDriver(routeViewDriverStream, urlObject, _isGmailRoute(urlObject.name));
 }
 
 function _observeVisibilityChangeOnMainElement(routeViewDriverStream, element){
@@ -86,17 +95,17 @@ function _handleNewUrl(routeViewDriverStream, newUrl){
 	var urlObject = getURLObject(newUrl);
 	currentUrlObject = urlObject;
 
-	if(!_isGmailView(urlObject.name)){
+	if(!_isGmailRoute(urlObject.name)){
 		_createRouteViewDriver(routeViewDriverStream, urlObject, false);
 		return;
 	}
 
-	if(!_isThreadListView(urlObject.name)){
+	if(!_isThreadListRoute(urlObject.name)){
 		_createRouteViewDriver(routeViewDriverStream, urlObject, true);
 		return;
 	}
 
-	if(_isThreadView(urlObject)){
+	if(_isThreadRoute(urlObject)){
 		_createThreadRouteViewDriver(routeViewDriverStream, urlObject);
 		return;
 	}
@@ -104,15 +113,15 @@ function _handleNewUrl(routeViewDriverStream, newUrl){
 	_createRouteViewDriver(routeViewDriverStream, urlObject, true);
 }
 
-function _isGmailView(viewName){
-	return GmailViewNames.GMAIL_VIEWS.indexOf(viewName) > -1;
+function _isGmailRoute(viewName){
+	return GmailViewNames.GMAIL_ROUTE_NAMES.indexOf(viewName) > -1;
 }
 
-function _isThreadListView(viewName){
-	return GmailViewNames.GMAIL_THREAD_LIST_VIEWS.indexOf(viewName) > -1;
+function _isThreadListRoute(viewName){
+	return GmailViewNames.GMAIL_THREAD_LIST_ROUTE_NAMES.indexOf(viewName) > -1;
 }
 
-function _isThreadView(urlObject){
+function _isThreadRoute(urlObject){
 	return GmailElementGetter.getRowListElements().length === 0 || _doesUrlContainThreadId(urlObject);
 }
 
@@ -147,9 +156,9 @@ function _createThreadRouteViewDriver(routeViewDriverStream, urlObject){
 }
 
 
-function _createRouteViewDriver(routeViewDriverStream, urlObject, isGmailView){
+function _createRouteViewDriver(routeViewDriverStream, urlObject, isGmailRoute){
 	var options = _.clone(urlObject);
-	options.isCustomView = !isGmailView;
+	options.isCustomRoute = !isGmailRoute;
 
 	var routeViewDriver = new GmailRouteView(options);
 

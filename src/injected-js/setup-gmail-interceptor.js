@@ -12,6 +12,7 @@ function setupGmailInterceptor() {
   var XHRProxy = XHRProxyFactory(originalXHR, wrappers);
   win.XMLHttpRequest = XHRProxy;
 
+  //email sending notifier
   wrappers.push({
     isRelevantTo: function(connection) {
       return connection.params.act === 'sm';
@@ -50,6 +51,21 @@ function setupGmailInterceptor() {
 
         threadIdentifier.processThreadListResponse(responseText);
       }
+    }
+  });
+
+  /*
+    Search
+   */
+  wrappers.push({
+    isRelevantTo: function(connection) {
+      return connection.params.search && connection.params.view === 'tl';
+    },
+    originalSendBodyLogger: function(connection, body) {
+      triggerEvent({
+        type: 'sendingSearchRequest',
+        searchTerm: connection.params.q
+      });
     }
   });
 }
