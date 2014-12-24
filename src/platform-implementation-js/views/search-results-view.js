@@ -9,6 +9,9 @@ var Map = require('es6-unweak-collections').Map;
 var membersMap = new Map();
 
 
+/**
+ * This class represents a search results page
+ */
 var SearchResultsView = function(searchTerm, router){
 	EventEmitter.call(this);
 
@@ -25,12 +28,18 @@ SearchResultsView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(SearchResultsView.prototype, {
 
-	addResultsSection: function(resultsDescriptor){
+	/**
+	 * Adds a collapsible results section to the result page. If no results are specified then "loading" is shown in the section by default.
+	 * You can then set the actual results by calling setResults on the returned {ResultsSectionView} object.
+	 * @param {ResultsSectionDescriptor}
+	 * @returns {ResultsSectionView}
+	 */
+	addResultsSection: function(resultsSectionDescriptor){
 		var members = membersMap.get(this);
 		var resultsSectionView = new ResultsSectionView(members.router);
 
 		members.deferred.promise.then(function(routeViewDriver){
-			var resultsSectionViewDriver = routeViewDriver.addResultsSection(resultsDescriptor);
+			var resultsSectionViewDriver = routeViewDriver.addResultsSection(resultsSectionDescriptor);
 			resultsSectionView.setResultsSectionViewDriver(resultsSectionViewDriver);
 		});
 
@@ -61,6 +70,34 @@ _.extend(SearchResultsView.prototype, {
 		membersMap.delete(this);
 	}
 
+
+	/**
+	 * Fires an unload event when the view is no longer valid
+	 */
+
 });
+
+
+var ResultsSectionDescriptor = /** @lends ResultsSectionDescriptor */ {
+
+/**
+ * The name of the section
+ * @type {string}
+ */
+sectionName: null,
+
+/**
+ * Boolean whether or not to start the section collapsed or expanded
+ * @type {Boolean}
+ */
+startCollapsed: null,
+
+/**
+ * The results to display
+ * @type {[ResultDescriptor] or a Promise}
+ */
+results: null
+
+};
 
 module.exports = SearchResultsView;

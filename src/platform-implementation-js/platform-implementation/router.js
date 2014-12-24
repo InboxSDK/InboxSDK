@@ -38,7 +38,9 @@ var Router = function(appId, driver){
 
 	driver
 		.getXhrInterceptorStream()
-		.filter({type: 'sendingSearchRequest'})
+		.filter(function(event){
+			return event.type === 'sendingSearchRequest';
+		})
 		.map('.searchTerm')
 		.onValue(_handleSearchRequest, this, members);
 };
@@ -233,7 +235,12 @@ function _removeNativeNavItemActive(members){
 	}
 
 	members.modifiedNativeNavItem.setActive(false);
-	members.modifiedNativeNavItem.getEventStream().filter({eventName: 'invalidated'}).onValue(_removeNativeNavItemActive, members);
+	members.modifiedNativeNavItem
+		.getEventStream()
+		.filter(function(event){
+			return event.eventName === 'invalidated';
+		})
+		.onValue(_removeNativeNavItemActive, members);
 }
 
 function _restoreNativeNavItemActive(members){

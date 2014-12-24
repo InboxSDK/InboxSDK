@@ -44,7 +44,9 @@ function makeXhrInterceptor() {
       };
     }),
     //search
-    rawInterceptStream.filter({type: 'sendingSearchRequest'})
+    rawInterceptStream.filter(function(detail){
+      return detail.type === 'sendingSearchRequest';
+    })
   );
 
   var threadMetadataOracle = {

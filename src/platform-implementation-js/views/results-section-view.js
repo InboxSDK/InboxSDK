@@ -6,6 +6,9 @@ var EventEmitter = require('events').EventEmitter;
 var Map = require('es6-unweak-collections').Map;
 var membersMap = new Map();
 
+/**
+ * This class represents a result section.
+ */
 var ResultsSectionView = function(router){
 	EventEmitter.call(this);
 
@@ -21,14 +24,18 @@ ResultsSectionView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(ResultsSectionView.prototype, {
 
-	setResultsSectionViewDriver: function(resultsSectionViewDriver){
-		membersMap.get(this).deferred.resolve(resultsSectionViewDriver);
-	},
-
+	/**
+	 * Set the results for this section
+	 * @param {[ResultDescriptor]}
+	 */
 	setResults: function(resultsArray){
 		membersMap.get(this).deferred.promise.then(function(resultsSectionViewDriver){
 			resultsSectionViewDriver.setResults(resultsArray);
 		});
+	},
+
+	setResultsSectionViewDriver: function(resultsSectionViewDriver){
+		membersMap.get(this).deferred.resolve(resultsSectionViewDriver);
 	},
 
 	destroy: function(){
@@ -38,10 +45,81 @@ _.extend(ResultsSectionView.prototype, {
 			resultsSectionViewDriver.destroy();
 		});
 
+		this.emit('unoad');
+
 		membersMap.delete(this);
 	}
 
+	/**
+	 * Fires unload event when no longer valid
+	 */
+
 });
+
+var ResultDescriptor = /** @lends ResultDescriptor */ {
+
+/**
+ * An optional url to an icon to display an icon alongside the name of the NavItem
+ * ^optional
+ * ^default=null
+ * @type {string}
+ */
+iconUrl: null,
+
+/**
+ * An optional class to apply to the icon
+ * ^optional
+ * ^default=null
+ * @type {string}
+ */
+iconClass: null,
+
+
+/**
+ * Bolded text, first textual column
+ * @type {string}
+ */
+title: null,
+
+/**
+ * unbolded text, 2nd textual column
+ * @type {string}
+ */
+body: null,
+
+/**
+ * Last text right-aligned. Often used for dates.
+ * @type {string}
+ */
+extraText: null,
+
+
+/**
+ * The name of the route to navigate to when the result is clicked on
+ * ^optional
+ * ^default=null
+ * @type {string}
+ */
+routeName: null,
+
+/**
+ * The parameters of the route being navigated to when the result is clicked on
+ * ^optional
+ * ^default=null
+ * @type {string[]}
+ */
+routeParams: null,
+
+
+/**
+ * Callback for when the result is clicked on
+ * ^optional
+ * ^default=null
+ * @type {function}
+ */
+onClick: null
+
+};
 
 
 function _bindToEventStream(resultsSectionView, router){
@@ -53,7 +131,9 @@ function _bindToEventStream(resultsSectionView, router){
 
 		resultsSectionViewDriver
 			.getEventStream()
-			.filter({eventName: 'rowClicked'})
+			.filter(function(event){
+				return event.eventName === 'rowClicked';
+			})
 			.map('.resultDescriptor')
 			.onValue(function(resultDescriptor){
 				if(resultDescriptor.routeName){

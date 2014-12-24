@@ -64,7 +64,7 @@ _.extend(GmailResultsSectionView.prototype, {
 
 		this._titleElement = document.createElement('div');
 		this._titleElement.setAttribute('class', 'Wc inboxsdk__resultsSection_title');
-		this._titleElement.innerHTML = '<span class="Wp"></span><h3 class="Wd">' + this._resultsDescriptor.name + '</h3>';
+		this._titleElement.innerHTML = '<span class="Wp"></span><h3 class="Wd">' + this._resultsDescriptor.sectionName + '</h3>';
 		this._element.appendChild(this._titleElement);
 
 		this._bodyElement = document.createElement('div');

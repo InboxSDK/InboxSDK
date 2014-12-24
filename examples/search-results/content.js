@@ -3,7 +3,7 @@ InboxSDK.newApp('search-example', '1').then(function(inboxSDK){
 	inboxSDK.Router.registerSearchViewHandler(function(searchResultsView){
 
 		var section = searchResultsView.addResultsSection({
-			name: 'Monkeys'
+			sectionName: 'Monkeys'
 		});
 
 		setTimeout(function(){
