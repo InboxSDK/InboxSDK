@@ -81,6 +81,29 @@ InboxSDK.newApp = function(appId, opts){
   return loadPromise;
 };
 
+InboxSDK.load = function(version, appId, opts){
+  opts = _.extend({
+    // defaults
+    globalErrorLogging: true
+  }, opts, {
+    // stuff that can't be overridden, such as extra stuff this file passes to
+    // the implementation script.
+    VERSION: InboxSDK.LOADER_VERSION
+  });
+
+  checkRequirements(opts);
+
+  var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
+  var loadPromise = platformImplementationLoader.load().then(function(Imp) {
+    InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
+    return Imp;
+  });
+  loadPromise.catch(function(err) {
+    console.error("Failed to load implementation:", err);
+  });
+  return loadPromise;
+};
+
 InboxSDK.LOADER_VERSION = InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
 InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
 
