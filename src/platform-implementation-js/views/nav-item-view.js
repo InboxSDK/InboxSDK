@@ -101,7 +101,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, p
 			}
 
 			if(navItemDescriptor.routeName){
-				driver.gotoView(navItemDescriptor.routeName, navItemDescriptor.routeParams);
+				driver.goto(navItemDescriptor.routeName, navItemDescriptor.routeParams);
 			}
 			else{
 				navItemViewDriver.toggleCollapse();

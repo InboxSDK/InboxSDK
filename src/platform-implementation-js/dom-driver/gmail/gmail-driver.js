@@ -44,12 +44,12 @@ _.extend(GmailDriver.prototype, {
 		return require('./views/gmail-route-view/gmail-route-names').GMAIL_ROUTE_NAMES;
 	},
 
-	createLink: function(viewName, params){
-		return require('./gmail-driver/create-link')(this, viewName, params);
+	createLink: function(routeName, params){
+		return require('./gmail-driver/create-link')(this, routeName, params);
 	},
 
-	gotoView: function(viewName, params){
-		return require('./gmail-driver/goto-view')(this, viewName, params);
+	goto: function(routeName, params){
+		return require('./gmail-driver/goto-view')(this, routeName, params);
 	},
 
 	openComposeWindow: function(){

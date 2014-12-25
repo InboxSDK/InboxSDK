@@ -23,8 +23,8 @@ _.extend(Route.prototype, {
 		return this._driver.createLink(this._name, params);
 	},
 
-	gotoView: function(params){
-		this._driver.gotoView(this._name, params);
+	goto: function(params){
+		this._driver.goto(this._name, params);
 	},
 
 	isCustomRoute: function(){

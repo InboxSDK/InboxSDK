@@ -16,7 +16,7 @@ _.extend(Driver.prototype, {
 
 	createLink: null,
 
-	gotoView: null,
+	goto: null,
 
 	addNavItem: null,
 

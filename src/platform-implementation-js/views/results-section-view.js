@@ -9,7 +9,7 @@ var membersMap = new Map();
 /**
  * This class represents a result section.
  */
-var ResultsSectionView = function(router){
+var ResultsSectionView = function(driver){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -17,7 +17,7 @@ var ResultsSectionView = function(router){
 
 	members.deferred = RSVP.defer();
 
-	members.deferred.promise.then(_bindToEventStream(this, router));
+	members.deferred.promise.then(_bindToEventStream(this, driver));
 };
 
 ResultsSectionView.prototype = Object.create(EventEmitter.prototype);
@@ -144,7 +144,7 @@ onClick: null
 };
 
 
-function _bindToEventStream(resultsSectionView, router){
+function _bindToEventStream(resultsSectionView, driver){
 	return function(resultsSectionViewDriver){
 		resultsSectionViewDriver
 			.getEventStream()
@@ -159,7 +159,7 @@ function _bindToEventStream(resultsSectionView, router){
 			.map('.resultDescriptor')
 			.onValue(function(resultDescriptor){
 				if(resultDescriptor.routeName){
-					router.goto(resultDescriptor.routeName, resultDescriptor.routeParams);
+					driver.goto(resultDescriptor.routeName, resultDescriptor.routeParams);
 				}
 
 				if(_.isFunction(resultDescriptor.onClick)){

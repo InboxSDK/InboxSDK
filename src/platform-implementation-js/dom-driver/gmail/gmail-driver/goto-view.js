@@ -1,6 +1,6 @@
 var getURLObject = require('./get-url-object');
 
-function gotoView(gmailDriver, viewName, params){
+module.exports = function(gmailDriver, viewName, params){
 
 	var newURL = gmailDriver.createLink(viewName, params);
 	var currentURLObject = getURLObject(location.href);
@@ -10,6 +10,5 @@ function gotoView(gmailDriver, viewName, params){
 	}
 
 	location.hash = newURL.split('#')[1];
-}
+};
 
-module.exports = gotoView;

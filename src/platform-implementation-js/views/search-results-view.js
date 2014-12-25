@@ -12,13 +12,13 @@ var membersMap = new Map();
 /**
  * This class represents a search results page
  */
-var SearchResultsView = function(searchTerm, router, appId){
+var SearchResultsView = function(searchTerm, driver, appId){
 	EventEmitter.call(this);
 
 	var members = {};
 	membersMap.set(this, members);
 
-	members.router = router;
+	members.driver = driver;
 	members.appId = appId;
 	members.searchTerm = searchTerm;
 	members.deferred = RSVP.defer();
@@ -37,7 +37,7 @@ _.extend(SearchResultsView.prototype, {
 	 */
 	addResultsSection: function(resultsSectionDescriptor){
 		var members = membersMap.get(this);
-		var resultsSectionView = new ResultsSectionView(members.router);
+		var resultsSectionView = new ResultsSectionView(members.driver);
 
 		members.deferred.promise.then(function(routeViewDriver){
 			var resultsSectionViewDriver = routeViewDriver.addResultsSection(resultsSectionDescriptor, members.appId);

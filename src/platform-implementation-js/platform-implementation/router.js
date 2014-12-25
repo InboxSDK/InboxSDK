@@ -23,7 +23,6 @@ var Router = function(appId, driver){
 	members.currentRouteViewDriver = null;
 	members.currentRouteView = null;
 	members.handlerRegistry = new HandlerRegistry();
-	members.searchViewHandlerRegistry = new HandlerRegistry();
 
 	members.routes = [];
 	members.customRoutes = [];
@@ -31,18 +30,8 @@ var Router = function(appId, driver){
 	members.lastNativeRouteName = null;
 	members.modifiedNativeNavItem = null;
 
-	members.pendingSearchResultsView = null;
-
 	_setupNativeRoutes(members);
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
-
-	driver
-		.getXhrInterceptorStream()
-		.filter(function(event){
-			return event.type === 'sendingSearchRequest';
-		})
-		.map('.searchTerm')
-		.onValue(_handleSearchRequest, this, members);
 };
 
 
@@ -53,7 +42,7 @@ _.extend(Router.prototype,  {
 	},
 
 	goto: function(name, paramArray){
-		memberMap.get(this).driver.gotoView(name, paramArray);
+		memberMap.get(this).driver.goto(name, paramArray);
 	},
 
 	createNewRoute: function(routerDescription){
@@ -71,10 +60,6 @@ _.extend(Router.prototype,  {
 
 	registerRouteViewHandler: function(handler){
 		return memberMap.get(this).handlerRegistry.registerHandler(handler);
-	},
-
-	registerSearchViewHandler: function(handler){
-		return memberMap.get(this).searchViewHandlerRegistry.registerHandler(handler);
 	}
 
 });
@@ -95,21 +80,6 @@ function _setupNativeRoutes(members){
 }
 
 
-function _handleSearchRequest(router, members, searchTerm){
-	if(_isSearchRefresh(members.currentRouteViewDriver, searchTerm)){
-		return;
-	}
-
-	if(members.pendingSearchResultsView){
-		members.pendingSearchResultsView.destroy();
-	}
-
-	members.pendingSearchResultsView = new SearchResultsView(searchTerm, router, members.appId);
-}
-
-function _isSearchRefresh(routeViewDriver, searchTerm){
-	return routeViewDriver && routeViewDriver.getParams()[0] === searchTerm;
-}
 
 function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
@@ -127,53 +97,13 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	});
 
 	if(!route){
-		members.pendingSearchResultsView = null;
 		routeViewDriver.destroy();
 		return;
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
 
-	if(_isCachedSearchView(members, routeViewDriver, route)){
-		members.pendingSearchResultsView = new SearchResultsView(routeViewDriver.getParams()[0], router, members.appId);
-		_completePendingSearchResultsView(members, routeViewDriver, route);
-	}
-	else if(_isPendingSearchResultsViewRelevant(members.pendingSearchResultsView, routeViewDriver)){
-		_completePendingSearchResultsView(members, routeViewDriver, route);
-	}
-	else{
-		_completeRegularRouteView(members, routeViewDriver, route);
-	}
-
-	members.pendingSearchResultsView = null;
-}
-
-function _isCachedSearchView(members, routeViewDriver){
-	return routeViewDriver.isSearchResultsView() && !members.pendingSearchResultsView;
-}
-
-function _isPendingSearchResultsViewRelevant(pendingSearchResultsView, routeViewDriver){
-	if(!pendingSearchResultsView){
-		return false;
-	}
-
-	return pendingSearchResultsView.getSearchTerm() === routeViewDriver.getParams()[0];
-}
-
-function _completePendingSearchResultsView(members, routeViewDriver){
-	members.pendingSearchResultsView.setRouteViewDriver(routeViewDriver);
-	members.driver.showNativeRouteView();
-	members.searchViewHandlerRegistry.addTarget(members.pendingSearchResultsView);
-
-	members.currentRouteView = members.pendingSearchResultsView;
-}
-
-function _completeRegularRouteView(members, routeViewDriver, route){
 	var routeView = new RouteView(routeViewDriver, route);
-
-	if(members.pendingSearchResultsView){
-		members.pendingSearchResultsView.destroy();
-	}
 
 	if(route.isCustomRoute()){
 		members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
@@ -186,6 +116,7 @@ function _completeRegularRouteView(members, routeViewDriver, route){
 	members.handlerRegistry.addTarget(routeView);
 	members.currentRouteView = routeView;
 }
+
 
 function _informRelevantCustomRoutes(customRoutes, routeView){
 	customRoutes

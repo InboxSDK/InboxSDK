@@ -4,6 +4,7 @@ var Conversations = require('./platform-implementation/conversations');
 var Email = require('./platform-implementation/email');
 var Modal = require('./platform-implementation/modal');
 var Router = require('./platform-implementation/router');
+var Search = require('./platform-implementation/search');
 var Mailbox = require('./platform-implementation/mailbox');
 var NavMenu = require('./platform-implementation/nav-menu');
 var Toolbars = require('./platform-implementation/toolbars');
@@ -32,6 +33,7 @@ var PlatformImplementation = function(appId, opts){
 	this.Mailbox = new Mailbox(appId, this._driver, this);
 	this.NavMenu = new NavMenu(appId, this._driver);
 	this.Router = new Router(appId, this._driver);
+	this.Search = new Search(appId, this._driver);
 	this.Toolbars = new Toolbars(appId, this._driver, this);
 	this.Modal = new Modal(appId, this._driver);
 
