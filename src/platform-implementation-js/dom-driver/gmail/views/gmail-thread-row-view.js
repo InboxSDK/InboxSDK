@@ -72,7 +72,7 @@ _.extend(GmailThreadRowView.prototype, {
       } else {
         var stepTime = time.shift();
         if (stepTime == undefined) {
-          console.log('ThreadRowViewDriver never became ready', self);
+          //console.log('ThreadRowViewDriver never became ready', self);
           return Bacon.never();
         } else {
           return Bacon.later(stepTime).flatMap(step);
