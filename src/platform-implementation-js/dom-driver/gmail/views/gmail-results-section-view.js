@@ -3,13 +3,13 @@ var Bacon = require('baconjs');
 
 var BasicClass = require('../../../lib/basic-class');
 
-var GmailResultsSectionView = function(resultsDescriptor){
+var GmailResultsSectionView = function(resultsDescriptor, groupOrderHint){
 	BasicClass.call(this);
 
 	this._resultsDescriptor = resultsDescriptor;
 	this._eventStream = new Bacon.Bus();
 
-	this._setupElement();
+	this._setupElement(groupOrderHint);
 	if(resultsDescriptor.startCollapsed){
 		this._collapse();
 	}
@@ -58,9 +58,11 @@ _.extend(GmailResultsSectionView.prototype, {
 		this._setResults(resultArray);
 	},
 
-	_setupElement: function(){
+	_setupElement: function(groupOrderHint){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'inboxsdk__resultsSection');
+		this._element.setAttribute('data-group-order-hint', groupOrderHint);
+		this._element.setAttribute('data-order-hint', _.isNumber(this._resultsDescriptor.orderHint) ? this._resultsDescriptor.orderHint : 0);
 
 		this._titleElement = document.createElement('div');
 		this._titleElement.setAttribute('class', 'Wc inboxsdk__resultsSection_title');
@@ -85,11 +87,6 @@ _.extend(GmailResultsSectionView.prototype, {
 	_setResults: function(resultArray){
 		this._bodyElement.innerHTML = '';
 
-		if(this._messageDiv){
-			this._messageDiv.remove();
-			this._messageDiv = null;
-		}
-
 		if(!resultArray || resultArray.length === 0){
 			this._showEmpty();
 			return;
@@ -99,9 +96,10 @@ _.extend(GmailResultsSectionView.prototype, {
 	},
 
 	_showEmpty: function(){
-		this._messageDiv.innerHTML = 'No results found'; //TODO: localize
-		this._messageDiv.classList.remove('inboxsdk__resultsSection_loading');
+		this._messageDiv = document.createElement('div');
+		this._messageDiv.setAttribute('class', 'TB TC');
 
+		this._messageDiv.innerHTML = 'No results found'; //TODO: localize
 		this._bodyElement.appendChild(this._messageDiv);
 	},
 

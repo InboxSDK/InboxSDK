@@ -4,6 +4,7 @@ var Bacon = require('baconjs');
 
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
+var getInsertBeforeElement = require('../../../../lib/dom/get-insert-before-element');
 
 var RouteViewDriver = require('../../../../driver-interfaces/route-view-driver');
 
@@ -58,9 +59,21 @@ _.extend(GmailRouteView.prototype, {
 		return this._threadView === null && GmailRouteNames.GMAIL_SEARCH_RESULT_ROUTE_NAMES.indexOf(this._name) > -1;
 	},
 
-	addResultsSection: function(resultsDescriptor){
-		var gmailResultsSectionView = new GmailResultsSectionView(resultsDescriptor);
-		GmailElementGetter.getCurrentMainContentElement().insertAdjacentElement('beforeBegin', gmailResultsSectionView.getElement());
+	addResultsSection: function(resultsDescriptor, groupOrderHint){
+		var gmailResultsSectionView = new GmailResultsSectionView(resultsDescriptor, groupOrderHint);
+
+		var children = Array.prototype.filter.call(GmailElementGetter.getCurrentMainContentElement().parentElement.children, function(element){
+			return !element.classList.contains('nH');
+		});
+
+		var insertBeforeElement = getInsertBeforeElement(gmailResultsSectionView.getElement(), children, ['data-group-order-hint', 'data-order-hint']);
+		if(insertBeforeElement){
+			GmailElementGetter.getCurrentMainContentElement().parentElement.insertBefore(gmailResultsSectionView.getElement(), insertBeforeElement);
+		}
+		else{
+			GmailElementGetter.getCurrentMainContentElement().insertAdjacentElement('beforeBegin', gmailResultsSectionView.getElement());
+		}
+
 
 		return gmailResultsSectionView;
 	},

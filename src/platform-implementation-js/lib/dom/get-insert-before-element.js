@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Bacon = require('baconjs');
 
 module.exports = function(checkElement, childElements, dataAttributes){
@@ -6,7 +7,7 @@ module.exports = function(checkElement, childElements, dataAttributes){
 
 	dataAttributes.forEach(function(attribute){
 		var value = checkElement.getAttribute(attribute);
-		checkValues[attribute] = isNumber(value) ? parseFloat(value) : value;
+		checkValues[attribute] = _.isNumber(value) ? parseFloat(value) : value;
 	});
 
 	for(var ii=0; ii<childElements.length; ii++){
@@ -27,7 +28,7 @@ function _isChildAfter(checkValues, child, dataAttributes){
 		var attribute = dataAttributes[ii];
 		var value = child.getAttribute(attribute);
 
-		value = isNumber(value) ? parseFloat(value) : value;
+		value = _.isNumber(value) ? parseFloat(value) : value;
 
 		if(value > checkValues[attribute]){
 			return true;

@@ -29,16 +29,28 @@ _.extend(ResultsSectionView.prototype, {
 	 * @param {[ResultDescriptor]}
 	 */
 	setResults: function(resultsArray){
+		if(!membersMap.has(this)){
+			return;
+		}
+
 		membersMap.get(this).deferred.promise.then(function(resultsSectionViewDriver){
 			resultsSectionViewDriver.setResults(resultsArray);
 		});
 	},
 
 	setResultsSectionViewDriver: function(resultsSectionViewDriver){
+		if(!membersMap.has(this)){
+			return;
+		}
+
 		membersMap.get(this).deferred.resolve(resultsSectionViewDriver);
 	},
 
 	destroy: function(){
+		if(!membersMap.has(this)){
+			return;
+		}
+
 		var members = membersMap.get(this);
 
 		members.deferred.promise.then(function(resultsSectionViewDriver){
@@ -47,11 +59,21 @@ _.extend(ResultsSectionView.prototype, {
 
 		this.emit('unoad');
 
+		this.removeAllListeners();
+
 		membersMap.delete(this);
 	}
 
 	/**
-	 * Fires unload event when no longer valid
+	 * Fires "unload" event when no longer valid
+	 */
+
+	/**
+	 * Fires "expanded" event when section is expanded
+	 */
+
+	/**
+	 * Fires "collapsed" event when section is collapsed
 	 */
 
 });

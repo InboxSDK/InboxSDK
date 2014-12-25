@@ -104,7 +104,7 @@ function _handleSearchRequest(router, members, searchTerm){
 		members.pendingSearchResultsView.destroy();
 	}
 
-	members.pendingSearchResultsView = new SearchResultsView(searchTerm, router);
+	members.pendingSearchResultsView = new SearchResultsView(searchTerm, router, members.appId);
 }
 
 function _isSearchRefresh(routeViewDriver, searchTerm){
@@ -135,7 +135,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.currentRouteViewDriver = routeViewDriver;
 
 	if(_isCachedSearchView(members, routeViewDriver, route)){
-		members.pendingSearchResultsView = new SearchResultsView(routeViewDriver.getParams()[0], router);
+		members.pendingSearchResultsView = new SearchResultsView(routeViewDriver.getParams()[0], router, members.appId);
 		_completePendingSearchResultsView(members, routeViewDriver, route);
 	}
 	else if(_isPendingSearchResultsViewRelevant(members.pendingSearchResultsView, routeViewDriver)){
