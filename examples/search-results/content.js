@@ -1,6 +1,6 @@
-InboxSDK.newApp('search-example', '1').then(function(inboxSDK){
+InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 
-	inboxSDK.Router.registerSearchViewHandler(function(searchResultsView){
+	inboxSDK.Search.registerSearchResultsViewHandler(function(searchResultsView){
 
 		var section = searchResultsView.addResultsSection({
 			sectionName: 'Monkeys'
