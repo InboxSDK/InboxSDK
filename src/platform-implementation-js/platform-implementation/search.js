@@ -59,7 +59,7 @@ function _handleSearchRequest(members, searchTerm){
 }
 
 function _isSearchRefresh(routeViewDriver, searchTerm){
-	return routeViewDriver && routeViewDriver.getParams()[0] === searchTerm;
+	return routeViewDriver && routeViewDriver.getParams() && routeViewDriver.getParams()[0] === searchTerm;
 }
 
 function _handleRouteViewChange(members, routeViewDriver){

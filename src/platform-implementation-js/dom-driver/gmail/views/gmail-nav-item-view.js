@@ -107,10 +107,10 @@ _.extend(GmailNavItemView.prototype, {
 		}
 
 		if(value){
-			this._expand();
+			this._collapse();
 		}
 		else{
-			this._collapse();
+			this._expand();
 		}
 	},
 
@@ -250,7 +250,8 @@ _.extend(GmailNavItemView.prototype, {
 		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
 
-		this._accessoryViewController = new DropdownButtonViewController(buttonOptions);
+		var accessoryViewController = new DropdownButtonViewController(buttonOptions);
+		this._accessoryViewController = accessoryViewController;
 
 		var innerElement = this._element.querySelector('.TO');
 		innerElement.addEventListener('mouseenter', function(){
@@ -262,6 +263,27 @@ _.extend(GmailNavItemView.prototype, {
 		});
 
 		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
+
+		var self = this;
+
+		Bacon
+			.fromEventTarget(this._element, 'contextmenu')
+			.takeWhile(function(){
+				return self._accessoryViewController === accessoryViewController;
+			})
+			.filter(function(domEvent){
+				if(domEvent.target === self._element){
+					return true;
+				}
+
+				var navItems = _.filter(domEvent.path, function(el){return el.classList && el.classList.contains('inboxsdk__navItem');});
+				return navItems[0] === self._element;
+			})
+			.onValue(function(domEvent){
+				domEvent.preventDefault();
+
+				accessoryViewController.showDropdown();
+			});
 	},
 
 	_updateOrder: function(navItemDescriptor){
