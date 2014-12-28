@@ -1,4 +1,4 @@
-var inboxSDK = new InboxSDK('custom-view');
+InboxSDK.load(1.0, 'custom-view').then(function(inboxSDK){
 
 
 inboxSDK.Router.createNewRoute({
@@ -15,6 +15,12 @@ inboxSDK.Router.registerRouteViewHandler(function(routeView){
 });
 
 
+
+inboxSDK.NavMenu.SENT_MAIL.addNavItem({
+	name: 'Sent Monkeys'
+});
+
+
 var navItem = inboxSDK.NavMenu.addNavItem({
 	name: 'Monkeys',
 	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
@@ -26,7 +32,6 @@ var navItem = inboxSDK.NavMenu.addNavItem({
 		}
 	}
 });
-
 
 var lion = navItem.addNavItem({
 	name: 'Lions',
@@ -65,4 +70,7 @@ inboxSDK.NavMenu.addNavItem({
 
 lion.addNavItem({
 	name: 'aved View 2'
+});
+
+
 });

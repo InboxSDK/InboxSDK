@@ -334,7 +334,7 @@ _.extend(GmailNavItemView.prototype, {
 
 	_createExpando: function(){
 		this._expandoElement = document.createElement('div');
-		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji expando');
+		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
 		this._expandoElement.setAttribute('role', 'link');
 
 		var self = this;

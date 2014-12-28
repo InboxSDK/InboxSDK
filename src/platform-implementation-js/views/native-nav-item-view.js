@@ -1,28 +1,24 @@
 var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
+var EventEmitter = require('events').EventEmitter;
+
+var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
+
+var NavItemView = require('./nav-item-view');
 
 var NativeNavItemView = function(appId, driver, navItemViewDriver){
-	BasicClass.call(this);
+	EventEmitter.call(this);
 
 	this._appId = appId;
 	this._driver = driver;
 	this._navItemViewDriver = navItemViewDriver;
-	this._eventStream = new Bacon.Bus();
+	this._navItemViews = [];
 
 	this._navItemViewDriver.getEventStream().onValue(this, '_handleStreamEvent');
 };
 
-NativeNavItemView.prototype = Object.create(BasicClass.prototype);
+NativeNavItemView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(NativeNavItemView.prototype, {
-
-	__memberVariables:[
-		{name: '_appId', destroy: false},
-		{name: '_driver', destroy: false},
-		{name: '_navItemViewDriver', destroy: true},
-		{name: '_navItemViews', destroy: true, defaultValue: []},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
 
 	addNavItem: function(navItemDescriptor){
 		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
@@ -47,7 +43,7 @@ _.extend(NativeNavItemView.prototype, {
 		switch(event.eventName){
 			case 'expanded':
 			case 'collapsed':
-				this._eventStream.push(event);
+				this.emit(event.eventName);
 			break;
 		}
 	}

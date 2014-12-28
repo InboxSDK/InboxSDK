@@ -43,6 +43,12 @@ var PlatformImplementation = function(appId, opts){
 	    logErrorToServer: this._tracker.logErrorToServer.bind(this._tracker),
 	    track: this._tracker.track.bind(this._tracker)
 	};
+
+	var self = this;
+	this.readyPromise = this._driver.waitForReady().then(function(){
+		delete self.readyPromise;
+		return self;
+	});
 };
 
 

@@ -27,6 +27,20 @@ var GmailElementGetter = {
 		});
 	},
 
+	waitForReady: function(){
+		return GmailElementGetter.waitForGmailModeToSettle().then(function(){
+
+			if(GmailElementGetter.isStandalone()){
+				return;
+			}
+
+			return waitFor(function(){
+				return $(GmailElementGetter.getLeftNavContainerElement()).find('.aim a[href*=#sent]').length > 0;
+			}, 300*1000);
+
+		});
+	},
+
 	isStandalone: function(){
 		return GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow();
 	},

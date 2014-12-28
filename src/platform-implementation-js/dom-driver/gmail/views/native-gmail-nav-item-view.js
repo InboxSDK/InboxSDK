@@ -8,15 +8,17 @@ var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observe
 var GmailElementGetter = require('../gmail-element-getter');
 
 var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
+var GmailNavItemView = require('./gmail-nav-item-view');
 
-
-var NativeGmailNavItemView = function(nativeElement){
+var NativeGmailNavItemView = function(nativeElement, navItemName){
 	NavItemViewDriver.call(this);
 
 	this._element = nativeElement;
-	this._element.classList.add('inboxsdk__navItem_claimed');
 	this._eventStream = new Bacon.Bus();
 
+	this._navItemName = navItemName;
+
+	this._isCollapsed = localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed';
 	this._monitorElementForActiveChanges();
 };
 
@@ -26,6 +28,7 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_navItemName', destroy: false},
 		{name: '_activeMarkerElement', destroy: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_itemContainerElement', destroy: true},
@@ -34,12 +37,14 @@ _.extend(NativeGmailNavItemView.prototype, {
 	],
 
 	addNavItem: function(orderGroup, navItemDescriptor){
-		var gmailNavItemView = new GmailNavItemView(orderGroup, navItemDescriptor);
+		var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
 
 		gmailNavItemView
 			.getEventStream()
 			.filter(eventNameFilter('orderChanged'))
 			.onValue(this, '_addNavItemElement', gmailNavItemView);
+
+		gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
 		return gmailNavItemView;
 	},
@@ -81,6 +86,7 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_monitorElementForActiveChanges: function(){
+		this._element.classList.add('inboxsdk__navItem_claimed');
 		var element = this._element;
 		var classChangeStream = makeMutationObserverStream(element, {attributes: true, attributeFilter: ['class']});
 
@@ -138,16 +144,18 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 	_createExpando: function(){
 		this._expandoElement = document.createElement('div');
-		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji expando');
+		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
 		this._expandoElement.setAttribute('role', 'link');
 
 		var self = this;
 		this._expandoElement.addEventListener('click', function(e){
 			self._toggleCollapse();
 			e.stopPropagation();
-		});
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		}, true);
 
-		this._element.querySelector('.inboxsdk__navItem_name').insertAdjacentElement('beforebegin', this._expandoElement);
+		this._element.querySelector('.nU').insertAdjacentElement('beforebegin', this._expandoElement);
 
 		if(this._isCollapsed){
 			this._collapse();
@@ -179,6 +187,8 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 		this._isCollapsed = true;
 
+		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'collapsed';
+
 		this._eventStream.push({
 			eventName: 'collapsed'
 		});
@@ -191,6 +201,8 @@ _.extend(NativeGmailNavItemView.prototype, {
 		this._itemContainerElement.style.display = '';
 
 		this._isCollapsed = false;
+
+		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'expanded';
 
 		this._eventStream.push({
 			eventName: 'expanded'

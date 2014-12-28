@@ -3,8 +3,6 @@ var Bacon = require('baconjs');
 
 var EventEmitter = require('events').EventEmitter;
 
-var BasicClass = require('../lib/basic-class');
-
 
 var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 

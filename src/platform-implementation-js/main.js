@@ -6,7 +6,10 @@ if (!global.__InboxSDKImpLoader) {
       }
 
       var PlatformImp = require('./platform-implementation');
-      return new PlatformImp(appId, opts);
+
+      var instance = new PlatformImp(appId, opts);
+
+      return instance.readyPromise;
     }
   };
 }

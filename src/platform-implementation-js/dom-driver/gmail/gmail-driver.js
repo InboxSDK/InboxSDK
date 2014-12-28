@@ -68,6 +68,14 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/get-current-active-nav-item')();
 	},
 
+	getSentMailNativeNavItem: function(){
+		return require('./gmail-driver/get-native-nav-item')('sent');
+	},
+
+	waitForReady: function(){
+		return GmailElementGetter.waitForReady();
+	},
+
 	_setupEventStreams: function(){
 		var self = this;
 		var result = makeXhrInterceptor();
