@@ -156,7 +156,7 @@ function _updateNavMenu(members, newRouteViewDriver){
 
 function _removeNativeNavItemActive(members){
 	if(members.modifiedNativeNavItem){
-		members.modifiedNativeNavItem.destroy(); //make sure there is only one active at a time;
+		members.modifiedNativeNavItem.setActive(false); //make sure there is only one active at a time;
 	}
 
 	members.modifiedNativeNavItem = members.driver.getCurrentActiveNavItem();
@@ -180,15 +180,11 @@ function _restoreNativeNavItemActive(members){
 	}
 
 	members.modifiedNativeNavItem.setActive(true);
-	members.modifiedNativeNavItem.destroy();
 	members.modifiedNativeNavItem = null;
 }
 
 function _unhandleNativeNavItem(members){
-	if(members.modifiedNativeNavItem){
-		members.modifiedNativeNavItem.destroy();
-		members.modifiedNativeNavItem = null;
-	}
+	members.modifiedNativeNavItem = null;
 }
 
 

@@ -24,7 +24,13 @@ module.exports = function(url){
 	var hashParts = hash.split('/');
 
 	urlObject.name = decodeURIComponent(hashParts[0]);
-	urlObject.params = _.chain(hashParts).rest().map(decodeURIComponent).value();
+	urlObject.params = _.chain(hashParts)
+							.rest()
+							.map(decodeURIComponent)
+							.map(function(part){
+								return part.replace('+', ' ');
+							})
+							.value();
 	urlObject.hash = hash;
 
 	return urlObject;

@@ -15,5 +15,9 @@ module.exports = function(label){
 		return null;
 	}
 
-	return new NativeGmailNavItemView(labelElement);
+	if(!labelElement.__nativeGmailNavItemView){
+		labelElement.__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement);
+	}
+
+	return labelElement.__nativeGmailNavItemView;
 };

@@ -389,14 +389,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 .ain .inboxsdk__navItem_container {
-  margin-left: -4px;
-}
-
-.inboxsdk__navMenu .ain .inboxsdk__navItem_container {
   margin-left: -18px;
 }
 
-.inboxsdk__navMenu  .inboxsdk__navItem_container {
+.inboxsdk__navItem_container {
   margin-left: -14px;
 }
 

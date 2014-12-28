@@ -10,6 +10,8 @@ var GmailElementGetter = require('../gmail-element-getter');
 var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
 var GmailNavItemView = require('./gmail-nav-item-view');
 
+var LEFT_INDENTATION_PADDING = 14;
+
 var NativeGmailNavItemView = function(nativeElement, navItemName){
 	NavItemViewDriver.call(this);
 
@@ -60,6 +62,8 @@ _.extend(NativeGmailNavItemView.prototype, {
 			this._element.querySelector('.TO').classList.remove('nZ');
 			this._element.querySelector('.TO').classList.remove('aiq');
 		}
+
+		this._setHeights();
 	},
 
 	toggleCollapse: function(){
@@ -124,12 +128,20 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
+
+		var element = gmailNavItemView.getElement();
+		element.querySelector('.TO').style.paddingLeft = LEFT_INDENTATION_PADDING + 'px';
+
+		this._setHeights();
 	},
 
 	_getItemContainerElement: function(){
 		if(!this._itemContainerElement){
-			this._createItemContainerElement();
-			this._createExpando();
+			this._itemContainerElement = this._element.querySelector('.inboxsdk__navItem_container');
+			if(!this._itemContainerElement){
+				this._createItemContainerElement();
+				this._createExpando();
+			}
 		}
 
 		return this._itemContainerElement;
@@ -192,6 +204,8 @@ _.extend(NativeGmailNavItemView.prototype, {
 		this._eventStream.push({
 			eventName: 'collapsed'
 		});
+
+		this._setHeights();
 	},
 
 	_expand: function(){
@@ -207,10 +221,32 @@ _.extend(NativeGmailNavItemView.prototype, {
 		this._eventStream.push({
 			eventName: 'expanded'
 		});
+
+		this._setHeights();
 	},
 
 	_isExpanded: function(){
 		return  this._expandoElement.classList.contains('aih');
+	},
+
+	_setHeights: function(){
+		var toElement = this._element.querySelector('.TO');
+
+		if(this._element.classList.contains('ain') && this._itemContainerElement){
+			this._element.style.height = '';
+
+			var totalHeight = this._element.clientHeight;
+			var itemHeight = toElement.clientHeight;
+
+			this._element.style.height = itemHeight + 'px';
+			this._element.style.overflow = 'visible';
+			this._element.style.marginBottom = (totalHeight - itemHeight) + 'px';
+		}
+		else{
+			this._element.style.height = '';
+			this._element.style.overflow = '';
+			this._element.style.marginBottom = '';
+		}
 	},
 
 	_createActiveMarkerElement: function(){

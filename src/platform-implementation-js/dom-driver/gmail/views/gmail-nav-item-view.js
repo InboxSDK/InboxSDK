@@ -309,8 +309,6 @@ _.extend(GmailNavItemView.prototype, {
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
 		var element = gmailNavItemView.getElement();
-		var left = this._element.querySelector('.TO').offsetLeft;
-
 		element.querySelector('.TO').style.paddingLeft = (LEFT_INDENTATION_PADDING * this._level) + 'px';
 
 		this._setHeights();

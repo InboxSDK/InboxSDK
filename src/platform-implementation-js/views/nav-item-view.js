@@ -24,7 +24,6 @@ var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptorPr
 		this._driver
 			.getRouteViewDriverStream()
 			.takeUntil(this._navItemViewDriver.getEventStream().filter(false).mapEnd())
-			.takeUntil(navItemDescriptorPropertyStream.filter(false).mapEnd())
 			.toProperty(),
 
 		navItemDescriptorPropertyStream
