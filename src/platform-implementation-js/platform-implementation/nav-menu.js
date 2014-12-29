@@ -17,11 +17,7 @@ var NavMenu = function(appId, driver){
 	members.driver = driver;
 	members.navItemViews = [];
 
-
-	var self = this;
-	driver.waitForReady().then(function(){
-		self.SENT_MAIL = _setupSentMail(appId, driver);
-	});
+	this.SENT_MAIL = _setupSentMail(appId, driver);
 };
 
 _.extend(NavMenu.prototype, {
@@ -30,11 +26,12 @@ _.extend(NavMenu.prototype, {
 		var members = memberMap.get(this);
 		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
 
+		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
+
 		var navItemViewDriver = members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream);
-		var navItemView = new NavItemView(members.appId, members.driver, navItemViewDriver, navItemDescriptorPropertyStream);
+		navItemView.setNavItemViewDriver(navItemViewDriver);
 
 		members.navItemViews.push(navItemView);
-
 		return navItemView;
 	},
 
@@ -43,8 +40,13 @@ _.extend(NavMenu.prototype, {
 });
 
 function _setupSentMail(appId, driver){
-	var sentMailNavItemViewDriver = driver.getSentMailNativeNavItem();
-	return new NativeNavItemView(appId, driver, sentMailNavItemViewDriver);
+	var nativeNavItemView = new NativeNavItemView(appId, driver);
+
+	driver.getSentMailNativeNavItem().then(function(sentMailNavItemViewDriver){
+		nativeNavItemView.setNavItemViewDriver(sentMailNavItemViewDriver);
+	});
+
+	return nativeNavItemView;
 }
 
 module.exports = NavMenu;

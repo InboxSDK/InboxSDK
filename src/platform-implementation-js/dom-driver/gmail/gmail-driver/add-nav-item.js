@@ -18,6 +18,9 @@ module.exports = function(orderGroup, navItemDescriptor){
 	gmailNavItemView
 		.getEventStream()
 		.filter(eventNameFilter('orderChanged'))
+		.takeWhile(function(){
+			return !!GmailElementGetter.getNavItemMenuInjectionContainer();
+		})
 		.onValue(attacher);
 
 	gmailNavItemView.setNavItemDescriptor(navItemDescriptor);

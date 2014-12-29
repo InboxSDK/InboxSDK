@@ -1,19 +1,29 @@
+'use strict';
+
 var _ = require('lodash');
+var RSVP = require('rsvp');
+
 var EventEmitter = require('events').EventEmitter;
+
+var Map = require('es6-unweak-collections').Map;
 
 var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 
 var NavItemView = require('./nav-item-view');
 
-var NativeNavItemView = function(appId, driver, navItemViewDriver){
+var memberMap = new Map();
+
+var NativeNavItemView = function(appId, driver, labelName){
 	EventEmitter.call(this);
+	var members = {};
+	memberMap.set(this, members);
 
-	this._appId = appId;
-	this._driver = driver;
-	this._navItemViewDriver = navItemViewDriver;
-	this._navItemViews = [];
+	members.appId = appId;
+	members.driver = driver;
+	members.labelName = labelName;
+	members.deferred = RSVP.defer();
 
-	this._navItemViewDriver.getEventStream().onValue(this, '_handleStreamEvent');
+	members.navItemViews = [];
 };
 
 NativeNavItemView.prototype = Object.create(EventEmitter.prototype);
@@ -21,33 +31,52 @@ NativeNavItemView.prototype = Object.create(EventEmitter.prototype);
 _.extend(NativeNavItemView.prototype, {
 
 	addNavItem: function(navItemDescriptor){
+		var members = memberMap.get(this);
+
 		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
+		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
-		var navItemViewDriver = this._navItemViewDriver.addNavItem(this._appId, navItemDescriptorPropertyStream);
-		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver, navItemDescriptorPropertyStream);
 
-		this._navItemViews.push(navItemView);
+		members.deferred.promise.then(function(navItemViewDriver){
+			var childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
+			navItemView.setNavItemViewDriver(childNavItemViewDriver);
+		});
 
+		members.navItemViews.push(navItemView);
 		return navItemView;
 	},
 
+	setNavItemViewDriver: function(navItemViewDriver){
+		memberMap.get(this).navItemViewDriver = navItemViewDriver;
+		navItemViewDriver.getEventStream().onValue(_handleStreamEvent, this);
+
+		memberMap.get(this).deferred.resolve(navItemViewDriver);
+	},
+
 	isCollapsed: function(){
-		return this._navItemViewDriver.isCollapsed();
+		return localStorage['inboxsdk__nativeNavItem__state_' + memberMap.get(this).labelName] === 'collapsed';
 	},
 
 	setCollapsed: function(collapseValue){
-		this._navItemViewDriver.setCollapsed(collapseValue);
-	},
+		var members = memberMap.get(this);
 
-	_handleStreamEvent: function(event){
-		switch(event.eventName){
-			case 'expanded':
-			case 'collapsed':
-				this.emit(event.eventName);
-			break;
+		if(members.navItemViewDriver){
+			members.navItemViewDriver.setCollapsed(collapseValue);
+		}
+		else{
+			localStorage['inboxsdk__nativeNavItem__state_' + members.labelName] = collapseValue ? 'collapsed' : 'expanded';
 		}
 	}
 
 });
+
+function _handleStreamEvent(emitter, event){
+	switch(event.eventName){
+		case 'expanded':
+		case 'collapsed':
+			emitter.emit(event.eventName);
+		break;
+	}
+}
 
 module.exports = NativeNavItemView;

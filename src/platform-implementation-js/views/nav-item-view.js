@@ -1,33 +1,24 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
-
+var RSVP = require('rsvp');
 var EventEmitter = require('events').EventEmitter;
-
-
 var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 
-var NavItemView = function(appId, driver, navItemViewDriver, navItemDescriptorPropertyStream){
+var Map = require('es6-unweak-collections').Map;
+
+var memberMap = new Map();
+
+var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 	EventEmitter.call(this);
 
-	this._appId = appId;
-	this._driver = driver;
-	this._navItemViewDriver = navItemViewDriver;
-	this._navItemViews = [];
+	var members = {};
+	memberMap.set(this, members);
 
-
-	Bacon.combineAsArray(
-		navItemDescriptorPropertyStream,
-		this._navItemViewDriver.getEventStream().toProperty()
-	).onValue(_handleViewDriverStreamEvent, this, this._navItemViewDriver, this._driver);
-
-	Bacon.combineAsArray(
-		this._driver
-			.getRouteViewDriverStream()
-			.takeUntil(this._navItemViewDriver.getEventStream().filter(false).mapEnd())
-			.toProperty(),
-
-		navItemDescriptorPropertyStream
-	).onValue(_handleRouteViewChange, this._navItemViewDriver);
+	members.appId = appId;
+	members.driver = driver;
+	members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
+	members.deferred = RSVP.defer();
+	members.navItemViews = [];
 };
 
 NavItemView.prototype = Object.create(EventEmitter.prototype);
@@ -35,40 +26,75 @@ NavItemView.prototype = Object.create(EventEmitter.prototype);
 _.extend(NavItemView.prototype, {
 
 	addNavItem: function(navItemDescriptor){
+		var members = memberMap.get(this);
 		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
+		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
-		var navItemViewDriver = this._navItemViewDriver.addNavItem(this._appId, navItemDescriptorPropertyStream);
-		var navItemView = new NavItemView(this._appId, this._driver, navItemViewDriver, navItemDescriptorPropertyStream);
+		members.deferred.promise.then(function(navItemViewDriver){
+			var childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
+			navItemView.setNavItemViewDriver(childNavItemViewDriver);
+		});
 
-		this._navItemViews.push(navItemView);
 
+		members.navItemViews.push(navItemView);
 		return navItemView;
 	},
 
+	setNavItemViewDriver: function(navItemViewDriver){
+		var members = memberMap.get(this);
+		members.navItemViewDriver = navItemViewDriver;
+
+		Bacon.combineAsArray(
+			members.navItemDescriptorPropertyStream,
+			navItemViewDriver.getEventStream().toProperty()
+		).onValue(_handleViewDriverStreamEvent, this, navItemViewDriver, members.driver);
+
+		Bacon.combineAsArray(
+			members.driver
+				.getRouteViewDriverStream()
+				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
+				.toProperty(),
+
+			members.navItemDescriptorPropertyStream
+		).onValue(_handleRouteViewChange, navItemViewDriver);
+
+		members.deferred.resolve(navItemViewDriver);
+	},
+
 	remove: function(){
-		if(!this._navItemViews){
+		var members = memberMap.get(this);
+		if(!members.navItemViews){
 			return;
 		}
 
-		this._navItemViews.forEach(function(navItemView){
+		members.navItemViews.forEach(function(navItemView){
 			navItemView.remove();
 		});
 
-		this._navItemViews = null;
+		members.navItemViews = null;
 
-		this._navItemViewDriver.destroy();
-		this._navItemViewDriver = null;
+		members.appId = null;
+		members.driver = null;
 
-		this._appId = null;
-		this._driver = null;
+		members.deferred.promise.then(function(navItemViewDriver){
+			navItemViewDriver.destroy();
+			members.navItemViewDriver = null;
+		});
 	},
 
 	isCollapsed: function(){
-		return this._navItemViewDriver.isCollapsed();
+		if(memberMap.get(this).navItemViewDriver){
+			return memberMap.get(this).navItemViewDriver.isCollapsed();
+		}
+		else{
+			return false;
+		}
 	},
 
 	setCollapsed: function(collapseValue){
-		this._navItemViewDriver.setCollapsed(collapseValue);
+		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){
+			navItemViewDriver.setCollapsed(collapseValue);
+		});
 	}
 
 });
