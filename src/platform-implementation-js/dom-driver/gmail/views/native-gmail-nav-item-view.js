@@ -111,9 +111,6 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 		makeMutationObserverStream(element.parentElement, {childList: true})
 					.takeUntil(this._eventStream.filter(false).mapEnd())
-					.flatMap(function(mutations){
-						return Bacon.fromArray(mutations);
-					})
 					.flatMap(function(mutation){
 						return Bacon.fromArray(_.toArray(mutation.removedNodes));
 					})
@@ -276,4 +273,3 @@ _.extend(NativeGmailNavItemView.prototype, {
 
 
 module.exports = NativeGmailNavItemView;
-
