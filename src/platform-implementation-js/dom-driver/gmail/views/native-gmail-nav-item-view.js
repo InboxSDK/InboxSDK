@@ -20,7 +20,6 @@ var NativeGmailNavItemView = function(nativeElement, navItemName){
 
 	this._navItemName = navItemName;
 
-	this._isCollapsed = localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed';
 	this._monitorElementForActiveChanges();
 };
 
@@ -33,9 +32,7 @@ _.extend(NativeGmailNavItemView.prototype, {
 		{name: '_navItemName', destroy: false},
 		{name: '_activeMarkerElement', destroy: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_itemContainerElement', destroy: true},
-		{name: '_expandoElement', destroy: true},
-		{name: '_isCollapsed', destroy: false, defaultValue: false}
+		{name: '_itemContainerElement', destroy: true}
 	],
 
 	addNavItem: function(orderGroup, navItemDescriptor){
@@ -71,17 +68,17 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	setCollapsed: function(value){
-		this._isCollapsed = value;
+		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = value;
 
-		if(!this._expandoElement){
+		if(!this._element.querySelector('.inboxsdk__expando')){
 			return;
 		}
 
 		if(value){
-			this._expand();
+			this._collapse();
 		}
 		else{
-			this._collapse();
+			this._expand();
 		}
 	},
 
@@ -112,7 +109,12 @@ _.extend(NativeGmailNavItemView.prototype, {
 		makeMutationObserverStream(element.parentElement, {childList: true})
 					.takeUntil(this._eventStream.filter(false).mapEnd())
 					.flatMap(function(mutations){
-						return Bacon.fromArray(mutations);
+						if(_.isArray(mutations)){
+							return Bacon.fromArray(mutations);
+						}
+						else{
+							return Bacon.once(mutations);
+						}
 					})
 					.flatMap(function(mutation){
 						return Bacon.fromArray(_.toArray(mutation.removedNodes));
@@ -155,21 +157,21 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_createExpando: function(){
-		this._expandoElement = document.createElement('div');
-		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
-		this._expandoElement.setAttribute('role', 'link');
+		var expandoElement = document.createElement('div');
+		expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
+		expandoElement.setAttribute('role', 'link');
 
 		var self = this;
-		this._expandoElement.addEventListener('click', function(e){
+		expandoElement.addEventListener('click', function(e){
 			self._toggleCollapse();
 			e.stopPropagation();
 			e.preventDefault();
 			e.stopImmediatePropagation();
 		}, true);
 
-		this._element.querySelector('.nU').insertAdjacentElement('beforebegin', this._expandoElement);
+		this._element.querySelector('.nU').insertAdjacentElement('beforebegin', expandoElement);
 
-		if(this._isCollapsed){
+		if(localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed'){
 			this._collapse();
 		}
 		else{
@@ -178,12 +180,17 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_toggleCollapse: function(){
-		if(!this._expandoElement){
-			this._isCollapsed = !this._isCollapsed;
+		if(!this._element.querySelector('.inboxsdk__expando')){
+			if(localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed'){
+				localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'expanded';
+			}
+			else{
+				localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'collapsed';
+			}
 			return;
 		}
 
-		if(this._isCollapsed){
+		if(localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed'){
 			this._expand();
 		}
 		else{
@@ -192,12 +199,11 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_collapse: function(){
-		this._expandoElement.classList.remove('aih');
-		this._expandoElement.classList.add('aii');
+		var expandoElement = this._element.querySelector('.inboxsdk__expando');
+		expandoElement.classList.remove('aih');
+		expandoElement.classList.add('aii');
 
 		this._itemContainerElement.style.display = 'none';
-
-		this._isCollapsed = true;
 
 		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'collapsed';
 
@@ -209,12 +215,11 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_expand: function(){
-		this._expandoElement.classList.add('aih');
-		this._expandoElement.classList.remove('aii');
+		var expandoElement = this._element.querySelector('.inboxsdk__expando');
+		expandoElement.classList.add('aih');
+		expandoElement.classList.remove('aii');
 
 		this._itemContainerElement.style.display = '';
-
-		this._isCollapsed = false;
 
 		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'expanded';
 
@@ -226,7 +231,7 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_isExpanded: function(){
-		return  this._expandoElement.classList.contains('aih');
+		return !!this._element.querySelector('.inboxsdk__expando.aih');
 	},
 
 	_setHeights: function(){
