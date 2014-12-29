@@ -5,13 +5,21 @@ var cproc = require('child_process');
 function run(command, args) {
   return new RSVP.Promise(function(resolve, reject) {
     var proc = cproc.spawn(command, args);
+    function killProc() {
+      proc.kill();
+    }
+    process.on('exit', killProc);
     proc.stdout.pipe(process.stdout);
     proc.stderr.pipe(process.stderr);
-    proc.on('close', function(code) {
-      if (code === 0)
+    proc.on('exit', function(code) {
+      process.removeListener('exit', killProc);
+      if (code === 0) {
         resolve();
-      else
-        reject(new Error("Program failed with exit status "+code));
+      } else {
+        var err = new Error("Program failed with exit status "+code);
+        err.code = code;
+        reject(err);
+      }
     });
   });
 }
