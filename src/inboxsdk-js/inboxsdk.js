@@ -14,7 +14,7 @@ var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
-var InboxSDK = function(appId, opts){
+/*deprecated*/ var InboxSDK = function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
@@ -58,27 +58,8 @@ var InboxSDK = function(appId, opts){
   });
 };
 
-InboxSDK.newApp = function(appId, opts){
-  opts = _.extend({
-    // defaults
-    globalErrorLogging: true
-  }, opts, {
-    // stuff that can't be overridden, such as extra stuff this file passes to
-    // the implementation script.
-    VERSION: InboxSDK.LOADER_VERSION
-  });
-
-  checkRequirements(opts);
-
-  var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
-  var loadPromise = platformImplementationLoader.load().then(function(Imp) {
-    InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
-    return Imp;
-  });
-  loadPromise.catch(function(err) {
-    console.error("Failed to load implementation:", err);
-  });
-  return loadPromise;
+/*deprecated*/ InboxSDK.newApp = function(appId, opts){
+  return InboxSDK.load(1, appId, opts);
 };
 
 InboxSDK.load = function(version, appId, opts){
@@ -88,14 +69,15 @@ InboxSDK.load = function(version, appId, opts){
   }, opts, {
     // stuff that can't be overridden, such as extra stuff this file passes to
     // the implementation script.
-    VERSION: InboxSDK.LOADER_VERSION
+    VERSION: InboxSDK.LOADER_VERSION,
+    REQUESTED_API_VERSION: version
   });
 
   checkRequirements(opts);
 
   var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
   var loadPromise = platformImplementationLoader.load().then(function(Imp) {
-    InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
+    /*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
     return Imp;
   });
   loadPromise.catch(function(err) {
@@ -104,8 +86,8 @@ InboxSDK.load = function(version, appId, opts){
   return loadPromise;
 };
 
-InboxSDK.LOADER_VERSION = InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
-InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
+InboxSDK.LOADER_VERSION = /*deprecated*/InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
+/*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
 
 InboxSDK.Util = {
   loadScript: require('../common/load-script')
