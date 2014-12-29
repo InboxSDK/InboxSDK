@@ -5,7 +5,10 @@ function log() {
 InboxSDK.newApp('thread-rows').then(function(inboxSDK) {
 	var i = 0;
 	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
-		console.log('threadRowView', threadRowView.getThreadId(), threadRowView.getSubject());
+		var threadId = threadRowView.getThreadId();
+		if (!threadId || typeof threadId != 'string') {
+			console.log('threadRowView', threadId, threadRowView.getSubject());
+		}
 		threadRowView.addLabel(Bacon.repeatedly(10000, [
 			{text:'A'},
 			{text:'B', textColor: 'blue'}
