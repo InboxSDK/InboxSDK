@@ -11,7 +11,7 @@ function extractMetadataFromThreadRow(threadRow) {
   if (threadRowIsVertical) {
     var threadRow2 = threadRow.nextSibling;
     var threadRow3 = threadRow2.nextSibling;
-    assert(_.contains(threadRow3.classList, 'apw'), 'check 3rd row is last in group');
+    assert(threadRow3.classList.contains('apw'), 'check 3rd row is last in group');
 
     timeSpan = threadRow.querySelector("td.apt > div.apm > span[title]");
     subjectSpan = threadRow2.querySelector("td div.xS div.xT div.y6 > span");

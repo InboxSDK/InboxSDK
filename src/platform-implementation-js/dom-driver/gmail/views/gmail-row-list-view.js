@@ -109,7 +109,11 @@ _.extend(GmailRowListView.prototype, {
 			makeElementViewStream2({
 				elementStream: elementStream,
 				viewFn: function(element) {
-					return new GmailThreadRowView(element);
+					// In vertical preview pane mode, each thread row has three <tr>
+					// elements. We just want to pass the first one to GmailThreadRowView().
+					if (element.hasAttribute('id')) {
+						return new GmailThreadRowView(element);
+					}
 				}
 			}).map(function(view) {
 				return {
