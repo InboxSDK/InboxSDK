@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var $ = require('jquery');
+var assert = require('assert');
 var Bacon = require('baconjs');
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
@@ -13,6 +14,12 @@ var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
   this._element = element;
+  this._isVertical = _.intersection(_.toArray(this._element.classList), ['zA','apv']).length === 2;
+  if (this._isVertical) {
+    var threadRow3 = this._element.nextSibling.nextSibling;
+    assert(threadRow3.classList.contains('apw'), 'check 3rd row is last in group');
+  }
+
   this._threadMetadataOracle = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
 
@@ -38,6 +45,7 @@ _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
     {name: '_element', destroy: false},
+    {name: '_isVertical', destroy: false},
     {name: '_threadMetadataOracle', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -98,6 +106,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
+    if (this._isVertical) return; // TODO
     var self = this;
     var labelDiv = document.createElement('div');
     labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
@@ -135,6 +144,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
+    if (this._isVertical) return; // TODO
     var self = this;
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
@@ -207,6 +217,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
+    if (this._isVertical) return; // TODO
     var self = this;
     var img = document.createElement('img');
     // The gmail iP css class sets width:16, height:16, opacity: 0.8
@@ -236,6 +247,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   replaceDate: function(opts) {
+    if (this._isVertical) return; // TODO
     var self = this;
 
     var prop = convertForeignInputToBacon(opts).toProperty();
@@ -274,11 +286,15 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getSubject: function() {
-    return this._element.querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+    if (this._isVertical) {
+      return this._element.nextSibling.querySelector('div.xS div.xT div.y6 > span[id]').textContent;
+    } else {
+      return this._element.querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+    }
   },
 
   getDateString: function() {
-    return this._element.querySelector('td.xW > span').title;
+    return this._element.querySelector('td.xW > span, td.yf.apt > div.apm > span').title;
   },
 
   _threadIdReady: function() {
