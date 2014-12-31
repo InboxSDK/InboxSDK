@@ -9,16 +9,7 @@ var DropdownButtonViewController = require('../../../../widgets/buttons/dropdown
 
 var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 
-function addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions){
-	if(buttonDescriptor.onValue){
-		_addButtonStream(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions);
-	}
-	else{
-		_addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions);
-	}
-}
-
-function _addButtonStream(gmailComposeView, buttonDescriptorStream, groupOrderHint, extraOnClickOptions){
+function addButton(gmailComposeView, buttonDescriptorStream, groupOrderHint, extraOnClickOptions){
 	var buttonViewController;
 
 	var unsubscribeFunction = buttonDescriptorStream.onValue(function(buttonDescriptor){
