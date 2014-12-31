@@ -85,8 +85,7 @@ module.exports = function(XHR, wrappers, opts) {
    * @property {XHRProxyWrapperCallback} [originalResponseTextLogger] - called with the responseText as
    *  given by the server. Is not called if responseType is set to a value besides 'text'.
    * @property {XHRProxyWrapperCallback} [responseTextChanger] - called with the responseText as given
-   *  by the server and returns new responseText value. Note that only one
-   *  responseTextChanger can be used on a single connection. Is not called if responseType
+   *  by the server and returns new responseText value. Is not called if responseType
    * is set to a value besides 'text'.
    * @property {XHRProxyWrapperCallback} [finalResponseTextLogger] - called with the responseText as
    *  delivered to application code. Is not called if responseType is set to a value besides 'text'.
@@ -195,38 +194,35 @@ module.exports = function(XHR, wrappers, opts) {
             }
           });
 
-          if (self._activeResponseTextChanger) {
-            var finish = _.once(finalRsc.bind(null, event));
-            var connection = self._connection;
-            new RSVP.Promise(function(resolve, reject) {
-              resolve(self._activeResponseTextChanger(
-                self._connection, self._connection.originalResponseText));
-            }).then(
-              function(modifiedResponseText) {
-                // Only continue if the connection was not aborted.
-                if (connection === self._connection) {
-                  Object.defineProperty(self._connection, 'modifiedResponseText', {
-                    enumerable: true, writable: false, configurable: false,
-                    value: modifiedResponseText
-                  });
-                  self.responseText = modifiedResponseText;
-                  finish();
-                }
-              },
-              function(err) {
-                logError(err);
-                if (connection === self._connection) {
-                  // On responseTextChanger failure, pass the original response
-                  // through, and don't set connection.modifiedResponseText.
-                  self.responseText = self._realxhr.responseText;
-                  finish();
-                }
-              }
-            ).catch(logError);
-            return;
-          }
+          var finish = _.once(finalRsc.bind(null, event));
+          // If the XHR object is re-used for another connection, then we need
+          // to make sure that our upcoming async calls here do nothing.
+          // Remember the current connection object, and do nothing in our async
+          // calls if it no longer matches.
+          var startConnection = self._connection;
 
-          self.responseText = self._realxhr.responseText;
+          self._activeWrappers.map(function(wrapper) {
+            return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
+          }).filter(Boolean).reduce(function(promise, nextResponseTextChanger) {
+            return promise.then(function(modifiedResponseText) {
+              if (startConnection === self._connection) {
+                self._connection.modifiedResponseText = modifiedResponseText;
+                return nextResponseTextChanger(self._connection, modifiedResponseText);
+              }
+            });
+          }, RSVP.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
+            if (startConnection === self._connection) {
+              self.responseText = self._connection.modifiedResponseText = modifiedResponseText;
+              finish();
+            }
+          }, function(err) {
+            logError(err);
+            if (startConnection === self._connection) {
+              self.responseText = self._realxhr.responseText;
+              finish();
+            }
+          }).catch(logError);
+          return;
         } else {
           self.responseText = null;
         }
@@ -234,7 +230,7 @@ module.exports = function(XHR, wrappers, opts) {
         finalRsc(event);
       } else {
         if (self._realxhr.readyState >= 3 && supportsResponseText) {
-          if (self._activeResponseTextChanger) {
+          if (self._usingResponseTextChangers) {
             // If we're going to transform the final response, then we don't
             // want to expose any partial untransformed responses and we don't
             // want to bother trying to transform partial responses. Only show
@@ -335,14 +331,9 @@ module.exports = function(XHR, wrappers, opts) {
       params: deparam(url.split('?')[1] || '')
     };
     this._activeWrappers = findApplicableWrappers(this._wrappers, this._connection);
-    var wrappersWithResponseTextChangers = _.filter(this._activeWrappers, function(wrapper) {
+    this._usingResponseTextChangers = !!_.find(this._activeWrappers, function(wrapper) {
       return !!wrapper.responseTextChanger;
     });
-    if (wrappersWithResponseTextChangers.length > 1) {
-      logError(new Error("can't have multiple active wrappers with response changers"));
-    }
-    this._activeResponseTextChanger = wrappersWithResponseTextChangers[0] &&
-      wrappersWithResponseTextChangers[0].responseTextChanger.bind(wrappersWithResponseTextChangers[0]);
 
     return this._realxhr.open.apply(this._realxhr,arguments);
   };
