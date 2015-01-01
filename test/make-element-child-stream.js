@@ -3,9 +3,9 @@ var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Symbol = require('../src/common/symbol');
 
-var makeElementChildStream2 = require('../src/platform-implementation-js/lib/dom/make-element-child-stream2.js');
+var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
 
-describe('makeElementChildStream2', function() {
+describe('makeElementChildStream', function() {
   global.MutationObserver = null;
   before(function() {
     global.MutationObserver = require('./lib/mock-mutation-observer');
@@ -22,7 +22,7 @@ describe('makeElementChildStream2', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementChildStream2(target).onValue(function(event) {
+    makeElementChildStream(target).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);
@@ -66,7 +66,7 @@ describe('makeElementChildStream2', function() {
     var call = 0;
     var child1Removed = 0, child2Removed = 0;
     var child1Ended = false, child2Ended = false;
-    var stream = makeElementChildStream2(target).takeUntil(stopper);
+    var stream = makeElementChildStream(target).takeUntil(stopper);
     stream.onValue(function(event) {
       switch(++call) {
         case 1:

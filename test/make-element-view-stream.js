@@ -3,10 +3,10 @@ var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Symbol = require('../src/common/symbol');
 
-var makeElementViewStream2 = require('../src/platform-implementation-js/lib/dom/make-element-view-stream2');
-var makeElementChildStream2 = require('../src/platform-implementation-js/lib/dom/make-element-child-stream2');
+var makeElementViewStream = require('../src/platform-implementation-js/lib/dom/make-element-view-stream');
+var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
 
-describe('makeElementViewStream2', function() {
+describe('makeElementViewStream', function() {
   global.MutationObserver = null;
   before(function() {
     global.MutationObserver = require('./lib/mock-mutation-observer');
@@ -15,7 +15,7 @@ describe('makeElementViewStream2', function() {
     delete global.MutationObserver;
   });
 
-  it('should work with makeElementChildStream2', function(done) {
+  it('should work with makeElementChildStream', function(done) {
     var child1 = Symbol('child1'), child2 = Symbol('child2'), child3 = Symbol('child3');
 
     var stopper = new Bacon.Bus();
@@ -26,8 +26,8 @@ describe('makeElementViewStream2', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementViewStream2({
-      elementStream: makeElementChildStream2(target).takeUntil(stopper),
+    makeElementViewStream({
+      elementStream: makeElementChildStream(target).takeUntil(stopper),
       viewFn: function(el) {
         activeViewCount++;
         return {

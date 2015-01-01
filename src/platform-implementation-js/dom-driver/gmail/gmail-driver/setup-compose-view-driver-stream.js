@@ -1,8 +1,8 @@
 var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
-var makeElementChildStream = require('../../../lib/dom/make-element-child-stream2');
-var makeElementViewStream = require('../../../lib/dom/make-element-view-stream2');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');

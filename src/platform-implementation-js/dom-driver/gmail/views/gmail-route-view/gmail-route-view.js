@@ -2,8 +2,8 @@ var _ = require('lodash');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
-var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream2');
-var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream2');
+var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
 var getInsertBeforeElement = require('../../../../lib/dom/get-insert-before-element');
 
 var RouteViewDriver = require('../../../../driver-interfaces/route-view-driver');
