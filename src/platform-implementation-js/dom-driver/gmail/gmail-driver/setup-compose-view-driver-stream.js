@@ -1,5 +1,5 @@
 var Bacon = require('baconjs');
-var waitFor = require('../../../lib/wait-for');
+var streamWaitFor = require('../../../lib/stream-wait-for');
 
 var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
@@ -39,13 +39,9 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 }
 
 function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	var containerEl;
-	return Bacon.fromPromise(
-		waitFor(function() {
-			containerEl = containerFn();
-			return !!containerEl;
-		})
-	).flatMap(function() {
+	return streamWaitFor(function() {
+		return containerFn();
+	}).flatMap(function(containerEl) {
 		return makeElementChildStream(containerEl);
 	});
 }
