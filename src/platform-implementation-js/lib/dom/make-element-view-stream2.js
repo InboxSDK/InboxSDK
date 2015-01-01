@@ -1,7 +1,8 @@
 // Built to be able to take a stream from makeElementChildStream2(). This doesn't
 // call makeElementChildStream2() here -- you can call that yourself so you can
 // filter/map/merge that stream however you want before passing it here. Make
-// sure that the input elementStream ends at some point!
+// sure that this stream stops being listened to at some point to trigger the
+// destruction of the views!
 function makeElementViewStream2(opts) {
   var elementStream = opts.elementStream;
   var viewFn = opts.viewFn;

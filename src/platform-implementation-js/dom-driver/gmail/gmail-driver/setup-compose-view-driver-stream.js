@@ -1,8 +1,8 @@
 var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
-var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
-var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream2');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream2');
 var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');
@@ -61,7 +61,7 @@ function _setupStandardComposeElementStream() {
 		return !event.el.classList.contains('aJl');
 	}).map(function(event) {
 		return {
-			type: event.type,
+			removalStream: event.removalStream,
 			el: event.el.querySelector('[role=dialog]')
 		};
 	}).filter(function(event) {

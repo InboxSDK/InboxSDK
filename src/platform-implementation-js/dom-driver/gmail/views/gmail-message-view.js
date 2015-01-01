@@ -7,12 +7,16 @@ var MessageViewDriver = require('../../../driver-interfaces/message-view-driver'
 var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 
+var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+
 var GmailMessageView = function(element){
 	MessageViewDriver.call(this);
 
 	this._element = element;
 	this._eventStream = new Bacon.Bus();
+	this._stopper = this._eventStream.filter(false).mapEnd();
 
+	// Outputs the same type of stream as makeElementChildStream does.
 	this._replyElementStream = this._eventStream.filter(function(event) {
 		return event.eventName === 'replyElement';
 	}).map('.change');
@@ -27,8 +31,7 @@ _.extend(GmailMessageView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
-		{name: '_messageStateMutationObserver', destroy: false},
-		{name: '_replyAreaStateMutationObserver', destroy: false},
+		{name: '_stopper', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
@@ -112,17 +115,11 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	_setupMessageStateStream: function(){
-		this._messageStateMutationObserver = new MutationObserver(this._handleMessageStateMutations.bind(this));
-		this._messageStateMutationObserver.observe(
-			this._element,
-			{attributes: true, attributeFilter: ['class'], attributeOldValue: true}
-		);
-	},
-
-	_handleMessageStateMutations: function(mutations){
 		var self = this;
 
-		mutations.forEach(function(mutation){
+		makeMutationObserverStream(this._element, {
+			attributes: true, attributeFilter: ['class'], attributeOldValue: true
+		}).takeUntil(this._stopper).onValue(function(mutation) {
 			var currentClassList = mutation.target.classList;
 
 			if(mutation.oldValue.indexOf('h7') > -1){ //we were open
@@ -131,8 +128,6 @@ _.extend(GmailMessageView.prototype, {
 						eventName: 'messageClosed',
 						view: self
 					});
-
-					return;
 				}
 			}
 			else {
@@ -167,13 +162,12 @@ _.extend(GmailMessageView.prototype, {
 		if(this._messageLoaded){
 			return;
 		}
+		this._messageLoaded = true;
 
 		this._eventStream.push({
 			eventName: 'messageLoaded',
 			view: this
 		});
-
-		this._messageLoaded = true;
 
 		this._setupReplyStream();
 	},
@@ -185,48 +179,30 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		if(!this._replyAreaStateMutationObserver){
-			this._replyAreaStateMutationObserver = new MutationObserver(this._handleReplyAreaStateMutations.bind(this));
-		}
+		var self = this;
+		var currentReplyElementRemovalStream = null;
 
-		this._replyAreaStateMutationObserver.observe(
-			replyContainer,
-			{attributes: true, attributeFilter: ['class'], attributeOldValue: true}
-		);
-
-		if(replyContainer.classList.contains('adB')){
-			this._eventStream.push({
-				eventName: 'replyElement',
-				change: {
-					type: 'added', el: replyContainer
+		makeMutationObserverStream(replyContainer, {
+			attributes: true, attributeFilter: ['class'], attributeOldValue: true
+		}).takeUntil(this._stopper).startWith(null).onValue(function() {
+			if (replyContainer.classList.contains('adB')) {
+				if (!currentReplyElementRemovalStream) {
+					currentReplyElementRemovalStream = new Bacon.Bus();
+					self._eventStream.push({
+						eventName: 'replyElement',
+						change: {
+							el: replyContainer, removalStream: currentReplyElementRemovalStream
+						}
+					});
 				}
-			});
-		}
-	},
-
-	_handleReplyAreaStateMutations: function(mutations){
-		var mutation = mutations[0];
-		var currentClassList = mutation.target.classList;
-		var oldValue = mutation.oldValue;
-
-		if(currentClassList.contains('adB')){
-			if(oldValue.indexOf('adB') === -1){
-				this._eventStream.push({
-					eventName: 'replyElement',
-					change: {
-						type: 'added', el: mutation.target
-					}
-				});
+			} else {
+				if (currentReplyElementRemovalStream) {
+					currentReplyElementRemovalStream.push(null);
+					currentReplyElementRemovalStream.end();
+					currentReplyElementRemovalStream = null;
+				}
 			}
-		}
-		else{
-			this._eventStream.push({
-				eventName: 'replyElement',
-				change: {
-					type: 'removed', el: mutation.target
-				}
-			});
-		}
+		});
 	},
 
 	_getAttachmentCardOptionsHash: function(options){
