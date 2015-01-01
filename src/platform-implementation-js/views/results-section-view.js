@@ -4,20 +4,18 @@ var RSVP = require('rsvp');
 var EventEmitter = require('events').EventEmitter;
 
 var Map = require('es6-unweak-collections').Map;
-var membersMap = new Map();
 
 /**
  * This class represents a result section.
  */
-var ResultsSectionView = function(driver){
+var ResultsSectionView = function(resultsSectionViewDriver, driver){
 	EventEmitter.call(this);
 
 	var members = {};
 	membersMap.set(this, members);
+	members.resultsSectionViewDriver = resultsSectionViewDriver;
 
-	members.deferred = RSVP.defer();
-
-	members.deferred.promise.then(_bindToEventStream(this, driver));
+	_bindToEventStream(this, resultsSectionViewDriver, driver);
 };
 
 ResultsSectionView.prototype = Object.create(EventEmitter.prototype);
@@ -33,17 +31,7 @@ _.extend(ResultsSectionView.prototype, {
 			return;
 		}
 
-		membersMap.get(this).deferred.promise.then(function(resultsSectionViewDriver){
-			resultsSectionViewDriver.setResults(resultsArray);
-		});
-	},
-
-	setResultsSectionViewDriver: function(resultsSectionViewDriver){
-		if(!membersMap.has(this)){
-			return;
-		}
-
-		membersMap.get(this).deferred.resolve(resultsSectionViewDriver);
+		membersMap.get(this).resultsSectionViewDriver.setResults(resultsArray);
 	},
 
 	destroy: function(){
@@ -53,14 +41,9 @@ _.extend(ResultsSectionView.prototype, {
 
 		var members = membersMap.get(this);
 
-		members.deferred.promise.then(function(resultsSectionViewDriver){
-			resultsSectionViewDriver.destroy();
-		});
-
-		this.emit('unoad');
+		members.resultsSectionViewDriver.destroy();
 
 		this.removeAllListeners();
-
 		membersMap.delete(this);
 	}
 
@@ -77,6 +60,33 @@ _.extend(ResultsSectionView.prototype, {
 	 */
 
 });
+
+
+function _bindToEventStream(resultsSectionView, resultsSectionViewDriver, driver){
+	resultsSectionViewDriver
+		.getEventStream()
+		.map('.eventName')
+		.onValue(resultsSectionView, 'emit');
+
+	resultsSectionViewDriver
+		.getEventStream()
+		.filter(function(event){
+			return event.eventName === 'rowClicked';
+		})
+		.map('.resultDescriptor')
+		.onValue(function(resultDescriptor){
+			if(resultDescriptor.routeName){
+				driver.goto(resultDescriptor.routeName, resultDescriptor.routeParams);
+			}
+
+			if(_.isFunction(resultDescriptor.onClick)){
+				resultDescriptor.onClick();
+			}
+		});
+
+	resultsSectionViewDriver.getEventStream().onEnd(resultsSectionView, 'emit', 'unload');
+}
+
 
 var ResultDescriptor = /** @lends ResultDescriptor */ {
 
@@ -143,31 +153,6 @@ onClick: null
 
 };
 
-
-function _bindToEventStream(resultsSectionView, driver){
-	return function(resultsSectionViewDriver){
-		resultsSectionViewDriver
-			.getEventStream()
-			.map('.eventName')
-			.onValue(resultsSectionView, 'emit');
-
-		resultsSectionViewDriver
-			.getEventStream()
-			.filter(function(event){
-				return event.eventName === 'rowClicked';
-			})
-			.map('.resultDescriptor')
-			.onValue(function(resultDescriptor){
-				if(resultDescriptor.routeName){
-					driver.goto(resultDescriptor.routeName, resultDescriptor.routeParams);
-				}
-
-				if(_.isFunction(resultDescriptor.onClick)){
-					resultDescriptor.onClick();
-				}
-			});
-	};
-}
 
 
 module.exports = ResultsSectionView;

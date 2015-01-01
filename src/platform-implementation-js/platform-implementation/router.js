@@ -6,10 +6,7 @@ var Map = require('es6-unweak-collections').Map;
 
 var HandlerRegistry = require('../lib/handler-registry');
 
-var Route = require('../views/route-view/route');
-var RouteView = require('../views/route-view/route-view');
-
-var SearchResultsView = require('../views/search-results-view');
+var RouteView = require('../views/route-view');
 
 var memberMap = new Map();
 
@@ -22,40 +19,34 @@ var Router = function(appId, driver){
 
 	members.currentRouteViewDriver = null;
 	members.currentRouteView = null;
+
 	members.handlerRegistry = new HandlerRegistry();
 
-	members.routes = [];
 	members.customRoutes = [];
 
-	members.lastNativeRouteName = null;
+	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
 
-	_setupNativeRoutes(members);
-	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
+	driver.getRouteViewDriverStream().delay(1).onValue(_handleRouteViewChange, this, members);
+
+	this.NativeRouteIDs = driver.getNativeRouteIDs();
+	this.NativeRouteTypes = driver.getNativeRouteTypes();
 };
 
 
 _.extend(Router.prototype,  {
 
-	createLink: function(name, paramArray){
-		return memberMap.get(this).driver.createLink(name, paramArray);
+	createLink: function(routeID, params){
+		return memberMap.get(this).driver.createLink(routeID, params);
 	},
 
-	goto: function(name, paramArray){
-		memberMap.get(this).driver.goto(name, paramArray);
+	goto: function(routeID, params){
+		memberMap.get(this).driver.goto(routeID, params);
 	},
 
 	createNewRoute: function(routerDescription){
 		var members = memberMap.get(this);
 		members.customRoutes.push(routerDescription);
-
-		members.routes.push(
-			new Route({
-				name: routerDescription.name,
-				isCustomRoute: true,
-				driver: members.driver
-			})
-		);
 	},
 
 	registerRouteViewHandler: function(handler){
@@ -64,71 +55,67 @@ _.extend(Router.prototype,  {
 
 });
 
-function _setupNativeRoutes(members){
-	var nativeViewNames = members.driver.getNativeRouteNames();
-
-	nativeViewNames.forEach(function(viewName){
-		members.routes.push(
-			new Route({
-				name: viewName,
-				isCustomRoute: false,
-				driver: members.driver
-			})
-		);
-
-	});
-}
-
-
 
 function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
-
-	if(members.currentRouteViewDriver){
-		members.currentRouteViewDriver.destroy();
-	}
 
 	if(members.currentRouteView){
 		members.currentRouteView.destroy();
 	}
 
-	var route = _.find(members.routes, function(route){
-		return route.getName() === routeViewDriver.getName();
-	});
-
-	if(!route){
-		routeViewDriver.destroy();
-		return;
-	}
-
 	members.currentRouteViewDriver = routeViewDriver;
+	var routeView = new RouteView(routeViewDriver, members.driver);
 
-	var routeView = new RouteView(routeViewDriver, route);
-
-	if(route.isCustomRoute()){
-		members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
-		_informRelevantCustomRoutes(members.customRoutes, routeView);
+	if(routeView.isCustomRoute()){
+		_informRelevantCustomRoutes(members, routeView, routeViewDriver);
 	}
 	else{
 		members.driver.showNativeRouteView();
 	}
 
+	members.pendingSearchResultsView = null;
 	members.handlerRegistry.addTarget(routeView);
 	members.currentRouteView = routeView;
 }
 
 
-function _informRelevantCustomRoutes(customRoutes, routeView){
-	customRoutes
+function _informRelevantCustomRoutes(members, routeView, routeViewDriver){
+	members.customRoutes
 		.filter(function(customRoute){
-			return customRoute.name === routeView.getName();
+			if(!customRoute.routeID){
+				return false;
+			}
+
+			if(_.isArray(customRoute.routeID)){
+				return _.any(customRoute.routeID, function(routeID){
+					return routeViewDriver.doesMatchRouteID(routeID);
+				});
+			}
+
+			return routeViewDriver.doesMatchRouteID(customRoute.routeID);
 		})
 		.forEach(function(customRoute){
-			customRoute.onActivate({
-				routeView: routeView,
-				fullscreenView: routeView, /* deprecated */
-				el: routeView.getElement()
-			});
+			if(_.isArray(customRoute.routeID)){
+				routeView.setRouteID(
+					_.find(customRoute.routeID, function(routeID){
+						return routeViewDriver.doesMatchRouteID(routeID);
+					})
+				);
+			}
+			else{
+				routeView.setRouteID(customRoute.routeID);
+			}
+			try{
+				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
+
+				customRoute.onActivate({
+					routeView: routeView,
+					el: routeView.getElement()
+				});
+			}
+			catch(err){
+			}
+
 		});
 }
 
@@ -138,13 +125,13 @@ function _updateNavMenu(members, newRouteViewDriver){
 
 	if(oldRouteViewDriver && !oldRouteViewDriver.isCustomRoute()){
 		if(newRouteViewDriver.isCustomRoute()){
-			members.lastNativeRouteName = oldRouteViewDriver.getName();
+			members.lastNativeRouteID = oldRouteViewDriver.getRouteID();
 			_removeNativeNavItemActive(members);
 			return;
 		}
 	}
-	else if(members.lastNativeRouteName && !newRouteViewDriver.isCustomRoute()){
-		if(members.lastNativeRouteName === newRouteViewDriver.getName()){
+	else if(members.lastNativeRouteID && !newRouteViewDriver.isCustomRoute()){
+		if(members.lastNativeRouteID === newRouteViewDriver.getRouteID()){
 			_restoreNativeNavItemActive(members);
 		}
 		else{

@@ -2,7 +2,7 @@ InboxSDK.load(1.0, 'custom-view').then(function(inboxSDK){
 
 
 inboxSDK.Router.createNewRoute({
-	name: 'example',
+	routeID: 'example/:monkeyName',
 	onActivate: function(event){
 		event.el.innerHTML = 'hello world!';
 	}
@@ -10,7 +10,8 @@ inboxSDK.Router.createNewRoute({
 
 
 inboxSDK.Router.registerRouteViewHandler(function(routeView){
-	console.log('name', routeView.getName());
+	console.log('id', routeView.getRouteID());
+	console.log('type', routeView.getRouteType());
 	console.log('params', routeView.getParams());
 });
 
@@ -24,7 +25,8 @@ inboxSDK.NavMenu.SENT_MAIL.addNavItem({
 var navItem = inboxSDK.NavMenu.addNavItem({
 	name: 'Monkeys',
 	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-	route: 'example',
+	routeID: 'example/:monkeyName',
+	routeParams: 'george {} {} {}',
 	accessory: {
 		type: 'CREATE',
 		onClick: function(){
@@ -35,6 +37,8 @@ var navItem = inboxSDK.NavMenu.addNavItem({
 
 var lion = navItem.addNavItem({
 	name: 'Lions',
+	routeID: inboxSDK.Router.NativeRouteIDs.Thread,
+	routeParams: {threadID: '14aa1bcd3deefcf7'},
 	iconUrl: chrome.runtime.getURL('lion.png'),
 	accessory: {
 		type: 'ICON_BUTTON',

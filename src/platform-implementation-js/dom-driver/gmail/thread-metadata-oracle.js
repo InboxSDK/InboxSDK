@@ -8,6 +8,13 @@ var threadMetadataOracle = {
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
     return threadid;
+  },
+
+  getCurrentThreadID: function(threadContainerElement){
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, null);
+    threadContainerElement.dispatchEvent(event);
+    return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
   }
 };
 

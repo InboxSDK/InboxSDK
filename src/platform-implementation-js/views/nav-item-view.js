@@ -51,7 +51,7 @@ _.extend(NavItemView.prototype, {
 
 		Bacon.combineAsArray(
 			members.driver
-				.getRouteViewDriverStream()
+				.getRouteViewDriverStream().delay(10)
 				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
 				.toProperty(),
 
@@ -107,7 +107,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, p
 	switch(event.eventName){
 		case 'mouseenter':
 
-			if(navItemDescriptor.routeName){
+			if(navItemDescriptor.routeID){
 				navItemViewDriver.setHighlight(true);
 			}
 
@@ -123,8 +123,8 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, p
 				navItemDescriptor.onClick();
 			}
 
-			if(navItemDescriptor.routeName){
-				driver.goto(navItemDescriptor.routeName, navItemDescriptor.routeParams);
+			if(navItemDescriptor.routeID){
+				driver.goto(navItemDescriptor.routeID, navItemDescriptor.routeParams);
 			}
 			else{
 				navItemViewDriver.toggleCollapse();
@@ -144,8 +144,8 @@ function _handleRouteViewChange(navItemViewDriver, paramHolder){
 
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
-		navItemDescriptor.routeName === routeViewDriver.getName() &&
-		_.isEqual(navItemDescriptor.routeParams, routeViewDriver.getParams())
+		routeViewDriver.doesMatchRouteID(navItemDescriptor.routeID) &&
+		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams(navItemDescriptor.routeID))
 	);
 }
 

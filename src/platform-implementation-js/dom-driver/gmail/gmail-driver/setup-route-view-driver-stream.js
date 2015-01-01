@@ -1,9 +1,10 @@
+'use strict';
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var waitFor = require('../../../lib/wait-for');
 
 var GmailElementGetter = require('../gmail-element-getter');
-var GmailViewNames = require('../views/gmail-route-view/gmail-route-names');
 
 var GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
 
@@ -11,18 +12,18 @@ var getURLObject = require('./get-url-object');
 
 var currentUrlObject = {};
 
-function setupRouteViewDriverStream(){
+function setupRouteViewDriverStream(GmailRouteInfo){
 	// TODO return a stream that handles unsubscription instead of a bus
 	var routeViewDriverStream = new Bacon.Bus();
 
 	window.addEventListener('hashchange', function(event){
-		_checkForCustomRoute(routeViewDriverStream, event);
+		_checkForCustomRoute(routeViewDriverStream, GmailRouteInfo, event);
 	});
 
 	waitFor(function(){
 		return !!GmailElementGetter.getMainContentContainer();
 	}).then(function(){
-		_handleNewUrl(routeViewDriverStream, location.href);
+		_handleNewUrl(routeViewDriverStream, GmailRouteInfo, location.href);
 
 		var mainContentContainer = GmailElementGetter.getMainContentContainer();
 
@@ -40,12 +41,12 @@ function setupRouteViewDriverStream(){
 					}
 
 					shouldHandleNewUrl = true;
-					_observeVisibilityChangeOnMainElement(routeViewDriverStream, element);
+					_observeVisibilityChangeOnMainElement(routeViewDriverStream, GmailRouteInfo, element);
 				});
 			});
 
 			if(shouldHandleNewUrl){
-				_handleNewUrl(routeViewDriverStream, location.href);
+				_handleNewUrl(routeViewDriverStream, GmailRouteInfo, location.href);
 			}
 		});
 
@@ -54,33 +55,33 @@ function setupRouteViewDriverStream(){
 			{childList: true}
 		);
 
-		_observeVisibilityChangeOnMainElement(routeViewDriverStream, GmailElementGetter.getCurrentMainContentElement());
+		_observeVisibilityChangeOnMainElement(routeViewDriverStream, GmailRouteInfo, GmailElementGetter.getCurrentMainContentElement());
 	});
 
-	return routeViewDriverStream;
+	return routeViewDriverStream.debounceImmediate(20);
 }
 
-function _checkForCustomRoute(routeViewDriverStream, event){
+function _checkForCustomRoute(routeViewDriverStream, GmailRouteInfo, event){
 	var urlObject = getURLObject(event.newURL);
 	if(currentUrlObject.hash === urlObject.hash){
 		return;
 	}
 
-	if(_isGmailRoute(urlObject.name) && _isGmailRoute(currentUrlObject.name)){
+	if(GmailRouteInfo.isNativeRoute(urlObject.name) && GmailRouteInfo.isNativeRoute(currentUrlObject.name)){
 		return;
 	}
 
 	currentUrlObject = urlObject;
-	_createRouteViewDriver(routeViewDriverStream, urlObject, _isGmailRoute(urlObject.name));
+	_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 }
 
-function _observeVisibilityChangeOnMainElement(routeViewDriverStream, element){
+function _observeVisibilityChangeOnMainElement(routeViewDriverStream, GmailRouteInfo, element){
 	var observer = new MutationObserver(function(mutations){
 		var oldValue = mutations[0].oldValue;
 		var newValue = mutations[0].target.getAttribute('role');
 
 		if(!oldValue && newValue === 'main'){
-			_handleNewUrl(routeViewDriverStream, location.href);
+			_handleNewUrl(routeViewDriverStream, GmailRouteInfo, location.href);
 		}
 	});
 
@@ -91,34 +92,26 @@ function _observeVisibilityChangeOnMainElement(routeViewDriverStream, element){
 }
 
 
-function _handleNewUrl(routeViewDriverStream, newUrl){
+function _handleNewUrl(routeViewDriverStream, GmailRouteInfo, newUrl){
 	var urlObject = getURLObject(newUrl);
 	currentUrlObject = urlObject;
 
-	if(!_isGmailRoute(urlObject.name)){
-		_createRouteViewDriver(routeViewDriverStream, urlObject, false);
+	if(!GmailRouteInfo.isNativeRoute(urlObject.name)){
+		_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 		return;
 	}
 
-	if(!_isThreadListRoute(urlObject.name)){
-		_createRouteViewDriver(routeViewDriverStream, urlObject, true);
+	if(!GmailRouteInfo.isListRouteName(urlObject.name)){
+		_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 		return;
 	}
 
 	if(_isThreadRoute(urlObject)){
-		_createThreadRouteViewDriver(routeViewDriverStream, urlObject);
+		_createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 		return;
 	}
 
-	_createRouteViewDriver(routeViewDriverStream, urlObject, true);
-}
-
-function _isGmailRoute(viewName){
-	return GmailViewNames.GMAIL_ROUTE_NAMES.indexOf(viewName) > -1;
-}
-
-function _isThreadListRoute(viewName){
-	return GmailViewNames.GMAIL_THREAD_LIST_ROUTE_NAMES.indexOf(viewName) > -1;
+	_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 }
 
 function _isThreadRoute(urlObject){
@@ -138,7 +131,7 @@ function _doesUrlContainThreadId(urlObject){
 	return !!potentialThreadId.toLowerCase().match(/^[0-9a-f]+$/); //only contains base16 chars
 }
 
-function _createThreadRouteViewDriver(routeViewDriverStream, urlObject){
+function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject){
 	waitFor(function(){
 		var urlHash = location.hash;
 		if(urlHash){
@@ -151,17 +144,24 @@ function _createThreadRouteViewDriver(routeViewDriverStream, urlObject){
 		return !!GmailElementGetter.getThreadContainerElement();
 
 	}, 30*1000, 50).then(function(){
-		_createRouteViewDriver(routeViewDriverStream, urlObject, true);
+		_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
+	}, function(err){
+		if(err !== 'no longer loading a thread'){
+			throw err;
+		}
 	});
 }
 
 
-function _createRouteViewDriver(routeViewDriverStream, urlObject, isGmailRoute){
+function _createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject){
 	var options = _.clone(urlObject);
-	options.isCustomRoute = !isGmailRoute;
+	options.isCustomRoute = !GmailRouteInfo.isNativeRoute(urlObject.name);
 
-	var routeViewDriver = new GmailRouteView(options);
+	if(options.isCustomRoute){
+		options.params.unshift(options.name);
+	}
 
+	var routeViewDriver = new GmailRouteView(options, GmailRouteInfo);
 	routeViewDriverStream.push(routeViewDriver);
 }
 
