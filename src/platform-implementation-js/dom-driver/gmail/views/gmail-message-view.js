@@ -184,8 +184,8 @@ _.extend(GmailMessageView.prototype, {
 
 		makeMutationObserverStream(replyContainer, {
 			attributes: true, attributeFilter: ['class'], attributeOldValue: true
-		}).takeUntil(this._stopper).startWith(null).onValue(function() {
-			if (replyContainer.classList.contains('adB')) {
+		}).takeUntil(this._stopper).startWith(null).mapEnd('END').onValue(function(mutation) {
+			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
 					currentReplyElementRemovalStream = new Bacon.Bus();
 					self._eventStream.push({
