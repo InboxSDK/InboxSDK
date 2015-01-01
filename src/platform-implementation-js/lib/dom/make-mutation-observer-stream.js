@@ -1,4 +1,4 @@
-var RSVP = require('rsvp');
+var asap = require('asap');
 var Bacon = require('baconjs');
 
 // Creates a mutation observer watching the given element and emits the events in a stream.
@@ -10,7 +10,7 @@ function makeMutationObserverStream(element, options) {
 
     // We don't want to emit the events synchronously before all
     // stream listeners are subscribed.
-    RSVP.Promise.resolve().then(function() {
+    asap(function() {
       if (observer) {
         observer.observe(element, options);
       }

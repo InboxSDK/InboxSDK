@@ -1,4 +1,4 @@
-var RSVP = require('rsvp');
+var asap = require('asap');
 var Bacon = require('baconjs');
 var Map = require('es6-unweak-collections').Map;
 
@@ -30,7 +30,7 @@ function makeElementChildStream(element) {
 
     // We don't want to emit the start children synchronously before all
     // stream listeners are subscribed.
-    RSVP.Promise.resolve().then(function() {
+    asap(function() {
       if (observer) {
         Array.prototype.forEach.call(element.children, newEl);
         observer.observe(element, {childList: true});
