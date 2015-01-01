@@ -59,7 +59,8 @@ function setupGmailInterceptor() {
    */
   wrappers.push({
     isRelevantTo: function(connection) {
-      return connection.params.search && connection.params.view === 'tl';
+      return connection.params.search && connection.params.view === 'tl' &&
+        connection.params.q != null;
     },
     originalSendBodyLogger: function(connection, body) {
       triggerEvent({

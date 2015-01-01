@@ -8,8 +8,8 @@ var GmailToolbarView = require('./gmail-toolbar-view');
 var GmailThreadRowView = require('./gmail-thread-row-view');
 
 var streamWaitFor = require('../../../lib/stream-wait-for');
-var makeElementChildStream2 = require('../../../lib/dom/make-element-child-stream2');
-var makeElementViewStream2 = require('../../../lib/dom/make-element-view-stream2');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
 var GmailRowListView = function(rootElement, routeViewDriver){
 	RowListViewDriver.call(this);
@@ -97,16 +97,16 @@ _.extend(GmailRowListView.prototype, {
 
 		var tableDivParent = self._element.querySelector('div.Cp');
 
-		var elementStream = makeElementChildStream2(tableDivParent).flatMap(function(event) {
+		var elementStream = makeElementChildStream(tableDivParent).flatMap(function(event) {
 			self._fixColumnWidths(event.el);
 			var tbody = event.el.querySelector('table > tbody');
-			return makeElementChildStream2(tbody).takeUntil(event.removalStream).filter(function(event) {
+			return makeElementChildStream(tbody).takeUntil(event.removalStream).filter(function(event) {
 				return event.el.classList.contains('zA');
 			});
 		});
 
 		this._eventStreamBus.plug(
-			makeElementViewStream2({
+			makeElementViewStream({
 				elementStream: elementStream,
 				viewFn: function(element) {
 					// In vertical preview pane mode, each thread row has three <tr>

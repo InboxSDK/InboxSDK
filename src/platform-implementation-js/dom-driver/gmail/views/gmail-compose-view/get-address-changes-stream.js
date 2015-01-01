@@ -62,7 +62,8 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 }
 
 function _isRecipientNode(node){
-	return node.classList.contains('vR');
+	// We want to filter non-element nodes out too.
+	return node.classList && node.classList.contains('vR');
 }
 
 function _convertToEvent(eventName, addressInfo){

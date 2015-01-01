@@ -212,7 +212,6 @@ _.extend(GmailRouteView.prototype, {
 		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
 
 		var elementStream = makeElementChildStream(threadContainerTableElement)
-			.takeUntil(this._eventStream.filter(false).mapEnd())
 			.filter(function(event) {
 				return !!event.el.querySelector('.if');
 			});

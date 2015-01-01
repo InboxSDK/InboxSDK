@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-
+var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
 
 /**
 * @class
@@ -37,11 +37,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){
-		if(!buttonDescriptor.onValue && !buttonDescriptor.onClick){
-			throw new Error('Must have an onClick function defined');
-		}
-
-		this._composeViewImplementation.addButton(buttonDescriptor, this._appId, {composeView: this});
+		var buttonDescriptorStream = convertForeignInputToBacon(buttonDescriptor);
+		this._composeViewImplementation.addButton(buttonDescriptorStream, this._appId, {composeView: this});
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
