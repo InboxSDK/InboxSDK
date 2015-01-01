@@ -183,7 +183,7 @@ _.extend(GmailMessageView.prototype, {
 		var currentReplyElementRemovalStream = null;
 
 		makeMutationObserverStream(replyContainer, {
-			attributes: true, attributeFilter: ['class'], attributeOldValue: true
+			attributes: true, attributeFilter: ['class']
 		}).takeUntil(this._stopper).startWith(null).mapEnd('END').onValue(function(mutation) {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
