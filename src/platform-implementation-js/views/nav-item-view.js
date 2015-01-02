@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var RSVP = require('rsvp');
 var EventEmitter = require('events').EventEmitter;
-var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
+var baconCast = require('bacon-cast');
 
 var Map = require('es6-unweak-collections').Map;
 
@@ -27,7 +27,7 @@ _.extend(NavItemView.prototype, {
 
 	addNavItem: function(navItemDescriptor){
 		var members = memberMap.get(this);
-		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
+		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
 		members.deferred.promise.then(function(navItemViewDriver){

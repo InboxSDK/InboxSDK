@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "asap": "^2.0.0",
+    "bacon-cast": "1.0.0",
     "baconjs": "0.7.41",
     "brfs": "^1.2.0",
     "entities": "1.1.1",
@@ -33,7 +34,6 @@
     "mold-source-map": "^0.3.0",
     "node-dir": "^0.1.6",
     "rimraf": "^2.2.8",
-    "rx": "^2.3.22",
     "sinon": "^1.12.1",
     "stdio": "^0.2.6",
     "vinyl-source-stream": "^1.0.0",

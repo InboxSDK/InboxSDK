@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
+var Bacon = require('baconjs');
+var baconCast = require('bacon-cast');
 
 /**
 * @class
@@ -37,7 +38,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){
-		var buttonDescriptorStream = convertForeignInputToBacon(buttonDescriptor);
+		var buttonDescriptorStream = baconCast(Bacon, buttonDescriptor);
 		this._composeViewImplementation.addButton(buttonDescriptorStream, this._appId, {composeView: this});
 	},
 
