@@ -4,7 +4,7 @@ var assert = require('assert');
 var Bacon = require('baconjs');
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-var convertForeignInputToBacon = require('../../../lib/convert-foreign-input-to-bacon');
+var baconCast = require('bacon-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
@@ -116,7 +116,7 @@ _.extend(GmailThreadRowView.prototype, {
     var au = labelDiv.querySelector('div.au');
     var av = labelDiv.querySelector('div.av');
 
-    var prop = convertForeignInputToBacon(label).toProperty();
+    var prop = baconCast(Bacon, label).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(label) {
       if (!label) {
         labelDiv.remove();
@@ -151,7 +151,7 @@ _.extend(GmailThreadRowView.prototype, {
     var buttonImg = document.createElement('img');
     buttonSpan.appendChild(buttonImg);
 
-    var prop = convertForeignInputToBacon(buttonDescriptor).toProperty();
+    var prop = baconCast(Bacon, buttonDescriptor).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue(function(buttonDescriptor) {
       if (!buttonDescriptor) {
         if (activeDropdown) {
@@ -225,7 +225,7 @@ _.extend(GmailThreadRowView.prototype, {
     img.src = 'images/cleardot.gif';
     var currentIconUrl;
 
-    var prop = convertForeignInputToBacon(opts).toProperty();
+    var prop = baconCast(Bacon, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
       if (!opts) {
         img.remove();
@@ -250,7 +250,7 @@ _.extend(GmailThreadRowView.prototype, {
     if (this._isVertical) return; // TODO
     var self = this;
 
-    var prop = convertForeignInputToBacon(opts).toProperty();
+    var prop = baconCast(Bacon, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
       var dateContainer = self._element.querySelector('td.xW');
       var originalDateSpan = dateContainer.firstChild;

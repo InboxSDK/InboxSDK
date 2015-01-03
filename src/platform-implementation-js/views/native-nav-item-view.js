@@ -7,7 +7,8 @@ var EventEmitter = require('events').EventEmitter;
 
 var Map = require('es6-unweak-collections').Map;
 
-var convertForeignInputToBacon = require('../lib/convert-foreign-input-to-bacon');
+var Bacon = require('baconjs');
+var baconCast = require('bacon-cast');
 
 var NavItemView = require('./nav-item-view');
 
@@ -33,7 +34,7 @@ _.extend(NativeNavItemView.prototype, {
 	addNavItem: function(navItemDescriptor){
 		var members = memberMap.get(this);
 
-		var navItemDescriptorPropertyStream = convertForeignInputToBacon(navItemDescriptor).toProperty();
+		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
 
