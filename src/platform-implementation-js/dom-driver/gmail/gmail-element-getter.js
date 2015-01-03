@@ -6,25 +6,11 @@ var $ = require('jquery');
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle: function(){
-		return new RSVP.Promise(function(resolve, reject){
-			if(document.body.classList.length > 0){
-				resolve();
-			}
+		return require('./gmail-element-getter/wait-for-gmail-mode-to-settle')();
+	},
 
-			var mutationObserver = new MutationObserver(function(mutations){
-				var classList = mutations[0].target.classList;
-
-				if(classList.length > 0){
-					mutationObserver.disconnect();
-					resolve();
-				}
-			});
-
-			mutationObserver.observe(
-				document.body,
-				{attributes: true, attributeFilter: ['class']}
-			);
-		});
+	getMainContentElementChangedStream: function(){
+		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this);
 	},
 
 	isStandalone: function(){

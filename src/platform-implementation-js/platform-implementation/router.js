@@ -27,7 +27,7 @@ var Router = function(appId, driver){
 	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
 
-	driver.getRouteViewDriverStream().delay(1).onValue(_handleRouteViewChange, this, members);
+	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
 	this.NativeRouteIDs = driver.getNativeRouteIDs();
 	this.NativeRouteTypes = driver.getNativeRouteTypes();

@@ -126,7 +126,7 @@ var routeNames = {
 	'inbox': routeIDs.Inbox,
 	'section_query': routeIDs.Search,
 	'all': routeIDs.All,
-	'imp': routeIDs.Impportant,
+	'imp': routeIDs.Important,
 	'contacts': routeIDs.Contacts,
 	'contact': routeIDs.Contact,
 	'sent': routeIDs.Sent,

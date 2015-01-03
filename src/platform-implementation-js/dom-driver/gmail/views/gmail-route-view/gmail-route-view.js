@@ -356,7 +356,7 @@ _.extend(GmailRouteView.prototype, {
 		}
 		else{
 			if(this._isThreadRoute()){
-				return this._gmailRouteInfo.getRouteID('thread');
+				return this._gmailRouteInfo.ROUTE_IDS.Thread;
 			}
 			else{
 				return this._gmailRouteInfo.getRouteID(this._name);
