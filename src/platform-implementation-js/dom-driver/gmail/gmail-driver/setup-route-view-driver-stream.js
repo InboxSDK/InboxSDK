@@ -16,6 +16,10 @@ function setupRouteViewDriverStream(GmailRouteInfo){
 	// TODO return a stream that handles unsubscription instead of a bus
 	var routeViewDriverStream = new Bacon.Bus();
 
+	var hashChangeStream = Bacon.fromEventTarget(window, 'hashchange');
+	var nativeToNativeHashChangeStream = hashChangeStream.filter(_isNativeToNative);
+
+
 	window.addEventListener('hashchange', function(event){
 		_checkForCustomRoute(routeViewDriverStream, GmailRouteInfo, event);
 	});

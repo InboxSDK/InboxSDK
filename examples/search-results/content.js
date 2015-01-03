@@ -1,6 +1,9 @@
 InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 
-	inboxSDK.Search.registerSearchResultsViewHandler(function(searchResultsView){
+	inboxSDK.Router.registerRouteViewHandler(function(searchResultsView){
+		if(searchResultsView.getRouteID() !== inboxSDK.Router.NativeRouteIDs.Search){
+			return;
+		}
 
 		var section = searchResultsView.addResultsSection({
 			sectionName: 'Monkeys'
