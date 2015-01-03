@@ -21,38 +21,17 @@ function setupRouteViewDriverStream(GmailRouteInfo){
 
 	//if we're to or from a custom view then push to the routeViewDriverStream right away
 	hashChangeStream.filter(_isNotNativeToNative(GmailRouteInfo)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteInfo));
+
+	//when native gmail changes main view there's a div that takes on role=main
 	GmailElementGetter.getMainContentElementChangedStream().map(null).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteInfo));
 
-
-	//var nativeToNativeHashChangeStream = hashChangeStream.filter(_isNativeToNative(GmailRouteInfo));
-
-
 	return routeViewDriverStream;
-}
-
-function _isNativeToNative(GmailRouteInfo){
-	return function(urlObject){
-		return GmailRouteInfo.isNativeRoute(urlObject.name) && GmailRouteInfo.isNativeRoute(currentUrlObject.name);
-	};
 }
 
 function _isNotNativeToNative(GmailRouteInfo){
 	return function(urlObject){
 		return !GmailRouteInfo.isNativeRoute(urlObject.name) || !GmailRouteInfo.isNativeRoute(currentUrlObject.name);
 	};
-}
-
-
-function _handleNewUrl(routeViewDriverStream, GmailRouteInfo, newUrl){
-	var urlObject = getURLObject(newUrl);
-
-
-	if(_isThreadRoute(GmailRouteInfo, urlObject)){
-		_createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
-		return;
-	}
-
-	_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
 }
 
 function _isThreadRoute(GmailRouteInfo, urlObject){
