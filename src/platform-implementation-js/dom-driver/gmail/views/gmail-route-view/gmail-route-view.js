@@ -334,6 +334,12 @@ _.extend(GmailRouteView.prototype, {
 		};
 	},
 
+	_getSettingsRouteParams: function(){
+		return {
+			tabName: this._paramsArray[0]
+		};
+	},
+
 	_getPageParam: function(){
 		for(var ii=1; ii<this._paramsArray.length; ii++){
 			if(this._paramsArray[ii].match(/p\d+/)){
