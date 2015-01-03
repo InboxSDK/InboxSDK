@@ -45,7 +45,12 @@ _.extend(HandlerRegistry.prototype, {
 
     _informHandlerOfTargets: function(handler){
         this._targets.forEach(function(target) {
-          handler(target);
+            try{
+                handler(target);
+            }
+            catch(err){
+                console.error(err);
+            }
         });
     },
 

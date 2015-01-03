@@ -48,10 +48,9 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	 */
 	addResultsSection: function(resultsSectionDescriptor){
 		var members = membersMap.get(this);
-		var resultsSectionView = new ResultsSectionView(members.driver);
 
 		var resultsSectionViewDriver = members.routeViewDriver.addResultsSection(resultsSectionDescriptor, members.appId);
-		resultsSectionView.setResultsSectionViewDriver(resultsSectionViewDriver);
+		var resultsSectionView = new ResultsSectionView(resultsSectionViewDriver, members.driver);
 
 		members.sectionViews.push(resultsSectionView);
 		return resultsSectionView;

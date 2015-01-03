@@ -5,6 +5,8 @@ var EventEmitter = require('events').EventEmitter;
 
 var Map = require('es6-unweak-collections').Map;
 
+var membersMap = new Map();
+
 /**
  * This class represents a result section.
  */

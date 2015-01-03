@@ -53,22 +53,6 @@ function setupGmailInterceptor() {
       }
     }
   });
-
-  /*
-    Search
-   */
-  wrappers.push({
-    isRelevantTo: function(connection) {
-      return connection.params.search && connection.params.view === 'tl' &&
-        connection.params.q != null;
-    },
-    originalSendBodyLogger: function(connection, body) {
-      triggerEvent({
-        type: 'sendingSearchRequest',
-        searchTerm: connection.params.q
-      });
-    }
-  });
 }
 
 function triggerEvent(detail) {

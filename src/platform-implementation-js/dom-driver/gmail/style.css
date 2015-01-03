@@ -439,4 +439,20 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin-left: 9px;
 }
 
+.inboxsdk__resultsSection .xX {
+  width: 20ex;
+}
+
+.inboxsdk__resultsSection_result_title span {
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+}
+
+.inboxsdk__resultsSection tr .xW > span {
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+}
+
 /* end search results section */
