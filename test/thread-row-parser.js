@@ -35,5 +35,20 @@ describe('threadRowParser', function() {
         peopleHtml: '<span email="cowan@streak.com" name="me">me</span> (15)'
       });
     });
+
+    it('can read snippet-less vertical preview pane row', function() {
+      var table = document.createElement('table');
+      table.innerHTML = '<tbody>' +
+        '<tr class="zA yO apv" id=":3p" tabindex="-1" aria-labelledby=":3q"><td rowspan="2" class="PF xY"></td><td rowspan="2" id=":3r" class="apq-x3 xY aid" style=""><div id=":3s" class="apq-jc T-Jo J-J5-Ji " role="checkbox" aria-labelledby=":3q" dir="ltr" aria-checked="false" tabindex="-1"><div class="T-Jo-auh"></div></div></td><td class="xY apx"><div id=":3q" class="afn"><span class="yP" email="notifications@mailfoogae.appspotmail.com" name="Streak Bot">Streak Bot</span>, lordprogrammer finished a deploy (fed8a27), 11:02 am, .</div><div class="apu"><div class="as">&nbsp;</div></div><div class="yW NyC7Y"><span class="yP" email="notifications@mailfoogae.appspotmail.com" name="Streak Bot">Streak Bot</span></div></td><td class="yf xY  apt"><div class="apm"><span title="Mon, Jan 5, 2015 at 11:02 AM" id=":3t" aria-label="Mon, Jan 5, 2015 at 11:02 AM">11:02 am</span></div>&nbsp;</td><td rowspan="2" class="apU apC"><span id=":3u" class="aXw T-KT" title="Not starred" aria-label="Not starred"><img class="T-KT-JX" src="images/cleardot.gif" alt="Not starred"></span></td></tr>' +
+        '<tr class="zA yO apv"><td colspan="2" tabindex="0" role="link" class="xY  apE"><div class="apn apd"><div class="pG" data-tooltip-contained="true" data-tooltip-align="b,l" data-tooltip-delay="1500" aria-label="Not important" role="img" id=":3v"><div class="T-ays-a45"><span class="aol">Click to teach Streak Mail this conversation is important.</span></div><div class="pH-A7"></div><div class="UW "></div></div></div><div class="xS" role="undefined"><div class="xT"><div class="y6"><span id=":3w">lordprogrammer finished a deploy (fed8a27)</span></div></div></div></td></tr>' +
+      '</tbody>';
+      var threadRow = table.querySelector('tr');
+      var parsed = threadRowParser.extractMetadataFromThreadRow(threadRow);
+      assert.deepEqual(parsed, {
+        timeString: 'Mon, Jan 5, 2015 at 11:02 AM',
+        subject: 'lordprogrammer finished a deploy (fed8a27)',
+        peopleHtml: '<span email="notifications@mailfoogae.appspotmail.com" name="Streak Bot">Streak Bot</span>'
+      });
+    });
   });
 });

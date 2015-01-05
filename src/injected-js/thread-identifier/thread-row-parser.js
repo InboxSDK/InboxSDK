@@ -7,15 +7,19 @@ function extractMetadataFromThreadRow(threadRow) {
 
   var timeSpan, subjectSpan, peopleDiv;
 
+  assert(threadRow.hasAttribute('id'), 'check element is main thread row');
+
   var threadRowIsVertical = _.intersection(_.toArray(threadRow.classList), ['zA','apv']).length === 2;
   if (threadRowIsVertical) {
     var threadRow2 = threadRow.nextSibling;
     var threadRow3 = threadRow2.nextSibling;
-    assert(threadRow3.classList.contains('apw'), 'check 3rd row is last in group');
+    if (!threadRow3 || !threadRow3.classList.contains('apw')) {
+      threadRow3 = null;
+    }
 
     timeSpan = threadRow.querySelector("td.apt > div.apm > span[title]");
     subjectSpan = threadRow2.querySelector("td div.xS div.xT div.y6 > span");
-    peopleDiv = threadRow.querySelector("td.apy > div.yW");
+    peopleDiv = threadRow.querySelector("td.apy > div.yW, td.apx > div.yW");
   } else {
     timeSpan = threadRow.querySelector("td.xW > span[title]");
 
