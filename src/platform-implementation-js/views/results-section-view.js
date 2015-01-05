@@ -77,8 +77,8 @@ function _bindToEventStream(resultsSectionView, resultsSectionViewDriver, driver
 		})
 		.map('.resultDescriptor')
 		.onValue(function(resultDescriptor){
-			if(resultDescriptor.routeName){
-				driver.goto(resultDescriptor.routeName, resultDescriptor.routeParams);
+			if(resultDescriptor.routeID){
+				driver.goto(resultDescriptor.routeID, resultDescriptor.routeParams);
 			}
 
 			if(_.isFunction(resultDescriptor.onClick)){
@@ -134,7 +134,7 @@ extraText: null,
  * ^default=null
  * @type {string}
  */
-routeName: null,
+routeID: null,
 
 /**
  * The parameters of the route being navigated to when the result is clicked on
