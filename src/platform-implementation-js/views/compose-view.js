@@ -72,6 +72,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return this._composeViewImplementation.getBodyElement();
 	},
 
+	/* NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS */
 	getComposeID: function(){
 		return this._composeViewImplementation.getComposeID();
 	},
@@ -143,8 +144,10 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
 	* If anything inside the body is selected, it will be replaced.
+	* Returns the root noHTMLElement of the inserted link
+	*
 	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element  (HTMLElement)
-	* @return {void}
+	* @return {HTMLElement}
 	*/
 	insertHTMLIntoBodyAtCursor: function(html){
 		return this._composeViewImplementation.insertBodyHTMLAtCursor(html);
@@ -159,8 +162,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @param {string} text - The anchor text of the link to insert.
 	* @param {string} url - The URL of the link to insert.
 	* @param {string} iconUrl - The URL of the icon that will be shown in the chip.
+	* Returns the HTMLElement of the inserted chip
 	*
-	* @return {void}
+	* @return {HTMLElement}
 	*
 	*/
 	insertLinkChipIntoBodyAtCursor: function(text, url, iconUrl){
@@ -179,10 +183,11 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places a link inside the body of the message at the cursor or at the beginning of the message
 	* if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
+	* Returns the HTMLElement of the inserted link
 	*
 	* @param {string} text - The anchor text of the link to insert.
 	* @param {string} url - The URL of the link to insert.
-	* @return {void}
+	* @return {HTMLElement}
 	*/
 	insertLinkIntoBodyAtCursor: function(text, url){
 		return this._composeViewImplementation.insertLinkIntoBody(text, url);
