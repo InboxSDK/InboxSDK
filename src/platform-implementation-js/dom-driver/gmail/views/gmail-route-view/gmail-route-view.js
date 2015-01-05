@@ -51,6 +51,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
+		{name: '_sectionsContainer', destroy: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_threadMetadataOracle', destroy: false, set: true},
@@ -113,6 +114,7 @@ _.extend(GmailRouteView.prototype, {
 
 	addResultsSection: function(resultsDescriptor, groupOrderHint){
 		var gmailResultsSectionView = new GmailResultsSectionView(resultsDescriptor, groupOrderHint);
+		var sectionsContainer = this._getSectionsContainer();
 
 		var children = Array.prototype.filter.call(GmailElementGetter.getCurrentMainContentElement().parentElement.children, function(element){
 			return !element.classList.contains('nH');
@@ -232,6 +234,10 @@ _.extend(GmailRouteView.prototype, {
 				};
 			})
 		);
+	},
+
+	_getSectionsContainer: function(){
+		//var sectionsContainer = GmailElementGetter.getCurrentMainContentElement().parentElement.querySelector('.inboxsdk__');
 	},
 
 	_getCustomParams: function(routeID){

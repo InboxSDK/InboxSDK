@@ -8,6 +8,7 @@ var GmailResultsSectionView = function(resultsDescriptor, groupOrderHint){
 
 	this._resultsDescriptor = resultsDescriptor;
 	this._eventStream = new Bacon.Bus();
+	this._collapsedContainer = null;
 
 	this._setupElement(groupOrderHint);
 	if(resultsDescriptor.startCollapsed){
