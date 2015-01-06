@@ -211,13 +211,13 @@ gulp.task('docs', function(cb) {
                           .value();
 
 
-    console.log(JSON.stringify(docsJson, null, 2));
     fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
   });
 
 });
 
 function parseCommentsInFile(file) {
+  gutil.log("Parsing: " + gutil.colors.cyan(file));
   var comments = JSON.parse(execSync("jsdoc " + file + ' -t templates/haruki -d console -q format=json'));
   comments['filename'] = file;
   return comments;
