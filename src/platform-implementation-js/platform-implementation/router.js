@@ -114,6 +114,9 @@ function _informRelevantCustomRoutes(members, routeView, routeViewDriver){
 				});
 			}
 			catch(err){
+				setTimeout(function() {
+					throw err;
+				}, 0);
 			}
 
 		});

@@ -13,11 +13,13 @@ var DropdownView = require('../../../widgets/buttons/dropdown-view');
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
+  assert(element.hasAttribute('id'), 'check element is main thread row');
+
   this._element = element;
   this._isVertical = _.intersection(_.toArray(this._element.classList), ['zA','apv']).length === 2;
   if (this._isVertical) {
     var threadRow3 = this._element.nextSibling.nextSibling;
-    assert(threadRow3.classList.contains('apw'), 'check 3rd row is last in group');
+    this._verticalRowCount = (threadRow3 && threadRow3.classList.contains('apw')) ? 3 : 2;
   }
 
   this._threadMetadataOracle = null; // supplied by GmailDriver later
@@ -46,6 +48,7 @@ _.extend(GmailThreadRowView.prototype, {
   __memberVariables: [
     {name: '_element', destroy: false},
     {name: '_isVertical', destroy: false},
+    {name: '_verticalRowCount', destroy: false},
     {name: '_threadMetadataOracle', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
