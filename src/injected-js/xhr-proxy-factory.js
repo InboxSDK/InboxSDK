@@ -241,7 +241,7 @@ module.exports = function(XHR, wrappers, opts) {
             self.responseText = self._realxhr.responseText;
           }
         } else {
-          self.responseText = null;
+          self.responseText = '';
         }
 
         self.readyState = self._realxhr.readyState;
