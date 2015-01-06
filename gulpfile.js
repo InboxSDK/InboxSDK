@@ -27,7 +27,7 @@ var dir = require('node-dir');
 var sys = require('sys');
 var execSync = require('exec-sync');
 
-var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
+var sdkFilename = 'inboxsdk.js';
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -110,7 +110,7 @@ function browserifyTask(name, deps, entry, destname) {
           preserveComments: 'some'
         }))))
         .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
-          // don't include sourcemap comment in the inboxsdk-x.js file that we
+          // don't include sourcemap comment in the inboxsdk.js file that we
           // distribute to developers since it'd always be broken.
           addComment: !args.production || name != 'sdk',
           sourceMappingURLPrefix: name == 'injected' ?
