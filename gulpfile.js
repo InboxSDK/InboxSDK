@@ -27,7 +27,7 @@ var dir = require('node-dir');
 var sys = require('sys');
 var execSync = require('exec-sync');
 
-var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
+var sdkFilename = 'inboxsdk.js';
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
