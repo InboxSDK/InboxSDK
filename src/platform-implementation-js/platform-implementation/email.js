@@ -10,11 +10,16 @@ var Email = function(appId, driver){
 _.extend(Email.prototype, {
 
 	getUserAsync: function() {
-		return RSVP.Promise.resolve({
-			displayName: 'Bob Example',
-			emailAddress: 'bob@example.com'
-		});
+		throw new Error("Not implemented");
+		// return RSVP.Promise.resolve({
+		// 	displayName: 'Bob Example',
+		// 	emailAddress: 'bob@example.com'
+		// });
 	},
+
+	getUserEmailAddress: function() {
+		return this._driver.getUserEmailAddress();
+	}
 
 });
 

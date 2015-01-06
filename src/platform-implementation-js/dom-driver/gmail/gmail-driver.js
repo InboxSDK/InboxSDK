@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 require('./custom-style');
@@ -76,6 +77,10 @@ _.extend(GmailDriver.prototype, {
 
 	getNativeRouteTypes: function(){
 		return GmailRouteInfo.ROUTE_TYPES;
+	},
+
+	getUserEmailAddress: function() {
+		return this._threadMetadataOracle.getUserEmailAddress();
 	},
 
 	_setupEventStreams: function(){
