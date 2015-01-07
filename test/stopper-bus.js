@@ -62,10 +62,10 @@ describe('StopperBus', function() {
     ender.stream.onEnd(done);
   });
 
-  it('should not listen on streams after end', function() {
+  it('throws error if you try to add a stream after end', function() {
     var ender = new StopperBus(Bacon.once(null));
-    ender.add(Bacon.fromBinder(function(sink) {
-      throw new Error("Should not be subscribed to");
-    }));
+    assert.throws(function() {
+      ender.add(Bacon.once(null));
+    });
   });
 });

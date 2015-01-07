@@ -21,7 +21,7 @@ function StopperBus(stream) {
 StopperBus.prototype.add = function(newStream) {
   var self = this;
   if (this._ended) {
-    return;
+    throw new Error("Tried to add a stream to a stopped StopperBus");
   }
   this._streams.add(newStream);
   newStream.takeUntil(this.stream).onValue(function() {
