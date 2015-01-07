@@ -15,7 +15,7 @@ describe('delayImmediate', function() {
     }, 0);
     var tooEarly = true;
     var calls = 0;
-    delayImmediate(Bacon.once(shouldNotBeCalled)).subscribe(function(event) {
+    Bacon.once(shouldNotBeCalled).flatMap(delayImmediate).subscribe(function(event) {
       switch (++calls) {
         case 1:
           assert.strictEqual(tooEarly, false);
