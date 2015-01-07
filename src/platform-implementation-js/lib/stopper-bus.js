@@ -42,4 +42,8 @@ StopperBus.prototype.add = function(newStreams) {
   });
 };
 
+StopperBus.prototype.getSize = function() {
+  return this._streams.size;
+};
+
 module.exports = StopperBus;

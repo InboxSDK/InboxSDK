@@ -94,4 +94,23 @@ describe('StopperBus', function() {
     hasReachedEnd = true;
     b2.end();
   });
+
+  it('getSize method works', function() {
+    var hasEnded = false;
+    var b1 = new Bacon.Bus();
+    var b2 = new Bacon.Bus();
+    var ender = new StopperBus(b1.mapEnd(null));
+    ender.stream.onValue(function() {
+      assert.strictEqual(ender.getSize(), 0);
+      hasEnded = true;
+    });
+    assert.strictEqual(ender.getSize(), 1);
+    ender.add(b2.mapEnd(null));
+    assert.strictEqual(ender.getSize(), 2);
+    b2.end();
+    assert.strictEqual(ender.getSize(), 1);
+    b1.end();
+    assert.strictEqual(ender.getSize(), 0);
+    assert(hasEnded, 'stopperbus has stopped');
+  });
 });
