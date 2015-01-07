@@ -195,36 +195,46 @@ module.exports = function(XHR, wrappers, opts) {
           });
 
           var finish = _.once(finalRsc.bind(null, event));
-          // If the XHR object is re-used for another connection, then we need
-          // to make sure that our upcoming async calls here do nothing.
-          // Remember the current connection object, and do nothing in our async
-          // calls if it no longer matches.
-          var startConnection = self._connection;
+          if (self._connection.async) {
+            // If the XHR object is re-used for another connection, then we need
+            // to make sure that our upcoming async calls here do nothing.
+            // Remember the current connection object, and do nothing in our async
+            // calls if it no longer matches.
+            var startConnection = self._connection;
 
-          self._activeWrappers.map(function(wrapper) {
-            return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
-          }).filter(Boolean).reduce(function(promise, nextResponseTextChanger) {
-            return promise.then(function(modifiedResponseText) {
+            self._activeWrappers.map(function(wrapper) {
+              return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
+            }).filter(Boolean).reduce(function(promise, nextResponseTextChanger) {
+              return promise.then(function(modifiedResponseText) {
+                if (startConnection === self._connection) {
+                  self._connection.modifiedResponseText = modifiedResponseText;
+                  return nextResponseTextChanger(self._connection, modifiedResponseText);
+                }
+              }).then(function(modifiedResponseText) {
+                if (typeof modifiedResponseText != 'string') {
+                  throw new Error("responseTextChanger returned non-string value "+modifiedResponseText);
+                } else {
+                  return modifiedResponseText;
+                }
+              });
+            }, RSVP.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
               if (startConnection === self._connection) {
-                self._connection.modifiedResponseText = modifiedResponseText;
-                return nextResponseTextChanger(self._connection, modifiedResponseText);
+                self.responseText = self._connection.modifiedResponseText = modifiedResponseText;
+                finish();
               }
-            });
-          }, RSVP.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
-            if (startConnection === self._connection) {
-              self.responseText = self._connection.modifiedResponseText = modifiedResponseText;
-              finish();
-            }
-          }, function(err) {
-            logError(err);
-            if (startConnection === self._connection) {
-              self.responseText = self._realxhr.responseText;
-              finish();
-            }
-          }).catch(logError);
-          return;
+            }, function(err) {
+              logError(err);
+              if (startConnection === self._connection) {
+                self.responseText = self._realxhr.responseText;
+                finish();
+              }
+            }).catch(logError);
+            return;
+          } else {
+            self.responseText = self._realxhr.responseText;
+          }
         } else {
-          self.responseText = null;
+          self.responseText = '';
         }
 
         finalRsc(event);
@@ -253,10 +263,9 @@ module.exports = function(XHR, wrappers, opts) {
       'dispatchEvent','abort',
       'getAllResponseHeaders','getResponseHeader','overrideMimeType',
       'setRequestHeader',
-      'responseType','responseXML','status','statusText',
+      'responseType','responseXML','responseURL','status','statusText',
       'timeout','ontimeout','onloadstart','onprogress','onabort',
-      'upload','withCredentials',
-      'UNSENT','OPENED','HEADERS_RECEIVED','LOADING','DONE'
+      'upload','withCredentials'
     ].forEach(function(prop) {
       Object.defineProperty(self, prop, {
         enumerable: true, configurable: false,
@@ -324,11 +333,12 @@ module.exports = function(XHR, wrappers, opts) {
     }
   };
 
-  XHRProxy.prototype.open = function(method, url) {
+  XHRProxy.prototype.open = function(method, url, async) {
     this._connection = {
       method: method,
       url: url,
-      params: deparam(url.split('?')[1] || '')
+      params: deparam(url.split('?')[1] || ''),
+      async: async !== false
     };
     this._activeWrappers = findApplicableWrappers(this._wrappers, this._connection);
     this._usingResponseTextChangers = !!_.find(this._activeWrappers, function(wrapper) {
@@ -358,6 +368,16 @@ module.exports = function(XHR, wrappers, opts) {
 
     return this._realxhr.send.apply(this._realxhr,arguments);
   };
+
+  [XHRProxy, XHRProxy.prototype].forEach(function(obj) {
+    _.extend(obj, {
+      UNSENT: 0,
+      OPENED: 1,
+      HEADERS_RECEIVED: 2,
+      LOADING: 3,
+      DONE: 4
+    });
+  });
 
   return XHRProxy;
 };
