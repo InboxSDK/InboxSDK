@@ -6,19 +6,19 @@ var delayImmediate = require('../delay-immediate');
 function makeElementStreamMerger() {
   var knownElementStopperBuses = new Map();
 
-  return function(childEvent) {
-    var stopperBus = knownElementStopperBuses.get(childEvent.el);
+  return function(event) {
+    var stopperBus = knownElementStopperBuses.get(event.el);
     if (stopperBus) {
-      stopperBus.add(childEvent.removalStream.flatMap(delayImmediate));
+      stopperBus.add(event.removalStream.flatMap(delayImmediate));
       return Bacon.never();
     } else {
-      stopperBus = new StopperBus(childEvent.removalStream.flatMap(delayImmediate));
+      stopperBus = new StopperBus(event.removalStream.flatMap(delayImmediate));
       stopperBus.stream.onValue(function() {
-        knownElementStopperBuses.delete(childEvent.el);
+        knownElementStopperBuses.delete(event.el);
       });
-      knownElementStopperBuses.set(childEvent.el, stopperBus);
+      knownElementStopperBuses.set(event.el, stopperBus);
       return Bacon.once({
-        el: childEvent.el,
+        el: event.el,
         removalStream: stopperBus.stream
       });
     }
