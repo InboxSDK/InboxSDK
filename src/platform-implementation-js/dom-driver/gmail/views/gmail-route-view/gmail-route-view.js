@@ -112,22 +112,27 @@ _.extend(GmailRouteView.prototype, {
 		return routeParams;
 	},
 
-	addResultsSection: function(resultsDescriptor, groupOrderHint){
-		var gmailResultsSectionView = new GmailResultsSectionView(resultsDescriptor, groupOrderHint);
+	addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint){
+		var gmailResultsSectionView = new GmailResultsSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search);
+
 		var sectionsContainer = this._getSectionsContainer();
+		gmailResultsSectionView
+			.getEventStream()
+			.filter(function(event){
+				return event.type === 'update' && event.property === 'orderHint';
+			})
+			.onValue(function(){
+				var children = sectionsContainer.children;
+				var insertBeforeElement = getInsertBeforeElement(gmailResultsSectionView.getElement(), children, ['data-group-order-hint', 'data-order-hint']);
+				if(insertBeforeElement){
+					sectionsContainer.insertBefore(gmailResultsSectionView.getElement(), insertBeforeElement);
+				}
+				else{
+					sectionsContainer.appendChild(gmailResultsSectionView.getElement());
+				}
+			});
 
-		var children = Array.prototype.filter.call(GmailElementGetter.getCurrentMainContentElement().parentElement.children, function(element){
-			return !element.classList.contains('nH');
-		});
-
-		var insertBeforeElement = getInsertBeforeElement(gmailResultsSectionView.getElement(), children, ['data-group-order-hint', 'data-order-hint']);
-		if(insertBeforeElement){
-			GmailElementGetter.getCurrentMainContentElement().parentElement.insertBefore(gmailResultsSectionView.getElement(), insertBeforeElement);
-		}
-		else{
-			GmailElementGetter.getCurrentMainContentElement().insertAdjacentElement('beforeBegin', gmailResultsSectionView.getElement());
-		}
-
+		gmailResultsSectionView.setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty);
 
 		return gmailResultsSectionView;
 	},
@@ -237,7 +242,20 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_getSectionsContainer: function(){
-		//var sectionsContainer = GmailElementGetter.getCurrentMainContentElement().parentElement.querySelector('.inboxsdk__');
+		var sectionsContainer = GmailElementGetter.getMainContentContainer().querySelector('.inboxsdk__custom_sections');
+		if(!sectionsContainer){
+			this._sectionsContainer = document.createElement('div');
+			this._sectionsContainer.classList.add('inboxsdk__custom_sections');
+
+			if(this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search){
+				this._sectionsContainer.classList.add('Wc');
+			}
+
+			GmailElementGetter.getMainContentContainer().insertBefore(this._sectionsContainer, GmailElementGetter.getMainContentContainer().firstChild);
+			sectionsContainer = this._sectionsContainer;
+		}
+
+		return sectionsContainer;
 	},
 
 	_getCustomParams: function(routeID){

@@ -86,6 +86,18 @@ function _bindToEventStream(resultsSectionView, resultsSectionViewDriver, driver
 			}
 		});
 
+	resultsSectionViewDriver
+		.getEventStream()
+		.filter(function(event){
+			return event.eventName === 'summaryClicked';
+		})
+		.map('.resultDescriptor')
+		.onValue(function(resultDescriptor){
+			if(resultDescriptor.onSummaryClick){
+				resultDescriptor.onSummaryClick(resultsSectionView);
+			}
+		});
+
 	resultsSectionViewDriver.getEventStream().onEnd(resultsSectionView, 'emit', 'unload');
 }
 

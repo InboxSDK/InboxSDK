@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 var RSVP = require('rsvp');
 var Map = require('es6-unweak-collections').Map;
 
+var baconCast = require('bacon-cast');
 
 var ResultsSectionView = require('./results-section-view');
 
@@ -43,13 +44,13 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 	/**
 	 * Adds a collapsible results section to the result page. If no results are specified then "loading" is shown in the section by default.
 	 * You can then set the actual results by calling setResults on the returned {ResultsSectionView} object.
-	 * @param {ResultsSectionDescriptor}
-	 * @returns {ResultsSectionView}
+	 * @param {CollapsibleSectionDescriptor}
+	 * @returns {CollapsibleSectionView}
 	 */
-	addResultsSection: function(resultsSectionDescriptor){
+	addCollapsibleSection: function(collapsibleSectionDescriptor){
 		var members = membersMap.get(this);
 
-		var resultsSectionViewDriver = members.routeViewDriver.addResultsSection(resultsSectionDescriptor, members.appId);
+		var resultsSectionViewDriver = members.routeViewDriver.addCollapsibleSection(baconCast(collapsibleSectionDescriptor).toProperty(), members.appId);
 		var resultsSectionView = new ResultsSectionView(resultsSectionViewDriver, members.driver);
 
 		members.sectionViews.push(resultsSectionView);
