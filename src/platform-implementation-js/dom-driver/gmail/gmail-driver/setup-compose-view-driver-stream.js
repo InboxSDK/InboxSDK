@@ -49,13 +49,18 @@ function _waitForContainerAndMonitorChildrenStream(containerFn) {
 function _setupStandardComposeElementStream() {
 	return _waitForContainerAndMonitorChildrenStream(function() {
 		return GmailElementGetter.getComposeWindowContainer();
+	}).flatMap(function(composeGrandParent) {
+		var composeParentEl = composeGrandParent.el.querySelector('div.AD');
+		if (composeParentEl) {
+			return makeElementChildStream(composeParentEl).takeUntil(composeGrandParent.removalStream);
+		} else {
+			return Bacon.never();
+		}
 	}).merge(
 		_waitForContainerAndMonitorChildrenStream(function() {
 			return GmailElementGetter.getFullscreenComposeWindowContainer();
 		})
-	).filter(function(event) {
-		return !event.el.classList.contains('aJl');
-	}).map(function(event) {
+	).map(function(event) {
 		return {
 			removalStream: event.removalStream,
 			el: event.el.querySelector('[role=dialog]')
