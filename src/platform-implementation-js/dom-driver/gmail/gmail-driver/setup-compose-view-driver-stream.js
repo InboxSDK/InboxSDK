@@ -3,6 +3,7 @@ var streamWaitFor = require('../../../lib/stream-wait-for');
 
 var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
+var makeElementStreamMerger = require('../../../lib/dom/make-element-stream-merger');
 var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');
@@ -67,7 +68,7 @@ function _setupStandardComposeElementStream() {
 		};
 	}).filter(function(event) {
 		return event && event.el;
-	});
+	}).flatMap(makeElementStreamMerger());
 }
 
 function _setupStandaloneComposeElementStream() {
