@@ -11,7 +11,7 @@ var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
 
 
-var GmailResultsSectionView = function(groupOrderHint, isSearch){
+var GmailCollapsibleSectionView = function(groupOrderHint, isSearch){
 	BasicClass.call(this);
 
 	this._isSearch = isSearch;
@@ -20,13 +20,13 @@ var GmailResultsSectionView = function(groupOrderHint, isSearch){
 	this._collapsedContainer = null;
 };
 
-GmailResultsSectionView.prototype = Object.create(BasicClass.prototype);
+GmailCollapsibleSectionView.prototype = Object.create(BasicClass.prototype);
 
-_.extend(GmailResultsSectionView.prototype, {
+_.extend(GmailCollapsibleSectionView.prototype, {
 
 	__memberVariables: [
 		{name: '_groupOrderHint', destroy: false},
-		{name: '_sectionDescriptor', destroy: false},
+		{name: '_collapsibleSectionDescriptor', destroy: false, defaultValue: {}},
 		{name: '_element', destroy: true, get: true},
 		{name: '_isSearch', destroy: false},
 		{name: '_headerElement', destroy: true},
@@ -40,8 +40,10 @@ _.extend(GmailResultsSectionView.prototype, {
 		{name: '_dropdownViewController', destroy: true}
 	],
 
-	setCollapsibleSectionDescriptorProperty: function(sectionDescriptorProperty){
-		sectionDescriptorProperty.onValue(this, '_updateValues');
+	setCollapsibleSectionDescriptorProperty: function(collapsibleSectionDescriptorProperty){
+		collapsibleSectionDescriptorProperty.onValue(this, '_updateValues');
+
+		this._showLoading();
 	},
 
 	setCollapsed: function(value){
@@ -53,35 +55,36 @@ _.extend(GmailResultsSectionView.prototype, {
 		}
 	},
 
-	setResults: function(resultArray){
-		this._setResults(resultArray);
+	setTableRows: function(tableRows){
+		this._setTableRows(tableRows);
 	},
 
-	_updateValues: function(sectionDescriptor){
+	_updateValues: function(collapsibleSectionDescriptor){
 		if(!this._element){
-			this._setupElement(sectionDescriptor);
+			this._setupElement(collapsibleSectionDescriptor);
 		}
 		else{
-			this._updateElement(sectionDescriptor);
+			this._updateElement(collapsibleSectionDescriptor);
 		}
 
-		this._updateTitle(sectionDescriptor);
-		this._updateSubtitle(sectionDescriptor);
-		this._updateSummaryText(sectionDescriptor);
-		this._updateDropdown(sectionDescriptor);
+		this._updateTitle(collapsibleSectionDescriptor);
+		this._updateSubtitle(collapsibleSectionDescriptor);
+		this._updateSummaryText(collapsibleSectionDescriptor);
+		this._updateDropdown(collapsibleSectionDescriptor);
 
-		this._sectionDescriptor = sectionDescriptor;
+		this._collapsibleSectionDescriptor = collapsibleSectionDescriptor;
 	},
 
-	_setupElement: function(sectionDescriptor){
+	_setupElement: function(collapsibleSectionDescriptor){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'inboxsdk__resultsSection');
 		this._element.setAttribute('data-group-order-hint', this._groupOrderHint);
-		this._element.setAttribute('data-order-hint', _.isNumber(sectionDescriptor.orderHint) ? sectionDescriptor.orderHint : 0);
+		this._element.setAttribute('data-order-hint', _.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0);
 
-		this._setupHeader(sectionDescriptor);
+		this._setupHeader(collapsibleSectionDescriptor);
 
 		this._bodyElement = document.createElement('div');
+		this._bodyElement.classList.add('zE');
 		this._element.appendChild(this._bodyElement);
 
 		Bacon.fromEventTarget(this._titleElement, 'click').onValue(this, '_toggleCollapseState');
@@ -91,11 +94,11 @@ _.extend(GmailResultsSectionView.prototype, {
 		this._eventStream.push({
 			type: 'update',
 			property: 'orderHint',
-			sectionDescriptor: sectionDescriptor
+			collapsibleSectionDescriptor: collapsibleSectionDescriptor
 		});
 	},
 
-	_setupHeader: function(sectionDescriptor){
+	_setupHeader: function(collapsibleSectionDescriptor){
 		this._headerElement = document.createElement('div');
 		this._headerElement.classList.add('inboxsdk__resultsSection_header');
 
@@ -105,11 +108,11 @@ _.extend(GmailResultsSectionView.prototype, {
 		var titleInnerHTML = '<span class="Wp Wq"></span>';
 
 		if(this._isSearch){
-			titleInnerHTML += '<h3 class="Wd">' + _.escape(sectionDescriptor.title) + '</h3>';
+			titleInnerHTML += '<h3 class="Wd">' + _.escape(collapsibleSectionDescriptor.title) + '</h3>';
 		}
 		else{
 			this._headerElement.classList.add('Wg');
-			titleInnerHTML += '<h3 class="Wr">' + _.escape(sectionDescriptor.title) + '</h3>';
+			titleInnerHTML += '<h3 class="Wr">' + _.escape(collapsibleSectionDescriptor.title) + '</h3>';
 		}
 
 		this._titleElement.innerHTML = titleInnerHTML;
@@ -126,9 +129,9 @@ _.extend(GmailResultsSectionView.prototype, {
 		this._element.appendChild(this._headerElement);
 	},
 
-	_updateElement: function(sectionDescriptor){
-		if(this._sectionDescriptor.orderHint !== sectionDescriptor.orderHint){
-			this._element.setAttribute('data-order-hint', _.isNumber(sectionDescriptor.orderHint) ? sectionDescriptor.orderHint : 0);
+	_updateElement: function(collapsibleSectionDescriptor){
+		if(this._collapsibleSectionDescriptor.orderHint !== collapsibleSectionDescriptor.orderHint){
+			this._element.setAttribute('data-order-hint', _.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0);
 
 			this._eventStream.push({
 				type: 'update',
@@ -137,67 +140,101 @@ _.extend(GmailResultsSectionView.prototype, {
 		}
 	},
 
-	_updateTitle: function(sectionDescriptor){
-		if(this._sectionDescriptor.title !== sectionDescriptor.title){
-			this._titleElement.querySelector('h3').textContent = sectionDescriptor.title;
+	_updateTitle: function(collapsibleSectionDescriptor){
+		if(this._collapsibleSectionDescriptor.title !== collapsibleSectionDescriptor.title){
+			this._titleElement.querySelector('h3').textContent = collapsibleSectionDescriptor.title;
 		}
 	},
 
-	_updateSubtitle: function(sectionDescriptor){
+	_updateSubtitle: function(collapsibleSectionDescriptor){
 		var subtitleElement = this._titleElement.querySelector('.inboxsdk__resultsSection_title_subtitle');
-		if(!sectionDescriptor.subtitle){
+		if(!collapsibleSectionDescriptor.subtitle){
 			if(subtitleElement){
 				subtitleElement.remove();
 			}
 		}
-		else if(this._sectionDescriptor.subtitle !== sectionDescriptor.subtitle){
+		else if(this._collapsibleSectionDescriptor.subtitle !== collapsibleSectionDescriptor.subtitle){
 			if(!subtitleElement){
 				subtitleElement = document.createElement('span');
 				subtitleElement.classList.add('inboxsdk__resultsSection_title_subtitle');
 				this._titleElement.querySelector('h3').insertAdjacentElement('afterend', subtitleElement);
 			}
 
-			subtitleElement.textContent = sectionDescriptor.subtitle;
+			subtitleElement.textContent = '(' + collapsibleSectionDescriptor.subtitle + ')';
 		}
 	},
 
-	_updateSummaryText: function(sectionDescriptor){
-		var summaryTextElement = this._titleElement.querySelector('.inboxsdk__resultsSection_header_summaryText');
-		if(!sectionDescriptor.summaryText){
+	_updateSummaryText: function(collapsibleSectionDescriptor){
+		var summaryTextElement = this._headerElement.querySelector('.inboxsdk__resultsSection_header_summaryText');
+		if(!collapsibleSectionDescriptor.summaryText){
 			if(summaryTextElement){
 				summaryTextElement.remove();
 			}
 		}
-		else if(sectionDescriptor.summaryText !== this._sectionDescriptor.summaryText){
+		else if(collapsibleSectionDescriptor.summaryText !== this._collapsibleSectionDescriptor.summaryText){
 			if(!summaryTextElement){
 				summaryTextElement = document.createElement('div');
-				summaryTextElement.classList.add('.inboxsdk__resultsSection_header_summaryText');
+				summaryTextElement.setAttribute('class', 'inboxsdk__resultsSection_header_summaryText Wm');
 
-				this._titleElement.querySelector('.Cr').insertAdjacentElement('afterbegin', summaryTextElement);
+				summaryTextElement.innerHTML = [
+					'<span class="Di">&nbsp;',
+						'<div class="J-J5-Ji amH">',
+							'<span class="Dj"><b>',
+							'</b></span>',
+						'</div>',
+					'</span>'
+				].join('');
+
+				var self = this;
+				this._eventStream.plug(
+					Bacon.fromEventTarget(summaryTextElement, 'click').map(function(){
+						return {
+							eventName: 'summaryClicked',
+							collapsibleSectionDescriptor: self._collapsibleSectionDescriptor
+						};
+					})
+				);
+
+				summaryTextElement.addEventListener('mouseenter', function(){
+					summaryTextElement.classList.add('aqi');
+				});
+
+				summaryTextElement.addEventListener('mouseleave', function(){
+					summaryTextElement.classList.remove('aqi');
+				});
+
+				this._headerElement.querySelector('.Cr').insertAdjacentElement('afterbegin', summaryTextElement);
 			}
 
-			summaryTextElement.textContent = sectionDescriptor.summaryText;
+			summaryTextElement.querySelector('b').textContent = collapsibleSectionDescriptor.summaryText;
 		}
 	},
 
-	_updateDropdown: function(sectionDescriptor){
-		if(this._inboxDropdownButtonView){
-			this._inboxDropdownButtonView.destroy();
+	_updateDropdown: function(collapsibleSectionDescriptor){
+		if(!collapsibleSectionDescriptor.hasDropdown || !collapsibleSectionDescriptor.onDropdownClick){
+			if(this._inboxDropdownButtonView){
+				this._inboxDropdownButtonView.destroy();
+			}
+
+			if(this._dropdownViewController){
+				this._dropdownViewController.destroy();
+			}
 		}
+		else if(collapsibleSectionDescriptor.hasDropdown && collapsibleSectionDescriptor.onDropdownClick){
 
-		if(this._dropdownViewController){
-			this._dropdownViewController.destroy();
-		}
+			if(!this._inboxDropdownButtonView || !this._dropdownViewController){
+				this._inboxDropdownButtonView = new InboxDropdownButtonView();
+				this._dropdownViewController = new DropdownButtonViewController({
+					buttonView: this._inboxDropdownButtonView,
+					dropdownViewDriverClass: GmailDropdownView,
+					dropdownShowFunction: collapsibleSectionDescriptor.onDropdownClick
+				});
 
-		if(this._sectionDescriptor.hasDropdown && this._sectionDescriptor.onDropdownClick){
-			this._inboxDropdownButtonView = new InboxDropdownButtonView();
-			this._dropdownViewController = new DropdownButtonViewController({
-				buttonView: this._inboxDropdownButtonView,
-				dropdownViewDriverClass: GmailDropdownView,
-				dropdownShowFunction: this._sectionDescriptor.onDropdownClick
-			});
-
-			this._headerElement.querySelector('.Cr').appendChild(this._inboxDropdownButtonView.getElement());
+				this._headerElement.querySelector('.Cr').appendChild(this._inboxDropdownButtonView.getElement());
+			}
+			else if(collapsibleSectionDescriptor.onDropdownClick !== this._collapsibleSectionDescriptor.onDropdownClick){
+				this._dropdownViewController.setDropdownShowFunction(collapsibleSectionDescriptor.onDropdownClick);
+			}
 		}
 	},
 
@@ -210,15 +247,15 @@ _.extend(GmailResultsSectionView.prototype, {
 		this._bodyElement.appendChild(this._messageDiv);
 	},
 
-	_setResults: function(resultArray){
+	_setTableRows: function(tableRows){
 		this._bodyElement.innerHTML = '';
 
-		if(!resultArray || resultArray.length === 0){
+		if(!tableRows || tableRows.length === 0){
 			this._showEmpty();
 			return;
 		}
 
-		this._renderResults(resultArray);
+		this._renderTable(tableRows);
 	},
 
 	_showEmpty: function(){
@@ -229,7 +266,7 @@ _.extend(GmailResultsSectionView.prototype, {
 		this._bodyElement.appendChild(this._messageDiv);
 	},
 
-	_renderResults: function(resultArray){
+	_renderTable: function(tableRows){
 		if(this._messageDiv){
 			this._messageDiv.remove();
 			this._messageDiv = null;
@@ -244,7 +281,7 @@ _.extend(GmailResultsSectionView.prototype, {
 		var tbody = tableElement.querySelector('tbody');
 		var eventStream = this._eventStream;
 
-		resultArray.forEach(function(result){
+		tableRows.forEach(function(result){
 			var rowElement = document.createElement('tr');
 			rowElement.setAttribute('class', 'zA zE');
 			rowElement.innerHTML = _getRowHTML(result);
@@ -256,7 +293,7 @@ _.extend(GmailResultsSectionView.prototype, {
 					.fromEventTarget(rowElement, 'click')
 					.map({
 						eventName: 'rowClicked',
-						resultDescriptor: result
+						rowDescriptor: result
 					})
 			);
 		});
@@ -471,9 +508,9 @@ function _getRowHTML(result){
 	]);
 
 	rowArr.push('<td class="xY"></td>');
-	rowArr.push('<td class="xY xW"><span class="sehUKb">' + _.escape(result.extraText || '') + '</span></td>');
+	rowArr.push('<td class="xY xW"><span class="sehUKb">' + _.escape(result.shortDetailText || '') + '</span></td>');
 
 	return rowArr.join('');
 }
 
-module.exports = GmailResultsSectionView;
+module.exports = GmailCollapsibleSectionView;

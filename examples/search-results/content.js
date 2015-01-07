@@ -5,16 +5,16 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 			return;
 		}
 
-		var section = searchResultsView.addResultsSection({
-			sectionName: 'Monkeys'
+		var section = searchResultsView.addCollapsibleSection({
+			title: 'Monkeys'
 		});
 
 		setTimeout(function(){
-			section.setResults([
+			section.setTableRows([
 				{
 					title: 'title',
 					body: 'body',
-					extraText: 'extra',
+					shortDetailText: 'extra',
 					iconUrl: chrome.runtime.getURL('monkey.png'),
 					onClick: function(){
 						console.log('hi');
@@ -23,7 +23,7 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 				{
 					title: 'wagon of monkeys',
 					body: '2222',
-					routeName: 'inbox'
+					routeID: inboxSDK.Router.NativeRouteIDs.Inbox
 				}
 			]);
 		}, 2000);

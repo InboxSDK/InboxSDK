@@ -1,6 +1,6 @@
 {
-  "name": "Search Results Inbox SDK example",
-  "description": "Demonstrate adding results to search results",
+  "name": "Collapsible Sections Inbox SDK example",
+  "description": "Demonstrate adding collapsible sections list pages",
   "version": "0.1",
   "content_scripts": [
     {

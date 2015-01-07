@@ -13,7 +13,7 @@ var RouteViewDriver = require('../../../../driver-interfaces/route-view-driver')
 var GmailRowListView = require('../gmail-row-list-view');
 var GmailThreadView = require('../gmail-thread-view');
 
-var GmailResultsSectionView = require('../gmail-results-section-view');
+var GmailCollapsibleSectionView = require('../gmail-collapsible-section-view');
 
 var GmailElementGetter = require('../../gmail-element-getter');
 
@@ -113,7 +113,7 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint){
-		var gmailResultsSectionView = new GmailResultsSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search);
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView

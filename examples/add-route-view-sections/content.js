@@ -6,11 +6,11 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			subtitle: 'chunkeys'
 		});
 
-		view1.setResults([
+		view1.setTableRows([
 			{
 				title: 'title',
 				body: 'body',
-				extraText: 'extra',
+				shortDetailText: 'extra',
 				iconUrl: chrome.runtime.getURL('monkey.png'),
 				onClick: function(){
 					console.log('hi');
@@ -23,43 +23,45 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			}
 		]);
 
-		searchResultsView.addCollapsibleSection({
+		var view2 = searchResultsView.addCollapsibleSection({
 			title: 'Lions',
 			subtitle: 'lions',
 			summaryText: 'click me',
 			onSummaryClick: function(){
 				console.log('clicked!');
-			},
-			results: [
-				{
-					title: 'lion title',
-					body: 'lion body',
-					extraText: 'extra',
-					iconUrl: chrome.runtime.getURL('lion.png'),
-					onClick: function(){
-						console.log('roar');
-					}
-				}
-			]
+			}
 		});
 
+		view2.setTableRows([
+			{
+				title: 'lion title',
+				body: 'lion body',
+				shortDetailText: 'extra',
+				iconUrl: chrome.runtime.getURL('lion.png'),
+				onClick: function(){
+					console.log('roar');
+				}
+			}
+		]);
 
-		searchResultsView.addCollapsibleSection({
+
+		var view3 = searchResultsView.addCollapsibleSection({
 			title: 'Third wheel',
 			summaryText: 'click me',
 			hasDropdown: true,
 			onDropdownClick: function(event){
 				event.dropdown.el.textContent = 'hello world';
-			},
-			results: [
-				{
-					title: 'wheels',
-					onClick: function(){
-						console.log('squeeeek');
-					}
-				}
-			]
+			}
 		});
+
+		view3.setTableRows([
+			{
+				title: 'wheels',
+				onClick: function(){
+					console.log('squeeeek');
+				}
+			}
+		]);
 
 	});
 

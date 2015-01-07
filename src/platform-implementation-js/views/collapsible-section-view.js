@@ -10,30 +10,30 @@ var membersMap = new Map();
 /**
  * This class represents a result section.
  */
-var ResultsSectionView = function(resultsSectionViewDriver, driver){
+var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
 	EventEmitter.call(this);
 
 	var members = {};
 	membersMap.set(this, members);
-	members.resultsSectionViewDriver = resultsSectionViewDriver;
+	members.collapsibleSectionViewDriver = collapsibleSectionViewDriver;
 
-	_bindToEventStream(this, resultsSectionViewDriver, driver);
+	_bindToEventStream(this, collapsibleSectionViewDriver, driver);
 };
 
-ResultsSectionView.prototype = Object.create(EventEmitter.prototype);
+CollapsibleSectionView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(ResultsSectionView.prototype, {
+_.extend(CollapsibleSectionView.prototype, {
 
 	/**
 	 * Set the results for this section
 	 * @param {ResultDescriptor[]}
 	 */
-	setResults: function(resultsArray){
+	setTableRows: function(rows){
 		if(!membersMap.has(this)){
 			return;
 		}
 
-		membersMap.get(this).resultsSectionViewDriver.setResults(resultsArray);
+		membersMap.get(this).collapsibleSectionViewDriver.setTableRows(rows);
 	},
 
 	destroy: function(){
@@ -43,7 +43,7 @@ _.extend(ResultsSectionView.prototype, {
 
 		var members = membersMap.get(this);
 
-		members.resultsSectionViewDriver.destroy();
+		members.collapsibleSectionViewDriver.destroy();
 
 		this.removeAllListeners();
 		membersMap.delete(this);
@@ -64,41 +64,41 @@ _.extend(ResultsSectionView.prototype, {
 });
 
 
-function _bindToEventStream(resultsSectionView, resultsSectionViewDriver, driver){
-	resultsSectionViewDriver
+function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver, driver){
+	collapsibleSectionViewDriver
 		.getEventStream()
 		.map('.eventName')
-		.onValue(resultsSectionView, 'emit');
+		.onValue(collapsibleSectionView, 'emit');
 
-	resultsSectionViewDriver
+	collapsibleSectionViewDriver
 		.getEventStream()
 		.filter(function(event){
 			return event.eventName === 'rowClicked';
 		})
-		.map('.resultDescriptor')
-		.onValue(function(resultDescriptor){
-			if(resultDescriptor.routeID){
-				driver.goto(resultDescriptor.routeID, resultDescriptor.routeParams);
+		.map('.rowDescriptor')
+		.onValue(function(rowDescriptor){
+			if(rowDescriptor.routeID){
+				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
 			}
 
-			if(_.isFunction(resultDescriptor.onClick)){
-				resultDescriptor.onClick();
+			if(_.isFunction(rowDescriptor.onClick)){
+				rowDescriptor.onClick();
 			}
 		});
 
-	resultsSectionViewDriver
+	collapsibleSectionViewDriver
 		.getEventStream()
 		.filter(function(event){
 			return event.eventName === 'summaryClicked';
 		})
-		.map('.resultDescriptor')
-		.onValue(function(resultDescriptor){
-			if(resultDescriptor.onSummaryClick){
-				resultDescriptor.onSummaryClick(resultsSectionView);
+		.map('.collapsibleSectionDescriptor')
+		.onValue(function(collapsibleSectionDescriptor){
+			if(collapsibleSectionDescriptor.onSummaryClick){
+				collapsibleSectionDescriptor.onSummaryClick(collapsibleSectionView);
 			}
 		});
 
-	resultsSectionViewDriver.getEventStream().onEnd(resultsSectionView, 'emit', 'unload');
+	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'unload');
 }
 
 
@@ -169,4 +169,4 @@ onClick: null
 
 
 
-module.exports = ResultsSectionView;
+module.exports = CollapsibleSectionView;

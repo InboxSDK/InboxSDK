@@ -478,8 +478,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   float: none;
 }
 
-.Wc .J-JN-M-I {
+.inboxsdk__resultsSection_header_summaryText.Wm:last-child .amH {
+  padding-right: 0px;
+  margin-right: 0px;
+}
+
+  .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection_header_summaryText:last-child {
+    margin-right: 11px;
+  }
+
+.inboxsdk__custom_sections.Wc .J-JN-M-I {
   margin-right: 13px;
+}
+
+.inboxsdk__resultsSection_header_summaryText.Wm + .aAE {
+  margin-left: 3px;
 }
 
 .inboxsdk__resultsSection .TB.TC {
