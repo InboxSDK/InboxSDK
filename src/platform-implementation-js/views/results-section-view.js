@@ -26,7 +26,7 @@ _.extend(ResultsSectionView.prototype, {
 
 	/**
 	 * Set the results for this section
-	 * @param {[ResultDescriptor]}
+	 * @param {ResultDescriptor[]}
 	 */
 	setResults: function(resultsArray){
 		if(!membersMap.has(this)){

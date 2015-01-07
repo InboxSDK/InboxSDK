@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 var threadMetadataOracle = {
   getThreadIdForThreadRow: function(threadRow) {
     var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
@@ -15,7 +17,11 @@ var threadMetadataOracle = {
     event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, null);
     threadContainerElement.dispatchEvent(event);
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
-  }
+  },
+
+  getUserEmailAddress: _.once(function() {
+    return document.head.getAttribute('data-inboxsdk-user-email-address');
+  })
 };
 
 module.exports = threadMetadataOracle;

@@ -27,7 +27,7 @@ var dir = require('node-dir');
 var sys = require('sys');
 var execSync = require('exec-sync');
 
-var sdkFilename = 'inboxsdk-'+require('./package.json').version+'.js';
+var sdkFilename = 'inboxsdk.js';
 
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
@@ -110,7 +110,7 @@ function browserifyTask(name, deps, entry, destname) {
           preserveComments: 'some'
         }))))
         .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
-          // don't include sourcemap comment in the inboxsdk-x.js file that we
+          // don't include sourcemap comment in the inboxsdk.js file that we
           // distribute to developers since it'd always be broken.
           addComment: !args.production || name != 'sdk',
           sourceMappingURLPrefix: name == 'injected' ?
@@ -211,13 +211,13 @@ gulp.task('docs', function(cb) {
                           .value();
 
 
-    console.log(JSON.stringify(docsJson, null, 2));
     fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
   });
 
 });
 
 function parseCommentsInFile(file) {
+  gutil.log("Parsing: " + gutil.colors.cyan(file));
   var comments = JSON.parse(execSync("jsdoc " + file + ' -t templates/haruki -d console -q format=json'));
   comments['filename'] = file;
   return comments;
