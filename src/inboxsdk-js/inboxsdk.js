@@ -59,6 +59,8 @@ var InboxSDK = /*deprecated*/ function(appId, opts){
   });
 };
 
+InboxSDK.LOADER_VERSION = process.env.VERSION;
+
 InboxSDK.load = function(version, appId, opts){
   opts = _.extend({
     // defaults
@@ -73,18 +75,12 @@ InboxSDK.load = function(version, appId, opts){
   checkRequirements(opts);
 
   var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
-  var loadPromise = platformImplementationLoader.load().then(function(Imp) {
-    /*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
-    return Imp;
-  });
+  var loadPromise = platformImplementationLoader.load();
   loadPromise.catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
   return loadPromise;
 };
-
-InboxSDK.LOADER_VERSION = /*deprecated*/InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
-/*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
 
 InboxSDK.loadScript = require('../common/load-script');
 

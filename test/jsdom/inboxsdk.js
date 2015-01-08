@@ -14,17 +14,15 @@ global.window = document.parentWindow;
 document.head.setAttribute('data-inboxsdk-script-injected', true);
 
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
-assert.strictEqual(InboxSDK.IMPL_VERSION, null);
 
 var appOpts = {
   TEMPORARY_INTERNAL_skipWeakMapRequirement: true,
   globalErrorLogging: false
 };
 
-InboxSDK.load(1, "test", appOpts).then(function(inboxsdk) {
-  assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
-  assert.strictEqual(InboxSDK.IMPL_VERSION, 'beep');
+assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
 
+InboxSDK.load(1, "test", appOpts).then(function(inboxsdk) {
   assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
 
