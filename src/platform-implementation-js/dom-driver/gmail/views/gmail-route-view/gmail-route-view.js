@@ -329,7 +329,7 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isListRoute: function(){
-		return this._gmailRouteInfo.isListRouteName(this._name) && this._rowListViews.length > 0;
+		return this._gmailRouteInfo.isListRouteName(this._name) && GmailElementGetter.getRowListElements().length > 0;
 	},
 
 	_isSettingsRoute: function(){

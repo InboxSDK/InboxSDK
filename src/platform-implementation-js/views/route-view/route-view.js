@@ -5,11 +5,6 @@ var EventEmitter = require('events').EventEmitter;
 var RSVP = require('rsvp');
 var Map = require('es6-unweak-collections').Map;
 
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
-
-var CollapsibleSectionView = require('./collapsible-section-view');
-
 
 var membersMap = new Map();
 
@@ -25,15 +20,13 @@ var membersMap = new Map();
  *
  * When navigating to RouteViews, parameters can be supplied (see <code>Router.goto</code>) which can later be fetched using <code>getParams</code>.
  */
-var RouteView = function(routeViewDriver, driver){
+var RouteView = function(routeViewDriver){
 	EventEmitter.call(this);
 
 	var members = {};
 	membersMap.set(this, members);
 
 	members.routeViewDriver = routeViewDriver;
-	members.driver = driver;
-	members.sectionViews = [];
 
 	_bindToEventStream(routeViewDriver, this);
 };
@@ -41,22 +34,6 @@ var RouteView = function(routeViewDriver, driver){
 RouteView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(RouteView.prototype, /** @lends RouteView */{
-
-	/**
-	 * Adds a collapsible section to the page. On create "loading" is shown in the section by default.
-	 * You can then set the content by calling actual results by calling setResults on the returned {CollapsibleSectionView} object.
-	 * @param {CollapsibleSectionDescriptor}
-	 * @returns {CollapsibleSectionView}
-	 */
-	addCollapsibleSection: function(collapsibleSectionDescriptor){
-		var members = membersMap.get(this);
-
-		var collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(baconCast(Bacon, collapsibleSectionDescriptor).toProperty(), members.appId);
-		var collapsibleSectionView = new CollapsibleSectionView(collapsibleSectionViewDriver, members.driver);
-
-		members.sectionViews.push(collapsibleSectionView);
-		return collapsibleSectionView;
-	},
 
 	/**
 	 * Get the name of the RouteView. If this is a custom route then this is the name you registered the route with.
@@ -104,14 +81,6 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return membersMap.get(this).routeViewDriver.isCustomRoute();
 	},
 
-	/**
-	* Gets the element representing the content area of this RouteView
-	* @return {HTMLElement}
-	*/
-	getElement: function(){
-		return membersMap.get(this).routeViewDriver.getCustomViewElement();
-	},
-
 	setRouteID: function(routeID){
 		membersMap.get(this).routeID = routeID;
 	},
@@ -120,13 +89,6 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		if(!membersMap.has(this)){
 			return;
 		}
-
-		var members = membersMap.get(this);
-
-		members.routeViewDriver.destroy();
-		members.sectionViews.forEach(function(sectionView){
-			sectionView.destroy();
-		});
 
 		this.removeAllListeners();
 		membersMap.delete(this);
@@ -142,6 +104,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 function _bindToEventStream(routeViewDriver, routeView){
 	routeViewDriver.getEventStream().onEnd(routeView, 'emit', 'unload');
+	routeViewDriver.getEventStream().onEnd(routeView, 'destroy');
 }
 
 module.exports = RouteView;

@@ -6,7 +6,9 @@ var Map = require('es6-unweak-collections').Map;
 
 var HandlerRegistry = require('../lib/handler-registry');
 
-var RouteView = require('../views/route-view');
+var RouteView = require('../views/route-view/route-view');
+var ListRouteView = require('../views/route-view/list-route-view');
+var CustomRouteView = require('../views/route-view/custom-route-view');
 
 var memberMap = new Map();
 
@@ -18,9 +20,9 @@ var Router = function(appId, driver){
 	members.driver = driver;
 
 	members.currentRouteViewDriver = null;
-	members.currentRouteView = null;
 
-	members.handlerRegistry = new HandlerRegistry();
+	members.allRoutesHandlerRegistry = new HandlerRegistry();
+	members.listRouteHandlerRegistries = {};
 
 	members.customRoutes = [];
 
@@ -44,13 +46,34 @@ _.extend(Router.prototype,  {
 		memberMap.get(this).driver.goto(routeID, params);
 	},
 
-	createNewRoute: function(routerDescription){
-		var members = memberMap.get(this);
-		members.customRoutes.push(routerDescription);
+	handleAllRoutes: function(handler){
+		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
 	},
 
-	registerRouteViewHandler: function(handler){
-		return memberMap.get(this).handlerRegistry.registerHandler(handler);
+	handleListRoute: function(routeID, handler){
+		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
+		if(!listRouteHandlerRegistries[routeID]){
+			listRouteHandlerRegistries[routeID] = new HandlerRegistry();
+		}
+
+		return listRouteHandlerRegistries[routeID].registerHandler(handler);
+	},
+
+	handleCustomRoute: function(routeID, handler){
+		var customRouteDescriptor = {
+			routeID: routeID,
+			onActivate: handler
+		};
+
+		var customRoutes = memberMap.get(this).customRoutes;
+		customRoutes.push(customRouteDescriptor);
+
+		return function(){
+			var index = customRoutes.indexOf(customRouteDescriptor);
+			if(index > -1){
+				customRoutes.splice(index, 1);
+			}
+		};
 	}
 
 });
@@ -59,27 +82,36 @@ _.extend(Router.prototype,  {
 function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
 
-	if(members.currentRouteView){
-		members.currentRouteView.destroy();
+	if(members.currentRouteViewDriver){
+		members.currentRouteViewDriver.destroy();
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver, members.driver);
 
 	if(routeView.isCustomRoute()){
-		_informRelevantCustomRoutes(members, routeView, routeViewDriver);
+		_informRelevantCustomRoutes(members, routeViewDriver);
 	}
 	else{
 		members.driver.showNativeRouteView();
 	}
 
 	members.pendingSearchResultsView = null;
-	members.handlerRegistry.addTarget(routeView);
-	members.currentRouteView = routeView;
+	members.allRoutesHandlerRegistry.addTarget(routeView);
+
+	if(!routeView.isCustomRoute() && routeView.getRouteType() === router.NativeRouteTypes.List){
+		var listRouteView = new ListRouteView(routeViewDriver, members.driver);
+
+		if(members.listRouteHandlerRegistries[routeView.getRouteID()]){
+			members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
+		}
+	}
 }
 
 
-function _informRelevantCustomRoutes(members, routeView, routeViewDriver){
+function _informRelevantCustomRoutes(members, routeViewDriver){
+	var customRouteView = new CustomRouteView(routeViewDriver);
+
 	members.customRoutes
 		.filter(function(customRoute){
 			if(!customRoute.routeID){
@@ -96,22 +128,18 @@ function _informRelevantCustomRoutes(members, routeView, routeViewDriver){
 		})
 		.forEach(function(customRoute){
 			if(_.isArray(customRoute.routeID)){
-				routeView.setRouteID(
+				customRouteView.setRouteID(
 					_.find(customRoute.routeID, function(routeID){
 						return routeViewDriver.doesMatchRouteID(routeID);
 					})
 				);
 			}
 			else{
-				routeView.setRouteID(customRoute.routeID);
+				customRouteView.setRouteID(customRoute.routeID);
 			}
 			try{
 				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
-
-				customRoute.onActivate({
-					routeView: routeView,
-					el: routeView.getElement()
-				});
+				customRoute.onActivate(customRouteView);
 			}
 			catch(err){
 				setTimeout(function() {

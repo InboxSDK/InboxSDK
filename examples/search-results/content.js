@@ -1,11 +1,8 @@
 InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 
-	inboxSDK.Router.registerRouteViewHandler(function(searchResultsView){
-		if(searchResultsView.getRouteID() !== inboxSDK.Router.NativeRouteIDs.Search){
-			return;
-		}
+	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.Search, function(listRouteView){
 
-		var section = searchResultsView.addCollapsibleSection({
+		var section = listRouteView.addCollapsibleSection({
 			title: 'Monkeys'
 		});
 

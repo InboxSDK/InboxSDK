@@ -1,7 +1,7 @@
 InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 
-	inboxSDK.Router.registerRouteViewHandler(function(searchResultsView){
-		var view1 = searchResultsView.addCollapsibleSection({
+	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.Inbox, function(listRouteView){
+		var view1 = listRouteView.addCollapsibleSection({
 			title: 'Monkeys',
 			subtitle: 'chunkeys'
 		});
@@ -23,7 +23,7 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			}
 		]);
 
-		var view2 = searchResultsView.addCollapsibleSection({
+		var view2 = listRouteView.addCollapsibleSection({
 			title: 'Lions',
 			subtitle: 'lions',
 			summaryText: 'click me',
@@ -45,7 +45,7 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 		]);
 
 
-		var view3 = searchResultsView.addCollapsibleSection({
+		var view3 = listRouteView.addCollapsibleSection({
 			title: 'Third wheel',
 			summaryText: 'click me',
 			hasDropdown: true,
