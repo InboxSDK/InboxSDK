@@ -12,6 +12,15 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 				body: 'body',
 				shortDetailText: 'extra',
 				iconUrl: chrome.runtime.getURL('monkey.png'),
+				labels: [
+					{
+						title: 'label',
+						backgroundColor: 'yellow',
+						foregroundColor: 'red',
+						iconUrl: chrome.runtime.getURL('monkey.png')
+					}
+				],
+				isRead: true,
 				onClick: function(){
 					console.log('hi');
 				}
@@ -27,6 +36,7 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			title: 'Lions',
 			subtitle: 'lions',
 			summaryText: 'click me',
+			isRead: true,
 			onSummaryClick: function(){
 				console.log('clicked!');
 			}

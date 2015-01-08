@@ -283,7 +283,14 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 
 		tableRows.forEach(function(result){
 			var rowElement = document.createElement('tr');
-			rowElement.setAttribute('class', 'zA zE');
+
+			if(result.isRead){
+				rowElement.setAttribute('class', 'zA yO');
+			}
+			else{
+				rowElement.setAttribute('class', 'zA zE');
+			}
+
 			rowElement.innerHTML = _getRowHTML(result);
 
 			tbody.appendChild(rowElement);
@@ -497,10 +504,20 @@ function _getRowHTML(result){
 
 	rowArr.push('<td class="xY"></td>');
 
+
 	rowArr = rowArr.concat([
 		'<td class="xY">',
 			'<div class="V3">',
-				'<span class="ya35Wb">',
+				'<span class="ya35Wb">'
+	]);
+
+	if(_.isArray(result.labels)){
+		result.labels.forEach(function(label){
+			rowArr = rowArr.concat(_getLabelHTML(label));
+		});
+	}
+
+	rowArr = rowArr.concat([
 					_.escape(result.body || ''),
 				'</span>',
 			'</div>',
@@ -512,5 +529,38 @@ function _getRowHTML(result){
 
 	return rowArr.join('');
 }
+
+function _getLabelHTML(label){
+	var backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
+	var foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
+
+	var retArray = [
+		'<div class="ar as" data-tooltip="' + _.escape(label.title) + '">',
+			'<div class="at" style="background-color: ' + backgroundColor + '; border-color: ' + backgroundColor + ';">'
+	];
+
+	if(label.iconClass){
+		retArray = retArray.concat([
+			'<div class="inboxsdk__resultsSection_label_icon ' + label.iconClass + '"></div>'
+		]);
+	}
+	else if(label.iconUrl){
+		retArray = retArray.concat([
+			'<img class="inboxsdk__resultsSection_label_icon" src="' + label.iconUrl + '" />'
+		]);
+	}
+
+
+	retArray = retArray.concat([
+				'<div class="av" style="color: ' + foregroundColor + '; ">',
+					_.escape(label.title),
+				'</div>',
+			'</div>',
+		'</div>'
+	]);
+
+	return retArray.join('');
+}
+
 
 module.exports = GmailCollapsibleSectionView;
