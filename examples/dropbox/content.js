@@ -1,6 +1,6 @@
 Promise.all([
   InboxSDK.load('1', 'dropbox'),
-  InboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js')
+  InboxSDK.loadScript('https://www.dropbox.com/static/api/2/dropins.js')
 ]).then(function(results){
   var sdk = results[0];
 
