@@ -19,22 +19,16 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 			elementStream = _setupStandardComposeElementStream();
 		}
 
-		return makeElementViewStream({
-			elementStream: elementStream,
-			viewFn: function(el) {
-				return new GmailComposeView(el, xhrInterceptorStream);
-			}
-		});
+		return elementStream.flatMap(makeElementViewStream(function(el) {
+			return new GmailComposeView(el, xhrInterceptorStream);
+		}));
 	}).merge(
 		messageViewDriverStream.flatMap(function(gmailMessageView){
-			return makeElementViewStream({
-				elementStream: gmailMessageView.getReplyElementStream(),
-				viewFn: function(el) {
-					var view = new GmailComposeView(el, xhrInterceptorStream);
-					view.setIsInlineReplyForm(true);
-					return view;
-				}
-			});
+			return gmailMessageView.getReplyElementStream().flatMap(makeElementViewStream(function(el) {
+				var view = new GmailComposeView(el, xhrInterceptorStream);
+				view.setIsInlineReplyForm(true);
+				return view;
+			}));
 		})
 	).flatMap(_waitForReady);
 }

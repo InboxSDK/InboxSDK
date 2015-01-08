@@ -26,9 +26,9 @@ describe('makeElementViewStream', function() {
     target.children = [child1, child2];
 
     var call = 0;
-    makeElementViewStream({
-      elementStream: makeElementChildStream(target).takeUntil(stopper),
-      viewFn: function(el) {
+    makeElementChildStream(target)
+      .takeUntil(stopper)
+      .flatMap(makeElementViewStream(function(el) {
         activeViewCount++;
         return {
           el: el,
@@ -44,23 +44,22 @@ describe('makeElementViewStream', function() {
             }
           }
         };
-      }
-    }).onValue(function(view) {
-      switch(++call) {
-        case 1:
-          assert.strictEqual(view.el, child1);
-          break;
-        case 2:
-          assert.strictEqual(view.el, child2);
-          break;
-        case 3:
-          assert.strictEqual(view.el, child3);
-          stopper.push('beep');
-          break;
-        default:
-          throw new Error("should not happen");
-      }
-    });
+      })).onValue(function(view) {
+        switch(++call) {
+          case 1:
+            assert.strictEqual(view.el, child1);
+            break;
+          case 2:
+            assert.strictEqual(view.el, child2);
+            break;
+          case 3:
+            assert.strictEqual(view.el, child3);
+            stopper.push('beep');
+            break;
+          default:
+            throw new Error("should not happen");
+        }
+      });
 
     setTimeout(function() {
       target.emit('mutation', {
