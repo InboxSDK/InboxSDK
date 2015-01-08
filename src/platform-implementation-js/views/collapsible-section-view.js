@@ -36,6 +36,10 @@ _.extend(CollapsibleSectionView.prototype, {
 		membersMap.get(this).collapsibleSectionViewDriver.setTableRows(rows);
 	},
 
+	setCollapsed: function(value){
+		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
+	},
+
 	destroy: function(){
 		if(!membersMap.has(this)){
 			return;

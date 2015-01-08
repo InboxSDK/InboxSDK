@@ -8,7 +8,7 @@ var Map = require('es6-unweak-collections').Map;
 var membersMap = new Map();
 
 var CustomRouteView = function(routeViewDriver){
-	RouteView.apply(this, routeViewDriver);
+	RouteView.call(this, routeViewDriver);
 
 	var members = {};
 	membersMap.set(this, members);

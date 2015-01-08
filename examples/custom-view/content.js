@@ -1,15 +1,12 @@
 InboxSDK.load(1.0, 'custom-view').then(function(inboxSDK){
 
 
-inboxSDK.Router.createNewRoute({
-	routeID: 'example/:monkeyName',
-	onActivate: function(event){
-		event.el.innerHTML = 'hello world!';
-	}
+inboxSDK.Router.handleCustomRoute('example/:monkeyName', function(customRouteView){
+	customRouteView.getElement().innerHTML = 'hello world!';
 });
 
 
-inboxSDK.Router.registerRouteViewHandler(function(routeView){
+inboxSDK.Router.handleAllRoutes(function(routeView){
 	console.log('id', routeView.getRouteID());
 	console.log('type', routeView.getRouteType());
 	console.log('params', routeView.getParams());
