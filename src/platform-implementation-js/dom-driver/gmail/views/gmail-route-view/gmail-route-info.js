@@ -26,7 +26,7 @@ Object.defineProperties(routeIDs, {
 		writable: false
 	},
 
-	'All': {
+	'All_Mail': {
 		value: 'all/:page',
 		writable: false
 	},
@@ -99,12 +99,17 @@ Object.defineProperties(routeIDs, {
 	'Settings': {
 		value: 'settings/:section',
 		writable: false
+	},
+
+	'ANY_LIST': {
+		value: '*',
+		writable: false
 	}
 });
 
 var compatibleRouteIDs = {};
 compatibleRouteIDs[routeIDs.Inbox] = 'inbox/p:page';
-compatibleRouteIDs[routeIDs.All] = 'all/p:page';
+compatibleRouteIDs[routeIDs.All_Mail] = 'all/p:page';
 compatibleRouteIDs[routeIDs.Sent] = 'sent/p:page';
 compatibleRouteIDs[routeIDs.Starred] = 'starred/p:page';
 compatibleRouteIDs[routeIDs.Drafts] = 'drafts/p:page';
@@ -125,7 +130,7 @@ compatibleRouteIDs[routeIDs.Settings] = routeIDs.Settings;
 var routeNames = {
 	'inbox': routeIDs.Inbox,
 	'section_query': routeIDs.Search,
-	'all': routeIDs.All,
+	'all': routeIDs.All_Mail,
 	'imp': routeIDs.Important,
 	'contacts': routeIDs.Contacts,
 	'contact': routeIDs.Contact,

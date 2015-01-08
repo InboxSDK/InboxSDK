@@ -427,6 +427,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   padding-top: 0px;
 }
 
+  .inboxsdk__custom_sections.Wc .Wg {
+    border-bottom: 0;
+    padding: 0px;
+  }
+
 .inboxsdk__results_collapsedContainer > div {
   display: inline-block;
 }

@@ -1,6 +1,6 @@
 InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 
-	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.Inbox, function(listRouteView){
+	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.ANY_LIST, function(listRouteView){
 		var view1 = listRouteView.addCollapsibleSection({
 			title: 'Monkeys',
 			subtitle: 'chunkeys'

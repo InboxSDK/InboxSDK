@@ -105,6 +105,10 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 		if(members.listRouteHandlerRegistries[routeView.getRouteID()]){
 			members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
 		}
+
+		if(members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST]){
+			members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
+		}
 	}
 }
 
