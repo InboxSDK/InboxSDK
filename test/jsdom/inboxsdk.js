@@ -20,12 +20,8 @@ var appOpts = {
   TEMPORARY_INTERNAL_skipWeakMapRequirement: true,
   globalErrorLogging: false
 };
-var inboxsdk = new InboxSDK("test", appOpts);
 
-assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
-assert.strictEqual(inboxsdk.IMPL_VERSION, null);
-
-inboxsdk._platformImplementationLoader.load().then(function() {
+InboxSDK.load(1, "test", appOpts).then(function(inboxsdk) {
   assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
   assert.strictEqual(InboxSDK.IMPL_VERSION, 'beep');
 
@@ -33,8 +29,8 @@ inboxsdk._platformImplementationLoader.load().then(function() {
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
 
   RSVP.all([
-    InboxSDK.newApp('new1', appOpts),
-    InboxSDK.newApp('new2', appOpts)
+    InboxSDK.load(1, 'new1', appOpts),
+    InboxSDK.load(1, 'new2', appOpts)
   ]).then(function(apps) {
     assert.notStrictEqual(apps[0], apps[1]);
     assert.strictEqual(apps[0].LOADER_VERSION, 'beep');

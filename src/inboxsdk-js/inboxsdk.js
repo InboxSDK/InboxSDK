@@ -14,10 +14,11 @@ var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
-/*deprecated*/ var InboxSDK = function(appId, opts){
+var InboxSDK = /*deprecated*/ function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
+  console.warn("Deprecation warning: Use InboxSDK.load(...) instead.");
   opts = _.extend({
     // defaults
     globalErrorLogging: true
@@ -58,10 +59,6 @@ var Modal = require('./api-definitions/modal');
   });
 };
 
-/*deprecated*/ InboxSDK.newApp = function(appId, opts){
-  return InboxSDK.load(1, appId, opts);
-};
-
 InboxSDK.load = function(version, appId, opts){
   opts = _.extend({
     // defaults
@@ -89,8 +86,6 @@ InboxSDK.load = function(version, appId, opts){
 InboxSDK.LOADER_VERSION = /*deprecated*/InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
 /*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
 
-InboxSDK.Util = {
-  loadScript: require('../common/load-script')
-};
+InboxSDK.loadScript = require('../common/load-script');
 
 module.exports = InboxSDK;
