@@ -2,7 +2,7 @@ function log() {
 	console.log.apply(console, ['thread-rows'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.newApp('thread-rows').then(function(inboxSDK) {
+InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
 	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadId();
