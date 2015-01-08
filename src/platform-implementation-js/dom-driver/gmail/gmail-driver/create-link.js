@@ -17,6 +17,10 @@ function createLink(GmailRouteInfo, routeID, params){
 		}
 	}
 
+	if(!params.page){
+		params.page = 0;
+	}
+
 	var parts = routeID.split('/');
 	var processedRoute = parts
 							.map(function(part){
@@ -25,7 +29,7 @@ function createLink(GmailRouteInfo, routeID, params){
 								}
 
 								var colonParts = part.split(':');
-								if(params[colonParts[1]]){
+								if(typeof params[colonParts[1]] !== 'undefined'){
 									return colonParts[0] + params[colonParts[1]];
 								}
 
@@ -33,6 +37,12 @@ function createLink(GmailRouteInfo, routeID, params){
 							})
 							.map(encodeURIComponent)
 							.join('/');
+
+
+	//check if link is of the form inbox/p0 or search/blah/p0
+	if(GmailRouteInfo.isListRouteName(parts[0]) && processedRoute.indexOf('p0') === processedRoute.length - 2){
+		processedRoute = processedRoute.substring(0, processedRoute.length - 3);
+	}
 
 	return location.origin + '/#' + processedRoute;
 }
