@@ -15,8 +15,8 @@ var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
 /**
-* The functions in this class are only used for load related functionality like loading the SDK itself or other external scripts.
 * @class
+* The functions in this class are only used for load related functionality like loading the SDK itself or other external scripts.
 */
 var InboxSDK = /*deprecated*/ function(appId, opts){
   if (!(this instanceof InboxSDK)) {
