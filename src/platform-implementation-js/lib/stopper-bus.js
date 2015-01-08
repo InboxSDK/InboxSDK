@@ -1,5 +1,4 @@
 var Bacon = require('baconjs');
-var Set = require('es6-unweak-collections').Set;
 
 // An StopperBus is created from a stopper stream, and can have more stopper
 // streams added to it. It has a stream property which is a stopper stream which
@@ -14,7 +13,7 @@ function StopperBus(streams) {
   this._bus.onValue(function() {});
 
   this.stream = this._bus.mapEnd(null);
-  this._streams = new Set();
+  this._streamCount = 0;
   this.add(streams);
 }
 
@@ -26,15 +25,11 @@ StopperBus.prototype.add = function(newStreams) {
   if (!Array.isArray(newStreams)) {
     newStreams = [newStreams];
   }
-  // All the new streams must be in the set before we listen on them, or else
-  // if the first stream synchronously ends, the stopperbus will end there.
-  newStreams.forEach(function(newStream) {
-    self._streams.add(newStream);
-  });
+  this._streamCount += newStreams.length;
   newStreams.forEach(function(newStream) {
     newStream.take(1).takeUntil(self.stream).onValue(function() {
-      self._streams.delete(newStream);
-      if (self._streams.size === 0) {
+      self._streamCount--;
+      if (self._streamCount === 0) {
         self._ended = true;
         self._bus.end();
       }
@@ -43,7 +38,7 @@ StopperBus.prototype.add = function(newStreams) {
 };
 
 StopperBus.prototype.getSize = function() {
-  return this._streams.size;
+  return this._streamCount;
 };
 
 module.exports = StopperBus;
