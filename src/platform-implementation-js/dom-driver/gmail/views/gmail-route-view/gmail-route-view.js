@@ -51,7 +51,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
-		{name: '_sectionsContainer', destroy: true},
+		{name: '_sectionsContainer', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_threadMetadataOracle', destroy: false, set: true},
@@ -253,6 +253,12 @@ _.extend(GmailRouteView.prototype, {
 
 			GmailElementGetter.getMainContentContainer().insertBefore(this._sectionsContainer, GmailElementGetter.getMainContentContainer().firstChild);
 			sectionsContainer = this._sectionsContainer;
+		}
+		else if(!sectionsContainer.classList.contains('Wc') && this._isSearchRoute()){
+			sectionsContainer.classList.add('Wc');
+		}
+		else if(sectionsContainer.classList.contains('Wc') && !this._isSearchRoute()){
+			sectionsContainer.classList.remove('Wc');
 		}
 
 		return sectionsContainer;
