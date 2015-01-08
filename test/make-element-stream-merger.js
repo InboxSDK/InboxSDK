@@ -1,5 +1,6 @@
 var assert = require('assert');
 var Bacon = require('baconjs');
+var sinon = require('sinon');
 var Symbol = require('../src/common/symbol');
 
 var makeElementStreamMerger = require('../src/platform-implementation-js/lib/dom/make-element-stream-merger');
@@ -115,5 +116,37 @@ describe('makeElementStreamMerger', function() {
       bus.push(e2);
       bus.push(e3);
     }, 0);
+  });
+
+  it('warns if element stays in multiple streams', function(done) {
+    sinon.stub(console, "warn");
+    after(function() {
+      console.warn.restore();
+    });
+    var e1 = {
+      el: Symbol('e1.el'),
+      removalStream: new Bacon.Bus()
+    };
+    var e2 = {
+      el: e1.el,
+      removalStream: new Bacon.Bus()
+    };
+    var e3 = {
+      el: e1.el,
+      removalStream: new Bacon.Bus()
+    };
+    var i = 0;
+    Bacon.fromArray([e1, e2, e3]).flatMap(makeElementStreamMerger()).onValue(function(event) {
+      switch(++i) {
+        case 1:
+          setTimeout(function() {
+            assert(console.warn.called > 0, 'console.warn was called');
+            done();
+          }, 5);
+          break;
+        default:
+          throw new Error("Should not happen");
+      }
+    });
   });
 });

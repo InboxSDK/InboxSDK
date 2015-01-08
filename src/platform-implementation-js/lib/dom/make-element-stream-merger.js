@@ -9,6 +9,9 @@ function makeElementStreamMerger() {
   return function(event) {
     var stopperBus = knownElementStopperBuses.get(event.el);
     if (stopperBus) {
+      if (stopperBus.getSize() > 1) {
+        console.warn('element is part of multiple element streams', stopperBus.getSize(), event.el);
+      }
       stopperBus.add(event.removalStream.flatMap(delayImmediate));
       return Bacon.never();
     } else {
