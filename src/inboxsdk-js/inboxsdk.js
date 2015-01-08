@@ -14,10 +14,15 @@ var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
-/*deprecated*/ var InboxSDK = function(appId, opts){
+/**
+* @class
+* The functions in this class are only used for load related functionality like loading the SDK itself or other external scripts.
+*/
+var InboxSDK = /*deprecated*/ function(appId, opts){
   if (!(this instanceof InboxSDK)) {
     throw new Error("new must be used");
   }
+  console.warn("Deprecation warning: Use InboxSDK.load(...) instead.");
   opts = _.extend({
     // defaults
     globalErrorLogging: true
@@ -58,10 +63,15 @@ var Modal = require('./api-definitions/modal');
   });
 };
 
-/*deprecated*/ InboxSDK.newApp = function(appId, opts){
-  return InboxSDK.load(1, appId, opts);
-};
+InboxSDK.LOADER_VERSION = process.env.VERSION;
 
+/**
+* Loads the InboxSDK remotely and prepares it to be used.
+* @function
+* @param {string} version - the version of the SDK to load, the only acceptable value currently is "1"
+* @param {string} appId - the name of your app that was given to you by the InboxSDK team
+* @return {Promise} a promise which resolves when the SDK is loaded and ready to be used
+*/
 InboxSDK.load = function(version, appId, opts){
   opts = _.extend({
     // defaults
@@ -76,21 +86,20 @@ InboxSDK.load = function(version, appId, opts){
   checkRequirements(opts);
 
   var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
-  var loadPromise = platformImplementationLoader.load().then(function(Imp) {
-    /*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = Imp.IMPL_VERSION;
-    return Imp;
-  });
+  var loadPromise = platformImplementationLoader.load();
   loadPromise.catch(function(err) {
     console.error("Failed to load implementation:", err);
   });
   return loadPromise;
 };
 
-InboxSDK.LOADER_VERSION = /*deprecated*/InboxSDK.prototype.LOADER_VERSION = process.env.VERSION;
-/*deprecated*/ InboxSDK.IMPL_VERSION = InboxSDK.prototype.IMPL_VERSION = null;
+/**
+* Loads the a remote script into this extensions content script space and evals it
+* @function
+* @param {string} url - the URL of the remote script to load.
+* @return {Promise} a promise which resolves when this script is finished downloading and eval'ing
+*/
 
-InboxSDK.Util = {
-  loadScript: require('../common/load-script')
-};
+InboxSDK.loadScript = require('../common/load-script');
 
 module.exports = InboxSDK;

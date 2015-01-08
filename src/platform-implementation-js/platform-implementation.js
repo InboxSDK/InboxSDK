@@ -23,6 +23,15 @@ var PlatformImplementation = function(appId, opts){
 	this.LOADER_VERSION = opts.VERSION;
 	this.IMPL_VERSION = process.env.VERSION;
 
+	if (_.has(opts, 'REQUESTED_API_VERSION')) {
+		opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
+		if (opts.REQUESTED_API_VERSION !== 1) {
+			throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
+		}
+	} else {
+		// Deprecated `new InboxSDK` constructor used.
+	}
+
 	this._tracker = new Tracker(appId, opts);
 
 	this._driver = new GmailDriver();

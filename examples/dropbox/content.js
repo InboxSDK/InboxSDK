@@ -1,12 +1,12 @@
 Promise.all([
-  InboxSDK.newApp('dropbox'),
+  InboxSDK.load('1', 'dropbox'),
   InboxSDK.Util.loadScript('https://www.dropbox.com/static/api/2/dropins.js')
 ]).then(function(results){
-  var inboxSDK = results[0];
+  var sdk = results[0];
 
   Dropbox.init({appKey: "82bgsya5b7h847j"});
 
-  inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
+  sdk.Compose.registerComposeViewHandler(function(composeView) {
     composeView.addButton({
       title: "Add Dropbox File",
       iconUrl: chrome.runtime.getURL('images/icon48.png'),
@@ -40,7 +40,7 @@ Promise.all([
         chooser.style.width = "660px";
         chooser.style.height = "440px";
 
-        var modal = inboxSDK.Modal.show({
+        var modal = sdk.Modal.show({
           el: chooser,
           chrome: false
         });
@@ -48,7 +48,7 @@ Promise.all([
     });
   });
 
-  inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
+  sdk.Conversations.registerMessageViewHandler(function(messageView) {
     var links = messageView.getLinksInBody();
 
     links.filter(isEligibleLink).forEach(function(link) {
