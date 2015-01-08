@@ -61,6 +61,13 @@ var InboxSDK = /*deprecated*/ function(appId, opts){
 
 InboxSDK.LOADER_VERSION = process.env.VERSION;
 
+/**
+* Loads the InboxSDK remotely and prepares it to be used.
+* @function
+* @param {string} version - the version of the SDK to load, the only acceptable value currently is "1"
+* @param {string} appId - the name of your app that was given to you by the InboxSDK team
+* @return {Promise} a promise which resolves when the SDK is loaded and ready to be used
+*/
 InboxSDK.load = function(version, appId, opts){
   opts = _.extend({
     // defaults
@@ -81,6 +88,13 @@ InboxSDK.load = function(version, appId, opts){
   });
   return loadPromise;
 };
+
+/**
+* Loads the a remote script into this extensions content script space and evals it
+* @function
+* @param {string} url - the URL of the remote script to load.
+* @return {Promise} a promise which resolves when this script is finished downloading and eval'ing
+*/
 
 InboxSDK.loadScript = require('../common/load-script');
 
