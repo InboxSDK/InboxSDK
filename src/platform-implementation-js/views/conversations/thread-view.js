@@ -60,7 +60,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
 				 .value();
-	}
+	},
 
 	/**
 	* Gets all the MessageView objects in the thread regardless of their load state. See MessageView for more information on what "loaded" means.
