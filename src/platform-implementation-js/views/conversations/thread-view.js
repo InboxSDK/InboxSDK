@@ -45,8 +45,11 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 		return null;
 	},
 
-
-	getMessageViews: function(){
+	/**
+	* Gets all the loaded MessageView objects in the thread. See MessageView for more information on what "loaded" means.
+	* @return {MessageView[]} an array of message view objects
+	*/
+	getMessageViewsDataLoaded: function(){
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViews())
@@ -57,12 +60,27 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
 				 .value();
+	},
+
+	/**
+	* Gets all the MessageView objects in the thread regardless of their load state. See MessageView for more information on what "loaded" means.
+	* @return {MessageView[]} an array of message view objects
+	*/
+	getMessageViewsAll: function(){
+		var members = memberMap.get(this);
+
+		return _.chain(members.threadViewImplementation.getMessageViews())
+				 .map(function(messageViewDriver){
+				 	return members.membraneMap.get(messageViewDriver);
+				 })
+				 .value();
 	}
 
 
 	/**
-	 * Fires when the user hovers over a contact. {ContactHoverEvent}
+	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}
 	 * @event ThreadView#contactHover
+	 *
 	 */
 
 	/**

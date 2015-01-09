@@ -42,7 +42,24 @@ var Conversations = function(appId, driver){
 		MessageView,
 		members.messageViewHandlerRegistries.loaded
 	);
+
+	this.MessageViewStates = {};
+	Object.defineProperties(this.MessageViewStates, {
+		'HIDDEN': {
+			value: ["HIDDEN"],
+			writable: false
+		},
+		'COLLAPSED': {
+			value: ["COLLAPSED"],
+			writable: false
+		},
+		'EXPANDED': {
+			value: ["EXPANDED"],
+			writable: false
+		}
+	});
 };
+
 
 _.extend(Conversations.prototype, {
 
@@ -50,11 +67,11 @@ _.extend(Conversations.prototype, {
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(handler);
 	},
 
-	registerAllMessageViewHandler: function(handler){
+	registerMessageAllViewHandler: function(handler){
 		return memberMap.get(this). messageViewHandlerRegistry.registerHandler(handler);
 	},
 
-	registerLoadedMessageViewHandler: function(handler){
+	registerMessageViewDataLoadedHandler: function(handler){
 		return memberMap.get(this).messageViewHandlerRegistry.registerHandler(handler);
 	}
 
@@ -71,11 +88,13 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
 	});
 
 	combinedStream.onValue(function(event){
-		membraneMap.set(event.viewDriver, event.view);
+		if(!membraneMap.has(event.viewDriver)){
+			membraneMap.set(event.viewDriver, event.view);
 
-		event.view.on('unload', function(){
-			membraneMap.delete(event.viewDriver);
-		});
+			event.view.on('unload', function(){
+				membraneMap.delete(event.viewDriver);
+			});
+		}
 	});
 
 
