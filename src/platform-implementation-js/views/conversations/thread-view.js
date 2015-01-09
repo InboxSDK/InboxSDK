@@ -73,6 +73,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	/**
 	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}
 	 * @event ThreadView#contactHover
+	 *
 	 */
 
 	/**
