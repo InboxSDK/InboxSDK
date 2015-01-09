@@ -36,7 +36,7 @@ var InboxSDK = /*deprecated*/ function(appId, opts){
 
   this._appId = appId;
   this._platformImplementationLoader = new PlatformImplementationLoader(this._appId, opts);
-  this._tracker = new Tracker(this._appId, opts);
+  this._tracker = new Tracker(this._platformImplementationLoader, opts);
 
   this.Compose = new Compose(this._platformImplementationLoader);
   this.Conversations = new Conversations(this._platformImplementationLoader);
