@@ -17,7 +17,8 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 		});
 
 
-		threadView.on('contactHover', function(contact){
+		threadView.on('contactHover', function(event){
+			var contact = event.contact;
 			console.log(contact);
 			el.textContent = "Hi, " + contact.name + ' <' + contact.emailAddress + '>';
 		});
