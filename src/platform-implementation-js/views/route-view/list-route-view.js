@@ -29,7 +29,7 @@ _.extend(ListRouteView.prototype, {
 
 	/**
 	 * Adds a collapsible section to the page. On create "loading" is shown in the section by default.
-	 * You can then set the content by calling actual results by calling setResults on the returned {CollapsibleSectionView} object.
+	 * You can then set the content by calling actual results by calling setTableRows on the returned {CollapsibleSectionView} object.
 	 * @param {CollapsibleSectionDescriptor}
 	 * @returns {CollapsibleSectionView}
 	 */
