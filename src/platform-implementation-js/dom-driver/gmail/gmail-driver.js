@@ -51,6 +51,10 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, routeID, params);
 	},
 
+	createSearchFilter: function(obj) {
+		console.log('createSearchFilter', obj);
+	},
+
 	openComposeWindow: function(){
 		require('./gmail-driver/open-compose-window')(this);
 	},

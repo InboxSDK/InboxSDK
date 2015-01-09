@@ -17,7 +17,10 @@ var Search = function(appId, driver){
 
 _.extend(Search.prototype,  {
 
-	//one day something will go here
+	createFilter: function(obj) {
+		var members = memberMap.get(this);
+		members.driver.createSearchFilter(obj);
+	}
 
 });
 
