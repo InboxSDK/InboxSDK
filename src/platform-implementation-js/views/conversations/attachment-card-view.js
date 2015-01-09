@@ -9,7 +9,7 @@ var AttachmentCardView = function(attachmentCardImplementation){
 	EventEmitter.call(this);
 
 	this._attachmentCardImplementation = attachmentCardImplementation;
-	this._attachmentCardImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+	this._attachmentCardImplementation.getEventStream().onEnd(this, 'emit', 'destroy');
 };
 
 AttachmentCardView.prototype = Object.create(EventEmitter.prototype);
@@ -41,7 +41,7 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 	/**
 	 * Fires when the view card is destroyed
-	 * @event AttachmentCardView#unload
+	 * @event AttachmentCardView#destroy
 	 */
 
 });

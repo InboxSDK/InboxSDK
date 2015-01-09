@@ -49,10 +49,10 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	* Gets all the loaded MessageView objects in the thread. See MessageView for more information on what "loaded" means.
 	* @return {MessageView[]} an array of message view objects
 	*/
-	getMessageViewsDataLoaded: function(){
+	getMessageViews: function(){
 		var members = memberMap.get(this);
 
-		return _.chain(members.threadViewImplementation.getMessageViews())
+		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
 				 .filter(function(messageViewDriver){
 				 	return messageViewDriver.isLoaded();
 				 })
@@ -69,7 +69,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	getMessageViewsAll: function(){
 		var members = memberMap.get(this);
 
-		return _.chain(members.threadViewImplementation.getMessageViews())
+		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
 				 .map(function(messageViewDriver){
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
@@ -85,7 +85,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 
 	/**
 	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread)
-	 * @event ThreadView#unload
+	 * @event ThreadView#destroy
 	 */
 
 });
@@ -94,7 +94,7 @@ module.exports = ThreadView;
 
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
-	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'unload');
+	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'destroy');
 
 	threadViewImplementation
 		.getEventStream()

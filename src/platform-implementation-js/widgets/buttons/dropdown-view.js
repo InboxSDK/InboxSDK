@@ -48,7 +48,7 @@ _.extend(DropdownView.prototype, {
 			this.el = null;
 			this._focusUnsub();
 			this._dropdownViewDriver.destroy();
-			this.emit('unload');
+			this.emit('destroy');
 		}
 	}
 

@@ -96,14 +96,14 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
 	* Fires when this RouteView instance is navigated away from
-	* @event RouteView#unload
+	* @event RouteView#destroy
 	*/
 
 });
 
 
 function _bindToEventStream(routeViewDriver, routeView){
-	routeViewDriver.getEventStream().onEnd(routeView, 'emit', 'unload');
+	routeViewDriver.getEventStream().onEnd(routeView, 'emit', 'destroy');
 	routeViewDriver.getEventStream().onEnd(routeView, 'destroy');
 }
 

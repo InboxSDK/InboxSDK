@@ -27,15 +27,15 @@ var Conversations = function(appId, driver){
 
 	this.registerMessageViewHandler = this.registerLoadedMessageViewHandler;
 
-	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry);
-	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all);
+	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this);
+	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this);
 
 	_setupViewDriverWatcher(
 		appId,
 		driver.getMessageViewDriverStream().flatMap(function(messageViewDriver){
 			return messageViewDriver.getEventStream()
 									.filter(function(event){
-										return event.eventName === 'messageLoaded';
+										return event.eventName === 'messageLoad';
 									})
 									.map('.view');
 		}),
@@ -43,8 +43,8 @@ var Conversations = function(appId, driver){
 		members.messageViewHandlerRegistries.loaded
 	);
 
-	this.MessageViewStates = {};
-	Object.defineProperties(this.MessageViewStates, {
+	this.MessageViewViewStates = {};
+	Object.defineProperties(this.MessageViewViewStates, {
 		'HIDDEN': {
 			value: ["HIDDEN"],
 			writable: false
@@ -77,9 +77,9 @@ _.extend(Conversations.prototype, {
 
 });
 
-function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
+function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance){
 	var combinedStream = stream.map(function(viewDriver){
-		var view = membraneMap.get(viewDriver) || new ViewClass(viewDriver, appId, membraneMap);
+		var view = membraneMap.get(viewDriver) || new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance);
 
 		return {
 			viewDriver: viewDriver,
@@ -91,7 +91,7 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
 		if(!membraneMap.has(event.viewDriver)){
 			membraneMap.set(event.viewDriver, event.view);
 
-			event.view.on('unload', function(){
+			event.view.on('destroy', function(){
 				membraneMap.delete(event.viewDriver);
 			});
 		}

@@ -22,7 +22,7 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	this._composeViewImplementation.getEventStream().onEnd(function(){
 		self.emit('close'); /* TODO: deprecated */
-		self.emit('unload');
+		self.emit('destroy');
 	});
 };
 
@@ -241,7 +241,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Fires when the compose view is closed. This can be triggered by the .close method, the user
 	* clicking the close or discard buttons, the message being sent, etc.
-	* @event ComposeView#unload
+	* @event ComposeView#destroy
 	*/
 
 	/**

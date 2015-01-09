@@ -2,8 +2,10 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 
 	sdk.Conversations.registerThreadViewHandler(function(threadView){
 
-		var messages = threadView.getMessageViews();
+		var messages = threadView.getMessageViewsAll();
 		var lastMessage = messages[messages.length - 1];
+
+		console.log('viewState', lastMessage.getViewState());
 
 		var sender = lastMessage.getSender();
 
@@ -22,6 +24,10 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 			console.log(contact);
 			el.textContent = "Hi, " + contact.name + ' <' + contact.emailAddress + '>';
 		});
+
+		messages[1].on('viewStateChange', console.log.bind(console, 'viewStateChange'));
+		messages[1].on('load', console.log.bind(console, 'load'));
+		messages[1].on('destroy', console.log.bind(console, 'destroy'));
 
 	});
 

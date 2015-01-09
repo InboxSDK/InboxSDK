@@ -27,7 +27,7 @@ _.extend(ContentPanelView.prototype, /** @lends ContentPanelView */ {
 
     _bindToStreamEvents: function(){
         this._contentPanelViewImplementation.getEventStream().map('.eventName').onValue(this, 'emit');
-        this._contentPanelViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+        this._contentPanelViewImplementation.getEventStream().onEnd(this, 'emit', 'destroy');
     }
 
     /**
@@ -43,7 +43,7 @@ _.extend(ContentPanelView.prototype, /** @lends ContentPanelView */ {
 
     /**
     * Fires when the content panel view is no longer valid (i.e. the user navigates away from the thread with the sidebar)
-    * @event ContentPanelView#unload
+    * @event ContentPanelView#destroy
     */
 
 });

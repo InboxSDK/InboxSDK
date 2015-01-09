@@ -20,9 +20,9 @@ var memberMap = new Map();
 * The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
 * In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
 * state is COLLAPSED or HIDDEN. You should not depend on any relationship between the view state and load state. Instead,
-* use the provided <code>getViewState</code> and <code>isDataLoaded</code> methods.
+* use the provided <code>getViewState</code> and <code>isLoaded</code> methods.
 */
-var MessageView = function(messageViewImplementation, appId, membraneMap){
+var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -30,25 +30,9 @@ var MessageView = function(messageViewImplementation, appId, membraneMap){
 
 	members.messageViewImplementation = messageViewImplementation;
 	members.membraneMap = membraneMap;
+	members.Conversations = Conversations;
 
-	var self = this;
-	messageViewImplementation.getEventStream().onEnd(function(){
-		self.emit('unload');
-		memberMap.delete(self);
-	});
-
-	messageViewImplementation.getEventStream()
-							 .filter(function(event){
-							 	return event.type !== 'internal' && event.eventName === 'contactHover';
-							 })
-							 .onValue(function(event){
-							 	self.emit(event.eventName, {
-							 		contactType: event.type,
-							 		contact: event.contact,
-							 		messageView: self,
-							 		threadView: self.getThreadView()
-							 	});
-							 });
+	_bindToEventStream(this, members, messageViewImplementation.getEventStream());
 };
 
 MessageView.prototype = Object.create(EventEmitter.prototype);
@@ -115,10 +99,9 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* to be loaded, you should set the view state to <code>EXPANDED</code>.
 	* @return {boolean}
 	*/
-	isDataLoaded: function() {
-
+	isLoaded: function() {
+		return memberMap.get(this).messageViewImplementation.isLoaded();
 	},
-
 
 	/**
 	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
@@ -158,24 +141,37 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/**
 	* Returns the view state of this Message view. The possible view states are
-	* <code>Conversation.MessageViewViewState.HIDDEN</code> (no information visible),
-	* <code>Conversation.MessageViewViewState.COLLAPSED</code> (partial information visible) or
-	* <code>Conversation.MessageViewViewState.EXPANDED</code>
+	* <code>Conversations.MessageViewViewStates.HIDDEN</code> (no information visible),
+	* <code>Conversations.MessageViewViewStates.COLLAPSED</code> (partial information visible) or
+	* <code>Conversations.MessageViewViewStates.EXPANDED</code>
 	* @return {Conversation.MessageViewViewState}
 	*/
 	getViewState: function() {
+		var members = memberMap.get(this);
+		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
+	},
 
+	setViewState: function(viewState){
+		var MessageViewViewStates = memberMap.get(this).Conversations.MessageViewViewStates;
+		var internalViewState;
+
+		if(viewState === MessageViewViewState.HIDDEN){
+			internalViewState = 'HIDDEN';
+		}
+		else if(viewState === MessageViewViewState.COLLAPSED){
+			internalViewState = 'COLLAPSED';
+		}
+		else{
+			internalViewState = 'EXPANDED';
+		}
+
+		memberMap.get(this).messageViewImplementation.setViewState(internalViewState);
 	}
 
 
 	/**
-	 * Fires when message is collapsed
-	 * @event MessageView#collapsed
-	 */
-
-	/**
-	 * Fires when message is expanded
-	 * @event MessageView#expanded
+	 * Fires when message viewState is changed
+	 * @event MessageView#viewStateChange
 	 */
 
 	/**
@@ -183,20 +179,62 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	 * @event MessageView#contactHover
 	 */
 
-	/**
-	 * Fires when the view card is destroyed
-	 * @event MessageView#unload
-	 */
+	 /**
+	* Fires when the data for a message is loaded. This can happen when the message view is first presented or later when the user chooses to expand its view state.
+	* @event MessageView#load
+	*/
 
 	/**
-	* Fires when the data for a message is loaded. This can happen when the message view is first presented or later when the user chooses to expand its view state.
-	* @event MessageView#dataLoad
-	*/
+	 * Fires when the view card is destroyed
+	 * @event MessageView#destroy
+	 */
 
 
 
 });
 
+
+function _bindToEventStream(messageView, members, stream){
+	stream.onEnd(function(){
+		self.emit('destroy');
+		memberMap.delete(messageView);
+	});
+
+	stream
+		.filter(function(event){
+			return event.type !== 'internal' && event.eventName === 'contactHover';
+		})
+		.onValue(function(event){
+			messageView.emit(event.eventName, {
+				contactType: event.type,
+				contact: event.contact,
+				messageView: messageView,
+				threadView: messageView.getThreadView()
+			});
+		});
+
+	stream
+		.filter(function(event){
+			return event.eventName === 'messageLoad';
+		})
+		.onValue(function(event){
+			messageView.emit('load', {
+				messageView: messageView
+			});
+		});
+
+	stream
+		.filter(function(event){
+			return event.eventName === 'viewStateChange';
+		})
+		.onValue(function(event){
+			messageView.emit('viewStateChange', {
+				oldViewState: members.Conversations.MessageViewViewStates[event.oldValue],
+				newViewState: members.Conversations.MessageViewViewStates[event.newValue],
+				messageView: messageView
+			});
+		});
+}
 
 module.exports = MessageView;
 

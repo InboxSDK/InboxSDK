@@ -54,7 +54,7 @@ _.extend(CollapsibleSectionView.prototype, {
 	}
 
 	/**
-	 * Fires "unload" event when no longer valid
+	 * Fires "destroy" event when no longer valid
 	 */
 
 	/**
@@ -102,7 +102,7 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 			}
 		});
 
-	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'unload');
+	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'destroy');
 }
 
 
