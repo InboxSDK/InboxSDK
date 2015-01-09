@@ -10,7 +10,17 @@ var memberMap = new Map();
 /**
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
-* itself as well as change the state of the UI.
+* itself as well as change the state of the UI.MessageViews have a view state as well as a loaded state. These
+* 2 properties are orthoganal to each other.
+*
+* A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
+* Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
+* to show a user.
+*
+* The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
+* In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
+* state is COLLAPSED or HIDDEN. You should not depend on any relationship between the view state and load state. Instead,
+* use the provided <code>getViewState</code> and <code>isLoaded</code> methods.
 */
 var MessageView = function(messageViewImplementation, appId, membraneMap){
 	EventEmitter.call(this);
