@@ -241,23 +241,26 @@ _.extend(GmailMessageView.prototype, {
 				 	return element && element.getAttribute('email');
 				 })
 				 .map(function(element){
-				 	var addressInformation = _extractAddressInformation(element);
+				 	var addressInformation = _extractContactInformation(element);
+				 	var contactType = null;
 
 					if(!self._element.classList.contains('h7')){
-						addressInformation.type = 'sender';
+						contactType = 'sender';
 					}
 					else{
 						if(self._element.querySelector('h3.iw').contains(element)){
-							addressInformation.type = 'sender';
+							contactType = 'sender';
 						}
 						else{
-							addressInformation.type = 'recipient';
+							contactType = 'recipient';
 						}
 					}
 
 				 	return {
 				 		eventName: 'contactHover',
-				 		data: addressInformation
+				 		contact: addressInformation,
+				 		contactType: contactType,
+				 		messageViewDriver: self
 				 	};
 				 })
 
@@ -291,7 +294,7 @@ _.extend(GmailMessageView.prototype, {
 
 });
 
-function _extractAddressInformation(span){
+function _extractContactInformation(span){
 	return {
 		name: span.getAttribute('name'),
 		emailAddress: span.getAttribute('email')

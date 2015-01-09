@@ -61,7 +61,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 
 
 	/**
-	 * Fires when the user hovers over a contact. {Contact}
+	 * Fires when the user hovers over a contact. {ContactHoverEvent}
 	 * @event ThreadView#contactHover
 	 */
 
@@ -81,10 +81,15 @@ function _bindToStreamEvents(threadView, threadViewImplementation){
 	threadViewImplementation
 		.getEventStream()
 		.filter(function(event){
-			return event.type !== 'internal';
+			return event.type !== 'internal' && event.eventName === 'contactHover';
 		})
 		.onValue(function(event){
-			threadView.emit(event.eventName, event.data);
+			threadView.emit(event.eventName, {
+				contactType: event.contactType,
+				messageView: memberMap.get(threadView).membraneMap.get(event.messageViewDriver),
+				contact: event.contact,
+				threadView: threadView
+			});
 		});
 }
 

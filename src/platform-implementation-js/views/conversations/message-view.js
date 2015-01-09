@@ -29,10 +29,15 @@ var MessageView = function(messageViewImplementation, appId, membraneMap){
 
 	messageViewImplementation.getEventStream()
 							 .filter(function(event){
-							 	return event.type !== 'internal';
+							 	return event.type !== 'internal' && event.eventName === 'contactHover';
 							 })
 							 .onValue(function(event){
-							 	self.emit(event.eventName, event.data);
+							 	self.emit(event.eventName, {
+							 		contactType: event.type,
+							 		contact: event.contact,
+							 		messageView: self,
+							 		threadView: self.getThreadView()
+							 	});
 							 });
 };
 
@@ -132,7 +137,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	 */
 
 	/**
-	 * Fires when the user hovers over a contact. {Contact}
+	 * Fires when the user hovers over a contact. {ContactHoverEvent}
 	 * @event MessageView#contactHover
 	 */
 
