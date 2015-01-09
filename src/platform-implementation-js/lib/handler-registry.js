@@ -56,7 +56,16 @@ _.extend(HandlerRegistry.prototype, {
 
     _informHandlersOfTarget: function(target){
         this._handlers.forEach(function(handler){
-            handler(target);
+            try{
+                handler(target);
+            }
+            catch(err){
+                //rethrow in timeout to avoid Bacon's ridiculous error
+                setTimeout(function(){
+                    throw err;
+                }, 1);
+            }
+
         });
     }
 

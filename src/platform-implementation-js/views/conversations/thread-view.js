@@ -1,19 +1,27 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
+var Map = require('es6-unweak-collections').Map;
+
 var ContentPanelView = require('../content-panel-view');
+
+var memberMap = new Map();
 
 /**
 * @class
 * Object that represents a visible thread view that the user has navigated to
 */
-var ThreadView = function(threadViewImplementation, appId){
+var ThreadView = function(threadViewImplementation, appId, membraneMap){
 	EventEmitter.call(this);
 
-	this._threadViewImplementation = threadViewImplementation;
-	this._appId = appId;
+	var members = {};
+	memberMap.set(this, members);
 
-	this._bindToStreamEvents();
+	members.threadViewImplementation = threadViewImplementation;
+	members.appId = appId;
+	members.membraneMap = membraneMap;
+
+	_bindToStreamEvents(this, threadViewImplementation);
 };
 
 ThreadView.prototype = Object.create(EventEmitter.prototype);
@@ -28,7 +36,8 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	 * @return {ContentPanelView}
 	 */
 	addSidebarContentPanel: function(descriptor){
-		var contentPanelImplementation = this._threadViewImplementation.addSidebarContentPanel(descriptor, this._appId);
+		var members = memberMap.get(this);
+		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptor, members.appId);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}
@@ -36,10 +45,25 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 		return null;
 	},
 
-	_bindToStreamEvents: function(){
-		this._threadViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+
+	getMessageViews: function(){
+		var members = memberMap.get(this);
+
+		return _.chain(members.threadViewImplementation.getMessageViews())
+				 .filter(function(messageViewDriver){
+				 	return messageViewDriver.isLoaded();
+				 })
+				 .map(function(messageViewDriver){
+				 	return members.membraneMap.get(messageViewDriver);
+				 })
+				 .value();
 	}
 
+
+	/**
+	 * Fires when the user hovers over a contact. {Contact}
+	 * @event ThreadView#contactHover
+	 */
 
 	/**
 	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread)
@@ -49,6 +73,20 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 });
 
 module.exports = ThreadView;
+
+
+function _bindToStreamEvents(threadView, threadViewImplementation){
+	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'unload');
+
+	threadViewImplementation
+		.getEventStream()
+		.filter(function(event){
+			return event.type !== 'internal';
+		})
+		.onValue(function(event){
+			threadView.emit(event.eventName, event.data);
+		});
+}
 
 
 

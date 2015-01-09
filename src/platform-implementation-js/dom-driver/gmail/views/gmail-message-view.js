@@ -9,12 +9,13 @@ var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 
-var GmailMessageView = function(element){
+var GmailMessageView = function(element, gmailThreadView){
 	MessageViewDriver.call(this);
 
 	this._element = element;
 	this._eventStream = new Bacon.Bus();
 	this._stopper = this._eventStream.filter(false).mapEnd();
+	this._threadViewDriver = gmailThreadView;
 
 	// Outputs the same type of stream as makeElementChildStream does.
 	this._replyElementStream = this._eventStream.filter(function(event) {
@@ -23,6 +24,7 @@ var GmailMessageView = function(element){
 
 	this._setupMessageStateStream();
 	this._processInitialState();
+	this._monitorEmailAddressHovering();
 };
 
 GmailMessageView.prototype = Object.create(MessageViewDriver.prototype);
@@ -33,12 +35,17 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_element', destroy: false, get: true},
 		{name: '_stopper', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_threadViewDriver', destroy: false, get: true},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
 		{name: '_messageLoaded', destroy: false, defaultValue: false}
 	],
+
+	isLoaded: function(){
+		return this._messageLoaded;
+	},
 
 	getContentsElement: function(){
 		return this._element.querySelector('.adP');
@@ -61,6 +68,24 @@ _.extend(GmailMessageView.prototype, {
 
 	isElementInQuotedArea: function(element){
 		return $(element).parents('blockquote').length > 0;
+	},
+
+	getSender: function(){
+		var senderSpan = this._element.querySelector('h3.iw span[email]');
+		return {
+			name: senderSpan.getAttribute('name'),
+			emailAddress: senderSpan.getAttribute('email')
+		};
+	},
+
+	getRecipients: function(){
+		var receipientSpans = this._element.querySelectorAll('.hb span[email]');
+		return _.map(receipientSpans, function(span){
+			return {
+				name: span.getAttribute('name'),
+				emailAddress: span.getAttribute('email')
+			};
+		});
 	},
 
 	getAttachmentCardViewDrivers: function(){
@@ -125,7 +150,7 @@ _.extend(GmailMessageView.prototype, {
 			if(mutation.oldValue.indexOf('h7') > -1){ //we were open
 				if(!currentClassList.contains('h7')){
 					self._eventStream.push({
-						eventName: 'messageClosed',
+						eventName: 'collapsed',
 						view: self
 					});
 				}
@@ -155,7 +180,7 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		this._eventStream.push({
-			eventName: 'messageOpen',
+			eventName: 'expanded',
 			view: this
 		});
 
@@ -165,6 +190,7 @@ _.extend(GmailMessageView.prototype, {
 		this._messageLoaded = true;
 
 		this._eventStream.push({
+			type: 'internal',
 			eventName: 'messageLoaded',
 			view: this
 		});
@@ -189,6 +215,7 @@ _.extend(GmailMessageView.prototype, {
 				if (!currentReplyElementRemovalStream) {
 					currentReplyElementRemovalStream = new Bacon.Bus();
 					self._eventStream.push({
+						type: 'internal',
 						eventName: 'replyElement',
 						change: {
 							el: replyContainer, removalStream: currentReplyElementRemovalStream
@@ -203,6 +230,38 @@ _.extend(GmailMessageView.prototype, {
 				}
 			}
 		});
+	},
+
+	_monitorEmailAddressHovering: function(){
+		var self = this;
+		this._eventStream.plug(
+			Bacon.fromEventTarget(this._element, 'mouseover')
+				 .map('.target')
+				 .filter(function(element){
+				 	return element && element.getAttribute('email');
+				 })
+				 .map(function(element){
+				 	var addressInformation = _extractAddressInformation(element);
+
+					if(!self._element.classList.contains('h7')){
+						addressInformation.type = 'sender';
+					}
+					else{
+						if(self._element.querySelector('h3.iw').contains(element)){
+							addressInformation.type = 'sender';
+						}
+						else{
+							addressInformation.type = 'recipient';
+						}
+					}
+
+				 	return {
+				 		eventName: 'contactHover',
+				 		data: addressInformation
+				 	};
+				 })
+
+		);
 	},
 
 	_getAttachmentCardOptionsHash: function(options){
@@ -231,5 +290,12 @@ _.extend(GmailMessageView.prototype, {
 	}
 
 });
+
+function _extractAddressInformation(span){
+	return {
+		name: span.getAttribute('name'),
+		emailAddress: span.getAttribute('email')
+	};
+}
 
 module.exports = GmailMessageView;

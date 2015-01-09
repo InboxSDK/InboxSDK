@@ -10,6 +10,7 @@ var MessageView = require('../views/conversations/message-view');
 var HandlerRegistry = require('../lib/handler-registry');
 
 var memberMap = new Map();
+var membraneMap = new Map();
 
 var Conversations = function(appId, driver){
 	var members = {};
@@ -38,9 +39,24 @@ _.extend(Conversations.prototype, {
 });
 
 function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
-	return stream.onValue(function(viewDriver){
-		var view = new ViewClass(viewDriver, appId);
-		handlerRegistry.addTarget(view);
+	var combinedStream = stream.map(function(viewDriver){
+		return {
+			viewDriver: viewDriver,
+			view: new ViewClass(viewDriver, appId, membraneMap)
+		};
+	});
+
+	combinedStream.onValue(function(event){
+		membraneMap.set(event.viewDriver, event.view);
+
+		event.view.on('unload', function(){
+			membraneMap.delete(event.viewDriver);
+		});
+	});
+
+
+	combinedStream.delay(0).onValue(function(event){
+		handlerRegistry.addTarget(event.view);
 	});
 }
 
