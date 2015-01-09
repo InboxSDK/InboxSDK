@@ -20,7 +20,7 @@ var memberMap = new Map();
 * The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
 * In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
 * state is COLLAPSED or HIDDEN. You should not depend on any relationship between the view state and load state. Instead,
-* use the provided <code>getViewState</code> and <code>isLoaded</code> methods.
+* use the provided <code>getViewState</code> and <code>isDataLoaded</code> methods.
 */
 var MessageView = function(messageViewImplementation, appId, membraneMap){
 	EventEmitter.call(this);
@@ -109,6 +109,16 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
 	},
 
+	/**
+	* Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on
+	* this object may return empty results. There is no way to set the load state to true directly. If you require this message
+	* to be loaded, you should set the view state to <code>EXPANDED</code>.
+	* @return {boolean}
+	*/
+	isDataLoaded: function() {
+
+	},
+
 
 	/**
 	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
@@ -131,9 +141,19 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	getThreadView: function(){
 		var members = memberMap.get(this);
-
 		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
 	},
+
+	/**
+	* Returns the view state of this Message view. The possible view states are
+	* <code>Conversation.MessageViewViewState.HIDDEN</code> (no information visible),
+	* <code>Conversation.MessageViewViewState.COLLAPSED</code> (partial information visible) or
+	* <code>Conversation.MessageViewViewState.EXPANDED</code>
+	* @return {Conversation.MessageViewViewState}
+	*/
+	getViewState: function() {
+
+	}
 
 
 	/**
@@ -155,6 +175,11 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	 * Fires when the view card is destroyed
 	 * @event MessageView#unload
 	 */
+
+	/**
+	* Fires when the data for a message is loaded. This can happen when the message view is first presented or later when the user chooses to expand its view state.
+	* @event MessageView#dataLoad
+	*/
 
 
 
