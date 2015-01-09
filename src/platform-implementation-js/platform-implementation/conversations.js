@@ -20,10 +20,28 @@ var Conversations = function(appId, driver){
 	members.driver = driver;
 
 	members.threadViewHandlerRegistry = new HandlerRegistry();
-	members.messageViewHandlerRegistry = new HandlerRegistry();
+	members.messageViewHandlerRegistries = {
+		all: new HandlerRegistry(),
+		loaded: new HandlerRegistry()
+	};
+
+	this.registerMessageViewHandler = this.registerLoadedMessageViewHandler;
 
 	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry);
-	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistry);
+	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all);
+
+	_setupViewDriverWatcher(
+		appId,
+		driver.getMessageViewDriverStream().flatMap(function(messageViewDriver){
+			return messageViewDriver.getEventStream()
+									.filter(function(event){
+										return event.eventName === 'messageLoaded';
+									})
+									.map('.view');
+		}),
+		MessageView,
+		members.messageViewHandlerRegistries.loaded
+	);
 };
 
 _.extend(Conversations.prototype, {
@@ -32,7 +50,11 @@ _.extend(Conversations.prototype, {
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(handler);
 	},
 
-	registerMessageViewHandler: function(handler){
+	registerAllMessageViewHandler: function(handler){
+		return memberMap.get(this). messageViewHandlerRegistry.registerHandler(handler);
+	},
+
+	registerLoadedMessageViewHandler: function(handler){
 		return memberMap.get(this).messageViewHandlerRegistry.registerHandler(handler);
 	}
 
@@ -40,9 +62,11 @@ _.extend(Conversations.prototype, {
 
 function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry){
 	var combinedStream = stream.map(function(viewDriver){
+		var view = membraneMap.get(viewDriver) || new ViewClass(viewDriver, appId, membraneMap);
+
 		return {
 			viewDriver: viewDriver,
-			view: new ViewClass(viewDriver, appId, membraneMap)
+			view: view
 		};
 	});
 

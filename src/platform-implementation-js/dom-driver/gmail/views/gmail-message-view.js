@@ -167,6 +167,11 @@ _.extend(GmailMessageView.prototype, {
 		setTimeout(
 			function(){
 				if (self._element) {
+					self._eventStream.push({
+						type: 'internal',
+						eventName: 'messageCreated',
+						view: self
+					});
 					self._checkMessageOpenState(self._element.classList);
 				}
 			},

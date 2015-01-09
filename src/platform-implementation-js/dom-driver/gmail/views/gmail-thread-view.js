@@ -33,7 +33,7 @@ _.extend(GmailThreadView.prototype, {
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
+		{name: '_messageViewDrivers', destroy: true, get: true, defaultValue: []}
 	],
 
 	addSidebarContentPanel: function(descriptor, appId){
@@ -141,7 +141,7 @@ _.extend(GmailThreadView.prototype, {
 
 		this._eventStream.plug(messageView.getEventStream());
 
-		this._messageViews.push(messageView);
+		this._messageViewDrivers.push(messageView);
 	}
 
 });
