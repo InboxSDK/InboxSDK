@@ -24,7 +24,24 @@ var Conversations = function(appId, driver){
 
 	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry);
 	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistry);
+
+	this.MessageViewStates = {};
+	Object.defineProperties(this.MessageViewStates, {
+		'HIDDEN': {
+			value: ["HIDDEN"],
+			writable: false
+		},
+		'COLLAPSED': {
+			value: ["COLLAPSED"],
+			writable: false
+		},
+		'EXPANDED': {
+			value: ["EXPANDED"],
+			writable: false
+		}
+	});
 };
+
 
 _.extend(Conversations.prototype, {
 
