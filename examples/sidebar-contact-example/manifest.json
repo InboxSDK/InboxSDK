@@ -8,19 +8,13 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js","bacon.js", "content.js"],
+      "js": ["inboxsdk.js", "content.js"],
       "run_at": "document_end"
     }
   ],
   "permissions": [
     "https://mail.google.com/",
     "https://inbox.google.com/"
-  ],
-  "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "monkey.png",
-    "monkey-face.jpg",
-    "lion.png"
   ],
 
   "manifest_version": 2
