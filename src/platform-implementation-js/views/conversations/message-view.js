@@ -131,14 +131,26 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return memberMap.get(this).messageViewImplementation.getLinks();
 	},
 
+	/**
+	* Get the contact of the sender of this message.
+	* @return {Contact}
+	*/
 	getSender: function(){
 		return memberMap.get(this).messageViewImplementation.getSender();
 	},
 
+	/**
+	* Get all the recipients of this message (to, cc, bcc)
+	* @return {Contact[]}
+	*/
 	getRecipients: function(){
 		return memberMap.get(this).messageViewImplementation.getRecipients();
 	},
 
+	/**
+	* Get the <code>ThreadView</code> that this MessageView is in
+	* @return {ThreadView}
+	*/
 	getThreadView: function(){
 		var members = memberMap.get(this);
 		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
