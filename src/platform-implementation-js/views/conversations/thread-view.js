@@ -49,7 +49,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	* Gets all the loaded MessageView objects in the thread. See MessageView for more information on what "loaded" means.
 	* @return {MessageView[]} an array of message view objects
 	*/
-	getLoadedMessageViews: function(){
+	getMessageViewsDataLoaded: function(){
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViews())
@@ -66,7 +66,7 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	* Gets all the MessageView objects in the thread regardless of their load state. See MessageView for more information on what "loaded" means.
 	* @return {MessageView[]} an array of message view objects
 	*/
-	getAllMessageViews: function(){
+	getMessageViewsAll: function(){
 	}
 
 
