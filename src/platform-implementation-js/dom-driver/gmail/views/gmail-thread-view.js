@@ -137,7 +137,7 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	_createMessageView: function(messageElement) {
-		var messageView = new GmailMessageView(messageElement);
+		var messageView = new GmailMessageView(messageElement, this);
 
 		this._eventStream.plug(messageView.getEventStream());
 

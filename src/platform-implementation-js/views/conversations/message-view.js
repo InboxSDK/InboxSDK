@@ -1,18 +1,44 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
+var Map = require('es6-unweak-collections').Map;
+
 var AttachmentCardView = require('./attachment-card-view');
+
+var memberMap = new Map();
 
 /**
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
 * itself as well as change the state of the UI.
 */
-var MessageView = function(messageViewImplementation){
+var MessageView = function(messageViewImplementation, appId, membraneMap){
 	EventEmitter.call(this);
 
-	this._messageViewImplementation = messageViewImplementation;
-	this._messageViewImplementation.getEventStream().onEnd(this, 'emit', 'unload');
+	var members = {};
+	memberMap.set(this, members);
+
+	members.messageViewImplementation = messageViewImplementation;
+	members.membraneMap = membraneMap;
+
+	var self = this;
+	messageViewImplementation.getEventStream().onEnd(function(){
+		self.emit('unload');
+		memberMap.delete(self);
+	});
+
+	messageViewImplementation.getEventStream()
+							 .filter(function(event){
+							 	return event.type !== 'internal' && event.eventName === 'contactHover';
+							 })
+							 .onValue(function(event){
+							 	self.emit(event.eventName, {
+							 		contactType: event.type,
+							 		contact: event.contact,
+							 		messageView: self,
+							 		threadView: self.getThreadView()
+							 	});
+							 });
 };
 
 MessageView.prototype = Object.create(EventEmitter.prototype);
@@ -26,7 +52,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {AttachmentCardView}
 	*/
 	addAttachmentCardView: function(cardOptions){
-		this._messageViewImplementation.addAttachmentCard(cardOptions);
+		memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
 	},
 
 
@@ -36,7 +62,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {void}
 	*/
 	addAttachmentsToolbarButton: function(buttonOptions){
-		this._messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
+		memberMap.get(this).messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
 	},
 
 
@@ -47,7 +73,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {HTMLElement}
 	*/
 	getBodyElement: function(){
-		return this._messageViewImplementation.getContentsElement();
+		return memberMap.get(this).messageViewImplementation.getContentsElement();
 	},
 
 	// returns array of attachment card views
@@ -57,7 +83,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {AttachmentCardView[]}
 	*/
 	getAttachmentCardViews: function(){
-		return _.map(this._messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
+		return _.map(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
 			return new AttachmentCardView(attachmentCardViewDriver);
 		});
 	},
@@ -70,7 +96,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {boolean}
 	*/
 	isElementInQuotedArea: function(element){
-		this._messageViewImplementation.isElementInQuotedArea(element);
+		memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
 	},
 
 
@@ -82,13 +108,45 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {MessageViewLinkDescriptor[]}
 	*/
 	getLinksInBody: function(){
-		return this._messageViewImplementation.getLinks();
-	}
+		return memberMap.get(this).messageViewImplementation.getLinks();
+	},
+
+	getSender: function(){
+		return memberMap.get(this).messageViewImplementation.getSender();
+	},
+
+	getRecipients: function(){
+		return memberMap.get(this).messageViewImplementation.getRecipients();
+	},
+
+	getThreadView: function(){
+		var members = memberMap.get(this);
+
+		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
+	},
+
+
+	/**
+	 * Fires when message is collapsed
+	 * @event MessageView#collapsed
+	 */
+
+	/**
+	 * Fires when message is expanded
+	 * @event MessageView#expanded
+	 */
+
+	/**
+	 * Fires when the user hovers over a contact. {ContactHoverEvent}
+	 * @event MessageView#contactHover
+	 */
 
 	/**
 	 * Fires when the view card is destroyed
 	 * @event MessageView#unload
 	 */
+
+
 
 });
 
