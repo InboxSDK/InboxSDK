@@ -82,6 +82,8 @@ module.exports = function(XHR, wrappers, opts) {
    *  for request.
    * @property {XHRProxyWrapperCallback} [originalSendBodyLogger] - called with value passed to
    *  send.
+   * @property {XHRProxyWrapperCallback} [sendBodyChanger] - Allows the send body to be changed before
+   *  it's sent.
    * @property {XHRProxyWrapperCallback} [originalResponseTextLogger] - called with the responseText as
    *  given by the server. Is not called if responseType is set to a value besides 'text'.
    * @property {XHRProxyWrapperCallback} [responseTextChanger] - called with the responseText as given
@@ -260,7 +262,7 @@ module.exports = function(XHR, wrappers, opts) {
     }, false);
 
     [
-      'dispatchEvent','abort',
+      'dispatchEvent',
       'getAllResponseHeaders','getResponseHeader','overrideMimeType',
       'setRequestHeader',
       'responseType','responseXML','responseURL','status','statusText',
@@ -299,6 +301,19 @@ module.exports = function(XHR, wrappers, opts) {
     });
 
     self.readyState = self._realxhr.readyState;
+
+    self.abort = function() {
+      // Important: If the request has already been sent, the XHR will change
+      // its readyState to 4 after abort. However, we sometimes asynchronously
+      // delay send calls. If the application has already called send but we
+      // haven't sent off the real call yet, then we need to hurry up and send
+      // something before the abort so that the readyState change happens.
+      if (this._clientStartedSend && !this._realStartedSend) {
+        this._realStartedSend = true;
+        this._realxhr.send();
+      }
+      this._realxhr.abort();
+    };
   }
 
   XHRProxy.prototype.addEventListener = function(name, listener) {
@@ -340,6 +355,8 @@ module.exports = function(XHR, wrappers, opts) {
       params: deparam(url.split('?')[1] || ''),
       async: async !== false
     };
+    this._clientStartedSend = false;
+    this._realStartedSend = false;
     this._activeWrappers = findApplicableWrappers(this._wrappers, this._connection);
     this._usingResponseTextChangers = !!_.find(this._activeWrappers, function(wrapper) {
       return !!wrapper.responseTextChanger;
@@ -350,6 +367,7 @@ module.exports = function(XHR, wrappers, opts) {
 
   XHRProxy.prototype.send = function(body) {
     var self = this;
+    this._clientStartedSend = true;
     Object.defineProperty(this._connection, 'originalSendBody', {
       enumerable: true, writable: false, configurable: false, value: body
     });
@@ -364,9 +382,41 @@ module.exports = function(XHR, wrappers, opts) {
       }
     });
 
-    // If we ever want to modify the body before send, this is the right spot.
+    function finish(body) {
+      self._realStartedSend = true;
+      self._realxhr.send(body);
+    }
 
-    return this._realxhr.send.apply(this._realxhr,arguments);
+    if (self._connection.async) {
+      // If the XHR object is re-used for another connection, then we need
+      // to make sure that our upcoming async calls here do nothing.
+      // Remember the current connection object, and do nothing in our async
+      // calls if it no longer matches. Also check for aborts.
+      var startConnection = self._connection;
+
+      self._activeWrappers.map(function(wrapper) {
+        return wrapper.sendBodyChanger && wrapper.sendBodyChanger.bind(wrapper);
+      }).filter(Boolean).reduce(function(promise, nextSendBodyChanger) {
+        return promise.then(function(modifiedSendBody) {
+          if (startConnection === self._connection && !self._realStartedSend) {
+            self._connection.modifiedSendBody = modifiedSendBody;
+            return nextSendBodyChanger(self._connection, modifiedSendBody);
+          }
+        });
+      }, RSVP.resolve(self._connection.originalSendBody)).then(function(modifiedSendBody) {
+        if (startConnection === self._connection && !self._realStartedSend) {
+          self._connection.modifiedSendBody = modifiedSendBody;
+          finish(modifiedSendBody);
+        }
+      }, function(err) {
+        logError(err);
+        if (startConnection === self._connection && !self._realStartedSend) {
+          finish(body);
+        }
+      }).catch(logError);
+    } else {
+      finish(body);
+    }
   };
 
   [XHRProxy, XHRProxy.prototype].forEach(function(obj) {
