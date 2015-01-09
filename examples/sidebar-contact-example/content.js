@@ -1,7 +1,5 @@
 InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 
-	window.sdk = sdk;
-
 	sdk.Conversations.registerThreadViewHandler(function(threadView){
 
 		var messages = threadView.getMessageViews();
