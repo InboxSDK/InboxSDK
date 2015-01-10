@@ -29,6 +29,8 @@ var memberMap = new Map();
 * Using the <code>handleX</code> family of methods, you can specify which routes your application can handle. You will be called back with
 * and instance of a RouteView or similar when the user navigates to a route you've declared you can handle. For custom routes, you'll typically
 * add your own content and for built in routes, you'll typically modify the existing content.
+*
+* Route ID's are path like strings with named parameters, for example: "/myroute/:someParamMyRouteNeeds"
 */
 var Router = function(appId, driver){
 	var members = {};
@@ -54,7 +56,7 @@ var Router = function(appId, driver){
 };
 
 
-_.extend(Router.prototype,  {
+_.extend(Router.prototype, /** @lends Router */ {
 
 	/**
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
@@ -77,6 +79,31 @@ _.extend(Router.prototype,  {
 	*/
 	goto: function(routeID, params){
 		memberMap.get(this).driver.goto(routeID, params);
+	},
+
+	/**
+	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
+	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
+	* <code>CustomRouteView</code> which you can modify the content.
+	* @param {string} routeID - which route this handler is registering for
+	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a custom route matching
+	* the provided routeID
+	*/
+	handleCustomRoute: function(routeID, handler){
+		var customRouteDescriptor = {
+			routeID: routeID,
+			onActivate: handler
+		};
+
+		var customRoutes = memberMap.get(this).customRoutes;
+		customRoutes.push(customRouteDescriptor);
+
+		return function(){
+			var index = customRoutes.indexOf(customRouteDescriptor);
+			if(index > -1){
+				customRoutes.splice(index, 1);
+			}
+		};
 	},
 
 	/**
@@ -104,31 +131,6 @@ _.extend(Router.prototype,  {
 		}
 
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
-	},
-
-	/**
-	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
-	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
-	* <code>CustomRouteView</code> which you can modify the content.
-	* @param {string} routeID - which route this handler is registering for
-	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a custom route matching
-	* the provided routeID
-	*/
-	handleCustomRoute: function(routeID, handler){
-		var customRouteDescriptor = {
-			routeID: routeID,
-			onActivate: handler
-		};
-
-		var customRoutes = memberMap.get(this).customRoutes;
-		customRoutes.push(customRouteDescriptor);
-
-		return function(){
-			var index = customRoutes.indexOf(customRouteDescriptor);
-			if(index > -1){
-				customRoutes.splice(index, 1);
-			}
-		};
 	}
 
 });
