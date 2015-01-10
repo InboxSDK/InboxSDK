@@ -1,6 +1,4 @@
-var inboxSDK = new InboxSDK('open-compose');
-
-inboxSDK.ready().then(function(){
+InboxSDK.load(1, 'open-compose').then(function(inboxSDK){
 
 	inboxSDK.Views.getComposeView().then(function(composeView){
 

@@ -1,37 +1,38 @@
-var inboxSDK = new InboxSDK('hello-world');
+InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 
-function log() {
-	console.log.apply(console, ['hello-world'].concat(Array.prototype.slice.call(arguments)));
-}
+	function log() {
+		console.log.apply(console, ['hello-world'].concat(Array.prototype.slice.call(arguments)));
+	}
 
-inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
-	composeView.addButton({
-		title: "Beep",
-		iconUrl: 'https://mailfoogae.appspot.com/build/images/snippetIcon.png',
-		type: 'MODIFIER',
-		onClick: function(event) {
-			log('onClick', event);
-		}
-	});
-	['close','sending','sent'].forEach(function(evtName) {
-		composeView.on(evtName, function(evt) {
-			log('composeView', evtName, evt);
+	inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
+		composeView.addButton({
+			title: "Beep",
+			iconUrl: 'https://mailfoogae.appspot.com/build/images/snippetIcon.png',
+			type: 'MODIFIER',
+			onClick: function(event) {
+				log('onClick', event);
+			}
+		});
+		['close','sending','sent'].forEach(function(evtName) {
+			composeView.on(evtName, function(evt) {
+				log('composeView', evtName, evt);
+			});
 		});
 	});
-});
 
-var i = 0;
-inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
-	threadRowView.addLabel({
-		text:'1'
-	});
-	threadRowView.addLabel({
-		text:'a'+(i++),
-		color:'white',
-		textColor:'blue'
-	});
-	threadRowView.addAttachmentIcon({
-		iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-		title: 'blah blah'
+	var i = 0;
+	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+		threadRowView.addLabel({
+			text:'1'
+		});
+		threadRowView.addLabel({
+			text:'a'+(i++),
+			color:'white',
+			textColor:'blue'
+		});
+		threadRowView.addAttachmentIcon({
+			iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+			title: 'blah blah'
+		});
 	});
 });
