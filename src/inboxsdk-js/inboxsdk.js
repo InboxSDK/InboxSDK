@@ -39,8 +39,6 @@ var InboxSDK = /*deprecated*/ function(appId, opts){
 
   this.Compose = new Compose(this._platformImplementationLoader);
   this.Conversations = new Conversations(this._platformImplementationLoader);
-  this.Router = new Router(this._platformImplementationLoader);
-  this.FullscreenViews = this.Router; /* deprecated */
   this.Mailbox = new Mailbox(this._platformImplementationLoader);
   this.Modal = new Modal(this._platformImplementationLoader);
   this.NavMenu = new NavMenu(this._platformImplementationLoader);
