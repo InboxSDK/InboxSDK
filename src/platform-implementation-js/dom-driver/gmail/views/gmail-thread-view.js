@@ -60,9 +60,14 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	_setupSidebarView: function(sidebarElement){
-		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView();
-		sidebarElement.classList.add('inboxsdk__sidebar');
-		sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+		var existingContentPanelContainer = sidebarElement.querySelector('.inboxsdk__contentPanelContainer');
+		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView(existingContentPanelContainer);
+
+		if(!existingContentPanelContainer){
+			sidebarElement.classList.add('inboxsdk__sidebar');
+			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+		}
+
 	},
 
 	_findToolbarElement: function(){

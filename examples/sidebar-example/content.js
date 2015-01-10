@@ -5,11 +5,15 @@ inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
 	var el = document.createElement("div");
 	el.innerHTML = 'Hello world!';
 
-	threadView.addSidebarContentPanel({
+	var cp =  threadView.addSidebarContentPanel({
 		title: 'Monkey',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 		el: el,
 		orderHint: 2
+	});
+
+	cp.on('activate', function(){
+		cp.remove();
 	});
 
 
@@ -38,8 +42,8 @@ inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
 		stream.push(options);
 	});
 
-	contentPanel.on('unload', function(){
-		console.log('unload');
+	contentPanel.on('destroy', function(){
+		console.log('destroy');
 	});
 
 });

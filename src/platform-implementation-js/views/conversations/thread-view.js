@@ -1,5 +1,7 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
+var baconCast = require('bacon-cast');
+var Bacon = require('baconjs');
 
 var Map = require('es6-unweak-collections').Map;
 
@@ -36,8 +38,9 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	 * @return {ContentPanelView}
 	 */
 	addSidebarContentPanel: function(descriptor){
+		var descriptorPropertyStream = baconCast(Bacon, descriptor).toProperty();
 		var members = memberMap.get(this);
-		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptor, members.appId);
+		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}

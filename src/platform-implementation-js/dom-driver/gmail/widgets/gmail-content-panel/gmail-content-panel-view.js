@@ -10,13 +10,7 @@ var GmailContentPanelView = function(contentPanelDescriptor, gmailContentPanelCo
      this._element = document.createElement('div');
 
      this._gmailContentPanelContainerView = gmailContentPanelContainerView;
-
-     if(contentPanelDescriptor.onValue){
-          contentPanelDescriptor.map('.el').onValue(this._element, 'appendChild');
-     }
-     else{
-          this._element.appendChild(contentPanelDescriptor.el);
-     }
+     contentPanelDescriptor.map('.el').onValue(this._element, 'appendChild');
 };
 
 GmailContentPanelView.prototype = Object.create(ContentPanelViewDriver.prototype);
@@ -46,7 +40,7 @@ _.extend(GmailContentPanelView.prototype, {
           if(this._gmailContentPanelContainerView){
                this._gmailContentPanelContainerView.remove(this);
           }
-          
+
           ContentPanelViewDriver.prototype.destroy.call(this);
      }
 
