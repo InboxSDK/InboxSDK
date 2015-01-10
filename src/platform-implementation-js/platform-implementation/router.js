@@ -55,6 +55,8 @@ var Router = function(appId, driver){
 	this.NativeRouteTypes = driver.getNativeRouteTypes();
 };
 
+// TODO aleem add a section for all enum types in this section
+
 
 _.extend(Router.prototype, /** @lends Router */ {
 
