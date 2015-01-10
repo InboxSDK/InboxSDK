@@ -10,12 +10,13 @@ var makeXhrInterceptor = require('./make-xhr-interceptor');
 var GmailThreadView = require('./views/gmail-thread-view');
 
 var GmailModalView = require('./widgets/gmail-modal-view');
-var GmailRouteInfo = require('./views/gmail-route-view/gmail-route-info');
+var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 
 
 var GmailDriver = function(){
 	Driver.call(this);
 
+	this._gmailRouteProcessor = new GmailRouteProcessor();
 	this._setupEventStreams();
 };
 
@@ -44,7 +45,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	createLink: function(routeID, params){
-		return require('./gmail-driver/create-link')(GmailRouteInfo, routeID, params);
+		return require('./gmail-driver/create-link')(this._gmailRouteProcessor, routeID, params);
 	},
 
 	goto: function(routeID, params){
@@ -71,12 +72,16 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/get-native-nav-item')('sent');
 	},
 
-	getNativeRouteIDs: function(){
-		return GmailRouteInfo.ROUTE_IDS;
+	setNativeRouteIDs: function(nativeRouteIDs){
+		this._gmailRouteProcessor.setNativeRouteIDs(nativeRouteIDs);
 	},
 
-	getNativeRouteTypes: function(){
-		return GmailRouteInfo.ROUTE_TYPES;
+	setNativeListRouteIDs: function(nativeListRouteIDs){
+		this._gmailRouteProcessor.setNativeListRouteIDs(nativeListRouteIDs);
+	},
+
+	setRouteTypes: function(routeTypes){
+		this._gmailRouteProcessor.setRouteTypes(routeTypes);
 	},
 
 	getUserEmailAddress: function() {
@@ -94,7 +99,7 @@ _.extend(GmailDriver.prototype, {
 
 		this._routeViewDriverStream = new Bacon.Bus();
 		this._routeViewDriverStream.plug(
-			require('./gmail-driver/setup-route-view-driver-stream')(GmailRouteInfo).doAction(function(routeViewDriver){
+			require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor).doAction(function(routeViewDriver){
 				routeViewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
 			})
 		);

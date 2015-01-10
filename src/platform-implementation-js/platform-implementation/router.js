@@ -51,8 +51,13 @@ var Router = function(appId, driver){
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
-	this.NativeRouteIDs = driver.getNativeRouteIDs();
-	this.NativeRouteTypes = driver.getNativeRouteTypes();
+	this.NativeRouteIDs = nativeRouteIDs;
+	this.NativeListRouteIDs = nativeListRouteIDs;
+	this.RouteTypes = routeTypes;
+
+	driver.setNativeRouteIDs(this.NativeRouteIDs);
+	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
+	driver.setRouteTypes(this.RouteTypes);
 };
 
 // TODO aleem add a section for all enum types in this section
@@ -138,11 +143,170 @@ _.extend(Router.prototype, /** @lends Router */ {
 });
 
 
+var nativeRouteIDs = {};
+Object.defineProperties(nativeRouteIDs, {
+	'INBOX': {
+		value: 'inbox/:page',
+		writable: false
+	},
+
+	'ALL_MAIL': {
+		value: 'all/:page',
+		writable: false
+	},
+
+	'SENT': {
+		value: 'sent/:page',
+		writable: false
+	},
+
+	'STARRED': {
+		value: 'starred/:page',
+		writable: false
+	},
+
+	'DRAFTS': {
+		value: 'drafts/:page',
+		writable: false
+	},
+
+	'LABEL': {
+		value: 'label/:labelName/:page',
+		writable: false
+	},
+
+	'TRASH': {
+		value: 'trash/:page',
+		writable: false
+	},
+
+	'SPAM': {
+		value: 'spam/:page',
+		writable: false
+	},
+
+	'IMPORTANT': {
+		value: 'imp/p:page',
+		writable: false
+	},
+
+	'SEARCH': {
+		value: 'search/:query/:page',
+		writable: false
+	},
+
+	'THREAD': {
+		value: 'inbox/:threadID',
+		writable: false
+	},
+
+	'CHATS': {
+		value: 'chats/:page',
+		writable: false
+	},
+
+	'CHAT': {
+		value: 'chats/:chatID',
+		writable: false
+	},
+
+	'CONTACTS': {
+		value: 'contacts/:page',
+		writable: false
+	},
+
+	'CONTACT': {
+		value: 'contacts/:contactID',
+		writable: false
+	},
+
+	'SETTINGS': {
+		value: 'settings/:section',
+		writable: false
+	},
+
+	'ANY_LIST': {
+		value: '*',
+		writable: false
+	}
+});
+
+var nativeListRouteIDs = {};
+Object.defineProperties(nativeListRouteIDs, {
+	'INBOX': {
+		value: nativeRouteIDs.INBOX,
+		writable: false
+	},
+
+	'ALL_MAIL': {
+		value: nativeRouteIDs.ALL_MAIL,
+		writable: false
+	},
+
+	'SENT': {
+		value: nativeRouteIDs.SENT,
+		writable: false
+	},
+
+	'STARRED': {
+		value: nativeRouteIDs.STARRED,
+		writable: false
+	},
+
+	'DRAFTS': {
+		value: nativeRouteIDs.DRAFTS,
+		writable: false
+	},
+
+	'LABEL': {
+		value: nativeRouteIDs.LABEL,
+		writable: false
+	},
+
+	'TRASH': {
+		value: nativeRouteIDs.TRASH,
+		writable: false
+	},
+
+	'SPAM': {
+		value: nativeRouteIDs.SPAM,
+		writable: false
+	},
+
+	'IMPORTANT': {
+		value: nativeRouteIDs.IMPORTANT,
+		writable: false
+	},
+
+	'SEARCH': {
+		value: nativeRouteIDs.SEARCH,
+		writable: false
+	},
+
+	'ANY_LIST': {
+		value: nativeRouteIDs.ANY_LIST,
+		writable: false
+	}
+});
 
 
+var routeTypes = {
+	LIST: 'LIST',
+	THREAD: 'THREAD',
+	SETTINGS: 'SETTINGS',
+	CHAT: 'CHAT',
+	CUSTOM: 'CUSTOM',
+	UNKNOWN: 'UNKNOWN'
+};
 
 
+for(var key in nativeRouteIDs){
+	Object.freeze(nativeRouteIDs[key]);
+}
 
+Object.freeze(nativeRouteIDs);
+Object.freeze(nativeListRouteIDs);
+Object.freeze(routeTypes);
 
 
 function _handleRouteViewChange(router, members, routeViewDriver){
@@ -155,7 +319,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver, members.driver);
 
-	if(routeView.isCustomRoute()){
+	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver);
 	}
 	else{
@@ -165,7 +329,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.pendingSearchResultsView = null;
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
-	if(!routeView.isCustomRoute() && routeView.getRouteType() === router.NativeRouteTypes.List){
+	if(routeView.getRouteType() === routeTypes.LIST){
 		var listRouteView = new ListRouteView(routeViewDriver, members.driver);
 
 		if(members.listRouteHandlerRegistries[routeView.getRouteID()]){
@@ -224,14 +388,14 @@ function _informRelevantCustomRoutes(members, routeViewDriver){
 function _updateNavMenu(members, newRouteViewDriver){
 	var oldRouteViewDriver = members.currentRouteViewDriver;
 
-	if(oldRouteViewDriver && !oldRouteViewDriver.isCustomRoute()){
-		if(newRouteViewDriver.isCustomRoute()){
+	if(oldRouteViewDriver && oldRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
+		if(newRouteViewDriver.getRouteType() === routeTypes.CUSTOM){
 			members.lastNativeRouteID = oldRouteViewDriver.getRouteID();
 			_removeNativeNavItemActive(members);
 			return;
 		}
 	}
-	else if(members.lastNativeRouteID && !newRouteViewDriver.isCustomRoute()){
+	else if(members.lastNativeRouteID && newRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
 		if(members.lastNativeRouteID === newRouteViewDriver.getRouteID()){
 			_restoreNativeNavItemActive(members);
 		}

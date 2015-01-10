@@ -13,10 +13,6 @@ _.extend(RouteViewDriver.prototype, {
 
 	getParams: null,
 
-	isCustomRoute: null,
-
-	getCustomViewElement: null,
-
 	getEventStream: null
 
 });

@@ -34,7 +34,7 @@ var navItem = inboxSDK.NavMenu.addNavItem({
 
 var lion = navItem.addNavItem({
 	name: 'Lions',
-	routeID: inboxSDK.Router.NativeRouteIDs.Thread,
+	routeID: inboxSDK.Router.NativeRouteIDs.THREAD,
 	routeParams: {threadID: '14aa1bcd3deefcf7'},
 	iconUrl: chrome.runtime.getURL('lion.png'),
 	accessory: {

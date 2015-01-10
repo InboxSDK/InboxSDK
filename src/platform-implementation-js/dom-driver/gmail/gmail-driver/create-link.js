@@ -1,9 +1,9 @@
 var _ = require('lodash');
 
-function createLink(GmailRouteInfo, routeID, params){
+function createLink(GmailRouteProcessor, routeID, params){
 	params = params || {};
 
-	routeID = GmailRouteInfo.getCompatibleRouteID(routeID);
+	routeID = GmailRouteProcessor.getCompatibleRouteID(routeID);
 
 	if(_.isString(params)){
 		var matches = routeID.match(/:/g);
@@ -40,7 +40,7 @@ function createLink(GmailRouteInfo, routeID, params){
 
 
 	//check if link is of the form inbox/p0 or search/blah/p0
-	if(GmailRouteInfo.isListRouteName(parts[0]) && processedRoute.indexOf('p0') === processedRoute.length - 2){
+	if(GmailRouteProcessor.isListRouteName(parts[0]) && processedRoute.indexOf('p0') === processedRoute.length - 2){
 		processedRoute = processedRoute.substring(0, processedRoute.length - 3);
 	}
 
