@@ -10,7 +10,6 @@ var Mailbox = require('./api-definitions/mailbox');
 var NavMenu = require('./api-definitions/nav-menu');
 var Sidebar = require('./api-definitions/sidebar');
 var Tracker = require('./tracker');
-var Router = require('./api-definitions/router');
 var Toolbars = require('./api-definitions/toolbars');
 var Modal = require('./api-definitions/modal');
 
