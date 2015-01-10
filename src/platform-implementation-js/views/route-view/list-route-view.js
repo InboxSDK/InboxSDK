@@ -12,6 +12,15 @@ var CollapsibleSectionView = require('../collapsible-section-view');
 
 var membersMap = new Map();
 
+
+
+/**
+* @class
+* @extends RouteView
+* ListRouteViews represent pages within Gmail or Inbox that show a list of emails. Typical examples are the Inbox, Sent Mail,
+* Drafts, etc. However, views like the Conversation view or Settings would *not* be a ListRouteView.
+*/
+
 var ListRouteView = function(routeViewDriver, driver){
 	RouteView.call(this, routeViewDriver);
 
@@ -25,13 +34,12 @@ var ListRouteView = function(routeViewDriver, driver){
 
 ListRouteView.prototype = Object.create(RouteView.prototype);
 
-_.extend(ListRouteView.prototype, {
+_.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 	/**
-	 * Adds a collapsible section to the page. On create "loading" is shown in the section by default.
-	 * You can then set the content by calling actual results by calling setTableRows on the returned {CollapsibleSectionView} object.
-	 * @param {CollapsibleSectionDescriptor}
-	 * @returns {CollapsibleSectionView}
+	 * Adds a collapsible section to the top of the page.
+	 * @param {CollapsibleSectionDescriptor} configuration options of the CollapsibleSectionView
+	 * @returns {CollapsibleSectionView} the CollapsibleSectionView that was added
 	 */
 	addCollapsibleSection: function(collapsibleSectionDescriptor){
 		var members = membersMap.get(this);
@@ -43,6 +51,7 @@ _.extend(ListRouteView.prototype, {
 		return collapsibleSectionView;
 	},
 
+	/* TODO NOT PUBLIC, get it outta here */
 	destroy: function(){
 		if(!membersMap.has(this)){
 			return;
