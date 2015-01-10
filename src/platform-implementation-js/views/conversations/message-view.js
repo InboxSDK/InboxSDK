@@ -196,7 +196,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 function _bindToEventStream(messageView, members, stream){
 	stream.onEnd(function(){
-		self.emit('destroy');
+		messageView.emit('destroy');
 		memberMap.delete(messageView);
 	});
 

@@ -176,32 +176,42 @@ _.extend(GmailMessageView.prototype, {
 				if(mutation.oldValue.indexOf('kQ') > -1){
 					oldValue = 'HIDDEN';
 				}
-				else if(mutation.oldValue.indexOf('kv') > -1){
+				else if(mutation.oldValue.indexOf('kv') > -1 || mutation.oldValue.indexOf('ky') > -1){
 					oldValue = 'COLLAPSED';
 				}
-				else{
+				else if(mutation.oldValue.indexOf('h7') > -1){
 					oldValue = 'EXPANDED';
 				}
 
 				if(currentClassList.contains('kQ')){
 					newValue = 'HIDDEN';
 				}
-				else if(currentClassList.contains('kv')){
+				else if(currentClassList.contains('kv') || currentClassList.contains('ky')){
 					newValue = 'COLLAPSED';
 				}
-				else{
+				else if(currentClassList.contains('h7')){
 					newValue = 'EXPANDED';
 				}
 
-
-				if(newValue === 'EXPANDED' && oldValue !== 'EXPANDED'){
-					self._checkMessageOpenState(currentClassList);
+				return {
+					oldValue: oldValue,
+					newValue: newValue,
+					currentClassList: currentClassList
+				};
+			})
+			.doAction(function(event){
+				if(event.newValue === 'EXPANDED' && event.oldValue !== 'EXPANDED'){
+					self._checkMessageOpenState(event.currentClassList);
 				}
-
+			})
+			.filter(function(event){
+				return event.newValue !== event.oldValue && !!event.oldValue && !!event.newValue;
+			})
+			.map(function(event){
 				return {
 					eventName: 'viewStateChange',
-					oldValue: oldValue,
-					newValue: newValue
+					oldValue: event.oldValue,
+					newValue: event.newValue
 				};
 			})
 		);
@@ -230,11 +240,6 @@ _.extend(GmailMessageView.prototype, {
 		if(!classList.contains('h7')){
 			return;
 		}
-
-		this._eventStream.push({
-			eventName: 'expanded',
-			view: this
-		});
 
 		if(this._messageLoaded){
 			return;
