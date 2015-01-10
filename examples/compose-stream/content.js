@@ -1,50 +1,51 @@
-var inboxSDK = new InboxSDK('compose-stream-example');
+InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 
-inboxSDK.Compose.registerComposeViewHandler(function(composeView){
+	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 
-	var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
-	var monkeyIndex = 1;
+		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
+		var monkeyIndex = 1;
 
-	composeView.addButton(Bacon.fromBinder(function(sinkFunction){
+		composeView.addButton(Bacon.fromBinder(function(sinkFunction){
 
-		var buttonOptions = {
-			title: 'Monkeys!',
-			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+			var buttonOptions = {
+				title: 'Monkeys!',
+				iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+				onClick: function(event){
+					monkeyIndex = (monkeyIndex + 1)%2;
+					buttonOptions.iconUrl = monkeyImages[monkeyIndex];
+
+					sinkFunction(buttonOptions);
+
+
+					var element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
+					element.textContent = 'monkey time';
+				},
+				section: 'TRAY_LEFT'
+			};
+
+			sinkFunction(buttonOptions);
+
+			return function(){};
+
+		}));
+
+		composeView.addButton({
+			title: 'Lion',
+			iconUrl: chrome.runtime.getURL('lion.png'),
 			onClick: function(event){
-				monkeyIndex = (monkeyIndex + 1)%2;
-				buttonOptions.iconUrl = monkeyImages[monkeyIndex];
-
-				sinkFunction(buttonOptions);
-
-
-				var element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
-				element.textContent = 'monkey time';
+				event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
 			},
-			section: 'TRAY_LEFT'
-		};
+			section: 'SEND_RIGHT'
+		});
 
-		sinkFunction(buttonOptions);
+		composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
+		composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));
+		composeView.on('ccContactAdded', console.log.bind(console, 'ccContactAdded'));
+		composeView.on('ccContactRemoved', console.log.bind(console, 'ccContactRemoved'));
+		composeView.on('bccContactAdded', console.log.bind(console, 'bccContactAdded'));
+		composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
+		composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
 
-		return function(){};
 
-	}));
-
-	composeView.addButton({
-		title: 'Lion',
-		iconUrl: chrome.runtime.getURL('lion.png'),
-		onClick: function(event){
-			event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
-		},
-		section: 'SEND_RIGHT'
 	});
-
-	composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
-	composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));
-	composeView.on('ccContactAdded', console.log.bind(console, 'ccContactAdded'));
-	composeView.on('ccContactRemoved', console.log.bind(console, 'ccContactRemoved'));
-	composeView.on('bccContactAdded', console.log.bind(console, 'bccContactAdded'));
-	composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
-	composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
-
-
 });

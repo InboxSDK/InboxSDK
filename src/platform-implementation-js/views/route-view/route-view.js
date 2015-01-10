@@ -10,15 +10,13 @@ var membersMap = new Map();
 
 /**
  * @class
- * RouteViews are created when the user navigates to a specific url or page. RouteViews can be "custom", those
+ * RouteViews represent pages within Gmail or Inbox that a user can navigate to. RouteViews can be "custom", those
  * that the application developer registers, or they can be "builtin" which are those that the email client natively
  * supports like "Sent", "Drafts", or "Inbox"
  *
- * When using custom RouteViews, you'll typicall register a RouteView on the Router class and then be given a RouterView
- * when the user navigates to it. You'll typically add your own custom content to the RouteView by using the
- * <code>getElement</code> function.
- *
- * When navigating to RouteViews, parameters can be supplied (see <code>Router.goto</code>) which can later be fetched using <code>getParams</code>.
+ * This class mostly just gives you metadata about the route, most of the functionality to modify the route are
+ * defined in subclasses like <code>ListRouteView</code> and <code>CustomRouteView</code>, which you get by
+ * handling those types specifically in the Router.
  */
 var RouteView = function(routeViewDriver){
 	EventEmitter.call(this);
@@ -36,7 +34,7 @@ RouteView.prototype = Object.create(EventEmitter.prototype);
 _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
-	 * Get the name of the RouteView. If this is a custom route then this is the name you registered the route with.
+	 * Get the ID of the RouteView. This is the same routeID that you give <code>Router.goto</code> or <code>Router.createLink</code>.
 	 * @return {string}
 	 */
 	getRouteID: function(){
@@ -49,6 +47,10 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return members.routeID;
 	},
 
+	/**
+	* Get the type of the route, either custom or native
+	* @return {string}
+	*/
 	getRouteType: function(){
 		var members = membersMap.get(this);
 
@@ -61,7 +63,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
 	 * Get the URL parameters of this RouteView instance
-	 * @return {stringp[]}
+	 * @return {string[]}
 	 */
 	getParams: function(){
 		var members = membersMap.get(this);
@@ -73,18 +75,12 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return members.params;
 	},
 
-	/**
-	 * Indicates whether this RouteView is a custom route, or native to the web client
-	 * @return {Boolean}
-	 */
-	isCustomRoute: function(){
-		return membersMap.get(this).routeViewDriver.isCustomRoute();
-	},
-
+	/* TODO NOT PUBLIC, get it outta here */
 	setRouteID: function(routeID){
 		membersMap.get(this).routeID = routeID;
 	},
 
+	/* TODO NOT PUBLIC, get it outta here */
 	destroy: function(){
 		if(!membersMap.has(this)){
 			return;
