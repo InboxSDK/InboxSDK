@@ -63,7 +63,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
 	 * Get the URL parameters of this RouteView instance
-	 * @return {stringp[]}
+	 * @return {string[]}
 	 */
 	getParams: function(){
 		var members = membersMap.get(this);
@@ -75,12 +75,12 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return members.params;
 	},
 
-	/** TODO NOT PUBLIC, get it outta here */
+	/* TODO NOT PUBLIC, get it outta here */
 	setRouteID: function(routeID){
 		membersMap.get(this).routeID = routeID;
 	},
 
-	/** TODO NOT PUBLIC, get it outta here */
+	/* TODO NOT PUBLIC, get it outta here */
 	destroy: function(){
 		if(!membersMap.has(this)){
 			return;
