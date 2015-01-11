@@ -7,6 +7,11 @@ var Map = require('es6-unweak-collections').Map;
 
 var membersMap = new Map();
 
+/**
+* @class
+* @extends RouteView
+* CustomRouteViews represent your own custom pages of content.
+*/
 var CustomRouteView = function(routeViewDriver){
 	RouteView.call(this, routeViewDriver);
 
@@ -18,12 +23,12 @@ var CustomRouteView = function(routeViewDriver){
 
 CustomRouteView.prototype = Object.create(RouteView.prototype);
 
-_.extend(CustomRouteView.prototype, {
+_.extend(CustomRouteView.prototype, /** @lends CustomRouteView */{
 
 
 	/**
-	* Gets the element representing the content area of this RouteView
-	* @return {HTMLElement}
+	* Gets the element representing the content area of this CustomRouteView
+	* @return {HTMLElement} the main element of your custom route
 	*/
 	getElement: function(){
 		return membersMap.get(this).routeViewDriver.getCustomViewElement();
