@@ -125,8 +125,11 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'destroy');
 }
 
-
-var ResultDescriptor = /** @lends RowDescriptor */ {
+/**
+* @class
+* Represents the a single row to render in CollapsibleSectionViews
+*/
+var RowDescriptor = /** @lends RowDescriptor */ {
 
 /**
  * Bolded text, first textual column

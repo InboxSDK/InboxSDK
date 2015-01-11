@@ -16,9 +16,9 @@ var membersMap = new Map();
 
 /**
 * @class
-* @extends RouteView
 * ListRouteViews represent pages within Gmail or Inbox that show a list of emails. Typical examples are the Inbox, Sent Mail,
 * Drafts, etc. However, views like the Conversation view or Settings would *not* be a ListRouteView.
+* @extends RouteView
 */
 var ListRouteView = function(routeViewDriver, driver){
 	RouteView.call(this, routeViewDriver);

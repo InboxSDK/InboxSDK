@@ -9,8 +9,8 @@ var membersMap = new Map();
 
 /**
 * @class
-* @extends RouteView
 * CustomRouteViews represent your own custom pages of content.
+* @extends RouteView
 */
 var CustomRouteView = function(routeViewDriver){
 	RouteView.call(this, routeViewDriver);
