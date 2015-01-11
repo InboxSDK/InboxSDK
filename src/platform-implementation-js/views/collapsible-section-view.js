@@ -132,13 +132,13 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 var RowDescriptor = /** @lends RowDescriptor */ {
 
 /**
- * Bolded text, first textual column
+ * First textual column
  * @type {string}
  */
 title: null,
 
 /**
- * unbolded text, 2nd textual column
+ * Second textual column
  * @type {string}
  */
 body: null,
@@ -147,7 +147,19 @@ body: null,
  * Last text right-aligned. Often used for dates.
  * @type {string}
  */
-extraText: null,
+shortDetailText: null,
+
+/**
+* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles
+* @type {string}
+*/
+isRead: null,
+
+/**
+* Any labels that should be rendered. A LabelDescriptor simply has title, backgroundColor, and foregroundColor string properties.
+* @type {LabelDescriptor[]}
+*/
+labels: null,
 
 /**
 * An optional url to an icon to display on the left side of the row
