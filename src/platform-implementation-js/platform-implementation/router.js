@@ -42,7 +42,6 @@ var Router = function(appId, driver){
 	members.currentRouteViewDriver = null;
 
 	members.allRoutesHandlerRegistry = new HandlerRegistry();
-	members.listRouteHandlerRegistries = {};
 
 	members.customRoutes = [];
 
@@ -54,6 +53,12 @@ var Router = function(appId, driver){
 	this.NativeRouteIDs = nativeRouteIDs;
 	this.NativeListRouteIDs = nativeListRouteIDs;
 	this.RouteTypes = routeTypes;
+
+	members.listRouteHandlerRegistries = {};
+	var listRouteIDs = Object.getOwnPropertyNames(this.NativeListRouteIDs);
+	listRouteIDs.forEach(function(listRouteID){
+		members.listRouteHandlerRegistries[this.NativeListRouteIDs[listRouteID]] = new HandlerRegistry();
+	}.bind(this));
 
 	driver.setNativeRouteIDs(this.NativeRouteIDs);
 	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
@@ -134,7 +139,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	handleListRoute: function(routeID, handler){
 		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
 		if(!listRouteHandlerRegistries[routeID]){
-			listRouteHandlerRegistries[routeID] = new HandlerRegistry();
+			throw new Error('Invalid routeID specified');
 		}
 
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
@@ -290,14 +295,39 @@ Object.defineProperties(nativeListRouteIDs, {
 });
 
 
-var routeTypes = {
-	LIST: 'LIST',
-	THREAD: 'THREAD',
-	SETTINGS: 'SETTINGS',
-	CHAT: 'CHAT',
-	CUSTOM: 'CUSTOM',
-	UNKNOWN: 'UNKNOWN'
-};
+var routeTypes = {};
+Object.defineProperties(routeTypes, {
+	'LIST': {
+		value: 'LIST',
+		writable: false
+	},
+
+	'THREAD': {
+		value: 'THREAD',
+		writable: false
+	},
+
+	'SETTINGS': {
+		value: 'SETTINGS',
+		writable: false
+	},
+
+	'CHAT': {
+		value: 'CHAT',
+		writable: false
+	},
+
+	'CUSTOM': {
+		value: 'CUSTOM',
+		writable: false
+	},
+
+	'UNKNOWN': {
+		value: 'UNKNOWN',
+		writable: false
+	}
+
+});
 
 
 for(var key in nativeRouteIDs){
@@ -317,7 +347,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
-	var routeView = new RouteView(routeViewDriver, members.driver);
+	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
 
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver);
@@ -330,15 +360,9 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
 	if(routeView.getRouteType() === routeTypes.LIST){
-		var listRouteView = new ListRouteView(routeViewDriver, members.driver);
-
-		if(members.listRouteHandlerRegistries[routeView.getRouteID()]){
-			members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
-		}
-
-		if(members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST]){
-			members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
-		}
+		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
+		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
+		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
 }
 

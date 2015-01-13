@@ -20,7 +20,7 @@ var membersMap = new Map();
 * Drafts, etc. However, views like the Conversation view or Settings would *not* be a ListRouteView.
 * @extends RouteView
 */
-var ListRouteView = function(routeViewDriver, driver){
+var ListRouteView = function(routeViewDriver, driver, appId){
 	RouteView.call(this, routeViewDriver);
 
 	var members = {};
@@ -29,6 +29,7 @@ var ListRouteView = function(routeViewDriver, driver){
 	members.sectionViews = [];
 	members.routeViewDriver = routeViewDriver;
 	members.driver = driver;
+	members.appId = appId;
 };
 
 ListRouteView.prototype = Object.create(RouteView.prototype);

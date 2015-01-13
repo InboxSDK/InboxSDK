@@ -60,6 +60,10 @@ _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ 
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
 	},
 
+	remove: function(){
+		this.destroy();
+	},
+
 	destroy: function(){
 		if(!membersMap.has(this)){
 			return;

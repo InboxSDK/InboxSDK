@@ -244,7 +244,7 @@ _.extend(GmailRouteView.prototype, {
 			this._sectionsContainer = document.createElement('div');
 			this._sectionsContainer.classList.add('inboxsdk__custom_sections');
 
-			if(this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH){
+			if(this._isSearchRoute()){
 				this._sectionsContainer.classList.add('Wc');
 			}
 
