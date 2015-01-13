@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-var threadMetadataOracle = {
+var pageCommunicator = {
   getThreadIdForThreadRow: function(threadRow) {
     var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
@@ -24,4 +24,4 @@ var threadMetadataOracle = {
   })
 };
 
-module.exports = threadMetadataOracle;
+module.exports = pageCommunicator;

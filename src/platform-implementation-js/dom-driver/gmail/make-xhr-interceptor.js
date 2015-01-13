@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
-var threadMetadataOracle = require('./thread-metadata-oracle');
+var pageCommunicator = require('./page-communicator');
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
@@ -50,7 +50,7 @@ function makeXhrInterceptor() {
 
   return {
     xhrInterceptStream: interceptStream,
-    threadMetadataOracle: threadMetadataOracle
+    pageCommunicator: pageCommunicator
   };
 }
 

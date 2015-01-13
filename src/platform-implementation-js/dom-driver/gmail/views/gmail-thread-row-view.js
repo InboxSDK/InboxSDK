@@ -22,7 +22,7 @@ var GmailThreadRowView = function(element) {
     this._verticalRowCount = (threadRow3 && threadRow3.classList.contains('apw')) ? 3 : 2;
   }
 
-  this._threadMetadataOracle = null; // supplied by GmailDriver later
+  this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
 
   this._eventStream = new Bacon.Bus();
@@ -49,7 +49,7 @@ _.extend(GmailThreadRowView.prototype, {
     {name: '_element', destroy: false},
     {name: '_isVertical', destroy: false},
     {name: '_verticalRowCount', destroy: false},
-    {name: '_threadMetadataOracle', destroy: false},
+    {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
@@ -67,8 +67,8 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   // Called by GmailDriver
-  setThreadMetadataOracle: function(threadMetadataOracle) {
-    this._threadMetadataOracle = threadMetadataOracle;
+  setPageCommunicator: function(pageCommunicator) {
+    this._pageCommunicator = pageCommunicator;
   },
 
   // Returns a stream that emits this object once this object is ready for the
@@ -305,7 +305,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getThreadId: function() {
-    return this._threadMetadataOracle.getThreadIdForThreadRow(this._element);
+    return this._pageCommunicator.getThreadIdForThreadRow(this._element);
   }
 
 });
