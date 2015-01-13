@@ -1,7 +1,9 @@
 /*jslint node: true */
 'use strict';
 var _ = require('lodash');
+var assert = require('assert');
 var RSVP = require('rsvp');
+var EventEmitter = require('events').EventEmitter;
 var deparam = require('querystring').parse;
 
 /**
@@ -82,8 +84,8 @@ module.exports = function(XHR, wrappers, opts) {
    *  for request.
    * @property {XHRProxyWrapperCallback} [originalSendBodyLogger] - called with value passed to
    *  send.
-   * @property {XHRProxyWrapperCallback} [sendBodyChanger] - Allows the send body to be changed before
-   *  it's sent.
+   * @property {XHRProxyWrapperCallback} [requestChanger] - Allows the protocol, URL, and body
+   *  to be changed together before the connection is opened and sent.
    * @property {XHRProxyWrapperCallback} [originalResponseTextLogger] - called with the responseText as
    *  given by the server. Is not called if responseType is set to a value besides 'text'.
    * @property {XHRProxyWrapperCallback} [responseTextChanger] - called with the responseText as given
@@ -99,6 +101,8 @@ module.exports = function(XHR, wrappers, opts) {
     this._wrappers = wrappers;
     this._listeners = {};
     this._boundListeners = {};
+    this._events = new EventEmitter(); // used for internal stuff, not user-visible events
+    this.responseText = '';
 
     var extraArgs = _.rest(arguments, 2);
     if (XHR.bind && XHR.bind.apply) {
@@ -130,10 +134,25 @@ module.exports = function(XHR, wrappers, opts) {
       triggerEventListeners('readystatechange', event);
     }
 
-    function finalRsc(event) {
+    this._fakeRscEvent = function() {
+      runRscListeners(Object.freeze({
+        bubbles: false, cancelBubble: false, cancelable: false,
+        defaultPrevented: false,
+        preventDefault: _.noop,
+        stopPropagation: _.noop,
+        stopImmediatePropagation: _.noop,
+        type: 'readystatechange',
+        currentTarget: this, target: this,
+        srcElement: this,
+        NONE: 0, CAPTURING_PHASE: 1, AT_TARGET: 2, BUBBLING_PHASE: 3,
+        eventPhase: 0
+      }));
+    };
+
+    function deliverFinalRsc(event) {
       self.readyState = 4;
       // Remember the status now before any event handlers are called, just in
-      // case on aborts the request.
+      // case one aborts the request.
       var wasSuccess = self.status == 200;
       var progressEvent = _.extend({}, event, {
         lengthComputable: false, loaded: 0, total: 0
@@ -196,7 +215,7 @@ module.exports = function(XHR, wrappers, opts) {
             }
           });
 
-          var finish = _.once(finalRsc.bind(null, event));
+          var finish = _.once(deliverFinalRsc.bind(null, event));
           if (self._connection.async) {
             // If the XHR object is re-used for another connection, then we need
             // to make sure that our upcoming async calls here do nothing.
@@ -204,9 +223,7 @@ module.exports = function(XHR, wrappers, opts) {
             // calls if it no longer matches.
             var startConnection = self._connection;
 
-            self._activeWrappers.map(function(wrapper) {
-              return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
-            }).filter(Boolean).reduce(function(promise, nextResponseTextChanger) {
+            self._responseTextChangers.reduce(function(promise, nextResponseTextChanger) {
               return promise.then(function(modifiedResponseText) {
                 if (startConnection === self._connection) {
                   self._connection.modifiedResponseText = modifiedResponseText;
@@ -239,10 +256,14 @@ module.exports = function(XHR, wrappers, opts) {
           self.responseText = '';
         }
 
-        finalRsc(event);
+        deliverFinalRsc(event);
       } else {
-        if (self._realxhr.readyState >= 3 && supportsResponseText) {
-          if (self._usingResponseTextChangers) {
+        if (self._realxhr.readyState == 1 && self.readyState == 1) {
+          // Delayed open+send just happened. We already delivered an event
+          // for this, so drop this event.
+          return;
+        } else if (self._realxhr.readyState >= 3 && supportsResponseText) {
+          if (self._responseTextChangers.length) {
             // If we're going to transform the final response, then we don't
             // want to expose any partial untransformed responses and we don't
             // want to bother trying to transform partial responses. Only show
@@ -264,7 +285,6 @@ module.exports = function(XHR, wrappers, opts) {
     [
       'dispatchEvent',
       'getAllResponseHeaders','getResponseHeader','overrideMimeType',
-      'setRequestHeader',
       'responseType','responseXML','responseURL','status','statusText',
       'timeout','ontimeout','onloadstart','onprogress','onabort',
       'upload','withCredentials'
@@ -301,20 +321,37 @@ module.exports = function(XHR, wrappers, opts) {
     });
 
     self.readyState = self._realxhr.readyState;
-
-    self.abort = function() {
-      // Important: If the request has already been sent, the XHR will change
-      // its readyState to 4 after abort. However, we sometimes asynchronously
-      // delay send calls. If the application has already called send but we
-      // haven't sent off the real call yet, then we need to hurry up and send
-      // something before the abort so that the readyState change happens.
-      if (this._clientStartedSend && !this._realStartedSend) {
-        this._realStartedSend = true;
-        this._realxhr.send();
-      }
-      this._realxhr.abort();
-    };
   }
+
+  XHRProxy.prototype.abort = function() {
+    // Important: If the request has already been sent, the XHR will change
+    // its readyState to 4 after abort. However, we sometimes asynchronously
+    // delay send calls. If the application has already called send but we
+    // haven't sent off the real call yet, then we need to hurry up and send
+    // something before the abort so that the readyState change happens.
+    if (this._clientStartedSend && !this._realStartedSend) {
+      if (this.readyState != 0 && this._realxhr.readyState == 0) {
+        this._realxhr.open(this._connection.method, this._connection.url);
+      }
+      this._realStartedSend = true;
+      this._realxhr.send();
+    }
+    this._realxhr.abort();
+  };
+
+  XHRProxy.prototype.setRequestHeader = function(name, value) {
+    var self = this;
+    if (this.readyState != 1) {
+      throw new Error("Can't set headers now at readyState "+this.readyState);
+    }
+    if (this._connection.async && this._requestChangers.length) {
+      this._events.once('realOpen', function() {
+        self._realxhr.setRequestHeader(name, value);
+      });
+    } else {
+      this._realxhr.setRequestHeader(name, value);
+    }
+  };
 
   XHRProxy.prototype.addEventListener = function(name, listener) {
     if (!this._listeners[name]) {
@@ -349,20 +386,40 @@ module.exports = function(XHR, wrappers, opts) {
   };
 
   XHRProxy.prototype.open = function(method, url, async) {
+    var self = this;
     this._connection = {
       method: method,
       url: url,
       params: deparam(url.split('?')[1] || ''),
-      async: async !== false
+      async: arguments.length < 3 || !!async
     };
     this._clientStartedSend = false;
     this._realStartedSend = false;
     this._activeWrappers = findApplicableWrappers(this._wrappers, this._connection);
-    this._usingResponseTextChangers = !!_.find(this._activeWrappers, function(wrapper) {
-      return !!wrapper.responseTextChanger;
-    });
+    this._responseTextChangers = this._activeWrappers.map(function(wrapper) {
+      return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
+    }).filter(Boolean);
+    this.responseText = '';
 
-    return this._realxhr.open.apply(this._realxhr,arguments);
+    function finish(method, url) {
+      return self._realxhr.open(method, url, self._connection.async);
+    }
+
+    if (this._connection.async) {
+      this._requestChangers = this._activeWrappers.map(function(wrapper) {
+        return wrapper.requestChanger && wrapper.requestChanger.bind(wrapper);
+      }).filter(Boolean);
+      if (this._requestChangers.length) {
+        if (this.readyState != 1) {
+          this.readyState = 1;
+          this._fakeRscEvent();
+        }
+      } else {
+        finish(method, url);
+      }
+    } else {
+      finish(method, url);
+    }
   };
 
   XHRProxy.prototype.send = function(body) {
@@ -387,33 +444,44 @@ module.exports = function(XHR, wrappers, opts) {
       self._realxhr.send(body);
     }
 
-    if (self._connection.async) {
+    if (this._connection.async && this._requestChangers.length) {
       // If the XHR object is re-used for another connection, then we need
       // to make sure that our upcoming async calls here do nothing.
       // Remember the current connection object, and do nothing in our async
       // calls if it no longer matches. Also check for aborts.
-      var startConnection = self._connection;
+      var startConnection = this._connection;
 
-      self._activeWrappers.map(function(wrapper) {
-        return wrapper.sendBodyChanger && wrapper.sendBodyChanger.bind(wrapper);
-      }).filter(Boolean).reduce(function(promise, nextSendBodyChanger) {
-        return promise.then(function(modifiedSendBody) {
+      var request = {
+        method: this._connection.method,
+        url: this._connection.url,
+        body: body
+      };
+      this._requestChangers.reduce(function(promise, nextRequestChanger) {
+        return promise.then(function(modifiedRequest) {
           if (startConnection === self._connection && !self._realStartedSend) {
-            self._connection.modifiedSendBody = modifiedSendBody;
-            return nextSendBodyChanger(self._connection, modifiedSendBody);
+            assert(_.has(modifiedRequest, 'method'), 'modifiedRequest has method');
+            assert(_.has(modifiedRequest, 'url'), 'modifiedRequest has url');
+            assert(_.has(modifiedRequest, 'body'), 'modifiedRequest has body');
+            return nextRequestChanger(self._connection, Object.freeze(modifiedRequest));
           }
         });
-      }, RSVP.resolve(self._connection.originalSendBody)).then(function(modifiedSendBody) {
+      }, RSVP.Promise.resolve(request)).then(function(modifiedRequest) {
         if (startConnection === self._connection && !self._realStartedSend) {
-          self._connection.modifiedSendBody = modifiedSendBody;
-          finish(modifiedSendBody);
+          assert(_.has(modifiedRequest, 'method'), 'modifiedRequest has method');
+          assert(_.has(modifiedRequest, 'url'), 'modifiedRequest has url');
+          assert(_.has(modifiedRequest, 'body'), 'modifiedRequest has body');
+          return modifiedRequest;
         }
-      }, function(err) {
+      }).catch(function(err) {
         logError(err);
+        return request;
+      }).then(function(modifiedRequest) {
         if (startConnection === self._connection && !self._realStartedSend) {
-          finish(body);
+          self._realxhr.open(modifiedRequest.method, modifiedRequest.url);
+          self._events.emit('realOpen');
+          finish(modifiedRequest.body);
         }
-      }).catch(logError);
+      });
     } else {
       finish(body);
     }
