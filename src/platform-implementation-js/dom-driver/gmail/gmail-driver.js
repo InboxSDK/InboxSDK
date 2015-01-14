@@ -52,22 +52,8 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, routeID, params);
 	},
 
-	createSearchFilter: function(obj) {
-		var self = this;
-		this._pageCommunicator.createCustomSearchTerm(obj.term);
-
-		this._pageCommunicator.ajaxInterceptStream.filter(function(event) {
-			return event.type === 'searchQueryForReplacement' && event.term === obj.term;
-		}).onValue(function(event) {
-			RSVP.Promise.resolve(obj.termReplacer({})).then(function(result) {
-				if (typeof result != 'string') {
-					throw new Error("termReplacer response must be a string");
-				}
-				var newTerm = "(" + result + ")";
-				var newQuery = event.query.replace(obj.term, newTerm.replace(/\$/g, '$$$$'));
-				self._pageCommunicator.setSearchTermReplacement(event.query, newQuery);
-			});
-		});
+	registerSearchQueryRewriter: function(obj) {
+		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	},
 
 	openComposeWindow: function(){

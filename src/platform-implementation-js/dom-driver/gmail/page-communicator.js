@@ -42,7 +42,7 @@ PageCommunicator.prototype = {
     document.dispatchEvent(event);
   },
 
-  setSearchTermReplacement: function(query, newQuery) {
+  setSearchQueryReplacement: function(query, newQuery) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKsearchReplacementReady', false, false, {
       query: query, newQuery: newQuery

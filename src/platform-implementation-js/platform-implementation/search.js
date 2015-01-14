@@ -24,7 +24,7 @@ _.extend(Search.prototype,  {
 			throw new Error("Custom search term must begin with 'app:'");
 		}
 		var members = memberMap.get(this);
-		members.driver.createSearchFilter(obj);
+		members.driver.registerSearchQueryRewriter(obj);
 	},
 
 	/* Proposed. Probably would have to return promises.
