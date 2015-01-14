@@ -3,6 +3,7 @@ var RSVP = require('rsvp');
 var XHRProxyFactory = require('./xhr-proxy-factory');
 var threadIdentifier = require('./thread-identifier');
 var stringify = require('querystring').stringify;
+var quotedSplit = require('../common/quoted-split');
 
 function setupGmailInterceptor() {
   threadIdentifier.setup();
@@ -85,7 +86,7 @@ function setupGmailInterceptor() {
         params.search && params.view === 'tl' &&
         connection.url.match(/^\?/) &&
         params.q &&
-        (customSearchTerm = _.intersection(customSearchTerms, params.q.split(' '))[0])
+        (customSearchTerm = _.intersection(customSearchTerms, quotedSplit(params.q))[0])
       ) {
         if (queryReplacement && queryReplacement.query === params.q && queryReplacement.start != params.start) {
           // If this is the same query that was made last, but just for a
