@@ -1,9 +1,12 @@
+'use strict';
+
 var GmailElementGetter = require('../gmail-element-getter');
 var GmailNavItemView = require('../views/gmail-nav-item-view');
 
 var waitFor = require('../../../lib/wait-for');
 var eventNameFilter = require('../../../lib/event-name-filter');
 var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
+var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 
 module.exports = function(orderGroup, navItemDescriptor){
 	var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
@@ -65,6 +68,12 @@ function _createNavItemsHolder(){
 
 	var navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
 	navMenuInjectionContainer.children[2].insertAdjacentElement('beforebegin', holder);
+
+	makeMutationObserverStream(holder, {attributes: true, attributeFilter: ['class']}).onValue(function(){
+		if(holder.classList.contains('TA')){
+			holder.classList.remove('TA');
+		}
+	});
 
 	return holder.querySelector('.TK');
 }
