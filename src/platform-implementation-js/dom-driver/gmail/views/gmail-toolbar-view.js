@@ -6,6 +6,7 @@ var waitFor = require('../../../lib/wait-for');
 var ToolbarViewDriver = require('../../../driver-interfaces/toolbar-view-driver');
 
 var ButtonView = require('../widgets/buttons/button-view');
+var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
 
@@ -69,7 +70,7 @@ _.extend(GmailToolbarView.prototype, {
 		this._ready.then(
 			function(){
 				if (!self._element) return;
-				var sectionElement = self._getSectionElement(buttonDescriptor.type);
+				var sectionElement = self._getSectionElement(buttonDescriptor.section);
 
 				var buttonViewController = self._createButtonViewController(buttonDescriptor);
 				self._buttonViewControllers.push(buttonViewController);
@@ -87,8 +88,11 @@ _.extend(GmailToolbarView.prototype, {
 
 		var buttonViewController = null;
 		if(buttonDescriptor.hasDropdown){
-			buttonDescriptor.dropdownViewDriver = new GmailDropdownView();
-			buttonViewController = new DropdownButtonViewController(buttonDescriptor);
+			buttonViewController = new DropdownButtonViewController({
+				buttonView: buttonView,
+				dropdownViewDriverClass: GmailDropdownView,
+				dropdownShowFunction: buttonDescriptor.onClick
+			});
 		}
 		else{
 			buttonViewController = new BasicButtonViewController(buttonDescriptor);

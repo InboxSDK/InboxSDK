@@ -104,7 +104,7 @@ _.extend(GmailDriver.prototype, {
 			})
 		);
 
-		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
+		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
 		// Each ThreadRowView may be delayed if the thread id is not known yet.
 		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
