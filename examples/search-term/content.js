@@ -5,8 +5,8 @@ function log() {
 InboxSDK.load(1, 'search-term').then(function(sdk) {
 	sdk.Search.registerSearchQueryRewriter({
 		term: 'app:custom',
-		termReplacer: function(event) {
-			console.log('is:custom activate', event);
+		termReplacer: function() {
+			console.log('app:custom activate');
 			return sdk.Search.generateSearchQueryForMessagesByRfcID([
 				'<bcaec51b1acbb643d8050b8ee898@google.com>',
 				'<CADBYpy=tCAyweRdjMTuvKd5y8XYtbJZmQHW19gTOgAhotQtYQA@mail.gmail.com>',
