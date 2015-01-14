@@ -13,30 +13,30 @@ var getURLObject = require('./get-url-object');
 var currentUrlObject = {};
 var currentMainElement = null;
 
-function setupRouteViewDriverStream(GmailRouteInfo){
+function setupRouteViewDriverStream(GmailRouteProcessor){
 	// TODO return a stream that handles unsubscription instead of a bus
 	var routeViewDriverStream = new Bacon.Bus();
 
 	var hashChangeStream = Bacon.fromEventTarget(window, 'hashchange').map('.newURL').map(getURLObject);
 
 	//if we're to or from a custom view then push to the routeViewDriverStream right away
-	hashChangeStream.filter(_isNotNativeToNative(GmailRouteInfo)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteInfo));
+	hashChangeStream.filter(_isNotNativeToNative(GmailRouteProcessor)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
 
 	//when native gmail changes main view there's a div that takes on role=main
-	GmailElementGetter.getMainContentElementChangedStream().map(null).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteInfo));
+	GmailElementGetter.getMainContentElementChangedStream().map(null).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
 
 	return routeViewDriverStream;
 }
 
-function _isNotNativeToNative(GmailRouteInfo){
+function _isNotNativeToNative(GmailRouteProcessor){
 	return function(urlObject){
-		return !GmailRouteInfo.isNativeRoute(urlObject.name) || !GmailRouteInfo.isNativeRoute(currentUrlObject.name);
+		return !GmailRouteProcessor.isNativeRoute(urlObject.name) || !GmailRouteProcessor.isNativeRoute(currentUrlObject.name);
 	};
 }
 
-function _isThreadRoute(GmailRouteInfo, urlObject){
-	return  GmailRouteInfo.isNativeRoute(urlObject.name) &&
-			GmailRouteInfo.isListRouteName(urlObject.name) &&
+function _isThreadRoute(GmailRouteProcessor, urlObject){
+	return  GmailRouteProcessor.isNativeRoute(urlObject.name) &&
+			GmailRouteProcessor.isListRouteName(urlObject.name) &&
 		    (GmailElementGetter.getRowListElements().length === 0 || _doesUrlContainThreadId(urlObject));
 }
 
@@ -53,7 +53,7 @@ function _doesUrlContainThreadId(urlObject){
 	return !!potentialThreadId.toLowerCase().match(/^[0-9a-f]+$/); //only contains base16 chars
 }
 
-function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject){
+function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject){
 	waitFor(function(){
 		var urlHash = location.hash;
 		if(urlHash){
@@ -66,7 +66,7 @@ function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, url
 		return !!GmailElementGetter.getThreadContainerElement();
 
 	}, 30*1000, 50).then(function(){
-		_createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject);
+		_createRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject);
 	}, function(err){
 		if(err !== 'no longer loading a thread'){
 			throw err;
@@ -75,18 +75,18 @@ function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteInfo, url
 }
 
 
-function _createRouteViewDriver(routeViewDriverStream, GmailRouteInfo, urlObject){
+function _createRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject){
 	urlObject = urlObject || getURLObject(location.href);
 
 	currentUrlObject = urlObject;
 	var options = _.clone(urlObject);
-	options.isCustomRoute = !GmailRouteInfo.isNativeRoute(urlObject.name);
+	options.isCustomRoute = !GmailRouteProcessor.isNativeRoute(urlObject.name);
 
 	if(options.isCustomRoute){
 		options.params.unshift(options.name);
 	}
 
-	var routeViewDriver = new GmailRouteView(options, GmailRouteInfo);
+	var routeViewDriver = new GmailRouteView(options, GmailRouteProcessor);
 	routeViewDriverStream.push(routeViewDriver);
 }
 

@@ -8,15 +8,22 @@ var GmailContentPanelView = require('./gmail-content-panel-view');
 
 var BasicClass = require('../../../../lib/basic-class');
 
-var GmailContentPanelContainerView = function(){
+var GmailContentPanelContainerView = function(element){
      BasicClass.call(this);
 
      this._eventStream = new Bacon.Bus();
      this._descriptorToViewMap = new Map();
      this._viewToDescriptorMap = new Map();
 
-     this._setupElement();
+     if(!element){
+          this._setupElement();
+     }
+     else{
+          this._setupExistingElement(element);
+     }
+
      this._setupGmailTabContainerView();
+
 };
 
 GmailContentPanelContainerView.prototype = Object.create(BasicClass.prototype);
@@ -67,9 +74,19 @@ _.extend(GmailContentPanelContainerView.prototype, {
           this._element.appendChild(this._contentContainer);
      },
 
+     _setupExistingElement: function(element){
+          this._element = element;
+          this._tabContainer = element.querySelector('.inboxsdk__contentPanelContainer_tabContainer');
+          this._contentContainer = element.querySelector('.inboxsdk__contentPanelContainer_contentContainer');
+     },
+
      _setupGmailTabContainerView: function(){
-          this._gmailTabContainerView = new GmailTabContainerView();
-          this._tabContainer.appendChild(this._gmailTabContainerView.getElement());
+          var existingTabContainerElement = this._tabContainer.children[0];
+          this._gmailTabContainerView = new GmailTabContainerView(existingTabContainerElement);
+
+          if(!existingTabContainerElement){
+               this._tabContainer.appendChild(this._gmailTabContainerView.getElement());
+          }
 
           this._gmailTabContainerView
                .getEventStream()
@@ -87,6 +104,7 @@ _.extend(GmailContentPanelContainerView.prototype, {
                .map(this._descriptorToViewMap, 'get')
                .onValue('.deactivate');
      }
+
 
  });
 

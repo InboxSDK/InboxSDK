@@ -1,5 +1,7 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
+var baconCast = require('bacon-cast');
+var Bacon = require('baconjs');
 
 var Map = require('es6-unweak-collections').Map;
 
@@ -36,8 +38,9 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	 * @return {ContentPanelView}
 	 */
 	addSidebarContentPanel: function(descriptor){
+		var descriptorPropertyStream = baconCast(Bacon, descriptor).toProperty();
 		var members = memberMap.get(this);
-		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptor, members.appId);
+		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}
@@ -45,14 +48,31 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 		return null;
 	},
 
-
+	/**
+	* Gets all the loaded MessageView objects in the thread. See MessageView for more information on what "loaded" means.
+	* @return {MessageView[]} an array of message view objects
+	*/
 	getMessageViews: function(){
 		var members = memberMap.get(this);
 
-		return _.chain(members.threadViewImplementation.getMessageViews())
+		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
 				 .filter(function(messageViewDriver){
 				 	return messageViewDriver.isLoaded();
 				 })
+				 .map(function(messageViewDriver){
+				 	return members.membraneMap.get(messageViewDriver);
+				 })
+				 .value();
+	},
+
+	/**
+	* Gets all the MessageView objects in the thread regardless of their load state. See MessageView for more information on what "loaded" means.
+	* @return {MessageView[]} an array of message view objects
+	*/
+	getMessageViewsAll: function(){
+		var members = memberMap.get(this);
+
+		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
 				 .map(function(messageViewDriver){
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
@@ -61,13 +81,14 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 
 
 	/**
-	 * Fires when the user hovers over a contact. {ContactHoverEvent}
+	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}
 	 * @event ThreadView#contactHover
+	 *
 	 */
 
 	/**
 	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread)
-	 * @event ThreadView#unload
+	 * @event ThreadView#destroy
 	 */
 
 });
@@ -76,7 +97,7 @@ module.exports = ThreadView;
 
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
-	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'unload');
+	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'destroy');
 
 	threadViewImplementation
 		.getEventStream()

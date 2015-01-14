@@ -12,6 +12,26 @@ var CustomRouteView = require('../views/route-view/custom-route-view');
 
 var memberMap = new Map();
 
+/**
+* @class
+* This namespace contains functionality associated with creating your own content inside Gmail or Inbox. It allows you to define "Routes"
+* which define a full page of content and an associated URL space for which they are active. You can think of routes as different pages
+* in your application. Gmail and Inbox already have a few routes built in (Inbox, Sent, Drafts, etc). This namespace allows you to define
+* your own as well as listen in on the built in routes being navigated to.
+*
+* This is typically used when you want to create content to fill the main content area of Gmail or Inbox.
+*
+* Every route has a URL associated with it and can have optional parameters. However, you never construct these URL's manually.
+* The SDK will take care of creating a URL that will work in Gmail/Inbox for your Route. Since these URL's may change due to
+* implementations of Gmail/Inbox, you should always create new links when trying to set URL on elements or simply use the goto
+* function which naviagtes to the created link automatically.
+*
+* Using the <code>handleX</code> family of methods, you can specify which routes your application can handle. You will be called back with
+* and instance of a RouteView or similar when the user navigates to a route you've declared you can handle. For custom routes, you'll typically
+* add your own content and for built in routes, you'll typically modify the existing content.
+*
+* Route ID's are path like strings with named parameters, for example: "/myroute/:someParamMyRouteNeeds"
+*/
 var Router = function(appId, driver){
 	var members = {};
 	memberMap.set(this, members);
@@ -22,7 +42,6 @@ var Router = function(appId, driver){
 	members.currentRouteViewDriver = null;
 
 	members.allRoutesHandlerRegistry = new HandlerRegistry();
-	members.listRouteHandlerRegistries = {};
 
 	members.customRoutes = [];
 
@@ -31,34 +50,57 @@ var Router = function(appId, driver){
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
-	this.NativeRouteIDs = driver.getNativeRouteIDs();
-	this.NativeRouteTypes = driver.getNativeRouteTypes();
+	this.NativeRouteIDs = nativeRouteIDs;
+	this.NativeListRouteIDs = nativeListRouteIDs;
+	this.RouteTypes = routeTypes;
+
+	members.listRouteHandlerRegistries = {};
+	var listRouteIDs = Object.getOwnPropertyNames(this.NativeListRouteIDs);
+	listRouteIDs.forEach(function(listRouteID){
+		members.listRouteHandlerRegistries[this.NativeListRouteIDs[listRouteID]] = new HandlerRegistry();
+	}.bind(this));
+
+	driver.setNativeRouteIDs(this.NativeRouteIDs);
+	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
+	driver.setRouteTypes(this.RouteTypes);
 };
 
+// TODO aleem add a section for all enum types in this section
 
-_.extend(Router.prototype,  {
 
+_.extend(Router.prototype, /** @lends Router */ {
+
+	/**
+	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
+	* @param {string} routeID - a route specifying where the link should navigate the user to
+	* @param {Object} params an object containing the parameters that will be encoded in the link and decoded when the user
+	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
+	* only simple key value pairs with no nested arrays/objects.
+	* @return {string} the encoded URL
+	*/
 	createLink: function(routeID, params){
 		return memberMap.get(this).driver.createLink(routeID, params);
 	},
 
+	/**
+	* Change the route to be the one with the given ID and have the given parameters
+	* @param {string} routeID - a route specifying where the link should navigate the user to
+	* @param {Object} params an object containing the parameters that will be encoded in the link and decoded when the user
+	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
+	* only simple key value pairs with no nested arrays/objects.
+	*/
 	goto: function(routeID, params){
 		memberMap.get(this).driver.goto(routeID, params);
 	},
 
-	handleAllRoutes: function(handler){
-		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
-	},
-
-	handleListRoute: function(routeID, handler){
-		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
-		if(!listRouteHandlerRegistries[routeID]){
-			listRouteHandlerRegistries[routeID] = new HandlerRegistry();
-		}
-
-		return listRouteHandlerRegistries[routeID].registerHandler(handler);
-	},
-
+	/**
+	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
+	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
+	* <code>CustomRouteView</code> which you can modify the content.
+	* @param {string} routeID - which route this handler is registering for
+	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a custom route matching
+	* the provided routeID
+	*/
 	handleCustomRoute: function(routeID, handler){
 		var customRouteDescriptor = {
 			routeID: routeID,
@@ -74,9 +116,227 @@ _.extend(Router.prototype,  {
 				customRoutes.splice(index, 1);
 			}
 		};
+	},
+
+	/**
+	* Registers a handler (callback) to be called when the user navigates to any route (both customs and built in routes).
+	* Because this can apply to any route, your callback will be given only a generic <code>RouteView</code>. This is typically used
+	* when you want to monitor for page changes but don't necessarily need to modify the page.
+	* @param {function(RouteView)} handler - the callback to call when the route changes
+	*/
+	handleAllRoutes: function(handler){
+		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
+	},
+
+	/**
+	* Registers a handler (callback) to be called when the user navigates to a list route which matches the routeID you provide.
+	* Gmail and Inbox have several built in routes which are "Lists". These include routes like Inbox, All Mail, Sent, Drafts, etc.
+	* You'll typically use this modify Gmail's and Inbox's built in List routes. Your callback will be passed an instance of a
+	* <code>ListRouteView</code>
+	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in <code>Router.NativeListRoutes</code>
+	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a list route matching the routeId
+	*/
+	handleListRoute: function(routeID, handler){
+		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
+		if(!listRouteHandlerRegistries[routeID]){
+			throw new Error('Invalid routeID specified');
+		}
+
+		return listRouteHandlerRegistries[routeID].registerHandler(handler);
 	}
 
 });
+
+
+var nativeRouteIDs = {};
+Object.defineProperties(nativeRouteIDs, {
+	'INBOX': {
+		value: 'inbox/:page',
+		writable: false
+	},
+
+	'ALL_MAIL': {
+		value: 'all/:page',
+		writable: false
+	},
+
+	'SENT': {
+		value: 'sent/:page',
+		writable: false
+	},
+
+	'STARRED': {
+		value: 'starred/:page',
+		writable: false
+	},
+
+	'DRAFTS': {
+		value: 'drafts/:page',
+		writable: false
+	},
+
+	'LABEL': {
+		value: 'label/:labelName/:page',
+		writable: false
+	},
+
+	'TRASH': {
+		value: 'trash/:page',
+		writable: false
+	},
+
+	'SPAM': {
+		value: 'spam/:page',
+		writable: false
+	},
+
+	'IMPORTANT': {
+		value: 'imp/p:page',
+		writable: false
+	},
+
+	'SEARCH': {
+		value: 'search/:query/:page',
+		writable: false
+	},
+
+	'THREAD': {
+		value: 'inbox/:threadID',
+		writable: false
+	},
+
+	'CHATS': {
+		value: 'chats/:page',
+		writable: false
+	},
+
+	'CHAT': {
+		value: 'chats/:chatID',
+		writable: false
+	},
+
+	'CONTACTS': {
+		value: 'contacts/:page',
+		writable: false
+	},
+
+	'CONTACT': {
+		value: 'contacts/:contactID',
+		writable: false
+	},
+
+	'SETTINGS': {
+		value: 'settings/:section',
+		writable: false
+	},
+
+	'ANY_LIST': {
+		value: '*',
+		writable: false
+	}
+});
+
+var nativeListRouteIDs = {};
+Object.defineProperties(nativeListRouteIDs, {
+	'INBOX': {
+		value: nativeRouteIDs.INBOX,
+		writable: false
+	},
+
+	'ALL_MAIL': {
+		value: nativeRouteIDs.ALL_MAIL,
+		writable: false
+	},
+
+	'SENT': {
+		value: nativeRouteIDs.SENT,
+		writable: false
+	},
+
+	'STARRED': {
+		value: nativeRouteIDs.STARRED,
+		writable: false
+	},
+
+	'DRAFTS': {
+		value: nativeRouteIDs.DRAFTS,
+		writable: false
+	},
+
+	'LABEL': {
+		value: nativeRouteIDs.LABEL,
+		writable: false
+	},
+
+	'TRASH': {
+		value: nativeRouteIDs.TRASH,
+		writable: false
+	},
+
+	'SPAM': {
+		value: nativeRouteIDs.SPAM,
+		writable: false
+	},
+
+	'IMPORTANT': {
+		value: nativeRouteIDs.IMPORTANT,
+		writable: false
+	},
+
+	'SEARCH': {
+		value: nativeRouteIDs.SEARCH,
+		writable: false
+	},
+
+	'ANY_LIST': {
+		value: nativeRouteIDs.ANY_LIST,
+		writable: false
+	}
+});
+
+
+var routeTypes = {};
+Object.defineProperties(routeTypes, {
+	'LIST': {
+		value: 'LIST',
+		writable: false
+	},
+
+	'THREAD': {
+		value: 'THREAD',
+		writable: false
+	},
+
+	'SETTINGS': {
+		value: 'SETTINGS',
+		writable: false
+	},
+
+	'CHAT': {
+		value: 'CHAT',
+		writable: false
+	},
+
+	'CUSTOM': {
+		value: 'CUSTOM',
+		writable: false
+	},
+
+	'UNKNOWN': {
+		value: 'UNKNOWN',
+		writable: false
+	}
+
+});
+
+
+for(var key in nativeRouteIDs){
+	Object.freeze(nativeRouteIDs[key]);
+}
+
+Object.freeze(nativeRouteIDs);
+Object.freeze(nativeListRouteIDs);
+Object.freeze(routeTypes);
 
 
 function _handleRouteViewChange(router, members, routeViewDriver){
@@ -87,9 +347,9 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
-	var routeView = new RouteView(routeViewDriver, members.driver);
+	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
 
-	if(routeView.isCustomRoute()){
+	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver);
 	}
 	else{
@@ -99,16 +359,10 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.pendingSearchResultsView = null;
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
-	if(!routeView.isCustomRoute() && routeView.getRouteType() === router.NativeRouteTypes.List){
-		var listRouteView = new ListRouteView(routeViewDriver, members.driver);
-
-		if(members.listRouteHandlerRegistries[routeView.getRouteID()]){
-			members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
-		}
-
-		if(members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST]){
-			members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
-		}
+	if(routeView.getRouteType() === routeTypes.LIST){
+		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
+		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
+		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
 }
 
@@ -158,14 +412,14 @@ function _informRelevantCustomRoutes(members, routeViewDriver){
 function _updateNavMenu(members, newRouteViewDriver){
 	var oldRouteViewDriver = members.currentRouteViewDriver;
 
-	if(oldRouteViewDriver && !oldRouteViewDriver.isCustomRoute()){
-		if(newRouteViewDriver.isCustomRoute()){
+	if(oldRouteViewDriver && oldRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
+		if(newRouteViewDriver.getRouteType() === routeTypes.CUSTOM){
 			members.lastNativeRouteID = oldRouteViewDriver.getRouteID();
 			_removeNativeNavItemActive(members);
 			return;
 		}
 	}
-	else if(members.lastNativeRouteID && !newRouteViewDriver.isCustomRoute()){
+	else if(members.lastNativeRouteID && newRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
 		if(members.lastNativeRouteID === newRouteViewDriver.getRouteID()){
 			_restoreNativeNavItemActive(members);
 		}

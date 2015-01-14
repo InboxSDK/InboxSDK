@@ -1,45 +1,52 @@
-var inboxSDK = new InboxSDK('sidebar-example');
+InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
 
-inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
+	inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
 
-	var el = document.createElement("div");
-	el.innerHTML = 'Hello world!';
-
-	threadView.addSidebarContentPanel({
-		title: 'Monkey',
-		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-		el: el,
-		orderHint: 2
-	});
+		var el = document.createElement("div");
+		el.innerHTML = 'Hello world!';
 
 
-	var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
-	var monkeyIndex = 1;
+		var cp =  threadView.addSidebarContentPanel({
+			title: 'Monkey',
+			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+			el: el,
+			orderHint: 2
+		});
 
-	var el2 = document.createElement('div');
-	el2.innerHTML = 'Hellow back!';
-
-	var options = {
-		title: 'Monkey 2',
-		iconUrl: monkeyImages[monkeyIndex],
-		el: el2,
-		orderHint: 1
-	};
-
-	var stream = new Bacon.Bus();
-	var contentPanel = threadView.addSidebarContentPanel(stream);
-
-	stream.push(options);
+		cp.on('activate', function(){
+			cp.remove();
+		});
 
 
-	contentPanel.on('activate', function(){
-		monkeyIndex = (monkeyIndex + 1)%2;
-		options.iconUrl = monkeyImages[monkeyIndex];
+		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
+		var monkeyIndex = 1;
+
+		var el2 = document.createElement('div');
+		el2.innerHTML = 'Hellow back!';
+
+		var options = {
+			title: 'Monkey 2',
+			iconUrl: monkeyImages[monkeyIndex],
+			el: el2,
+			orderHint: 1
+		};
+
+		var stream = new Bacon.Bus();
+		var contentPanel = threadView.addSidebarContentPanel(stream);
+
 		stream.push(options);
-	});
 
-	contentPanel.on('unload', function(){
-		console.log('unload');
+
+		contentPanel.on('activate', function(){
+			monkeyIndex = (monkeyIndex + 1)%2;
+			options.iconUrl = monkeyImages[monkeyIndex];
+			stream.push(options);
+		});
+
+		contentPanel.on('destroy', function(){
+			console.log('destroy');
+		});
+
 	});
 
 });

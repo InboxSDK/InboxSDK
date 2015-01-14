@@ -433,7 +433,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   }
 
 .inboxsdk__results_collapsedContainer > div {
-  display: inline-block;
+  display: inline;
 }
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
@@ -465,7 +465,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
   .Wc .inboxsdk__resultsSection_title_subtitle {
-    margin-left: -5px;
     font-size: 80%;
   }
 
@@ -528,6 +527,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
+}
+
+.inboxsdk__resultsSection .at {
+  position: relative;
 }
 
 .inboxsdk__resultsSection .at > * {

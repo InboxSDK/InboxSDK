@@ -19,7 +19,7 @@ var GmailElementGetter = require('../../gmail-element-getter');
 
 
 
-var GmailRouteView = function(options, gmailRouteInfo){
+var GmailRouteView = function(options, gmailRouteProcessor){
 	RouteViewDriver.call(this);
 
 	this._hash = options.hash;
@@ -27,7 +27,7 @@ var GmailRouteView = function(options, gmailRouteInfo){
 	this._paramsArray = options.params || [];
 	this._isCustomRoute = options.isCustomRoute;
 
-	this._gmailRouteInfo = gmailRouteInfo;
+	this._gmailRouteProcessor = gmailRouteProcessor;
 
 	this._eventStream = new Bacon.Bus();
 
@@ -55,7 +55,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_pageCommunicator', destroy: false, set: true},
-		{name: '_gmailRouteInfo', destroy: false}
+		{name: '_gmailRouteProcessor', destroy: false}
 	],
 
 	isCustomRoute: function(){
@@ -67,7 +67,7 @@ _.extend(GmailRouteView.prototype, {
 			return false;
 		}
 
-		if(!this._gmailRouteInfo){
+		if(!this._gmailRouteProcessor){
 			return false;
 		}
 
@@ -113,7 +113,7 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint){
-		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search);
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView
@@ -244,7 +244,7 @@ _.extend(GmailRouteView.prototype, {
 			this._sectionsContainer = document.createElement('div');
 			this._sectionsContainer.classList.add('inboxsdk__custom_sections');
 
-			if(this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search){
+			if(this._isSearchRoute()){
 				this._sectionsContainer.classList.add('Wc');
 			}
 
@@ -301,24 +301,24 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isSearchRoute: function(){
-		return this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Search;
+		return this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH;
 	},
 
 	_getRouteType: function(){
 		if(this._isCustomRoute){
-			return this._gmailRouteInfo.ROUTE_TYPES.Custom;
+			return this._gmailRouteProcessor.RouteTypes.CUSTOM;
 		}
 		else if(this._isListRoute()){
-			return this._gmailRouteInfo.ROUTE_TYPES.List;
+			return this._gmailRouteProcessor.RouteTypes.LIST;
 		}
 		else if(this._isThreadRoute()){
-			return this._gmailRouteInfo.ROUTE_TYPES.Thread;
+			return this._gmailRouteProcessor.RouteTypes.THREAD;
 		}
 		else if(this._isSettingsRoute()){
-			return this._gmailRouteInfo.ROUTE_TYPES.Settings;
+			return this._gmailRouteProcessor.RouteTypes.SETTINGS;
 		}
 
-		return this._gmailRouteInfo.ROUTE_TYPES.Unknown;
+		return this._gmailRouteProcessor.RouteTypes.UNKNOWN;
 	},
 
 	_isThreadRoute: function(){
@@ -326,11 +326,11 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isListRoute: function(){
-		return this._gmailRouteInfo.isListRouteName(this._name) && GmailElementGetter.getRowListElements().length > 0;
+		return this._gmailRouteProcessor.isListRouteName(this._name) && GmailElementGetter.getRowListElements().length > 0;
 	},
 
 	_isSettingsRoute: function(){
-		return this._gmailRouteInfo.isSettingsRouteName(this._name);
+		return this._gmailRouteProcessor.isSettingsRouteName(this._name);
 	},
 
 	_getSearchRouteParams: function(){
@@ -346,7 +346,7 @@ _.extend(GmailRouteView.prototype, {
 			page: this._getPageParam()
 		};
 
-		if(this._getRouteID() === this._gmailRouteInfo.ROUTE_IDS.Label){
+		if(this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
 			if(this._paramsArray[0] && this._paramsArray[0].indexOf('p') === -1){
 				params.labelName = this._paramsArray[0];
 			}
@@ -383,10 +383,10 @@ _.extend(GmailRouteView.prototype, {
 		}
 		else{
 			if(this._isThreadRoute()){
-				return this._gmailRouteInfo.ROUTE_IDS.Thread;
+				return this._gmailRouteProcessor.NativeRouteIDs.THREAD;
 			}
 			else{
-				return this._gmailRouteInfo.getRouteID(this._name);
+				return this._gmailRouteProcessor.getRouteID(this._name);
 			}
 		}
 	},

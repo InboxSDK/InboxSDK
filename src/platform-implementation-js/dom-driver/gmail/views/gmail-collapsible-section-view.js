@@ -379,6 +379,10 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		var element = this._element;
 		var container = element.parentElement.parentElement;
 
+		if(!container.classList.contains('inboxsdk__results_collapsedContainer')){
+			return;
+		}
+
 		var elementsToRecollapse = _.toArray(container.children[0].children).concat(_.toArray(container.children[1].children));
 		this._pulloutSectionsFromCollapsedContainer(container);
 		this._destroyCollapsedContainer();

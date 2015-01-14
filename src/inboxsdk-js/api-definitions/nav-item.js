@@ -83,7 +83,7 @@ _.extend(NavItem.prototype, {
 	},
 
 	_bindToImplementationEvents: function(){
-		this._implementation.getEventStream().onEnd(this, 'emit', 'unload');
+		this._implementation.getEventStream().onEnd(this, 'emit', 'destroy');
 
 		var self = this;
 		this._implementation.getEventStream().onValue(function(event){

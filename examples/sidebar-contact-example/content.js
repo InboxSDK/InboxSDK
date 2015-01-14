@@ -2,7 +2,7 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 
 	sdk.Conversations.registerThreadViewHandler(function(threadView){
 
-		var messages = threadView.getMessageViews();
+		var messages = threadView.getMessageViewsAll();
 		var lastMessage = messages[messages.length - 1];
 
 		var sender = lastMessage.getSender();
@@ -17,7 +17,8 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 		});
 
 
-		threadView.on('contactHover', function(contact){
+		threadView.on('contactHover', function(event){
+			var contact = event.contact;
 			console.log(contact);
 			el.textContent = "Hi, " + contact.name + ' <' + contact.emailAddress + '>';
 		});

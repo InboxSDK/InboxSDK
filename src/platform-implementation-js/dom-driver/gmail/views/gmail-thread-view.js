@@ -33,7 +33,7 @@ _.extend(GmailThreadView.prototype, {
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_messageViews', destroy: true, get: true, defaultValue: []}
+		{name: '_messageViewDrivers', destroy: true, get: true, defaultValue: []}
 	],
 
 	addSidebarContentPanel: function(descriptor, appId){
@@ -60,9 +60,14 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	_setupSidebarView: function(sidebarElement){
-		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView();
-		sidebarElement.classList.add('inboxsdk__sidebar');
-		sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+		var existingContentPanelContainer = sidebarElement.querySelector('.inboxsdk__contentPanelContainer');
+		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView(existingContentPanelContainer);
+
+		if(!existingContentPanelContainer){
+			sidebarElement.classList.add('inboxsdk__sidebar');
+			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+		}
+
 	},
 
 	_findToolbarElement: function(){
@@ -141,7 +146,7 @@ _.extend(GmailThreadView.prototype, {
 
 		this._eventStream.plug(messageView.getEventStream());
 
-		this._messageViews.push(messageView);
+		this._messageViewDrivers.push(messageView);
 	}
 
 });

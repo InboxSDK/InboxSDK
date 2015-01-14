@@ -32,7 +32,7 @@ _.extend(DropdownButtonViewController.prototype, {
 		this._view.activate();
 		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), this._dropdownPositionOptions);
 
-		this._dropdownView.on('unload', this._dropdownClosed.bind(this));
+		this._dropdownView.on('destroy', this._dropdownClosed.bind(this));
 
 		if(this._dropdownShowFunction){
 			this._dropdownShowFunction({dropdown: this._dropdownView});

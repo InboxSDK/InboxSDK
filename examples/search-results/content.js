@@ -1,6 +1,6 @@
 InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 
-	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.Search, function(listRouteView){
+	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.SEARCH, function(listRouteView){
 
 		var section = listRouteView.addCollapsibleSection({
 			title: 'Monkeys'
@@ -20,7 +20,7 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
 				{
 					title: 'wagon of monkeys',
 					body: '2222',
-					routeID: inboxSDK.Router.NativeRouteIDs.Inbox
+					routeID: inboxSDK.Router.NativeRouteIDs.INBOX
 				}
 			]);
 		}, 2000);

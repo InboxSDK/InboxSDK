@@ -8,6 +8,7 @@ var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+var simulateClick = require('../../../lib/dom/simulate-click');
 
 var GmailMessageView = function(element, gmailThreadView){
 	MessageViewDriver.call(this);
@@ -139,26 +140,82 @@ _.extend(GmailMessageView.prototype, {
 		this._addedDownloadAllAreaButtonOptions[optionsHash] = true;
 	},
 
+	getViewState: function(){
+		if(this._element.classList.contains('kQ')){
+			return 'HIDDEN';
+		}
+		else if(this._element.classList.contains('kv')){
+			return 'COLLAPSED';
+		}
+		else{
+			return 'EXPANDED';
+		}
+	},
+
+	setViewState: function(viewState){
+		if(viewState === this.getViewState() || viewState === 'HIDDEN'){
+			return;
+		}
+
+		simulateClick(this._element.querySelector('.iv'));
+	},
+
 	_setupMessageStateStream: function(){
 		var self = this;
 
-		makeMutationObserverStream(this._element, {
-			attributes: true, attributeFilter: ['class'], attributeOldValue: true
-		}).takeUntil(this._stopper).onValue(function(mutation) {
-			var currentClassList = mutation.target.classList;
+		this._eventStream.plug(
+			makeMutationObserverStream(this._element, {
+				attributes: true, attributeFilter: ['class'], attributeOldValue: true
+			}).takeUntil(this._stopper)
+			  .map(function(mutation) {
+				var currentClassList = mutation.target.classList;
 
-			if(mutation.oldValue.indexOf('h7') > -1){ //we were open
-				if(!currentClassList.contains('h7')){
-					self._eventStream.push({
-						eventName: 'collapsed',
-						view: self
-					});
+				var oldValue;
+				var newValue;
+
+				if(mutation.oldValue.indexOf('kQ') > -1){
+					oldValue = 'HIDDEN';
 				}
-			}
-			else {
-				self._checkMessageOpenState(currentClassList);
-			}
-		});
+				else if(mutation.oldValue.indexOf('kv') > -1 || mutation.oldValue.indexOf('ky') > -1){
+					oldValue = 'COLLAPSED';
+				}
+				else if(mutation.oldValue.indexOf('h7') > -1){
+					oldValue = 'EXPANDED';
+				}
+
+				if(currentClassList.contains('kQ')){
+					newValue = 'HIDDEN';
+				}
+				else if(currentClassList.contains('kv') || currentClassList.contains('ky')){
+					newValue = 'COLLAPSED';
+				}
+				else if(currentClassList.contains('h7')){
+					newValue = 'EXPANDED';
+				}
+
+				return {
+					oldValue: oldValue,
+					newValue: newValue,
+					currentClassList: currentClassList
+				};
+			})
+			.doAction(function(event){
+				if(event.newValue === 'EXPANDED' && event.oldValue !== 'EXPANDED'){
+					self._checkMessageOpenState(event.currentClassList);
+				}
+			})
+			.filter(function(event){
+				return event.newValue !== event.oldValue && !!event.oldValue && !!event.newValue;
+			})
+			.map(function(event){
+				return {
+					eventName: 'viewStateChange',
+					oldValue: event.oldValue,
+					newValue: event.newValue
+				};
+			})
+		);
+
 	},
 
 	_processInitialState: function(){
@@ -167,6 +224,11 @@ _.extend(GmailMessageView.prototype, {
 		setTimeout(
 			function(){
 				if (self._element) {
+					self._eventStream.push({
+						type: 'internal',
+						eventName: 'messageCreated',
+						view: self
+					});
 					self._checkMessageOpenState(self._element.classList);
 				}
 			},
@@ -179,11 +241,6 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		this._eventStream.push({
-			eventName: 'expanded',
-			view: this
-		});
-
 		if(this._messageLoaded){
 			return;
 		}
@@ -191,7 +248,7 @@ _.extend(GmailMessageView.prototype, {
 
 		this._eventStream.push({
 			type: 'internal',
-			eventName: 'messageLoaded',
+			eventName: 'messageLoad',
 			view: this
 		});
 

@@ -15,7 +15,7 @@ var Mailbox = function(appId, driver, platformImplementation){
 	this._driver.getThreadRowViewDriverStream().onValue(function(viewDriver){
 		var view = new ThreadRowView(viewDriver);
 		self._threadRowViewRegistry.addTarget(view);
-		view.on('unload', function() {
+		view.on('destroy', function() {
 			self._threadRowViewRegistry.removeTarget(view);
 		});
 	});

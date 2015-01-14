@@ -10,9 +10,19 @@ var memberMap = new Map();
 /**
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
-* itself as well as change the state of the UI.
+* itself as well as change the state of the UI.MessageViews have a view state as well as a loaded state. These
+* 2 properties are orthoganal to each other.
+*
+* A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
+* Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
+* to show a user.
+*
+* The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
+* In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
+* state is COLLAPSED or HIDDEN. You should not depend on any relationship between the view state and load state. Instead,
+* use the provided <code>getViewState</code> and <code>isLoaded</code> methods.
 */
-var MessageView = function(messageViewImplementation, appId, membraneMap){
+var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -20,25 +30,9 @@ var MessageView = function(messageViewImplementation, appId, membraneMap){
 
 	members.messageViewImplementation = messageViewImplementation;
 	members.membraneMap = membraneMap;
+	members.Conversations = Conversations;
 
-	var self = this;
-	messageViewImplementation.getEventStream().onEnd(function(){
-		self.emit('unload');
-		memberMap.delete(self);
-	});
-
-	messageViewImplementation.getEventStream()
-							 .filter(function(event){
-							 	return event.type !== 'internal' && event.eventName === 'contactHover';
-							 })
-							 .onValue(function(event){
-							 	self.emit(event.eventName, {
-							 		contactType: event.type,
-							 		contact: event.contact,
-							 		messageView: self,
-							 		threadView: self.getThreadView()
-							 	});
-							 });
+	_bindToEventStream(this, members, messageViewImplementation.getEventStream());
 };
 
 MessageView.prototype = Object.create(EventEmitter.prototype);
@@ -99,6 +93,15 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
 	},
 
+	/**
+	* Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on
+	* this object may return empty results. There is no way to set the load state to true directly. If you require this message
+	* to be loaded, you should set the view state to <code>EXPANDED</code>.
+	* @return {boolean}
+	*/
+	isLoaded: function() {
+		return memberMap.get(this).messageViewImplementation.isLoaded();
+	},
 
 	/**
 	* Returns an array of MessageViewLinkDescriptors representing all the links in the message and their associated metadata.
@@ -111,29 +114,64 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return memberMap.get(this).messageViewImplementation.getLinks();
 	},
 
+	/**
+	* Get the contact of the sender of this message.
+	* @return {Contact}
+	*/
 	getSender: function(){
 		return memberMap.get(this).messageViewImplementation.getSender();
 	},
 
+	/**
+	* Get all the recipients of this message (to, cc, bcc)
+	* @return {Contact[]}
+	*/
 	getRecipients: function(){
 		return memberMap.get(this).messageViewImplementation.getRecipients();
 	},
 
+	/**
+	* Get the <code>ThreadView</code> that this MessageView is in
+	* @return {ThreadView}
+	*/
 	getThreadView: function(){
 		var members = memberMap.get(this);
-
 		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
 	},
 
+	/**
+	* Returns the view state of this Message view. The possible view states are
+	* <code>Conversations.MessageViewViewStates.HIDDEN</code> (no information visible),
+	* <code>Conversations.MessageViewViewStates.COLLAPSED</code> (partial information visible) or
+	* <code>Conversations.MessageViewViewStates.EXPANDED</code>
+	* @return {Conversation.MessageViewViewState}
+	*/
+	getViewState: function() {
+		var members = memberMap.get(this);
+		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
+	},
+
+	setViewState: function(viewState){
+		var MessageViewViewStates = memberMap.get(this).Conversations.MessageViewViewStates;
+		var internalViewState;
+
+		if(viewState === MessageViewViewState.HIDDEN){
+			internalViewState = 'HIDDEN';
+		}
+		else if(viewState === MessageViewViewState.COLLAPSED){
+			internalViewState = 'COLLAPSED';
+		}
+		else{
+			internalViewState = 'EXPANDED';
+		}
+
+		memberMap.get(this).messageViewImplementation.setViewState(internalViewState);
+	}
+
 
 	/**
-	 * Fires when message is collapsed
-	 * @event MessageView#collapsed
-	 */
-
-	/**
-	 * Fires when message is expanded
-	 * @event MessageView#expanded
+	 * Fires when message viewState is changed
+	 * @event MessageView#viewStateChange
 	 */
 
 	/**
@@ -141,15 +179,62 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	 * @event MessageView#contactHover
 	 */
 
+	 /**
+	* Fires when the data for a message is loaded. This can happen when the message view is first presented or later when the user chooses to expand its view state.
+	* @event MessageView#load
+	*/
+
 	/**
 	 * Fires when the view card is destroyed
-	 * @event MessageView#unload
+	 * @event MessageView#destroy
 	 */
 
 
 
 });
 
+
+function _bindToEventStream(messageView, members, stream){
+	stream.onEnd(function(){
+		messageView.emit('destroy');
+		memberMap.delete(messageView);
+	});
+
+	stream
+		.filter(function(event){
+			return event.type !== 'internal' && event.eventName === 'contactHover';
+		})
+		.onValue(function(event){
+			messageView.emit(event.eventName, {
+				contactType: event.type,
+				contact: event.contact,
+				messageView: messageView,
+				threadView: messageView.getThreadView()
+			});
+		});
+
+	stream
+		.filter(function(event){
+			return event.eventName === 'messageLoad';
+		})
+		.onValue(function(event){
+			messageView.emit('load', {
+				messageView: messageView
+			});
+		});
+
+	stream
+		.filter(function(event){
+			return event.eventName === 'viewStateChange';
+		})
+		.onValue(function(event){
+			messageView.emit('viewStateChange', {
+				oldViewState: members.Conversations.MessageViewViewStates[event.oldValue],
+				newViewState: members.Conversations.MessageViewViewStates[event.newValue],
+				messageView: messageView
+			});
+		});
+}
 
 module.exports = MessageView;
 
