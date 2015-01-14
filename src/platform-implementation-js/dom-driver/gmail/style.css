@@ -529,6 +529,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   text-overflow: ellipsis;
 }
 
+.inboxsdk__resultsSection .V3 {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .inboxsdk__resultsSection .at {
   position: relative;
 }

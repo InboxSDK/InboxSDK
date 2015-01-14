@@ -1,7 +1,7 @@
 var _ = require('lodash');
 
 function createLink(GmailRouteProcessor, routeID, params){
-	params = params || {};
+	params = !!params ? _.clone(params) : {};
 
 	routeID = GmailRouteProcessor.getCompatibleRouteID(routeID);
 
