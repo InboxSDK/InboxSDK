@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
-var pageCommunicator = require('./page-communicator');
+var PageCommunicator = require('./page-communicator');
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
@@ -19,9 +19,8 @@ var injectScript = _.once(function() {
 function makeXhrInterceptor() {
   injectScript();
 
-  var rawInterceptStream = Bacon
-    .fromEventTarget(document, 'inboxSDKajaxIntercept')
-    .map('.detail');
+  var pageCommunicator = new PageCommunicator();
+  var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
 
   var interceptStream = Bacon.mergeAll(
     rawInterceptStream.filter(function(detail) {

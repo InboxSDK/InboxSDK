@@ -53,7 +53,26 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	createSearchFilter: function(obj) {
-		console.log('createSearchFilter', obj);
+		var self = this;
+		this._pageCommunicator.createCustomSearchTerm(obj.term);
+
+		this._pageCommunicator.ajaxInterceptStream.filter(function(event) {
+			return event.type === 'searchQueryForReplacement' && event.term === obj.term;
+		}).onValue(function(event) {
+			RSVP.Promise.resolve(obj.termReplacer({a:1})).then(function(result) {
+				if (!Array.isArray(result)) {
+					throw new Error("termReplacer response must be array");
+				}
+				var newTerm = "(" + result.map(function(item) {
+					if (!item.rfc822msgid) {
+						throw new Error("rfc822msgid property required");
+					}
+					return 'rfc822msgid:' + item.rfc822msgid;
+				}).join(' OR ') + ")";
+				var newQuery = event.query.replace(obj.term, newTerm.replace(/\$/g, '$$$$'));
+				self._pageCommunicator.setSearchTermReplacement(event.query, event.start, newQuery);
+			});
+		});
 	},
 
 	openComposeWindow: function(){

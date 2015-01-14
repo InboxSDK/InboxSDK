@@ -1,6 +1,17 @@
 var _ = require('lodash');
+var Bacon = require('baconjs');
 
-var pageCommunicator = {
+// This is intended to be instantiated from makeXhrInterceptor, since it depends
+// on the injected script, and if it's not instantiated elsewhere, you know that
+// if you have an instance of this, then the injected script is present and this
+// will work.
+function PageCommunicator() {
+  this.ajaxInterceptStream = Bacon
+    .fromEventTarget(document, 'inboxSDKajaxIntercept')
+    .map('.detail');
+}
+
+PageCommunicator.prototype = {
   getThreadIdForThreadRow: function(threadRow) {
     var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
@@ -21,7 +32,23 @@ var pageCommunicator = {
 
   getUserEmailAddress: _.once(function() {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
-  })
+  }),
+
+  createCustomSearchTerm: function(term) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKcreateCustomSearchTerm', false, false, {
+      term: term
+    });
+    document.dispatchEvent(event);
+  },
+
+  setSearchTermReplacement: function(query, start, newQuery) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKsearchReplacementReady', false, false, {
+      query: query, start: start, newQuery: newQuery
+    });
+    document.dispatchEvent(event);
+  }
 };
 
-module.exports = pageCommunicator;
+module.exports = PageCommunicator;

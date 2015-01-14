@@ -4,7 +4,7 @@ function log() {
 
 InboxSDK.load(1, 'search-term').then(function(sdk) {
 	sdk.Search.createFilter({
-		term: 'is:custom',
+		term: 'app:commits',
 		termReplacer: function(event) {
 			console.log('is:custom activate', event);
 			return [
