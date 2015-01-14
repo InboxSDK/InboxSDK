@@ -25,8 +25,6 @@ var Conversations = function(appId, driver){
 		loaded: new HandlerRegistry()
 	};
 
-	this.registerMessageViewHandler = this.registerLoadedMessageViewHandler;
-
 	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this);
 	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this);
 
@@ -67,12 +65,12 @@ _.extend(Conversations.prototype, {
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(handler);
 	},
 
-	registerMessageAllViewHandler: function(handler){
-		return memberMap.get(this). messageViewHandlerRegistry.registerHandler(handler);
+	registerMessageViewHandlerAll: function(handler){
+		return memberMap.get(this).messageViewHandlerRegistries.all.registerHandler(handler);
 	},
 
-	registerMessageViewDataLoadedHandler: function(handler){
-		return memberMap.get(this).messageViewHandlerRegistry.registerHandler(handler);
+	registerMessageViewHandler: function(handler){
+		return memberMap.get(this).messageViewHandlerRegistries.loaded.registerHandler(handler);
 	}
 
 });

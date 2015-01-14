@@ -50,6 +50,10 @@ _.extend(GmailRouteProcessor.prototype, {
 		return this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.SETTINGS;
 	},
 
+	isContactRouteName: function(routeName){
+		return this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.CONTACTS || this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.CONTACT;
+	},
+
 	getRouteID: function(routeName){
 		var routeID = this._routeNameToRouteIDMap[routeName];
 		return routeID ? routeID : null;

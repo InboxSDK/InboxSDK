@@ -64,6 +64,7 @@ _.extend(GmailTabContainerView.prototype, {
 
           _.remove(this._gmailTabViews, gmailTabView);
           _.remove(this._visibleGmailTabViews, gmailTabView);
+          gmailTabView.getElement().remove();
 
           this._descriptorToGmailTabViewMap.delete(gmailTabView.getDescriptor());
           this._resetColorIndexes();
@@ -74,6 +75,9 @@ _.extend(GmailTabContainerView.prototype, {
                if(this._tablistElement.children.length > 1){
                     var newIndex = Math.min(index, this._tablistElement.children.length - 2);
                     dispatchCustomEvent(this._tablistElement.children[newIndex], 'tabActivate');
+               }
+               else if(this._tablistElement.children.length === 1){
+                    dispatchCustomEvent(this._tablistElement.children[0], 'tabActivate');
                }
           }
 

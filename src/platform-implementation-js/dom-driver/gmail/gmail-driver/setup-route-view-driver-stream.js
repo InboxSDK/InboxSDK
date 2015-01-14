@@ -20,7 +20,7 @@ function setupRouteViewDriverStream(GmailRouteProcessor){
 	var hashChangeStream = Bacon.fromEventTarget(window, 'hashchange').map('.newURL').map(getURLObject);
 
 	//if we're to or from a custom view then push to the routeViewDriverStream right away
-	hashChangeStream.filter(_isNotNativeToNative(GmailRouteProcessor)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
+	hashChangeStream.filter(_shouldHandleHashChange(GmailRouteProcessor)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
 
 	//when native gmail changes main view there's a div that takes on role=main
 	GmailElementGetter.getMainContentElementChangedStream().map(null).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
@@ -28,50 +28,11 @@ function setupRouteViewDriverStream(GmailRouteProcessor){
 	return routeViewDriverStream;
 }
 
-function _isNotNativeToNative(GmailRouteProcessor){
+function _shouldHandleHashChange(GmailRouteProcessor){
 	return function(urlObject){
-		return !GmailRouteProcessor.isNativeRoute(urlObject.name) || !GmailRouteProcessor.isNativeRoute(currentUrlObject.name);
+		return (!GmailRouteProcessor.isNativeRoute(urlObject.name) || !GmailRouteProcessor.isNativeRoute(currentUrlObject.name)) ||
+			   GmailRouteProcessor.isContactRouteName(urlObject.name);
 	};
-}
-
-function _isThreadRoute(GmailRouteProcessor, urlObject){
-	return  GmailRouteProcessor.isNativeRoute(urlObject.name) &&
-			GmailRouteProcessor.isListRouteName(urlObject.name) &&
-		    (GmailElementGetter.getRowListElements().length === 0 || _doesUrlContainThreadId(urlObject));
-}
-
-function _doesUrlContainThreadId(urlObject){
-	if(urlObject.params.length === 0){
-		return false;
-	}
-
-	var potentialThreadId = _.last(urlObject.params);
-	if(potentialThreadId.length !== 16){
-		return false;
-	}
-
-	return !!potentialThreadId.toLowerCase().match(/^[0-9a-f]+$/); //only contains base16 chars
-}
-
-function _createThreadRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject){
-	waitFor(function(){
-		var urlHash = location.hash;
-		if(urlHash){
-			urlHash = urlHash.substring(1);
-			if(urlHash.split('?')[0] !== urlObject.hash){
-				throw new Error('no longer loading a thread');
-			}
-		}
-
-		return !!GmailElementGetter.getThreadContainerElement();
-
-	}, 30*1000, 50).then(function(){
-		_createRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject);
-	}, function(err){
-		if(err !== 'no longer loading a thread'){
-			throw err;
-		}
-	});
 }
 
 
