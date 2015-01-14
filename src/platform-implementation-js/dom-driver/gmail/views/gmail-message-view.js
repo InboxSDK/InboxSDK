@@ -49,6 +49,10 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	getContentsElement: function(){
+		if(!this._messageLoaded){
+			throw new Error('tried to get message contents before message is loaded');
+		}
+
 		return this._element.querySelector('.adP');
 	},
 
@@ -91,14 +95,10 @@ _.extend(GmailMessageView.prototype, {
 
 	getAttachmentCardViewDrivers: function(){
 		if(!this._gmailAttachmentAreaView){
-			this._gmailAttachmentAreaView = this._getAttachmentArea();
-		}
-
-		if(!this._gmailAttachmentAreaView){
 			return [];
 		}
 
-		return this._gmailAttachmentAreaView.getGmailAttachmentCardViews();
+		return this._gmailAttachmentAreaView.getAttachmentCardViews();
 	},
 
 	addAttachmentCard: function(options){
@@ -246,11 +246,27 @@ _.extend(GmailMessageView.prototype, {
 		}
 		this._messageLoaded = true;
 
-		this._eventStream.push({
-			type: 'internal',
-			eventName: 'messageLoad',
-			view: this
-		});
+
+		this._gmailAttachmentAreaView = this._getAttachmentArea();
+		var self = this;
+
+		if(this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView.ready().then(function(){
+				self._eventStream.push({
+					type: 'internal',
+					eventName: 'messageLoad',
+					view: self
+				});
+			});
+		}
+		else{
+			this._eventStream.push({
+				type: 'internal',
+				eventName: 'messageLoad',
+				view: this
+			});
+		}
+
 
 		this._setupReplyStream();
 	},

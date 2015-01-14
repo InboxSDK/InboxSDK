@@ -12,6 +12,8 @@ var waitFor = require('../../../lib/wait-for');
 var GmailAttachmentCardView = function(options){
 	AttachmentCardViewDriver.call(this);
 
+	this._eventStream = new Bacon.Bus();
+
 	if(options.element){
 		this._element = options.element;
 		this.ready().then(this._extractAttachmentInfo.bind(this));
