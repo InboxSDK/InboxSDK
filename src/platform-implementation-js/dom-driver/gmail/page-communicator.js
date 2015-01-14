@@ -42,10 +42,10 @@ PageCommunicator.prototype = {
     document.dispatchEvent(event);
   },
 
-  setSearchTermReplacement: function(query, start, newQuery) {
+  setSearchTermReplacement: function(query, newQuery) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKsearchReplacementReady', false, false, {
-      query: query, start: start, newQuery: newQuery
+      query: query, newQuery: newQuery
     });
     document.dispatchEvent(event);
   }

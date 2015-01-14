@@ -59,7 +59,7 @@ _.extend(GmailDriver.prototype, {
 		this._pageCommunicator.ajaxInterceptStream.filter(function(event) {
 			return event.type === 'searchQueryForReplacement' && event.term === obj.term;
 		}).onValue(function(event) {
-			RSVP.Promise.resolve(obj.termReplacer({a:1})).then(function(result) {
+			RSVP.Promise.resolve(obj.termReplacer({})).then(function(result) {
 				if (!Array.isArray(result)) {
 					throw new Error("termReplacer response must be array");
 				}
@@ -70,7 +70,7 @@ _.extend(GmailDriver.prototype, {
 					return 'rfc822msgid:' + item.rfc822msgid;
 				}).join(' OR ') + ")";
 				var newQuery = event.query.replace(obj.term, newTerm.replace(/\$/g, '$$$$'));
-				self._pageCommunicator.setSearchTermReplacement(event.query, event.start, newQuery);
+				self._pageCommunicator.setSearchTermReplacement(event.query, newQuery);
 			});
 		});
 	},

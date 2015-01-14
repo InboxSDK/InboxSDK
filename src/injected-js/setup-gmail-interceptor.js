@@ -71,10 +71,7 @@ function setupGmailInterceptor() {
   document.addEventListener('inboxSDKsearchReplacementReady', function(event) {
     // Go through all the queries, resolve the matching ones, and then remove
     // them from the list.
-    if (
-        queryReplacement.query == event.detail.query &&
-        queryReplacement.start == event.detail.start
-    ) {
+    if (queryReplacement.query === event.detail.query) {
       queryReplacement.newQuery.resolve(event.detail.newQuery);
     }
   });
@@ -86,17 +83,21 @@ function setupGmailInterceptor() {
       if (
         connection.method === 'POST' &&
         params.search && params.view === 'tl' &&
-        connection.url.match(/^\?/)
+        connection.url.match(/^\?/) &&
+        params.q &&
+        (customSearchTerm = _.intersection(customSearchTerms, params.q.split(' '))[0])
       ) {
-        if (params.search == 'cat') {
-          params = _.clone(params);
-          params.search = 'apps';
-          params.q = 'is:'+params.cat;
-          delete params.cat;
-        }
-        if (params.q &&
-          (customSearchTerm = _.intersection(customSearchTerms, params.q.split(' '))[0])
-        ) {
+        if (queryReplacement && queryReplacement.query === params.q && queryReplacement.start != params.start) {
+          // If this is the same query that was made last, but just for a
+          // different page, then re-use the replacement query we got last time.
+          // Don't wait on the extension to come up with it again (and risk it
+          // giving an inconsistent answer between pages).
+          connection._queryReplacement = queryReplacement;
+          // Mark the old queryReplacement with this page now so we can tell on
+          // a later request whether the page was changed or the list refresh
+          // button was hit.
+          queryReplacement.start = params.start;
+        } else {
           if (queryReplacement) {
             // Resolve the old one with something because no one else is going
             // to after it's replaced in a moment.
@@ -111,21 +112,20 @@ function setupGmailInterceptor() {
           triggerEvent({
             type: 'searchQueryForReplacement',
             term: customSearchTerm,
-            query: params.q,
-            start: params.start
+            query: params.q
           });
-          connection._newParams = params;
-          return true;
         }
+        return true;
       }
       return false;
     },
     requestChanger: function(connection, request) {
       return connection._queryReplacement.newQuery.promise.then(function(newQuery) {
-        connection._newParams.q = newQuery;
+        var newParams = _.clone(connection.params);
+        newParams.q = newQuery;
         return {
           method: request.method,
-          url: '?'+stringify(connection._newParams),
+          url: '?'+stringify(newParams),
           body: request.body
         };
       });
