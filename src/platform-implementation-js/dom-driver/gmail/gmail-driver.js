@@ -60,15 +60,10 @@ _.extend(GmailDriver.prototype, {
 			return event.type === 'searchQueryForReplacement' && event.term === obj.term;
 		}).onValue(function(event) {
 			RSVP.Promise.resolve(obj.termReplacer({})).then(function(result) {
-				if (!Array.isArray(result)) {
-					throw new Error("termReplacer response must be array");
+				if (typeof result != 'string') {
+					throw new Error("termReplacer response must be a string");
 				}
-				var newTerm = "(" + result.map(function(item) {
-					if (!item.rfc822msgid) {
-						throw new Error("rfc822msgid property required");
-					}
-					return 'rfc822msgid:' + item.rfc822msgid;
-				}).join(' OR ') + ")";
+				var newTerm = "(" + result + ")";
 				var newQuery = event.query.replace(obj.term, newTerm.replace(/\$/g, '$$$$'));
 				self._pageCommunicator.setSearchTermReplacement(event.query, newQuery);
 			});

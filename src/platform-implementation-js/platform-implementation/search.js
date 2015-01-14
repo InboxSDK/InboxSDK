@@ -16,7 +16,7 @@ var Search = function(appId, driver){
 
 _.extend(Search.prototype,  {
 
-	createFilter: function(obj) {
+	registerSearchQueryRewriter: function(obj) {
 		if (typeof obj.termReplacer != 'function' || typeof obj.term != 'string') {
 			throw new Error("Incorrect arguments");
 		}
@@ -25,6 +25,21 @@ _.extend(Search.prototype,  {
 		}
 		var members = memberMap.get(this);
 		members.driver.createSearchFilter(obj);
+	},
+
+	/* Proposed. Probably would have to return promises.
+	generateSearchQueryForMessagesByThreadID: function(ids) {
+
+	},
+
+	generateSearchQueryForMessagesByID: function(ids) {
+
+	},*/
+
+	generateSearchQueryForMessagesByRfcID: function(ids) {
+		return ids.map(function(id) {
+			return 'rfc822msgid:' + id;
+		}).join(' OR ');
 	}
 
 });
