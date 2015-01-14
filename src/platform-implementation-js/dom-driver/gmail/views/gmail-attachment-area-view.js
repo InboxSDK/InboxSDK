@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var AttachmentAreaViewDriver = require('../../../driver-interfaces/attachment-area-view-driver');
 
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
@@ -8,8 +9,11 @@ var BasicButtonViewController = require('../../../widgets/buttons/basic-button-v
 var GmailAttachmentAreaView = function(element){
 	AttachmentAreaViewDriver.call(this);
 
+	this._isNative = !!element;
+
 	if(element){
 		this._element = element;
+		this._setupAttachmentCardViews();
 	}
 	else{
 		this._setupElement();
@@ -21,8 +25,24 @@ GmailAttachmentAreaView.prototype = Object.create(AttachmentAreaViewDriver.proto
 _.extend(GmailAttachmentAreaView.prototype, {
 
 	__memberVariables: [
-		{name: '_element', destroy: false, get: true}
+		{name: '_element', destroy: false, get: true},
+		{name: '_isNative', destroy: false},
+		{name: '_attachmentCardViews', destroy: true, get: true}
 	],
+
+	ready: function(){
+		var self = this;
+
+		return RSVP.resolve().then(function(){
+			if(!self._isNative || self._attachmentCardViews.length === 0){
+				return true;
+			}
+
+			return RSVP.all(self._attachmentCardViews.map(function(attachmentCardView){
+				return attachmentCardView.ready();
+			}));
+		});
+	},
 
 	_setupElement: function(){
 		this._element = document.createElement('div');
@@ -38,13 +58,11 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		].join('');
 	},
 
-	getGmailAttachmentCardViews: function(){
+	_setupAttachmentCardViews: function(){
 		var attachments = this._element.querySelectorAll('.aQH > span');
-
-		return Array.prototype.map.call(attachments, function(attachment){
+		this._attachmentCardViews = Array.prototype.map.call(attachments, function(attachment){
 			return new GmailAttachmentCardView({element: attachment});
 		});
-
 	},
 
 	addGmailAttachmentCardView: function(gmailAttachmentCardView){
@@ -71,7 +89,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
 				if(options.onClick){
-					options.onClick(self.getGmailAttachmentCardViews());
+					options.onClick(self.getAttachmentCardViews());
 				}
 			},
 			buttonView: buttonView
