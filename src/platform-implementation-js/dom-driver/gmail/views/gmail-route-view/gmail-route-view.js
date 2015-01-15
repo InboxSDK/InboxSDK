@@ -54,7 +54,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_sectionsContainer', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'},
-		{name: '_threadMetadataOracle', destroy: false, set: true},
+		{name: '_pageCommunicator', destroy: false, set: true},
 		{name: '_gmailRouteProcessor', destroy: false}
 	],
 
@@ -357,7 +357,7 @@ _.extend(GmailRouteView.prototype, {
 
 	_getThreadRouteParams: function(){
 		return {
-			threadId: this._threadMetadataOracle.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
+			threadId: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
 		};
 	},
 

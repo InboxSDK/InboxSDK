@@ -25,7 +25,7 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
-		{name: '_threadMetadataOracle', destroy: false, get: true},
+		{name: '_pageCommunicator', destroy: false, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadRowViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -50,6 +50,10 @@ _.extend(GmailDriver.prototype, {
 
 	goto: function(routeID, params){
 		return require('./gmail-driver/goto-view')(this, routeID, params);
+	},
+
+	registerSearchQueryRewriter: function(obj) {
+		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	},
 
 	openComposeWindow: function(){
@@ -85,14 +89,14 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	getUserEmailAddress: function() {
-		return this._threadMetadataOracle.getUserEmailAddress();
+		return this._pageCommunicator.getUserEmailAddress();
 	},
 
 	_setupEventStreams: function(){
 		var self = this;
 		var result = makeXhrInterceptor();
 		var xhrInterceptStream = result.xhrInterceptStream;
-		this._threadMetadataOracle = result.threadMetadataOracle;
+		this._pageCommunicator = result.pageCommunicator;
 
 		this._xhrInterceptorStream = new Bacon.Bus();
 		this._xhrInterceptorStream.plug(xhrInterceptStream);
@@ -100,7 +104,7 @@ _.extend(GmailDriver.prototype, {
 		this._routeViewDriverStream = new Bacon.Bus();
 		this._routeViewDriverStream.plug(
 			require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor).doAction(function(routeViewDriver){
-				routeViewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
+				routeViewDriver.setPageCommunicator(self._pageCommunicator);
 			})
 		);
 
@@ -109,7 +113,7 @@ _.extend(GmailDriver.prototype, {
 		// Each ThreadRowView may be delayed if the thread id is not known yet.
 		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
 			.flatMap(function(viewDriver) {
-				viewDriver.setThreadMetadataOracle(self._threadMetadataOracle);
+				viewDriver.setPageCommunicator(self._pageCommunicator);
 				return viewDriver.waitForReady();
 			});
 
