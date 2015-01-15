@@ -10,14 +10,14 @@ var MessageView = require('../views/conversations/message-view');
 var HandlerRegistry = require('../lib/handler-registry');
 
 var memberMap = new Map();
-var membraneMap = new Map();
 
-var Conversations = function(appId, driver){
+var Conversations = function(appId, driver, membraneMap){
 	var members = {};
 	memberMap.set(this, members);
 
 	members.appId = appId;
 	members.driver = driver;
+	members.membraneMap = membraneMap;
 
 	members.threadViewHandlerRegistry = new HandlerRegistry();
 	members.messageViewHandlerRegistries = {
@@ -25,8 +25,8 @@ var Conversations = function(appId, driver){
 		loaded: new HandlerRegistry()
 	};
 
-	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this);
-	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this);
+	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap);
+	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap);
 
 	_setupViewDriverWatcher(
 		appId,
@@ -38,7 +38,9 @@ var Conversations = function(appId, driver){
 									.map('.view');
 		}),
 		MessageView,
-		members.messageViewHandlerRegistries.loaded
+		members.messageViewHandlerRegistries.loaded,
+		this,
+		membraneMap
 	);
 
 	this.MessageViewViewStates = {};
@@ -75,7 +77,7 @@ _.extend(Conversations.prototype, {
 
 });
 
-function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance){
+function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance, membraneMap){
 	var combinedStream = stream.map(function(viewDriver){
 		var view = membraneMap.get(viewDriver) || new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance);
 

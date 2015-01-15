@@ -58,6 +58,10 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    */
   getThreadId: function() {
     return this._threadRowViewDriver.getThreadId();
+  },
+
+  getContacts: function(){
+    return this._threadRowViewDriver.getContacts();
   }
 
   /**

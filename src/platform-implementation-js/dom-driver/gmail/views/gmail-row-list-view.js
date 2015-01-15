@@ -30,16 +30,12 @@ _.extend(GmailRowListView.prototype, {
 		{name: '_element', destroy: false, get: true},
 		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_toolbarView', destroy: true, get: true},
-		{name: '_rowViews', destroy: true, get: true, defaultValue: []},
+		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
 	],
 
 	getEventStream: function(){
 		return this._eventStreamBus;
-	},
-
-	getSelectedThreadRows: function() {
-		throw new Error("getSelectedThreadRows unimplemented");
 	},
 
 	_setupToolbarView: function(){
@@ -106,19 +102,36 @@ _.extend(GmailRowListView.prototype, {
 		});
 
 		this._eventStreamBus.plug(
-			elementStream.flatMap(makeElementViewStream(function(element) {
-				// In vertical preview pane mode, each thread row has three <tr>
-				// elements. We just want to pass the first one to GmailThreadRowView().
-				if (element.hasAttribute('id')) {
-					return new GmailThreadRowView(element);
-				}
-			})).map(function(view) {
-				return {
-					eventName: 'newGmailThreadRowView',
-					view: view
-				};
-			})
+			elementStream
+				.flatMap(makeElementViewStream(function(element) {
+					// In vertical preview pane mode, each thread row has three <tr>
+					// elements. We just want to pass the first one to GmailThreadRowView().
+					if (element.hasAttribute('id')) {
+						return new GmailThreadRowView(element);
+					}
+				}))
+				.doAction(this, '_addThreadRowView')
+				.map(function(view) {
+					return {
+						eventName: 'newGmailThreadRowView',
+						view: view
+					};
+				})
 		);
+	},
+
+	_addThreadRowView: function(gmailThreadRowView){
+		this._threadRowViewDrivers.push(gmailThreadRowView);
+
+		var self = this;
+		gmailThreadRowView
+			.getEventStream()
+			.onEnd(function(){
+				if(self._threadRowViewDrivers){
+					var index = self._threadRowViewDrivers.indexOf(gmailThreadRowView);
+					self._threadRowViewDrivers.splice(index, 1);
+				}
+			});
 	}
 });
 

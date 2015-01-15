@@ -1,4 +1,9 @@
+'use strict';
+
 var _ = require('lodash');
+
+var MembraneMap = require('./lib/membrane-map');
+
 var Compose = require('./platform-implementation/compose');
 var Conversations = require('./platform-implementation/conversations');
 var User = require('./platform-implementation/user');
@@ -33,19 +38,20 @@ var PlatformImplementation = function(appId, opts){
 	}
 
 	this._tracker = new Tracker(appId, opts);
+	this._membraneMap = new MembraneMap();
 
 	this._driver = new GmailDriver();
 	this._tracker.setDriver(this._driver);
 
-	this.Compose = new Compose(appId, this._driver);
-	this.Conversations = new Conversations(appId, this._driver);
-	this.User = new User(appId, this._driver);
-	this.Mailbox = new Mailbox(appId, this._driver, this);
-	this.NavMenu = new NavMenu(appId, this._driver);
-	this.Router = new Router(appId, this._driver);
-	this.Search = new Search(appId, this._driver);
-	this.Toolbars = new Toolbars(appId, this._driver, this);
-	this.Modal = new Modal(appId, this._driver);
+	this.Compose = new Compose(appId, this._driver, this._membraneMap);
+	this.Conversations = new Conversations(appId, this._driver, this._membraneMap);
+	this.User = new User(appId, this._driver, this._membraneMap);
+	this.Mailbox = new Mailbox(appId, this._driver, this._membraneMap);
+	this.NavMenu = new NavMenu(appId, this._driver, this._membraneMap);
+	this.Router = new Router(appId, this._driver, this._membraneMap);
+	this.Search = new Search(appId, this._driver, this._membraneMap);
+	this.Toolbars = new Toolbars(appId, this._driver, this._membraneMap);
+	this.Modal = new Modal(appId, this._driver, this._membraneMap);
 
 	this.Utils = {
 	    logErrorToServer: this._tracker.logErrorToServer.bind(this._tracker),

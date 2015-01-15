@@ -10,6 +10,7 @@ InboxSDK.load(1, 'toolbar-example').then(function(inboxSDK) {
 		hasDropdown: true,
 		onClick: function(event){
 			event.dropdown.el.innerHTML = 'Hello monkey world!';
+			console.log(event);
 		}
 	});
 
@@ -21,21 +22,14 @@ InboxSDK.load(1, 'toolbar-example').then(function(inboxSDK) {
 		showFor: function(){
 			return true;
 		},
-		onClick: function(){
-			alert('hi monkeys 2');
-		}
-	});
-
-
-	inboxSDK.Toolbars.registerThreadListNoSelectionsButton({
-		iconUrl: chrome.runtime.getURL('monkey.png'),
-		title: 'Monkeys 3',
-		section: 'CHECKBOX_GROUP',
-		showFor: function(){
-			return true;
-		},
-		onClick: function(){
-			alert('hi monkeys 3');
+		onClick: function(event){
+			event.selectedThreadRowViews.forEach(function(threadRowView){
+				threadRowView.getContacts().forEach(function(contact){
+					threadRowView.addLabel({
+						title: contact.emailAddress
+					});
+				});
+			});
 		}
 	});
 

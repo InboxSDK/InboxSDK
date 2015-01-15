@@ -1,23 +1,33 @@
+'use strict';
+
 var _ = require('lodash');
+var Map = require('es6-unweak-collections').Map;
+
+
 var HandlerRegistry = require('../lib/handler-registry');
 var ThreadRowView = require('../views/thread-row-view');
 
-var Mailbox = function(appId, driver, platformImplementation){
+var memberMap = new Map();
 
-	this._appId = appId;
-	this._driver = driver;
-	this._platformImplementation = platformImplementation;
+var Mailbox = function(appId, driver, membraneMap){
 
-	this._threadRowViewRegistry = new HandlerRegistry();
+	var members = {};
+	memberMap.set(this, memberMap);
 
-	var self = this;
+	members.appId = appId;
+	members.driver = driver;
+	members.membraneMap = membraneMap;
 
-	this._driver.getThreadRowViewDriverStream().onValue(function(viewDriver){
-		var view = new ThreadRowView(viewDriver);
-		self._threadRowViewRegistry.addTarget(view);
-		view.on('destroy', function() {
-			self._threadRowViewRegistry.removeTarget(view);
-		});
+	members.threadRowViewRegistry = new HandlerRegistry();
+
+	members.driver.getThreadRowViewDriverStream().onValue(function(viewDriver){
+		var view = membraneMap.get(viewDriver);
+		if(!view){
+			view = new ThreadRowView(viewDriver);
+			membraneMap.set(viewDriver, view);
+		}
+
+		members.threadRowViewRegistry.addTarget(view);
 	});
 
 };
@@ -25,7 +35,7 @@ var Mailbox = function(appId, driver, platformImplementation){
 _.extend(Mailbox.prototype, {
 
 	registerThreadRowViewHandler: function(handler) {
-		return this._threadRowViewRegistry.registerHandler(handler);
+		return memberMap.get(this).threadRowViewRegistry.registerHandler(handler);
 	}
 
 });

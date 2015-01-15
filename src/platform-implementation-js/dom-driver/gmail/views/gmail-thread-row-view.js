@@ -57,6 +57,10 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
+    if(!this._element){
+      return;
+    }
+
     _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_addition')).forEach(function(node) {
       node.remove();
     });
@@ -125,11 +129,12 @@ _.extend(GmailThreadRowView.prototype, {
         labelDiv.remove();
       } else {
         _.defaults(label, {
-          color: '#ddd', textColor: '#666'
+          color: '#ddd',
+          textColor: '#666'
         });
 
-        if (at.title != label.text) {
-          at.title = av.textContent = label.text;
+        if (at.title != label.title) {
+          at.title = av.textContent = label.title;
         }
         if (at.style.backgroundColor != label.color) {
           at.style.backgroundColor = at.style.borderColor = au.style.borderColor = label.color;
@@ -306,6 +311,26 @@ _.extend(GmailThreadRowView.prototype, {
 
   getThreadId: function() {
     return this._threadMetadataOracle.getThreadIdForThreadRow(this._element);
+  },
+
+  getContacts: function(){
+    var senderSpans = this._element.querySelectorAll('[email]');
+
+    return _.chain(senderSpans)
+            .map(function(span){
+              return {
+                emailAddress: span.getAttribute('email'),
+                name: span.getAttribute('name')
+              };
+            })
+            .uniq(function(contact){
+              return contact.emailAddress;
+            })
+            .value();
+  },
+
+  isSelected: function(){
+    return !!this._element.querySelector('div[role=checkbox][aria-checked=true]');
   }
 
 });
