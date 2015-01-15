@@ -147,181 +147,304 @@ _.extend(Router.prototype, /** @lends Router */ {
 
 });
 
-
+/**
+* enum^All the different route types that exist in Gmail/Inbox
+* @class
+* @name nativeRouteIDs
+*/
 var nativeRouteIDs = {};
-Object.defineProperties(nativeRouteIDs, {
+Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
+	/**
+	* @type string
+	*/
 	'INBOX': {
 		value: 'inbox/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'ALL_MAIL': {
 		value: 'all/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SENT': {
 		value: 'sent/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'STARRED': {
 		value: 'starred/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'DRAFTS': {
 		value: 'drafts/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'LABEL': {
 		value: 'label/:labelName/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'TRASH': {
 		value: 'trash/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SPAM': {
 		value: 'spam/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'IMPORTANT': {
 		value: 'imp/p:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SEARCH': {
 		value: 'search/:query/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'THREAD': {
 		value: 'inbox/:threadID',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'CHATS': {
 		value: 'chats/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'CHAT': {
 		value: 'chats/:chatID',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'CONTACTS': {
 		value: 'contacts/:page',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'CONTACT': {
 		value: 'contacts/:contactID',
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SETTINGS': {
 		value: 'settings/:section',
 		writable: false
 	},
 
+	/**
+	* This refers to any of the above lists
+	* @type string
+	*/
 	'ANY_LIST': {
 		value: '*',
 		writable: false
 	}
 });
 
+/**
+* enum^The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
+* @class
+* @name NativeListRouteIDs
+*/
 var nativeListRouteIDs = {};
-Object.defineProperties(nativeListRouteIDs, {
+Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
+	/**
+	* @type string
+	*/
 	'INBOX': {
 		value: nativeRouteIDs.INBOX,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'ALL_MAIL': {
 		value: nativeRouteIDs.ALL_MAIL,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SENT': {
 		value: nativeRouteIDs.SENT,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'STARRED': {
 		value: nativeRouteIDs.STARRED,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'DRAFTS': {
 		value: nativeRouteIDs.DRAFTS,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'LABEL': {
 		value: nativeRouteIDs.LABEL,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'TRASH': {
 		value: nativeRouteIDs.TRASH,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SPAM': {
 		value: nativeRouteIDs.SPAM,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'IMPORTANT': {
 		value: nativeRouteIDs.IMPORTANT,
 		writable: false
 	},
 
+	/**
+	* @type string
+	*/
 	'SEARCH': {
 		value: nativeRouteIDs.SEARCH,
 		writable: false
 	},
 
+	/**
+	* This refers to any of the above lists
+	* @type string
+	*/
 	'ANY_LIST': {
 		value: nativeRouteIDs.ANY_LIST,
 		writable: false
 	}
 });
 
-
+/**
+* enum^The different route types that exist
+* @class
+* @name RouteTypes
+*/
 var routeTypes = {};
-Object.defineProperties(routeTypes, {
+Object.defineProperties(routeTypes, /** @lends RouteTypes */ {
+	/**
+	* a list of threads or messages
+	* @type string
+	*/
 	'LIST': {
 		value: 'LIST',
 		writable: false
 	},
 
+	/**
+	* a single thread or message
+	* @type string
+	*/
 	'THREAD': {
 		value: 'THREAD',
 		writable: false
 	},
 
+	/**
+	* a Gmail or Inbox settings
+	* @type string
+	*/
 	'SETTINGS': {
 		value: 'SETTINGS',
 		writable: false
 	},
 
+	/**
+	* a single chat history
+	* @type string
+	*/
 	'CHAT': {
 		value: 'CHAT',
 		writable: false
 	},
 
+	/**
+	* a custom route created by any app
+	* @type string
+	*/
 	'CUSTOM': {
 		value: 'CUSTOM',
 		writable: false
 	},
 
+	/**
+	* an unknown route
+	* @type string
+	*/
 	'UNKNOWN': {
 		value: 'UNKNOWN',
 		writable: false

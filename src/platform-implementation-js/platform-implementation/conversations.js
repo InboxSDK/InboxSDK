@@ -56,13 +56,12 @@ var Conversations = function(appId, driver){
 		members.messageViewHandlerRegistries.loaded
 	);
 
-	this.MessageViewViewStates = {};
-
 	/**
-	* ^enum The various UI states a MessageView can be in
+	* enum^The various UI states a MessageView can be in
 	* @class
 	* @name MessageViewViewStates
 	*/
+	this.MessageViewViewStates = {};
 	Object.defineProperties(this.MessageViewViewStates, /**@lends MessageViewViewStates */ {
 		/**
 		* in this state none of the message is visible except for the outline of its existence
