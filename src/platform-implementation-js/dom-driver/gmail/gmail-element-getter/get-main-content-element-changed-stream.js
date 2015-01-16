@@ -16,10 +16,10 @@ function getMainContentElementChangedStream(GmailElementGetter){
 							.flatMap(function(addedNodes){
 								return Bacon.fromArray(_.toArray(addedNodes));
 							})
+							.merge(Bacon.fromArray(_.toArray(GmailElementGetter.getMainContentContainer().children)))
 							.filter(function(node){
 								return node.classList.contains('nH');
 							})
-							.startWith(GmailElementGetter.getCurrentMainContentElement())
 							.flatMap(function(mainNode){
 								return makeMutationObserverStream(mainNode, {attributes: true, attributeFilter: ['role'], attributeOldValue: true})
 											.startWith({
