@@ -80,15 +80,6 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		membersMap.get(this).routeID = routeID;
 	},
 
-	/* TODO NOT PUBLIC, get it outta here */
-	destroy: function(){
-		if(!membersMap.has(this)){
-			return;
-		}
-
-		this.removeAllListeners();
-		membersMap.delete(this);
-	}
 
 	/**
 	* Fires when this RouteView instance is navigated away from
@@ -99,8 +90,11 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 
 function _bindToEventStream(routeViewDriver, routeView){
-	routeViewDriver.getEventStream().onEnd(routeView, 'emit', 'destroy');
-	routeViewDriver.getEventStream().onEnd(routeView, 'destroy');
+	routeViewDriver.getEventStream().onEnd(function(){
+		routeView.emit('destroy');
+		membersMap.delete(routeView);
+		routeView.removeAllListeners();
+	});
 }
 
 module.exports = RouteView;

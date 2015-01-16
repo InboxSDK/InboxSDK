@@ -123,6 +123,9 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		if(this._isSearch){
 			floatRightElement.classList.add('Wg');
 		}
+		else{
+			this._titleElement.classList.add('Wn');
+		}
 
 		this._headerElement.appendChild(this._titleElement);
 		this._headerElement.appendChild(floatRightElement);

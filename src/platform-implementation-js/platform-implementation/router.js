@@ -473,7 +473,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
 
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
-		_informRelevantCustomRoutes(members, routeViewDriver);
+		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
 	}
 	else{
 		members.driver.showNativeRouteView();
@@ -490,7 +490,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 }
 
 
-function _informRelevantCustomRoutes(members, routeViewDriver){
+function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	var customRouteView = new CustomRouteView(routeViewDriver);
 
 	members.customRoutes
@@ -518,6 +518,9 @@ function _informRelevantCustomRoutes(members, routeViewDriver){
 			else{
 				customRouteView.setRouteID(customRoute.routeID);
 			}
+
+			routeView.setRouteID(customRouteView.getRouteID());
+
 			try{
 				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
 				customRoute.onActivate(customRouteView);

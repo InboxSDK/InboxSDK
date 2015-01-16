@@ -17,7 +17,6 @@ var CustomRouteView = function(routeViewDriver){
 
 	var members = {};
 	membersMap.set(this, members);
-
 	members.routeViewDriver = routeViewDriver;
 };
 
@@ -35,5 +34,6 @@ _.extend(CustomRouteView.prototype, /** @lends CustomRouteView */{
 	}
 
 });
+
 
 module.exports = CustomRouteView;

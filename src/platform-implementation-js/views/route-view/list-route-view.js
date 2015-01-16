@@ -21,6 +21,8 @@ var membersMap = new Map();
 * @extends RouteView
 */
 var ListRouteView = function(routeViewDriver, driver, appId){
+	_bindToEventStream(routeViewDriver, this);
+
 	RouteView.call(this, routeViewDriver);
 
 	var members = {};
@@ -49,10 +51,12 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 		members.sectionViews.push(collapsibleSectionView);
 		return collapsibleSectionView;
-	},
+	}
 
-	/* TODO NOT PUBLIC, get it outta here */
-	destroy: function(){
+});
+
+function _bindToEventStream(routeViewDriver, routeView){
+	routeViewDriver.getEventStream().onEnd(function(){
 		if(!membersMap.has(this)){
 			return;
 		}
@@ -64,10 +68,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 		});
 
 		membersMap.delete(this);
-
-		RouteView.prototype.destroy.call(this);
-	}
-
-});
+	});
+}
 
 module.exports = ListRouteView;
