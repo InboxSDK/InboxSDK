@@ -198,6 +198,8 @@ function _bindToEventStream(messageView, members, stream){
 	stream.onEnd(function(){
 		messageView.emit('destroy');
 		memberMap.delete(messageView);
+
+		messageView.removeAllListeners();
 	});
 
 	stream

@@ -10,7 +10,10 @@ var GmailContentPanelView = function(contentPanelDescriptor, gmailContentPanelCo
      this._element = document.createElement('div');
 
      this._gmailContentPanelContainerView = gmailContentPanelContainerView;
-     contentPanelDescriptor.map('.el').onValue(this._element, 'appendChild');
+     contentPanelDescriptor
+          .takeUntil(this._eventStream.filter(false).mapEnd())
+          .map('.el')
+          .onValue(this._element, 'appendChild');
 };
 
 GmailContentPanelView.prototype = Object.create(ContentPanelViewDriver.prototype);

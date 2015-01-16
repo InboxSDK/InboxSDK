@@ -97,7 +97,12 @@ module.exports = ThreadView;
 
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
-	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'destroy');
+	threadViewImplementation.getEventStream().onEnd(function(){
+		threadView.emit('destroy');
+		memberMap.delete(threadView);
+
+		threadView.removeAllListeners();
+	});
 
 	threadViewImplementation
 		.getEventStream()
