@@ -45,7 +45,7 @@ _.extend(GmailRowListView.prototype, {
 			toolbarElement = this._findToolbarElement();
 		}
 
-		this._toolbarView = new GmailToolbarView(toolbarElement);
+		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
 		this._toolbarView.setRowListViewDriver(this);
 	},
 

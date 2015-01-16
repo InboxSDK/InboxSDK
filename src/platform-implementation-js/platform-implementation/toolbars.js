@@ -19,52 +19,44 @@ var Toolbars = function(appId, driver, membraneMap){
 	members.driver = driver;
 	members.membraneMap = membraneMap;
 
+	members.listButtonDescriptors = [];
+	members.threadViewButtonDescriptors = [];
 
-	members.threadListButtonDescriptors = [];
-	members.threadViewButtonDesriptors = [];
+	this.SectionNames = sectionNames;
 
-	members.threadListNoSelectionsMoreItemDescriptors = [];
-	members.threadListWithSelectionsMoreItemDescriptors = [];
-	members.threadViewMoreItemDescriptors = [];
-
-	_setupViewDriverWatchers(this, members);
+	_setupToolbarViewDriverWatcher(this, members);
 };
 
 Toolbars.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(Toolbars.prototype, {
 
-	registerThreadListNoSelectionsButton: function(buttonDescriptor){
-		memberMap.get(this).threadListButtonDescriptors.push(_.merge(buttonDescriptor, {toolbarState: 'COLLASED'}));
+	registerToolbarButtonForList: function(buttonDescriptor){
+		var members = memberMap.get(this);
+		members.listButtonDescriptors.push(buttonDescriptor);
+
+		return function(){
+			_unregisterButtonDescriptor(members.get(this).listButtonDescriptors, buttonDescriptor);
+		};
 	},
 
-	registerThreadListWithSelectionsButton: function(buttonDescriptor){
-		memberMap.get(this).threadListButtonDescriptors.push(_.merge(buttonDescriptor, {toolbarState: 'EXPANDED'}));
-	},
+	registerToolbarButtonForThreadView: function(buttonDescriptor){
+		var members = memberMap.get(this);
+		members.threadViewButtonDescriptors.push(buttonDescriptor);
 
-	registerThreadViewButton: function(buttonDescriptor){
-		memberMap.get(this).threadViewButtonDesriptors.push(buttonDescriptor);
-	},
-
-	registerThreadListNoSelectionsMoreItem: function(buttonDescriptor){
-		memberMap.get(this).threadListNoSelectionsMoreItemDescriptors.push(buttonDescriptor);
-	},
-
-	registerThreadListWithSelectionsMoreItem: function(buttonDescriptor){
-		memberMap.get(this).threadListWithSelectionsMoreItemDescriptors.push(buttonDescriptor);
-	},
-
-	registerThreadViewMoreItem: function(buttonDescriptor){
-		memberMap.get(this).threadViewMoreItemDescriptors.push(buttonDescriptor);
+		return function(){
+			_unregisterButtonDescriptor(members.get(this).threadViewButtonDescriptors, buttonDescriptor);
+		};
 	}
 
 });
 
 
-function _setupViewDriverWatchers(toolbars, members){
-	_setupToolbarViewDriverWatcher(toolbars, members);
-	_setupMoreMenuViewDriverWatcher(toolbars, members);
+function _unregisterButtonDescriptor(list, buttonDescriptor){
+	var index = list.indexOf(buttonDescriptor);
+	list.splice(index, 1);
 }
+
 
 function _setupToolbarViewDriverWatcher(toolbars, members){
 	members.driver.getToolbarViewDriverStream().onValue(_handleNewToolbarViewDriver, toolbars, members);
@@ -74,26 +66,32 @@ function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
 	var buttonDescriptors = null;
 
 	if(toolbarViewDriver.getRowListViewDriver()){
-		buttonDescriptors = members.threadListButtonDescriptors;
+		buttonDescriptors = members.listButtonDescriptors;
 	}
 	else if(toolbarViewDriver.getThreadViewDriver()){
-		buttonDescriptors = members.threadViewButtonDesriptors;
+		buttonDescriptors = members.threadViewButtonDescriptors;
 	}
 
 	_.chain(buttonDescriptors)
 		.filter(function(buttonDescriptor){
-			return true; /* deprecated */
-			//return buttonDescriptor.showFor(fullscreenView);
+			if(!buttonDescriptor.hideFor){
+				return true;
+			}
+
+			var routeView = members.membraneMap.get(toolbarViewDriver.getRouteViewDriver());
+
+			if(buttonDescriptor.hideFor(routeView)){
+				return false;
+			}
+
+			return true;
 		})
 		.each(function(buttonDescriptor){
-			toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver));
+			toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), sectionNames);
 		});
 
 }
 
-function _setupMoreMenuViewDriverWatcher(toolbars, members){
-	//todo
-}
 
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 	var membraneMap = members.membraneMap;
@@ -153,5 +151,51 @@ function _getThreadRowView(membraneMap){
 		return threadRowView;
 	};
 }
+
+
+/**
+* enum^The different toolbar sections that exist
+* @class
+* @name ToolbarSections
+*/
+var sectionNames = {};
+Object.defineProperties(sectionNames, /** @lends SectionNames */ {
+	/**
+	* to the right of the checkbox button
+	* @type string
+	*/
+	'CHECKBOX': {
+		value: 'CHECKBOX',
+		writable: false
+	},
+
+	/**
+	* The section containing the archive/delete/trash buttons
+	* @type string
+	*/
+	'ARCHIVE': {
+		value: 'ARCHIVE',
+		writable: false
+	},
+
+	/**
+	* The section containing the move and label buttons
+	* @type string
+	*/
+	'MOVE': {
+		value: 'MOVE',
+		writable: false
+	},
+
+	/**
+	* Add an entry to the more menu
+	* @type string
+	*/
+	'MORE': {
+		value: 'MORE',
+		writable: false
+	}
+
+});
 
 module.exports = Toolbars;

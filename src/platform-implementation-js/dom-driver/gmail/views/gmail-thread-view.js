@@ -33,7 +33,8 @@ _.extend(GmailThreadView.prototype, {
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_messageViewDrivers', destroy: true, get: true, defaultValue: []}
+		{name: '_messageViewDrivers', destroy: true, get: true, defaultValue: []},
+		{name: '_pageCommunicator', destroy: false, set: true}
 	],
 
 	addSidebarContentPanel: function(descriptor, appId){
@@ -63,13 +64,13 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	getThreadId: function(){
-
+		return this._pageCommunicator.getCurrentThreadID(this._element);
 	},
 
 	_setupToolbarView: function(){
 		var toolbarElement = this._findToolbarElement();
 
-		this._toolbarView = new GmailToolbarView(toolbarElement);
+		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
 		this._toolbarView.setThreadViewDriver(this);
 	},
 

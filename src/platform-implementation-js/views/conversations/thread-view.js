@@ -77,7 +77,17 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
 				 .value();
-	}
+	},
+
+	getSubject: function(){
+		return memberMap.get(this).threadViewImplementation.getSubject();
+	},
+
+	getThreadID: function(){
+		return memberMap.get(this).threadViewImplementation.getThreadID();
+	},
+
+
 
 
 	/**

@@ -1,5 +1,8 @@
+'use strict';
+
 var _ = require('lodash');
 var $ = require('jquery');
+var Bacon = require('baconjs');
 
 var waitFor = require('../../../lib/wait-for');
 
@@ -12,15 +15,18 @@ var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-bu
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 
-var GmailToolbarView = function(element){
+var GmailToolbarView = function(element, routeViewDriver){
 	ToolbarViewDriver.call(this);
 
 	this._element = element;
+	this._routeViewDriver = routeViewDriver;
 
 	var self = this;
 	this._ready = waitFor(function(){
 		// Resolve if we're destroyed, so that this waitFor doesn't ever wait forever.
-		return !self._element || !!self._getSectionElement('ARCHIVE_GROUP');
+		return !self._element || !!self._getArchiveSectionElement();
+	}).then(function(){
+		return self;
 	});
 
 	this._ready.then(function(){
@@ -41,6 +47,7 @@ _.extend(GmailToolbarView.prototype, {
 		{name: '_buttonViewControllers', destroy: true, defaultValue: []},
 		{name: '_parentElement', destroy: false},
 		{name: '_toolbarState', destroy: false},
+		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_classMutationObsever', destroy: true, destroyFunction: 'disconnect'}
 	],
 
@@ -65,21 +72,31 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 
-	addButton: function(buttonDescriptor){
+	addButton: function(buttonDescriptor, toolbarSections){
 		var self = this;
 		this._ready.then(
 			function(){
 				if (!self._element) return;
-				var sectionElement = self._getSectionElement(buttonDescriptor.section);
 
-				var buttonViewController = self._createButtonViewController(buttonDescriptor);
-				self._buttonViewControllers.push(buttonViewController);
+				if(buttonDescriptor.section === toolbarSections.MORE){
+					//do something different
+				}
+				else{
+					var sectionElement = self._getSectionElement(buttonDescriptor.section, toolbarSections);
 
-				sectionElement.appendChild(buttonViewController.getView().getElement());
+					var buttonViewController = self._createButtonViewController(buttonDescriptor);
+					self._buttonViewControllers.push(buttonViewController);
 
-				self._updateButtonClasses(self._element);
+					sectionElement.appendChild(buttonViewController.getView().getElement());
+
+					self._updateButtonClasses(self._element);
+				}
 			}
 		);
+	},
+
+	waitForReady: function() {
+		return Bacon.fromPromise(this._ready);
 	},
 
 	_createButtonViewController: function(buttonDescriptor){
@@ -106,13 +123,7 @@ _.extend(GmailToolbarView.prototype, {
 
 		if(this._rowListViewDriver){
 			buttonView.getElement().setAttribute('data-rowlist-toolbar', 'true');
-
-			if(buttonDescriptor.toolbarState === 'EXPANDED'){
-				buttonView.getElement().setAttribute('data-toolbar-expanded', 'true');
-			}
-			else{
-				buttonView.getElement().setAttribute('data-toolbar-expanded', 'false');
-			}
+			buttonView.getElement().setAttribute('data-toolbar-expanded', 'true');
 		}
 		else if(this._threadViewDriver){
 			buttonView.getElement().setAttribute('data-thread-toolbar', 'true');
@@ -124,7 +135,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_determineToolbarState: function(){
-		var sectionElement = this._getSectionElement('ARCHIVE_GROUP');
+		var sectionElement = this._getArchiveSectionElement();
 
 		if(sectionElement.style.display === 'none'){
 			this._toolbarState = 'COLLAPSED';
@@ -148,38 +159,45 @@ _.extend(GmailToolbarView.prototype, {
 		});
 
 		this._classMutationObsever.observe(
-			this._getSectionElement('ARCHIVE_GROUP'),
+			this._getArchiveSectionElement(),
 			{attributes: true, attributeFilter: ['style']}
 		);
 	},
 
-	_getSectionElement: function(sectionName){
+	_getSectionElement: function(sectionName, toolbarSections){
 		if(!this._element){
 			return null;
 		}
 
-		var sectionElements = this._element.querySelectorAll('.G-Ni');
-		var buttonSelector = null;
-
 		switch(sectionName){
-			case 'CHECKBOX_GROUP':
-				buttonSelector = '.T-Jo-auh';
-				break;
-			case 'ARCHIVE_GROUP':
-				buttonSelector = '.ar9, .aFh, .aFj';
-				break;
-			case 'MOVE_GROUP':
-				buttonSelector = '.asb, .asa';
-				break;
-			case 'REFRESH_GROUP':
-				buttonSelector = '.asf';
-				break;
-			case 'MORE_GROUP':
-				buttonSelector = '.Ykrj7b';
-				break;
+			case toolbarSections.CHECKBOX:
+				return this._getCheckboxSectionElement();
+
+			case toolbarSections.ARCHIVE:
+				return this._getArchiveSectionElement();
+
+			case toolbarSections.MOVE:
+				return this._getMoveSectionElement();
+
 			default:
 				return null;
 		}
+	},
+
+	_getArchiveSectionElement: function(){
+		return this._getSectionElementForButtonSelector('.ar9, .aFh, .aFj');
+	},
+
+	_getCheckboxSectionElement: function(){
+		return this._getSectionElementForButtonSelector('.T-Jo-auh');
+	},
+
+	_getMoveSectionElement: function(){
+		return this._getSectionElementForButtonSelector('.asb, .asa');
+	},
+
+	_getSectionElementForButtonSelector: function(buttonSelector){
+		var sectionElements = this._element.querySelectorAll('.G-Ni');
 
 		for(var ii=0; ii<sectionElements.length; ii++){
 			if(!!sectionElements[ii].querySelector(buttonSelector)){

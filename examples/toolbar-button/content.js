@@ -1,26 +1,22 @@
 InboxSDK.load(1, 'toolbar-example').then(function(inboxSDK) {
 
-	inboxSDK.Toolbars.registerThreadViewButton({
+	inboxSDK.Toolbars.registerToolbarButtonForThreadView({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys',
-		section: 'MOVE_GROUP',
-		showFor: function(){
-			return true;
-		},
+		section: inboxSDK.Toolbars.SectionNames.MOVE,
 		hasDropdown: true,
 		onClick: function(event){
-			event.dropdown.el.innerHTML = 'Hello monkey world!';
-			console.log(event);
+			event.dropdown.el.innerHTML = 'Subject: ' + event.threadView.getSubject() + '\n' + 'Messages: ' + event.threadView.getMessageViews().length;
 		}
 	});
 
 
-	inboxSDK.Toolbars.registerThreadListWithSelectionsButton({
+	inboxSDK.Toolbars.registerToolbarButtonForList({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys 2',
-		section: 'ARCHIVE_GROUP',
-		showFor: function(){
-			return true;
+		section: inboxSDK.Toolbars.SectionNames.ARCHIVE,
+		hideFor: function(routeView){
+			return routeView.getRouteID() === inboxSDK.Router.NativeListRouteIDs.DRAFTS;
 		},
 		onClick: function(event){
 			event.selectedThreadRowViews.forEach(function(threadRowView){

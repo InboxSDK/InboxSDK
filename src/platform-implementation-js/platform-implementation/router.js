@@ -32,7 +32,7 @@ var memberMap = new Map();
 *
 * Route ID's are path like strings with named parameters, for example: "/myroute/:someParamMyRouteNeeds"
 */
-var Router = function(appId, driver){
+var Router = function(appId, driver, membraneMap){
 	var members = {};
 	memberMap.set(this, members);
 
@@ -47,6 +47,7 @@ var Router = function(appId, driver){
 
 	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
+	members.membraneMap = membraneMap;
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
@@ -471,6 +472,8 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
+
+	members.membraneMap.set(routeViewDriver, routeView);
 
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
