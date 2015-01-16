@@ -52,6 +52,20 @@ _.extend(GmailThreadView.prototype, {
 		return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
 	},
 
+	getSubject: function(){
+		var subjectElement = this._element.querySelector('.ha h2');
+		if(!subjectElement){
+			return "";
+		}
+		else{
+			return subjectElement.textContent;
+		}
+	},
+
+	getThreadId: function(){
+
+	},
+
 	_setupToolbarView: function(){
 		var toolbarElement = this._findToolbarElement();
 
