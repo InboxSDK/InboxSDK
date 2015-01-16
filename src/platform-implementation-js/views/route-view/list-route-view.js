@@ -57,17 +57,17 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 function _bindToEventStream(routeViewDriver, routeView){
 	routeViewDriver.getEventStream().onEnd(function(){
-		if(!membersMap.has(this)){
+		if(!membersMap.has(routeView)){
 			return;
 		}
 
-		var members = membersMap.get(this);
+		var members = membersMap.get(routeView);
 
 		members.sectionViews.forEach(function(sectionView){
 			sectionView.destroy();
 		});
 
-		membersMap.delete(this);
+		membersMap.delete(routeView);
 	});
 }
 
