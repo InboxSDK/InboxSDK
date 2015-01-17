@@ -7,6 +7,12 @@ var extId = ''+Math.random();
 var Z_SPACE_CHAR = '\u200b';
 
 module.exports = function(gmailComposeView){
+    var mainElement = gmailComposeView.getElement();
+    if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
+        return;
+    }
+    mainElement.classList.add('inboxsdk__ensure_link_active');
+
 
     var bodyElement = gmailComposeView.getBodyElement();
     var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
@@ -117,6 +123,12 @@ function _fixupCursor(gmailComposeView){
             .filter(_rangeStillExists)
             .map(_getMovementType)
             .onValue(_fixupRange);
+
+    Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'mouseup')
+         .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+         .delay(1)
+         .map('VERTICAL')
+         .onValue(_fixupRange);
 }
 
 function _isArrowKey(event){
