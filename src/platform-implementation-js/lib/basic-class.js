@@ -53,6 +53,8 @@ _.extend(BasicClass.prototype, {
 		}
 
 		var value = this[memberVariable.name];
+		this[memberVariable.name] = null;
+
 		if (!value) {
 			return;
 		}
