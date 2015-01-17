@@ -467,6 +467,10 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
 
 	if(members.currentRouteViewDriver){
+		if(_isSameRoute(members.currentRouteViewDriver, routeViewDriver)){
+			return;
+		}
+
 		members.currentRouteViewDriver.destroy();
 	}
 
@@ -490,6 +494,12 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
 		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
+}
+
+function _isSameRoute(currentRouteViewDriver, routeViewDriver){
+	return currentRouteViewDriver.getRouteType() === routeViewDriver.getRouteType() &&
+			currentRouteViewDriver.getRouteID() === routeViewDriver.getRouteID() &&
+			_.isEqual(currentRouteViewDriver.getParams() === routeViewDriver.getParams());
 }
 
 
