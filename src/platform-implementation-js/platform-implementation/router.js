@@ -66,9 +66,6 @@ var Router = function(appId, driver, membraneMap){
 	driver.setRouteTypes(this.RouteTypes);
 };
 
-// TODO aleem add a section for all enum types in this section
-
-
 _.extend(Router.prototype, /** @lends Router */ {
 
 	/**
@@ -149,9 +146,9 @@ _.extend(Router.prototype, /** @lends Router */ {
 });
 
 /**
-* enum^All the different route types that exist in Gmail/Inbox
+* All the different route types that exist in Gmail/Inbox
 * @class
-* @name nativeRouteIDs
+* @name NativeRouteIDs
 */
 var nativeRouteIDs = {};
 Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
@@ -294,7 +291,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 });
 
 /**
-* enum^The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
+* The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
 * @class
 * @name NativeListRouteIDs
 */
@@ -391,7 +388,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 });
 
 /**
-* enum^The different route types that exist
+* The different route types that exist
 * @class
 * @name RouteTypes
 */

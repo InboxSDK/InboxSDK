@@ -60,7 +60,7 @@ var Conversations = function(appId, driver, membraneMap){
 	);
 
 	/**
-	* enum^The various UI states a MessageView can be in
+	* The various UI states a MessageView can be in
 	* @class
 	* @name MessageViewViewStates
 	*/
