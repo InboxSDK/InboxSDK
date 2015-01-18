@@ -306,10 +306,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _threadIdReady: function() {
-    return !!this.getThreadId();
+    return !!this.getThreadID();
   },
 
-  getThreadId: function() {
+  getThreadID: function() {
     return this._pageCommunicator.getThreadIdForThreadRow(this._element);
   },
 
