@@ -384,8 +384,18 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_getThreadRouteParams: function(){
+		if(this._paramsArray && this._paramsArray.length > 0){
+			var threadID = _.last(this._paramsArray);
+
+			if(threadID && threadID.length === 16){
+				return {
+					threadID: threadID
+				};
+			}
+		}
+
 		return {
-			threadId: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
+			threadID: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
 		};
 	},
 

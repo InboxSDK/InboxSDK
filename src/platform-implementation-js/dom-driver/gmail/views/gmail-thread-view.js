@@ -63,7 +63,13 @@ _.extend(GmailThreadView.prototype, {
 		}
 	},
 
-	getThreadId: function(){
+	getThreadID: function(){
+		var params = this._routeViewDriver.getParams();
+
+		if(params.threadID){
+			return params.threadID;
+		}
+
 		return this._pageCommunicator.getCurrentThreadID(this._element);
 	},
 
