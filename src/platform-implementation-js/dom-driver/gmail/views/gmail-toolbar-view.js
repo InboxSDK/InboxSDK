@@ -111,7 +111,10 @@ _.extend(GmailToolbarView.prototype, {
 			buttonViewController = new DropdownButtonViewController({
 				buttonView: buttonView,
 				dropdownViewDriverClass: GmailDropdownView,
-				dropdownShowFunction: buttonDescriptor.onClick
+				dropdownShowFunction: buttonDescriptor.onClick,
+				dropdownPositionOptions: {
+					isRightAligned: true
+				}
 			});
 		}
 		else{
@@ -196,7 +199,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_getMoveSectionElement: function(){
-		return this._getSectionElementForButtonSelector('.asb, .asa');
+		return this._getSectionElementForButtonSelector('.asb, .ase');
 	},
 
 	_getSectionElementForButtonSelector: function(buttonSelector){
