@@ -4,8 +4,12 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var Map = require('es6-unweak-collections').Map;
 
+var HandlerRegistry = require('../lib/handler-registry');
+
 var ThreadRowView = require('../views/thread-row-view');
 var ThreadView = require('../views/conversations/thread-view');
+var ToolbarView = require('../views/toolbar-view'); //only used for internal bookkeeping
+
 
 var memberMap = new Map();
 
@@ -19,8 +23,8 @@ var Toolbars = function(appId, driver, membraneMap){
 	members.driver = driver;
 	members.membraneMap = membraneMap;
 
-	members.listButtonDescriptors = [];
-	members.threadViewButtonDescriptors = [];
+	members.listButtonHandlerRegistry = new HandlerRegistry();
+	members.threadViewHandlerRegistry = new HandlerRegistry();
 
 	this.SectionNames = sectionNames;
 
@@ -32,29 +36,30 @@ Toolbars.prototype = Object.create(EventEmitter.prototype);
 _.extend(Toolbars.prototype, {
 
 	registerToolbarButtonForList: function(buttonDescriptor){
-		var members = memberMap.get(this);
-		members.listButtonDescriptors.push(buttonDescriptor);
-
-		return function(){
-			_unregisterButtonDescriptor(members.get(this).listButtonDescriptors, buttonDescriptor);
-		};
+		return memberMap.get(this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	},
 
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
-		var members = memberMap.get(this);
-		members.threadViewButtonDescriptors.push(buttonDescriptor);
-
-		return function(){
-			_unregisterButtonDescriptor(members.get(this).threadViewButtonDescriptors, buttonDescriptor);
-		};
+		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 });
 
+function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
+	return function(toolbarView){
+		var members = memberMap.get(toolbarsInstance);
 
-function _unregisterButtonDescriptor(list, buttonDescriptor){
-	var index = list.indexOf(buttonDescriptor);
-	list.splice(index, 1);
+		var toolbarViewDriver = toolbarView.getToolbarViewDriver();
+
+		if(buttonDescriptor.hideFor){
+			var routeView = members.membraneMap.get(toolbarViewDriver.getRouteViewDriver());
+			if(buttonDescriptor.hideFor(routeView)){
+				return;
+			}
+		}
+
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames);
+	};
 }
 
 
@@ -63,35 +68,15 @@ function _setupToolbarViewDriverWatcher(toolbars, members){
 }
 
 function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
-	var buttonDescriptors = null;
+	var toolbarView = new ToolbarView(toolbarViewDriver);
 
 	if(toolbarViewDriver.getRowListViewDriver()){
-		buttonDescriptors = members.listButtonDescriptors;
+		members.listButtonHandlerRegistry.addTarget(toolbarView);
 	}
 	else if(toolbarViewDriver.getThreadViewDriver()){
-		buttonDescriptors = members.threadViewButtonDescriptors;
+		members.threadViewHandlerRegistry.addTarget(toolbarView);
 	}
-
-	_.chain(buttonDescriptors)
-		.filter(function(buttonDescriptor){
-			if(!buttonDescriptor.hideFor){
-				return true;
-			}
-
-			var routeView = members.membraneMap.get(toolbarViewDriver.getRouteViewDriver());
-
-			if(buttonDescriptor.hideFor(routeView)){
-				return false;
-			}
-
-			return true;
-		})
-		.each(function(buttonDescriptor){
-			toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), sectionNames);
-		});
-
 }
-
 
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 	var membraneMap = members.membraneMap;
@@ -111,6 +96,7 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 			var threadView = membraneMap.get(toolbarViewDriver.getThreadViewDriver());
 			if(!threadView){
 				threadView = new ThreadView(toolbarViewDriver.getThreadViewDriver(), members.appId, membraneMap);
+				membraneMap.set(toolbarViewDriver.getThreadViewDriver(), threadView);
 			}
 
 			event.threadView = threadView;
