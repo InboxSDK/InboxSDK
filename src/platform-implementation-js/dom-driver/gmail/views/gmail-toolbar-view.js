@@ -33,7 +33,9 @@ var GmailToolbarView = function(element, routeViewDriver){
 		if (!self._element) return;
 		self._determineToolbarState();
 		self._setupToolbarStateMonitoring();
-	});
+ 	});
+
+ 	this._eventStream = new Bacon.Bus();
 };
 
 GmailToolbarView.prototype = Object.create(ToolbarViewDriver.prototype);
@@ -48,7 +50,8 @@ _.extend(GmailToolbarView.prototype, {
 		{name: '_parentElement', destroy: false},
 		{name: '_toolbarState', destroy: false},
 		{name: '_routeViewDriver', destroy: false, get: true},
-		{name: '_classMutationObsever', destroy: true, destroyFunction: 'disconnect'}
+		{name: '_classMutationObsever', destroy: true, destroyFunction: 'disconnect'},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
 	setThreadViewDriver: function(threadViewDriver){
