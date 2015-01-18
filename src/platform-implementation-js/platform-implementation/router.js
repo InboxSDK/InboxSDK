@@ -153,6 +153,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 var nativeRouteIDs = {};
 Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	/**
+	* inbox list
 	* @type string
 	*/
 	'INBOX': {
@@ -161,6 +162,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* all mail list
 	* @type string
 	*/
 	'ALL_MAIL': {
@@ -169,6 +171,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* sent list
 	* @type string
 	*/
 	'SENT': {
@@ -177,6 +180,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* starred list
 	* @type string
 	*/
 	'STARRED': {
@@ -185,6 +189,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* drafts list
 	* @type string
 	*/
 	'DRAFTS': {
@@ -193,6 +198,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* any label list
 	* @type string
 	*/
 	'LABEL': {
@@ -201,6 +207,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* trash list
 	* @type string
 	*/
 	'TRASH': {
@@ -209,6 +216,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* spam list
 	* @type string
 	*/
 	'SPAM': {
@@ -217,6 +225,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* built in list of important emails
 	* @type string
 	*/
 	'IMPORTANT': {
@@ -225,6 +234,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* any search results page
 	* @type string
 	*/
 	'SEARCH': {
@@ -233,6 +243,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single conversation view
 	* @type string
 	*/
 	'THREAD': {
@@ -241,6 +252,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* list of chats
 	* @type string
 	*/
 	'CHATS': {
@@ -249,6 +261,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single chat view
 	* @type string
 	*/
 	'CHAT': {
@@ -257,6 +270,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* google contacts view
 	* @type string
 	*/
 	'CONTACTS': {
@@ -265,6 +279,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single google contact view
 	* @type string
 	*/
 	'CONTACT': {
@@ -273,6 +288,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* the settings view
 	* @type string
 	*/
 	'SETTINGS': {
@@ -281,7 +297,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
-	* This refers to any of the above lists
+	* this refers to any of the above lists
 	* @type string
 	*/
 	'ANY_LIST': {
@@ -298,6 +314,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 var nativeListRouteIDs = {};
 Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	/**
+	* inbox list
 	* @type string
 	*/
 	'INBOX': {
@@ -306,6 +323,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* all mail list
 	* @type string
 	*/
 	'ALL_MAIL': {
@@ -314,6 +332,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* sent list
 	* @type string
 	*/
 	'SENT': {
@@ -322,6 +341,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* starred list
 	* @type string
 	*/
 	'STARRED': {
@@ -330,6 +350,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* drafts list
 	* @type string
 	*/
 	'DRAFTS': {
@@ -338,6 +359,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* label list
 	* @type string
 	*/
 	'LABEL': {
@@ -346,6 +368,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* trash list
 	* @type string
 	*/
 	'TRASH': {
@@ -354,6 +377,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* spam list
 	* @type string
 	*/
 	'SPAM': {
@@ -362,6 +386,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* important list
 	* @type string
 	*/
 	'IMPORTANT': {
@@ -370,6 +395,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* any search result list
 	* @type string
 	*/
 	'SEARCH': {
