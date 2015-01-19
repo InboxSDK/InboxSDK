@@ -9,6 +9,19 @@ var ThreadView = require('../views/conversations/thread-view');
 
 var memberMap = new Map();
 
+/**
+* @class
+* The Toolbar namespace allows you to add your own buttons and actions to various toolbars in Gmail or
+* Inbox. Toolbars appear in various Lists, ThreadViews and MessageViews. Within a toolbar, you have control
+* over the placement of your buttons.
+*
+* Toolbar buttons are typically used to take actions on the email(s) that the toolbar applies to. Do not use
+* this API to add buttons that don't take a direct action on the selected email.
+*
+* Since toolbar buttons only apply to emails, they will ONLY appear when an email is selected or you are
+* on a ThreadView.
+
+*/
 var Toolbars = function(appId, driver, membraneMap){
 	EventEmitter.call(this);
 
@@ -29,8 +42,13 @@ var Toolbars = function(appId, driver, membraneMap){
 
 Toolbars.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(Toolbars.prototype, {
+_.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
+	/**
+	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
 	registerToolbarButtonForList: function(buttonDescriptor){
 		var members = memberMap.get(this);
 		members.listButtonDescriptors.push(buttonDescriptor);
@@ -40,6 +58,11 @@ _.extend(Toolbars.prototype, {
 		};
 	},
 
+	/**
+	* Registers a toolbar button to appear in a conversation view.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
 		var members = memberMap.get(this);
 		members.threadViewButtonDescriptors.push(buttonDescriptor);
