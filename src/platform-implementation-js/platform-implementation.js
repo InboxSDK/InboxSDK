@@ -9,10 +9,9 @@ var Mailbox = require('./platform-implementation/mailbox');
 var NavMenu = require('./platform-implementation/nav-menu');
 var Toolbars = require('./platform-implementation/toolbars');
 
-var Tracker = require('./platform-implementation/tracker');
+var tracker = require('./lib/tracker');
 
 var GmailDriver = require('./dom-driver/gmail/gmail-driver');
-
 
 var PlatformImplementation = function(appId, opts){
 	this._appId = appId;
@@ -32,10 +31,9 @@ var PlatformImplementation = function(appId, opts){
 		// Deprecated `new InboxSDK` constructor used.
 	}
 
-	this._tracker = new Tracker(appId, opts);
-
+	tracker.setup(appId, opts, this.LOADER_VERSION, this.IMPL_VERSION);
 	this._driver = new GmailDriver();
-	this._tracker.setDriver(this._driver);
+	tracker.setUserEmailAddress(this._driver.getUserEmailAddress());
 
 	this.Compose = new Compose(appId, this._driver);
 	this.Conversations = new Conversations(appId, this._driver);
@@ -48,10 +46,8 @@ var PlatformImplementation = function(appId, opts){
 	this.Modal = new Modal(appId, this._driver);
 
 	this.Utils = {
-	    logErrorToServer: this._tracker.logErrorToServer.bind(this._tracker),
-	    track: this._tracker.track.bind(this._tracker)
+		logError: tracker.logError.bind(tracker)
 	};
 };
-
 
 module.exports = PlatformImplementation;
