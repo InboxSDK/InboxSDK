@@ -229,6 +229,11 @@ div.T-I.inboxsdk__button {
   display: none;
 }
 
+
+[data-toolbar-icononly=true] .inboxsdk__button_text {
+  display: none;
+}
+
 /* end */
 
 /* modal */
@@ -561,3 +566,5 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end search results section */
+
+

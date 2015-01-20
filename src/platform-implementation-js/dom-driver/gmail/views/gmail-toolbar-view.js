@@ -32,6 +32,7 @@ var GmailToolbarView = function(element, routeViewDriver){
 	this._ready.then(function(){
 		if (!self._element) return;
 		self._determineToolbarState();
+		self._determineToolbarIconMode();
 		self._setupToolbarStateMonitoring();
  	});
 
@@ -151,6 +152,16 @@ _.extend(GmailToolbarView.prototype, {
 		}
 	},
 
+	_determineToolbarIconMode: function(){
+		var sectionElement = this._getArchiveSectionElement();
+		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.length  === 0){
+			this._element.setAttribute('data-toolbar-icononly', 'true');
+		}
+		else{
+			this._element.setAttribute('data-toolbar-icononly', 'false');
+		}
+	},
+
 	_setupToolbarStateMonitoring: function(){
 		var self = this;
 		this._classMutationObsever = new MutationObserver(function(mutations){
@@ -191,7 +202,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_getArchiveSectionElement: function(){
-		return this._getSectionElementForButtonSelector('.ar9, .aFh, .aFj');
+		return this._getSectionElementForButtonSelector('.ar9, .aFh, .aFj, .lR, .nN, .nX');
 	},
 
 	_getCheckboxSectionElement: function(){
@@ -199,7 +210,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_getMoveSectionElement: function(){
-		return this._getSectionElementForButtonSelector('.asb, .ase');
+		return this._getSectionElementForButtonSelector('.asb, .ase, .ns, .mw');
 	},
 
 	_getSectionElementForButtonSelector: function(buttonSelector){
@@ -222,48 +233,59 @@ _.extend(GmailToolbarView.prototype, {
 		if(this._toolbarState === 'EXPANDED'){
 			element.setAttribute('data-toolbar-expanded', 'true');
 		}
-		else{
+		else if(this._toolbarState === 'COLLAPSED'){
 			element.setAttribute('data-toolbar-expanded', 'false');
 		}
 
 		var buttons = element.querySelectorAll('.G-Ni > [role=button]');
 
 		Array.prototype.forEach.call(buttons, function(button){
-
-			if(button.previousElementSibling){
-				if(button.previousElementSibling.classList.contains('inboxsdk__button')){
-					if($(button.previousElementSibling).is(':visible')){
+			var current = button;
+			for(var ii=0; ii<100000; ii++){
+				if(current.previousElementSibling){
+					if(current.previousElementSibling.classList.contains('inboxsdk__button')){
+						if($(current.previousElementSibling).is(':visible')){
+							button.classList.add('T-I-Js-Gs');
+							break;
+						}
+						else{
+							current = current.previousElementSibling;
+						}
+					}
+					else{
 						button.classList.add('T-I-Js-Gs');
-					}
-					else{
-						button.classList.remove('T-I-Js-Gs');
+						break;
 					}
 				}
 				else{
-					button.classList.add('T-I-Js-Gs');
+					button.classList.remove('T-I-Js-Gs');
+					break;
 				}
 			}
-			else {
-				button.classList.remove('T-I-Js-Gs');
-			}
 
-
-			if(button.nextElementSibling){
-				if(button.nextElementSibling.classList.contains('inboxsdk__button')){
-					if($(button.nextElementSibling).is(':visible')){
+			current = button;
+			for(ii=0; ii<100000; ii++){
+				if(current.nextElementSibling){
+					if(current.nextElementSibling.classList.contains('inboxsdk__button')){
+						if($(current.nextElementSibling).is(':visible')){
+							button.classList.add('T-I-Js-IF');
+							break;
+						}
+						else{
+							current = current.nextElementSibling;
+						}
+					}
+					else{
 						button.classList.add('T-I-Js-IF');
-					}
-					else{
-						button.classList.remove('T-I-Js-IF');
+						break;
 					}
 				}
 				else{
-					button.classList.add('T-I-Js-IF');
+					button.classList.remove('T-I-Js-IF');
+					break;
 				}
 			}
-			else {
-				button.classList.remove('T-I-Js-IF');
-			}
+
 		});
 	},
 
