@@ -182,40 +182,33 @@ function _getThreadRowView(membraneMap){
 * @name ToolbarSections
 */
 var sectionNames = {};
-Object.defineProperties(sectionNames, /** @lends SectionNames */ {
+Object.defineProperties(sectionNames, /** @lends ToolbarSections */ {
+
 	/**
-	* to the right of the checkbox button
+	* The section is for buttons that move emails out of or into the users inbox
 	* @type string
 	*/
-	'CHECKBOX': {
-		value: 'CHECKBOX',
+	'INBOX_STATE': {
+		value: 'INBOX_STATE',
 		writable: false
 	},
 
 	/**
-	* The section containing the archive/delete/trash buttons
+	* This section is for buttons that alter metadata of emails. Common examples are labeling or moving an email.
 	* @type string
 	*/
-	'ARCHIVE': {
-		value: 'ARCHIVE',
+	'METADATA_STATE': {
+		value: 'METADATA_STATE',
 		writable: false
 	},
 
 	/**
-	* The section containing the move and label buttons
+	* This sectiom is used for other actions. Typically these will be placed in the "More"
+	* menu in Gmail or in submenus in Inbox.
 	* @type string
 	*/
-	'MOVE': {
-		value: 'MOVE',
-		writable: false
-	},
-
-	/**
-	* Add an entry to the more menu
-	* @type string
-	*/
-	'MORE': {
-		value: 'MORE',
+	'OTHER': {
+		value: 'OTHER',
 		writable: false
 	}
 
