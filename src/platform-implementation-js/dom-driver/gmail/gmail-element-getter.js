@@ -34,17 +34,8 @@ var GmailElementGetter = {
 	},
 
 	getContentSectionElement: function(){
-		var mainContentElement = GmailElementGetter.getMainContentContainer();
-		if(!mainContentElement){
-			return null;
-		}
-
-		var sectionParent = $(mainContentElement).parents().filter('.nn');
-		if(sectionParent.length === 0){
-			return null;
-		}
-
-		return sectionParent[0];
+		var leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
+		return leftNavContainer.nextElementSibling.children[0];
 	},
 
 	getMainContentContainer: function(){
