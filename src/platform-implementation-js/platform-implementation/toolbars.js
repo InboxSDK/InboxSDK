@@ -177,7 +177,7 @@ function _getThreadRowView(membraneMap){
 
 
 /**
-* enum^The different toolbar sections that exist
+* The different toolbar sections that exist
 * @class
 * @name ToolbarSections
 */
