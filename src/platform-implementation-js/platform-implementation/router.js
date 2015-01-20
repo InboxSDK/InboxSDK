@@ -66,9 +66,6 @@ var Router = function(appId, driver, membraneMap){
 	driver.setRouteTypes(this.RouteTypes);
 };
 
-// TODO aleem add a section for all enum types in this section
-
-
 _.extend(Router.prototype, /** @lends Router */ {
 
 	/**
@@ -149,13 +146,14 @@ _.extend(Router.prototype, /** @lends Router */ {
 });
 
 /**
-* enum^All the different route types that exist in Gmail/Inbox
+* All the different route types that exist in Gmail/Inbox
 * @class
-* @name nativeRouteIDs
+* @name NativeRouteIDs
 */
 var nativeRouteIDs = {};
 Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	/**
+	* inbox list
 	* @type string
 	*/
 	'INBOX': {
@@ -164,6 +162,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* all mail list
 	* @type string
 	*/
 	'ALL_MAIL': {
@@ -172,6 +171,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* sent list
 	* @type string
 	*/
 	'SENT': {
@@ -180,6 +180,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* starred list
 	* @type string
 	*/
 	'STARRED': {
@@ -188,6 +189,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* drafts list
 	* @type string
 	*/
 	'DRAFTS': {
@@ -196,6 +198,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* any label list
 	* @type string
 	*/
 	'LABEL': {
@@ -204,6 +207,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* trash list
 	* @type string
 	*/
 	'TRASH': {
@@ -212,6 +216,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* spam list
 	* @type string
 	*/
 	'SPAM': {
@@ -220,6 +225,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* built in list of important emails
 	* @type string
 	*/
 	'IMPORTANT': {
@@ -228,6 +234,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* any search results page
 	* @type string
 	*/
 	'SEARCH': {
@@ -236,6 +243,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single conversation view
 	* @type string
 	*/
 	'THREAD': {
@@ -244,6 +252,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* list of chats
 	* @type string
 	*/
 	'CHATS': {
@@ -252,6 +261,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single chat view
 	* @type string
 	*/
 	'CHAT': {
@@ -260,6 +270,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* google contacts view
 	* @type string
 	*/
 	'CONTACTS': {
@@ -268,6 +279,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* single google contact view
 	* @type string
 	*/
 	'CONTACT': {
@@ -276,6 +288,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
+	* the settings view
 	* @type string
 	*/
 	'SETTINGS': {
@@ -284,7 +297,7 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 	},
 
 	/**
-	* This refers to any of the above lists
+	* this refers to any of the above lists
 	* @type string
 	*/
 	'ANY_LIST': {
@@ -294,13 +307,14 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 });
 
 /**
-* enum^The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
+* The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
 * @class
 * @name NativeListRouteIDs
 */
 var nativeListRouteIDs = {};
 Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	/**
+	* inbox list
 	* @type string
 	*/
 	'INBOX': {
@@ -309,6 +323,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* all mail list
 	* @type string
 	*/
 	'ALL_MAIL': {
@@ -317,6 +332,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* sent list
 	* @type string
 	*/
 	'SENT': {
@@ -325,6 +341,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* starred list
 	* @type string
 	*/
 	'STARRED': {
@@ -333,6 +350,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* drafts list
 	* @type string
 	*/
 	'DRAFTS': {
@@ -341,6 +359,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* label list
 	* @type string
 	*/
 	'LABEL': {
@@ -349,6 +368,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* trash list
 	* @type string
 	*/
 	'TRASH': {
@@ -357,6 +377,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* spam list
 	* @type string
 	*/
 	'SPAM': {
@@ -365,6 +386,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* important list
 	* @type string
 	*/
 	'IMPORTANT': {
@@ -373,6 +395,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 	},
 
 	/**
+	* any search result list
 	* @type string
 	*/
 	'SEARCH': {
@@ -391,7 +414,7 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 });
 
 /**
-* enum^The different route types that exist
+* The different route types that exist
 * @class
 * @name RouteTypes
 */

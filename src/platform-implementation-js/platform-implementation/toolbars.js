@@ -13,6 +13,19 @@ var ToolbarView = require('../views/toolbar-view'); //only used for internal boo
 
 var memberMap = new Map();
 
+/**
+* @class
+* The Toolbar namespace allows you to add your own buttons and actions to various toolbars in Gmail or
+* Inbox. Toolbars appear in various Lists, ThreadViews and MessageViews. Within a toolbar, you have control
+* over the placement of your buttons.
+*
+* Toolbar buttons are typically used to take actions on the email(s) that the toolbar applies to. Do not use
+* this API to add buttons that don't take a direct action on the selected email.
+*
+* Since toolbar buttons only apply to emails, they will ONLY appear when an email is selected or you are
+* on a ThreadView.
+
+*/
 var Toolbars = function(appId, driver, membraneMap){
 	EventEmitter.call(this);
 
@@ -33,12 +46,22 @@ var Toolbars = function(appId, driver, membraneMap){
 
 Toolbars.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(Toolbars.prototype, {
+_.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
+	/**
+	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
 	registerToolbarButtonForList: function(buttonDescriptor){
 		return memberMap.get(this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	},
 
+	/**
+	* Registers a toolbar button to appear in a conversation view.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
@@ -140,45 +163,38 @@ function _getThreadRowView(membraneMap){
 
 
 /**
-* enum^The different toolbar sections that exist
+* The different toolbar sections that exist
 * @class
 * @name ToolbarSections
 */
 var sectionNames = {};
-Object.defineProperties(sectionNames, /** @lends SectionNames */ {
+Object.defineProperties(sectionNames, /** @lends ToolbarSections */ {
+
 	/**
-	* to the right of the checkbox button
+	* The section is for buttons that move emails out of or into the users inbox
 	* @type string
 	*/
-	'CHECKBOX': {
-		value: 'CHECKBOX',
+	'INBOX_STATE': {
+		value: 'INBOX_STATE',
 		writable: false
 	},
 
 	/**
-	* The section containing the archive/delete/trash buttons
+	* This section is for buttons that alter metadata of emails. Common examples are labeling or moving an email.
 	* @type string
 	*/
-	'ARCHIVE': {
-		value: 'ARCHIVE',
+	'METADATA_STATE': {
+		value: 'METADATA_STATE',
 		writable: false
 	},
 
 	/**
-	* The section containing the move and label buttons
+	* This sectiom is used for other actions. Typically these will be placed in the "More"
+	* menu in Gmail or in submenus in Inbox.
 	* @type string
 	*/
-	'MOVE': {
-		value: 'MOVE',
-		writable: false
-	},
-
-	/**
-	* Add an entry to the more menu
-	* @type string
-	*/
-	'MORE': {
-		value: 'MORE',
+	'OTHER': {
+		value: 'OTHER',
 		writable: false
 	}
 

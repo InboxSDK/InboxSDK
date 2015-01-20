@@ -3,7 +3,7 @@ var EventEmitter = require('events').EventEmitter;
 
 /**
 * @class
-* Object that represents a visible thread row view in a mailbox.
+* Object that represents a visible thread row view in a list of threads
 */
 var ThreadRowView = function(threadRowViewDriver){
   EventEmitter.call(this);
@@ -20,8 +20,8 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   /**
    * Adds a label
    */
-  addLabel: function(label) {
-    this._threadRowViewDriver.addLabel(label);
+  addLabel: function(labelDescriptor) {
+    this._threadRowViewDriver.addLabel(labelDescriptor);
   },
 
   /**
