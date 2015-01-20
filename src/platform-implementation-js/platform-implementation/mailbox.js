@@ -19,7 +19,7 @@ var memberMap = new Map();
 var Mailbox = function(appId, driver, membraneMap){
 
 	var members = {};
-	memberMap.set(this, memberMap);
+	memberMap.set(this, members);
 
 	members.appId = appId;
 	members.driver = driver;
