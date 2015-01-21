@@ -1,5 +1,7 @@
 'use strict';
 
+var $ = require('jquery');
+
 var GmailElementGetter = require('../gmail-element-getter');
 var GmailNavItemView = require('../views/gmail-nav-item-view');
 
@@ -47,6 +49,10 @@ function _attachNavItemView(gmailNavItemView){
 
 		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), holder.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		holder.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
+
+		var navigation = $(holder).closest('[role=navigation]')[0];
+		var realHeight = holder.parentElement.clientHeight;
+		navigation.style.minHeight = realHeight + 'px';
 	};
 }
 

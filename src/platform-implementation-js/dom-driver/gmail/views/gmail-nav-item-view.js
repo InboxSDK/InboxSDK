@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var $ = require('jquery');
 
 var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
 var eventNameFilter = require('../../../lib/event-name-filter');
@@ -417,6 +418,14 @@ _.extend(GmailNavItemView.prototype, {
 			this._element.style.overflow = '';
 			this._element.style.marginBottom = '';
 		}
+
+		if(!$(this._element).closest('.inboxsdk__navMenu')){
+			return;
+		}
+
+		var navigation = $(this._element).closest('[role=navigation]')[0];
+		var realHeight = $(this._element).closest('.inboxsdk__navMenu')[0].parentElement.clientHeight;
+		navigation.style.minHeight = realHeight + 'px';
 	},
 
 	_createActiveMarkerElement: function(){
