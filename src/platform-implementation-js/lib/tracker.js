@@ -195,10 +195,10 @@ tracker.logError = function(err, details) {
     if (err && err.stack) {
       stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
     }
+    stuffToLog = stuffToLog.concat(["\n\nError logged from:", nowStack]);
     if (details) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nError logged from:", nowStack]);
     stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:"], _appIds);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
