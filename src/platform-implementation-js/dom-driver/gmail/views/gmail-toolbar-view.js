@@ -20,6 +20,7 @@ var GmailToolbarView = function(element, routeViewDriver){
 
 	this._element = element;
 	this._routeViewDriver = routeViewDriver;
+	this._eventStream = new Bacon.Bus();
 
 	var self = this;
 	this._ready = waitFor(function(){
@@ -35,8 +36,6 @@ var GmailToolbarView = function(element, routeViewDriver){
 		self._determineToolbarIconMode();
 		self._setupToolbarStateMonitoring();
  	});
-
- 	this._eventStream = new Bacon.Bus();
 };
 
 GmailToolbarView.prototype = Object.create(ToolbarViewDriver.prototype);
