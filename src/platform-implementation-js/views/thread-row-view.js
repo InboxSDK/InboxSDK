@@ -107,9 +107,9 @@ var LabelDescriptor = /** @lends LabelDescriptor */{
 
   /**
   * A CSS class to apply to the icon
-  * @type {string}
   * ^optional
   * ^default=MODIFIER
+  * @type {string}
   */
   iconClass:null
 };
@@ -129,9 +129,9 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
   /**
   * A CSS class to apply to the icon button
-  * @type {string}
   * ^optional
   * ^default=MODIFIER
+  * @type {string}
   */
   iconClass:null,
 
