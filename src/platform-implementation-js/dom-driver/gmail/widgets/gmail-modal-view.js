@@ -135,7 +135,7 @@ _.extend(GmailModalView.prototype, {
         var eventStream = this._eventStream;
         var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
 
-        closeElement.addEventListener('mousedown', function(event){
+        closeElement.addEventListener('click', function(event){
             eventStream.push({
                 eventName: 'closeClick',
                 domEvent: event

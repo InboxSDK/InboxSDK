@@ -44,7 +44,8 @@ _.extend(Mailbox.prototype, /** @lends Lists */{
 	/**
 	* Registers a handler that gets called whenever a new ThreadRowView becomes visible on screen.
 	* Your handler is guranteed to be called exactly once per thread.
-	* @param {function(handler)} handler - the function to call on each new visible ThreadRowView
+	* @param {function(ThreadRowView)} handler - the function to call on each new visible ThreadRowView.
+	* Your function is passed a ThreadRowView
 	* @return {void}
 	*/
 	registerThreadRowViewHandler: function(handler) {
