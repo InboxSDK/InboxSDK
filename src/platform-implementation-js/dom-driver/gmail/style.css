@@ -79,13 +79,26 @@ div.T-I.inboxsdk__button {
   white-space: nowrap;
 }
 
-.inboxsdk__compose_actionToolbar .inboxsdk__button {
+.inboxsdk__compose_actionToolbar div.inboxsdk__button {
   min-width: 27px;
-  height: 29px;
+  height: 27px;
+}
+
+.inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
+  height: 17px;
+  width: 17px;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  margin-top: 2px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
-  margin-top: 4px;
+  vertical-align: initial;
+  height: 17px;
+  width: 17px;
+  display: inline-block;
+  margin-top: 0px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button > div {
@@ -108,10 +121,6 @@ div.T-I.inboxsdk__button {
   padding: 1px !important;
   z-index: 10;
   left: 0px;
-}
-
-.inboxsdk__compose_groupedActionButton .inboxsdk__button_iconImg {
-  margin-top: 4px;
 }
 
 .inboxsdk__compose_groupedActionToolbar_arrow {
