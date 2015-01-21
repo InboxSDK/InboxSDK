@@ -349,14 +349,14 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	* @type {number}
 	*/
 	orderHint:null
-	};
+};
 
 
-	/**
-	 * @class  Contact
-	 * Simple object that contains the email address and full name if it exists
-	 */
-	var Contact = /** @lends Contact */ {
+/**
+ * @class  Contact
+ * Simple object that contains the email address and full name if it exists
+ */
+var Contact = /** @lends Contact */ {
 
 	/**
 	 * email address of the contact
