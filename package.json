@@ -12,6 +12,7 @@
     "brfs": "^1.2.0",
     "entities": "1.1.1",
     "es6-unweak-collections": "0.4.3",
+    "isnumber": "^1.0.0",
     "jquery": "2.1.3",
     "lodash": "2.4.1",
     "rsvp": "3.0.14"
