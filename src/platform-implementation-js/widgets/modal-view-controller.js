@@ -1,4 +1,8 @@
+'use strict';
+
 var _ = require('lodash');
+var Bacon = require('baconjs');
+
 var BasicClass = require('../lib/basic-class');
 
 var ModalViewController = function(options){
@@ -24,6 +28,32 @@ _.extend(ModalViewController.prototype, {
 
         document.body.appendChild(this._view.getOverlayElement());
         document.body.appendChild(this._view.getModalContainerElement());
+
+        this._view.getModalContainerElement().focus();
+
+        var self = this;
+
+        Bacon
+            .fromBinder(function(sink){
+                document.body.addEventListener('keydown', sink, true);
+
+                return function(){
+                    document.body.removeEventListener('keydown', sink, true);
+                };
+            })
+            .filter(function(domEvent){
+                return domEvent.keyCode === 27;
+            })
+            .takeWhile(function(){
+                return !!self._view;
+            })
+            .doAction(function(domEvent){
+                domEvent.stopImmediatePropagation();
+                domEvent.stopPropagation();
+                domEvent.preventDefault();
+             })
+             .onValue(this, 'close');
+
     },
 
     close: function(){

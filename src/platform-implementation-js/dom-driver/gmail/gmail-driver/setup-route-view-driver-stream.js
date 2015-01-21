@@ -14,29 +14,34 @@ var currentUrlObject = {};
 var currentMainElement = null;
 
 function setupRouteViewDriverStream(GmailRouteProcessor){
-	// TODO return a stream that handles unsubscription instead of a bus
-	var routeViewDriverStream = new Bacon.Bus();
+	return Bacon.mergeAll(
 
-	var hashChangeStream = Bacon.fromEventTarget(window, 'hashchange').map('.newURL').map(getURLObject);
+				//if we're to or from a custom view then push to the routeViewDriverStream right away
+				Bacon.fromEventTarget(window, 'hashchange')
+						.map('.newURL')
+						.map(getURLObject)
+						.filter(_shouldHandleHashChange(GmailRouteProcessor)),
 
-	//if we're to or from a custom view then push to the routeViewDriverStream right away
-	hashChangeStream.filter(_shouldHandleHashChange(GmailRouteProcessor)).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
 
-	//when native gmail changes main view there's a div that takes on role=main
-	GmailElementGetter.getMainContentElementChangedStream().map(null).onValue(_createRouteViewDriver.bind(null, routeViewDriverStream, GmailRouteProcessor));
+				//when native gmail changes main view there's a div that takes on role=main
+				GmailElementGetter
+						.getMainContentElementChangedStream()
+						.map(null)
+			)
+			.map(_createRouteViewDriver, GmailRouteProcessor);
 
-	return routeViewDriverStream;
 }
 
 function _shouldHandleHashChange(GmailRouteProcessor){
 	return function(urlObject){
-		return (!GmailRouteProcessor.isNativeRoute(urlObject.name) || !GmailRouteProcessor.isNativeRoute(currentUrlObject.name)) ||
-			   GmailRouteProcessor.isContactRouteName(urlObject.name);
+		return !GmailRouteProcessor.isNativeRoute(urlObject.name) ||
+				!GmailRouteProcessor.isNativeRoute(currentUrlObject.name) ||
+				GmailRouteProcessor.isContactRouteName(urlObject.name);
 	};
 }
 
 
-function _createRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlObject){
+function _createRouteViewDriver(GmailRouteProcessor, urlObject){
 	urlObject = urlObject || getURLObject(location.href);
 
 	currentUrlObject = urlObject;
@@ -47,8 +52,7 @@ function _createRouteViewDriver(routeViewDriverStream, GmailRouteProcessor, urlO
 		options.params.unshift(options.name);
 	}
 
-	var routeViewDriver = new GmailRouteView(options, GmailRouteProcessor);
-	routeViewDriverStream.push(routeViewDriver);
+	return new GmailRouteView(options, GmailRouteProcessor);
 }
 
 module.exports = setupRouteViewDriverStream;

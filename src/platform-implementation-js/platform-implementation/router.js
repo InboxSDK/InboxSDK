@@ -32,7 +32,7 @@ var memberMap = new Map();
 *
 * Route ID's are path like strings with named parameters, for example: "/myroute/:someParamMyRouteNeeds"
 */
-var Router = function(appId, driver){
+var Router = function(appId, driver, membraneMap){
 	var members = {};
 	memberMap.set(this, members);
 
@@ -47,6 +47,7 @@ var Router = function(appId, driver){
 
 	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
+	members.membraneMap = membraneMap;
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
@@ -64,9 +65,6 @@ var Router = function(appId, driver){
 	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
 	driver.setRouteTypes(this.RouteTypes);
 };
-
-// TODO aleem add a section for all enum types in this section
-
 
 _.extend(Router.prototype, /** @lends Router */ {
 
@@ -147,181 +145,330 @@ _.extend(Router.prototype, /** @lends Router */ {
 
 });
 
-
+/**
+* All the different route types that exist in Gmail/Inbox
+* @class
+* @name NativeRouteIDs
+*/
 var nativeRouteIDs = {};
-Object.defineProperties(nativeRouteIDs, {
+Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
+	/**
+	* inbox list
+	* @type string
+	*/
 	'INBOX': {
 		value: 'inbox/:page',
 		writable: false
 	},
 
+	/**
+	* all mail list
+	* @type string
+	*/
 	'ALL_MAIL': {
 		value: 'all/:page',
 		writable: false
 	},
 
+	/**
+	* sent list
+	* @type string
+	*/
 	'SENT': {
 		value: 'sent/:page',
 		writable: false
 	},
 
+	/**
+	* starred list
+	* @type string
+	*/
 	'STARRED': {
 		value: 'starred/:page',
 		writable: false
 	},
 
+	/**
+	* drafts list
+	* @type string
+	*/
 	'DRAFTS': {
 		value: 'drafts/:page',
 		writable: false
 	},
 
+	/**
+	* any label list
+	* @type string
+	*/
 	'LABEL': {
 		value: 'label/:labelName/:page',
 		writable: false
 	},
 
+	/**
+	* trash list
+	* @type string
+	*/
 	'TRASH': {
 		value: 'trash/:page',
 		writable: false
 	},
 
+	/**
+	* spam list
+	* @type string
+	*/
 	'SPAM': {
 		value: 'spam/:page',
 		writable: false
 	},
 
+	/**
+	* built in list of important emails
+	* @type string
+	*/
 	'IMPORTANT': {
 		value: 'imp/p:page',
 		writable: false
 	},
 
+	/**
+	* any search results page
+	* @type string
+	*/
 	'SEARCH': {
 		value: 'search/:query/:page',
 		writable: false
 	},
 
+	/**
+	* single conversation view
+	* @type string
+	*/
 	'THREAD': {
 		value: 'inbox/:threadID',
 		writable: false
 	},
 
+	/**
+	* list of chats
+	* @type string
+	*/
 	'CHATS': {
 		value: 'chats/:page',
 		writable: false
 	},
 
+	/**
+	* single chat view
+	* @type string
+	*/
 	'CHAT': {
 		value: 'chats/:chatID',
 		writable: false
 	},
 
+	/**
+	* google contacts view
+	* @type string
+	*/
 	'CONTACTS': {
 		value: 'contacts/:page',
 		writable: false
 	},
 
+	/**
+	* single google contact view
+	* @type string
+	*/
 	'CONTACT': {
 		value: 'contacts/:contactID',
 		writable: false
 	},
 
+	/**
+	* the settings view
+	* @type string
+	*/
 	'SETTINGS': {
 		value: 'settings/:section',
 		writable: false
 	},
 
+	/**
+	* this refers to any of the above lists
+	* @type string
+	*/
 	'ANY_LIST': {
 		value: '*',
 		writable: false
 	}
 });
 
+/**
+* The different list routes natively available in Gmail/Inbox. List routes display lists of threads or messages or other types.
+* @class
+* @name NativeListRouteIDs
+*/
 var nativeListRouteIDs = {};
-Object.defineProperties(nativeListRouteIDs, {
+Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
+	/**
+	* inbox list
+	* @type string
+	*/
 	'INBOX': {
 		value: nativeRouteIDs.INBOX,
 		writable: false
 	},
 
+	/**
+	* all mail list
+	* @type string
+	*/
 	'ALL_MAIL': {
 		value: nativeRouteIDs.ALL_MAIL,
 		writable: false
 	},
 
+	/**
+	* sent list
+	* @type string
+	*/
 	'SENT': {
 		value: nativeRouteIDs.SENT,
 		writable: false
 	},
 
+	/**
+	* starred list
+	* @type string
+	*/
 	'STARRED': {
 		value: nativeRouteIDs.STARRED,
 		writable: false
 	},
 
+	/**
+	* drafts list
+	* @type string
+	*/
 	'DRAFTS': {
 		value: nativeRouteIDs.DRAFTS,
 		writable: false
 	},
 
+	/**
+	* label list
+	* @type string
+	*/
 	'LABEL': {
 		value: nativeRouteIDs.LABEL,
 		writable: false
 	},
 
+	/**
+	* trash list
+	* @type string
+	*/
 	'TRASH': {
 		value: nativeRouteIDs.TRASH,
 		writable: false
 	},
 
+	/**
+	* spam list
+	* @type string
+	*/
 	'SPAM': {
 		value: nativeRouteIDs.SPAM,
 		writable: false
 	},
 
+	/**
+	* important list
+	* @type string
+	*/
 	'IMPORTANT': {
 		value: nativeRouteIDs.IMPORTANT,
 		writable: false
 	},
 
+	/**
+	* any search result list
+	* @type string
+	*/
 	'SEARCH': {
 		value: nativeRouteIDs.SEARCH,
 		writable: false
 	},
 
+	/**
+	* This refers to any of the above lists
+	* @type string
+	*/
 	'ANY_LIST': {
 		value: nativeRouteIDs.ANY_LIST,
 		writable: false
 	}
 });
 
-
+/**
+* The different route types that exist
+* @class
+* @name RouteTypes
+*/
 var routeTypes = {};
-Object.defineProperties(routeTypes, {
+Object.defineProperties(routeTypes, /** @lends RouteTypes */ {
+	/**
+	* a list of threads or messages
+	* @type string
+	*/
 	'LIST': {
 		value: 'LIST',
 		writable: false
 	},
 
+	/**
+	* a single thread or message
+	* @type string
+	*/
 	'THREAD': {
 		value: 'THREAD',
 		writable: false
 	},
 
+	/**
+	* a Gmail or Inbox settings
+	* @type string
+	*/
 	'SETTINGS': {
 		value: 'SETTINGS',
 		writable: false
 	},
 
+	/**
+	* a single chat history
+	* @type string
+	*/
 	'CHAT': {
 		value: 'CHAT',
 		writable: false
 	},
 
+	/**
+	* a custom route created by any app
+	* @type string
+	*/
 	'CUSTOM': {
 		value: 'CUSTOM',
 		writable: false
 	},
 
+	/**
+	* an unknown route
+	* @type string
+	*/
 	'UNKNOWN': {
 		value: 'UNKNOWN',
 		writable: false
@@ -343,14 +490,20 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
 
 	if(members.currentRouteViewDriver){
+		if(_isSameRoute(members.currentRouteViewDriver, routeViewDriver)){
+			return;
+		}
+
 		members.currentRouteViewDriver.destroy();
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
 
+	members.membraneMap.set(routeViewDriver, routeView);
+
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
-		_informRelevantCustomRoutes(members, routeViewDriver);
+		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
 	}
 	else{
 		members.driver.showNativeRouteView();
@@ -366,8 +519,14 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	}
 }
 
+function _isSameRoute(currentRouteViewDriver, routeViewDriver){
+	return currentRouteViewDriver.getRouteType() === routeViewDriver.getRouteType() &&
+			currentRouteViewDriver.getRouteID() === routeViewDriver.getRouteID() &&
+			_.isEqual(currentRouteViewDriver.getParams() === routeViewDriver.getParams());
+}
 
-function _informRelevantCustomRoutes(members, routeViewDriver){
+
+function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	var customRouteView = new CustomRouteView(routeViewDriver);
 
 	members.customRoutes
@@ -395,6 +554,9 @@ function _informRelevantCustomRoutes(members, routeViewDriver){
 			else{
 				customRouteView.setRouteID(customRoute.routeID);
 			}
+
+			routeView.setRouteID(customRouteView.getRouteID());
+
 			try{
 				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
 				customRoute.onActivate(customRouteView);

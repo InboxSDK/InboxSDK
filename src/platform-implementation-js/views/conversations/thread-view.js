@@ -77,7 +77,17 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 				 	return members.membraneMap.get(messageViewDriver);
 				 })
 				 .value();
-	}
+	},
+
+	getSubject: function(){
+		return memberMap.get(this).threadViewImplementation.getSubject();
+	},
+
+	getThreadID: function(){
+		return memberMap.get(this).threadViewImplementation.getThreadID();
+	},
+
+
 
 
 	/**
@@ -97,7 +107,12 @@ module.exports = ThreadView;
 
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
-	threadViewImplementation.getEventStream().onEnd(threadView, 'emit', 'destroy');
+	threadViewImplementation.getEventStream().onEnd(function(){
+		threadView.emit('destroy');
+		memberMap.delete(threadView);
+
+		threadView.removeAllListeners();
+	});
 
 	threadViewImplementation
 		.getEventStream()

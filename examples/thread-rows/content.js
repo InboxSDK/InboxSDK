@@ -5,16 +5,16 @@ function log() {
 InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
 	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
-		var threadId = threadRowView.getThreadId();
+		var threadId = threadRowView.getThreadID();
 		if (!threadId || typeof threadId != 'string') {
 			console.log('threadRowView', threadId, threadRowView.getSubject());
 		}
 		threadRowView.addLabel(Bacon.repeatedly(10000, [
-			{text:'A'},
-			{text:'B', textColor: 'blue'}
-			]).toProperty({text:'0'}));
+			{title:'A'},
+			{title:'B', textColor: 'blue'}
+		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
-			text:'a'+(i++),
+			title:'a'+(i++),
 			color:'white',
 			textColor:'blue'
 		});

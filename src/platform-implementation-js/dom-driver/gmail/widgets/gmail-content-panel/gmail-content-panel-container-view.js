@@ -54,10 +54,17 @@ _.extend(GmailContentPanelContainerView.prototype, {
           _.remove(this._gmailContentPanelViews, gmailContentPanelView);
           var descriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
 
-          this._gmailTabContainerView.remove(descriptor);
+          if(this._gmailTabContainerView){
+               this._gmailTabContainerView.remove(descriptor);
+          }
 
-          this._viewToDescriptorMap.delete(gmailContentPanelView);
-          this._descriptorToViewMap.delete(descriptor);
+          if(this._viewToDescriptorMap){
+               this._viewToDescriptorMap.delete(gmailContentPanelView);
+          }
+
+          if(this._descriptorToViewMap){
+               this._descriptorToViewMap.delete(descriptor);
+          }
      },
 
      _setupElement: function(){

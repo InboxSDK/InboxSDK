@@ -1,103 +1,201 @@
+'use strict';
+
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
+var Map = require('es6-unweak-collections').Map;
 
-var Toolbars = function(appId, driver, platformImplementation){
+var HandlerRegistry = require('../lib/handler-registry');
+
+var ThreadRowView = require('../views/thread-row-view');
+var ThreadView = require('../views/conversations/thread-view');
+var ToolbarView = require('../views/toolbar-view'); //only used for internal bookkeeping
+
+
+var memberMap = new Map();
+
+/**
+* @class
+* The Toolbar namespace allows you to add your own buttons and actions to various toolbars in Gmail or
+* Inbox. Toolbars appear in various Lists, ThreadViews and MessageViews. Within a toolbar, you have control
+* over the placement of your buttons.
+*
+* Toolbar buttons are typically used to take actions on the email(s) that the toolbar applies to. Do not use
+* this API to add buttons that don't take a direct action on the selected email.
+*
+* Since toolbar buttons only apply to emails, they will ONLY appear when an email is selected or you are
+* on a ThreadView.
+
+*/
+var Toolbars = function(appId, driver, membraneMap){
 	EventEmitter.call(this);
 
-	this._appId = appId;
-	this._driver = driver;
-	this._platformImplementation = platformImplementation;
+	var members = {};
+	memberMap.set(this, members);
 
-	this._threadListButtonDescriptors = [];
-	this._threadViewButtonDesriptors = [];
+	members.appId = appId;
+	members.driver = driver;
+	members.membraneMap = membraneMap;
 
-	this._threadListNoSelectionsMoreItemDescriptors = [];
-	this._threadListWithSelectionsMoreItemDescriptors = [];
-	this._threadViewMoreItemDescriptors = [];
+	members.listButtonHandlerRegistry = new HandlerRegistry();
+	members.threadViewHandlerRegistry = new HandlerRegistry();
 
-	this._setupViewDriverWatchers();
+	this.SectionNames = sectionNames;
+
+	_setupToolbarViewDriverWatcher(this, members);
 };
 
 Toolbars.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(Toolbars.prototype, {
+_.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
-	registerThreadListNoSelectionsButton: function(buttonDescriptor){
-		this._threadListButtonDescriptors.push(_.merge(this._processButtonDescriptor(buttonDescriptor), {toolbarState: 'COLLASED'}));
+	/**
+	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
+	registerToolbarButtonForList: function(buttonDescriptor){
+		return memberMap.get(this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	},
 
-	registerThreadListWithSelectionsButton: function(buttonDescriptor){
-		this._threadListButtonDescriptors.push(_.merge(this._processButtonDescriptor(buttonDescriptor), {toolbarState: 'EXPANDED'}));
-	},
+	/**
+	* Registers a toolbar button to appear in a conversation view.
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @return {void}
+	*/
+	registerToolbarButtonForThreadView: function(buttonDescriptor){
+		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+	}
 
-	registerThreadViewButton: function(buttonDescriptor){
-		this._threadViewButtonDesriptors.push(this._processButtonDescriptor(buttonDescriptor));
-	},
+});
 
-	registerThreadListNoSelectionsMoreItem: function(buttonDescriptor){
-		this._threadListNoSelectionsMoreItemDescriptors.push(this._processButtonDescriptor(buttonDescriptor));
-	},
+function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
+	return function(toolbarView){
+		var members = memberMap.get(toolbarsInstance);
 
-	registerThreadListWithSelectionsMoreItem: function(buttonDescriptor){
-		this._threadListWithSelectionsMoreItemDescriptors.push(this._processButtonDescriptor(buttonDescriptor));
-	},
+		var toolbarViewDriver = toolbarView.getToolbarViewDriver();
 
-	registerThreadViewMoreItem: function(buttonDescriptor){
-		this._threadViewMoreItemDescriptors.push(this._processButtonDescriptor(buttonDescriptor));
-	},
+		if(buttonDescriptor.hideFor){
+			var routeView = members.membraneMap.get(toolbarViewDriver.getRouteViewDriver());
+			if(buttonDescriptor.hideFor(routeView)){
+				return;
+			}
+		}
 
-	_setupViewDriverWatchers: function(){
-		this._setupToolbarViewDriverWatcher();
-		this._setupMoreMenuViewDriverWatcher();
-	},
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames);
+	};
+}
 
-	_setupToolbarViewDriverWatcher: function(){
-		this._driver.getToolbarViewDriverStream().delay(10).onValue(this, '_handleNewToolbarViewDriver');
-	},
 
-	_handleNewToolbarViewDriver: function(toolbarViewDriver){
-		//var fullscreenView = this._platformImplementation.FullscreenViews.getCurrent();
-		var buttonDescriptors = null;
+function _setupToolbarViewDriverWatcher(toolbars, members){
+	members.driver.getToolbarViewDriverStream().onValue(_handleNewToolbarViewDriver, toolbars, members);
+}
+
+function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
+	var toolbarView = new ToolbarView(toolbarViewDriver);
+
+	if(toolbarViewDriver.getRowListViewDriver()){
+		members.listButtonHandlerRegistry.addTarget(toolbarView);
+	}
+	else if(toolbarViewDriver.getThreadViewDriver()){
+		members.threadViewHandlerRegistry.addTarget(toolbarView);
+	}
+}
+
+function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
+	var membraneMap = members.membraneMap;
+	var buttonOptions = _.clone(buttonDescriptor);
+	var oldOnClick = buttonOptions.onClick || function(){};
+
+	buttonOptions.onClick = function(event){
+		event = event || {};
 
 		if(toolbarViewDriver.getRowListViewDriver()){
-			buttonDescriptors = this._threadListButtonDescriptors;
+			_.merge(event, {
+				threadRowViews: _getThreadRowViews(toolbarViewDriver, membraneMap),
+				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membraneMap)
+			});
 		}
 		else if(toolbarViewDriver.getThreadViewDriver()){
-			buttonDescriptors = this._threadViewButtonDesriptors;
+			var threadView = membraneMap.get(toolbarViewDriver.getThreadViewDriver());
+			if(!threadView){
+				threadView = new ThreadView(toolbarViewDriver.getThreadViewDriver(), members.appId, membraneMap);
+				membraneMap.set(toolbarViewDriver.getThreadViewDriver(), threadView);
+			}
+
+			event.threadView = threadView;
 		}
 
-		_.chain(buttonDescriptors)
-			.filter(function(buttonDescriptor){
-				return true; /* deprecated */
-				//return buttonDescriptor.showFor(fullscreenView);
+		oldOnClick(event);
+
+	};
+
+	return buttonOptions;
+}
+
+function _getThreadRowViews(toolbarViewDriver, membraneMap){
+	return toolbarViewDriver
+			.getRowListViewDriver()
+			.getThreadRowViewDrivers()
+			.map(_getThreadRowView(membraneMap));
+}
+
+function _getSelectedThreadRowViews(toolbarViewDriver, membraneMap){
+	return toolbarViewDriver
+			.getRowListViewDriver()
+			.getThreadRowViewDrivers()
+			.filter(function(threadRowViewDriver){
+				return threadRowViewDriver.isSelected();
 			})
-			.each(function(buttonDescriptor){
-				toolbarViewDriver.addButton(buttonDescriptor);
-			});
+			.map(_getThreadRowView(membraneMap));
+}
 
-	},
-
-	_setupMoreMenuViewDriverWatcher: function(){
-		//todo
-	},
-
-	_processButtonDescriptor: function(buttonDescriptor){
-		var buttonOptions = _.clone(buttonDescriptor);
-		if(buttonDescriptor.hasDropdown){
-			buttonOptions.preMenuShowFunction = function(menuView, menuButtonViewController){
-				buttonDescriptor.onClick({
-					dropdown: {
-						el: menuView.getElement(),
-						close: menuButtonViewController.hideMenu.bind(menuButtonViewController)
-					}
-				});
-			};
-		}
-		else{
-			buttonOptions.activateFunction = buttonDescriptor.onClick;
+function _getThreadRowView(membraneMap){
+	return function(threadRowViewDriver){
+		var threadRowView = membraneMap.get(threadRowViewDriver);
+		if(!threadRowView){
+			threadRowView = new ThreadRowView(threadRowViewDriver);
+			membraneMap.set(threadRowView);
 		}
 
-		return buttonOptions;
+		return threadRowView;
+	};
+}
+
+
+/**
+* The different toolbar sections that exist
+* @class
+* @name ToolbarSections
+*/
+var sectionNames = {};
+Object.defineProperties(sectionNames, /** @lends ToolbarSections */ {
+
+	/**
+	* The section is for buttons that move emails out of or into the users inbox
+	* @type string
+	*/
+	'INBOX_STATE': {
+		value: 'INBOX_STATE',
+		writable: false
+	},
+
+	/**
+	* This section is for buttons that alter metadata of emails. Common examples are labeling or moving an email.
+	* @type string
+	*/
+	'METADATA_STATE': {
+		value: 'METADATA_STATE',
+		writable: false
+	},
+
+	/**
+	* This sectiom is used for other actions. Typically these will be placed in the "More"
+	* menu in Gmail or in submenus in Inbox.
+	* @type string
+	*/
+	'OTHER': {
+		value: 'OTHER',
+		writable: false
 	}
 
 });

@@ -85,7 +85,7 @@ div.T-I.inboxsdk__button {
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
-  margin-top: 0px;
+  margin-top: 4px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button > div {
@@ -226,6 +226,11 @@ div.T-I.inboxsdk__button {
 }
 
 [data-toolbar-expanded=false] [data-toolbar-expanded=true] {
+  display: none;
+}
+
+
+[data-toolbar-icononly=true] .inboxsdk__button_text {
   display: none;
 }
 
@@ -561,3 +566,5 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end search results section */
+
+

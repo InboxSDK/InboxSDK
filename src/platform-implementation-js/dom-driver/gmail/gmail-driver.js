@@ -30,7 +30,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadRowViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_toolbarViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_toolbarViewDriverStream', destroy: true, get: true},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
@@ -108,16 +108,19 @@ _.extend(GmailDriver.prototype, {
 			})
 		);
 
-		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowlistView');
+		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
 		// Each ThreadRowView may be delayed if the thread id is not known yet.
 		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
-			.flatMap(function(viewDriver) {
-				viewDriver.setPageCommunicator(self._pageCommunicator);
-				return viewDriver.waitForReady();
-			});
+												.flatMap(function(viewDriver) {
+													viewDriver.setPageCommunicator(self._pageCommunicator);
+													return viewDriver.waitForReady();
+												});
 
-		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView');
+		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
+											.doAction(function(gmailThreadView){
+												gmailThreadView.setPageCommunicator(self._pageCommunicator);
+											});
 
 		this._setupToolbarViewDriverStream();
 		this._setupMessageViewDriverStream();
@@ -151,19 +154,17 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupToolbarViewDriverStream: function(){
-		this._toolbarViewDriverStream = new Bacon.Bus();
-
-		this._toolbarViewDriverStream.plug(
-			this._rowListViewDriverStream.map(function(gmailRowListView){
-				return gmailRowListView.getToolbarView();
-			})
-		);
-
-		this._toolbarViewDriverStream.plug(
-			this._threadViewDriverStream.map(function(gmailThreadView){
-				return gmailThreadView.getToolbarView();
-			})
-		);
+		this._toolbarViewDriverStream = Bacon.mergeAll(
+											this._rowListViewDriverStream.map(function(gmailRowListView){
+												return gmailRowListView.getToolbarView();
+											}),
+											this._threadViewDriverStream.map(function(gmailThreadView){
+												return gmailThreadView.getToolbarView();
+											})
+										)
+										.flatMap(function(gmailToolbarView){
+											return gmailToolbarView.waitForReady();
+										});
 	},
 
 	_setupMessageViewDriverStream: function(){
