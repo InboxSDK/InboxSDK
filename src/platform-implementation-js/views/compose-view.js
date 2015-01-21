@@ -304,71 +304,69 @@ module.exports = ComposeView;
 * This type is passed into the <code>ComposeView.addButton</code> method as a way to configure the button shown.
 */
 var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
+	/**
+	* Text to show when the user hovers the mouse over the button.
+	* @type {string}
+	*/
+	title:null,
 
-/**
-* Text to show when the user hovers the mouse over the button.
-* @type {string}
-*/
-title:null,
+	/**
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	* @type {string}
+	*/
+	iconUrl:null,
 
-/**
-* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
-* @type {string}
-*/
-iconUrl:null,
+	/**
+	* This is called when the button is clicked, and gets passed an event object. The event object will have a composeView
+	* object and optionally a dropdown property if the button had a dropdown.
+	* @type {function(event)}
+	*/
+	onClick:null,
 
-/**
-* This is called when the button is clicked, and gets passed an event object. The event object will have a composeView
-* object and optionally a dropdown property if the button had a dropdown.
-* @type {function(event)}
-*/
-onClick:null,
+	/**
+	* If true, the button will open a dropdown menu above it, and the event object will have a dropdown property that
+	* allows the dropdown to be customized when opened.
+	* ^optional
+	* ^default=false
+	* @type {boolean}
+	*/
+	hasDropdown:null,
 
-/**
-* If true, the button will open a dropdown menu above it, and the event object will have a dropdown property that
-* allows the dropdown to be customized when opened.
-* ^optional
-* ^default=false
-* @type {boolean}
-*/
-hasDropdown:null,
+	/**
+	* There are currently two supported types of compose buttons, one which results in the message being sent and
+	* another which just modifies the current message but does not send it. The button is placed according to its
+	* type. The permissable values for type are <code>SEND_ACTION</code> and <code>MODIFIER</code>
+	* ^optional
+	* ^default=MODIFIER
+	* @type {string}
+	*/
+	type:null,
 
-/**
-* There are currently two supported types of compose buttons, one which results in the message being sent and
-* another which just modifies the current message but does not send it. The button is placed according to its
-* type. The permissable values for type are <code>SEND_ACTION</code> and <code>MODIFIER</code>
-* ^optional
-* ^default=MODIFIER
-* @type {string}
-*/
-type:null,
-
-/**
-* If multiple buttons are placed next to each other, then they will be ordered by this value.
-* ^optional
-* ^default=0
-* @type {number}
-*/
-orderHint:null
-};
+	/**
+	* If multiple buttons are placed next to each other, then they will be ordered by this value.
+	* ^optional
+	* ^default=0
+	* @type {number}
+	*/
+	orderHint:null
+	};
 
 
-/**
- * @class  Contact
- * Simple object that contains the email address and full name if it exists
- */
-var Contact = /** @lends Contact */ {
+	/**
+	 * @class  Contact
+	 * Simple object that contains the email address and full name if it exists
+	 */
+	var Contact = /** @lends Contact */ {
 
-/**
- * email address of the contact
- * @type {string}
- */
-emailAddress: null,
+	/**
+	 * email address of the contact
+	 * @type {string}
+	 */
+	emailAddress: null,
 
-/**
- * name of the contact, may be null
- * @type {string}
- */
-name: null
-
+	/**
+	 * name of the contact, may be null
+	 * @type {string}
+	 */
+	name: null
 };
