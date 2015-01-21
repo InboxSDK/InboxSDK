@@ -260,8 +260,11 @@ tracker.setUserEmailAddress = function(userEmailAddress) {
   _userEmailHash = hash(userEmailAddress);
 };
 
-tracker.track = function(eventName, details) {
+function track(type, eventName, details) {
+  console.log('track', type, eventName, details);
   details = _.extend({
+    'type': type,
+    'eventName': eventName,
     'timestamp': new Date().getTime()*1000,
     'screenWidth': screen.width,
     'screenHeight': screen.height,
@@ -284,22 +287,22 @@ tracker.track = function(eventName, details) {
       })
     }
   });
-};
+}
 
 // For tracking app events that are possibly triggered by the user. Extensions
 // can opt out of this with a flag passed to InboxSDK.load().
 tracker.trackAppActive = function(eventName, detail) {
-  console.log('trackActive', eventName, detail);
+  return track('appActive', eventName, detail);
 };
 
 // Track events unrelated to user activity about how the app uses the SDK.
 // Examples include the app being initialized, and calls to any of the
 // register___ViewHandler functions.
 tracker.trackAppPassive = function(eventName, detail) {
-  console.log('trackPassive', eventName, detail);
+  return track('appPassive', eventName, detail);
 };
 
 // Track Gmail events.
 tracker.trackGmail = function(eventName, detail) {
-  console.log('trackGmail', eventName, detail);
+  return track('gmail', eventName, detail);
 };
