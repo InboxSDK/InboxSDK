@@ -52,7 +52,7 @@ function _attachNavItemView(gmailNavItemView){
 
 		var navigation = $(holder).closest('[role=navigation]')[0];
 		var realHeight = holder.parentElement.clientHeight;
-		navigation.style.minHeight = realHeight + 'px';
+		navigation.style.minHeight = Math.min(realHeight, 400) + 'px';
 	};
 }
 
