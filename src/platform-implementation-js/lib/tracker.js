@@ -1,20 +1,139 @@
 var _ = require('lodash');
 var ajax = require('../../common/ajax');
-var crypto = require('crypto');
 var RSVP = require('rsvp');
+var sha256 = require('sha256');
 var getStackTrace = require('../../common/get-stack-trace');
 
 var tracker = {};
 module.exports = tracker;
 
-// Yeah, this module has some shared state. This is just for logging
-// convenience. Other modules should avoid doing this!
+// Yeah, this module is a singleton with some shared state. This is just for
+// logging convenience. Other modules should avoid doing this!
 var _appIds = [];
 var _LOADER_VERSION;
 var _IMPL_VERSION;
 var _userEmailHash;
 
 var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
+
+// Set up error logging.
+tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
+  _appIds.push(appId);
+  if (_LOADER_VERSION) {
+    // If we've been set up before, don't do it all again.
+    return;
+  }
+  _LOADER_VERSION = LOADER_VERSION;
+  _IMPL_VERSION = IMPL_VERSION;
+
+  if (opts.globalErrorLogging) {
+    if (Error.stackTraceLimit < 30) {
+      Error.stackTraceLimit = 30;
+    }
+
+    RSVP.on('error', function(err) {
+      tracker.logError(err, "Possibly uncaught promise rejection");
+    });
+
+    window.addEventListener('error', function(event) {
+      // Ugh, currently Chrome makes this pretty useless. Once Chrome fixes
+      // this, we can remove the logged function wrappers around setTimeout and
+      // things.
+      if (event.error) {
+        tracker.logError(event.error, "Uncaught exception");
+      }
+    });
+
+    replaceFunction(window, 'setTimeout', function(original) {
+      return function wrappedSetTimeout() {
+        var args = _.toArray(arguments);
+        if (typeof args[0] == 'function') {
+          args[0] = makeLoggedFunction(args[0], "setTimeout callback");
+        }
+        return original.apply(this, args);
+      };
+    });
+
+    replaceFunction(window, 'setInterval', function(original) {
+      return function wrappedSetInterval() {
+        var args = _.toArray(arguments);
+        if (typeof args[0] == 'function') {
+          args[0] = makeLoggedFunction(args[0], "setInterval callback");
+        }
+        return original.apply(this, args);
+      };
+    });
+
+    var ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
+    replaceFunction(ETp, 'addEventListener', function(original) {
+      return function wrappedAddEventListener() {
+        var args = _.toArray(arguments);
+        if (typeof args[1] == 'function') {
+          try {
+            // If we've made a logger for this function before, use it again,
+            // otherwise attach it as a property to the original function.
+            // This is necessary so that removeEventListener is called with
+            // the right function.
+            var loggedFn = args[1].__streak_logged;
+            if (!loggedFn) {
+              loggedFn = makeLoggedFunction(args[1], "event listener");
+              args[1].__streak_logged = loggedFn;
+            }
+            args[1] = loggedFn;
+          } catch(e) {
+            // This could be triggered if the given function was immutable
+            // and stopped us from saving the logged copy on it.
+            console.error("Failed to error wrap function", e);
+          }
+        }
+        return original.apply(this, args);
+      };
+    });
+
+    replaceFunction(ETp, 'removeEventListener', function(original) {
+      return function wrappedRemoveEventListener() {
+        var args = _.toArray(arguments);
+        if (typeof args[1] == 'function' && args[1].__streak_logged) {
+          args[1] = args[1].__streak_logged;
+        }
+        return original.apply(this, args);
+      };
+    });
+
+    replaceFunction(window, 'MutationObserver', function(Original) {
+      Original = Original || window.WebKitMutationObserver;
+
+      function WrappedMutationObserver() {
+        var args = _.toArray(arguments);
+        if (typeof args[0] == 'function') {
+          args[0] = makeLoggedFunction(args[0], "MutationObserver callback");
+        }
+        if (Original.bind && Original.bind.apply) {
+          // call constructor with variable number of arguments
+          return new (Original.bind.apply(Original, [null].concat(args)))();
+        } else {
+          // Safari's MutationObserver lacks a bind method, but its constructor
+          // doesn't support extra arguments anyway, so don't bother logging an
+          // error here.
+          return new Original(args[0]);
+        }
+      }
+
+      // Just in case someone wants to monkey-patch the prototype.
+      WrappedMutationObserver.prototype = Original.prototype;
+
+      return WrappedMutationObserver;
+    });
+  } else {
+    // Even if we're set not to log errors, we should still avoid letting RSVP
+    // swallow errors entirely.
+    RSVP.on('error', function(err) {
+      setTimeout(function() {
+        throw err;
+      }, 0);
+    });
+  }
+};
 
 function haveWeSeenThisErrorAlready(error) {
   if (error && typeof error == 'object') {
@@ -81,8 +200,8 @@ tracker.logError = function(err, details) {
     }
     stuffToLog = stuffToLog.concat(["\n\nError logged from:", nowStack]);
     stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:"], _appIds);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:"], _LOADER_VERSION);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:"], _IMPL_VERSION);
+    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
+    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
 
     console.error.apply(console, stuffToLog);
 
@@ -134,50 +253,8 @@ function replaceFunction(parent, name, newFnMaker) {
 }
 
 function hash(str) {
-  var hasher = crypto.createHash('sha256');
-  hasher.update('inboxsdk:'+str);
-  return hasher.digest('base64');
+  return sha256('inboxsdk:'+str);
 }
-
-// Set up error logging.
-tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-  _appIds.push(appId);
-  _LOADER_VERSION = LOADER_VERSION;
-  _IMPL_VERSION = IMPL_VERSION;
-
-  if (opts.globalErrorLogging) {
-    if (Error.stackTraceLimit < 30) {
-      Error.stackTraceLimit = 30;
-    }
-
-    if (!RSVP._errorHandlerSetup) {
-      RSVP._errorHandlerSetup = true;
-      RSVP.on('error', function(err) {
-        tracker.logError(err, "Possibly uncaught promise rejection");
-      });
-    }
-
-    window.addEventListener('error', function(event) {
-      // Ugh, currently Chrome makes this pretty useless. Once Chrome fixes
-      // this, we can remove the logged function wrappers around setTimeout and
-      // things.
-      if (event.error) {
-        tracker.logError(event.error, "Uncaught exception");
-      }
-    });
-  } else {
-    // Even if we're set not to log errors, we should still avoid letting RSVP
-    // swallow errors entirely.
-    if (!RSVP._errorHandlerSetup) {
-      RSVP._errorHandlerSetup = true;
-      RSVP.on('error', function(err) {
-        setTimeout(function() {
-          throw err;
-        }, 1);
-      });
-    }
-  }
-};
 
 tracker.setUserEmailAddress = function(userEmailAddress) {
   _userEmailHash = hash(userEmailAddress);
