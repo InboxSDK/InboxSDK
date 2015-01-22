@@ -6,7 +6,7 @@ var BasicClass = require('../../../lib/basic-class');
 var ButtonView = require('./buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
-var GmailModalView = function(options){
+var GmailModalViewDriver = function(options){
     BasicClass.call(this);
 
     this._setupOverlayElement();
@@ -17,9 +17,9 @@ var GmailModalView = function(options){
     this._setupEventStream();
 };
 
-GmailModalView.prototype = Object.create(BasicClass.prototype);
+GmailModalViewDriver.prototype = Object.create(BasicClass.prototype);
 
-_.extend(GmailModalView.prototype, {
+_.extend(GmailModalViewDriver.prototype, {
 
     __memberVariables: [
         {name: '_overlayElement', destroy: true, get: true},
@@ -135,7 +135,7 @@ _.extend(GmailModalView.prototype, {
         var eventStream = this._eventStream;
         var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
 
-        closeElement.addEventListener('mousedown', function(event){
+        closeElement.addEventListener('click', function(event){
             eventStream.push({
                 eventName: 'closeClick',
                 domEvent: event
@@ -144,4 +144,4 @@ _.extend(GmailModalView.prototype, {
     }
 });
 
-module.exports = GmailModalView;
+module.exports = GmailModalViewDriver;

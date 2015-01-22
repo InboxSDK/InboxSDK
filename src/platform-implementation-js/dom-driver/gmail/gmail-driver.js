@@ -9,7 +9,7 @@ var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptor = require('./make-xhr-interceptor');
 var GmailThreadView = require('./views/gmail-thread-view');
 
-var GmailModalView = require('./widgets/gmail-modal-view');
+var GmailModalViewDriver = require('./widgets/gmail-modal-view-driver');
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 
 
@@ -60,8 +60,8 @@ _.extend(GmailDriver.prototype, {
 		require('./gmail-driver/open-compose-window')(this);
 	},
 
-	createModalView: function(options){
-		return new GmailModalView(options);
+	createModalViewDriver: function(options){
+		return new GmailModalViewDriver(options);
 	},
 
 	addNavItem: function(appId, navItemDescriptor){

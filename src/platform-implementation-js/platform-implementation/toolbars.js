@@ -87,7 +87,11 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 
 
 function _setupToolbarViewDriverWatcher(toolbars, members){
-	members.driver.getToolbarViewDriverStream().onValue(_handleNewToolbarViewDriver, toolbars, members);
+	members.driver.getToolbarViewDriverStream()
+			.filter(function(toolbarViewDriver){
+				return !!toolbarViewDriver.getEventStream();
+			})
+		   	.onValue(_handleNewToolbarViewDriver, toolbars, members);
 }
 
 function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
@@ -199,5 +203,62 @@ Object.defineProperties(sectionNames, /** @lends ToolbarSections */ {
 	}
 
 });
+
+
+/**
+* @class
+* This type is passed into the <code>Toolbars.registerToolbarButtonForList</code> and
+* <code>Toolbars.registerToolbarButtonForThreadView</code> method as a way to configure
+* the toolbar button shown.
+*/
+var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
+
+	/**
+	* Text to show when the user hovers the mouse over the button.
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* The section of the toolbar to place the button. Several different positions are defined in <code>Toolbars.ToolbarSections</code>
+	* @type {ToolbarSections}
+	*/
+	section:null,
+
+	/**
+	* This is called when the button is clicked, and gets passed an event object. The event object will have
+	* a <code>selectedThreadRowViews</code> (ThreadRowView[]) property, a <code>threadRowViews</code>
+	* (ThreadRowViewp[]) property and optionally a <code>dropdown</code> (HTMLElement) property if you set
+	* the <code>hasDropdown</code> property to true
+	* @type {function(event)}
+	*/
+	onClick:null,
+
+	/**
+	* If true, the button will open a dropdown menu below it, and the event object will have a dropdown property that
+	* allows the dropdown to be customized when opened.
+	* ^optional
+	* ^default=false
+	* @type {boolean}
+	*/
+	hasDropdown:null,
+
+	/**
+	* A function that determines when this toolbar button should be hidden. You may want to hide the
+	* toolbar button on certain Routes or in certain conditions. The function should return true when
+	* the toolbar button should be hidden. Your function is passed a <code>RouteView</code>
+	* ^optional
+	* ^default=null
+	* @type {function(RouteView)}
+	*/
+	hideFor:null
+};
+
 
 module.exports = Toolbars;
