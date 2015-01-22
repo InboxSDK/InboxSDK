@@ -135,77 +135,121 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 */
 var RowDescriptor = /** @lends RowDescriptor */ {
 
-/**
- * First textual column
- * @type {string}
- */
-title: null,
+	/**
+	 * First textual column
+	 * @type {string}
+	 */
+	title: null,
+
+	/**
+	 * Second textual column
+	 * @type {string}
+	 */
+	body: null,
+
+	/**
+	 * Last text right-aligned. Often used for dates.
+	 * @type {string}
+	 */
+	shortDetailText: null,
+
+	/**
+	* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles
+	* @type {string}
+	*/
+	isRead: null,
+
+	/**
+	* Any labels that should be rendered. A LabelDescriptor simply has title, backgroundColor, and foregroundColor string properties.
+	* @type {LabelDescriptor[]}
+	*/
+	labels: null,
+
+	/**
+	* An optional url to an icon to display on the left side of the row
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconUrl: null,
+
+	/**
+	* An optional class to apply to the icon
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass: null,
+
+	/**
+	 * The name of the route to navigate to when the row is clicked on
+	 * ^optional
+	 * ^default=null
+	 * @type {string}
+	 */
+	routeID: null,
+
+	/**
+	 * The parameters of the route being navigated to when the row is clicked on
+	 * ^optional
+	 * ^default=null
+	 * @type {string[]}
+	 */
+	routeParams: null,
+
+
+	/**
+	 * Callback for when the row is clicked on
+	 * ^optional
+	 * ^default=null
+	 * @type {function}
+	 */
+	onClick: null
+
+};
+
 
 /**
- * Second textual column
- * @type {string}
- */
-body: null,
-
-/**
- * Last text right-aligned. Often used for dates.
- * @type {string}
- */
-shortDetailText: null,
-
-/**
-* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles
-* @type {string}
+* @class
+* The properties required to create a CollapsibleSectionView
 */
-isRead: null,
+var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
 
-/**
-* Any labels that should be rendered. A LabelDescriptor simply has title, backgroundColor, and foregroundColor string properties.
-* @type {LabelDescriptor[]}
-*/
-labels: null,
+	/**
+	* Main title
+	* @type {string}
+	*/
+	title: null,
 
-/**
-* An optional url to an icon to display on the left side of the row
-* ^optional
-* ^default=null
-* @type {string}
-*/
-iconUrl: null,
+	/**
+	* Subtitle
+	* @type {string}
+	*/
+	subtitle: null,
 
-/**
-* An optional class to apply to the icon
-* ^optional
-* ^default=null
-* @type {string}
-*/
-iconClass: null,
+	/**
+	* Text to display in the summary area of the CollapsibleSectionView. Typically page counts are displayed here.
+	* @type {string}
+	*/
+	summaryText: null,
 
-/**
- * The name of the route to navigate to when the row is clicked on
- * ^optional
- * ^default=null
- * @type {string}
- */
-routeID: null,
+	/**
+	* A function to call when the summary text has been clicked
+	* @type {function()}
+	*/
+	onSummaryClick: null,
 
-/**
- * The parameters of the route being navigated to when the row is clicked on
- * ^optional
- * ^default=null
- * @type {string[]}
- */
-routeParams: null,
+	/**
+	* Whether to display a dropdown arrow for more options on the collapsible section
+	* @type {boolean}
+	*/
+	hasDropdown: null,
 
-
-/**
- * Callback for when the row is clicked on
- * ^optional
- * ^default=null
- * @type {function}
- */
-onClick: null
-
+	/**
+	* A function to call when the dropdown is opened. Your function is passed an event object with a single <code>dropdown</code> property.
+	* @type {function(event)}
+	*/
+	onDropdownClick: null
 };
 
 
