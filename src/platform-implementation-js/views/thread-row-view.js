@@ -36,34 +36,53 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   },
 
   /**
-   * Adds an attachment icon
+   * Adds an attachment icon to the row
+   * @param {ThreadRowAttachmentIconDescriptor} ThreadRowAttachmentIconDescriptor - the options for the icon to add
    */
-  addAttachmentIcon: function(opts) {
-    this._threadRowViewDriver.addAttachmentIcon(opts);
+  addAttachmentIcon: function(threadRowAttachmentIconDescriptor) {
+    this._threadRowViewDriver.addAttachmentIcon(ThreadRowAttachmentIconDescriptor);
   },
 
   /**
    * Replaces the text inside the date column
+   * @param {ThreadRowDateDescriptor} threadRowDateDescriptor - the options for the date replacement
+   * @return {void}
    */
-  replaceDate: function(opts) {
+  replaceDate: function(threadRowDateDescriptor) {
     this._threadRowViewDriver.replaceDate(opts);
   },
 
+  /**
+  * Gets the subject of this thread
+  * @return {string} the subject
+  */
   getSubject: function() {
     return this._threadRowViewDriver.getSubject();
   },
 
+  /**
+  * Gets string representation of the timestamp of the most recent message on the thread.
+  * Note: this is the string representation because timezone information is not available
+  * and the accuracy is limited to minutes
+  * @return {string} the date as a string
+  */
   getDateString: function() {
     return this._threadRowViewDriver.getDateString();
   },
 
   /**
-   * Gets the Gmail Thread Id
+   * Gets the Gmail Thread Id of the thread
+   * @return {string} the gmail threadId
    */
   getThreadID: function() {
     return this._threadRowViewDriver.getThreadID();
   },
 
+  /**
+  * Gets the <b>visible</b> contacts listed on the row. Note: this may noit include all
+  * participants on the thread as this information is not visible
+  * @return {Contact[]} the visible contact objects
+  */
   getContacts: function(){
     return this._threadRowViewDriver.getContacts();
   }
@@ -149,5 +168,57 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   */
   hasDropdown:null
 };
+
+
+/**
+* @class
+* This type is used to describe a button you add to a <code>ThreadRowView</code>
+*/
+var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescriptor */{
+
+  /**
+  * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
+  * @type {string}
+  */
+  iconUrl:null,
+
+  /**
+  * The tooltip text to show when the user hovers over the icon
+  * @type {string}
+  */
+  tooltip:null
+};
+
+
+/**
+* @class
+* This type is used to describe a button you add to a <code>ThreadRowView</code>
+*/
+var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
+
+  /**
+  * The date text to replace with
+  * @type {string}
+  */
+  text:null,
+
+  /**
+  * The text color of the replaced date text
+  * @type {string}
+  */
+  textColor:null,
+
+  /**
+  * The tooltip text to show when the user hovers over the date
+  * @type {string}
+  */
+  tooltip:null
+};
+
+
+
+
+
+
 
 module.exports = ThreadRowView;
