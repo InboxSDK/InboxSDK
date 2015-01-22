@@ -577,3 +577,25 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 /* end search results section */
 
 
+/* tooltip */
+
+.inboxsdk__tooltip {
+  position: fixed;
+  z-index: 1300;
+}
+
+.inboxsdk__tooltip .T-P {
+  position: relative;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_arrow {
+  position: fixed;
+  z-index: 1400;
+  margin-top: -1px;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_close {
+  -webkit-user-select: none;
+}
+
+/* end tooltip */

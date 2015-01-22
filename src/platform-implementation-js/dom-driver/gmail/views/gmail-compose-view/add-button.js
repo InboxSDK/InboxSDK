@@ -1,7 +1,11 @@
+'use strict';
+
 var _ = require('lodash');
+var RSVP = require('rsvp');
 
 var waitFor = require('../../../../lib/wait-for');
 var simulateClick = require('../../../../lib/dom/simulate-click');
+var dispatchCustomEvent = require('../../../../lib/dom/dispatch-custom-event');
 
 var ButtonView = require('../../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../../widgets/buttons/basic-button-view-controller');
@@ -12,19 +16,31 @@ var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 function addButton(gmailComposeView, buttonDescriptorStream, groupOrderHint, extraOnClickOptions){
 	var buttonViewController;
 
-	var unsubscribeFunction = buttonDescriptorStream.onValue(function(buttonDescriptor){
+	return new RSVP.Promise(function(resolve, reject){
 
-		var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
+		buttonDescriptorStream
+			.takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+			.onValue(function(buttonDescriptor){
+				var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
 
-		if(!buttonViewController){
-			buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
-		}
-		else{
-			buttonViewController.getView().update(buttonOptions);
-		}
+				if(!buttonViewController){
+					buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
+					resolve({
+						buttonViewController: buttonViewController,
+						composeViewDriver: gmailComposeView,
+						buttonDescriptor: buttonDescriptor
+					});
+				}
+				else{
+					buttonViewController.getView().update(buttonOptions);
+				}
+			});
+
+		gmailComposeView.getEventStream().onEnd(function(){
+			resolve(null);
+		});
 	});
 
-	gmailComposeView.addUnsubscribeFunction(unsubscribeFunction);
 }
 
 function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnClickOptions){
@@ -44,6 +60,8 @@ function _addButton(gmailComposeView, buttonDescriptor, groupOrderHint, extraOnC
 
 	_groupButtonsIfNeeded(gmailComposeView);
 	_fixToolbarPosition(gmailComposeView);
+
+	dispatchCustomEvent(gmailComposeView.getElement(), 'buttonAdded');
 
 	return buttonViewController;
 }

@@ -1,7 +1,14 @@
+'use strict';
+
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
+
+var ComposeButtonView = require('./compose-button-view');
+
+var Map = require('es6-unweak-collections').Map;
+var memberMap = new Map();
 
 /**
 * @class
@@ -12,17 +19,23 @@ var baconCast = require('bacon-cast');
 var ComposeView = function(composeViewImplementation, appId){
 	EventEmitter.call(this);
 
-	this._composeViewImplementation = composeViewImplementation;
-	this._appId = appId;
+	var members = {};
+	memberMap.set(this, members);
+
+	members.composeViewImplementation = composeViewImplementation;
+	members.appId = appId;
 
 	var self = this;
-	this._composeViewImplementation.getEventStream().onValue(function(event){
+	members.composeViewImplementation.getEventStream().onValue(function(event){
 		self.emit(event.eventName, event.data);
 	});
 
-	this._composeViewImplementation.getEventStream().onEnd(function(){
+	members.composeViewImplementation.getEventStream().onEnd(function(){
 		self.emit('close'); /* TODO: deprecated */
 		self.emit('destroy');
+
+		self.removeAllListeners();
+		memberMap.delete(self);
 	});
 };
 
@@ -38,30 +51,33 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){
+		var members = memberMap.get(this);
 		var buttonDescriptorStream = baconCast(Bacon, buttonDescriptor);
-		this._composeViewImplementation.addButton(buttonDescriptorStream, this._appId, {composeView: this});
+
+		var composeButtonObject = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
+		return new ComposeButtonView(composeButtonObject);
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addInnerSidebar: function(options){
-		this._composeViewImplementation.addInnerSidebar(options);
+		memberMap.get(this).composeViewImplementation.addInnerSidebar(options);
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addMessageSendModifier: function(modifier){
-		this._composeViewImplementation.addMessageSendModifier(modifier);
+		memberMap.get(this).composeViewImplementation.addMessageSendModifier(modifier);
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	addOuterSidebar: function(options){
-		this._composeViewImplementation.addOuterSidebar(options);
+		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
 	},
 
 	/**
 	* closes the compose window
 	*/
 	close: function(){
-		this._composeViewImplementation.close();
+		memberMap.get(this).composeViewImplementation.close();
 	},
 
 	/**
@@ -69,12 +85,12 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {HTMLElement}
 	*/
 	getBodyElement: function(){
-		return this._composeViewImplementation.getBodyElement();
+		return memberMap.get(this).composeViewImplementation.getBodyElement();
 	},
 
 	/* NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS */
 	getComposeID: function(){
-		return this._composeViewImplementation.getComposeID();
+		return memberMap.get(this).composeViewImplementation.getComposeID();
 	},
 
 	/**
@@ -82,7 +98,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {string}
 	*/
 	getHTMLContent: function(){
-		return this._composeViewImplementation.getHTMLContent();
+		return memberMap.get(this).composeViewImplementation.getHTMLContent();
 	},
 
 	/*
@@ -90,7 +106,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {string}
 	*/
 	getSelectedBodyHTML: function(){
-		return this._composeViewImplementation.getSelectedBodyHTML();
+		return memberMap.get(this).composeViewImplementation.getSelectedBodyHTML();
 	},
 
 	/**
@@ -98,7 +114,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {string}
 	*/
 	getSelectedBodyText: function(){
-		return this._composeViewImplementation.getSelectedBodyText();
+		return memberMap.get(this).composeViewImplementation.getSelectedBodyText();
 	},
 
 	/**
@@ -106,7 +122,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {string}
 	*/
 	getSubject: function(){
-		return this._composeViewImplementation.getSubject();
+		return memberMap.get(this).composeViewImplementation.getSubject();
 	},
 
 	/**
@@ -114,7 +130,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {string}
 	*/
 	getTextContent: function(){
-		return this._composeViewImplementation.getTextContent();
+		return memberMap.get(this).composeViewImplementation.getTextContent();
 	},
 
 	/**
@@ -122,7 +138,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * @return {object[]}
 	 */
 	getToRecipients: function(){
-		return this._composeViewImplementation.getToRecipients();
+		return memberMap.get(this).composeViewImplementation.getToRecipients();
 	},
 
 	/**
@@ -130,7 +146,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {object[]}
 	*/
 	getCcRecipients: function(){
-		return this._composeViewImplementation.getCcRecipients();
+		return memberMap.get(this).composeViewImplementation.getCcRecipients();
 	},
 
 	/**
@@ -138,7 +154,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {object[]}
 	*/
 	getBccRecipients: function(){
-		return this._composeViewImplementation.getBccRecipients();
+		return memberMap.get(this).composeViewImplementation.getBccRecipients();
 	},
 
 	/**
@@ -150,7 +166,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {HTMLElement}
 	*/
 	insertHTMLIntoBodyAtCursor: function(html){
-		return this._composeViewImplementation.insertBodyHTMLAtCursor(html);
+		return memberMap.get(this).composeViewImplementation.insertBodyHTMLAtCursor(html);
 	},
 
 	/**
@@ -173,7 +189,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 			return;
 		}
 
-		return this._composeViewImplementation.insertLinkChipIntoBody({
+		return memberMap.get(this).composeViewImplementation.insertLinkChipIntoBody({
 			text: text,
 			url: url,
 			iconUrl: iconUrl
@@ -190,7 +206,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {HTMLElement}
 	*/
 	insertLinkIntoBodyAtCursor: function(text, url){
-		return this._composeViewImplementation.insertLinkIntoBody(text, url);
+		return memberMap.get(this).composeViewImplementation.insertLinkIntoBody(text, url);
 	},
 
 
@@ -201,7 +217,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {void}
 	*/
 	insertTextIntoBodyAtCursor: function(text){
-		return this._composeViewImplementation.insertBodyTextAtCursor(text);
+		return memberMap.get(this).composeViewImplementation.insertBodyTextAtCursor(text);
 	},
 
 
@@ -211,7 +227,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {boolean}
 	*/
 	isInlineReplyForm: function(){
-		return this._composeViewImplementation.isInlineReplyForm();
+		return memberMap.get(this).composeViewImplementation.isInlineReplyForm();
 	},
 
 	/**
@@ -220,22 +236,22 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @return {boolean}
 	*/
 	isReply: function(){
-		return this._composeViewImplementation.isReply();
+		return memberMap.get(this).composeViewImplementation.isReply();
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setBccRecipients: function(emails){
-		this._composeViewImplementation.setBccRecipients(emails);
+		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setCcRecipients: function(emails){
-		this._composeViewImplementation.setCcRecipients(emails);
+		memberMap.get(this).composeViewImplementation.setCcRecipients(emails);
 	},
 
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setToRecipients: function(emails){
-		this._composeViewImplementation.setToRecipients(emails);
+		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
 	}
 
 	/**
