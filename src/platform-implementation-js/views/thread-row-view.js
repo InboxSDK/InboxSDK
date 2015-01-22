@@ -49,7 +49,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    * @return {void}
    */
   replaceDate: function(threadRowDateDescriptor) {
-    this._threadRowViewDriver.replaceDate(opts);
+    this._threadRowViewDriver.replaceDate(threadRowDateDescriptor);
   },
 
   /**
