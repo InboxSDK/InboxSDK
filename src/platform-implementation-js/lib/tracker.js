@@ -3,6 +3,8 @@ var ajax = require('../../common/ajax');
 var RSVP = require('rsvp');
 var sha256 = require('sha256');
 var getStackTrace = require('../../common/get-stack-trace');
+var getExtensionId = require('../../common/get-extension-id');
+
 
 var tracker = {};
 module.exports = tracker;
@@ -200,6 +202,7 @@ tracker.logError = function(err, details) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
     stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:"], _appIds);
+    stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
 
@@ -263,15 +266,17 @@ tracker.setUserEmailAddress = function(userEmailAddress) {
 function track(type, eventName, details) {
   console.log('track', type, eventName, details);
   details = _.extend({
-    'type': type,
-    'eventName': eventName,
-    'timestamp': new Date().getTime()*1000,
-    'screenWidth': screen.width,
-    'screenHeight': screen.height,
-    'windowWidth': window.innerWidth,
-    'windowHeight': window.innerHeight,
-    'origin': document.location.origin,
-    'emailHash': _userEmailHash
+    type: type,
+    eventName: eventName,
+    timestamp: new Date().getTime()*1000,
+    screenWidth: screen.width,
+    screenHeight: screen.height,
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    origin: document.location.origin,
+    extensionId: getExtensionId(),
+    appIds: _appIds,
+    emailHash: _userEmailHash
   }, details);
 
   // TODO queue a bunch before sending
