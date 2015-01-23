@@ -9,6 +9,8 @@ var getExtensionId = require('../../common/get-extension-id');
 var tracker = {};
 module.exports = tracker;
 
+var _sessionId = Date.now()+'-'+Math.random();
+
 // This will only return true for the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
 var isTrackerMaster = _.once(function() {
@@ -213,6 +215,7 @@ tracker.logError = function(err, details) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
     stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:"], _appIds);
+    stuffToLog = stuffToLog.concat(["\nSession Id:", _sessionId]);
     stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
@@ -285,6 +288,7 @@ function track(type, eventName, details) {
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
     origin: document.location.origin,
+    sessionId: _sessionId,
     extensionId: getExtensionId(),
     appIds: _appIds,
     emailHash: _userEmailHash
