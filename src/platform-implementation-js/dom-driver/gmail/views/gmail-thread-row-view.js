@@ -328,10 +328,6 @@ _.extend(GmailThreadRowView.prototype, {
     return this._pageCommunicator.getThreadIdForThreadRow(this._element);
   },
 
-  isThreadIDStable: function() {
-    return true;
-  },
-
   getVisibleDraftCount: function() {
     return this.getCounts().draftCount;
   },
