@@ -79,10 +79,12 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   },
 
   /**
-  * Gets the Gmail Thread ID of the thread only if the thread ID is expected to stay the
-  * same. Returns null otherwise. It would return null if the thread row is only a draft
-  * that isn't threaded with any messages.
-  * @return {string} the gmail threadID
+  * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads
+  * such as those with only a signle Draft message in them will occasionally change their
+  * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
+  * if you're not careful about this fact. This method provides you with an easy way to tell if
+  * the thread has a stable ID. It will only return a thread ID if it is expected to stay the same.
+  * @return {string} the gmail threadID or null if its not stable
   */
   getThreadIDIfStable: function() {
     if (this.getVisibleMessageCount() > 0) {
@@ -92,10 +94,17 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
     }
   },
 
+  /**
+  * Gets the number of visible draft messages in the row. This is purely an estimate based on
+  * what is visible in the row.
+  */
   getVisibleDraftCount: function() {
     return this._threadRowViewDriver.getVisibleDraftCount();
   },
 
+  /**
+  * Gets the number of visible messages in the thread based on the visible numeric marker
+  */
   getVisibleMessageCount: function() {
     return this._threadRowViewDriver.getVisibleMessageCount();
   },
