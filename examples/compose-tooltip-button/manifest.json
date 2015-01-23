@@ -18,7 +18,8 @@
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
-    "monkey.png"
+    "monkey.png",
+    "partycat.jpg"
   ],
 
   "manifest_version": 2

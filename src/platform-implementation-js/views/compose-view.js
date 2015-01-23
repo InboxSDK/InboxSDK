@@ -252,7 +252,12 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	//NOT DOCUMENTED BECAUSE NOT TESTED YET
 	setToRecipients: function(emails){
 		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
-	}
+	},
+
+	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
+	getElement: function(){
+		return memberMap.get(this).composeViewImplementation.getElement();
+	},
 
 	/**
 	* Fires when the compose view is closed. This can be triggered by the .close method, the user

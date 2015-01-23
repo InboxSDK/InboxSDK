@@ -38,6 +38,11 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 				return {
 					eventName: 'buttonAdded'
 				};
+			}),
+			Bacon.fromEventTarget(this._element, 'composeFullscreenStateChanged').map(function(){
+				return {
+					eventName: 'composeFullscreenStateChanged'
+				};
 			})
 		)
 	);
@@ -77,6 +82,7 @@ _.extend(GmailComposeView.prototype, {
 	_setupConsistencyCheckers: function(){
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
+		require('./gmail-compose-view/manage-button-grouping')(this);
 	},
 
 	insertBodyTextAtCursor: function(text){

@@ -11,8 +11,15 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		});
 
 		button.showTooltip({
+			imageUrl: chrome.runtime.getURL('partycat.jpg'),
 			title: 'Monkeys Rule!',
-			subtitle: 'the jungle'
+			subtitle: 'the jungle',
+			button: {
+				title: 'Party!',
+				onClick: function(){
+					console.log('partying');
+				}
+			}
 		});
 
 		composeView.addButton({

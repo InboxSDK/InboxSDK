@@ -4,6 +4,9 @@ var _ = require('lodash');
 var BasicClass = require('../../../lib/basic-class');
 var Bacon = require('baconjs');
 
+var ButtonView = require('./buttons/button-view');
+var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+
 var ARROW_HORIZONTAL_HEIGHT = 9;
 var ARROW_HORIZONTAL_WIDTH = 18;
 var ARROW_VERTICAL_HEIGHT = 18;
@@ -26,16 +29,40 @@ _.extend(GmailTooltipView.prototype, {
 		{name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'}
 	],
 
-	anchor: function(anchorElement){
+	anchor: function(anchorElement, position){
+		if(!anchorElement){
+			return;
+		}
+
+		if(!this._element){
+			return;
+		}
+
 		var targetBoundingBox = anchorElement.getBoundingClientRect();
 		var tipBoundingBox = this._element.getBoundingClientRect();
 
 		var theBoundingBoxWrapperToUse;
-		theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(targetBoundingBox, tipBoundingBox);
+		if(position){
+			switch(position){
+				case 'top':
+					theBoundingBoxWrapperToUse = {
+						type: 'top',
+						value: this._getTopPositionBoundingBox(targetBoundingBox, tipBoundingBox)
+					};
+				break;
+			}
+		}
+		else{
+			theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(targetBoundingBox, tipBoundingBox);
+		}
 
 		var containedBoundingBox = this._containBoundingBox(theBoundingBoxWrapperToUse.value);
 		this._setPositionAtBoundingBox(containedBoundingBox);
 		this._setArrowPosition(theBoundingBoxWrapperToUse.type, containedBoundingBox, targetBoundingBox);
+	},
+
+	close: function(){
+		this.destroy();
 	},
 
 	_setupElement: function(options){
@@ -43,7 +70,7 @@ _.extend(GmailTooltipView.prototype, {
 			'<div class="T-P aRL">',
 				'<div class="T-P-Jz-UR">',
 					'<div class="aRM" tabindex="0">',
-						'<div class="aVn">',
+						'<div class="aVn inboxsdk__tooltip_image">',
 							//image goes here
 						'</div>',
 						'<div class="aRR">',
@@ -52,12 +79,12 @@ _.extend(GmailTooltipView.prototype, {
 						'<div class="aRQ">',
 							_.escape(options.subtitle),
 						'</div>',
-						'<div>',
+						'<div class="inboxsdk__tooltip_button">',
 							//button goes here
 						'</div>',
 					'</div>',
 				'</div>',
-				'<div class="T-P-aut-UR T-P-aut inboxsdk__tooltip_close" aria-label="Close" role="button" tabindex="0"></div>',
+				'<div class="T-P-aut-UR T-P-aut inboxsdk__tooltip_close" aria-label="Close" role="button"></div>',
 				'<div class="T-P-hFsbo-UR T-P-hFsbo T-P-atB inboxsdk__tooltip_arrow">',
 					'<div class="T-P-atD"></div>',
 					'<div class="T-P-atC"></div>',
@@ -69,10 +96,32 @@ _.extend(GmailTooltipView.prototype, {
 		this._element.setAttribute('class', 'inboxsdk__tooltip');
 		this._element.innerHTML = html;
 
-		var element = this._element;
+		var self = this;
 		this._element.querySelector('.inboxsdk__tooltip_close').addEventListener('click', function(){
-			element.remove();
+			self.destroy();
 		});
+
+		if(options.imageUrl){
+			var image = document.createElement('img');
+			image.src = options.imageUrl;
+			this._element.querySelector('.inboxsdk__tooltip_image').appendChild(image);
+		}
+
+		if(options.button){
+			var buttonOptions = _.clone(options.button);
+
+			buttonOptions.color = 'blue';
+
+			var oldOnClick = buttonOptions.onClick;
+			buttonOptions.onClick = function(){
+				self.destroy();
+				oldOnClick();
+			};
+
+			buttonOptions.buttonView = new ButtonView(buttonOptions);
+			var buttonViewController = new BasicButtonViewController(buttonOptions);
+			this._element.querySelector('.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
+		}
 	},
 
 	_getAutomaticPlacementBoundingBox: function(targetBoundingBox, tipBoundingBox){
@@ -222,7 +271,7 @@ _.extend(GmailTooltipView.prototype, {
 		switch(type){
 			case 'top':
 				position.top = containedBoundingBox[1].y;
-				position.left = (containedBoundingBox[0].x + containedBoundingBox[1].x)/2;
+				position.left = targetBoundingBox.left + targetBoundingBox.width/2;
 			break;
 			case 'left':
 				position.top = (containedBoundingBox[0].y + containedBoundingBox[1].y)/2 - ARROW_VERTICAL_HEIGHT/2;
