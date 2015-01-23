@@ -123,6 +123,10 @@ div.T-I.inboxsdk__button {
   left: 0px;
 }
 
+.inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
+  z-index: 1;
+}
+
 .inboxsdk__compose_groupedActionToolbar_arrow {
   position: absolute;
   background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;
@@ -577,3 +581,45 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 /* end search results section */
 
 
+/* tooltip */
+
+.inboxsdk__tooltip {
+  position: fixed;
+  z-index: 1300;
+  transition: left 200ms ease, top 200ms ease;
+}
+
+.inboxsdk__tooltip .T-P {
+  position: relative;
+  width: auto;
+  max-width: 500px;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_arrow {
+  position: fixed;
+  z-index: 1400;
+  margin-top: -1px;
+  transition: left 200ms ease, top 200ms ease;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_close {
+  -webkit-user-select: none;
+}
+
+.inboxsdk__tooltip .inboxsdk__button {
+  margin-right: 0px;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_image {
+  max-height: 300px;
+  max-width: 500px;
+  overflow: hidden;
+  height: auto;
+}
+
+.inboxsdk__tooltip .inboxsdk__tooltip_image > img {
+  max-height: 300px;
+  max-width: 500px;
+}
+
+/* end tooltip */

@@ -33,6 +33,16 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 			}).map(function(event) {
 				var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 				return {eventName: 'sent', data: response};
+			}),
+			Bacon.fromEventTarget(this._element, 'buttonAdded').map(function(){
+				return {
+					eventName: 'buttonAdded'
+				};
+			}),
+			Bacon.fromEventTarget(this._element, 'composeFullscreenStateChanged').map(function(){
+				return {
+					eventName: 'composeFullscreenStateChanged'
+				};
 			})
 		)
 	);
@@ -60,7 +70,6 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
-		{name: '_unsubscribeFunctions', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
 		{name: '_selectionRange', destroy: false, set: true, get: true}
 	],
@@ -73,6 +82,7 @@ _.extend(GmailComposeView.prototype, {
 	_setupConsistencyCheckers: function(){
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
+		require('./gmail-compose-view/manage-button-grouping')(this);
 	},
 
 	insertBodyTextAtCursor: function(text){
@@ -109,7 +119,11 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	addButton: function(buttonDescriptor, groupOrderHint, extraOnClickOptions){
-		require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
+		return require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
+	},
+
+	addTooltipToButton: function(buttonViewController,buttonDescriptor,  tooltipDescriptor){
+		require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
 	},
 
 	addOuterSidebar: function(options){
@@ -253,8 +267,8 @@ _.extend(GmailComposeView.prototype, {
 		this._managedViewControllers.push(viewController);
 	},
 
-	addUnsubscribeFunction: function(unsubscribeFunction){
-		this._unsubscribeFunctions.push(unsubscribeFunction);
+	ensureGroupingIsOpen: function(type){
+		require('./gmail-compose-view/ensure-grouping-is-open')(this._element, type);
 	}
 
 });
