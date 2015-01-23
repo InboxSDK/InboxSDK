@@ -9,6 +9,17 @@ var getExtensionId = require('../../common/get-extension-id');
 var tracker = {};
 module.exports = tracker;
 
+// This will only return true for the first InboxSDK extension to load. This
+// first extension is tasked with reporting tracked events to the server.
+var isTrackerMaster = _.once(function() {
+  if (document.head.getAttribute('data-inboxsdk-tracker-master-set')) {
+    return false;
+  } else {
+    document.head.setAttribute('data-inboxsdk-tracker-master-set', true);
+    return true;
+  }
+});
+
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
 var _appIds = [];
@@ -282,7 +293,7 @@ function track(type, eventName, details) {
   // TODO queue a bunch before sending
   var events = [details];
 
-  return ajax({
+  ajax({
     url: 'https://events.inboxsdk.com/api/v2/track',
     method: 'POST',
     data: {
@@ -297,17 +308,21 @@ function track(type, eventName, details) {
 // For tracking app events that are possibly triggered by the user. Extensions
 // can opt out of this with a flag passed to InboxSDK.load().
 tracker.trackAppActive = function(eventName, detail) {
-  return track('appActive', eventName, detail);
+  track('appActive', eventName, detail);
 };
 
 // Track events unrelated to user activity about how the app uses the SDK.
 // Examples include the app being initialized, and calls to any of the
 // register___ViewHandler functions.
 tracker.trackAppPassive = function(eventName, detail) {
-  return track('appPassive', eventName, detail);
+  track('appPassive', eventName, detail);
 };
 
 // Track Gmail events.
 tracker.trackGmail = function(eventName, detail) {
-  return track('gmail', eventName, detail);
+  // Only the first InboxSDK extension reports Gmail events.
+  if (!isTrackerMaster()) {
+    return;
+  }
+  track('gmail', eventName, detail);
 };
