@@ -71,11 +71,33 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   },
 
   /**
-   * Gets the Gmail Thread Id of the thread
-   * @return {string} the gmail threadId
+   * Gets the Gmail Thread ID of the thread
+   * @return {string} the gmail threadID
    */
   getThreadID: function() {
     return this._threadRowViewDriver.getThreadID();
+  },
+
+  /**
+  * Gets the Gmail Thread ID of the thread only if the thread ID is expected to stay the
+  * same. Returns null otherwise. It would return null if the thread row is only a draft
+  * that isn't threaded with any messages.
+  * @return {string} the gmail threadID
+  */
+  getThreadIDIfStable: function() {
+    if (this.getVisibleMessageCount() > 0) {
+      return this.getThreadID();
+    } else {
+      return null;
+    }
+  },
+
+  getVisibleDraftCount: function() {
+    return this._threadRowViewDriver.getVisibleDraftCount();
+  },
+
+  getVisibleMessageCount: function() {
+    return this._threadRowViewDriver.getVisibleMessageCount();
   },
 
   /**
