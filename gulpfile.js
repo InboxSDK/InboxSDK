@@ -25,6 +25,7 @@ var exec = require('./src/build/exec');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
+var to5ify = require("6to5ify");
 var execSync = require('exec-sync');
 
 var sdkFilename = 'inboxsdk.js';
@@ -98,6 +99,8 @@ function browserifyTask(name, deps, entry, destname) {
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
       VERSION: getVersion()
+    })).transform(to5ify.configure({
+      blacklist: ["generators"]
     }));
 
     function buildBundle() {
