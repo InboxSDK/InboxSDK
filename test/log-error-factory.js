@@ -7,7 +7,7 @@ describe("logErrorFactory", function() {
   var logError, reporter, consoleMock;
 
   beforeEach(function() {
-    consoleMock = sinon.mock(console)
+    consoleMock = sinon.mock(console);
     reporter = sinon.spy();
     logError = logErrorFactory(reporter);
   });
