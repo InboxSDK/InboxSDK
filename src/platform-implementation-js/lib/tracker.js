@@ -76,10 +76,10 @@ tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
             // otherwise attach it as a property to the original function.
             // This is necessary so that removeEventListener is called with
             // the right function.
-            var loggedFn = args[1].__streak_logged;
+            var loggedFn = args[1].__inboxsdk_logged;
             if (!loggedFn) {
               loggedFn = makeLoggedFunction(args[1], "event listener");
-              args[1].__streak_logged = loggedFn;
+              args[1].__inboxsdk_logged = loggedFn;
             }
             args[1] = loggedFn;
           } catch(e) {
@@ -95,8 +95,8 @@ tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     replaceFunction(ETp, 'removeEventListener', function(original) {
       return function wrappedRemoveEventListener() {
         var args = _.toArray(arguments);
-        if (typeof args[1] == 'function' && args[1].__streak_logged) {
-          args[1] = args[1].__streak_logged;
+        if (typeof args[1] == 'function' && args[1].__inboxsdk_logged) {
+          args[1] = args[1].__inboxsdk_logged;
         }
         return original.apply(this, args);
       };
