@@ -41,6 +41,8 @@ var PlatformImplementation = function(appId, opts){
 	this._driver = new GmailDriver();
 	tracker.setUserEmailAddress(this._driver.getUserEmailAddress());
 
+	tracker.trackAppPassive('load', {appId: appId});
+
 	this.Compose = new Compose(appId, this._driver, this._membraneMap);
 	this.Conversations = new Conversations(appId, this._driver, this._membraneMap);
 	this.User = new User(appId, this._driver, this._membraneMap);
