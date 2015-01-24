@@ -9,7 +9,6 @@ var makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
 
 var tracker = {};
 module.exports = tracker;
-window.tracker = tracker; // TODO temporary
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
