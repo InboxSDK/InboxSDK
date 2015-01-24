@@ -17,6 +17,7 @@ var _appIds = [];
 var _LOADER_VERSION;
 var _IMPL_VERSION;
 var _userEmailHash;
+var _useEventTracking;
 
 var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
 
@@ -41,6 +42,7 @@ tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
   }
   _LOADER_VERSION = LOADER_VERSION;
   _IMPL_VERSION = IMPL_VERSION;
+  _useEventTracking = opts.eventTracking;
 
   if (opts.globalErrorLogging) {
     if (Error.stackTraceLimit < 30) {
@@ -333,6 +335,9 @@ if (_isTrackerMaster) {
 // For tracking app events that are possibly triggered by the user. Extensions
 // can opt out of this with a flag passed to InboxSDK.load().
 tracker.trackAppActive = function(eventName, detail) {
+  if (!_useEventTracking) {
+    return;
+  }
   track('appActive', eventName, detail);
 };
 
@@ -346,7 +351,7 @@ tracker.trackAppPassive = function(eventName, detail) {
 // Track Gmail events.
 tracker.trackGmail = function(eventName, detail) {
   // Only the first InboxSDK extension reports Gmail events.
-  if (!_isTrackerMaster) {
+  if (!_isTrackerMaster || !_useEventTracking) {
     return;
   }
   track('gmail', eventName, detail);

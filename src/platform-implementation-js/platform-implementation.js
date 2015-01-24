@@ -22,7 +22,7 @@ var PlatformImplementation = function(appId, opts){
 	this._appId = appId;
 	opts = _.extend({
 		// defaults
-		globalErrorLogging: true
+		globalErrorLogging: true, eventTracking: true
 	}, opts);
 	this.LOADER_VERSION = opts.VERSION;
 	this.IMPL_VERSION = process.env.VERSION;
