@@ -4,23 +4,12 @@ var RSVP = require('rsvp');
 var sha256 = require('sha256');
 var getStackTrace = require('../../common/get-stack-trace');
 var getExtensionId = require('../../common/get-extension-id');
-
+var PersistentQueue = require('./persistent-queue');
+var makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
 
 var tracker = {};
 module.exports = tracker;
-
-var _sessionId = Date.now()+'-'+Math.random();
-
-// This will only return true for the first InboxSDK extension to load. This
-// first extension is tasked with reporting tracked events to the server.
-var isTrackerMaster = _.once(function() {
-  if (document.head.getAttribute('data-inboxsdk-tracker-master-set')) {
-    return false;
-  } else {
-    document.head.setAttribute('data-inboxsdk-tracker-master-set', true);
-    return true;
-  }
-});
+window.tracker = tracker; // TODO temporary
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -30,6 +19,18 @@ var _IMPL_VERSION;
 var _userEmailHash;
 
 var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
+
+// This will only be true for the first InboxSDK extension to load. This
+// first extension is tasked with reporting tracked events to the server.
+var _isTrackerMaster = false;
+var _sessionId = document.head.getAttribute('data-inboxsdk-session-id');
+if (!_sessionId) {
+  _sessionId = Date.now()+'-'+Math.random();
+  document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+  _isTrackerMaster = true;
+}
+
+var _trackedEventsQueue = new PersistentQueue('events');
 
 // Set up error logging.
 tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
@@ -279,33 +280,53 @@ tracker.setUserEmailAddress = function(userEmailAddress) {
 
 function track(type, eventName, details) {
   console.log('track', type, eventName, details);
-  details = _.extend({
+  var event = {
     type: type,
-    eventName: eventName,
-    timestamp: new Date().getTime()*1000,
-    screenWidth: screen.width,
-    screenHeight: screen.height,
-    windowWidth: window.innerWidth,
-    windowHeight: window.innerHeight,
-    origin: document.location.origin,
-    sessionId: _sessionId,
-    extensionId: getExtensionId(),
-    appIds: _appIds,
-    emailHash: _userEmailHash
-  }, details);
+    event: eventName,
+    properties: _.extend({}, details, {
+      type: type,
+      eventName: eventName,
+      timestamp: new Date().getTime()*1000,
+      screenWidth: screen.width,
+      screenHeight: screen.height,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+      origin: document.location.origin,
+      sessionId: _sessionId,
+      emailHash: _userEmailHash
+    })
+  };
 
-  // TODO queue a bunch before sending
-  var events = [details];
+  if (type != 'gmail') {
+    _.extend(event.properties, {
+      extensionId: getExtensionId(),
+      appIds: _appIds
+    });
+  }
 
-  ajax({
-    url: 'https://events.inboxsdk.com/api/v2/track',
-    method: 'POST',
-    data: {
-      json: JSON.stringify({
+  _trackedEventsQueue.add(event);
+
+  // Signal to the tracker master that a new event is ready to be sent.
+  document.head.setAttribute('data-inboxsdk-last-event', Date.now());
+}
+
+if (_isTrackerMaster) {
+  makeMutationObserverStream(document.head, {
+    attributes: true, attributeFilter: 'data-inboxsdk-last-event'
+  }).map(null).throttle(30*1000).onValue(function() {
+    var events = _trackedEventsQueue.removeAll();
+
+    ajax({
+      url: 'https://events.inboxsdk.com/api/v2/track',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
         data: events,
         clientRequestTimestamp: new Date().getTime()*1000
       })
-    }
+    });
   });
 }
 
@@ -325,7 +346,7 @@ tracker.trackAppPassive = function(eventName, detail) {
 // Track Gmail events.
 tracker.trackGmail = function(eventName, detail) {
   // Only the first InboxSDK extension reports Gmail events.
-  if (!isTrackerMaster()) {
+  if (!_isTrackerMaster) {
     return;
   }
   track('gmail', eventName, detail);
