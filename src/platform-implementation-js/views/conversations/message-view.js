@@ -56,7 +56,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/**
 	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
 	* cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own. Use this method
-	* when you don't have a preview image available and instead want to show the image of a large icon.
+	* when you don't have a preview image available and instead want to show the image of a icon in the thumbnail area instead
 	* @param {AttachmentCardNoPreviewOptions} cardOptions - the configuration of the AttachmentCardView to create
 	* @return {AttachmentCardView}
 	*/
@@ -320,7 +320,19 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* ^default=#BEBEBE
 	* @type {string}
 	*/
-	foldColor:null
+	foldColor:null,
+
+	/**
+	* The mime type of the attachment if it has one. This is used to render image
+	* mime types slightly differently to be consistent with Gmail and Inbox. Specifically,
+	* the <code>previewThumbnailUrl</code> images are rendered full bleed to show as much
+	* of the image as possible. As such the hover UI looks slightly different.
+	*
+	* If null, it is assumed that the attachment is NOT an image mime type
+	* ^optional
+	* ^default=null
+	*/
+	mimeType: null
 };
 
 
@@ -330,6 +342,9 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
+*
+* These options differ from <code>AttachmentCardOptions</code> in that there is no <code>previewThumbnailUrl</code>, instead you use a
+* iconThumbnailUrl to show a generic icon. These are rendered and positioned slightly differently than preview images.
 */
 var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions */{
 
@@ -354,7 +369,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	previewUrl:null,
 
 	/**
-	* A URL to an image representing the icon thumbnail of the attachment card
+	* A URL to an icon to show in the thumbnail area of the attachment card
 	* @type {string}
 	*/
 	iconThumbnailUrl:null,
@@ -407,6 +422,16 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	* @type {function(event)}
 	*/
 	onClick:null,
+
+	/**
+	*	Whether the download action should open in a new tab. It may be useful to open a new tab to perform the download if
+	* for example you want to sometimes redirect the user to a login or permission page. By default, the SDK will attempt
+	* to download the file in the same tab and not open a new one. This is typically a better user experience
+	* ^optional
+	* ^default=false
+	* @type {boolean}
+	*/
+	openInNewTab:null
 };
 
 /**
@@ -431,7 +456,7 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 	* actually downloading which happens automatically.
 	* @type {function(event)}
 	*/
-	onClick:null,
+	onClick:null
 };
 
 
