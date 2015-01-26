@@ -1,7 +1,7 @@
 var assert = require('assert');
 var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
-var Symbol = require('../src/common/symbol');
+var Marker = require('../src/common/marker');
 
 var makeElementViewStream = require('../src/platform-implementation-js/lib/dom/make-element-view-stream');
 var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
@@ -16,7 +16,7 @@ describe('makeElementViewStream', function() {
   });
 
   it('should work with makeElementChildStream', function(done) {
-    var child1 = Symbol('child1'), child2 = Symbol('child2'), child3 = Symbol('child3');
+    var child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     var stopper = new Bacon.Bus();
     var activeViewCount = 0;

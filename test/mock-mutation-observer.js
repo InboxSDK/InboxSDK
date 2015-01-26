@@ -2,6 +2,7 @@ var assert = require('assert');
 var RSVP = require('./lib/rsvp');
 var EventEmitter = require('events').EventEmitter;
 
+// jshint -W079
 var MutationObserver = require('./lib/mock-mutation-observer');
 
 describe('MockMutationObserver', function() {

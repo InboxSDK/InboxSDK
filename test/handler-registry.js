@@ -1,13 +1,13 @@
 var assert = require('assert');
-var Symbol = require('../src/common/symbol');
+var Marker = require('../src/common/marker');
 var Set = require('es6-unweak-collections').Set;
 
 var HandlerRegistry = require('../src/platform-implementation-js/lib/handler-registry');
 
 describe('HandlerRegistry', function() {
   it('handler called on existing targets', function() {
-    var target1 = Symbol('target1');
-    var target2 = Symbol('target2');
+    var target1 = Marker('target1');
+    var target2 = Marker('target2');
 
     var reg = new HandlerRegistry();
     reg.addTarget(target1);
@@ -22,8 +22,8 @@ describe('HandlerRegistry', function() {
   });
 
   it('handler called on new targets', function() {
-    var target1 = Symbol('target1');
-    var target2 = Symbol('target2');
+    var target1 = Marker('target1');
+    var target2 = Marker('target2');
 
     var reg = new HandlerRegistry();
     reg.addTarget(target1);
@@ -48,8 +48,8 @@ describe('HandlerRegistry', function() {
   });
 
   it('handler not called on removed targets', function() {
-    var target1 = Symbol('target1');
-    var target2 = Symbol('target2');
+    var target1 = Marker('target1');
+    var target2 = Marker('target2');
 
     var reg = new HandlerRegistry();
     reg.addTarget(target1);
@@ -67,7 +67,7 @@ describe('HandlerRegistry', function() {
   });
 
   it('handler can unsubscribe', function() {
-    var target1 = Symbol('target1');
+    var target1 = Marker('target1');
 
     var reg = new HandlerRegistry();
 
