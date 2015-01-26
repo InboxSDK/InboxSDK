@@ -49,7 +49,7 @@
   "private": true,
   "scripts": {
     "start": "gulp default --single --watch --reloader",
-    "test": "mocha"
+    "test": "gulp test"
   },
   "version": "0.7.6"
 }
