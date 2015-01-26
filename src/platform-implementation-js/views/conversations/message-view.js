@@ -54,9 +54,9 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 
 	/**
-	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
-	* cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own. Use this method
-	* when you don't have a preview image available and instead want to show the image of a icon in the thumbnail area instead
+	* Adds an <code>AttachmentCardView</code> to the message. Using this method instead of <code>addAttachmentCardView</code>
+	* indicates to the SDK that you don't have a preview image available and instead want to show the image of a icon in the
+	* thumbnail area instead. The SDK will then render this appropriately.
 	* @param {AttachmentCardNoPreviewOptions} cardOptions - the configuration of the AttachmentCardView to create
 	* @return {AttachmentCardView}
 	*/
