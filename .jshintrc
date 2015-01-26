@@ -1,6 +1,7 @@
 {
   "node": true,
   "browser": true,
+  "esnext": true,
   "-W041": true, // Use '===' to compare with 'null'.
   "-W049": true, // Unexpected escaped character '<' in regular expression.
   "-W069": true // "better written in dot notation"

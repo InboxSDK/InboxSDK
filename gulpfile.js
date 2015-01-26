@@ -100,6 +100,7 @@ function browserifyTask(name, deps, entry, destname) {
         'http://localhost:4567/platform-implementation.js',
       VERSION: getVersion()
     })).transform(to5ify.configure({
+      optional: ["coreAliasing"],
       blacklist: ["generators"]
     }));
 
