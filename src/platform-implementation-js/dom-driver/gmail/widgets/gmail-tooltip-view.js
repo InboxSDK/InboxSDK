@@ -74,10 +74,10 @@ _.extend(GmailTooltipView.prototype, {
 							//image goes here
 						'</div>',
 						'<div class="aRR">',
-							_.escape(options.title),
+							_.escape(options.title || ""),
 						'</div>',
 						'<div class="aRQ">',
-							_.escape(options.subtitle),
+							_.escape(options.subtitle || ""),
 						'</div>',
 						'<div class="inboxsdk__tooltip_button">',
 							//button goes here

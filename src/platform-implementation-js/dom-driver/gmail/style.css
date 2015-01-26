@@ -623,3 +623,19 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end tooltip */
+
+
+/* attachment card */
+
+.inboxsdk__attachmentCard img.aQG.aYB {
+  max-width: 178px;
+  min-width: 178px;
+  max-height: 118px;
+  min-height: 118px;
+}
+
+.inboxsdk__attachmentCard img.aZG.aYw {
+  background: none;
+}
+
+/* end attachment card */

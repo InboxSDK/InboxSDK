@@ -127,18 +127,33 @@ _.extend(GmailAttachmentCardView.prototype, {
 		this._element.classList.add('aZo');
 		this._element.classList.add('inboxsdk__attachmentCard');
 
-		this._element.innerHTML = [
+		var htmlArray = [
 			'<a target="_blank" role="link" class="aQy e" href="">',
 				'<div aria-hidden="true">',
 					'<div class="aSG"></div>',
 					'<div class="aVY aZn">',
 						'<div class="aZm"></div>',
 					'</div>',
-					'<div class="aSH">',
-						'<img class="aQG aYB" src="">',
+					'<div class="aSH">'
+		];
+
+		if(options.iconThumbnailUrl){
+			htmlArray = htmlArray.concat([
+				'<div class="aYv">',
+					'<img class="aZG aYw" src="' + options.iconThumbnailUrl + '">',
+				'</div>'
+			]);
+		}
+		else{
+			htmlArray = htmlArray.concat([
+				'<img class="aQG aYB" src="' +  options.previewThumbnailUrl + '">'
+			]);
+		}
+
+		htmlArray = htmlArray.concat([
 						'<div class="aYy">',
 							'<div class="aYA">',
-								'<img class="aSM" src="">',
+								'<img class="aSM" src="' + options.fileIconImageUrl + '">',
 							'</div>',
 							'<div class="aYz">',
 								'<div class="a12">',
@@ -159,11 +174,17 @@ _.extend(GmailAttachmentCardView.prototype, {
 			'</a>',
 			'<div class="aQw">',
 			'</div>'
-		].join('');
+		]);
+
+		this._element.innerHTML = htmlArray.join('');
 
 		this._element.children[0].href = options.previewUrl;
-		this._element.querySelector('img.aYB').src = options.previewThumbnailUrl;
-		this._element.querySelector('img.aSM').src = options.fileIconImageUrl;
+
+		if(options.mimeType && options.mimeType.split('/')[0] === 'image'){
+			this._element.children[0].classList.add('aZI');
+		}
+
+
 		this._element.querySelector('span .aV3').textContent = options.title;
 		this._element.querySelector('div.aYp > span').textContent = options.description || '';
 		this._element.querySelector('div.aSJ').style.borderColor = options.foldColor;
@@ -245,6 +266,10 @@ _.extend(GmailAttachmentCardView.prototype, {
 					e.stopImmediatePropagation();
 					e.stopPropagation();
 				}, true);
+
+				if(options.openInNewTab){
+					downloadLink.setAttribute('target', '_blank');
+				}
 
 				document.body.appendChild(downloadLink);
 

@@ -46,9 +46,26 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {AttachmentCardView}
 	*/
 	addAttachmentCardView: function(cardOptions){
-		memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
+		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
+		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver);
+
+		return attachmentCardView;
 	},
 
+
+	/**
+	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
+	* cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own. Use this method
+	* when you don't have a preview image available and instead want to show the image of a large icon.
+	* @param {AttachmentCardNoPreviewOptions} cardOptions - the configuration of the AttachmentCardView to create
+	* @return {AttachmentCardView}
+	*/
+	addAttachmentCardViewNoPreview: function(cardOptions){
+		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCardNoPreview(cardOptions);
+		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver);
+
+		return attachmentCardView;
+	},
 
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
@@ -275,6 +292,72 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* @type {string}
 	*/
 	previewThumbnailUrl:null,
+
+	/**
+	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
+	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
+	* one property - <code>attachmentCardView</code>. It also has a <code>preventDefault()</code> function. Calling
+	* this function prevents the preview from opening in a new window.
+	* @type {function(event)}
+	*/
+	previewOnClick:null,
+
+	/**
+	* The url of the icon of the attachment
+	* @type {boolean}
+	*/
+	fileIconImageUrl:null,
+
+	/**
+	* An array of buttons to support functionality in addition to the preview functionality
+	* @type {DownloadButtonDescriptor[]|CustomButtonDescriptor[]}
+	*/
+	buttons:null,
+
+	/**
+	* The color of the attachment card fold and an accompying accent color
+	* ^optional
+	* ^default=#BEBEBE
+	* @type {string}
+	*/
+	foldColor:null
+};
+
+
+/**
+* @class
+* This type is required by the <code>MessageView.addAttachmentCardNoPreview</code> method to insert an <code>AttachmentCardView</code>
+* for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
+* 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
+* show you YouTube attachment cards for any YouTube links present in an email.
+*/
+var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions */{
+
+	/**
+	* The title of the attachment card. Typically a filename is set here.
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* A description of the attachment card displayed subtly
+	* @type {string}
+	*/
+	description:null,
+
+	/**
+	* The url of an "open" or "preview" action for this attachment. The attachment cards primary action (clicking on the card)
+	* takes the user in a new window to the URL specified here. This is also the URL used if the user right clicks and copies
+	* the link address
+	* @type {string}
+	*/
+	previewUrl:null,
+
+	/**
+	* A URL to an image representing the icon thumbnail of the attachment card
+	* @type {string}
+	*/
+	iconThumbnailUrl:null,
 
 	/**
 	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
