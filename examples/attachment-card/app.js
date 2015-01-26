@@ -19,7 +19,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 		});
 
 
-		messageView.addAttachmentCardView({
+		var attachmentCard = messageView.addAttachmentCardView({
 
 			title: 'Test file',
 			description: 'Test description 2',
