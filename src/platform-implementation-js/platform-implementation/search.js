@@ -16,6 +16,11 @@ var Search = function(appId, driver){
 
 _.extend(Search.prototype,  {
 
+	registerSearchAutoCompleter: function(handler) {
+		var members = memberMap.get(this);
+		members.driver.registerSearchAutocompleter(handler);
+	},
+
 	registerSearchQueryRewriter: function(obj) {
 		if (typeof obj.termReplacer != 'function' || typeof obj.term != 'string') {
 			throw new Error("Incorrect arguments");

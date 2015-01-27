@@ -60,6 +60,14 @@ var GmailElementGetter = {
 		return document.querySelectorAll('[gh=tl]');
 	},
 
+	getSearchInput: function() {
+		return document.getElementById('gbqfq');
+	},
+
+	getSearchSuggestions: function() {
+		return document.getElementById('gs_sbt50');
+	},
+
 	getToolbarElementContainer: function(){
 		return document.querySelector('[gh=tm]').parentElement;
 	},
