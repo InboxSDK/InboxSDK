@@ -7,18 +7,29 @@ var GmailTooltipView = require('../../widgets/gmail-tooltip-view');
 function addTooltipToButton(gmailComposeView, buttonViewController, buttonDescriptor, tooltipDescriptor){
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
+	var tooltipStopperStream = gmailTooltipView.getEventStream().filter(false).mapEnd();
 
 	document.body.appendChild(gmailTooltipView.getElement());
 
 	_anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
 
 	gmailComposeView.getEventStream()
-					.takeUntil(gmailTooltipView.getEventStream().filter(false).mapEnd())
+					.takeUntil(tooltipStopperStream)
 					.filter(function(event){
 						return event.eventName === 'buttonAdded' || event.eventName === 'composeFullscreenStateChanged';
 					})
 					.debounce(10)
 					.onValue(_anchorTooltip, gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
+
+	buttonViewController
+		.getView()
+		.getEventStream()
+		.takeUntil(tooltipStopperStream)
+		.filter(function(event){
+			return event.eventName === 'click';
+		})
+		.onValue(gmailTooltipView, 'destroy');
+
 
 	var stoppedIntervalStream = Bacon.interval(50).takeUntil(gmailTooltipView.getEventStream().filter(false).mapEnd());
 
