@@ -110,12 +110,14 @@ _.extend(GmailTooltipView.prototype, {
 		if(options.button){
 			var buttonOptions = _.clone(options.button);
 
-			buttonOptions.color = 'blue';
+			buttonOptions.buttonColor = 'blue';
 
 			var oldOnClick = buttonOptions.onClick;
 			buttonOptions.onClick = function(){
 				self.destroy();
-				oldOnClick();
+				if(oldOnClick){
+					oldOnClick();
+				}
 			};
 
 			buttonOptions.buttonView = new ButtonView(buttonOptions);
