@@ -17,8 +17,11 @@ function makeElementChildStream(element) {
     function removedEl(el) {
       var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
-      removalStream.push(null);
-      removalStream.end();
+
+      if(removalStream){
+        removalStream.push(null);
+        removalStream.end();
+      }
     }
 
     var observer = new MutationObserver(function(mutations) {
