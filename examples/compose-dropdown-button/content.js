@@ -18,5 +18,9 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 			section: 'TRAY_LEFT'
 		});
 
+		composeView.on('presending', function(event){
+			event.cancel();
+		});
+
 	});
 });
