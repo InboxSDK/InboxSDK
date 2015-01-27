@@ -35,7 +35,12 @@ var GmailElementGetter = {
 
 	getContentSectionElement: function(){
 		var leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
-		return leftNavContainer.nextElementSibling.children[0];
+		if(leftNavContainer){
+			return leftNavContainer.nextElementSibling.children[0];
+		}
+		else{
+			return null;
+		}
 	},
 
 	getMainContentContainer: function(){
