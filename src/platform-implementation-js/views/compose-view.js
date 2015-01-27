@@ -266,7 +266,21 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
-	* Fires when the user presses send.
+	* Fires when the user presses send. The event object contains a <code>composeView</code> property
+	* that can be used to modify anything before the message actually starts sending. Note that
+	* multiple applications may modify the message.
+	*
+	* The presending event is also canceallable by calling <code>cancel</code> on the event object.
+	* This will prevent the message from being sent. This event is the only one which allows you to
+	* modify or cancel the sent message.
+	* @event ComposeView#presending
+	*/
+
+	/**
+	* Fires when an AJAX request to Gmail/Inbox has been initiated but the response has not yet been
+	* received. The event object contains a <code>composeView</code> property, however, any modifications
+	* you make will not have an effect as the AJAX request has already been sent. You'd typically use this
+	* event to record stats about what messages are being sent.
 	* @event ComposeView#sending
 	*/
 
