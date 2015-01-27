@@ -7,10 +7,7 @@ var simulateClick = require('../../../../lib/dom/simulate-click');
 var setValueAndDispatchEvent = require('../../../../lib/dom/set-value-and-dispatch-event');
 
 function insertLinkIntoBody(gmailComposeView, text, href){
-	return new RSVP.Promise(function(resolve, reject){
-		_insertLinkIntoBody(gmailComposeView, text, href);
-		resolve();
-	});
+	return _insertLinkIntoBody(gmailComposeView, text, href);
 }
 
 function _insertLinkIntoBody(gmailComposeView, text, href){
