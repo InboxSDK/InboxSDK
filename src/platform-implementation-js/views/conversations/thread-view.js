@@ -40,6 +40,11 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	addSidebarContentPanel: function(descriptor){
 		var descriptorPropertyStream = baconCast(Bacon, descriptor).toProperty();
 		var members = memberMap.get(this);
+
+		if(!members){
+			return null;
+		}
+
 		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);

@@ -11,8 +11,9 @@ module.exports = function(gmailComposeView){
         })
     ).takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
     .debounceImmediate(10).onValue(function(event){
-        if(document.getSelection() && document.getSelection().rangeCount > 0){
-            gmailComposeView.setSelectionRange(document.getSelection().getRangeAt(0));
+        var selection = document.getSelection();
+        if(selection && selection.rangeCount > 0 && body.contains(selection.anchorNode)){
+            gmailComposeView.setSelectionRange(selection.getRangeAt(0));
         }
         else{
             gmailComposeView.setSelectionRange(null);

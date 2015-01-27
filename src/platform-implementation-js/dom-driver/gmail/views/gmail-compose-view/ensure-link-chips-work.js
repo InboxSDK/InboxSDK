@@ -105,6 +105,9 @@ function _addEnhancements(chipElement){
     chipElement.contentEditable = false;
     chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
     chipElement._linkChipEnhancedByThisExtension = true;
+
+    chipElement._previousSpacerTextNode = chipElement.previousSibling;
+    chipElement._nextSpacerTextNode = chipElement.nextSibling;
 }
 
 function _fixupCursor(gmailComposeView){
@@ -247,7 +250,9 @@ function _checkChipZSpaceSharing(gmailComposeView){
 }
 
 function _checkAndRemoveBrokenChip(gmailComposeView, chipElement){
-    /* purposefully doesn't handle ambiguous case where you have Z_SPACE linkChip Z_SPACE linkChip Z_SPACE */
+    _fixupBlockquotes(chipElement);
+    _fixupStyling(chipElement);
+    _fixupTriggerZones(chipElement);
     var brokenModes = _getBrokenModes(chipElement);
 
     if(brokenModes.length > 0){
@@ -255,37 +260,134 @@ function _checkAndRemoveBrokenChip(gmailComposeView, chipElement){
     }
 }
 
+function _fixupBlockquotes(chipElement){
+    //our text nodes have a previous and next sibling, so it's not the blockquote case
+    if(chipElement._previousSpacerTextNode.nextSibling || chipElement._nextSpacerTextNode.previousSibling){
+        return;
+    }
+
+    chipElement.insertAdjacentText('beforebegin', Z_SPACE_CHAR);
+    chipElement.insertAdjacentText('afterend', Z_SPACE_CHAR);
+
+    chipElement._previousSpacerTextNode = chipElement.previousSibling;
+    chipElement._nextSpacerTextNode = chipElement.nextSibling;
+}
+
+function _fixupStyling(chipElement){
+    chipElement.setAttribute('style', 'width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);');
+}
+
+function _fixupTriggerZones(chipElement){
+    var inNonTextNode = false;
+    var children;
+    var ii;
+    var newTextNode;
+
+    var previousSibling = chipElement.previousSibling;
+    for(ii=0; ii<10000; ii++){
+        if(!previousSibling){
+            break;
+        }
+
+        if(previousSibling.nodeType === Node.TEXT_NODE){
+            if(previousSibling.nodeValue.charAt(previousSibling.nodeValue.length - 1) === Z_SPACE_CHAR){
+                if(inNonTextNode){
+                    previousSibling.nodeValue = previousSibling.nodeValue.substring(0, previousSibling.nodeValue.length - 1);
+                    chipElement.insertAdjacentText('beforebegin', Z_SPACE_CHAR);
+                }
+            }
+            break;
+        }
+
+        children = previousSibling.childNodes;
+        if(children.length ===  0){
+            break;
+        }
+
+        previousSibling = children[children.length - 1];
+        inNonTextNode = true;
+    }
+
+    inNonTextNode = false;
+    var nextSibling = chipElement.nextSibling;
+    for(ii=0; ii<10000; ii++){
+        if(!nextSibling){
+            break;
+        }
+
+        if(nextSibling.nodeType === Node.TEXT_NODE){
+            if(nextSibling.nodeValue.charAt(0) === Z_SPACE_CHAR){
+                if(inNonTextNode){
+                    nextSibling.nodeValue = nextSibling.nodeValue.substring(1);
+                    chipElement.insertAdjacentText('afterend', Z_SPACE_CHAR);
+                }
+            }
+
+            break;
+        }
+
+        children = nextSibling.childNodes;
+        if(children.length ===  0){
+            break;
+        }
+
+        inNonTextNode = true;
+        nextSibling = children[0];
+    }
+}
+
+/* purposefully doesn't handle ambiguous case where you have Z_SPACE linkChip Z_SPACE linkChip Z_SPACE */
 function _getBrokenModes(chipElement){
     var brokenModes = [];
-    if(chipElement.previousSibling){
-        if(chipElement.previousSibling.nodeType === Node.TEXT_NODE){
-            if(chipElement.previousSibling.nodeValue.charAt(chipElement.previousSibling.length - 1) !== Z_SPACE_CHAR){
+    var children;
+    var ii;
+
+    var previousSibling = chipElement.previousSibling;
+    for(ii=0; ii<10000; ii++){
+        if(!previousSibling){
+            brokenModes.push('MISSING_PREVIOUS_SIBLING');
+            break;
+        }
+
+        if(previousSibling.nodeType === Node.TEXT_NODE){
+            if(previousSibling.nodeValue.charAt(previousSibling.length - 1) !== Z_SPACE_CHAR){
                 brokenModes.push('PREVIOUS_SIBLING_MISSING_Z_SPACE_CHAR');
             }
+            break;
         }
-        else{
-            brokenModes.push('PREVIOUS_SIBLING_NOT_TEXT_NODE');
+
+        children = previousSibling.childNodes;
+        if(children.length ===  0){
+            brokenModes.push('MISSING_PREVIOUS_SIBLING');
+            break;
         }
-    }
-    else{
-        brokenModes.push('MISSING_PREVIOUS_SIBLING');
+
+        previousSibling = children[children.length - 1];
     }
 
-    if(chipElement.nextSibling){
-        if(chipElement.nextSibling.nodeType === Node.TEXT_NODE){
-            if(chipElement.nextSibling.nodeValue.charAt(0) !== Z_SPACE_CHAR){
+    var nextSibling = chipElement.nextSibling;
+    for(ii=0; ii<10000; ii++){
+        if(!nextSibling){
+            brokenModes.push('MISSING_NEXT_SIBLING');
+            break;
+        }
+
+        if(nextSibling.nodeType === Node.TEXT_NODE){
+            if(nextSibling.nodeValue.charAt(0) !== Z_SPACE_CHAR){
                 brokenModes.push('NEXT_SIBLING_MISSING_Z_SPACE_CHAR');
             }
-        }
-        else{
-            brokenModes.push('NEXT_SIBLING_NOT_TEXT_NODE');
-        }
-    }
-    else{
-        brokenModes.push('MISSING_NEXT_SIBLING');
-    }
 
+            break;
+        }
 
+        children = nextSibling.childNodes;
+        if(children.length ===  0){
+            brokenModes.push('MISSING_NEXT_SIBLING');
+            break;
+        }
+
+        nextSibling = children[0];
+    }
 
     return brokenModes;
 }
