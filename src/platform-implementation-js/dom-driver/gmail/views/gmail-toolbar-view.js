@@ -25,7 +25,7 @@ var GmailToolbarView = function(element, routeViewDriver){
 	var self = this;
 	this._ready = waitFor(function(){
 		// Resolve if we're destroyed, so that this waitFor doesn't ever wait forever.
-		return !self._element || !!self._getArchiveSectionElement();
+		return !self._element || !!self._getMoveSectionElement();
 	}).then(function(){
 		return self;
 	});
@@ -141,7 +141,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_determineToolbarState: function(){
-		var sectionElement = this._getArchiveSectionElement();
+		var sectionElement = this._getMoveSectionElement();
 
 		if(sectionElement.style.display === 'none'){
 			this._toolbarState = 'COLLAPSED';
@@ -152,7 +152,7 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_determineToolbarIconMode: function(){
-		var sectionElement = this._getArchiveSectionElement();
+		var sectionElement = this._getMoveSectionElement();
 		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.length  === 0){
 			this._element.setAttribute('data-toolbar-icononly', 'true');
 		}
@@ -175,7 +175,7 @@ _.extend(GmailToolbarView.prototype, {
 		});
 
 		this._classMutationObsever.observe(
-			this._getArchiveSectionElement(),
+			this._getMoveSectionElement(),
 			{attributes: true, attributeFilter: ['style']}
 		);
 	},
