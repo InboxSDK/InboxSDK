@@ -29,7 +29,7 @@ PersistentQueue.prototype._clearSavedQueue = function() {
 
 PersistentQueue.prototype.add = function(val) {
   var success = false;
-  if (window.localStorage) {
+  if (global.localStorage) {
     try {
       var queue = this._getSavedQueue();
       queue.push(val);
@@ -44,7 +44,7 @@ PersistentQueue.prototype.add = function(val) {
 
 PersistentQueue.prototype.remove = function() {
   var ret;
-  if (window.localStorage) {
+  if (global.localStorage) {
     try {
       var queue = this._getSavedQueue();
       var tmpRet = queue.shift();
@@ -62,7 +62,7 @@ PersistentQueue.prototype.remove = function() {
 
 PersistentQueue.prototype.removeAll = function() {
   var ret;
-  if (window.localStorage) {
+  if (global.localStorage) {
     try {
       var queue = this._getSavedQueue();
       this._clearSavedQueue();
@@ -79,7 +79,7 @@ PersistentQueue.prototype.removeAll = function() {
 
 PersistentQueue.prototype.peekAll = function() {
   var ret;
-  if (window.localStorage) {
+  if (global.localStorage) {
     try {
       ret = this._getSavedQueue();
     } catch (e) {}
@@ -92,7 +92,7 @@ PersistentQueue.prototype.peekAll = function() {
 };
 
 PersistentQueue.prototype.clear = function() {
-  if (window.localStorage) {
+  if (global.localStorage) {
     try {
       this._clearSavedQueue();
     } catch (e) {}
