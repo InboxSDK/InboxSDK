@@ -6,6 +6,8 @@ var simulateHover = require('../../../../lib/dom/simulate-hover');
 var isKeyboardKey = require('../../../../lib/dom/is-keyboard-key');
 var not = require('../../../../lib/not');
 
+var keyboardShortcutStream = require('../../../../lib/dom/keyboard-shortcut-stream');
+
 var BUTTON_COLOR_CLASSES = require('./button-color-classes');
 
 /*
@@ -33,7 +35,7 @@ var ButtonView = function(options){
 	this._createElement(options);
 
 	this._eventStream = new Bacon.Bus();
-	this._setupEventStream();
+	this._setupEventStream(options);
 	this._setupAestheticEvents();
 };
 
@@ -282,7 +284,7 @@ _.extend(ButtonView.prototype, {
 		}
 	},
 
-	_setupEventStream: function(){
+	_setupEventStream: function(options){
 		var self = this;
 
 		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
@@ -318,6 +320,19 @@ _.extend(ButtonView.prototype, {
 			event.stopPropagation();
 			event.preventDefault();
 		});
+
+
+		if(options.keyboardShortcutHandle){
+			this._eventStream.plug(
+				keyboardShortcutStream(options.keyboardShortcutHandle.chord).map(function(domEvent){
+					return {
+						eventName: 'click',
+						domEvent: domEvent
+					};
+				})
+			);
+		}
+
 	},
 
 	_setupAestheticEvents: function(){

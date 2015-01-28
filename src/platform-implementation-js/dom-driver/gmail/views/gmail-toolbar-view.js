@@ -186,13 +186,10 @@ _.extend(GmailToolbarView.prototype, {
 		}
 
 		switch(sectionName){
-			case toolbarSections.CHECKBOX:
-				return this._getCheckboxSectionElement();
-
-			case toolbarSections.ARCHIVE:
+			case toolbarSections.INBOX_STATE:
 				return this._getArchiveSectionElement();
 
-			case toolbarSections.MOVE:
+			case toolbarSections.METADATA_STATE:
 				return this._getMoveSectionElement();
 
 			default:
