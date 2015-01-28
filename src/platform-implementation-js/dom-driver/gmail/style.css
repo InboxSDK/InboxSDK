@@ -674,3 +674,43 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end attachment card */
+
+
+/* keyboard shortcut help */
+
+table.cf.wd.inboxsdk__shortcutHelp_table {
+  margin-bottom: 15px;
+}
+
+.inboxsdk__shortcutHelp_table td.Dn {
+  display: inline-block;
+  width: 50%;
+}
+
+.inboxsdk__shortcutHelp_table table.cf {
+  display: block;
+}
+
+.inboxsdk__shortcutHelp_table tbody tbody {
+  display: block;
+}
+
+.inboxsdk__shortcutHelp_table tbody tbody tr {
+  display: block;
+  white-space: nowrap;
+}
+
+.inboxsdk__shortcutHelp_table td.wg.Dn {
+  display: inline-block;
+  width: 45%;
+}
+
+.inboxsdk__shortcutHelp_table span.wb {
+  margin-left: 3px;
+}
+
+.inboxsdk__shortcutHelp_table td.we.Dn {
+  width: 60%;
+}
+
+/* end keyboard shortcut help */

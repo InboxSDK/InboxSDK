@@ -84,6 +84,7 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		var index = 0;
 		this._shortcuts.forEach(function(shortcutDescriptor){
 			self._renderShortcut(bodies[index % 2], shortcutDescriptor);
+			index++;
 		});
 
 		var firstHeader = node.querySelector('.aov');
@@ -97,7 +98,7 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		header.innerHTML = [
 			'<div class="aow">',
 				'<span class="inboxsdk__shortcutHelp_title">',
-					_.escape(this._appId),
+					_.escape(this._appId) + ' keyboard shortcuts',
 				'</span>',
 			'</div>'
 		].join('');
@@ -117,20 +118,20 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 	_renderTable: function(){
 		var table = document.createElement('table');
 		table.setAttribute('cellpadding', '0');
-		table.setAttribute('class', 'cf wd');
+		table.setAttribute('class', 'cf wd inboxsdk__shortcutHelp_table');
 
 		table.innerHTML = [
 			'<tbody>',
 				'<tr>',
 					'<td class="Dn">',
-						'<table cellpadding="0" class="cf" style="table-layout: fixed;">',
+						'<table cellpadding="0" class="cf">',
 							'<tbody>',
 								'<tr><th>&nbsp;</th><th>&nbsp;</th></tr>',
 							'</tbody>',
 						'</table>',
 					'</td>',
 					'<td class="Dn">',
-						'<table cellpadding="0" class="cf" style="table-layout: fixed;">',
+						'<table cellpadding="0" class="cf">',
 							'<tbody>',
 								'<tr><th>&nbsp;</th><th>&nbsp;</th></tr>',
 							'</tbody>',
@@ -149,7 +150,7 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 			'<td class="wg Dn"> ',
 				_getShortcutHTML(shortcutDescriptor.chord),
 			'</td>',
-			'<td class="wg Dn"> ',
+			'<td class="we Dn"> ',
 				_.escape(shortcutDescriptor.description || ""),
 			'</td>'
 		].join('');
@@ -166,13 +167,27 @@ function _getShortcutHTML(chord){
 	var separators = chord.match(/[\s+]/g);
 
 	for(var ii=0; ii<parts.length; ii++){
-		retArray.push('<span class="wh">' + _.escape(parts[ii]) + '</span>');
+		retArray.push('<span class="wh">' + _.escape(_getAngledBracket(parts[ii])) + '</span>');
 		retArray.push(_getSeparatorHTML(separators[ii]));
 	}
 
 	retArray.push(' :');
 
 	return retArray.join('');
+}
+
+function _getAngledBracket(chordChar){
+	switch(chordChar.toLowerCase()){
+		case 'shift':
+			return '<Shift>';
+		case 'ctrl':
+			return '<Ctrl>';
+		case 'meta':
+		case 'command':
+			return '<⌘>';
+		default:
+			return chordChar;
+	}
 }
 
 function _getSeparatorHTML(separator){
