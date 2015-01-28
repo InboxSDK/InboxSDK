@@ -7,8 +7,8 @@ var getExtensionId = require('../../common/get-extension-id');
 var PersistentQueue = require('./persistent-queue');
 var makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
 
-var tracker = {};
-module.exports = tracker;
+var logger = {};
+module.exports = logger;
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -22,18 +22,18 @@ var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
 
 // This will only be true for the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
-var _isTrackerMaster = false;
+var _isLoggerMaster = false;
 var _sessionId = document.head.getAttribute('data-inboxsdk-session-id');
 if (!_sessionId) {
   _sessionId = Date.now()+'-'+Math.random();
   document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
-  _isTrackerMaster = true;
+  _isLoggerMaster = true;
 }
 
 var _trackedEventsQueue = new PersistentQueue('events');
 
 // Set up error logging.
-tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
+logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
   _appIds.push(appId);
   if (_LOADER_VERSION) {
     // If we've been set up before, don't do it all again.
@@ -49,7 +49,7 @@ tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     }
 
     RSVP.on('error', function(err) {
-      tracker.logError(err, "Possibly uncaught promise rejection");
+      logger.logError(err, "Possibly uncaught promise rejection");
     });
 
     window.addEventListener('error', function(event) {
@@ -57,7 +57,7 @@ tracker.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
       // this, we can remove the logged function wrappers around setTimeout and
       // things.
       if (event.error) {
-        tracker.logError(event.error, "Uncaught exception");
+        logger.logError(event.error, "Uncaught exception");
       }
     });
 
@@ -186,7 +186,7 @@ function tooManyErrors(err2, originalArgs) {
 }
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
-tracker.logError = function(err, details) {
+logger.error = function(err, details) {
   var args = arguments;
 
   // It's important that we can't throw an error or leave a rejected promise
@@ -259,7 +259,7 @@ function makeLoggedFunction(func, name) {
       return func.apply(this, arguments);
     } catch (err) {
       var msg = name ? "Uncaught error in "+name : "Uncaught error";
-      tracker.logError(err, msg);
+      logger.logError(err, msg);
       throw err;
     }
   };
@@ -275,12 +275,20 @@ function hash(str) {
   return sha256('inboxsdk:'+str);
 }
 
-tracker.setUserEmailAddress = function(userEmailAddress) {
+logger.setUserEmailAddress = function(userEmailAddress) {
   _userEmailHash = hash(userEmailAddress);
 };
 
 function track(type, eventName, details) {
-  console.log('track', type, eventName, details);
+  if (typeof type != 'string') {
+    throw new Error("type must be string: "+type);
+  }
+  if (typeof eventName != 'string') {
+    throw new Error("eventName must be string: "+eventName);
+  }
+  if (details && typeof details != 'object') {
+    throw new Error("details must be object or null: "+details);
+  }
   var event = {
     type: type,
     event: eventName,
@@ -307,11 +315,11 @@ function track(type, eventName, details) {
 
   _trackedEventsQueue.add(event);
 
-  // Signal to the tracker master that a new event is ready to be sent.
+  // Signal to the logger master that a new event is ready to be sent.
   document.head.setAttribute('data-inboxsdk-last-event', Date.now());
 }
 
-if (_isTrackerMaster) {
+if (_isLoggerMaster) {
   makeMutationObserverStream(document.head, {
     attributes: true, attributeFilter: 'data-inboxsdk-last-event'
   }).map(null).throttle(30*1000).onValue(function() {
@@ -331,26 +339,31 @@ if (_isTrackerMaster) {
   });
 }
 
+// Should only be used by the InboxSDK users for their own app events.
+logger.eventApp = function(eventName, detail) {
+  track('app', eventName, detail);
+};
+
 // For tracking app events that are possibly triggered by the user. Extensions
 // can opt out of this with a flag passed to InboxSDK.load().
-tracker.trackAppActive = function(eventName, detail) {
+logger.eventSdkActive = function(eventName, detail) {
   if (!_useEventTracking) {
     return;
   }
-  track('appActive', eventName, detail);
+  track('sdkActive', eventName, detail);
 };
 
 // Track events unrelated to user activity about how the app uses the SDK.
 // Examples include the app being initialized, and calls to any of the
 // register___ViewHandler functions.
-tracker.trackAppPassive = function(eventName, detail) {
-  track('appPassive', eventName, detail);
+logger.eventSdkPassive = function(eventName, detail) {
+  track('sdkPassive', eventName, detail);
 };
 
 // Track Gmail events.
-tracker.trackGmail = function(eventName, detail) {
+logger.eventGmail = function(eventName, detail) {
   // Only the first InboxSDK extension reports Gmail events.
-  if (!_isTrackerMaster || !_useEventTracking) {
+  if (!_isLoggerMaster || !_useEventTracking) {
     return;
   }
   track('gmail', eventName, detail);
