@@ -157,7 +157,7 @@ function deserialize(threadResponseString) {
 }
 exports.deserialize = deserialize;
 
-function serialize(threadResponseArray, dontIncludeNumbers) {
+function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
   if(!threadResponseArray){
     return '';
   }
@@ -185,26 +185,41 @@ function serialize(threadResponseArray, dontIncludeNumbers) {
 
   return response;
 }
-exports.serialize = serialize;
+exports.threadListSerialize = threadListSerialize;
+
+function suggestionSerialize(suggestionsArray) {
+  var response = "5\n)]}'\n";
+  for(var ii=0; ii<suggestionsArray.length; ii++){
+    var arraySection = suggestionsArray[ii];
+    var arraySectionString = serializeArray(arraySection);
+
+    var length = arraySectionString.length;
+    response += length + '\r\n' + arraySectionString;
+  }
+
+  return response;
+}
+exports.suggestionSerialize = suggestionSerialize;
+
 
 function serializeArray(array) {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
 
-    var addition = '';
+    var addition;
     if(_.isArray(item)){
       addition = serializeArray(item);
     }
-    else if(item == null){
+    else if(item == null) {
       addition = '';
     }
     else {
-      addition = JSON.stringify(item);
-      addition = addition.replace(/\</igm, '\\u003c')
-      .replace(/\=/igm, '\\u003d')
-      .replace(/\>/igm, '\\u003e')
-      .replace(/\&/igm, '\\u0026');
+      addition = JSON.stringify(item)
+        .replace(/</igm, '\\u003c')
+        .replace(/=/igm, '\\u003d')
+        .replace(/>/igm, '\\u003e')
+        .replace(/&/igm, '\\u0026');
     }
 
     if(ii > 0){
@@ -218,59 +233,6 @@ function serializeArray(array) {
   return response;
 }
 exports.serializeArray = serializeArray;
-
-function replaceThreadsInResponse(originalResponse, threads) {
-  var doesResponseUseFormatWithSectionNumbers = _doesResponseUseFormatWithSectionNumbers(originalResponse);
-
-  var originalResponseArray = deserialize(originalResponse);
-  var modifiedResponseArray = _newReplaceThreads(originalResponseArray, threads);
-
-
-  var modifiedResponse = serialize(modifiedResponseArray, !doesResponseUseFormatWithSectionNumbers);
-
-  return modifiedResponse;
-}
-exports.replaceThreadsInResponse = replaceThreadsInResponse;
-
-function _newReplaceThreads(originalResponseArray, replacementThreads){
-  var ii;
-  var threadsUsed = 0;
-  var originalThreads = _extractThreadArraysFromResponseArray(originalResponseArray);
-
-  var replacementThreadIds = {};
-  for(ii=0; ii<replacementThreads.length; ii++){
-    replacementThreadIds[replacementThreads[ii][0]] = true;
-  }
-
-  var originalThreadToReuse;
-  for(ii=0; ii<originalThreads.length; ii++){
-    if(!replacementThreadIds[originalThreads[ii][0]]){
-      originalThreadToReuse = _.clone(originalThreads[ii]);
-      originalThreadToReuse[7] = originalThreadToReuse[7].replace('<span', '<span streakhiderow="true"');
-      originalThreadToReuse[7] = originalThreadToReuse[7].replace('<font', '<font streakhiderow="true"');
-      break;
-    }
-  }
-
-  for(ii=0; ii<originalThreads.length; ii++){
-    var jj;
-    var originalThread = originalThreads[ii];
-
-    if(threadsUsed >= replacementThreads.length){
-      for(jj=0; jj<originalThreadToReuse.length; jj++){
-        originalThread[jj] = originalThreadToReuse[jj];
-      }
-    } else {
-      var replacementThread = replacementThreads[threadsUsed];
-      for(jj=0; jj<replacementThread.length; jj++){
-        originalThread[jj] = replacementThread[jj];
-      }
-      threadsUsed++;
-    }
-  }
-
-  return originalResponseArray;
-}
 
 function _extractThreadArraysFromResponseArray(threadResponseArray){
   var threads = [];
