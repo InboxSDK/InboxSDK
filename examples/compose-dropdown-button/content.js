@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
+InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		composeView.addButton({
 			title: 'Monkeys!',
@@ -21,6 +21,8 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		composeView.on('presending', function(event){
 			event.cancel();
 		});
+
+		composeView.on('destroy', console.log.bind(console, 'destroyed'));
 
 	});
 });
