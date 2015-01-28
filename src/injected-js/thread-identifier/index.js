@@ -5,7 +5,7 @@ var deparam = require('querystring').parse;
 var threadRowParser = require('./thread-row-parser');
 var cleanupPeopleLine = require('./cleanup-people-line');
 var clickAndGetPopupUrl = require('./click-and-get-popup-url');
-var Symbol = require('../../common/symbol');
+var Marker = require('../../common/marker');
 
 function setup() {
   processPreloadedThreads();
@@ -26,7 +26,7 @@ function processThreadListResponse(threadListResponse) {
 }
 exports.processThreadListResponse = processThreadListResponse;
 
-var AMBIGUOUS = Symbol('ABIGUOUS');
+var AMBIGUOUS = Marker('ABIGUOUS');
 var threadIdsByKey = {};
 function storeThreadMetadata(threadMetadata) {
   var key = threadMetadataKey(threadMetadata);

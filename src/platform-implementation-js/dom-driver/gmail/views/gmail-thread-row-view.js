@@ -39,6 +39,21 @@ var GmailThreadRowView = function(element) {
   this._refresher = makeMutationObserverStream(this._element, {
     childList: true
   }).map(null).takeUntil(this._stopper).toProperty(null);
+
+  this.getCounts = _.once(function() {
+    var thing = this._element.querySelector('td.yX div.yW');
+    var parts = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
+    var preDrafts = parts[0], drafts = parts[1];
+
+    var preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+
+    var messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
+    var messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+
+    var draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
+    var draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
+    return {messageCount: messageCount, draftCount: draftCount};
+  });
 };
 
 GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
@@ -311,6 +326,14 @@ _.extend(GmailThreadRowView.prototype, {
 
   getThreadID: function() {
     return this._pageCommunicator.getThreadIdForThreadRow(this._element);
+  },
+
+  getVisibleDraftCount: function() {
+    return this.getCounts().draftCount;
+  },
+
+  getVisibleMessageCount: function() {
+    return this.getCounts().messageCount;
   },
 
   getContacts: function(){

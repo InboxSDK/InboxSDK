@@ -21,5 +21,11 @@ module.exports = function(label){
 		}
 
 		return labelElement.__nativeGmailNavItemView;
+	}).catch(function(err){
+		if(GmailElementGetter.isStandalone()){
+			return;
+		}
+
+		throw err;
 	});
 };

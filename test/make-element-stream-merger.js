@@ -1,18 +1,18 @@
 var assert = require('assert');
 var Bacon = require('baconjs');
 var sinon = require('sinon');
-var Symbol = require('../src/common/symbol');
+var Marker = require('../src/common/marker');
 
 var makeElementStreamMerger = require('../src/platform-implementation-js/lib/dom/make-element-stream-merger');
 
 describe('makeElementStreamMerger', function() {
   it('passes through unrelated events', function(done) {
     var e1 = {
-      el: Symbol('e1.el'),
+      el: Marker('e1.el'),
       removalStream: new Bacon.Bus()
     };
     var e2 = {
-      el: Symbol('e2.el'),
+      el: Marker('e2.el'),
       removalStream: new Bacon.Bus()
     };
     var i = 0;
@@ -46,11 +46,11 @@ describe('makeElementStreamMerger', function() {
     // be removed and re-added a moment later (e6), which shouldn't get merged
     // and should get its own event.
     var e1 = {
-      el: Symbol('e1.el'),
+      el: Marker('e1.el'),
       removalStream: new Bacon.Bus()
     };
     var e2 = {
-      el: Symbol('e2.el'),
+      el: Marker('e2.el'),
       removalStream: new Bacon.Bus()
     };
     var e3 = {
@@ -62,7 +62,7 @@ describe('makeElementStreamMerger', function() {
       removalStream: new Bacon.Bus()
     };
     var e5 = {
-      el: Symbol('e5.el'),
+      el: Marker('e5.el'),
       removalStream: new Bacon.Bus()
     };
     var e6 = {
@@ -124,7 +124,7 @@ describe('makeElementStreamMerger', function() {
       console.warn.restore();
     });
     var e1 = {
-      el: Symbol('e1.el'),
+      el: Marker('e1.el'),
       removalStream: new Bacon.Bus()
     };
     var e2 = {
