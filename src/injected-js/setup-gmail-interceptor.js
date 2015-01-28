@@ -5,6 +5,7 @@ var querystring = require('querystring');
 var threadIdentifier = require('./thread-identifier');
 var stringify = querystring.stringify;
 var quotedSplit = require('../common/quoted-split');
+var modifySuggestions = require('./modify-suggestions');
 
 function setupGmailInterceptor() {
   threadIdentifier.setup();
@@ -82,7 +83,7 @@ function setupGmailInterceptor() {
       if (event.detail.query === currentQuery) {
         suggestionModifications.push(event.detail.suggestions);
         if (suggestionModifications.length === modifierCount) {
-          currentQueryDefer.resolve(suggestionModifications);
+          currentQueryDefer.resolve(_.flatten(suggestionModifications, true));
           currentQueryDefer = currentQuery = suggestionModifications = null;
         }
       }
@@ -120,8 +121,7 @@ function setupGmailInterceptor() {
             if (!modifications) {
               return responseText;
             } else {
-              console.log('got modifications', modifications, responseText);
-              return responseText;
+              return modifySuggestions(responseText, modifications);
             }
           });
         }
