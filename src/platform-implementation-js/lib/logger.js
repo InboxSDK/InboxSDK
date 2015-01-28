@@ -51,7 +51,7 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     }
 
     RSVP.on('error', function(err) {
-      logger.logError(err, "Possibly uncaught promise rejection");
+      logger.error(err, "Possibly uncaught promise rejection");
     });
 
     window.addEventListener('error', function(event) {
@@ -59,7 +59,7 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
       // this, we can remove the logged function wrappers around setTimeout and
       // things.
       if (event.error) {
-        logger.logError(event.error, "Uncaught exception");
+        logger.error(event.error, "Uncaught exception");
       }
     });
 
@@ -207,7 +207,7 @@ logger.error = function(err, details) {
     }
 
     if (!(err instanceof Error)) {
-      console.warn('First parameter to logError was not an error object:', err);
+      console.warn('First parameter to Logger.error was not an error object:', err);
     }
 
     // Might not have been passed a useful error object with a stack, so get
@@ -266,7 +266,7 @@ function makeLoggedFunction(func, name) {
       return func.apply(this, arguments);
     } catch (err) {
       var msg = name ? "Uncaught error in "+name : "Uncaught error";
-      logger.logError(err, msg);
+      logger.error(err, msg);
       throw err;
     }
   };
