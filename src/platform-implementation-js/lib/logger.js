@@ -293,8 +293,6 @@ function track(type, eventName, details) {
     type: type,
     event: eventName,
     properties: _.extend({}, details, {
-      type: type,
-      eventName: eventName,
       timestamp: new Date().getTime()*1000,
       screenWidth: window.screen && window.screen.width,
       screenHeight: window.screen && window.screen.height,
