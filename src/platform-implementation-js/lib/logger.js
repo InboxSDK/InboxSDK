@@ -23,10 +23,12 @@ var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
 // This will only be true for the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
 var _isLoggerMaster = false;
-var _sessionId = document.head.getAttribute('data-inboxsdk-session-id');
+var _sessionId = global.document && document.head.getAttribute('data-inboxsdk-session-id');
 if (!_sessionId) {
   _sessionId = Date.now()+'-'+Math.random();
-  document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+  if (global.document) {
+    document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+  }
   _isLoggerMaster = true;
 }
 
@@ -187,6 +189,11 @@ function tooManyErrors(err2, originalArgs) {
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
 logger.error = function(err, details) {
+  if (!global.document) {
+    // In tests, just throw the error.
+    throw err;
+  }
+
   var args = arguments;
 
   // It's important that we can't throw an error or leave a rejected promise
@@ -311,13 +318,17 @@ function track(type, eventName, details) {
     });
   }
 
+  if (!global.document) {
+    return;
+  }
+
   _trackedEventsQueue.add(event);
 
   // Signal to the logger master that a new event is ready to be sent.
   document.head.setAttribute('data-inboxsdk-last-event', Date.now());
 }
 
-if (_isLoggerMaster) {
+if (_isLoggerMaster && global.document) {
   makeMutationObserverStream(document.head, {
     attributes: true, attributeFilter: 'data-inboxsdk-last-event'
   }).map(null).throttle(30*1000).onValue(function() {
