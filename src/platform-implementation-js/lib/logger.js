@@ -349,8 +349,11 @@ if (_isLoggerMaster && global.document) {
 }
 
 // Should only be used by the InboxSDK users for their own app events.
-logger.eventApp = function(eventName, detail) {
-  track('app', eventName, detail);
+logger.eventApp = function(appId, eventName, detail) {
+  if (details && typeof details != 'object') {
+    throw new Error("details must be object or null: "+details);
+  }
+  track('app', eventName, _.extend({}, detail, {appId:appId}));
 };
 
 // For tracking app events that are possibly triggered by the user. Extensions

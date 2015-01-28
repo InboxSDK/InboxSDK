@@ -55,7 +55,7 @@ var PlatformImplementation = function(appId, opts){
 
 	this.Logger = {
 		error: logger.error.bind(logger),
-		event: logger.eventApp.bind(logger)
+		event: logger.eventApp.bind(logger, appId)
 	};
 };
 
