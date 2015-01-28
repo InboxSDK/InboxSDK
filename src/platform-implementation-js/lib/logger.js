@@ -349,34 +349,34 @@ if (_isLoggerMaster && global.document) {
 }
 
 // Should only be used by the InboxSDK users for their own app events.
-logger.eventApp = function(appId, eventName, detail) {
+logger.eventApp = function(appId, eventName, details) {
   if (details && typeof details != 'object') {
     throw new Error("details must be object or null: "+details);
   }
-  track('app', eventName, _.extend({}, detail, {appId:appId}));
+  track('app', eventName, _.extend({}, details, {appId:appId}));
 };
 
 // For tracking app events that are possibly triggered by the user. Extensions
 // can opt out of this with a flag passed to InboxSDK.load().
-logger.eventSdkActive = function(eventName, detail) {
+logger.eventSdkActive = function(eventName, details) {
   if (!_useEventTracking) {
     return;
   }
-  track('sdkActive', eventName, detail);
+  track('sdkActive', eventName, details);
 };
 
 // Track events unrelated to user activity about how the app uses the SDK.
 // Examples include the app being initialized, and calls to any of the
 // register___ViewHandler functions.
-logger.eventSdkPassive = function(eventName, detail) {
-  track('sdkPassive', eventName, detail);
+logger.eventSdkPassive = function(eventName, details) {
+  track('sdkPassive', eventName, details);
 };
 
 // Track Gmail events.
-logger.eventGmail = function(eventName, detail) {
+logger.eventGmail = function(eventName, details) {
   // Only the first InboxSDK extension reports Gmail events.
   if (!_isLoggerMaster || !_useEventTracking) {
     return;
   }
-  track('gmail', eventName, detail);
+  track('gmail', eventName, details);
 };
