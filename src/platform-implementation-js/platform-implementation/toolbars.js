@@ -118,6 +118,11 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 				threadRowViews: _getThreadRowViews(toolbarViewDriver, membraneMap),
 				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membraneMap)
 			});
+
+			//don't emit event when there are no rows actually selected
+			if(event.selectedThreadRowViews.length === 0){
+				return;
+			}
 		}
 		else if(toolbarViewDriver.getThreadViewDriver()){
 			var threadView = membraneMap.get(toolbarViewDriver.getThreadViewDriver());
