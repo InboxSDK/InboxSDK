@@ -12,7 +12,7 @@ module.exports = logger;
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-var _appIds = [];
+var _appIds = Object.create(null);
 var _LOADER_VERSION;
 var _IMPL_VERSION;
 var _userEmailHash;
@@ -36,7 +36,7 @@ var _trackedEventsQueue = new PersistentQueue('events');
 
 // Set up error logging.
 logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-  _appIds.push(appId);
+  _appIds[appId] = opts.appVersion || null;
   if (_LOADER_VERSION) {
     // If we've been set up before, don't do it all again.
     return;
@@ -188,7 +188,7 @@ function tooManyErrors(err2, originalArgs) {
 }
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
-logger.error = function(err, details) {
+function _sendError(err, details, appId, sentByApp) {
   if (!global.document) {
     // In tests, just throw the error.
     throw err;
@@ -219,11 +219,17 @@ logger.error = function(err, details) {
     if (err && err.stack) {
       stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nError logged from:", nowStack]);
+    stuffToLog = stuffToLog.concat(["\n\nError logged from:\n"+nowStack]);
     if (details) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:"], _appIds);
+    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", _appIds]);
+    if (appId) {
+      stuffToLog = stuffToLog.concat(["\nApp Id:", appId]);
+    }
+    if (sentByApp) {
+      stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
+    }
     stuffToLog = stuffToLog.concat(["\nSession Id:", _sessionId]);
     stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
@@ -231,33 +237,43 @@ logger.error = function(err, details) {
 
     console.error.apply(console, stuffToLog);
 
-    var stringReport = _.map(stuffToLog, function(piece) {
-      if (typeof piece == 'string') {
-        return piece;
-      } else if (piece instanceof Error && piece.message) {
-        return piece.message;
-      } else {
-        try {
-          return JSON.stringify(piece);
-        } catch(e) {
-          return '((Could not convert to JSON))';
-        }
-      }
-    }).join(' ');
+    var report = {
+      message: err && err.message || err,
+      stack: err && err.stack,
+      loggedFrom: nowStack,
+      details: details,
+      appId: appId || undefined,
+      sentByApp: sentByApp,
+      appIds: _appIds,
+      sessionId: _sessionId,
+      emailHash: _userEmailHash,
+      extensionId: getExtensionId(),
+      loaderVersion: _LOADER_VERSION,
+      implementationVersion: _IMPL_VERSION,
+      clientRequestTimestamp: new Date().getTime()*1000
+    };
 
     ajax({
       url: 'https://events.inboxsdk.com/api/v2/errors',
       method: 'POST',
-      data: {
-        error: stringReport,
-        emailHash: _userEmailHash
-      }
+      headers: {
+        //'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(report)
     }).catch(function(err2) {
       tooManyErrors(err2, args);
     });
   } catch(err2) {
     tooManyErrors(err2, args);
   }
+}
+
+logger.error = function(err, details) {
+  _sendError(err, details);
+};
+
+logger.errorApp = function(appId, err, details) {
+  _sendError(err, details, appId, true);
 };
 
 function makeLoggedFunction(func, name) {

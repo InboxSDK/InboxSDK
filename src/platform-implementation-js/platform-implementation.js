@@ -54,7 +54,7 @@ var PlatformImplementation = function(appId, opts){
 	this.Modal = new Modal(appId, this._driver, this._membraneMap);
 
 	this.Logger = {
-		error: logger.error.bind(logger),
+		error: logger.errorApp.bind(logger, appId),
 		event: logger.eventApp.bind(logger, appId)
 	};
 };
