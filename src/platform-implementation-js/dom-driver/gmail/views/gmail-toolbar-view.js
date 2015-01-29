@@ -93,6 +93,7 @@ _.extend(GmailToolbarView.prototype, {
 					sectionElement.appendChild(buttonViewController.getView().getElement());
 
 					self._updateButtonClasses(self._element);
+					buttonViewController.getView().setEnabled(self._toolbarState === 'EXPANDED');
 				}
 			}
 		);
@@ -153,7 +154,7 @@ _.extend(GmailToolbarView.prototype, {
 
 	_determineToolbarIconMode: function(){
 		var sectionElement = this._getMoveSectionElement();
-		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.length  === 0){
+		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.trim().length  === 0){
 			this._element.setAttribute('data-toolbar-icononly', 'true');
 		}
 		else{
@@ -172,6 +173,7 @@ _.extend(GmailToolbarView.prototype, {
 			}
 
 			self._updateButtonClasses(self._element);
+			self._updateButtonEnabledState();
 		});
 
 		this._classMutationObsever.observe(
@@ -282,6 +284,13 @@ _.extend(GmailToolbarView.prototype, {
 				}
 			}
 
+		});
+	},
+
+	_updateButtonEnabledState: function(){
+		var enabled = this._toolbarState === 'EXPANDED';
+		this._buttonViewControllers.forEach(function(buttonViewController){
+			buttonViewController.getView().setEnabled(enabled);
 		});
 	},
 
