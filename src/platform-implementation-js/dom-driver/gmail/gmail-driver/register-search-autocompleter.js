@@ -8,6 +8,10 @@ const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutatio
 const gmailElementGetter = require('../gmail-element-getter');
 
 module.exports = function registerSearchAutocompleter(driver, handler) {
+  // We inject the app-provided suggestions into Gmail's AJAX response. Then we
+  // watch the DOM for our injected suggestions to show up and attach click and
+  // enter handlers to them to let them do custom actions.
+
   const id = 'inboxsdk__suggestions_'+(''+Date.now()+Math.random()).replace(/\D+/g,'');
   const pageCommunicator = driver.getPageCommunicator();
   pageCommunicator.announceSearchAutocompleter();
@@ -16,7 +20,20 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
     .filter((event) => event.type === 'suggestionsRequest')
     .map('.query')
     .flatMapLatest((query) =>
-      Bacon.fromPromise(RSVP.Promise.resolve(handler({query})), true).delay(1000)
+      Bacon.fromPromise(RSVP.Promise.resolve(handler({query})), true)
+        .flatMap((suggestions) => {
+          if (Array.isArray(suggestions)) {
+            return Bacon.once(suggestions);
+          } else {
+            console.error("suggestions not an array", suggestions);
+            return new Bacon.Error(new Error("suggestions must be an array"));
+          }
+        })
+        .mapError((err) => {
+          // TODO log this better
+          setTimeout(() => {throw err;}, 0);
+          return [];
+        })
         .doAction((suggestions) => {
           suggestions.forEach((suggestion) => {suggestion.owner = id;});
         })
@@ -24,11 +41,7 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
     );
 
   querySuggestionsStream.onValue((event) => {
-    if (!Array.isArray(event.suggestions)) {
-      console.error("autocompleter response must be an array", event.suggestions);
-    } else {
-      pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
-    }
+    pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
   });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
