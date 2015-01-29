@@ -64,8 +64,8 @@ var GmailElementGetter = {
 		return document.getElementById('gbqfq');
 	},
 
-	getSearchSuggestions: function() {
-		return document.getElementById('gs_sbt50');
+	getSearchSuggestionsBoxParent: function() {
+		return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
 	},
 
 	getToolbarElementContainer: function(){

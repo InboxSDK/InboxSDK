@@ -1,20 +1,113 @@
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-var gmailElementGetter = require('../gmail-element-getter');
+const _ = require('lodash');
+const Bacon = require('baconjs');
+const fromEventTargetCapture = require('../../../lib/from-event-target-capture');
+const simulateClick = require('../../../lib/dom/simulate-click');
+const makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+const RSVP = require('rsvp');
+const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
+const gmailElementGetter = require('../gmail-element-getter');
 
 module.exports = function registerSearchAutocompleter(driver, handler) {
+  const id = 'inboxsdk__suggestions_'+(''+Date.now()+Math.random()).replace(/\D+/g,'');
   const pageCommunicator = driver.getPageCommunicator();
   pageCommunicator.announceSearchAutocompleter();
 
-  pageCommunicator.ajaxInterceptStream
+  const querySuggestionsStream = pageCommunicator.ajaxInterceptStream
     .filter((event) => event.type === 'suggestionsRequest')
-    .onValue((event) => {
-      RSVP.Promise.resolve(handler({query:event.query})).then((suggestions) => {
-        if (!Array.isArray(suggestions)) {
-          throw new Error("autocompleter response must be an array");
+    .map('.query')
+    .flatMapLatest((query) =>
+      Bacon.fromPromise(RSVP.Promise.resolve(handler({query})), true).delay(1000)
+        .doAction((suggestions) => {
+          suggestions.forEach((suggestion) => {suggestion.owner = id;});
+        })
+        .map((suggestions) => ({query, suggestions}))
+    );
+
+  querySuggestionsStream.onValue((event) => {
+    if (!Array.isArray(event.suggestions)) {
+      console.error("autocompleter response must be an array", event.suggestions);
+    } else {
+      pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
+    }
+  });
+
+  // Wait for the first routeViewDriver to happen before looking for the search box.
+  const searchBoxStream = driver.getRouteViewDriverStream()
+    .map(() => gmailElementGetter.getSearchInput())
+    .filter(Boolean)
+    .take(1).toProperty();
+
+  const searchValueStream = searchBoxStream
+    .flatMap((search) => Bacon.fromEventTarget(search, 'input').startWith(null).map(search))
+    .map('.value').toProperty();
+
+  // Wait for the search box to be focused before looking for the suggestions box.
+  const suggestionsBoxTbodyStream = searchBoxStream
+    .flatMapLatest((searchBox) => Bacon.fromEventTarget(searchBox, 'focus'))
+    .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
+    .filter(Boolean)
+    .flatMapLatest(makeElementChildStream)
+    .map('.el.firstElementChild')
+    .take(1).toProperty();
+
+  const suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
+    .flatMap((suggestionsBoxTbody) =>
+      makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).startWith(null)
+    )
+    .filter((changes) => {
+      if (changes === null)
+        return true;
+      for (let change of changes) {
+        for (let addedNode of _.toArray(change.addedNodes)) {
+          if (addedNode.nodeName === 'TR' && addedNode.getAttribute('role') === 'option')
+            return true;
         }
-        pageCommunicator.provideAutocompleteSuggestions(event.query, suggestions);
-      });
+      }
+      return false;
+    })
+    .map(null);
+
+  const suggestionsBoxEnterPresses = searchBoxStream
+    .flatMap((searchBox) => fromEventTargetCapture(searchBox, 'keypress'))
+    .filter((event) => event.keyCode == 13);
+
+  // Add select handlers
+  suggestionsBoxTbodyStream
+    .sampledBy(suggestionsBoxGmailChanges)
+    .flatMapLatest((suggestionsBoxTbody) =>
+      Bacon.fromArray(_.toArray(suggestionsBoxTbody.children))
+        .filter((row) => row.getElementsByClassName(id).length > 0)
+        .flatMap((row) => Bacon.mergeAll(
+          fromEventTargetCapture(row, 'click') // todo also enter
+        ))
+    )
+    .combine(searchBoxStream, (a,b) => [a,b])
+    .onValue(([event, searchBox]) => {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      searchBox.blur();
+      searchBox.value = "";
+      setTimeout(() => alert('custom option selected'), 0);
     });
+
+  // Add separators
+  // suggestionsBoxTbodyStream
+  //   .sampledBy(suggestionsBoxGmailChanges)
+  //   .onValue((suggestionsBoxTbody) => {
+  //     for (let child of _.toArray(suggestionsBoxTbody.getElementsByClassName('inboxsdk__custom_suggestion_separator'))) {
+  //       console.log('removing separator', new Date());
+  //       child.remove();
+  //     }
+  //     for (let child of _.toArray(suggestionsBoxTbody.children)) {
+  //       if (child.querySelector('.inboxsdk__custom_suggestion')) {
+  //         const separator = document.createElement('tr');
+  //         separator.className = 'inboxsdk__custom_suggestion_separator';
+  //         separator.setAttribute('role', 'separator');
+  //         separator.innerHTML = '<td><div class="gssb_l"></div></td>';
+  //         child.parentElement.insertBefore(separator, child);
+  //         break;
+  //       }
+  //       console.log('child', child.textContent);
+  //     }
+  //   });
 };
