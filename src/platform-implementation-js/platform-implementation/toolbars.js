@@ -257,7 +257,13 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	* ^default=null
 	* @type {function(RouteView)}
 	*/
-	hideFor:null
+	hideFor:null,
+
+	/**
+	 * if passed in then when the button is visible, pressing the keyboard shortcut will activate the button
+	 * ^optional
+	 */
+	 keyboardShortcutHandle: null
 };
 
 

@@ -23,6 +23,21 @@ var Keyboard = function(appId, appIconUrl, driver){
 
 _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 
+    /*
+     * keyboard shortcut descriptor
+     *  {
+     *      chord: string,
+     *      description: string
+     *  }
+     *
+     *  chord is what the user types. Simultaneous keypresses can be defined with "+".
+     *  For multi-key chords (like Gmail's) include a space between the keys, i.e. "g i".
+     *
+     *  description is the text that will show up in Gmail's keyboard shortcut help
+     *
+     *  returns a KeyboardShortcutHandle
+     */
+
   createShortcutHandle: function(shortcutDescriptor){
     var members = memberMap.get(this);
 
