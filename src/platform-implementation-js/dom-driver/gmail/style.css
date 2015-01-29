@@ -678,6 +678,15 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* keyboard shortcut help */
 
+.inboxsdk__shortcutHelp_table img.inboxsdk__icon {
+  background-color: white;
+  height: 21px;
+  width: 21px;
+  vertical-align: middle;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
 table.cf.wd.inboxsdk__shortcutHelp_table {
   margin-bottom: 15px;
 }
