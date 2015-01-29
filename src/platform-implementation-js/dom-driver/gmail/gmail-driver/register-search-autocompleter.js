@@ -73,12 +73,16 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
         .filter((event) => event.keyCode == 13 && event.target === searchBox)
     );
 
-  // Add select handlers
+  // With the suggestions box and search box
   Bacon.combineAsArray(suggestionsBoxTbodyStream, searchBoxStream)
+    // every time Gmail changes the suggestion box
     .sampledBy(suggestionsBoxGmailChanges)
     .flatMapLatest(([suggestionsBoxTbody, searchBox]) =>
+      // get all of the suggestions box rows
       Bacon.fromArray(_.toArray(suggestionsBoxTbody.children))
+        // that were injected by this extension
         .filter((row) => row.getElementsByClassName(id).length > 0)
+        // and listen to click and enter events on them
         .flatMap((row) => Bacon.mergeAll(
           fromEventTargetCapture(row, 'click'),
           suggestionsBoxEnterPresses
