@@ -68,17 +68,21 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
     .map(null);
 
   const suggestionsBoxEnterPresses = searchBoxStream
-    .flatMap((searchBox) => fromEventTargetCapture(searchBox, 'keypress'))
-    .filter((event) => event.keyCode == 13);
+    .flatMap((searchBox) =>
+      fromEventTargetCapture(document, 'keydown')
+        .filter((event) => event.keyCode == 13 && event.target === searchBox)
+    );
 
   // Add select handlers
-  suggestionsBoxTbodyStream
+  Bacon.combineAsArray(suggestionsBoxTbodyStream, searchBoxStream)
     .sampledBy(suggestionsBoxGmailChanges)
-    .flatMapLatest((suggestionsBoxTbody) =>
+    .flatMapLatest(([suggestionsBoxTbody, searchBox]) =>
       Bacon.fromArray(_.toArray(suggestionsBoxTbody.children))
         .filter((row) => row.getElementsByClassName(id).length > 0)
         .flatMap((row) => Bacon.mergeAll(
-          fromEventTargetCapture(row, 'click') // todo also enter
+          fromEventTargetCapture(row, 'click'),
+          suggestionsBoxEnterPresses
+            .filter(() => row.classList.contains('gssb_i'))
         ))
     )
     .combine(searchBoxStream, (a,b) => [a,b])
