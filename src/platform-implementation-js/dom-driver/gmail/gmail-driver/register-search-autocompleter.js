@@ -16,7 +16,10 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
   const pageCommunicator = driver.getPageCommunicator();
   pageCommunicator.announceSearchAutocompleter();
 
-  const querySuggestionsStream = pageCommunicator.ajaxInterceptStream
+  // Listen for the AJAX requests, call the application's handler function, and
+  // give the application's suggestions back to the pageCommunicator for it to
+  // inject into the AJAX responses.
+  pageCommunicator.ajaxInterceptStream
     .filter((event) => event.type === 'suggestionsRequest')
     .map('.query')
     .flatMapLatest((query) =>
@@ -38,21 +41,16 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
           suggestions.forEach((suggestion) => {suggestion.owner = id;});
         })
         .map((suggestions) => ({query, suggestions}))
-    );
-
-  querySuggestionsStream.onValue((event) => {
-    pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
-  });
+    )
+    .onValue((event) => {
+      pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
+    });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
   const searchBoxStream = driver.getRouteViewDriverStream()
     .map(() => gmailElementGetter.getSearchInput())
     .filter(Boolean)
     .take(1).toProperty();
-
-  const searchValueStream = searchBoxStream
-    .flatMap((search) => Bacon.fromEventTarget(search, 'input').startWith(null).map(search))
-    .map('.value').toProperty();
 
   // Wait for the search box to be focused before looking for the suggestions box.
   const suggestionsBoxTbodyStream = searchBoxStream
@@ -63,23 +61,15 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
     .map('.el.firstElementChild')
     .take(1).toProperty();
 
+  // This stream emits an event after every time Gmail changes the suggestions
+  // list.
   const suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
     .flatMap((suggestionsBoxTbody) =>
       makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).startWith(null)
-    )
-    .filter((changes) => {
-      if (changes === null)
-        return true;
-      for (let change of changes) {
-        for (let addedNode of _.toArray(change.addedNodes)) {
-          if (addedNode.nodeName === 'TR' && addedNode.getAttribute('role') === 'option')
-            return true;
-        }
-      }
-      return false;
-    })
-    .map(null);
+    ).map(null);
 
+  // We listen to the event on the document node so that the event can be
+  // canceled before Gmail receives it.
   const suggestionsBoxEnterPresses = searchBoxStream
     .flatMap((searchBox) =>
       fromEventTargetCapture(document, 'keydown')
