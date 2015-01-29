@@ -10,7 +10,7 @@
     "bacon-cast": "1.0.0",
     "baconjs": "0.7.42",
     "brfs": "^1.2.0",
-    "combokeys": "^2.3.0",
+    "combokeys-capture": "^2.4.2",
     "entities": "1.1.1",
     "es6-unweak-collections": "0.4.3",
     "isnumber": "^1.0.0",
