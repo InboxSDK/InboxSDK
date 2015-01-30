@@ -16,9 +16,9 @@ var Search = function(appId, driver){
 
 _.extend(Search.prototype,  {
 
-	registerSearchAutoCompleter: function(handler) {
+	registerSearchSuggestionsProvider: function(handler) {
 		var members = memberMap.get(this);
-		members.driver.registerSearchAutocompleter(handler);
+		members.driver.registerSearchSuggestionsProvider(handler);
 	},
 
 	registerSearchQueryRewriter: function(obj) {

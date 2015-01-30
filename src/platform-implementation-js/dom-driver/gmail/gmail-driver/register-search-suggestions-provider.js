@@ -7,7 +7,7 @@ const RSVP = require('rsvp');
 const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 const gmailElementGetter = require('../gmail-element-getter');
 
-module.exports = function registerSearchAutocompleter(driver, handler) {
+module.exports = function registerSearchSuggestionsProvider(driver, handler) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we
   // watch the DOM for our injected suggestions to show up and attach click and
   // enter handlers to them to let them do custom actions.

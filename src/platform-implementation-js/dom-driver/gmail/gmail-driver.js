@@ -52,8 +52,8 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, routeID, params);
 	},
 
-	registerSearchAutocompleter: function(handler) {
-		require('./gmail-driver/register-search-autocompleter')(this, handler);
+	registerSearchSuggestionsProvider: function(handler) {
+		require('./gmail-driver/register-search-suggestions-provider')(this, handler);
 	},
 
 	registerSearchQueryRewriter: function(obj) {

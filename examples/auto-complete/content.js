@@ -3,7 +3,7 @@ function log() {
 }
 
 InboxSDK.load(1, 'auto-complete').then(function(inboxSDK) {
-	inboxSDK.Search.registerSearchAutoCompleter(function(event) {
+	inboxSDK.Search.registerSearchSuggestionsProvider(function(event) {
 		console.log('search autocompleter', event);
 		return [
 			{
