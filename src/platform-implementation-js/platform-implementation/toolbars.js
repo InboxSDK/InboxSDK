@@ -260,9 +260,11 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	hideFor:null,
 
 	/**
-	 * if passed in then when the button is visible, pressing the keyboard shortcut will activate the button
-	 * ^optional
-	 */
+	* The keyboard shortcut that will activate this button
+	* ^optional
+	* ^default=null
+	* @type {keyboardShortcutHandle}
+	*/
 	 keyboardShortcutHandle: null
 };
 

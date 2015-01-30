@@ -11,6 +11,7 @@ var memberMap = new Map();
 
 /**
 * @class
+* This namespace allows you to setup keyboard shortcuts that your application can response to.
 */
 var Keyboard = function(appId, appIconUrl, driver){
     var members = {};
@@ -23,21 +24,12 @@ var Keyboard = function(appId, appIconUrl, driver){
 
 _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 
-    /*
-     * keyboard shortcut descriptor
-     *  {
-     *      chord: string,
-     *      description: string
-     *  }
-     *
-     *  chord is what the user types. Simultaneous keypresses can be defined with "+".
-     *  For multi-key chords (like Gmail's) include a space between the keys, i.e. "g i".
-     *
-     *  description is the text that will show up in Gmail's keyboard shortcut help
-     *
-     *  returns a KeyboardShortcutHandle
-     */
-
+  /**
+  * This method creates a shortcut handle. A shortcut handle can be used in various APIs in
+  * the SDK to keyboard enable them.
+  * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut
+  * @return {KeyboardShortcutHandle}
+  */
   createShortcutHandle: function(shortcutDescriptor){
     var members = memberMap.get(this);
 
@@ -47,6 +39,25 @@ _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 
 });
 
+/**
+ * @class
+ * Describes a keyboard dhortcut combination
+ */
+var KeyboardShortcutDescriptor = /** @lends KeyboardShortcutDescriptor */ {
+
+  /**
+  * The keys the user has to press to activate the shortcut. Simultaneous keypresses can be defined with "+".
+  * For multi-key chords (like Gmail's) include a space between the keys, i.e. "g i".
+  * @type{Element}
+  */
+  chord:  null,
+
+  /**
+  * The description text that shows up in Gmail's keyboard shortcut help (when the user presses '?')
+  * @type {string}
+  */
+  description: null,
+};
 
 
 module.exports = Keyboard;
