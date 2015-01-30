@@ -16,10 +16,15 @@ module.exports = function modifySuggestions(responseText, modifications) {
     } else if (_.has(modification, 'descriptionHTML')) {
       modification.description = htmlToText(modification.descriptionHTML);
     }
-    if (modification.URL) {
+    if (modification.routeName || modification.externalURL) {
+      const data = {
+        routeName: modification.routeName,
+        routeParams: modification.routeParams,
+        externalURL: modification.externalURL
+      };
       modification.nameHTML +=
-        ' <span style="display:none" data-inboxsdk-item-url="' +
-        _.escape(modification.URL) + '"></span>';
+        ' <span style="display:none" data-inboxsdk-suggestion="' +
+        _.escape(JSON.stringify(data)) + '"></span>';
     }
     let newItem = [
       "aso.sug", modification.searchTerm || query, modification.nameHTML, null, [], 34, null,

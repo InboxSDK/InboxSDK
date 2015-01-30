@@ -95,17 +95,17 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
         )
     )
     .onValue(({event, row, searchBox}) => {
-      const itemURLspan = row.querySelector('span[data-inboxsdk-item-url]');
-      const itemURL = itemURLspan && itemURLspan.getAttribute('data-inboxsdk-item-url');
-      if (itemURL) {
+      const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
+      const itemData = itemDataSpan && JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion'));
+      if (itemData) {
         event.stopImmediatePropagation();
         event.preventDefault();
         searchBox.blur();
         searchBox.value = "";
-        if (itemURL.indexOf('#') === 0) {
-          window.location = itemURL;
-        } else {
-          window.open(itemURL);
+        if (itemData.routeName) {
+          driver.goto(itemData.routeName, itemData.routeParams);
+        } else if (itemData.externalURL) {
+          window.open(itemData.externalURL);
         }
       }
     });

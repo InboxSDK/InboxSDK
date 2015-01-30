@@ -17,13 +17,13 @@ InboxSDK.load(1, 'search-suggestions').then(function(inboxSDK) {
 			{
 				name: 'Bacon API',
 				description: 'Why not have a link in search?',
-				URL: 'https://baconjs.github.io/api.html'
+				externalURL: 'https://baconjs.github.io/api.html'
 			},
 			{
-				name: 'Drafts',
-				description: 'Jumps to drafts folder',
+				name: 'Sent',
+				description: 'Jumps to sent folder',
 				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png',
-				URL: '#drafts'
+				routeName: inboxSDK.Router.NativeRouteIDs.SENT, routeParams: {page:2}
 			}
 		];
 	});

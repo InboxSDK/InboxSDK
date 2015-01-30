@@ -19,7 +19,7 @@ _.extend(Search.prototype,  {
 	// handler must be a function that takes a string, and returns (optionally a
 	// Promise for) an array of suggestions objects. Each suggestion object may
 	// contain the properties name, nameHTML, description, descriptionHTML,
-	// iconURL, and URL.
+	// iconURL, routeName, routeParams, and externalURL.
 	registerSearchSuggestionsProvider: function(handler) {
 		if (typeof handler != 'function') {
 			throw new Error("Incorrect arguments");
