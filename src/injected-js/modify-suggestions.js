@@ -8,9 +8,13 @@ module.exports = function modifySuggestions(responseText, modifications) {
   for (let modification of modifications) {
     if (modification.name) {
       modification.nameHTML = _.escape(modification.name);
+    } else {
+      modification.name = htmlToText(modification.nameHTML);
     }
     if (modification.description) {
       modification.descriptionHTML = _.escape(modification.description);
+    } else {
+      modification.description = htmlToText(modification.descriptionHTML);
     }
     if (modification.URL) {
       modification.nameHTML +=
@@ -23,8 +27,8 @@ module.exports = function modifySuggestions(responseText, modifications) {
     if (modification.descriptionHTML) {
       newItem[3] = [
         'aso.eme',
-        htmlToText(modification.descriptionHTML),
-        htmlToText(modification.nameHTML),
+        modification.description,
+        modification.name,
         modification.descriptionHTML,
         modification.nameHTML
       ];
