@@ -100,25 +100,4 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
       searchBox.value = "";
       setTimeout(() => alert('custom option selected'), 0);
     });
-
-  // Add separators
-  // suggestionsBoxTbodyStream
-  //   .sampledBy(suggestionsBoxGmailChanges)
-  //   .onValue((suggestionsBoxTbody) => {
-  //     for (let child of _.toArray(suggestionsBoxTbody.getElementsByClassName('inboxsdk__custom_suggestion_separator'))) {
-  //       console.log('removing separator', new Date());
-  //       child.remove();
-  //     }
-  //     for (let child of _.toArray(suggestionsBoxTbody.children)) {
-  //       if (child.querySelector('.inboxsdk__custom_suggestion')) {
-  //         const separator = document.createElement('tr');
-  //         separator.className = 'inboxsdk__custom_suggestion_separator';
-  //         separator.setAttribute('role', 'separator');
-  //         separator.innerHTML = '<td><div class="gssb_l"></div></td>';
-  //         child.parentElement.insertBefore(separator, child);
-  //         break;
-  //       }
-  //       console.log('child', child.textContent);
-  //     }
-  //   });
 };
