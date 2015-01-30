@@ -81,7 +81,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 			}
 		}
 
-		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames);
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames, members.appId);
 	};
 }
 

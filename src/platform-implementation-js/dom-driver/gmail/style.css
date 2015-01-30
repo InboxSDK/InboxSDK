@@ -247,6 +247,14 @@ div.T-I.inboxsdk__button {
   display: none;
 }
 
+.inboxsdk__menuItem img, .inboxsdk__menuItem .inboxsdk__icon {
+  height: 16px;
+  width: 16px;
+  margin-left: -20px;
+  position: absolute;
+  margin-top: -1px;
+}
+
 /* end */
 
 /* modal */
@@ -711,10 +719,10 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__shortcutHelp_table td.we.Dn {
   width: 60%;
+  white-space: normal;
 }
 
 .inboxsdk__shortcutHelp_title img.inboxsdk__icon {
-  background-color: white;
   height: 21px;
   width: 21px;
   vertical-align: middle;

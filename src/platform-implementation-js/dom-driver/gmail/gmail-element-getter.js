@@ -95,7 +95,18 @@ var GmailElementGetter = {
 
 	getNavItemMenuInjectionContainer: function(){
 		return document.querySelectorAll('.aeN .n3')[0];
+	},
 
+	getActiveMoreMenu: function(){
+		var elements = document.querySelectorAll('.J-M.aX0.aYO.jQjAxd');
+
+		for(var ii=0; ii<elements.length; ii++){
+			if(elements[ii].style.display !== 'none'){
+				return elements[ii];
+			}
+		}
+
+		return null;
 	}
 
 };

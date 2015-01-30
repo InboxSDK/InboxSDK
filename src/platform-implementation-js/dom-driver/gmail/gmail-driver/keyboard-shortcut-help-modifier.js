@@ -70,10 +70,11 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 	},
 
 	_renderHelp: function(node){
-		var keys = this._shortcuts.keys();
-		if(keys.length === 0){
+		if(this._shortcuts.size === 0){
 			return;
 		}
+
+		var keys = this._shortcuts.keys();
 
 		var header = this._renderHeader();
 		var table = this._renderTable();
