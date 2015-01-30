@@ -1,10 +1,10 @@
 function log() {
-	console.log.apply(console, ['auto-complete'].concat(Array.prototype.slice.call(arguments)));
+	console.log.apply(console, ['search-suggestions'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.load(1, 'auto-complete').then(function(inboxSDK) {
-	inboxSDK.Search.registerSearchSuggestionsProvider(function(event) {
-		console.log('search autocompleter', event);
+InboxSDK.load(1, 'search-suggestions').then(function(inboxSDK) {
+	inboxSDK.Search.registerSearchSuggestionsProvider(function(query) {
+		log('search autocompleter', query);
 		return [
 			{
 				name: 'aaaaaaa',

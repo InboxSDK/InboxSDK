@@ -23,7 +23,7 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
     .filter((event) => event.type === 'suggestionsRequest')
     .map('.query')
     .flatMapLatest((query) =>
-      Bacon.fromPromise(RSVP.Promise.resolve(handler({query})), true)
+      Bacon.fromPromise(RSVP.Promise.resolve(handler(query)), true)
         .flatMap((suggestions) => {
           if (Array.isArray(suggestions)) {
             return Bacon.once(suggestions);

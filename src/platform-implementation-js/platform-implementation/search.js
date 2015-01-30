@@ -17,6 +17,9 @@ var Search = function(appId, driver){
 _.extend(Search.prototype,  {
 
 	registerSearchSuggestionsProvider: function(handler) {
+		if (typeof handler != 'function') {
+			throw new Error("Incorrect arguments");
+		}
 		var members = memberMap.get(this);
 		members.driver.registerSearchSuggestionsProvider(handler);
 	},

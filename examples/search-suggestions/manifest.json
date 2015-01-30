@@ -1,5 +1,5 @@
 {
-  "name": "Search Auto-Complete - Example Gmail Extension",
+  "name": "Search Suggestions - Example Gmail Extension",
   "description": "Example extension showing use of the Streak Gmail SDK",
   "version": "0.1",
   "content_scripts": [
