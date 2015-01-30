@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var RSVP = require('rsvp');
 
 var BasicClass = require('../../../lib/basic-class');
 
@@ -18,6 +19,8 @@ var GmailCollapsibleSectionView = function(groupOrderHint, isSearch){
 	this._groupOrderHint = groupOrderHint;
 	this._eventStream = new Bacon.Bus();
 	this._collapsedContainer = null;
+
+	this._isReadyDeferred = new RSVP.defer();
 };
 
 GmailCollapsibleSectionView.prototype = Object.create(BasicClass.prototype);
@@ -42,21 +45,25 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 
 	setCollapsibleSectionDescriptorProperty: function(collapsibleSectionDescriptorProperty){
 		collapsibleSectionDescriptorProperty.onValue(this, '_updateValues');
-
-		this._showLoading();
+		collapsibleSectionDescriptorProperty.take(1).onValue(this, '_showLoading');
+		collapsibleSectionDescriptorProperty.take(1).onValue(this._isReadyDeferred, 'resolve', this);
 	},
 
 	setCollapsed: function(value){
-		if(value){
-			this._collapse();
-		}
-		else{
-			this._expand();
-		}
+		this._isReadyDeferred.promise.then(function(self){
+			if(value){
+				self._collapse();
+			}
+			else{
+				self._expand();
+			}
+		});
 	},
 
 	setTableRows: function(tableRows){
-		this._setTableRows(tableRows);
+		this._isReadyDeferred.promise.then(function(self){
+			self._setTableRows(tableRows);
+		});
 	},
 
 	_updateValues: function(collapsibleSectionDescriptor){

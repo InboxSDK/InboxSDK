@@ -41,4 +41,22 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		}
 	});
 
+
+	inboxSDK.Toolbars.registerToolbarButtonForThreadView({
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		title: 'Monkeys 3',
+		section: inboxSDK.Toolbars.SectionNames.OTHER,
+		onClick: function(event){
+			console.log('monkeys 3');
+		}
+	});
+
+	inboxSDK.Toolbars.registerToolbarButtonForList({
+		title: 'Monkeys 4',
+		section: inboxSDK.Toolbars.SectionNames.OTHER,
+		onClick: function(event){
+			console.log('selected: ', event.selectedThreadRowViews.length);
+		}
+	});
+
 });
