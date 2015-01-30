@@ -2,6 +2,9 @@ var _ = require('lodash');
 var RSVP = require('rsvp');
 var assert = require('assert');
 var querystring = require('querystring');
+var Set = require('es6-unweak-collections').Set;
+
+var serversToIgnore = new Set();
 
 // Simple ajax helper.
 // opts:
@@ -26,12 +29,24 @@ function ajax(opts) {
       }
     }
 
+    var server = opts.url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//)[1];
+    if (serversToIgnore.has(server)) {
+      reject(new Error("Server at "+opts.url+" has told us to stop connecting"));
+      return;
+    }
+
     var xhr = new XMLHttpRequest();
     _.extend(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
       var err = new Error("Failed to load "+opts.url);
       err.event = event;
       err.xhr = xhr;
+
+      // give a way for a server to tell us to go away for now. Good fallback
+      // in case a bug ever causes clients to spam a server with requests.
+      if (xhr.status == 490) {
+        serversToIgnore.add(server);
+      }
       reject(err);
     };
     xhr.onload = function(event) {
