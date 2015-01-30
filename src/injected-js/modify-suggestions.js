@@ -6,14 +6,14 @@ module.exports = function modifySuggestions(responseText, modifications) {
   let parsed = gmailResponseProcessor.deserialize(responseText);
   const query = parsed[0][1];
   for (let modification of modifications) {
-    if (modification.name) {
+    if (_.has(modification, 'name')) {
       modification.nameHTML = _.escape(modification.name);
     } else {
       modification.name = htmlToText(modification.nameHTML);
     }
-    if (modification.description) {
+    if (_.has(modification, 'description')) {
       modification.descriptionHTML = _.escape(modification.description);
-    } else {
+    } else if (_.has(modification, 'descriptionHTML')) {
       modification.description = htmlToText(modification.descriptionHTML);
     }
     if (modification.URL) {
@@ -24,7 +24,7 @@ module.exports = function modifySuggestions(responseText, modifications) {
     let newItem = [
       "aso.sug", modification.searchTerm || query, modification.nameHTML, null, [], 34, null,
       "asor inboxsdk__custom_suggestion "+modification.owner, 0];
-    if (modification.descriptionHTML) {
+    if (_.has(modification, 'descriptionHTML')) {
       newItem[3] = [
         'aso.eme',
         modification.description,
