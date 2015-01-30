@@ -260,7 +260,7 @@ function _sendError(err, details, appId, sentByApp) {
     };
 
     ajax({
-      url: 'https://events.inboxsdk.com/api/v2/errors/log',
+      url: 'https://www.inboxsdk.com/api/v2/errors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -357,7 +357,7 @@ if (_isLoggerMaster && global.document) {
     var events = _trackedEventsQueue.removeAll();
 
     ajax({
-      url: 'https://events.inboxsdk.com/api/v2/track',
+      url: 'https://www.inboxsdk.com/api/v2/events',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
