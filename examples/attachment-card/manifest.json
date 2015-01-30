@@ -1,6 +1,5 @@
 {
-  "name": "Collapsible Sections Inbox SDK example",
-  "description": "Demonstrate adding collapsible sections list pages",
+  "name": "Attachment Card Example Extension",
   "version": "0.1",
   "content_scripts": [
     {
@@ -8,7 +7,7 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js","bacon.js","content.js"],
+      "js": ["inboxsdk.js", "app.js"],
       "run_at": "document_end"
     }
   ],
@@ -18,9 +17,8 @@
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
-    "monkey-face.jpg",
-    "lion.png",
-    "monkey.png"
+    "partycat.jpg",
+    "zipicon.png"
   ],
 
   "manifest_version": 2

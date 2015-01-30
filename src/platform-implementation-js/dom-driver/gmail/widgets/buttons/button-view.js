@@ -6,6 +6,8 @@ var simulateHover = require('../../../../lib/dom/simulate-hover');
 var isKeyboardKey = require('../../../../lib/dom/is-keyboard-key');
 var not = require('../../../../lib/not');
 
+var keyboardShortcutStream = require('../../../../lib/dom/keyboard-shortcut-stream');
+
 var BUTTON_COLOR_CLASSES = require('./button-color-classes');
 
 /*
@@ -30,11 +32,14 @@ var ButtonView = function(options){
 
 	this._buttonColor = options.buttonColor || this._buttonColor;
 
+	this._keyboardShortcutHandle = options.keyboardShortcutHandle;
+
 	this._createElement(options);
 
 	this._eventStream = new Bacon.Bus();
 	this._setupEventStream();
 	this._setupAestheticEvents();
+	this._setupKeyboardShortcutEvent();
 };
 
 ButtonView.prototype = Object.create(BasicClass.prototype);
@@ -55,6 +60,7 @@ _.extend(ButtonView.prototype, {
 		{name: '_hasDropdown', destroy: false, defaultValue: false},
 		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
 		{name: '_isEnabled', destroy: false, defaultValue: true},
+		{name: '_keyboardShortcutHandle', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
@@ -280,6 +286,15 @@ _.extend(ButtonView.prototype, {
 		else{
 			this._element.classList.add('inboxsdk__button_disabled');
 		}
+
+		this._eventStream.push({
+			eventName: 'enabledChanged',
+			isEnabled: this._isEnabled
+		});
+
+		if(this._isEnabled){
+			this._setupKeyboardShortcutEvent();
+		}
 	},
 
 	_setupEventStream: function(){
@@ -318,6 +333,26 @@ _.extend(ButtonView.prototype, {
 			event.stopPropagation();
 			event.preventDefault();
 		});
+
+	},
+
+	_setupKeyboardShortcutEvent: function(){
+		if(this._keyboardShortcutHandle){
+			this._eventStream.plug(
+				keyboardShortcutStream(this._keyboardShortcutHandle.chord)
+					.takeUntil(
+						this._eventStream.filter(function(event){
+							return event.eventName === 'enabledChanged' && event.isEnabled === false;
+						})
+					)
+					.map(function(domEvent){
+						return {
+							eventName: 'click',
+							domEvent: domEvent
+						};
+					})
+			);
+		}
 	},
 
 	_setupAestheticEvents: function(){

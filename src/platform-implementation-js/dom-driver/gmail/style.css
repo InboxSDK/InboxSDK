@@ -247,6 +247,14 @@ div.T-I.inboxsdk__button {
   display: none;
 }
 
+.inboxsdk__menuItem img, .inboxsdk__menuItem .inboxsdk__icon {
+  height: 16px;
+  width: 16px;
+  margin-left: -20px;
+  position: absolute;
+  margin-top: -1px;
+}
+
 /* end */
 
 /* modal */
@@ -583,6 +591,42 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* tooltip */
 
+/* gmail styles */
+
+.inboxsdk__tooltip .T-P {
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  background-color: #fff;
+  border: 1px solid;
+  border-color: #bbb #bbb #a8a8a8;
+  padding: 16px;
+  position: absolute;
+  z-index: 1201!important;
+}
+
+.inboxsdk__tooltip .aRM {
+  outline: none;
+  padding: 13px 10px 16px;
+  text-align: center;
+}
+
+.inboxsdk__tooltip .aRR {
+  color: #333;
+  font-size: 18px;
+  margin-top: 13px;
+}
+
+.inboxsdk__tooltip .aRQ {
+  color: #777;
+  font-size: 13px;
+  margin: 3px 0 14px 0;
+}
+
+
+
+
+/* end gmail styles */
+
 .inboxsdk__tooltip {
   position: fixed;
   z-index: 1300;
@@ -623,3 +667,67 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* end tooltip */
+
+
+/* attachment card */
+
+.inboxsdk__attachmentCard img.aQG.aYB {
+  max-width: 178px;
+  min-width: 178px;
+  min-height: 118px;
+}
+
+.inboxsdk__attachmentCard img.aZG.aYw {
+  background: none;
+}
+
+/* end attachment card */
+
+
+/* keyboard shortcut help */
+
+table.cf.wd.inboxsdk__shortcutHelp_table {
+  margin-bottom: 15px;
+}
+
+.inboxsdk__shortcutHelp_table td.Dn {
+  display: inline-block;
+  width: 50%;
+}
+
+.inboxsdk__shortcutHelp_table table.cf {
+  display: block;
+}
+
+.inboxsdk__shortcutHelp_table tbody tbody {
+  display: block;
+}
+
+.inboxsdk__shortcutHelp_table tbody tbody tr {
+  display: block;
+  white-space: nowrap;
+}
+
+.inboxsdk__shortcutHelp_table td.wg.Dn {
+  display: inline-block;
+  width: 45%;
+}
+
+.inboxsdk__shortcutHelp_table span.wb {
+  margin-left: 3px;
+}
+
+.inboxsdk__shortcutHelp_table td.we.Dn {
+  width: 60%;
+  white-space: normal;
+}
+
+.inboxsdk__shortcutHelp_title img.inboxsdk__icon {
+  height: 21px;
+  width: 21px;
+  vertical-align: middle;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+/* end keyboard shortcut help */

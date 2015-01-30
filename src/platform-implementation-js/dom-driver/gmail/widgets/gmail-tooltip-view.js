@@ -74,10 +74,10 @@ _.extend(GmailTooltipView.prototype, {
 							//image goes here
 						'</div>',
 						'<div class="aRR">',
-							_.escape(options.title),
+							_.escape(options.title || ""),
 						'</div>',
 						'<div class="aRQ">',
-							_.escape(options.subtitle),
+							_.escape(options.subtitle || ""),
 						'</div>',
 						'<div class="inboxsdk__tooltip_button">',
 							//button goes here
@@ -110,12 +110,14 @@ _.extend(GmailTooltipView.prototype, {
 		if(options.button){
 			var buttonOptions = _.clone(options.button);
 
-			buttonOptions.color = 'blue';
+			buttonOptions.buttonColor = 'blue';
 
 			var oldOnClick = buttonOptions.onClick;
 			buttonOptions.onClick = function(){
 				self.destroy();
-				oldOnClick();
+				if(oldOnClick){
+					oldOnClick();
+				}
 			};
 
 			buttonOptions.buttonView = new ButtonView(buttonOptions);

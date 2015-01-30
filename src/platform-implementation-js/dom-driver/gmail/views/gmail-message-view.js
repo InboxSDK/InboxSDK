@@ -39,7 +39,6 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_threadViewDriver', destroy: false, get: true},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
-		{name: '_addedAttachmentCardOptions', destroy: false, defaultValue: {}},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
 		{name: '_messageLoaded', destroy: false, defaultValue: false}
 	],
@@ -101,26 +100,18 @@ _.extend(GmailMessageView.prototype, {
 		return this._gmailAttachmentAreaView.getAttachmentCardViews();
 	},
 
+	addAttachmentCardNoPreview: function(options){
+		var newOptions = _.clone(options);
+
+		return this._addAttachmentCard(newOptions);
+	},
+
 	addAttachmentCard: function(options){
-		var attachmentCardOptionsHash = this._getAttachmentCardOptionsHash(options);
+		var newOptions = _.clone(options);
 
-		if(this._addedAttachmentCardOptions[attachmentCardOptionsHash]){
-			return;
-		}
+		delete newOptions.iconThumbnailUrl;
 
-		var gmailAttachmentCardView = new GmailAttachmentCardView(options);
-
-		if(!this._gmailAttachmentAreaView){
-			this._gmailAttachmentAreaView = this._getAttachmentArea();
-		}
-
-		if(!this._gmailAttachmentAreaView){
-			this._gmailAttachmentAreaView = this._createAttachmentArea();
-		}
-
-		this._gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
-
-		this._addedAttachmentCardOptions[attachmentCardOptionsHash] = true;
+		return this._addAttachmentCard(newOptions);
 	},
 
 	addButtonToDownloadAllArea: function(options){
@@ -158,6 +149,22 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		simulateClick(this._element.querySelector('.iv'));
+	},
+
+	_addAttachmentCard: function(options){
+		var gmailAttachmentCardView = new GmailAttachmentCardView(options);
+
+		if(!this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView = this._getAttachmentArea();
+		}
+
+		if(!this._gmailAttachmentAreaView){
+			this._gmailAttachmentAreaView = this._createAttachmentArea();
+		}
+
+		this._gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
+
+		return gmailAttachmentCardView;
 	},
 
 	_setupMessageStateStream: function(){
@@ -338,10 +345,6 @@ _.extend(GmailMessageView.prototype, {
 				 })
 
 		);
-	},
-
-	_getAttachmentCardOptionsHash: function(options){
-		return options.fileName + options.previewUrl + options.downloadUrl;
 	},
 
 	_getDownloadAllAreaButtonOptionsHash: function(options){

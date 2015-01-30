@@ -77,6 +77,7 @@ _.extend(GmailComposeView.prototype, {
 	_setupStreams: function(){
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
+		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
 	},
 
 	_setupConsistencyCheckers: function(){
@@ -236,6 +237,19 @@ _.extend(GmailComposeView.prototype, {
 
 	getSendButton: function(){
 		return this._element.querySelector('.IZ .Up > div > [role=button]');
+	},
+
+	getSendAndArchiveButton: function(){
+		if(!this.isReply()){
+			return null;
+		}
+
+		var siblings = $(this.getSendButton()).siblings();
+		if(siblings.length === 0){
+			return null;
+		}
+
+		return siblings.first().find('[role=button]')[0];
 	},
 
 	getCloseButton: function(){
