@@ -86,18 +86,27 @@ module.exports = function registerSearchAutocompleter(driver, handler) {
         // that were injected by this extension
         .filter((row) => row.getElementsByClassName(id).length > 0)
         // and listen to click and enter events on them
-        .flatMap((row) => Bacon.mergeAll(
-          fromEventTargetCapture(row, 'click'),
-          suggestionsBoxEnterPresses
-            .filter(() => row.classList.contains('gssb_i'))
-        ))
+        .flatMap((row) =>
+          Bacon.mergeAll(
+            fromEventTargetCapture(row, 'click'),
+            suggestionsBoxEnterPresses
+              .filter(() => row.classList.contains('gssb_i'))
+          ).map((event) => ({event, row, searchBox}))
+        )
     )
-    .combine(searchBoxStream, (a,b) => [a,b])
-    .onValue(([event, searchBox]) => {
-      event.stopImmediatePropagation();
-      event.preventDefault();
-      searchBox.blur();
-      searchBox.value = "";
-      setTimeout(() => alert('custom option selected'), 0);
+    .onValue(({event, row, searchBox}) => {
+      const itemURLspan = row.querySelector('span[data-inboxsdk-item-url]');
+      const itemURL = itemURLspan && itemURLspan.getAttribute('data-inboxsdk-item-url');
+      if (itemURL) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        searchBox.blur();
+        searchBox.value = "";
+        if (itemURL.indexOf('#') === 0) {
+          window.location = itemURL;
+        } else {
+          window.open(itemURL);
+        }
+      }
     });
 };

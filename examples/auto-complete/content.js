@@ -11,16 +11,19 @@ InboxSDK.load(1, 'auto-complete').then(function(inboxSDK) {
 				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png'
 			},
 			{
-				name: 'beeeep'
+				name: 'beeeep',
+				searchTerm: 'bop'
 			},
 			{
-				name: 'name',
-				description: 'description'
+				name: 'Bacon API',
+				description: 'Why not have a link in search?',
+				URL: 'https://baconjs.github.io/api.html'
 			},
 			{
-				name: 'name',
-				description: 'description',
-				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png'
+				name: 'Drafts',
+				description: 'Jumps to drafts folder',
+				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png',
+				URL: '#drafts'
 			}
 		];
 	});

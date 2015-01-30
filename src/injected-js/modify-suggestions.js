@@ -12,8 +12,13 @@ module.exports = function modifySuggestions(responseText, modifications) {
     if (modification.description) {
       modification.descriptionHTML = _.escape(modification.description);
     }
+    if (modification.URL) {
+      modification.nameHTML +=
+        ' <span style="display:none" data-inboxsdk-item-url="' +
+        _.escape(modification.URL) + '"></span>';
+    }
     let newItem = [
-      "aso.sug", query, modification.nameHTML, null, [], 34, null,
+      "aso.sug", modification.searchTerm || query, modification.nameHTML, null, [], 34, null,
       "asor inboxsdk__custom_suggestion "+modification.owner, 0];
     if (modification.descriptionHTML) {
       newItem[3] = [
