@@ -12,7 +12,7 @@ module.exports = logger;
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-var _appIds = Object.create(null);
+var _appIds = [];
 var _LOADER_VERSION;
 var _IMPL_VERSION;
 var _userEmailHash;
@@ -36,7 +36,10 @@ var _trackedEventsQueue = new PersistentQueue('events');
 
 // Set up error logging.
 logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-  _appIds[appId] = opts.appVersion || null;
+  _appIds.push({
+    appId: appId,
+    version: opts.appVersion || undefined
+  });
   if (_LOADER_VERSION) {
     // If we've been set up before, don't do it all again.
     return;
@@ -237,20 +240,26 @@ function _sendError(err, details, appId, sentByApp) {
 
     console.error.apply(console, stuffToLog);
 
+    var appIds = _.cloneDeep(_appIds);
+    appIds.some(function(entry) {
+      if (entry.appId === appId) {
+        entry.causedBy = true;
+        return true;
+      }
+    });
+
     var report = {
       message: err && err.message || err,
       stack: err && err.stack,
       loggedFrom: nowStack,
       details: details,
-      appId: appId || undefined,
-      sentByApp: sentByApp,
-      appIds: _appIds,
+      appIds: appIds,
       sessionId: _sessionId,
       emailHash: _userEmailHash,
       extensionId: getExtensionId(),
       loaderVersion: _LOADER_VERSION,
       implementationVersion: _IMPL_VERSION,
-      clientRequestTimestamp: new Date().getTime()*1000
+      timestamp: new Date().getTime()*1000
     };
 
     ajax({
@@ -358,7 +367,7 @@ if (_isLoggerMaster && global.document) {
       },
       data: JSON.stringify({
         data: events,
-        clientRequestTimestamp: new Date().getTime()*1000
+        timestamp: new Date().getTime()*1000
       })
     });
   });
