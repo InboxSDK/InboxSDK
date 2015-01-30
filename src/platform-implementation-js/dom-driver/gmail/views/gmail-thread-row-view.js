@@ -2,6 +2,8 @@ var _ = require('lodash');
 var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
+var asap = require('asap');
+
 
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 var baconCast = require('bacon-cast');
@@ -171,8 +173,7 @@ _.extend(GmailThreadRowView.prototype, {
     var self = this;
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
-    var buttonImg = document.createElement('img');
-    buttonSpan.appendChild(buttonImg);
+    var buttonImg;
 
     var prop = baconCast(Bacon, buttonDescriptor).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue(function(buttonDescriptor) {
@@ -212,7 +213,6 @@ _.extend(GmailThreadRowView.prototype, {
         };
 
         buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
-        buttonImg.src = buttonDescriptor.iconUrl;
         buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
           var appEvent = {
             threadRowView: self._userView
@@ -226,16 +226,39 @@ _.extend(GmailThreadRowView.prototype, {
             } else {
               self._element.classList.add('inboxsdk__dropdown_active');
               appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
+              appEvent.dropdown.on('destroy', function(){
+                setTimeout(function(){
+                  activeDropdown = null;
+                }, 1);
+              });
             }
           }
           buttonDescriptor.onClick.call(null, appEvent);
         };
+
+        if(buttonImg){
+          if(buttonDescriptor.iconUrl){
+            buttonImg.src = buttonDescriptor.iconUr;
+          }
+          else{
+            buttonImg.remove();
+            buttonImg = null;
+          }
+        }
+        else if(buttonDescriptor.iconUrl){
+          buttonImg = document.createElement('img');
+          buttonImg.src = buttonDescriptor.iconUrl;
+
+          buttonSpan.insertBefore(buttonImg, buttonSpan.firstChild);
+        }
 
         if (!starGroup.contains(buttonSpan)) {
           starGroup.appendChild(buttonSpan);
           self._expandColumn('col.y5', 26*starGroup.children.length);
         }
       }
+
+
     });
   },
 

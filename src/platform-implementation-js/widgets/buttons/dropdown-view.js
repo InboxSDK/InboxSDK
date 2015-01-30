@@ -6,7 +6,7 @@ var Bacon = require('baconjs');
 var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
 
-var DropdownView = function(dropdownViewDriver, anchorElement, options){
+var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions){
 	EventEmitter.call(this);
 
 	var self = this;
@@ -33,7 +33,7 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 
 	asap(function() {
 		if (!self.closed) {
-			containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, options);
+			containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, placementOptions);
 		}
 	});
 };
