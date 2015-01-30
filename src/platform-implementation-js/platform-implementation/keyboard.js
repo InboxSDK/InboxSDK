@@ -41,7 +41,7 @@ _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 
 /**
  * @class
- * Describes a keyboard dhortcut combination
+ * Describes a keyboard shortcut combination
  */
 var KeyboardShortcutDescriptor = /** @lends KeyboardShortcutDescriptor */ {
 
