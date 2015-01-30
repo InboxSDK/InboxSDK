@@ -23,6 +23,7 @@ var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
 var exec = require('./src/build/exec');
 var spawn = require('./src/build/spawn');
+var escapeShellArg = require('./src/build/escape-shell-arg');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
@@ -236,7 +237,7 @@ gulp.task('docs', function(cb) {
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
-  var results = execSync("node_modules/.bin/jsdoc " + file + ' -t templates/haruki -d console -q format=json', true);
+  var results = execSync("node_modules/.bin/jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', true);
   if (results.stderr)
     console.error(results.stderr);
   var comments = JSON.parse(results.stdout);
