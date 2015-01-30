@@ -304,9 +304,15 @@ _.extend(GmailMessageView.prototype, {
 				}
 			} else {
 				if (currentReplyElementRemovalStream) {
-					currentReplyElementRemovalStream.push(null);
-					currentReplyElementRemovalStream.end();
+					// Ending the currentReplyElementRemovalStream can trigger something
+					// that triggers the mutation observer stream which will call back into
+					// this function before we've unset currentReplyElementRemovalStream,
+					// so we need to copy the bus to a temporary variable and unset
+					// currentReplyElementRemovalStream first.
+					var temp = currentReplyElementRemovalStream;
 					currentReplyElementRemovalStream = null;
+					temp.push(null);
+					temp.end();
 				}
 			}
 		});

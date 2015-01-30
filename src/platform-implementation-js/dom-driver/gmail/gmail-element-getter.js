@@ -65,6 +65,14 @@ var GmailElementGetter = {
 		return document.querySelectorAll('[gh=tl]');
 	},
 
+	getSearchInput: function() {
+		return document.getElementById('gbqfq');
+	},
+
+	getSearchSuggestionsBoxParent: function() {
+		return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
+	},
+
 	getToolbarElementContainer: function(){
 		return document.querySelector('[gh=tm]').parentElement;
 	},
@@ -95,7 +103,18 @@ var GmailElementGetter = {
 
 	getNavItemMenuInjectionContainer: function(){
 		return document.querySelectorAll('.aeN .n3')[0];
+	},
 
+	getActiveMoreMenu: function(){
+		var elements = document.querySelectorAll('.J-M.aX0.aYO.jQjAxd');
+
+		for(var ii=0; ii<elements.length; ii++){
+			if(elements[ii].style.display !== 'none'){
+				return elements[ii];
+			}
+		}
+
+		return null;
 	}
 
 };

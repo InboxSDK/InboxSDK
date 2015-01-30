@@ -2,6 +2,7 @@ var _ = require('lodash');
 var RSVP = require('rsvp');
 var cproc = require('child_process');
 
+// Executes a process and captures stdout.
 function exec() {
   var args = _.toArray(arguments);
   return new RSVP.Promise(function(resolve, reject) {

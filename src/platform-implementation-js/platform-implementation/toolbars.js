@@ -81,7 +81,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 			}
 		}
 
-		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames);
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames, members.appId);
 	};
 }
 
@@ -257,7 +257,15 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	* ^default=null
 	* @type {function(RouteView)}
 	*/
-	hideFor:null
+	hideFor:null,
+
+	/**
+	* The keyboard shortcut that will activate this button
+	* ^optional
+	* ^default=null
+	* @type {keyboardShortcutHandle}
+	*/
+	 keyboardShortcutHandle: null
 };
 
 

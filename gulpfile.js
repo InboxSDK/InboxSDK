@@ -22,9 +22,11 @@ var globp = RSVP.denodeify(require('glob'));
 var streamToPromise = require('./src/common/stream-to-promise');
 var envify = require('envify/custom');
 var exec = require('./src/build/exec');
+var spawn = require('./src/build/spawn');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
+var to5ify = require("6to5ify");
 var execSync = require('exec-sync');
 
 var sdkFilename = 'inboxsdk.js';
@@ -98,6 +100,8 @@ function browserifyTask(name, deps, entry, destname) {
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
       VERSION: getVersion()
+    })).transform(to5ify.configure({
+      optional: ["selfContained"]
     }));
 
     function buildBundle() {
@@ -185,7 +189,21 @@ gulp.task('clean', function(cb) {
   rimraf('./dist/', cb);
 });
 
+gulp.task('test', ['test-unit', 'test-jsdom']);
 
+gulp.task('test-unit', function() {
+  return spawn('node_modules/.bin/mocha');
+});
+
+gulp.task('test-jsdom', ['test-jsdom-inboxsdk', 'test-jsdom-iti']);
+
+gulp.task('test-jsdom-inboxsdk', function() {
+  return spawn('node_modules/.bin/6to5-node', ['test/jsdom/inboxsdk.js']);
+});
+
+gulp.task('test-jsdom-iti', function() {
+  return spawn('node_modules/.bin/6to5-node', ['test/jsdom/injected-thread-identifier.js']);
+});
 
 gulp.task('docs', function(cb) {
   parseCommentsInFile('gulpfile.js');

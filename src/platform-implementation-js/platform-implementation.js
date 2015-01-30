@@ -6,13 +6,14 @@ var MembraneMap = require('./lib/membrane-map');
 
 var Compose = require('./platform-implementation/compose');
 var Conversations = require('./platform-implementation/conversations');
-var User = require('./platform-implementation/user');
+var Keyboard = require('./platform-implementation/keyboard.js');
 var Modal = require('./platform-implementation/modal');
-var Router = require('./platform-implementation/router');
-var Search = require('./platform-implementation/search');
 var Mailbox = require('./platform-implementation/mailbox');
 var NavMenu = require('./platform-implementation/nav-menu');
+var Router = require('./platform-implementation/router');
+var Search = require('./platform-implementation/search');
 var Toolbars = require('./platform-implementation/toolbars');
+var User = require('./platform-implementation/user');
 
 var logger = require('./lib/logger');
 
@@ -45,6 +46,7 @@ var PlatformImplementation = function(appId, opts){
 
 	this.Compose = new Compose(appId, this._driver, this._membraneMap);
 	this.Conversations = new Conversations(appId, this._driver, this._membraneMap);
+	this.Keyboard = new Keyboard(appId, opts.appIconUrl, this._driver, this._membraneMap);
 	this.User = new User(appId, this._driver, this._membraneMap);
 	this.Mailbox = new Mailbox(appId, this._driver, this._membraneMap);
 	this.NavMenu = new NavMenu(appId, this._driver, this._membraneMap);

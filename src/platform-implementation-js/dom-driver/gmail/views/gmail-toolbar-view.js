@@ -5,8 +5,12 @@ var $ = require('jquery');
 var Bacon = require('baconjs');
 
 var waitFor = require('../../../lib/wait-for');
+var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
 
 var ToolbarViewDriver = require('../../../driver-interfaces/toolbar-view-driver');
+
+var GmailElementGetter = require('../gmail-element-getter');
 
 var ButtonView = require('../widgets/buttons/button-view');
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
@@ -32,6 +36,7 @@ var GmailToolbarView = function(element, routeViewDriver){
 
 	this._ready.then(function(){
 		if (!self._element) return;
+		self._startMonitoringMoreMenu();
 		self._determineToolbarState();
 		self._determineToolbarIconMode();
 		self._setupToolbarStateMonitoring();
@@ -50,6 +55,7 @@ _.extend(GmailToolbarView.prototype, {
 		{name: '_parentElement', destroy: false},
 		{name: '_toolbarState', destroy: false},
 		{name: '_routeViewDriver', destroy: false, get: true},
+		{name: '_moreMenuItems', destroy: false, defaultValue: []},
 		{name: '_classMutationObsever', destroy: true, destroyFunction: 'disconnect'},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
@@ -75,14 +81,18 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 
-	addButton: function(buttonDescriptor, toolbarSections){
+	addButton: function(buttonDescriptor, toolbarSections, appId){
 		var self = this;
 		this._ready.then(
 			function(){
 				if (!self._element) return;
 
-				if(buttonDescriptor.section === toolbarSections.MORE){
-					//do something different
+				if(buttonDescriptor.section === toolbarSections.OTHER){
+					self._moreMenuItems.push({
+						buttonDescriptor: buttonDescriptor,
+						appId: appId
+					});
+					self._addToOpenMoreMenu(buttonDescriptor, appId);
 				}
 				else{
 					var sectionElement = self._getSectionElement(buttonDescriptor.section, toolbarSections);
@@ -93,6 +103,7 @@ _.extend(GmailToolbarView.prototype, {
 					sectionElement.appendChild(buttonViewController.getView().getElement());
 
 					self._updateButtonClasses(self._element);
+					buttonViewController.getView().setEnabled(self._toolbarState === 'EXPANDED');
 				}
 			}
 		);
@@ -140,6 +151,26 @@ _.extend(GmailToolbarView.prototype, {
 		return buttonView;
 	},
 
+	_startMonitoringMoreMenu: function(){
+		var moreButtonElement = this._element.querySelector('.nf[role=button]');
+		if(!moreButtonElement){
+			return;
+		}
+
+		var self = this;
+		makeMutationObserverStream(moreButtonElement, {attributes: true, attributeFilter: ['aria-expanded']})
+			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.map(function(){
+				return moreButtonElement.getAttribute('aria-expanded');
+			})
+			.startWith(moreButtonElement.getAttribute('aria-expanded'))
+			.filter(function(ariaExpanded){
+				return ariaExpanded === 'true';
+			})
+			.onValue(this, '_addMoreItems');
+
+	},
+
 	_determineToolbarState: function(){
 		var sectionElement = this._getMoveSectionElement();
 
@@ -153,7 +184,7 @@ _.extend(GmailToolbarView.prototype, {
 
 	_determineToolbarIconMode: function(){
 		var sectionElement = this._getMoveSectionElement();
-		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.length  === 0){
+		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.trim().length  === 0){
 			this._element.setAttribute('data-toolbar-icononly', 'true');
 		}
 		else{
@@ -172,6 +203,7 @@ _.extend(GmailToolbarView.prototype, {
 			}
 
 			self._updateButtonClasses(self._element);
+			self._updateButtonEnabledState();
 		});
 
 		this._classMutationObsever.observe(
@@ -186,13 +218,10 @@ _.extend(GmailToolbarView.prototype, {
 		}
 
 		switch(sectionName){
-			case toolbarSections.CHECKBOX:
-				return this._getCheckboxSectionElement();
-
-			case toolbarSections.ARCHIVE:
+			case toolbarSections.INBOX_STATE:
 				return this._getArchiveSectionElement();
 
-			case toolbarSections.MOVE:
+			case toolbarSections.METADATA_STATE:
 				return this._getMoveSectionElement();
 
 			default:
@@ -288,6 +317,120 @@ _.extend(GmailToolbarView.prototype, {
 		});
 	},
 
+	_updateButtonEnabledState: function(){
+		var enabled = this._toolbarState === 'EXPANDED';
+		this._buttonViewControllers.forEach(function(buttonViewController){
+			buttonViewController.getView().setEnabled(enabled);
+		});
+	},
+
+	_addMoreItems: function(){
+		var self = this;
+
+		this._clearMoreItems();
+
+		if(this._toolbarState !== 'EXPANDED'){
+			return;
+		}
+
+		this._moreMenuItems.forEach(function(item){
+			self._addToOpenMoreMenu(item.buttonDescriptor, item.appId);
+		});
+	},
+
+	_clearMoreItems: function(){
+		var moreMenu = GmailElementGetter.getActiveMoreMenu();
+		if(!moreMenu){
+			return;
+		}
+
+		_.chain(this._moreMenuItems)
+			.pluck('appId')
+			.uniq()
+			.map(function(appId){
+				return moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
+			})
+			.compact()
+			.each(function(container){
+				container.remove();
+			});
+	},
+
+	_addToOpenMoreMenu: function(buttonDescriptor, appId){
+		var moreMenu = GmailElementGetter.getActiveMoreMenu();
+		if(!moreMenu){
+			return;
+		}
+
+		var appDiv = this._getMoreMenuItemsContainer(moreMenu, appId);
+		var menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
+
+		var insertBeforeElement = getInsertBeforeElement(menuItemElement, appDiv.querySelectorAll('[role=menuitem]'), ['data-order-hint']);
+
+		if(insertBeforeElement){
+			appDiv.insertBefore(menuItemElement, insertBeforeElement);
+		}
+		else{
+			appDiv.appendChild(menuItemElement);
+		}
+	},
+
+	_getMoreMenuItemsContainer: function(moreMenu, appId){
+		var container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
+		if(container){
+			return container;
+		}
+
+		container = document.createElement('div');
+		container.setAttribute('data-group-order-hint', appId);
+		container.innerHTML = '<div class="J-Kh"></div>';
+
+		var containers = moreMenu.querySelectorAll('[data-group-order-hint]');
+		var insertBeforeElement = getInsertBeforeElement(container, containers, ['data-group-order-hint']);
+
+		if(insertBeforeElement){
+			moreMenu.insertBefore(container, insertBeforeElement);
+		}
+		else{
+			moreMenu.appendChild(container);
+		}
+
+		return container;
+	},
+
+	_getMoreMenuItemElement: function(buttonDescriptor){
+		var itemElement = document.createElement('div');
+		itemElement.setAttribute('class', 'J-N inboxsdk__menuItem');
+		itemElement.setAttribute('role', 'menuitem');
+		itemElement.setAttribute('orderHint', buttonDescriptor.orderHint || 0);
+
+		itemElement.innerHTML = [
+			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
+				 buttonDescriptor.iconUrl ? '<img src="' + buttonDescriptor.iconUrl + '" />' : '',
+				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + buttonDescriptor.iconClass + '"></span>' : '',
+				_.escape(buttonDescriptor.title),
+			'</div>'
+		].join('');
+
+		itemElement.addEventListener('mouseenter', function(){
+			itemElement.classList.add('J-N-JT');
+		});
+
+		itemElement.addEventListener('mouseleave', function(){
+			itemElement.classList.remove('J-N-JT');
+		});
+
+		itemElement.addEventListener('click', function(){
+
+			if(buttonDescriptor.onClick){
+				buttonDescriptor.onClick();
+			}
+
+		});
+
+		return itemElement;
+	},
+
 	destroy: function(){
 		var element = this._element;
 
@@ -300,7 +443,7 @@ _.extend(GmailToolbarView.prototype, {
 			}
 		}
 
-
+		this._clearMoreItems();
 		ToolbarViewDriver.prototype.destroy.call(this);
 		this._updateButtonClasses(element);
 	}

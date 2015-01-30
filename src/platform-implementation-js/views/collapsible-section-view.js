@@ -223,30 +223,42 @@ var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
 
 	/**
 	* Subtitle
+	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	subtitle: null,
 
 	/**
-	* Text to display in the summary area of the CollapsibleSectionView. Typically page counts are displayed here.
+	* Text to display in the summary area of the CollapsibleSectionView. Typically page
+	* counts are displayed here.
+	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	summaryText: null,
 
 	/**
 	* A function to call when the summary text has been clicked
+	* ^optional
+	* ^default=null
 	* @type {function()}
 	*/
 	onSummaryClick: null,
 
 	/**
 	* Whether to display a dropdown arrow for more options on the collapsible section
+	* ^optional
+	* ^default=false
 	* @type {boolean}
 	*/
 	hasDropdown: null,
 
 	/**
-	* A function to call when the dropdown is opened. Your function is passed an event object with a single <code>dropdown</code> property.
+	* A function to call when the dropdown is opened. Your function is passed an
+	* event object with a single <code>dropdown</code> property.
+	* ^optional
+	* ^default=null
 	* @type {function(event)}
 	*/
 	onDropdownClick: null

@@ -1,6 +1,6 @@
 {
-  "name": "Collapsible Sections Inbox SDK example",
-  "description": "Demonstrate adding collapsible sections list pages",
+  "name": "Search Suggestions - Example Gmail Extension",
+  "description": "Example extension showing use of the Streak Gmail SDK",
   "version": "0.1",
   "content_scripts": [
     {
@@ -8,7 +8,7 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js","bacon.js","content.js"],
+      "js": ["inboxsdk.js","content.js"],
       "run_at": "document_end"
     }
   ],
@@ -17,11 +17,7 @@
     "https://inbox.google.com/"
   ],
   "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "monkey-face.jpg",
-    "lion.png",
-    "monkey.png"
+    "inboxsdk.js.map"
   ],
-
   "manifest_version": 2
 }
