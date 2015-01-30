@@ -5,6 +5,10 @@ div.T-I.inboxsdk__button {
   min-width: 27px;
 }
 
+.inboxsdk__no_bg {
+  background: none;
+}
+
 .inboxsdk__button.inboxsdk__button_disabled {
   opacity: 0.55;
 }
