@@ -48,7 +48,7 @@ var KeyboardShortcutDescriptor = /** @lends KeyboardShortcutDescriptor */ {
   /**
   * The keys the user has to press to activate the shortcut. Simultaneous keypresses can be defined with "+".
   * For multi-key chords (like Gmail's) include a space between the keys, i.e. "g i".
-  * @type{Element}
+  * @type {string}
   */
   chord:  null,
 
