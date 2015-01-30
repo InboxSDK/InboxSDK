@@ -36,7 +36,6 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			title: 'Lions',
 			subtitle: 'lions',
 			summaryText: 'click me',
-			isRead: true,
 			onSummaryClick: function(){
 				console.log('clicked!');
 			}
@@ -72,6 +71,15 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 				}
 			}
 		]);
+
+
+		var bus = new Bacon.Bus();
+		listRouteView.addCollapsibleSection(bus);
+
+		bus.push({
+			title: 'Stream',
+			subtitle: "I'm so streamy"
+		});
 
 	});
 

@@ -64,9 +64,9 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	getThreadID: function(){
-		var params = this._routeViewDriver.getParams();
+		var params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
-		if(params.threadID){
+		if(params && params.threadID){
 			return params.threadID;
 		}
 

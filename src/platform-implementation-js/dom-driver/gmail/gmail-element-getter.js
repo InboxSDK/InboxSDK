@@ -35,7 +35,12 @@ var GmailElementGetter = {
 
 	getContentSectionElement: function(){
 		var leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
-		return leftNavContainer.nextElementSibling.children[0];
+		if(leftNavContainer){
+			return leftNavContainer.nextElementSibling.children[0];
+		}
+		else{
+			return null;
+		}
 	},
 
 	getMainContentContainer: function(){
@@ -98,7 +103,18 @@ var GmailElementGetter = {
 
 	getNavItemMenuInjectionContainer: function(){
 		return document.querySelectorAll('.aeN .n3')[0];
+	},
 
+	getActiveMoreMenu: function(){
+		var elements = document.querySelectorAll('.J-M.aX0.aYO.jQjAxd');
+
+		for(var ii=0; ii<elements.length; ii++){
+			if(elements[ii].style.display !== 'none'){
+				return elements[ii];
+			}
+		}
+
+		return null;
 	}
 
 };

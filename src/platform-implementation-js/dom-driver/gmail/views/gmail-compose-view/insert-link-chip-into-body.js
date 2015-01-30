@@ -3,10 +3,7 @@ var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 function insertLinkChipIntoBody(gmailComposeView, options){
-    return new RSVP.Promise(function(resolve, reject){
-        _insertLinkChipIntoBody(gmailComposeView, options);
-        resolve();
-    });
+    return _insertLinkChipIntoBody(gmailComposeView, options);
 }
 
 function _insertLinkChipIntoBody(gmailComposeView, options){

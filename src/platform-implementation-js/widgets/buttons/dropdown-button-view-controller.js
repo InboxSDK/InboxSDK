@@ -50,15 +50,12 @@ _.extend(DropdownButtonViewController.prototype, {
 	},
 
 	_bindToViewEvents: function(){
-		var self = this;
 		this._view
 			.getEventStream()
 			.filter(function(event){
 				return event.eventName === 'click';
 			})
-			.onValue(function(){
-				self._toggleDropdownState();
-			});
+			.onValue(this, '_toggleDropdownState');
 	},
 
 	_toggleDropdownState: function(){
