@@ -213,6 +213,14 @@ function _sendError(err, details, appId, sentByApp) {
       console.warn('First parameter to Logger.error was not an error object:', err);
     }
 
+    var appIds = _.cloneDeep(_appIds);
+    appIds.some(function(entry) {
+      if (entry.appId === appId) {
+        entry.causedBy = true;
+        return true;
+      }
+    });
+
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
     var nowStack = getStackTrace();
@@ -226,10 +234,7 @@ function _sendError(err, details, appId, sentByApp) {
     if (details) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", _appIds]);
-    if (appId) {
-      stuffToLog = stuffToLog.concat(["\nApp Id:", appId]);
-    }
+    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", JSON.stringify(appIds, null, 2)]);
     if (sentByApp) {
       stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
     }
@@ -239,14 +244,6 @@ function _sendError(err, details, appId, sentByApp) {
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
 
     console.error.apply(console, stuffToLog);
-
-    var appIds = _.cloneDeep(_appIds);
-    appIds.some(function(entry) {
-      if (entry.appId === appId) {
-        entry.causedBy = true;
-        return true;
-      }
-    });
 
     var report = {
       message: err && err.message || err,
@@ -263,10 +260,10 @@ function _sendError(err, details, appId, sentByApp) {
     };
 
     ajax({
-      url: 'https://events.inboxsdk.com/api/v2/errors',
+      url: 'https://events.inboxsdk.com/api/v2/errors/log',
       method: 'POST',
       headers: {
-        //'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       },
       data: JSON.stringify(report)
     }).catch(function(err2) {
