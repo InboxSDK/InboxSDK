@@ -34,6 +34,20 @@ PageCommunicator.prototype = {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }),
 
+  announceSearchAutocompleter: function() {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, null);
+    document.dispatchEvent(event);
+  },
+
+  provideAutocompleteSuggestions: function(query, suggestions) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKprovideSuggestions', false, false, {
+      query, suggestions
+    });
+    document.dispatchEvent(event);
+  },
+
   createCustomSearchTerm: function(term) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcreateCustomSearchTerm', false, false, {

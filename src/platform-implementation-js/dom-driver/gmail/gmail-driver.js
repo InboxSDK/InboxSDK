@@ -55,6 +55,10 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, routeID, params);
 	},
 
+	registerSearchSuggestionsProvider: function(handler) {
+		require('./gmail-driver/register-search-suggestions-provider')(this, handler);
+	},
+
 	registerSearchQueryRewriter: function(obj) {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	},

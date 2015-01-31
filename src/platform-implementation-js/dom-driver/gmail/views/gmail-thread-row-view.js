@@ -360,18 +360,14 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getContacts: function(){
-    var senderSpans = this._element.querySelectorAll('[email]');
+    const senderSpans = this._element.querySelectorAll('[email]');
 
     return _.chain(senderSpans)
-            .map(function(span){
-              return {
-                emailAddress: span.getAttribute('email'),
-                name: span.getAttribute('name')
-              };
-            })
-            .uniq(function(contact){
-              return contact.emailAddress;
-            })
+            .map((span) => ({
+              emailAddress: span.getAttribute('email'),
+              name: span.getAttribute('name')
+            }))
+            .uniq((contact) => contact.emailAddress)
             .value();
   },
 

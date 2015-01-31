@@ -25,22 +25,32 @@ describe('GmailResponseProcessor', function(){
   });
 
   describe('serialization', function() {
-    it('test1', function() {
-      var data = require('./data/gmail-response-processor.json');
+    it('message send response', function() {
+      const data = require('./data/gmail-response-processor/send-response.json');
 
-      var decoded = GmailResponseProcessor.deserialize(data.input1);
-      assert.deepEqual(decoded, data.output1, 'deserialize test');
+      const decoded = GmailResponseProcessor.deserialize(data.input);
+      assert.deepEqual(decoded, data.output, 'deserialize test');
 
-      var reencoded = GmailResponseProcessor.serialize(decoded);
-      var redecoded = GmailResponseProcessor.deserialize(reencoded);
-      assert.deepEqual(redecoded, data.output1, 're-deserialize test');
+      const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
+      const redecoded = GmailResponseProcessor.deserialize(reencoded);
+      assert.deepEqual(redecoded, data.output, 're-deserialize test');
+    });
+
+    it('suggestions', function() {
+      const data = require('./data/gmail-response-processor/suggestions.json');
+
+      const decoded = GmailResponseProcessor.deserialize(data.input);
+      assert.deepEqual(decoded, data.output, 'deserialize test');
+
+      const reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
+      assert.strictEqual(reencoded, data.input, 'serialize test');
     });
   });
 
   describe('interpretSentEmailResponse', function() {
     it('can read new thread', function() {
       return readFile(
-        __dirname+'/data/gmail-message-sent-response.txt', 'utf8'
+        __dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8'
       ).then(function(rawResponse) {
         var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
         assert.strictEqual(response.gmailMessageId, '14a08f7810935cb3');
@@ -50,7 +60,7 @@ describe('GmailResponseProcessor', function(){
 
     it('can read reply', function() {
       return readFile(
-        __dirname+'/data/gmail-message-sent-response2.txt', 'utf8'
+        __dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8'
       ).then(function(rawResponse) {
         var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
         assert.strictEqual(response.gmailMessageId, '14a090139a3835a4');

@@ -6,20 +6,24 @@
     ]
   },
   "dependencies": {
+    "6to5-runtime": "^3.1.1",
+    "6to5ify": "^4.0.0",
     "asap": "^2.0.0",
     "bacon-cast": "1.0.0",
-    "baconjs": "0.7.42",
-    "brfs": "^1.2.0",
+    "baconjs": "0.7.43",
+    "brfs": "^1.3.0",
     "combokeys-capture": "^2.4.2",
     "entities": "1.1.1",
     "es6-unweak-collections": "0.4.3",
     "isnumber": "^1.0.0",
     "jquery": "2.1.3",
     "lodash": "2.4.1",
-    "rsvp": "3.0.14"
+    "rsvp": "3.0.14",
+    "sha256": "0.1.1"
   },
   "description": "Library for browser extensions to interact with Gmail.",
   "devDependencies": {
+    "6to5": "^3.1.1",
     "browserify": "^8.1.1",
     "envify": "^3.2.0",
     "exec-sync": "^0.1.6",
@@ -31,7 +35,8 @@
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^1.1.0",
     "gulp-util": "^3.0.2",
-    "jsdom": "^3.0.0",
+    "jsdoc": "^3.3.0-beta1",
+    "jsdom": "^3.1.0",
     "mocha": "^2.0.1",
     "mold-source-map": "^0.3.0",
     "node-dir": "^0.1.6",
@@ -47,7 +52,7 @@
   "private": true,
   "scripts": {
     "start": "gulp default --single --watch --reloader",
-    "test": "mocha"
+    "test": "gulp test"
   },
   "version": "0.7.6"
 }

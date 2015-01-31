@@ -283,6 +283,13 @@ _.extend(GmailComposeView.prototype, {
 
 	ensureGroupingIsOpen: function(type){
 		require('./gmail-compose-view/ensure-grouping-is-open')(this._element, type);
+	},
+
+	destroy: function(){
+		this._eventStream.end();
+		this._eventStream = null;
+
+		ComposeWindowDriver.prototype.destroy.call(this);
 	}
 
 });

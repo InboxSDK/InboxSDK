@@ -9,6 +9,8 @@ var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 var simulateClick = require('../../../../lib/dom/simulate-click');
 var waitFor = require('../../../../lib/wait-for');
 
+var positionFormattingToolbar = require('./position-formatting-toolbar');
+
 var Map = require('es6-unweak-collections').Map;
 var memberMap = new Map();
 
@@ -38,6 +40,7 @@ function manageButtonGrouping(gmailComposeView){
 
 	gmailComposeView.getEventStream().onEnd(function(){
 		memberMap.delete(gmailComposeView);
+		gmailComposeView.getElement().setAttribute('data-button-grouping-managed', 'false');
 	});
 }
 
@@ -197,7 +200,7 @@ function _isToggleExpanded(){
 }
 
 function _fixToolbarPosition(gmailComposeView){
-	_positionFormattingToolbar(gmailComposeView);
+	positionFormattingToolbar(gmailComposeView);
 
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
 	if(!groupedActionToolbarContainer){
@@ -239,16 +242,6 @@ function _positionGroupToolbar(gmailComposeView){
 	}
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
-}
-
-function _positionFormattingToolbar(gmailComposeView){
-	if(gmailComposeView.getFormattingToolbar() && gmailComposeView.getFormattingToolbar().style.display === ''){
-		var arrowElement = gmailComposeView.getFormattingToolbarArrow();
-		var buttonElement = gmailComposeView.getFormattingToolbarToggleButton();
-
-		var left = buttonElement.offsetLeft+buttonElement.clientWidth/2-arrowElement.offsetWidth/2;
-		arrowElement.style.left = left + 'px';
-	}
 }
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){

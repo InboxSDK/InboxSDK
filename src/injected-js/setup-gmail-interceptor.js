@@ -1,22 +1,28 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var XHRProxyFactory = require('./xhr-proxy-factory');
+var querystring = require('querystring');
 var threadIdentifier = require('./thread-identifier');
-var stringify = require('querystring').stringify;
+var stringify = querystring.stringify;
 var quotedSplit = require('../common/quoted-split');
+var modifySuggestions = require('./modify-suggestions');
 
 function setupGmailInterceptor() {
   threadIdentifier.setup();
 
-  var win = top.document.getElementById('js_frame').contentDocument.defaultView;
-  var originalXHR = win.XMLHttpRequest;
-
-  var wrappers = [];
-  var XHRProxy = XHRProxyFactory(originalXHR, wrappers);
-  win.XMLHttpRequest = XHRProxy;
+  const js_frame_wrappers = [], main_wrappers = [];
+  {
+    const js_frame = top.document.getElementById('js_frame').contentDocument.defaultView;
+    const js_frame_originalXHR = js_frame.XMLHttpRequest;
+    js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers);
+  }
+  {
+    const main_originalXHR = top.XMLHttpRequest;
+    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers);
+  }
 
   //email sending notifier
-  wrappers.push({
+  js_frame_wrappers.push({
     isRelevantTo: function(connection) {
       return connection.params.act === 'sm';
     },
@@ -37,7 +43,7 @@ function setupGmailInterceptor() {
     }
   });
 
-  wrappers.push({
+  js_frame_wrappers.push({
     isRelevantTo: function(connection) {
       return connection.params.search && connection.params.view === 'tl';
     },
@@ -56,6 +62,73 @@ function setupGmailInterceptor() {
       }
     }
   });
+
+  // Search suggestions modifier
+  // The content scripts tell us when they're interested in adding
+  // modifications to future suggestion results. When we see a search
+  // suggestions request come through, we signal the query string to the content
+  // scripts, wait for the same number of responses as the number of registered
+  // suggestion modifiers, and then meld them into the query response.
+  {
+    let modifierCount = 0;
+    let currentQuery;
+    let suggestionModifications;
+    let currentQueryDefer;
+
+    document.addEventListener('inboxSDKregisterSuggestionsModifier', function(event) {
+      modifierCount++;
+    });
+
+    document.addEventListener('inboxSDKprovideSuggestions', function(event) {
+      if (event.detail.query === currentQuery) {
+        suggestionModifications.push(event.detail.suggestions);
+        if (suggestionModifications.length === modifierCount) {
+          currentQueryDefer.resolve(_.flatten(suggestionModifications, true));
+          currentQueryDefer = currentQuery = suggestionModifications = null;
+        }
+      }
+    });
+
+    main_wrappers.push({
+      isRelevantTo: function(connection) {
+        return modifierCount > 0 &&
+          connection.url.match(/^\/cloudsearch\/request\?/) &&
+          connection.params.client == 'gmail' &&
+          connection.params.gs_ri == 'gmail';
+      },
+      originalSendBodyLogger: function(connection, body) {
+        const parsedBody = querystring.parse(body);
+        if (!parsedBody.request) {
+          return;
+        }
+        const query = JSON.parse(parsedBody.request)[2];
+        if (!query) {
+          return;
+        }
+        currentQuery = query;
+        if (currentQueryDefer)
+          currentQueryDefer.resolve();
+        currentQueryDefer = connection._defer = RSVP.defer();
+        suggestionModifications = [];
+        triggerEvent({
+          type: 'suggestionsRequest',
+          query: currentQuery
+        });
+      },
+      responseTextChanger: function(connection, responseText) {
+        if (connection._defer) {
+          return connection._defer.promise.then((modifications) => {
+            if (!modifications) {
+              return responseText;
+            } else {
+              return modifySuggestions(responseText, modifications);
+            }
+          });
+        }
+        return responseText;
+      }
+    });
+  }
 
   // Search query replacer.
   // The content script tells us search terms to watch for. Whenever we see a
@@ -77,7 +150,7 @@ function setupGmailInterceptor() {
     }
   });
 
-  wrappers.push({
+  js_frame_wrappers.push({
     isRelevantTo: function(connection) {
       var customSearchTerm;
       var params = connection.params;

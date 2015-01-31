@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var logger = require('./logger');
 var BasicClass = require('./basic-class');
 var Set = require('es6-unweak-collections').Set;
 
@@ -49,7 +50,7 @@ _.extend(HandlerRegistry.prototype, {
                 handler(target);
             }
             catch(err){
-                console.error(err);
+                logger.error(err);
             }
         });
     },
@@ -60,10 +61,7 @@ _.extend(HandlerRegistry.prototype, {
                 handler(target);
             }
             catch(err){
-                //rethrow in timeout to avoid Bacon's ridiculous error
-                setTimeout(function(){
-                    throw err;
-                }, 1);
+                logger.error(err);
             }
 
         });

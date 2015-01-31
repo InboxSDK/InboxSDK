@@ -44,7 +44,7 @@ function createLink(GmailRouteProcessor, routeID, params){
 		processedRoute = processedRoute.substring(0, processedRoute.length - 3);
 	}
 
-	return location.origin + '/#' + processedRoute;
+	return '#' + processedRoute;
 }
 
 module.exports = createLink;

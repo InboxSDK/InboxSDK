@@ -6,7 +6,7 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
 	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
-		console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
+		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
 		threadRowView.addLabel(Bacon.repeatedly(10000, [
 			{title:'A'},
 			{title:'B', textColor: 'blue'}

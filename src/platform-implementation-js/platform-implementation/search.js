@@ -16,6 +16,18 @@ var Search = function(appId, driver){
 
 _.extend(Search.prototype,  {
 
+	// handler must be a function that takes a string, and returns (optionally a
+	// Promise for) an array of suggestions objects. Each suggestion object may
+	// contain the properties name, nameHTML, description, descriptionHTML,
+	// iconURL, routeName, routeParams, and externalURL.
+	registerSearchSuggestionsProvider: function(handler) {
+		if (typeof handler != 'function') {
+			throw new Error("Incorrect arguments");
+		}
+		var members = memberMap.get(this);
+		members.driver.registerSearchSuggestionsProvider(handler);
+	},
+
 	registerSearchQueryRewriter: function(obj) {
 		if (typeof obj.termReplacer != 'function' || typeof obj.term != 'string') {
 			throw new Error("Incorrect arguments");

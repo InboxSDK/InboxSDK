@@ -1,4 +1,5 @@
 var asap = require('asap');
+var logger = require('../logger');
 var Bacon = require('baconjs');
 var Map = require('es6-unweak-collections').Map;
 
@@ -21,6 +22,8 @@ function makeElementChildStream(element) {
       if(removalStream){
         removalStream.push(null);
         removalStream.end();
+      } else {
+        logger.error(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
