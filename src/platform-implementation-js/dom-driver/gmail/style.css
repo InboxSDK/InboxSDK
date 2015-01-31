@@ -151,17 +151,18 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__thread_row_button {
   display: inline-block;
+  outline: 0;
+  padding: 0 5px;
+  position: relative;
+  height: 15px;
+  width: 15px;
+  margin-left: 6px;
 }
 
 .inboxsdk__thread_row_custom_date {
   margin-left: 2px;
 }
 
-.inboxsdk__thread_row_button {
-  padding: 0 5px;
-  position: relative;
-  top: 2px;
-}
 
 /* end thread rows */
 
@@ -572,21 +573,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   display: inline-block;
 }
 
-.inboxsdk__resultsSection_label_icon {
+.inboxsdk__resultsSection_label_icon, .inboxsdk__thread_row_label .inboxsdk__button_icon {
   height: 11px;
-  width: 12px;
+  width: 11px;
   position: absolute;
   margin-left: 4px;
   margin-top: 1px;
 }
 
-.inboxsdk__resultsSection .av {
+.inboxsdk__resultsSection .av, .inboxsdk__thread_row_label .av {
   max-width: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.inboxsdk__resultsSection_label_icon + .av {
+.inboxsdk__resultsSection_label_icon + .av, .inboxsdk__thread_row_label .inboxsdk__button_icon + .av {
   margin-left: 16px;
 }
 

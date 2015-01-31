@@ -12,6 +12,8 @@ var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-dr
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
 
+var GmailLabelView = require('../widgets/gmail-label-view');
+
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
@@ -132,40 +134,37 @@ _.extend(GmailThreadRowView.prototype, {
   addLabel: function(label) {
     if (this._isVertical) return; // TODO
     var self = this;
-    var labelDiv = document.createElement('div');
-    labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
-    labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
 
-    var at = labelDiv.querySelector('div.at');
-    var au = labelDiv.querySelector('div.au');
-    var av = labelDiv.querySelector('div.av');
+    var gmailLabelView = new GmailLabelView();
 
-    var prop = baconCast(Bacon, label).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(label) {
-      if (!label) {
-        labelDiv.remove();
-      } else {
-        _.defaults(label, {
-          color: '#ddd',
-          textColor: '#666'
-        });
+    gmailLabelView.getElement().classList.add('yi');
+    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
+    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
 
-        if (at.title != label.title) {
-          at.title = av.textContent = label.title;
-        }
-        if (at.style.backgroundColor != label.color) {
-          at.style.backgroundColor = at.style.borderColor = au.style.borderColor = label.color;
-        }
-        if (av.style.color != label.textColor) {
-          av.style.color = label.textColor;
-        }
+    var prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
 
-        var labelParentDiv = self._element.querySelector('td.a4W div.xS div.xT');
-        if (!labelParentDiv.contains(labelDiv)) {
-          labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
+    var added = false;
+    prop.onValue(function(labelDescriptor){
+
+      if(labelDescriptor){
+        if(!added){
+          var labelParentDiv = self._element.querySelector('td.a4W div.xS div.xT');
+          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.querySelector('.y6'));
+          added = true;
         }
       }
+      else{
+        gmailLabelView.getElement().remove();
+        added = false;
+      }
+
     });
+
+    this._eventStream.onEnd(function(){
+      gmailLabelView.destroy();
+    });
+
+    gmailLabelView.setLabelDescriptorProperty(prop);
   },
 
   addButton: function(buttonDescriptor) {
@@ -213,6 +212,8 @@ _.extend(GmailThreadRowView.prototype, {
         };
 
         buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
+        buttonSpan.setAttribute('tabindex', "-1");
+
         buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
           var appEvent = {
             threadRowView: self._userView
@@ -234,6 +235,11 @@ _.extend(GmailThreadRowView.prototype, {
             }
           }
           buttonDescriptor.onClick.call(null, appEvent);
+        };
+
+        buttonSpan.onmousedown = function(event){
+          buttonSpan.focus();
+          event.stopPropagation();
         };
 
         if(buttonImg){

@@ -141,6 +141,14 @@ _.extend(Router.prototype, /** @lends Router */ {
 		}
 
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
+	},
+
+
+
+	getCurrentRouteView: function(){
+		var members = memberMap.get(this);
+
+		return members.membraneMap.get(members.currentRouteViewDriver);
 	}
 
 });
