@@ -1,6 +1,5 @@
-'use strict';
-
 var Bacon = require('baconjs');
+var logger = require('../../../../lib/logger');
 
 var GmailTooltipView = require('../../widgets/gmail-tooltip-view');
 
@@ -71,7 +70,7 @@ function _anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController
 		}, 10);
 	}
 	catch(err){
-		console.error(err);
+		logger.error(err);
 	}
 }
 

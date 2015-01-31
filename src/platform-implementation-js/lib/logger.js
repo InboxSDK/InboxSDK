@@ -352,7 +352,7 @@ function track(type, eventName, details) {
 
 if (_isLoggerMaster && global.document) {
   makeMutationObserverStream(document.head, {
-    attributes: true, attributeFilter: 'data-inboxsdk-last-event'
+    attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(30*1000).onValue(function() {
     var events = _trackedEventsQueue.removeAll();
 
