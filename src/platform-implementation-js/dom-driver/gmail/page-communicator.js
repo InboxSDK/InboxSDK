@@ -43,7 +43,8 @@ PageCommunicator.prototype = {
   provideAutocompleteSuggestions: function(query, suggestions) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKprovideSuggestions', false, false, {
-      query, suggestions
+      query: query,
+      suggestions: suggestions
     });
     document.dispatchEvent(event);
   },
