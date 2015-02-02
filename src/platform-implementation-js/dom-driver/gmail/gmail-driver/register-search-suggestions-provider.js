@@ -76,25 +76,34 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
         .filter((event) => event.keyCode == 13 && event.target === searchBox)
     );
 
-  // With the suggestions box and search box
-  Bacon.combineAsArray(suggestionsBoxTbodyStream, searchBoxStream)
-    // every time Gmail changes the suggestion box
+  // Stream of arrays of row elements belonging to this provider.
+  const providedRows = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
-    .flatMapLatest(([suggestionsBoxTbody, searchBox]) =>
-      // get all of the suggestions box rows
-      Bacon.fromArray(_.toArray(suggestionsBoxTbody.children))
-        // that were injected by this extension
-        .filter((row) => row.getElementsByClassName(id).length > 0)
-        // and listen to click and enter events on them
-        .flatMap((row) =>
-          Bacon.mergeAll(
-            fromEventTargetCapture(row, 'click'),
-            suggestionsBoxEnterPresses
-              .filter(() => row.classList.contains('gssb_i'))
-          ).map((event) => ({event, row, searchBox}))
-        )
-    )
-    .onValue(({event, row, searchBox}) => {
+    .map(suggestionsBoxTbody =>
+      _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
+    );
+
+  providedRows.onValue(rows => {
+    if (rows[0] && rows[0].previousElementSibling) {
+      rows[0].previousElementSibling.firstElementChild.classList.add(
+        'inboxsdk__suggestions_separator_before');
+      rows[0].firstElementChild.classList.add(
+        'inboxsdk__suggestions_separator_after');
+    }
+  });
+
+  const rowSelectionEvents = providedRows.flatMapLatest(rows =>
+    Bacon.mergeAll(rows.map(row =>
+      Bacon.mergeAll(
+        fromEventTargetCapture(row, 'click'),
+        suggestionsBoxEnterPresses
+          .filter(() => row.classList.contains('gssb_i'))
+      ).map(event => ({event, row}))
+    ))
+  );
+
+  Bacon.combineAsArray(rowSelectionEvents, searchBoxStream)
+    .onValue(([{event, row}, searchBox]) => {
       const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
       const itemData = itemDataSpan && JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion'));
       if (itemData) {
