@@ -735,3 +735,20 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 /* end keyboard shortcut help */
+
+
+/* search suggestions */
+
+.asor.inboxsdk__custom_suggestion {
+  display: -webkit-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inboxsdk__custom_suggestion img {
+  max-width: 32px;
+  max-height: 32px;
+  margin-left: -11px;
+}
+
+/* end send suggestions */
