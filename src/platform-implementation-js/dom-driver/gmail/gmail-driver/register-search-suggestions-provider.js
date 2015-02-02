@@ -47,7 +47,7 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
-  const searchBoxStream = driver.getRouteViewDriverStream()
+  const searchBoxStream = driver.getRouteViewDriverStream().startWith(null)
     .map(() => gmailElementGetter.getSearchInput())
     .filter(Boolean)
     .take(1).toProperty();
