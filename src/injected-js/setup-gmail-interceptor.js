@@ -70,19 +70,19 @@ function setupGmailInterceptor() {
   // scripts, wait for the same number of responses as the number of registered
   // suggestion modifiers, and then meld them into the query response.
   {
-    let modifierCount = 0;
+    const providers = {};
     let currentQuery;
     let suggestionModifications;
     let currentQueryDefer;
 
-    document.addEventListener('inboxSDKregisterSuggestionsModifier', function(event) {
-      modifierCount++;
+    document.addEventListener('inboxSDKregisterSuggestionsModifier', function({detail}) {
+      providers[detail.providerID] = {position: Object.keys(providers).length};
     });
 
-    document.addEventListener('inboxSDKprovideSuggestions', function(event) {
-      if (event.detail.query === currentQuery) {
-        suggestionModifications.push(event.detail.suggestions);
-        if (suggestionModifications.length === modifierCount) {
+    document.addEventListener('inboxSDKprovideSuggestions', function({detail}) {
+      if (detail.query === currentQuery) {
+        suggestionModifications[providers[detail.providerID].position] = detail.suggestions;
+        if (suggestionModifications.filter(Boolean).length === Object.keys(providers).length) {
           currentQueryDefer.resolve(_.flatten(suggestionModifications, true));
           currentQueryDefer = currentQuery = suggestionModifications = null;
         }
@@ -91,7 +91,7 @@ function setupGmailInterceptor() {
 
     main_wrappers.push({
       isRelevantTo: function(connection) {
-        return modifierCount > 0 &&
+        return Object.keys(providers).length > 0 &&
           connection.url.match(/^\/cloudsearch\/request\?/) &&
           connection.params.client == 'gmail' &&
           connection.params.gs_ri == 'gmail';
