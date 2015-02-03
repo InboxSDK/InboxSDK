@@ -33,7 +33,7 @@ InboxSDK.load = function(version, appId, opts){
   if (!RSVP._errorHandlerSetup) {
     RSVP._errorHandlerSetup = true;
     RSVP.on('error', function(err) {
-      console.error("Possibly uncaught promise rejection", err);
+      console.error("Possibly uncaught promise rejection", err, err && err.stack);
     });
   }
 
@@ -42,7 +42,7 @@ InboxSDK.load = function(version, appId, opts){
   var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
   var loadPromise = platformImplementationLoader.load();
   loadPromise.catch(function(err) {
-    console.error("Failed to load implementation:", err);
+    console.error("Failed to load implementation:", err, err && err.stack);
   });
   return loadPromise;
 };

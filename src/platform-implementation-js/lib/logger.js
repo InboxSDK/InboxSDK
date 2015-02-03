@@ -1,52 +1,111 @@
-var _ = require('lodash');
-var ajax = require('../../common/ajax');
-var RSVP = require('rsvp');
-var sha256 = require('sha256');
-var getStackTrace = require('../../common/get-stack-trace');
-var getExtensionId = require('../../common/get-extension-id');
-var PersistentQueue = require('./persistent-queue');
-var makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
-
-var logger = {};
-module.exports = logger;
+const _ = require('lodash');
+const ajax = require('../../common/ajax');
+const RSVP = require('rsvp');
+const getStackTrace = require('../../common/get-stack-trace');
+const getExtensionId = require('../../common/get-extension-id');
+const PersistentQueue = require('./persistent-queue');
+const makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-var _appIds = [];
-var _LOADER_VERSION;
-var _IMPL_VERSION;
-var _userEmailHash;
-var _useEventTracking;
+const _extensionAppIds = [];
+const _extensionSeenErrors = new WeakSet();
+var _extensionLoaderVersion;
+var _extensionImplVersion;
+var _extensionUserEmailHash;
+var _extensionUseEventTracking;
 
-var _seenErrors = typeof WeakSet == 'undefined' ? null : new WeakSet();
-
-// This will only be true for the first InboxSDK extension to load. This
+// The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
-var _isLoggerMaster = false;
-var _sessionId = global.document && document.head.getAttribute('data-inboxsdk-session-id');
-if (!_sessionId) {
-  _sessionId = Date.now()+'-'+Math.random();
-  if (global.document) {
-    document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+const [_extensionIsLoggerMaster, _sessionId] = (function() {
+  if (global.document && document.head.hasAttribute('data-inboxsdk-session-id')) {
+    return [false, document.head.getAttribute('data-inboxsdk-session-id')];
+  } else {
+    const _sessionId = Date.now()+'-'+Math.random();
+    if (global.document) {
+      document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+    }
+    return [true, _sessionId];
   }
-  _isLoggerMaster = true;
+})();
+
+const _trackedEventsQueue = new PersistentQueue('events');
+
+class Logger {
+  constructor(appId, opts, loaderVersion, implVersion) {
+    this._appId = appId;
+    _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
+  }
+
+  setUserEmailAddress(email) {
+    _extensionUserEmailHash = hash(email);
+  }
+
+  static error(err, details) {
+    _sendError(err, details, null, false);
+  }
+
+  error(err, details) {
+    _sendError(err, details, this._appId, false);
+  }
+
+  errorApp(err, details) {
+    _sendError(err, details, this._appId, true);
+  }
+
+  // Should only be used by the InboxSDK users for their own app events.
+  eventApp(name, details) {
+    _trackEvent('app', name, details);
+  }
+
+  // For tracking app events that are possibly triggered by the user. Extensions
+  // can opt out of this with a flag passed to InboxSDK.load().
+  eventSdkActive(name, details) {
+    if (!_extensionUseEventTracking) {
+      return;
+    }
+    _trackEvent('sdkActive', name, details);
+  }
+
+  // Track events unrelated to user activity about how the app uses the SDK.
+  // Examples include the app being initialized, and calls to any of the
+  // register___ViewHandler functions.
+  eventSdkPassive(name, details) {
+    _trackEvent('sdkPassive', name, details);
+  }
+
+  // Track Gmail events.
+  eventGmail(name, details) {
+    // Only the first InboxSDK extension reports Gmail events.
+    if (!_extensionIsLoggerMaster || !_extensionUseEventTracking) {
+      return;
+    }
+    _trackEvent('gmail', name, details);
+  }
+
+  getAppLogger() {
+    return {
+      error: (err, details) => this.errorApp(err, details),
+      event: (name, details) => this.eventApp(name, details)
+    };
+  }
 }
 
-var _trackedEventsQueue = new PersistentQueue('events');
+module.exports = Logger;
 
-// Set up error logging.
-logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-  _appIds.push({
+function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
+  _extensionAppIds.push(Object.freeze({
     appId: appId,
     version: opts.appVersion || undefined
-  });
-  if (_LOADER_VERSION) {
-    // If we've been set up before, don't do it all again.
+  }));
+
+  if (_extensionLoaderVersion) {
     return;
   }
-  _LOADER_VERSION = LOADER_VERSION;
-  _IMPL_VERSION = IMPL_VERSION;
-  _useEventTracking = opts.eventTracking;
+
+  _extensionLoaderVersion = loaderVersion;
+  _extensionImplVersion = implVersion;
+  _extensionUseEventTracking = opts.eventTracking;
 
   if (opts.globalErrorLogging) {
     if (Error.stackTraceLimit < 30) {
@@ -54,7 +113,7 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     }
 
     RSVP.on('error', function(err) {
-      logger.error(err, "Possibly uncaught promise rejection");
+      Logger.error(err, "Possibly uncaught promise rejection");
     });
 
     window.addEventListener('error', function(event) {
@@ -62,7 +121,7 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
       // this, we can remove the logged function wrappers around setTimeout and
       // things.
       if (event.error) {
-        logger.error(event.error, "Uncaught exception");
+        Logger.error(event.error, "Uncaught exception");
       }
     });
 
@@ -86,7 +145,7 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
       };
     });
 
-    var ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
+    const ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
     replaceFunction(ETp, 'addEventListener', function(original) {
       return function wrappedAddEventListener() {
         var args = _.toArray(arguments);
@@ -150,38 +209,23 @@ logger.setup = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     // Even if we're set not to log errors, we should still avoid letting RSVP
     // swallow errors entirely.
     RSVP.on('error', function(err) {
-      setTimeout(function() {
+      setTimeout(() => {
         throw err;
       }, 0);
     });
   }
-};
+}
 
 function haveWeSeenThisErrorAlready(error) {
   if (error && typeof error == 'object') {
-    if (_seenErrors) {
-      return _seenErrors.has(error);
-    } else {
-      return error.__alreadyLoggedBySDK;
-    }
+    return _extensionSeenErrors.has(error);
   }
   return false;
 }
 
 function markErrorAsSeen(error) {
   if (error && typeof error == 'object') {
-    // Prefer to stick the error in a WeakSet over adding a property to it.
-    if (_seenErrors) {
-      _seenErrors.add(error);
-    } else {
-      try {
-        Object.defineProperty(error, '__alreadyLoggedBySDK', {
-          value: true, enumerable: false
-        });
-      } catch(extraError) {
-        // In case we get an immutable exception
-      }
-    }
+    _extensionSeenErrors.add(error);
   }
 }
 
@@ -197,7 +241,7 @@ function _sendError(err, details, appId, sentByApp) {
     throw err;
   }
 
-  var args = arguments;
+  const args = arguments;
 
   // It's important that we can't throw an error or leave a rejected promise
   // unheard while logging an error in order to make sure to avoid ever
@@ -211,9 +255,12 @@ function _sendError(err, details, appId, sentByApp) {
 
     if (!(err instanceof Error)) {
       console.warn('First parameter to Logger.error was not an error object:', err);
+      err = new Error("Logger.error called with non-error: "+err);
+      markErrorAsSeen(err);
     }
+    sentByApp = !!sentByApp;
 
-    var appIds = _.cloneDeep(_appIds);
+    const appIds = _.cloneDeep(_extensionAppIds);
     appIds.some(function(entry) {
       if (entry.appId === appId) {
         entry.causedBy = true;
@@ -223,10 +270,10 @@ function _sendError(err, details, appId, sentByApp) {
 
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
-    var nowStack = getStackTrace();
+    const nowStack = getStackTrace();
 
     // Show the error immediately, don't wait on implementation load for that.
-    var stuffToLog = ["Error logged:", err];
+    let stuffToLog = ["Error logged:", err];
     if (err && err.stack) {
       stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
     }
@@ -235,27 +282,26 @@ function _sendError(err, details, appId, sentByApp) {
       stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
     }
     stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", JSON.stringify(appIds, null, 2)]);
-    if (sentByApp) {
-      stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
-    }
+    stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
     stuffToLog = stuffToLog.concat(["\nSession Id:", _sessionId]);
     stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _LOADER_VERSION]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _IMPL_VERSION]);
+    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _extensionLoaderVersion]);
+    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _extensionImplVersion]);
 
-    console.error.apply(console, stuffToLog);
+    console.error(...stuffToLog);
 
-    var report = {
+    const report = {
       message: err && err.message || err,
       stack: err && err.stack,
       loggedFrom: nowStack,
       details: details,
       appIds: appIds,
+      sentByApp: sentByApp,
       sessionId: _sessionId,
-      emailHash: _userEmailHash,
+      emailHash: _extensionUserEmailHash,
       extensionId: getExtensionId(),
-      loaderVersion: _LOADER_VERSION,
-      implementationVersion: _IMPL_VERSION,
+      loaderVersion: _extensionLoaderVersion,
+      implementationVersion: _extensionImplVersion,
       timestamp: new Date().getTime()*1000
     };
 
@@ -274,21 +320,13 @@ function _sendError(err, details, appId, sentByApp) {
   }
 }
 
-logger.error = function(err, details) {
-  _sendError(err, details);
-};
-
-logger.errorApp = function(appId, err, details) {
-  _sendError(err, details, appId, true);
-};
-
 function makeLoggedFunction(func, name) {
+  const msg = name ? "Uncaught error in "+name : "Uncaught error";
   return function() {
     try {
       return func.apply(this, arguments);
     } catch (err) {
-      var msg = name ? "Uncaught error in "+name : "Uncaught error";
-      logger.error(err, msg);
+      Logger.error(err, msg);
       throw err;
     }
   };
@@ -301,14 +339,11 @@ function replaceFunction(parent, name, newFnMaker) {
 }
 
 function hash(str) {
+  const sha256 = require('sha256');
   return sha256('inboxsdk:'+str);
 }
 
-logger.setUserEmailAddress = function(userEmailAddress) {
-  _userEmailHash = hash(userEmailAddress);
-};
-
-function track(type, eventName, properties) {
+function _trackEvent(type, eventName, properties) {
   if (typeof type != 'string') {
     throw new Error("type must be string: "+type);
   }
@@ -318,7 +353,7 @@ function track(type, eventName, properties) {
   if (properties && typeof properties != 'object') {
     throw new Error("properties must be object or null: "+properties);
   }
-  var event = {
+  let event = {
     type: type,
     event: eventName,
     timestamp: new Date().getTime()*1000,
@@ -328,14 +363,14 @@ function track(type, eventName, properties) {
     windowHeight: window.innerHeight,
     origin: document.location.origin,
     sessionId: _sessionId,
-    emailHash: _userEmailHash,
+    emailHash: _extensionUserEmailHash,
     properties: properties
   };
 
   if (type != 'gmail') {
     _.extend(event, {
       extensionId: getExtensionId(),
-      appIds: _appIds
+      appIds: _extensionAppIds
     });
   }
 
@@ -349,11 +384,11 @@ function track(type, eventName, properties) {
   document.head.setAttribute('data-inboxsdk-last-event', Date.now());
 }
 
-if (_isLoggerMaster && global.document) {
+if (_extensionIsLoggerMaster && global.document) {
   makeMutationObserverStream(document.head, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(30*1000).onValue(function() {
-    var events = _trackedEventsQueue.removeAll();
+    const events = _trackedEventsQueue.removeAll();
 
     ajax({
       url: 'https://www.inboxsdk.com/api/v2/events',
@@ -368,36 +403,3 @@ if (_isLoggerMaster && global.document) {
     });
   });
 }
-
-// Should only be used by the InboxSDK users for their own app events.
-logger.eventApp = function(appId, eventName, details) {
-  if (details && typeof details != 'object') {
-    throw new Error("details must be object or null: "+details);
-  }
-  track('app', eventName, _.extend({}, details, {appId:appId}));
-};
-
-// For tracking app events that are possibly triggered by the user. Extensions
-// can opt out of this with a flag passed to InboxSDK.load().
-logger.eventSdkActive = function(eventName, details) {
-  if (!_useEventTracking) {
-    return;
-  }
-  track('sdkActive', eventName, details);
-};
-
-// Track events unrelated to user activity about how the app uses the SDK.
-// Examples include the app being initialized, and calls to any of the
-// register___ViewHandler functions.
-logger.eventSdkPassive = function(eventName, details) {
-  track('sdkPassive', eventName, details);
-};
-
-// Track Gmail events.
-logger.eventGmail = function(eventName, details) {
-  // Only the first InboxSDK extension reports Gmail events.
-  if (!_isLoggerMaster || !_useEventTracking) {
-    return;
-  }
-  track('gmail', eventName, details);
-};
