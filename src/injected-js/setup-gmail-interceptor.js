@@ -83,7 +83,7 @@ function setupGmailInterceptor() {
       if (detail.query === currentQuery) {
         suggestionModifications[providers[detail.providerID].position] = detail.suggestions;
         if (suggestionModifications.filter(Boolean).length === Object.keys(providers).length) {
-          currentQueryDefer.resolve(_.flatten(suggestionModifications, true));
+          currentQueryDefer.resolve(_.flatten(suggestionModifications));
           currentQueryDefer = currentQuery = suggestionModifications = null;
         }
       }
