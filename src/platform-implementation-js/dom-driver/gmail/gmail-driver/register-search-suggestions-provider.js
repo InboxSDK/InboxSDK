@@ -4,6 +4,7 @@ const fromEventTargetCapture = require('../../../lib/from-event-target-capture')
 const simulateClick = require('../../../lib/dom/simulate-click');
 const makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 const RSVP = require('rsvp');
+const logger = require('../../../lib/logger');
 const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 const gmailElementGetter = require('../gmail-element-getter');
 
@@ -25,16 +26,35 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
     .flatMapLatest((query) =>
       Bacon.fromPromise(RSVP.Promise.resolve(handler(query)), true)
         .flatMap((suggestions) => {
-          if (Array.isArray(suggestions)) {
-            return Bacon.once(suggestions);
-          } else {
-            console.error("suggestions not an array", suggestions);
-            return new Bacon.Error(new Error("suggestions must be an array"));
+          try {
+            // Strip out anything not JSONifiable.
+            suggestions = JSON.parse(JSON.stringify(suggestions));
+
+            if (!Array.isArray(suggestions)) {
+              throw new Error("suggestions must be an array");
+            }
+            for (let suggestion of suggestions) {
+              if (
+                typeof suggestion.name !== 'string' &&
+                typeof suggestion.nameHTML !== 'string'
+              ) {
+                throw new Error("suggestion must have name or nameHTML property");
+              }
+              if (
+                typeof suggestion.routeName !== 'string' &&
+                typeof suggestion.externalURL !== 'string' &&
+                typeof suggestion.searchTerm !== 'string'
+              ) {
+                throw new Error("suggestion must have routeName, externalURL, or searchTerm property");
+              }
+            }
+          } catch(e) {
+            return new Bacon.Error(e);
           }
+          return Bacon.once(suggestions);
         })
         .mapError((err) => {
-          // TODO log this better
-          setTimeout(() => {throw err;}, 0);
+          logger.error(err);
           return [];
         })
         .doAction((suggestions) => {
