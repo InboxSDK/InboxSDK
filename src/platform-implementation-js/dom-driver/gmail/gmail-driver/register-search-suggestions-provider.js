@@ -15,7 +15,7 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
 
   const id = 'inboxsdk__suggestions_'+(''+Date.now()+Math.random()).replace(/\D+/g,'');
   const pageCommunicator = driver.getPageCommunicator();
-  pageCommunicator.announceSearchAutocompleter();
+  pageCommunicator.announceSearchAutocompleter(id);
 
   // Listen for the AJAX requests, call the application's handler function, and
   // give the application's suggestions back to the pageCommunicator for it to
@@ -63,7 +63,7 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
         .map((suggestions) => ({query, suggestions}))
     )
     .onValue((event) => {
-      pageCommunicator.provideAutocompleteSuggestions(event.query, event.suggestions);
+      pageCommunicator.provideAutocompleteSuggestions(id, event.query, event.suggestions);
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
