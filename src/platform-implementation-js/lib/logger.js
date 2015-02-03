@@ -308,33 +308,32 @@ logger.setUserEmailAddress = function(userEmailAddress) {
   _userEmailHash = hash(userEmailAddress);
 };
 
-function track(type, eventName, details) {
+function track(type, eventName, properties) {
   if (typeof type != 'string') {
     throw new Error("type must be string: "+type);
   }
   if (typeof eventName != 'string') {
     throw new Error("eventName must be string: "+eventName);
   }
-  if (details && typeof details != 'object') {
-    throw new Error("details must be object or null: "+details);
+  if (properties && typeof properties != 'object') {
+    throw new Error("properties must be object or null: "+properties);
   }
   var event = {
     type: type,
     event: eventName,
-    properties: _.extend({}, details, {
-      timestamp: new Date().getTime()*1000,
-      screenWidth: window.screen && window.screen.width,
-      screenHeight: window.screen && window.screen.height,
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-      origin: document.location.origin,
-      sessionId: _sessionId,
-      emailHash: _userEmailHash
-    })
+    timestamp: new Date().getTime()*1000,
+    screenWidth: window.screen && window.screen.width,
+    screenHeight: window.screen && window.screen.height,
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    origin: document.location.origin,
+    sessionId: _sessionId,
+    emailHash: _userEmailHash,
+    properties: properties
   };
 
   if (type != 'gmail') {
-    _.extend(event.properties, {
+    _.extend(event, {
       extensionId: getExtensionId(),
       appIds: _appIds
     });

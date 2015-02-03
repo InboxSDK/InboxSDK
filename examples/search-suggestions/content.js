@@ -7,8 +7,9 @@ InboxSDK.load(1, 'search-suggestions').then(function(inboxSDK) {
 		log('search autocompleter', query);
 		return [
 			{
-				name: 'aaaaaaa',
-				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png'
+				name: 'aaaaaaa also bacon',
+				iconURL: 'https://www.streak.com/build/images/boxIconOnNewCompose.png',
+				externalURL: 'https://baconjs.github.io/api.html'
 			},
 			{
 				name: 'beeeep',

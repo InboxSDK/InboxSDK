@@ -34,16 +34,18 @@ PageCommunicator.prototype = {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }),
 
-  announceSearchAutocompleter: function() {
+  announceSearchAutocompleter: function(providerID) {
     var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, null);
+    event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, {
+      providerID
+    });
     document.dispatchEvent(event);
   },
 
-  provideAutocompleteSuggestions: function(query, suggestions) {
+  provideAutocompleteSuggestions: function(providerID, query, suggestions) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKprovideSuggestions', false, false, {
-      query, suggestions
+      providerID, query, suggestions
     });
     document.dispatchEvent(event);
   },
