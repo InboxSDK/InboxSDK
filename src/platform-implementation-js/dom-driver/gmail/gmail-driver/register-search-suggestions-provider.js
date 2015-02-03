@@ -4,6 +4,7 @@ const fromEventTargetCapture = require('../../../lib/from-event-target-capture')
 const simulateClick = require('../../../lib/dom/simulate-click');
 const makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 const RSVP = require('rsvp');
+const logger = require('../../../lib/logger');
 const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 const gmailElementGetter = require('../gmail-element-getter');
 
@@ -25,16 +26,35 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
     .flatMapLatest((query) =>
       Bacon.fromPromise(RSVP.Promise.resolve(handler(query)), true)
         .flatMap((suggestions) => {
-          if (Array.isArray(suggestions)) {
-            return Bacon.once(suggestions);
-          } else {
-            console.error("suggestions not an array", suggestions);
-            return new Bacon.Error(new Error("suggestions must be an array"));
+          try {
+            // Strip out anything not JSONifiable.
+            suggestions = JSON.parse(JSON.stringify(suggestions));
+
+            if (!Array.isArray(suggestions)) {
+              throw new Error("suggestions must be an array");
+            }
+            for (let suggestion of suggestions) {
+              if (
+                typeof suggestion.name !== 'string' &&
+                typeof suggestion.nameHTML !== 'string'
+              ) {
+                throw new Error("suggestion must have name or nameHTML property");
+              }
+              if (
+                typeof suggestion.routeName !== 'string' &&
+                typeof suggestion.externalURL !== 'string' &&
+                typeof suggestion.searchTerm !== 'string'
+              ) {
+                throw new Error("suggestion must have routeName, externalURL, or searchTerm property");
+              }
+            }
+          } catch(e) {
+            return new Bacon.Error(e);
           }
+          return Bacon.once(suggestions);
         })
         .mapError((err) => {
-          // TODO log this better
-          setTimeout(() => {throw err;}, 0);
+          logger.error(err);
           return [];
         })
         .doAction((suggestions) => {
@@ -76,25 +96,34 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
         .filter((event) => event.keyCode == 13 && event.target === searchBox)
     );
 
-  // With the suggestions box and search box
-  Bacon.combineAsArray(suggestionsBoxTbodyStream, searchBoxStream)
-    // every time Gmail changes the suggestion box
+  // Stream of arrays of row elements belonging to this provider.
+  const providedRows = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
-    .flatMapLatest(([suggestionsBoxTbody, searchBox]) =>
-      // get all of the suggestions box rows
-      Bacon.fromArray(_.toArray(suggestionsBoxTbody.children))
-        // that were injected by this extension
-        .filter((row) => row.getElementsByClassName(id).length > 0)
-        // and listen to click and enter events on them
-        .flatMap((row) =>
-          Bacon.mergeAll(
-            fromEventTargetCapture(row, 'click'),
-            suggestionsBoxEnterPresses
-              .filter(() => row.classList.contains('gssb_i'))
-          ).map((event) => ({event, row, searchBox}))
-        )
-    )
-    .onValue(({event, row, searchBox}) => {
+    .map(suggestionsBoxTbody =>
+      _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
+    );
+
+  providedRows.onValue(rows => {
+    if (rows[0] && rows[0].previousElementSibling) {
+      rows[0].previousElementSibling.firstElementChild.classList.add(
+        'inboxsdk__suggestions_separator_before');
+      rows[0].firstElementChild.classList.add(
+        'inboxsdk__suggestions_separator_after');
+    }
+  });
+
+  const rowSelectionEvents = providedRows.flatMapLatest(rows =>
+    Bacon.mergeAll(rows.map(row =>
+      Bacon.mergeAll(
+        fromEventTargetCapture(row, 'click'),
+        suggestionsBoxEnterPresses
+          .filter(() => row.classList.contains('gssb_i'))
+      ).map(event => ({event, row}))
+    ))
+  );
+
+  Bacon.combineAsArray(rowSelectionEvents, searchBoxStream)
+    .onValue(([{event, row}, searchBox]) => {
       const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
       const itemData = itemDataSpan && JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion'));
       if (itemData) {

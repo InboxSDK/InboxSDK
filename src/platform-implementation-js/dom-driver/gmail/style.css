@@ -1,3 +1,14 @@
+/* suggestions */
+
+.inboxsdk__suggestions_separator_before {
+  padding-bottom: 2px !important;
+}
+
+.inboxsdk__suggestions_separator_after {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 2px !important;
+}
+
 /* buttons */
 
 div.T-I.inboxsdk__button {
