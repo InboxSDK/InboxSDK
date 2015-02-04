@@ -104,10 +104,9 @@ module.exports = function(XHR, wrappers, opts) {
     this._events = new EventEmitter(); // used for internal stuff, not user-visible events
     this.responseText = '';
 
-    var extraArgs = _.rest(arguments, 2);
     if (XHR.bind && XHR.bind.apply) {
       // call constructor with variable number of arguments
-      this._realxhr = new (XHR.bind.apply(XHR, [null].concat(extraArgs)))();
+      this._realxhr = new (XHR.bind.apply(XHR, [null].concat(arguments)))();
     } else {
       // Safari's XMLHttpRequest lacks a bind method, but its constructor
       // doesn't support extra arguments anyway, so don't bother logging an
