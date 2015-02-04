@@ -24,6 +24,8 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 
 	this._setupEventStreams();
 	this._logger.setUserEmailAddress(this.getUserEmailAddress());
+
+	require('./gmail-driver/gmail-load-event')(this);
 };
 
 GmailDriver.prototype = Object.create(Driver.prototype);

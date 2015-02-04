@@ -1,8 +1,6 @@
 var RSVP = require('rsvp');
 var waitFor = require('../../lib/wait-for');
 
-var $ = require('jquery');
-
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle: function(){

@@ -34,6 +34,10 @@ PageCommunicator.prototype = {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }),
 
+  getUserLanguage: _.once(function() {
+    return document.head.getAttribute('data-inboxsdk-user-language');
+  }),
+
   announceSearchAutocompleter: function(providerID) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, {
