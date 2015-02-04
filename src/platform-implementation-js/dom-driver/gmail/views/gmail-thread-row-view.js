@@ -81,6 +81,7 @@ _.extend(GmailThreadRowView.prototype, {
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
+      .map(_.toArray)
       .flatten()
       .value().forEach((el) => {
         el.remove();
@@ -88,6 +89,7 @@ _.extend(GmailThreadRowView.prototype, {
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_hidden_inline'))
+      .map(_.toArray)
       .flatten()
       .value().forEach((el) => {
         el.style.display = 'inline';
