@@ -1,6 +1,10 @@
 /*jslint node: true */
 'use strict';
 
+var checkDependencies = require('./src/build/check-dependencies');
+
+checkDependencies(require('./package.json'));
+
 var _ = require('lodash');
 var gulp = require('gulp');
 var browserify = require('browserify');

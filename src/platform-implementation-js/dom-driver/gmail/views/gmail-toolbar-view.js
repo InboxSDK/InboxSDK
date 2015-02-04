@@ -353,7 +353,7 @@ _.extend(GmailToolbarView.prototype, {
 			.compact()
 			.each(function(container){
 				container.remove();
-			});
+			}).value();
 	},
 
 	_addToOpenMoreMenu: function(buttonDescriptor, appId){
