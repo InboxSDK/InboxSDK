@@ -76,10 +76,14 @@ _.extend(GmailThreadRowView.prototype, {
       return;
     }
 
-    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_addition')).forEach(function(node) {
+    _.toArray(
+      this._element.getElementsByClassName('inboxsdk__thread_row_addition')
+    ).forEach(function(node) {
       node.remove();
     });
-    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_hidden_inline')).forEach(function(node) {
+    _.toArray(
+      this._element.getElementsByClassName('inboxsdk__thread_row_hidden_inline')
+    ).forEach(function(node) {
       node.style.display = 'inline';
     });
     ThreadRowViewDriver.prototype.destroy.call(this);
