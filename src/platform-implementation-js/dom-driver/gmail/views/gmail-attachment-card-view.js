@@ -296,7 +296,7 @@ _.extend(GmailAttachmentCardView.prototype, {
 
 				return buttonView;
 			})
-			.each(this._addButton.bind(this));
+			.each(this._addButton.bind(this)).value();
 	},
 
 	_addButton: function(buttonView){

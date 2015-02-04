@@ -32,11 +32,11 @@ module.exports = function(gmailComposeView){
             chipContainerChain
                 .filter(_isNotEnhanced)
                 .each(_addEnhancements)
-                .each(fixupCursorFunction);
+                .each(fixupCursorFunction).value();
 
             chipContainerChain
                 .filter(_isOurEnhanced)
-                .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView));
+                .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView)).value();
         });
 
 };

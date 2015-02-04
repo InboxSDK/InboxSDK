@@ -177,8 +177,8 @@ function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
 
   if(dontIncludeNumbers){
     var lines = response.split(/\r|\n/);
-    var firstLines = _.initial(lines, 3);
-    var lastLines = _.last(lines, 3);
+    var firstLines = _.dropRight(lines, 3);
+    var lastLines = _.takeRight(lines, 3);
     response = firstLines.join('\n');
     response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
   }
