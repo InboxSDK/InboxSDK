@@ -67,7 +67,7 @@ class Logger {
 
   // Should only be used by the InboxSDK users for their own app events.
   eventApp(name, details) {
-    _trackEvent('app', name, details);
+    _trackEvent(this._appId, 'app', name, details);
   }
 
   // For tracking app events that are possibly triggered by the user. Extensions
@@ -76,14 +76,14 @@ class Logger {
     if (!_extensionUseEventTracking) {
       return;
     }
-    _trackEvent('sdkActive', name, details);
+    _trackEvent(this._appId, 'sdkActive', name, details);
   }
 
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
   eventSdkPassive(name, details) {
-    _trackEvent('sdkPassive', name, details);
+    _trackEvent(this._appId, 'sdkPassive', name, details);
   }
 
   // Track Gmail events.
@@ -92,7 +92,7 @@ class Logger {
     if (!this._isMaster) {
       return;
     }
-    _trackEvent('gmail', name, details);
+    _trackEvent(null, 'gmail', name, details);
   }
 
   getAppLogger() {
@@ -246,6 +246,21 @@ function tooManyErrors(err2, originalArgs) {
   console.error("ORIGINAL ERROR", originalArgs);
 }
 
+function getAppIdsProperty(causedByAppId) {
+  if (!causedByAppId) {
+    return _extensionAppIds;
+  } else {
+    const appIds = _.cloneDeep(_extensionAppIds);
+    appIds.forEach(function(entry) {
+      if (entry.appId === causedByAppId) {
+        entry.causedBy = true;
+      }
+      Object.freeze(entry);
+    });
+    return Object.freeze(appIds);
+  }
+}
+
 // err should be an Error instance, and details can be any JSON-ifiable value.
 function _sendError(err, details, appId, sentByApp) {
   if (!global.document) {
@@ -272,13 +287,7 @@ function _sendError(err, details, appId, sentByApp) {
     }
     sentByApp = !!sentByApp;
 
-    const appIds = _.cloneDeep(_extensionAppIds);
-    appIds.some(function(entry) {
-      if (entry.appId === appId) {
-        entry.causedBy = true;
-        return true;
-      }
-    });
+    const appIds = getAppIdsProperty(appId);
 
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
@@ -355,7 +364,7 @@ function hash(str) {
   return sha256('inboxsdk:'+str);
 }
 
-function _trackEvent(type, eventName, properties) {
+function _trackEvent(appId, type, eventName, properties) {
   if (typeof type != 'string') {
     throw new Error("type must be string: "+type);
   }
@@ -382,7 +391,7 @@ function _trackEvent(type, eventName, properties) {
   if (type != 'gmail') {
     _.extend(event, {
       extensionId: getExtensionId(),
-      appIds: _extensionAppIds
+      appIds: getAppIdsProperty(appId)
     });
   }
 
