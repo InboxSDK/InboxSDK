@@ -34,6 +34,18 @@ const _trackedEventsQueue = new PersistentQueue('events');
 class Logger {
   constructor(appId, opts, loaderVersion, implVersion) {
     this._appId = appId;
+    this._isMaster = (function() {
+      if (
+        !_extensionUseEventTracking || (
+          global.document &&
+          document.head.hasAttribute('data-inboxsdk-app-logger-master-chosen')
+      )) {
+        return false;
+      } else {
+        document.head.setAttribute('data-inboxsdk-app-logger-master-chosen', true);
+        return true;
+      }
+    })();
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
   }
 
@@ -76,8 +88,8 @@ class Logger {
 
   // Track Gmail events.
   eventGmail(name, details) {
-    // Only the first InboxSDK extension reports Gmail events.
-    if (!_extensionIsLoggerMaster || !_extensionUseEventTracking) {
+    // Only the first logger instance reports Gmail events.
+    if (!this._isMaster) {
       return;
     }
     _trackEvent('gmail', name, details);
