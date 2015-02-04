@@ -33,6 +33,7 @@ const _trackedEventsQueue = new PersistentQueue('events');
 
 class Logger {
   constructor(appId, opts, loaderVersion, implVersion) {
+    _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
     this._appId = appId;
     this._isMaster = (function() {
       if (
@@ -46,7 +47,6 @@ class Logger {
         return true;
       }
     })();
-    _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
   }
 
   setUserEmailAddress(email) {
