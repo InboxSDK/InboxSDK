@@ -323,7 +323,7 @@ function _sendError(err, details, appId, sentByApp) {
       extensionId: getExtensionId(),
       loaderVersion: _extensionLoaderVersion,
       implementationVersion: _extensionImplVersion,
-      timestamp: new Date().getTime()*1000
+      timestamp: new Date().getTime()
     };
 
     ajax({
@@ -377,7 +377,7 @@ function _trackEvent(appId, type, eventName, properties) {
   let event = {
     type: type,
     event: eventName,
-    timestamp: new Date().getTime()*1000,
+    timestamp: new Date().getTime(),
     screenWidth: window.screen && window.screen.width,
     screenHeight: window.screen && window.screen.height,
     windowWidth: window.innerWidth,
@@ -419,7 +419,7 @@ if (_extensionIsLoggerMaster && global.document) {
       },
       data: JSON.stringify({
         data: events,
-        timestamp: new Date().getTime()*1000
+        timestamp: new Date().getTime()
       })
     });
   });
