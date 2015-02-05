@@ -3,6 +3,8 @@ var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
 
+const BasicClass = require('../../../lib/basic-class');
+const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
@@ -11,7 +13,7 @@ var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
 
 var GmailThreadRowView = function(element) {
-  ThreadRowViewDriver.call(this);
+  BasicClass.call(this);
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
@@ -61,7 +63,7 @@ var GmailThreadRowView = function(element) {
   });
 };
 
-GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
+GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(GmailThreadRowView.prototype, {
 
@@ -95,7 +97,7 @@ _.extend(GmailThreadRowView.prototype, {
         el.style.display = 'inline';
       });
 
-    ThreadRowViewDriver.prototype.destroy.call(this);
+    BasicClass.prototype.destroy.call(this);
   },
 
   // Called by GmailDriver
@@ -376,5 +378,7 @@ _.extend(GmailThreadRowView.prototype, {
   }
 
 });
+
+assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 module.exports = GmailThreadRowView;
