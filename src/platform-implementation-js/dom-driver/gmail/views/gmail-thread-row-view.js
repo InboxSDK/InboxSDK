@@ -314,7 +314,13 @@ _.extend(GmailThreadRowView.prototype, {
         customDateSpan.style.display = 'inline';
         originalDateSpan.style.display = 'none';
 
-        self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6);
+        if (self._elements.length === 1) {
+          self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6);
+        } else {
+          // A little more room since in vertical preview pane, the column is
+          // shared with icons.
+          self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6+28);
+        }
       }
     });
   },
