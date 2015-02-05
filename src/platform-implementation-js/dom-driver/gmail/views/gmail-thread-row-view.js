@@ -3,7 +3,7 @@ var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
 
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
@@ -15,11 +15,15 @@ var GmailThreadRowView = function(element) {
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
-  this._element = element;
-  this._isVertical = _.intersection(_.toArray(this._element.classList), ['zA','apv']).length === 2;
-  if (this._isVertical) {
-    var threadRow3 = this._element.nextSibling.nextSibling;
-    this._verticalRowCount = (threadRow3 && threadRow3.classList.contains('apw')) ? 3 : 2;
+  const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
+  if (isVertical) {
+    const threadRow3 = element.nextElementSibling.nextElementSibling;
+    const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
+    this._elements = has3Rows ?
+      [element, element.nextElementSibling, element.nextElementSibling.nextElementSibling] :
+      [element, element.nextElementSibling];
+  } else {
+    this._elements = [element];
   }
 
   this._pageCommunicator = null; // supplied by GmailDriver later
@@ -36,23 +40,24 @@ var GmailThreadRowView = function(element) {
   // (like addLabel) is called. If none of those methods are called, then the
   // stream is not listened on and no MutationObserver ever gets made, saving
   // us a little bit of work.
-  this._refresher = makeMutationObserverStream(this._element, {
+  const watchElement = this._elements.length === 1 ?
+    this._elements[0] : this._elements[0].children[2];
+  this._refresher = makeMutationObserverChunkedStream(watchElement, {
     childList: true
   }).map(null).takeUntil(this._stopper).toProperty(null);
 
   this.getCounts = _.once(function() {
-    var thing = this._element.querySelector('td.yX div.yW');
-    var parts = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
-    var preDrafts = parts[0], drafts = parts[1];
+    const thing = this._elements[0].querySelector('td div.yW');
+    const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
 
-    var preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+    const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
 
-    var messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-    var messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+    const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
+    const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
 
-    var draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-    var draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
-    return {messageCount: messageCount, draftCount: draftCount};
+    const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
+    const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
+    return {messageCount, draftCount};
   });
 };
 
@@ -61,9 +66,7 @@ GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
 _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
-    {name: '_element', destroy: false},
-    {name: '_isVertical', destroy: false},
-    {name: '_verticalRowCount', destroy: false},
+    {name: '_elements', destroy: false},
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -72,16 +75,26 @@ _.extend(GmailThreadRowView.prototype, {
   ],
 
   destroy: function() {
-    if(!this._element){
+    if(!this._elements){
       return;
     }
 
-    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_addition')).forEach(function(node) {
-      node.remove();
-    });
-    _.toArray(this._element.getElementsByClassName('inboxsdk__thread_row_hidden_inline')).forEach(function(node) {
-      node.style.display = 'inline';
-    });
+    _.chain(this._elements)
+      .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
+      .map(_.toArray)
+      .flatten()
+      .value().forEach((el) => {
+        el.remove();
+      });
+
+    _.chain(this._elements)
+      .map((el) => el.getElementsByClassName('inboxsdk__thread_row_hidden_inline'))
+      .map(_.toArray)
+      .flatten()
+      .value().forEach((el) => {
+        el.style.display = 'inline';
+      });
+
     ThreadRowViewDriver.prototype.destroy.call(this);
   },
 
@@ -118,7 +131,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _expandColumn: function(colSelector, width) {
-    var tableParent = $(this._element).closest('div > table.cf').get(0);
+    var tableParent = $(this._elements[0]).closest('div > table.cf').get(0);
     _.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), function(col) {
       var currentWidth = parseInt(col.style.width, 10);
       if (isNaN(currentWidth) || currentWidth < width) {
@@ -128,18 +141,16 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    if (this._isVertical) return; // TODO
-    var self = this;
-    var labelDiv = document.createElement('div');
-    labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
-    labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'ar as inboxsdk__thread_row_addition inboxSDKlabel';
+    labelDiv.innerHTML = '<div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div>';
 
-    var at = labelDiv.querySelector('div.at');
-    var au = labelDiv.querySelector('div.au');
-    var av = labelDiv.querySelector('div.av');
+    const at = labelDiv.querySelector('div.at');
+    const au = labelDiv.querySelector('div.au');
+    const av = labelDiv.querySelector('div.av');
 
-    var prop = baconCast(Bacon, label).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(label) {
+    const prop = baconCast(Bacon, label).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue((label) => {
       if (!label) {
         labelDiv.remove();
       } else {
@@ -158,7 +169,9 @@ _.extend(GmailThreadRowView.prototype, {
           av.style.color = label.textColor;
         }
 
-        var labelParentDiv = self._element.querySelector('td.a4W div.xS div.xT');
+        const labelParentDiv = this._elements.length > 1 ?
+          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+          this._elements[0].querySelector('td.a4W div.xS div.xT');
         if (!labelParentDiv.contains(labelDiv)) {
           labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
         }
@@ -167,7 +180,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
-    if (this._isVertical) return; // TODO
+    if (this._elements.length != 1) return; // TODO
     var self = this;
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
@@ -183,7 +196,7 @@ _.extend(GmailThreadRowView.prototype, {
         }
         buttonSpan.remove();
       } else {
-        var starGroup = self._element.querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+        var starGroup = self._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
 
         // Don't let the whole column count as the star for click and mouse over purposes.
         // Click events that aren't directly on the star should be stopped.
@@ -219,12 +232,12 @@ _.extend(GmailThreadRowView.prototype, {
           };
           if (buttonDescriptor.hasDropdown) {
             if (activeDropdown) {
-              self._element.classList.remove('inboxsdk__dropdown_active');
+              self._elements[0].classList.remove('inboxsdk__dropdown_active');
               activeDropdown.close();
               activeDropdown = null;
               return;
             } else {
-              self._element.classList.add('inboxsdk__dropdown_active');
+              self._elements[0].classList.add('inboxsdk__dropdown_active');
               appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
             }
           }
@@ -240,8 +253,6 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    if (this._isVertical) return; // TODO
-    var self = this;
     var img = document.createElement('img');
     // The gmail iP css class sets width:16, height:16, opacity: 0.8
     img.className = 'iP inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon';
@@ -249,7 +260,7 @@ _.extend(GmailThreadRowView.prototype, {
     var currentIconUrl;
 
     var prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
       if (!opts) {
         img.remove();
       } else {
@@ -261,22 +272,34 @@ _.extend(GmailThreadRowView.prototype, {
           currentIconUrl = opts.iconUrl;
         }
 
-        var attachmentDiv = self._element.querySelector('td.yf.xY');
+        var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
+        }
+        if (this._elements.length > 1) {
+          this._fixDateColumnWidth();
         }
       }
     });
   },
 
-  replaceDate: function(opts) {
-    if (this._isVertical) return; // TODO
-    var self = this;
+  _fixDateColumnWidth: function() {
+    const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+    if (!dateContainer) return;
+    const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
+      dateContainer.firstElementChild;
 
-    var prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
-      var dateContainer = self._element.querySelector('td.xW');
-      var originalDateSpan = dateContainer.firstChild;
+    // Attachment icons are only in the date column in vertical preivew pane.
+    const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
+    this._expandColumn('col.xX',
+      visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+  },
+
+  replaceDate: function(opts) {
+    const prop = baconCast(Bacon, opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      const originalDateSpan = dateContainer.firstElementChild;
       var customDateSpan = originalDateSpan.nextElementSibling;
       if (!customDateSpan) {
         customDateSpan = document.createElement('span');
@@ -303,21 +326,21 @@ _.extend(GmailThreadRowView.prototype, {
         customDateSpan.style.display = 'inline';
         originalDateSpan.style.display = 'none';
 
-        self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6);
+        this._fixDateColumnWidth();
       }
     });
   },
 
   getSubject: function() {
-    if (this._isVertical) {
-      return this._element.nextSibling.querySelector('div.xS div.xT div.y6 > span[id]').textContent;
+    if (this._elements.length > 1) {
+      return this._elements[1].querySelector('div.xS div.xT div.y6 > span[id]').textContent;
     } else {
-      return this._element.querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+      return this._elements[0].querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
     }
   },
 
   getDateString: function() {
-    return this._element.querySelector('td.xW > span, td.yf.apt > div.apm > span').title;
+    return this._elements[0].querySelector('td.xW > span, td.yf.apt > div.apm > span').title;
   },
 
   _threadIdReady: function() {
@@ -325,7 +348,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getThreadID: function() {
-    return this._pageCommunicator.getThreadIdForThreadRow(this._element);
+    return this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
   },
 
   getVisibleDraftCount: function() {
@@ -337,7 +360,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getContacts: function(){
-    const senderSpans = this._element.querySelectorAll('[email]');
+    const senderSpans = this._elements[0].querySelectorAll('[email]');
 
     return _.chain(senderSpans)
             .map((span) => ({
@@ -349,8 +372,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   isSelected: function(){
-    return !!this._element.querySelector('div[role=checkbox][aria-checked=true]');
-
+    return !!this._elements[0].querySelector('div[role=checkbox][aria-checked=true]');
   }
 
 });
