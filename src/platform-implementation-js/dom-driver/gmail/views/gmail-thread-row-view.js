@@ -14,6 +14,8 @@ var DropdownView = require('../../../widgets/buttons/dropdown-view');
 
 var GmailLabelView = require('../widgets/gmail-label-view');
 
+var updateIcon = require('../lib/update-icon/update-icon');
+
 var GmailThreadRowView = function(element) {
   ThreadRowViewDriver.call(this);
 
@@ -172,6 +174,7 @@ _.extend(GmailThreadRowView.prototype, {
     var self = this;
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
+
     var buttonImg;
 
     var prop = baconCast(Bacon, buttonDescriptor).toProperty();
@@ -270,31 +273,51 @@ _.extend(GmailThreadRowView.prototype, {
 
   addAttachmentIcon: function(opts) {
     if (this._isVertical) return; // TODO
-    var self = this;
-    var img = document.createElement('img');
-    // The gmail iP css class sets width:16, height:16, opacity: 0.8
-    img.className = 'iP inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon';
-    img.src = 'images/cleardot.gif';
-    var currentIconUrl;
+
+    var iconWrapper = {
+      _iconUrl: null,
+      _iconClass: null,
+      _iconElement: null,
+      _iconImgElement: null
+    };
 
     var prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
-      if (!opts) {
-        img.remove();
-      } else {
-        if (img.title != opts.title) {
-          img.title = opts.title;
-        }
-        if (currentIconUrl != opts.iconUrl) {
-          img.style.background = "url("+opts.iconUrl+") no-repeat 0 0";
-          currentIconUrl = opts.iconUrl;
-        }
+    var container = this._element.querySelector('td.yf.xY');
 
-        var attachmentDiv = self._element.querySelector('td.yf.xY');
-        if (!attachmentDiv.contains(img)) {
-          attachmentDiv.appendChild(img);
+    var self = this;
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
+      var options = opts || {};
+
+      updateIcon(iconWrapper, container, true, options.iconClass, options.iconUrl);
+      if(options.tooltip){
+        if(iconWrapper._iconElement){
+          iconWrapper._iconElement.setAttribute('data-tooltip', _.escape(options.tooltip));
+        }
+        else if(iconWrapper._iconImgElement){
+          iconWrapper._iconImgElement.setAttribute('data-tooltip', _.escape(options.tooltip));
         }
       }
+      else{
+        if(iconWrapper._iconElement){
+          iconWrapper._iconElement.setAttribute('data-tooltip', '');
+        }
+        else if(iconWrapper._iconImgElement){
+          iconWrapper._iconImgElement.setAttribute('data-tooltip', '');
+        }
+      }
+
+      if(iconWrapper._iconElement || iconWrapper._iconImgElement){
+        self._expandColumn('col.yg', Math.max(25, 22*container.children.length));
+      }
+
+      if(iconWrapper._iconElement){
+        iconWrapper._iconElement.classList.add('inboxsdk__thread_row_addition');
+      }
+
+      if(iconWrapper._iconImgElement){
+        iconWrapper._iconImgElement.classList.add('inboxsdk__thread_row_addition');
+      }
+
     });
   },
 
@@ -320,11 +343,11 @@ _.extend(GmailThreadRowView.prototype, {
         originalDateSpan.style.display = 'inline';
       } else {
         customDateSpan.textContent = opts.text;
-        if (opts.title) {
-          customDateSpan.setAttribute('title', opts.title);
-          customDateSpan.setAttribute('aria-label', opts.title);
+        if (opts.tooltip) {
+          customDateSpan.setAttribute('data-tooltip', opts.tooltip);
+          customDateSpan.setAttribute('aria-label', opts.tooltip);
         } else {
-          customDateSpan.removeAttribute('title');
+          customDateSpan.removeAttribute('data-tooltip');
           customDateSpan.removeAttribute('aria-label');
         }
         customDateSpan.style.color = opts.textColor || '';

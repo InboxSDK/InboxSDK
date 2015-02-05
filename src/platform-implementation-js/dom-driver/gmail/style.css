@@ -160,6 +160,20 @@ div.T-I.inboxsdk__button {
 
 /* thread rows */
 
+.inboxsdk__thread_row_label .au {
+  display: inline-block;
+  margin-left: 14px;
+}
+
+  .inboxsdk__thread_row_label .inboxsdk__button_icon {
+    height: 11px;
+    width: 11px;
+    display: inline-block;
+    margin-top: 2px;
+    margin-left: 4px;
+    position: absolute;
+  }
+
 .inboxsdk__thread_row_button {
   display: inline-block;
   outline: 0;
@@ -172,6 +186,11 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__thread_row_custom_date {
   margin-left: 2px;
+}
+
+.inboxsdk__thread_row_addition.inboxsdk__button_icon {
+  margin-left: 3px;
+  width: 16px;
 }
 
 
@@ -584,7 +603,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   display: inline-block;
 }
 
-.inboxsdk__resultsSection_label_icon, .inboxsdk__thread_row_label .inboxsdk__button_icon {
+.inboxsdk__resultsSection_label_icon {
   height: 11px;
   width: 11px;
   position: absolute;

@@ -53,6 +53,8 @@ _.extend(GmailLabelView.prototype, {
 		var elToChange = this._element.querySelector('.at');
 		elToChange.style.backgroundColor = backgroundColor;
 		elToChange.style.borderColor = backgroundColor;
+
+		this._element.querySelector('.au').style.borderColor = backgroundColor;
 	},
 
 	_updateForegroundColor: function(foregroundColor){
@@ -89,7 +91,9 @@ function _getLabelHTML(){
 
 	return `<div class="ar as">
 				<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor}; color: ${foregroundColor};">
-					<div class="av"></div>
+					<div class="au" style="border-color: ${backgroundColor}">
+						<div class="av"></div>
+					</div>
 				</div>
 			</div>`;
 }

@@ -40,7 +40,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    * @param {ThreadRowAttachmentIconDescriptor} ThreadRowAttachmentIconDescriptor - the options for the icon to add
    */
   addAttachmentIcon: function(threadRowAttachmentIconDescriptor) {
-    this._threadRowViewDriver.addAttachmentIcon(ThreadRowAttachmentIconDescriptor);
+    this._threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
   },
 
   /**
