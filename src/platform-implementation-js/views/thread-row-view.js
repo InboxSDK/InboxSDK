@@ -37,7 +37,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Adds an attachment icon to the row
-   * @param {ThreadRowAttachmentIconDescriptor} ThreadRowAttachmentIconDescriptor - the options for the icon to add
+   * @param {ThreadRowAttachmentIconDescriptor} threadRowAttachmentIconDescriptor - the options for the icon to add
    */
   addAttachmentIcon: function(threadRowAttachmentIconDescriptor) {
     this._threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
