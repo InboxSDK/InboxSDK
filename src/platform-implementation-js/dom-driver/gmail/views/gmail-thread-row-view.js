@@ -295,39 +295,16 @@ _.extend(GmailThreadRowView.prototype, {
       options = options || {};
 
       updateIcon(iconWrapper, attachmentDiv, true, options.iconClass, options.iconUrl);
-      if(options.tooltip){
-        if(iconWrapper._iconElement){
-          iconWrapper._iconElement.setAttribute('data-tooltip', options.tooltip);
-        }
-        else if(iconWrapper._iconImgElement){
-          iconWrapper._iconImgElement.setAttribute('data-tooltip', options.tooltip);
-        }
-      }
-      else{
-        if(iconWrapper._iconElement){
-          iconWrapper._iconElement.setAttribute('data-tooltip', '');
-        }
-        else if(iconWrapper._iconImgElement){
-          iconWrapper._iconImgElement.setAttribute('data-tooltip', '');
-        }
+      if(iconWrapper._iconElement){
+        iconWrapper._iconElement.setAttribute('data-tooltip', options.tooltip || '');
+        this._expandColumn('col.yg', Math.max(25, 22*attachmentDiv.children.length));
+        iconWrapper._iconElement.classList.add('inboxsdk__thread_row_addition');
+        iconWrapper._iconImgElement.classList.add('inboxsdk__thread_row_addition');
       }
 
       if (this._elements.length > 1) {
         this._fixDateColumnWidth();
       }
-
-      if(iconWrapper._iconElement || iconWrapper._iconImgElement){
-        this._expandColumn('col.yg', Math.max(25, 22*attachmentDiv.children.length));
-      }
-
-      if(iconWrapper._iconElement){
-        iconWrapper._iconElement.classList.add('inboxsdk__thread_row_addition');
-      }
-
-      if(iconWrapper._iconImgElement){
-        iconWrapper._iconImgElement.classList.add('inboxsdk__thread_row_addition');
-      }
-
     });
   },
 
