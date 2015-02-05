@@ -4,17 +4,17 @@ function log() {
 
 InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
-	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
 		threadRowView.addLabel(Bacon.repeatedly(10000, [
 			{title:'A'},
-			{title:'B', textColor: 'blue'}
+			{title:'B', foregroundColor: 'blue'}
 		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
 			title:'a'+(i++),
-			color:'white',
-			textColor:'blue'
+			backgroundColor:'white',
+			foregroundColor:'blue'
 		});
 		threadRowView.addAttachmentIcon(Bacon.repeatedly(2000, [
 			{

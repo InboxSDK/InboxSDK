@@ -149,13 +149,13 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    var gmailLabelView = new GmailLabelView();
+    const gmailLabelView = new GmailLabelView();
 
     gmailLabelView.getElement().classList.add('yi');
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
 
-    var prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
+    const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
 
     var added = false;
     prop.onValue((labelDescriptor) => {
@@ -163,7 +163,8 @@ _.extend(GmailThreadRowView.prototype, {
       if(labelDescriptor){
         if(!added){
           const labelParentDiv = this._elements.length > 1 ?
-          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') : this._elements[0].querySelector('td.a4W div.xS div.xT');
+            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+            this._elements[0].querySelector('td.a4W div.xS div.xT');
 
           labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.querySelector('.y6'));
           added = true;
@@ -290,16 +291,16 @@ _.extend(GmailThreadRowView.prototype, {
     var prop = baconCast(Bacon, opts).toProperty();
     var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
 
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue((opts) => {
-      var options = opts || {};
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(options => {
+      options = options || {};
 
       updateIcon(iconWrapper, attachmentDiv, true, options.iconClass, options.iconUrl);
       if(options.tooltip){
         if(iconWrapper._iconElement){
-          iconWrapper._iconElement.setAttribute('data-tooltip', _.escape(options.tooltip));
+          iconWrapper._iconElement.setAttribute('data-tooltip', options.tooltip);
         }
         else if(iconWrapper._iconImgElement){
-          iconWrapper._iconImgElement.setAttribute('data-tooltip', _.escape(options.tooltip));
+          iconWrapper._iconImgElement.setAttribute('data-tooltip', options.tooltip);
         }
       }
       else{
