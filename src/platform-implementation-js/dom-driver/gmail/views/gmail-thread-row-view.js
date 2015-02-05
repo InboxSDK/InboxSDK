@@ -253,7 +253,6 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    if (this._elements.length != 1) return; // TODO
     var self = this;
     var img = document.createElement('img');
     // The gmail iP css class sets width:16, height:16, opacity: 0.8
