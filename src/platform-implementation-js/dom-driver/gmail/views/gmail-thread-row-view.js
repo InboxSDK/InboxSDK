@@ -3,7 +3,7 @@ var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
 
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
@@ -40,7 +40,9 @@ var GmailThreadRowView = function(element) {
   // (like addLabel) is called. If none of those methods are called, then the
   // stream is not listened on and no MutationObserver ever gets made, saving
   // us a little bit of work.
-  this._refresher = makeMutationObserverStream(_.last(this._elements), {
+  const watchElement = this._elements.length === 1 ?
+    this._elements[0] : this._elements[0].children[2];
+  this._refresher = makeMutationObserverChunkedStream(watchElement, {
     childList: true
   }).map(null).takeUntil(this._stopper).toProperty(null);
 
@@ -139,10 +141,9 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    if (this._elements.length == 2) return; // TODO
     const labelDiv = document.createElement('div');
-    labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
-    labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
+    labelDiv.className = 'ar as inboxsdk__thread_row_addition inboxSDKlabel';
+    labelDiv.innerHTML = '<div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div>';
 
     const at = labelDiv.querySelector('div.at');
     const au = labelDiv.querySelector('div.au');
@@ -168,8 +169,8 @@ _.extend(GmailThreadRowView.prototype, {
           av.style.color = label.textColor;
         }
 
-        const labelParentDiv = this._elements.length >= 3 ?
-          this._elements[2].querySelector('td.xY.apA div.apB div.apu') :
+        const labelParentDiv = this._elements.length > 1 ?
+          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
           this._elements[0].querySelector('td.a4W div.xS div.xT');
         if (!labelParentDiv.contains(labelDiv)) {
           labelParentDiv.insertBefore(labelDiv, labelParentDiv.firstChild);
