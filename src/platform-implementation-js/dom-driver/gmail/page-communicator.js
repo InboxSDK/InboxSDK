@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 // This is intended to be instantiated from makeXhrInterceptor, since it depends
@@ -33,6 +34,28 @@ PageCommunicator.prototype = {
   getUserEmailAddress: _.once(function() {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }),
+
+  getUserLanguage: _.once(function() {
+    return document.head.getAttribute('data-inboxsdk-user-language');
+  }),
+
+  getUserOriginalPreviewPaneMode: _.once(function() {
+    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
+  }),
+
+  isConversationViewDisabled() {
+    return new RSVP.Promise((resolve, reject) => {
+      Bacon.fromEventTarget(document, 'inboxSDKgmonkeyResponse')
+        .take(1)
+        .onValue(event => {
+          resolve(event.detail);
+        });
+
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('inboxSDKtellMeIsConversationViewDisabled', false, false, null);
+      document.dispatchEvent(event);
+    });
+  },
 
   announceSearchAutocompleter: function(providerID) {
     var event = document.createEvent('CustomEvent');

@@ -10,6 +10,8 @@ Driver.prototype = Object.create(BasicClass.prototype);
 
 _.extend(Driver.prototype, {
 
+	getLogger: null,
+
 	showCustomRouteView: null,
 
 	showNativeRouteView: null,

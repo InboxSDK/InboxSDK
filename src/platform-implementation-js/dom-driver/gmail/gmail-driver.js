@@ -1,6 +1,7 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+const _ = require('lodash');
+const RSVP = require('rsvp');
+const Bacon = require('baconjs');
+const Logger = require('../../lib/logger');
 
 require('./custom-style');
 
@@ -13,13 +14,18 @@ var GmailModalViewDriver = require('./widgets/gmail-modal-view-driver');
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 
-var GmailDriver = function(){
+var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	Driver.call(this);
+
+	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 
 	this._gmailRouteProcessor = new GmailRouteProcessor();
 	this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
 
 	this._setupEventStreams();
+	this._logger.setUserEmailAddress(this.getUserEmailAddress());
+
+	require('./gmail-driver/gmail-load-event')(this);
 };
 
 GmailDriver.prototype = Object.create(Driver.prototype);
@@ -28,6 +34,7 @@ _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
 		{name: '_pageCommunicator', destroy: false, get: true},
+		{name: '_logger', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},

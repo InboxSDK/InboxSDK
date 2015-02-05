@@ -37,12 +37,10 @@ var PlatformImplementation = function(appId, opts){
 		// Deprecated `new InboxSDK` constructor used.
 	}
 
-	logger.setup(appId, opts, this.LOADER_VERSION, this.IMPL_VERSION);
 	this._membraneMap = new MembraneMap();
-	this._driver = new GmailDriver();
-	logger.setUserEmailAddress(this._driver.getUserEmailAddress());
+	this._driver = new GmailDriver(appId, opts, this.LOADER_VERSION, this.IMPL_VERSION);
 
-	logger.eventSdkPassive('load', {appId: appId});
+	this._driver.getLogger().eventSdkPassive('load');
 
 	this.Compose = new Compose(appId, this._driver, this._membraneMap);
 	this.Conversations = new Conversations(appId, this._driver, this._membraneMap);
@@ -55,10 +53,7 @@ var PlatformImplementation = function(appId, opts){
 	this.Toolbars = new Toolbars(appId, this._driver, this._membraneMap);
 	this.Modal = new Modal(appId, this._driver, this._membraneMap);
 
-	this.Logger = {
-		error: logger.errorApp.bind(logger, appId),
-		event: logger.eventApp.bind(logger, appId)
-	};
+	this.Logger = this._driver.getLogger().getAppLogger();
 };
 
 module.exports = PlatformImplementation;

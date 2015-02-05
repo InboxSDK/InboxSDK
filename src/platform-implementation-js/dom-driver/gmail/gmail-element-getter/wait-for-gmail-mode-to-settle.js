@@ -1,6 +1,7 @@
+var _ = require('lodash');
 var RSVP = require('rsvp');
 
-module.exports = function(){
+module.exports = _.once(function(){
 	return new RSVP.Promise(function(resolve, reject){
 		if(document.body.classList.length > 0){
 			resolve();
@@ -20,4 +21,4 @@ module.exports = function(){
 			{attributes: true, attributeFilter: ['class']}
 		);
 	});
-};
+});

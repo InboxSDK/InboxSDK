@@ -307,6 +307,9 @@ _.extend(GmailThreadRowView.prototype, {
         else if(iconWrapper._iconImgElement){
           iconWrapper._iconImgElement.setAttribute('data-tooltip', '');
         }
+        if (this._elements.length > 1) {
+          this._fixDateColumnWidth();
+        }
       }
 
       if(iconWrapper._iconElement || iconWrapper._iconImgElement){
@@ -324,13 +327,23 @@ _.extend(GmailThreadRowView.prototype, {
     });
   },
 
-  replaceDate: function(opts) {
-    var self = this;
+  _fixDateColumnWidth: function() {
+    const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+    if (!dateContainer) return;
+    const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
+      dateContainer.firstElementChild;
 
-    var prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
-      var dateContainer = self._elements[0].querySelector('td.xW, td.yf > div.apm');
-      var originalDateSpan = dateContainer.firstChild;
+    // Attachment icons are only in the date column in vertical preivew pane.
+    const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
+    this._expandColumn('col.xX',
+      visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+  },
+
+  replaceDate: function(opts) {
+    const prop = baconCast(Bacon, opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      const originalDateSpan = dateContainer.firstElementChild;
       var customDateSpan = originalDateSpan.nextElementSibling;
       if (!customDateSpan) {
         customDateSpan = document.createElement('span');
@@ -357,13 +370,7 @@ _.extend(GmailThreadRowView.prototype, {
         customDateSpan.style.display = 'inline';
         originalDateSpan.style.display = 'none';
 
-        if (self._elements.length === 1) {
-          self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6);
-        } else {
-          // A little more room since in vertical preview pane, the column is
-          // shared with icons.
-          self._expandColumn('col.xX', customDateSpan.offsetWidth+8+6+28);
-        }
+        this._fixDateColumnWidth();
       }
     });
   },
