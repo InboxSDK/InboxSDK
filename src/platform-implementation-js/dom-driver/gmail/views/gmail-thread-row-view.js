@@ -310,9 +310,10 @@ _.extend(GmailThreadRowView.prototype, {
         else if(iconWrapper._iconImgElement){
           iconWrapper._iconImgElement.setAttribute('data-tooltip', '');
         }
-        if (this._elements.length > 1) {
-          this._fixDateColumnWidth();
-        }
+      }
+
+      if (this._elements.length > 1) {
+        this._fixDateColumnWidth();
       }
 
       if(iconWrapper._iconElement || iconWrapper._iconImgElement){
