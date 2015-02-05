@@ -71,6 +71,10 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	setHighlight: function(value){
+		if(!this._element){
+			return;
+		}
+
 		if(value){
 			this._element.querySelector('.TO').classList.add('NQ');
 		}
