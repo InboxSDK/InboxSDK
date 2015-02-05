@@ -282,12 +282,11 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   replaceDate: function(opts) {
-    if (this._elements.length != 1) return; // TODO
     var self = this;
 
     var prop = baconCast(Bacon, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(function(opts) {
-      var dateContainer = self._elements[0].querySelector('td.xW');
+      var dateContainer = self._elements[0].querySelector('td.xW, td.yf > div.apm');
       var originalDateSpan = dateContainer.firstChild;
       var customDateSpan = originalDateSpan.nextElementSibling;
       if (!customDateSpan) {
