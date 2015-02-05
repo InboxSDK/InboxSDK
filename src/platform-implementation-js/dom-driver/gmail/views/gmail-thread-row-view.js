@@ -187,7 +187,12 @@ _.extend(GmailThreadRowView.prototype, {
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
 
-    var buttonImg;
+    var iconWrapper = {
+      _iconUrl: null,
+      _iconClass: null,
+      _iconElement: null,
+      _iconImgElement: null
+    };
 
     var prop = baconCast(Bacon, buttonDescriptor).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue((buttonDescriptor) => {
@@ -229,49 +234,38 @@ _.extend(GmailThreadRowView.prototype, {
         buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
         buttonSpan.setAttribute('tabindex', "-1");
 
-        buttonSpan.onclick = buttonDescriptor.onClick && function(event) {
-          var appEvent = {
-            threadRowView: this._userView
-          };
-          if (buttonDescriptor.hasDropdown) {
-            if (activeDropdown) {
-              this._elements[0].classList.remove('inboxsdk__dropdown_active');
-              activeDropdown.close();
-              activeDropdown = null;
-              return;
-            } else {
-              this._elements[0].classList.add('inboxsdk__dropdown_active');
-              appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
-              appEvent.dropdown.on('destroy', function(){
-                setTimeout(function(){
-                  activeDropdown = null;
-                }, 1);
-              });
+        if(buttonDescriptor.onClick){
+          buttonSpan.onclick = (event) => {
+            var appEvent = {
+              threadRowView: this._userView
+            };
+            if (buttonDescriptor.hasDropdown) {
+              if (activeDropdown) {
+                this._elements[0].classList.remove('inboxsdk__dropdown_active');
+                activeDropdown.close();
+                activeDropdown = null;
+                return;
+              } else {
+                this._elements[0].classList.add('inboxsdk__dropdown_active');
+                appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
+                appEvent.dropdown.on('destroy', function(){
+                  setTimeout(function(){
+                    activeDropdown = null;
+                  }, 1);
+                });
+              }
             }
-          }
-          buttonDescriptor.onClick.call(null, appEvent);
-        };
+            buttonDescriptor.onClick.call(null, appEvent);
+          };
+        }
+
 
         buttonSpan.onmousedown = function(event){
           buttonSpan.focus();
           event.stopPropagation();
         };
 
-        if(buttonImg){
-          if(buttonDescriptor.iconUrl){
-            buttonImg.src = buttonDescriptor.iconUr;
-          }
-          else{
-            buttonImg.remove();
-            buttonImg = null;
-          }
-        }
-        else if(buttonDescriptor.iconUrl){
-          buttonImg = document.createElement('img');
-          buttonImg.src = buttonDescriptor.iconUrl;
-
-          buttonSpan.insertBefore(buttonImg, buttonSpan.firstChild);
-        }
+        updateIcon(iconWrapper, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
 
         if (!starGroup.contains(buttonSpan)) {
           starGroup.appendChild(buttonSpan);
