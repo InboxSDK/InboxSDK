@@ -1,28 +1,9 @@
-var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
-
-var ThreadRowViewDriver = function(){
-  BasicClass.call(this);
+module.exports = {
+  addLabel: 1,
+  addButton: 1,
+  addAttachmentIcon: 1,
+  replaceDate: 1,
+  getSubject: 0,
+  getDateString: 0,
+  getThreadID: 0
 };
-
-ThreadRowViewDriver.prototype = Object.create(BasicClass.prototype);
-
-_.extend(ThreadRowViewDriver.prototype, {
-
-  addLabel: null,
-
-  addButton: null,
-
-  addAttachmentIcon: null,
-
-  replaceDate: null,
-
-  getSubject: null,
-
-  getDateString: null,
-
-  getThreadId: null
-
-});
-
-module.exports = ThreadRowViewDriver;
