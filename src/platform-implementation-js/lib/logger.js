@@ -323,7 +323,7 @@ function _sendError(err, details, appId, sentByApp) {
       extensionId: getExtensionId(),
       loaderVersion: _extensionLoaderVersion,
       implementationVersion: _extensionImplVersion,
-      timestamp: new Date().getTime()
+      timestamp: Date.now()*1000
     };
 
     ajax({
@@ -377,7 +377,7 @@ function _trackEvent(appId, type, eventName, properties) {
   let event = {
     type: type,
     event: eventName,
-    timestamp: new Date().getTime(),
+    timestamp: Date.now()*1000,
     origin: document.location.origin,
     sessionId: _sessionId,
     emailHash: _extensionUserEmailHash,
@@ -415,7 +415,7 @@ if (_extensionIsLoggerMaster && global.document) {
       },
       data: JSON.stringify({
         data: events,
-        timestamp: new Date().getTime()
+        timestamp: Date.now()*1000
       })
     });
   });
