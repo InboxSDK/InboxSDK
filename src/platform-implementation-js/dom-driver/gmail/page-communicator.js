@@ -38,6 +38,10 @@ PageCommunicator.prototype = {
     return document.head.getAttribute('data-inboxsdk-user-language');
   }),
 
+  getUserOriginalPreviewPaneMode: _.once(function() {
+    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
+  }),
+
   announceSearchAutocompleter: function(providerID) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, {
