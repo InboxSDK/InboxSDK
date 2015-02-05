@@ -16,7 +16,7 @@ var memberMap = new Map();
 * and modify data in each row of the list.
 * @name Lists
 */
-var Mailbox = function(appId, driver, membraneMap){
+var Lists = function(appId, driver, membraneMap){
 
 	var members = {};
 	memberMap.set(this, members);
@@ -39,7 +39,7 @@ var Mailbox = function(appId, driver, membraneMap){
 
 };
 
-_.extend(Mailbox.prototype, /** @lends Lists */{
+_.extend(Lists.prototype, /** @lends Lists */{
 
 	/**
 	* Registers a handler that gets called whenever a new ThreadRowView becomes visible on screen.
@@ -54,4 +54,4 @@ _.extend(Mailbox.prototype, /** @lends Lists */{
 
 });
 
-module.exports = Mailbox;
+module.exports = Lists;
