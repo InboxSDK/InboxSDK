@@ -15,8 +15,8 @@ var GmailThreadRowView = function(element) {
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
-  this._isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
-  if (this._isVertical) {
+  const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
+  if (isVertical) {
     const threadRow3 = element.nextElementSibling.nextElementSibling;
     const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
     this._elements = has3Rows ?
@@ -45,7 +45,7 @@ var GmailThreadRowView = function(element) {
   }).map(null).takeUntil(this._stopper).toProperty(null);
 
   this.getCounts = _.once(function() {
-    const thing = this._elements[0].querySelector('td.yX div.yW');
+    const thing = this._elements[0].querySelector('td div.yW');
     const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
 
     const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
@@ -65,8 +65,6 @@ _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
     {name: '_elements', destroy: false},
-    {name: '_isVertical', destroy: false},
-    {name: '_verticalRowCount', destroy: false},
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -141,6 +139,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
+    if (this._elements.length == 2) return; // TODO
     const labelDiv = document.createElement('div');
     labelDiv.className = 'yi inboxsdk__thread_row_addition inboxSDKlabel';
     labelDiv.innerHTML = '<div class="ar as"><div class="at" title="text" style="background-color: #ddd; border-color: #ddd;"><div class="au" style="border-color:#ddd"><div class="av" style="color: #666">text</div></div></div></div><div class="as">&nbsp;</div>';
@@ -169,7 +168,7 @@ _.extend(GmailThreadRowView.prototype, {
           av.style.color = label.textColor;
         }
 
-        const labelParentDiv = this._isVertical ?
+        const labelParentDiv = this._elements.length >= 3 ?
           this._elements[2].querySelector('td.xY.apA div.apB div.apu') :
           this._elements[0].querySelector('td.a4W div.xS div.xT');
         if (!labelParentDiv.contains(labelDiv)) {
@@ -180,7 +179,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
-    if (this._isVertical) return; // TODO
+    if (this._elements.length != 1) return; // TODO
     var self = this;
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
@@ -253,7 +252,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    if (this._isVertical) return; // TODO
+    if (this._elements.length != 1) return; // TODO
     var self = this;
     var img = document.createElement('img');
     // The gmail iP css class sets width:16, height:16, opacity: 0.8
@@ -283,7 +282,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   replaceDate: function(opts) {
-    if (this._isVertical) return; // TODO
+    if (this._elements.length != 1) return; // TODO
     var self = this;
 
     var prop = baconCast(Bacon, opts).toProperty();
@@ -322,7 +321,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getSubject: function() {
-    if (this._isVertical) {
+    if (this._elements.length > 1) {
       return this._elements[1].querySelector('div.xS div.xT div.y6 > span[id]').textContent;
     } else {
       return this._elements[0].querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
