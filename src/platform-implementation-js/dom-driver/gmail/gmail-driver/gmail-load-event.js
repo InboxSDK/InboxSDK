@@ -5,6 +5,10 @@ module.exports = function gmailLoadEvent(driver) {
 
   pageCommunicator.isConversationViewDisabled().then(isConversationViewDisabled => {
     driver.getLogger().eventGmail('gmailSettings', {
+      screenWidth: window.screen && window.screen.width,
+      screenHeight: window.screen && window.screen.height,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
       language: pageCommunicator.getUserLanguage(),
       previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
       isConversationViewDisabled
