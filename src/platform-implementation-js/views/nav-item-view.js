@@ -36,12 +36,12 @@ var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 
 NavItemView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(NavItemView.prototype, {
+_.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 	/**
 	* Add a nested child NavItemView
-	* @param {NavItemDescriptor}
-	* @returns {NavItemView}
+	* @param {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
+	* @return {NavItemView}
 	*/
 	addNavItem: function(navItemDescriptor){
 		var members = memberMap.get(this);
@@ -105,7 +105,7 @@ _.extend(NavItemView.prototype, {
 
 	/**
 	* Whether the NavItemView is currently collapsed and hiding its children
-	* @returns {boolean}
+	* @return {boolean}
 	*/
 	isCollapsed: function(){
 		if(memberMap.get(this).navItemViewDriver){
@@ -118,7 +118,7 @@ _.extend(NavItemView.prototype, {
 
 	/**
 	* Collapse or uncollapse this NavItemView
-	* @param {boolean}
+	* @param {boolean} collapseValue - whether to collapse or uncollapse
 	*/
 	setCollapsed: function(collapseValue){
 		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){

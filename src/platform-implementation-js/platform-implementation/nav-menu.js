@@ -37,13 +37,13 @@ var NavMenu = function(appId, driver){
 	this.SENT_MAIL = _setupSentMail(appId, driver);
 };
 
-_.extend(NavMenu.prototype, {
+_.extend(NavMenu.prototype, /** @lends NavMenu */{
 
 	/**
 	* Adds a navigation item to the root of the navigation menu. Navigation items from your app are grouped together
 	* where possible but ultimately the SDK optimizes for the best user experience when displaying navigation items.
-	* @params {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
-	* @returns {NavItemView}
+	* @param {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
+	* @return {NavItemView}
 	*/
 	addNavItem: function(navItemDescriptor){
 		var members = memberMap.get(this);
@@ -87,22 +87,6 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	name: null,
 
 	/**
-	* An optional url to an icon to display an icon alongside the name of the NavItem
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	iconUrl: null,
-
-	/**
-	* An optional class to apply to the icon
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	iconClass: null,
-
-	/**
 	* The name of the route to navigate to when the NavItemView is clicked on
 	* @type {string}
 	*/
@@ -129,7 +113,23 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	* ^default=null
 	* @type {AccessoryDescriptor}
 	*/
-	accessory: null
+	accessory: null,
+
+	/**
+	* An optional url to an icon to display an icon alongside the name of the NavItem
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconUrl: null,
+
+	/**
+	* An optional class to apply to the icon
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass: null
 
 };
 
@@ -166,6 +166,12 @@ var IconButtonAccessoryDescriptor = /** @lends IconButtonAccessoryDescriptor */ 
 	type: 'ICON_BUTTON',
 
 	/**
+	* Callback for when the IconButton accessory is pressed.
+	* @type {function}
+	*/
+	onClick: null,
+
+	/**
 		* A URL for the icon to be displayed in the button
 		* @type {string}
 	*/
@@ -177,13 +183,7 @@ var IconButtonAccessoryDescriptor = /** @lends IconButtonAccessoryDescriptor */ 
 	* ^default=null
 	* @type {string}
 	*/
-	iconClass: null,
-
-	/**
-	* Callback for when the IconButton accessory is pressed.
-	* @type {function}
-	*/
-	onClick: null
+	iconClass: null
 };
 
 
