@@ -113,4 +113,32 @@ describe('makeElementChildStream', function() {
       }, 0);
     });
   });
+
+  it("doesn't miss children added during initial emits", function(done) {
+    const child1 = Marker('child1'), child2 = Marker('child2');
+
+    const target = new EventEmitter();
+    target._emitsMutations = true;
+    target.children = [child1];
+
+    var i = 0;
+    const stream = makeElementChildStream(target);
+    stream.onValue(event => {
+      switch(++i) {
+        case 1:
+          assert.strictEqual(event.el, child1);
+          target.emit('mutation', {
+            addedNodes: [child2],
+            removedNodes: []
+          });
+          break;
+        case 2:
+          assert.strictEqual(event.el, child2);
+          done();
+          break;
+        default:
+          throw new Error("should not happen");
+      }
+    });
+  });
 });

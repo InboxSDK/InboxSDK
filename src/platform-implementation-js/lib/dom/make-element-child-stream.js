@@ -38,8 +38,8 @@ function makeElementChildStream(element) {
     // stream listeners are subscribed.
     asap(function() {
       if (observer) {
-        Array.prototype.forEach.call(element.children, newEl);
         observer.observe(element, {childList: true});
+        Array.prototype.forEach.call(element.children, newEl);
       }
     });
 
