@@ -241,7 +241,7 @@ gulp.task('docs', function(cb) {
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
-  var results = execSync("node_modules/.bin/jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', true);
+  var results = execSync("jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', true);
   if (results.stderr)
     console.error(results.stderr);
   var comments = JSON.parse(results.stdout);
