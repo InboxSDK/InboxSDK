@@ -37,6 +37,8 @@ module.exports = function updateIcon(iconSettings, containerElement, append, new
 		if (!iconSettings._iconClass) {
 			iconSettings._iconElement.remove();
 			iconSettings._iconElement = null;
+		} else {
+			iconSettings._iconElement.innerHTML = '&nbsp;';
 		}
 		iconSettings._iconUrl = newIconUrl;
 	}
