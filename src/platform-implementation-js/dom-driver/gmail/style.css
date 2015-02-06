@@ -180,6 +180,7 @@ div.T-I.inboxsdk__button {
   position: relative;
   height: 15px;
   width: 15px;
+  top: -2px;
 }
 
 .inboxsdk__thread_row_custom_date {
