@@ -187,6 +187,8 @@ _.extend(GmailThreadRowView.prototype, {
 
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
+    buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button';
+    buttonSpan.setAttribute('tabindex', "-1");
 
     var iconWrapper = {
       _iconUrl: null,
@@ -204,6 +206,12 @@ _.extend(GmailThreadRowView.prototype, {
         }
         buttonSpan.remove();
       } else {
+        // compat workaround
+        if (buttonDescriptor.className) {
+          buttonDescriptor.iconClass = buttonDescriptor.className;
+          delete buttonDescriptor.className;
+        }
+
         var starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
 
         // Don't let the whole column count as the star for click and mouse over purposes.
@@ -231,9 +239,6 @@ _.extend(GmailThreadRowView.prototype, {
             }
           }
         };
-
-        buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
-        buttonSpan.setAttribute('tabindex', "-1");
 
         if(buttonDescriptor.onClick){
           buttonSpan.onclick = (event) => {

@@ -39,6 +39,10 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			}
 		]));
 
+		threadRowView.addButton({
+			iconClass: 'test_button_thing',
+		});
+
 		var buttonBus = new Bacon.Bus();
 		threadRowView.addButton(buttonBus.toProperty());
 		buttonBus.push({
