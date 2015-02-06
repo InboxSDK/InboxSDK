@@ -2,6 +2,9 @@ const _ = require('lodash');
 const assert = require('assert');
 
 function assertInterface(object, interface_) {
+  // Currently there's no way at runtime to query what interfaces an object
+  // implements. If we ever want to do that in the future, here's an example of
+  // a good way to.
   // if (!_.has(object, 'interfaces')) {
   //   object.interfaces = new Set();
   // }
