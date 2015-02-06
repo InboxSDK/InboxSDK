@@ -5,6 +5,8 @@ var Bacon = require('baconjs');
 var asap = require('asap');
 
 
+const BasicClass = require('../../../lib/basic-class');
+const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
@@ -17,7 +19,7 @@ var GmailLabelView = require('../widgets/gmail-label-view');
 var updateIcon = require('../lib/update-icon/update-icon');
 
 var GmailThreadRowView = function(element) {
-  ThreadRowViewDriver.call(this);
+  BasicClass.call(this);
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
@@ -67,7 +69,7 @@ var GmailThreadRowView = function(element) {
   });
 };
 
-GmailThreadRowView.prototype = Object.create(ThreadRowViewDriver.prototype);
+GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(GmailThreadRowView.prototype, {
 
@@ -101,7 +103,7 @@ _.extend(GmailThreadRowView.prototype, {
         el.style.display = 'inline';
       });
 
-    ThreadRowViewDriver.prototype.destroy.call(this);
+    BasicClass.prototype.destroy.call(this);
   },
 
   // Called by GmailDriver
@@ -147,13 +149,11 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    var gmailLabelView = new GmailLabelView();
-
-    gmailLabelView.getElement().classList.add('yi');
+    const gmailLabelView = new GmailLabelView();
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
 
-    var prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
+    const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
 
     var added = false;
     prop.onValue((labelDescriptor) => {
@@ -161,9 +161,10 @@ _.extend(GmailThreadRowView.prototype, {
       if(labelDescriptor){
         if(!added){
           const labelParentDiv = this._elements.length > 1 ?
-          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') : this._elements[0].querySelector('td.a4W div.xS div.xT');
+            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+            this._elements[0].querySelector('td.a4W div.xS div.xT');
 
-          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.querySelector('.y6'));
+          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
           added = true;
         }
       }
@@ -186,6 +187,8 @@ _.extend(GmailThreadRowView.prototype, {
 
     var activeDropdown = null;
     var buttonSpan = document.createElement('span');
+    buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button';
+    buttonSpan.setAttribute('tabindex', "-1");
 
     var iconWrapper = {
       _iconUrl: null,
@@ -203,6 +206,12 @@ _.extend(GmailThreadRowView.prototype, {
         }
         buttonSpan.remove();
       } else {
+        // compat workaround
+        if (buttonDescriptor.className) {
+          buttonDescriptor.iconClass = buttonDescriptor.className;
+          delete buttonDescriptor.className;
+        }
+
         var starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
 
         // Don't let the whole column count as the star for click and mouse over purposes.
@@ -230,9 +239,6 @@ _.extend(GmailThreadRowView.prototype, {
             }
           }
         };
-
-        buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button ' + (buttonDescriptor.className || '');
-        buttonSpan.setAttribute('tabindex', "-1");
 
         if(buttonDescriptor.onClick){
           buttonSpan.onclick = (event) => {
@@ -278,52 +284,32 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    var iconWrapper = {
-      _iconUrl: null,
-      _iconClass: null,
-      _iconElement: null,
-      _iconImgElement: null
-    };
+    const classNamePrefix = 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ';
+    var img = document.createElement('img');
+    img.className = classNamePrefix;
+    img.src = 'images/cleardot.gif';
+    var currentIconUrl;
 
     var prop = baconCast(Bacon, opts).toProperty();
-    var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+      if (!opts) {
+        img.remove();
+      } else {
+        img.title = opts.title;
+        img.className = classNamePrefix + (opts.iconClass || '');
+        if (currentIconUrl != opts.iconUrl) {
+          img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
+          currentIconUrl = opts.iconUrl;
+        }
 
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue((opts) => {
-      var options = opts || {};
-
-      updateIcon(iconWrapper, attachmentDiv, true, options.iconClass, options.iconUrl);
-      if(options.tooltip){
-        if(iconWrapper._iconElement){
-          iconWrapper._iconElement.setAttribute('data-tooltip', _.escape(options.tooltip));
-        }
-        else if(iconWrapper._iconImgElement){
-          iconWrapper._iconImgElement.setAttribute('data-tooltip', _.escape(options.tooltip));
-        }
-      }
-      else{
-        if(iconWrapper._iconElement){
-          iconWrapper._iconElement.setAttribute('data-tooltip', '');
-        }
-        else if(iconWrapper._iconImgElement){
-          iconWrapper._iconImgElement.setAttribute('data-tooltip', '');
+        var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
+        if (!attachmentDiv.contains(img)) {
+          attachmentDiv.appendChild(img);
         }
         if (this._elements.length > 1) {
           this._fixDateColumnWidth();
         }
       }
-
-      if(iconWrapper._iconElement || iconWrapper._iconImgElement){
-        this._expandColumn('col.yg', Math.max(25, 22*attachmentDiv.children.length));
-      }
-
-      if(iconWrapper._iconElement){
-        iconWrapper._iconElement.classList.add('inboxsdk__thread_row_addition');
-      }
-
-      if(iconWrapper._iconImgElement){
-        iconWrapper._iconImgElement.classList.add('inboxsdk__thread_row_addition');
-      }
-
     });
   },
 
@@ -420,5 +406,7 @@ _.extend(GmailThreadRowView.prototype, {
   }
 
 });
+
+assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 module.exports = GmailThreadRowView;

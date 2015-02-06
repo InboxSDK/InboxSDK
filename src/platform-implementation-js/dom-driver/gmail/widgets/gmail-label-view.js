@@ -1,7 +1,5 @@
 var _ = require('lodash');
-
-
-var _ = require('lodash');
+var updateIcon = require('../lib/update-icon/update-icon');
 var BasicClass = require('../../../lib/basic-class');
 
 var GmailLabelView = function(){
@@ -23,8 +21,14 @@ _.extend(GmailLabelView.prototype, {
 
 	_setupElement: function(){
 		this._element = document.createElement('div');
+		this._element.className = 'inboxsdk__gmail_label ar as';
 
-		this._element.innerHTML = _getLabelHTML();
+		this._element.innerHTML = `
+			<div class="at">
+				<div class="au">
+					<div class="av"></div>
+				</div>
+			</div>`;
 	},
 
 	setLabelDescriptorProperty: function(labelDescriptorProperty){
@@ -36,8 +40,19 @@ _.extend(GmailLabelView.prototype, {
 			return;
 		}
 
-		this._updateIconClass(this._element.querySelector('.at'), false, labelDescriptor.iconClass);
-		this._updateIconUrl(this._element.querySelector('.at'), false, labelDescriptor.iconUrl);
+		labelDescriptor = _.extend({
+			foregroundColor: 'rgb(102, 102, 102)', //dark grey
+			backgroundColor: 'rgb(221, 221, 221)' //light grey
+		}, labelDescriptor);
+
+		updateIcon(
+			this, this._element.querySelector('.at'),
+			false, labelDescriptor.iconClass, labelDescriptor.iconUrl);
+		if (labelDescriptor.iconClass || labelDescriptor.iconUrl) {
+			this._element.classList.add('inboxsdk__label_has_icon');
+		} else {
+			this._element.classList.remove('inboxsdk__label_has_icon');
+		}
 		this._updateBackgroundColor(labelDescriptor.backgroundColor);
 		this._updateForegroundColor(labelDescriptor.foregroundColor);
 		this._updateTitle(labelDescriptor.title);
@@ -62,11 +77,11 @@ _.extend(GmailLabelView.prototype, {
 			return;
 		}
 
-		this._element.querySelector('.av').style.color = foregroundColor;
+		this._element.querySelector('.at').style.color = foregroundColor;
 
 		var iconClassImg = this._element.querySelector('.inboxsdk__button_icon');
 		if(iconClassImg){
-			iconClassImg.setAttribute('style', `background-color: ${foregroundColor};`);
+			iconClassImg.style.backgroundColor = foregroundColor;
 		}
 	},
 
@@ -76,27 +91,8 @@ _.extend(GmailLabelView.prototype, {
 		}
 
 		this._element.querySelector('.av').textContent = title;
-		this._element.children[0].setAttribute('data-tooltip', _.escape(title));
-	},
-
-	_updateIconClass: require('../lib/update-icon/update-icon-class'),
-	_updateIconUrl: require('../lib/update-icon/update-icon-url')
-
+		this._element.children[0].setAttribute('data-tooltip', title);
+	}
 });
-
-
-function _getLabelHTML(){
-	var backgroundColor = 'rgb(194, 194, 194)'; //grey
-	var foregroundColor = 'rgb(255, 255, 255)'; //white
-
-	return `<div class="ar as">
-				<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor}; color: ${foregroundColor};">
-					<div class="au" style="border-color: ${backgroundColor}">
-						<div class="av"></div>
-					</div>
-				</div>
-			</div>`;
-}
-
 
 module.exports = GmailLabelView;
