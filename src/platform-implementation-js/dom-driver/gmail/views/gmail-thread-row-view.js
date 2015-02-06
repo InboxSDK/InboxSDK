@@ -150,8 +150,6 @@ _.extend(GmailThreadRowView.prototype, {
 
   addLabel: function(label) {
     const gmailLabelView = new GmailLabelView();
-
-    gmailLabelView.getElement().classList.add('yi');
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
     gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
 
@@ -166,7 +164,7 @@ _.extend(GmailThreadRowView.prototype, {
             this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
             this._elements[0].querySelector('td.a4W div.xS div.xT');
 
-          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.querySelector('.y6'));
+          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.firstChild);
           added = true;
         }
       }

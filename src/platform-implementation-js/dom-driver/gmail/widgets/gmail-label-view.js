@@ -20,13 +20,12 @@ _.extend(GmailLabelView.prototype, {
 
 	_setupElement: function(){
 		this._element = document.createElement('div');
+		this._element.className = 'inboxsdk__gmail_label ar as';
 
 		this._element.innerHTML = `
-			<div class="ar as">
-				<div class="at">
-					<div class="au">
-						<div class="av"></div>
-					</div>
+			<div class="at">
+				<div class="au">
+					<div class="av"></div>
 				</div>
 			</div>`;
 	},
