@@ -14,7 +14,7 @@ var memberMap = new Map();
 * @class
 * This namespace contains functionality associated with adding navigation items to the navigation menu of Gmail and Inbox.
 * Typically, these navigation links are accessible by the user on the left side of the email client and include built in
-* navigation items like the Inbox, Sentamil or Drafts links.
+* navigation items like the Inbox, Sent Mail or Drafts links.
 *
 * This namespace allows you to add your own items to this Navigation menu. Typically, these navigation items are useful
 * to send users to different Routes that you have already registered providing navigation for your entire application.
@@ -23,7 +23,8 @@ var memberMap = new Map();
 * several options to configure the appearance of the items.
 *
 * Items can also have accessories which provide secondary actions like opening a dropdown (like Gmails labels) or
-* providing a "create new" action. There are several predefined accesories, see <code>AccessoryDescriptor</code>
+* providing a "create new" action. There are several predefined accesories, see <code>CreateAccessoryDescriptor</code>,
+* <code>IconButtonAccessoryDescriptor</code> or <code>DropdownButtonAccessoryDescriptor</code>
 */
 var NavMenu = function(appId, driver){
 	var members = {};
@@ -211,8 +212,11 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
 	buttonForegroundColor: null,
 
 	/**
-	* A callback when the dropdown button is pressed. The event object passed to you has a dropdown property which you can fill your content with.
+	* A callback when the dropdown button is pressed. The event object passed to you has a
+	* dropdown property which you can fill your content with.
+	*
+	* //TODO document callback params
 	* @type {function(event)}
 	*/
-	onClick: null //TODO document callback params
+	onClick: null
 };
