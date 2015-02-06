@@ -281,29 +281,31 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    var iconWrapper = {
-      _iconUrl: null,
-      _iconClass: null,
-      _iconElement: null,
-      _iconImgElement: null
-    };
+    const classNamePrefix = 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ';
+    var img = document.createElement('img');
+    img.className = classNamePrefix;
+    img.src = 'images/cleardot.gif';
+    var currentIconUrl;
 
     var prop = baconCast(Bacon, opts).toProperty();
-    var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
+    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+      if (!opts) {
+        img.remove();
+      } else {
+        img.title = opts.title;
+        img.className = classNamePrefix + (opts.iconClass || '');
+        if (currentIconUrl != opts.iconUrl) {
+          img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
+          currentIconUrl = opts.iconUrl;
+        }
 
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(options => {
-      options = options || {};
-
-      updateIcon(iconWrapper, attachmentDiv, true, options.iconClass, options.iconUrl);
-      if(iconWrapper._iconElement){
-        iconWrapper._iconElement.setAttribute('data-tooltip', options.tooltip || '');
-        this._expandColumn('col.yg', Math.max(25, 22*attachmentDiv.children.length));
-        iconWrapper._iconElement.classList.add('inboxsdk__thread_row_addition');
-        iconWrapper._iconImgElement.classList.add('inboxsdk__thread_row_addition');
-      }
-
-      if (this._elements.length > 1) {
-        this._fixDateColumnWidth();
+        var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
+        if (!attachmentDiv.contains(img)) {
+          attachmentDiv.appendChild(img);
+        }
+        if (this._elements.length > 1) {
+          this._fixDateColumnWidth();
+        }
       }
     });
   },

@@ -193,6 +193,10 @@ div.T-I.inboxsdk__button {
   width: 16px;
 }
 
+.inboxsdk__thread_row_attachment_icon {
+  width: 16px;
+  height: 16px;
+}
 
 /* end thread rows */
 
