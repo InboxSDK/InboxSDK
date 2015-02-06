@@ -1,8 +1,7 @@
-'use strict';
-
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
+const asap = require('asap');
 
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
@@ -162,19 +161,17 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_setupSubViews: function(){
-		var self = this;
-		RSVP.resolve().then(function(){
-			self._setupRowListViews();
-			self._setupContentAndSidebarView();
+		asap(() => {
+			this._setupRowListViews();
+			this._setupContentAndSidebarView();
 		});
 	},
 
 	_setupRowListViews: function(){
 		this._rowListElements = GmailElementGetter.getRowListElements();
 
-		var self = this;
-		Array.prototype.forEach.call(this._rowListElements, function(rowListElement){
-			self._processRowListElement(rowListElement);
+		Array.prototype.forEach.call(this._rowListElements, (rowListElement) => {
+			this._processRowListElement(rowListElement);
 		});
 	},
 
