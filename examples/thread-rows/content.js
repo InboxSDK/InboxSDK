@@ -29,6 +29,16 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		]));
 		threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
 
+		threadRowView.addButton(Bacon.repeatedly(5000, [
+			{
+				iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+				iconClass: 'buttonLight'
+			},
+			{
+				iconClass: 'test_button_thing',
+			}
+		]));
+
 		var buttonBus = new Bacon.Bus();
 		threadRowView.addButton(buttonBus.toProperty());
 		buttonBus.push({

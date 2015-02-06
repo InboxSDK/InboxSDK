@@ -175,13 +175,17 @@ div.T-I.inboxsdk__button {
   }
 
 .inboxsdk__thread_row_button {
-  display: inline-block;
   outline: 0;
   padding: 0 5px;
   position: relative;
   height: 15px;
   width: 15px;
-  margin-left: 6px;
+  top: 2px;
+}
+
+.inboxsdk__thread_row_button img {
+  vertical-align: baseline;
+  margin: 0;
 }
 
 .inboxsdk__thread_row_custom_date {

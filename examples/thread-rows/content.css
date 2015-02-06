@@ -5,3 +5,9 @@
 .test_icon_thing {
   background: no-repeat url(https://ssl.gstatic.com/mail/sprites/general_black-16bf964ab5b51c4b7462e4429bfa7fe8.png) 0 -215px;
 }
+
+.test_button_thing {
+  background: no-repeat url('https://mailfoogae.appspot.com/build/images/listIndicator.png') 0 0;
+  width: 16px;
+  height: 16px;
+}
