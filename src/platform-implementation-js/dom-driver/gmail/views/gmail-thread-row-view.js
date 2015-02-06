@@ -164,7 +164,7 @@ _.extend(GmailThreadRowView.prototype, {
             this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
             this._elements[0].querySelector('td.a4W div.xS div.xT');
 
-          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.firstChild);
+          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
           added = true;
         }
       }
