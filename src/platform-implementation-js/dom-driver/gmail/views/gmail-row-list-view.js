@@ -91,9 +91,9 @@ _.extend(GmailRowListView.prototype, {
 	_startWatchingForRowViews: function(){
 		var self = this;
 
-		var tableDivParent = self._element.querySelector('div.Cp');
+		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
 
-		var elementStream = makeElementChildStream(tableDivParent).flatMap(function(event) {
+		const elementStream = Bacon.mergeAll(tableDivParents.map(makeElementChildStream)).flatMap(function(event) {
 			self._fixColumnWidths(event.el);
 			var tbody = event.el.querySelector('table > tbody');
 			return makeElementChildStream(tbody).takeUntil(event.removalStream).filter(function(event) {
