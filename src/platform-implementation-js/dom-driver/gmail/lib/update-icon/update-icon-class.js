@@ -4,8 +4,9 @@ module.exports = function(containerElement, append, newIconClass){
 
 	}
 	else if(this._iconClass && !newIconClass){
-		if(!this._iconClass){
+		if(!this._iconUrl){
 			this._iconElement.remove();
+			this._iconElement = null;
 			this._iconClass = newIconClass;
 		}
 		else{

@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var updateIcon = require('../lib/update-icon/update-icon');
 var BasicClass = require('../../../lib/basic-class');
 
 var GmailLabelView = function(){
@@ -44,8 +45,9 @@ _.extend(GmailLabelView.prototype, {
 			backgroundColor: 'rgb(221, 221, 221)' //light grey
 		}, labelDescriptor);
 
-		this._updateIconClass(this._element.querySelector('.at'), false, labelDescriptor.iconClass);
-		this._updateIconUrl(this._element.querySelector('.at'), false, labelDescriptor.iconUrl);
+		updateIcon(
+			this, this._element.querySelector('.at'),
+			false, labelDescriptor.iconClass, labelDescriptor.iconUrl);
 		this._updateBackgroundColor(labelDescriptor.backgroundColor);
 		this._updateForegroundColor(labelDescriptor.foregroundColor);
 		this._updateTitle(labelDescriptor.title);
@@ -85,11 +87,7 @@ _.extend(GmailLabelView.prototype, {
 
 		this._element.querySelector('.av').textContent = title;
 		this._element.children[0].setAttribute('data-tooltip', title);
-	},
-
-	_updateIconClass: require('../lib/update-icon/update-icon-class'),
-	_updateIconUrl: require('../lib/update-icon/update-icon-url')
-
+	}
 });
 
 module.exports = GmailLabelView;

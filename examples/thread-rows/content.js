@@ -7,9 +7,10 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
-		threadRowView.addLabel(Bacon.repeatedly(10000, [
+		threadRowView.addLabel(Bacon.repeatedly(5000, [
 			{title:'A'},
-			{title:'B', foregroundColor: 'blue'}
+			{title:'B', foregroundColor: 'blue', iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png'},
+			{title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
 		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
 			title:'a'+(i++),
