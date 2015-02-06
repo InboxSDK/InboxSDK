@@ -48,6 +48,11 @@ _.extend(GmailLabelView.prototype, {
 		updateIcon(
 			this, this._element.querySelector('.at'),
 			false, labelDescriptor.iconClass, labelDescriptor.iconUrl);
+		if (labelDescriptor.iconClass || labelDescriptor.iconUrl) {
+			this._element.classList.add('inboxsdk__label_has_icon');
+		} else {
+			this._element.classList.remove('inboxsdk__label_has_icon');
+		}
 		this._updateBackgroundColor(labelDescriptor.backgroundColor);
 		this._updateForegroundColor(labelDescriptor.foregroundColor);
 		this._updateTitle(labelDescriptor.title);
