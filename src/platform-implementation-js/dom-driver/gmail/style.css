@@ -160,7 +160,7 @@ div.T-I.inboxsdk__button {
 
 /* thread rows */
 
-.inboxsdk__thread_row_label .au {
+.inboxsdk__gmail_label.inboxsdk__label_has_icon .au {
   display: inline-block;
   margin-left: 14px;
 }
@@ -175,13 +175,12 @@ div.T-I.inboxsdk__button {
   }
 
 .inboxsdk__thread_row_button {
-  display: inline-block;
   outline: 0;
   padding: 0 5px;
   position: relative;
   height: 15px;
   width: 15px;
-  margin-left: 6px;
+  top: -2px;
 }
 
 .inboxsdk__thread_row_custom_date {
@@ -193,6 +192,10 @@ div.T-I.inboxsdk__button {
   width: 16px;
 }
 
+.inboxsdk__thread_row_attachment_icon {
+  width: 16px;
+  height: 16px;
+}
 
 /* end thread rows */
 

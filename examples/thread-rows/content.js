@@ -4,21 +4,22 @@ function log() {
 
 InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
-	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
-		threadRowView.addLabel(Bacon.repeatedly(10000, [
+		threadRowView.addLabel(Bacon.repeatedly(5000, [
 			{title:'A'},
-			{title:'B', textColor: 'blue'}
+			{title:'B', foregroundColor: 'blue', iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png'},
+			{title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
 		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
 			title:'a'+(i++),
-			color:'white',
-			textColor:'blue'
+			backgroundColor:'white',
+			foregroundColor:'blue'
 		});
 		threadRowView.addAttachmentIcon(Bacon.repeatedly(2000, [
 			{
-				iconUrl: 'https://ssl.gstatic.com/mail/sprites/general_black-16bf964ab5b51c4b7462e4429bfa7fe8.png',
+				iconClass: 'test_icon_thing',
 				title: 'thing'
 			},
 			{
@@ -27,6 +28,20 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			}
 		]));
 		threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
+
+		threadRowView.addButton(Bacon.repeatedly(5000, [
+			{
+				iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+				iconClass: 'buttonLight'
+			},
+			{
+				iconClass: 'test_button_thing',
+			}
+		]));
+
+		threadRowView.addButton({
+			iconClass: 'test_button_thing',
+		});
 
 		var buttonBus = new Bacon.Bus();
 		threadRowView.addButton(buttonBus.toProperty());

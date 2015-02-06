@@ -161,8 +161,9 @@ _.extend(GmailNavItemView.prototype, {
 
 		this._updateName(navItemDescriptor.name);
 
-		require('../lib/update-icon/update-icon-class').apply(this, [this._element.querySelector('.aio'), true, navItemDescriptor.iconClass]);
-		require('../lib/update-icon/update-icon-url').apply(this, [this._element.querySelector('.aio'), true, navItemDescriptor.iconUrl]);
+		require('../lib/update-icon/update-icon')(
+			this, this._element.querySelector('.aio'), true,
+			navItemDescriptor.iconClass, navItemDescriptor.iconUrl);
 
 		this._updateAccessory(navItemDescriptor.accessory);
 		this._updateOrder(navItemDescriptor);
@@ -452,4 +453,3 @@ _.extend(GmailNavItemView.prototype, {
 
 
 module.exports = GmailNavItemView;
-
