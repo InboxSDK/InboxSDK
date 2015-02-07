@@ -103,7 +103,7 @@ describe('makeElementChildStream', function() {
   });
 
   it("doesn't miss children added during initial emits", function(done) {
-    const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
+    const child1 = Marker('child1'), child2 = Marker('child2');
 
     const target = new MockElementParent([child1]);
 
@@ -114,6 +114,29 @@ describe('makeElementChildStream', function() {
         case 1:
           assert.strictEqual(event.el, child1);
           target.appendChild(child2);
+          break;
+        case 2:
+          assert.strictEqual(event.el, child2);
+          done();
+          break;
+        default:
+          throw new Error("should not happen");
+      }
+    });
+  });
+
+  it("doesn't miss children if some are removed during initial emits", function(done) {
+    const child1 = Marker('child1'), child2 = Marker('child2');
+
+    const target = new MockElementParent([child1, child2]);
+
+    var i = 0;
+    const stream = makeElementChildStream(target);
+    stream.onValue(event => {
+      switch(++i) {
+        case 1:
+          assert.strictEqual(event.el, child1);
+          target.removeChild(child1);
           break;
         case 2:
           assert.strictEqual(event.el, child2);
