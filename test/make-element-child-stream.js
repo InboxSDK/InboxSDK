@@ -2,6 +2,7 @@ var assert = require('assert');
 var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Marker = require('../src/common/marker');
+const MockElementParent = require('./lib/mock-element-parent');
 
 var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
 
@@ -17,9 +18,7 @@ describe('makeElementChildStream', function() {
   it('should work', function(done) {
     var child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
-    var target = new EventEmitter();
-    target._emitsMutations = true;
-    target.children = [child1, child2];
+    const target = new MockElementParent([child1, child2]);
 
     var call = 0;
     makeElementChildStream(target).onValue(function(event) {
@@ -27,10 +26,7 @@ describe('makeElementChildStream', function() {
         case 1:
           assert.strictEqual(event.el, child1);
           event.removalStream.onValue(function() {
-            target.emit('mutation', {
-              addedNodes: [child3],
-              removedNodes: []
-            });
+            target.appendChild(child3);
           });
           break;
         case 2:
@@ -48,10 +44,7 @@ describe('makeElementChildStream', function() {
     });
 
     setTimeout(function() {
-      target.emit('mutation', {
-        addedNodes: [],
-        removedNodes: [child1]
-      });
+      target.removeChild(child1);
     }, 0);
   });
 
@@ -59,9 +52,7 @@ describe('makeElementChildStream', function() {
     var child1 = Marker('child1'), child2 = Marker('child2');
     var stopper = new Bacon.Bus();
 
-    var target = new EventEmitter();
-    target._emitsMutations = true;
-    target.children = [child1];
+    const target = new MockElementParent([child1]);
 
     var call = 0;
     var child1Removed = 0, child2Removed = 0;
@@ -78,10 +69,7 @@ describe('makeElementChildStream', function() {
             child1Ended = true;
           });
           setTimeout(function() {
-            target.emit('mutation', {
-              addedNodes: [child2],
-              removedNodes: []
-            });
+            target.appendChild(child2);
           }, 0);
           break;
         case 2:
@@ -115,11 +103,9 @@ describe('makeElementChildStream', function() {
   });
 
   it("doesn't miss children added during initial emits", function(done) {
-    const child1 = Marker('child1'), child2 = Marker('child2');
+    const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
-    const target = new EventEmitter();
-    target._emitsMutations = true;
-    target.children = [child1];
+    const target = new MockElementParent([child1]);
 
     var i = 0;
     const stream = makeElementChildStream(target);
@@ -127,10 +113,7 @@ describe('makeElementChildStream', function() {
       switch(++i) {
         case 1:
           assert.strictEqual(event.el, child1);
-          target.emit('mutation', {
-            addedNodes: [child2],
-            removedNodes: []
-          });
+          target.appendChild(child2);
           break;
         case 2:
           assert.strictEqual(event.el, child2);
