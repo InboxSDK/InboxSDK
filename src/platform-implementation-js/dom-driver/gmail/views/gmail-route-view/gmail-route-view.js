@@ -162,6 +162,9 @@ _.extend(GmailRouteView.prototype, {
 
 	_setupSubViews: function(){
 		asap(() => {
+			if (!this._eventStream) {
+				return;
+			}
 			this._setupRowListViews();
 			this._setupContentAndSidebarView();
 		});
