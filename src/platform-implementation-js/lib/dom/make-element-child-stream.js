@@ -1,7 +1,7 @@
-var asap = require('asap');
-var logger = require('../logger');
-var Bacon = require('baconjs');
-var Map = require('es6-unweak-collections').Map;
+const _ = require('lodash');
+const asap = require('asap');
+const logger = require('../logger');
+const Bacon = require('baconjs');
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
@@ -38,8 +38,9 @@ function makeElementChildStream(element) {
     // stream listeners are subscribed.
     asap(function() {
       if (observer) {
-        Array.prototype.forEach.call(element.children, newEl);
         observer.observe(element, {childList: true});
+        // Children list can change during iteration, so clone it first.
+        _.toArray(element.children).slice().forEach(newEl);
       }
     });
 

@@ -2,6 +2,7 @@ var assert = require('assert');
 var Bacon = require('baconjs');
 var EventEmitter = require('events').EventEmitter;
 var Marker = require('../src/common/marker');
+const MockElementParent = require('./lib/mock-element-parent');
 
 var makeElementViewStream = require('../src/platform-implementation-js/lib/dom/make-element-view-stream');
 var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
@@ -16,14 +17,12 @@ describe('makeElementViewStream', function() {
   });
 
   it('should work with makeElementChildStream', function(done) {
-    var child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
+    const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
-    var stopper = new Bacon.Bus();
+    const stopper = new Bacon.Bus();
     var activeViewCount = 0;
 
-    var target = new EventEmitter();
-    target._emitsMutations = true;
-    target.children = [child1, child2];
+    const target = new MockElementParent([child1, child2]);
 
     var call = 0;
     makeElementChildStream(target)
@@ -35,10 +34,7 @@ describe('makeElementViewStream', function() {
           destroy: function() {
             activeViewCount--;
             if (el === child2) {
-              target.emit('mutation', {
-                addedNodes: [child3],
-                removedNodes: []
-              });
+              target.appendChild(child3);
             } else if (activeViewCount === 0) {
               done();
             }
@@ -62,10 +58,7 @@ describe('makeElementViewStream', function() {
       });
 
     setTimeout(function() {
-      target.emit('mutation', {
-        addedNodes: [],
-        removedNodes: [child2]
-      });
+      target.removeChild(child2);
     }, 0);
   });
 });

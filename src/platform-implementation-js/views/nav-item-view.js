@@ -8,6 +8,19 @@ var Map = require('es6-unweak-collections').Map;
 
 var memberMap = new Map();
 
+/**
+* @class
+* NavItemsViews are the elements placed inside a NavMenu. Each NavItemView
+* represents an entry in the left navigation of Gmail or Inbox. These NavItemViews
+* can be nested.
+*
+* Typically the main action of a NavItemView is performed when the user clicks on the
+* main text. However, you can also provide accessories which are secondary actions which
+* typically appear on the right side of the NavItemView but may be rendered in other ways.
+
+* For nested NavItemViews, the SDK will handle collapsing and expanding children depending
+* on user input.
+*/
 var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 	EventEmitter.call(this);
 
@@ -25,6 +38,11 @@ NavItemView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(NavItemView.prototype, {
 
+	/**
+	* Add a nested child NavItemView
+	* @param {NavItemDescriptor}
+	* @returns {NavItemView}
+	*/
 	addNavItem: function(navItemDescriptor){
 		var members = memberMap.get(this);
 		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
@@ -61,6 +79,9 @@ _.extend(NavItemView.prototype, {
 		members.deferred.resolve(navItemViewDriver);
 	},
 
+	/**
+	* Remove this NavItemView from its parent
+	*/
 	remove: function(){
 		var members = memberMap.get(this);
 		if(!members.navItemViews){
@@ -82,6 +103,10 @@ _.extend(NavItemView.prototype, {
 		});
 	},
 
+	/**
+	* Whether the NavItemView is currently collapsed and hiding its children
+	* @returns {boolean}
+	*/
 	isCollapsed: function(){
 		if(memberMap.get(this).navItemViewDriver){
 			return memberMap.get(this).navItemViewDriver.isCollapsed();
@@ -91,6 +116,10 @@ _.extend(NavItemView.prototype, {
 		}
 	},
 
+	/**
+	* Collapse or uncollapse this NavItemView
+	* @param {boolean}
+	*/
 	setCollapsed: function(collapseValue){
 		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){
 			navItemViewDriver.setCollapsed(collapseValue);

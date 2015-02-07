@@ -6,6 +6,10 @@ var fromEventTargetCapture = require('../lib/from-event-target-capture');
 
 var EventEmitter = require('events').EventEmitter;
 
+/**
+* @class
+* Represents a modal dialog.
+*/
 function ModalView(options){
     EventEmitter.call(this);
 
@@ -17,7 +21,7 @@ function ModalView(options){
 
 ModalView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(ModalView.prototype, {
+_.extend(ModalView.prototype, /** @lends ModalView */{
 
     show: function(){
         if(!this._driver){
@@ -47,6 +51,10 @@ _.extend(ModalView.prototype, {
 
     },
 
+    /**
+    * This closes the modal. Does nothing if already closed.
+    * @return {void}
+    */
     close: function(){
         if (this._driver) {
             this._driver.getOverlayElement().remove();
@@ -56,16 +64,8 @@ _.extend(ModalView.prototype, {
         }
     },
 
-    /*
-    * options = {
-    * 	iconUrl: ,
-    * 	tooltip,
-    * 	callback:
-    * }
-    */
     addButton: function(options){
         throw new Error("not implemented");
-        //this._attachmentCardImplementation.addButton(options);
     }
 });
 
