@@ -381,6 +381,8 @@ function _trackEvent(appId, type, eventName, properties) {
     origin: document.location.origin,
     sessionId: _sessionId,
     emailHash: _extensionUserEmailHash,
+    loaderVersion: _extensionLoaderVersion,
+    implementationVersion: _extensionImplVersion,
     properties: properties
   };
 

@@ -89,14 +89,12 @@ _.extend(GmailRowListView.prototype, {
 	},
 
 	_startWatchingForRowViews: function(){
-		var self = this;
+		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
 
-		var tableDivParent = self._element.querySelector('div.Cp');
-
-		var elementStream = makeElementChildStream(tableDivParent).flatMap(function(event) {
-			self._fixColumnWidths(event.el);
-			var tbody = event.el.querySelector('table > tbody');
-			return makeElementChildStream(tbody).takeUntil(event.removalStream).filter(function(event) {
+		const elementStream = Bacon.mergeAll(tableDivParents.map(makeElementChildStream)).flatMap(event => {
+			this._fixColumnWidths(event.el);
+			const tbody = event.el.querySelector('table > tbody');
+			return makeElementChildStream(tbody).takeUntil(event.removalStream).filter(event => {
 				return event.el.classList.contains('zA');
 			});
 		});
@@ -111,25 +109,22 @@ _.extend(GmailRowListView.prototype, {
 					}
 				}))
 				.doAction(this, '_addThreadRowView')
-				.map(function(view) {
-					return {
-						eventName: 'newGmailThreadRowView',
-						view: view
-					};
-				})
+				.map(view => ({
+					eventName: 'newGmailThreadRowView',
+					view: view
+				}))
 		);
 	},
 
 	_addThreadRowView: function(gmailThreadRowView){
 		this._threadRowViewDrivers.push(gmailThreadRowView);
 
-		var self = this;
 		gmailThreadRowView
 			.getEventStream()
-			.onEnd(function(){
-				if(self._threadRowViewDrivers){
-					var index = self._threadRowViewDrivers.indexOf(gmailThreadRowView);
-					self._threadRowViewDrivers.splice(index, 1);
+			.onEnd(() => {
+				if(this._threadRowViewDrivers){
+					const index = this._threadRowViewDrivers.indexOf(gmailThreadRowView);
+					this._threadRowViewDrivers.splice(index, 1);
 				}
 			});
 	}
