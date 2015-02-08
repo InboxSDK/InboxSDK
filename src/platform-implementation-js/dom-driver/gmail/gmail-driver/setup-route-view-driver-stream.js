@@ -1,17 +1,17 @@
 'use strict';
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var waitFor = require('../../../lib/wait-for');
+const _ = require('lodash');
+const Bacon = require('baconjs');
+const waitFor = require('../../../lib/wait-for');
+const GmailElementGetter = require('../gmail-element-getter');
+const GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
+const getURLObject = require('./get-url-object');
 
-var GmailElementGetter = require('../gmail-element-getter');
-
-var GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
-
-var getURLObject = require('./get-url-object');
+const Map = require('es6-unweak-collections').Map;
 
 var currentUrlObject = {};
-var currentMainElement = null;
+
+const elementToGmailRouteViewMap = new Map();
 
 function setupRouteViewDriverStream(GmailRouteProcessor){
 	return Bacon.mergeAll(
@@ -50,9 +50,28 @@ function _createRouteViewDriver(GmailRouteProcessor, urlObject){
 
 	if(options.isCustomRoute){
 		options.params.unshift(options.name);
+		return new GmailRouteView(options, GmailRouteProcessor);
 	}
+	else{
+		const currentMainElement = GmailElementGetter.getCurrentMainContentElement();
+		if(elementToGmailRouteViewMap.has(currentMainElement)){
+			return elementToGmailRouteViewMap.get(currentMainElement);
+		}
+		else{
+			options.element = currentMainElement;
 
-	return new GmailRouteView(options, GmailRouteProcessor);
+			const gmailRouteView = new GmailRouteView(options, GmailRouteProcessor);
+			_addToMap(currentMainElement, gmailRouteView);
+			return gmailRouteView;
+		}
+	}
+}
+
+function _addToMap(element, gmailRouteView){
+	elementToGmailRouteViewMap.set(element, gmailRouteView);
+	gmailRouteView.getEventStream().onEnd((event) => {
+		elementToGmailRouteViewMap.delete(element);
+	});
 }
 
 module.exports = setupRouteViewDriverStream;

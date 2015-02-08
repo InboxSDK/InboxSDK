@@ -40,6 +40,7 @@ var Router = function(appId, driver, membraneMap){
 	members.driver = driver;
 
 	members.currentRouteViewDriver = null;
+	members.driverPool = [];
 
 	members.allRoutesHandlerRegistry = new HandlerRegistry();
 
@@ -502,13 +503,24 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 			return;
 		}
 
-		members.currentRouteViewDriver.destroy();
+		if(members.currentRouteViewDriver.isCustomRoute()){
+			members.currentRouteViewDriver.destroy();
+		}
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
-	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
 
-	members.membraneMap.set(routeViewDriver, routeView);
+	var routeView;
+
+	var wrapper = _.find(members.driverPool, (aWrapper) => { return aWrapper.routeViewDriver === routeViewDriver; });
+	if(wrapper){
+		routeView = wrapper.routeView;
+	}
+	else{
+		routeView = new RouteView(routeViewDriver, members.driver, members.appId);
+		members.membraneMap.set(routeViewDriver, routeView);
+	}
+
 
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
@@ -517,14 +529,20 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 		members.driver.showNativeRouteView();
 	}
 
-	members.pendingSearchResultsView = null;
+	if(wrapper){
+		return; //don't need to do anything more
+	}
+
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
+	var listRouteView;
 	if(routeView.getRouteType() === routeTypes.LIST){
-		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
+		listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
 		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
 		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
+
+	_addToDriverPool(members, {routeViewDriver: routeViewDriver, routeView: routeView, listRouteView: listRouteView});
 }
 
 function _isSameRoute(currentRouteViewDriver, routeViewDriver){
@@ -631,6 +649,17 @@ function _restoreNativeNavItemActive(members){
 
 function _unhandleNativeNavItem(members){
 	members.modifiedNativeNavItem = null;
+}
+
+function _addToDriverPool(members, wrapper){
+	members.driverPool.push(wrapper);
+
+	wrapper.routeViewDriver.getEventStream().onEnd((event) => {
+
+		var index = members.driverPool.indexOf(wrapper);
+		members.driverPool.splice(index, 1);
+
+	});
 }
 
 
