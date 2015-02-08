@@ -214,6 +214,14 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
   iconUrl:null,
 
   /**
+  * A CSS class to apply to the icon
+  * ^optional
+  * ^default=MODIFIER
+  * @type {string}
+  */
+  iconClass:null,
+
+  /**
   * The tooltip text to show when the user hovers over the icon
   * @type {string}
   */
