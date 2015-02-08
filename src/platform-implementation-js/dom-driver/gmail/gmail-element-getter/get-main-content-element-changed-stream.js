@@ -32,17 +32,49 @@ function createMainChangeStream(GmailElementGetter){
 							.filter(function(node){
 								return node.classList.contains('nH');
 							})
-							.flatMap(function(mainNode){
-								return makeMutationObserverStream(mainNode, {attributes: true, attributeFilter: ['role'], attributeOldValue: true})
-											.startWith({
-												oldValue: null,
-												target: mainNode
-											})
-											.filter(_isNowMain)
-											.map('.target');
-							})
+							.flatMap(_monitorForMainAttributeStream)
 			});
 }
+
+function _monitorForMainAttributeStream(mainNode){
+	var mainAttributeStream = makeMutationObserverStream(
+								mainNode,
+								{
+									attributes: true,
+									attributeFilter: ['role'],
+									attributeOldValue: true
+								}
+							)
+							.startWith({
+								oldValue: null,
+								target: mainNode
+							})
+							.toProperty();
+
+	//setup not main notifier
+	mainAttributeStream
+		.filter(_isNowNotMain)
+		.map('.target')
+		.onValue((node) => {dispatchCustomEvent(node, 'nowNotMain');});
+
+
+
+	//main notifier
+	return mainAttributeStream
+			.filter(_isNowMain)
+			.map('.target')
+			.doAction((node) => {dispatchCustomEvent(node, 'nowMain');})
+}
+
+function _isNowNotMain(mutation){
+	var oldValue = mutation.oldValue;
+	var newValue = mutation.target.getAttribute('role');
+
+	if(!newValue && oldValue === 'main'){
+		return true;
+	}
+}
+
 
 function _isNowMain(mutation){
 	var oldValue = mutation.oldValue;

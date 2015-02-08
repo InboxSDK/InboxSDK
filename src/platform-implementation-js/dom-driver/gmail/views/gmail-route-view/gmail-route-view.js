@@ -38,7 +38,7 @@ var GmailRouteView = function(options, gmailRouteProcessor){
 
 		if(options.element){
 			this._element = options.element;
-			this._bindToRemovalEvent();
+			this._bindToElementEvents();
 		}
 
 	}
@@ -466,7 +466,19 @@ _.extend(GmailRouteView.prototype, {
 		return true;
 	},
 
-	_bindToRemovalEvent: function(){
+	_bindToElementEvents: function(){
+		this._element.addEventListener('nowMain', (event) => {
+			if(this._sectionsContainer){
+				this._sectionsContainer.style.display = '';
+			}
+		});
+
+		this._element.addEventListener('nowNotMain', (event) => {
+			if(this._sectionsContainer){
+				this._sectionsContainer.style.display = 'none';
+			}
+		});
+
 		this._element.addEventListener('removed', (event) => {
 			this.destroy();
 		});
