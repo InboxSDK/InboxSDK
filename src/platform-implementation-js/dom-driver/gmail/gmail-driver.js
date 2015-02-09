@@ -3,6 +3,8 @@ const RSVP = require('rsvp');
 const Bacon = require('baconjs');
 const Logger = require('../../lib/logger');
 
+const Set = require('es6-unweak-collections').Set;
+
 require('./custom-style');
 
 var Driver = require('../../driver-interfaces/driver');
@@ -126,6 +128,8 @@ _.extend(GmailDriver.prototype, {
 			})
 		);
 
+		this._uniqueRouteViewDriverStream = this._getUniqueRouteViewDriverStream();
+
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
 		// Each ThreadRowView may be delayed if the thread id is not known yet.
@@ -154,11 +158,27 @@ _.extend(GmailDriver.prototype, {
 		);
 	},
 
+	_getUniqueRouteViewDriverStream: function(){
+		var seenRouteViewDrivers = new Set();
+
+		return this._routeViewDriverStream
+					.filter((routeViewDriver) => {
+						return !seenRouteViewDrivers.has(routeViewDriver);
+					})
+					.doAction((routeViewDriver) => {
+						seenRouteViewDrivers.add(routeViewDriver);
+
+						routeViewDriver.getEventStream().onEnd((event) => {
+							seenRouteViewDrivers.delete(routeViewDriver);
+						});
+					});
+	},
+
 	_setupRouteSubViewDriver: function(viewName){
 		var bus = new Bacon.Bus();
 
 		bus.plug(
-			this._routeViewDriverStream.flatMap(function(gmailRouteView){
+			this._uniqueRouteViewDriverStream.flatMap(function(gmailRouteView){
 				return gmailRouteView.getEventStream().filter(function(event){
 					return event.eventName === viewName;
 				})

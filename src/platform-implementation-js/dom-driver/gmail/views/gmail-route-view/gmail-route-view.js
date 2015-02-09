@@ -35,6 +35,12 @@ var GmailRouteView = function(options, gmailRouteProcessor){
 	}
 	else{
 		this._setupSubViews();
+
+		if(options.element){
+			this._element = options.element;
+			this._bindToElementEvents();
+		}
+
 	}
 };
 
@@ -56,7 +62,8 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_pageCommunicator', destroy: false, set: true},
 		{name: '_gmailRouteProcessor', destroy: false},
 		{name: '_threadContainerElement', destroy: false},
-		{name: '_rowListElements', destroy: false}
+		{name: '_rowListElements', destroy: false},
+		{name: '_element', destroy: false}
 	],
 
 	isCustomRoute: function(){
@@ -395,7 +402,7 @@ _.extend(GmailRouteView.prototype, {
 		}
 
 		return {
-			threadID: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
+			threadID: this._pageCommunicator.getCurrentThreadID(this._threadContainerElement)
 		};
 	},
 
@@ -457,6 +464,24 @@ _.extend(GmailRouteView.prototype, {
 		}
 
 		return true;
+	},
+
+	_bindToElementEvents: function(){
+		this._element.addEventListener('nowMain', (event) => {
+			if(this._sectionsContainer){
+				this._sectionsContainer.style.display = '';
+			}
+		});
+
+		this._element.addEventListener('nowNotMain', (event) => {
+			if(this._sectionsContainer){
+				this._sectionsContainer.style.display = 'none';
+			}
+		});
+
+		this._element.addEventListener('removed', (event) => {
+			this.destroy();
+		});
 	}
 
 });
