@@ -394,8 +394,10 @@ _.extend(GmailRouteView.prototype, {
 			}
 		}
 
+		var threadContainerElement = this._threadContainerElement || GmailElementGetter.getThreadContainerElement();
+
 		return {
-			threadID: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
+			threadID: threadContainerElement ? this._pageCommunicator.getCurrentThreadID(threadContainerElement) : ''
 		};
 	},
 
