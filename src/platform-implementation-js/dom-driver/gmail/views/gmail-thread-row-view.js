@@ -311,9 +311,10 @@ _.extend(GmailThreadRowView.prototype, {
         var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
-        }
-        if (this._elements.length > 1) {
-          this._fixDateColumnWidth();
+          this._expandColumn('col.yg', attachmentDiv.children.length*16);
+          if (this._elements.length > 1) {
+            this._fixDateColumnWidth();
+          }
         }
       }
     });
