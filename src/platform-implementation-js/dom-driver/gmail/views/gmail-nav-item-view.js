@@ -427,10 +427,6 @@ _.extend(GmailNavItemView.prototype, {
 		if($(this._element).closest('.inboxsdk__navMenu').length === 0){
 			return;
 		}
-
-		var navigation = $(this._element).closest('[role=navigation]')[0];
-		var realHeight = $(this._element).closest('.inboxsdk__navMenu')[0].parentElement.clientHeight;
-		navigation.style.minHeight = Math.min(realHeight, 400) + 'px';
 	},
 
 	_createActiveMarkerElement: function(){
