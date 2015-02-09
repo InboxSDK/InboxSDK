@@ -235,6 +235,10 @@ function _positionGroupToolbar(gmailComposeView){
 			groupedActionToolbarArrow.style.left = (groupedActionToolbarContainer.offsetWidth/2) + 'px';
 			groupedActionToolbarArrow.style.marginLeft = (-1*(groupedActionToolbarArrow.offsetWidth/2) + 3) + 'px'; //magic number 3 is the margin on the toolbar container
 		}
+		else{
+			groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
+			groupedActionToolbarArrow.style.marginLeft = (marginLeft + groupedActionToolbarArrow.offsetWidth/2 - 3) + 'px';
+		}
 	}
 	else{
 		groupedActionToolbarContainer.style.left = '';
