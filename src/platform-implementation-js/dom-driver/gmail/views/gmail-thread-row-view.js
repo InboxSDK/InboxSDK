@@ -295,7 +295,13 @@ _.extend(GmailThreadRowView.prototype, {
       if (!opts) {
         img.remove();
       } else {
-        img.title = opts.title;
+        if(opts.tooltip){
+          img.setAttribute('data-tooltip', opts.tooltip);
+        }
+        else{
+          img.removeAttribute('data-tooltip');
+        }
+
         img.className = classNamePrefix + (opts.iconClass || '');
         if (currentIconUrl != opts.iconUrl) {
           img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
