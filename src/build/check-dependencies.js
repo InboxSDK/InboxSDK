@@ -1,5 +1,6 @@
 var fs = require('fs');
 var _ = require('lodash');
+var assert = require('assert');
 var rimraf = require('rimraf');
 var semver = require('semver');
 
@@ -32,11 +33,26 @@ function fix6to5ifyDep(package) {
   }
 }
 
+function checkDependenciesRecursive(packagePath, shrinkWrap) {
+  var package = require(packagePath.join('/node_modules/')+'/package.json');
+  assert.strictEqual(package.version, shrinkWrap.version);
+  _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
+    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+  });
+}
+
 function checkDependencies(package) {
   fix6to5ifyDep(package);
+
   try {
-    _.forOwn(package.dependencies, checkDependency);
-    _.forOwn(package.devDependencies, checkDependency);
+    var shrinkWrapPath = __dirname+'/../../npm-shrinkwrap.json';
+    if (fs.existsSync(shrinkWrapPath)) {
+      var shrinkWrap = require(shrinkWrapPath);
+      checkDependenciesRecursive([__dirname+'/../../'], shrinkWrap);
+    } else {
+      _.forOwn(package.dependencies, checkDependency);
+      _.forOwn(package.devDependencies, checkDependency);
+    }
   } catch(e) {
     console.error("Dependencies check failed. Try running `npm install` to fix.");
     throw e;
