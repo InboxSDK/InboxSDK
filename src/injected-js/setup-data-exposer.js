@@ -17,16 +17,23 @@ function getSettingValue(settings, name) {
 }
 
 module.exports = function() {
-  document.head.setAttribute('data-inboxsdk-user-email-address', GLOBALS[10]);
-  document.head.setAttribute('data-inboxsdk-user-language', GLOBALS[4].split('.')[1]);
+  const userEmail = global.GLOBALS ?
+    GLOBALS[10] : gbar._CONFIG[0][10][5];
+  document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
 
-  const globalSettings = _.find(GLOBALS[17], (item) => item[0] === 'p')[1];
-  {
-    const previewPaneLabEnabled = getSettingValue(globalSettings, 'bx_lab_1252');
-    const previewPaneEnabled = getSettingValue(globalSettings, 'bx_spa');
-    const previewPaneVertical = getSettingValue(globalSettings, 'bx_spo');
-    const previewPaneMode = (previewPaneLabEnabled && previewPaneEnabled) ?
-      (previewPaneVertical ? 'vertical' : 'horizontal') : 'none';
-    document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
+  const userLanguage = global.GLOBALS ?
+    GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
+  document.head.setAttribute('data-inboxsdk-user-language', userLanguage);
+
+  if (global.GLOBALS) {
+    const globalSettings = _.find(GLOBALS[17], (item) => item[0] === 'p')[1];
+    {
+      const previewPaneLabEnabled = getSettingValue(globalSettings, 'bx_lab_1252');
+      const previewPaneEnabled = getSettingValue(globalSettings, 'bx_spa');
+      const previewPaneVertical = getSettingValue(globalSettings, 'bx_spo');
+      const previewPaneMode = (previewPaneLabEnabled && previewPaneEnabled) ?
+        (previewPaneVertical ? 'vertical' : 'horizontal') : 'none';
+      document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
+    }
   }
 };
