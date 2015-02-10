@@ -149,9 +149,9 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    const gmailLabelView = new GmailLabelView();
-    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
-    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
+    const gmailLabelView = new GmailLabelView({
+      classes: ['inboxsdk__thread_row_addition', 'inboxsdk__thread_row_label']
+    });
 
     const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
 
@@ -173,10 +173,6 @@ _.extend(GmailThreadRowView.prototype, {
         added = false;
       }
 
-    });
-
-    this._eventStream.onEnd(function(){
-      gmailLabelView.destroy();
     });
 
     gmailLabelView.setLabelDescriptorProperty(prop);
