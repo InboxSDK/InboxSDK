@@ -169,8 +169,10 @@ _.extend(GmailThreadRowView.prototype, {
         }
       }
       else{
-        gmailLabelView.getElement().remove();
-        added = false;
+        if (added) {
+          gmailLabelView.getElement().remove();
+          added = false;
+        }
       }
 
     });
