@@ -21,12 +21,12 @@ InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 	});
 
 	var i = 0;
-	inboxSDK.Mailbox.registerThreadRowViewHandler(function(threadRowView) {
+	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		threadRowView.addLabel({
-			text:'1'
+			title:'1'
 		});
 		threadRowView.addLabel({
-			text:'a'+(i++),
+			title:'a'+(i++),
 			color:'white',
 			textColor:'blue'
 		});
