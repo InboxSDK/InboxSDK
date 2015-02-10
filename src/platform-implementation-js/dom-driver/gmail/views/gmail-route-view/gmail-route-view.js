@@ -148,6 +148,11 @@ _.extend(GmailRouteView.prototype, {
 
 	_monitorLeftNavHeight: function(){
 		var leftNav = GmailElementGetter.getLeftNavContainerElement();
+
+		if(!leftNav){
+			return;
+		}
+
 		this._leftNavHeightObserver = new MutationObserver(this._setCustomViewElementHeight.bind(this));
 		this._leftNavHeightObserver.observe(
 			leftNav,
