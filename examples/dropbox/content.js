@@ -5,6 +5,7 @@ Promise.all([
   var sdk = results[0];
 
   Dropbox.init({appKey: "82bgsya5b7h847j"});
+  console.log("user email", sdk.User.getEmailAddress());
 
   sdk.Compose.registerComposeViewHandler(function(composeView) {
     composeView.addButton({
