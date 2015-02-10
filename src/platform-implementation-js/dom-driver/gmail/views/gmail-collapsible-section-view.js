@@ -35,17 +35,20 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		{name: '_headerElement', destroy: true},
 		{name: '_titleElement', destroy: true},
 		{name: '_bodyElement', destroy: true},
+		{name: '_contentElement', destroy: true},
+		{name: '_tableBodyElement', destroy: true},
 		{name: '_collapsedContainer', destroy: true},
-		{name: '_messageDiv', destroy: true},
+		{name: '_messageElement', destroy: true},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_isCollapsed', destroy: false, defaultValue: false},
 		{name: '_inboxDropdownButtonView', destroy: true},
-		{name: '_dropdownViewController', destroy: true}
+		{name: '_dropdownViewController', destroy: true},
+		{name: '_footerElement', destroy: false}
 	],
 
 	setCollapsibleSectionDescriptorProperty: function(collapsibleSectionDescriptorProperty){
+		collapsibleSectionDescriptorProperty.take(1).onValue(this, '_showLoadingMessage');
 		collapsibleSectionDescriptorProperty.onValue(this, '_updateValues');
-		collapsibleSectionDescriptorProperty.take(1).onValue(this, '_showLoading');
 		collapsibleSectionDescriptorProperty.take(1).onValue(this._isReadyDeferred, 'resolve', this);
 	},
 
@@ -57,12 +60,6 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 			else{
 				self._expand();
 			}
-		});
-	},
-
-	setTableRows: function(tableRows){
-		this._isReadyDeferred.promise.then(function(self){
-			self._setTableRows(tableRows);
 		});
 	},
 
@@ -78,6 +75,10 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		this._updateSubtitle(collapsibleSectionDescriptor);
 		this._updateSummaryText(collapsibleSectionDescriptor);
 		this._updateDropdown(collapsibleSectionDescriptor);
+		this._updateContentElement(collapsibleSectionDescriptor);
+		this._updateTableRows(collapsibleSectionDescriptor);
+		this._updateMessageElement(collapsibleSectionDescriptor);
+		this._updateFooter(collapsibleSectionDescriptor);
 
 		this._collapsibleSectionDescriptor = collapsibleSectionDescriptor;
 	},
@@ -91,8 +92,23 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		this._setupHeader(collapsibleSectionDescriptor);
 
 		this._bodyElement = document.createElement('div');
-		this._bodyElement.classList.add('zE');
+		var bodyContentsElement = document.createElement('div');
+		bodyContentsElement.classList.add('zE');
+		this._bodyElement.appendChild(bodyContentsElement);
+
 		this._element.appendChild(this._bodyElement);
+
+		this._contentElement = document.createElement('div');
+		bodyContentsElement.appendChild(this._contentElement);
+
+		this._messageElement = document.createElement('div');
+		bodyContentsElement.appendChild(this._messageElement);
+
+		this._tableBodyElement = document.createElement('div');
+		bodyContentsElement.appendChild(this._tableBodyElement);
+
+		this._setupFooter(collapsibleSectionDescriptor);
+
 
 		Bacon.fromEventTarget(this._titleElement, 'click').onValue(this, '_toggleCollapseState');
 		Bacon.fromEventTarget(this._element, 'removeCollapsedContainer').onValue(this, '_destroyCollapsedContainer');
@@ -139,6 +155,13 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		this._element.appendChild(this._headerElement);
 	},
 
+	_setupFooter: function(collapsibleSectionDescriptor){
+		this._footerElement = document.createElement('div');
+		this._footerElement.classList.add('inboxsdk__resultsSection_footer');
+
+		this._bodyElement.appendChild(this._footerElement);
+	},
+
 	_updateElement: function(collapsibleSectionDescriptor){
 		if(this._collapsibleSectionDescriptor.orderHint !== collapsibleSectionDescriptor.orderHint){
 			this._element.setAttribute('data-order-hint', _.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0);
@@ -176,12 +199,12 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 
 	_updateSummaryText: function(collapsibleSectionDescriptor){
 		var summaryTextElement = this._headerElement.querySelector('.inboxsdk__resultsSection_header_summaryText');
-		if(!collapsibleSectionDescriptor.summaryText){
+		if(!collapsibleSectionDescriptor.titleLinkText){
 			if(summaryTextElement){
 				summaryTextElement.remove();
 			}
 		}
-		else if(collapsibleSectionDescriptor.summaryText !== this._collapsibleSectionDescriptor.summaryText){
+		else if(collapsibleSectionDescriptor.titleLinkText !== this._collapsibleSectionDescriptor.titleLinkText){
 			if(!summaryTextElement){
 				summaryTextElement = document.createElement('div');
 				summaryTextElement.setAttribute('class', 'inboxsdk__resultsSection_header_summaryText Wm');
@@ -216,7 +239,7 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 				this._headerElement.querySelector('.Cr').insertAdjacentElement('afterbegin', summaryTextElement);
 			}
 
-			summaryTextElement.querySelector('b').textContent = collapsibleSectionDescriptor.summaryText;
+			summaryTextElement.querySelector('b').textContent = collapsibleSectionDescriptor.titleLinkText;
 		}
 	},
 
@@ -248,45 +271,38 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		}
 	},
 
-	_showLoading: function(){
-		this._messageDiv = document.createElement('div');
-		this._messageDiv.setAttribute('class', 'TB TC inboxsdk__resultsSection_loading');
+	_updateContentElement: function(collapsibleSectionDescriptor){
+		this._contentElement.innerHTML = '';
 
-		this._messageDiv.innerHTML = 'loading...'; //TODO: localize
-
-		this._bodyElement.appendChild(this._messageDiv);
+		if(collapsibleSectionDescriptor.contentElement){
+			this._contentElement.style.display = '';
+			this._contentElement.appendChild(collapsibleSectionDescriptor.contentElement);
+		}
+		else{
+			this._contentElement.style.display = 'none';
+		}
 	},
 
-	_setTableRows: function(tableRows){
-		this._bodyElement.innerHTML = '';
+	_updateTableRows: function(collapsibleSectionDescriptor){
+		var tableRows = collapsibleSectionDescriptor.tableRows;
+
+		this._tableBodyElement.innerHTML = '';
 
 		if(!tableRows || tableRows.length === 0){
-			this._showEmpty();
-			return;
+			this._tableBodyElement.style.display = 'none';
 		}
-
-		this._renderTable(tableRows);
-	},
-
-	_showEmpty: function(){
-		this._messageDiv = document.createElement('div');
-		this._messageDiv.setAttribute('class', 'TB TC');
-
-		this._messageDiv.innerHTML = 'No results found'; //TODO: localize
-		this._bodyElement.appendChild(this._messageDiv);
+		else{
+			this._tableBodyElement.stlye.display = '';
+			this._renderTable(tableRows);
+		}
 	},
 
 	_renderTable: function(tableRows){
-		if(this._messageDiv){
-			this._messageDiv.remove();
-			this._messageDiv = null;
-		}
-
 		var tableElement = document.createElement('table');
 		tableElement.setAttribute('class', 'F cf zt');
 
 		tableElement.innerHTML = _getTableHTML();
-		this._bodyElement.appendChild(tableElement);
+		this._tableBodyElement.appendChild(tableElement);
 
 		var tbody = tableElement.querySelector('tbody');
 		var eventStream = this._eventStream;
@@ -314,6 +330,53 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 					})
 			);
 		});
+	},
+
+	_updateMessageElement: function(collapsibleSectionDescriptor){
+		if(collapsibleSectionDescriptor.tableRows && collapsibleSectionDescriptor.tableRows.length > 0 || collapsibleSectionDescriptor.contentElement){
+			this._messageElement.innerHTML = '';
+			this._messageElement.style.display = 'none';
+		}
+		else{
+			this._showEmptyMessage();
+		}
+	},
+
+	_showLoadingMessage: function(){
+		this._messageElement.setAttribute('class', 'TB TC inboxsdk__resultsSection_loading');
+		this._messageElement.innerHTML = 'loading...'; //TODO: localize
+		this._messageElement.style.display = '';
+	},
+
+	_showEmptyMessage: function(){
+		this._messageElement.setAttribute('class', 'TB TC');
+		this._messageElement.innerHTML = 'No results found'; //TODO: localize
+		this._messageElement.style.display = '';
+	},
+
+	_updateFooter: function(collapsibleSectionDescriptor){
+		this._footerElement.innerHTML = '';
+
+		if(!collapsibleSectionDescriptor.footerLinkText && !collapsibleSectionDescriptor.footerLinkIconUrl && collapsibleSectionDescriptor.footerLinkIconClass){
+			this._footerElement.style.display = 'none';
+		}
+		else{
+			this._footerElement.style.display = '';
+
+			var footerLinkElement = document.createElement('span');
+			footerLinkElement.setAttribute('class', 'e Wb');
+			footerLinkElement.text(collapsibleSectionDescriptor.footerlinkText);
+
+			this._eventStream.plug(
+				Bacon.fromEventTarget(footerLinkElement, 'click')
+					 .map(() => {
+					 	return {
+					 		eventName: 'footerClicked',
+					 		collapsibleSectionDescriptor: this._collapsibleSectionDescriptor
+					 	};
+					 })
+			);
+		}
 	},
 
 	_toggleCollapseState: function(){

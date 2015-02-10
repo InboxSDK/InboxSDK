@@ -121,8 +121,20 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 		})
 		.map('.collapsibleSectionDescriptor')
 		.onValue(function(collapsibleSectionDescriptor){
-			if(collapsibleSectionDescriptor.onSummaryClick){
-				collapsibleSectionDescriptor.onSummaryClick(collapsibleSectionView);
+			if(collapsibleSectionDescriptor.onTitleLinkClick){
+				collapsibleSectionDescriptor.onTitleLinkClick(collapsibleSectionView);
+			}
+		});
+
+	collapsibleSectionViewDriver
+		.getEventStream()
+		.filter(function(event){
+			return event.eventName === 'footerClicked';
+		})
+		.map('.collapsibleSectionDescriptor')
+		.onValue(function(collapsibleSectionDescriptor){
+			if(collapsibleSectionDescriptor.onFooterLinkClick){
+				collapsibleSectionDescriptor.onFooterLinkClick(collapsibleSectionView);
 			}
 		});
 
