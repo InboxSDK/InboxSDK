@@ -159,7 +159,11 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 
 
 	combinedStream.delay(0).onValue(function(event){
-		handlerRegistry.addTarget(event.view);
+		// TODO fix this more properly so the .delay(0) isn't necessary.
+		// Don't emit views that have already been destroyed.
+		if (membraneMap.has(event.viewDriver)) {
+			handlerRegistry.addTarget(event.view);
+		}
 	});
 }
 
