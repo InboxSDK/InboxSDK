@@ -7,16 +7,24 @@ const Bacon = require('baconjs');
 // Also when first listened to, it emits events for existing children.
 function makeElementChildStream(element) {
   return Bacon.fromBinder(function(sink) {
-    var removalStreams = new Map();
+    const removalStreams = new Map();
 
-    function newEl(el) {
-      var removalStream = new Bacon.Bus();
-      removalStreams.set(el, removalStream);
-      sink({el:el, removalStream: removalStream});
+    function newEls(els) {
+      const len = els.length;
+      if (len === 0) {
+        return;
+      }
+      const toSink = new Array(len);
+      for (let i=0; i<len; i++) {
+        const el = els[i], removalStream = new Bacon.Bus();
+        removalStreams.set(el, removalStream);
+        toSink[i] = new Bacon.Next({el, removalStream});
+      }
+      sink(toSink);
     }
 
     function removedEl(el) {
-      var removalStream = removalStreams.get(el);
+      const removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
       if(removalStream){
@@ -29,7 +37,7 @@ function makeElementChildStream(element) {
 
     var observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation){
-        Array.prototype.forEach.call(mutation.addedNodes, newEl);
+        newEls(mutation.addedNodes);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
       });
     });
@@ -39,8 +47,7 @@ function makeElementChildStream(element) {
     asap(function() {
       if (observer) {
         observer.observe(element, {childList: true});
-        // Children list can change during iteration, so clone it first.
-        _.toArray(element.children).slice().forEach(newEl);
+        newEls(element.children);
       }
     });
 
