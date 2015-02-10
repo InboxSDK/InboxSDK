@@ -162,6 +162,9 @@ _.extend(GmailRouteView.prototype, {
 
 	_setupSubViews: function(){
 		asap(() => {
+			if (!this._eventStream) {
+				return;
+			}
 			this._setupRowListViews();
 			this._setupContentAndSidebarView();
 		});
@@ -391,8 +394,10 @@ _.extend(GmailRouteView.prototype, {
 			}
 		}
 
+		var threadContainerElement = this._threadContainerElement || GmailElementGetter.getThreadContainerElement();
+
 		return {
-			threadID: this._pageCommunicator.getCurrentThreadID(GmailElementGetter.getThreadContainerElement())
+			threadID: threadContainerElement ? this._pageCommunicator.getCurrentThreadID(threadContainerElement) : ''
 		};
 	},
 

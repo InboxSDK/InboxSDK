@@ -96,14 +96,15 @@ _.extend(GmailToolbarView.prototype, {
 				}
 				else{
 					var sectionElement = self._getSectionElement(buttonDescriptor.section, toolbarSections);
+					if (sectionElement) {
+						var buttonViewController = self._createButtonViewController(buttonDescriptor);
+						self._buttonViewControllers.push(buttonViewController);
 
-					var buttonViewController = self._createButtonViewController(buttonDescriptor);
-					self._buttonViewControllers.push(buttonViewController);
+						sectionElement.appendChild(buttonViewController.getView().getElement());
 
-					sectionElement.appendChild(buttonViewController.getView().getElement());
-
-					self._updateButtonClasses(self._element);
-					buttonViewController.getView().setEnabled(self._toolbarState === 'EXPANDED');
+						self._updateButtonClasses(self._element);
+						buttonViewController.getView().setEnabled(self._toolbarState === 'EXPANDED');
+					}
 				}
 			}
 		);

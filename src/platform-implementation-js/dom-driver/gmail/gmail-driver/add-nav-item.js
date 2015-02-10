@@ -49,10 +49,6 @@ function _attachNavItemView(gmailNavItemView){
 
 		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), holder.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		holder.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
-
-		var navigation = $(holder).closest('[role=navigation]')[0];
-		var realHeight = holder.parentElement.clientHeight;
-		navigation.style.minHeight = Math.min(realHeight, 400) + 'px';
 	};
 }
 

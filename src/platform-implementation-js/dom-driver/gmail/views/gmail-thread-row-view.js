@@ -295,7 +295,13 @@ _.extend(GmailThreadRowView.prototype, {
       if (!opts) {
         img.remove();
       } else {
-        img.title = opts.title;
+        if(opts.tooltip){
+          img.setAttribute('data-tooltip', opts.tooltip);
+        }
+        else{
+          img.removeAttribute('data-tooltip');
+        }
+
         img.className = classNamePrefix + (opts.iconClass || '');
         if (currentIconUrl != opts.iconUrl) {
           img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
@@ -305,9 +311,10 @@ _.extend(GmailThreadRowView.prototype, {
         var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
-        }
-        if (this._elements.length > 1) {
-          this._fixDateColumnWidth();
+          this._expandColumn('col.yg', attachmentDiv.children.length*16);
+          if (this._elements.length > 1) {
+            this._fixDateColumnWidth();
+          }
         }
       }
     });

@@ -109,11 +109,11 @@ div.T-I.inboxsdk__button {
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
-  vertical-align: initial;
+  vertical-align: top;
   height: 17px;
   width: 17px;
   display: inline-block;
-  margin-top: 0px;
+  margin-top: -1px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button > div {
@@ -187,12 +187,9 @@ div.T-I.inboxsdk__button {
   margin-left: 2px;
 }
 
-.inboxsdk__thread_row_addition.inboxsdk__button_icon {
-  margin-left: 3px;
-  width: 16px;
-}
 
 .inboxsdk__thread_row_attachment_icon {
+  margin-left: 3px;
   width: 16px;
   height: 16px;
 }

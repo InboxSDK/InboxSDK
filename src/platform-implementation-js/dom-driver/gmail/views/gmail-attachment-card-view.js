@@ -7,7 +7,7 @@ var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
 var simulateClick = require('../../../lib/dom/simulate-click');
-var waitFor = require('../../../lib/wait-for');
+const streamWaitFor = require('../../../lib/stream-wait-for');
 
 var GmailAttachmentCardView = function(options){
 	AttachmentCardViewDriver.call(this);
@@ -16,7 +16,11 @@ var GmailAttachmentCardView = function(options){
 
 	if(options.element){
 		this._element = options.element;
-		this.ready().then(this._extractAttachmentInfo.bind(this));
+		this.ready()
+			.takeUntil(this._eventStream.filter(false).mapEnd(null))
+			.onValue(() => {
+				this._extractAttachmentInfo();
+			});
 	}
 	else{
 		this._createNewElement(options);
@@ -37,9 +41,8 @@ _.extend(GmailAttachmentCardView.prototype, {
 	],
 
 	ready: function(){
-		var self = this;
-		return waitFor(function(){
-			return !self._isStandardAttachment() || (self._isStandardAttachment() && self._element.querySelector('.aQw') && self._element.querySelector('.aQw').children.length > 0);
+		return streamWaitFor(() => {
+			return !this._isStandardAttachment() || (this._isStandardAttachment() && this._element.querySelector('.aQw') && this._element.querySelector('.aQw').children.length > 0);
 		});
 	},
 
