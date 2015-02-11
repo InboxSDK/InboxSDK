@@ -56,10 +56,17 @@ _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ 
 		// TODO not implemented
 	},
 
+	/**
+	* Changes the collapsed state
+	* @param {boolean} value - whether the section should be collapsed or not
+	*/
 	setCollapsed: function(value){
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
 	},
 
+	/**
+	* Removes this section from the current Route
+	*/
 	remove: function(){
 		this.destroy();
 	},
