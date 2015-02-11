@@ -1,13 +1,13 @@
 var assert = require('assert');
 var Bacon = require('baconjs');
 
-var delayImmediate = require('../src/platform-implementation-js/lib/delay-immediate');
+var delayAsap = require('../src/platform-implementation-js/lib/delay-asap');
 
 function shouldNotBeCalled() {
   throw new Error("Should not be called");
 }
 
-describe('delayImmediate', function() {
+describe('delayAsap', function() {
   it('should work in simple case', function(done) {
     var tooLate = false;
     setTimeout(function() {
@@ -15,7 +15,7 @@ describe('delayImmediate', function() {
     }, 0);
     var tooEarly = true;
     var calls = 0;
-    Bacon.once(shouldNotBeCalled).flatMap(delayImmediate).subscribe(function(event) {
+    Bacon.once(shouldNotBeCalled).flatMap(delayAsap).subscribe(function(event) {
       switch (++calls) {
         case 1:
           assert.strictEqual(tooEarly, false);
