@@ -1,4 +1,5 @@
 var _ = require('lodash');
+const asap = require('asap');
 var assert = require('assert');
 var Bacon = require('baconjs');
 
@@ -18,6 +19,11 @@ var GmailRowListView = function(rootElement, routeViewDriver){
 
 	this._element = rootElement;
 	this._routeViewDriver = routeViewDriver;
+
+	this._pendingExpansions = new Map();
+	this._pendingExpansionsSignal = new Bacon.Bus();
+	this._pendingExpansionsSignal.bufferWithTime(asap).onValue(this._expandColumnJob.bind(this));
+
 	this._setupToolbarView();
 	this._startWatchingForRowViews();
 };
@@ -29,6 +35,8 @@ _.extend(GmailRowListView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_routeViewDriver', destroy: false, get: true},
+		{name: '_pendingExpansions', destroy: false},
+		{name: '_pendingExpansionsSignal', destroy: false},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
@@ -87,6 +95,29 @@ _.extend(GmailRowListView.prototype, {
 		}
 	},
 
+	expandColumn(colSelector, width) {
+		const pendingWidth = this._pendingExpansions.get(colSelector);
+		if (!pendingWidth || width > pendingWidth) {
+			this._pendingExpansions.set(colSelector, width);
+			this._pendingExpansionsSignal.push();
+		}
+	},
+
+	_expandColumnJob() {
+		if (!this._pendingExpansions) return;
+
+		const tableParent = this._element.querySelector('div > table.cf').parentElement;
+		this._pendingExpansions.forEach((width, colSelector) => {
+			_.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
+				const currentWidth = parseInt(col.style.width, 10);
+				if (isNaN(currentWidth) || currentWidth < width) {
+					col.style.width = width+'px';
+				}
+			});
+		});
+		this._pendingExpansions.clear();
+	},
+
 	_startWatchingForRowViews: function(){
 		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
 
@@ -100,11 +131,11 @@ _.extend(GmailRowListView.prototype, {
 
 		this._eventStreamBus.plug(
 			elementStream
-				.flatMap(makeElementViewStream(function(element) {
+				.flatMap(makeElementViewStream(element => {
 					// In vertical preview pane mode, each thread row has three <tr>
 					// elements. We just want to pass the first one to GmailThreadRowView().
 					if (element.hasAttribute('id')) {
-						return new GmailThreadRowView(element);
+						return new GmailThreadRowView(element, this);
 					}
 				}))
 				.doAction(this, '_addThreadRowView')

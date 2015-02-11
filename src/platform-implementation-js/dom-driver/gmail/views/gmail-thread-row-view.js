@@ -1,8 +1,6 @@
 var _ = require('lodash');
-var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
-var asap = require('asap');
 
 
 const BasicClass = require('../../../lib/basic-class');
@@ -18,7 +16,7 @@ var GmailLabelView = require('../widgets/gmail-label-view');
 
 var updateIcon = require('../lib/update-icon/update-icon');
 
-var GmailThreadRowView = function(element) {
+var GmailThreadRowView = function(element, rowListViewDriver) {
   BasicClass.call(this);
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
@@ -34,6 +32,7 @@ var GmailThreadRowView = function(element) {
     this._elements = [element];
   }
 
+  this._rowListViewDriver = rowListViewDriver;
   this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
 
@@ -78,6 +77,9 @@ _.extend(GmailThreadRowView.prototype, {
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_cachedThreadID', destroy: false},
+    {name: '_rowListViewDriver', destroy: false},
+    {name: '_pendingExpansionsSignal', destroy: false},
+    {name: '_pendingExpansions', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
     {name: '_refresher', destroy: false}
@@ -140,13 +142,7 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _expandColumn: function(colSelector, width) {
-    var tableParent = $(this._elements[0]).closest('div > table.cf').get(0);
-    _.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), function(col) {
-      var currentWidth = parseInt(col.style.width, 10);
-      if (isNaN(currentWidth) || currentWidth < width) {
-        col.style.width = width+'px';
-      }
-    });
+    this._rowListViewDriver.expandColumn(colSelector, width);
   },
 
   addLabel: function(label) {
