@@ -5,8 +5,19 @@ if (!global.__InboxSDKImpLoader) {
         throw new Error("Unsupported InboxSDK version");
       }
 
-      var PlatformImp = require('./platform-implementation');
-      return new PlatformImp(appId, opts);
+      if(_isOnInbox()){
+      	return new Promise(function(resolve, reject){
+      		//never resolve
+      	});
+      }
+      else{
+      	var PlatformImp = require('./platform-implementation');
+      	return new PlatformImp(appId, opts);
+      }
     }
   };
+}
+
+function _isOnInbox(){
+	return !location.href || location.href.indexOf('//inbox.google') > -1;
 }
