@@ -57,6 +57,7 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 		el.innerHTML = 'Hello World';
 
 		var view3 = listRouteView.addSection({
+			title: 'No Collapse!',
 			contentElement: el,
 			footerLinkText: "Smell my feet",
 			onFooterLinkClick: console.log.bind(console, 'they stink!')

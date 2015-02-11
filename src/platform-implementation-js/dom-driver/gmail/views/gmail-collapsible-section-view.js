@@ -117,7 +117,10 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		this._setupFooter(collapsibleSectionDescriptor);
 
 
-		Bacon.fromEventTarget(this._titleElement, 'click').onValue(this, '_toggleCollapseState');
+		if(this._isCollapsible){
+			Bacon.fromEventTarget(this._titleElement, 'click').onValue(this, '_toggleCollapseState');
+		}
+
 		Bacon.fromEventTarget(this._element, 'removeCollapsedContainer').onValue(this, '_destroyCollapsedContainer');
 		Bacon.fromEventTarget(this._element, 'readdToCollapsedContainer').onValue(this, '_addToCollapsedContainer');
 
@@ -135,7 +138,12 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 		this._titleElement = document.createElement('div');
 		this._titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
-		var titleInnerHTML = '<span class="Wp Wq"></span>';
+		var titleInnerHTML = '';
+
+		if(this._isCollapsible){
+			 titleInnerHTML += '<span class="Wp Wq"></span>';
+		}
+
 
 		if(this._isSearch){
 			titleInnerHTML += '<h3 class="Wd">' + _.escape(collapsibleSectionDescriptor.title) + '</h3>';
@@ -181,7 +189,7 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 	},
 
 	_updateHeader: function(collapsibleSectionDescriptor){
-		if(this._isCollapsible || this._collapsibleSectionDescriptor.title || this._collapsibleSectionDescriptor.subtitle || this._collapsibleSectionDescriptor.titleLinkText || this._collapsibleSectionDescriptor.hasDropdown){
+		if(this._isCollapsible || collapsibleSectionDescriptor.title || collapsibleSectionDescriptor.subtitle || collapsibleSectionDescriptor.titleLinkText || collapsibleSectionDescriptor.hasDropdown){
 			this._headerElement.style.display = '';
 		}
 		else{
