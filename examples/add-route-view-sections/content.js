@@ -72,6 +72,14 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 			subtitle: "I'm so streamy"
 		});
 
+		setTimeout(function(){
+			bus.push({
+				title: 'Stream',
+				subtitle: "I'm so stream",
+				tableRows: []
+			});
+		}, 5000);
+
 	});
 
 });
