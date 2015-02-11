@@ -56,14 +56,10 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 		var el = document.createElement("div");
 		el.innerHTML = 'Hello World';
 
-		var view3 = listRouteView.addCollapsibleSection({
-			title: 'Third wheel',
-			titleLinkText: 'click me',
-			hasDropdown: true,
-			onDropdownClick: function(event){
-				event.dropdown.el.textContent = 'hello world';
-			},
-			contentElement: el
+		var view3 = listRouteView.addSection({
+			contentElement: el,
+			footerLinkText: "Smell my feet",
+			onFooterLinkClick: console.log.bind(console, 'they stink!')
 		});
 
 
