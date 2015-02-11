@@ -283,17 +283,23 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    const classNamePrefix = 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ';
-    var img = document.createElement('img');
-    img.className = classNamePrefix;
-    img.src = 'images/cleardot.gif';
+    const getImgElement = _.once(() => {
+      const img = document.createElement('img');
+      img.src = 'images/cleardot.gif';
+      return img;
+    });
+    var added = false;
     var currentIconUrl;
 
     var prop = baconCast(Bacon, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
       if (!opts) {
-        img.remove();
+        if (added) {
+          getImgElement().remove();
+          added = false;
+        }
       } else {
+        const img = getImgElement();
         if(opts.tooltip){
           img.setAttribute('data-tooltip', opts.tooltip);
         }
@@ -301,7 +307,9 @@ _.extend(GmailThreadRowView.prototype, {
           img.removeAttribute('data-tooltip');
         }
 
-        img.className = classNamePrefix + (opts.iconClass || '');
+        img.className =
+          'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
+          (opts.iconClass || '');
         if (currentIconUrl != opts.iconUrl) {
           img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
           currentIconUrl = opts.iconUrl;
@@ -310,6 +318,7 @@ _.extend(GmailThreadRowView.prototype, {
         var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
+          added = true;
           this._expandColumn('col.yg', attachmentDiv.children.length*16);
           if (this._elements.length > 1) {
             this._fixDateColumnWidth();
