@@ -106,9 +106,8 @@ _.extend(GmailRowListView.prototype, {
 	_expandColumnJob() {
 		if (!this._pendingExpansions) return;
 
-		const tableParent = this._element.querySelector('div > table.cf').parentElement;
 		this._pendingExpansions.forEach((width, colSelector) => {
-			_.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
+			_.each(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
 				const currentWidth = parseInt(col.style.width, 10);
 				if (isNaN(currentWidth) || currentWidth < width) {
 					col.style.width = width+'px';
