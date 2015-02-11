@@ -69,6 +69,17 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 	},
 
 	_updateValues: function(collapsibleSectionDescriptor){
+		if(!collapsibleSectionDescriptor){
+			if(this._element){
+				this._element.style.display = 'none';
+			}
+
+			return;
+		}
+		else if(this._element){
+			this._element.style.display = '';
+		}
+
 		if(!this._element){
 			this._setupElement(collapsibleSectionDescriptor);
 			this._showLoadingMessage();
@@ -361,7 +372,7 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 			this._messageElement.innerHTML = '';
 			this._messageElement.style.display = 'none';
 		}
-		else{
+		else if((collapsibleSectionDescriptor.tableRows && collapsibleSectionDescriptor.tableRows.length === 0) && !collapsibleSectionDescriptor.contentElement){
 			this._showEmptyMessage();
 		}
 	},
