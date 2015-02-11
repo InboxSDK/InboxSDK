@@ -34,32 +34,6 @@ CollapsibleSectionView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ {
 
-	/**
-	 * Sets the rows to render in this section. These render like typical Gmail or Inbox rows with respect to style.
-	 *
-	 * Calling this function with an empty array is allowed and encouraged. Doing this will remove the loading indicator and show "No Results" or similar.
-	 * @param {RowDescriptor[]} - the rows to render
-	 */
-	setTableRows: function(rows){
-		if(!membersMap.has(this)){
-			return;
-		}
-
-		membersMap.get(this).collapsibleSectionViewDriver.setTableRows(rows);
-	},
-
-	/**
-	* Sets an arbitrary or custom HTML element as the content of this CollapsibleSectionView
-	* @param {HTMLElement} - the element to show in the collapsible section
-	*/
-	setContent: function(ele){
-		// TODO not implemented
-	},
-
-	/**
-	* Changes the collapsed state
-	* @param {boolean} value - whether the section should be collapsed or not
-	*/
 	setCollapsed: function(value){
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
 	},
@@ -124,12 +98,24 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 	collapsibleSectionViewDriver
 		.getEventStream()
 		.filter(function(event){
-			return event.eventName === 'summaryClicked';
+			return event.eventName === 'titleLinkClicked';
 		})
-		.map('.collapsibleSectionDescriptor')
-		.onValue(function(collapsibleSectionDescriptor){
-			if(collapsibleSectionDescriptor.onSummaryClick){
-				collapsibleSectionDescriptor.onSummaryClick(collapsibleSectionView);
+		.map('.sectionDescriptor')
+		.onValue(function(sectionDescriptor){
+			if(sectionDescriptor.onTitleLinkClick){
+				sectionDescriptor.onTitleLinkClick(collapsibleSectionView);
+			}
+		});
+
+	collapsibleSectionViewDriver
+		.getEventStream()
+		.filter(function(event){
+			return event.eventName === 'footerClicked';
+		})
+		.map('.sectionDescriptor')
+		.onValue(function(sectionDescriptor){
+			if(sectionDescriptor.onFooterLinkClick){
+				sectionDescriptor.onFooterLinkClick(collapsibleSectionView);
 			}
 		});
 
@@ -243,7 +229,7 @@ var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
 	* ^default=null
 	* @type {string}
 	*/
-	summaryText: null,
+	titleLinkText: null,
 
 	/**
 	* A function to call when the summary text has been clicked
@@ -251,7 +237,7 @@ var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
 	* ^default=null
 	* @type {function()}
 	*/
-	onSummaryClick: null,
+	onTitleLinkClick: null,
 
 	/**
 	* Whether to display a dropdown arrow for more options on the collapsible section
@@ -268,7 +254,11 @@ var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
 	* ^default=null
 	* @type {function(event)}
 	*/
-	onDropdownClick: null
+	onDropdownClick: null,
+
+	footerLinkText: null,
+
+	onFooterLinkClick: null
 };
 
 
