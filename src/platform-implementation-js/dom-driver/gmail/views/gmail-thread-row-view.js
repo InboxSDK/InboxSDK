@@ -77,6 +77,7 @@ _.extend(GmailThreadRowView.prototype, {
     {name: '_elements', destroy: false},
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
+    {name: '_cachedThreadID', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
     {name: '_refresher', destroy: false}
@@ -383,7 +384,14 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getThreadID: function() {
-    return this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
+    if (this._cachedThreadID) {
+      return this._cachedThreadID;
+    }
+    const threadID = this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
+    if (threadID) {
+      this._cachedThreadID = threadID;
+    }
+    return threadID;
   },
 
   getVisibleDraftCount: function() {
