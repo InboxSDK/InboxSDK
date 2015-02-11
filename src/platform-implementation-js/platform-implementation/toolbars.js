@@ -64,6 +64,10 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 	*/
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+	},
+
+	registerToolbarButtonForApp: function(buttonDescriptor){
+		memberMap.get(this).driver.registerToolbarButtonForApp(buttonDescriptor);
 	}
 
 });
