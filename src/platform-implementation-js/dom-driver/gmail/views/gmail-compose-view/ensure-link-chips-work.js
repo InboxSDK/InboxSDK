@@ -130,6 +130,7 @@ function _fixupCursor(gmailComposeView){
     Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'mouseup')
          .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
          .delay(1)
+         .filter(_rangeStillExists)
          .map('VERTICAL')
          .onValue(_fixupRange);
 }

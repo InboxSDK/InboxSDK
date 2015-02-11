@@ -1,0 +1,38 @@
+{
+  "name": {
+    "message": "Dropbox for Gmail",
+    "description": "Name of the extension"
+  },
+  "short_name": {
+    "message": "Dropbox",
+    "description": "Short name of the extension - up to 12 characters"
+  },
+  "description": {
+    "message": "Add Dropbox to Gmail",
+    "description": "Description of the extension"
+  },
+  "add_file": {
+    "message": "Add file using Dropbox",
+    "description": "Tooltip of the Dropbox button in the Gmail compose view"
+  },
+  "tooltip_title": {
+    "message": "Your Dropbox is just a click away",
+    "description": "Title of the onboarding tooltip"
+  },
+  "tooltip_subtitle": {
+    "message": "Click on the icon to send any files from Dropbox",
+    "description": "Subtitle of the onboarding tooltip"
+  },
+  "tooltip_button": {
+    "message": "Got it",
+    "description": "Button that dismisses the onboarding tooltip"
+  },
+  "saver_button_tooltip": {
+    "message": "Add to Dropbox",
+    "description": "Button to add a link directly to Dropbox"
+  },
+  "saver_error": {
+    "message": "Failed to save the file to Dropbox; please try again.",
+    "description": "Error message displayed if saving the link fails"
+  }
+}

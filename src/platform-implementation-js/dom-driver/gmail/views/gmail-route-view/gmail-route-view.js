@@ -113,8 +113,16 @@ _.extend(GmailRouteView.prototype, {
 		return routeParams;
 	},
 
-	addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint){
-		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH);
+	addCollapsibleSection: function(sectionDescriptorProperty, groupOrderHint){
+		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
+	},
+
+	addSection: function(sectionDescriptorProperty, groupOrderHint){
+		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, false);
+	},
+
+	_addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint, isCollapsible){
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView
@@ -148,6 +156,11 @@ _.extend(GmailRouteView.prototype, {
 
 	_monitorLeftNavHeight: function(){
 		var leftNav = GmailElementGetter.getLeftNavContainerElement();
+
+		if(!leftNav){
+			return;
+		}
+
 		this._leftNavHeightObserver = new MutationObserver(this._setCustomViewElementHeight.bind(this));
 		this._leftNavHeightObserver.observe(
 			leftNav,

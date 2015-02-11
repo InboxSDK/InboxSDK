@@ -34,7 +34,8 @@ function setupRouteViewDriverStream(GmailRouteProcessor){
 
 function _shouldHandleHashChange(GmailRouteProcessor){
 	return function(urlObject){
-		return !GmailRouteProcessor.isNativeRoute(urlObject.name) ||
+		return  !GmailElementGetter.isStandalone() &&
+				!GmailRouteProcessor.isNativeRoute(urlObject.name) ||
 				!GmailRouteProcessor.isNativeRoute(currentUrlObject.name) ||
 				GmailRouteProcessor.isContactRouteName(urlObject.name);
 	};
@@ -46,7 +47,7 @@ function _createRouteViewDriver(GmailRouteProcessor, urlObject){
 
 	currentUrlObject = urlObject;
 	var options = _.clone(urlObject);
-	options.isCustomRoute = !GmailRouteProcessor.isNativeRoute(urlObject.name);
+	options.isCustomRoute = !GmailRouteProcessor.isNativeRoute(urlObject.name) && !GmailElementGetter.isStandalone();
 
 	if(options.isCustomRoute){
 		options.params.unshift(options.name);

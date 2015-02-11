@@ -1,31 +1,44 @@
 {
-  "name": "Dropbox Gmail Extension",
-  "description": "Add Dropbox to Gmail!",
-  "version": "0.1",
+  "manifest_version": 2,
+  "name": "__MSG_name__",
+  "short_name": "__MSG_short_name__",
+  "description": "__MSG_description__",
+  "version": "0.3",
+  "default_locale": "en",
+
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+
+  "background": {
+    "scripts": ["constants.js", "util.js", "background.js"],
+    "persistent": false
+  },
   "content_scripts": [
     {
       "matches": [
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js","content.js"],
+      "js": ["inboxsdk.js", "constants.js", "sha1.js", "util.js", "content.js"],
       "run_at": "document_end"
     }
   ],
   "permissions": [
+    "storage",
     "https://mail.google.com/",
     "https://inbox.google.com/",
     "https://*.dropbox.com/"
   ],
   "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "images/download.png",
-    "images/white19.png",
-    "images/black19.png",
-    "images/dark38.png",
+    "images/logo.png",
+    "images/icon16.png",
     "images/icon48.png",
-    "images/icon128.png"
-  ],
-
-  "manifest_version": 2
+    "images/icon128.png",
+    "images/white_icon48.png",
+    "images/onboarding.png",
+    "blank.html"
+  ]
 }
