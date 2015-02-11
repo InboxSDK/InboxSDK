@@ -120,8 +120,8 @@ function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
   _extensionUseEventTracking = opts.eventTracking;
 
   if (opts.globalErrorLogging) {
-    if (Error.stackTraceLimit < 30) {
-      Error.stackTraceLimit = 30;
+    if (Error.stackTraceLimit < 60) {
+      Error.stackTraceLimit = 60;
     }
 
     RSVP.on('error', function(err) {

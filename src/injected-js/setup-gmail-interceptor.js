@@ -8,13 +8,16 @@ var quotedSplit = require('../common/quoted-split');
 var modifySuggestions = require('./modify-suggestions');
 
 function setupGmailInterceptor() {
-  threadIdentifier.setup();
-
   const js_frame_wrappers = [], main_wrappers = [];
   {
-    const js_frame = top.document.getElementById('js_frame').contentDocument.defaultView;
-    const js_frame_originalXHR = js_frame.XMLHttpRequest;
-    js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers);
+    const js_frame_element = top.document.getElementById('js_frame');
+    if (js_frame_element) {
+      threadIdentifier.setup();
+
+      const js_frame = js_frame_element.contentDocument.defaultView;
+      const js_frame_originalXHR = js_frame.XMLHttpRequest;
+      js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers);
+    }
   }
   {
     const main_originalXHR = top.XMLHttpRequest;
