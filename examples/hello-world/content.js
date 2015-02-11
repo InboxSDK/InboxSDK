@@ -27,8 +27,8 @@ InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 		});
 		threadRowView.addLabel({
 			title:'a'+(i++),
-			color:'white',
-			textColor:'blue'
+			backgroundColor:'white',
+			foregroundColor:'blue'
 		});
 		threadRowView.addAttachmentIcon({
 			iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
