@@ -19,5 +19,6 @@ if (!global.__InboxSDKImpLoader) {
 }
 
 function _isOnInbox(){
-	return !location.href || location.href.indexOf('//inbox.google') > -1;
+  const origin = window.location && window.location.origin;
+	return origin && origin.match(/^https?:\/\/inbox\.google\.com$/);
 }
