@@ -2,6 +2,7 @@
 
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
+var asap = require('asap');
 
 var updateIcon = require('../lib/update-icon/update-icon');
 
@@ -46,6 +47,12 @@ module.exports = function(gmailDriver, inButtonDescriptor){
 					else{
 						var appEvent = {};
 						var tooltipView = new GmailTooltipView();
+						tooltipView.getContainerElement().classList.add('inboxsdk__appButton_tooltip');
+						tooltipView.getContentElement().innerHTML = '';
+
+						if(buttonDescriptor.arrowColor){
+							tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
+						}
 
 						appEvent.dropdown = activeDropdown = new DropdownView(tooltipView, element, {manualPosition: true});
 						appEvent.dropdown.on('destroy', function(){
@@ -54,9 +61,22 @@ module.exports = function(gmailDriver, inButtonDescriptor){
 		                  }, 1);
 		                });
 
-		                setTimeout(function(){
-		                	tooltipView.anchor(element);
-		                }, 1);
+		                if(buttonDescriptor.onClick){
+		                	buttonDescriptor.onClick(appEvent);
+		                }
+
+		                asap(() => {
+		                	tooltipView.anchor(
+		                		element,
+		                		{
+		                			position: 'bottom',
+		                			offset: {
+		                				top: 8
+		                			}
+		                		}
+		                	);
+		                });
+
 					}
 				};
 			});

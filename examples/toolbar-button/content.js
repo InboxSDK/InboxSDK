@@ -60,9 +60,15 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 	});
 
 	inboxSDK.Toolbars.registerToolbarButtonForApp({
+		iconUrl: 'https://ssl.gstatic.com/s2/oz/images/notifications/spinner_32_4152eb447e3e756250b29a0b19b2bbf9.gif',
 		title: 'App Monkey',
+		arrowColor: 'green',
 		onClick: function(event){
-			event.dropdown.el.textContent = 'hello world';
+			var div = document.createElement("div");
+			div.textContent = 'Hello World!';
+			div.style.backgroundColor = 'green';
+
+			event.dropdown.el.appendChild(div);
 		}
 	});
 

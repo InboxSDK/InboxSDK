@@ -71,7 +71,7 @@ function _anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController
 	try{
 		gmailComposeView.ensureGroupingIsOpen(buttonDescriptor.type);
 		setTimeout(function(){
-			gmailTooltipView.anchor(buttonViewController.getView().getElement(), 'top');
+			gmailTooltipView.anchor(buttonViewController.getView().getElement(), {position: 'top'});
 		}, 10);
 	}
 	catch(err){

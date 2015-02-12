@@ -4,15 +4,15 @@ function createIconElement(iconSettings, containerElement, append){
 	iconSettings.iconElement.innerHTML = '&nbsp;';
 
 	if(append){
-		containerElement.appendChild(iconSettings._iconElement);
+		containerElement.appendChild(iconSettings.iconElement);
 	}
 	else{
-		containerElement.insertBefore(iconSettings._iconElement, containerElement.firstElementChild);
+		containerElement.insertBefore(iconSettings.iconElement, containerElement.firstElementChild);
 	}
 }
 
 function createIconImgElement(iconSettings, containerElement, append){
-	if(!iconSettings._iconElement){
+	if(!iconSettings.iconElement){
 		createIconElement(iconSettings, containerElement, append);
 	}
 

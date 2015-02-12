@@ -30,7 +30,7 @@ _.extend(GmailTooltipView.prototype, {
 		{name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'}
 	],
 
-	anchor: function(anchorElement, position){
+	anchor: function(anchorElement, placementOptions){
 		if(!anchorElement){
 			return;
 		}
@@ -43,12 +43,18 @@ _.extend(GmailTooltipView.prototype, {
 		var tipBoundingBox = this._element.getBoundingClientRect();
 
 		var theBoundingBoxWrapperToUse;
-		if(position){
-			switch(position){
+		if(placementOptions && placementOptions.position){
+			switch(placementOptions.position){
 				case 'top':
 					theBoundingBoxWrapperToUse = {
 						type: 'top',
 						value: this._getTopPositionBoundingBox(targetBoundingBox, tipBoundingBox)
+					};
+				break;
+				case 'bottom':
+					theBoundingBoxWrapperToUse = {
+						type: 'bottom',
+						value: this._getBottomPositionBoundingBox(targetBoundingBox, tipBoundingBox)
 					};
 				break;
 			}
@@ -57,7 +63,7 @@ _.extend(GmailTooltipView.prototype, {
 			theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(targetBoundingBox, tipBoundingBox);
 		}
 
-		var containedBoundingBox = this._containBoundingBox(theBoundingBoxWrapperToUse.value);
+		var containedBoundingBox = this._containBoundingBox(theBoundingBoxWrapperToUse.value, placementOptions && placementOptions.offset);
 		this._setPositionAtBoundingBox(containedBoundingBox);
 		this._setArrowPosition(theBoundingBoxWrapperToUse.type, containedBoundingBox, targetBoundingBox);
 	},
@@ -255,7 +261,7 @@ _.extend(GmailTooltipView.prototype, {
 		})[0];
 	},
 
-	_containBoundingBox: function(boundingBox){
+	_containBoundingBox: function(boundingBox, offset){
 		var boundingBoxHeight = boundingBox[1].y - boundingBox[0].y;
 		var boundingBoxWidth = boundingBox[1].x - boundingBox[0].x;
 
@@ -275,6 +281,18 @@ _.extend(GmailTooltipView.prototype, {
 		else if(boundingBox[1].x > document.body.clientWidth){
 			boundingBox[0].x = document.body.clientWidth - boundingBoxWidth - 20;
 			boundingBox[1].x = boundingBox[0].x + boundingBoxWidth;
+		}
+
+		if(offset){
+			if(offset.left){
+				boundingBox[0].x += offset.left;
+				boundingBox[1].x += offset.left;
+			}
+
+			if(offset.top){
+				boundingBox[0].y += offset.top;
+				boundingBox[1].y += offset.top;
+			}
 		}
 
 		return boundingBox;
