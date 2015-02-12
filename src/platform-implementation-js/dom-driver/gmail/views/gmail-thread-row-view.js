@@ -156,14 +156,14 @@ _.extend(GmailThreadRowView.prototype, {
     prop.onValue((labelDescriptor) => {
 
       if(labelDescriptor){
-        if(!added){
-          const labelParentDiv = this._elements.length > 1 ?
-            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
-            this._elements[0].querySelector('td.a4W div.xS div.xT');
+        const labelParentDiv = this._elements.length > 1 ?
+          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+          this._elements[0].querySelector('td.a4W div.xS div.xT');
 
-          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
-          added = true;
-        }
+        // Yes, we're inserting the element again even if it had already been
+        // added, because the refresher stream might have fired.
+        labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
+        added = true;
       }
       else{
         if (added) {
