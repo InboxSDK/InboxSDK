@@ -18,7 +18,7 @@ var GmailTooltipView = function(options){
 
 	this._eventStream = new Bacon.Bus();
 
-	this._setupElement(options);
+	this._setupElement(options || {});
 };
 
 GmailTooltipView.prototype = Object.create(BasicClass.prototype);
@@ -60,6 +60,14 @@ _.extend(GmailTooltipView.prototype, {
 		var containedBoundingBox = this._containBoundingBox(theBoundingBoxWrapperToUse.value);
 		this._setPositionAtBoundingBox(containedBoundingBox);
 		this._setArrowPosition(theBoundingBoxWrapperToUse.type, containedBoundingBox, targetBoundingBox);
+	},
+
+	getContainerElement: function(){
+		return this._element;
+	},
+
+	getContentElement: function(){
+		return this._element.querySelector('.aRM');
 	},
 
 	close: function(){

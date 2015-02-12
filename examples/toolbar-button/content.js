@@ -59,4 +59,11 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		}
 	});
 
+	inboxSDK.Toolbars.registerToolbarButtonForApp({
+		title: 'App Monkey',
+		onClick: function(event){
+			event.dropdown.el.textContent = 'hello world';
+		}
+	});
+
 });

@@ -113,6 +113,15 @@ var GmailElementGetter = {
 		}
 
 		return null;
+	},
+
+	getTopAccountContainer: function(){
+		var gPlusMenu = document.getElementById('gbsfw');
+		if(!gPlusMenu){
+			return null;
+		}
+
+		return gPlusMenu.parentElement.parentElement;
 	}
 
 };

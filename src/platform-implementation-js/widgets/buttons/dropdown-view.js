@@ -15,7 +15,10 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	this.el = dropdownViewDriver.getContentElement();
 	this.closed = false;
 
-	this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
+	if(!placementOptions || placementOptions.manualPosition){
+		this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
+	}
+
 	document.body.appendChild(this._dropdownViewDriver.getContainerElement());
 
 	if(this._dropdownViewDriver.getContainerElement().getAttribute('tabindex') == null){
@@ -31,11 +34,13 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 			!self._dropdownViewDriver.getContainerElement().contains(event.target);
 	}).onValue(self, 'close');
 
-	asap(function() {
-		if (!self.closed) {
-			containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, placementOptions);
-		}
-	});
+	if(!placementOptions || placementOptions.manualPosition){
+		asap(function() {
+			if (!self.closed) {
+				containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, placementOptions);
+			}
+		});
+	}
 };
 
 DropdownView.prototype = Object.create(EventEmitter.prototype);

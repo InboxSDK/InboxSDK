@@ -1,7 +1,7 @@
 function createIconElement(iconSettings, containerElement, append){
-	iconSettings._iconElement = document.createElement('div');
-	iconSettings._iconElement.classList.add('inboxsdk__button_icon');
-	iconSettings._iconElement.innerHTML = '&nbsp;';
+	iconSettings.iconElement = document.createElement('div');
+	iconSettings.iconElement.classList.add('inboxsdk__button_icon');
+	iconSettings.iconElement.innerHTML = '&nbsp;';
 
 	if(append){
 		containerElement.appendChild(iconSettings._iconElement);
@@ -16,54 +16,54 @@ function createIconImgElement(iconSettings, containerElement, append){
 		createIconElement(iconSettings, containerElement, append);
 	}
 
-	iconSettings._iconElement.innerHTML = '';
+	iconSettings.iconElement.innerHTML = '';
 
-	iconSettings._iconImgElement = document.createElement('img');
-	iconSettings._iconImgElement.classList.add('inboxsdk__button_iconImg');
+	iconSettings.iconImgElement = document.createElement('img');
+	iconSettings.iconImgElement.classList.add('inboxsdk__button_iconImg');
 
-	iconSettings._iconImgElement.src = iconSettings._iconUrl;
-	iconSettings._iconElement.appendChild(iconSettings._iconImgElement);
+	iconSettings.iconImgElement.src = iconSettings.iconUrl;
+	iconSettings.iconElement.appendChild(iconSettings.iconImgElement);
 }
 
 // TODO make this return a class instead of taking the iconSettings state object
 module.exports = function updateIcon(iconSettings, containerElement, append, newIconClass, newIconUrl){
-	if(!iconSettings._iconUrl && newIconUrl){
-		iconSettings._iconUrl = newIconUrl;
+	if(!iconSettings.iconUrl && newIconUrl){
+		iconSettings.iconUrl = newIconUrl;
 		createIconImgElement(iconSettings, containerElement, append);
 	}
-	else if(iconSettings._iconUrl && !newIconUrl){
-		iconSettings._iconImgElement.remove();
-		iconSettings._iconImgElement = null;
-		if (!iconSettings._iconClass) {
-			iconSettings._iconElement.remove();
-			iconSettings._iconElement = null;
+	else if(iconSettings.iconUrl && !newIconUrl){
+		iconSettings.iconImgElement.remove();
+		iconSettings.iconImgElement = null;
+		if (!iconSettings.iconClass) {
+			iconSettings.iconElement.remove();
+			iconSettings.iconElement = null;
 		} else {
-			iconSettings._iconElement.innerHTML = '&nbsp;';
+			iconSettings.iconElement.innerHTML = '&nbsp;';
 		}
-		iconSettings._iconUrl = newIconUrl;
+		iconSettings.iconUrl = newIconUrl;
 	}
 	else if(newIconUrl){
-		iconSettings._iconImgElement.src = newIconUrl;
-		iconSettings._iconUrl = newIconUrl;
+		iconSettings.iconImgElement.src = newIconUrl;
+		iconSettings.iconUrl = newIconUrl;
 	}
 
-	if(!iconSettings._iconElement && newIconClass){
+	if(!iconSettings.iconElement && newIconClass){
 		createIconElement(iconSettings, containerElement, append);
 	}
-	else if(iconSettings._iconClass && !newIconClass){
-		if(!iconSettings._iconUrl){
-			iconSettings._iconElement.remove();
-			iconSettings._iconElement = null;
-			iconSettings._iconClass = newIconClass;
+	else if(iconSettings.iconClass && !newIconClass){
+		if(!iconSettings.iconUrl){
+			iconSettings.iconElement.remove();
+			iconSettings.iconElement = null;
+			iconSettings.iconClass = newIconClass;
 		}
 		else{
-			iconSettings._iconElement.setAttribute('class', 'inboxsdk__button_icon ');
-			iconSettings._iconClass = newIconClass;
+			iconSettings.iconElement.setAttribute('class', 'inboxsdk__button_icon ');
+			iconSettings.iconClass = newIconClass;
 		}
 	}
 
 	if(newIconClass) {
-		iconSettings._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
-		iconSettings._iconClass = newIconClass;
+		iconSettings.iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
+		iconSettings.iconClass = newIconClass;
 	}
 };
