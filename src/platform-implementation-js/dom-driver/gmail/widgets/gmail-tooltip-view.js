@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var BasicClass = require('../../../lib/basic-class');
 var Bacon = require('baconjs');
+var asap = require('asap');
 
 var ButtonView = require('./buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
@@ -105,6 +106,15 @@ _.extend(GmailTooltipView.prototype, {
 			var image = document.createElement('img');
 			image.src = options.imageUrl;
 			this._element.querySelector('.inboxsdk__tooltip_image').appendChild(image);
+
+			image.addEventListener('load', (domEvent) => {
+				asap(() => {
+					this._eventStream.push({
+						eventName: 'imageLoaded'
+					});
+				});
+			});
+
 		}
 
 		if(options.button){

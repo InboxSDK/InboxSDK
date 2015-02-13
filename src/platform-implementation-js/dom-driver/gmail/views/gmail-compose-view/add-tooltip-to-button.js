@@ -17,6 +17,11 @@ function addTooltipToButton(gmailComposeView, buttonViewController, buttonDescri
 					.filter(function(event){
 						return event.eventName === 'buttonAdded' || event.eventName === 'composeFullscreenStateChanged';
 					})
+					.merge(
+						gmailTooltipView
+							.getEventStream()
+							.filter(({eventName}) => eventName === 'imageLoaded')
+					)
 					.debounce(10)
 					.onValue(_anchorTooltip, gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
 

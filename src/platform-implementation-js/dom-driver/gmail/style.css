@@ -621,6 +621,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin-left: 16px;
 }
 
+.Wc .inboxsdk__resultsSection_footer {
+  padding: 3px 3px 3px 8px;
+}
+
 /* end search results section */
 
 

@@ -1,4 +1,5 @@
 var _ = require('lodash');
+const asap = require('asap');
 var assert = require('assert');
 var Bacon = require('baconjs');
 
@@ -18,6 +19,11 @@ var GmailRowListView = function(rootElement, routeViewDriver){
 
 	this._element = rootElement;
 	this._routeViewDriver = routeViewDriver;
+
+	this._pendingExpansions = new Map();
+	this._pendingExpansionsSignal = new Bacon.Bus();
+	this._pendingExpansionsSignal.bufferWithTime(asap).onValue(this._expandColumnJob.bind(this));
+
 	this._setupToolbarView();
 	this._startWatchingForRowViews();
 };
@@ -29,6 +35,8 @@ _.extend(GmailRowListView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_routeViewDriver', destroy: false, get: true},
+		{name: '_pendingExpansions', destroy: false},
+		{name: '_pendingExpansionsSignal', destroy: false},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
@@ -76,16 +84,37 @@ _.extend(GmailRowListView.prototype, {
 	// column widths modified (by GmailThreadRowView), then the new table needs to
 	// match.
 	_fixColumnWidths: function(newTableParent) {
-		var firstTableParent = newTableParent.parentElement.firstElementChild;
+		const firstTableParent = newTableParent.parentElement.firstElementChild;
 		if (firstTableParent !== newTableParent) {
-			var firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
-			var newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
+			const firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
+			const newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
 			assert.strictEqual(firstCols.length, newCols.length);
-			_.zip(firstCols, newCols).forEach(function(colPair) {
-				var firstCol = colPair[0], newCol = colPair[1];
+			_.zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
 				newCol.style.width = firstCol.style.width;
 			});
 		}
+	},
+
+	expandColumn(colSelector, width) {
+		const pendingWidth = this._pendingExpansions.get(colSelector);
+		if (!pendingWidth || width > pendingWidth) {
+			this._pendingExpansions.set(colSelector, width);
+			this._pendingExpansionsSignal.push();
+		}
+	},
+
+	_expandColumnJob() {
+		if (!this._pendingExpansions) return;
+
+		this._pendingExpansions.forEach((width, colSelector) => {
+			_.each(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
+				const currentWidth = parseInt(col.style.width, 10);
+				if (isNaN(currentWidth) || currentWidth < width) {
+					col.style.width = width+'px';
+				}
+			});
+		});
+		this._pendingExpansions.clear();
 	},
 
 	_startWatchingForRowViews: function(){
@@ -101,11 +130,11 @@ _.extend(GmailRowListView.prototype, {
 
 		this._eventStreamBus.plug(
 			elementStream
-				.flatMap(makeElementViewStream(function(element) {
+				.flatMap(makeElementViewStream(element => {
 					// In vertical preview pane mode, each thread row has three <tr>
 					// elements. We just want to pass the first one to GmailThreadRowView().
 					if (element.hasAttribute('id')) {
-						return new GmailThreadRowView(element);
+						return new GmailThreadRowView(element, this);
 					}
 				}))
 				.doAction(this, '_addThreadRowView')

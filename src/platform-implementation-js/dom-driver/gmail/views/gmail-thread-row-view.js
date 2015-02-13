@@ -1,8 +1,6 @@
 var _ = require('lodash');
-var $ = require('jquery');
 var assert = require('assert');
 var Bacon = require('baconjs');
-var asap = require('asap');
 
 
 const BasicClass = require('../../../lib/basic-class');
@@ -18,7 +16,7 @@ var GmailLabelView = require('../widgets/gmail-label-view');
 
 var updateIcon = require('../lib/update-icon/update-icon');
 
-var GmailThreadRowView = function(element) {
+var GmailThreadRowView = function(element, rowListViewDriver) {
   BasicClass.call(this);
 
   assert(element.hasAttribute('id'), 'check element is main thread row');
@@ -34,6 +32,7 @@ var GmailThreadRowView = function(element) {
     this._elements = [element];
   }
 
+  this._rowListViewDriver = rowListViewDriver;
   this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
 
@@ -77,6 +76,10 @@ _.extend(GmailThreadRowView.prototype, {
     {name: '_elements', destroy: false},
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
+    {name: '_cachedThreadID', destroy: false},
+    {name: '_rowListViewDriver', destroy: false},
+    {name: '_pendingExpansionsSignal', destroy: false},
+    {name: '_pendingExpansions', destroy: false},
     {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
     {name: '_stopper', destroy: false},
     {name: '_refresher', destroy: false}
@@ -139,19 +142,13 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _expandColumn: function(colSelector, width) {
-    var tableParent = $(this._elements[0]).closest('div > table.cf').get(0);
-    _.each(tableParent.querySelectorAll('table.cf > colgroup > '+colSelector), function(col) {
-      var currentWidth = parseInt(col.style.width, 10);
-      if (isNaN(currentWidth) || currentWidth < width) {
-        col.style.width = width+'px';
-      }
-    });
+    this._rowListViewDriver.expandColumn(colSelector, width);
   },
 
   addLabel: function(label) {
-    const gmailLabelView = new GmailLabelView();
-    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_addition');
-    gmailLabelView.getElement().classList.add('inboxsdk__thread_row_label');
+    const gmailLabelView = new GmailLabelView({
+      classes: ['inboxsdk__thread_row_addition', 'inboxsdk__thread_row_label']
+    });
 
     const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
 
@@ -159,24 +156,22 @@ _.extend(GmailThreadRowView.prototype, {
     prop.onValue((labelDescriptor) => {
 
       if(labelDescriptor){
-        if(!added){
-          const labelParentDiv = this._elements.length > 1 ?
-            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
-            this._elements[0].querySelector('td.a4W div.xS div.xT');
+        const labelParentDiv = this._elements.length > 1 ?
+          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+          this._elements[0].querySelector('td.a4W div.xS div.xT');
 
-          labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
-          added = true;
-        }
+        // Yes, we're inserting the element again even if it had already been
+        // added, because the refresher stream might have fired.
+        labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
+        added = true;
       }
       else{
-        gmailLabelView.getElement().remove();
-        added = false;
+        if (added) {
+          gmailLabelView.getElement().remove();
+          added = false;
+        }
       }
 
-    });
-
-    this._eventStream.onEnd(function(){
-      gmailLabelView.destroy();
     });
 
     gmailLabelView.setLabelDescriptorProperty(prop);
@@ -284,17 +279,23 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
-    const classNamePrefix = 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ';
-    var img = document.createElement('img');
-    img.className = classNamePrefix;
-    img.src = 'images/cleardot.gif';
+    const getImgElement = _.once(() => {
+      const img = document.createElement('img');
+      img.src = 'images/cleardot.gif';
+      return img;
+    });
+    var added = false;
     var currentIconUrl;
 
     var prop = baconCast(Bacon, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
       if (!opts) {
-        img.remove();
+        if (added) {
+          getImgElement().remove();
+          added = false;
+        }
       } else {
+        const img = getImgElement();
         if(opts.tooltip){
           img.setAttribute('data-tooltip', opts.tooltip);
         }
@@ -302,7 +303,9 @@ _.extend(GmailThreadRowView.prototype, {
           img.removeAttribute('data-tooltip');
         }
 
-        img.className = classNamePrefix + (opts.iconClass || '');
+        img.className =
+          'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
+          (opts.iconClass || '');
         if (currentIconUrl != opts.iconUrl) {
           img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
           currentIconUrl = opts.iconUrl;
@@ -311,6 +314,7 @@ _.extend(GmailThreadRowView.prototype, {
         var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
+          added = true;
           this._expandColumn('col.yg', attachmentDiv.children.length*16);
           if (this._elements.length > 1) {
             this._fixDateColumnWidth();
@@ -385,7 +389,14 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   getThreadID: function() {
-    return this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
+    if (this._cachedThreadID) {
+      return this._cachedThreadID;
+    }
+    const threadID = this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
+    if (threadID) {
+      this._cachedThreadID = threadID;
+    }
+    return threadID;
   },
 
   getVisibleDraftCount: function() {

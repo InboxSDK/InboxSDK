@@ -9,6 +9,7 @@ var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
 
 var CollapsibleSectionView = require('../collapsible-section-view');
+var SectionView = require('../section-view');
 
 var membersMap = new Map();
 
@@ -51,6 +52,16 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 		members.sectionViews.push(collapsibleSectionView);
 		return collapsibleSectionView;
+	},
+
+	addSection: function(sectionDescriptor){
+		var members = membersMap.get(this);
+
+		var sectionViewDriver = members.routeViewDriver.addSection(baconCast(Bacon, sectionDescriptor).toProperty(), members.appId);
+		var sectionView = new SectionView(sectionViewDriver, members.driver);
+
+		members.sectionViews.push(sectionView);
+		return sectionView;
 	}
 
 });
