@@ -796,6 +796,10 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   flex-shrink: 0;
 }
 
+  .inboxsdk__appButton.inboxsdk__appButton_noGPlus {
+    margin-right: 0px;
+  }
+
 .inboxsdk__appButton .inboxsdk__button_icon {
   margin-right: 5px;
 }
@@ -805,6 +809,10 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   text-decoration: none;
   line-height: 24px;
 }
+
+  .inboxsdk__appButton.inboxsdk__appButton_noGPlus a {
+    line-height: 30px;
+  }
 
   .inboxsdk__appButton a:hover {
     text-decoration: underline;

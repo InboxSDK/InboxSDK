@@ -70,8 +70,8 @@ _.extend(GmailDriver.prototype, {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	},
 
-	registerToolbarButtonForApp: function(buttonDescriptor){
-		require('./gmail-driver/register-toolbar-button-for-app')(this, buttonDescriptor);
+	addToolbarButtonForApp: function(buttonDescriptor){
+		return require('./gmail-driver/add-toolbar-button-for-app')(this, buttonDescriptor);
 	},
 
 	openComposeWindow: function(){

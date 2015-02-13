@@ -59,7 +59,7 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		}
 	});
 
-	inboxSDK.Toolbars.registerToolbarButtonForApp({
+	var button = inboxSDK.Toolbars.addToolbarButtonForApp({
 		iconUrl: 'https://ssl.gstatic.com/s2/oz/images/notifications/spinner_32_4152eb447e3e756250b29a0b19b2bbf9.gif',
 		title: 'App Monkey',
 		arrowColor: 'green',
@@ -71,5 +71,9 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 			event.dropdown.el.appendChild(div);
 		}
 	});
+
+	setTimeout(function(){
+		button.open();
+	}, 5*1000);
 
 });

@@ -10,6 +10,7 @@ var ThreadRowView = require('../views/thread-row-view');
 var ThreadView = require('../views/conversations/thread-view');
 var ToolbarView = require('../views/toolbar-view'); //only used for internal bookkeeping
 
+var AppToolbarButtonView = require('../views/app-toolbar-button-view');
 
 var memberMap = new Map();
 
@@ -66,8 +67,11 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	},
 
-	registerToolbarButtonForApp: function(buttonDescriptor){
-		memberMap.get(this).driver.registerToolbarButtonForApp(buttonDescriptor);
+	addToolbarButtonForApp: function(buttonDescriptor){
+		var appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptor);
+		var appToolbarButtonView = new AppToolbarButtonView(appToolbarButtonViewDriverPromise);
+
+		return appToolbarButtonView;
 	}
 
 });

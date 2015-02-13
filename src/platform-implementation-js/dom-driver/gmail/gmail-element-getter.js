@@ -122,6 +122,15 @@ var GmailElementGetter = {
 		}
 
 		return gPlusMenu.parentElement.parentElement;
+	},
+
+	isGplusEnabled: function(){
+		var topAccountContainer = GmailElementGetter.getTopAccountContainer();
+		if(!topAccountContainer){
+			return false;
+		}
+
+		return topAccountContainer.querySelectorAll('a[href*="https://plus"][href*="upgrade"]').length === 0;
 	}
 
 };
