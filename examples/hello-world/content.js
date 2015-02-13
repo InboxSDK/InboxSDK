@@ -1,38 +1,17 @@
-InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
+InboxSDK.load('1', 'Hello World!').then(function(sdk){
 
-	function log() {
-		console.log.apply(console, ['hello-world'].concat(Array.prototype.slice.call(arguments)));
-	}
+	// the SDK has been loaded, now do something with it!
+	sdk.Compose.registerComposeViewHandler(function(composeView){
 
-	inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
+		// a compose view has come into existence, do something with it!
 		composeView.addButton({
-			title: "Beep",
-			iconUrl: 'https://mailfoogae.appspot.com/build/images/snippetIcon.png',
-			type: 'MODIFIER',
+			title: "My Nifty Button!",
+			iconUrl: 'http://www.w3schools.com/html/html5.gif',
 			onClick: function(event) {
-				log('onClick', event);
-			}
+				event.composeView.insertTextIntoBodyAtCursor('Hello World!');
+			},
 		});
-		['close','sending','sent'].forEach(function(evtName) {
-			composeView.on(evtName, function(evt) {
-				log('composeView', evtName, evt);
-			});
-		});
+
 	});
 
-	var i = 0;
-	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
-		threadRowView.addLabel({
-			title:'1'
-		});
-		threadRowView.addLabel({
-			title:'a'+(i++),
-			color:'white',
-			textColor:'blue'
-		});
-		threadRowView.addAttachmentIcon({
-			iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-			title: 'blah blah'
-		});
-	});
 });
