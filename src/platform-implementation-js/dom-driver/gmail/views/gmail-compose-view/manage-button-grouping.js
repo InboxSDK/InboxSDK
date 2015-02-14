@@ -82,6 +82,11 @@ function _groupButtonsIfNeeded(gmailComposeView){
 	_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
 	_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
 	_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+
+	gmailComposeView.getEventStream().onEnd(function(){
+		groupedActionToolbarContainer.remove();
+		groupToggleButtonViewController.destroy();
+	});
 }
 
 function _doButtonsNeedToGroup(gmailComposeView){
@@ -99,6 +104,8 @@ function _createGroupedActionToolbarContainer(gmailComposeView){
 	memberMap.get(gmailComposeView).groupedActionToolbarContainer = groupedActionToolbarContainer;
 
 	groupedActionToolbarContainer.style.display = 'none';
+
+	return groupedActionToolbarContainer;
 }
 
 function _createGroupToggleButtonViewController(gmailComposeView){
@@ -276,6 +283,8 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 		);
 
 		memberMap.get(gmailComposeView).formattingToolbarMutationObserver = mutationObserver;
+
+		gmailComposeView.getEventStream().onEnd(() => mutationObserver.disconnect());
 
 	}).catch(function(err){
 		if(err !== 'skip'){

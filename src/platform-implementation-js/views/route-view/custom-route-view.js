@@ -18,6 +18,8 @@ var CustomRouteView = function(routeViewDriver){
 	var members = {};
 	membersMap.set(this, members);
 	members.routeViewDriver = routeViewDriver;
+
+	routeViewDriver.getEventStream().onEnd(() => membersMap.delete(this));
 };
 
 CustomRouteView.prototype = Object.create(RouteView.prototype);
