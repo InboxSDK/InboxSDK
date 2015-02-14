@@ -29,7 +29,7 @@ _.extend(AppToolbarButtonView.prototype, {
 
 	open: function(){
 		if(!memberMap.has(this)){
-			console.error('Tried to add a tooltip after the button is destroyed');
+			console.error('Tried to open after the button is destroyed');
 			return;
 		}
 
@@ -37,6 +37,20 @@ _.extend(AppToolbarButtonView.prototype, {
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			asap(function(){
 				appToolbarButtonViewDriver.open();
+			});
+		});
+	},
+
+	close: function(){
+		if(!memberMap.has(this)){
+			console.error('Tried to close after the button is destroyed');
+			return;
+		}
+
+		var members = memberMap.get(this);
+		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
+			asap(function(){
+				appToolbarButtonViewDriver.close();
 			});
 		});
 	},
