@@ -4,6 +4,7 @@ var _ = require('lodash');
 
 var MembraneMap = require('./lib/membrane-map');
 
+var ButterBar = require('./platform-implementation/butter-bar');
 var Compose = require('./platform-implementation/compose');
 var Conversations = require('./platform-implementation/conversations');
 var Keyboard = require('./platform-implementation/keyboard.js');
@@ -51,6 +52,7 @@ var PlatformImplementation = function(appId, opts){
 	this.Router = new Router(appId, this._driver, this._membraneMap);
 	this.Search = new Search(appId, this._driver, this._membraneMap);
 	this.Toolbars = new Toolbars(appId, this._driver, this._membraneMap);
+	this.ButterBar = new ButterBar(appId, this._driver);
 	this.Modal = new Modal(appId, this._driver, this._membraneMap);
 
 	this.Logger = this._driver.getLogger().getAppLogger();

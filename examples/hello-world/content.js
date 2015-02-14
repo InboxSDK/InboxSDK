@@ -18,6 +18,8 @@ InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 				log('composeView', evtName, evt);
 			});
 		});
+
+		inboxSDK.ButterBar.showMessage({text:'a<b>c'});
 	});
 
 	var i = 0;

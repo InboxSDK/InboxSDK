@@ -13,6 +13,7 @@ var GmailThreadView = require('./views/gmail-thread-view');
 var GmailModalViewDriver = require('./widgets/gmail-modal-view-driver');
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
+const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	Driver.call(this);
@@ -21,6 +22,7 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 
 	this._gmailRouteProcessor = new GmailRouteProcessor();
 	this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
+	this._butterBarDriver = new GmailButterBarDriver();
 
 	this._setupEventStreams();
 	this._logger.setUserEmailAddress(this.getUserEmailAddress());
@@ -35,6 +37,7 @@ _.extend(GmailDriver.prototype, {
 	__memberVariables: [
 		{name: '_pageCommunicator', destroy: false, get: true},
 		{name: '_logger', destroy: false, get: true},
+		{name: '_butterBarDriver', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
