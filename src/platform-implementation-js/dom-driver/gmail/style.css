@@ -793,8 +793,15 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__appButton {
   margin-right: -15px;
-  flex-shrink: 0;
 }
+
+  .inboxsdk__appButton:first-child {
+    margin-left: -45px;
+  }
+
+  .inboxsdk__appButton + .inboxsdk__appButton {
+    margin-left: 35px;
+  }
 
   .inboxsdk__appButton.inboxsdk__appButton_noGPlus {
     margin-right: 0px;

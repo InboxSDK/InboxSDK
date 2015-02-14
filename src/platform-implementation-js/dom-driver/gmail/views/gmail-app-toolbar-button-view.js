@@ -41,6 +41,12 @@ _.extend(GmailAppToolbarButtonView.prototype, {
 		}
 	},
 
+	close: function(){
+		if(this._activeDropdown){
+			this._handleClick();
+		}
+	},
+
 	_handleButtonDescriptor: function(buttonDescriptor){
 		if(!this._element && buttonDescriptor){
 			this._element = _createAppButtonElement();
