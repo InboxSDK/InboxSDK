@@ -57,3 +57,13 @@ function _createRouteViewDriver(GmailRouteProcessor, urlObject){
 }
 
 module.exports = setupRouteViewDriverStream;
+
+
+/**
+ *
+ * TODO: Split up "role=main" DOM watching and hash change watching.
+ *
+ * SDK only cares about hash change when the hash goes to a route that the app registered as custom.
+ * Otherwise it only responds to route changes when the role=main div changes.
+ *
+ */

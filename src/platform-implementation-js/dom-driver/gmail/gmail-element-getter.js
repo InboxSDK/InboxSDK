@@ -113,6 +113,24 @@ var GmailElementGetter = {
 		}
 
 		return null;
+	},
+
+	getTopAccountContainer: function(){
+		var gPlusMenu = document.getElementById('gbsfw');
+		if(!gPlusMenu){
+			return null;
+		}
+
+		return gPlusMenu.parentElement.parentElement;
+	},
+
+	isGplusEnabled: function(){
+		var topAccountContainer = GmailElementGetter.getTopAccountContainer();
+		if(!topAccountContainer){
+			return false;
+		}
+
+		return topAccountContainer.querySelectorAll('a[href*="https://plus"][href*="upgrade"]').length === 0;
 	}
 
 };

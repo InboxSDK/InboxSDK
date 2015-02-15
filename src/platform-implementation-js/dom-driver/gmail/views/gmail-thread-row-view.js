@@ -185,11 +185,11 @@ _.extend(GmailThreadRowView.prototype, {
     buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button';
     buttonSpan.setAttribute('tabindex', "-1");
 
-    var iconWrapper = {
-      _iconUrl: null,
-      _iconClass: null,
-      _iconElement: null,
-      _iconImgElement: null
+    var iconSettings = {
+      iconUrl: null,
+      iconClass: null,
+      iconElement: null,
+      iconImgElement: null
     };
 
     var prop = baconCast(Bacon, buttonDescriptor).toProperty();
@@ -266,7 +266,7 @@ _.extend(GmailThreadRowView.prototype, {
           event.stopPropagation();
         };
 
-        updateIcon(iconWrapper, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+        updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
 
         if (!starGroup.contains(buttonSpan)) {
           starGroup.appendChild(buttonSpan);
