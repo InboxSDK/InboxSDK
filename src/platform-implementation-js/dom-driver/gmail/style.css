@@ -809,6 +809,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__appButton .inboxsdk__button_icon {
   margin-right: 5px;
+  position: relative;
 }
 
 .inboxsdk__appButton a {

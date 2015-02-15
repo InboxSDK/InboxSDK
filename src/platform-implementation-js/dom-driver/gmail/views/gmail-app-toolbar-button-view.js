@@ -32,7 +32,8 @@ _.extend(GmailAppToolbarButtonView.prototype, {
 		{name: '_buttonDescriptorProperty', destroy: false},
 		{name: '_buttonDescriptor', destroy: false},
 		{name: '_element', destroy: true, get: true},
-		{name: '_activeDropdown', destroy: true}
+		{name: '_activeDropdown', destroy: true},
+		{name: '_iconSettings', destroy: false, defaultValue: {}}
 	],
 
 	open: function(){
@@ -54,10 +55,9 @@ _.extend(GmailAppToolbarButtonView.prototype, {
 
 		this._buttonDescriptor = buttonDescriptor;
 
-		var iconSettings = {};
 		var currentTitle = null;
 
-		updateIcon(iconSettings, this._element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+		updateIcon(this._iconSettings, this._element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
 		_updateTitle(this._element.querySelector('span'), currentTitle, buttonDescriptor.title);
 		currentTitle = buttonDescriptor.title;
 
