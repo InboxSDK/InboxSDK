@@ -50,8 +50,19 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   const watchElement = this._elements.length === 1 ?
     this._elements[0] : this._elements[0].children[2];
   this._refresher = makeMutationObserverChunkedStream(watchElement, {
-    childList: true
+    childList: true, attributes: true, attributeFilter: ['class']
   }).map(null).takeUntil(this._stopper).toProperty(null);
+
+  if(isVertical){
+    this._subjectRefresher = Bacon.once(null).toProperty(null);
+  }
+  else{
+    const subjectElement = watchElement.querySelector('.y6');
+    this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
+      childList: true
+    }).map(null).takeUntil(this._stopper).toProperty(null);
+  }
+
 
   this.getCounts = _.once(function() {
     const thing = this._elements[0].querySelector('td div.yW');
@@ -156,9 +167,7 @@ _.extend(GmailThreadRowView.prototype, {
     prop.onValue((labelDescriptor) => {
 
       if(labelDescriptor){
-        const labelParentDiv = this._elements.length > 1 ?
-          this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
-          this._elements[0].querySelector('td.a4W div.xS div.xT');
+        const labelParentDiv = this._getLabelParent();
 
         // Yes, we're inserting the element again even if it had already been
         // added, because the refresher stream might have fired.
@@ -175,6 +184,61 @@ _.extend(GmailThreadRowView.prototype, {
     });
 
     gmailLabelView.setLabelDescriptorProperty(prop);
+  },
+
+  addImage: function(inIconDescriptor){
+    const prop = baconCast(Bacon, inIconDescriptor)
+                  .toProperty()
+                  .combine(this._refresher, _.identity)
+                  .combine(this._subjectRefresher, _.identity)
+                  .takeUntil(this._stopper);
+
+    var iconSettings = {};
+
+    var iconWrapper = document.createElement('div');
+    iconWrapper.setAttribute('class', 'inboxsdk__thread_row_icon_wrapper inboxsdk__thread_row_addition');
+    var added = false;
+
+    prop.onValue((newIconDescriptor) => {
+
+      var iconDescriptor = newIconDescriptor || {};
+
+      updateIcon(iconSettings, iconWrapper, false, iconDescriptor.imageClass, iconDescriptor.imageUrl);
+
+      var containerRow = this._elements.length > 1 ?
+                           this._elements[this._elements.length === 2 ? 0 : 2] :
+                           this._elements[0];
+
+      if(iconSettings.iconElement){
+        containerRow.classList.add('inboxsdk__thread_row_image_added');
+
+        if(iconDescriptor.tooltip){
+          iconSettings.iconElement.setAttribute('data-tooltip', iconDescriptor.tooltip);
+        }
+
+        if(!added || !this._elements[0].contains(iconWrapper)){
+          var insertionPoint = this._elements.length > 1 ?
+                                this._getLabelParent() :
+                                this._getLabelParent().querySelector('.y6');
+
+          insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+
+          added = true;
+          this._elements[0].style.display = 'none';
+          this._elements[0].style.display = '';
+        }
+      }
+      else{
+        if(added){
+          iconWrapper.remove();
+
+          containerRow.classList.remove('inboxsdk__thread_row_image_added');
+
+          added = false;
+        }
+      }
+
+    });
   },
 
   addButton: function(buttonDescriptor) {
@@ -421,6 +485,12 @@ _.extend(GmailThreadRowView.prototype, {
 
   isSelected: function(){
     return !!this._elements[0].querySelector('div[role=checkbox][aria-checked=true]');
+  },
+
+  _getLabelParent: function(){
+    return this._elements.length > 1 ?
+            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
+            this._elements[0].querySelector('td.a4W div.xS div.xT');
   }
 
 });

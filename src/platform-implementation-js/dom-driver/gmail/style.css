@@ -194,6 +194,32 @@ div.T-I.inboxsdk__button {
   height: 16px;
 }
 
+.inboxsdk__thread_row_icon_wrapper {
+  display: inline-block;
+  width: 23px;
+  margin-right: 3px;
+}
+
+  .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
+    position: absolute;
+    top: 50%;
+    height: 23px;
+    overflow: hidden;
+    width: 23px;
+    margin-top: -11.5px;
+  }
+
+    .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+      height: 23px;
+      width: 23px;
+      margin-top: 0px;
+    }
+
+  .inboxsdk__thread_row_image_added .a4W, .inboxsdk__thread_row_image_added .apA, .inboxsdk__thread_row_image_added .apx {
+    position: relative;
+  }
+
+
 /* end thread rows */
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this

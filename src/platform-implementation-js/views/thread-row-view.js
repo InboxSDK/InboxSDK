@@ -26,6 +26,10 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
     this._threadRowViewDriver.addLabel(labelDescriptor);
   },
 
+  addImage: function(imageDescriptor){
+    this._threadRowViewDriver.addImage(imageDescriptor);
+  },
+
   /**
    * Adds an icon style button to this row, placed right next to the star button
    * @param {ThreadRowButtonDescriptor} buttonDescriptor - an options object for the button
