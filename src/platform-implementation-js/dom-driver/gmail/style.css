@@ -196,22 +196,26 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__thread_row_icon_wrapper {
   display: inline-block;
-  width: 23px;
+  width: 25px;
   margin-right: 3px;
+}
+
+.inboxsdk__thread_row_image_added .y6 .inboxsdk__thread_row_icon_wrapper ~ span[id] {
+  margin-left: 3px;
 }
 
   .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
     position: absolute;
     top: 50%;
-    height: 23px;
+    height: 24px;
     overflow: hidden;
-    width: 23px;
-    margin-top: -11.5px;
+    width: 24px;
+    margin-top: -12px;
   }
 
     .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
-      height: 23px;
-      width: 23px;
+      height: 24px;
+      width: 24px;
       margin-top: 0px;
     }
 
