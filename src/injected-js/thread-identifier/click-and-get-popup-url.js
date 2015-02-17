@@ -17,8 +17,11 @@ function clickAndGetPopupUrl(element) {
   );
 
   var url;
-  var oldWindowOpen = window.open, oldWindowOnerror = window.onerror;
+  const oldWindowOpen = window.open, oldWindowOnerror = window.onerror,
+    oldFocus = Element.prototype.focus, oldBlur = Element.prototype.blur;
   try {
+    Element.prototype.focus = _.noop;
+    Element.prototype.blur = _.noop;
     window.onerror = ignoreErrors;
     window.open = function(_url, _title, _options) {
       url = _url;
@@ -33,6 +36,8 @@ function clickAndGetPopupUrl(element) {
     };
     element.dispatchEvent(event);
   } finally {
+    Element.prototype.focus = oldFocus;
+    Element.prototype.blur = oldBlur;
     window.onerror = oldWindowOnerror;
     window.open = oldWindowOpen;
   }
