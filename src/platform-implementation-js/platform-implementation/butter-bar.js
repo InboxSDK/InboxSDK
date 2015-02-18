@@ -111,7 +111,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
     return message;
   },
 
-  showLoading(options) {
+  showLoading(options={}) {
     _.defaults(options, {
       message: 'Loading...',
       priority: -3,
@@ -135,17 +135,18 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   * @param options {Object} message options
   * @return {Object} Object with resolve and reject methods
   */
-  showSaving(options) {
+  showSaving(options={}) {
     _.defaults(options, {
       message: 'Saving...',
       priority: -2,
       time: Infinity,
       persistent: true,
+      hideOnViewChanged: false,
       showConfirmation: true
     });
     const savingMessage = this.showMessage(options);
 
-    const defer = RSVP.Promise.defer();
+    const defer = RSVP.defer();
 
     defer.promise.then(() => {
       savingMessage.destroy();
@@ -182,7 +183,3 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 });
 
 module.exports = ButterBar;
-
-function _initPersistenceManager(members) {
-
-}

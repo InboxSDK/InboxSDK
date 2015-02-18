@@ -207,4 +207,111 @@ describe("ButterBar", function() {
       assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
     });
   });
+
+  describe("showSaving", function() {
+    it('resolves', function(done) {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
+
+      const options1 = {};
+      const message1 = butterBar.showSaving(options1);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      message1.resolve();
+
+      setTimeout(() => {
+        assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 2);
+        assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
+        assert(driver.getButterBarDriver()._currentMessage);
+        done();
+      }, 0);
+    });
+
+    it('respects showConfirmation', function(done) {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
+
+      const options1 = {showConfirmation: false};
+      const message1 = butterBar.showSaving(options1);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      message1.resolve();
+
+      setTimeout(() => {
+        assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+        assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
+        done();
+      }, 0);
+    });
+
+    it('rejects', function(done) {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
+
+      const options1 = {};
+      const message1 = butterBar.showSaving(options1);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      message1.reject();
+
+      setTimeout(() => {
+        assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+        assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
+        done();
+      }, 0);
+    });
+
+    it('has a high priority saved message', function(done) {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
+
+      const options1 = {text: 'blah'};
+      const message1 = butterBar.showMessage(options1);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      const options2 = {};
+      const message2 = butterBar.showSaving(options2);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      message2.resolve();
+
+      setTimeout(() => {
+        assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 2);
+        assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
+        assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options2);
+        assert(driver.getButterBarDriver()._currentMessage);
+        done();
+      }, 0);
+    });
+  });
 });
