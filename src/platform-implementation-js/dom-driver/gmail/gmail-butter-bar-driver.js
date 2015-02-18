@@ -25,16 +25,16 @@ const googleNoticeMutationChunks = elements
     makeMutationObserverChunkedStream(googleNotice, {childList: true})
   );
 const googleAddedNotice = googleNoticeMutationChunks
-  .filter(mutations => mutations.some(m => m.addedNodes.length > 0)).log('googleAddedNotice');
+  .filter(mutations => mutations.some(m => m.addedNodes.length > 0));
 const googleRemovedNotice = googleNoticeMutationChunks
-  .filter(mutations => !mutations.some(m => m.addedNodes.length > 0)).log('googleRemovedNotice');
+  .filter(mutations => !mutations.some(m => m.addedNodes.length > 0));
 
 const sdkRemovedNotice = elements
   .flatMapLatest(({sdkNotice}) =>
     makeMutationObserverStream(sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']})
       .map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
   )
-  .filter(id => id == null && id != 'gmail').log('sdkRemovedNotice');
+  .filter(id => id == null && id != 'gmail');
 
 const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
 

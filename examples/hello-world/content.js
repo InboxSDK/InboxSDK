@@ -14,7 +14,7 @@ InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 			}
 		});
 
-		var msg = inboxSDK.ButterBar.showMessage({text:'a<b>c '+Math.random(), persistent: true});
+		var msg = inboxSDK.ButterBar.showMessage({text:'a<b>c '+Math.random(), persistent: true, hideOnViewChanged: false});
 		setTimeout(function() {
 			var msg2 = inboxSDK.ButterBar.showMessage({text:'bop', time:1000});
 
