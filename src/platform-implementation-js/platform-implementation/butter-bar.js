@@ -119,7 +119,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 
   showLoading(options={}) {
     _.defaults(options, {
-      message: 'Loading...',
+      text: 'Loading...',
       priority: -3,
       time: Infinity,
       persistent: true,
@@ -143,7 +143,8 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   */
   showSaving(options={}) {
     _.defaults(options, {
-      message: 'Saving...',
+      text: 'Saving...',
+      confirmationText: 'Saved',
       priority: -2,
       time: Infinity,
       persistent: true,
@@ -158,7 +159,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
       savingMessage.destroy();
       if (options.showConfirmation) {
         this.showMessage({
-          message: 'Saved',
+          text: options.confirmationText,
           messageKey: options.messageKey,
           time: 1*1000,
           priority: 200
