@@ -4,6 +4,7 @@ import RSVP from 'rsvp';
 
 import streamWaitFor from '../../lib/stream-wait-for';
 import makeRevocableFunction from '../../lib/make-revocable-function';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import makeMutationObserverStream from '../../lib/dom/make-mutation-observer-stream';
 
 const elements = streamWaitFor(() => document.body.querySelector('div.nn:nth-child(2) .b8'))
@@ -19,21 +20,21 @@ const elements = streamWaitFor(() => document.body.querySelector('div.nn:nth-chi
   })
   .toProperty();
 
-const googleNoticeMutations = elements
+const googleNoticeMutationChunks = elements
   .flatMapLatest(({googleNotice}) =>
-    makeMutationObserverStream(googleNotice, {childList: true})
+    makeMutationObserverChunkedStream(googleNotice, {childList: true})
   );
-const googleAddedNotice = googleNoticeMutations
-  .filter(mutation => mutation.addedNodes.length > 0);
-const googleRemovedNotice = googleNoticeMutations
-  .filter(mutation => mutation.addedNodes.length === 0);
+const googleAddedNotice = googleNoticeMutationChunks
+  .filter(mutations => mutations.some(m => m.addedNodes.length > 0)).log('googleAddedNotice');
+const googleRemovedNotice = googleNoticeMutationChunks
+  .filter(mutations => !mutations.some(m => m.addedNodes.length > 0)).log('googleRemovedNotice');
 
 const sdkRemovedNotice = elements
   .flatMapLatest(({sdkNotice}) =>
     makeMutationObserverStream(sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']})
       .map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
   )
-  .filter(id => id == null);
+  .filter(id => id == null && id != 'gmail').log('sdkRemovedNotice');
 
 const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
 
@@ -41,7 +42,7 @@ Bacon.combineAsArray(elements, googleAddedNotice)
   .onValues(({googleNotice, sdkNotice}) => {
     googleNotice.style.display = '';
     sdkNotice.style.display = 'none';
-    sdkNotice.removeAttribute('data-inboxsdk-id');
+    sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
   });
 
 export default class GmailButterBarDriver {
