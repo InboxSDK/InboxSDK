@@ -45,6 +45,14 @@ Bacon.combineAsArray(elements, googleAddedNotice)
     sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
   });
 
+function hideMessage(noticeContainer, googleNotice, sdkNotice) {
+  googleNotice.style.display = '';
+  noticeContainer.style.top = '-10000px';
+  noticeContainer.style.position = 'relative';
+  sdkNotice.style.display = 'none';
+  sdkNotice.removeAttribute('data-inboxsdk-id');
+}
+
 export default class GmailButterBarDriver {
   getNoticeAvailableStream() {
     return noticeAvailableStream;
@@ -80,13 +88,18 @@ export default class GmailButterBarDriver {
       destroy() {
         elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
           if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
-            googleNotice.style.display = '';
-            noticeContainer.style.top = '-10000px';
-            sdkNotice.style.display = 'none';
-            sdkNotice.removeAttribute('data-inboxsdk-id');
+            hideMessage(noticeContainer, googleNotice, sdkNotice);
           }
         });
       }
     };
+  }
+
+  hideGmailMessage() {
+    elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
+      if (sdkNotice.getAttribute('data-inboxsdk-id') === 'gmail') {
+        hideMessage(noticeContainer, googleNotice, sdkNotice);
+      }
+    });
   }
 }

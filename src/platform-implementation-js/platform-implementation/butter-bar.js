@@ -184,6 +184,16 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
         message.destroy();
       }
     }
+  },
+
+  /**
+  * Hides any messages currently displayed by Gmail.
+  */
+  hideGmailMessage() {
+    const members = memberMap.get(this);
+    const butterBarDriver = members.driver.getButterBarDriver();
+
+    butterBarDriver.hideGmailMessage();
   }
 
 });

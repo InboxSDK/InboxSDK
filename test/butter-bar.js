@@ -11,6 +11,7 @@ class MockButterBarDriver {
     this._openBus = new Bacon.Bus();
     this._showMessageCount = 0;
     this._currentMessage = null;
+    this._hideGmailMessageCount = 0;
   }
   getNoticeAvailableStream() {
     return this._openBus;
@@ -32,6 +33,9 @@ class MockButterBarDriver {
   }
   setSharedMessageQueue(queue) {
     this._queue = _.cloneDeep(queue);
+  }
+  hideGmailMessage() {
+    this._hideGmailMessageCount++;
   }
 }
 
@@ -338,6 +342,20 @@ describe("ButterBar", function() {
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
       assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
+    });
+  });
+
+  describe("hideGmailMessage", function() {
+    it("calls driver", function() {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      assert.strictEqual(driver.getButterBarDriver()._hideGmailMessageCount, 0);
+      butterBar.hideGmailMessage();
+      assert.strictEqual(driver.getButterBarDriver()._hideGmailMessageCount, 1);
     });
   });
 });
