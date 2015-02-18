@@ -15,8 +15,8 @@ class GmailLabelView {
 			return element;
 		});
 		this._labelDescriptor = {};
-		this._iconClass = null;
-		this._iconUrl = null;
+		this.iconClass = null;
+		this.iconUrl = null;
 	}
 
 	setLabelDescriptorProperty(labelDescriptorProperty){

@@ -194,6 +194,36 @@ div.T-I.inboxsdk__button {
   height: 16px;
 }
 
+.inboxsdk__thread_row_icon_wrapper {
+  display: inline-block;
+  width: 25px;
+  margin-right: 3px;
+}
+
+.inboxsdk__thread_row_image_added .y6 .inboxsdk__thread_row_icon_wrapper ~ span[id] {
+  margin-left: 3px;
+}
+
+  .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
+    position: absolute;
+    top: 50%;
+    height: 24px;
+    overflow: hidden;
+    width: 24px;
+    margin-top: -12px;
+  }
+
+    .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+      height: 24px;
+      width: 24px;
+      margin-top: 0px;
+    }
+
+  .inboxsdk__thread_row_image_added .a4W, .inboxsdk__thread_row_image_added .apA, .inboxsdk__thread_row_image_added .apx {
+    position: relative;
+  }
+
+
 /* end thread rows */
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this
@@ -435,6 +465,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   position: absolute;
   top: 0px;
   right: -4px;
+}
+
+[dir=rtl] .inboxsdk__navItem_link {
+  left: -4px;
+  right: initial;
 }
 
 .inboxsdk__navItem_container .aio .inboxsdk__button {
@@ -787,3 +822,68 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 /* end send suggestions */
+
+
+/* app toolbar */
+
+.inboxsdk__appButton {
+  margin-right: -15px;
+}
+
+  .inboxsdk__appButton:first-child {
+    margin-left: -45px;
+  }
+
+  .inboxsdk__appButton + .inboxsdk__appButton {
+    margin-left: 35px;
+  }
+
+  .inboxsdk__appButton.inboxsdk__appButton_noGPlus {
+    margin-right: 0px;
+  }
+
+.inboxsdk__appButton .inboxsdk__button_icon {
+  margin-right: 5px;
+  position: relative;
+}
+
+.inboxsdk__appButton a {
+  color: #404040;
+  text-decoration: none;
+  line-height: 24px;
+}
+
+  .inboxsdk__appButton.inboxsdk__appButton_noGPlus a {
+    line-height: 30px;
+  }
+
+  .inboxsdk__appButton a:hover {
+    text-decoration: underline;
+    color: #000;
+  }
+
+.inboxsdk__appButton_tooltip {
+  outline: none;
+  transition: none;
+  -webkit-animation: gb__a .2s;
+}
+
+.inboxsdk__appButton_tooltip .inboxsdk__tooltip_close {
+  display: none;
+}
+
+.inboxsdk__tooltip.inboxsdk__appButton_tooltip .T-P {
+  padding: 0px;
+}
+
+.inboxsdk__tooltip.inboxsdk__appButton_tooltip .aRM {
+  padding: 0px;
+}
+
+.inboxsdk__tooltip.inboxsdk__appButton_tooltip .inboxsdk__tooltip_arrow {
+  transform-origin: top;
+  transform: rotateZ(180deg);
+  margin-top: 9px;
+}
+
+/* end app toolbar */

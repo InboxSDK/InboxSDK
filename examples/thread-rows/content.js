@@ -71,6 +71,11 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				]));
 			}
 		});
+
+		threadRowView.addImage({
+			imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+			tooltip: 'Monkeys'
+		});
 	});
 
 });

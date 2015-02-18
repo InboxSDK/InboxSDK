@@ -20,7 +20,7 @@ function getAdditionalActionToolbar(gmailComposeView){
 
 function _addActionToolbar(gmailComposeView){
 	var td = $(document.createElement('td'));
-	td[0].setAttribute('class', 'inboxsdk__compose_actionToolbar gU pXSFsb');
+	td[0].setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
 	$(gmailComposeView.getFormattingArea()).before(td);
 
 	var separator = document.createElement('td');
