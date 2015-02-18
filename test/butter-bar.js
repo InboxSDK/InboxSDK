@@ -314,4 +314,30 @@ describe("ButterBar", function() {
       }, 0);
     });
   });
+
+  describe("hideMessage", function() {
+    it("works", function() {
+      const driver = {
+        getButterBarDriver: _.constant(new MockButterBarDriver()),
+        getRouteViewDriverStream: _.constant(Bacon.never())
+      };
+      const butterBar = new ButterBar('test', driver);
+
+      const options1 = {text: 'a', messageKey: {}, priority: 100};
+      const message1 = butterBar.showMessage(options1);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      butterBar.hideMessage({});
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, options1);
+
+      butterBar.hideMessage(options1.messageKey);
+
+      assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
+      assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
+    });
+  });
 });
