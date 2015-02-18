@@ -13,13 +13,18 @@ InboxSDK.load(1, 'hello-world').then(function(inboxSDK) {
 				log('onClick', event);
 			}
 		});
+
+		var msg = inboxSDK.ButterBar.showMessage({text:'a<b>c '+Math.random(), persistent: true});
+		setTimeout(function() {
+			var msg2 = inboxSDK.ButterBar.showMessage({text:'bop', time:1000});
+
+		}, 3000);
+
 		['close','sending','sent'].forEach(function(evtName) {
 			composeView.on(evtName, function(evt) {
 				log('composeView', evtName, evt);
 			});
 		});
-
-		inboxSDK.ButterBar.showMessage({text:'a<b>c'});
 	});
 
 	var i = 0;
