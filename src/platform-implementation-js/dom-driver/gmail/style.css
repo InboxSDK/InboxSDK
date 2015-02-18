@@ -467,6 +467,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   right: -4px;
 }
 
+[dir=rtl] .inboxsdk__navItem_link {
+  left: -4px;
+  right: initial;
+}
+
 .inboxsdk__navItem_container .aio .inboxsdk__button {
   position: absolute;
   top: 0px;
