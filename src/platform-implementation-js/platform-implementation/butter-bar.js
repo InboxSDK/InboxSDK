@@ -78,6 +78,12 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
       stopper.plug(Bacon.later(options.time, null));
     }
 
+    // Error made here for sensible stack
+    const timeoutErr = new Error("Butter bar message timed out");
+    stopper.plug(Bacon.later(ancientComplainTime, null).doAction(() => {
+      members.driver.getLogger().errorApp(timeoutErr);
+    }));
+
     stopper.take(1).onValue(() => {
       if (options.messageKey) {
         members.messagesByKey.delete(options.messageKey);
