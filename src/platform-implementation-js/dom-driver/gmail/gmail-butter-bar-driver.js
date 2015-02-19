@@ -5,7 +5,6 @@ import RSVP from 'rsvp';
 import streamWaitFor from '../../lib/stream-wait-for';
 import makeRevocableFunction from '../../lib/make-revocable-function';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
-import makeMutationObserverStream from '../../lib/dom/make-mutation-observer-stream';
 
 const elements = streamWaitFor(() => document.body.querySelector('div.nn:nth-child(2) .b8'))
   .map(noticeContainer => {
@@ -31,10 +30,11 @@ const googleRemovedNotice = googleNoticeMutationChunks
 
 const sdkRemovedNotice = elements
   .flatMapLatest(({sdkNotice}) =>
-    makeMutationObserverStream(sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']})
-      .map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
+    makeMutationObserverChunkedStream(
+      sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']}
+    ).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
   )
-  .filter(id => id == null && id != 'gmail');
+  .filter(id => id == null);
 
 const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
 
