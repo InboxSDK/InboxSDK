@@ -50,7 +50,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   const watchElement = this._elements.length === 1 ?
     this._elements[0] : this._elements[0].children[2];
   this._refresher = makeMutationObserverChunkedStream(watchElement, {
-    childList: true, attributes: true, attributeFilter: ['class']
+    childList: true
   }).map(null).takeUntil(this._stopper).toProperty(null);
 
   if(isVertical){
@@ -60,7 +60,11 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     const subjectElement = watchElement.querySelector('.y6');
     this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
       childList: true
-    }).map(null).takeUntil(this._stopper).toProperty(null);
+    }).merge(
+      makeMutationObserverChunkedStream(watchElement, {
+        attributes: true, attributeFilter: ['class']
+      })
+    ).map(null).takeUntil(this._stopper).toProperty(null);
   }
 
 
