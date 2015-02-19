@@ -79,7 +79,11 @@ export default class GmailButterBarDriver {
 
       googleNotice.style.display = 'none';
 
-      sdkNotice.textContent = rawOptions.text;
+      if (rawOptions.html) {
+        sdkNotice.innerHTML = rawOptions.html;
+      } else {
+        sdkNotice.textContent = rawOptions.text;
+      }
       sdkNotice.style.display = '';
       sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
     });
