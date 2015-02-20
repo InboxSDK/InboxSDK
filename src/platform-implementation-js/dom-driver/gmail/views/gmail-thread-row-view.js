@@ -424,15 +424,19 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _fixDateColumnWidth: function() {
-    const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
-    if (!dateContainer) return;
-    const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
-      dateContainer.firstElementChild;
+    asap(() => {
+      if (!this._elements) return;
 
-    // Attachment icons are only in the date column in vertical preivew pane.
-    const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
-    this._expandColumn('col.xX',
-      visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      if (!dateContainer) return;
+      const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
+        dateContainer.firstElementChild;
+
+      // Attachment icons are only in the date column in vertical preivew pane.
+      const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
+      this._expandColumn('col.xX',
+        visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+    });
   },
 
   replaceDate: function(opts) {
