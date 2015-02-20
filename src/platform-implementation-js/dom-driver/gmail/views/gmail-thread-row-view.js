@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var assert = require('assert');
 var Bacon = require('baconjs');
-
+const asap = require('asap');
 
 const BasicClass = require('../../../lib/basic-class');
 const assertInterface = require('../../../lib/assert-interface');
@@ -11,10 +11,11 @@ var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-dr
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
-
 var GmailLabelView = require('../widgets/gmail-label-view');
 
 var updateIcon = require('../lib/update-icon/update-icon');
+
+const cachedModificationsByRow = new WeakMap();
 
 var GmailThreadRowView = function(element, rowListViewDriver) {
   BasicClass.call(this);
@@ -30,6 +31,14 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
       [element, element.nextElementSibling];
   } else {
     this._elements = [element];
+  }
+
+  this._modifications = cachedModificationsByRow.get(this._elements[0]);
+  if (!this._modifications) {
+    this._modifications = {
+      label: {unclaimed: [], claimed: []}
+    };
+    cachedModificationsByRow.set(this._elements[0], this._modifications);
   }
 
   this._rowListViewDriver = rowListViewDriver;
@@ -67,7 +76,6 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     ).map(null).takeUntil(this._stopper).toProperty(null);
   }
 
-
   this.getCounts = _.once(function() {
     const thing = this._elements[0].querySelector('td div.yW');
     const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
@@ -81,6 +89,16 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
     return {messageCount, draftCount};
   });
+
+  // Undo any remaining cached row modifications
+  setTimeout(() => {
+    if (!this._modifications) return;
+    for (let mod of this._modifications.label.unclaimed) {
+      console.log('removing unclaimed mod', mod);
+      mod.remove();
+    }
+    this._modifications.label.unclaimed.length = 0;
+  }, 3000);
 };
 
 GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
@@ -89,6 +107,7 @@ _.extend(GmailThreadRowView.prototype, {
 
   __memberVariables: [
     {name: '_elements', destroy: false},
+    {name: '_modifications', destroy: false},
     {name: '_pageCommunicator', destroy: false},
     {name: '_userView', destroy: false},
     {name: '_cachedThreadID', destroy: false},
@@ -104,6 +123,10 @@ _.extend(GmailThreadRowView.prototype, {
     if(!this._elements){
       return;
     }
+
+    this._modifications.label.unclaimed = this._modifications.label.unclaimed
+      .concat(this._modifications.label.claimed);
+    this._modifications.label.claimed.length = 0;
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
@@ -161,33 +184,41 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    const gmailLabelView = new GmailLabelView({
-      classes: ['inboxsdk__thread_row_addition', 'inboxsdk__thread_row_label']
-    });
-
     const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
-
-    var added = false;
-    prop.onValue((labelDescriptor) => {
-
+    var labelMod;
+    prop.onValue(labelDescriptor => {
       if(labelDescriptor){
+        if (!labelMod) {
+          labelMod = this._modifications.label.unclaimed.shift();
+          if (!labelMod) {
+            const gmailLabelView = new GmailLabelView({
+              classes: ['inboxsdk__thread_row_label']
+            });
+            const el = gmailLabelView.getElement();
+            labelMod = {
+              type: 'label',
+              labelDescriptor,
+              gmailLabelView,
+              remove: el.remove.bind(el)
+            };
+          }
+          labelMod.gmailLabelView.setLabelDescriptorProperty(prop);
+          this._modifications.label.claimed.push(labelMod);
+        }
         const labelParentDiv = this._getLabelParent();
-
-        // Yes, we're inserting the element again even if it had already been
-        // added, because the refresher stream might have fired.
-        labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
-        added = true;
-      }
-      else{
-        if (added) {
-          gmailLabelView.getElement().remove();
-          added = false;
+        if (!_.contains(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
+          labelParentDiv.insertBefore(
+            labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
       }
-
+      else{
+        if (labelMod) {
+          labelMod.gmailLabelView.getElement().remove();
+          this._modifications.label.claimed.splice(
+            this._modifications.label.indexOf(labelMod), 1);
+        }
+      }
     });
-
-    gmailLabelView.setLabelDescriptorProperty(prop);
   },
 
   addImage: function(inIconDescriptor){
