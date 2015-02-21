@@ -17,6 +17,24 @@ var updateIcon = require('../lib/update-icon/update-icon');
 
 const cachedModificationsByRow = new WeakMap();
 
+function starGroupEventInterceptor(event) {
+  const isOnStar = this.firstElementChild.contains(event.target);
+  const isOnSDKButton = !isOnStar && this !== event.target;
+  if (!isOnStar) {
+    event.stopImmediatePropagation();
+    if (!isOnSDKButton || event.type == 'mouseover') {
+      const newEvent = document.createEvent('MouseEvents');
+      newEvent.initMouseEvent(
+        event.type, event.bubbles, event.cancelable, event.view,
+        event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
+        event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
+        event.button, event.relatedTarget
+      );
+      this.parentElement.dispatchEvent(newEvent);
+    }
+  }
+}
+
 var GmailThreadRowView = function(element, rowListViewDriver) {
   BasicClass.call(this);
 
@@ -36,7 +54,8 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._modifications = cachedModificationsByRow.get(this._elements[0]);
   if (!this._modifications) {
     this._modifications = {
-      label: {unclaimed: [], claimed: []}
+      label: {unclaimed: [], claimed: []},
+      button: {unclaimed: [], claimed: []}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
   }
@@ -94,10 +113,15 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   setTimeout(() => {
     if (!this._modifications) return;
     for (let mod of this._modifications.label.unclaimed) {
-      console.log('removing unclaimed mod', mod);
+      console.log('removing unclaimed label mod', mod);
       mod.remove();
     }
     this._modifications.label.unclaimed.length = 0;
+    for (let mod of this._modifications.button.unclaimed) {
+      console.log('removing unclaimed button mod', mod);
+      mod.remove();
+    }
+    this._modifications.button.unclaimed.length = 0;
   }, 3000);
 };
 
@@ -127,6 +151,10 @@ _.extend(GmailThreadRowView.prototype, {
     this._modifications.label.unclaimed = this._modifications.label.unclaimed
       .concat(this._modifications.label.claimed);
     this._modifications.label.claimed.length = 0;
+
+    this._modifications.button.unclaimed = this._modifications.button.unclaimed
+      .concat(this._modifications.button.claimed);
+    this._modifications.button.claimed.length = 0;
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
@@ -185,9 +213,16 @@ _.extend(GmailThreadRowView.prototype, {
 
   addLabel: function(label) {
     const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
-    var labelMod;
+    var labelMod = null;
     prop.onValue(labelDescriptor => {
-      if(labelDescriptor){
+      if(!labelDescriptor){
+        if (labelMod) {
+          labelMod.remove();
+          this._modifications.label.claimed.splice(
+            this._modifications.label.claimed.indexOf(labelMod), 1);
+          labelMod = null;
+        }
+      } else {
         if (!labelMod) {
           labelMod = this._modifications.label.unclaimed.shift();
           if (!labelMod) {
@@ -196,8 +231,6 @@ _.extend(GmailThreadRowView.prototype, {
             });
             const el = gmailLabelView.getElement();
             labelMod = {
-              type: 'label',
-              labelDescriptor,
               gmailLabelView,
               remove: el.remove.bind(el)
             };
@@ -209,13 +242,6 @@ _.extend(GmailThreadRowView.prototype, {
         if (!_.contains(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
-        }
-      }
-      else{
-        if (labelMod) {
-          labelMod.gmailLabelView.getElement().remove();
-          this._modifications.label.claimed.splice(
-            this._modifications.label.indexOf(labelMod), 1);
         }
       }
     });
@@ -259,7 +285,6 @@ _.extend(GmailThreadRowView.prototype, {
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
 
           added = true;
-          this._elements[0].style.display = 'none';
           this._elements[0].style.display = '';
         }
       }
@@ -277,28 +302,29 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
-    if (this._elements.length != 1) return; // TODO
+    if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
     var activeDropdown = null;
-    var buttonSpan = document.createElement('span');
-    buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button';
-    buttonSpan.setAttribute('tabindex', "-1");
+    var buttonMod = null;
 
-    var iconSettings = {
-      iconUrl: null,
-      iconClass: null,
-      iconElement: null,
-      iconImgElement: null
-    };
-
-    var prop = baconCast(Bacon, buttonDescriptor).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue((buttonDescriptor) => {
+    const prop = baconCast(Bacon, buttonDescriptor).toProperty()
+      .combine(this._refresher, _.identity).takeUntil(this._stopper);
+    prop.mapEnd(null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
           activeDropdown = null;
         }
-        buttonSpan.remove();
+      }
+    });
+    prop.onValue(buttonDescriptor => {
+      if (!buttonDescriptor) {
+        if (buttonMod) {
+          buttonMod.remove();
+          this._modifications.button.claimed.splice(
+            this._modifications.button.claimed.indexOf(buttonMod), 1);
+          buttonMod = null;
+        }
       } else {
         // compat workaround
         if (buttonDescriptor.className) {
@@ -306,37 +332,58 @@ _.extend(GmailThreadRowView.prototype, {
           delete buttonDescriptor.className;
         }
 
-        var starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+        let buttonSpan, iconSettings;
+        if (!buttonMod) {
+          buttonMod = this._modifications.button.unclaimed.shift();
+          if (!buttonMod) {
+            buttonSpan = document.createElement('span');
+            buttonSpan.className = 'inboxsdk__thread_row_button';
+            buttonSpan.setAttribute('tabindex', "-1");
+            buttonSpan.onmousedown = function(event) {
+              this.focus();
+              event.stopPropagation();
+            };
 
-        // Don't let the whole column count as the star for click and mouse over purposes.
-        // Click events that aren't directly on the star should be stopped.
-        // Mouseover events that aren't directly on the star should be stopped and
-        // re-emitted from the thread row, so the thread row still has the mouseover
-        // appearance.
-        // Click events that are on one of our buttons should be stopped. Click events
-        // that aren't on the star button or our buttons should be re-emitted from the
-        // thread row so it counts as clicking on the thread.
-        starGroup.onmouseover = starGroup.onclick = function(event) {
-          var isOnStar = this.firstElementChild.contains(event.target);
-          var isOnSDKButton = !isOnStar && this !== event.target;
-          if (!isOnStar) {
-            event.stopPropagation();
-            if (!isOnSDKButton || event.type == 'mouseover') {
-              var newEvent = document.createEvent('MouseEvents');
-              newEvent.initMouseEvent(
-                event.type, event.bubbles, event.cancelable, event.view,
-                event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
-                event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-                event.button, event.relatedTarget
-              );
-              this.parentElement.dispatchEvent(newEvent);
+            const starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+
+            // Don't let the whole column count as the star for click and mouse over purposes.
+            // Click events that aren't directly on the star should be stopped.
+            // Mouseover events that aren't directly on the star should be stopped and
+            // re-emitted from the thread row, so the thread row still has the mouseover
+            // appearance.
+            // Click events that are on one of our buttons should be stopped. Click events
+            // that aren't on the star button or our buttons should be re-emitted from the
+            // thread row so it counts as clicking on the thread.
+            starGroup.onmouseover = starGroup.onclick = starGroupEventInterceptor;
+
+            if (!_.contains(starGroup.children, buttonSpan)) {
+              starGroup.appendChild(buttonSpan);
+              this._expandColumn('col.y5', 26*starGroup.children.length);
             }
+
+            iconSettings = {
+              iconUrl: null,
+              iconClass: null,
+              iconElement: null,
+              iconImgElement: null
+            };
+
+            buttonMod = {
+              buttonSpan,
+              iconSettings,
+              buttonDescriptor: {},
+              remove: buttonSpan.remove.bind(buttonSpan)
+            };
           }
-        };
+          this._modifications.button.claimed.push(buttonMod);
+        }
+
+        buttonSpan = buttonMod.buttonSpan;
+        iconSettings = buttonMod.iconSettings;
 
         if(buttonDescriptor.onClick){
           buttonSpan.onclick = (event) => {
-            var appEvent = {
+            const appEvent = {
               threadRowView: this._userView
             };
             if (buttonDescriptor.hasDropdown) {
@@ -359,21 +406,14 @@ _.extend(GmailThreadRowView.prototype, {
           };
         }
 
-
-        buttonSpan.onmousedown = function(event){
-          buttonSpan.focus();
-          event.stopPropagation();
-        };
-
-        updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-
-        if (!starGroup.contains(buttonSpan)) {
-          starGroup.appendChild(buttonSpan);
-          this._expandColumn('col.y5', 26*starGroup.children.length);
+        if (
+          buttonDescriptor.iconUrl !== buttonMod.buttonDescriptor.iconUrl ||
+          buttonDescriptor.iconClass !== buttonMod.buttonDescriptor.iconClass
+        ) {
+          updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
         }
+        buttonMod.buttonDescriptor = buttonDescriptor;
       }
-
-
     });
   },
 
