@@ -312,9 +312,6 @@ _.extend(GmailThreadRowView.prototype, {
     var activeDropdown = null;
     var buttonMod = null;
 
-    // could also be trash icon
-    const getStarGroup = _.once(() => this._elements[0].querySelector('td.apU.xY, td.aqM.xY'));
-
     const prop = baconCast(Bacon, buttonDescriptor).toProperty().takeUntil(this._stopper);
     prop.mapEnd(null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
@@ -342,7 +339,8 @@ _.extend(GmailThreadRowView.prototype, {
           delete buttonDescriptor.className;
         }
 
-        const starGroup = getStarGroup();
+        // could also be trash icon
+        const starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY');
 
         let buttonSpan, iconSettings;
         if (!buttonMod) {
