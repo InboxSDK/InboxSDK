@@ -17,6 +17,11 @@ var updateIcon = require('../lib/update-icon/update-icon');
 
 const cachedModificationsByRow = new WeakMap();
 
+function focusAndNoPropagation(event) {
+  this.focus();
+  event.stopImmediatePropagation();
+}
+
 function starGroupEventInterceptor(event) {
   const isOnStar = this.firstElementChild.contains(event.target);
   const isOnSDKButton = !isOnStar && this !== event.target;
@@ -307,8 +312,10 @@ _.extend(GmailThreadRowView.prototype, {
     var activeDropdown = null;
     var buttonMod = null;
 
-    const prop = baconCast(Bacon, buttonDescriptor).toProperty()
-      .combine(this._refresher, _.identity).takeUntil(this._stopper);
+    // could also be trash icon
+    const getStarGroup = _.once(() => this._elements[0].querySelector('td.apU.xY, td.aqM.xY'));
+
+    const prop = baconCast(Bacon, buttonDescriptor).toProperty().takeUntil(this._stopper);
     prop.mapEnd(null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
@@ -320,7 +327,7 @@ _.extend(GmailThreadRowView.prototype, {
         }
       }
     });
-    prop.onValue(buttonDescriptor => {
+    prop.combine(this._refresher, _.identity).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (buttonMod) {
           buttonMod.remove();
@@ -335,6 +342,8 @@ _.extend(GmailThreadRowView.prototype, {
           delete buttonDescriptor.className;
         }
 
+        const starGroup = getStarGroup();
+
         let buttonSpan, iconSettings;
         if (!buttonMod) {
           buttonMod = this._modifications.button.unclaimed.shift();
@@ -342,12 +351,7 @@ _.extend(GmailThreadRowView.prototype, {
             buttonSpan = document.createElement('span');
             buttonSpan.className = 'inboxsdk__thread_row_button';
             buttonSpan.setAttribute('tabindex', "-1");
-            buttonSpan.onmousedown = function(event) {
-              this.focus();
-              event.stopPropagation();
-            };
-
-            const starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+            buttonSpan.onmousedown = focusAndNoPropagation;
 
             // Don't let the whole column count as the star for click and mouse over purposes.
             // Click events that aren't directly on the star should be stopped.
@@ -358,11 +362,6 @@ _.extend(GmailThreadRowView.prototype, {
             // that aren't on the star button or our buttons should be re-emitted from the
             // thread row so it counts as clicking on the thread.
             starGroup.onmouseover = starGroup.onclick = starGroupEventInterceptor;
-
-            if (!_.contains(starGroup.children, buttonSpan)) {
-              starGroup.appendChild(buttonSpan);
-              this._expandColumn('col.y5', 26*starGroup.children.length);
-            }
 
             iconSettings = {
               iconUrl: null,
@@ -409,6 +408,10 @@ _.extend(GmailThreadRowView.prototype, {
         }
 
         updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+        if (!_.contains(starGroup.children, buttonSpan)) {
+          starGroup.appendChild(buttonSpan);
+          this._expandColumn('col.y5', 26*starGroup.children.length);
+        }
       }
     });
   },
