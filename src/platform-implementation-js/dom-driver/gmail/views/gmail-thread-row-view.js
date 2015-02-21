@@ -148,12 +148,12 @@ _.extend(GmailThreadRowView.prototype, {
       return;
     }
 
-    this._modifications.label.unclaimed = this._modifications.label.unclaimed
-      .concat(this._modifications.label.claimed);
+    this._modifications.label.unclaimed = this._modifications.label.claimed
+      .concat(this._modifications.label.unclaimed);
     this._modifications.label.claimed.length = 0;
 
-    this._modifications.button.unclaimed = this._modifications.button.unclaimed
-      .concat(this._modifications.button.claimed);
+    this._modifications.button.unclaimed = this._modifications.button.claimed
+      .concat(this._modifications.button.unclaimed);
     this._modifications.button.claimed.length = 0;
 
     _.chain(this._elements)
@@ -315,6 +315,9 @@ _.extend(GmailThreadRowView.prototype, {
           activeDropdown.close();
           activeDropdown = null;
         }
+        if (buttonMod && buttonMod.buttonSpan) {
+          buttonMod.buttonSpan.onclick = null;
+        }
       }
     });
     prop.onValue(buttonDescriptor => {
@@ -371,7 +374,6 @@ _.extend(GmailThreadRowView.prototype, {
             buttonMod = {
               buttonSpan,
               iconSettings,
-              buttonDescriptor: {},
               remove: buttonSpan.remove.bind(buttonSpan)
             };
           }
@@ -406,13 +408,7 @@ _.extend(GmailThreadRowView.prototype, {
           };
         }
 
-        if (
-          buttonDescriptor.iconUrl !== buttonMod.buttonDescriptor.iconUrl ||
-          buttonDescriptor.iconClass !== buttonMod.buttonDescriptor.iconClass
-        ) {
-          updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-        }
-        buttonMod.buttonDescriptor = buttonDescriptor;
+        updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
       }
     });
   },
