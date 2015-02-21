@@ -115,6 +115,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   });
 
   // Undo any remaining cached row modifications
+  // TODO do this synchronously after thread row has been delivered to app.
   setTimeout(() => {
     if (!this._modifications) return;
     for (let mod of this._modifications.label.unclaimed) {
@@ -127,7 +128,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
       mod.remove();
     }
     this._modifications.button.unclaimed.length = 0;
-  }, 3000);
+  }, 1);
 };
 
 GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
