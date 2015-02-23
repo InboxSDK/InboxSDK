@@ -344,6 +344,8 @@ function _sendError(err, details, appId, sentByApp) {
 function makeLoggedFunction(func, name) {
   const msg = name ? "Uncaught error in "+name : "Uncaught error";
   return function() {
+    const functionArgs = arguments;
+
     try {
       return func.apply(this, arguments);
     } catch (err) {
