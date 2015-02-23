@@ -68,7 +68,10 @@ _.extend(DropdownButtonViewController.prototype, {
 	},
 
 	_dropdownClosed: function(){
-		this._view.deactivate();
+		if(this._view){
+			this._view.deactivate();
+		}
+
 		this._dropdownView = null;
 	}
 

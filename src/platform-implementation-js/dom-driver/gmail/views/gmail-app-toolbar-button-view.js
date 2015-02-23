@@ -49,6 +49,10 @@ _.extend(GmailAppToolbarButtonView.prototype, {
 	},
 
 	_handleButtonDescriptor: function(buttonDescriptor){
+		if(!buttonDescriptor){
+			return;
+		}
+
 		if(!this._element && buttonDescriptor){
 			this._element = _createAppButtonElement();
 		}
