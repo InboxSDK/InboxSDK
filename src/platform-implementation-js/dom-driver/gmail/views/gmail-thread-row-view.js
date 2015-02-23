@@ -3,7 +3,6 @@ var assert = require('assert');
 var Bacon = require('baconjs');
 const asap = require('asap');
 
-const BasicClass = require('../../../lib/basic-class');
 const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
@@ -41,8 +40,6 @@ function starGroupEventInterceptor(event) {
 }
 
 var GmailThreadRowView = function(element, rowListViewDriver) {
-  BasicClass.call(this);
-
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
   const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
@@ -68,6 +65,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._rowListViewDriver = rowListViewDriver;
   this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
+  this._cachedThreadID = null; // set in getter
 
   this._eventStream = new Bacon.Bus();
   this._stopper = this._eventStream.filter(false).mapEnd();
@@ -131,23 +129,19 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   }, 1);
 };
 
-GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
+/* Members:
+{name: '_elements', destroy: false},
+{name: '_modifications', destroy: false},
+{name: '_pageCommunicator', destroy: false},
+{name: '_userView', destroy: false},
+{name: '_cachedThreadID', destroy: false},
+{name: '_rowListViewDriver', destroy: false},
+{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+{name: '_stopper', destroy: false},
+{name: '_refresher', destroy: false}
+*/
 
 _.extend(GmailThreadRowView.prototype, {
-
-  __memberVariables: [
-    {name: '_elements', destroy: false},
-    {name: '_modifications', destroy: false},
-    {name: '_pageCommunicator', destroy: false},
-    {name: '_userView', destroy: false},
-    {name: '_cachedThreadID', destroy: false},
-    {name: '_rowListViewDriver', destroy: false},
-    {name: '_pendingExpansionsSignal', destroy: false},
-    {name: '_pendingExpansions', destroy: false},
-    {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-    {name: '_stopper', destroy: false},
-    {name: '_refresher', destroy: false}
-  ],
 
   destroy: function() {
     if(!this._elements){
@@ -178,7 +172,11 @@ _.extend(GmailThreadRowView.prototype, {
         el.style.display = 'inline';
       });
 
-    BasicClass.prototype.destroy.call(this);
+    this._eventStream.end();
+  },
+
+  getEventStream() {
+    return this._eventStream;
   },
 
   // Called by GmailDriver
