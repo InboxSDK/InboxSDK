@@ -7,8 +7,7 @@ var baconCast = require('bacon-cast');
 
 var ComposeButtonView = require('./compose-button-view');
 
-var Map = require('es6-unweak-collections').Map;
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
@@ -35,7 +34,6 @@ var ComposeView = function(composeViewImplementation, appId){
 		self.emit('destroy');
 
 		self.removeAllListeners();
-		memberMap.delete(self);
 	});
 };
 

@@ -3,9 +3,7 @@ var RSVP = require('rsvp');
 
 var EventEmitter = require('events').EventEmitter;
 
-var Map = require('es6-unweak-collections').Map;
-
-var membersMap = new Map();
+var membersMap = new WeakMap();
 
 /**
 * @class
@@ -55,7 +53,6 @@ _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ 
 		members.collapsibleSectionViewDriver.destroy();
 
 		this.removeAllListeners();
-		membersMap.delete(this);
 	}
 
 	/**

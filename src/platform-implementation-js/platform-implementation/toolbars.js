@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-var Map = require('es6-unweak-collections').Map;
 
 var HandlerRegistry = require('../lib/handler-registry');
 
@@ -12,7 +11,7 @@ var ToolbarView = require('../views/toolbar-view'); //only used for internal boo
 
 var AppToolbarButtonView = require('../views/app-toolbar-button-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class

@@ -4,9 +4,7 @@ var RSVP = require('rsvp');
 var EventEmitter = require('events').EventEmitter;
 var baconCast = require('bacon-cast');
 
-var Map = require('es6-unweak-collections').Map;
-
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class

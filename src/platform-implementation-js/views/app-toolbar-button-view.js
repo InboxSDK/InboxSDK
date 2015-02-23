@@ -2,11 +2,10 @@
 
 var _ = require('lodash');
 var asap = require('asap');
-var Map = require('es6-unweak-collections').Map;
 
 var EventEmitter = require('events').EventEmitter;
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
 	EventEmitter.call(this);
@@ -65,7 +64,6 @@ function _destroy(appToolbarButtonViewInstance){
 	appToolbarButtonViewInstance.emit('destroy');
 
 	appToolbarButtonViewInstance.removeAllListeners();
-	memberMap.delete(appToolbarButtonViewInstance);
 }
 
 module.exports = AppToolbarButtonView;

@@ -3,10 +3,9 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var RSVP = require('rsvp');
-var Map = require('es6-unweak-collections').Map;
 
 
-var membersMap = new Map();
+var membersMap = new WeakMap();
 
 /**
  * @class
@@ -92,7 +91,6 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 function _bindToEventStream(routeViewDriver, routeView){
 	routeViewDriver.getEventStream().onEnd(function(){
 		routeView.emit('destroy');
-		membersMap.delete(routeView);
 		routeView.removeAllListeners();
 	});
 }

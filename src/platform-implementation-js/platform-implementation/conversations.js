@@ -2,14 +2,12 @@
 
 var _ = require('lodash');
 
-var Map = require('es6-unweak-collections').Map;
-
 var ThreadView = require('../views/conversations/thread-view');
 var MessageView = require('../views/conversations/message-view');
 
 var HandlerRegistry = require('../lib/handler-registry');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 
 /**

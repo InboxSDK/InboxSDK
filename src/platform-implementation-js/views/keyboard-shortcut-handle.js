@@ -3,9 +3,8 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 
-var Map = require('es6-unweak-collections').Map;
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
@@ -39,8 +38,6 @@ _.extend(KeyboardShortcutHandle.prototype, /** @lends KeyboardShortcutHandle */ 
 		if(members){
 			members.keyboardShortcutHandleDriver.destroy();
 		}
-
-		memberMap.delete(this);
 	}
 
 });

@@ -1,11 +1,9 @@
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
-var Map = require('es6-unweak-collections').Map;
-
 var AttachmentCardView = require('./attachment-card-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
@@ -214,7 +212,6 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 function _bindToEventStream(messageView, members, stream){
 	stream.onEnd(function(){
 		messageView.emit('destroy');
-		memberMap.delete(messageView);
 
 		messageView.removeAllListeners();
 	});

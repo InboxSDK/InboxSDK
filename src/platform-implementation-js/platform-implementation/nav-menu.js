@@ -1,14 +1,14 @@
 'use strict';
 
 var _ = require('lodash');
-var Map = require('es6-unweak-collections').Map;
+
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
 
 var NavItemView = require('../views/nav-item-view');
 var NativeNavItemView = require('../views/native-nav-item-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class

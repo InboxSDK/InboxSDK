@@ -1,13 +1,11 @@
 'use strict';
 
 var _ = require('lodash');
-var Map = require('es6-unweak-collections').Map;
-
 
 var HandlerRegistry = require('../lib/handler-registry');
 var ThreadRowView = require('../views/thread-row-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
