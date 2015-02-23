@@ -49,8 +49,11 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 	],
 
 	setCollapsibleSectionDescriptorProperty: function(collapsibleSectionDescriptorProperty){
-		collapsibleSectionDescriptorProperty.onValue(this, '_updateValues');
-		collapsibleSectionDescriptorProperty.take(1).onValue(this._isReadyDeferred, 'resolve', this);
+		var stoppedProperty = collapsibleSectionDescriptorProperty
+								.takeUntil(this._eventStream.filter(false).mapEnd(null));
+
+		stoppedProperty.onValue(this, '_updateValues');
+		stoppedProperty.take(1).onValue(this._isReadyDeferred, 'resolve', this);
 	},
 
 	setCollapsed: function(value){
