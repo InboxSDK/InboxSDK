@@ -3,12 +3,10 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 
-var Map = require('es6-unweak-collections').Map;
-
 var ComposeView = require('../views/compose-view');
 var HandlerRegistry = require('../lib/handler-registry');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class

@@ -2,11 +2,10 @@
 
 var _ = require('lodash');
 var asap = require('asap');
-var Map = require('es6-unweak-collections').Map;
 
 var EventEmitter = require('events').EventEmitter;
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 var ComposeButtonView = function(optionsPromise){
 	EventEmitter.call(this);
@@ -57,7 +56,6 @@ function _destroy(composeButtonViewInstance){
 	composeButtonViewInstance.emit('destroy');
 
 	composeButtonViewInstance.removeAllListeners();
-	memberMap.delete(composeButtonViewInstance);
 }
 
 module.exports = ComposeButtonView;

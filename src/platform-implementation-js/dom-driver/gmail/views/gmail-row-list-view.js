@@ -85,6 +85,10 @@ _.extend(GmailRowListView.prototype, {
 	// column widths modified (by GmailThreadRowView), then the new table needs to
 	// match.
 	_fixColumnWidths: function(newTableParent) {
+		if(!newTableParent || !newTableParent.parentElement){
+			return;
+		}
+
 		const firstTableParent = newTableParent.parentElement.firstElementChild;
 		if (firstTableParent !== newTableParent) {
 			const firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');

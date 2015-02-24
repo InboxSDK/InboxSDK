@@ -1,9 +1,8 @@
 'use strict';
 
 var _ = require('lodash');
-var Map = require('es6-unweak-collections').Map;
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 
 /**

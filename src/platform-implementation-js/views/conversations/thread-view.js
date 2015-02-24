@@ -3,11 +3,9 @@ var EventEmitter = require('events').EventEmitter;
 var baconCast = require('bacon-cast');
 var Bacon = require('baconjs');
 
-var Map = require('es6-unweak-collections').Map;
-
 var ContentPanelView = require('../content-panel-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
@@ -114,7 +112,6 @@ module.exports = ThreadView;
 function _bindToStreamEvents(threadView, threadViewImplementation){
 	threadViewImplementation.getEventStream().onEnd(function(){
 		threadView.emit('destroy');
-		memberMap.delete(threadView);
 
 		threadView.removeAllListeners();
 	});

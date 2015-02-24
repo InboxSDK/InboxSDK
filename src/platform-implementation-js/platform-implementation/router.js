@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var Bacon = require('baconjs');
-var Map = require('es6-unweak-collections').Map;
 
 var HandlerRegistry = require('../lib/handler-registry');
 
@@ -10,7 +9,7 @@ var RouteView = require('../views/route-view/route-view');
 var ListRouteView = require('../views/route-view/list-route-view');
 var CustomRouteView = require('../views/route-view/custom-route-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 /**
 * @class
@@ -522,6 +521,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 
 	if(routeView.getRouteType() === routeTypes.LIST){
 		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
+
 		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
 		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}

@@ -3,15 +3,13 @@
 var _ = require('lodash');
 var RouteView = require('./route-view');
 
-var Map = require('es6-unweak-collections').Map;
-
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
 
 var CollapsibleSectionView = require('../collapsible-section-view');
 var SectionView = require('../section-view');
 
-var membersMap = new Map();
+var membersMap = new WeakMap();
 
 
 
@@ -77,8 +75,6 @@ function _bindToEventStream(routeViewDriver, routeView){
 		members.sectionViews.forEach(function(sectionView){
 			sectionView.destroy();
 		});
-
-		membersMap.delete(routeView);
 	});
 }
 

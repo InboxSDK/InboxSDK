@@ -5,14 +5,12 @@ var RSVP = require('rsvp');
 
 var EventEmitter = require('events').EventEmitter;
 
-var Map = require('es6-unweak-collections').Map;
-
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
 
 var NavItemView = require('./nav-item-view');
 
-var memberMap = new Map();
+var memberMap = new WeakMap();
 
 var NativeNavItemView = function(appId, driver, labelName){
 	EventEmitter.call(this);
