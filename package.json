@@ -1,12 +1,16 @@
 {
   "author": "Streak",
+  "browser": {
+    "asap": "asap-browser"
+  },
   "browserify": {
     "transform": [
       "brfs"
     ]
   },
   "dependencies": {
-    "asap": "^2.0.0",
+    "asap": "^2.0.1",
+    "asap-browser": "^2.0.1",
     "babel": "^4.4.6",
     "babel-runtime": "^4.4.6",
     "babelify": "^5.0.3",

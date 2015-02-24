@@ -7,6 +7,10 @@
       "from": "asap@>=2.0.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/asap/-/asap-2.0.1.tgz"
     },
+    "asap-browser": {
+      "version": "2.0.1",
+      "from": "asap-browser@*"
+    },
     "babel": {
       "version": "4.4.6",
       "from": "babel@>=4.4.6 <5.0.0",
@@ -2314,7 +2318,7 @@
     },
     "combokeys-capture": {
       "version": "2.4.2",
-      "from": "combokeys-capture@>=2.4.2 <3.0.0",
+      "from": "https://registry.npmjs.org/combokeys-capture/-/combokeys-capture-2.4.2.tgz",
       "resolved": "https://registry.npmjs.org/combokeys-capture/-/combokeys-capture-2.4.2.tgz"
     },
     "entities": {
@@ -4370,7 +4374,7 @@
     },
     "lodash": {
       "version": "3.3.1",
-      "from": "lodash@3.3.1",
+      "from": "https://registry.npmjs.org/lodash/-/lodash-3.3.1.tgz",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.3.1.tgz"
     },
     "mocha": {
