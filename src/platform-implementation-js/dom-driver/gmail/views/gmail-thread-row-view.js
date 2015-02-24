@@ -241,10 +241,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    const prop = kefirCast(Kefir, label).toProperty(null).combine(this._refresher, _.identity).takeUntilBy(this._stopper);
+    const prop = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
-    prop.onValue(labelDescriptor => {
+    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(labelDescriptor => {
       if(!labelDescriptor){
         if (labelMod) {
           labelMod.remove();
