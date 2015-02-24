@@ -192,10 +192,10 @@ _.extend(GmailThreadRowView.prototype, {
     var time = [0,10,100];
     const step = () => {
       if (this._threadIdReady()) {
-        setTimeout(() => {
+        Bacon.later(1).takeUntil(this._stopper).onValue(() => {
           // TODO do this synchronously after thread row has been delivered to app.
           this._removeUnclaimedModifications();
-        }, 1);
+        });
         return Bacon.once(this);
       } else {
         var stepTime = time.shift();
@@ -212,7 +212,7 @@ _.extend(GmailThreadRowView.prototype, {
     // a moment before we re-emit the thread row and process our new
     // modifications.
     const stepToUse = this._alreadyHadModifications ?
-      () => Bacon.later(1).flatMap(step) : step;
+      () => Bacon.later(2).flatMap(step) : step;
     return stepToUse().takeUntil(this._stopper);
   },
 
