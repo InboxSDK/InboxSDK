@@ -1,7 +1,9 @@
 var _ = require('lodash');
 var assert = require('assert');
-var Bacon = require('baconjs');
+const Bacon = require('baconjs');
+const Kefir = require('kefir');
 
+const kefirCast = require('../../../lib/kefir-cast');
 
 const BasicClass = require('../../../lib/basic-class');
 const assertInterface = require('../../../lib/assert-interface');
@@ -36,8 +38,8 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
 
-  this._eventStream = new Bacon.Bus();
-  this._stopper = this._eventStream.filter(false).mapEnd();
+  this._eventStream = new Kefir.bus();
+  this._stopper = this._eventStream.filter(false).mapEnd(() => 0);
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
   // nodes. One time this happens is when you have a new email in your inbox,
@@ -49,18 +51,18 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   // us a little bit of work.
   const watchElement = this._elements.length === 1 ?
     this._elements[0] : this._elements[0].children[2];
-  this._refresher = makeMutationObserverChunkedStream(watchElement, {
+  this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
     childList: true, attributes: true, attributeFilter: ['class']
-  }).map(null).takeUntil(this._stopper).toProperty(null);
+  })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
 
   if(isVertical){
-    this._subjectRefresher = Bacon.once(null).toProperty(null);
+    this._subjectRefresher = Kefir.constant(null);
   }
   else{
     const subjectElement = watchElement.querySelector('.y6');
-    this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
+    this._subjectRefresher = kefirCast(Kefir, makeMutationObserverChunkedStream(subjectElement, {
       childList: true
-    }).map(null).takeUntil(this._stopper).toProperty(null);
+    })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
   }
 
 
@@ -145,7 +147,9 @@ _.extend(GmailThreadRowView.prototype, {
       }
     }
 
-    return step().takeUntil(this._stopper);
+    return step().takeWhile(function(){
+      return !!self._eventStream;
+    });
   },
 
   setUserView: function(userView) {
@@ -161,7 +165,7 @@ _.extend(GmailThreadRowView.prototype, {
       classes: ['inboxsdk__thread_row_addition', 'inboxsdk__thread_row_label']
     });
 
-    const prop = baconCast(Bacon, label).toProperty().combine(this._refresher, _.identity).takeUntil(this._stopper);
+    const prop = kefirCast(Kefir, label).combine(this._refresher, _.identity).takeUntilBy(this._stopper);
 
     var added = false;
     prop.onValue((labelDescriptor) => {
@@ -187,11 +191,11 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addImage: function(inIconDescriptor){
-    const prop = baconCast(Bacon, inIconDescriptor)
+    const prop = kefirCast(Kefir, inIconDescriptor)
                   .toProperty()
                   .combine(this._refresher, _.identity)
                   .combine(this._subjectRefresher, _.identity)
-                  .takeUntil(this._stopper);
+                  .takeUntilBy(this._stopper);
 
     var iconSettings = {};
 
@@ -256,8 +260,8 @@ _.extend(GmailThreadRowView.prototype, {
       iconImgElement: null
     };
 
-    var prop = baconCast(Bacon, buttonDescriptor).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).mapEnd(null).onValue((buttonDescriptor) => {
+    var prop = kefirCast(Kefir, buttonDescriptor).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue((buttonDescriptor) => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
@@ -351,8 +355,8 @@ _.extend(GmailThreadRowView.prototype, {
     var added = false;
     var currentIconUrl;
 
-    var prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+    var prop = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
       if (!opts) {
         if (added) {
           getImgElement().remove();
@@ -401,8 +405,8 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   replaceDate: function(opts) {
-    const prop = baconCast(Bacon, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntil(this._stopper).onValue(opts => {
+    const prop = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
       var customDateSpan = originalDateSpan.nextElementSibling;

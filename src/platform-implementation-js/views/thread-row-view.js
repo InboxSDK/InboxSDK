@@ -9,7 +9,7 @@ var ThreadRowView = function(threadRowViewDriver){
   EventEmitter.call(this);
 
   this._threadRowViewDriver = threadRowViewDriver;
-  this._threadRowViewDriver.getEventStream().onEnd(this, 'emit', 'destroy');
+  this._threadRowViewDriver.getEventStream().onEnd(() => this.emit('destroy'));
   this._threadRowViewDriver.setUserView(this);
 };
 
