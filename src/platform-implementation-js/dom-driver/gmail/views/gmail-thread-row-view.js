@@ -68,7 +68,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._cachedThreadID = null; // set in getter
 
   this._eventStream = new Bacon.Bus();
-  this._stopper = this._eventStream.filter(false).mapEnd();
+  this._stopper = new Bacon.Bus();
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
   // nodes. One time this happens is when you have a new email in your inbox,
@@ -137,7 +137,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
 {name: '_cachedThreadID', destroy: false},
 {name: '_rowListViewDriver', destroy: false},
 {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-{name: '_stopper', destroy: false},
+{name: '_stopper', destroy: true, destroyFunction: 'push'},
 {name: '_refresher', destroy: false}
 */
 
@@ -173,6 +173,7 @@ _.extend(GmailThreadRowView.prototype, {
       });
 
     this._eventStream.end();
+    this._stopper.push(null);
   },
 
   getEventStream() {
