@@ -1,7 +1,6 @@
 var fs = require('fs');
 var _ = require('lodash');
 var assert = require('assert');
-var rimraf = require('rimraf');
 var semver = require('semver');
 
 function checkDependency(version, depname) {
