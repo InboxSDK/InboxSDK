@@ -39,7 +39,8 @@ _.extend(GmailRowListView.prototype, {
 		{name: '_pendingExpansionsSignal', destroy: false},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
-		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'}
+		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
+		{name: '_rowViewDriverStream', destroy: false, get: true}
 	],
 
 	getEventStream: function(){
@@ -127,26 +128,19 @@ _.extend(GmailRowListView.prototype, {
 		const elementStream = Bacon.mergeAll(tableDivParents.map(makeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
 			const tbody = event.el.querySelector('table > tbody');
-			return makeElementChildStream(tbody).takeUntil(event.removalStream).filter(event => {
-				return event.el.classList.contains('zA');
-			});
+
+			// In vertical preview pane mode, each thread row has three <tr>
+			// elements. We just want to pass the first one to GmailThreadRowView().
+			return makeElementChildStream(tbody)
+				.takeUntil(event.removalStream)
+				.filter(rowEvent => rowEvent.el.id);
 		});
 
-		this._eventStreamBus.plug(
-			elementStream
-				.flatMap(makeElementViewStream(element => {
-					// In vertical preview pane mode, each thread row has three <tr>
-					// elements. We just want to pass the first one to GmailThreadRowView().
-					if (element.hasAttribute('id')) {
-						return new GmailThreadRowView(element, this);
-					}
-				}))
-				.doAction(this, '_addThreadRowView')
-				.map(view => ({
-					eventName: 'newGmailThreadRowView',
-					view: view
-				}))
-		);
+		this._rowViewDriverStream = elementStream
+			.takeUntil(this._eventStreamBus.filter(false).mapEnd(null))
+			.flatMap(makeElementViewStream(element => new GmailThreadRowView(element, this)));
+
+		this._rowViewDriverStream.onValue(this, '_addThreadRowView');
 	},
 
 	_addThreadRowView: function(gmailThreadRowView){
