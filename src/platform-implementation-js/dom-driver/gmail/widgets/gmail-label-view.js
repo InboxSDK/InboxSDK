@@ -20,19 +20,25 @@ class GmailLabelView {
 	}
 
 	setLabelDescriptorProperty(labelDescriptorProperty){
-		labelDescriptorProperty.onValue(this, '_handleNewLabelDescriptor');
+		labelDescriptorProperty.onValue((labelDescriptor) => this._handleNewLabelDescriptor(labelDescriptor));
 	}
 
 	_handleNewLabelDescriptor(labelDescriptor){
 		if(!labelDescriptor){
+			this._labelDescriptor = {};
 			return;
 		}
-		const element = this.getElement();
 
 		labelDescriptor = _.extend({
 			foregroundColor: 'rgb(102, 102, 102)', //dark grey
 			backgroundColor: 'rgb(221, 221, 221)' //light grey
 		}, labelDescriptor);
+
+		if (_.isEqual(this._labelDescriptor, labelDescriptor)) {
+			return;
+		}
+
+		const element = this.getElement();
 
 		updateIcon(
 			this, element.querySelector('.at'),

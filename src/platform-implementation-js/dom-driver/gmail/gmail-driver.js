@@ -135,12 +135,13 @@ _.extend(GmailDriver.prototype, {
 
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
-		// Each ThreadRowView may be delayed if the thread id is not known yet.
-		this._threadRowViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadRowView')
-												.flatMap(function(viewDriver) {
-													viewDriver.setPageCommunicator(self._pageCommunicator);
-													return viewDriver.waitForReady();
-												});
+		this._threadRowViewDriverStream = this._rowListViewDriverStream
+			.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())
+			.flatMap(threadRowViewDriver => {
+				threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
+				// Each ThreadRowView may be delayed if the thread id is not known yet.
+				return threadRowViewDriver.waitForReady();
+			});
 
 		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
 											.doAction(function(gmailThreadView){

@@ -2,25 +2,47 @@ var _ = require('lodash');
 var assert = require('assert');
 const Bacon = require('baconjs');
 const Kefir = require('kefir');
+const asap = require('asap');
 
-const kefirCast = require('../../../lib/kefir-cast');
 
-const BasicClass = require('../../../lib/basic-class');
 const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
+const kefirCast = require('../../../lib/kefir-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
-
 var GmailLabelView = require('../widgets/gmail-label-view');
 
 var updateIcon = require('../lib/update-icon/update-icon');
 
-var GmailThreadRowView = function(element, rowListViewDriver) {
-  BasicClass.call(this);
+const cachedModificationsByRow = new WeakMap();
 
+function focusAndNoPropagation(event) {
+  this.focus();
+  event.stopImmediatePropagation();
+}
+
+function starGroupEventInterceptor(event) {
+  const isOnStar = this.firstElementChild.contains(event.target);
+  const isOnSDKButton = !isOnStar && this !== event.target;
+  if (!isOnStar) {
+    event.stopImmediatePropagation();
+    if (!isOnSDKButton || event.type == 'mouseover') {
+      const newEvent = document.createEvent('MouseEvents');
+      newEvent.initMouseEvent(
+        event.type, event.bubbles, event.cancelable, event.view,
+        event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
+        event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
+        event.button, event.relatedTarget
+      );
+      this.parentElement.dispatchEvent(newEvent);
+    }
+  }
+}
+
+var GmailThreadRowView = function(element, rowListViewDriver) {
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
   const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
@@ -34,12 +56,27 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     this._elements = [element];
   }
 
+  this._modifications = cachedModificationsByRow.get(this._elements[0]);
+  if (!this._modifications) {
+    this._alreadyHadModifications = false;
+    this._modifications = {
+      label: {unclaimed: [], claimed: []},
+      button: {unclaimed: [], claimed: []}
+    };
+    cachedModificationsByRow.set(this._elements[0], this._modifications);
+  } else {
+    this._alreadyHadModifications = true;
+  }
+
   this._rowListViewDriver = rowListViewDriver;
   this._pageCommunicator = null; // supplied by GmailDriver later
   this._userView = null; // supplied by ThreadRowView
+  this._cachedThreadID = null; // set in getter
+
 
   this._eventStream = new Kefir.bus();
-  this._stopper = this._eventStream.filter(false).mapEnd(() => 0);
+  this._stopper = new Kefir.bus();
+
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
   // nodes. One time this happens is when you have a new email in your inbox,
@@ -51,20 +88,32 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   // us a little bit of work.
   const watchElement = this._elements.length === 1 ?
     this._elements[0] : this._elements[0].children[2];
-  this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
-    childList: true, attributes: true, attributeFilter: ['class']
-  })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
+
+    this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
+      childList: true
+    })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
 
   if(isVertical){
     this._subjectRefresher = Kefir.constant(null);
   }
   else{
     const subjectElement = watchElement.querySelector('.y6');
-    this._subjectRefresher = kefirCast(Kefir, makeMutationObserverChunkedStream(subjectElement, {
-      childList: true
-    })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
+    this._subjectRefresher = kefirCast(
+                              Kefir,
+                              makeMutationObserverChunkedStream(subjectElement, {
+                                childList: true
+                              })
+                            )
+                            .merge(
+                              kefirCast(
+                                Kefir,
+                                makeMutationObserverChunkedStream(watchElement, {
+                                  attributes: true, attributeFilter: ['class']
+                                })
+                              )
+                            )
+                            .mapTo(null).takeUntilBy(this._stopper).toProperty(null);
   }
-
 
   this.getCounts = _.once(function() {
     const thing = this._elements[0].querySelector('td div.yW');
@@ -81,27 +130,32 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   });
 };
 
-GmailThreadRowView.prototype = Object.create(BasicClass.prototype);
+/* Members:
+{name: '_elements', destroy: false},
+{name: '_modifications', destroy: false},
+{name: '_pageCommunicator', destroy: false},
+{name: '_userView', destroy: false},
+{name: '_cachedThreadID', destroy: false},
+{name: '_rowListViewDriver', destroy: false},
+{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
+{name: '_stopper', destroy: true, destroyFunction: 'push'},
+{name: '_refresher', destroy: false}
+*/
 
 _.extend(GmailThreadRowView.prototype, {
-
-  __memberVariables: [
-    {name: '_elements', destroy: false},
-    {name: '_pageCommunicator', destroy: false},
-    {name: '_userView', destroy: false},
-    {name: '_cachedThreadID', destroy: false},
-    {name: '_rowListViewDriver', destroy: false},
-    {name: '_pendingExpansionsSignal', destroy: false},
-    {name: '_pendingExpansions', destroy: false},
-    {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-    {name: '_stopper', destroy: false},
-    {name: '_refresher', destroy: false}
-  ],
 
   destroy: function() {
     if(!this._elements){
       return;
     }
+
+    this._modifications.label.unclaimed = this._modifications.label.claimed
+      .concat(this._modifications.label.unclaimed);
+    this._modifications.label.claimed.length = 0;
+
+    this._modifications.button.unclaimed = this._modifications.button.claimed
+      .concat(this._modifications.button.unclaimed);
+    this._modifications.button.claimed.length = 0;
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
@@ -119,7 +173,12 @@ _.extend(GmailThreadRowView.prototype, {
         el.style.display = 'inline';
       });
 
-    BasicClass.prototype.destroy.call(this);
+    this._eventStream.end();
+    this._stopper.emit(null);
+  },
+
+  getEventStream() {
+    return this._eventStream;
   },
 
   // Called by GmailDriver
@@ -127,29 +186,50 @@ _.extend(GmailThreadRowView.prototype, {
     this._pageCommunicator = pageCommunicator;
   },
 
+  _removeUnclaimedModifications() {
+    for (let mod of this._modifications.label.unclaimed) {
+      console.log('removing unclaimed label mod', mod);
+      mod.remove();
+    }
+    this._modifications.label.unclaimed.length = 0;
+    for (let mod of this._modifications.button.unclaimed) {
+      console.log('removing unclaimed button mod', mod);
+      mod.remove();
+    }
+    this._modifications.button.unclaimed.length = 0;
+  },
+
   // Returns a stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
   // a few cases such as with multiple inbox that it needs a moment.
   waitForReady: function() {
-    var self = this;
     var time = [0,10,100];
-    function step() {
-      if (self._threadIdReady()) {
-        return Bacon.once(self);
+    const step = () => {
+      if (this._threadIdReady()) {
+        Bacon.later(1).takeWhile(() => !this._eventStream.ended).onValue(() => {
+          // TODO do this synchronously after thread row has been delivered to app.
+          this._removeUnclaimedModifications();
+        });
+        return Bacon.once(this);
       } else {
         var stepTime = time.shift();
         if (stepTime == undefined) {
-          console.log('Should not happen: ThreadRowViewDriver never became ready', self);
+          console.log('Should not happen: ThreadRowViewDriver never became ready', this);
           return Bacon.never();
         } else {
           return Bacon.later(stepTime).flatMap(step);
         }
       }
-    }
+    };
 
-    return step().takeWhile(function(){
-      return !!self._eventStream;
-    });
+    // Performance hack: If the row already has old modifications on it, wait
+    // a moment before we re-emit the thread row and process our new
+    // modifications.
+    const stepToUse = this._alreadyHadModifications ?
+      () => Bacon.later(2).flatMap(step) : step;
+
+    return stepToUse().takeWhile(() => !this._eventStream.ended);
+
   },
 
   setUserView: function(userView) {
@@ -161,33 +241,41 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
-    const gmailLabelView = new GmailLabelView({
-      classes: ['inboxsdk__thread_row_addition', 'inboxsdk__thread_row_label']
-    });
+    const prop = kefirCast(Kefir, label).toProperty(null).combine(this._refresher, _.identity).takeUntilBy(this._stopper);
+    var labelMod = null;
 
-    const prop = kefirCast(Kefir, label).combine(this._refresher, _.identity).takeUntilBy(this._stopper);
+    prop.onValue(labelDescriptor => {
+      if(!labelDescriptor){
+        if (labelMod) {
+          labelMod.remove();
+          this._modifications.label.claimed.splice(
+            this._modifications.label.claimed.indexOf(labelMod), 1);
+          labelMod = null;
+        }
+      } else {
+        if (!labelMod) {
+          labelMod = this._modifications.label.unclaimed.shift();
+          if (!labelMod) {
+            const gmailLabelView = new GmailLabelView({
+              classes: ['inboxsdk__thread_row_label']
+            });
+            const el = gmailLabelView.getElement();
+            labelMod = {
+              gmailLabelView,
+              remove: el.remove.bind(el)
+            };
+          }
+          labelMod.gmailLabelView.setLabelDescriptorProperty(prop);
+          this._modifications.label.claimed.push(labelMod);
+        }
 
-    var added = false;
-    prop.onValue((labelDescriptor) => {
-
-      if(labelDescriptor){
         const labelParentDiv = this._getLabelParent();
-
-        // Yes, we're inserting the element again even if it had already been
-        // added, because the refresher stream might have fired.
-        labelParentDiv.insertBefore(gmailLabelView.getElement(), labelParentDiv.lastChild);
-        added = true;
-      }
-      else{
-        if (added) {
-          gmailLabelView.getElement().remove();
-          added = false;
+        if (!_.contains(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
+          labelParentDiv.insertBefore(
+            labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
       }
-
     });
-
-    gmailLabelView.setLabelDescriptorProperty(prop);
   },
 
   addImage: function(inIconDescriptor){
@@ -228,7 +316,6 @@ _.extend(GmailThreadRowView.prototype, {
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
 
           added = true;
-          this._elements[0].style.display = 'none';
           this._elements[0].style.display = '';
         }
       }
@@ -246,28 +333,34 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
-    if (this._elements.length != 1) return; // TODO
+    if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
     var activeDropdown = null;
-    var buttonSpan = document.createElement('span');
-    buttonSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_button';
-    buttonSpan.setAttribute('tabindex', "-1");
+    var buttonMod = null;
 
-    var iconSettings = {
-      iconUrl: null,
-      iconClass: null,
-      iconElement: null,
-      iconImgElement: null
-    };
 
-    var prop = kefirCast(Kefir, buttonDescriptor).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue((buttonDescriptor) => {
+    var prop = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
+
+    prop.mapEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
           activeDropdown = null;
         }
-        buttonSpan.remove();
+        if (buttonMod && buttonMod.buttonSpan) {
+          buttonMod.buttonSpan.onclick = null;
+        }
+      }
+    });
+
+    prop.combine(this._refresher, _.identity).onValue(buttonDescriptor => {
+      if (!buttonDescriptor) {
+        if (buttonMod) {
+          buttonMod.remove();
+          this._modifications.button.claimed.splice(
+            this._modifications.button.claimed.indexOf(buttonMod), 1);
+          buttonMod = null;
+        }
       } else {
         // compat workaround
         if (buttonDescriptor.className) {
@@ -275,37 +368,50 @@ _.extend(GmailThreadRowView.prototype, {
           delete buttonDescriptor.className;
         }
 
-        var starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY'); // could also be trash icon
+        // could also be trash icon
+        const starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY');
 
-        // Don't let the whole column count as the star for click and mouse over purposes.
-        // Click events that aren't directly on the star should be stopped.
-        // Mouseover events that aren't directly on the star should be stopped and
-        // re-emitted from the thread row, so the thread row still has the mouseover
-        // appearance.
-        // Click events that are on one of our buttons should be stopped. Click events
-        // that aren't on the star button or our buttons should be re-emitted from the
-        // thread row so it counts as clicking on the thread.
-        starGroup.onmouseover = starGroup.onclick = function(event) {
-          var isOnStar = this.firstElementChild.contains(event.target);
-          var isOnSDKButton = !isOnStar && this !== event.target;
-          if (!isOnStar) {
-            event.stopPropagation();
-            if (!isOnSDKButton || event.type == 'mouseover') {
-              var newEvent = document.createEvent('MouseEvents');
-              newEvent.initMouseEvent(
-                event.type, event.bubbles, event.cancelable, event.view,
-                event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
-                event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-                event.button, event.relatedTarget
-              );
-              this.parentElement.dispatchEvent(newEvent);
-            }
+        let buttonSpan, iconSettings;
+        if (!buttonMod) {
+          buttonMod = this._modifications.button.unclaimed.shift();
+          if (!buttonMod) {
+            buttonSpan = document.createElement('span');
+            buttonSpan.className = 'inboxsdk__thread_row_button';
+            buttonSpan.setAttribute('tabindex', "-1");
+            buttonSpan.onmousedown = focusAndNoPropagation;
+
+            // Don't let the whole column count as the star for click and mouse over purposes.
+            // Click events that aren't directly on the star should be stopped.
+            // Mouseover events that aren't directly on the star should be stopped and
+            // re-emitted from the thread row, so the thread row still has the mouseover
+            // appearance.
+            // Click events that are on one of our buttons should be stopped. Click events
+            // that aren't on the star button or our buttons should be re-emitted from the
+            // thread row so it counts as clicking on the thread.
+            starGroup.onmouseover = starGroup.onclick = starGroupEventInterceptor;
+
+            iconSettings = {
+              iconUrl: null,
+              iconClass: null,
+              iconElement: null,
+              iconImgElement: null
+            };
+
+            buttonMod = {
+              buttonSpan,
+              iconSettings,
+              remove: buttonSpan.remove.bind(buttonSpan)
+            };
           }
-        };
+          this._modifications.button.claimed.push(buttonMod);
+        }
+
+        buttonSpan = buttonMod.buttonSpan;
+        iconSettings = buttonMod.iconSettings;
 
         if(buttonDescriptor.onClick){
           buttonSpan.onclick = (event) => {
-            var appEvent = {
+            const appEvent = {
               threadRowView: this._userView
             };
             if (buttonDescriptor.hasDropdown) {
@@ -328,21 +434,12 @@ _.extend(GmailThreadRowView.prototype, {
           };
         }
 
-
-        buttonSpan.onmousedown = function(event){
-          buttonSpan.focus();
-          event.stopPropagation();
-        };
-
         updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-
-        if (!starGroup.contains(buttonSpan)) {
+        if (!_.contains(starGroup.children, buttonSpan)) {
           starGroup.appendChild(buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
         }
       }
-
-
     });
   },
 
@@ -393,15 +490,19 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   _fixDateColumnWidth: function() {
-    const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
-    if (!dateContainer) return;
-    const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
-      dateContainer.firstElementChild;
+    asap(() => {
+      if (!this._elements) return;
 
-    // Attachment icons are only in the date column in vertical preivew pane.
-    const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
-    this._expandColumn('col.xX',
-      visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      if (!dateContainer) return;
+      const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
+        dateContainer.firstElementChild;
+
+      // Attachment icons are only in the date column in vertical preivew pane.
+      const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
+      this._expandColumn('col.xX',
+        visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+    });
   },
 
   replaceDate: function(opts) {
