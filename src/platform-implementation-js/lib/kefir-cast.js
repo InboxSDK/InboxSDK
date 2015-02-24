@@ -1,6 +1,6 @@
-var once = require('lodash.once');
-var noop = require('lodash.noop');
-var constant = require('lodash.constant');
+var once = require('lodash').once;
+var noop = require('lodash').noop;
+var constant = require('lodash').constant;
 
 function kefirCast(Kefir, input){
 
