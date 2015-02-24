@@ -31,7 +31,7 @@ var escapeShellArg = require('./src/build/escape-shell-arg');
 var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
-var to5ify = require("6to5ify");
+var babelify = require("babelify");
 var execSync = require('exec-sync');
 
 var sdkFilename = 'inboxsdk.js';
@@ -106,8 +106,8 @@ function browserifyTask(name, deps, entry, destname) {
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
       VERSION: getVersion()
-    })).transform(to5ify.configure({
-      optional: ["selfContained"]
+    })).transform(babelify.configure({
+      optional: ["runtime"]
     }));
 
     function buildBundle() {
@@ -204,11 +204,11 @@ gulp.task('test-unit', function() {
 gulp.task('test-jsdom', ['test-jsdom-inboxsdk', 'test-jsdom-iti']);
 
 gulp.task('test-jsdom-inboxsdk', function() {
-  return spawn('node_modules/.bin/6to5-node', ['test/jsdom/inboxsdk.js']);
+  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk.js']);
 });
 
 gulp.task('test-jsdom-iti', function() {
-  return spawn('node_modules/.bin/6to5-node', ['test/jsdom/injected-thread-identifier.js']);
+  return spawn('node_modules/.bin/babel-node', ['test/jsdom/injected-thread-identifier.js']);
 });
 
 gulp.task('docs', function(cb) {
