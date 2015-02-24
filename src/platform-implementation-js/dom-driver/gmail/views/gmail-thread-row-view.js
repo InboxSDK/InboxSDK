@@ -8,7 +8,7 @@ const asap = require('asap');
 const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var baconCast = require('bacon-cast');
-const kefirCast = require('../../../lib/kefir-cast');
+const kefirCast = require('kefir-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
