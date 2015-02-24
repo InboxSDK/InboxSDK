@@ -55,11 +55,14 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
 
   this._modifications = cachedModificationsByRow.get(this._elements[0]);
   if (!this._modifications) {
+    this._alreadyHadModifications = false;
     this._modifications = {
       label: {unclaimed: [], claimed: []},
       button: {unclaimed: [], claimed: []}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
+  } else {
+    this._alreadyHadModifications = true;
   }
 
   this._rowListViewDriver = rowListViewDriver;
@@ -111,22 +114,6 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
     return {messageCount, draftCount};
   });
-
-  // Undo any remaining cached row modifications
-  // TODO do this synchronously after thread row has been delivered to app.
-  setTimeout(() => {
-    if (!this._modifications) return;
-    for (let mod of this._modifications.label.unclaimed) {
-      console.log('removing unclaimed label mod', mod);
-      mod.remove();
-    }
-    this._modifications.label.unclaimed.length = 0;
-    for (let mod of this._modifications.button.unclaimed) {
-      console.log('removing unclaimed button mod', mod);
-      mod.remove();
-    }
-    this._modifications.button.unclaimed.length = 0;
-  }, 1);
 };
 
 /* Members:
@@ -185,27 +172,48 @@ _.extend(GmailThreadRowView.prototype, {
     this._pageCommunicator = pageCommunicator;
   },
 
+  _removeUnclaimedModifications() {
+    for (let mod of this._modifications.label.unclaimed) {
+      console.log('removing unclaimed label mod', mod);
+      mod.remove();
+    }
+    this._modifications.label.unclaimed.length = 0;
+    for (let mod of this._modifications.button.unclaimed) {
+      console.log('removing unclaimed button mod', mod);
+      mod.remove();
+    }
+    this._modifications.button.unclaimed.length = 0;
+  },
+
   // Returns a stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
   // a few cases such as with multiple inbox that it needs a moment.
   waitForReady: function() {
-    var self = this;
     var time = [0,10,100];
-    function step() {
-      if (self._threadIdReady()) {
-        return Bacon.once(self);
+    const step = () => {
+      if (this._threadIdReady()) {
+        setTimeout(() => {
+          // TODO do this synchronously after thread row has been delivered to app.
+          this._removeUnclaimedModifications();
+        }, 1);
+        return Bacon.once(this);
       } else {
         var stepTime = time.shift();
         if (stepTime == undefined) {
-          console.log('Should not happen: ThreadRowViewDriver never became ready', self);
+          console.log('Should not happen: ThreadRowViewDriver never became ready', this);
           return Bacon.never();
         } else {
           return Bacon.later(stepTime).flatMap(step);
         }
       }
-    }
+    };
 
-    return step().takeUntil(this._stopper);
+    // Performance hack: If the row already has old modifications on it, wait
+    // a moment before we re-emit the thread row and process our new
+    // modifications.
+    const stepToUse = this._alreadyHadModifications ?
+      () => Bacon.later(1).flatMap(step) : step;
+    return stepToUse().takeUntil(this._stopper);
   },
 
   setUserView: function(userView) {
