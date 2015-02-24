@@ -23,6 +23,10 @@ class GmailLabelView {
 		labelDescriptorProperty.onValue((labelDescriptor) => this._handleNewLabelDescriptor(labelDescriptor));
 	}
 
+	updateLabelDescriptor(labelDescriptor){
+		this._handleNewLabelDescriptor(labelDescriptor);
+	}
+
 	_handleNewLabelDescriptor(labelDescriptor){
 		if(!labelDescriptor){
 			this._labelDescriptor = {};
