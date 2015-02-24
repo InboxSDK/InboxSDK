@@ -1,7 +1,6 @@
 var fs = require('fs');
 var _ = require('lodash');
 var assert = require('assert');
-var rimraf = require('rimraf');
 var semver = require('semver');
 
 function checkDependency(version, depname) {
@@ -33,7 +32,10 @@ function checkDependencies(package) {
       _.forOwn(package.devDependencies, checkDependency);
     }
   } catch(e) {
-    console.error("Dependencies check failed. Try running `npm install` to fix.");
+    console.error(
+      "Dependencies check failed. Try running `npm install` to fix. If that doesn't\n" +
+      "fix the issue, then delete your node_modules folder and re-run the command."
+    );
     throw e;
   }
 }
