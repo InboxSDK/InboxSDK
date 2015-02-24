@@ -265,9 +265,10 @@ _.extend(GmailThreadRowView.prototype, {
               remove: el.remove.bind(el)
             };
           }
-          labelMod.gmailLabelView.setLabelDescriptorProperty(prop);
           this._modifications.label.claimed.push(labelMod);
         }
+
+        labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
 
         const labelParentDiv = this._getLabelParent();
         if (!_.contains(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
