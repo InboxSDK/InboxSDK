@@ -175,6 +175,7 @@ _.extend(GmailThreadRowView.prototype, {
 
     this._eventStream.end();
     this._stopper.emit(null);
+    this._elements = null;
   },
 
   getEventStream() {
@@ -199,7 +200,7 @@ _.extend(GmailThreadRowView.prototype, {
     this._modifications.button.unclaimed.length = 0;
   },
 
-  // Returns a stream that emits this object once this object is ready for the
+  // Returns a Kefir stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
   // a few cases such as with multiple inbox that it needs a moment.
   waitForReady: function() {
@@ -207,18 +208,17 @@ _.extend(GmailThreadRowView.prototype, {
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
-          // TODO do this synchronously after thread row has been delivered to app.
-          if (!this._eventStream.ended)
+          if (this._elements)
             this._removeUnclaimedModifications();
         });
-        return Bacon.once(this);
+        return Kefir.constant(this);
       } else {
         var stepTime = time.shift();
         if (stepTime == undefined) {
           console.log('Should not happen: ThreadRowViewDriver never became ready', this);
-          return Bacon.never();
+          return Kefir.never();
         } else {
-          return Bacon.later(stepTime).flatMap(step);
+          return Kefir.later(stepTime).flatMap(step);
         }
       }
     };
@@ -228,7 +228,7 @@ _.extend(GmailThreadRowView.prototype, {
     // modifications.
     const stepToUse = step;
 
-    return stepToUse().takeWhile(() => !this._eventStream.ended);
+    return stepToUse().takeUntilBy(this._stopper);
 
   },
 
