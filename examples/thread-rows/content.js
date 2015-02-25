@@ -7,7 +7,7 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
-		threadRowView.addLabel(Bacon.repeatedly(5000, [
+		threadRowView.addLabel(Kefir.repeatedly(5000, [
 			{title:'A'},
 			{title:'B', foregroundColor: 'blue', iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png'},
 			{title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
@@ -17,7 +17,7 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			backgroundColor:'white',
 			foregroundColor:'blue'
 		});
-		threadRowView.addAttachmentIcon(Bacon.repeatedly(2000, [
+		threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
 			{
 				iconClass: 'test_icon_thing',
 				title: 'thing'
@@ -29,7 +29,7 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		]));
 		threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
 
-		threadRowView.addButton(Bacon.repeatedly(5000, [
+		threadRowView.addButton(Kefir.repeatedly(5000, [
 			{
 				iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
 				iconClass: 'buttonLight'
@@ -43,16 +43,16 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			iconClass: 'test_button_thing',
 		});
 
-		var buttonBus = new Bacon.Bus();
+		var buttonBus = new Kefir.Bus();
 		threadRowView.addButton(buttonBus.toProperty());
-		buttonBus.push({
+		buttonBus.emit({
 			iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
 			className: 'buttonLight',
 			hasDropdown: true,
 			onClick: function(event) {
 				event.dropdown.el.innerHTML += 'beep <b>beep</b><br>aaa<br>aaaaaa';
 
-				buttonBus.plug(Bacon.sequentially(1000, [
+				buttonBus.plug(Kefir.sequentially(1000, [
 					null,
 					{
 						iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicator.png',
