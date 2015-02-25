@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const RSVP = require('rsvp');
 const Bacon = require('baconjs');
+const Kefir = require('kefir');
+const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
 
 require('./custom-style');
@@ -41,7 +43,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_threadRowViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
+		{name: '_threadRowViewDriverKefirStream', destroy: false, get: true},
 		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_toolbarViewDriverStream', destroy: true, get: true},
 		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -135,8 +137,8 @@ _.extend(GmailDriver.prototype, {
 
 		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
-		this._threadRowViewDriverStream = this._rowListViewDriverStream
-			.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())
+		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
+			.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
 			.flatMap(threadRowViewDriver => {
 				threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
 				// Each ThreadRowView may be delayed if the thread id is not known yet.

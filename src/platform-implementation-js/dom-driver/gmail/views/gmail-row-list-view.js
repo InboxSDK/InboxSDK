@@ -12,6 +12,12 @@ var streamWaitFor = require('../../../lib/stream-wait-for');
 var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
+const Kefir = require('kefir');
+const kefirCast = require('kefir-cast');
+const kefirMakeElementChildStream = require('../../../lib/dom/kefir-make-element-child-stream');
+const kefirElementViewMapper = require('../../../lib/dom/kefir-element-view-mapper');
+
+
 var GmailRowListView = function(rootElement, routeViewDriver){
 	RowListViewDriver.call(this);
 
@@ -40,7 +46,7 @@ _.extend(GmailRowListView.prototype, {
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
-		{name: '_rowViewDriverStream', destroy: false, get: true}
+		{name: '_rowViewDriverKefirStream', destroy: false, get: true}
 	],
 
 	getEventStream: function(){
@@ -124,23 +130,24 @@ _.extend(GmailRowListView.prototype, {
 
 	_startWatchingForRowViews: function(){
 		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
+		const stopper = kefirCast(Kefir, this._eventStreamBus.filter(false).mapEnd(null));
 
-		const elementStream = Bacon.mergeAll(tableDivParents.map(makeElementChildStream)).flatMap(event => {
+		const elementKefirStream = Kefir.merge(tableDivParents.map(kefirMakeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
 			const tbody = event.el.querySelector('table > tbody');
 
 			// In vertical preview pane mode, each thread row has three <tr>
 			// elements. We just want to pass the first one to GmailThreadRowView().
-			return makeElementChildStream(tbody)
-				.takeUntil(event.removalStream)
+			return kefirMakeElementChildStream(tbody)
+				.takeUntilBy(event.removalStream)
 				.filter(rowEvent => rowEvent.el.id);
 		});
 
-		this._rowViewDriverStream = elementStream
-			.takeUntil(this._eventStreamBus.filter(false).mapEnd(null))
-			.flatMap(makeElementViewStream(element => new GmailThreadRowView(element, this)));
+		this._rowViewDriverKefirStream = elementKefirStream
+			.takeUntilBy(stopper)
+			.map(kefirElementViewMapper(element => new GmailThreadRowView(element, this)));
 
-		this._rowViewDriverStream.onValue(this, '_addThreadRowView');
+		this._rowViewDriverKefirStream.onValue(x => this._addThreadRowView(x));
 	},
 
 	_addThreadRowView: function(gmailThreadRowView){
