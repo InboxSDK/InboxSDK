@@ -226,7 +226,8 @@ _.extend(GmailThreadRowView.prototype, {
     // Performance hack: If the row already has old modifications on it, wait
     // a moment before we re-emit the thread row and process our new
     // modifications.
-    const stepToUse = step;
+    const stepToUse = this._alreadyHadModifications ?
+      () => Kefir.later(2).flatMap(step) : step;
 
     return stepToUse().takeUntilBy(this._stopper);
 
