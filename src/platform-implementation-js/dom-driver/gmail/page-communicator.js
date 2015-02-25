@@ -24,10 +24,11 @@ PageCommunicator.prototype = {
     return threadid;
   },
 
-  getCurrentThreadID: function(threadContainerElement){
+  getCurrentThreadID: function(threadContainerElement, isPreviewedThread){
     var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, null);
+    event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, {isPreviewedThread: isPreviewedThread});
     threadContainerElement.dispatchEvent(event);
+
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
   },
 

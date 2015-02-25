@@ -10,11 +10,12 @@ var GmailToolbarView = require('./gmail-toolbar-view');
 
 var GmailContentPanelContainerView = require('../widgets/gmail-content-panel/gmail-content-panel-container-view');
 
-var GmailThreadView = function(element, routeViewDriver){
+var GmailThreadView = function(element, routeViewDriver, isPreviewedThread){
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
 	this._routeViewDriver = routeViewDriver;
+	this._isPreviewedThread = isPreviewedThread;
 
 	this._eventStream = new Bacon.Bus();
 
@@ -28,7 +29,9 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_threadID', destroy: false},
 		{name: '_routeViewDriver', destroy: false, get: true},
+		{name: '_isPreviewedThread', destroy: false, get: true},
 		{name: '_sidebarContentPanelContainerView', destroy: true},
 		{name: '_toolbarView', destroy: true, get: true},
 		{name: '_newMessageMutationObserver', destroy: true, destroyFunction: 'disconnect'},
@@ -64,13 +67,25 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	getThreadID: function(){
-		var params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
-
-		if(params && params.threadID){
-			return params.threadID;
+		if(this._threadID){
+			return this._threadID;
 		}
 
-		return this._pageCommunicator.getCurrentThreadID(this._element);
+		if(this._isPreviewedThread){
+			this._threadID = this._pageCommunicator.getCurrentThreadID(this._element, true);
+		}
+		else{
+			var params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
+
+			if(params && params.threadID){
+				this._threadID = params.threadID;
+			}
+			else{
+				this._threadID = this._pageCommunicator.getCurrentThreadID(this._element);
+			}
+		}
+
+		return this._threadID;
 	},
 
 	_setupToolbarView: function(){

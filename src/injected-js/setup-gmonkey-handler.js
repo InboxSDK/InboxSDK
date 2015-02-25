@@ -13,8 +13,20 @@ module.exports = function(){
 	});
 
 	document.addEventListener('inboxSDKtellMeCurrentThreadId', function(event) {
-	    const threadId = window.gmonkey && window.gmonkey.v2 &&
+		var threadId;
+
+		if(event.detail.isPreviewedThread){
+			var rows = document.querySelectorAll('[gh=tl] tr.aps');
+			if(rows.length > 0){
+				threadId = rows[0].getAttribute('data-inboxsdk-threadid');
+			}
+		}
+		else{
+			threadId = window.gmonkey && window.gmonkey.v2 &&
 				window.gmonkey.v2.getCurrentThread().getThreadId();
+		}
+
+
 	    if (threadId) {
 	      event.target.setAttribute('data-inboxsdk-currentthreadid', threadId);
 	    }
