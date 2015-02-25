@@ -311,7 +311,6 @@ _.extend(GmailThreadRowView.prototype, {
         if (!imageMod) {
           imageMod = this._modifications.image.unclaimed.shift();
           if (!imageMod) {
-            const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
 
             imageMod = {
               iconSettings: {},
@@ -327,6 +326,8 @@ _.extend(GmailThreadRowView.prototype, {
         const {iconSettings, iconWrapper} = imageMod;
 
         updateIcon(iconSettings, iconWrapper, false, iconDescriptor.imageClass, iconDescriptor.imageUrl);
+
+        const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
         containerRow.classList.add('inboxsdk__thread_row_image_added');
 
         if(iconDescriptor.tooltip){
