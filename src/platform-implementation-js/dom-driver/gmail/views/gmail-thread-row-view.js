@@ -61,7 +61,8 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     this._alreadyHadModifications = false;
     this._modifications = {
       label: {unclaimed: [], claimed: []},
-      button: {unclaimed: [], claimed: []}
+      button: {unclaimed: [], claimed: []},
+      image: {unclaimed: [], claimed: []}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
   } else {
@@ -157,6 +158,10 @@ _.extend(GmailThreadRowView.prototype, {
       .concat(this._modifications.button.unclaimed);
     this._modifications.button.claimed.length = 0;
 
+    this._modifications.image.unclaimed = this._modifications.image.claimed
+      .concat(this._modifications.image.unclaimed);
+    this._modifications.image.claimed.length = 0;
+
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
       .map(_.toArray)
@@ -198,13 +203,18 @@ _.extend(GmailThreadRowView.prototype, {
       mod.remove();
     }
     this._modifications.button.unclaimed.length = 0;
+    for (let mod of this._modifications.image.unclaimed) {
+      console.log('removing unclaimed image mod', mod);
+      mod.remove();
+    }
+    this._modifications.image.unclaimed.length = 0;
   },
 
   // Returns a Kefir stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
   // a few cases such as with multiple inbox that it needs a moment.
   waitForReady: function() {
-    var time = [0,10,100];
+    const time = [0,10,100];
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
@@ -213,7 +223,7 @@ _.extend(GmailThreadRowView.prototype, {
         });
         return Kefir.constant(this);
       } else {
-        var stepTime = time.shift();
+        const stepTime = time.shift();
         if (stepTime == undefined) {
           console.log('Should not happen: ThreadRowViewDriver never became ready', this);
           return Kefir.never();
@@ -287,50 +297,50 @@ _.extend(GmailThreadRowView.prototype, {
                   .combine(this._subjectRefresher, _.identity)
                   .takeUntilBy(this._stopper);
 
-    var iconSettings = {};
+    let imageMod = null;
 
-    var iconWrapper = document.createElement('div');
-    iconWrapper.setAttribute('class', 'inboxsdk__thread_row_icon_wrapper inboxsdk__thread_row_addition');
-    var added = false;
+    prop.onValue(iconDescriptor => {
+      if (!iconDescriptor) {
+        if (imageMod) {
+          imageMod.remove();
+          this._modifications.image.claimed.splice(
+            this._modifications.image.claimed.indexOf(imageMod), 1);
+          imageMod = null;
+        }
+      } else {
+        if (!imageMod) {
+          imageMod = this._modifications.image.unclaimed.shift();
+          if (!imageMod) {
+            const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
+            containerRow.classList.add('inboxsdk__thread_row_image_added');
 
-    prop.onValue((newIconDescriptor) => {
+            imageMod = {
+              iconSettings: {},
+              iconWrapper: document.createElement('div'),
+              remove() {
+                imageMod.iconWrapper.remove();
+              }
+            };
+            imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
+          }
+          this._modifications.image.claimed.push(imageMod);
+        }
+        const {iconSettings, iconWrapper} = imageMod;
 
-      var iconDescriptor = newIconDescriptor || {};
-
-      updateIcon(iconSettings, iconWrapper, false, iconDescriptor.imageClass, iconDescriptor.imageUrl);
-
-      var containerRow = this._elements.length > 1 ?
-                           this._elements[this._elements.length === 2 ? 0 : 2] :
-                           this._elements[0];
-
-      if(iconSettings.iconElement){
-        containerRow.classList.add('inboxsdk__thread_row_image_added');
+        updateIcon(iconSettings, iconWrapper, false, iconDescriptor.imageClass, iconDescriptor.imageUrl);
 
         if(iconDescriptor.tooltip){
           iconSettings.iconElement.setAttribute('data-tooltip', iconDescriptor.tooltip);
         }
 
-        if(!added || !this._elements[0].contains(iconWrapper)){
-          var insertionPoint = this._elements.length > 1 ?
+        if(!this._elements[0].contains(iconWrapper)) {
+          const insertionPoint = this._elements.length > 1 ?
                                 this._getLabelParent() :
                                 this._getLabelParent().querySelector('.y6');
 
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
-
-          added = true;
-          this._elements[0].style.display = '';
         }
       }
-      else{
-        if(added){
-          iconWrapper.remove();
-
-          containerRow.classList.remove('inboxsdk__thread_row_image_added');
-
-          added = false;
-        }
-      }
-
     });
   },
 

@@ -29,15 +29,15 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		]));
 		threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
 
-		threadRowView.addButton(Kefir.repeatedly(5000, [
-			{
-				iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
-				iconClass: 'buttonLight'
-			},
-			{
-				iconClass: 'test_button_thing',
-			}
-		]));
+		// threadRowView.addButton(Kefir.repeatedly(5000, [
+		// 	{
+		// 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+		// 		iconClass: 'buttonLight'
+		// 	},
+		// 	{
+		// 		iconClass: 'test_button_thing',
+		// 	}
+		// ]));
 
 		threadRowView.addButton({
 			iconClass: 'test_button_thing',
@@ -72,10 +72,16 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			}
 		});
 
-		// threadRowView.addImage({
-		// 	imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
-		// 	tooltip: 'Monkeys'
-		// });
+		threadRowView.addImage(Kefir.repeatedly(5000, [
+			null,
+			{
+				imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+				tooltip: 'Monkeys'
+			}
+		]).toProperty({
+			imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+			tooltip: 'Monkeys'
+		}));
 	});
 
 });
