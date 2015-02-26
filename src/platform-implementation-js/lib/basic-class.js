@@ -11,8 +11,8 @@
 import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';
 
-const BasicClass = function(){
-	this._validateMemberVariables();
+const BasicClass = function() {
+	_validateMemberVariables(this);
 	this._nullifyMemberVariables();
 	this._createGettersAndSetters();
 	this._initializeDefaultValues();
@@ -66,27 +66,36 @@ let _shouldMakeMethod;
 	};
 }
 
+let _validateMemberVariables;
+{
+	const validatedPrototypes = new WeakSet();
+
+	_validateMemberVariables = (object) => {
+		const proto = Object.getPrototypeOf(object);
+		if (!validatedPrototypes.has(proto)) {
+			object._memberVariableIterate(memberVariable => {
+				if (memberVariable.name === undefined) {
+					throw new Error('name is a required parameter to memberVariables');
+				}
+
+				if (memberVariable.destroy === undefined) {
+					throw new Error('destroy is a required parameter to memberVariables');
+				}
+
+				for (var property in memberVariable) {
+					if (['name', 'destroy', 'get', 'set', 'defaultValue', 'destroyFunction'].indexOf(property) == -1) {
+						throw new Error(property + ' is not a valid parameter to memberVariables');
+					}
+				}
+			});
+			validatedPrototypes.add(proto);
+		}
+	};
+}
+
 _.extend(BasicClass.prototype, {
 
 	__memberVariables: [],
-
-	_validateMemberVariables: function() {
-		this._memberVariableIterate(function(memberVariable){
-			if (memberVariable.name === undefined) {
-				throw new Error('name is a required parameter to memberVariables');
-			}
-
-			if (memberVariable.destroy === undefined) {
-				throw new Error('destroy is a required parameter to memberVariables');
-			}
-
-			for (var property in memberVariable) {
-				if (['name', 'destroy', 'get', 'set', 'defaultValue', 'destroyFunction'].indexOf(property) == -1) {
-					throw new Error(property + ' is not a valid parameter to memberVariables');
-				}
-			}
-		});
-	},
 
 	_nullifyMemberVariables: function(doDestroy) {
 		this._memberVariableIterate(function(memberVariable){

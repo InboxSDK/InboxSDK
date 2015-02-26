@@ -16,6 +16,34 @@ describe('BasicClass', function() {
     test.foo(done);
   });
 
+  it('throws error for invalid memberVariables', function() {
+    class Test extends BasicClass {}
+    Test.prototype.__memberVariables = [
+      {}
+    ];
+
+    assert.throws(() => {
+      const test = new Test();
+    }, 'name is a required parameter to memberVariables');
+  });
+
+  it('memberVariables are only validated on first construction', function() {
+    const destroySpy = sinon.spy(() => false);
+
+    class Test extends BasicClass {}
+    Test.prototype.__memberVariables = [
+      Object.defineProperties({name: '_foo'}, {
+        destroy: {get: destroySpy}
+      })
+    ];
+
+    const test1 = new Test();
+    assert.strictEqual(destroySpy.callCount, 1);
+
+    const test2 = new Test();
+    assert.strictEqual(destroySpy.callCount, 1);
+  });
+
   describe('destroy', function() {
     it('destroyable member works', function() {
       class Test extends BasicClass {}
