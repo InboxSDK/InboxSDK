@@ -211,7 +211,10 @@ describe('BasicClass', function() {
       class TestChildChild extends TestChild {}
       TestChildChild.prototype.__memberVariables = [];
 
-      for (let test of [new TestChild(), new TestChildChild()]) {
+      for (let TestClass of [TestChild, TestChildChild]) {
+        //console.log('round', TestClass.name);
+        const test = new TestClass();
+
         assert.strictEqual(test.getPa, undefined);
         assert.strictEqual(test.getCa, undefined);
         test.setPa(100);

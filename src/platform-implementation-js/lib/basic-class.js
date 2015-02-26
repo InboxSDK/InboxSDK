@@ -8,15 +8,63 @@
  *
  */
 
-var _ = require('lodash');
+import _ from 'lodash';
+import getPrototypeChain from './get-prototype-chain';
 
-var BasicClass = function(){
+const BasicClass = function(){
 	this._validateMemberVariables();
 	this._nullifyMemberVariables();
 	this._createGettersAndSetters();
 	this._initializeDefaultValues();
 };
 
+const _getterName = _.memoize(variableName =>
+	'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
+);
+
+const _setterName = _.memoize(variableName =>
+	'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
+);
+
+const _makeGetter = _.memoize(variableName =>
+	function() {
+		return this[variableName];
+	}
+);
+
+const _makeSetter = _.memoize(variableName =>
+	function(x) {
+		this[variableName] = x;
+	}
+);
+
+let _shouldMakeMethod;
+{
+	const __cachedShouldMakeMethod = new WeakMap();
+
+	// Follow the Object's prototype chain until memberProto is hit to see if
+	// any of them already have a methodName method. Caches based on the object
+	// parameter's prototype and on the methodName.
+	_shouldMakeMethod = (object, memberProto, methodName) => {
+		const objectProto = Object.getPrototypeOf(object);
+		let protoCache = __cachedShouldMakeMethod.get(objectProto);
+		if (!protoCache) {
+			protoCache = _.memoize((memberProto, methodName) => {
+				for (let currentProto of getPrototypeChain(object)) {
+					if (_.has(currentProto, methodName)) {
+						return false;
+					}
+					if (currentProto === memberProto) {
+						break;
+					}
+				}
+				return true;
+			}, (memberProto, methodName) => methodName);
+			__cachedShouldMakeMethod.set(objectProto, protoCache);
+		}
+		return protoCache(memberProto, methodName);
+	};
+}
 
 _.extend(BasicClass.prototype, {
 
@@ -105,52 +153,31 @@ _.extend(BasicClass.prototype, {
 	},
 
 	_createGettersAndSetters: function() {
-		this._memberVariableIterate(function(memberVariable, prototype, rootPrototype){
-			var name = memberVariable.name;
-
-			var prototypeProperyNames = Object.getOwnPropertyNames(prototype);
-			var rootPrototypePropertyNames = Object.getOwnPropertyNames(rootPrototype);
-
+		this._memberVariableIterate(function(memberVariable, prototype) {
 			if (memberVariable.get) {
-				this._makeGetterFunction(name, prototypeProperyNames, rootPrototypePropertyNames);
+				this._makeGetterFunction(memberVariable.name, prototype);
 			}
 
 			if (memberVariable.set) {
-				this._makeSetterFunction(name, prototypeProperyNames, rootPrototypePropertyNames);
+				this._makeSetterFunction(memberVariable.name, prototype);
 			}
 		});
 	},
 
-	_makeGetterFunction: function(name, prototypeProperyNames, rootPrototypePropertyNames) {
-		var getterName = this._getterName(name);
+	_makeGetterFunction: function(name, prototype) {
+		const getterName = _getterName(name);
 
-		if(prototypeProperyNames.indexOf(getterName) > -1 || rootPrototypePropertyNames.indexOf(getterName) > -1){
-			return;
+		if(_shouldMakeMethod(this, prototype, getterName)) {
+			this[getterName] = _makeGetter(name);
 		}
-
-		this[getterName] = function() {
-			return this[name];
-		};
 	},
 
-	_getterName: function(variableName) {
-		return 'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2);
-	},
+	_makeSetterFunction: function(name, prototype) {
+		const setterName = _setterName(name);
 
-	_makeSetterFunction: function(name, prototypeProperyNames, rootPrototypePropertyNames) {
-		var setterName = this._setterName(name);
-
-		if(prototypeProperyNames.indexOf(setterName) > -1 || rootPrototypePropertyNames.indexOf(setterName) > -1){
-			return;
+		if(_shouldMakeMethod(this, prototype, setterName)) {
+			this[setterName] = _makeSetter(name);
 		}
-
-		this[setterName] = function(value) {
-			this[name] = value;
-		};
-	},
-
-	_setterName: function(variableName) {
-		return 'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2);
 	},
 
 	_initializeDefaultValues: function() {
@@ -162,17 +189,11 @@ _.extend(BasicClass.prototype, {
 	},
 
 	_memberVariableIterate: function(iterateFunction){
-		var object = this;
-		var proto;
-
-		var rootPrototype = Object.getPrototypeOf(this);
-
-		while ((proto = Object.getPrototypeOf(object))) {
-			object = proto;
-			if (object.__memberVariables) {
-				for (var i = 0; i < object.__memberVariables.length; i++) {
-					var memberVariable = object.__memberVariables[i];
-					iterateFunction.call(this, memberVariable, proto, rootPrototype);
+		for (let proto of getPrototypeChain(this)) {
+			if (proto.__memberVariables) {
+				for (var i = 0; i < proto.__memberVariables.length; i++) {
+					var memberVariable = proto.__memberVariables[i];
+					iterateFunction.call(this, memberVariable, proto);
 				}
 			}
 		}
