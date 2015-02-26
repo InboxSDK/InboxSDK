@@ -198,7 +198,8 @@ _.extend(BasicClass.prototype, {
 	},
 
 	_memberVariableIterate: function(iterateFunction){
-		for (let proto of getPrototypeChain(this)) {
+		let proto = this;
+		while ((proto = Object.getPrototypeOf(proto))) {
 			if (proto.__memberVariables) {
 				for (var i = 0; i < proto.__memberVariables.length; i++) {
 					var memberVariable = proto.__memberVariables[i];
