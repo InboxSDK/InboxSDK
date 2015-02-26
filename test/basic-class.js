@@ -184,32 +184,50 @@ describe('BasicClass', function() {
     });
 
     it('works with inheritance', function() {
-      class TestParent extends BasicClass {}
+      class TestParent extends BasicClass {
+        getC() {
+          return 300;
+        }
+      }
       TestParent.prototype.__memberVariables = [
         {name: '_pa', destroy: false, set: true},
-        {name: '_pb', destroy: false, get: true}
+        {name: '_pb', destroy: false, get: true},
+        {name: '_c', destroy: false, get: false},
+        {name: '_d', destroy: false, get: true}
       ];
 
-      class TestChild extends TestParent {}
+      class TestChild extends TestParent {
+        getD() {
+          return 4000;
+        }
+      }
       TestChild.prototype.__memberVariables = [
         {name: '_ca', destroy: false, set: true},
-        {name: '_cb', destroy: false, get: true}
+        {name: '_cb', destroy: false, get: true},
+        {name: '_c', destroy: false, get: true},
+        {name: '_d', destroy: false, get: false}
       ];
 
       const test = new TestChild();
       assert.strictEqual(test.getPa, undefined);
       assert.strictEqual(test.getCa, undefined);
       test.setPa(100);
-      test.setCa(200);
+      test.setCa(1000);
       assert.strictEqual(test._pa, 100);
-      assert.strictEqual(test._ca, 200);
+      assert.strictEqual(test._ca, 1000);
 
       assert.strictEqual(test.setPb, undefined);
       assert.strictEqual(test.setCb, undefined);
-      test._pb = 1000;
+      test._pb = 200;
       test._cb = 2000;
-      assert.strictEqual(test.getPb(), 1000);
+      assert.strictEqual(test.getPb(), 200);
       assert.strictEqual(test.getCb(), 2000);
+
+      test._c = 3000;
+      assert.strictEqual(test.getC(), 3000);
+
+      test._d = 400;
+      assert.strictEqual(test.getD(), 4000);
     });
   });
 });
