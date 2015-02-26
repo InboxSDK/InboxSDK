@@ -54,15 +54,15 @@ class Logger {
   }
 
   static error(err, details) {
-    _sendError(err, details, null, false);
+    _logError(err, details, null, false);
   }
 
   error(err, details) {
-    _sendError(err, details, this._appId, false);
+    _logError(err, details, this._appId, false);
   }
 
   errorApp(err, details) {
-    _sendError(err, details, this._appId, true);
+    _logError(err, details, this._appId, true);
   }
 
   // Should only be used by the InboxSDK users for their own app events.
@@ -262,7 +262,7 @@ function getAppIdsProperty(causedByAppId) {
 }
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
-function _sendError(err, details, appId, sentByApp) {
+function _logError(err, details, appId, sentByApp) {
   if (!global.document) {
     // In tests, just throw the error.
     throw err;
@@ -326,6 +326,16 @@ function _sendError(err, details, appId, sentByApp) {
       timestamp: Date.now()*1000
     };
 
+    _sendError(report);
+  } catch(err2) {
+    tooManyErrors(err2, args);
+  }
+}
+
+const _sendError = _.throttle(report => {
+  const args = arguments;
+
+  try {
     ajax({
       url: 'https://www.inboxsdk.com/api/v2/errors',
       method: 'POST',
@@ -339,7 +349,7 @@ function _sendError(err, details, appId, sentByApp) {
   } catch(err2) {
     tooManyErrors(err2, args);
   }
-}
+}, 1000);
 
 function makeLoggedFunction(func, name) {
   const msg = name ? "Uncaught error in "+name : "Uncaught error";
