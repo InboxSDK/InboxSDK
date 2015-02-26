@@ -208,26 +208,30 @@ describe('BasicClass', function() {
         {name: '_d', destroy: false, get: false}
       ];
 
-      const test = new TestChild();
-      assert.strictEqual(test.getPa, undefined);
-      assert.strictEqual(test.getCa, undefined);
-      test.setPa(100);
-      test.setCa(1000);
-      assert.strictEqual(test._pa, 100);
-      assert.strictEqual(test._ca, 1000);
+      class TestChildChild extends TestChild {}
+      TestChildChild.prototype.__memberVariables = [];
 
-      assert.strictEqual(test.setPb, undefined);
-      assert.strictEqual(test.setCb, undefined);
-      test._pb = 200;
-      test._cb = 2000;
-      assert.strictEqual(test.getPb(), 200);
-      assert.strictEqual(test.getCb(), 2000);
+      for (let test of [new TestChild(), new TestChildChild()]) {
+        assert.strictEqual(test.getPa, undefined);
+        assert.strictEqual(test.getCa, undefined);
+        test.setPa(100);
+        test.setCa(1000);
+        assert.strictEqual(test._pa, 100);
+        assert.strictEqual(test._ca, 1000);
 
-      test._c = 3000;
-      assert.strictEqual(test.getC(), 3000);
+        assert.strictEqual(test.setPb, undefined);
+        assert.strictEqual(test.setCb, undefined);
+        test._pb = 200;
+        test._cb = 2000;
+        assert.strictEqual(test.getPb(), 200);
+        assert.strictEqual(test.getCb(), 2000);
 
-      test._d = 400;
-      assert.strictEqual(test.getD(), 4000);
+        test._c = 3000;
+        assert.strictEqual(test.getC(), 3000);
+
+        test._d = 400;
+        assert.strictEqual(test.getD(), 4000);
+      }
     });
   });
 });
