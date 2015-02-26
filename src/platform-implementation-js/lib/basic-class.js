@@ -12,40 +12,40 @@ import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';
 
 const BasicClass = function() {
-	_validateMemberVariables(this);
-	this._nullifyMemberVariables();
-	this._createGettersAndSetters();
-	this._initializeDefaultValues();
+	validateMemberVariables(this);
+	nullifyMemberVariables(this);
+	createGettersAndSetters(this);
+	initializeDefaultValues(this);
 };
 
-const _getterName = _.memoize(variableName =>
+const getGetterName = _.memoize(variableName =>
 	'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
 );
 
-const _setterName = _.memoize(variableName =>
+const getSetterName = _.memoize(variableName =>
 	'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
 );
 
-const _makeGetter = _.memoize(variableName =>
+const makeGetter = _.memoize(variableName =>
 	function() {
 		return this[variableName];
 	}
 );
 
-const _makeSetter = _.memoize(variableName =>
+const makeSetter = _.memoize(variableName =>
 	function(x) {
 		this[variableName] = x;
 	}
 );
 
-let _shouldMakeMethod;
+let shouldMakeMethod;
 {
 	const __cachedShouldMakeMethod = new WeakMap();
 
 	// Follow the Object's prototype chain until memberProto is hit to see if
 	// any of them already have a methodName method. Caches based on the object
 	// parameter's prototype and on the methodName.
-	_shouldMakeMethod = (object, memberProto, methodName) => {
+	shouldMakeMethod = (object, memberProto, methodName) => {
 		const objectProto = Object.getPrototypeOf(object);
 		let protoCache = __cachedShouldMakeMethod.get(objectProto);
 		if (!protoCache) {
@@ -66,14 +66,14 @@ let _shouldMakeMethod;
 	};
 }
 
-let _validateMemberVariables;
+let validateMemberVariables;
 {
 	const validatedPrototypes = new WeakSet();
 
-	_validateMemberVariables = (object) => {
+	validateMemberVariables = (object) => {
 		const proto = Object.getPrototypeOf(object);
 		if (!validatedPrototypes.has(proto)) {
-			object._memberVariableIterate(memberVariable => {
+			memberVariableIterate(object, memberVariable => {
 				if (memberVariable.name === undefined) {
 					throw new Error('name is a required parameter to memberVariables');
 				}
@@ -93,124 +93,124 @@ let _validateMemberVariables;
 	};
 }
 
-_.extend(BasicClass.prototype, {
+function nullifyMemberVariables(object, doDestroy) {
+	memberVariableIterate(object, function(memberVariable) {
+		nullifyMemberVariable.call(this, memberVariable, doDestroy && memberVariable.destroy);
+	});
+}
 
-	__memberVariables: [],
-
-	_nullifyMemberVariables: function(doDestroy) {
-		this._memberVariableIterate(function(memberVariable){
-			this._nullifyMemberVariable(memberVariable, doDestroy && memberVariable.destroy);
-		});
-	},
-
-	_nullifyMemberVariable: function(memberVariable, doDestroy) {
-		if (!doDestroy) {
-			this[memberVariable.name] = null;
-			return;
-		}
-
-		var value = this[memberVariable.name];
+function nullifyMemberVariable(memberVariable, doDestroy) {
+	if (!doDestroy) {
 		this[memberVariable.name] = null;
+		return;
+	}
 
-		if (!value) {
+	var value = this[memberVariable.name];
+	this[memberVariable.name] = null;
+
+	if (!value) {
+		return;
+	}
+
+	if(memberVariable.destroyFunction){
+		if(_.isFunction(value[memberVariable.destroyFunction])){
+			value[memberVariable.destroyFunction]();
 			return;
 		}
+	}
 
-		if(memberVariable.destroyFunction){
-			if(_.isFunction(value[memberVariable.destroyFunction])){
-				value[memberVariable.destroyFunction]();
-				return;
+	if (_.isArray(value)) {
+		var valueClone = _.clone(value);
+		for (var c = 0; c < valueClone.length; c++) {
+			if(!valueClone[c]){
+				continue;
+			}
+
+			if (valueClone[c].destroy) {
+				valueClone[c].destroy();
+			}
+			else if(valueClone[c].remove){
+				valueClone[c].remove();
 			}
 		}
-
-		if (_.isArray(value)) {
-			var valueClone = _.clone(value);
-			for (var c = 0; c < valueClone.length; c++) {
-				if(!valueClone[c]){
-					continue;
-				}
-
-				if (valueClone[c].destroy) {
-					valueClone[c].destroy();
-				}
-				else if(valueClone[c].remove){
-					valueClone[c].remove();
-				}
-			}
-			value.length = 0;
-		} else if (value.destroy) {
-			value.destroy();
-		} else if(value.remove){
-			value.remove();
-		} else if (_.isObject(value)) {
-			for (var key in value) {
-				if(value[key]){
-					if (value[key].destroy) {
-						value[key].destroy();
-					} else if (value[key].remove) {
-						try{
-							value[key].remove();
-						}
-						catch(err){
-						}
+		value.length = 0;
+	} else if (value.destroy) {
+		value.destroy();
+	} else if(value.remove){
+		value.remove();
+	} else if (_.isObject(value)) {
+		for (var key in value) {
+			if(value[key]){
+				if (value[key].destroy) {
+					value[key].destroy();
+				} else if (value[key].remove) {
+					try{
+						value[key].remove();
+					}
+					catch(err){
 					}
 				}
 			}
-		} else if (_.isFunction(value)){
-			value();
 		}
-	},
+	} else if (_.isFunction(value)){
+		value();
+	}
+}
 
-	_createGettersAndSetters: function() {
-		this._memberVariableIterate(function(memberVariable, prototype) {
-			if (memberVariable.get) {
-				this._makeGetterFunction(memberVariable.name, prototype);
-			}
-
-			if (memberVariable.set) {
-				this._makeSetterFunction(memberVariable.name, prototype);
-			}
-		});
-	},
-
-	_makeGetterFunction: function(name, prototype) {
-		const getterName = _getterName(name);
-
-		if(_shouldMakeMethod(this, prototype, getterName)) {
-			this[getterName] = _makeGetter(name);
+function createGettersAndSetters(object, memberVariable, prototype) {
+	memberVariableIterate(object, function(memberVariable, prototype) {
+		if (memberVariable.get) {
+			makeGetterFunction(this, memberVariable.name, prototype);
 		}
-	},
 
-	_makeSetterFunction: function(name, prototype) {
-		const setterName = _setterName(name);
-
-		if(_shouldMakeMethod(this, prototype, setterName)) {
-			this[setterName] = _makeSetter(name);
+		if (memberVariable.set) {
+			makeSetterFunction(this, memberVariable.name, prototype);
 		}
-	},
+	});
+}
 
-	_initializeDefaultValues: function() {
-		this._memberVariableIterate(function(memberVariable){
-			if (memberVariable.defaultValue !== undefined) {
-				this[memberVariable.name] = _.clone(memberVariable.defaultValue);
-			}
-		});
-	},
+function initializeDefaultValues(object) {
+	memberVariableIterate(object, function(memberVariable){
+		if (memberVariable.defaultValue !== undefined) {
+			this[memberVariable.name] = _.clone(memberVariable.defaultValue);
+		}
+	});
+}
 
-	_memberVariableIterate: function(iterateFunction){
-		let proto = this;
-		while ((proto = Object.getPrototypeOf(proto))) {
-			if (proto.__memberVariables) {
-				for (var i = 0; i < proto.__memberVariables.length; i++) {
-					var memberVariable = proto.__memberVariables[i];
-					iterateFunction.call(this, memberVariable, proto);
-				}
+function memberVariableIterate(object, iterateFunction) {
+	let proto = object;
+	while ((proto = Object.getPrototypeOf(proto))) {
+		if (proto.__memberVariables) {
+			for (var i = 0; i < proto.__memberVariables.length; i++) {
+				var memberVariable = proto.__memberVariables[i];
+				iterateFunction.call(object, memberVariable, proto);
 			}
 		}
-	},
+	}
+}
+
+function makeGetterFunction(object, name, prototype) {
+	const getterName = getGetterName(name);
+
+	if(shouldMakeMethod(object, prototype, getterName)) {
+		object[getterName] = makeGetter(name);
+	}
+}
+
+function makeSetterFunction(object, name, prototype) {
+	const setterName = getSetterName(name);
+
+	if(shouldMakeMethod(object, prototype, setterName)) {
+		object[setterName] = makeSetter(name);
+	}
+}
+
+_.extend(BasicClass.prototype, {
+
+	//__memberVariables: [],
 
 	destroy: function() {
-		this._nullifyMemberVariables(true);
+		nullifyMemberVariables(this, true);
 	}
 });
 
