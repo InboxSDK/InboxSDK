@@ -4511,6 +4511,17 @@
       "from": "rsvp@3.0.14",
       "resolved": "https://registry.npmjs.org/rsvp/-/rsvp-3.0.14.tgz"
     },
+    "safari-fix-map": {
+      "version": "1.0.0",
+      "from": "safari-fix-map@*",
+      "dependencies": {
+        "core-js": {
+          "version": "0.6.1",
+          "from": "core-js@>=0.6.1 <0.7.0",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-0.6.1.tgz"
+        }
+      }
+    },
     "semver": {
       "version": "4.3.1",
       "from": "semver@>=4.2.0 <5.0.0",
