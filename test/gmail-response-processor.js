@@ -36,6 +36,17 @@ describe('GmailResponseProcessor', function(){
       assert.deepEqual(redecoded, data.output, 're-deserialize test');
     });
 
+    it('thread list search response', function() {
+      const data = require('./data/gmail-response-processor/search-response.json');
+
+      const decoded = GmailResponseProcessor.deserialize(data.input);
+      assert.deepEqual(decoded, data.output, 'deserialize test');
+
+      const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
+      const redecoded = GmailResponseProcessor.deserialize(reencoded);
+      assert.deepEqual(redecoded, data.output, 're-deserialize test');
+    });
+
     it('suggestions', function() {
       const data = require('./data/gmail-response-processor/suggestions.json');
 
