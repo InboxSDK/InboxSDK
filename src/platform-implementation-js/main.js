@@ -1,4 +1,6 @@
 if (!global.__InboxSDKImpLoader) {
+  require('safari-fix-map');
+
   global.__InboxSDKImpLoader = {
     load: function(version, appId, opts) {
       if (version !== "0.1") {
