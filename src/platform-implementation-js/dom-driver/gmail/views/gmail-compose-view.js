@@ -78,6 +78,7 @@ _.extend(GmailComposeView.prototype, {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
+		this._eventStream.plug(require('./gmail-compose-view/get-minimize-restore-stream')(this));
 	},
 
 	_setupConsistencyCheckers: function(){
@@ -283,6 +284,13 @@ _.extend(GmailComposeView.prototype, {
 
 	ensureGroupingIsOpen: function(type){
 		require('./gmail-compose-view/ensure-grouping-is-open')(this._element, type);
+	},
+
+	minimize: function(){
+		let minimizeButton = this._element.querySelector('.Hm > img');
+		if(minimizeButton){
+			simulateClick(minimizeButton);
+		}
 	},
 
 	destroy: function(){

@@ -30,6 +30,7 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	this._logger.setUserEmailAddress(this.getUserEmailAddress());
 
 	require('./gmail-driver/gmail-load-event')(this);
+	require('./gmail-driver/maintain-compose-window-state')(this);
 };
 
 GmailDriver.prototype = Object.create(Driver.prototype);
