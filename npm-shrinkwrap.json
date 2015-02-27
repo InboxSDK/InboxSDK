@@ -2316,6 +2316,11 @@
         }
       }
     },
+    "co": {
+      "version": "4.4.0",
+      "from": "co@*",
+      "resolved": "https://registry.npmjs.org/co/-/co-4.4.0.tgz"
+    },
     "combokeys-capture": {
       "version": "2.4.2",
       "from": "https://registry.npmjs.org/combokeys-capture/-/combokeys-capture-2.4.2.tgz",

@@ -18,6 +18,7 @@
     "baconjs": "0.7.50",
     "brfs": "^1.4.0",
     "browserify": "^9.0.3",
+    "co": "^4.4.0",
     "combokeys-capture": "^2.4.2",
     "entities": "1.1.1",
     "envify": "^3.2.0",
