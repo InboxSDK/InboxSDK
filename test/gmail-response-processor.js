@@ -44,8 +44,7 @@ describe('GmailResponseProcessor', function(){
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
       const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
-      const redecoded = GmailResponseProcessor.deserialize(reencoded);
-      assert.deepEqual(redecoded, data.output, 're-deserialize test');
+      assert.strictEqual(reencoded, data.input);
     });
 
     it('suggestions', function() {
