@@ -148,10 +148,6 @@ export function deserialize(threadResponseString) {
 }
 
 export function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
-  if(!threadResponseArray){
-    return '';
-  }
-
   var response = ")]}'\n\n";
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arraySection = threadResponseArray[ii];
@@ -220,8 +216,20 @@ export function serializeArray(array) {
   return response;
 }
 
-export function extractThreads(crapFormatThreadString) {
-  var crapFormatThreads = deserialize(crapFormatThreadString);
+export function replaceThreadsInResponse(response, replacementThreads) {
+  const parsed = deserialize(response);
+  const firstTbIndex = _.findIndex(parsed, item => item[0][0] === 'tb');
+  const parsedNoTb = parsed.filter(item => item[0][0] !== 'tb');
+  const parsedNew = _.flatten([
+    parsedNoTb.slice(0, firstTbIndex),
+    _threadsToTbStructure(replacementThreads),
+    parsedNoTb.slice(firstTbIndex)
+  ]);
+  return threadListSerialize(parsedNew);
+}
+
+export function extractThreads(response) {
+  const crapFormatThreads = deserialize(response);
   return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread =>
     Object.freeze(Object.defineProperty({
       subject: htmlToText(thread[9]),
@@ -247,27 +255,19 @@ export function cleanupPeopleLine(peopleHtml) {
 }
 
 function _extractThreadArraysFromResponseArray(threadResponseArray){
-  var threads = [];
-  for(var ii=0; ii<threadResponseArray.length; ii++){
-    var arrayElement = threadResponseArray[ii];
-    if(_isThreadArray(arrayElement)) {
-      threads.push(arrayElement);
-    } else if(_.isArray(arrayElement)) {
-      var newThreadArray = _extractThreadArraysFromResponseArray(arrayElement);
-      if (newThreadArray.length) {
-        threads = threads.concat(newThreadArray);
-      }
-    }
-  }
-
-  return threads;
+  return _.chain(threadResponseArray)
+    .filter(item => item[0][0] === 'tb')
+    .map(item => item[0][2])
+    .flatten()
+    .value();
 }
 
-function _isThreadArray(array){
-  return _.isArray(array) && array.length >= 30 &&
-    _.isString(array[0]) && array[0].length === 16 &&
-    _.isString(array[1]) && array[1].length === 16 &&
-    _.isString(array[2]) && array[2].length === 16;
+function _threadsToTbStructure(threads) {
+  return _.chain(threads)
+    .map(thread => thread._originalGmailFormat)
+    .chunk(10)
+    .map((threadsChunk, i) => [['tb', i*10, threadsChunk]])
+    .value();
 }
 
 function _doesResponseUseFormatWithSectionNumbers(responseString){

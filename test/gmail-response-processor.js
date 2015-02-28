@@ -37,16 +37,6 @@ describe('GmailResponseProcessor', function(){
       assert.deepEqual(redecoded, data.output, 're-deserialize test');
     });
 
-    it('thread list search response', function() {
-      const data = require('./data/gmail-response-processor/search-response.json');
-
-      const decoded = GmailResponseProcessor.extractThreads(data.input);
-      assert.deepEqual(decoded, data.output, 'deserialize test');
-
-      //const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
-      //assert.strictEqual(reencoded, data.input);
-    });
-
     it('suggestions', function() {
       const data = require('./data/gmail-response-processor/suggestions.json');
 
@@ -55,6 +45,31 @@ describe('GmailResponseProcessor', function(){
 
       const reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
       assert.strictEqual(reencoded, data.input, 'serialize test');
+    });
+  });
+
+  describe('extractThreads', function() {
+    it('works', function() {
+      const data = require('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert.deepEqual(threads, data.output, 'deserialize test');
+    });
+  });
+
+  describe('replaceThreadsInResponse', function() {
+    it('seems to work', function() {
+      const data = require('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // swap two threads
+      threads.push(threads.shift());
+      assert.notEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // put them back
+      threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
     });
   });
 
