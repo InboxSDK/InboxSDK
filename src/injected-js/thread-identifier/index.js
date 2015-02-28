@@ -1,9 +1,7 @@
 var _ = require('lodash');
 var GmailResponseProcessor = require('../../platform-implementation-js/dom-driver/gmail/gmail-response-processor');
-var htmlToText = require('../../common/html-to-text');
 var deparam = require('querystring').parse;
 var threadRowParser = require('./thread-row-parser');
-var cleanupPeopleLine = require('./cleanup-people-line');
 var clickAndGetPopupUrl = require('./click-and-get-popup-url');
 var Marker = require('../../common/marker');
 
@@ -21,7 +19,7 @@ exports.setup = setup;
 
 function processThreadListResponse(threadListResponse) {
   GmailResponseProcessor.extractThreads(threadListResponse).forEach(function(thread) {
-    storeThreadMetadata(convertToThreadMetadata(thread));
+    storeThreadMetadata(thread);
   });
 }
 exports.processThreadListResponse = processThreadListResponse;
@@ -41,24 +39,6 @@ function storeThreadMetadata(threadMetadata) {
 
 function threadMetadataKey(threadMetadata) {
   return threadMetadata.subject.trim()+':'+threadMetadata.timeString.trim()+':'+threadMetadata.peopleHtml.trim();
-}
-
-function convertToThreadMetadata(thread) {
-  var threadMetadata = {
-    // subjectHtml: thread[9],
-    subject: htmlToText(thread[9]),
-    // shortDate: htmlToText(thread[14]),
-    timeString: htmlToText(thread[15]),
-    peopleHtml: cleanupPeopleLine(thread[7]),
-    // timestamp: thread[16] / 1000,
-    // isUnread: thread[9].indexOf('<b>') > -1,
-    // lastEmailAddress: thread[28],
-    // someMessageIds: [thread[1], thread[2]],
-    // bodyHtml: thread[10],
-    gmailThreadId: thread[0]
-  };
-
-  return threadMetadata;
 }
 
 function processPreloadedThreads() {

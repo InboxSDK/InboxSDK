@@ -1,12 +1,7 @@
-var _ = require('lodash');
+import _ from 'lodash';
+import htmlToText from '../../../common/html-to-text';
 
-function extractThreads(crapFormatThreadString) {
-  var crapFormatThreads = deserialize(crapFormatThreadString);
-  return _extractThreadArraysFromResponseArray(crapFormatThreads);
-}
-exports.extractThreads = extractThreads;
-
-function interpretSentEmailResponse(responseString) {
+export function interpretSentEmailResponse(responseString) {
   var emailSentArray = deserialize(responseString);
 
   var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
@@ -16,9 +11,8 @@ function interpretSentEmailResponse(responseString) {
     gmailMessageId: gmailMessageId
   };
 }
-exports.interpretSentEmailResponse = interpretSentEmailResponse;
 
-function extractGmailMessageIdFromSentEmail(emailSentArray) {
+export function extractGmailMessageIdFromSentEmail(emailSentArray) {
   var messageIdArrayMarker = "a";
   var messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, function(markerArray) {
     return markerArray.length > 3 && _.isArray(markerArray[3]) && markerArray[3].length > 0;
@@ -30,9 +24,8 @@ function extractGmailMessageIdFromSentEmail(emailSentArray) {
 
   return messageIdArray[3][0];
 }
-exports.extractGmailMessageIdFromSentEmail = extractGmailMessageIdFromSentEmail;
 
-function extractGmailThreadIdFromSentEmail(emailSentArray) {
+export function extractGmailThreadIdFromSentEmail(emailSentArray) {
   var threadIdArrayMarker = "csd";
   var threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
     return markerArray.length == 3 && _.isArray(markerArray[2]) && markerArray[2].length > 5;
@@ -44,9 +37,9 @@ function extractGmailThreadIdFromSentEmail(emailSentArray) {
 
   return threadIdArray[1];
 }
-exports.extractGmailThreadIdFromSentEmail = extractGmailThreadIdFromSentEmail;
 
-function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
+// TODO what is this for?
+/*export*/ function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
   if(!responseString){
     return null;
   }
@@ -63,9 +56,8 @@ function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
 
   return threadIdArray[1];
 }
-exports.extractHexGmailThreadIdFromMessageIdSearch = extractHexGmailThreadIdFromMessageIdSearch;
 
-function rewriteSingleQuotes(s) {
+export function rewriteSingleQuotes(s) {
   // The input string contains unquoted, double-quoted, and single-quoted
   // parts. Parse the string for these parts, and transform the single-
   // quoted part into a double-quoted part by swapping the quotes, and
@@ -116,9 +108,8 @@ function rewriteSingleQuotes(s) {
   }
   return result;
 }
-exports.rewriteSingleQuotes = rewriteSingleQuotes;
 
-function deserialize(threadResponseString) {
+export function deserialize(threadResponseString) {
   var VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
@@ -155,9 +146,8 @@ function deserialize(threadResponseString) {
 
   return vData;
 }
-exports.deserialize = deserialize;
 
-function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
+export function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
   if(!threadResponseArray){
     return '';
   }
@@ -185,9 +175,8 @@ function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
 
   return response;
 }
-exports.threadListSerialize = threadListSerialize;
 
-function suggestionSerialize(suggestionsArray) {
+export function suggestionSerialize(suggestionsArray) {
   var response = "5\n)]}'\n";
   for(var ii=0; ii<suggestionsArray.length; ii++){
     var arraySection = suggestionsArray[ii];
@@ -199,10 +188,8 @@ function suggestionSerialize(suggestionsArray) {
 
   return response;
 }
-exports.suggestionSerialize = suggestionSerialize;
 
-
-function serializeArray(array) {
+export function serializeArray(array) {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
@@ -232,7 +219,32 @@ function serializeArray(array) {
 
   return response;
 }
-exports.serializeArray = serializeArray;
+
+// TODO unit test
+export function extractThreads(crapFormatThreadString) {
+  var crapFormatThreads = deserialize(crapFormatThreadString);
+  return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread => ({
+    subjectHtml: thread[9],
+    subject: htmlToText(thread[9]),
+    shortDate: htmlToText(thread[14]),
+    timeString: htmlToText(thread[15]),
+    peopleHtml: cleanupPeopleLine(thread[7]),
+    timestamp: thread[16] / 1000,
+    isUnread: thread[9].indexOf('<b>') > -1,
+    lastEmailAddress: thread[28],
+    bodyHtml: thread[10],
+    someGmailMessageIds: [thread[1], thread[2]],
+    gmailThreadId: thread[0]
+  }));
+}
+
+export function cleanupPeopleLine(peopleHtml) {
+  // Removes possible headings like "To: " that get added on the Sent page, and
+  // removes a class that's specific to the current preview pane setting.
+  return peopleHtml
+    .replace(/^[^<]*/, '')
+    .replace(/(<span[^>]*) class="[^"]*"/g, '$1');
+}
 
 function _extractThreadArraysFromResponseArray(threadResponseArray){
   var threads = [];
