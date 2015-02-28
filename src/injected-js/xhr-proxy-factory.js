@@ -385,6 +385,11 @@ module.exports = function(XHR, wrappers, opts) {
   };
 
   XHRProxy.prototype.open = function(method, url, async) {
+    // Work around MailTrack issue
+    if (!(this instanceof XHRProxy)) {
+      return XHR.prototype.open.apply(this, arguments);
+    }
+
     var self = this;
     this._connection = {
       method: method,
