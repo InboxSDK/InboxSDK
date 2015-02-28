@@ -27,14 +27,11 @@ function _setupManagement(gmailDriver){
 								.filter(({eventName}) => eventName === 'restored')
 								.map(() => gmailComposeView)
 				)
-				.log('flatMap')
 				.filterBy(
 					kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
 								.flatMapLatest(() => Kefir.constant(true).merge(Kefir.later(250, false)))
 								.toProperty(false)
-								.log('skipWhileBy')
 				)
-				.log('before onValue')
 				.onValue(gmailComposeView => gmailComposeView.minimize());
 
 }
