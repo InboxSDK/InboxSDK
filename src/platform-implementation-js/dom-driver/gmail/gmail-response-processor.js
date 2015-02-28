@@ -224,7 +224,6 @@ export function serializeArray(array) {
 export function extractThreads(crapFormatThreadString) {
   var crapFormatThreads = deserialize(crapFormatThreadString);
   return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread => ({
-    subjectHtml: thread[9],
     subject: htmlToText(thread[9]),
     shortDate: htmlToText(thread[14]),
     timeString: htmlToText(thread[15]),
@@ -232,7 +231,7 @@ export function extractThreads(crapFormatThreadString) {
     timestamp: thread[16] / 1000,
     isUnread: thread[9].indexOf('<b>') > -1,
     lastEmailAddress: thread[28],
-    bodyHtml: thread[10],
+    bodyPreviewHtml: thread[10],
     someGmailMessageIds: [thread[1], thread[2]],
     gmailThreadId: thread[0]
   }));
