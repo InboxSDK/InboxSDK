@@ -220,21 +220,22 @@ export function serializeArray(array) {
   return response;
 }
 
-// TODO unit test
 export function extractThreads(crapFormatThreadString) {
   var crapFormatThreads = deserialize(crapFormatThreadString);
-  return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread => ({
-    subject: htmlToText(thread[9]),
-    shortDate: htmlToText(thread[14]),
-    timeString: htmlToText(thread[15]),
-    peopleHtml: cleanupPeopleLine(thread[7]),
-    timestamp: thread[16] / 1000,
-    isUnread: thread[9].indexOf('<b>') > -1,
-    lastEmailAddress: thread[28],
-    bodyPreviewHtml: thread[10],
-    someGmailMessageIds: [thread[1], thread[2]],
-    gmailThreadId: thread[0]
-  }));
+  return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread =>
+    Object.freeze(Object.defineProperty({
+      subject: htmlToText(thread[9]),
+      shortDate: htmlToText(thread[14]),
+      timeString: htmlToText(thread[15]),
+      peopleHtml: cleanupPeopleLine(thread[7]),
+      timestamp: thread[16] / 1000,
+      isUnread: thread[9].indexOf('<b>') > -1,
+      lastEmailAddress: thread[28],
+      bodyPreviewHtml: thread[10],
+      someGmailMessageIds: [thread[1], thread[2]],
+      gmailThreadId: thread[0]
+    }, '_originalGmailFormat', {value: thread}))
+  );
 }
 
 export function cleanupPeopleLine(peopleHtml) {
