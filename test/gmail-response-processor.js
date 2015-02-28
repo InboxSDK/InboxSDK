@@ -40,11 +40,11 @@ describe('GmailResponseProcessor', function(){
     it('thread list search response', function() {
       const data = require('./data/gmail-response-processor/search-response.json');
 
-      const decoded = GmailResponseProcessor.deserialize(data.input);
+      const decoded = GmailResponseProcessor.extractThreads(data.input);
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
-      const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
-      assert.strictEqual(reencoded, data.input);
+      //const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
+      //assert.strictEqual(reencoded, data.input);
     });
 
     it('suggestions', function() {
