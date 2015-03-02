@@ -63,15 +63,6 @@ _.extend(Search.prototype,  /** @lends Search */{
 		members.driver.registerSearchQueryRewriter(rewriter);
 	},
 
-	/* Proposed. Probably would have to return promises.
-	generateSearchQueryForMessagesByThreadID: function(ids) {
-
-	},
-
-	generateSearchQueryForMessagesByID: function(ids) {
-
-	},*/
-
 	/**
 	* A convenience function that generates a search query for threads matching RFC2822 Message-Id headers.
 	* This is typically used when you want to specifically show messages with a given ID
