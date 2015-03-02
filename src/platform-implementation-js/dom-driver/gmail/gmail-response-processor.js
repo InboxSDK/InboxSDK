@@ -256,8 +256,9 @@ export function cleanupPeopleLine(peopleHtml) {
 
 function _extractThreadArraysFromResponseArray(threadResponseArray){
   return _.chain(threadResponseArray)
-    .filter(item => item[0][0] === 'tb')
-    .map(item => item[0][2])
+    .flatten()
+    .filter(item => item[0] === 'tb')
+    .map(item => item[2])
     .flatten()
     .value();
 }
