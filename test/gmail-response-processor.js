@@ -58,6 +58,8 @@ describe('GmailResponseProcessor', function(){
 
   describe('replaceThreadsInResponse', function() {
     it('seems to work', function() {
+      this.slow(80);
+
       const data = require('./data/gmail-response-processor/search-response.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
 
