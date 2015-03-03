@@ -76,6 +76,10 @@ _.extend(GmailDriver.prototype, {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	},
 
+	getRfcMessageIdsForGmailMessageIds(gmailMessageIds) {
+		return require('./gmail-driver/get-rfc-message-ids-for-gmail-message-ids')(this, gmailMessageIds);
+	},
+
 	addToolbarButtonForApp: function(buttonDescriptor){
 		return require('./gmail-driver/add-toolbar-button-for-app')(this, buttonDescriptor);
 	},

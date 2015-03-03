@@ -26,6 +26,8 @@ module.exports = function() {
   document.head.setAttribute('data-inboxsdk-user-language', userLanguage);
 
   if (global.GLOBALS) {
+    document.head.setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
+
     const globalSettings = _.find(GLOBALS[17], (item) => item[0] === 'p')[1];
     {
       const previewPaneLabEnabled = getSettingValue(globalSettings, 'bx_lab_1252');

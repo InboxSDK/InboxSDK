@@ -44,6 +44,8 @@ PageCommunicator.prototype = {
     return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
   }),
 
+  getIkValue: _.once(() => document.head.getAttribute('data-inboxsdk-ik-value')),
+
   isConversationViewDisabled() {
     return new RSVP.Promise((resolve, reject) => {
       Bacon.fromEventTarget(document, 'inboxSDKgmonkeyResponse')
