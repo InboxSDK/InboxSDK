@@ -287,7 +287,8 @@ function isFileEligbleForDocs(filename) {
   return  endsWith(filename, ".js") &&
           filename.indexOf('/src/') > -1 &&
           filename.indexOf('/dist/') == -1 &&
-          filename.indexOf('/dom-driver/') == -1;
+          filename.indexOf('/dom-driver/') == -1 &&
+          filename.indexOf('platform-implementation-js/lib') == -1;
 }
 
 function endsWith(str, suffix) {

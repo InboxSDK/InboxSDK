@@ -26,6 +26,11 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
     this._threadRowViewDriver.addLabel(labelDescriptor);
   },
 
+  /**
+   * Adds an image to the thread row view
+   * @param {ImageDescriptor} imageDescriptor - an options object for the image
+   * @return {void}
+   */
   addImage: function(imageDescriptor){
     this._threadRowViewDriver.addImage(imageDescriptor);
   },
@@ -171,6 +176,44 @@ var LabelDescriptor = /** @lends LabelDescriptor */{
 
 /**
 * @class
+* This type is used to describe images that you add to <code>ThreadRowView</code>
+*/
+var ImageDescriptor = /** @lends ImageDescriptor */{
+
+  /**
+  * URL for the image to show on the row. Should be a local extension file URL or a HTTPS URL.
+  * @type {string}
+  */
+  imageUrl:null,
+
+  /**
+  * A CSS class to apply to the image
+  * ^optional
+  * ^default=null
+  * @type {string}
+  */
+  imageClass: null,
+
+  /**
+  * The tooltip text to show when the user hovers over the image
+  * ^optional
+  * ^default=null
+  * @type {string}
+  */
+  tooltip:null,
+
+  /**
+	 * If multiple images from your app are added then they will be ordered by this value
+	 * ^optional
+	 * ^default=0
+	 * @type {number}
+	 */
+  orderHint:null
+};
+
+
+/**
+* @class
 * This type is used to describe a button you add to a <code>ThreadRowView</code>
 */
 var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
@@ -257,10 +300,6 @@ var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
   */
   tooltip:null
 };
-
-
-
-
 
 
 
