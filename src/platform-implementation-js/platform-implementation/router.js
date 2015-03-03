@@ -55,10 +55,9 @@ var Router = function(appId, driver, membraneMap){
 	this.RouteTypes = routeTypes;
 
 	members.listRouteHandlerRegistries = {};
-	var listRouteIDs = Object.getOwnPropertyNames(this.NativeListRouteIDs);
-	listRouteIDs.forEach(function(listRouteID){
-		members.listRouteHandlerRegistries[this.NativeListRouteIDs[listRouteID]] = new HandlerRegistry();
-	}.bind(this));
+	_.forOwn(this.NativeListRouteIDs, value => {
+		members.listRouteHandlerRegistries[value] = new HandlerRegistry();
+	});
 
 	driver.setNativeRouteIDs(this.NativeRouteIDs);
 	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
@@ -142,8 +141,6 @@ _.extend(Router.prototype, /** @lends Router */ {
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
 	},
 
-
-
 	getCurrentRouteView: function(){
 		var members = memberMap.get(this);
 
@@ -157,160 +154,108 @@ _.extend(Router.prototype, /** @lends Router */ {
 * @class
 * @name NativeRouteIDs
 */
-var nativeRouteIDs = {};
-Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
+var nativeRouteIDs = Object.freeze(/** @lends NativeRouteIDs */ {
 	/**
 	* inbox list
 	* @type string
 	*/
-	'INBOX': {
-		value: 'inbox/:page',
-		writable: false
-	},
+	'INBOX': 'inbox/:page',
 
 	/**
 	* all mail list
 	* @type string
 	*/
-	'ALL_MAIL': {
-		value: 'all/:page',
-		writable: false
-	},
+	'ALL_MAIL': 'all/:page',
 
 	/**
 	* sent list
 	* @type string
 	*/
-	'SENT': {
-		value: 'sent/:page',
-		writable: false
-	},
+	'SENT': 'sent/:page',
 
 	/**
 	* starred list
 	* @type string
 	*/
-	'STARRED': {
-		value: 'starred/:page',
-		writable: false
-	},
+	'STARRED': 'starred/:page',
 
 	/**
 	* drafts list
 	* @type string
 	*/
-	'DRAFTS': {
-		value: 'drafts/:page',
-		writable: false
-	},
+	'DRAFTS': 'drafts/:page',
 
 	/**
 	* any label list
 	* @type string
 	*/
-	'LABEL': {
-		value: 'label/:labelName/:page',
-		writable: false
-	},
+	'LABEL': 'label/:labelName/:page',
 
 	/**
 	* trash list
 	* @type string
 	*/
-	'TRASH': {
-		value: 'trash/:page',
-		writable: false
-	},
+	'TRASH': 'trash/:page',
 
 	/**
 	* spam list
 	* @type string
 	*/
-	'SPAM': {
-		value: 'spam/:page',
-		writable: false
-	},
+	'SPAM': 'spam/:page',
 
 	/**
 	* built in list of important emails
 	* @type string
 	*/
-	'IMPORTANT': {
-		value: 'imp/p:page',
-		writable: false
-	},
+	'IMPORTANT': 'imp/p:page',
 
 	/**
 	* any search results page
 	* @type string
 	*/
-	'SEARCH': {
-		value: 'search/:query/:page',
-		writable: false
-	},
+	'SEARCH': 'search/:query/:page',
 
 	/**
 	* single conversation view
 	* @type string
 	*/
-	'THREAD': {
-		value: 'inbox/:threadID',
-		writable: false
-	},
+	'THREAD': 'inbox/:threadID',
 
 	/**
 	* list of chats
 	* @type string
 	*/
-	'CHATS': {
-		value: 'chats/:page',
-		writable: false
-	},
+	'CHATS': 'chats/:page',
 
 	/**
 	* single chat view
 	* @type string
 	*/
-	'CHAT': {
-		value: 'chats/:chatID',
-		writable: false
-	},
+	'CHAT': 'chats/:chatID',
 
 	/**
 	* google contacts view
 	* @type string
 	*/
-	'CONTACTS': {
-		value: 'contacts/:page',
-		writable: false
-	},
+	'CONTACTS': 'contacts/:page',
 
 	/**
 	* single google contact view
 	* @type string
 	*/
-	'CONTACT': {
-		value: 'contacts/:contactID',
-		writable: false
-	},
+	'CONTACT': 'contacts/:contactID',
 
 	/**
 	* the settings view
 	* @type string
 	*/
-	'SETTINGS': {
-		value: 'settings/:section',
-		writable: false
-	},
+	'SETTINGS': 'settings/:section',
 
 	/**
 	* this refers to any of the above lists
 	* @type string
 	*/
-	'ANY_LIST': {
-		value: '*',
-		writable: false
-	}
+	'ANY_LIST': '*'
 });
 
 /**
@@ -318,106 +263,72 @@ Object.defineProperties(nativeRouteIDs, /** @lends NativeRouteIDs */ {
 * @class
 * @name NativeListRouteIDs
 */
-var nativeListRouteIDs = {};
-Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
+var nativeListRouteIDs = Object.freeze(/** @lends NativeListRouteIDs */ {
 	/**
 	* inbox list
 	* @type string
 	*/
-	'INBOX': {
-		value: nativeRouteIDs.INBOX,
-		writable: false
-	},
+	'INBOX': nativeRouteIDs.INBOX,
 
 	/**
 	* all mail list
 	* @type string
 	*/
-	'ALL_MAIL': {
-		value: nativeRouteIDs.ALL_MAIL,
-		writable: false
-	},
+	'ALL_MAIL': nativeRouteIDs.ALL_MAIL,
 
 	/**
 	* sent list
 	* @type string
 	*/
-	'SENT': {
-		value: nativeRouteIDs.SENT,
-		writable: false
-	},
+	'SENT': nativeRouteIDs.SENT,
 
 	/**
 	* starred list
 	* @type string
 	*/
-	'STARRED': {
-		value: nativeRouteIDs.STARRED,
-		writable: false
-	},
+	'STARRED': nativeRouteIDs.STARRED,
 
 	/**
 	* drafts list
 	* @type string
 	*/
-	'DRAFTS': {
-		value: nativeRouteIDs.DRAFTS,
-		writable: false
-	},
+	'DRAFTS': nativeRouteIDs.DRAFTS,
 
 	/**
 	* label list
 	* @type string
 	*/
-	'LABEL': {
-		value: nativeRouteIDs.LABEL,
-		writable: false
-	},
+	'LABEL': nativeRouteIDs.LABEL,
 
 	/**
 	* trash list
 	* @type string
 	*/
-	'TRASH': {
-		value: nativeRouteIDs.TRASH,
-		writable: false
-	},
+	'TRASH': nativeRouteIDs.TRASH,
 
 	/**
 	* spam list
 	* @type string
 	*/
-	'SPAM': {
-		value: nativeRouteIDs.SPAM,
-		writable: false
-	},
+	'SPAM': nativeRouteIDs.SPAM,
 
 	/**
 	* important list
 	* @type string
 	*/
-	'IMPORTANT': {
-		value: nativeRouteIDs.IMPORTANT,
-		writable: false
-	},
+	'IMPORTANT': nativeRouteIDs.IMPORTANT,
 
 	/**
 	* any search result list
 	* @type string
 	*/
-	'SEARCH': {
-		value: nativeRouteIDs.SEARCH,
-		writable: false
-	},
+	'SEARCH': nativeRouteIDs.SEARCH,
 
 	/**
 	* This refers to any of the above lists
 	* @type string
 	*/
-	'ANY_LIST': {
-		value: nativeRouteIDs.ANY_LIST,
-		writable: false
-	}
+	'ANY_LIST': nativeRouteIDs.ANY_LIST
 });
 
 /**
@@ -425,72 +336,44 @@ Object.defineProperties(nativeListRouteIDs, /** @lends NativeListRouteIDs */ {
 * @class
 * @name RouteTypes
 */
-var routeTypes = {};
-Object.defineProperties(routeTypes, /** @lends RouteTypes */ {
+var routeTypes = Object.freeze(/** @lends RouteTypes */ {
 	/**
 	* a list of threads or messages
 	* @type string
 	*/
-	'LIST': {
-		value: 'LIST',
-		writable: false
-	},
+	'LIST': 'LIST',
 
 	/**
 	* a single thread or message
 	* @type string
 	*/
-	'THREAD': {
-		value: 'THREAD',
-		writable: false
-	},
+	'THREAD': 'THREAD',
 
 	/**
 	* a Gmail or Inbox settings
 	* @type string
 	*/
-	'SETTINGS': {
-		value: 'SETTINGS',
-		writable: false
-	},
+	'SETTINGS': 'SETTINGS',
 
 	/**
 	* a single chat history
 	* @type string
 	*/
-	'CHAT': {
-		value: 'CHAT',
-		writable: false
-	},
+	'CHAT': 'CHAT',
 
 	/**
 	* a custom route created by any app
 	* @type string
 	*/
-	'CUSTOM': {
-		value: 'CUSTOM',
-		writable: false
-	},
+	'CUSTOM': 'CUSTOM',
 
 	/**
 	* an unknown route
 	* @type string
 	*/
-	'UNKNOWN': {
-		value: 'UNKNOWN',
-		writable: false
-	}
+	'UNKNOWN': 'UNKNOWN'
 
 });
-
-
-for(var key in nativeRouteIDs){
-	Object.freeze(nativeRouteIDs[key]);
-}
-
-Object.freeze(nativeRouteIDs);
-Object.freeze(nativeListRouteIDs);
-Object.freeze(routeTypes);
 
 
 function _handleRouteViewChange(router, members, routeViewDriver){
