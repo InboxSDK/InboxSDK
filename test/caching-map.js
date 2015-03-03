@@ -1,5 +1,6 @@
 import assert from 'assert';
 import co from 'co';
+import sinon from 'sinon';
 import delay from '../src/common/delay';
 import MockStorage from './lib/mock-storage';
 
@@ -44,5 +45,17 @@ describe("CachingMap", function() {
 
     assert.deepEqual(foo2.get('a'), {b:'c'});
     assert.strictEqual(bar1.has('a'), false);
+  }));
+
+  it("doesn't fail even if storage is corrupt", sinon.test(function() {
+    const storage = new MockStorage();
+    storage.setItem('foo', JSON.stringify([null]));
+
+    const consoleMock = this.mock(console);
+    consoleMock.expects("error").once();
+    const foo = new CachingMap('foo', {storage, flushTime: 1});
+    assert.strictEqual(foo.size, 0);
+    foo.set('a', 'b');
+    assert.strictEqual(foo.size, 1);
   }));
 });

@@ -7,18 +7,20 @@ export default class CachingMap extends Map {
     const storage = opts.storage || localStorage;
     const flushTime = typeof opts.flushTime === 'undefined' ? 3000 : opts.flushTime;
 
-    let lsc = null;
+    this._flush = _.noop;
+    let initialized = false;
+
     try {
-      lsc = JSON.parse(storage.getItem(cacheKey));
+      const lsc = JSON.parse(storage.getItem(cacheKey));
+      if (lsc) {
+        super(lsc);
+        initialized = true;
+      }
     } catch(e) {
-      console.error("CachingMap: failed to parse item", cacheKey);
+      console.error("CachingMap: failed to parse item", cacheKey, e);
     }
 
-    this._flush = _.noop;
-
-    if (lsc) {
-      super(lsc);
-    } else {
+    if (!initialized) {
       super();
     }
 
