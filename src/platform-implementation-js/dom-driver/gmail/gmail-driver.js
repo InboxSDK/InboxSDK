@@ -17,10 +17,19 @@ var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processo
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
+import MessageIdManager from '../../lib/message-id-manager';
+
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	Driver.call(this);
 
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+
+	this._messageIdManager = new MessageIdManager({
+		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
+			require('./gmail-driver/get-gmail-thread-id-for-rfc-message-id')(this, rfcMessageId),
+		getRfcMessageIdForGmailMessageId: (gmailMessageId) =>
+			require('./gmail-driver/get-rfc-message-id-for-gmail-message-id')(this, gmailMessageId)
+	});
 
 	this._gmailRouteProcessor = new GmailRouteProcessor();
 	this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
@@ -40,6 +49,7 @@ _.extend(GmailDriver.prototype, {
 	__memberVariables: [
 		{name: '_pageCommunicator', destroy: false, get: true},
 		{name: '_logger', destroy: false, get: true},
+		{name: '_messageIdManager', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -74,10 +84,6 @@ _.extend(GmailDriver.prototype, {
 
 	registerSearchQueryRewriter: function(obj) {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
-	},
-
-	getRfcMessageIdsForGmailMessageIds(gmailMessageIds) {
-		return require('./gmail-driver/get-rfc-message-ids-for-gmail-message-ids')(this, gmailMessageIds);
 	},
 
 	addToolbarButtonForApp: function(buttonDescriptor){
