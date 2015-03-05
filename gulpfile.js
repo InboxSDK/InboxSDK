@@ -41,7 +41,8 @@ var args = stdio.getopt({
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
   'single': {key: 's', description: 'Single bundle build (for development)'},
   'minify': {key: 'm', description: 'Minify build'},
-  'production': {key: 'p', description: 'Production build'}
+  'production': {key: 'p', description: 'Production build'},
+  'copy': {key: 'c', description: 'Also copy to Streak'}
 });
 
 // Don't let production be built without minification.
@@ -59,7 +60,12 @@ if (args.production && (args.watch || args.single)) {
 
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  return globp('./examples/*/').then(function(dirs) {
+  return globp('./examples/*/').then(function(dirs){
+    if(args.copy){
+      dirs.push('../MailFoo/ServerGmailSdk-war/src/main/webapp/build/');
+    }
+    return dirs;
+  }).then(function(dirs) {
     return dirs.reduce(
       function(stream, dir) {
         return stream.pipe(gulp.dest(dir));

@@ -26,7 +26,7 @@ var memberMap = new WeakMap();
 * providing a "create new" action. There are several predefined accesories, see <code>CreateAccessoryDescriptor</code>,
 * <code>IconButtonAccessoryDescriptor</code> or <code>DropdownButtonAccessoryDescriptor</code>
 */
-var NavMenu = function(appId, driver){
+var NavMenu = function(appId, driver, membraneMap){
 	var members = {};
 	memberMap.set(this, members);
 
@@ -35,6 +35,7 @@ var NavMenu = function(appId, driver){
 	members.navItemViews = [];
 
 	this.SENT_MAIL = _setupSentMail(appId, driver);
+	this.NavItemTypes = require('../../common/constants/nav-item-types');
 };
 
 _.extend(NavMenu.prototype, /** @lends NavMenu */{
