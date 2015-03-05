@@ -3,17 +3,19 @@ import RSVP from 'rsvp';
 import ajax from '../../common/ajax';
 
 export default class MessageIdManager {
-  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId}) {
+  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId, storage, saveThrottle}) {
     this._getGmailThreadIdForRfcMessageId = getGmailThreadIdForRfcMessageId;
     this._getRfcMessageIdForGmailMessageId = getRfcMessageIdForGmailMessageId;
+    this._storage = storage || localStorage;
+    if (saveThrottle === undefined) {
+      saveThrottle = 3000;
+    }
+
     this._rfcIdsTimestamps = new Map(); // Map containing times the lookup was last done. Could use for expiration.
     this._rfcIdsToThreadIds = new Map();
     this._threadIdsToRfcIds = new Map();
 
     this._saveCache = _.throttle(() => {
-      if (typeof localStorage === 'undefined') {
-        return;
-      }
       // If there are other SDK extensions running too, it's important we load
       // everything from localStorage first before overwriting it.
       this._loadCache();
@@ -23,18 +25,15 @@ export default class MessageIdManager {
         const timestamp = this._rfcIdsTimestamps.get(rfcId);
         item.push([rfcId, gmailThreadId, timestamp]);
       });
-      localStorage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
-    }, 3000, {leading:false});
+      this._storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
+    }, saveThrottle, {leading:false});
 
     this._loadCache();
   }
 
   _loadCache() {
-    if (typeof localStorage === 'undefined') {
-      return;
-    }
     try {
-      const item = JSON.parse(localStorage.getItem('inboxsdk__cached_thread_ids'));
+      const item = JSON.parse(this._storage.getItem('inboxsdk__cached_thread_ids'));
       if (item) {
         for (let [rfcId, gmailThreadId, timestamp] of item) {
           this._rfcIdsTimestamps.set(rfcId, timestamp);
