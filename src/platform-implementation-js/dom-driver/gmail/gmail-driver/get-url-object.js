@@ -26,10 +26,8 @@ module.exports = function(url){
 	urlObject.name = decodeURIComponent(hashParts[0]);
 	urlObject.params = _.chain(hashParts)
 							.rest()
+							.map(part => part.replace(/\+/g, ' '))
 							.map(decodeURIComponent)
-							.map(function(part){
-								return part.replace('+', ' ');
-							})
 							.value();
 	urlObject.hash = hash;
 
