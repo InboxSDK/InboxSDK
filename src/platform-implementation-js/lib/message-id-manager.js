@@ -6,7 +6,7 @@ export default class MessageIdManager {
   constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId, storage, saveThrottle}) {
     this._getGmailThreadIdForRfcMessageId = getGmailThreadIdForRfcMessageId;
     this._getRfcMessageIdForGmailMessageId = getRfcMessageIdForGmailMessageId;
-    this._storage = storage || localStorage;
+    this._storage = storage || (typeof localStorage !== 'undefined' && localStorage);
     if (saveThrottle === undefined) {
       saveThrottle = 3000;
     }
@@ -16,6 +16,7 @@ export default class MessageIdManager {
     this._threadIdsToRfcIds = new Map();
 
     this._saveCache = _.throttle(() => {
+      if (!this._storage) return;
       // If there are other SDK extensions running too, it's important we load
       // everything from localStorage first before overwriting it.
       this._loadCache();
@@ -32,6 +33,7 @@ export default class MessageIdManager {
   }
 
   _loadCache() {
+    if (!this._storage) return;
     try {
       const item = JSON.parse(this._storage.getItem('inboxsdk__cached_thread_ids'));
       if (item) {
