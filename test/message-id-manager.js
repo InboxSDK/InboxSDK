@@ -67,4 +67,20 @@ describe("MessageIdManager", function() {
     assert.strictEqual(typeof cachedThreadIds[0][2], "number");
     assert(startTime <= cachedThreadIds[0][2] && cachedThreadIds[0][2] <= endTime);
   }));
+
+  it("can load from storage", co.wrap(function*() {
+    const storage = new MockStorage();
+    storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify([["<789>", "789", Date.now()]]));
+    const mim = new MessageIdManager({
+      getGmailThreadIdForRfcMessageId(rfcId) {
+        throw new Error("should not happen");
+      },
+      getRfcMessageIdForGmailMessageId(mid) {
+        throw new Error("should not happen");
+      },
+      storage, saveThrottle: 2
+    });
+    assert.strictEqual(yield mim.getRfcMessageIdForGmailThreadId("789"), "<789>");
+    assert.strictEqual(yield mim.getGmailThreadIdForRfcMessageId("<789>"), "789");
+  }));
 });
