@@ -1,26 +1,26 @@
 'use strict';
 
-var _ = require('lodash');
+let _ = require('lodash');
 
-var MembraneMap = require('./lib/membrane-map');
+let MembraneMap = require('./lib/membrane-map');
 
-var ButterBar = require('./platform-implementation/butter-bar');
-var Compose = require('./platform-implementation/compose');
-var Conversations = require('./platform-implementation/conversations');
-var Keyboard = require('./platform-implementation/keyboard.js');
-var Modal = require('./platform-implementation/modal');
-var Lists = require('./platform-implementation/lists');
-var NavMenu = require('./platform-implementation/nav-menu');
-var Router = require('./platform-implementation/router');
-var Search = require('./platform-implementation/search');
-var Toolbars = require('./platform-implementation/toolbars');
-var User = require('./platform-implementation/user');
+let ButterBar = require('./platform-implementation/butter-bar');
+let Compose = require('./platform-implementation/compose');
+let Conversations = require('./platform-implementation/conversations');
+let Keyboard = require('./platform-implementation/keyboard.js');
+let Modal = require('./platform-implementation/modal');
+let Lists = require('./platform-implementation/lists');
+let NavMenu = require('./platform-implementation/nav-menu');
+let Router = require('./platform-implementation/router');
+let Search = require('./platform-implementation/search');
+let Toolbars = require('./platform-implementation/toolbars');
+let User = require('./platform-implementation/user');
 
-var logger = require('./lib/logger');
+let logger = require('./lib/logger');
 
-var GmailDriver = require('./dom-driver/gmail/gmail-driver');
+let GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
-var PlatformImplementation = function(appId, opts){
+let PlatformImplementation = function(appId, opts){
 	this._appId = appId;
 	opts = _.extend({
 		// defaults
@@ -52,7 +52,7 @@ var PlatformImplementation = function(appId, opts){
 	this.Router = new Router(appId, this._driver, this._membraneMap);
 	this.Search = new Search(appId, this._driver, this._membraneMap);
 	this.Toolbars = new Toolbars(appId, this._driver, this._membraneMap);
-	this.ButterBar = new ButterBar(appId, this._driver);
+	this.ButterBar = new ButterBar(appId, this._driver, this._membraneMap);
 	this.Modal = new Modal(appId, this._driver, this._membraneMap);
 
 	this.Logger = this._driver.getLogger().getAppLogger();

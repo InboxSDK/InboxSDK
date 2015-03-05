@@ -496,6 +496,14 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   z-index: 1;
 }
 
+.aip .CK {
+  color: #15c;
+}
+
+.aip .CK:hover {
+  text-decoration: underline;
+}
+
 /* end nav menu */
 
 

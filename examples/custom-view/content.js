@@ -24,6 +24,7 @@ var navItem = inboxSDK.NavMenu.addNavItem({
 	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 	routeID: 'example/:monkeyName',
 	routeParams: 'george {} {} {}',
+	type: inboxSDK.NavMenu.NavItemTypes.MANAGE,
 	accessory: {
 		type: 'CREATE',
 		onClick: function(){

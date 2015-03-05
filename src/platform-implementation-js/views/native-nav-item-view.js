@@ -35,7 +35,6 @@ _.extend(NativeNavItemView.prototype, {
 		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
-
 		members.deferred.promise.then(function(navItemViewDriver){
 			var childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
 			navItemView.setNavItemViewDriver(childNavItemViewDriver);
@@ -46,10 +45,12 @@ _.extend(NativeNavItemView.prototype, {
 	},
 
 	setNavItemViewDriver: function(navItemViewDriver){
-		memberMap.get(this).navItemViewDriver = navItemViewDriver;
+		var members = memberMap.get(this);
+
+		members.navItemViewDriver = navItemViewDriver;
 		navItemViewDriver.getEventStream().onValue(_handleStreamEvent, this);
 
-		memberMap.get(this).deferred.resolve(navItemViewDriver);
+		members.deferred.resolve(navItemViewDriver);
 	},
 
 	isCollapsed: function(){

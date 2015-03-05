@@ -17,6 +17,8 @@ var BasicButtonViewController = require('../../../widgets/buttons/basic-button-v
 var NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 var LEFT_INDENTATION_PADDING = 14;
 
+var NAV_ITEM_TYPES = require('../../../../common/constants/nav-item-types');
+
 var GmailNavItemView = function(orderGroup, level){
 	NavItemViewDriver.call(this);
 
@@ -46,6 +48,7 @@ _.extend(GmailNavItemView.prototype, {
 		{name: '_isCollapsed', destroy: false, defaultValue: false},
 		{name: '_orderGroup', destroy: false, get: true},
 		{name: '_orderHint', destroy: false, get: true},
+		{name: '_type', destroy: false},
 		{name: '_name', destroy: false, get: true, defaultValue: ''},
 		{name: '_iconUrl', destroy: false},
 		{name: '_iconClass', destroy: false},
@@ -71,7 +74,7 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	setHighlight: function(value){
-		if(!this._element){
+		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE){
 			return;
 		}
 
@@ -84,6 +87,10 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	setActive: function(value){
+		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE){
+			return;
+		}
+
 		var toElement = this._element.querySelector('.TO');
 
 		if(value){
@@ -131,7 +138,7 @@ _.extend(GmailNavItemView.prototype, {
 			'<div class="TO">',
 				'<div class="TN aik">',
 					'<div class="aio aip">',
-						'<span class="nU n1 inboxsdk__navItem_name"></span>',
+
 					'</div>',
 				'</div>',
 			'</div>'
@@ -148,6 +155,7 @@ _.extend(GmailNavItemView.prototype, {
 		var self = this;
 		return function(domEvent){
 			domEvent.stopPropagation();
+			domEvent.preventDefault();
 
 			return {
 				eventName: eventName,
@@ -159,6 +167,7 @@ _.extend(GmailNavItemView.prototype, {
 	_updateValues: function(navItemDescriptor){
 		this._navItemDescriptor = navItemDescriptor;
 
+		this._updateType(navItemDescriptor.type);
 		this._updateName(navItemDescriptor.name);
 
 		require('../lib/update-icon/update-icon')(
@@ -167,6 +176,30 @@ _.extend(GmailNavItemView.prototype, {
 
 		this._updateAccessory(navItemDescriptor.accessory);
 		this._updateOrder(navItemDescriptor);
+	},
+
+	_updateType: function(type){
+		type = type || NAV_ITEM_TYPES.NAVIGATION;
+		if(this._type === type){
+			return;
+		}
+
+		var nameElement = this._element.querySelector('.inboxsdk__navItem_name');
+
+		switch(type){
+			case NAV_ITEM_TYPES.NAVIGATION:
+				if(!nameElement || nameElement.tagName !== 'SPAN'){
+					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<span class="nU n1 inboxsdk__navItem_name">${_.escape(this._name)}</span>`;
+				}
+			break;
+			case NAV_ITEM_TYPES.MANAGE:
+				if(!nameElement || nameElement.tagName !== 'A'){
+					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<a href="#" class="inboxsdk__navItem_name CK">${_.escape(this._name)}</a>`;
+				}
+			break;
+		}
+
+		this._type = type;
 	},
 
 	_updateName: function(name){
@@ -347,7 +380,7 @@ _.extend(GmailNavItemView.prototype, {
 			e.stopPropagation();
 		});
 
-		this._element.querySelector('.inboxsdk__navItem_name').insertAdjacentElement('beforebegin', this._expandoElement);
+		this._element.querySelector('.aip').insertAdjacentElement('afterbegin', this._expandoElement);
 
 		if(this._isCollapsed){
 			this._collapse();
