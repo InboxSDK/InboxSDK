@@ -48,7 +48,7 @@ InboxSDK.load = function(version, appId, opts){
 };
 
 /**
-* Loads the a remote script into this extensions content script space and evals it
+* Loads a remote script into this extensions content script space and evals it
 * @function
 * @param {string} url - the URL of the remote script to load.
 * @return {Promise} a promise which resolves when this script is finished downloading and eval'ing

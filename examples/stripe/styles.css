@@ -1,0 +1,8 @@
+.rounded_stripe {
+  border-radius: 25px;
+}
+
+.profile_container {
+  flex-direction: column;
+  align-items: center;
+}

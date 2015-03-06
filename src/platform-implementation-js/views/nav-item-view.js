@@ -51,7 +51,6 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 			navItemView.setNavItemViewDriver(childNavItemViewDriver);
 		});
 
-
 		members.navItemViews.push(navItemView);
 		return navItemView;
 	},
@@ -125,6 +124,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 	}
 
 });
+
 
 
 function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, params){
