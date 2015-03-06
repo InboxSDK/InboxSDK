@@ -252,6 +252,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addLabel: function(label) {
+    if (!this._elements) {
+      console.warn('addLabel called on destroyed thread row');
+      return;
+    }
     const prop = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
@@ -291,6 +295,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addImage: function(inIconDescriptor){
+    if (!this._elements) {
+      console.warn('addImage called on destroyed thread row');
+      return;
+    }
     const prop = kefirCast(Kefir, inIconDescriptor)
                   .toProperty()
                   .combine(this._refresher, _.identity)
@@ -346,6 +354,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addButton: function(buttonDescriptor) {
+    if (!this._elements) {
+      console.warn('addButton called on destroyed thread row');
+      return;
+    }
     if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
     var activeDropdown = null;
@@ -457,6 +469,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   addAttachmentIcon: function(opts) {
+    if (!this._elements) {
+      console.warn('addAttachmentIcon called on destroyed thread row');
+      return;
+    }
     const getImgElement = _.once(() => {
       const img = document.createElement('img');
       img.src = 'images/cleardot.gif';
@@ -519,6 +535,10 @@ _.extend(GmailThreadRowView.prototype, {
   },
 
   replaceDate: function(opts) {
+    if (!this._elements) {
+      console.warn('replaceDate called on destroyed thread row');
+      return;
+    }
     const prop = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
