@@ -75,20 +75,20 @@ _.extend(GmailDriver.prototype, {
 	showCustomThreadList(threadsPromise) {
 		const uniqueSearch = Date.now()+'-'+Math.random();
 		const customHash = document.location.hash;
-		document.location.hash = 'search/'+encodeURIComponent(uniqueSearch);
+
 		var GmailElementGetter = require('./gmail-element-getter');
-		setTimeout(() => {
-			Bacon.fromEvent(window, 'hashchange')
-				.takeUntil(
-					GmailElementGetter.getMainContentElementChangedStream()
-						.take(1)
-						.delay(250)
-				)
-				.onValue(() => {
-					this._hashChangeNoViewChange(customHash);
-				});
-			this._hashChangeNoViewChange(customHash);
-		}, 0);
+		Bacon.fromEvent(window, 'hashchange')
+			.takeUntil(
+				GmailElementGetter.getMainContentElementChangedStream()
+					.take(1)
+					.delay(250)
+			)
+			.merge(Bacon.later(0))
+			.onValue(() => {
+				this._hashChangeNoViewChange(customHash);
+			});
+
+		document.location.hash = 'search/'+encodeURIComponent(uniqueSearch);
 		threadsPromise.then(threads => {
 			console.log('showCustomThreadList', threads);
 		});
