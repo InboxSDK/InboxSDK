@@ -1,0 +1,44 @@
+<div class="profile_container">
+  <div class="profile"><p>some text</p></div>
+</div>
+
+
+<div>
+  <p><%= customer.email %></p>
+  <div>
+    <p>Active Subscriptions</p>
+    <%
+      _.each(subscriptions.data, function(sub) {
+        if (sub.status = "active") {
+    %>
+          <p><%= sub.id %></p>
+    <%  }
+      });
+    %>
+  </div>
+  <div>
+    <p>Invoices</p>
+    <%
+      _.each(invoices.data, function(inv) {
+    %>
+          <p><%= inv.id %></p>
+    <%
+      });
+    %>
+  </div>
+  <div>
+    <p>Cards</p>
+    <%
+      if (!customer.sources.data) {
+        return;
+      }
+      _.each(customer.sources.data, function(source) {
+    %>
+          <p><%= source.id %></p>
+    <%
+      });
+    %>
+  </div>
+
+
+</div>
