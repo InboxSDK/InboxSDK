@@ -29,6 +29,14 @@ const [_extensionIsLoggerMaster, _sessionId] = (function() {
   }
 })();
 
+function getAllAppIds() {
+  if (global.document && document.head.hasAttribute('data-inboxsdk-active-app-ids')) {
+    return JSON.parse(document.head.getAttribute('data-inboxsdk-active-app-ids'));
+  } else {
+    return [];
+  }
+}
+
 const _trackedEventsQueue = new PersistentQueue('events');
 
 class Logger {
@@ -110,6 +118,13 @@ function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
     appId: appId,
     version: opts.appVersion || undefined
   }));
+  document.head.setAttribute(
+    'data-inboxsdk-active-app-ids', JSON.stringify(getAllAppIds().concat([
+      {
+        appId: appId,
+        version: opts.appVersion || undefined
+      }
+    ])));
 
   if (_extensionLoaderVersion) {
     return;
@@ -246,18 +261,19 @@ function tooManyErrors(err2, originalArgs) {
   console.error("ORIGINAL ERROR", originalArgs);
 }
 
-function getAppIdsProperty(causedByAppId) {
+function getAppIdsProperty(causedByAppId, onlyExtensionApps=true) {
+  const appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
-    return _extensionAppIds;
+    return appIds;
   } else {
-    const appIds = _.cloneDeep(_extensionAppIds);
-    appIds.forEach(function(entry) {
+    const appIdsWithCause = _.cloneDeep(appIds);
+    appIdsWithCause.forEach(function(entry) {
       if (entry.appId === causedByAppId) {
         entry.causedBy = true;
       }
       Object.freeze(entry);
     });
-    return Object.freeze(appIds);
+    return Object.freeze(appIdsWithCause);
   }
 }
 
@@ -402,6 +418,10 @@ function _trackEvent(appId, type, eventName, properties) {
     _.extend(event, {
       extensionId: getExtensionId(),
       appIds: getAppIdsProperty(appId)
+    });
+  } else {
+    _.extend(event, {
+      appIds: getAppIdsProperty(null, false)
     });
   }
 
