@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var Bacon = require('baconjs');
+import RSVP from 'rsvp';
 
 var HandlerRegistry = require('../lib/handler-registry');
 
@@ -9,7 +10,7 @@ var RouteView = require('../views/route-view/route-view');
 var ListRouteView = require('../views/route-view/list-route-view');
 var CustomRouteView = require('../views/route-view/custom-route-view');
 
-var memberMap = new WeakMap();
+const memberMap = new WeakMap();
 
 /**
 * @class
@@ -43,6 +44,7 @@ var Router = function(appId, driver, membraneMap){
 	members.allRoutesHandlerRegistry = new HandlerRegistry();
 
 	members.customRoutes = [];
+	members.customListRoutes = [];
 
 	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
@@ -139,6 +141,23 @@ _.extend(Router.prototype, /** @lends Router */ {
 		}
 
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
+	},
+
+	handleCustomListRoute: function(routeID, handler) {
+		var customListRouteDescriptor = {
+			routeID: routeID,
+			onActivate: handler
+		};
+
+		var customListRoutes = memberMap.get(this).customListRoutes;
+		customListRoutes.push(customListRouteDescriptor);
+
+		return function() {
+			var index = customListRoutes.indexOf(customListRouteDescriptor);
+			if(index > -1){
+				customListRoutes.splice(index, 1);
+			}
+		};
 	},
 
 	getCurrentRouteView: function(){
@@ -418,47 +437,63 @@ function _isSameRoute(currentRouteViewDriver, routeViewDriver){
 
 
 function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
-	var customRouteView = new CustomRouteView(routeViewDriver);
+	const relevantCustomRoutes = members.customRoutes.filter(customRoute => {
+		if(!customRoute.routeID){
+			return false;
+		}
 
-	members.customRoutes
-		.filter(function(customRoute){
-			if(!customRoute.routeID){
-				return false;
-			}
+		if(_.isArray(customRoute.routeID)){
+			return _.any(customRoute.routeID, function(routeID){
+				return routeViewDriver.doesMatchRouteID(routeID);
+			});
+		}
 
-			if(_.isArray(customRoute.routeID)){
-				return _.any(customRoute.routeID, function(routeID){
-					return routeViewDriver.doesMatchRouteID(routeID);
-				});
-			}
+		return routeViewDriver.doesMatchRouteID(customRoute.routeID);
+	});
 
-			return routeViewDriver.doesMatchRouteID(customRoute.routeID);
-		})
-		.forEach(function(customRoute){
+	if (relevantCustomRoutes.length) {
+		const customRouteView = new CustomRouteView(routeViewDriver);
+
+		relevantCustomRoutes.forEach(customRoute => {
 			if(_.isArray(customRoute.routeID)){
 				customRouteView.setRouteID(
-					_.find(customRoute.routeID, function(routeID){
-						return routeViewDriver.doesMatchRouteID(routeID);
-					})
+					_.find(customRoute.routeID, routeID => routeViewDriver.doesMatchRouteID(routeID))
 				);
-			}
-			else{
+			}else{
 				customRouteView.setRouteID(customRoute.routeID);
 			}
 
 			routeView.setRouteID(customRouteView.getRouteID());
 
-			try{
+			try {
 				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
 				customRoute.onActivate(customRouteView);
-			}
-			catch(err){
-				setTimeout(function() {
-					throw err;
-				}, 0);
+			} catch(err) {
+				members.driver.getLogger().error(err);
 			}
 
 		});
+	} else {
+		const relevantCustomListRoute = _.find(members.customListRoutes, customListRoute => {
+			if(!customListRoute.routeID){
+				return false;
+			}
+
+			if(_.isArray(customListRoute.routeID)){
+				return _.any(customListRoute.routeID, routeID => routeViewDriver.doesMatchRouteID(routeID));
+			}
+
+			return routeViewDriver.doesMatchRouteID(customListRoute.routeID);
+		});
+
+		if (relevantCustomListRoute) {
+			try {
+				members.driver.showCustomThreadList(RSVP.Promise.resolve(relevantCustomListRoute.onActivate()));
+			} catch(err) {
+				members.driver.getLogger().error(err);
+			}
+		}
+	}
 }
 
 

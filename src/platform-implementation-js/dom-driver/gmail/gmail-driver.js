@@ -48,6 +48,7 @@ _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
 		{name: '_pageCommunicator', destroy: false, get: true},
+		{name: '_ignoreNextRouteViewChangeTo', destroy: false, defaultValue: []},
 		{name: '_logger', destroy: false, get: true},
 		{name: '_messageIdManager', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
@@ -61,6 +62,37 @@ _.extend(GmailDriver.prototype, {
 		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
+
+	_hashChangeNoViewChange(hash) {
+		const entry = {hash: hash.replace(/^#/, '')};
+		this._ignoreNextRouteViewChangeTo.push(entry);
+		setTimeout(() => {
+			_.remove(this._ignoreNextRouteViewChangeTo, entry);
+		}, 1);
+		document.location.hash = hash;
+	},
+
+	showCustomThreadList(threadsPromise) {
+		const uniqueSearch = Date.now()+'-'+Math.random();
+		const customHash = document.location.hash;
+		document.location.hash = 'search/'+encodeURIComponent(uniqueSearch);
+		var GmailElementGetter = require('./gmail-element-getter');
+		setTimeout(() => {
+			Bacon.fromEvent(window, 'hashchange')
+				.takeUntil(
+					GmailElementGetter.getMainContentElementChangedStream()
+						.take(1)
+						.delay(250)
+				)
+				.onValue(() => {
+					this._hashChangeNoViewChange(customHash);
+				});
+			this._hashChangeNoViewChange(customHash);
+		}, 0);
+		threadsPromise.then(threads => {
+			console.log('showCustomThreadList', threads);
+		});
+	},
 
 	showCustomRouteView: function(element){
 		require('./gmail-driver/show-custom-route-view')(this, element);
@@ -143,6 +175,13 @@ _.extend(GmailDriver.prototype, {
 		this._routeViewDriverStream.plug(
 			require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor).doAction(function(routeViewDriver){
 				routeViewDriver.setPageCommunicator(self._pageCommunicator);
+			}).filter(routeViewDriver => {
+				const entry = _.find(this._ignoreNextRouteViewChangeTo, entry => entry.hash == routeViewDriver.getHash());
+				if (entry) {
+					_.remove(this._ignoreNextRouteViewChangeTo, entry);
+					return false;
+				}
+				return true;
 			})
 		);
 
