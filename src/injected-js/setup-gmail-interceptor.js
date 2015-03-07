@@ -139,7 +139,7 @@ function setupGmailInterceptor() {
     // search query containing the term, we delay it being sent out, trigger an
     // event containing the full query, and wait for a response event from the
     // content script that contains a new query to substitute in.
-    let customSearchTerms = [];
+    const customSearchTerms = [];
     let queryReplacement;
 
     document.addEventListener('inboxSDKcreateCustomSearchTerm', function(event) {
@@ -147,8 +147,6 @@ function setupGmailInterceptor() {
     });
 
     document.addEventListener('inboxSDKsearchReplacementReady', function(event) {
-      // Go through all the queries, resolve the matching ones, and then remove
-      // them from the list.
       if (queryReplacement.query === event.detail.query) {
         queryReplacement.newQuery.resolve(event.detail.newQuery);
       }
@@ -207,6 +205,86 @@ function setupGmailInterceptor() {
             body: request.body
           };
         });
+      }
+    });
+  }
+
+  {
+    // Search results replacer.
+    // The content script tells us a search query to watch for. Whenever we see
+    // the search query, trigger an event containing the query, trigger an
+    // event containing the response, and then wait for a response event from
+    // the content script that contains new results to substitute in.
+    const customSearchQueries = [];
+    let customListJob;
+
+    document.addEventListener('inboxSDKcustomListRegisterQuery', event => {
+      customSearchQueries.push(event.detail.query);
+    });
+
+    document.addEventListener('inboxSDKcustomListNewQuery', event => {
+      if (customListJob.query === event.detail.query) {
+        customListJob.newQuery.resolve(event.detail.newQuery);
+      }
+    });
+
+    document.addEventListener('inboxSDKcustomListResults', event => {
+      if (customListJob.query === event.detail.query) {
+        customListJob.newResults.resolve(event.detail.newResults);
+      }
+    });
+
+    js_frame_wrappers.push({
+      isRelevantTo: function(connection) {
+        let customSearchQuery;
+        const params = connection.params;
+        if (
+          connection.method === 'POST' &&
+          params.search && params.view === 'tl' &&
+          connection.url.match(/^\?/) &&
+          params.q &&
+          (customSearchQuery = _.find(customSearchQueries, x => x === params.q))
+        ) {
+          if (customListJob) {
+            // Resolve the old one with something because no one else is going
+            // to after it's replaced in a moment.
+            customListJob.newQuery.resolve(customListJob.query);
+            customListJob.newResults.resolve(null);
+          }
+          customListJob = connection._customListJob = {
+            query: params.q,
+            start: params.start,
+            newQuery: RSVP.defer(),
+            newResults: RSVP.defer()
+          };
+          triggerEvent({
+            type: 'searchForReplacement',
+            query: params.q
+          });
+          return true;
+        }
+        return false;
+      },
+      requestChanger: function(connection, request) {
+        return connection._customListJob.newQuery.promise.then(newQuery => {
+          const newParams = _.clone(connection.params);
+          newParams.q = newQuery;
+          return {
+            method: request.method,
+            url: '?'+stringify(newParams),
+            body: request.body
+          };
+        });
+      },
+      responseTextChanger: function(connection, response) {
+        triggerEvent({
+          type: 'searchResultsResponse',
+          query: connection.params.q,
+          response
+        });
+        return connection._customListJob.newResults.promise.then(newResults =>
+          newResults === null ? response : newResults
+        );
       }
     });
   }

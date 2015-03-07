@@ -76,6 +76,30 @@ PageCommunicator.prototype = {
     document.dispatchEvent(event);
   },
 
+  setupCustomListResultsQuery(query) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKcustomListRegisterQuery', false, false, {
+      query
+    });
+    document.dispatchEvent(event);
+  },
+
+  setCustomListNewQuery(query, newQuery) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKcustomListNewQuery', false, false, {
+      query, newQuery
+    });
+    document.dispatchEvent(event);
+  },
+
+  setCustomListResults(query, newResults) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKcustomListResults', false, false, {
+      query, newResults
+    });
+    document.dispatchEvent(event);
+  },
+
   createCustomSearchTerm: function(term) {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcreateCustomSearchTerm', false, false, {

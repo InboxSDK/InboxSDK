@@ -18,10 +18,11 @@ function setupRouteViewDriverStream(GmailRouteProcessor){
 
 				//if we're to or from a custom view then push to the routeViewDriverStream right away
 				Bacon.fromEventTarget(window, 'hashchange')
+						.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
 						.map('.newURL')
 						.filter(newURL => newURL == document.location.href) // ignore outdated events
 						.map(getURLObject)
-						.filter(_shouldHandleHashChange(GmailRouteProcessor)).log('sdk hash'),
+						.filter(_shouldHandleHashChange(GmailRouteProcessor)),
 
 
 				//when native gmail changes main view there's a div that takes on role=main

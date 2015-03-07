@@ -1,0 +1,23 @@
+{
+  "name": "Custom Thread List - Example Gmail Extension",
+  "description": "Example extension showing use of the Streak Gmail SDK",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*"
+      ],
+      "js": ["inboxsdk.js","content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "https://mail.google.com/",
+    "https://inbox.google.com/"
+  ],
+  "web_accessible_resources": [
+    "inboxsdk.js.map", "monkey-face.jpg"
+  ],
+  "manifest_version": 2
+}

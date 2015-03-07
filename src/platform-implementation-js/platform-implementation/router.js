@@ -488,7 +488,7 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 
 		if (relevantCustomListRoute) {
 			try {
-				members.driver.showCustomThreadList(RSVP.Promise.resolve(relevantCustomListRoute.onActivate()));
+				members.driver.showCustomThreadList(relevantCustomListRoute.onActivate);
 			} catch(err) {
 				members.driver.getLogger().error(err);
 			}
