@@ -63,7 +63,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
-	_hashChangeNoViewChange(hash) {
+	hashChangeNoViewChange(hash) {
 		if (hash[0] !== '#') {
 			throw new Error("bad hash");
 		}
@@ -76,74 +76,7 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	showCustomThreadList(onActivate) {
-		const GRP = require('./gmail-response-processor');
-
-		const uniqueSearch = Date.now()+'-'+Math.random();
-		this._pageCommunicator.setupCustomListResultsQuery(uniqueSearch);
-		this._pageCommunicator.ajaxInterceptStream
-			.filter(e =>
-				e.type === 'searchForReplacement' &&
-				e.query === uniqueSearch
-			)
-			.flatMap(e => {
-				const page = +e.start;
-				try {
-					return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(page)), true);
-				} catch(e) {
-					this.getLogger().error(e);
-					return Bacon.once([]);
-				}
-			})
-			.map(threadIds => RSVP.Promise.all(threadIds.map(id =>
-				id[0] == '<' ?
-					this._messageIdManager.getGmailThreadIdForRfcMessageId(id).then(gtid => ({gtid, rfcId: id}))
-					:
-					this._messageIdManager.getRfcMessageIdForGmailThreadId(id).then(rfcId => ({gtid: id, rfcId}))
-			)))
-			.flatMap(Bacon.fromPromise)
-			.onValue(threadIds => {
-				const query = threadIds.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ');
-				this._pageCommunicator.setCustomListNewQuery(uniqueSearch, query);
-				this._pageCommunicator.ajaxInterceptStream
-					.filter(e =>
-						e.type === 'searchResultsResponse' &&
-						e.query === uniqueSearch
-					)
-					.map('.response')
-					.take(1)
-					.onValue(response => {
-						const extractedThreads = GRP.extractThreads(response);
-						const newThreads = _.chain(threadIds)
-							.map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
-							.compact()
-							.value();
-						const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
-						this._pageCommunicator.setCustomListResults(uniqueSearch, newResponse);
-					});
-			});
-
-		const customHash = document.location.hash;
-
-		var GmailElementGetter = require('./gmail-element-getter');
-		Bacon.fromEvent(window, 'hashchange')
-			.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-			.takeUntil(
-				GmailElementGetter.getMainContentElementChangedStream()
-					.take(1)
-					.delay(250)
-			)
-			.merge(Bacon.later(0))
-			.onValue(() => {
-				this._hashChangeNoViewChange(customHash);
-			});
-
-		const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
-		window.history.replaceState(null, null, searchHash);
-		const hce = new HashChangeEvent('hashchange', {
-			oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-blah',
-			newURL: document.location.href.replace(/#.*$/, '')+searchHash
-		});
-		window.dispatchEvent(hce);
+		require('./gmail-driver/show-custom-thread-list')(this, onActivate);
 	},
 
 	showCustomRouteView: function(element){
