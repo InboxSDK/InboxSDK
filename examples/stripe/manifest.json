@@ -21,6 +21,9 @@
   ],
   "web_accessible_resources": [
     "stripe.png",
+    "paid.png",
+    "unpaid.png",
+    "cards/*",
     "templates.html"
   ],
   "manifest_version": 2
