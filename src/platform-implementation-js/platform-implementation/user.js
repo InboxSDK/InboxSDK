@@ -7,6 +7,7 @@ var User = function(appId, driver){
 
 _.extend(User.prototype, {
 
+	/* this is being used by screenleap*/
 	getEmailAddress: function() {
 		return this._driver.getUserEmailAddress();
 	}
