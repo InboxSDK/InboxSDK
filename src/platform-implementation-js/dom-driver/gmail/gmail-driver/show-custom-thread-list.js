@@ -4,18 +4,23 @@ import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import * as GRP from '../gmail-response-processor';
 
-export default function showCustomThreadList(driver, onActivate) {
-  const uniqueSearch = Date.now()+'-'+Math.random();
-  driver.getPageCommunicator().setupCustomListResultsQuery(uniqueSearch);
+const threadListSearchStrings = new WeakMap();
+
+function doSearchReplacing(driver, onActivate) {
+  const preexistingQuery = threadListSearchStrings.get(onActivate);
+  if (preexistingQuery) {
+    return preexistingQuery;
+  }
+  const newQuery = Date.now()+'-'+Math.random();
+  driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
     .filter(e =>
       e.type === 'searchForReplacement' &&
-      e.query === uniqueSearch
+      e.query === newQuery
     )
     .flatMap(e => {
-      const start = +e.start;
       try {
-        return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(start)), true);
+        return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
       } catch(e) {
         driver.getLogger().error(e);
         return Bacon.once([]);
@@ -30,11 +35,11 @@ export default function showCustomThreadList(driver, onActivate) {
     .flatMap(Bacon.fromPromise)
     .onValue(threadIds => {
       const query = threadIds.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ');
-      driver.getPageCommunicator().setCustomListNewQuery(uniqueSearch, query);
+      driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
       driver.getPageCommunicator().ajaxInterceptStream
         .filter(e =>
           e.type === 'searchResultsResponse' &&
-          e.query === uniqueSearch
+          e.query === newQuery
         )
         .map('.response')
         .take(1)
@@ -45,10 +50,15 @@ export default function showCustomThreadList(driver, onActivate) {
             .compact()
             .value();
           const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
-          driver.getPageCommunicator().setCustomListResults(uniqueSearch, newResponse);
+          driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         });
     });
+  threadListSearchStrings.set(onActivate, newQuery);
+  return newQuery;
+}
 
+export default function showCustomThreadList(driver, onActivate) {
+  const uniqueSearch = doSearchReplacing(driver, onActivate);
   const customHash = document.location.hash;
 
   Bacon.fromEvent(window, 'hashchange')
