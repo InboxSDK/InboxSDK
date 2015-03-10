@@ -6,21 +6,24 @@ var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observe
 
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-export default function getMainContentElementChangedStream(GmailElementGetter){
+export default function getMainContentElementChangedStream(GmailElementGetter, onlyChanges=false){
 	return waitForMainContentContainer(GmailElementGetter)
 				.flatMap(mainContentContainer => {
 					return makeElementChildStream(mainContentContainer)
 							.map(({el}) => el)
 							.filter(el => el.classList.contains('nH'))
-							.flatMap(el =>
-								makeMutationObserverStream(el, {attributes: true, attributeFilter: ['role'], attributeOldValue: true})
-									.toProperty({
+							.flatMap(el => {
+								let stream = makeMutationObserverStream(el, {attributes: true, attributeFilter: ['role'], attributeOldValue: true});
+								if (!onlyChanges) {
+									stream = stream.toProperty({
 										oldValue: null,
 										target: el
-									})
+									});
+								}
+								return stream
 									.filter(_isNowMain)
-									.map('.target')
-							);
+									.map('.target');
+							});
 
 				});
 }

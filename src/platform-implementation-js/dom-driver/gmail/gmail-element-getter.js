@@ -7,8 +7,8 @@ var GmailElementGetter = {
 		return require('./gmail-element-getter/wait-for-gmail-mode-to-settle')();
 	},
 
-	getMainContentElementChangedStream: function(){
-		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this);
+	getMainContentElementChangedStream: function(onlyChanges=false){
+		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this, onlyChanges);
 	},
 
 	isStandalone: function(){

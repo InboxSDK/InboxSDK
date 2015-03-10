@@ -92,17 +92,25 @@ export default function showCustomThreadList(driver, onActivate) {
   const uniqueSearch = doSearchReplacing(driver, onActivate);
   const customHash = document.location.hash;
 
+  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream(true).take(1);
+
   Bacon.fromEvent(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
     .takeUntil(
-      GmailElementGetter.getMainContentElementChangedStream()
-        .take(1)
-        .delay(250)
+      nextMainContentElementChange.delay(250)
     )
     .merge(Bacon.later(0))
     .onValue(() => {
       driver.hashChangeNoViewChange(customHash);
     });
+
+  const searchInput = GmailElementGetter.getSearchInput();
+  searchInput.value = '';
+  searchInput.style.visibility = 'hidden';
+  nextMainContentElementChange.delay(100).onValue(() => {
+    searchInput.value = '';
+    searchInput.style.visibility = 'visible';
+  });
 
   const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
   window.history.replaceState(null, null, searchHash);
