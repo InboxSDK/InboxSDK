@@ -253,13 +253,14 @@ function setupGmailInterceptor() {
           }
           customListJob = connection._customListJob = {
             query: params.q,
-            start: params.start,
+            start: +params.start,
             newQuery: RSVP.defer(),
             newResults: RSVP.defer()
           };
           triggerEvent({
             type: 'searchForReplacement',
-            query: params.q
+            query: customListJob.query,
+            start: customListJob.start
           });
           return true;
         }
@@ -279,7 +280,8 @@ function setupGmailInterceptor() {
       responseTextChanger: function(connection, response) {
         triggerEvent({
           type: 'searchResultsResponse',
-          query: connection.params.q,
+          query: connection._customListJob.query,
+          start: connection._customListJob.start,
           response
         });
         return connection._customListJob.newResults.promise.then(newResults =>

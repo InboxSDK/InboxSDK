@@ -13,9 +13,9 @@ export default function showCustomThreadList(driver, onActivate) {
       e.query === uniqueSearch
     )
     .flatMap(e => {
-      const page = +e.start;
+      const start = +e.start;
       try {
-        return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(page)), true);
+        return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(start)), true);
       } catch(e) {
         driver.getLogger().error(e);
         return Bacon.once([]);
