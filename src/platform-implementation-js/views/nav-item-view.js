@@ -61,14 +61,15 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 		Bacon.combineAsArray(
 			members.navItemDescriptorPropertyStream,
-			navItemViewDriver.getEventStream().toProperty()
-		).onValue(_handleViewDriverStreamEvent, this, navItemViewDriver, members.driver);
+			navItemViewDriver.getEventStream()
+		)
+			.sampledBy(navItemViewDriver.getEventStream())
+			.onValue(_handleViewDriverStreamEvent, this, navItemViewDriver, members.driver);
 
 		Bacon.combineAsArray(
 			members.driver
 				.getRouteViewDriverStream().delay(10)
-				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
-				.toProperty(),
+				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd()),
 
 			members.navItemDescriptorPropertyStream
 		).onValue(_handleRouteViewChange, navItemViewDriver);
@@ -127,10 +128,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 
 
-function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, params){
-	var navItemDescriptor = params[0];
-	var event = params[1];
-
+function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [navItemDescriptor, event]){
 	switch(event.eventName){
 		case 'mouseenter':
 
@@ -138,12 +136,12 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, p
 				navItemViewDriver.setHighlight(true);
 			}
 
-		break;
+			break;
 		case 'mouseleave':
 
 			navItemViewDriver.setHighlight(false);
 
-		break;
+			break;
 		case 'click':
 
 			if(navItemDescriptor.onClick){
@@ -157,18 +155,15 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, p
 				navItemViewDriver.toggleCollapse();
 			}
 
-		break;
+			break;
 		case 'expanded':
 		case 'collapsed':
 			eventEmitter.emit(event.eventName);
-		break;
+			break;
 	}
 }
 
-function _handleRouteViewChange(navItemViewDriver, paramHolder){
-	var routeViewDriver = paramHolder[0];
-	var navItemDescriptor = paramHolder[1];
-
+function _handleRouteViewChange(navItemViewDriver, [routeViewDriver, navItemDescriptor]){
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
 		routeViewDriver.doesMatchRouteID(navItemDescriptor.routeID) &&
