@@ -1,4 +1,3 @@
-import assert from 'assert';
 import RSVP from 'rsvp';
 import {extractThreads} from '../gmail-response-processor';
 import ajax from '../../../../common/ajax';
@@ -23,7 +22,9 @@ export default function getGmailThreadIdForRfcMessageId(driver, rfcMessageId) {
     }
   }).then(response => {
     const threads = extractThreads(response.text);
-    assert.equal(threads.length, 1);
+    if (threads.length !== 1) {
+      throw new Error("Failed to find gmail thread id for rfc message id. Message may not exist in user's account.");
+    }
     return threads[0].gmailThreadId;
   });
 }

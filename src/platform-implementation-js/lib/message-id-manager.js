@@ -69,7 +69,7 @@ export default class MessageIdManager {
     const promise = this._getGmailThreadIdForRfcMessageId(rfcMessageId);
     promise.then(gmailThreadId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
-    });
+    }, _.noop);
     return promise;
   }
 
@@ -84,7 +84,7 @@ export default class MessageIdManager {
     const promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
     promise.then(rfcMessageId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
-    });
+    }, _.noop);
     return promise;
   }
 }

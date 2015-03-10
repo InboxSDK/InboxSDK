@@ -6,11 +6,17 @@ import * as GRP from '../gmail-response-processor';
 
 const threadListSearchStrings = new WeakMap();
 
+function findIdFailure(id, err) {
+  console.log("Failed to find id for thread", id, err);
+  return null;
+}
+
 function doSearchReplacing(driver, onActivate) {
   const preexistingQuery = threadListSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
   }
+  let start;
   const newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
@@ -19,6 +25,7 @@ function doSearchReplacing(driver, onActivate) {
       e.query === newQuery
     )
     .flatMap(e => {
+      start = e.start;
       try {
         return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
       } catch(e) {
@@ -26,32 +33,56 @@ function doSearchReplacing(driver, onActivate) {
         return Bacon.once([]);
       }
     })
-    .map(threadIds => RSVP.Promise.all(threadIds.map(id =>
-      id[0] == '<' ?
-        driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(id).then(gtid => ({gtid, rfcId: id}))
-        :
-        driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(id).then(rfcId => ({gtid: id, rfcId}))
+    .mapError(e => {
+      driver.getLogger().error(e);
+      return [];
+    })
+    .map(ids => ids.map(id => {
+      if (typeof id === 'string') {
+        if (id[0] == '<') {
+          return {rfcId: id};
+        } else {
+          return {gtid: id};
+        }
+      } else {
+        return id;
+      }
+    }))
+    // Figure out any rfc ids we don't know yet
+    .map(idPairs => RSVP.Promise.all(idPairs.map(pair =>
+      pair.rfcId ? pair :
+      driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(pair.gtid)
+        .then(rfcId => ({gtid: pair.gtid, rfcId}), findIdFailure.bind(null, pair.gtid))
     )))
     .flatMap(Bacon.fromPromise)
-    .onValue(threadIds => {
-      const query = threadIds.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ');
+    .map(_.compact)
+    .onValue(idPairs => {
+      const query = idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ');
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
-      driver.getPageCommunicator().ajaxInterceptStream
-        .filter(e =>
-          e.type === 'searchResultsResponse' &&
-          e.query === newQuery
-        )
-        .map('.response')
-        .take(1)
-        .onValue(response => {
-          const extractedThreads = GRP.extractThreads(response);
-          const newThreads = _.chain(threadIds)
-            .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
-            .compact()
-            .value();
-          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
-          driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
-        });
+      Bacon.combineAsArray([
+        // Figure out any gmail thread ids we don't know yet
+        Bacon.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
+          pair.gtid ? pair :
+          driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
+            .then(gtid => ({gtid, rfcId: pair.rfcId}), findIdFailure.bind(null, pair.rfcId))
+        ))).map(_.compact),
+
+        driver.getPageCommunicator().ajaxInterceptStream
+          .filter(e =>
+            e.type === 'searchResultsResponse' &&
+            e.query === newQuery && e.start === start
+          )
+          .map('.response')
+          .take(1)
+      ]).onValue(([idPairs, response]) => {
+        const extractedThreads = GRP.extractThreads(response);
+        const newThreads = _.chain(idPairs)
+          .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
+          .compact()
+          .value();
+        const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+        driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
+      });
     });
   threadListSearchStrings.set(onActivate, newQuery);
   return newQuery;
