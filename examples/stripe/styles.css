@@ -1,0 +1,87 @@
+.rounded_stripe {
+  border-radius: 25px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left:25px;
+  margin-right:25px;
+}
+
+.stripe_sidebar_section {
+  border-top: 1px solid lightgray;
+  margin-top: 15px;
+}
+
+.stripe_sidebar_section .title {
+  color: gray;
+  font-variant: small-caps;
+  font-size: 140%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.stripe_sidebar_section .main {
+  margin-top: 15px;
+}
+
+.stripe_sidebar_section .secondary {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.row .name {
+  color: black;
+  font-weight: bold;
+}
+
+.row .details {
+  color: gray;
+}
+
+.row .description {
+  color: black;
+}
+
+.row .spacer {
+  flex-grow: 1;
+}
+
+.pay_status {
+  height: 15px;
+  padding-right: 5px;
+}
+
+.card {
+  height: 20px;
+  padding-right: 5px;
+}
+
+
+.num {
+  font-weight: bold;
+  font-size: 145%;
+}
+
+.num_description {
+  color: gray;
+}
+
+.person {
+  margin-bottom: 15px;
+}
+
+.person .name {
+  font-weight: bold;
+  font-size: 110%;
+}
+
+.gmail_simple_button {
+  margin: 10px;
+}
