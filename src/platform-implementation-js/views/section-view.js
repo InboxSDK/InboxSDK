@@ -211,7 +211,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	subtitle: null,
 
 	/**
-	* Text to display in the summary area of the CollapsibleSectionView. Typically page
+	* Link to display in the summary area of the SectionView. Typically page
 	* counts are displayed here.
 	* ^optional
 	* ^default=null
@@ -220,7 +220,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	titleLinkText: null,
 
 	/**
-	* A function to call when the summary text has been clicked
+	* A function to call when the title link has been clicked
 	* ^optional
 	* ^default=null
 	* @type {function()}
@@ -244,8 +244,28 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	*/
 	onDropdownClick: null,
 
+	/**
+	* An arbitrary HTML element to place above the table rows but below the title
+	* ^optional
+	* ^default=null
+	* @type {HTMLElement}
+	*/
+	contentElement: null,
+
+	/**
+	* A link to place in the footer of the SectionView
+	* ^optional
+	* ^default=null
+	* @type {String}
+	*/
 	footerLinkText: null,
 
+	/**
+	* A function to call when the link in the footer is clicked
+	* ^optional
+	* ^default=null
+	* @type {function()}
+	*/
 	onFooterLinkClick: null
 };
 
