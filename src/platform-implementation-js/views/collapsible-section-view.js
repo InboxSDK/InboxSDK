@@ -32,12 +32,16 @@ CollapsibleSectionView.prototype = Object.create(EventEmitter.prototype);
 
 _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ {
 
+	/**
+	* @param value {boolean} whether to set the
+	*/
 	setCollapsed: function(value){
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
 	},
 
 	/**
 	* Removes this section from the current Route
+	* @return {void}
 	*/
 	remove: function(){
 		this.destroy();
@@ -56,16 +60,19 @@ _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ 
 	}
 
 	/**
-	 * Fires "destroy" event when no longer valid
-	 */
+	* Fires when the CollapsibleSectionView is no longer visible
+	* @event CollapsibleSectionView#destroy
+	*/
 
 	/**
-	 * Fires "expanded" event when section is expanded
-	 */
+	* Fires when the CollapsibleSectionView is expanded
+	* @event CollapsibleSectionView#expanded
+	*/
 
 	/**
-	 * Fires "collapsed" event when section is collapsed
-	 */
+	* Fires when the CollapsibleSectionView is collapsed
+	* @event CollapsibleSectionView#collapsed
+	*/
 
 });
 
@@ -118,146 +125,5 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 
 	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'destroy');
 }
-
-/**
-* @class
-* Represents the a single row to render in CollapsibleSectionViews
-*/
-var RowDescriptor = /** @lends RowDescriptor */ {
-
-	/**
-	 * First textual column
-	 * @type {string}
-	 */
-	title: null,
-
-	/**
-	 * Second textual column
-	 * @type {string}
-	 */
-	body: null,
-
-	/**
-	 * Last text right-aligned. Often used for dates.
-	 * @type {string}
-	 */
-	shortDetailText: null,
-
-	/**
-	* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles
-	* @type {string}
-	*/
-	isRead: null,
-
-	/**
-	* Any labels that should be rendered. A LabelDescriptor simply has title, backgroundColor, and foregroundColor string properties.
-	* @type {LabelDescriptor[]}
-	*/
-	labels: null,
-
-	/**
-	* An optional url to an icon to display on the left side of the row
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	iconUrl: null,
-
-	/**
-	* An optional class to apply to the icon
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	iconClass: null,
-
-	/**
-	 * The name of the route to navigate to when the row is clicked on
-	 * ^optional
-	 * ^default=null
-	 * @type {string}
-	 */
-	routeID: null,
-
-	/**
-	 * The parameters of the route being navigated to when the row is clicked on
-	 * ^optional
-	 * ^default=null
-	 * @type {string[]}
-	 */
-	routeParams: null,
-
-
-	/**
-	 * Callback for when the row is clicked on
-	 * ^optional
-	 * ^default=null
-	 * @type {function}
-	 */
-	onClick: null
-
-};
-
-
-/**
-* @class
-* The properties required to create a CollapsibleSectionView
-*/
-var CollapsibleSectionDescriptor = /** @lends CollapsibleSectionDescriptor */ {
-
-	/**
-	* Main title
-	* @type {string}
-	*/
-	title: null,
-
-	/**
-	* Subtitle
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	subtitle: null,
-
-	/**
-	* Text to display in the summary area of the CollapsibleSectionView. Typically page
-	* counts are displayed here.
-	* ^optional
-	* ^default=null
-	* @type {string}
-	*/
-	titleLinkText: null,
-
-	/**
-	* A function to call when the summary text has been clicked
-	* ^optional
-	* ^default=null
-	* @type {function()}
-	*/
-	onTitleLinkClick: null,
-
-	/**
-	* Whether to display a dropdown arrow for more options on the collapsible section
-	* ^optional
-	* ^default=false
-	* @type {boolean}
-	*/
-	hasDropdown: null,
-
-	/**
-	* A function to call when the dropdown is opened. Your function is passed an
-	* event object with a single <code>dropdown</code> property.
-	* ^optional
-	* ^default=null
-	* @type {function(event)}
-	*/
-	onDropdownClick: null,
-
-	footerLinkText: null,
-
-	onFooterLinkClick: null
-};
-
-
 
 module.exports = CollapsibleSectionView;

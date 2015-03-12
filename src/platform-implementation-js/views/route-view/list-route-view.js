@@ -38,7 +38,7 @@ ListRouteView.prototype = Object.create(RouteView.prototype);
 _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 	/**
-	 * Adds a collapsible section to the top of the page.
+	 * Adds a collapsible section to the top of the page
 	 * @param {CollapsibleSectionDescriptor} configuration options of the CollapsibleSectionView
 	 * @returns {CollapsibleSectionView} the CollapsibleSectionView that was added
 	 */
@@ -52,6 +52,11 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 		return collapsibleSectionView;
 	},
 
+	/**
+	 * Adds a non-collapsible section to the top of the page
+	 * @param {SectionDescriptor} configuration options of the CollapsibleSectionView
+	 * @returns {SectionView} the SectionView that was added
+	 */
 	addSection: function(sectionDescriptor){
 		var members = membersMap.get(this);
 
