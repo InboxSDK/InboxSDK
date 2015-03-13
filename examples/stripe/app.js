@@ -1,27 +1,21 @@
 var cachedCustomerPromises = {};
 
 var seenSidebarEmails = new WeakMap();
-var emailsAddedToSidebar = new WeakMap();
 var sidebarForThread = new WeakMap();
 
 var stripeInfoPromise = null;
 
-var templateHtmlPromise = null;
+var sidebarTemplatePromise = null;
 
-Promise.all([
-  InboxSDK.load('1', 'stripe'),
-  InboxSDK.loadScript('https://code.jquery.com/jquery-2.1.3.min.js'),
-  InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js')
-])
-.then(function(results){
-  var sdk = results[0];
+
+InboxSDK.load('1', 'stripe').then(function(sdk) {
 	stripeInfoPromise = getStripeInfo();
 
 	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var contacts = threadRowView.getContacts();
 		for (var i = 0; i < contacts.length; i++) {
 			var contact = contacts[i];
-			getStripeCustomer(contact, sdk.User.getEmailAddress()).then(function(customer) {
+      getStripeCustomerWithoutMyDomain(contact, sdk.User.getEmailAddress()).then(function(customer) {
 				if (customer != null) {
 					addStripeIndicatorToThreadRow(threadRowView, contact.emailAddress);
 				}
@@ -35,10 +29,6 @@ Promise.all([
 			seenSidebarEmails.set(threadView, []);
 		}
 
-		if (!emailsAddedToSidebar.has(threadView)) {
-			emailsAddedToSidebar.set(threadView, []);
-		}
-
 		var contacts = messageView.getRecipients();
 		contacts.push(messageView.getSender());
 
@@ -50,7 +40,7 @@ Promise.all([
 			seenSidebarEmails.get(threadView).push(contact.emailAddress);
 
 
-      getStripeCustomer(contact, sdk.User.getEmailAddress()).then(function(customer) {
+      getStripeCustomerWithoutMyDomain(contact, sdk.User.getEmailAddress()).then(function(customer) {
 				if (customer != null) {
           addStripeSidebar(threadView, customer);
 				}
@@ -62,10 +52,6 @@ Promise.all([
 
 
 function addStripeSidebar(threadView, customer) {
-	if (emailsAddedToSidebar.get(threadView).indexOf(customer.email) != -1) {
-		return;
-	}
-
 	if (!sidebarForThread.has(threadView)) {
 		sidebarForThread.set(threadView, document.createElement('div'));
 
@@ -76,14 +62,14 @@ function addStripeSidebar(threadView, customer) {
 		});
 	}
 
-  if (!templateHtmlPromise) {
-    templateHtmlPromise = get(chrome.runtime.getURL('templates.html'), null, null);
+  if (!sidebarTemplatePromise) {
+    sidebarTemplatePromise = get(chrome.runtime.getURL('sidebarTemplate.html'), null, null);
   }
 
   Promise.all([
     stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/invoices", {customer: customer.id, count: 50, limit: 50}),
     stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/customers/" + customer.id + "/subscriptions", {count: 50, limit: 50}),
-    templateHtmlPromise
+    sidebarTemplatePromise
   ])
   .then(function(results) {
 
@@ -144,6 +130,7 @@ function transformInvoices(invoices) {
 }
 
 function createStats(customer, subscriptions, invoices) {
+  var mostRecentSub = subscriptions.data[subscriptions.data.length - 1];
   var retVal = {
     totalSpend: 0,
     currentMRR: (subscriptions.data ? subscriptions.data[0].discountedPrice : 0)
@@ -185,7 +172,7 @@ function stripeGet(url, params) {
 	});
 }
 
-function getStripeCustomer(contact, currentUserEmail) {
+function getStripeCustomerWithoutMyDomain(contact, currentUserEmail) {
 	if (!cachedCustomerPromises[contact.emailAddress]) {
 		if (contact.emailAddress.split("@")[1] === currentUserEmail.split("@")[1]) {
 			cachedCustomerPromises[contact.emailAddress] = new Promise(function(resolve, reject) {

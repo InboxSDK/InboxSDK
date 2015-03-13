@@ -1,14 +1,17 @@
 {
   "name": "Stripe for Gmail",
   "description": "Show Stripe customer information in Gmail",
-  "version": "0.2",
+  "version": "0.4",
+  "icons": {
+    "128": "stripe.png"
+  },
   "content_scripts": [
     {
       "matches": [
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js","app.js"],
+      "js": ["jquery.js", "underscore.js", "inboxsdk.js","app.js"],
       "css": ["styles.css"],
       "run_at": "document_end"
     }
@@ -16,15 +19,14 @@
   "permissions": [
     "https://mail.google.com/",
     "https://inbox.google.com/",
-    "https://*.stripe.com/",
-    "https://code.jquery.com/"
+    "https://*.stripe.com/"
   ],
   "web_accessible_resources": [
     "stripe.png",
     "paid.png",
     "unpaid.png",
     "cards/*",
-    "templates.html"
+    "sidebarTemplate.html"
   ],
   "manifest_version": 2
 }
