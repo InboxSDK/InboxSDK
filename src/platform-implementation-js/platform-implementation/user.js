@@ -13,9 +13,9 @@ var User = function(appId, driver){
 _.extend(User.prototype, /** @lends User */ {
 
 	/**
-  * Get the email address of the currently logged in user
-  * @return {string} an email address
-  */
+	  * Get the email address of the currently logged in user
+	  * @return {string} an email address
+	  */
 	getEmailAddress: function() {
 		return this._driver.getUserEmailAddress();
 	}

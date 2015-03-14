@@ -57,7 +57,7 @@ _.extend(GmailNavItemView.prototype, {
 	],
 
 	setNavItemDescriptor: function(navItemDescriptorPropertyStream){
-		navItemDescriptorPropertyStream.onValue(this, '_updateValues');
+		navItemDescriptorPropertyStream.takeUntil(this._eventStream.filter(false).mapEnd()).onValue(this, '_updateValues');
 	},
 
 	addNavItem: function(orderGroup, navItemDescriptor){
@@ -179,10 +179,15 @@ _.extend(GmailNavItemView.prototype, {
 	},
 
 	_updateType: function(type){
+		if(!this._element){
+			return;
+		}
+
 		type = type || NAV_ITEM_TYPES.NAVIGATION;
 		if(this._type === type){
 			return;
 		}
+
 
 		var nameElement = this._element.querySelector('.inboxsdk__navItem_name');
 
