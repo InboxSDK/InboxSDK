@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 
-var EventEmitter = require('events').EventEmitter;
+var SectionView = require('./section-view');
 
 var membersMap = new WeakMap();
 
@@ -19,8 +19,6 @@ var membersMap = new WeakMap();
 * the CollapsibleSectionView will simply display a "Loading..." indicator.
 */
 var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
-	EventEmitter.call(this);
-
 	var members = {};
 	membersMap.set(this, members);
 	members.collapsibleSectionViewDriver = collapsibleSectionViewDriver;
@@ -28,7 +26,7 @@ var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
 	_bindToEventStream(this, collapsibleSectionViewDriver, driver);
 };
 
-CollapsibleSectionView.prototype = Object.create(EventEmitter.prototype);
+CollapsibleSectionView.prototype = Object.create(SectionView.prototype);
 
 _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ {
 
