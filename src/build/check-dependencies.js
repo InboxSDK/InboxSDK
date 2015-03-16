@@ -3,6 +3,8 @@ var _ = require('lodash');
 var assert = require('assert');
 var semver = require('semver');
 
+var optionalDeps = ['fsevents'];
+
 function checkDependency(version, depname) {
   var depPackage = require(depname+'/package.json');
   if (!semver.satisfies(depPackage.version, version)) {
@@ -17,7 +19,9 @@ function checkDependenciesRecursive(packagePath, shrinkWrap) {
   var package = require(packagePath.join('/node_modules/')+'/package.json');
   assert.strictEqual(package.version, shrinkWrap.version);
   _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
-    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+    if (!_.contains(optionalDeps, depname)) {
+      checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+    }
   });
 }
 
