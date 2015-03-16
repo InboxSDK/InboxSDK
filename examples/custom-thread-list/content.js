@@ -13,8 +13,8 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		console.log('beep activate', arguments);
 		return [
 			'<CADBYpy=tCAyweRdjMTuvKd5y8XYtbJZmQHW19gTOgAhotQtYQA@mail.gmail.com>',
-			'<bcaec51b1acbb643d8050b8ee898@google.com>',
-			'<047d7b6760760bc84f050b66ad3e@google.com>',
+			'14aa38f8a9552dd5',
+			'14a9942d5a69f0cc',
 			'<CADBYpykj83T_cW9Xpb6jKAq7_RuKvcEZ6qfccJd6JLq2ndm4iA@mail.gmail.com>',
 			'<047d7b0722a8b0e3f2050b65a36b@google.com>',
 			'<047d7b6d83be145f07050b63eb10@google.com>',
@@ -53,11 +53,22 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 			'<CAKDYPWBbyyHko3Q2HG=OCw=XST7QSstecenNUM9q0E91Ebr2hA@mail.gmail.com>',
 			'<CAG5517AWbP2uBmq-P4v+5Dxq1ORN3_8Wf4aA25g4beB66Z=+yA@mail.gmail.com>',
 			'<702cdc6d8ae2fee48124bfb55e9207b8132.20141209180343@mail157.atl21.rsgsv.net>',
-			'<047d7b11208ffa58f50509caa4f1@google.com>',
+			'14a2fc7f186e6fe7',
 			'<bcaec517cdb65def830509c5a0de@google.com>',
 			'<CADBYpymTHxjOsXsXjeGShiTpbnuuDC5Mh31LACkSE8ACWZp0mQ@mail.gmail.com>',
 			'<6-5288392773638389732-2578584358222473794-googleappengine=googlecode.com@googlecode.com>'
 		];
+	});
+
+	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
+		var routeID = sdk.Router.getCurrentRouteView().getRouteID();
+		if (routeID === 'search/:query/:page') {
+			threadRowView.replaceDate({
+				text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
+				textColor: 'green',
+				title: 'beep'
+			});
+		}
 	});
 
 	var customNavItem = sdk.NavMenu.addNavItem({
