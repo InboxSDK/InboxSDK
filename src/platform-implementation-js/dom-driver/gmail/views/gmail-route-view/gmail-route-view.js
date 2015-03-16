@@ -76,7 +76,7 @@ _.extend(GmailRouteView.prototype, {
 			return this._doesMatchCustomRouteID(routeID);
 		}
 		else{
-			if(routeID !== this._getRouteID()){
+			if(routeID !== this.getRouteID()){
 				return false;
 			}
 
@@ -86,14 +86,6 @@ _.extend(GmailRouteView.prototype, {
 			var paramKeys = Object.keys(nativeParams);
 			return _.isEqual(paramKeys.sort(), extractedParamKeys.sort());
 		}
-	},
-
-	getRouteID: function(){
-		return this._getRouteID();
-	},
-
-	getRouteType: function(){
-		return this._getRouteType();
 	},
 
 	getParams: function(routeID){
@@ -126,7 +118,7 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint, isCollapsible){
-		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView
@@ -320,10 +312,10 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isSearchRoute: function(){
-		return this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH;
+		return this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH;
 	},
 
-	_getRouteType: function(){
+	getRouteType: function(){
 		if(this._isCustomRoute){
 			return this._gmailRouteProcessor.RouteTypes.CUSTOM;
 		}
@@ -391,7 +383,7 @@ _.extend(GmailRouteView.prototype, {
 			page: this._getPageParam()
 		};
 
-		if(this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
+		if(this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
 			if(this._paramsArray[0] && this._paramsArray[0].indexOf('p') === -1){
 				params.labelName = this._paramsArray[0];
 			}
@@ -434,7 +426,7 @@ _.extend(GmailRouteView.prototype, {
 		return 1;
 	},
 
-	_getRouteID: function(){
+	getRouteID: function(){
 		if(this._isCustomRoute){
 			return null;
 		}
