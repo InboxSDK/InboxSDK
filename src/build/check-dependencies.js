@@ -33,8 +33,8 @@ function checkDependencies(package) {
     }
   } catch(e) {
     console.error(
-      "Dependencies check failed. Try running `npm install` to fix. If that doesn't\n" +
-      "fix the issue, then delete your node_modules folder and re-run the command."
+      "Dependencies check failed. To fix, run:\n" +
+      "    rm -rf node_modules && npm install"
     );
     throw e;
   }
