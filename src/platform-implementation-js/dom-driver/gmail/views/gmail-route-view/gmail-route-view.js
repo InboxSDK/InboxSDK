@@ -441,11 +441,9 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_extractParamKeysFromRouteID: function(routeID){
-		return routeID.split('/').filter(function(part){
-			return part.indexOf(':') === 0;
-		}).map(function(part){
-			return part.substring(1);
-		});
+		return routeID.split('/')
+			.filter(part => part[0] === ':')
+			.map(part => part.substring(1));
 	},
 
 	_doesMatchCustomRouteID: function(routeID){
