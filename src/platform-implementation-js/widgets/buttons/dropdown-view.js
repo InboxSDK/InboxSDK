@@ -6,12 +6,23 @@ var Bacon = require('baconjs');
 var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
 
+/**
+* @class
+* This class represents a Dropdown returned by the SDK to the app in various places.
+* The dropdown can be filled with your apps content, but it automatically handles dismissing
+* the dropdown on certain user actions.
+*/
 var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions){
 	EventEmitter.call(this);
 
 	var self = this;
 
 	this._dropdownViewDriver = dropdownViewDriver;
+
+	/**
+	* The HTML element that is displayed in the dropdown
+	* @type {HTMLElement}
+	*/
 	this.el = dropdownViewDriver.getContentElement();
 	this.closed = false;
 
@@ -45,8 +56,12 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 
 DropdownView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(DropdownView.prototype, {
+_.extend(DropdownView.prototype, /** @lends DropdownView */ {
 
+	/**
+	* Closes the dropdown
+	* @return {void}
+	*/
 	close: function() {
 		if (!this.closed) {
 			this.closed = true;

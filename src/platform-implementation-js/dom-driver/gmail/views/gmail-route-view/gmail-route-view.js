@@ -76,6 +76,10 @@ _.extend(GmailRouteView.prototype, {
 			return this._doesMatchCustomRouteID(routeID);
 		}
 		else{
+			if(routeID !== this._getRouteID()){
+				return false;
+			}
+
 			var nativeParams = this.getParams(routeID);
 			var extractedParamKeys = this._extractParamKeysFromRouteID(routeID);
 

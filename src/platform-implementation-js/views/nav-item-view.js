@@ -57,6 +57,11 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 	setNavItemViewDriver: function(navItemViewDriver){
 		var members = memberMap.get(this);
+		if(!members.driver){
+			members.deferred.resolve(navItemViewDriver);
+			return; //we have been removed already
+		}
+
 		members.navItemViewDriver = navItemViewDriver;
 
 		Bacon.combineAsArray(

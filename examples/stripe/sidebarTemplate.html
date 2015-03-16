@@ -1,0 +1,88 @@
+<div class="column person">
+  <div class="name"><%- customer.name %></div>
+  <div><%- customer.email %></div>
+  <a class="gmail_simple_button" href="<%- customer.dashboardURL %>" target="_blank">
+    <div role="button" class="J-J5-Ji T-I T-I-ax7 ayk-axZ-aup-I-UR ayk-axZ-aup-I ayk-axZ-aup-at2 T-I-JW T-I-Zf-aw2" style="visibility: visible; -webkit-user-select: none;">
+      <span class="Txql0d ayk-axZ-aup-I-Jm-UR">View on Stripe</span>
+    </div>
+  </a>
+</div>
+
+<div class="row">
+  <div class="column">
+    <div class="num"><%- formatStripeCurrency(stats.currentMRR, 0) %></div>
+    <div class="num_description">MRR</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="column">
+    <div class="num"><%- formatStripeCurrency(stats.totalSpend, 0) %></div>
+    <div class="num_description">Total</div>
+  </div>
+</div>
+
+
+
+<div class="stripe_sidebar_section">
+  <p class="title">Active Subscriptions</p>
+  <%
+    _.each(subscriptions.data, function(sub) {
+      if (sub.status = "active") {
+  %>
+        <div class="row main">
+          <div class="name"><%- sub.quantity %> x <%- sub.plan.name %></div>
+          <div class="spacer"></div>
+          <div class="details">(<%- formatStripeCurrency(sub.discountedPrice, 0) %>/month)</div>
+        </div>
+
+        <div class="row secondary">
+          <div class="spacer"></div>
+          <!-- <div class="actions">Edit | Cancel</div> -->
+        </div>
+  <%  }
+    });
+  %>
+<div>
+
+<div class="stripe_sidebar_section">
+  <p class="title">Recent Invoices</p>
+  <%
+    _.each(invoices.data, function(inv, i) {
+      if (i > 2) return;
+  %>
+      <div class="row main">
+        <div class="name"><%- formatStripeCurrency(inv.total, 2) %></div>
+        <div class="spacer"></div>
+        <div class="details"><%- new Date(inv.date*1000).toLocaleDateString() %></div>
+      </div>
+
+      <div class="row secondary">
+        <img class="pay_status" src="<%- inv.imageUrl %>"></img>
+        <div class="description row"><%- inv.paid ? "Paid" : "Failed" %></div>
+        <div class="spacer"></div>
+        <!-- <div class="actions">Refund</div> -->
+      </div>
+  <%
+    });
+  %>
+</div>
+
+
+<div class="stripe_sidebar_section">
+  <p class="title">Cards</p>
+  <%
+    if (!customer.sources.data) {
+      return;
+    }
+    _.each(customer.sources.data, function(source) {
+
+  %>
+      <div class="row main">
+        <img class="card" src="<%- source.imageUrl %>"></img>
+        <div class="name row">**** **** **** <%- source.last4 %></div>
+        <div class="spacer"></div>
+        <div class="details"><%- source.exp_month %>/<%- source.exp_year %></div>
+      </div>
+  <%
+    });
+  %>
+</div>

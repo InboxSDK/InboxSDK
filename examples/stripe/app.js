@@ -1,29 +1,23 @@
 var cachedCustomerPromises = {};
 
 var seenSidebarEmails = new WeakMap();
-var emailsAddedToSidebar = new WeakMap();
 var sidebarForThread = new WeakMap();
 
 var stripeInfoPromise = null;
 
-var templateHtmlPromise = null;
+var sidebarTemplatePromise = null;
 
-Promise.all([
-  InboxSDK.load('1', 'stripe'),
-  InboxSDK.loadScript('https://code.jquery.com/jquery-2.1.3.min.js'),
-  InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js')
-])
-.then(function(results){
-  var sdk = results[0];
+
+InboxSDK.load('1', 'stripe').then(function(sdk) {
 	stripeInfoPromise = getStripeInfo();
 
 	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var contacts = threadRowView.getContacts();
 		for (var i = 0; i < contacts.length; i++) {
-			var email = contacts[i].emailAddress;
-			getStripeCustomer(email, sdk.User.getEmailAddress()).then(function(customer) {
+			var contact = contacts[i];
+      getStripeCustomerWithoutMyDomain(contact, sdk.User.getEmailAddress()).then(function(customer) {
 				if (customer != null) {
-					addStripeIndicatorToThreadRow(threadRowView, email);
+					addStripeIndicatorToThreadRow(threadRowView, contact.emailAddress);
 				}
 			});
 		}
@@ -35,22 +29,18 @@ Promise.all([
 			seenSidebarEmails.set(threadView, []);
 		}
 
-		if (!emailsAddedToSidebar.has(threadView)) {
-			emailsAddedToSidebar.set(threadView, []);
-		}
-
 		var contacts = messageView.getRecipients();
 		contacts.push(messageView.getSender());
 
 		for (var i = 0; i < contacts.length; i++) {
-			var email = contacts[i].emailAddress;
-			if (seenSidebarEmails.get(threadView).indexOf(email) != -1) {
+			var contact = contacts[i];
+			if (seenSidebarEmails.get(threadView).indexOf(contact.emailAddress) != -1) {
 				continue;
 			}
-			seenSidebarEmails.get(threadView).push(email);
+			seenSidebarEmails.get(threadView).push(contact.emailAddress);
 
 
-      getStripeCustomer(email, sdk.User.getEmailAddress()).then(function(customer) {
+      getStripeCustomerWithoutMyDomain(contact, sdk.User.getEmailAddress()).then(function(customer) {
 				if (customer != null) {
           addStripeSidebar(threadView, customer);
 				}
@@ -62,10 +52,6 @@ Promise.all([
 
 
 function addStripeSidebar(threadView, customer) {
-	if (emailsAddedToSidebar.get(threadView).indexOf(customer.email) != -1) {
-		return;
-	}
-
 	if (!sidebarForThread.has(threadView)) {
 		sidebarForThread.set(threadView, document.createElement('div'));
 
@@ -76,24 +62,85 @@ function addStripeSidebar(threadView, customer) {
 		});
 	}
 
-  if (!templateHtmlPromise) {
-    templateHtmlPromise = get(chrome.runtime.getURL('templates.html'), null, null);
+  if (!sidebarTemplatePromise) {
+    sidebarTemplatePromise = get(chrome.runtime.getURL('sidebarTemplate.html'), null, null);
   }
 
   Promise.all([
     stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/invoices", {customer: customer.id, count: 50, limit: 50}),
     stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/customers/" + customer.id + "/subscriptions", {count: 50, limit: 50}),
-    templateHtmlPromise
+    sidebarTemplatePromise
   ])
   .then(function(results) {
-    console.log(results);
-    var template = _.template(results[2]);
-    sidebarForThread.get(threadView).innerHTML = sidebarForThread.get(threadView).innerHTML + template({customer: customer, invoices: results[0], subscriptions: results[1]});
+
+    var invoices = results[0];
+    var subscriptions = results[1];
+    var html = results[2];
+
+
+    transformCustomer(customer);
+    transformSubscriptions(subscriptions);
+    transformInvoices(invoices);
+    var stats = createStats(customer, subscriptions, invoices);
+
+    var template = _.template(html);
+    sidebarForThread.get(threadView).innerHTML = sidebarForThread.get(threadView).innerHTML + template({
+      customer: customer,
+      invoices: invoices,
+      subscriptions: subscriptions,
+      stats: stats
+    });
   });
 
+}
 
+function formatStripeCurrency(amount, digits) {
+  return (amount/100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: digits, minimumFractionDigits: digits });
+}
 
+function transformCustomer(customer) {
+  for (var i = 0; i < customer.sources.data.length; i++) {
+    var source = customer.sources.data[i];
+    source.imageUrl = chrome.runtime.getURL('cards/' + source.brand  + '.png');
+  }
+  customer.dashboardURL = "https://dashboard.stripe.com/customers/" + customer.id;
+}
 
+function transformSubscriptions(subscriptions) {
+  _.sortBy(subscriptions.data, 'start');
+  for (var i = 0; i < subscriptions.data.length; i++) {
+    var sub = subscriptions.data[i];
+    sub.discountedPrice = sub.plan.amount;
+    if (sub.discount && sub.discount.coupon && sub.discount.coupon.valid) {
+      if (sub.discount.coupon.amount_off) {
+        sub.discountedPrice = sub.discountedPrice - sub.discount.coupon.amount_off;
+      }
+      else if (sub.discount.coupon.percent_off) {
+        sub.discountedPrice = sub.discountedPrice * (100 - sub.discount.coupon.percent_off) / 100;
+      }
+    }
+  }
+}
+
+function transformInvoices(invoices) {
+  for (var i = 0; i < invoices.data.length; i++) {
+    var inv = invoices.data[i];
+    inv.imageUrl = inv.paid ? chrome.runtime.getURL('paid.png') : chrome.runtime.getURL('unpaid.png');
+  }
+}
+
+function createStats(customer, subscriptions, invoices) {
+  var mostRecentSub = subscriptions.data[subscriptions.data.length - 1];
+  var retVal = {
+    totalSpend: 0,
+    currentMRR: (subscriptions.data ? subscriptions.data[0].discountedPrice : 0)
+  };
+
+  _.each(invoices.data, function(inv) {
+    retVal.totalSpend += inv.total;
+  });
+
+  return retVal;
 }
 
 function addStripeIndicatorToThreadRow(threadRowView, email) {
@@ -125,26 +172,27 @@ function stripeGet(url, params) {
 	});
 }
 
-function getStripeCustomer(email, currentUserEmail) {
-	if (!cachedCustomerPromises[email]) {
-		if (email.split("@")[1] === currentUserEmail.split("@")[1]) {
-			cachedCustomerPromises[email] = new Promise(function(resolve, reject) {
+function getStripeCustomerWithoutMyDomain(contact, currentUserEmail) {
+	if (!cachedCustomerPromises[contact.emailAddress]) {
+		if (contact.emailAddress.split("@")[1] === currentUserEmail.split("@")[1]) {
+			cachedCustomerPromises[contact.emailAddress] = new Promise(function(resolve, reject) {
 				resolve(null);
 			});
 		}
 		else {
-			cachedCustomerPromises[email] = stripeGet('https://dashboard.stripe.com/ajax/proxy/api/v1/search', {count:20, query:email})
+			cachedCustomerPromises[contact.emailAddress] = stripeGet('https://dashboard.stripe.com/ajax/proxy/api/v1/search', {count:20, query:contact.emailAddress})
 			.then(function(result){
 				for (var i = 0; i < result.data.length; i++) {
 					if (result.data[i].object == "customer") {
-						return result.data[i];
+						result.data[i].name = contact.name;
+            return result.data[i];
 					}
 				}
 				return null;
 			});
 		}
 	}
-	return cachedCustomerPromises[email];
+	return cachedCustomerPromises[contact.emailAddress];
 }
 
 function getStripeInfo() {

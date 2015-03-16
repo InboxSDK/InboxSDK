@@ -19,6 +19,16 @@ inboxSDK.NavMenu.SENT_MAIL.addNavItem({
 });
 
 
+inboxSDK.NavMenu.addNavItem({
+	name: 'beep',
+	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+	routeID: 'beep'
+});
+
+inboxSDK.Router.handleCustomRoute('beep', function(customRouteView){
+	customRouteView.getElement().innerHTML = 'beep';
+});
+
 var navItem = inboxSDK.NavMenu.addNavItem({
 	name: 'Monkeys',
 	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),

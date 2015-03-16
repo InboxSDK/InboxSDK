@@ -381,7 +381,15 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	* ^default=0
 	* @type {number}
 	*/
-	orderHint:null
+	orderHint:null,
+
+	/**
+	* If false, the button will be disabled and will not emit any events.
+	* ^optional
+	* ^default=true
+	* @type {boolean}
+	*/
+	enabled: null
 };
 
 

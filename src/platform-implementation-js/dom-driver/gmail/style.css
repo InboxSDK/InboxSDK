@@ -504,6 +504,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   text-decoration: underline;
 }
 
+.inboxsdk__navItem_container .aio.aip {
+  white-space: nowrap;
+  width: 300%;
+}
+
 /* end nav menu */
 
 

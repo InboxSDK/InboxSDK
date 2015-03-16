@@ -3,6 +3,8 @@ var _ = require('lodash');
 var assert = require('assert');
 var semver = require('semver');
 
+var optionalDeps = ['fsevents'];
+
 function checkDependency(version, depname) {
   var depPackage = require(depname+'/package.json');
   if (!semver.satisfies(depPackage.version, version)) {
@@ -17,7 +19,9 @@ function checkDependenciesRecursive(packagePath, shrinkWrap) {
   var package = require(packagePath.join('/node_modules/')+'/package.json');
   assert.strictEqual(package.version, shrinkWrap.version);
   _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
-    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+    if (!_.contains(optionalDeps, depname)) {
+      checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+    }
   });
 }
 
@@ -33,8 +37,8 @@ function checkDependencies(package) {
     }
   } catch(e) {
     console.error(
-      "Dependencies check failed. Try running `npm install` to fix. If that doesn't\n" +
-      "fix the issue, then delete your node_modules folder and re-run the command."
+      "Dependencies check failed. To fix, run:\n" +
+      "    rm -rf node_modules && npm install"
     );
     throw e;
   }
