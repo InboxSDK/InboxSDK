@@ -47,6 +47,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_paramsArray', destroy: false},
 		{name: '_hash', get: true, destroy: false},
 		{name: '_isCustomRoute', destroy: true},
+		{name: '_customRouteID', destroy: false, set: true},
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
@@ -428,7 +429,7 @@ _.extend(GmailRouteView.prototype, {
 
 	getRouteID: function(){
 		if(this._isCustomRoute){
-			return null;
+			return this._customRouteID;
 		}
 		else{
 			if(this._isThreadRoute()){

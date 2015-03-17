@@ -72,13 +72,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		}
 
 		return members.params;
-	},
-
-	/* TODO NOT PUBLIC, get it outta here */
-	setRouteID: function(routeID){
-		membersMap.get(this).routeID = routeID;
-	},
-
+	}
 
 	/**
 	* Fires when this RouteView instance is navigated away from

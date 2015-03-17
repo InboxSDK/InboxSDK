@@ -456,14 +456,12 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 
 		relevantCustomRoutes.forEach(customRoute => {
 			if(_.isArray(customRoute.routeID)){
-				customRouteView.setRouteID(
+				routeViewDriver.setCustomRouteID(
 					_.find(customRoute.routeID, routeID => routeViewDriver.doesMatchRouteID(routeID))
 				);
 			}else{
-				customRouteView.setRouteID(customRoute.routeID);
+				routeViewDriver.setCustomRouteID(customRoute.routeID);
 			}
-
-			routeView.setRouteID(customRouteView.getRouteID());
 
 			try {
 				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
