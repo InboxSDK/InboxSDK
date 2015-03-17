@@ -75,8 +75,8 @@ _.extend(GmailDriver.prototype, {
 		window.dispatchEvent(hce);
 	},
 
-	showCustomThreadList(onActivate) {
-		require('./gmail-driver/show-custom-thread-list')(this, onActivate);
+	showCustomThreadList(customRouteID, onActivate) {
+		require('./gmail-driver/show-custom-thread-list')(this, customRouteID, onActivate);
 	},
 
 	showCustomRouteView: function(element){

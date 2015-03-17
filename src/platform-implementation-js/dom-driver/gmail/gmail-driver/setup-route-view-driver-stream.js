@@ -19,37 +19,38 @@ function setupRouteViewDriverStream(GmailRouteProcessor){
 				//if we're to or from a custom view then push to the routeViewDriverStream right away
 				Bacon.fromEventTarget(window, 'hashchange')
 						.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-						.map('.newURL')
-						.filter(newURL => newURL == document.location.href) // ignore outdated events
-						.map(getURLObject)
-						.filter(_shouldHandleHashChange(GmailRouteProcessor)),
-
+						.filter(event => event.newURL == document.location.href) // ignore outdated events
+						.map(({_inboxsdk_customThreadListRouteID, newURL}) => ({
+							customThreadListRouteID: _inboxsdk_customThreadListRouteID,
+							urlObject: getURLObject(newURL)
+						}))
+						.filter(({urlObject}) => _shouldHandleHashChange(GmailRouteProcessor, urlObject)),
 
 				//when native gmail changes main view there's a div that takes on role=main
 				GmailElementGetter
 						.getMainContentElementChangedStream()
-						.map(null)
+						.map({})
 			)
 			.map(_createRouteViewDriver, GmailRouteProcessor);
 
 }
 
-function _shouldHandleHashChange(GmailRouteProcessor){
-	return function(urlObject){
-		return  !GmailElementGetter.isStandalone() &&
-				!GmailRouteProcessor.isNativeRoute(urlObject.name) ||
-				!GmailRouteProcessor.isNativeRoute(currentUrlObject.name) ||
-				GmailRouteProcessor.isContactRouteName(urlObject.name);
-	};
+function _shouldHandleHashChange(GmailRouteProcessor, urlObject){
+	return !GmailElementGetter.isStandalone() &&
+		!GmailRouteProcessor.isNativeRoute(urlObject.name) ||
+		!GmailRouteProcessor.isNativeRoute(currentUrlObject.name) ||
+		GmailRouteProcessor.isContactRouteName(urlObject.name);
 }
 
 
-function _createRouteViewDriver(GmailRouteProcessor, urlObject){
+function _createRouteViewDriver(GmailRouteProcessor, {customThreadListRouteID, urlObject}) {
 	urlObject = urlObject || getURLObject(location.href);
 
 	currentUrlObject = urlObject;
-	var options = _.clone(urlObject);
-	options.isCustomRoute = !GmailRouteProcessor.isNativeRoute(urlObject.name) && !GmailElementGetter.isStandalone();
+	const options = _.extend(_.clone(urlObject), {
+		customThreadListRouteID,
+		isCustomRoute: !GmailRouteProcessor.isNativeRoute(urlObject.name) && !GmailElementGetter.isStandalone()
+	});
 
 	if(options.isCustomRoute){
 		options.params.unshift(options.name);

@@ -62,7 +62,8 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 
 	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var routeID = sdk.Router.getCurrentRouteView().getRouteID();
-		if (routeID === 'search/:query/:page') {
+		console.log(routeID);
+		if (routeID === 'beep') {
 			threadRowView.replaceDate({
 				text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
 				textColor: 'green',

@@ -25,6 +25,7 @@ var GmailRouteView = function(options, gmailRouteProcessor){
 	this._name = options.name;
 	this._paramsArray = options.params || [];
 	this._isCustomRoute = options.isCustomRoute;
+	this._customRouteID = options.customThreadListRouteID;
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
@@ -428,8 +429,12 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	getRouteID: function(){
-		if(this._isCustomRoute){
+		if (this._customRouteID) {
 			return this._customRouteID;
+		}
+
+		if(this._isCustomRoute){
+			return null;
 		}
 		else{
 			if(this._isThreadRoute()){

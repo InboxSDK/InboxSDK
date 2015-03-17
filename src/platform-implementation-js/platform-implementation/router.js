@@ -424,7 +424,10 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	if(routeView.getRouteType() === routeTypes.LIST){
 		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
 
-		members.listRouteHandlerRegistries[routeView.getRouteID()].addTarget(listRouteView);
+		var listRouteHandlerRegistry = members.listRouteHandlerRegistries[routeView.getRouteID()];
+		if (listRouteHandlerRegistry) {
+			listRouteHandlerRegistry.addTarget(listRouteView);
+		}
 		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
 }
@@ -486,7 +489,8 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 
 		if (relevantCustomListRoute) {
 			try {
-				members.driver.showCustomThreadList(relevantCustomListRoute.onActivate);
+				members.driver.showCustomThreadList(
+					relevantCustomListRoute.routeID, relevantCustomListRoute.onActivate);
 			} catch(err) {
 				members.driver.getLogger().error(err);
 			}

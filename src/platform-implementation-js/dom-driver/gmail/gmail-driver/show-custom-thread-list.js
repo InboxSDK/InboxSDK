@@ -88,7 +88,7 @@ function doSearchReplacing(driver, onActivate) {
   return newQuery;
 }
 
-export default function showCustomThreadList(driver, onActivate) {
+export default function showCustomThreadList(driver, customRouteID, onActivate) {
   const uniqueSearch = doSearchReplacing(driver, onActivate);
   const customHash = document.location.hash;
 
@@ -107,7 +107,7 @@ export default function showCustomThreadList(driver, onActivate) {
   const searchInput = GmailElementGetter.getSearchInput();
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
-  nextMainContentElementChange.delay(100).onValue(() => {
+  nextMainContentElementChange.onValue(() => {
     searchInput.value = '';
     searchInput.style.visibility = 'visible';
   });
@@ -118,5 +118,7 @@ export default function showCustomThreadList(driver, onActivate) {
     oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-blah',
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });
+  Object.defineProperty(hce, '_inboxsdk_customThreadListRouteID',
+    {value: customRouteID});
   window.dispatchEvent(hce);
 }
