@@ -75,7 +75,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		name: 'Monkeys',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 		routeID: 'example/:monkeyName',
-		routeParams: 'george {} {} {}',
+		routeParams: {monkeyName: 'george {} {} {}'},
 	});
 
 	var listNavItem = sdk.NavMenu.addNavItem({
