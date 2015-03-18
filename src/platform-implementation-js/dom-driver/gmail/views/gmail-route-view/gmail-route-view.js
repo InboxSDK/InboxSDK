@@ -18,7 +18,7 @@ var GmailElementGetter = require('../../gmail-element-getter');
 
 
 
-var GmailRouteView = function(urlObject, {customRouteID, customListRouteID}, gmailRouteProcessor){
+var GmailRouteView = function({urlObject, customRouteID, customListRouteID}, gmailRouteProcessor){
 	RouteViewDriver.call(this);
 
 	this._hash = urlObject.hash;

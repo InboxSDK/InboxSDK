@@ -178,7 +178,7 @@ _.extend(GmailDriver.prototype, {
 		this._routeViewDriverStream = new Bacon.Bus();
 		this._routeViewDriverStream.plug(
 			baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
-				this._gmailRouteProcessor, this._customRouteIDs, this._customListRouteIDs
+				this._gmailRouteProcessor, this, this._customRouteIDs, this._customListRouteIDs
 			)).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(self._pageCommunicator);
 			})
