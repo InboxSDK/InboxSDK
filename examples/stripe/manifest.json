@@ -1,7 +1,7 @@
 {
   "name": "Stripe for Gmail",
   "description": "Show Stripe customer information in Gmail",
-  "version": "0.4",
+  "version": "0.5",
   "icons": {
     "128": "stripe.png"
   },
