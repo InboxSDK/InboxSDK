@@ -67,27 +67,31 @@ function addStripeSidebar(threadView, customer) {
   }
 
   Promise.all([
-    stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/invoices", {customer: customer.id, count: 50, limit: 50}),
-    stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/customers/" + customer.id + "/subscriptions", {count: 50, limit: 50}),
+    stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/invoices", {customer: customer.id, count: 100, limit: 100}),
+		stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/charges", {customer: customer.id, count: 100, limit: 100}),
+    stripeGet("https://dashboard.stripe.com/ajax/proxy/api/v1/customers/" + customer.id + "/subscriptions", {count: 100, limit: 100}),
     sidebarTemplatePromise
   ])
   .then(function(results) {
 
     var invoices = results[0];
-    var subscriptions = results[1];
-    var html = results[2];
+		var charges = results[1];
+    var subscriptions = results[2];
+		var html = results[3];
 
 
     transformCustomer(customer);
     transformSubscriptions(subscriptions);
     transformInvoices(invoices);
-    var stats = createStats(customer, subscriptions, invoices);
+		transformCharges(charges);
+    var stats = createStats(customer, subscriptions, invoices, charges);
 
     var template = _.template(html);
     sidebarForThread.get(threadView).innerHTML = sidebarForThread.get(threadView).innerHTML + template({
       customer: customer,
       invoices: invoices,
       subscriptions: subscriptions,
+			charges: charges,
       stats: stats
     });
   });
@@ -129,15 +133,22 @@ function transformInvoices(invoices) {
   }
 }
 
-function createStats(customer, subscriptions, invoices) {
+function transformCharges(charges) {
+  for (var i = 0; i < charges.data.length; i++) {
+    var chg = charges.data[i];
+    chg.imageUrl = chg.status == "succeeded" ? chrome.runtime.getURL('paid.png') : chrome.runtime.getURL('unpaid.png');
+  }
+}
+
+function createStats(customer, subscriptions, invoices, charges) {
   var mostRecentSub = subscriptions.data[subscriptions.data.length - 1];
   var retVal = {
     totalSpend: 0,
-    currentMRR: (subscriptions.data ? subscriptions.data[0].discountedPrice : 0)
+    currentMRR: (mostRecentSub ? mostRecentSub.discountedPrice : 0)
   };
 
-  _.each(invoices.data, function(inv) {
-    retVal.totalSpend += inv.total;
+  _.each(charges.data, function(chg) {
+    retVal.totalSpend += (chg.amount - chg.amount_refunded);
   });
 
   return retVal;
@@ -202,14 +213,4 @@ function getStripeInfo() {
     e2.innerHTML = e1.querySelector('#preloaded_json').text;
   	return JSON.parse(e2.textContent);
 	});
-}
-
-
-function gravatarUrl (email, size, defaultImage)
-{
-  var url = "https://secure.gravatar.com/avatar/" + md5(email.toLowerCase().trim()) + "?size=" + size;
-  if (default_image) {
-    url += "&default=" + encodeURIComponent(default_image);
-  }
-  return url;
 }

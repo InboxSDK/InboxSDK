@@ -47,7 +47,7 @@
   <p class="title">Recent Invoices</p>
   <%
     _.each(invoices.data, function(inv, i) {
-      if (i > 2) return;
+      if (i > 4) return;
   %>
       <div class="row main">
         <div class="name"><%- formatStripeCurrency(inv.total, 2) %></div>
@@ -57,9 +57,31 @@
 
       <div class="row secondary">
         <img class="pay_status" src="<%- inv.imageUrl %>"></img>
-        <div class="description row"><%- inv.paid ? "Paid" : "Failed" %></div>
+        <div class="description row"><%- inv.paid ? "Paid" : "Unpaid" %></div>
         <div class="spacer"></div>
         <!-- <div class="actions">Refund</div> -->
+      </div>
+  <%
+    });
+  %>
+</div>
+
+<div class="stripe_sidebar_section">
+  <p class="title">Recent Charges</p>
+  <%
+    _.each(charges.data, function(chg, i) {
+      if (i > 4) return;
+  %>
+      <div class="row main">
+        <div class="name"><%- formatStripeCurrency(chg.amount, 2) %></div>
+        <div class="spacer"></div>
+        <div class="details"><%- new Date(chg.created*1000).toLocaleDateString() %></div>
+      </div>
+
+      <div class="row secondary">
+        <img class="pay_status" src="<%- chg.imageUrl %>"></img>
+        <div class="description row"><%- chg.status == "succeeded" ? "Charged" : "Failed" %></div>
+        <div class="spacer"></div>
       </div>
   <%
     });
