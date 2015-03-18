@@ -434,6 +434,7 @@ _.extend(GmailRouteView.prototype, {
 		}
 
 		if(this._isCustomRoute){
+			// TODO should not happen
 			return null;
 		}
 		else{
@@ -452,20 +453,22 @@ _.extend(GmailRouteView.prototype, {
 			.map(part => part.substring(1));
 	},
 
+	// TODO kill
 	_doesMatchCustomRouteID: function(routeID){
 		if(!this._paramsArray){
 			return false;
 		}
 
+		const params = [this._name].concat(this._paramsArray);
 		var parts = routeID.split('/');
-		if(parts.length !== this._paramsArray.length){
+		if(parts.length !== params.length){
 			return false;
 		}
 
 		for(var ii=0; ii<parts.length; ii++){
 			var part = parts[ii];
 			if(part.indexOf(':') === -1){
-				if(this._paramsArray[ii] !== part){
+				if(params[ii] !== part){
 					return false;
 				}
 			}

@@ -442,52 +442,30 @@ function _isSameRoute(currentRouteViewDriver, routeViewDriver){
 
 
 function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
-	const relevantCustomRoutes = members.customRoutes.filter(customRoute => {
-		if(!customRoute.routeID){
-			return false;
-		}
+	const routeID = routeView.getRouteID();
+	const relevantCustomRoute = _.find(members.customRoutes, customRoute =>
+		_.includes(
+			Array.isArray(customRoute.routeID) ? customRoute.routeID : [customRoute.routeID],
+			routeID
+		)
+	);
 
-		if(_.isArray(customRoute.routeID)){
-			return _.any(customRoute.routeID, function(routeID){
-				return routeViewDriver.doesMatchRouteID(routeID);
-			});
-		}
-
-		return routeViewDriver.doesMatchRouteID(customRoute.routeID);
-	});
-
-	if (relevantCustomRoutes.length) {
+	if (relevantCustomRoute) {
 		const customRouteView = new CustomRouteView(routeViewDriver);
 
-		relevantCustomRoutes.forEach(customRoute => {
-			if(_.isArray(customRoute.routeID)){
-				routeViewDriver.setCustomRouteID(
-					_.find(customRoute.routeID, routeID => routeViewDriver.doesMatchRouteID(routeID))
-				);
-			}else{
-				routeViewDriver.setCustomRouteID(customRoute.routeID);
-			}
-
-			try {
-				members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
-				customRoute.onActivate(customRouteView);
-			} catch(err) {
-				members.driver.getLogger().error(err);
-			}
-
-		});
+		members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
+		try {
+			relevantCustomRoute.onActivate(customRouteView);
+		} catch(err) {
+			members.driver.getLogger().error(err);
+		}
 	} else {
-		const relevantCustomListRoute = _.find(members.customListRoutes, customListRoute => {
-			if(!customListRoute.routeID){
-				return false;
-			}
-
-			if(_.isArray(customListRoute.routeID)){
-				return _.any(customListRoute.routeID, routeID => routeViewDriver.doesMatchRouteID(routeID));
-			}
-
-			return routeViewDriver.doesMatchRouteID(customListRoute.routeID);
-		});
+		const relevantCustomListRoute = _.find(members.customListRoutes, customListRoute =>
+			_.includes(
+				Array.isArray(customListRoute.routeID) ? customListRoute.routeID : [customListRoute.routeID],
+				routeID
+			)
+		);
 
 		if (relevantCustomListRoute) {
 			try {

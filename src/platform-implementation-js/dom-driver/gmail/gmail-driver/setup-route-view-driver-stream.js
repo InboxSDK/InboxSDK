@@ -68,11 +68,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, customRo
 function _createRouteViewDriver(GmailRouteProcessor, options) {
 	const urlObject = getURLObject(location.href);
 
-	if(options.customRouteID) {
-		// TODO why
-		urlObject.params.unshift(options.name);
-	}
-
 	return new GmailRouteView(urlObject, options, GmailRouteProcessor);
 }
 
