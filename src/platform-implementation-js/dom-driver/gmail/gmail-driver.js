@@ -2,6 +2,7 @@ const _ = require('lodash');
 const RSVP = require('rsvp');
 const Bacon = require('baconjs');
 const Kefir = require('kefir');
+const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
 
@@ -23,6 +24,8 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	Driver.call(this);
 
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	this._customRouteIDs = new Set();
+	this._customListRouteIDs = new Set();
 
 	this._messageIdManager = new MessageIdManager({
 		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
@@ -52,6 +55,8 @@ _.extend(GmailDriver.prototype, {
 		{name: '_logger', destroy: false, get: true},
 		{name: '_messageIdManager', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
+		{name: '_customRouteIDs', destroy: false, get: true},
+		{name: '_customListRouteIDs', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -73,6 +78,20 @@ _.extend(GmailDriver.prototype, {
 			newURL: document.location.href.replace(/#.*$/, '')+hash
 		});
 		window.dispatchEvent(hce);
+	},
+
+	addCustomRouteID(routeID) {
+		this._customRouteIDs.add(routeID);
+		return () => {
+			this._customRouteIDs.delete(routeID);
+		};
+	},
+
+	addCustomListRouteID(routeID) {
+		this._customListRouteIDs.add(routeID);
+		return () => {
+			this._customListRouteIDs.delete(routeID);
+		};
 	},
 
 	showCustomThreadList(customRouteID, onActivate) {
@@ -158,7 +177,9 @@ _.extend(GmailDriver.prototype, {
 
 		this._routeViewDriverStream = new Bacon.Bus();
 		this._routeViewDriverStream.plug(
-			require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor).doAction(function(routeViewDriver){
+			baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
+				this._gmailRouteProcessor, this._customRouteIDs, this._customListRouteIDs
+			)).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(self._pageCommunicator);
 			})
 		);

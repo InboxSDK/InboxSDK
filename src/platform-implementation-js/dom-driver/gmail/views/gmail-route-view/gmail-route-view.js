@@ -18,14 +18,14 @@ var GmailElementGetter = require('../../gmail-element-getter');
 
 
 
-var GmailRouteView = function(options, gmailRouteProcessor){
+var GmailRouteView = function(urlObject, {customRouteID, customListRouteID}, gmailRouteProcessor){
 	RouteViewDriver.call(this);
 
-	this._hash = options.hash;
-	this._name = options.name;
-	this._paramsArray = options.params || [];
-	this._isCustomRoute = options.isCustomRoute;
-	this._customRouteID = options.customThreadListRouteID;
+	this._hash = urlObject.hash;
+	this._name = urlObject.name;
+	this._paramsArray = urlObject.params;
+	this._isCustomRoute = !!customRouteID;
+	this._customRouteID = customRouteID || customListRouteID;
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
@@ -48,7 +48,7 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_paramsArray', destroy: false},
 		{name: '_hash', get: true, destroy: false},
 		{name: '_isCustomRoute', destroy: true},
-		{name: '_customRouteID', destroy: false, set: true},
+		{name: '_customRouteID', destroy: false},
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},

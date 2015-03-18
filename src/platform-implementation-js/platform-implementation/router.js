@@ -105,6 +105,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 			onActivate: handler
 		};
 
+		memberMap.get(this).driver.addCustomRouteID(routeID);
 		var customRoutes = memberMap.get(this).customRoutes;
 		customRoutes.push(customRouteDescriptor);
 
@@ -149,6 +150,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 			onActivate: handler
 		};
 
+		memberMap.get(this).driver.addCustomListRouteID(routeID);
 		var customListRoutes = memberMap.get(this).customListRoutes;
 		customListRoutes.push(customListRouteDescriptor);
 

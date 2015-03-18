@@ -1,66 +1,80 @@
-'use strict';
+const _ = require('lodash');
+const waitFor = require('../../../lib/wait-for');
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var waitFor = require('../../../lib/wait-for');
+const GmailElementGetter = require('../gmail-element-getter');
 
-var GmailElementGetter = require('../gmail-element-getter');
+const GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
 
-var GmailRouteView = require('../views/gmail-route-view/gmail-route-view');
+const getURLObject = require('./get-url-object');
 
-var getURLObject = require('./get-url-object');
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+import escapeRegExp from '../../../../common/escape-reg-exp';
 
-var currentUrlObject = {};
-var currentMainElement = null;
+let currentUrlObject = {};
+let currentMainElement = null;
 
-function setupRouteViewDriverStream(GmailRouteProcessor){
-	return Bacon.mergeAll(
+const routeIDtoRegExp = _.memoize(routeID =>
+	new RegExp('^#'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'$')
+);
 
-				//if we're to or from a custom view then push to the routeViewDriverStream right away
-				Bacon.fromEventTarget(window, 'hashchange')
-						.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-						.filter(event => event.newURL == document.location.href) // ignore outdated events
-						.map(({_inboxsdk_customThreadListRouteID, newURL}) => ({
-							customThreadListRouteID: _inboxsdk_customThreadListRouteID,
-							urlObject: getURLObject(newURL)
-						}))
-						.filter(({urlObject}) => _shouldHandleHashChange(GmailRouteProcessor, urlObject)),
-
-				//when native gmail changes main view there's a div that takes on role=main
-				GmailElementGetter
-						.getMainContentElementChangedStream()
-						.map({})
-			)
-			.map(_createRouteViewDriver, GmailRouteProcessor);
-
+function routeIDmatchesHash(routeID, hash) {
+	const routeIDre = routeIDtoRegExp(routeID);
+	return hash.match(routeIDre);
 }
 
-function _shouldHandleHashChange(GmailRouteProcessor, urlObject){
-	return !GmailElementGetter.isStandalone() &&
-		!GmailRouteProcessor.isNativeRoute(urlObject.name) ||
-		!GmailRouteProcessor.isNativeRoute(currentUrlObject.name) ||
-		GmailRouteProcessor.isContactRouteName(urlObject.name);
+// returns a Kefir stream
+export default function setupRouteViewDriverStream(GmailRouteProcessor, customRouteIDs, customListRouteIDs) {
+	const eligibleHashChanges = Kefir.fromEvent(window, 'hashchange')
+		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
+		.filter(event => event.newURL === document.location.href); // ignore outdated events
+
+	const customRouteHashChanges = eligibleHashChanges
+		.map(event => {
+			const hash = document.location.hash;
+			for (let routeID of customRouteIDs) {
+				if (routeIDmatchesHash(routeID, hash)) {
+					return routeID;
+				}
+			}
+			return null;
+		})
+		.filter(Boolean)
+		.map(customRouteID => ({customRouteID}));
+
+	const customListRouteHashChanges = eligibleHashChanges
+		.map(event => {
+			const hash = document.location.hash;
+			for (let routeID of customListRouteIDs) {
+				if (routeIDmatchesHash(routeID, hash)) {
+					return routeID;
+				}
+			}
+			return null;
+		})
+		.filter(Boolean)
+		.map(customListRouteID => ({customListRouteID}));
+
+	return Kefir.merge([
+		customRouteHashChanges,
+		customListRouteHashChanges,
+
+		//when native gmail changes main view there's a div that takes on role=main
+		kefirCast(Kefir, GmailElementGetter.getMainContentElementChangedStream())
+			.map(event => ({}))
+	]).map(options => _createRouteViewDriver(GmailRouteProcessor, options));
 }
 
+function _createRouteViewDriver(GmailRouteProcessor, options) {
+	const urlObject = getURLObject(location.href);
 
-function _createRouteViewDriver(GmailRouteProcessor, {customThreadListRouteID, urlObject}) {
-	urlObject = urlObject || getURLObject(location.href);
-
-	currentUrlObject = urlObject;
-	const options = _.extend(_.clone(urlObject), {
-		customThreadListRouteID,
-		isCustomRoute: !GmailRouteProcessor.isNativeRoute(urlObject.name) && !GmailElementGetter.isStandalone()
-	});
-
-	if(options.isCustomRoute){
-		options.params.unshift(options.name);
+	if(options.customRouteID) {
+		// TODO why
+		urlObject.params.unshift(options.name);
 	}
 
-	return new GmailRouteView(options, GmailRouteProcessor);
+	return new GmailRouteView(urlObject, options, GmailRouteProcessor);
 }
-
-module.exports = setupRouteViewDriverStream;
-
 
 /**
  *
