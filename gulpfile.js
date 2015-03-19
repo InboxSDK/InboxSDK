@@ -106,14 +106,14 @@ function browserifyTask(name, deps, entry, destname) {
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
-    }).transform(envify({
+    }).transform(babelify.configure({
+      optional: ["runtime"]
+    })).transform(envify({
       NODE_ENV: args.production ? 'production' : 'development',
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
       VERSION: getVersion()
-    })).transform(babelify.configure({
-      optional: ["runtime"]
     }));
 
     function buildBundle() {
