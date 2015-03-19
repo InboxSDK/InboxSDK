@@ -27,11 +27,12 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	this._butterBarDriver = new GmailButterBarDriver();
 
 	this._setupEventStreams();
-	this._logger.setUserEmailAddress(this.getUserEmailAddress());
 
-	require('./gmail-driver/track-events')(this);
-	require('./gmail-driver/gmail-load-event')(this);
-	require('./gmail-driver/maintain-compose-window-state')(this);
+	this.onready.then(() => {
+		require('./gmail-driver/track-events')(this);
+		require('./gmail-driver/gmail-load-event')(this);
+		require('./gmail-driver/maintain-compose-window-state')(this);
+	});
 };
 
 GmailDriver.prototype = Object.create(Driver.prototype);
@@ -39,7 +40,9 @@ GmailDriver.prototype = Object.create(Driver.prototype);
 _.extend(GmailDriver.prototype, {
 
 	__memberVariables: [
+		// This isn't available until the following promise has resolved
 		{name: '_pageCommunicator', destroy: false, get: true},
+		{name: '_pageCommunicatorPromise', destroy: false, get: true},
 		{name: '_logger', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
@@ -122,39 +125,46 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupEventStreams: function(){
-		var self = this;
-		var result = makeXhrInterceptor();
-		var xhrInterceptStream = result.xhrInterceptStream;
-		this._pageCommunicator = result.pageCommunicator;
+		const result = makeXhrInterceptor();
+		const xhrInterceptStream = result.xhrInterceptStream;
 
 		this._xhrInterceptorStream = new Bacon.Bus();
 		this._xhrInterceptorStream.plug(xhrInterceptStream);
 
-		this._routeViewDriverStream = new Bacon.Bus();
-		this._routeViewDriverStream.plug(
-			require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor).doAction(function(routeViewDriver){
-				routeViewDriver.setPageCommunicator(self._pageCommunicator);
-			})
-		);
+		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
-		this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
+		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
+			this._pageCommunicator = pageCommunicator;
 
-		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
-			.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
-			.flatMap(threadRowViewDriver => {
-				threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
-				// Each ThreadRowView may be delayed if the thread id is not known yet.
-				return threadRowViewDriver.waitForReady();
-			});
+			this._logger.setUserEmailAddress(this.getUserEmailAddress());
 
-		this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
-											.doAction(function(gmailThreadView){
-												gmailThreadView.setPageCommunicator(self._pageCommunicator);
-											});
+			this._routeViewDriverStream = new Bacon.Bus();
+			this._routeViewDriverStream.plug(
+				require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor)
+					.doAction(routeViewDriver => {
+						routeViewDriver.setPageCommunicator(this._pageCommunicator);
+					})
+			);
 
-		this._setupToolbarViewDriverStream();
-		this._setupMessageViewDriverStream();
-		this._setupComposeViewDriverStream();
+			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
+
+			this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
+				.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
+				.flatMap(threadRowViewDriver => {
+					threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
+					// Each ThreadRowView may be delayed if the thread id is not known yet.
+					return threadRowViewDriver.waitForReady();
+				});
+
+			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
+												.doAction(gmailThreadView => {
+													gmailThreadView.setPageCommunicator(this._pageCommunicator);
+												});
+
+			this._setupToolbarViewDriverStream();
+			this._setupMessageViewDriverStream();
+			this._setupComposeViewDriverStream();
+		});
 	},
 
 	_setupComposeViewDriverStream: function() {

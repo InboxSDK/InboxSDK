@@ -11,11 +11,7 @@ module.exports = function trackEvents(gmailDriver){
 
 
 function _setupComposeMonitoring(gmailDriver){
-
-
-
 	let logger = gmailDriver.getLogger();
-	let composeStats =
 
 	gmailDriver.getComposeViewDriverStream().onValue(
 		(composeViewDriver) => {
@@ -26,10 +22,6 @@ function _setupComposeMonitoring(gmailDriver){
 			_monitorComposeSpecificEvents(composeViewDriver, logFunction);
 		}
 	);
-
-
-
-
 }
 
 
@@ -47,10 +39,8 @@ function _getLogFunction(gmailDriver, composeViewDriver){
 }
 
 function _monitorComposeSpecificEvents(composeViewDriver, logFunction){
-
 	_monitorAttachmentButton(composeViewDriver, logFunction);
 	_monitorDriveButton(composeViewDriver, logFunction);
-
 }
 
 function _monitorAttachmentButton(composeViewDriver, logFunction){

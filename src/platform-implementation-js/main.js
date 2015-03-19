@@ -13,8 +13,8 @@ if (!global.__InboxSDKImpLoader) {
       	});
       }
       else{
-      	var PlatformImp = require('./platform-implementation');
-      	return new PlatformImp(appId, opts);
+      	const makePlatformImplementation = require('./platform-implementation');
+      	return makePlatformImplementation(appId, opts);
       }
     }
   };

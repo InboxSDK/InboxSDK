@@ -1,5 +1,3 @@
-'use strict';
-
 let _ = require('lodash');
 
 let MembraneMap = require('./lib/membrane-map');
@@ -20,14 +18,18 @@ let logger = require('./lib/logger');
 
 let GmailDriver = require('./dom-driver/gmail/gmail-driver');
 
-let PlatformImplementation = function(appId, opts){
-	this._appId = appId;
+// returns a promise for the PlatformImplementation object
+export default function makePlatformImplementation(appId, opts) {
+	const pi = {
+		_appId: appId,
+		LOADER_VERSION: opts.VERSION,
+		IMPL_VERSION: process.env.VERSION
+	};
+
 	opts = _.extend({
 		// defaults
 		globalErrorLogging: true, eventTracking: true
 	}, opts);
-	this.LOADER_VERSION = opts.VERSION;
-	this.IMPL_VERSION = process.env.VERSION;
 
 	if (_.has(opts, 'REQUESTED_API_VERSION')) {
 		opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
@@ -38,24 +40,25 @@ let PlatformImplementation = function(appId, opts){
 		// Deprecated `new InboxSDK` constructor used.
 	}
 
-	this._membraneMap = new MembraneMap();
-	this._driver = new GmailDriver(appId, opts, this.LOADER_VERSION, this.IMPL_VERSION);
+	pi._membraneMap = new MembraneMap();
+	pi._driver = new GmailDriver(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
+	return pi._driver.onready.then(() => {
+		pi._driver.getLogger().eventSdkPassive('load');
 
-	this._driver.getLogger().eventSdkPassive('load');
+		pi.Compose = new Compose(appId, pi._driver, pi._membraneMap);
+		pi.Conversations = new Conversations(appId, pi._driver, pi._membraneMap);
+		pi.Keyboard = new Keyboard(appId, opts.appIconUrl, pi._driver, pi._membraneMap);
+		pi.User = new User(appId, pi._driver, pi._membraneMap);
+		pi.Lists = new Lists(appId, pi._driver, pi._membraneMap);
+		pi.NavMenu = new NavMenu(appId, pi._driver, pi._membraneMap);
+		pi.Router = new Router(appId, pi._driver, pi._membraneMap);
+		pi.Search = new Search(appId, pi._driver, pi._membraneMap);
+		pi.Toolbars = new Toolbars(appId, pi._driver, pi._membraneMap);
+		pi.ButterBar = new ButterBar(appId, pi._driver, pi._membraneMap);
+		pi.Modal = new Modal(appId, pi._driver, pi._membraneMap);
 
-	this.Compose = new Compose(appId, this._driver, this._membraneMap);
-	this.Conversations = new Conversations(appId, this._driver, this._membraneMap);
-	this.Keyboard = new Keyboard(appId, opts.appIconUrl, this._driver, this._membraneMap);
-	this.User = new User(appId, this._driver, this._membraneMap);
-	this.Lists = new Lists(appId, this._driver, this._membraneMap);
-	this.NavMenu = new NavMenu(appId, this._driver, this._membraneMap);
-	this.Router = new Router(appId, this._driver, this._membraneMap);
-	this.Search = new Search(appId, this._driver, this._membraneMap);
-	this.Toolbars = new Toolbars(appId, this._driver, this._membraneMap);
-	this.ButterBar = new ButterBar(appId, this._driver, this._membraneMap);
-	this.Modal = new Modal(appId, this._driver, this._membraneMap);
+		pi.Logger = pi._driver.getLogger().getAppLogger();
 
-	this.Logger = this._driver.getLogger().getAppLogger();
-};
-
-module.exports = PlatformImplementation;
+		return pi;
+	});
+}

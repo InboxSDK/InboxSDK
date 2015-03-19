@@ -3,6 +3,7 @@ var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
 var PageCommunicator = require('./page-communicator');
+import RSVP from 'rsvp';
 
 var injectScript = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
@@ -47,9 +48,15 @@ function makeXhrInterceptor() {
     })
   );
 
+  const pageCommunicatorPromise = Bacon
+    .fromEvent(document, 'inboxSDKglobalsExposed')
+    .take(1)
+    .map(() => pageCommunicator)
+    .toPromise(RSVP.Promise);
+
   return {
     xhrInterceptStream: interceptStream,
-    pageCommunicator: pageCommunicator
+    pageCommunicatorPromise
   };
 }
 
