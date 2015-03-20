@@ -1,8 +1,8 @@
-var RSVP = require('rsvp');
+const RSVP = require('rsvp');
 
 function waitFor(condition, timeout, steptime) {
 	// make this error here so we have a sensible stack.
-	var timeoutError = new Error("waitFor timeout");
+	const timeoutError = new Error("waitFor timeout");
 
 	return new RSVP.Promise(function(resolve, reject) {
 		if (!timeout) {
@@ -11,11 +11,12 @@ function waitFor(condition, timeout, steptime) {
 		if (!steptime) {
 			steptime = 250;
 		}
-		var waited = 0;
+		let waited = 0;
 		function step() {
 			try {
-				if (condition()) {
-					resolve();
+				const result = condition();
+				if (result) {
+					resolve(result);
 				} else {
 					if (waited >= timeout) {
 						reject(timeoutError);
