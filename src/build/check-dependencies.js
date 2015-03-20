@@ -17,7 +17,10 @@ function checkDependency(version, depname) {
 
 function checkDependenciesRecursive(packagePath, shrinkWrap) {
   var package = require(packagePath.join('/node_modules/')+'/package.json');
-  assert.strictEqual(package.version, shrinkWrap.version);
+  // Don't check our own version number.
+  if (packagePath.length != 1) {
+    assert.strictEqual(package.version, shrinkWrap.version);
+  }
   _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
     if (!_.contains(optionalDeps, depname)) {
       checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
