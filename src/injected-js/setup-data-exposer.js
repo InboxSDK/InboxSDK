@@ -38,9 +38,5 @@ module.exports = function() {
         document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
       }
     }
-
-    const event = document.createEvent("CustomEvent");
-    event.initCustomEvent('inboxSDKglobalsExposed', true, false, null);
-    document.dispatchEvent(event);
   });
 };
