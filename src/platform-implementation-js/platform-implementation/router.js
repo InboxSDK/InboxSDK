@@ -30,7 +30,7 @@ const memberMap = new WeakMap();
 * and instance of a RouteView or similar when the user navigates to a route you've declared you can handle. For custom routes, you'll typically
 * add your own content and for built in routes, you'll typically modify the existing content.
 *
-* Route ID's are path like strings with named parameters, for example: "/myroute/:someParamMyRouteNeeds"
+* Route ID's are path like strings with named parameters, for example: "myroute/:someParamMyRouteNeeds"
 */
 var Router = function(appId, driver, membraneMap){
 	var members = {};
@@ -44,7 +44,6 @@ var Router = function(appId, driver, membraneMap){
 	members.allRoutesHandlerRegistry = new HandlerRegistry();
 
 	members.customRoutes = [];
-	members.customListRoutes = [];
 
 	members.lastNativeRouteID = null;
 	members.modifiedNativeNavItem = null;
@@ -105,11 +104,12 @@ _.extend(Router.prototype, /** @lends Router */ {
 			onActivate: handler
 		};
 
-		memberMap.get(this).driver.addCustomRouteID(routeID);
+		var removeCustomRouteFromDriver = memberMap.get(this).driver.addCustomRouteID(routeID);
 		var customRoutes = memberMap.get(this).customRoutes;
 		customRoutes.push(customRouteDescriptor);
 
 		return function(){
+			removeCustomRouteFromDriver();
 			var index = customRoutes.indexOf(customRouteDescriptor);
 			if(index > -1){
 				customRoutes.splice(index, 1);
@@ -145,21 +145,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	},
 
 	handleCustomListRoute: function(routeID, handler) {
-		var customListRouteDescriptor = {
-			routeID: routeID,
-			onActivate: handler
-		};
-
-		memberMap.get(this).driver.addCustomListRouteID(routeID);
-		var customListRoutes = memberMap.get(this).customListRoutes;
-		customListRoutes.push(customListRouteDescriptor);
-
-		return function() {
-			var index = customListRoutes.indexOf(customListRouteDescriptor);
-			if(index > -1){
-				customListRoutes.splice(index, 1);
-			}
-		};
+		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
 	},
 
 	getCurrentRouteView: function(){
@@ -401,10 +387,6 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	_updateNavMenu(members, routeViewDriver);
 
 	if(members.currentRouteViewDriver){
-		if(_isSameRoute(members.currentRouteViewDriver, routeViewDriver)){
-			return;
-		}
-
 		members.currentRouteViewDriver.destroy();
 	}
 
@@ -416,11 +398,7 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
 	}
-	else{
-		members.driver.showNativeRouteView();
-	}
 
-	members.pendingSearchResultsView = null;
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
 	if(routeView.getRouteType() === routeTypes.LIST){
@@ -433,13 +411,6 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
 	}
 }
-
-function _isSameRoute(currentRouteViewDriver, routeViewDriver){
-	return currentRouteViewDriver.getRouteType() === routeViewDriver.getRouteType() &&
-			currentRouteViewDriver.getRouteID() === routeViewDriver.getRouteID() &&
-			_.isEqual(currentRouteViewDriver.getParams() === routeViewDriver.getParams());
-}
-
 
 function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	const routeID = routeView.getRouteID();
@@ -458,22 +429,6 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 			relevantCustomRoute.onActivate(customRouteView);
 		} catch(err) {
 			members.driver.getLogger().error(err);
-		}
-	} else {
-		const relevantCustomListRoute = _.find(members.customListRoutes, customListRoute =>
-			_.includes(
-				Array.isArray(customListRoute.routeID) ? customListRoute.routeID : [customListRoute.routeID],
-				routeID
-			)
-		);
-
-		if (relevantCustomListRoute) {
-			try {
-				members.driver.showCustomThreadList(
-					relevantCustomListRoute.routeID, relevantCustomListRoute.onActivate);
-			} catch(err) {
-				members.driver.getLogger().error(err);
-			}
 		}
 	}
 }

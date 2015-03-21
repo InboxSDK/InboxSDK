@@ -171,7 +171,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 function _handleRouteViewChange(navItemViewDriver, [routeViewDriver, navItemDescriptor]){
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
-		routeViewDriver.doesMatchRouteID(navItemDescriptor.routeID) &&
+		routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
 		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams(navItemDescriptor.routeID))
 	);
 }

@@ -25,7 +25,8 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 	this._customRouteIDs = new Set();
-	this._customListRouteIDs = new Set();
+	this._customListRouteIDs = new Map();
+	this._customListSearchStringsToRouteIds = new Map();
 
 	this._messageIdManager = new MessageIdManager({
 		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
@@ -56,6 +57,7 @@ _.extend(GmailDriver.prototype, {
 		{name: '_pageCommunicator', destroy: false, get: true},
 		{name: '_pageCommunicatorPromise', destroy: false, get: true},
 		{name: '_logger', destroy: false, get: true},
+		{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
 		{name: '_messageIdManager', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
 		{name: '_customRouteIDs', destroy: false, get: true},
@@ -90,8 +92,8 @@ _.extend(GmailDriver.prototype, {
 		};
 	},
 
-	addCustomListRouteID(routeID) {
-		this._customListRouteIDs.add(routeID);
+	addCustomListRouteID(routeID, handler) {
+		this._customListRouteIDs.set(routeID, handler);
 		return () => {
 			this._customListRouteIDs.delete(routeID);
 		};
@@ -186,7 +188,7 @@ _.extend(GmailDriver.prototype, {
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
 				baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
-					this._gmailRouteProcessor, this, this._customRouteIDs, this._customListRouteIDs
+					this._gmailRouteProcessor, this
 				)).doAction(routeViewDriver => {
 					routeViewDriver.setPageCommunicator(this._pageCommunicator);
 				})

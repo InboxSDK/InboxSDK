@@ -1,3 +1,7 @@
+function log() {
+	console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
+}
+
 InboxSDK.load(1.0, 'custom-view').then(function(inboxSDK){
 
 
@@ -7,9 +11,11 @@ inboxSDK.Router.handleCustomRoute('example/:monkeyName', function(customRouteVie
 
 
 inboxSDK.Router.handleAllRoutes(function(routeView){
-	console.log('id', routeView.getRouteID());
-	console.log('type', routeView.getRouteType());
-	console.log('params', routeView.getParams());
+	log(
+		'id', routeView.getRouteID(),
+		'type', routeView.getRouteType(),
+		'params', routeView.getParams()
+	);
 });
 
 
@@ -38,7 +44,7 @@ var navItem = inboxSDK.NavMenu.addNavItem({
 	accessory: {
 		type: 'CREATE',
 		onClick: function(){
-			console.log('create monkeys');
+			log('create monkeys');
 		}
 	}
 });
@@ -52,7 +58,7 @@ var lion = navItem.addNavItem({
 		type: 'ICON_BUTTON',
 		iconUrl: chrome.runtime.getURL('lion.png'),
 		onClick: function(){
-			console.log('lions rocks!');
+			log('lions rocks!');
 		}
 	}
 });

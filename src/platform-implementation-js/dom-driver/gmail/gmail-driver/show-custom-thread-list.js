@@ -4,15 +4,16 @@ import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import * as GRP from '../gmail-response-processor';
 
-const threadListSearchStrings = new WeakMap();
+const threadListHandlersToSearchStrings = new Map();
 
 function findIdFailure(id, err) {
   console.log("Failed to find id for thread", id, err);
   return null;
 }
 
-function doSearchReplacing(driver, onActivate) {
-  const preexistingQuery = threadListSearchStrings.get(onActivate);
+// Returns the search string that will trigger the onActivate function.
+function setupSearchReplacing(driver, customRouteID, onActivate) {
+  const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
   }
@@ -84,15 +85,17 @@ function doSearchReplacing(driver, onActivate) {
         driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
       });
     });
-  threadListSearchStrings.set(onActivate, newQuery);
+
+  driver.getCustomListSearchStringsToRouteIds().set(newQuery, customRouteID);
+  threadListHandlersToSearchStrings.set(onActivate, newQuery);
   return newQuery;
 }
 
 export default function showCustomThreadList(driver, customRouteID, onActivate) {
-  const uniqueSearch = doSearchReplacing(driver, onActivate);
+  const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
   const customHash = document.location.hash;
 
-  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream(true).take(1);
+  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
   Bacon.fromEvent(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
@@ -101,7 +104,7 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
     )
     .merge(Bacon.later(0))
     .onValue(() => {
-      driver.hashChangeNoViewChange(customHash);
+      //driver.hashChangeNoViewChange(customHash);
     });
 
   const searchInput = GmailElementGetter.getSearchInput();
@@ -118,7 +121,5 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
     oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-blah',
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });
-  Object.defineProperty(hce, '_inboxsdk_customThreadListRouteID',
-    {value: customRouteID});
   window.dispatchEvent(hce);
 }

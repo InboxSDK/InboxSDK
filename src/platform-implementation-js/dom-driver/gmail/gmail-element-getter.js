@@ -1,3 +1,4 @@
+import _ from 'lodash';
 var RSVP = require('rsvp');
 var waitFor = require('../../lib/wait-for');
 
@@ -7,9 +8,9 @@ var GmailElementGetter = {
 		return require('./gmail-element-getter/wait-for-gmail-mode-to-settle')();
 	},
 
-	getMainContentElementChangedStream: function(onlyChanges=false){
-		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this, onlyChanges);
-	},
+	getMainContentElementChangedStream: _.once(function(){
+		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this);
+	}),
 
 	isStandalone: function(){
 		return GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow();

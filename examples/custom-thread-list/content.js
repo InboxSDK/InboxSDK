@@ -5,12 +5,20 @@ function log() {
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	window._sdk = sdk;
 
-	sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView){
+	sdk.Router.handleAllRoutes(function(routeView){
+		log(
+			'id', routeView.getRouteID(),
+			'type', routeView.getRouteType(),
+			'params', routeView.getParams()
+		);
+	});
+
+	sdk.Router.handleCustomRoute('tlexample/:monkeyName', function(customRouteView){
 		customRouteView.getElement().innerHTML = 'hello world!';
 	});
 
-	sdk.Router.handleCustomListRoute('beep', function(page) {
-		console.log('beep activate', arguments);
+	sdk.Router.handleCustomListRoute('tlbeep', function(page) {
+		log('tlbeep activate', arguments);
 		return [
 			'<CADBYpy=tCAyweRdjMTuvKd5y8XYtbJZmQHW19gTOgAhotQtYQA@mail.gmail.com>',
 			'14aa38f8a9552dd5',
@@ -62,26 +70,29 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 
 	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var routeID = sdk.Router.getCurrentRouteView().getRouteID();
-		console.log(routeID);
-		if (routeID === 'beep') {
+		log(routeID);
+		if (routeID === 'tlbeep') {
 			threadRowView.replaceDate({
 				text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
 				textColor: 'green',
-				title: 'beep'
+				title: 'tlbeep'
+			});
+			threadRowView.addLabel({
+				title: 'aaa'
 			});
 		}
 	});
 
 	var customNavItem = sdk.NavMenu.addNavItem({
-		name: 'Monkeys',
+		name: 'TL Custom View',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-		routeID: 'example/:monkeyName',
+		routeID: 'tlexample/:monkeyName',
 		routeParams: {monkeyName: 'george {} {} {}'},
 	});
 
 	var listNavItem = sdk.NavMenu.addNavItem({
-		name: 'Custom List',
+		name: 'TL Custom List',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-		routeID: 'beep',
+		routeID: 'tlbeep',
 	});
 });

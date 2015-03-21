@@ -6,26 +6,26 @@ var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observe
 
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-export default function getMainContentElementChangedStream(GmailElementGetter, onlyChanges=false){
+export default function getMainContentElementChangedStream(GmailElementGetter) {
 	return waitForMainContentContainer(GmailElementGetter)
-				.flatMap(mainContentContainer => {
-					return makeElementChildStream(mainContentContainer)
-							.map(({el}) => el)
-							.filter(el => el.classList.contains('nH'))
-							.flatMap(el => {
-								let stream = makeMutationObserverStream(el, {attributes: true, attributeFilter: ['role'], attributeOldValue: true});
-								if (!onlyChanges) {
-									stream = stream.toProperty({
-										oldValue: null,
-										target: el
-									});
-								}
-								return stream
-									.filter(_isNowMain)
-									.map('.target');
-							});
-
-				});
+				.flatMap(mainContentContainer =>
+					makeElementChildStream(mainContentContainer)
+						.map(({el}) => el)
+						.filter(el => el.classList.contains('nH'))
+						.flatMap(el =>
+							makeMutationObserverStream(el, {
+								attributes: true,
+								attributeFilter: ['role'],
+								attributeOldValue: true
+							})
+							.toProperty({
+								oldValue: null,
+								target: el
+							})
+							.filter(_isNowMain)
+							.map('.target')
+						)
+				).toProperty();
 }
 
 function waitForMainContentContainer(GmailElementGetter){

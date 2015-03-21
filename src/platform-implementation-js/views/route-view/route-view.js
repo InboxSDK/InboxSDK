@@ -20,7 +20,11 @@ var membersMap = new WeakMap();
 var RouteView = function(routeViewDriver){
 	EventEmitter.call(this);
 
-	var members = {};
+	var members = {
+		routeID: null,
+		routeType: null,
+		params: null
+	};
 	membersMap.set(this, members);
 
 	members.routeViewDriver = routeViewDriver;
