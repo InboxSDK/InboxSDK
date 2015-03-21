@@ -99,12 +99,15 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
 
   Bacon.fromEvent(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
+    .skipUntil(
+      nextMainContentElementChange
+    )
     .takeUntil(
       nextMainContentElementChange.delay(250)
     )
-    .merge(Bacon.later(0))
+    .merge(nextMainContentElementChange)
     .onValue(() => {
-      //driver.hashChangeNoViewChange(customHash);
+      driver.hashChangeNoViewChange(customHash);
     });
 
   const searchInput = GmailElementGetter.getSearchInput();
