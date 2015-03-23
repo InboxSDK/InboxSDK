@@ -414,11 +414,12 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 
 function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	const routeID = routeView.getRouteID();
+	const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
 	const relevantCustomRoute = _.find(members.customRoutes, customRoute =>
-		_.includes(
+		_.intersection(
 			Array.isArray(customRoute.routeID) ? customRoute.routeID : [customRoute.routeID],
-			routeID
-		)
+			routeIDArray
+		).length
 	);
 
 	if (relevantCustomRoute) {

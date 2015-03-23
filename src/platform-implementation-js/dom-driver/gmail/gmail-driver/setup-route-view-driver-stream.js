@@ -12,8 +12,8 @@ const routeIDtoRegExp = _.memoize(routeID =>
 );
 
 function routeIDmatchesHash(routeID, hash) {
-	const routeIDre = routeIDtoRegExp(routeID);
-	return hash.match(routeIDre);
+	const routeIDs = Array.isArray(routeID) ? routeID : [routeID];
+	return _.find(routeIDs, routeID => hash.match(routeIDtoRegExp(routeID)));
 }
 
 // returns a Kefir stream
@@ -30,13 +30,15 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		.map(event => {
 			const urlObject = getURLObject(document.location.href);
 			const hash = urlObject.hash;
-			for (let routeID of customRouteIDs.keys()) {
-				if (routeIDmatchesHash(routeID, hash)) {
+			for (let routeIDs of customRouteIDs.keys()) {
+				let routeID = routeIDmatchesHash(routeIDs, hash);
+				if (routeID) {
 					return {urlObject, type: 'CUSTOM', routeID};
 				}
 			}
-			for (let routeID of customListRouteIDs.keys()) {
-				if (routeIDmatchesHash(routeID, hash)) {
+			for (let routeIDs of customListRouteIDs.keys()) {
+				let routeID = routeIDmatchesHash(routeIDs, hash);
+				if (routeID) {
 					return {urlObject, type: 'CUSTOM_LIST_TRIGGER', routeID};
 				}
 			}
