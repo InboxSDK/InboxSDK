@@ -16,8 +16,11 @@ function checkDependency(version, depname) {
 }
 
 function checkDependenciesRecursive(packagePath, shrinkWrap) {
-  var package = require(packagePath.join('/node_modules/')+'/package.json');
-  assert.strictEqual(package.version, shrinkWrap.version);
+  var packageObj = require(packagePath.join('/node_modules/')+'/package.json');
+  // Don't check our own version number.
+  if (packagePath.length != 1) {
+    assert.strictEqual(packageObj.version, shrinkWrap.version);
+  }
   _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
     if (!_.contains(optionalDeps, depname)) {
       checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
@@ -25,15 +28,15 @@ function checkDependenciesRecursive(packagePath, shrinkWrap) {
   });
 }
 
-function checkDependencies(package) {
+function checkDependencies(packageObj) {
   try {
     var shrinkWrapPath = __dirname+'/../../npm-shrinkwrap.json';
     if (fs.existsSync(shrinkWrapPath)) {
       var shrinkWrap = require(shrinkWrapPath);
       checkDependenciesRecursive([__dirname+'/../../'], shrinkWrap);
     } else {
-      _.forOwn(package.dependencies, checkDependency);
-      _.forOwn(package.devDependencies, checkDependency);
+      _.forOwn(packageObj.dependencies, checkDependency);
+      _.forOwn(packageObj.devDependencies, checkDependency);
     }
   } catch(e) {
     console.error(
