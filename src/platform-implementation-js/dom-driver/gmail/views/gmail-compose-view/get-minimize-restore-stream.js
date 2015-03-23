@@ -25,7 +25,8 @@ function getMinimizeRestoreStream(gmailComposeView){
 				(isMinimized) => isMinimized ?
 					{eventName: 'minimized'} :
 					{eventName: 'restored'}
-			);
+			)
+			.throttle(10, {leading: true});
 
 
 
