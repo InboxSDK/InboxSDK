@@ -8,7 +8,7 @@ import getURLObject from './get-url-object';
 import escapeRegExp from '../../../../common/escape-reg-exp';
 
 const routeIDtoRegExp = _.memoize(routeID =>
-	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'$')
+	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
 
 function routeIDmatchesHash(routeID, hash) {
