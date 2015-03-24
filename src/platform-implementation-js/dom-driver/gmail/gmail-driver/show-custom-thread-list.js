@@ -121,7 +121,7 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
   const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
   window.history.replaceState(null, null, searchHash);
   const hce = new HashChangeEvent('hashchange', {
-    oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-blah',
+    oldURL: document.location.href.replace(/#.*$/, '')+customHash,
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });
   window.dispatchEvent(hce);
