@@ -2,6 +2,7 @@ const _ = require('lodash');
 const RSVP = require('rsvp');
 const Bacon = require('baconjs');
 const Kefir = require('kefir');
+const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
 
@@ -17,10 +18,22 @@ var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processo
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
+import MessageIdManager from '../../lib/message-id-manager';
+
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	Driver.call(this);
 
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	this._customRouteIDs = new Set();
+	this._customListRouteIDs = new Map();
+	this._customListSearchStringsToRouteIds = new Map();
+
+	this._messageIdManager = new MessageIdManager({
+		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
+			require('./gmail-driver/get-gmail-thread-id-for-rfc-message-id')(this, rfcMessageId),
+		getRfcMessageIdForGmailMessageId: (gmailMessageId) =>
+			require('./gmail-driver/get-rfc-message-id-for-gmail-message-id')(this, gmailMessageId)
+	});
 
 	this._gmailRouteProcessor = new GmailRouteProcessor();
 	this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
@@ -44,7 +57,11 @@ _.extend(GmailDriver.prototype, {
 		{name: '_pageCommunicator', destroy: false, get: true},
 		{name: '_pageCommunicatorPromise', destroy: false, get: true},
 		{name: '_logger', destroy: false, get: true},
+		{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
+		{name: '_messageIdManager', destroy: false, get: true},
 		{name: '_butterBarDriver', destroy: false, get: true},
+		{name: '_customRouteIDs', destroy: false, get: true},
+		{name: '_customListRouteIDs', destroy: false, get: true},
 		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
 		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
@@ -55,6 +72,36 @@ _.extend(GmailDriver.prototype, {
 		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
+
+	hashChangeNoViewChange(hash) {
+		if (hash[0] !== '#') {
+			throw new Error("bad hash");
+		}
+		window.history.replaceState(null, null, hash);
+		const hce = new HashChangeEvent('hashchange', {
+			oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-fake-no-vc',
+			newURL: document.location.href.replace(/#.*$/, '')+hash
+		});
+		window.dispatchEvent(hce);
+	},
+
+	addCustomRouteID(routeID) {
+		this._customRouteIDs.add(routeID);
+		return () => {
+			this._customRouteIDs.delete(routeID);
+		};
+	},
+
+	addCustomListRouteID(routeID, handler) {
+		this._customListRouteIDs.set(routeID, handler);
+		return () => {
+			this._customListRouteIDs.delete(routeID);
+		};
+	},
+
+	showCustomThreadList(customRouteID, onActivate) {
+		require('./gmail-driver/show-custom-thread-list')(this, customRouteID, onActivate);
+	},
 
 	showCustomRouteView: function(element){
 		require('./gmail-driver/show-custom-route-view')(this, element);
@@ -140,10 +187,11 @@ _.extend(GmailDriver.prototype, {
 
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
-				require('./gmail-driver/setup-route-view-driver-stream')(this._gmailRouteProcessor)
-					.doAction(routeViewDriver => {
-						routeViewDriver.setPageCommunicator(this._pageCommunicator);
-					})
+				baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
+					this._gmailRouteProcessor, this
+				)).doAction(routeViewDriver => {
+					routeViewDriver.setPageCommunicator(this._pageCommunicator);
+				})
 			);
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');

@@ -4,49 +4,37 @@ var Bacon = require('baconjs');
 var streamWaitFor = require('../../../lib/stream-wait-for');
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-function getMainContentElementChangedStream(GmailElementGetter){
+export default function getMainContentElementChangedStream(GmailElementGetter) {
 	return waitForMainContentContainer(GmailElementGetter)
-				.flatMap(function(){
-					return makeMutationObserverStream(GmailElementGetter.getMainContentContainer(), {childList: true})
-							.filter(function(mutation){
-								return mutation.removedNodes.length === 0 && mutation.addedNodes.length > 0;
+				.flatMap(mainContentContainer =>
+					makeElementChildStream(mainContentContainer)
+						.map(({el}) => el)
+						.filter(el => el.classList.contains('nH'))
+						.flatMap(el =>
+							makeMutationObserverStream(el, {
+								attributes: true,
+								attributeFilter: ['role'],
+								attributeOldValue: true
 							})
-							.map('.addedNodes')
-							.flatMap(function(addedNodes){
-								return Bacon.fromArray(_.toArray(addedNodes));
+							.toProperty({
+								oldValue: null,
+								target: el
 							})
-							.merge(Bacon.fromArray(_.toArray(GmailElementGetter.getMainContentContainer().children)))
-							.filter(function(node){
-								return node.classList.contains('nH');
-							})
-							.flatMap(function(mainNode){
-								return makeMutationObserverStream(mainNode, {attributes: true, attributeFilter: ['role'], attributeOldValue: true})
-											.startWith({
-												oldValue: null,
-												target: mainNode
-											})
-											.filter(_isNowMain)
-											.map('.target');
-							});
-
-				});
+							.filter(_isNowMain)
+							.map('.target')
+						)
+				).toProperty();
 }
 
 function waitForMainContentContainer(GmailElementGetter){
-	return streamWaitFor(function(){
-		return !!GmailElementGetter.getMainContentContainer();
-	});
+	return streamWaitFor(() => GmailElementGetter.getMainContentContainer());
 }
 
 function _isNowMain(mutation){
-	var oldValue = mutation.oldValue;
-	var newValue = mutation.target.getAttribute('role');
+	const oldValue = mutation.oldValue;
+	const newValue = mutation.target.getAttribute('role');
 
-	if(!oldValue && newValue === 'main'){
-		return true;
-	}
+	return (!oldValue && newValue === 'main');
 }
-
-
-module.exports = getMainContentElementChangedStream;

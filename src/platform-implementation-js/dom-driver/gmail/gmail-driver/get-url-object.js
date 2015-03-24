@@ -1,38 +1,27 @@
-var _ = require('lodash');
+import _ from 'lodash';
 
-module.exports = function(url){
+export default function getURLObject(url) {
+	const m = url.match(/#([^?]*)(?:\?(.*))?/);
+	if (!m) {
+		return {
+			name: 'inbox',
+			params: [],
+			hash: '',
+			query: undefined
+		};
+	}
 
-	var urlObject = {
-		hash: ''
+	const hash = m[1];
+	const hashParts = hash.split('/');
+
+	return {
+		name: decodeURIComponent(hashParts[0]),
+		params: _.chain(hashParts)
+			.rest()
+			.map(part => part.replace(/\+/g, ' '))
+			.map(decodeURIComponent)
+			.value(),
+		query: m[2],
+		hash
 	};
-
-	var urlParts = url.split('#');
-	if(urlParts.length !== 2){
-		urlObject.name = 'inbox';
-		urlObject.params = [];
-		return urlObject;
-	}
-
-	var hash = urlParts[1];
-
-	var queryParts = hash.split('?');
-	if(queryParts.length > 1){
-		urlObject.query = queryParts[1];
-		hash = queryParts[0];
-	}
-
-	var hashParts = hash.split('/');
-
-	urlObject.name = decodeURIComponent(hashParts[0]);
-	urlObject.params = _.chain(hashParts)
-							.rest()
-							.map(decodeURIComponent)
-							.map(function(part){
-								return part.replace('+', ' ');
-							})
-							.value();
-	urlObject.hash = hash;
-
-	return urlObject;
-
-};
+}

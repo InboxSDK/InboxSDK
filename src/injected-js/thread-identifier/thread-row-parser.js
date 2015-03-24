@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var assert = require('assert');
-var cleanupPeopleLine = require('./cleanup-people-line');
+import {cleanupPeopleLine} from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 function extractMetadataFromThreadRow(threadRow) {
   var threadMetadata = {};

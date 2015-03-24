@@ -3,6 +3,7 @@ var _ = require("lodash");
 var fs = require('fs');
 var RSVP = require('./lib/rsvp');
 var readFile = RSVP.denodeify(fs.readFile.bind(fs));
+var co = require('co');
 
 var GmailResponseProcessor = require('../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor');
 var disallowEval = require('./lib/disallow-eval');
@@ -47,26 +48,46 @@ describe('GmailResponseProcessor', function(){
     });
   });
 
+  describe('extractThreads', function() {
+    it('works', function() {
+      const data = require('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert.deepEqual(threads, data.output, 'deserialize test');
+    });
+  });
+
+  describe('replaceThreadsInResponse', function() {
+    it('seems to work', function() {
+      this.slow(80);
+
+      const data = require('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // swap two threads
+      threads.push(threads.shift());
+      assert.notEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // put them back
+      threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+    });
+  });
+
   describe('interpretSentEmailResponse', function() {
-    it('can read new thread', function() {
-      return readFile(
-        __dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8'
-      ).then(function(rawResponse) {
-        var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-        assert.strictEqual(response.gmailMessageId, '14a08f7810935cb3');
-        assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
-      });
-    });
+    it('can read new thread', co.wrap(function*() {
+      const rawResponse = yield readFile(__dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8');
+      const response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
+      assert.strictEqual(response.gmailMessageId, '14a08f7810935cb3');
+      assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
+    }));
 
-    it('can read reply', function() {
-      return readFile(
-        __dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8'
-      ).then(function(rawResponse) {
-        var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-        assert.strictEqual(response.gmailMessageId, '14a090139a3835a4');
-        assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
-      });
-    });
-
+    it('can read reply', co.wrap(function*() {
+      const rawResponse = yield readFile(__dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8');
+      const response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
+      assert.strictEqual(response.gmailMessageId, '14a090139a3835a4');
+      assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
+    }));
   });
 });

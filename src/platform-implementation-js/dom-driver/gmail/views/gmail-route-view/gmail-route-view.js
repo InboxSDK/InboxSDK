@@ -6,37 +6,31 @@ const asap = require('asap');
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
 var makeElementViewStream = require('../../../../lib/dom/make-element-view-stream');
 var getInsertBeforeElement = require('../../../../lib/dom/get-insert-before-element');
-
 var RouteViewDriver = require('../../../../driver-interfaces/route-view-driver');
-
 var GmailRowListView = require('../gmail-row-list-view');
 var GmailThreadView = require('../gmail-thread-view');
-
 var GmailCollapsibleSectionView = require('../gmail-collapsible-section-view');
-
 var GmailElementGetter = require('../../gmail-element-getter');
 
-
-
-var GmailRouteView = function(options, gmailRouteProcessor){
+function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	RouteViewDriver.call(this);
 
-	this._hash = options.hash;
-	this._name = options.name;
-	this._paramsArray = options.params || [];
-	this._isCustomRoute = options.isCustomRoute;
+	this._type = type;
+	this._hash = urlObject.hash;
+	this._name = urlObject.name;
+	this._paramsArray = urlObject.params;
+	this._customRouteID = routeID;
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
 	this._eventStream = new Bacon.Bus();
 
-	if(this._isCustomRoute){
+	if (this._type === 'CUSTOM') {
 		this._setupCustomViewElement();
-	}
-	else{
+	} else if (_.includes(['NATIVE', 'CUSTOM_LIST'], this._type)) {
 		this._setupSubViews();
 	}
-};
+}
 
 GmailRouteView.prototype = Object.create(RouteViewDriver.prototype);
 
@@ -46,7 +40,8 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_name', destroy: false},
 		{name: '_paramsArray', destroy: false},
 		{name: '_hash', get: true, destroy: false},
-		{name: '_isCustomRoute', destroy: true},
+		{name: '_type', get: true, destroy: false},
+		{name: '_customRouteID', destroy: false},
 		{name: '_customViewElement', destroy: true, get: true},
 		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
 		{name: '_threadView', destroy: true, get: true},
@@ -59,49 +54,13 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_rowListElements', destroy: false}
 	],
 
-	isCustomRoute: function(){
-		return this._isCustomRoute;
-	},
-
-	doesMatchRouteID: function(routeID){
-		if(!routeID){
-			return false;
-		}
-
-		if(!this._gmailRouteProcessor){
-			return false;
-		}
-
-		if(this._isCustomRoute){
-			return this._doesMatchCustomRouteID(routeID);
-		}
-		else{
-			if(routeID !== this._getRouteID()){
-				return false;
-			}
-
-			var nativeParams = this.getParams(routeID);
-			var extractedParamKeys = this._extractParamKeysFromRouteID(routeID);
-
-			var paramKeys = Object.keys(nativeParams);
-			return _.isEqual(paramKeys.sort(), extractedParamKeys.sort());
-		}
-	},
-
-	getRouteID: function(){
-		return this._getRouteID();
-	},
-
-	getRouteType: function(){
-		return this._getRouteType();
-	},
-
-	getParams: function(routeID){
-		if(this._isCustomRoute){
-			return this._getCustomParams(routeID);
+	getParams: function(){
+		if (this._customRouteID) {
+			return this._getCustomParams();
 		}
 
 		var params = this._getNativeParams() || {};
+		const routeID = this.getRouteID();
 		if(!routeID){
 			return params;
 		}
@@ -126,7 +85,7 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_addCollapsibleSection: function(collapsibleSectionDescriptorProperty, groupOrderHint, isCollapsible){
-		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView
@@ -211,14 +170,12 @@ _.extend(GmailRouteView.prototype, {
 		}));
 	},
 
-
 	_setupContentAndSidebarView: function(){
 		this._rowListElements = document.querySelector('.aia[gh=tl]');
 		if(this._rowListElements){
 			this._startMonitoringPreviewPaneRowListForThread(this._rowListElements);
 			return;
 		}
-
 
 		this._threadContainerElement = GmailElementGetter.getThreadContainerElement();
 		if(this._threadContainerElement){
@@ -231,7 +188,6 @@ _.extend(GmailRouteView.prototype, {
 				view: gmailThreadView
 			});
 		}
-
 	},
 
 	_startMonitoringPreviewPaneRowListForThread: function(rowListElement){
@@ -280,24 +236,20 @@ _.extend(GmailRouteView.prototype, {
 		return sectionsContainer;
 	},
 
-	_getCustomParams: function(routeID){
-		var params = {};
+	_getCustomParams: function() {
+		const params = {};
 
-		if(this._paramsArray.length === 0 || !routeID){
-			return params;
-		}
-
-		var paramsArray = this._paramsArray;
-		routeID
+		this._customRouteID
 			.split('/')
-			.forEach(function(part, index){
-				if(part.indexOf(':') !== 0){
+			.slice(1)
+			.forEach((part, index) => {
+				if(part[0] !== ':') {
 					return;
 				}
 				part = part.substring(1);
 
-				if(paramsArray[index]){
-					params[part] = paramsArray[index];
+				if(this._paramsArray[index]) {
+					params[part] = this._paramsArray[index];
 				}
 			});
 
@@ -320,11 +272,11 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isSearchRoute: function(){
-		return this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH;
+		return this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH;
 	},
 
-	_getRouteType: function(){
-		if(this._isCustomRoute){
+	getRouteType: function(){
+		if(_.includes(['CUSTOM', 'OTHER_APP_CUSTOM'], this._type)) {
 			return this._gmailRouteProcessor.RouteTypes.CUSTOM;
 		}
 		else if(this._isListRoute()){
@@ -391,7 +343,7 @@ _.extend(GmailRouteView.prototype, {
 			page: this._getPageParam()
 		};
 
-		if(this._getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
+		if(this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
 			if(this._paramsArray[0] && this._paramsArray[0].indexOf('p') === -1){
 				params.labelName = this._paramsArray[0];
 			}
@@ -434,48 +386,20 @@ _.extend(GmailRouteView.prototype, {
 		return 1;
 	},
 
-	_getRouteID: function(){
-		if(this._isCustomRoute){
-			return null;
-		}
-		else{
-			if(this._isThreadRoute()){
-				return this._gmailRouteProcessor.NativeRouteIDs.THREAD;
-			}
-			else{
-				return this._gmailRouteProcessor.getRouteID(this._name);
-			}
+	getRouteID: function(){
+		if (this._customRouteID) {
+			return this._customRouteID;
+		} else if(this._isThreadRoute()) {
+			return this._gmailRouteProcessor.NativeRouteIDs.THREAD;
+		} else {
+			return this._gmailRouteProcessor.getRouteID(this._name);
 		}
 	},
 
 	_extractParamKeysFromRouteID: function(routeID){
-		return routeID.split('/').filter(function(part){
-			return part.indexOf(':') === 0;
-		}).map(function(part){
-			return part.substring(1);
-		});
-	},
-
-	_doesMatchCustomRouteID: function(routeID){
-		if(!this._paramsArray){
-			return false;
-		}
-
-		var parts = routeID.split('/');
-		if(parts.length !== this._paramsArray.length){
-			return false;
-		}
-
-		for(var ii=0; ii<parts.length; ii++){
-			var part = parts[ii];
-			if(part.indexOf(':') === -1){
-				if(this._paramsArray[ii] !== part){
-					return false;
-				}
-			}
-		}
-
-		return true;
+		return routeID.split('/')
+			.filter(part => part[0] === ':')
+			.map(part => part.substring(1));
 	}
 
 });

@@ -20,7 +20,11 @@ var membersMap = new WeakMap();
 var RouteView = function(routeViewDriver){
 	EventEmitter.call(this);
 
-	var members = {};
+	var members = {
+		routeID: null,
+		routeType: null,
+		params: null
+	};
 	membersMap.set(this, members);
 
 	members.routeViewDriver = routeViewDriver;
@@ -68,17 +72,11 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		var members = membersMap.get(this);
 
 		if(!members.params){
-			members.params = members.routeViewDriver.getParams(members.routeID);
+			members.params = members.routeViewDriver.getParams();
 		}
 
 		return members.params;
-	},
-
-	/* TODO NOT PUBLIC, get it outta here */
-	setRouteID: function(routeID){
-		membersMap.get(this).routeID = routeID;
-	},
-
+	}
 
 	/**
 	* Fires when this RouteView instance is navigated away from
