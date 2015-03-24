@@ -62,6 +62,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return tmp === urlObject.hash;
 		});
 
+	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
 		revertNativeHashChanges,

@@ -6,6 +6,59 @@ import * as GRP from '../gmail-response-processor';
 
 const threadListHandlersToSearchStrings = new Map();
 
+/*
+Timeline of how a custom thread list works:
+
+* App registers a custom list by calling sdk.Router.handleCustomListRoute(),
+  which forwards the call to the driver where the route id and handler are
+  saved.
+
+<User eventually navigates to a custom list route>
+
+* setup-route-view-driver-stream.js receives the hashchange event, recognizes
+  that it matched a register custom list route id, and then calls this file's
+  showCustomThreadList function instead of creating a RouteView.
+
+* showCustomThreadList registers a bunch of listeners to respond at the right
+  times in the coming storm.
+
+* showCustomThreadList hides the text in the search box, so the nonsense search
+  isn't visible to the user.
+
+* showCustomThreadList sets it all in motion by navigating the user to a search
+  for a random string.
+
+<Gmail thinks the user has navigated to a search, and triggers an AJAX request
+for the search>
+
+* We intercept the search request before it goes out, call the handler function
+  the app gave us to figure out the RFC message IDs the app wants to show, and
+  then rewrite the search request to be a search for those specific messages.
+
+* We let the request through, and then look up all of the gmail thread ids for
+  the requested messages.
+
+<The server sends the browser the AJAX response back>
+
+* We intercept the response, and reorder the messages in the response into the
+  order that the app wants.
+
+<Gmail gets our rewritten AJAX response, and switches the DOM to the search
+ results>
+
+* When the search completes and Gmail switches to the search results,
+  setup-route-view-driver-stream.js recognizes the search string in the URL,
+  and associates the new RouteView with the custom list.
+
+* showCustomThreadList clears the search box and unhides the search box text so
+  that it works again.
+
+* showCustomThreadList changes the hash in the URL from the search back to the
+  custom list route id (and fights gmail for a few milliseconds to keep that
+  hash in the url).
+
+*/
+
 function findIdFailure(id, err) {
   console.log("Failed to find id for thread", id, err);
   return null;
@@ -103,7 +156,7 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
       nextMainContentElementChange
     )
     .takeUntil(
-      nextMainContentElementChange.delay(250)
+      nextMainContentElementChange.delay(10)
     )
     .merge(nextMainContentElementChange)
     .onValue(() => {
