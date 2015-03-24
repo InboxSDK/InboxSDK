@@ -54,12 +54,13 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_rowListElements', destroy: false}
 	],
 
-	getParams: function(routeID){
+	getParams: function(){
 		if (this._customRouteID) {
 			return this._getCustomParams();
 		}
 
 		var params = this._getNativeParams() || {};
+		const routeID = this.getRouteID();
 		if(!routeID){
 			return params;
 		}

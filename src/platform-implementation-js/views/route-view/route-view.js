@@ -72,7 +72,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		var members = membersMap.get(this);
 
 		if(!members.params){
-			members.params = members.routeViewDriver.getParams(members.routeID);
+			members.params = members.routeViewDriver.getParams();
 		}
 
 		return members.params;

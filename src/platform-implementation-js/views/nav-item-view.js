@@ -172,7 +172,7 @@ function _handleRouteViewChange(navItemViewDriver, [routeViewDriver, navItemDesc
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
 		routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
-		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams(navItemDescriptor.routeID))
+		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams())
 	);
 }
 
