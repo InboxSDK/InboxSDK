@@ -22,7 +22,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	const customListRouteIDs = driver.getCustomListRouteIDs();
 	const customListSearchStringsToRouteIds = driver.getCustomListSearchStringsToRouteIds();
 
-	let lastNativeHash = null;
+	let lastNativeHash = getURLObject(document.location.href).hash;
 
 	const eligibleHashChanges = Kefir.fromEvent(window, 'hashchange')
 		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
@@ -56,7 +56,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	// getMainContentElementChangedStream() won't be firing.
 	const revertNativeHashChanges = eligibleHashChanges
 		.filter(({type}) => type === 'NATIVE')
-		.toProperty({urlObject: getURLObject(document.location.href)})
 		.filter(({urlObject}) => {
 			const tmp = lastNativeHash;
 			lastNativeHash = urlObject.hash;
