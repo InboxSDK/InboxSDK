@@ -73,7 +73,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 		Bacon.combineAsArray(
 			members.driver
-				.getRouteViewDriverStream().delay(10)
+				.getRouteViewDriverStream()
 				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd()),
 
 			members.navItemDescriptorPropertyStream
