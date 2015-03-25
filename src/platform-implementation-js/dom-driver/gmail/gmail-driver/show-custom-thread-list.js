@@ -83,10 +83,14 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
       try {
         return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
       } catch(e) {
-        driver.getLogger().error(e);
-        return Bacon.once([]);
+        return new Bacon.Error(e);
       }
     })
+    .flatMap(ids =>
+      Array.isArray(ids) ?
+        Bacon.once(ids) :
+        new Bacon.Error(new Error("handleCustomListRoute result must be an array"))
+    )
     .mapError(e => {
       driver.getLogger().error(e);
       return [];
@@ -111,7 +115,9 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
     .flatMap(Bacon.fromPromise)
     .map(_.compact)
     .onValue(idPairs => {
-      const query = idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ');
+      const query = idPairs.length > 0 ?
+        idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
+        : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
       Bacon.combineAsArray([
         // Figure out any gmail thread ids we don't know yet
