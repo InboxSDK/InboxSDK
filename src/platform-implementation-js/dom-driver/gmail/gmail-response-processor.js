@@ -219,10 +219,12 @@ export function serializeArray(array) {
 export function replaceThreadsInResponse(response, replacementThreads) {
   const parsed = deserialize(response);
   const firstTbIndex = _.findIndex(parsed, item => item[0][0] === 'tb');
-  const parsedNoTb = parsed.filter(item => item[0][0] !== 'tb');
+  const [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0][0] === 'tb');
+  const tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
+  const newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
   const parsedNew = _.flatten([
     parsedNoTb.slice(0, firstTbIndex),
-    _threadsToTbStructure(replacementThreads),
+    newTbs,
     parsedNoTb.slice(firstTbIndex)
   ]);
   return threadListSerialize(parsedNew);
@@ -263,12 +265,18 @@ function _extractThreadArraysFromResponseArray(threadResponseArray){
     .value();
 }
 
-function _threadsToTbStructure(threads) {
-  return _.chain(threads)
+function _threadsToTbStructure(threads, followers=[]) {
+  const tbs = _.chain(threads)
     .map(thread => thread._originalGmailFormat)
     .chunk(10)
     .map((threadsChunk, i) => [['tb', i*10, threadsChunk]])
     .value();
+  if (tbs.length > 0) {
+    tbs[tbs.length-1] = tbs[tbs.length-1].concat(followers);
+  } else if (followers.length > 0) {
+    tbs.push(followers);
+  }
+  return tbs;
 }
 
 function _doesResponseUseFormatWithSectionNumbers(responseString){

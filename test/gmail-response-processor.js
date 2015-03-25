@@ -58,7 +58,7 @@ describe('GmailResponseProcessor', function(){
 
   describe('replaceThreadsInResponse', function() {
     it('seems to work', function() {
-      this.slow(80);
+      this.slow(100);
 
       const data = require('./data/gmail-response-processor/search-response.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
@@ -67,10 +67,36 @@ describe('GmailResponseProcessor', function(){
 
       // swap two threads
       threads.push(threads.shift());
-      assert.notEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      assert.notEqual(swapped, data.input);
 
       // put them back
       threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
+    });
+
+    it('works with small number of threads', function() {
+      const data = require('./data/gmail-response-processor/search-response-small.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // swap two threads
+      threads.push(threads.shift());
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      assert.notEqual(swapped, data.input);
+
+      // put them back
+      threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
+    });
+
+    it('works on empty responses', function() {
+      const data = require('./data/gmail-response-processor/search-response-empty.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert(Array.isArray(threads));
+      assert.strictEqual(threads.length, 0);
+
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
     });
   });
