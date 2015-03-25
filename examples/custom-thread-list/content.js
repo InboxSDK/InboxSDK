@@ -22,6 +22,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		return [
 			'<CADBYpy=tCAyweRdjMTuvKd5y8XYtbJZmQHW19gTOgAhotQtYQA@mail.gmail.com>',
 			'14aa38f8a9552dd5',
+			null,
 			'14a9942d5a69f0cc',
 			'<CADBYpykj83T_cW9Xpb6jKAq7_RuKvcEZ6qfccJd6JLq2ndm4iA@mail.gmail.com>',
 			'<047d7b0722a8b0e3f2050b65a36b@google.com>',

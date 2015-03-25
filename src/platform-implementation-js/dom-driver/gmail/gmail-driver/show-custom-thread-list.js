@@ -95,17 +95,24 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
       driver.getLogger().error(e);
       return [];
     })
-    .map(ids => ids.map(id => {
+    .map(ids => _.map(ids, id => {
       if (typeof id === 'string') {
         if (id[0] == '<') {
           return {rfcId: id};
         } else {
           return {gtid: id};
         }
-      } else {
-        return id;
+      } else if (id) {
+        const obj = {
+          gtid: typeof id.gtid === 'string' && id.gtid,
+          rfcId: typeof id.rfcId === 'string' && id.rfcId
+        };
+        if (obj.gtid || obj.rfcId) {
+          return obj;
+        }
       }
     }))
+    .map(_.compact)
     // Figure out any rfc ids we don't know yet
     .map(idPairs => RSVP.Promise.all(idPairs.map(pair =>
       pair.rfcId ? pair :
