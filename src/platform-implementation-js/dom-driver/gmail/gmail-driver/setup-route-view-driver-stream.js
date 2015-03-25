@@ -27,8 +27,9 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	const eligibleHashChanges = Kefir.fromEvent(window, 'hashchange')
 		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
 		.filter(event => event.newURL === document.location.href) // ignore outdated events
-		.map(event => {
-			const urlObject = getURLObject(document.location.href);
+		.map(() => getURLObject(document.location.href))
+		.skipDuplicates((a, b) => a.hash === b.hash)
+		.map(urlObject => {
 			const hash = urlObject.hash;
 			for (let routeIDs of customRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
