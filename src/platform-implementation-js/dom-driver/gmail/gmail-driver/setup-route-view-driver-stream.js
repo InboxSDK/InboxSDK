@@ -30,13 +30,13 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		.map(event => {
 			const urlObject = getURLObject(document.location.href);
 			const hash = urlObject.hash;
-			for (let routeIDs of customRouteIDs.keys()) {
+			for (let routeIDs of customRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
 				if (routeID) {
 					return {urlObject, type: 'CUSTOM', routeID};
 				}
 			}
-			for (let routeIDs of customListRouteIDs.keys()) {
+			for (let [routeIDs] of customListRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
 				if (routeID) {
 					return {urlObject, type: 'CUSTOM_LIST_TRIGGER', routeID};
