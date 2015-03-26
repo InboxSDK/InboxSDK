@@ -19,7 +19,6 @@ class MockButterBarDriver {
     return this._openBus;
   }
   showMessage(options) {
-    console.log('mock showMessage', options);
     const num = ++this._showMessageCount;
     this._currentMessage = options;
     return {
