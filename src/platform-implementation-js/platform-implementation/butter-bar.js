@@ -94,7 +94,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
     });
 
     butterBarDriver.getNoticeAvailableStream()
-      .startWith(null)
+      .toProperty(null)
       .takeUntil(stopper)
       .filter(() => {
         const queue = butterBarDriver.getSharedMessageQueue();
@@ -145,6 +145,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
     _.defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
+      confirmationTime: 1*1000,
       priority: -2,
       time: Infinity,
       persistent: true,
@@ -161,7 +162,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
         this.showMessage({
           text: options.confirmationText,
           messageKey: options.messageKey,
-          time: 1*1000,
+          time: options.confirmationTime,
           priority: 200
         });
       }

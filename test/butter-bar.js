@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import assert from 'assert';
 import sinon from 'sinon';
+import co from 'co';
 import Bacon from 'baconjs';
+import delay from '../src/common/delay';
 
 import ButterBar from '../src/platform-implementation-js/platform-implementation/butter-bar';
 
@@ -17,6 +19,7 @@ class MockButterBarDriver {
     return this._openBus;
   }
   showMessage(options) {
+    console.log('mock showMessage', options);
     const num = ++this._showMessageCount;
     this._currentMessage = options;
     return {
@@ -75,7 +78,7 @@ describe("ButterBar", function() {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
-      }, 0);
+      }, 1);
     });
 
     it("destroys after given time passes", function(done) {
@@ -235,7 +238,7 @@ describe("ButterBar", function() {
         assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
         assert(driver.getButterBarDriver()._currentMessage);
         done();
-      }, 0);
+      }, 1);
     });
 
     it('respects showConfirmation', function(done) {
@@ -259,7 +262,7 @@ describe("ButterBar", function() {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
-      }, 0);
+      }, 1);
     });
 
     it('rejects', function(done) {
@@ -283,7 +286,7 @@ describe("ButterBar", function() {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
-      }, 0);
+      }, 1);
     });
 
     it('has a high priority saved message', function(done) {
@@ -314,8 +317,9 @@ describe("ButterBar", function() {
         assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
         assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options2);
         assert(driver.getButterBarDriver()._currentMessage);
+        message1.destroy();
         done();
-      }, 0);
+      }, 2);
     });
   });
 

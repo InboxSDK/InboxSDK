@@ -38,6 +38,10 @@ const sdkRemovedNotice = elements
 
 const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
 
+// For stream to be in active state. sdkRemovedNotice is prone to missing
+// events if it only becomes active once a message has started.
+noticeAvailableStream.onValue(_.noop);
+
 Bacon.combineAsArray(elements, googleAddedNotice)
   .onValues(({googleNotice, sdkNotice}) => {
     googleNotice.style.display = '';
