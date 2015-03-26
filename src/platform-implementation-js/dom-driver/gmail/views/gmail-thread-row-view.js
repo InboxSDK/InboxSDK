@@ -62,7 +62,9 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     this._modifications = {
       label: {unclaimed: [], claimed: []},
       button: {unclaimed: [], claimed: []},
-      image: {unclaimed: [], claimed: []}
+      image: {unclaimed: [], claimed: []},
+
+      replacedDate: {destroy: null, claimed: false}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
   } else {
@@ -75,8 +77,8 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._cachedThreadID = null; // set in getter
 
 
-  this._eventStream = new Kefir.bus();
-  this._stopper = new Kefir.bus();
+  this._eventStream = new Kefir.Bus();
+  this._stopper = new Kefir.Emitter();
 
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
@@ -162,20 +164,14 @@ _.extend(GmailThreadRowView.prototype, {
       .concat(this._modifications.image.unclaimed);
     this._modifications.image.claimed.length = 0;
 
+    this._modifications.replacedDate.claimed = false;
+
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
       .map(_.toArray)
       .flatten()
       .value().forEach((el) => {
         el.remove();
-      });
-
-    _.chain(this._elements)
-      .map((el) => el.getElementsByClassName('inboxsdk__thread_row_hidden_inline'))
-      .map(_.toArray)
-      .flatten()
-      .value().forEach((el) => {
-        el.style.display = 'inline';
       });
 
     this._eventStream.end();
@@ -194,20 +190,28 @@ _.extend(GmailThreadRowView.prototype, {
 
   _removeUnclaimedModifications() {
     for (let mod of this._modifications.label.unclaimed) {
-      console.log('removing unclaimed label mod', mod);
+      //console.log('removing unclaimed label mod', mod);
       mod.remove();
     }
     this._modifications.label.unclaimed.length = 0;
     for (let mod of this._modifications.button.unclaimed) {
-      console.log('removing unclaimed button mod', mod);
+      //console.log('removing unclaimed button mod', mod);
       mod.remove();
     }
     this._modifications.button.unclaimed.length = 0;
     for (let mod of this._modifications.image.unclaimed) {
-      console.log('removing unclaimed image mod', mod);
+      //console.log('removing unclaimed image mod', mod);
       mod.remove();
     }
     this._modifications.image.unclaimed.length = 0;
+
+    if (this._modifications.replacedDate.destroy &&
+      !this._modifications.replacedDate.claimed
+    ) {
+      //console.log('removing unclaimed date replacement');
+      this._modifications.replacedDate.destroy();
+      this._modifications.replacedDate.destroy = null;
+    }
   },
 
   // Returns a Kefir stream that emits this object once this object is ready for the
@@ -546,16 +550,21 @@ _.extend(GmailThreadRowView.prototype, {
       var customDateSpan = originalDateSpan.nextElementSibling;
       if (!customDateSpan) {
         customDateSpan = document.createElement('span');
-        customDateSpan.className = 'inboxsdk__thread_row_addition inboxsdk__thread_row_custom_date';
+        customDateSpan.className = 'inboxsdk__thread_row_custom_date';
         dateContainer.appendChild(customDateSpan);
 
-        originalDateSpan.classList.add('inboxsdk__thread_row_hidden_inline');
+        this._modifications.replacedDate.destroy = () => {
+          customDateSpan.remove();
+          originalDateSpan.style.display = 'inline';
+        };
       }
 
       if (!opts) {
+        this._modifications.replacedDate.claimed = false;
         customDateSpan.style.display = 'none';
         originalDateSpan.style.display = 'inline';
       } else {
+        this._modifications.replacedDate.claimed = true;
         customDateSpan.textContent = opts.text;
         if (opts.tooltip) {
           customDateSpan.setAttribute('data-tooltip', opts.tooltip);
