@@ -56,7 +56,7 @@ _.extend(Search.prototype,  /** @lends Search */{
 		if (typeof rewriter.termReplacer != 'function' || typeof rewriter.term != 'string') {
 			throw new Error("Incorrect arguments");
 		}
-		if (!rewriter.term.match(/^app:/)) {
+		if (!rewriter.term.match(/^(app|has):/)) {
 			throw new Error("Custom search term must begin with 'app:'");
 		}
 		var members = memberMap.get(this);
