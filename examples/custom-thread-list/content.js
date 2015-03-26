@@ -25,7 +25,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 
 	sdk.Router.handleCustomListRoute('tlbeep', function(page) {
 		log('tlbeep activate', arguments);
-		return delay(50, [
+		return delay(5000, [
 			'<001a11c215129742ad0511fdbedb@google.com>',
 			'<CAGtu8GdkoMY1kCaV4ZvxTCqsK4tqM0esU-0OrRXTaSg28Hh1gg@mail.gmail.com>'
 		]);

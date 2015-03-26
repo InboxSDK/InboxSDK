@@ -163,6 +163,8 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
 
   const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
+  const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
+
   Bacon.fromEvent(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
     .skipUntil(
@@ -172,6 +174,7 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
       nextMainContentElementChange.delay(10)
     )
     .merge(nextMainContentElementChange)
+    .filter(() => document.location.hash === searchHash)
     .onValue(() => {
       driver.hashChangeNoViewChange(customHash);
     });
@@ -184,7 +187,6 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
     searchInput.style.visibility = 'visible';
   });
 
-  const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
   window.history.replaceState(null, null, searchHash);
   const hce = new HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,
