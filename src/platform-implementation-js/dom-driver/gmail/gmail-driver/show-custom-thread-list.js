@@ -48,14 +48,8 @@ for the search>
 
 * When the search completes and Gmail switches to the search results,
   setup-route-view-driver-stream.js recognizes the search string in the URL,
-  and associates the new RouteView with the custom list.
-
-* showCustomThreadList clears the search box and unhides the search box text so
-  that it works again.
-
-* showCustomThreadList changes the hash in the URL from the search back to the
-  custom list route id (and fights gmail for a few milliseconds to keep that
-  hash in the url).
+  clears the search box, changes the hash in the URL to look like the custom
+  list route id, and associates the new RouteView with the custom list.
 
 */
 
@@ -165,25 +159,11 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
 
   const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
-  Bacon.fromEvent(window, 'hashchange')
-    .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-    .skipUntil(
-      nextMainContentElementChange
-    )
-    .takeUntil(
-      nextMainContentElementChange.delay(10)
-    )
-    .merge(nextMainContentElementChange)
-    .filter(() => document.location.hash === searchHash)
-    .onValue(() => {
-      driver.hashChangeNoViewChange(customHash);
-    });
-
   const searchInput = GmailElementGetter.getSearchInput();
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
   nextMainContentElementChange.onValue(() => {
-    searchInput.value = '';
+    // setup-route-view-driver-stream handles clearing search again
     searchInput.style.visibility = 'visible';
   });
 

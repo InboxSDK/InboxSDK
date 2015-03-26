@@ -79,9 +79,15 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		if (type === 'NATIVE' && urlObject.name === 'search') {
 			const customListRouteId = customListSearchStringsToRouteIds.get(urlObject.params[0]);
 			if (customListRouteId) {
-				return {
-					type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
-				};
+				const searchInput = GmailElementGetter.getSearchInput();
+				searchInput.value = '';
+
+				if (urlObject.params.length === 1) {
+					driver.hashChangeNoViewChange('#'+customListRouteId);
+					return {
+						type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
+					};
+				}
 			}
 		}
 		return options;
