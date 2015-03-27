@@ -207,10 +207,13 @@ gulp.task('test-unit', function() {
   return spawn('node_modules/.bin/mocha');
 });
 
-gulp.task('test-jsdom', ['test-jsdom-inboxsdk', 'test-jsdom-iti']);
+gulp.task('test-jsdom', [
+  'test-jsdom-inboxsdk-gmail',
+  'test-jsdom-iti'
+]);
 
-gulp.task('test-jsdom-inboxsdk', function() {
-  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk.js']);
+gulp.task('test-jsdom-inboxsdk-gmail', function() {
+  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk-gmail.js']);
 });
 
 gulp.task('test-jsdom-iti', function() {

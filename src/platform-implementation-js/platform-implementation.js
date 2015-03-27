@@ -17,6 +17,12 @@ let User = require('./platform-implementation/user');
 let logger = require('./lib/logger');
 
 let GmailDriver = require('./dom-driver/gmail/gmail-driver');
+let DummyDriver = require('./dom-driver/dummy/dummy-driver');
+
+const DRIVERS_BY_ORIGIN = {
+	'https://mail.google.com': GmailDriver,
+	'https://inbox.google.com': null
+};
 
 // returns a promise for the PlatformImplementation object
 export default function makePlatformImplementation(appId, opts) {
@@ -31,17 +37,22 @@ export default function makePlatformImplementation(appId, opts) {
 		globalErrorLogging: true, eventTracking: true
 	}, opts);
 
-	if (_.has(opts, 'REQUESTED_API_VERSION')) {
-		opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
-		if (opts.REQUESTED_API_VERSION !== 1) {
-			throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
-		}
-	} else {
-		// Deprecated `new InboxSDK` constructor used.
+	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
+	if (opts.REQUESTED_API_VERSION !== 1) {
+		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
 	pi._membraneMap = new MembraneMap();
-	pi._driver = new GmailDriver(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
+
+	const DriverClass = DRIVERS_BY_ORIGIN[document.location.origin];
+	if (!DriverClass) {
+		console.log("InboxSDK: Unsupported origin", document.location.origin);
+		return new Promise(function(resolve, reject) {
+			// never resolve
+		});
+	}
+
+	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
 	return pi._driver.onready.then(() => {
 		pi._driver.getLogger().eventSdkPassive('load');
 
