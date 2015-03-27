@@ -190,4 +190,13 @@ describe('addAccessors', function() {
     assert.strictEqual(b.getX(), undefined);
     assert.strictEqual(b.getY(), undefined);
   });
+
+  it('throws error for invalid descriptors', function() {
+    class A {}
+    assert.throws(() => {
+      addAccessors(A.prototype, [
+        {name: '_foo', beep: 5}
+      ]);
+    });
+  });
 });
