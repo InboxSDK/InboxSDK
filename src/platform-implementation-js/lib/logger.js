@@ -339,6 +339,7 @@ function _logError(err, details, appId, sentByApp) {
       extensionId: getExtensionId(),
       loaderVersion: _extensionLoaderVersion,
       implementationVersion: _extensionImplVersion,
+      origin: document.location.origin,
       timestamp: Date.now()*1000
     };
 
