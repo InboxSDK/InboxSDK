@@ -61,18 +61,6 @@ _.extend(Search.prototype,  /** @lends Search */{
 		}
 		var members = memberMap.get(this);
 		members.driver.registerSearchQueryRewriter(rewriter);
-	},
-
-	/**
-	* A convenience function that generates a search query for threads matching RFC2822 Message-Id headers.
-	* This is typically used when you want to specifically show messages with a given ID
-	* @param {String[]} ids - an array of RFC2822 Message-IDs
-	* @return {String} a search query
-	*/
-	generateSearchQueryForMessagesByRfcID: function(ids) {
-		return ids.map(function(id) {
-			return 'rfc822msgid:' + id;
-		}).join(' OR ');
 	}
 
 });

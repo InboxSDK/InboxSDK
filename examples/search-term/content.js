@@ -7,7 +7,7 @@ InboxSDK.load(1, 'search-term').then(function(sdk) {
 		term: 'app:custom',
 		termReplacer: function() {
 			console.log('app:custom activate');
-			return sdk.Search.generateSearchQueryForMessagesByRfcID([
+			return [
 				'<bcaec51b1acbb643d8050b8ee898@google.com>',
 				'<CADBYpy=tCAyweRdjMTuvKd5y8XYtbJZmQHW19gTOgAhotQtYQA@mail.gmail.com>',
 				'<047d7b6760760bc84f050b66ad3e@google.com>',
@@ -53,7 +53,9 @@ InboxSDK.load(1, 'search-term').then(function(sdk) {
 				'<bcaec517cdb65def830509c5a0de@google.com>',
 				'<CADBYpymTHxjOsXsXjeGShiTpbnuuDC5Mh31LACkSE8ACWZp0mQ@mail.gmail.com>',
 				'<6-5288392773638389732-2578584358222473794-googleappengine=googlecode.com@googlecode.com>'
-			]);
+			].map(function(id) {
+				return 'rfc822msgid:' + id;
+			}).join(' OR ');
 		}
 	});
 });
