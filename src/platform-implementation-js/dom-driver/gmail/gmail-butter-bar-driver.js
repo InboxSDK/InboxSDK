@@ -38,17 +38,6 @@ const sdkRemovedNotice = elements
 
 const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
 
-// For stream to be in active state. sdkRemovedNotice is prone to missing
-// events if it only becomes active once a message has started.
-noticeAvailableStream.onValue(_.noop);
-
-Bacon.combineAsArray(elements, googleAddedNotice)
-  .onValues(({googleNotice, sdkNotice}) => {
-    googleNotice.style.display = '';
-    sdkNotice.style.display = 'none';
-    sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
-  });
-
 function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
@@ -58,6 +47,19 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
 }
 
 export default class GmailButterBarDriver {
+  constructor() {
+    Bacon.combineAsArray(elements, googleAddedNotice)
+      .onValues(({googleNotice, sdkNotice}) => {
+        googleNotice.style.display = '';
+        sdkNotice.style.display = 'none';
+        sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
+      });
+
+    // Force stream to be in active state. sdkRemovedNotice is prone to missing
+    // events if it only becomes active once a message has started.
+    noticeAvailableStream.onValue(_.noop);
+  }
+
   getNoticeAvailableStream() {
     return noticeAvailableStream;
   }
