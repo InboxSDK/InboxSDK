@@ -237,7 +237,7 @@ describe("ButterBar", function() {
         assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
         assert(driver.getButterBarDriver()._currentMessage);
         done();
-      }, 1);
+      }, 2);
     });
 
     it('respects showConfirmation', function(done) {
