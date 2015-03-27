@@ -6,8 +6,8 @@ const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
 
-require('./custom-style');
-
+import addAccessors from '../../lib/add-accessors';
+import assertInterface from '../../lib/assert-interface';
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptor = require('./make-xhr-interceptor');
@@ -21,7 +21,7 @@ const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 import MessageIdManager from '../../lib/message-id-manager';
 
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-	Driver.call(this);
+	require('./custom-style');
 
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 	this._customRouteIDs = new Set();
@@ -48,30 +48,28 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	});
 };
 
-GmailDriver.prototype = Object.create(Driver.prototype);
+addAccessors(GmailDriver.prototype, [
+	// This isn't available until the following promise has resolved
+	{name: '_pageCommunicator', destroy: false, get: true},
+	{name: '_pageCommunicatorPromise', destroy: false, get: true},
+	{name: '_logger', destroy: false, get: true},
+	{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
+	{name: '_messageIdManager', destroy: false, get: true},
+	{name: '_butterBarDriver', destroy: false, get: true},
+	{name: '_customRouteIDs', destroy: false, get: true},
+	{name: '_customListRouteIDs', destroy: false, get: true},
+	{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
+	{name: '_routeViewDriverStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_rowListViewDriverStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_threadRowViewDriverKefirStream', destroy: false, get: true},
+	{name: '_threadViewDriverStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_toolbarViewDriverStream', destroy: true, get: true},
+	{name: '_composeViewDriverStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_xhrInterceptorStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_messageViewDriverStream', destroy: true, get: true, destroyMethod: 'end'}
+]);
 
 _.extend(GmailDriver.prototype, {
-
-	__memberVariables: [
-		// This isn't available until the following promise has resolved
-		{name: '_pageCommunicator', destroy: false, get: true},
-		{name: '_pageCommunicatorPromise', destroy: false, get: true},
-		{name: '_logger', destroy: false, get: true},
-		{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
-		{name: '_messageIdManager', destroy: false, get: true},
-		{name: '_butterBarDriver', destroy: false, get: true},
-		{name: '_customRouteIDs', destroy: false, get: true},
-		{name: '_customListRouteIDs', destroy: false, get: true},
-		{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},
-		{name: '_routeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_rowListViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_threadRowViewDriverKefirStream', destroy: false, get: true},
-		{name: '_threadViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_toolbarViewDriverStream', destroy: true, get: true},
-		{name: '_composeViewDriverStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_xhrInterceptorStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_messageViewDriverStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
 
 	hashChangeNoViewChange(hash) {
 		if (hash[0] !== '#') {
@@ -271,5 +269,7 @@ _.extend(GmailDriver.prototype, {
 	}
 
 });
+
+assertInterface(GmailDriver.prototype, Driver);
 
 module.exports = GmailDriver;
