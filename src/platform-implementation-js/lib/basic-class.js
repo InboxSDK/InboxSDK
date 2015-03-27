@@ -6,30 +6,13 @@
  * member variables. Also adds a "destroy" function to help clear out references and
  * prevent memory leaks
  *
+ * DEPRECATED, Superseded by add-accessors.js
+ *
  */
 
 import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';
-
-const getGetterName = _.memoize(variableName =>
-	'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
-);
-
-const getSetterName = _.memoize(variableName =>
-	'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
-);
-
-const makeGetter = _.memoize(variableName =>
-	function() {
-		return this[variableName];
-	}
-);
-
-const makeSetter = _.memoize(variableName =>
-	function(x) {
-		this[variableName] = x;
-	}
-);
+import {getGetterName, getSetterName, makeGetter, makeSetter} from './add-accessors';
 
 let shouldMakeMethod;
 {
