@@ -144,6 +144,17 @@ _.extend(Router.prototype, /** @lends Router */ {
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
 	},
 
+	/**
+	* Used to create a custom view that shows a list of threads. When the user navigates
+	* to the given routeID, the handler function will be called. The handler function
+	* will be passed the starting offset (if the user sees 50 threads per page and is on
+	* page 2, then the offset will be 50) and it should return an array of up to 50 thread IDs
+	* or a Promise for an array of thread IDs.
+	* The thread IDs can be Gmail Thread IDs or the value of a message's Message-ID header
+	* (which must start with "<" and end with ">").
+	* @param {string} routeID - which route this handler is registering for
+	* @param {function} handler
+	*/
 	handleCustomListRoute: function(routeID, handler) {
 		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
 	},

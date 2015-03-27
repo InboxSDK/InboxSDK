@@ -152,6 +152,7 @@ var SearchQueryRewriter = /** @lends SearchQueryRewriter */ {
 
 	/**
 	* The query term that you'd like to rewrite/replace. No wildcards are currently supported.
+	* Currently it must begin with "app:" or "has:".
 	* @type{String}
 	*/
 	term:  null,

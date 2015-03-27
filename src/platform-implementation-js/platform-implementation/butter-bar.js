@@ -30,8 +30,8 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   /**
    * Spawns a message in a yellow block.
    *
-   * @param options {Object} message options
-   * @return {Object} Object with destroy method
+   * @param options {MessageDescriptor} message options
+   * @return {Object} Object with destroy method that can be called to remove the message.
    */
   showMessage(options) {
     _.defaults(options, {
@@ -117,6 +117,11 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
     return message;
   },
 
+  /**
+   * Spawns a "Loading..." message in a yellow block that stays until it's destroyed.
+   *
+   * @return {Object} Object with destroy method that can be called to remove the message.
+   */
   showLoading(options={}) {
     _.defaults(options, {
       text: 'Loading...',
@@ -136,9 +141,8 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   },
 
   /**
-  * Spawns a saving message in a yellow block.
+  * Spawns a "Saving..." message in a yellow block.
   *
-  * @param options {Object} message options
   * @return {Object} Object with resolve and reject methods
   */
   showSaving(options={}) {
@@ -201,3 +205,57 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 });
 
 module.exports = ButterBar;
+
+/**
+* @class
+* This type is used to describe a message for ButterBar to show
+*/
+var MessageDescriptor = /** @lends MessageDescriptor */{
+  /**
+  * Text to show.
+  * @type {string}
+  */
+  text: null,
+
+  /**
+  * Messages with lower priorities won't interrupt a currently displayed message.
+  * ^optional
+  * ^default=0
+  * @type {number}
+  */
+  priority: null,
+
+  /**
+  * Number of milliseconds the message is displayed before going away on its own.
+  * ^optional
+  * ^default=15000
+  * @type {number}
+  */
+  time: null,
+
+  /**
+  * If true, the message will immediately disappear if the user navigates to
+  * another route view.
+  * ^optional
+  * ^default=true
+  * @type {boolean}
+  */
+  hideOnViewChanged: null,
+
+  /**
+  * Whether this message should re-appear after being interrupted by another
+  * message.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  persistent: null,
+
+  /**
+  * If a new message has the same messageKey as the current message, then the
+  * current message will always be destroyed, regardless of its priority.
+  * ^optional
+  * @type {Object}
+  */
+  messageKey: null
+};
