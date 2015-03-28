@@ -3,26 +3,14 @@ var Bacon = require('baconjs');
 var fs = require('fs');
 var deparam = require('querystring').parse;
 var PageCommunicator = require('./page-communicator');
-import RSVP from 'rsvp';
-import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-var injectScript = _.once(function() {
-  if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
-    var url = 'https://www.inboxsdk.com/build/injected.js';
-
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../../dist/injected.js', 'utf8')+'\n//# sourceURL='+url+'\n';
-    document.head.appendChild(script).parentNode.removeChild(script);
-    document.head.setAttribute('data-inboxsdk-script-injected', true);
-  }
-});
+import injectScript from '../../lib/inject-script';
 
 function makeXhrInterceptor() {
-  injectScript();
-
   var pageCommunicator = new PageCommunicator();
   var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
+
+  const pageCommunicatorPromise = injectScript().then(() => pageCommunicator);
 
   var interceptStream = Bacon.mergeAll(
     rawInterceptStream.filter(function(detail) {
@@ -48,13 +36,6 @@ function makeXhrInterceptor() {
       };
     })
   );
-
-  const pageCommunicatorPromise = Bacon.later(0, null)
-    .merge( makeMutationObserverChunkedStream(document.head, {attributes: true}) )
-    .filter(() => document.head.hasAttribute('data-inboxsdk-user-email-address'))
-    .take(1)
-    .map(() => pageCommunicator)
-    .toPromise(RSVP.Promise);
 
   return {
     xhrInterceptStream: interceptStream,

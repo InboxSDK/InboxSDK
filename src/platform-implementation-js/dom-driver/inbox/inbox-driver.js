@@ -8,11 +8,16 @@ import addAccessors from '../../lib/add-accessors';
 import assertInterface from '../../lib/assert-interface';
 import Driver from '../../driver-interfaces/driver';
 import Logger from '../../lib/logger';
+import injectScript from '../../lib/inject-script';
 
 export default class DummyDriver {
   constructor(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
-    this.onready = RSVP.Promise.resolve();
+    this.onready = injectScript();
+
+    // this._customRouteIDs = new Set();
+    // this._customListRouteIDs = new Map();
+    // this._customListSearchStringsToRouteIds = new Map();
 
     this._routeViewDriverStream = new Bacon.Bus();
     this._rowListViewDriverStream = new Bacon.Bus();
@@ -32,7 +37,7 @@ export default class DummyDriver {
   }
 
   getUserEmailAddress() {
-    throw new Error("email address not implemented");
+    return document.head.getAttribute('data-inboxsdk-user-email-address');
   }
 
   addNavItem(a, b) {

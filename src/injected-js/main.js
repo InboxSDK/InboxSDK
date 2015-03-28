@@ -1,17 +1,24 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var gmailInterceptor = require('./setup-gmail-interceptor');
-var setupGmonkeyHandler = require('./setup-gmonkey-handler');
-var setupDataExposer = require('./setup-data-exposer');
-
 if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
+
+  const _ = require('lodash');
+  const RSVP = require('rsvp');
+  const gmailInterceptor = require('./setup-gmail-interceptor');
+  const setupGmonkeyHandler = require('./setup-gmonkey-handler');
+  const setupDataExposer = require('./setup-data-exposer');
 
   RSVP.on('error', function(err) {
     console.error("Possibly uncaught promise rejection", err);
   });
 
-  gmailInterceptor();
-  setupGmonkeyHandler();
+  if (document.location.origin === 'https://mail.google.com') {
+    gmailInterceptor();
+    setupGmonkeyHandler();
+  } else if (document.location.origin === 'https://inbox.google.com') {
+    // inbox-specific magic goes here
+  } else {
+    throw new Error("Should not happen");
+  }
+
   setupDataExposer();
 }
