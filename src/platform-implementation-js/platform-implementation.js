@@ -14,14 +14,12 @@ let Search = require('./platform-implementation/search');
 let Toolbars = require('./platform-implementation/toolbars');
 let User = require('./platform-implementation/user');
 
-let logger = require('./lib/logger');
-
-let GmailDriver = require('./dom-driver/gmail/gmail-driver');
-let DummyDriver = require('./dom-driver/dummy/dummy-driver');
+import GmailDriver from './dom-driver/gmail/gmail-driver';
+import InboxDriver from './dom-driver/inbox/inbox-driver';
 
 const DRIVERS_BY_ORIGIN = {
 	'https://mail.google.com': GmailDriver,
-	'https://inbox.google.com': null
+	'https://inbox.google.com': InboxDriver
 };
 
 // returns a promise for the PlatformImplementation object

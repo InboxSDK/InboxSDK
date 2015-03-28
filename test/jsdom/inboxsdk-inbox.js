@@ -8,7 +8,7 @@ var InboxSDK = require('./lib/inboxsdk');
 
 global.MutationObserver = require('../lib/mock-mutation-observer');
 global.document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
-Object.defineProperty(document.location, 'origin', {value:'https://mail.google.com'});
+Object.defineProperty(document.location, 'origin', {value:'https://inbox.google.com'});
 global.window = document.parentWindow;
 
 // don't try to inject ajax interceptor

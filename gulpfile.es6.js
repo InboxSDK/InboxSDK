@@ -209,11 +209,16 @@ gulp.task('test-unit', function() {
 
 gulp.task('test-jsdom', [
   'test-jsdom-inboxsdk-gmail',
+  'test-jsdom-inboxsdk-inbox',
   'test-jsdom-iti'
 ]);
 
 gulp.task('test-jsdom-inboxsdk-gmail', function() {
   return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk-gmail.js']);
+});
+
+gulp.task('test-jsdom-inboxsdk-inbox', function() {
+  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk-inbox.js']);
 });
 
 gulp.task('test-jsdom-iti', function() {
