@@ -20,10 +20,10 @@ describe("MessageIdManager", function() {
     });
 
     const startTime = Date.now();
+    assert.strictEqual(storage.length, 0);
     assert.strictEqual(yield mim.getGmailThreadIdForRfcMessageId("<123>"), "123");
     assert.strictEqual(yield mim.getGmailThreadIdForRfcMessageId("<123>"), "123");
     assert.strictEqual(yield mim.getRfcMessageIdForGmailThreadId("123"), "<123>");
-    assert.strictEqual(storage.length, 0);
     assert(getGmailThreadIdForRfcMessageId.calledOnce);
     yield delay(2);
     const endTime = Date.now();
@@ -50,10 +50,10 @@ describe("MessageIdManager", function() {
     });
 
     const startTime = Date.now();
+    assert.strictEqual(storage.length, 0);
     assert.strictEqual(yield mim.getRfcMessageIdForGmailThreadId("456"), "<456>");
     assert.strictEqual(yield mim.getRfcMessageIdForGmailThreadId("456"), "<456>");
     assert.strictEqual(yield mim.getGmailThreadIdForRfcMessageId("<456>"), "456");
-    assert.strictEqual(storage.length, 0);
     assert(getRfcMessageIdForGmailMessageId.calledOnce);
     yield delay(2);
     const endTime = Date.now();
