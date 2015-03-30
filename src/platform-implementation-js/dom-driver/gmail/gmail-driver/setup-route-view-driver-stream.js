@@ -94,10 +94,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	}).map(options => {
 		if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
 			driver.showNativeRouteView();
-		} else if (options.type === 'OTHER_APP_CUSTOM') {
-			// Apps don't see the custom views belonging to other apps. We might
-			// change this later.
-			return null;
 		} else if (options.type === 'CUSTOM_LIST_TRIGGER') {
 			driver.showCustomThreadList(options.routeID, customListRouteIDs.get(options.routeID));
 			return;
