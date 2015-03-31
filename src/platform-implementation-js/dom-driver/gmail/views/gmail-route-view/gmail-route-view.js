@@ -54,6 +54,14 @@ _.extend(GmailRouteView.prototype, {
 		{name: '_rowListElements', destroy: false}
 	],
 
+	getType: function() {
+		if (this._type === 'OTHER_APP_CUSTOM') {
+			return 'CUSTOM';
+		} else {
+			return this._type;
+		}
+	},
+
 	getParams: function(){
 		if (this._customRouteID) {
 			return this._getCustomParams();

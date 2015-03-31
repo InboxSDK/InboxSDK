@@ -453,8 +453,14 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 /* nav menu */
 
 
-.inboxsdk__navItem_claimed.ain {
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
+}
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ * {
+  color: inherit !important;
+}
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nU:not(.n1) .n0 {
+  font-weight: normal;
 }
 
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {

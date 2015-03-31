@@ -469,22 +469,6 @@ _.extend(GmailNavItemView.prototype, {
 		if($(this._element).closest('.inboxsdk__navMenu').length === 0){
 			return;
 		}
-	},
-
-	_createActiveMarkerElement: function(){
-		if(this._activeMarkerElement){
-			this._activeMarkerElement.remove();
-		}
-
-		this._activeMarkerElement = document.createElement('div');
-		this._activeMarkerElement.classList.add('inboxsdk__navItem_marker');
-		this._activeMarkerElement.classList.add('ain');
-		this._activeMarkerElement.innerHTML = '&nbsp;';
-
-		var position = $(this._element).position();
-		this._activeMarkerElement.style.top = position.top + 'px';
-
-		this._element.insertBefore(this._activeMarkerElement, this._element.firstElementChild);
 	}
 
 });

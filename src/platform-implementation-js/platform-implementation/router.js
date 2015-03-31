@@ -45,8 +45,6 @@ var Router = function(appId, driver, membraneMap){
 
 	members.customRoutes = [];
 
-	members.lastNativeRouteID = null;
-	members.modifiedNativeNavItem = null;
 	members.membraneMap = membraneMap;
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
@@ -445,60 +443,8 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	}
 }
 
-
 function _updateNavMenu(members, newRouteViewDriver){
-	var oldRouteViewDriver = members.currentRouteViewDriver;
-
-	if(oldRouteViewDriver && oldRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
-		if(newRouteViewDriver.getRouteType() === routeTypes.CUSTOM){
-			members.lastNativeRouteID = oldRouteViewDriver.getRouteID();
-			_removeNativeNavItemActive(members);
-			return;
-		}
-	}
-	else if(members.lastNativeRouteID && newRouteViewDriver.getRouteType() !== routeTypes.CUSTOM){
-		if(members.lastNativeRouteID === newRouteViewDriver.getRouteID()){
-			_restoreNativeNavItemActive(members);
-		}
-		else{
-			_unhandleNativeNavItem(members);
-		}
-	}
+	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== routeTypes.CUSTOM);
 }
-
-
-function _removeNativeNavItemActive(members){
-	if(members.modifiedNativeNavItem){
-		members.modifiedNativeNavItem.setActive(false); //make sure there is only one active at a time;
-	}
-
-	members.modifiedNativeNavItem = members.driver.getCurrentActiveNavItem();
-
-	if(!members.modifiedNativeNavItem){
-		return;
-	}
-
-	members.modifiedNativeNavItem.setActive(false);
-	members.modifiedNativeNavItem
-		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'invalidated';
-		})
-		.onValue(_removeNativeNavItemActive, members);
-}
-
-function _restoreNativeNavItemActive(members){
-	if(!members.modifiedNativeNavItem){
-		return;
-	}
-
-	members.modifiedNativeNavItem.setActive(true);
-	members.modifiedNativeNavItem = null;
-}
-
-function _unhandleNativeNavItem(members){
-	members.modifiedNativeNavItem = null;
-}
-
 
 module.exports = Router;

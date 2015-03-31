@@ -143,12 +143,17 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
 	},
 
-	getCurrentActiveNavItem: function(){
-		return require('./gmail-driver/get-current-active-nav-item')();
-	},
-
 	getSentMailNativeNavItem: function(){
 		return require('./gmail-driver/get-native-nav-item')('sent');
+	},
+
+	setShowNativeNavMarker: function(value) {
+		const c = GmailElementGetter.getLeftNavContainerElement();
+		if (value) {
+			c.classList.remove('inboxsdk__hide_native_marker');
+		} else {
+			c.classList.add('inboxsdk__hide_native_marker');
+		}
 	},
 
 	setNativeRouteIDs: function(nativeRouteIDs){
