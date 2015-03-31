@@ -16,7 +16,7 @@ export default {
 	addCustomRouteID: 1,
 	addCustomListRouteID: 2,
 	showCustomRouteView: 1,
-	getCurrentActiveNavItem: 0,
+	setShowNativeNavMarker: 1,
 
 	setNativeRouteIDs: 1,
 	setNativeListRouteIDs: 1,

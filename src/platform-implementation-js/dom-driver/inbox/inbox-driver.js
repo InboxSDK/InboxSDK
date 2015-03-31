@@ -73,8 +73,8 @@ export default class DummyDriver {
     throw new Error("Not implemented");
   }
 
-  getCurrentActiveNavItem() {
-    throw new Error("Not implemented");
+  setShowNativeNavMarker(value) {
+    // stub
   }
 
   setNativeRouteIDs(a) {
