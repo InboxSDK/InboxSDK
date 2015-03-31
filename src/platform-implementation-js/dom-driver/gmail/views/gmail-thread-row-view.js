@@ -43,6 +43,16 @@ function starGroupEventInterceptor(event) {
   }
 }
 
+// Change a color very slightly to force a re-render
+function tweakColor(color) {
+  // example:
+  // "rgba(255, 255, 255, 0.9)" -> "rgba(254, 254, 254, 0.9)"
+  if (typeof color === 'string') {
+    return color.replace(/(\d+),/g, (full, num) => (num^1)+',');
+  }
+  return color;
+}
+
 var GmailThreadRowView = function(element, rowListViewDriver) {
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
@@ -86,6 +96,20 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
     .map(x => null)
     .takeUntilBy(this._stopper);
+
+  this._subscribeTextFixer = _.once(() => {
+    // Work around the text-corruption issue on Chrome on retina displays that
+    // happens when images are added to the row.
+    this._imageFixerTask.onValue(() => {
+      const tr = this._elements[0];
+      const computedBgColor = window.getComputedStyle(tr).backgroundColor;
+      tr.style.backgroundColor = tweakColor(computedBgColor);
+      setTimeout(() => {
+        tr.style.backgroundColor = '';
+      }, 0);
+    });
+  });
+
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
   // nodes. One time this happens is when you have a new email in your inbox,
@@ -367,9 +391,11 @@ _.extend(GmailThreadRowView.prototype, {
     this._imageFixerTask.onValue(() => {
       const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
       if (el) {
+        // Make the image reposition itself horizontally.
         el.style.display = (el.style.display === 'block') ? 'inline-block' : 'block';
       }
     });
+    this._subscribeTextFixer();
   },
 
   addButton: function(buttonDescriptor) {
