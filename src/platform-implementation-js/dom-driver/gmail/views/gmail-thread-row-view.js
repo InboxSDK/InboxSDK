@@ -10,6 +10,7 @@ var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-
 var baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
+import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
@@ -80,6 +81,11 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
   this._eventStream = new Kefir.Bus();
   this._stopper = new Kefir.Emitter();
 
+  this._imageFixer = new Kefir.Emitter(); // emit into this to queue an image fixer run
+  this._imageFixerTask = this._imageFixer
+    .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
+    .map(x => null)
+    .takeUntilBy(this._stopper);
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
   // nodes. One time this happens is when you have a new email in your inbox,
@@ -294,6 +300,7 @@ _.extend(GmailThreadRowView.prototype, {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
+        this._imageFixer.emit();
       }
     });
   },
@@ -353,6 +360,14 @@ _.extend(GmailThreadRowView.prototype, {
 
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
         }
+        this._imageFixer.emit();
+      }
+    });
+
+    this._imageFixerTask.onValue(() => {
+      const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
+      if (el) {
+        el.style.display = (el.style.display === 'block') ? 'inline-block' : 'block';
       }
     });
   },
@@ -468,6 +483,7 @@ _.extend(GmailThreadRowView.prototype, {
           starGroup.appendChild(buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
         }
+        this._imageFixer.emit();
       }
     });
   },
