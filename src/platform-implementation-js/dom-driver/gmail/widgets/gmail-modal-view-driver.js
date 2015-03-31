@@ -66,7 +66,7 @@ _.extend(GmailModalViewDriver.prototype, {
 
         this._checkForMoreThanOnePrimaryButton(buttons);
         _.sortBy(buttons, function(button){
-            return button.orderHint || 0
+            return button.orderHint || 0;
         }).forEach(this._addButton.bind(this, this._modalContainerElement.querySelector('.inboxsdk__modal_buttons')));
     },
 
@@ -107,7 +107,7 @@ _.extend(GmailModalViewDriver.prototype, {
         if(
             _.chain(buttons)
              .pluck('type')
-             .filter(function(type){return type === 'PRIMARY_BUTTON';})
+             .filter(function(type){return type === 'PRIMARY_ACTION';})
              .value().length > 1
          ){
              throw new Error('At most one primary button is allowed');
@@ -116,14 +116,14 @@ _.extend(GmailModalViewDriver.prototype, {
 
     _addButton: function(buttonContainer, buttonDescriptor){
         var buttonOptions = _.clone(buttonDescriptor);
-        buttonOptions.buttonColor = (buttonDescriptor.type === 'PRIMARY_BUTTON' ? 'blue' : 'default');
+        buttonOptions.buttonColor = (buttonDescriptor.type === 'PRIMARY_ACTION' ? 'blue' : 'default');
 
         var buttonView = new ButtonView(buttonOptions);
 
         buttonOptions.buttonView = buttonView;
         var buttonViewController = new BasicButtonViewController(buttonOptions);
 
-        if(buttonDescriptor.type === 'PRIMARY_BUTTON'){
+        if(buttonDescriptor.type === 'PRIMARY_ACTION'){
             buttonContainer.insertBefore(buttonView.getElement(), buttonContainer.firstElementChild);
         }
         else{
