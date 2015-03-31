@@ -7,6 +7,12 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
+
+		threadRowView.addImage(Kefir.constant({
+			imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+			tooltip: 'Monkeys'
+		}));
+
 		threadRowView.addLabel(Kefir.repeatedly(5000, [
 			{title:'A'},
 			{title:'B', foregroundColor: 'blue', iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png'},
@@ -71,17 +77,6 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				]));
 			}
 		});
-
-		threadRowView.addImage(Kefir.repeatedly(5000, [
-			null,
-			{
-				imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
-				tooltip: 'Monkeys'
-			}
-		]).toProperty({
-			imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
-			tooltip: 'Monkeys'
-		}));
 	});
 
 });

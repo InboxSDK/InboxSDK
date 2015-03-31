@@ -10,6 +10,7 @@ var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-
 var baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
+import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
@@ -40,6 +41,16 @@ function starGroupEventInterceptor(event) {
       this.parentElement.dispatchEvent(newEvent);
     }
   }
+}
+
+// Change a color very slightly to force a re-render
+function tweakColor(color) {
+  // example:
+  // "rgba(255, 255, 255, 0.9)" -> "rgba(254, 254, 254, 0.9)"
+  if (typeof color === 'string') {
+    return color.replace(/(\d+),/g, (full, num) => (num^1)+',');
+  }
+  return color;
 }
 
 var GmailThreadRowView = function(element, rowListViewDriver) {
@@ -79,6 +90,25 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
 
   this._eventStream = new Kefir.Bus();
   this._stopper = new Kefir.Emitter();
+
+  this._imageFixer = new Kefir.Emitter(); // emit into this to queue an image fixer run
+  this._imageFixerTask = this._imageFixer
+    .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
+    .map(x => null)
+    .takeUntilBy(this._stopper);
+
+  this._subscribeTextFixer = _.once(() => {
+    // Work around the text-corruption issue on Chrome on retina displays that
+    // happens when images are added to the row.
+    this._imageFixerTask.onValue(() => {
+      const tr = this._elements[0];
+      const computedBgColor = window.getComputedStyle(tr).backgroundColor;
+      tr.style.backgroundColor = tweakColor(computedBgColor);
+      setTimeout(() => {
+        tr.style.backgroundColor = '';
+      }, 0);
+    });
+  });
 
 
   // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
@@ -294,6 +324,7 @@ _.extend(GmailThreadRowView.prototype, {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
+        this._imageFixer.emit();
       }
     });
   },
@@ -353,8 +384,18 @@ _.extend(GmailThreadRowView.prototype, {
 
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
         }
+        this._imageFixer.emit();
       }
     });
+
+    this._imageFixerTask.onValue(() => {
+      const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
+      if (el) {
+        // Make the image reposition itself horizontally.
+        el.style.display = (el.style.display === 'block') ? 'inline-block' : 'block';
+      }
+    });
+    this._subscribeTextFixer();
   },
 
   addButton: function(buttonDescriptor) {
@@ -468,6 +509,7 @@ _.extend(GmailThreadRowView.prototype, {
           starGroup.appendChild(buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
         }
+        this._imageFixer.emit();
       }
     });
   },

@@ -64,20 +64,17 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 		members.navItemViewDriver = navItemViewDriver;
 
-		Bacon.combineAsArray(
-			members.navItemDescriptorPropertyStream,
-			navItemViewDriver.getEventStream()
-		)
-			.sampledBy(navItemViewDriver.getEventStream())
+		members.navItemDescriptorPropertyStream.sampledBy(
+				navItemViewDriver.getEventStream(), (a, b) => [a, b]
+			)
 			.onValue(_handleViewDriverStreamEvent, this, navItemViewDriver, members.driver);
 
 		Bacon.combineAsArray(
-			members.driver
-				.getRouteViewDriverStream()
-				.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd()),
-
-			members.navItemDescriptorPropertyStream
-		).onValue(_handleRouteViewChange, navItemViewDriver);
+			members.navItemDescriptorPropertyStream,
+			members.driver.getRouteViewDriverStream()
+		)
+			.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
+			.onValue(_handleRouteViewChange, navItemViewDriver);
 
 		members.deferred.resolve(navItemViewDriver);
 	},
@@ -168,7 +165,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 	}
 }
 
-function _handleRouteViewChange(navItemViewDriver, [routeViewDriver, navItemDescriptor]){
+function _handleRouteViewChange(navItemViewDriver, [navItemDescriptor, routeViewDriver]){
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
 		routeViewDriver.getRouteID() === navItemDescriptor.routeID &&

@@ -3,6 +3,7 @@ var Bacon = require('baconjs');
 
 var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
 var eventNameFilter = require('../../../lib/event-name-filter');
+var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 
 var GmailElementGetter = require('../gmail-element-getter');
@@ -89,32 +90,33 @@ _.extend(NativeGmailNavItemView.prototype, {
 	_monitorElementForActiveChanges: function(){
 		this._element.classList.add('inboxsdk__navItem_claimed');
 		var element = this._element;
-		var classChangeStream = makeMutationObserverStream(element, {attributes: true, attributeFilter: ['class']});
+		var classChangeStream = makeMutationObserverChunkedStream(element, {attributes: true, attributeFilter: ['class']})
+			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.toProperty(null)
+			.map(_.constant(element));
 
 		classChangeStream
-			.filter(function(mutation){
-				return mutation.target.classList.contains('ain');
-			})
-			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.filter(el =>
+				el.classList.contains('ain')
+			)
 			.onValue(this, '_createActiveMarkerElement');
 
 		classChangeStream
-			.filter(function(mutation){
-				return !mutation.target.classList.contains('ain');
-			})
-			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.filter(el =>
+				!el.classList.contains('ain')
+			)
 			.onValue(this, '_removeActiveMarkerElement');
 
-
-		makeMutationObserverStream(element.parentElement, {childList: true})
-					.takeUntil(this._eventStream.filter(false).mapEnd())
-					.flatMap(function(mutation){
-						return Bacon.fromArray(_.toArray(mutation.removedNodes));
-					})
-					.filter(function(removedNode){
-						return removedNode === element;
-					})
-					.onValue(this._eventStream, 'push', {eventName: 'invalidated'});
+		this._eventStream.plug(
+			makeMutationObserverStream(element.parentElement, {childList: true})
+				.flatMap(mutation =>
+					Bacon.fromArray(_.toArray(mutation.removedNodes))
+				)
+				.filter(removedNode =>
+					removedNode === element
+				)
+				.map(_.constant({eventName: 'invalidated'}))
+		);
 	},
 
 	_addNavItemElement: function(gmailNavItemView){
