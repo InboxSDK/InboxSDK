@@ -15,6 +15,8 @@ import makeElementChildStream from '../../lib/dom/make-element-child-stream';
 import makeMutationObserverStream from '../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
+import InboxRouteView from './views/inbox-route-view';
+
 export default class InboxDriver {
   constructor(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
@@ -37,37 +39,14 @@ export default class InboxDriver {
       )
       .map(el => ({el, jsan: el.getAttribute('jsan')}))
       .skipDuplicates((a, b) => a.jsan === b.jsan)
-      .map(({el, jsan}) => ({
-        _jsan: jsan,
-        _url: document.location.pathname,
-        _el: el,
-        getEventStream: _.constant(new Bacon.Bus()),
-        destroy() {
-          this.getEventStream().end();
-        },
-        getType: _.constant('NATIVE'),
-        getRouteType: _.constant('LIST'),
-        getRouteID: _.constant(document.location.pathname.slice(1)),
-        getParams: _.constant([])
-      }));
+      .map(({el, jsan}) => new InboxRouteView(el));
 
     // tNsA5e-nUpftc nUpftc i5 xpv2f
     const searchViews = mainAdds.filter(({el}) =>
         !el.classList.contains('lk') &&
         el.classList.contains('i5') && el.classList.contains('xpv2f')
       )
-      .map(el => ({
-        _url: document.location.pathname,
-        _el: el,
-        getEventStream: _.constant(new Bacon.Bus()),
-        destroy() {
-          this.getEventStream().end();
-        },
-        getType: _.constant('NATIVE'),
-        getRouteType: _.constant('LIST'),
-        getRouteID: _.constant('search'),
-        getParams: _.constant([])
-      }));
+      .map(({el}) => new InboxRouteView(el));
 
     this._routeViewDriverStream = Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
