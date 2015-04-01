@@ -10,7 +10,12 @@ import Driver from '../../driver-interfaces/driver';
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
 
-export default class DummyDriver {
+import streamWaitFor from '../../lib/stream-wait-for';
+import makeElementChildStream from '../../lib/dom/make-element-child-stream';
+import makeMutationObserverStream from '../../lib/dom/make-mutation-observer-stream';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+
+export default class InboxDriver {
   constructor(appId, opts, LOADER_VERSION, IMPL_VERSION) {
     this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
     this.onready = injectScript();
@@ -19,7 +24,52 @@ export default class DummyDriver {
     // this._customListRouteIDs = new Map();
     // this._customListSearchStringsToRouteIds = new Map();
 
-    this._routeViewDriverStream = new Bacon.Bus();
+    const mainAdds = streamWaitFor(() => document.getElementById('mQ'))
+      .flatMap(el => makeElementChildStream(el));
+
+    // tNsA5e-nUpftc nUpftc lk
+    const mainViews = mainAdds.filter(({el}) => el.classList.contains('lk'))
+      .map(({el}) => el.querySelector('div.cz[jsan]'))
+      .flatMap(el =>
+        makeMutationObserverChunkedStream(el, {
+          attributes: true, attributeFilter: ['jsan']
+        }).toProperty(null).map(() => el)
+      )
+      .map(el => ({el, jsan: el.getAttribute('jsan')}))
+      .skipDuplicates((a, b) => a.jsan === b.jsan)
+      .map(({el, jsan}) => ({
+        _jsan: jsan,
+        _url: document.location.pathname,
+        _el: el,
+        getEventStream: _.constant(new Bacon.Bus()),
+        destroy() {
+          this.getEventStream().end();
+        },
+        getType: _.constant('NATIVE'),
+        getRouteType: _.constant('LIST'),
+        getRouteID: _.constant(document.location.pathname.slice(1)),
+        getParams: _.constant([])
+      }));
+
+    // tNsA5e-nUpftc nUpftc i5 xpv2f
+    const searchViews = mainAdds.filter(({el}) =>
+        !el.classList.contains('lk') &&
+        el.classList.contains('i5') && el.classList.contains('xpv2f')
+      )
+      .map(el => ({
+        _url: document.location.pathname,
+        _el: el,
+        getEventStream: _.constant(new Bacon.Bus()),
+        destroy() {
+          this.getEventStream().end();
+        },
+        getType: _.constant('NATIVE'),
+        getRouteType: _.constant('LIST'),
+        getRouteID: _.constant('search'),
+        getParams: _.constant([])
+      }));
+
+    this._routeViewDriverStream = Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = new Bacon.Bus();
     this._composeViewDriverStream = new Bacon.Bus();
     this._threadViewDriverStream = new Bacon.Bus();
@@ -106,7 +156,7 @@ export default class DummyDriver {
   }
 }
 
-addAccessors(DummyDriver.prototype, [
+addAccessors(InboxDriver.prototype, [
   {name: '_logger', get: true},
   {name: '_routeViewDriverStream', get: true},
   {name: '_rowListViewDriverStream', get: true},
@@ -118,4 +168,4 @@ addAccessors(DummyDriver.prototype, [
   {name: '_butterBarDriver', get: true}
 ]);
 
-assertInterface(DummyDriver.prototype, Driver);
+assertInterface(InboxDriver.prototype, Driver);

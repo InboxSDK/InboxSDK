@@ -17,11 +17,6 @@ let User = require('./platform-implementation/user');
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
 
-const DRIVERS_BY_ORIGIN = {
-	'https://mail.google.com': GmailDriver,
-	'https://inbox.google.com': InboxDriver
-};
-
 // returns a promise for the PlatformImplementation object
 export default function makePlatformImplementation(appId, opts) {
 	const pi = {
@@ -32,13 +27,19 @@ export default function makePlatformImplementation(appId, opts) {
 
 	opts = _.extend({
 		// defaults
-		globalErrorLogging: true, eventTracking: true
+		globalErrorLogging: true, eventTracking: true,
+		inboxBeta: false
 	}, opts);
 
 	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
 	if (opts.REQUESTED_API_VERSION !== 1) {
 		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
+
+	const DRIVERS_BY_ORIGIN = {
+		'https://mail.google.com': GmailDriver,
+		'https://inbox.google.com': opts.inboxBeta && InboxDriver
+	};
 
 	pi._membraneMap = new MembraneMap();
 

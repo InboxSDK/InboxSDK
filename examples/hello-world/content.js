@@ -1,4 +1,14 @@
-InboxSDK.load('1', 'Hello World!').then(function(sdk){
+InboxSDK.load('1', 'Hello World!', {inboxBeta: true}).then(function(sdk){
+
+	sdk.Router.handleAllRoutes(function(routeView) {
+		console.log('got a routeView', routeView);
+		console.log('routeType', routeView.getRouteType());
+		console.log('routeID', routeView.getRouteID());
+		console.log('params', routeView.getParams());
+		routeView.on('destroy', function() {
+			console.log('routeView destroyed', routeView.getRouteID());
+		});
+	});
 
 	// the SDK has been loaded, now do something with it!
 	sdk.Compose.registerComposeViewHandler(function(composeView){

@@ -16,7 +16,7 @@ document.head.setAttribute('data-inboxsdk-script-injected', true);
 document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
 
 var appOpts = {
-  globalErrorLogging: false
+  globalErrorLogging: false, inboxBeta: true
 };
 
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
