@@ -12,14 +12,17 @@ var GmailThreadView = require('../gmail-thread-view');
 var GmailCollapsibleSectionView = require('../gmail-collapsible-section-view');
 var GmailElementGetter = require('../../gmail-element-getter');
 
-function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
-	RouteViewDriver.call(this);
+import assertInterface from '../../../../lib/assert-interface';
+import addAccessors from '../../../../lib/add-accessors';
 
+function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	this._type = type;
 	this._hash = urlObject.hash;
 	this._name = urlObject.name;
 	this._paramsArray = urlObject.params;
 	this._customRouteID = routeID;
+
+	this._rowListViews = [];
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
@@ -32,27 +35,25 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	}
 }
 
-GmailRouteView.prototype = Object.create(RouteViewDriver.prototype);
+addAccessors(GmailRouteView.prototype, [
+	{name: '_name', destroy: false},
+	{name: '_paramsArray', destroy: false},
+	{name: '_hash', get: true, destroy: false},
+	{name: '_type', get: true, destroy: false},
+	{name: '_customRouteID', destroy: false},
+	{name: '_customViewElement', destroy: true, get: true, destroyMethod: 'remove'},
+	{name: '_rowListViews', destroy: true, get: true},
+	{name: '_threadView', destroy: true, get: true},
+	{name: '_sectionsContainer', destroy: false},
+	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_leftNavHeightObserver', destroy: true, destroyMethod: 'disconnect'},
+	{name: '_pageCommunicator', destroy: false, set: true},
+	{name: '_gmailRouteProcessor', destroy: false},
+	{name: '_threadContainerElement', destroy: false},
+	{name: '_rowListElements', destroy: false}
+]);
 
 _.extend(GmailRouteView.prototype, {
-
-	__memberVariables: [
-		{name: '_name', destroy: false},
-		{name: '_paramsArray', destroy: false},
-		{name: '_hash', get: true, destroy: false},
-		{name: '_type', get: true, destroy: false},
-		{name: '_customRouteID', destroy: false},
-		{name: '_customViewElement', destroy: true, get: true},
-		{name: '_rowListViews', destroy: true, get: true, defaultValue: []},
-		{name: '_threadView', destroy: true, get: true},
-		{name: '_sectionsContainer', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_leftNavHeightObserver', destroy: true, destroyFunction: 'disconnect'},
-		{name: '_pageCommunicator', destroy: false, set: true},
-		{name: '_gmailRouteProcessor', destroy: false},
-		{name: '_threadContainerElement', destroy: false},
-		{name: '_rowListElements', destroy: false}
-	],
 
 	getType: function() {
 		if (this._type === 'OTHER_APP_CUSTOM') {
@@ -411,5 +412,7 @@ _.extend(GmailRouteView.prototype, {
 	}
 
 });
+
+assertInterface(GmailRouteView.prototype, RouteViewDriver);
 
 module.exports = GmailRouteView;

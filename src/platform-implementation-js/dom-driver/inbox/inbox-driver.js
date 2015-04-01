@@ -70,12 +70,12 @@ export default class InboxDriver {
       }));
 
     this._routeViewDriverStream = Bacon.mergeAll(mainViews, searchViews);
-    this._rowListViewDriverStream = new Bacon.Bus();
-    this._composeViewDriverStream = new Bacon.Bus();
-    this._threadViewDriverStream = new Bacon.Bus();
-    this._messageViewDriverStream = new Bacon.Bus();
-    this._threadRowViewDriverKefirStream = new Kefir.Bus();
-    this._toolbarViewDriverStream = new Bacon.Bus();
+    this._rowListViewDriverStream = Bacon.never();
+    this._composeViewDriverStream = Bacon.never();
+    this._threadViewDriverStream = Bacon.never();
+    this._messageViewDriverStream = Bacon.never();
+    this._threadRowViewDriverKefirStream = Kefir.never();
+    this._toolbarViewDriverStream = Bacon.never();
   }
 
   openComposeWindow() {
