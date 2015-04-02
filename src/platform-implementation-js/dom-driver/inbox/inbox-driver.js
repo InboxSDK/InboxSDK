@@ -106,18 +106,6 @@ export default class InboxDriver {
     // stub
   }
 
-  setNativeRouteIDs(a) {
-    // stub
-  }
-
-  setNativeListRouteIDs(a) {
-    // stub
-  }
-
-  setRouteTypes(a) {
-    // stub
-  }
-
   registerSearchSuggestionsProvider(a) {
     // stub
   }

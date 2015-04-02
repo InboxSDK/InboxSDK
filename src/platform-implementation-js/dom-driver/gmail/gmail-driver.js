@@ -154,18 +154,6 @@ _.extend(GmailDriver.prototype, {
 		}
 	},
 
-	setNativeRouteIDs: function(nativeRouteIDs){
-		this._gmailRouteProcessor.setNativeRouteIDs(nativeRouteIDs);
-	},
-
-	setNativeListRouteIDs: function(nativeListRouteIDs){
-		this._gmailRouteProcessor.setNativeListRouteIDs(nativeListRouteIDs);
-	},
-
-	setRouteTypes: function(routeTypes){
-		this._gmailRouteProcessor.setRouteTypes(routeTypes);
-	},
-
 	getUserEmailAddress: function() {
 		return this._pageCommunicator.getUserEmailAddress();
 	},

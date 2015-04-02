@@ -17,11 +17,6 @@ export default {
 	addCustomListRouteID: 2,
 	showCustomRouteView: 1,
 	setShowNativeNavMarker: 1,
-
-	setNativeRouteIDs: 1,
-	setNativeListRouteIDs: 1,
-	setRouteTypes: 1,
-
 	registerSearchSuggestionsProvider: 1,
 	registerSearchQueryRewriter: 1,
 	addToolbarButtonForApp: 1,

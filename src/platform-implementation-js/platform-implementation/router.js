@@ -53,10 +53,6 @@ var Router = function(appId, driver, membraneMap){
 	_.forOwn(this.NativeListRouteIDs, value => {
 		members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 	});
-
-	driver.setNativeRouteIDs(this.NativeRouteIDs);
-	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
-	driver.setRouteTypes(this.RouteTypes);
 };
 
 _.extend(Router.prototype, /** @lends Router */ {

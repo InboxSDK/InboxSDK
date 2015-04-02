@@ -1,33 +1,21 @@
-'use strict';
+import _ from 'lodash';
 
-var _ = require('lodash');
+// only used for constants
+import Router from '../../../../platform-implementation/router';
 
-function GmailRouteProcessor(){
-
-	this.NativeRouteIDs = null;
-	this.NativeListRouteIDs = null;
-	this.RouteTypes = null;
-
+export default function GmailRouteProcessor() {
 	this._routeNameToRouteIDMap = null;
 	this._compatibleRouteIDMap = null;
 
+	this._setupRouteNameToRouteIDMap();
+	this._setupCompatibleRouteIDMap();
 }
 
 _.extend(GmailRouteProcessor.prototype, {
 
-	setNativeRouteIDs: function(nativeRouteIDs){
-		this.NativeRouteIDs = nativeRouteIDs;
-		this._setupRouteNameToRouteIDMap();
-		this._setupCompatibleRouteIDMap();
-	},
-
-	setNativeListRouteIDs: function(nativeListRouteIDs){
-		this.NativeListRouteIDs = nativeListRouteIDs;
-	},
-
-	setRouteTypes: function(routeTypes){
-		this.RouteTypes = routeTypes;
-	},
+	NativeRouteIDs: Router.NativeRouteIDs,
+	NativeListRouteIDs: Router.NativeListRouteIDs,
+	RouteTypes: Router.RouteTypes,
 
 	isListRouteName: function(routeName){
 		var routeID = this.getRouteID(routeName);
@@ -35,10 +23,10 @@ _.extend(GmailRouteProcessor.prototype, {
 			return false;
 		}
 
-		var keys = Object.getOwnPropertyNames(this.NativeListRouteIDs);
+		var keys = Object.getOwnPropertyNames(Router.NativeListRouteIDs);
 
 		for(var ii=0; ii<keys.length; ii++){
-			if(this.NativeListRouteIDs[keys[ii]] === routeID){
+			if(Router.NativeListRouteIDs[keys[ii]] === routeID){
 				return true;
 			}
 		}
@@ -122,5 +110,3 @@ _.extend(GmailRouteProcessor.prototype, {
 	}
 
 });
-
-module.exports = GmailRouteProcessor;
