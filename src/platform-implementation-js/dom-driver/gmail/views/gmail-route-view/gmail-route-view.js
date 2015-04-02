@@ -351,10 +351,11 @@ _.extend(GmailRouteView.prototype, {
 			page: this._getPageParam()
 		};
 
-		if(this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL){
-			if(this._paramsArray[0] && this._paramsArray[0].indexOf('p') === -1){
-				params.labelName = this._paramsArray[0];
-			}
+		if(
+			this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.LABEL &&
+			this._paramsArray[0]
+		) {
+			params.labelName = this._paramsArray[0];
 		}
 
 		return params;
