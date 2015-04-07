@@ -5,6 +5,10 @@ const Kefir = require('kefir');
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
 function kefirMakeElementChildStream(element) {
+  if (!element || !element.nodeType) {
+    throw new Error("Expected element, got "+element);
+  }
+
   return Kefir.fromBinder(function(emitter) {
     const removalStreams = new Map();
 

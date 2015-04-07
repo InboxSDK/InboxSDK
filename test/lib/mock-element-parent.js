@@ -48,5 +48,6 @@ class MockElementParent extends EventEmitter {
 }
 
 MockElementParent.prototype._emitsMutations = true;
+MockElementParent.prototype.nodeType = 1;
 
 module.exports = MockElementParent;

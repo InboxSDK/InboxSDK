@@ -15,14 +15,12 @@ export default function getMainContentElementChangedStream(GmailElementGetter) {
 						.flatMap(el =>
 							makeMutationObserverStream(el, {
 								attributes: true,
-								attributeFilter: ['role'],
-								attributeOldValue: true
+								attributeFilter: ['style']
 							})
 							.toProperty({
-								oldValue: null,
 								target: el
 							})
-							.filter(_isNowMain)
+							.filter(_isNowVisible)
 							.map('.target')
 						)
 				).toProperty();
@@ -32,9 +30,7 @@ function waitForMainContentContainer(GmailElementGetter){
 	return streamWaitFor(() => GmailElementGetter.getMainContentContainer());
 }
 
-function _isNowMain(mutation){
-	const oldValue = mutation.oldValue;
-	const newValue = mutation.target.getAttribute('role');
-
-	return (!oldValue && newValue === 'main');
+function _isNowVisible(mutation){
+	const el = mutation.target;
+	return el.style.display !== 'none';
 }

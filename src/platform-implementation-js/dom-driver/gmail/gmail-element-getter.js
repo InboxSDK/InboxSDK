@@ -43,17 +43,10 @@ var GmailElementGetter = {
 	},
 
 	getMainContentContainer: function(){
-		var mainContentElement = GmailElementGetter.getCurrentMainContentElement();
-
-		if(!mainContentElement){
-			return null;
-		}
-
-		return mainContentElement.parentElement;
-	},
-
-	getCurrentMainContentElement: function(){
-		return document.querySelector('div[role=main]');
+		// This method used to just look for the div[role=main] element and then
+		// return its parent, but it turns out the Contacts page does not set
+		// role=main.
+		return document.querySelector('div.aeJ > div.aeF > div.nH');
 	},
 
 	isPreviewPane: function(){
