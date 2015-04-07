@@ -54,33 +54,44 @@ _.extend(GmailRowListView.prototype, {
 	},
 
 	_setupToolbarView: function(){
-		var toolbarElement = this._element.querySelector('[gh=mtb]');
+		var toolbarElement = this._findToolbarElement();
 
-		if(!toolbarElement){
-			toolbarElement = this._findToolbarElement();
+		if (toolbarElement) {
+			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
+			this._toolbarView.setRowListViewDriver(this);
+		} else {
+			this._toolbarView = null;
 		}
-
-		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
-		this._toolbarView.setRowListViewDriver(this);
 	},
 
 	_findToolbarElement: function(){
-		var toolbarContainerElements = document.querySelectorAll('[gh=tm]');
-		for(var ii=0; ii<toolbarContainerElements.length; ii++){
-			if(this._isToolbarContainerRelevant(toolbarContainerElements[ii])){
-				return toolbarContainerElements[ii].querySelector('[gh=mtb]');
-			}
+		/* multiple inbox extra section */
+		const firstTry = this._element.querySelector('[gh=mtb]');
+		if (firstTry) {
+			return firstTry;
 		}
-
-		return null;
+		const toolbarContainerElements = document.querySelectorAll('[gh=tm]');
+		const el = _.find(toolbarContainerElements, toolbarContainerElement =>
+			this._isToolbarContainerRelevant(toolbarContainerElement)
+		);
+		return el ? el.querySelector('[gh=mtb]') : null;
 	},
 
 	_isToolbarContainerRelevant: function(toolbarContainerElement){
-		if(toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement){
+		if(
+			/* regular */
+			toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
+			/* multiple inbox main section */
+			toolbarContainerElement.parentElement.parentElement ===
+			this._element.parentElement
+		) {
 			return true;
 		}
 
-		if(toolbarContainerElement.parentElement.getAttribute('role') !== 'main' && this._element.parentElement.getAttribute('role') !== 'main'){
+		if ( false&&
+			toolbarContainerElement.parentElement.getAttribute('role') !== 'main' &&
+			this._element.parentElement.getAttribute('role') !== 'main'
+		) {
 			return true;
 		}
 

@@ -253,6 +253,7 @@ _.extend(GmailDriver.prototype, {
 												return gmailThreadView.getToolbarView();
 											})
 										)
+										.filter(Boolean)
 										.flatMap(function(gmailToolbarView){
 											return gmailToolbarView.waitForReady();
 										});
