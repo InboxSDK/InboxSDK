@@ -176,11 +176,12 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getSelectedBodyHTML: function(){
-		return require('../../../lib/dom/get-selected-html')(this.getBodyElement());
+
+		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._selectionRange);
 	},
 
 	getSelectedBodyText: function(){
-		return require('../../../lib/dom/get-selected-text')(this.getBodyElement());
+		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._selectionRange);
 	},
 
 	getSubject: function(){
