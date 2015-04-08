@@ -46,7 +46,7 @@ var GmailElementGetter = {
 		// This method used to just look for the div[role=main] element and then
 		// return its parent, but it turns out the Contacts page does not set
 		// role=main.
-		return document.querySelector('div.aeJ > div.aeF > div.nH');
+		return document.querySelector('div.aeF > div.nH');
 	},
 
 	isPreviewPane: function(){
