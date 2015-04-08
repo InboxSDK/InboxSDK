@@ -49,16 +49,22 @@ _.extend(Compose.prototype, /** @lends Compose */ {
       return memberMap.get(this).handlerRegistry.registerHandler(handler);
   },
 
+  /**
+   * Opens a new compose view
+   * @return {Promise(ComposeView)} a promise that will resolve to a ComposeView
+   */
+  openNewComposeView: function(){
+    return this.getComposeView();
+  },
+
   getComposeView: function(){
       var members = memberMap.get(this);
       members.requestedComposeViewDeferred = RSVP.defer();
-
       members.driver.openComposeWindow();
-
-      _createIgnoreComposeSignal();
 
       return members.requestedComposeViewDeferred.promise;
   }
+
 
 });
 
@@ -70,37 +76,14 @@ function _setupComposeViewDriverWatcher(members){
         if(members.requestedComposeViewDeferred){
             var deferred = members.requestedComposeViewDeferred;
             members.requestedComposeViewDeferred = null;
-            _removeIgnoreComposeSignal();
             deferred.resolve(view);
         }
-        else if(!_doesIgnoreComposeSignalExist()){
-            members.handlerRegistry.addTarget(view);
-        }
+
+        members.handlerRegistry.addTarget(view);
     });
 
 }
 
-function _createIgnoreComposeSignal(){
-    var signalDiv = document.createElement('div');
-    signalDiv.id = 'inboxsdk__ignoreCompose';
-
-    document.body.appendChild(signalDiv);
-}
-
-function _removeIgnoreComposeSignal(){
-    setTimeout(function(){
-        var signalDiv = document.getElementById('inboxsdk__ignoreCompose');
-        if(signalDiv){
-            signalDiv.remove();
-        }
-    }, 1);
-}
-
-function _doesIgnoreComposeSignalExist(){
-    var signalExists = !!document.getElementById('inboxsdk__ignoreCompose');
-
-    return signalExists;
-}
 
 
 module.exports = Compose;
