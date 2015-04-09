@@ -72,6 +72,10 @@ _.extend(DropdownView.prototype, /** @lends DropdownView */ {
 		}
 	}
 
+	/**
+	* Fires when this DropdownView instance is closed
+	* @event DropdownView#destroy
+	*/
 });
 
 module.exports = DropdownView;
