@@ -52,6 +52,8 @@ const GmailComposeView = function(element, xhrInterceptorStream){
 		)
 	);
 
+	this._buttonViewControllerTooltipMap = new WeakMap();
+
 	this.ready = _.constant(
 		waitFor(function(){
 			return !!self.getBodyElement();
@@ -78,7 +80,8 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
 		{name: '_isFullscreen', destroy: false, get: true, defaultValue: false},
 		{name: '_isStandalone', destroy: false, set: true, defaultValue: false},
-		{name: '_selectionRange', destroy: false, set: true, get: true}
+		{name: '_selectionRange', destroy: false, set: true, get: true},
+		{name: '_buttonViewControllerTooltipMap', destroy: false}
 	],
 
 	_setupStreams: function(){
@@ -140,7 +143,20 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	addTooltipToButton: function(buttonViewController,buttonDescriptor,  tooltipDescriptor){
-		require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
+		let tooltip = require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
+		this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
+	},
+
+	closeButtonTooltip: function(buttonViewController){
+		if(!this._buttonViewControllerTooltipMap){
+			return;
+		}
+
+		let tooltip = this._buttonViewControllerTooltipMap.get(buttonViewController);
+		if(tooltip){
+			tooltip.destroy();
+			this._buttonViewControllerTooltipMap.delete(buttonViewController);
+		}
 	},
 
 	addOuterSidebar: function(options){

@@ -33,6 +33,8 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 					button2.showTooltip({
 						el: div
 					});
+
+					setTimeout(function(){button2.closeTooltip();}, 5*1000);
 				}
 			}
 		});

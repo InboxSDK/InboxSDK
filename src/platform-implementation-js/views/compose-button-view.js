@@ -48,6 +48,21 @@ _.extend(ComposeButtonView.prototype, {
 				members.composeViewDriver.addTooltipToButton(members.buttonViewController, members.buttonDescriptor, tooltipDescriptor);
 			});
 		});
+	},
+
+	closeTooltip: function(){
+		if(!memberMap.has(this)){
+			console.error('Tried to add a tooltip after the button is destroyed');
+			return;
+		}
+
+		var members = memberMap.get(this);
+
+		members.optionsPromise.then(function(){
+			asap(function(){
+				members.composeViewDriver.closeButtonTooltip(members.buttonViewController);
+			});
+		});
 	}
 
 });
