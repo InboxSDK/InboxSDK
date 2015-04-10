@@ -1,5 +1,5 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+const _ = require('lodash');
+const Bacon = require('baconjs');
 
 module.exports = function(element, html, oldRange){
 	element.focus();

@@ -1,13 +1,13 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+const _ = require('lodash');
+const RSVP = require('rsvp');
+const Bacon = require('baconjs');
 
 function insertLinkChipIntoBody(gmailComposeView, options){
     return _insertLinkChipIntoBody(gmailComposeView, options);
 }
 
 function _insertLinkChipIntoBody(gmailComposeView, options){
-    gmailComposeView.getBodyElement().focus();
+    gmailComposeView.focus();
 
     var chipElement = _getChipElement(options);
 
@@ -20,6 +20,13 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
     frag.appendChild(document.createTextNode('\u200b'));
 
     require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag, gmailComposeView.getSelectionRange());
+
+    if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm()){
+        gmailComposeView.minimize();
+        gmailComposeView.restore();
+    }
+
+    gmailComposeView.focus();
 
     return chipElement;
 }
