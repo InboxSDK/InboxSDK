@@ -11,6 +11,8 @@ function insertLinkIntoBody(gmailComposeView, text, href){
 }
 
 function _insertLinkIntoBody(gmailComposeView, text, href){
+	gmailComposeView.focus();
+
 	var composeBodyElement = $(gmailComposeView.getBodyElement());
 	composeBodyElement.focus();
 

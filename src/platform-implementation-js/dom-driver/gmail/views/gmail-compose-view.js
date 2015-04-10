@@ -1,18 +1,20 @@
-var _ = require('lodash');
-var $ = require('jquery');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+const _ = require('lodash');
+const $ = require('jquery');
+const RSVP = require('rsvp');
+const Bacon = require('baconjs');
 
-var simulateClick = require('../../../lib/dom/simulate-click');
-var setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
+const simulateClick = require('../../../lib/dom/simulate-click');
+const setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
 
-var GmailResponseProcessor = require('../gmail-response-processor');
-var waitFor = require('../../../lib/wait-for');
+const GmailResponseProcessor = require('../gmail-response-processor');
+const GmailElementGetter = require('../gmail-element-getter');
 
-var ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
+const waitFor = require('../../../lib/wait-for');
+
+const ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
 
 
-var GmailComposeView = function(element, xhrInterceptorStream){
+const GmailComposeView = function(element, xhrInterceptorStream){
 	ComposeWindowDriver.call(this);
 
 	this._element = element;
@@ -39,11 +41,14 @@ var GmailComposeView = function(element, xhrInterceptorStream){
 					eventName: 'buttonAdded'
 				};
 			}),
-			Bacon.fromEventTarget(this._element, 'composeFullscreenStateChanged').map(function(){
-				return {
-					eventName: 'composeFullscreenStateChanged'
-				};
-			})
+			Bacon
+				.fromEventTarget(this._element, 'composeFullscreenStateChanged')
+				.doAction(() => this._updateComposeFullscreenState())
+				.map(function(){
+					return {
+						eventName: 'composeFullscreenStateChanged'
+					};
+				})
 		)
 	);
 
@@ -71,6 +76,8 @@ _.extend(GmailComposeView.prototype, {
 		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
 		{name: '_managedViewControllers', destroy: true, defaultValue: []},
 		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
+		{name: '_isFullscreen', destroy: false, get: true, defaultValue: false},
+		{name: '_isStandalone', destroy: false, set: true, defaultValue: false},
 		{name: '_selectionRange', destroy: false, set: true, get: true}
 	],
 
@@ -85,6 +92,14 @@ _.extend(GmailComposeView.prototype, {
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
 		require('./gmail-compose-view/manage-button-grouping')(this);
+	},
+
+	_updateComposeFullscreenState: function(){
+		this._isFullscreen = this._isStandalone || GmailElementGetter.getFullscreenComposeWindowContainer().contains(this._element);
+	},
+
+	focus: function(){
+		require('./gmail-compose-view/focus')(this);
 	},
 
 	insertBodyTextAtCursor: function(text){
@@ -176,11 +191,12 @@ _.extend(GmailComposeView.prototype, {
 	},
 
 	getSelectedBodyHTML: function(){
-
+		this.focus();
 		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._selectionRange);
 	},
 
 	getSelectedBodyText: function(){
+		this.focus();
 		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._selectionRange);
 	},
 
@@ -292,6 +308,10 @@ _.extend(GmailComposeView.prototype, {
 		if(minimizeButton){
 			simulateClick(minimizeButton);
 		}
+	},
+
+	restore: function(){
+		this.minimize(); //minize and restore buttons are the same
 	},
 
 	destroy: function(){

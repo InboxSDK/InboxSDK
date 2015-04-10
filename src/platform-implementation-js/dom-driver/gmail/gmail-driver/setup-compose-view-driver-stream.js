@@ -14,15 +14,21 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 	return Bacon.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(function() {
-		var elementStream;
+		let elementStream;
+		let isStandalone = false;
+
 		if (GmailElementGetter.isStandaloneComposeWindow()) {
 			elementStream = _setupStandaloneComposeElementStream();
+			isStandalone = true;
 		} else {
 			elementStream = _setupStandardComposeElementStream();
 		}
 
 		return elementStream.flatMap(makeElementViewStream(function(el) {
-			return new GmailComposeView(el, xhrInterceptorStream);
+			let composeView = new GmailComposeView(el, xhrInterceptorStream);
+			composeView.setIsStandalone(isStandalone);
+
+			return composeView;
 		}));
 	}).merge(
 		messageViewDriverStream.flatMap(function(gmailMessageView){

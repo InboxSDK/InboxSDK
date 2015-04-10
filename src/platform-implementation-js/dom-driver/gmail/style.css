@@ -696,11 +696,19 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   z-index: 1201!important;
 }
 
+  .inboxsdk__tooltip.inboxdk__tooltip_content .T-P {
+    padding: 0px;
+  }
+
 .inboxsdk__tooltip .aRM {
   outline: none;
   padding: 13px 10px 16px;
   text-align: center;
 }
+
+  .inboxdk__tooltip_content.inboxsdk__tooltip .aRM {
+    padding: 0px;
+  }
 
 .inboxsdk__tooltip .aRR {
   color: #333;
