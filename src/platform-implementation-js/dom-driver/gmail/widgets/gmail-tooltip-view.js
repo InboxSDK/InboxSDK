@@ -81,72 +81,97 @@ _.extend(GmailTooltipView.prototype, {
 	},
 
 	_setupElement: function(options){
-		var html = [
-			'<div class="T-P aRL">',
-				'<div class="T-P-Jz-UR">',
-					'<div class="aRM" tabindex="0">',
-						'<div class="aVn inboxsdk__tooltip_image">',
-							//image goes here
-						'</div>',
-						'<div class="aRR">',
-							_.escape(options.title || ""),
-						'</div>',
-						'<div class="aRQ">',
-							_.escape(options.subtitle || ""),
-						'</div>',
-						'<div class="inboxsdk__tooltip_button">',
-							//button goes here
-						'</div>',
-					'</div>',
-				'</div>',
-				'<div class="T-P-aut-UR T-P-aut inboxsdk__tooltip_close" aria-label="Close" role="button"></div>',
-				'<div class="T-P-hFsbo-UR T-P-hFsbo T-P-atB inboxsdk__tooltip_arrow">',
-					'<div class="T-P-atD"></div>',
-					'<div class="T-P-atC"></div>',
-				'</div>',
-			'</div>'
-		].join('');
-
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'inboxsdk__tooltip');
-		this._element.innerHTML = html;
 
-		var self = this;
-		this._element.querySelector('.inboxsdk__tooltip_close').addEventListener('click', function(){
-			self.destroy();
-		});
+		if(options.el){
+			let html =
+					`<div class="T-P aRL">
+						<div class="T-P-Jz-UR">
+							<div class="aRM" tabindex="0">
+							</div>
+						</div>
 
-		if(options.imageUrl){
-			var image = document.createElement('img');
-			image.src = options.imageUrl;
-			this._element.querySelector('.inboxsdk__tooltip_image').appendChild(image);
+						<div class="T-P-hFsbo-UR T-P-hFsbo T-P-atB inboxsdk__tooltip_arrow">
+							<div class="T-P-atD"></div>
+							<div class="T-P-atC"></div>
+						</div>
+					</div>`;
 
-			image.addEventListener('load', (domEvent) => {
-				asap(() => {
-					this._eventStream.push({
-						eventName: 'imageLoaded'
+			this._element.innerHTML = html;
+
+			this._element.classList.add('inboxdk__tooltip_content');
+			this._element.querySelector('.aRM').appendChild(options.el);
+		}
+		else{
+			let html = [
+				'<div class="T-P aRL">',
+					'<div class="T-P-Jz-UR">',
+						'<div class="aRM" tabindex="0">',
+							'<div class="aVn inboxsdk__tooltip_image">',
+								//image goes here
+							'</div>',
+							'<div class="aRR">',
+								_.escape(options.title || ""),
+							'</div>',
+							'<div class="aRQ">',
+								_.escape(options.subtitle || ""),
+							'</div>',
+							'<div class="inboxsdk__tooltip_button">',
+								//button goes here
+							'</div>',
+						'</div>',
+					'</div>',
+					'<div class="T-P-aut-UR T-P-aut inboxsdk__tooltip_close" aria-label="Close" role="button"></div>',
+					'<div class="T-P-hFsbo-UR T-P-hFsbo T-P-atB inboxsdk__tooltip_arrow">',
+						'<div class="T-P-atD"></div>',
+						'<div class="T-P-atC"></div>',
+					'</div>',
+				'</div>'
+			].join('');
+
+			this._element.innerHTML = html;
+
+			let closeElement = this._element.querySelector('.inboxsdk__tooltip_close');
+			if(closeElement){
+				closeElement.addEventListener('click', () => {
+					this.destroy();
+				});
+			}
+
+
+			if(options.imageUrl){
+				var image = document.createElement('img');
+				image.src = options.imageUrl;
+				this._element.querySelector('.inboxsdk__tooltip_image').appendChild(image);
+
+				image.addEventListener('load', (domEvent) => {
+					asap(() => {
+						this._eventStream.push({
+							eventName: 'imageLoaded'
+						});
 					});
 				});
-			});
 
-		}
+			}
 
-		if(options.button){
-			var buttonOptions = _.clone(options.button);
+			if(options.button){
+				var buttonOptions = _.clone(options.button);
 
-			buttonOptions.buttonColor = 'blue';
+				buttonOptions.buttonColor = 'blue';
 
-			var oldOnClick = buttonOptions.onClick;
-			buttonOptions.onClick = function(){
-				self.destroy();
-				if(oldOnClick){
-					oldOnClick();
-				}
-			};
+				var oldOnClick = buttonOptions.onClick;
+				buttonOptions.onClick = () => {
+					this.destroy();
+					if(oldOnClick){
+						oldOnClick();
+					}
+				};
 
-			buttonOptions.buttonView = new ButtonView(buttonOptions);
-			var buttonViewController = new BasicButtonViewController(buttonOptions);
-			this._element.querySelector('.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
+				buttonOptions.buttonView = new ButtonView(buttonOptions);
+				var buttonViewController = new BasicButtonViewController(buttonOptions);
+				this._element.querySelector('.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
+			}
 		}
 	},
 
