@@ -146,11 +146,13 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	setShowNativeNavMarker: function(value) {
-		const c = GmailElementGetter.getLeftNavContainerElement();
-		if (value) {
-			c.classList.remove('inboxsdk__hide_native_marker');
-		} else {
-			c.classList.add('inboxsdk__hide_native_marker');
+		const leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
+		if(leftNavContainerElement){
+			if (value) {
+				leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
+			} else {
+				leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
+			}
 		}
 	},
 
