@@ -393,16 +393,16 @@ var routeTypes = Object.freeze(/** @lends RouteTypes */ {
 
 
 function _handleRouteViewChange(router, members, routeViewDriver){
-	_updateNavMenu(members, routeViewDriver);
-
 	if(members.currentRouteViewDriver){
 		members.currentRouteViewDriver.destroy();
 	}
 
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
-
 	members.membraneMap.set(routeViewDriver, routeView);
+
+
+	_updateNavMenu(members, routeViewDriver);
 
 	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
