@@ -220,9 +220,19 @@ _.extend(GmailDriver.prototype, {
 	_setupRouteSubViewDriver: function(viewName){
 		var bus = new Bacon.Bus();
 
+		let latestGmailRouteView = null;
+
 		bus.plug(
-			this._routeViewDriverStream.flatMap(function(gmailRouteView){
+			this._routeViewDriverStream.flatMap((gmailRouteView) => {
+				latestGmailRouteView = gmailRouteView;
+				let err = new Error(this._getRouteViewErrorMessage(gmailRouteView));
+
 				return gmailRouteView.getEventStream().filter(function(event){
+					if(latestGmailRouteView !== gmailRouteView){
+						Logger.error(err);
+						return false;
+					}
+
 					return event.eventName === viewName;
 				})
 				.map(function(event){
@@ -232,6 +242,13 @@ _.extend(GmailDriver.prototype, {
 		);
 
 		return bus;
+	},
+
+	_getRouteViewErrorMessage: function(gmailRouteView){
+		return `Old gmailRouteView not destroyed
+routeID: ${gmailRouteView.getRouteID()}
+type: ${gmailRouteView.getType()}
+`;
 	},
 
 	_setupToolbarViewDriverStream: function(){
