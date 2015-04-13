@@ -137,6 +137,33 @@ describe('addAccessors', function() {
     assert.strictEqual(a.getY(), undefined);
   });
 
+  it('calls destroy on array items', function() {
+    class A {
+      constructor(x, y) {
+        this._x = x;
+        this._y = y;
+      }
+    }
+    addAccessors(A.prototype, [
+      {name: '_x', get: true, destroy: true, destroyMethod: 'foo'},
+      {name: '_y', get: true, destroy: false, destroyMethod: 'foo'}
+    ]);
+
+    const arrX = [{foo: sinon.spy()}, {foo: sinon.spy()}];
+    const arrY = [{foo: landmine}];
+
+    const a = new A(arrX, arrY);
+    assert.strictEqual(a.getX(), arrX);
+    assert.strictEqual(a.getY(), arrY);
+    assert(arrX[0].foo.notCalled);
+    assert(arrX[1].foo.notCalled);
+    a.destroy();
+    assert(arrX[0].foo.calledOnce);
+    assert(arrX[1].foo.calledOnce);
+    assert.strictEqual(a.getX(), undefined);
+    assert.strictEqual(a.getY(), undefined);
+  });
+
   it('always adds destroy method', function() {
     const destroySpy = sinon.spy();
     class A {

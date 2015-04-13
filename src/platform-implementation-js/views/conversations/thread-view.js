@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../../lib/safe-event-emitter');
 var baconCast = require('bacon-cast');
 var Bacon = require('baconjs');
 

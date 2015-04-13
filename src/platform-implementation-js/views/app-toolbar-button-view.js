@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var asap = require('asap');
 
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../lib/safe-event-emitter');
 
 var memberMap = new WeakMap();
 

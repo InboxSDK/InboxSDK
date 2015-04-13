@@ -4,6 +4,14 @@ function log() {
 
 InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 	var i = 0;
+
+	inboxSDK.Router.handleAllRoutes(function(routeView) {
+		console.log('routeID', routeView.getRouteID());
+		routeView.on('destroy', function() {
+			console.log('routeView destroyed', routeView.getRouteID());
+		});
+	});
+
 	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
 		var threadId = threadRowView.getThreadID();
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
