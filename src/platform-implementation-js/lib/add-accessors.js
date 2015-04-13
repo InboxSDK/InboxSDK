@@ -49,7 +49,7 @@ export default function addAccessors(obj, descriptors) {
       let {name, destroy, destroyMethod} = descriptor;
       destroyMethod = destroyMethod || 'destroy';
       if (_.has(this, name)) {
-        if (destroy && this[name] && this[name][destroyMethod]) {
+        if (destroy && this[name]) {
           this[name][destroyMethod]();
         }
         this[name] = undefined;
