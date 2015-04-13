@@ -5,7 +5,9 @@ var Bacon = require('baconjs');
 function makeMutationObserverChunkedStream(element, options) {
   return Bacon.fromBinder(function(sink) {
     var observer = new MutationObserver(function(mutations) {
-      sink(mutations);
+      // Work around Safari bug where sometimes mutations is an instance of a
+      // different context's Array.
+      sink(mutations instanceof Array ? mutations : Array.from(mutations));
     });
 
     observer.observe(element, options);
