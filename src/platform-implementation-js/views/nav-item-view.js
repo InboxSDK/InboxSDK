@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var RSVP = require('rsvp');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../lib/safe-event-emitter');
 var baconCast = require('bacon-cast');
 
 var memberMap = new WeakMap();

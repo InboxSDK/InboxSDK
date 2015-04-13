@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../../lib/safe-event-emitter');
 var RSVP = require('rsvp');
 
 

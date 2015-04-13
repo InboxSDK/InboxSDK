@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../lib/safe-event-emitter');
 
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
