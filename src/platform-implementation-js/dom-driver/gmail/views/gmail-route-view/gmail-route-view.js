@@ -48,9 +48,7 @@ addAccessors(GmailRouteView.prototype, [
 	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
 	{name: '_leftNavHeightObserver', destroy: true, destroyMethod: 'disconnect'},
 	{name: '_pageCommunicator', destroy: false, set: true},
-	{name: '_gmailRouteProcessor', destroy: false},
-	{name: '_threadContainerElement', destroy: false},
-	{name: '_rowListElements', destroy: false}
+	{name: '_gmailRouteProcessor', destroy: false}
 ]);
 
 _.extend(GmailRouteView.prototype, {
@@ -156,9 +154,9 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_setupRowListViews: function(){
-		this._rowListElements = GmailElementGetter.getRowListElements();
+		const rowListElements = GmailElementGetter.getRowListElements();
 
-		Array.prototype.forEach.call(this._rowListElements, (rowListElement) => {
+		Array.prototype.forEach.call(rowListElements, (rowListElement) => {
 			this._processRowListElement(rowListElement);
 		});
 	},
@@ -180,15 +178,17 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_setupContentAndSidebarView: function(){
-		this._rowListElements = document.querySelector('.aia[gh=tl]');
-		if(this._rowListElements){
-			this._startMonitoringPreviewPaneRowListForThread(this._rowListElements);
+		const rowListElements = document.querySelector('.aia[gh=tl]');
+
+		if(rowListElements){
+			this._startMonitoringPreviewPaneRowListForThread(rowListElements);
 			return;
 		}
 
-		this._threadContainerElement = GmailElementGetter.getThreadContainerElement();
-		if(this._threadContainerElement){
-			var gmailThreadView = new GmailThreadView(this._threadContainerElement, this);
+		const threadContainerElement = GmailElementGetter.getThreadContainerElement();
+
+		if(threadContainerElement){
+			var gmailThreadView = new GmailThreadView(threadContainerElement, this);
 
 			this._threadView = gmailThreadView;
 
@@ -302,37 +302,18 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_isThreadRoute: function(){
-		if(this._threadContainerElement){
-			return true;
-		}
-
-		if(!this._gmailRouteProcessor.isListRouteName(this._name)){
-			return false;
-		}
-
-		if(this._rowListElements && this._rowListElements.length > 0){
-			return false;
-		}
-
-		this._threadContainerElement = GmailElementGetter.getThreadContainerElement();
-		return !!this._threadContainerElement;
+		return !!GmailElementGetter.getThreadContainerElement();
 	},
 
 	_isListRoute: function(){
-		if(this._rowListElements && this._rowListElements.length > 0){
-			return true;
-		}
+		const rowListElements = GmailElementGetter.getRowListElements();
 
-		if(!this._gmailRouteProcessor.isListRouteName(this._name)){
-			return false;
-		}
-
-		if(this._rowListElements){
-			return false;
-		}
-
-		this._rowListElements = GmailElementGetter.getRowListElements();
-		return this._rowListElements.length > 0;
+		return (
+					this._type === 'CUSTOM_LIST' ||
+					this._gmailRouteProcessor.isListRouteName(this._name)
+				) &&
+				rowListElements &&
+				rowListElements.length > 0;
 	},
 
 	_isSettingsRoute: function(){
@@ -373,7 +354,7 @@ _.extend(GmailRouteView.prototype, {
 			}
 		}
 
-		var threadContainerElement = this._threadContainerElement || GmailElementGetter.getThreadContainerElement();
+		const threadContainerElement = GmailElementGetter.getThreadContainerElement();
 
 		return {
 			threadID: threadContainerElement ? this._pageCommunicator.getCurrentThreadID(threadContainerElement) : ''
