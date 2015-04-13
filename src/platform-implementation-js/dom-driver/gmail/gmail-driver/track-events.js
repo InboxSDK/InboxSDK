@@ -126,6 +126,9 @@ function _setupAttachmentModalMonitoring(gmailDriver){
 		.startWith(document.querySelector('[role=alertdialog]'))
 		.filter(Boolean)
 		.onValue((node) => {
+			if(!node || !node.querySelector){
+				return;
+			}
 
 			let heading = node.querySelector('[role=heading]');
 			if(heading){

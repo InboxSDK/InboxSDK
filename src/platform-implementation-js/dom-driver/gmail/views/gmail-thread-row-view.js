@@ -359,7 +359,7 @@ _.extend(GmailThreadRowView.prototype, {
               iconSettings: {},
               iconWrapper: document.createElement('div'),
               remove() {
-                imageMod.iconWrapper.remove();
+                this.iconWrapper.remove();
               }
             };
             imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';

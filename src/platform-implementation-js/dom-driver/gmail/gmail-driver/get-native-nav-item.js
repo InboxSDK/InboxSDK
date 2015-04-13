@@ -13,7 +13,7 @@ module.exports = function(label){
 		var labelElement = labelLinkElement.closest('.aim')[0];
 
 		if(!labelElement){
-			return null;
+			throw new Error('native nav item structured weird');
 		}
 
 		if(!labelElement.__nativeGmailNavItemView){

@@ -45,6 +45,10 @@ _.extend(NativeNavItemView.prototype, {
 	},
 
 	setNavItemViewDriver: function(navItemViewDriver){
+		if(!navItemViewDriver){
+			return;
+		}
+
 		var members = memberMap.get(this);
 
 		members.navItemViewDriver = navItemViewDriver;

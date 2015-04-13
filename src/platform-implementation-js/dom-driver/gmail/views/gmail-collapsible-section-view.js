@@ -430,6 +430,10 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 	},
 
 	_collapse: function(){
+		if(!this._element){
+			return;
+		}
+
 		this._element.classList.add('inboxsdk__resultsSection_collapsed');
 
 		if(!this._isSearch){
@@ -449,6 +453,10 @@ _.extend(GmailCollapsibleSectionView.prototype, {
 	},
 
 	_expand: function(){
+		if(!this._element){
+			return;
+		}
+
 		this._element.classList.remove('inboxsdk__resultsSection_collapsed');
 
 		if(!this._isSearch){
