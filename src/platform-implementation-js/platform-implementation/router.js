@@ -49,18 +49,10 @@ var Router = function(appId, driver, membraneMap){
 
 	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
-	this.NativeRouteIDs = nativeRouteIDs;
-	this.NativeListRouteIDs = nativeListRouteIDs;
-	this.RouteTypes = routeTypes;
-
 	members.listRouteHandlerRegistries = {};
 	_.forOwn(this.NativeListRouteIDs, value => {
 		members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 	});
-
-	driver.setNativeRouteIDs(this.NativeRouteIDs);
-	driver.setNativeListRouteIDs(this.NativeListRouteIDs);
-	driver.setRouteTypes(this.RouteTypes);
 };
 
 _.extend(Router.prototype, /** @lends Router */ {
@@ -202,6 +194,24 @@ var nativeRouteIDs = Object.freeze(/** @lends NativeRouteIDs */ {
 	'DRAFTS': 'drafts/:page',
 
 	/**
+	* snoozed list (Inbox)
+	* @type string
+	*/
+	'SNOOZED': 'snoozed',
+
+	/**
+	* done list (Inbox)
+	* @type string
+	*/
+	'DONE': 'done',
+
+	/**
+	* reminders list (Inbox)
+	* @type string
+	*/
+	'REMINDERS': 'reminders',
+
+	/**
 	* any label list
 	* @type string
 	*/
@@ -309,6 +319,24 @@ var nativeListRouteIDs = Object.freeze(/** @lends NativeListRouteIDs */ {
 	* @type string
 	*/
 	'DRAFTS': nativeRouteIDs.DRAFTS,
+
+	/**
+	* snoozed list (Inbox)
+	* @type string
+	*/
+	'SNOOZED': nativeRouteIDs.SNOOZED,
+
+	/**
+	* done list (Inbox)
+	* @type string
+	*/
+	'DONE': nativeRouteIDs.DONE,
+
+	/**
+	* reminders list (Inbox)
+	* @type string
+	*/
+	'REMINDERS': nativeRouteIDs.REMINDERS,
 
 	/**
 	* label list
@@ -446,5 +474,9 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 function _updateNavMenu(members, newRouteViewDriver){
 	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== routeTypes.CUSTOM);
 }
+
+Router.NativeRouteIDs = Router.prototype.NativeRouteIDs = nativeRouteIDs;
+Router.NativeListRouteIDs = Router.prototype.NativeListRouteIDs = nativeListRouteIDs;
+Router.RouteTypes = Router.prototype.RouteTypes = routeTypes;
 
 module.exports = Router;
