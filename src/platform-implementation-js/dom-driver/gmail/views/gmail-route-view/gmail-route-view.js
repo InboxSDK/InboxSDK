@@ -42,7 +42,7 @@ addAccessors(GmailRouteView.prototype, [
 	{name: '_type', get: true, destroy: false},
 	{name: '_customRouteID', destroy: false},
 	{name: '_customViewElement', destroy: true, get: true, destroyMethod: 'remove'},
-	{name: '_rowListViews', destroy: false, get: true},
+	{name: '_rowListViews', destroy: true, get: true},
 	{name: '_threadView', destroy: true, get: true},
 	{name: '_sectionsContainer', destroy: false},
 	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
@@ -54,9 +54,6 @@ addAccessors(GmailRouteView.prototype, [
 ]);
 
 _.extend(GmailRouteView.prototype, {
-	destroy() {
-		this._rowListViews.forEach(rowListView => rowListView.destroy());
-	},
 
 	getType: function() {
 		if (this._type === 'OTHER_APP_CUSTOM') {
