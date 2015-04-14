@@ -231,8 +231,8 @@ _.extend(GmailDriver.prototype, {
 							try{
 								gmailRouteView.destroy();
 							}
-							catch(err){
-								Logger.error(err, 'Failed to destroy gmailRouteView');
+							catch(destroyErr){
+								Logger.error(destroyErr, 'Failed to destroy gmailRouteView');
 								destroyGmailRouteView(gmailRouteView);
 							}
 
