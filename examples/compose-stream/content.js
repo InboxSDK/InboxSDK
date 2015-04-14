@@ -38,6 +38,11 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 			section: 'SEND_RIGHT'
 		});
 
+		composeView.on('destroy', console.log.bind(console, 'destroy'));
+		composeView.on('presending', console.log.bind(console, 'presending'));
+		composeView.on('sending', console.log.bind(console, 'sending'));
+		composeView.on('sent', console.log.bind(console, 'sent'));
+
 		composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
 		composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));
 		composeView.on('ccContactAdded', console.log.bind(console, 'ccContactAdded'));
