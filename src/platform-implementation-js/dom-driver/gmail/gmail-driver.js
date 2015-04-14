@@ -19,6 +19,7 @@ var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-hel
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
+import destroyGmailRouteView from './views/gmail-route-view/destroy-gmail-route-view';
 
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	require('./custom-style');
@@ -189,14 +190,7 @@ _.extend(GmailDriver.prototype, {
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
 
-			this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
-				.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
-				.flatMap(threadRowViewDriver => {
-					threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
-					// Each ThreadRowView may be delayed if the thread id is not known yet.
-					return threadRowViewDriver.waitForReady();
-				});
-
+			this._setupThreadRowViewDriverKefirStream();
 			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
 												.doAction(gmailThreadView => {
 													gmailThreadView.setPageCommunicator(this._pageCommunicator);
@@ -225,12 +219,20 @@ _.extend(GmailDriver.prototype, {
 		bus.plug(
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
 				latestGmailRouteView = gmailRouteView;
-				let err = new Error(this._getRouteViewErrorMessage(gmailRouteView));
+
+				let errorDetailsObject = this._getRouteViewErrorDetailsObject(gmailRouteView);
+				let err = new Error(errorDetailsObject.message);
 
 				return gmailRouteView.getEventStream().filter(function(event){
-					if(latestGmailRouteView !== gmailRouteView){
-						Logger.error(err);
-						return false;
+					if(gmailRouteView){
+						if(latestGmailRouteView !== gmailRouteView){
+							Logger.error(err, errorDetailsObject.details);
+
+							destroyGmailRouteView(gmailRouteView);
+							gmailRouteView = null;
+
+							return false;
+						}
 					}
 
 					return event.eventName === viewName;
@@ -244,11 +246,22 @@ _.extend(GmailDriver.prototype, {
 		return bus;
 	},
 
-	_getRouteViewErrorMessage: function(gmailRouteView){
-		return `Old gmailRouteView not destroyed
-routeID: ${gmailRouteView.getRouteID()}
-type: ${gmailRouteView.getType()}
-`;
+	_getRouteViewErrorDetailsObject: function(gmailRouteView){
+		return {
+				message: `Old gmailRouteView not destroyed`,
+				details: `routeID: ${gmailRouteView.getRouteID()}
+							type: ${gmailRouteView.getType()}`
+		};
+	},
+
+	_setupThreadRowViewDriverKefirStream: function(){
+		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
+				.flatMapLatest(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
+				.flatMap(threadRowViewDriver => {
+					threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
+					// Each ThreadRowView may be delayed if the thread id is not known yet.
+					return threadRowViewDriver.waitForReady();
+				});
 	},
 
 	_setupToolbarViewDriverStream: function(){

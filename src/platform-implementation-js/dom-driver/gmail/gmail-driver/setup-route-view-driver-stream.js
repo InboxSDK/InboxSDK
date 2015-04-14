@@ -1,3 +1,5 @@
+'use strict';
+
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
@@ -8,6 +10,8 @@ import getURLObject from './get-url-object';
 import escapeRegExp from '../../../../common/escape-reg-exp';
 
 import Logger from '../../../lib/logger';
+
+import destroyGmailRouteView from '../views/gmail-route-view/destroy-gmail-route-view';
 
 const routeIDtoRegExp = _.memoize(routeID =>
 	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
@@ -113,7 +117,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			catch(err){
 				Logger.error(err, 'Failed to destroy latestGmailRouteView');
 
-				_destroyGmailRouteView(latestGmailRouteView);
+				destroyGmailRouteView(latestGmailRouteView);
 			}
 
 		}
@@ -122,40 +126,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	});
 }
 
-function _destroyGmailRouteView(gmailRouteView){
-	//manual destruction
-	let rowListViews = latestGmailRouteView.getRowListViews();
-	if(rowListViews && rowListViews.length > 0){
-		rowListViews.forEach((rowListView) => {
-			try{
-				rowListView.destroy();
-			}
-			catch(err){
-				Logger.error(err, 'Failed to destroy rowListView');
-			}
-		});
-	}
-
-	let threadView = gmailRouteView.getThreadView();
-	if(threadView){
-		try{
-			threadView.destroy();
-		}
-		catch(err){
-			Logger.error(err, 'Failed to destroy threadView');
-		}
-	}
-
-	let eventStream = gmailRouteView.getEventStream();
-	if(eventStream){
-		try{
-			eventStream.end();
-		}
-		catch(err){
-			Logger.error(err, 'Failed to end GmailRouteView eventStream');
-		}
-	}
-}
 
 /**
  * TODO: Split up "role=main" DOM watching and hash change watching.
