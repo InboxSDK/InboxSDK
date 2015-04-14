@@ -7,6 +7,8 @@ import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 import escapeRegExp from '../../../../common/escape-reg-exp';
 
+import Logger from '../../../lib/logger';
+
 const routeIDtoRegExp = _.memoize(routeID =>
 	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
@@ -63,6 +65,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return tmp === urlObject.hash;
 		});
 
+
+	let latestGmailRouteView;
 	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
@@ -99,7 +103,58 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return;
 		}
 		return new GmailRouteView(options, GmailRouteProcessor);
-	}).filter(Boolean);
+	})
+	.filter(Boolean)
+	.tap((GmailRouteView) => {
+		if(latestGmailRouteView){
+			try{
+				latestGmailRouteView.destroy();
+			}
+			catch(err){
+				Logger.error(err, 'Failed to destroy latestGmailRouteView');
+
+				_destroyGmailRouteView(latestGmailRouteView);
+			}
+
+		}
+
+		latestGmailRouteView = GmailRouteView;
+	});
+}
+
+function _destroyGmailRouteView(gmailRouteView){
+	//manual destruction
+	let rowListViews = latestGmailRouteView.getRowListViews();
+	if(rowListViews && rowListViews.length > 0){
+		rowListViews.forEach((rowListView) => {
+			try{
+				rowListView.destroy();
+			}
+			catch(err){
+				Logger.error(err, 'Failed to destroy rowListView');
+			}
+		});
+	}
+
+	let threadView = gmailRouteView.getThreadView();
+	if(threadView){
+		try{
+			threadView.destroy();
+		}
+		catch(err){
+			Logger.error(err, 'Failed to destroy threadView');
+		}
+	}
+
+	let eventStream = gmailRouteView.getEventStream();
+	if(eventStream){
+		try{
+			eventStream.end();
+		}
+		catch(err){
+			Logger.error(err, 'Failed to end GmailRouteView eventStream');
+		}
+	}
 }
 
 /**
