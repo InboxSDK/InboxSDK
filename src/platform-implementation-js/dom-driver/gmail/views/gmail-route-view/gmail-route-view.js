@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
@@ -14,6 +16,8 @@ var GmailElementGetter = require('../../gmail-element-getter');
 
 import assertInterface from '../../../../lib/assert-interface';
 import addAccessors from '../../../../lib/add-accessors';
+
+import Logger from '../../../../lib/logger';
 
 function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	this._type = type;
@@ -148,8 +152,21 @@ _.extend(GmailRouteView.prototype, {
 			if (!this._eventStream) {
 				return;
 			}
-			this._setupRowListViews();
-			this._setupContentAndSidebarView();
+
+			try{
+				this._setupRowListViews();
+			}
+			catch(err){
+				Logger.error(err, 'Error setting up rowListViews');
+			}
+
+			try{
+				this._setupContentAndSidebarView();
+			}
+			catch(err){
+				Logger.error(err, 'Error setting up contentAndSidebarView');
+			}
+
 		});
 	},
 
