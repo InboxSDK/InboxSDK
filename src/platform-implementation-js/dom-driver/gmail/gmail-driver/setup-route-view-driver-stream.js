@@ -1,3 +1,5 @@
+'use strict';
+
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
@@ -6,6 +8,10 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 import escapeRegExp from '../../../../common/escape-reg-exp';
+
+import Logger from '../../../lib/logger';
+
+import destroyGmailRouteView from '../views/gmail-route-view/destroy-gmail-route-view';
 
 const routeIDtoRegExp = _.memoize(routeID =>
 	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
@@ -63,6 +69,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return tmp === urlObject.hash;
 		});
 
+
+	let latestGmailRouteView;
 	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
@@ -99,8 +107,25 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return;
 		}
 		return new GmailRouteView(options, GmailRouteProcessor);
-	}).filter(Boolean);
+	})
+	.filter(Boolean)
+	.tap((GmailRouteView) => {
+		if(latestGmailRouteView){
+			try{
+				latestGmailRouteView.destroy();
+			}
+			catch(err){
+				Logger.error(err, 'Failed to destroy latestGmailRouteView');
+
+				destroyGmailRouteView(latestGmailRouteView);
+			}
+
+		}
+
+		latestGmailRouteView = GmailRouteView;
+	});
 }
+
 
 /**
  * TODO: Split up "role=main" DOM watching and hash change watching.
