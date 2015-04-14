@@ -262,12 +262,12 @@ _.extend(GmailDriver.prototype, {
 
 	_setupThreadRowViewDriverKefirStream: function(){
 		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
-				.flatMapLatest(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
-				.flatMap(threadRowViewDriver => {
-					threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
-					// Each ThreadRowView may be delayed if the thread id is not known yet.
-					return threadRowViewDriver.waitForReady();
-				});
+												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
+												.flatMap(threadRowViewDriver => {
+													threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
+													// Each ThreadRowView may be delayed if the thread id is not known yet.
+													return threadRowViewDriver.waitForReady();
+												});
 	},
 
 	_setupToolbarViewDriverStream: function(){
