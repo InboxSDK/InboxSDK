@@ -231,9 +231,9 @@ _.extend(GmailRouteView.prototype, {
 		eventStream.plug(
 			elementStream.flatMap(makeElementViewStream((element) => {
 				return new GmailThreadView(element, this, true);
-			})).doAction(function(view) {
+			})).doAction((view) => {
 				this._threadView = view;
-			}).map(function(view) {
+			}).map((view) => {
 				return {
 					eventName: 'newGmailThreadView',
 					view: view
