@@ -228,9 +228,15 @@ _.extend(GmailDriver.prototype, {
 						if(latestGmailRouteView !== gmailRouteView){
 							Logger.error(err, errorDetailsObject.details);
 
-							destroyGmailRouteView(gmailRouteView);
-							gmailRouteView = null;
+							try{
+								gmailRouteView.destroy();
+							}
+							catch(err){
+								Logger.error(err, 'Failed to destroy gmailRouteView');
+								destroyGmailRouteView(gmailRouteView);
+							}
 
+							gmailRouteView = null;
 							return false;
 						}
 					}
