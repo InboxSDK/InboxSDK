@@ -19,7 +19,6 @@ var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-hel
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
-import destroyGmailRouteView from './views/gmail-route-view/destroy-gmail-route-view';
 
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	require('./custom-style');
@@ -227,15 +226,7 @@ _.extend(GmailDriver.prototype, {
 					if(gmailRouteView){
 						if(latestGmailRouteView !== gmailRouteView){
 							Logger.error(err, errorDetailsObject.details);
-
-							try{
-								gmailRouteView.destroy();
-							}
-							catch(destroyErr){
-								Logger.error(destroyErr, 'Failed to destroy gmailRouteView');
-								destroyGmailRouteView(gmailRouteView);
-							}
-
+							gmailRouteView.destroy();
 							gmailRouteView = null;
 							return false;
 						}

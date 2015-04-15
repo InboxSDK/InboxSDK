@@ -11,8 +11,6 @@ import escapeRegExp from '../../../../common/escape-reg-exp';
 
 import Logger from '../../../lib/logger';
 
-import destroyGmailRouteView from '../views/gmail-route-view/destroy-gmail-route-view';
-
 const routeIDtoRegExp = _.memoize(routeID =>
 	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
@@ -111,17 +109,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	.filter(Boolean)
 	.tap((GmailRouteView) => {
 		if(latestGmailRouteView){
-			try{
-				latestGmailRouteView.destroy();
-			}
-			catch(err){
-				Logger.error(err, 'Failed to destroy latestGmailRouteView');
-
-				destroyGmailRouteView(latestGmailRouteView);
-			}
-
+			latestGmailRouteView.destroy();
 		}
-
 		latestGmailRouteView = GmailRouteView;
 	});
 }
