@@ -248,7 +248,8 @@ _.extend(GmailDriver.prototype, {
 
 	_getRouteViewErrorDetailsObject: function(gmailRouteView){
 		return {
-			routeID: gmailRouteView.getRouteID(),
+			routeID: gmailRouteView._eventStream && gmailRouteView.getRouteID(),
+			_name: gmailRouteView._name,
 			type: gmailRouteView.getType(),
 			asapHasFired: gmailRouteView.asapHasFired,
 			isDestroyed: !gmailRouteView._eventStream
