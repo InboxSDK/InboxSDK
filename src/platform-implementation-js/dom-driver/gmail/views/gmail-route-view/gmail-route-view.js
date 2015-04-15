@@ -192,15 +192,6 @@ _.extend(GmailRouteView.prototype, {
 			eventName: 'newGmailRowListView',
 			view: gmailRowListView
 		});
-
-		/********
-		deprecated function that is throwing an error, keeping it around to help diagnose why it was throwing the error
-
-		this._eventStream.plug(gmailRowListView.getEventStream().filter(function(event) {
-			return event.eventName === 'newGmailThreadRowView';
-		}));
-
-		******/
 	},
 
 	_setupContentAndSidebarView: function(rowListViews, eventStream){

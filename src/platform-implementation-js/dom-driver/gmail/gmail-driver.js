@@ -227,6 +227,7 @@ _.extend(GmailDriver.prototype, {
 						// TODO is this still necessary? Check logs and remove if it's not
 						// firing still.
 						const errorDetailsObject = {
+							eventName: event && event.eventName,
 							old: this._getRouteViewErrorDetailsObject(gmailRouteView),
 							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView)
 						};
