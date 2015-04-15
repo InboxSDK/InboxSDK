@@ -225,6 +225,8 @@ _.extend(GmailDriver.prototype, {
 				return gmailRouteView.getEventStream().filter(function(event){
 					if(gmailRouteView){
 						if(latestGmailRouteView !== gmailRouteView){
+							// TODO is this still necessary? Check logs and remove if it's not
+							// firing still.
 							Logger.error(err, errorDetailsObject.details);
 							gmailRouteView.destroy();
 							gmailRouteView = null;
