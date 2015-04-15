@@ -31,6 +31,7 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
 	this._eventStream = new Bacon.Bus();
+	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
 	if (this._type === 'CUSTOM') {
 		this._setupCustomViewElement();
@@ -152,6 +153,8 @@ _.extend(GmailRouteView.prototype, {
 		const rowListViews = this._rowListViews;
 
 		asap(() => {
+			if (!this._eventStream) return;
+
 			try{
 				this._setupRowListViews(rowListViews, eventStream);
 			}
