@@ -214,12 +214,17 @@ _.extend(GmailDriver.prototype, {
 	_setupRouteSubViewDriver: function(viewName){
 		var bus = new Bacon.Bus();
 
+		let latestGmailRouteViewTime = null;
 		let latestGmailRouteView = null;
 
 		bus.plug(
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
+				const thisRouteViewTime = new Date();
+				latestGmailRouteViewTime = thisRouteViewTime;
 				latestGmailRouteView = gmailRouteView;
 
+				// Make one error object per gmailRouteView so that we only report an
+				// error once per gmailRouteView.
 				const err = new Error("Old gmailRouteView not destroyed");
 
 				return gmailRouteView.getEventStream().filter(event => {
@@ -229,10 +234,13 @@ _.extend(GmailDriver.prototype, {
 						const errorDetailsObject = {
 							eventName: event && event.eventName,
 							old: this._getRouteViewErrorDetailsObject(gmailRouteView),
-							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView)
+							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView),
+							oldTime: thisRouteViewTime,
+							latestTime: latestGmailRouteViewTime
 						};
 						Logger.error(err, errorDetailsObject);
 						gmailRouteView.destroy();
+						gmailRouteView.FALLBACK_DESTROYED = true;
 						return false;
 					}
 
@@ -253,7 +261,8 @@ _.extend(GmailDriver.prototype, {
 			_name: gmailRouteView._name,
 			type: gmailRouteView.getType(),
 			asapHasFired: gmailRouteView.asapHasFired,
-			isDestroyed: !gmailRouteView._eventStream
+			isDestroyed: !gmailRouteView._eventStream,
+			FALLBACK_DESTROYED: !!gmailRouteView.FALLBACK_DESTROYED
 		};
 	},
 
