@@ -114,7 +114,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			if (latestGmailRouteView._eventStream) {
 				const makeDescription = () => ({
 					isArray: Array.isArray(latestGmailRouteView._eventStream),
-					ended: latestGmailRouteView._eventStream.ended,
+					ended: latestGmailRouteView._eventStream && latestGmailRouteView._eventStream.ended,
 					has: _.has(latestGmailRouteView, '_eventStream'),
 					rightDestroyMethod: latestGmailRouteView.destroy === GmailRouteView.prototype.destroy,
 					DEBUG_LAST_DESTROY: latestGmailRouteView.DEBUG_LAST_DESTROY || '<not present>'
