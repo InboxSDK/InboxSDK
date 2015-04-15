@@ -222,7 +222,7 @@ _.extend(GmailDriver.prototype, {
 
 				const err = new Error("Old gmailRouteView not destroyed");
 
-				return gmailRouteView.getEventStream().filter(function(event){
+				return gmailRouteView.getEventStream().filter(event => {
 					if(latestGmailRouteView !== gmailRouteView){
 						// TODO is this still necessary? Check logs and remove if it's not
 						// firing still.
