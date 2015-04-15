@@ -45,24 +45,33 @@ export default function addAccessors(obj, descriptors) {
   });
   const superDestroy = obj.destroy;
   obj.destroy = function() {
+    this.DEBUG_LAST_DESTROY = [];
     descriptors.forEach(descriptor => {
       const {name, destroy} = descriptor;
+      this.DEBUG_LAST_DESTROY.push(['considering', name, destroy]);
       if (_.has(this, name)) {
+        this.DEBUG_LAST_DESTROY.push(['has']);
         if (destroy && this[name]) {
           const destroyMethod = descriptor.destroyMethod || 'destroy';
+          this.DEBUG_LAST_DESTROY.push(['destroy and present']);
           if (Array.isArray(this[name])) {
+            this.DEBUG_LAST_DESTROY.push(['is array']);
             this[name].forEach(x => {
               x[destroyMethod]();
             });
           } else {
+            this.DEBUG_LAST_DESTROY.push(['not array']);
             this[name][destroyMethod]();
           }
         }
+        this.DEBUG_LAST_DESTROY.push(['setting to undefined']);
         this[name] = undefined;
       }
     });
     if (superDestroy) {
       superDestroy.call(this);
     }
+    this.DEBUG_LAST_DESTROY.push(['done']);
   };
+  obj.destroy.DEBUG_descriptors = descriptors;
 }

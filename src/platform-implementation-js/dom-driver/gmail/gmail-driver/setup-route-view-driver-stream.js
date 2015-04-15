@@ -115,7 +115,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				Logger.error(new Error("Failed to destroy routeView"), {
 					isArray: Array.isArray(latestGmailRouteView._eventStream),
 					ended: latestGmailRouteView._eventStream.ended,
-					has: _.has(latestGmailRouteView, '_eventStream')
+					has: _.has(latestGmailRouteView, '_eventStream'),
+					DEBUG_LAST_DESTROY: latestGmailRouteView.DEBUG_LAST_DESTROY
 				});
 			}
 		}
