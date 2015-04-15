@@ -229,29 +229,29 @@ _.extend(GmailDriver.prototype, {
 				// error once per gmailRouteView.
 				const err = new Error("Old gmailRouteView not destroyed");
 
-				return gmailRouteView.getEventStream().filter(event => {
-					if(latestGmailRouteView !== gmailRouteView){
-						// TODO is this still necessary? Check logs and remove if it's not
-						// firing still.
-						const errorDetailsObject = {
-							eventName: event && event.eventName,
-							old: this._getRouteViewErrorDetailsObject(gmailRouteView),
-							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView),
-							oldTime: thisRouteViewTime,
-							latestTime: latestGmailRouteViewTime,
-							ID: ID
-						};
-						Logger.error(err, errorDetailsObject);
-						gmailRouteView.destroy();
-						gmailRouteView.FALLBACK_DESTROYED = true;
-						return false;
-					}
+				return gmailRouteView.getEventStream()
+					.filter(event => event.eventName === viewName)
+					.filter(event => {
+						if(latestGmailRouteView !== gmailRouteView){
+							// TODO is this still necessary? Check logs and remove if it's not
+							// firing still.
+							const errorDetailsObject = {
+								eventName: event && event.eventName,
+								old: this._getRouteViewErrorDetailsObject(gmailRouteView),
+								latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView),
+								oldTime: thisRouteViewTime,
+								latestTime: latestGmailRouteViewTime,
+								ID: ID
+							};
+							Logger.error(err, errorDetailsObject);
+							gmailRouteView.destroy();
+							gmailRouteView.FALLBACK_DESTROYED = true;
+							return false;
+						}
 
-					return event.eventName === viewName;
-				})
-				.map(function(event){
-					return event.view;
-				});
+						return true;
+					})
+					.map(event => event.view);
 			})
 		);
 
