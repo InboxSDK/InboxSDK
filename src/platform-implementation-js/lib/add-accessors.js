@@ -72,6 +72,7 @@ export default function addAccessors(obj, descriptors) {
       superDestroy.call(this);
     }
     this.DEBUG_LAST_DESTROY.push(['done']);
+    return 'foo-'+Math.random();
   };
   obj.destroy.DEBUG_descriptors = descriptors;
 }
