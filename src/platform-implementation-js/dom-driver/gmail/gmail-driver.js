@@ -219,6 +219,8 @@ _.extend(GmailDriver.prototype, {
 
 		bus.plug(
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
+				const ID = Math.random();
+				gmailRouteView.ID = ID;
 				const thisRouteViewTime = new Date();
 				latestGmailRouteViewTime = thisRouteViewTime;
 				latestGmailRouteView = gmailRouteView;
@@ -236,7 +238,8 @@ _.extend(GmailDriver.prototype, {
 							old: this._getRouteViewErrorDetailsObject(gmailRouteView),
 							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView),
 							oldTime: thisRouteViewTime,
-							latestTime: latestGmailRouteViewTime
+							latestTime: latestGmailRouteViewTime,
+							ID: ID
 						};
 						Logger.error(err, errorDetailsObject);
 						gmailRouteView.destroy();
@@ -259,10 +262,13 @@ _.extend(GmailDriver.prototype, {
 		return {
 			routeID: gmailRouteView._eventStream && gmailRouteView.getRouteID(),
 			_name: gmailRouteView._name,
+			hash: gmailRouteView.getHash(),
 			type: gmailRouteView.getType(),
 			asapHasFired: gmailRouteView.asapHasFired,
 			isDestroyed: !gmailRouteView._eventStream,
-			FALLBACK_DESTROYED: !!gmailRouteView.FALLBACK_DESTROYED
+			FALLBACK_DESTROYED: !!gmailRouteView.FALLBACK_DESTROYED,
+			GOOD_DESTROY: !!gmailRouteView.GOOD_DESTROY,
+			ID: gmailRouteView.ID
 		};
 	},
 

@@ -107,11 +107,12 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		return new GmailRouteView(options, GmailRouteProcessor);
 	})
 	.filter(Boolean)
-	.tap((GmailRouteView) => {
+	.tap((gmailRouteView) => {
 		if(latestGmailRouteView){
 			latestGmailRouteView.destroy();
+			latestGmailRouteView.GOOD_DESTROY = true;
 		}
-		latestGmailRouteView = GmailRouteView;
+		latestGmailRouteView = gmailRouteView;
 	});
 }
 
