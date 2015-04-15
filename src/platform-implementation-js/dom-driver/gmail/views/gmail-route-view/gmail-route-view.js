@@ -30,6 +30,7 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
+	this.asapHasFired = false;
 	this._eventStream = new Bacon.Bus();
 	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
@@ -154,6 +155,7 @@ _.extend(GmailRouteView.prototype, {
 
 		asap(() => {
 			if (!this._eventStream) return;
+			this.asapHasFired = true;
 
 			try{
 				this._setupRowListViews(rowListViews, eventStream);

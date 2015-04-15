@@ -5,6 +5,7 @@ const Kefir = require('kefir');
 const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
+import asap from 'asap';
 
 import addAccessors from '../../lib/add-accessors';
 import assertInterface from '../../lib/assert-interface';
@@ -219,19 +220,19 @@ _.extend(GmailDriver.prototype, {
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
 				latestGmailRouteView = gmailRouteView;
 
-				let errorDetailsObject = this._getRouteViewErrorDetailsObject(gmailRouteView);
-				let err = new Error(errorDetailsObject.message);
+				const err = new Error("Old gmailRouteView not destroyed");
 
 				return gmailRouteView.getEventStream().filter(function(event){
-					if(gmailRouteView){
-						if(latestGmailRouteView !== gmailRouteView){
-							// TODO is this still necessary? Check logs and remove if it's not
-							// firing still.
-							Logger.error(err, errorDetailsObject.details);
-							gmailRouteView.destroy();
-							gmailRouteView = null;
-							return false;
-						}
+					if(latestGmailRouteView !== gmailRouteView){
+						// TODO is this still necessary? Check logs and remove if it's not
+						// firing still.
+						const errorDetailsObject = {
+							old: this._getRouteViewErrorDetailsObject(gmailRouteView),
+							latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView)
+						};
+						Logger.error(err, errorDetailsObject);
+						gmailRouteView.destroy();
+						return false;
 					}
 
 					return event.eventName === viewName;
@@ -247,9 +248,10 @@ _.extend(GmailDriver.prototype, {
 
 	_getRouteViewErrorDetailsObject: function(gmailRouteView){
 		return {
-				message: `Old gmailRouteView not destroyed`,
-				details: `routeID: ${gmailRouteView.getRouteID()}
-							type: ${gmailRouteView.getType()}`
+			routeID: gmailRouteView.getRouteID(),
+			type: gmailRouteView.getType(),
+			asapHasFired: gmailRouteView.asapHasFired,
+			isDestroyed: !gmailRouteView._eventStream
 		};
 	},
 
