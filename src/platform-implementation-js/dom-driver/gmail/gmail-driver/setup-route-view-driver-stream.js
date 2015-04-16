@@ -68,7 +68,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		});
 
 
-	let latestGmailRouteView;
+	let latestGmailRouteView = null;
+	let routeViewIsChanging = false;
 	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
@@ -108,13 +109,18 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	})
 	.filter(Boolean)
 	.tap((gmailRouteView) => {
+		if (routeViewIsChanging) {
+			Logger.error(new Error("Re-entrance into routeview tap call!"));
+		}
+		routeViewIsChanging = true;
 		if(latestGmailRouteView){
 			const makeDescription = () => ({
 				isArray: Array.isArray(latestGmailRouteView._eventStream),
 				ended: latestGmailRouteView._eventStream && latestGmailRouteView._eventStream.ended,
 				has: _.has(latestGmailRouteView, '_eventStream'),
 				rightDestroyMethod: latestGmailRouteView.destroy === GmailRouteView.prototype.destroy,
-				DEBUG_LAST_DESTROY: latestGmailRouteView.DEBUG_LAST_DESTROY || '<not present>'
+				DEBUG_LAST_DESTROY: latestGmailRouteView.DEBUG_LAST_DESTROY ?
+					latestGmailRouteView.DEBUG_LAST_DESTROY.join(',') : '<not present>'
 			});
 
 			const pre = makeDescription();
@@ -130,6 +136,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			}
 		}
 		latestGmailRouteView = gmailRouteView;
+		routeViewIsChanging = false;
 	});
 }
 

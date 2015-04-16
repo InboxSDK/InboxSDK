@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Logger from './logger';
 
 export const getGetterName = _.memoize(variableName =>
   'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
@@ -45,7 +46,13 @@ export default function addAccessors(obj, descriptors) {
   });
   const superDestroy = obj.destroy;
   obj.destroy = function() {
-    this.DEBUG_LAST_DESTROY = [];
+    if (this.DEBUG_isDestroying) {
+      Logger.error(new Error("Re-entrance into object destroy call!"), {
+        name: this.constructor && this.constructor.name
+      });
+    }
+    this.DEBUG_isDestroying = true;
+    this.DEBUG_LAST_DESTROY = this.DEBUG_LAST_DESTROY || [];
     descriptors.forEach(descriptor => {
       const {name, destroy} = descriptor;
       this.DEBUG_LAST_DESTROY.push(`prop ${name} ${destroy?1:0}`);
@@ -72,7 +79,7 @@ export default function addAccessors(obj, descriptors) {
       superDestroy.call(this);
     }
     this.DEBUG_LAST_DESTROY.push('d');
-    this.DEBUG_LAST_DESTROY = this.DEBUG_LAST_DESTROY.join(',');
+    this.DEBUG_isDestroying = false;
     return this.DEBUG_LAST_DESTROY;
   };
   obj.destroy.DEBUG_descriptors = descriptors;
