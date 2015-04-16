@@ -114,28 +114,41 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		}
 		routeViewIsChanging = true;
 		if(latestGmailRouteView){
-			const makeDescription = () => ({
-				isArray: Array.isArray(latestGmailRouteView._eventStream),
-				ended: latestGmailRouteView._eventStream && latestGmailRouteView._eventStream.ended,
-				has: _.has(latestGmailRouteView, '_eventStream'),
-				rightDestroyMethod: latestGmailRouteView.destroy === GmailRouteView.prototype.destroy
-			});
-
-			const pre = makeDescription();
-			latestGmailRouteView.destroy();
+			const originalLatestGmailRouteView = latestGmailRouteView;
+			const pre = describeGmailRouteView(latestGmailRouteView);
 			latestGmailRouteView.GOOD_DESTROY = true;
+			latestGmailRouteView.destroy();
 			if (latestGmailRouteView._eventStream) {
-				const middle = makeDescription();
+				const middle = describeGmailRouteView(latestGmailRouteView);
 				latestGmailRouteView.destroy();
-				const post = makeDescription();
+				const post = describeGmailRouteView(latestGmailRouteView);
 				Logger.error(new Error("Failed to destroy routeView"), {
-					pre, middle, post
+					pre, middle, post,
+					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
+					latestEqNew: latestGmailRouteView === gmailRouteView
+				});
+			} else if (latestGmailRouteView !== originalLatestGmailRouteView) {
+				Logger.error(new Error("Re-entrance weirdness"), {
+					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
+					latestEqNew: latestGmailRouteView === gmailRouteView
 				});
 			}
 		}
 		latestGmailRouteView = gmailRouteView;
 		routeViewIsChanging = false;
 	});
+}
+
+function describeGmailRouteView(gmailRouteView) {
+	return {
+		ended: gmailRouteView._eventStream ? gmailRouteView._eventStream.ended : 'none',
+		GOOD_DESTROY: !!gmailRouteView.GOOD_DESTROY,
+		asapHasFired: gmailRouteView.asapHasFired,
+		routeID: gmailRouteView._eventStream && gmailRouteView.getRouteID(),
+		name: gmailRouteView._name,
+		hash: gmailRouteView.getHash(),
+		type: gmailRouteView.getType()
+	};
 }
 
 
