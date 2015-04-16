@@ -124,11 +124,19 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				const post = describeGmailRouteView(latestGmailRouteView);
 				Logger.error(new Error("Failed to destroy routeView"), {
 					pre, middle, post,
+					latest: describeGmailRouteView(latestGmailRouteView),
+					new: describeGmailRouteView(gmailRouteView),
+					original: latestGmailRouteView !== originalLatestGmailRouteView ?
+						describeGmailRouteView(originalLatestGmailRouteView) : null,
 					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
 					latestEqNew: latestGmailRouteView === gmailRouteView
 				});
 			} else if (latestGmailRouteView !== originalLatestGmailRouteView) {
 				Logger.error(new Error("Re-entrance weirdness"), {
+					latest: describeGmailRouteView(latestGmailRouteView),
+					new: describeGmailRouteView(gmailRouteView),
+					original: latestGmailRouteView !== originalLatestGmailRouteView ?
+						describeGmailRouteView(originalLatestGmailRouteView) : null,
 					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
 					latestEqNew: latestGmailRouteView === gmailRouteView
 				});
