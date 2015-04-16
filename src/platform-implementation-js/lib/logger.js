@@ -305,9 +305,11 @@ function _logError(err, details, appId, sentByApp) {
 
     const appIds = getAppIdsProperty(appId);
 
-    // Might not have been passed a useful error object with a stack, so get
-    // our own current stack just in case.
-    const nowStack = getStackTrace();
+    // The longer of an error stack we were passed, the fewer lines of our own
+    // current stack to include.
+    const nowStackLines = (err && err.stack) ?
+      Math.max(4, 150-err.stack.split('\n').length) : Infinity;
+    const nowStack = getStackTrace().split('\n').slice(0,nowStackLines).join('\n');
 
     // Show the error immediately, don't wait on implementation load for that.
     let stuffToLog = ["Error logged:", err];
