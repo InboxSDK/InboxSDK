@@ -112,7 +112,8 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	waitForReady: function() {
-		return Bacon.fromPromise(this._ready);
+		return Bacon.fromPromise(this._ready)
+			.takeUntil(this._eventStream.filter(false).mapEnd());
 	},
 
 	_createButtonViewController: function(buttonDescriptor){
