@@ -45,13 +45,14 @@ export default function addAccessors(obj, descriptors) {
     }
   });
   const superDestroy = obj.destroy;
+  let DEBUG_isDestroying = false;
   obj.destroy = function() {
-    if (this.DEBUG_isDestroying) {
+    if (DEBUG_isDestroying) {
       Logger.error(new Error("Re-entrance into object destroy call!"), {
         name: this.constructor && this.constructor.name
       });
     }
-    this.DEBUG_isDestroying = true;
+    DEBUG_isDestroying = true;
     this.DEBUG_LAST_DESTROY = this.DEBUG_LAST_DESTROY || [];
     descriptors.forEach(descriptor => {
       const {name, destroy} = descriptor;
@@ -79,7 +80,7 @@ export default function addAccessors(obj, descriptors) {
       superDestroy.call(this);
     }
     this.DEBUG_LAST_DESTROY.push('d');
-    this.DEBUG_isDestroying = false;
+    DEBUG_isDestroying = false;
     return this.DEBUG_LAST_DESTROY;
   };
   obj.destroy.DEBUG_descriptors = descriptors;
