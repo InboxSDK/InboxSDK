@@ -48,30 +48,31 @@ export default function addAccessors(obj, descriptors) {
     this.DEBUG_LAST_DESTROY = [];
     descriptors.forEach(descriptor => {
       const {name, destroy} = descriptor;
-      this.DEBUG_LAST_DESTROY.push(['considering', name, destroy]);
+      this.DEBUG_LAST_DESTROY.push(`prop ${name} ${destroy?1:0}`);
       if (_.has(this, name)) {
-        this.DEBUG_LAST_DESTROY.push(['has']);
+        this.DEBUG_LAST_DESTROY.push('has');
         if (destroy && this[name]) {
           const destroyMethod = descriptor.destroyMethod || 'destroy';
-          this.DEBUG_LAST_DESTROY.push(['destroy and present']);
+          this.DEBUG_LAST_DESTROY.push('good');
           if (Array.isArray(this[name])) {
-            this.DEBUG_LAST_DESTROY.push(['is array']);
+            this.DEBUG_LAST_DESTROY.push('arr');
             this[name].forEach(x => {
               x[destroyMethod]();
             });
           } else {
-            this.DEBUG_LAST_DESTROY.push(['not array']);
+            this.DEBUG_LAST_DESTROY.push('scl');
             this[name][destroyMethod]();
           }
         }
-        this.DEBUG_LAST_DESTROY.push(['setting to undefined']);
+        this.DEBUG_LAST_DESTROY.push('u');
         this[name] = undefined;
       }
     });
     if (superDestroy) {
       superDestroy.call(this);
     }
-    this.DEBUG_LAST_DESTROY.push(['done']);
+    this.DEBUG_LAST_DESTROY.push('d');
+    this.DEBUG_LAST_DESTROY = this.DEBUG_LAST_DESTROY.join(',');
     return this.DEBUG_LAST_DESTROY;
   };
   obj.destroy.DEBUG_descriptors = descriptors;
