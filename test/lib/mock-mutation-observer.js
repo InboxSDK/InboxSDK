@@ -1,49 +1,57 @@
-var assert = require('assert');
-var Bacon = require('baconjs');
+import assert from 'assert';
+import Kefir from 'kefir';
 
-function MockMutationObserver(callback) {
-  this._callback = callback;
-  this._records = [];
-  this._updateQueued = false;
-  this._stopper = new Bacon.Bus();
+export default class MockMutationObserver {
+  constructor(callback) {
+    this._callback = callback;
+    this._records = [];
+    this._updateQueued = false;
+    this._stopper = new Kefir.Emitter();
+  }
+
+  observe(element, options) {
+    assert(element);
+    assert(options);
+
+    if (element._emitsMutations) {
+      Kefir
+        .fromEvent(element, 'mutation')
+        .takeUntilBy( Kefir.fromEvent(element, 'removed') )
+        .takeUntilBy( this._stopper )
+        .map(event => {
+          const newEvent = {target: event.target};
+          if (options.childList) {
+            newEvent.addedNodes = event.addedNodes;
+            newEvent.removedNodes = event.removedNodes;
+          }
+          return newEvent;
+        })
+        .filter(event => Object.keys(event).length > 1)
+        .onValue(this._queueMutation.bind(this));
+    }
+  }
+
+  disconnect() {
+    this._stopper.emit('stop');
+    this.takeRecords();
+  }
+
+  takeRecords() {
+    var records = this._records;
+    this._records = [];
+    return records;
+  }
+
+  _queueMutation(mutation) {
+    this._records.push(mutation);
+    if (!this._updateQueued) {
+      this._updateQueued = true;
+      process.nextTick(() => {
+        this._updateQueued = false;
+        if (this._records.length) {
+          this._callback(this.takeRecords());
+        }
+      });
+    }
+  }
 }
-
-MockMutationObserver.prototype.observe = function(element, options) {
-  assert(element);
-  assert(options);
-
-  if (element._emitsMutations) {
-    Bacon
-      .fromEventTarget(element, 'mutation')
-      .takeUntil( Bacon.fromEventTarget(element, 'removed') )
-      .takeUntil( this._stopper )
-      .onValue(this._queueMutation.bind(this));
-  }
-};
-
-MockMutationObserver.prototype.disconnect = function() {
-  this._stopper.push('stop');
-  this.takeRecords();
-};
-
-MockMutationObserver.prototype.takeRecords = function() {
-  var records = this._records;
-  this._records = [];
-  return records;
-};
-
-MockMutationObserver.prototype._queueMutation = function(mutation) {
-  this._records.push(mutation);
-  if (!this._updateQueued) {
-    var self = this;
-    this._updateQueued = true;
-    process.nextTick(function() {
-      self._updateQueued = false;
-      if (self._records.length) {
-        self._callback(self.takeRecords());
-      }
-    });
-  }
-};
-
-module.exports = MockMutationObserver;

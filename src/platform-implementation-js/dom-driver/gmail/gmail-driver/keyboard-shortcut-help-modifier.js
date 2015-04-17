@@ -1,18 +1,18 @@
 'use strict';
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var BasicClass = require('../../../lib/basic-class');
-var Map = require('es6-unweak-collections').Map;
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import BasicClass from '../../../lib/basic-class';
+import baconFlatten from '../../../lib/bacon-flatten';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-
-var KeyboardShortcutHelpModifier = function(){
+function KeyboardShortcutHelpModifier() {
 	BasicClass.call(this);
 
 	this._shortcuts = new Map();
 	this._monitorKeyboardHelp();
-};
+}
 
 KeyboardShortcutHelpModifier.prototype = Object.create(BasicClass.prototype);
 
@@ -45,27 +45,19 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 	},
 
 	_monitorKeyboardHelp: function(){
-		makeMutationObserverStream(document.body, {childList: true})
-			.filter(function(mutation){
-				return mutation.addedNodes;
-			})
-			.flatMap(function(mutation){
-				return Bacon.fromArray(_.toArray(mutation.addedNodes));
-			})
-			.startWith(document.querySelector('body > .wa'))
-			.filter(function(node){
-				return node && node.classList && node.classList.contains('wa');
-			})
-			.flatMap(function(node){
-				return makeMutationObserverStream(node, {attributes: true, attributeFilter: ['class']})
-						.filter(function(){
-							return !node.classList.contains('aou');
-						})
-						.map(function(){
-							return node;
-						})
-						.startWith(node);
-			})
+		makeElementChildStream(document.body)
+			.map(event => event.el)
+			.filter(node =>
+				node && node.classList && node.classList.contains('wa')
+			)
+			.flatMap(node =>
+				makeMutationObserverChunkedStream(node, {attributes: true, attributeFilter: ['class']})
+					.filter(() =>
+						!node.classList.contains('aou')
+					)
+					.map(() => node)
+					.toProperty(node)
+			)
 			.onValue(this, '_renderHelp');
 	},
 
@@ -201,6 +193,5 @@ function _getSeparatorHTML(separator){
 			return '';
 	}
 }
-
 
 module.exports = KeyboardShortcutHelpModifier;

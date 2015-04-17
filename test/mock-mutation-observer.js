@@ -1,55 +1,57 @@
-var assert = require('assert');
-var RSVP = require('./lib/rsvp');
-var EventEmitter = require('events').EventEmitter;
+import assert from 'assert';
+import RSVP from './lib/rsvp';
+import {EventEmitter} from 'events';
+import Marker from '../src/common/marker';
 
 // jshint -W079
-var MutationObserver = require('./lib/mock-mutation-observer');
+import MutationObserver from './lib/mock-mutation-observer';
 
 describe('MockMutationObserver', function() {
   it('should work', function() {
     return new RSVP.Promise(function(resolve, reject) {
-      var mutation1 = {};
-      var mutation2 = {};
+      const c1 = Marker('c1'), c2 = Marker('c2'), c3 = Marker('c3');
 
-      var obs = new MutationObserver(function(mutations) {
+      const obs = new MutationObserver(function(mutations) {
         assert.strictEqual(mutations.length, 2);
-        assert.strictEqual(mutations[0], mutation1);
-        assert.strictEqual(mutations[1], mutation2);
+        assert.deepEqual(mutations[0].addedNodes, [c1,c2]);
+        assert.deepEqual(mutations[0].removedNodes, [c3]);
+        assert.deepEqual(mutations[1].addedNodes, [c3]);
+        assert.deepEqual(mutations[1].removedNodes, [c1,c2]);
         resolve();
       });
 
-      var el = new EventEmitter();
+      const el = new EventEmitter();
       el._emitsMutations = true;
-      obs.observe(el, {});
+      obs.observe(el, {childList:true});
 
-      el.emit('mutation', mutation1);
-      el.emit('mutation', mutation2);
+      el.emit('mutation', {addedNodes:[c1,c2], removedNodes:[c3]});
+      el.emit('mutation', {addedNodes:[c3], removedNodes:[c1,c2]});
     });
   });
 
   it('can disconnect', function() {
     return new RSVP.Promise(function(resolve, reject) {
-      var mutationBad = {};
-      var mutationGood = {};
+      const c1 = Marker('c1'), c2 = Marker('c2'), c3 = Marker('c3');
 
-      var obs = new MutationObserver(function(mutations) {
+      const obs = new MutationObserver(function(mutations) {
         assert.strictEqual(mutations.length, 1);
-        assert.strictEqual(mutations[0], mutationGood);
+        assert.deepEqual(mutations[0].addedNodes, [c1]);
+        assert.deepEqual(mutations[0].removedNodes, []);
         resolve();
       });
 
-      var elBad = new EventEmitter();
+      const elBad = new EventEmitter();
       elBad._emitsMutations = true;
-      obs.observe(elBad, {});
-      elBad.emit('mutation', mutationBad);
+      obs.observe(elBad, {childList:true});
+      elBad.emit('mutation', {addedNodes:[c2], removedNodes:[c3]});
 
       obs.disconnect();
-      elBad.emit('mutation', mutationBad);
+      elBad.emit('mutation', {addedNodes:[c2], removedNodes:[c3]});
 
-      var elGood = new EventEmitter();
+      const elGood = new EventEmitter();
       elGood._emitsMutations = true;
-      obs.observe(elGood, {});
-      elGood.emit('mutation', mutationGood);
+      obs.observe(elGood, {childList:true});
+      elGood.emit('mutation', {addedNodes:[c1], removedNodes:[]});
     });
   });
 });
