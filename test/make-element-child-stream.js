@@ -147,4 +147,35 @@ describe('makeElementChildStream', function() {
       }
     });
   });
+
+  // Make sure https://github.com/baconjs/bacon.js/issues/574 doesn't affect this.
+  it("doesn't cause reentrance issues", function(done) {
+    const child1 = Marker('child1'), child2 = Marker('child2');
+    const someBus = new Bacon.Bus();
+    someBus.onValue(()=>{});
+
+    const target = new MockElementParent([child1, child2]);
+
+    let i = 0, criticalSection = false;
+    const stream = makeElementChildStream(target);
+    stream.onValue(event => {
+      if (criticalSection) {
+        throw new Error("Re-entrance");
+      }
+      criticalSection = true;
+      switch(++i) {
+        case 1:
+          assert.strictEqual(event.el, child1);
+          someBus.end();
+          break;
+        case 2:
+          assert.strictEqual(event.el, child2);
+          done();
+          break;
+        default:
+          throw new Error("should not happen");
+      }
+      criticalSection = false;
+    });
+  });
 });
