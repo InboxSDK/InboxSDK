@@ -2,9 +2,13 @@ import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
+import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
 
 const threadListHandlersToSearchStrings = new Map();
+
+// temp debugging measure
+import setupRouteViewDriverStream from './setup-route-view-driver-stream';
 
 /*
 Timeline of how a custom thread list works:
@@ -167,6 +171,11 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
     searchInput.style.visibility = 'visible';
   });
 
+  if (setupRouteViewDriverStream.routeViewIsChanging) {
+    Logger.error(new Error("Re-entrance madness!"), {
+      customHash
+    });
+  }
   window.history.replaceState(null, null, searchHash);
   const hce = new HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,

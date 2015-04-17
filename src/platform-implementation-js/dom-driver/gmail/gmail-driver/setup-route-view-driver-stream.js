@@ -69,7 +69,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 
 
 	let latestGmailRouteView = null;
-	let routeViewIsChanging = false;
 	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
@@ -109,10 +108,10 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	})
 	.filter(Boolean)
 	.tap((gmailRouteView) => {
-		if (routeViewIsChanging) {
+		if (setupRouteViewDriverStream.routeViewIsChanging) {
 			Logger.error(new Error("Re-entrance into routeview tap call!"));
 		}
-		routeViewIsChanging = true;
+		setupRouteViewDriverStream.routeViewIsChanging = true;
 		if(latestGmailRouteView){
 			const originalLatestGmailRouteView = latestGmailRouteView;
 			const pre = describeGmailRouteView(latestGmailRouteView);
@@ -143,9 +142,10 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			}
 		}
 		latestGmailRouteView = gmailRouteView;
-		routeViewIsChanging = false;
+		setupRouteViewDriverStream.routeViewIsChanging = false;
 	});
 }
+setupRouteViewDriverStream.routeViewIsChanging = false;
 
 function describeGmailRouteView(gmailRouteView) {
 	return {
