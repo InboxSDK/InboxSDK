@@ -21,6 +21,19 @@ export default function getMainContentElementChangedStream(GmailElementGetter) {
 								target: el
 							})
 							.filter(_isNowVisible)
+							.doAction(event => {
+									// temporary
+									const Logger = require('../../../lib/logger');
+									const setupRouteViewDriverStream = require('../gmail-driver/setup-route-view-driver-stream');
+									if (setupRouteViewDriverStream.routeViewIsChanging) {
+									Logger.error(new Error("Re-entrance madness at a place!"), {
+										keys: Object.keys(event),
+										attributeName: event.attributeName,
+										style: event.target.getAttribute('style'),
+										hash: document.location.hash
+									});
+								}
+							})
 							.map('.target')
 						)
 				).toProperty();
