@@ -27,6 +27,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	const customListSearchStringsToRouteIds = driver.getCustomListSearchStringsToRouteIds();
 
 	let lastNativeHash = getURLObject(document.location.href).hash;
+	let latestGmailRouteView = null;
 
 	const eligibleHashChanges = Kefir.fromEvent(window, 'hashchange')
 		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
@@ -51,6 +52,13 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				return {urlObject, type: 'NATIVE'};
 			}
 			return {urlObject, type: 'OTHER_APP_CUSTOM'};
+		}).tap(obj => {
+			if (setupRouteViewDriverStream.routeViewIsChanging) {
+				Logger.error(new Error("Re-entrance hashchange"), {
+					obj,
+					latest: describeGmailRouteView(latestGmailRouteView)
+				});
+			}
 		});
 
 	const customAndCustomListRouteHashChanges = eligibleHashChanges
@@ -67,8 +75,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			return tmp === urlObject.hash;
 		});
 
-
-	let latestGmailRouteView = null;
 	// Merge everything that can trigger a new RouteView
 	return Kefir.merge([
 		customAndCustomListRouteHashChanges,
@@ -80,6 +86,14 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				urlObject: getURLObject(document.location.href),
 				type: 'NATIVE'
 			}))
+			.tap(obj => {
+				if (setupRouteViewDriverStream.routeViewIsChanging) {
+					Logger.error(new Error("Re-entrance content changed"), {
+						obj,
+						latest: describeGmailRouteView(latestGmailRouteView)
+					});
+				}
+			})
 	]).map(options => {
 		const {type, urlObject} = options;
 		if (type === 'NATIVE' && urlObject.name === 'search') {
@@ -108,9 +122,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	})
 	.filter(Boolean)
 	.tap((gmailRouteView) => {
-		if (setupRouteViewDriverStream.routeViewIsChanging) {
-			Logger.error(new Error("Re-entrance into routeview tap call!"));
-		}
 		setupRouteViewDriverStream.routeViewIsChanging = true;
 		if(latestGmailRouteView){
 			const originalLatestGmailRouteView = latestGmailRouteView;
