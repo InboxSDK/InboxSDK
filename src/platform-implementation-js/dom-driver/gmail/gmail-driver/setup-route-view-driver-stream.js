@@ -52,13 +52,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				return {urlObject, type: 'NATIVE'};
 			}
 			return {urlObject, type: 'OTHER_APP_CUSTOM'};
-		}).tap(obj => {
-			if (setupRouteViewDriverStream.routeViewIsChanging) {
-				Logger.error(new Error("Re-entrance hashchange"), {
-					obj,
-					latest: describeGmailRouteView(latestGmailRouteView)
-				});
-			}
 		});
 
 	const customAndCustomListRouteHashChanges = eligibleHashChanges
@@ -86,14 +79,6 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				urlObject: getURLObject(document.location.href),
 				type: 'NATIVE'
 			}))
-			.tap(obj => {
-				if (setupRouteViewDriverStream.routeViewIsChanging) {
-					Logger.error(new Error("Re-entrance content changed"), {
-						obj,
-						latest: describeGmailRouteView(latestGmailRouteView)
-					});
-				}
-			})
 	]).map(options => {
 		const {type, urlObject} = options;
 		if (type === 'NATIVE' && urlObject.name === 'search') {
