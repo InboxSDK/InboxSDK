@@ -1,19 +1,20 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import baconFlatten from '../../../lib/bacon-flatten';
 
-var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
-var eventNameFilter = require('../../../lib/event-name-filter');
-var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
+import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
+import eventNameFilter from '../../../lib/event-name-filter';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 
-var GmailElementGetter = require('../gmail-element-getter');
+import GmailElementGetter from '../gmail-element-getter';
 
-var NavItemViewDriver = require('../../../driver-interfaces/nav-item-view-driver');
-var GmailNavItemView = require('./gmail-nav-item-view');
+import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
+import GmailNavItemView from './gmail-nav-item-view';
 
-var LEFT_INDENTATION_PADDING = 14;
+const LEFT_INDENTATION_PADDING = 14;
 
-var NativeGmailNavItemView = function(nativeElement, navItemName){
+function NativeGmailNavItemView(nativeElement, navItemName) {
 	NavItemViewDriver.call(this);
 
 	this._element = nativeElement;
@@ -22,7 +23,7 @@ var NativeGmailNavItemView = function(nativeElement, navItemName){
 	this._navItemName = navItemName;
 
 	this._monitorElementForActiveChanges();
-};
+}
 
 NativeGmailNavItemView.prototype = Object.create(NavItemViewDriver.prototype);
 
@@ -90,7 +91,9 @@ _.extend(NativeGmailNavItemView.prototype, {
 	_monitorElementForActiveChanges: function(){
 		this._element.classList.add('inboxsdk__navItem_claimed');
 		var element = this._element;
-		var classChangeStream = makeMutationObserverChunkedStream(element, {attributes: true, attributeFilter: ['class']})
+		var classChangeStream = makeMutationObserverChunkedStream(element, {
+			attributes: true, attributeFilter: ['class']
+		})
 			.takeUntil(this._eventStream.filter(false).mapEnd())
 			.toProperty(null)
 			.map(_.constant(element));
@@ -108,10 +111,12 @@ _.extend(NativeGmailNavItemView.prototype, {
 			.onValue(this, '_removeActiveMarkerElement');
 
 		this._eventStream.plug(
-			makeMutationObserverStream(element.parentElement, {childList: true})
-				.flatMap(mutation =>
-					Bacon.fromArray(_.toArray(mutation.removedNodes))
-				)
+			baconFlatten(
+				makeMutationObserverStream(element.parentElement, {childList: true})
+					.map(mutation =>
+						_.toArray(mutation.removedNodes)
+					)
+			)
 				.filter(removedNode =>
 					removedNode === element
 				)

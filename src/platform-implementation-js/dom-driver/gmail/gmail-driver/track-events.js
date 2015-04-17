@@ -1,18 +1,14 @@
-const _ = require('lodash');
-const makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-const Bacon = require('baconjs');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-module.exports = function trackEvents(gmailDriver){
-
+export default function trackEvents(gmailDriver) {
 	_setupComposeMonitoring(gmailDriver);
 	_setupAttachmentModalMonitoring(gmailDriver);
 	_setupDragDropMonitoring(gmailDriver);
-};
-
+}
 
 function _setupComposeMonitoring(gmailDriver){
-	let logger = gmailDriver.getLogger();
-
 	gmailDriver.getComposeViewDriverStream().onValue(
 		(composeViewDriver) => {
 
@@ -56,11 +52,8 @@ function _monitorAttachmentButton(composeViewDriver, logFunction){
 }
 
 function _monitorAttachmentAdded(composeViewDriver, logFunction) {
-	makeMutationObserverStream(document.body, {childList: true})
-		.filter((mutation) => mutation.addedNodes.length > 0)
-		.map('.addedNodes')
-		.flatMap((addedNodes) => Bacon.fromArray(_.toArray(addedNodes)))
-		.startWith(document.querySelector('input[type=file]'))
+	makeElementChildStream(document.body)
+		.map(event => event.el)
 		.filter(node => node && node.type === 'file')
 		.take(1)
 		.flatMap((node) => {
@@ -90,13 +83,10 @@ function _monitorDriveButton(composeViewDriver, logFunction){
 }
 
 function _monitorDriveFileAdded(composeViewDriver, logFunction){
-	let numberCurrentDriveChips = composeViewDriver.getBodyElement().querySelectorAll('.gmail_drive_chip').length;
+	const numberCurrentDriveChips = composeViewDriver.getBodyElement().querySelectorAll('.gmail_drive_chip').length;
 
-	makeMutationObserverStream(document.body, {childList: true})
-		.filter((mutation) => mutation.addedNodes.length > 0)
-		.map('.addedNodes')
-		.flatMap((addedNodes) => Bacon.fromArray(_.toArray(addedNodes)))
-		.startWith(document.querySelector('.picker-dialog'))
+	makeElementChildStream(document.body)
+		.map(event => event.el)
 		.filter(node => node && node.classList.contains('picker-dialog'))
 		.take(1)
 		.flatMap((node) => {
@@ -119,18 +109,11 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 
 function _setupAttachmentModalMonitoring(gmailDriver){
 
-	makeMutationObserverStream(document.body, {childList: true})
-		.filter((mutation) => mutation.addedNodes.length > 0)
-		.map('.addedNodes')
-		.flatMap((addedNodes) => Bacon.fromArray(_.toArray(addedNodes)))
-		.startWith(document.querySelector('[role=alertdialog]'))
-		.filter(Boolean)
+	makeElementChildStream(document.body)
+		.map(event => event.el)
+		.filter(node => node.getAttribute('role') === 'alertdialog')
 		.onValue((node) => {
-			if(!node || !node.querySelector){
-				return;
-			}
-
-			let heading = node.querySelector('[role=heading]');
+			const heading = node.querySelector('[role=heading]');
 			if(heading){
 				if(heading.textContent.indexOf('exceeds the 25MB') > -1){
 					gmailDriver.getLogger().eventGmail('large attachment suggest drive');
@@ -138,16 +121,14 @@ function _setupAttachmentModalMonitoring(gmailDriver){
 				}
 			}
 
-			var body = node.querySelector('.Kj-JD-Jz');
+			const body = node.querySelector('.Kj-JD-Jz');
 			if(body){
 				if(body.textContent.indexOf('exceeds the maximum') > -1){
 					gmailDriver.getLogger().eventGmail('large attachment from drag and drop');
 					return;
 				}
 			}
-
 		});
-
 }
 
 function _setupDragDropMonitoring(gmailDriver){

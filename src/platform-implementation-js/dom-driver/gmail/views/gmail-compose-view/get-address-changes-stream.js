@@ -1,9 +1,10 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import RSVP from 'rsvp';
 
-var makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
-var getAddressInformationExtractor = require('./get-address-information-extractor');
+import baconFlatten from '../../../../lib/bacon-flatten';
+import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
+import getAddressInformationExtractor from './get-address-information-extractor';
 
 module.exports = function(gmailComposeView){
 	var recipientRowElements = gmailComposeView.getRecipientRowElements();
@@ -39,21 +40,23 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 
 	return Bacon.later(0).flatMap(function() {
 		return Bacon.mergeAll(
-			mainSubAddressStream
-				.startWith({
-					addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
-				})
-				.map('.addedNodes')
-				.map(_.toArray)
-				.flatMap(Bacon.fromArray)
+			baconFlatten(
+				mainSubAddressStream
+					.startWith({
+						addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
+					})
+					.map('.addedNodes')
+					.map(_.toArray)
+				)
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
 				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
 
-			mainSubAddressStream
-				.map('.removedNodes')
-				.map(_.toArray)
-				.flatMap(Bacon.fromArray)
+			baconFlatten(
+				mainSubAddressStream
+					.map('.removedNodes')
+					.map(_.toArray)
+				)
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
 				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
