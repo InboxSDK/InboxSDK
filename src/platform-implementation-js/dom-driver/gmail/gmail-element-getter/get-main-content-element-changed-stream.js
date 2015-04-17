@@ -1,9 +1,8 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Bacon from 'baconjs';
 
-var streamWaitFor = require('../../../lib/stream-wait-for');
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-
+import streamWaitFor from '../../../lib/stream-wait-for';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
 export default function getMainContentElementChangedStream(GmailElementGetter) {
@@ -13,10 +12,11 @@ export default function getMainContentElementChangedStream(GmailElementGetter) {
 						.map(({el}) => el)
 						.filter(el => el.classList.contains('nH'))
 						.flatMap(el =>
-							makeMutationObserverStream(el, {
+							makeMutationObserverChunkedStream(el, {
 								attributes: true,
 								attributeFilter: ['style']
 							})
+							.map(_.last)
 							.toProperty({
 								target: el
 							})
