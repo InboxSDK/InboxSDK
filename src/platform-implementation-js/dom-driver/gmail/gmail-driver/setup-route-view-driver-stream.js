@@ -9,8 +9,6 @@ import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 import escapeRegExp from '../../../../common/escape-reg-exp';
 
-import Logger from '../../../lib/logger';
-
 const routeIDtoRegExp = _.memoize(routeID =>
 	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
@@ -107,54 +105,12 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	})
 	.filter(Boolean)
 	.tap((gmailRouteView) => {
-		setupRouteViewDriverStream.routeViewIsChanging = true;
 		if(latestGmailRouteView){
-			const originalLatestGmailRouteView = latestGmailRouteView;
-			const pre = describeGmailRouteView(latestGmailRouteView);
-			latestGmailRouteView.GOOD_DESTROY = true;
 			latestGmailRouteView.destroy();
-			if (latestGmailRouteView._eventStream) {
-				const middle = describeGmailRouteView(latestGmailRouteView);
-				latestGmailRouteView.destroy();
-				const post = describeGmailRouteView(latestGmailRouteView);
-				Logger.error(new Error("Failed to destroy routeView"), {
-					pre, middle, post,
-					latest: describeGmailRouteView(latestGmailRouteView),
-					new: describeGmailRouteView(gmailRouteView),
-					original: latestGmailRouteView !== originalLatestGmailRouteView ?
-						describeGmailRouteView(originalLatestGmailRouteView) : null,
-					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
-					latestEqNew: latestGmailRouteView === gmailRouteView
-				});
-			} else if (latestGmailRouteView !== originalLatestGmailRouteView) {
-				Logger.error(new Error("Re-entrance weirdness"), {
-					latest: describeGmailRouteView(latestGmailRouteView),
-					new: describeGmailRouteView(gmailRouteView),
-					original: latestGmailRouteView !== originalLatestGmailRouteView ?
-						describeGmailRouteView(originalLatestGmailRouteView) : null,
-					latestEqOriginal: latestGmailRouteView === originalLatestGmailRouteView,
-					latestEqNew: latestGmailRouteView === gmailRouteView
-				});
-			}
 		}
 		latestGmailRouteView = gmailRouteView;
-		setupRouteViewDriverStream.routeViewIsChanging = false;
 	});
 }
-setupRouteViewDriverStream.routeViewIsChanging = false;
-
-function describeGmailRouteView(gmailRouteView) {
-	return {
-		ended: gmailRouteView._eventStream ? gmailRouteView._eventStream.ended : 'none',
-		GOOD_DESTROY: !!gmailRouteView.GOOD_DESTROY,
-		asapHasFired: gmailRouteView.asapHasFired,
-		routeID: gmailRouteView._eventStream && gmailRouteView.getRouteID(),
-		name: gmailRouteView._name,
-		hash: gmailRouteView.getHash(),
-		type: gmailRouteView.getType()
-	};
-}
-
 
 /**
  * TODO: Split up "role=main" DOM watching and hash change watching.

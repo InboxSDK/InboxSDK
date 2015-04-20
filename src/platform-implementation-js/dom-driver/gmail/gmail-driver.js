@@ -212,64 +212,16 @@ _.extend(GmailDriver.prototype, {
 	},
 
 	_setupRouteSubViewDriver: function(viewName){
-		var bus = new Bacon.Bus();
-
-		let latestGmailRouteViewTime = null;
-		let latestGmailRouteView = null;
-
+		const bus = new Bacon.Bus();
 		bus.plug(
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
-				const ID = Math.random();
-				gmailRouteView.ID = ID;
-				const thisRouteViewTime = new Date();
-				latestGmailRouteViewTime = thisRouteViewTime;
-				latestGmailRouteView = gmailRouteView;
-
-				// Make one error object per gmailRouteView so that we only report an
-				// error once per gmailRouteView.
-				const err = new Error("Old gmailRouteView not destroyed");
-
 				return gmailRouteView.getEventStream()
 					.filter(event => event.eventName === viewName)
-					.filter(event => {
-						if(latestGmailRouteView !== gmailRouteView){
-							// TODO is this still necessary? Check logs and remove if it's not
-							// firing still.
-							const errorDetailsObject = {
-								eventName: event && event.eventName,
-								old: this._getRouteViewErrorDetailsObject(gmailRouteView),
-								latest: this._getRouteViewErrorDetailsObject(latestGmailRouteView),
-								oldTime: thisRouteViewTime,
-								latestTime: latestGmailRouteViewTime,
-								ID: ID
-							};
-							Logger.error(err, errorDetailsObject);
-							gmailRouteView.destroy();
-							gmailRouteView.FALLBACK_DESTROYED = true;
-							return false;
-						}
-
-						return true;
-					})
 					.map(event => event.view);
 			})
 		);
 
 		return bus;
-	},
-
-	_getRouteViewErrorDetailsObject: function(gmailRouteView){
-		return {
-			routeID: gmailRouteView._eventStream && gmailRouteView.getRouteID(),
-			_name: gmailRouteView._name,
-			hash: gmailRouteView.getHash(),
-			type: gmailRouteView.getType(),
-			asapHasFired: gmailRouteView.asapHasFired,
-			isDestroyed: !gmailRouteView._eventStream,
-			FALLBACK_DESTROYED: !!gmailRouteView.FALLBACK_DESTROYED,
-			GOOD_DESTROY: !!gmailRouteView.GOOD_DESTROY,
-			ID: gmailRouteView.ID
-		};
 	},
 
 	_setupThreadRowViewDriverKefirStream: function(){

@@ -17,8 +17,6 @@ var GmailElementGetter = require('../../gmail-element-getter');
 import assertInterface from '../../../../lib/assert-interface';
 import addAccessors from '../../../../lib/add-accessors';
 
-import Logger from '../../../../lib/logger';
-
 function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	this._type = type;
 	this._hash = urlObject.hash;
@@ -30,7 +28,6 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
 
-	this.asapHasFired = false;
 	this._eventStream = new Bacon.Bus();
 	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
@@ -150,55 +147,39 @@ _.extend(GmailRouteView.prototype, {
 	},
 
 	_setupSubViews: function(){
-		const eventStream = this._eventStream;
-		const rowListViews = this._rowListViews;
-
 		asap(() => {
 			if (!this._eventStream) return;
-			this.asapHasFired = true;
 
-			try{
-				this._setupRowListViews(rowListViews, eventStream);
-			}
-			catch(err){
-				Logger.error(err, 'Error setting up rowListViews');
-			}
-
-			try{
-				this._setupContentAndSidebarView(rowListViews, eventStream);
-			}
-			catch(err){
-				Logger.error(err, 'Error setting up contentAndSidebarView');
-			}
-
+			this._setupRowListViews();
+			this._setupContentAndSidebarView();
 		});
 	},
 
-	_setupRowListViews: function(rowListViews, eventStream){
+	_setupRowListViews: function(){
 		const rowListElements = GmailElementGetter.getRowListElements();
 
 		Array.prototype.forEach.call(rowListElements, (rowListElement) => {
-			this._processRowListElement(rowListElement, rowListViews, eventStream);
+			this._processRowListElement(rowListElement);
 		});
 	},
 
-	_processRowListElement: function(rowListElement, rowListViews, eventStream){
-		var rootElement = rowListElement.parentElement;
-		var gmailRowListView = new GmailRowListView(rootElement, this);
+	_processRowListElement: function(rowListElement){
+		const rootElement = rowListElement.parentElement;
+		const gmailRowListView = new GmailRowListView(rootElement, this);
 
-		rowListViews.push(gmailRowListView);
+		this._rowListViews.push(gmailRowListView);
 
-		eventStream.push({
+		this._eventStream.push({
 			eventName: 'newGmailRowListView',
 			view: gmailRowListView
 		});
 	},
 
-	_setupContentAndSidebarView: function(rowListViews, eventStream){
+	_setupContentAndSidebarView: function(){
 		const rowListElements = document.querySelector('.aia[gh=tl]');
 
 		if(rowListElements){
-			this._startMonitoringPreviewPaneRowListForThread(rowListElements, eventStream);
+			this._startMonitoringPreviewPaneRowListForThread(rowListElements);
 			return;
 		}
 
@@ -209,22 +190,22 @@ _.extend(GmailRouteView.prototype, {
 
 			this._threadView = gmailThreadView;
 
-			eventStream.push({
+			this._eventStream.push({
 				eventName: 'newGmailThreadView',
 				view: gmailThreadView
 			});
 		}
 	},
 
-	_startMonitoringPreviewPaneRowListForThread: function(rowListElement, eventStream){
-		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
+	_startMonitoringPreviewPaneRowListForThread: function(rowListElement){
+		const threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
 
-		var elementStream = makeElementChildStream(threadContainerTableElement)
+		const elementStream = makeElementChildStream(threadContainerTableElement)
 			.filter(function(event) {
 				return !!event.el.querySelector('.if');
 			});
 
-		eventStream.plug(
+		this._eventStream.plug(
 			elementStream.flatMap(makeElementViewStream((element) => {
 				return new GmailThreadView(element, this, true);
 			})).doAction((view) => {
