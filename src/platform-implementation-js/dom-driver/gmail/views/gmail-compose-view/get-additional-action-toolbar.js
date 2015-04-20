@@ -1,4 +1,6 @@
-var $ = require('jquery');
+import $ from 'jquery';
+
+const composeViewActionToolbars = new WeakMap();
 
 function getAdditionalActionToolbar(gmailComposeView){
 	var groupedActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar > div');
@@ -6,16 +8,20 @@ function getAdditionalActionToolbar(gmailComposeView){
 		return groupedActionToolbar;
 	}
 
-	var actionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar > div');
+	let actionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar > div');
 	if(actionToolbar){
 		return actionToolbar;
 	}
 
-	if (!gmailComposeView._additionalAreas.actionToolbar) {
-		gmailComposeView._additionalAreas.actionToolbar = _addActionToolbar(gmailComposeView);
+	actionToolbar = composeViewActionToolbars.get(gmailComposeView);
+	if (!actionToolbar) {
+		actionToolbar = _addActionToolbar(gmailComposeView);
+		gmailComposeView.getEventStream().onEnd(() => {
+			actionToolbar.remove();
+		});
+		composeViewActionToolbars.set(gmailComposeView, actionToolbar);
 	}
-
-	return gmailComposeView._additionalAreas.actionToolbar;
+	return actionToolbar;
 }
 
 function _addActionToolbar(gmailComposeView){

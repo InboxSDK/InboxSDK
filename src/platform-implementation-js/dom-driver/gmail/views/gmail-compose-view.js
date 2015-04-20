@@ -1,343 +1,333 @@
-const _ = require('lodash');
-const $ = require('jquery');
-const RSVP = require('rsvp');
-const Bacon = require('baconjs');
+import _ from 'lodash';
+import $ from 'jquery';
+import RSVP from 'rsvp';
+import Bacon from 'baconjs';
 
-const simulateClick = require('../../../lib/dom/simulate-click');
-const setValueAndDispatchEvent = require('../../../lib/dom/set-value-and-dispatch-event');
+import simulateClick from '../../../lib/dom/simulate-click';
+import setValueAndDispatchEvent from '../../../lib/dom/set-value-and-dispatch-event';
 
-const GmailResponseProcessor = require('../gmail-response-processor');
-const GmailElementGetter = require('../gmail-element-getter');
+import GmailResponseProcessor from '../gmail-response-processor';
+import GmailElementGetter from '../gmail-element-getter';
 
-const waitFor = require('../../../lib/wait-for');
+import waitFor from '../../../lib/wait-for';
 
-const ComposeWindowDriver = require('../../../driver-interfaces/compose-view-driver');
+import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
 
+import addAccessors from '../../../lib/add-accessors';
+import assertInterface from '../../../lib/assert-interface';
 
-const GmailComposeView = function(element, xhrInterceptorStream){
-	ComposeWindowDriver.call(this);
+export default class GmailComposeView {
+	constructor(element, xhrInterceptorStream) {
+		this._element = element;
+		this._element.classList.add('inboxsdk__compose');
 
-	this._element = element;
-	this._element.classList.add('inboxsdk__compose');
+		this._isInlineReplyForm = false;
+		this._isFullscreen = false;
+		this._isStandalone = false;
+		this._managedViewControllers = [];
+		this._eventStream = new Bacon.Bus();
 
-	this._eventStream = new Bacon.Bus();
-
-	var self = this;
-	this._eventStream.plug(
-		Bacon.mergeAll(
-			xhrInterceptorStream.filter(function(event) {
-				return event.type === 'emailSending' && event.composeId === self.getComposeID();
-			}).map(function(event) {
-				return {eventName: 'sending'};
-			}),
-			xhrInterceptorStream.filter(function(event) {
-				return event.type === 'emailSent' && event.composeId === self.getComposeID();
-			}).map(function(event) {
-				var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-				return {eventName: 'sent', data: response};
-			}),
-			Bacon.fromEventTarget(this._element, 'buttonAdded').map(function(){
-				return {
-					eventName: 'buttonAdded'
-				};
-			}),
-			Bacon
-				.fromEventTarget(this._element, 'composeFullscreenStateChanged')
-				.doAction(() => this._updateComposeFullscreenState())
-				.map(function(){
+		this._eventStream.plug(
+			Bacon.mergeAll(
+				xhrInterceptorStream.filter((event) => {
+					return event.type === 'emailSending' && event.composeId === this.getComposeID();
+				}).map((event) => {
+					return {eventName: 'sending'};
+				}),
+				xhrInterceptorStream.filter((event) => {
+					return event.type === 'emailSent' && event.composeId === this.getComposeID();
+				}).map((event) => {
+					var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+					return {eventName: 'sent', data: response};
+				}),
+				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
 					return {
-						eventName: 'composeFullscreenStateChanged'
+						eventName: 'buttonAdded'
 					};
-				})
-		)
-	);
+				}),
+				Bacon
+					.fromEventTarget(this._element, 'composeFullscreenStateChanged')
+					.doAction(() => this._updateComposeFullscreenState())
+					.map(() => {
+						return {
+							eventName: 'composeFullscreenStateChanged'
+						};
+					})
+			)
+		);
 
-	this._buttonViewControllerTooltipMap = new WeakMap();
+		this._buttonViewControllerTooltipMap = new WeakMap();
 
-	this.ready = _.constant(
-		waitFor(function(){
-			return !!self.getBodyElement();
-		}).then(function(){
-			self._composeID = self._element.querySelector('input[name="composeid"]').value;
+		this.ready = _.constant(
+			waitFor(() => {
+				return !!this.getBodyElement();
+			}).then(() => {
+				this._composeID = this._element.querySelector('input[name="composeid"]').value;
 
-			self._setupStreams();
-			self._setupConsistencyCheckers();
+				this._setupStreams();
+				this._setupConsistencyCheckers();
 
-			return self;
-		})
-	);
-};
+				return this;
+			})
+		);
+	}
 
-GmailComposeView.prototype = Object.create(ComposeWindowDriver.prototype);
-
-_.extend(GmailComposeView.prototype, {
-
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_additionalAreas', destroy: true, get: true, defaultValue: {}},
-		{name: '_managedViewControllers', destroy: true, defaultValue: []},
-		{name: '_isInlineReplyForm', destroy: true, set: true, defaultValue: false},
-		{name: '_isFullscreen', destroy: false, get: true, defaultValue: false},
-		{name: '_isStandalone', destroy: false, set: true, defaultValue: false},
-		{name: '_selectionRange', destroy: false, set: true, get: true},
-		{name: '_buttonViewControllerTooltipMap', destroy: false}
-	],
-
-	_setupStreams: function(){
+	_setupStreams() {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-minimize-restore-stream')(this));
-	},
+	}
 
-	_setupConsistencyCheckers: function(){
+	_setupConsistencyCheckers() {
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
 		require('./gmail-compose-view/manage-button-grouping')(this);
-	},
+	}
 
-	_updateComposeFullscreenState: function(){
+	_updateComposeFullscreenState() {
 		this._isFullscreen = this._isStandalone || GmailElementGetter.getFullscreenComposeWindowContainer().contains(this._element);
-	},
+	}
 
-	focus: function(){
+	focus() {
 		require('./gmail-compose-view/focus')(this);
-	},
+	}
 
-	insertBodyTextAtCursor: function(text){
+	insertBodyTextAtCursor(text) {
 		return require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
-	},
+	}
 
-	insertBodyHTMLAtCursor: function(html){
+	insertBodyHTMLAtCursor(html) {
 		return require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html);
-	},
+	}
 
-	insertLinkIntoBody: function(text, href){
+	insertLinkIntoBody(text, href) {
 		return require('./gmail-compose-view/insert-link-into-body')(this, text, href);
-	},
+	}
 
-	insertLinkChipIntoBody: function(options){
+	insertLinkChipIntoBody(options) {
 		return require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
-	},
+	}
 
-	setSubject: function(text){
+	setSubject(text) {
 		$(this._element).find('input[name=subjectbox]').val(text);
 		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
-	},
+	}
 
-	setToRecipients: function(emails){
+	setToRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 0, emails);
-	},
+	}
 
-	setCcRecipients: function(emails){
+	setCcRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 1, emails);
-	},
+	}
 
-	setBccRecipients: function(emails){
+	setBccRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
-	},
+	}
 
-	addButton: function(buttonDescriptor, groupOrderHint, extraOnClickOptions){
+	addButton(buttonDescriptor, groupOrderHint, extraOnClickOptions) {
 		return require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
-	},
+	}
 
-	addTooltipToButton: function(buttonViewController,buttonDescriptor,  tooltipDescriptor){
-		let tooltip = require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
+	addTooltipToButton(buttonViewController,buttonDescriptor,  tooltipDescriptor) {
+		const tooltip = require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
 		this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
-	},
+	}
 
-	closeButtonTooltip: function(buttonViewController){
+	closeButtonTooltip(buttonViewController) {
 		if(!this._buttonViewControllerTooltipMap){
 			return;
 		}
 
-		let tooltip = this._buttonViewControllerTooltipMap.get(buttonViewController);
+		const tooltip = this._buttonViewControllerTooltipMap.get(buttonViewController);
 		if(tooltip){
 			tooltip.destroy();
 			this._buttonViewControllerTooltipMap.delete(buttonViewController);
 		}
-	},
+	}
 
-	addOuterSidebar: function(options){
+	addOuterSidebar(options) {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to add an outer sidebar to an inline reply which doesn't work.");
 			return;
 		}
 
 		require('./gmail-compose-view/add-outer-sidebar')(this, options);
-	},
+	}
 
-	addInnerSidebar: function(options){
+	addInnerSidebar(options) {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to add an inner sidebar to an inline reply which doesn't work.");
 			return;
 		}
 
 		require('./gmail-compose-view/add-inner-sidebar')(this, options);
-	},
+	}
 
-	close: function(){
+	close() {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to close an inline reply which doesn't work.");
 			return;
 		}
 
 		simulateClick(this.getCloseButton());
-	},
+	}
 
-	isReply: function(){
+	isReply() {
 		return this._isInlineReplyForm || !!this._element.querySelector('.HQ');
-	},
+	}
 
-	isInlineReplyForm: function(){
+	isInlineReplyForm() {
 		return this._isInlineReplyForm;
-	},
+	}
 
-	getBodyElement: function(){
+	getBodyElement() {
 		return this._element.querySelector('.Ap [g_editable=true]');
-	},
+	}
 
-	getHTMLContent: function(){
+	getHTMLContent() {
 		return this.getBodyElement().innerHTML;
-	},
+	}
 
-	getTextContent: function(){
+	getTextContent() {
 		return this.getBodyElement().textContent;
-	},
+	}
 
-	getSelectedBodyHTML: function(){
+	getSelectedBodyHTML() {
 		this.focus();
 		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._selectionRange);
-	},
+	}
 
-	getSelectedBodyText: function(){
+	getSelectedBodyText() {
 		this.focus();
 		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._selectionRange);
-	},
+	}
 
-	getSubject: function(){
+	getSubject() {
 		return $(this._element).find('input[name=subjectbox]').val();
-	},
+	}
 
-	getToRecipients: function(){
+	getToRecipients() {
 		return require('./gmail-compose-view/get-recipients')(this, 0, "to");
-	},
+	}
 
-	getCcRecipients: function(){
+	getCcRecipients() {
 		return require('./gmail-compose-view/get-recipients')(this, 1, "cc");
-	},
+	}
 
-	getBccRecipients: function(){
+	getBccRecipients() {
 		return require('./gmail-compose-view/get-recipients')(this, 2, "bcc");
-	},
+	}
 
-	getAdditionalActionToolbar: function(){
+	getAdditionalActionToolbar() {
 		return require('./gmail-compose-view/get-additional-action-toolbar')(this);
-	},
+	}
 
-	updateInsertMoreAreaLeft: function(oldFormattingAreaOffsetLeft) {
+	updateInsertMoreAreaLeft(oldFormattingAreaOffsetLeft)  {
 		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
-	},
+	}
 
-	_getFormattingAreaOffsetLeft: function() {
+	_getFormattingAreaOffsetLeft()  {
 		return require('./gmail-compose-view/get-formatting-area-offset-left')(this);
-	},
+	}
 
-	getFormattingArea: function() {
+	getFormattingArea()  {
 		return this._element.querySelector('.oc');
-	},
+	}
 
-	getFormattingToolbar: function(){
+	getFormattingToolbar() {
 		return this._element.querySelector('.aX');
-	},
+	}
 
-	getFormattingToolbarArrow: function(){
+	getFormattingToolbarArrow() {
 		return this.getFormattingToolbar().querySelector('.aA4');
-	},
+	}
 
-	getFormattingToolbarToggleButton: function(){
-		var innerElement = this._element.querySelector('[role=button] .dv');
+	getFormattingToolbarToggleButton() {
+		const innerElement = this._element.querySelector('[role=button] .dv');
 		return $(innerElement).closest('[role=button]')[0];
-	},
+	}
 
-	getInsertMoreArea: function() {
+	getInsertMoreArea()  {
 		return this._element.querySelector('.eq');
-	},
+	}
 
-	getInsertLinkButton: function() {
+	getInsertLinkButton()  {
 		return this._element.querySelector('.e5.aaA.aMZ');
-	},
+	}
 
-	getSendButton: function(){
+	getSendButton() {
 		return this._element.querySelector('.IZ .Up > div > [role=button]');
-	},
+	}
 
-	getSendAndArchiveButton: function(){
+	getSendAndArchiveButton() {
 		if(!this.isReply()){
 			return null;
 		}
 
-		var siblings = $(this.getSendButton()).siblings();
+		const siblings = $(this.getSendButton()).siblings();
 		if(siblings.length === 0){
 			return null;
 		}
 
 		return siblings.first().find('[role=button]')[0];
-	},
+	}
 
-	getCloseButton: function(){
+	getCloseButton() {
 		return this._element.querySelectorAll('.Hm > img')[2];
-	},
+	}
 
-	getBottomBarTable: function(){
+	getBottomBarTable() {
 		return this._element.querySelector('.aoP .aDh > table');
-	},
+	}
 
-	getBottomToolbarContainer: function(){
+	getBottomToolbarContainer() {
 		return this._element.querySelector('.aoP .aDj');
-	},
+	}
 
-	getComposeID: function(){
+	getComposeID() {
 		return this._composeID;
-	},
+	}
 
-	getDraftID: function() {
-		var input = this._element.querySelector('input[name="draft"]');
+	getDraftID()  {
+		const input = this._element.querySelector('input[name="draft"]');
 		return input && input.value;
-	},
+	}
 
-	getRecipientRowElements: function(){
+	getRecipientRowElements() {
 		return this._element.querySelectorAll('.GS tr');
-	},
+	}
 
-	addManagedViewController: function(viewController){
+	addManagedViewController(viewController) {
 		this._managedViewControllers.push(viewController);
-	},
+	}
 
-	ensureGroupingIsOpen: function(type){
+	ensureGroupingIsOpen(type) {
 		require('./gmail-compose-view/ensure-grouping-is-open')(this._element, type);
-	},
+	}
 
-	minimize: function(){
-		let minimizeButton = this._element.querySelector('.Hm > img');
+	minimize() {
+		const minimizeButton = this._element.querySelector('.Hm > img');
 		if(minimizeButton){
 			simulateClick(minimizeButton);
 		}
-	},
-
-	restore: function(){
-		this.minimize(); //minize and restore buttons are the same
-	},
-
-	destroy: function(){
-		this._eventStream.end();
-		this._eventStream = null;
-
-		ComposeWindowDriver.prototype.destroy.call(this);
 	}
 
-});
+	restore() {
+		this.minimize(); //minize and restore buttons are the same
+	}
+}
 
+addAccessors(GmailComposeView.prototype, [
+	{name: '_element', destroy: false, get: true},
+	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
+	{name: '_managedViewControllers', destroy: true},
+	{name: '_isInlineReplyForm', destroy: false, set: true},
+	{name: '_isFullscreen', destroy: false, get: true},
+	{name: '_isStandalone', destroy: false, set: true},
+	{name: '_selectionRange', destroy: false, set: true, get: true},
+	{name: '_buttonViewControllerTooltipMap', destroy: false}
+]);
 
-module.exports = GmailComposeView;
+assertInterface(GmailComposeView.prototype, ComposeViewDriver);
