@@ -292,6 +292,15 @@ div.T-I.inboxsdk__button {
   padding-right: 200px;
 }
 
+div.inboxsdk__compose_statusbar {
+  margin: 0;
+  border: 0;
+  height: 40px;
+}
+
+.inboxsdk__compose_statusbarActive .aDj > .aDh {
+  height: auto;
+}
 
 /* toolbar visibility */
 

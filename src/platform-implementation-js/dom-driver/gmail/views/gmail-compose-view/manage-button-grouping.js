@@ -11,7 +11,6 @@ var waitFor = require('../../../../lib/wait-for');
 
 var positionFormattingToolbar = require('./position-formatting-toolbar');
 
-var Map = require('es6-unweak-collections').Map;
 var memberMap = new Map();
 
 function manageButtonGrouping(gmailComposeView){
@@ -37,10 +36,10 @@ function manageButtonGrouping(gmailComposeView){
 					})
 					.onValue(_handleButtonAdded, gmailComposeView);
 
-
+	const el = gmailComposeView.getElement();
 	gmailComposeView.getEventStream().onEnd(function(){
 		memberMap.delete(gmailComposeView);
-		gmailComposeView.getElement().setAttribute('data-button-grouping-managed', 'false');
+		el.setAttribute('data-button-grouping-managed', 'false');
 	});
 }
 

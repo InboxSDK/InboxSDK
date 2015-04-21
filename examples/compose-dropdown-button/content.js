@@ -1,5 +1,11 @@
 InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
+		var statusbar = composeView.addStatusBar();
+		statusbar.el.innerHTML = 'foo <b>bar</b>';
+		statusbar.on('destroy', function() {
+			console.log('statusbar destroyed');
+		});
+
 		composeView.addButton({
 			title: 'Monkeys!',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
@@ -14,6 +20,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 			title: 'Monkeys 2',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			onClick: function(event){
+				statusbar.destroy();
 			},
 			section: 'TRAY_LEFT'
 		});

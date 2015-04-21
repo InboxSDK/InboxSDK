@@ -13,6 +13,7 @@ export default {
 	addButton: null,
 	addOuterSidebar: null,
 	addInnerSidebar: null,
+	addStatusBar: 0,
 	isReply: null,
 	isInlineReplyForm: null,
 	getBodyElement: null,

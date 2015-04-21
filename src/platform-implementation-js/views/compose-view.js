@@ -71,6 +71,10 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
 	},
 
+	addStatusBar: function() {
+		return memberMap.get(this).composeViewImplementation.addStatusBar();
+	},
+
 	/**
 	* closes the compose window
 	*/

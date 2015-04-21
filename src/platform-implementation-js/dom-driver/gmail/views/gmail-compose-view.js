@@ -4,7 +4,6 @@ import RSVP from 'rsvp';
 import Bacon from 'baconjs';
 
 import simulateClick from '../../../lib/dom/simulate-click';
-import setValueAndDispatchEvent from '../../../lib/dom/set-value-and-dispatch-event';
 
 import GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
@@ -15,6 +14,8 @@ import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
 
 import addAccessors from '../../../lib/add-accessors';
 import assertInterface from '../../../lib/assert-interface';
+
+import addStatusBar from './gmail-compose-view/add-status-bar';
 
 export default class GmailComposeView {
 	constructor(element, xhrInterceptorStream) {
@@ -163,6 +164,10 @@ export default class GmailComposeView {
 		}
 
 		require('./gmail-compose-view/add-inner-sidebar')(this, options);
+	}
+
+	addStatusBar() {
+		return addStatusBar(this);
 	}
 
 	close() {
