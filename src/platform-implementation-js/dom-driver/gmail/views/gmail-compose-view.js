@@ -5,7 +5,7 @@ import Bacon from 'baconjs';
 
 import simulateClick from '../../../lib/dom/simulate-click';
 
-import GmailResponseProcessor from '../gmail-response-processor';
+import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
 import waitFor from '../../../lib/wait-for';
