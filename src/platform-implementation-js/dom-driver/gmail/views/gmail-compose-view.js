@@ -67,6 +67,7 @@ export default class GmailComposeView {
 
 				this._setupStreams();
 				this._setupConsistencyCheckers();
+				this._updateComposeFullscreenState();
 
 				return this;
 			})
