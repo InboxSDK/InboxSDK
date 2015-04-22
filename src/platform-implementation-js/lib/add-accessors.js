@@ -48,17 +48,18 @@ export default function addAccessors(obj, descriptors) {
     descriptors.forEach(descriptor => {
       const {name, destroy} = descriptor;
       if (_.has(this, name)) {
-        if (destroy && this[name]) {
+        const value = this[name];
+        this[name] = undefined;
+        if (destroy && value) {
           const destroyMethod = descriptor.destroyMethod || 'destroy';
-          if (Array.isArray(this[name])) {
-            this[name].forEach(x => {
+          if (Array.isArray(value)) {
+            value.forEach(x => {
               x[destroyMethod]();
             });
           } else {
-            this[name][destroyMethod]();
+            value[destroyMethod]();
           }
         }
-        this[name] = undefined;
       }
     });
     if (superDestroy) {
