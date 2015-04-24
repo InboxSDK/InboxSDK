@@ -19,7 +19,6 @@
     "entities": "1.1.1",
     "envify": "^3.4.0",
     "es6-unweak-collections": "0.4.3",
-    "exec-sync": "^0.1.6",
     "glob": "^5.0.5",
     "gulp": "^3.8.10",
     "gulp-if": "^1.2.5",

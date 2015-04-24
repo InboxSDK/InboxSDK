@@ -32,7 +32,6 @@ var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
 var babelify = require("babelify");
-var execSync = require('exec-sync');
 
 var sdkFilename = 'inboxsdk.js';
 
@@ -226,42 +225,45 @@ gulp.task('test-jsdom-iti', function() {
 });
 
 gulp.task('docs', function(cb) {
-  parseCommentsInFile('gulpfile.js');
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
 
-    var classes = _.chain(paths.files)
-                        .filter(isFileEligbleForDocs)
-                        .map(logFiles)
-                        .map(parseCommentsInFile)
-                        .pluck('classes')
-                        .flatten(true)
-                        .filter(isNonEmptyClass)
-                        .map(transformClass)
-                        .value();
+    Promise.all(_.chain(paths.files)
+      .filter(isFileEligbleForDocs)
+      .map(logFiles)
+      .map(parseCommentsInFile)
+      .value()
+    ).then(files => {
+      const classes = _.chain(files)
+        .pluck('classes')
+        .flatten(true)
+        .filter(isNonEmptyClass)
+        .map(transformClass)
+        .value();
 
-    var docsJson = {};
-    docsJson.classes  = _.chain(classes)
-                          .map(function(ele) {
-                            return [ele.name, ele];
-                          })
-                          .object()
-                          .value();
+      const docsJson = {
+        classes: _.chain(classes)
+          .map(function(ele) {
+            return [ele.name, ele];
+          })
+          .object()
+          .value()
+      };
 
-
-    fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2));
+      fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
+    }).catch(err => cb(err));
   });
 
 });
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
-  var results = execSync("node_modules/.bin/jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', true);
-  if (results.stderr)
-    console.error(results.stderr);
-  var comments = JSON.parse(results.stdout);
-  comments['filename'] = file;
-  return comments;
+  return exec("node_modules/.bin/jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json')
+    .then(stdout => {
+      const comments = JSON.parse(stdout);
+      comments['filename'] = file;
+      return comments;
+    });
 }
 
 function transformClass(c) {
