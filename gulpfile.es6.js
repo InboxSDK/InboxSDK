@@ -235,6 +235,7 @@ gulp.task('docs', function(cb) {
       .value()
     ).then(files => {
       const classes = _.chain(files)
+        .filter(Boolean)
         .pluck('classes')
         .flatten(true)
         .filter(isNonEmptyClass)
@@ -263,6 +264,9 @@ function parseCommentsInFile(file) {
       const comments = JSON.parse(stdout);
       comments['filename'] = file;
       return comments;
+    }, err => {
+      console.error(err);
+      return null;
     });
 }
 
