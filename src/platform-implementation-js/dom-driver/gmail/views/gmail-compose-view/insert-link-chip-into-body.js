@@ -21,7 +21,7 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
 
     require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag, gmailComposeView.getSelectionRange());
 
-    if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm()){
+    if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm() && document.activeElement !== gmailComposeView.getBodyElement()){
         gmailComposeView.minimize();
         gmailComposeView.restore();
     }

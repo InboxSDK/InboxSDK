@@ -84,7 +84,7 @@ function _waitForContainerAndMonitorChildrenStream(containerFn) {
 
 function _informElement(eventName){
 	return function(event){
-		if(event && event.el && event.el.querySelector('[role=dialog]')){
+		if(event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]')){
 			var composeEl = event.el.querySelector('[role=dialog]');
 			if(composeEl){
 				dispatchCustomEvent(composeEl, eventName);

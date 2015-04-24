@@ -10,7 +10,7 @@ function exec() {
       if (stderr) {
         process.stderr.write(stderr);
       }
-      if (err || stderr) {
+      if (err) {
         reject(err);
       } else {
         resolve(stdout);
