@@ -137,7 +137,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	 * Returns an array of objects containing the name and email address of all recipients on the TO line
-	 * @return {object[]}
+	 * @return {Contact[]}
 	 */
 	getToRecipients: function(){
 		return memberMap.get(this).composeViewImplementation.getToRecipients();
@@ -145,7 +145,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Returns an array of objects containing the name and email address of all recipients on the CC line
-	* @return {object[]}
+	* @return {Contact[]}
 	*/
 	getCcRecipients: function(){
 		return memberMap.get(this).composeViewImplementation.getCcRecipients();
@@ -153,7 +153,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Returns an array of objects containing the name and email address of all recipients on the BCC line
-	* @return {object[]}
+	* @return {Contact[]}
 	*/
 	getBccRecipients: function(){
 		return memberMap.get(this).composeViewImplementation.getBccRecipients();
