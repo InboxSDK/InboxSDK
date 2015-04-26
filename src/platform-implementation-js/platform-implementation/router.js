@@ -75,6 +75,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* @param {Object} params an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
+	* @return {void}
 	*/
 	goto: function(routeID, params){
 		memberMap.get(this).driver.goto(routeID, params);
@@ -87,6 +88,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* @param {string} routeID - which route this handler is registering for
 	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a custom route matching
 	* the provided routeID
+	* @return {function} a function which can be called to remove this custom route
 	*/
 	handleCustomRoute: function(routeID, handler){
 		var customRouteDescriptor = {
@@ -112,6 +114,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* Because this can apply to any route, your callback will be given only a generic <code>RouteView</code>. This is typically used
 	* when you want to monitor for page changes but don't necessarily need to modify the page.
 	* @param {function(RouteView)} handler - the callback to call when the route changes
+	* @return {TODO}
 	*/
 	handleAllRoutes: function(handler){
 		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
@@ -124,6 +127,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* <code>ListRouteView</code>
 	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in <code>Router.NativeListRoutes</code>
 	* @param {function(CustomRouteView)} handler - the callback to call when the route changes to a list route matching the routeId
+	* @return {TODO}
 	*/
 	handleListRoute: function(routeID, handler){
 		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
@@ -144,14 +148,18 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* (which must start with "<" and end with ">").
 	* @param {string} routeID - which route this handler is registering for
 	* @param {function} handler
+	* @return {TODO}
 	*/
 	handleCustomListRoute: function(routeID, handler) {
 		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
 	},
 
+	/**
+	* Gets the current route view
+	* @return {RouteView}
+	*/
 	getCurrentRouteView: function(){
 		var members = memberMap.get(this);
-
 		return members.membraneMap.get(members.currentRouteViewDriver);
 	}
 

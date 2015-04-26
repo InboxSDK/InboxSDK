@@ -30,8 +30,9 @@ var KeyboardShortcutHandle = function(keyboardShortcutHandleDriver){
 _.extend(KeyboardShortcutHandle.prototype, /** @lends KeyboardShortcutHandle */ {
 
 
-  /*
+  /**
   * Deactivates the keyboard shortcut
+  * @return {void}
   */
 	remove: function(){
 		var members = memberMap.get(this);
