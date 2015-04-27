@@ -269,14 +269,13 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
-	* Fires when the user presses send. The event object contains a <code>composeView</code> property
-	* that can be used to modify anything before the message actually starts sending. Note that
-	* multiple applications may modify the message.
-	*
-	* The presending event is also canceallable by calling <code>cancel</code> on the event object.
-	* This will prevent the message from being sent. This event is the only one which allows you to
-	* modify or cancel the sent message.
+	* Fires when the user presses send. During this phase (between the presending and sending events)
+	* you can modify the {ComposeView} before the message actually starts sending. Note that multiple
+	* applications may modify the message. This event is the only one which allows you to modify or
+	* cancel the sent message.
 	* @event ComposeView#presending
+	* @param {function} cancel - a function you can call to cancel the sending of this message. This
+	* will prevent the message from being sent.
 	*/
 
 	/**
@@ -292,42 +291,56 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* object containing gmailMessageId and gmailThreadId properties will be
 	* passed to the event listeners.
 	* @event ComposeView#sent
+	* @param {string} gmailThreadId - the thread ID of the message that was just sent
+	* @param {string} gmailMessageId - the message ID of the message that was just sent
 	*/
 
 	/**
 	* Fires when any of the To/Cc/Bcc fields are changed. The passed in callback will receive an object which splits out
 	* what happened. {to: {added: [{Contact}], removed: [{Contact}]}, cc: {added: [{Contact}], removed: [{Contact}]}, bcc: {added: [{Contact}], removed: [{Contact}]}}.
 	* @event ComposeView#recipientsChanged
+	* @param {Contact[]} to.added - a list of contacts that were added to the "To" recipients
+	* @param {Contact[]} to.removed - a list of contacts that were removed from the "To" recipients
+	* @param {Contact[]} cc.added - a list of contacts that were added to the "CC" recipients
+	* @param {Contact[]} cc.removed - a list of contacts that were removed from the "CC" recipients
+	* @param {Contact[]} bcc.added - a list of contacts that were added to the "BCC" recipients
+	* @param {Contact[]} bcc.removed - a list of contacts that were removed from the "BCC" recipients
 	*/
 
 	/**
 	 * Fires when a to contact is added.
 	 * @event ComposeView#toContactAdded
+	 * @param {Contact} contact - the contact that was added to the "To" recipients
 	 */
 
 	/**
 	 * Fires when a to contact is removed.
 	 * @event ComposeView#toContactRemoved
+	 * @param {Contact} contact - the contact that was removed from the "To" recipients
 	 */
 
 	/**
 	 * Fires when a CC contact is added.
 	 * @event ComposeView#ccContactAdded
+	 * @param {Contact} contact - the contact that was added to the "CC" recipients
 	 */
 
 	/**
 	 * Fires when a CC contact is removed.
 	 * @event ComposeView#ccContactRemoved
+	 * @param {Contact} contact - the contact that was removed from the "CC" recipients
 	 */
 
 	/**
 	 * Fires when BCC to contact is added.
 	 * @event ComposeView#bccContactAdded
+	 * @param {Contact} contact - the contact that was added to the "BCC" recipients
 	 */
 
 	/**
 	 * Fires when a BCC contact is removed.
 	 * @event ComposeView#bccContactRemoved
+	 * @param {Contact} contact - the contact that was removed from the "BCC" recipients
 	 */
 });
 
