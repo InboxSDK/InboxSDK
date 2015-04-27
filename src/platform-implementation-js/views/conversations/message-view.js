@@ -13,7 +13,7 @@ var memberMap = new WeakMap();
 *
 * A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
 * Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
-* to show a user.
+* to show a user. These values are described in the enum {MessageViewViewStates}.
 *
 * The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
 * In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
@@ -187,8 +187,8 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/**
 	 * Fires when message viewState is changed
 	 * @event MessageView#viewStateChange
-	 * @param {string} newViewState - the new state the message view is in
-	 * @param {string} oldViewState - the old state the message view was in
+	 * @param {MessageViewViewStates} newViewState - the new state the message view is in
+	 * @param {MessageViewViewStates} oldViewState - the old state the message view was in
 	 * @param {MessageView} messageView - the message view whose state changed
 	 */
 
