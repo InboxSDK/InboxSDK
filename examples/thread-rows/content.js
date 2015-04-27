@@ -41,7 +41,10 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				title: 'blah blah'
 			}
 		]));
-		threadRowView.replaceDate({text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa', textColor: 'green', title: 'beep'});
+		threadRowView.replaceDate({
+			text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
+			textColor: 'green', title: 'beep'});
+		threadRowView.replaceDate(null);
 
 		// threadRowView.addButton(Kefir.repeatedly(5000, [
 		// 	{

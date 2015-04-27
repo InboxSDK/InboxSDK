@@ -226,4 +226,19 @@ describe('addAccessors', function() {
       ]);
     });
   });
+
+  it("doesn't break over cycles", function() {
+    // cycles aren't a great idea and are probably the sign of a design issue,
+    // but we should avoid self-destructing when we hit one as it's easy enough.
+    class A {}
+    class B {}
+    addAccessors(A.prototype, [{name:'_b', destroy:true, set:true}]);
+    addAccessors(B.prototype, [{name:'_a', destroy:true, set:true}]);
+    const a = new A();
+    const b = new B();
+    a.setB(b);
+    b.setA(a);
+    a.destroy();
+    b.destroy();
+  });
 });

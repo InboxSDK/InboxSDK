@@ -53,7 +53,7 @@ function tweakColor(color) {
   return color;
 }
 
-var GmailThreadRowView = function(element, rowListViewDriver) {
+function GmailThreadRowView(element, rowListViewDriver) {
   assert(element.hasAttribute('id'), 'check element is main thread row');
 
   const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
@@ -74,8 +74,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
       label: {unclaimed: [], claimed: []},
       button: {unclaimed: [], claimed: []},
       image: {unclaimed: [], claimed: []},
-
-      replacedDate: {destroy: null, claimed: false}
+      replacedDate: {unclaimed: [], claimed: []}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
   } else {
@@ -124,7 +123,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
 
     this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
       childList: true
-    })).mapTo(null).takeUntilBy(this._stopper).toProperty(null);
+    })).map(()=>null).takeUntilBy(this._stopper).toProperty(null);
 
   if(isVertical){
     this._subjectRefresher = Kefir.constant(null);
@@ -145,7 +144,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
                                 })
                               )
                             )
-                            .mapTo(null).takeUntilBy(this._stopper).toProperty(null);
+                            .map(()=>null).takeUntilBy(this._stopper).toProperty(null);
   }
 
   this.getCounts = _.once(function() {
@@ -161,7 +160,7 @@ var GmailThreadRowView = function(element, rowListViewDriver) {
     const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
     return {messageCount, draftCount};
   });
-};
+}
 
 /* Members:
 {name: '_elements', destroy: false},
@@ -194,7 +193,9 @@ _.extend(GmailThreadRowView.prototype, {
       .concat(this._modifications.image.unclaimed);
     this._modifications.image.claimed.length = 0;
 
-    this._modifications.replacedDate.claimed = false;
+    this._modifications.replacedDate.unclaimed = this._modifications.replacedDate.claimed
+      .concat(this._modifications.replacedDate.unclaimed);
+    this._modifications.replacedDate.claimed.length = 0;
 
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
@@ -235,13 +236,11 @@ _.extend(GmailThreadRowView.prototype, {
     }
     this._modifications.image.unclaimed.length = 0;
 
-    if (this._modifications.replacedDate.destroy &&
-      !this._modifications.replacedDate.claimed
-    ) {
-      //console.log('removing unclaimed date replacement');
-      this._modifications.replacedDate.destroy();
-      this._modifications.replacedDate.destroy = null;
+    for (let mod of this._modifications.replacedDate.unclaimed) {
+      //console.log('removing unclaimed replacedDate mod', mod);
+      mod.remove();
     }
+    this._modifications.replacedDate.unclaimed.length = 0;
   },
 
   // Returns a Kefir stream that emits this object once this object is ready for the
@@ -585,40 +584,43 @@ _.extend(GmailThreadRowView.prototype, {
       console.warn('replaceDate called on destroyed thread row');
       return;
     }
+    let dateMod;
     const prop = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
-      var customDateSpan = originalDateSpan.nextElementSibling;
-      if (!customDateSpan) {
-        customDateSpan = document.createElement('span');
-        customDateSpan.className = 'inboxsdk__thread_row_custom_date';
-        dateContainer.appendChild(customDateSpan);
-
-        this._modifications.replacedDate.destroy = () => {
-          customDateSpan.remove();
-          originalDateSpan.style.display = 'inline';
-        };
-      }
 
       if (!opts) {
-        this._modifications.replacedDate.claimed = false;
-        customDateSpan.style.display = 'none';
-        originalDateSpan.style.display = 'inline';
-      } else {
-        this._modifications.replacedDate.claimed = true;
-        customDateSpan.textContent = opts.text;
-        if (opts.tooltip) {
-          customDateSpan.setAttribute('data-tooltip', opts.tooltip);
-          customDateSpan.setAttribute('aria-label', opts.tooltip);
-        } else {
-          customDateSpan.removeAttribute('data-tooltip');
-          customDateSpan.removeAttribute('aria-label');
+        if (dateMod) {
+          dateMod.remove();
+          this._modifications.replacedDate.claimed.splice(
+            this._modifications.replacedDate.claimed.indexOf(dateMod), 1);
+          dateMod = null;
         }
-        customDateSpan.style.color = opts.textColor || '';
+      } else {
+        if (!dateMod) {
+          dateMod = this._modifications.replacedDate.unclaimed.shift();
+          if (!dateMod) {
+            dateMod = {
+              el: _.assign(document.createElement('span'), {className: 'inboxsdk__thread_row_custom_date'}),
+              remove() {
+                this.el.remove();
+              }
+            };
+            dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
+          }
+          this._modifications.replacedDate.claimed.push(dateMod);
+        }
 
-        customDateSpan.style.display = 'inline';
-        originalDateSpan.style.display = 'none';
+        dateMod.el.textContent = opts.text;
+        if (opts.tooltip) {
+          dateMod.el.setAttribute('data-tooltip', opts.tooltip);
+          dateMod.el.setAttribute('aria-label', opts.tooltip);
+        } else {
+          dateMod.el.removeAttribute('data-tooltip');
+          dateMod.el.removeAttribute('aria-label');
+        }
+        dateMod.el.style.color = opts.textColor || '';
 
         this._fixDateColumnWidth();
       }
