@@ -38,7 +38,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 	/**
 	* Add a nested child NavItemView
-	* @param {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
+	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
 	* @return {NavItemView}
 	*/
 	addNavItem: function(navItemDescriptor){
@@ -81,6 +81,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 	/**
 	* Remove this NavItemView from its parent
+	* @return {void}
 	*/
 	remove: function(){
 		var members = memberMap.get(this);
@@ -119,6 +120,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 	/**
 	* Collapse or uncollapse this NavItemView
 	* @param {boolean} collapseValue - whether to collapse or uncollapse
+	* @return {void}
 	*/
 	setCollapsed: function(collapseValue){
 		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){

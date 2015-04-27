@@ -17,11 +17,11 @@ AttachmentCardView.prototype = Object.create(EventEmitter.prototype);
 _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 	/**
-	* returns the type of the attachment card. Permissable values are
+	* Returns the type of the attachment card. Permissable values are
 	* <code>FILE</code> (regular file attachments), <code>DRIVE</code> (Drive attachments that are
 	*  present as links in the message), <code>FILE_IMAGE</code> (Image attachments),
 	* <code>CUSTOM</code> (attachment cards added by this or other apps built on the SDK) or
-	* <code>OTHER</code> (other types of attachments rendered by Gmail/Inbox such as YouTube or Yelp links)
+	* <code>OTHER</code> (other types of attachments rendered by Gmail/Inbox such as YouTube or Yelp links).
 	* @return {string}
 	*/
 	getAttachmentType: function(){
@@ -30,8 +30,8 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 
 	/**
-	* adds a button to this attachment card
-	* @param {DownloadButtonDescriptor|CustomButtonDescriptor}
+	* Adds a button to this attachment card.
+	* @param {DownloadButtonDescriptor|CustomButtonDescriptor} buttonDescriptor - The description of the button.
 	* @return {void}
 	*/
 	addButton: function(buttonOptions){
@@ -40,7 +40,7 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 
 	/**
-	 * Fires when the view card is destroyed
+	 * Fires when the view card is destroyed.
 	 * @event AttachmentCardView#destroy
 	 */
 

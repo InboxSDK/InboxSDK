@@ -14,7 +14,7 @@ var memberMap = new WeakMap();
 * @class
 * This namespace allows you to interact with Gmail and Inbox conversations (typically called threads). The fundamental
 * views you interact with are ThreadView and MessageView and there is a 1 to many relationship between them. The functions
-* in Conversationns.* allow you to obtain these views which you can then further manipulate.
+* in Conversations.* allow you to obtain these views which you can then further manipulate.
 *
 * It's important to note that ThreadViews and MessageViews can be navigated to in various ways by the user depending on their
 * email client and their settings (i.e. preview pane on in Gmail). This is abstracted completely away from you so you can just
@@ -58,14 +58,14 @@ var Conversations = function(appId, driver, membraneMap){
 	);
 
 	/**
-	* The various UI states a MessageView can be in
+	* The various UI states a MessageView can be in.
 	* @class
 	* @name MessageViewViewStates
 	*/
 	this.MessageViewViewStates = {};
 	Object.defineProperties(this.MessageViewViewStates, /**@lends MessageViewViewStates */ {
 		/**
-		* in this state none of the message is visible except for the outline of its existence
+		* In this state none of the message is visible except for the outline of its existence.
 		* @type string
 		*/
 		'HIDDEN': {
@@ -73,7 +73,7 @@ var Conversations = function(appId, driver, membraneMap){
 			writable: false
 		},
 		/**
-		* in this state most of the body of the message is not visible and some recipients may not be showing
+		* In this state most of the body of the message is not visible and some recipients may not be showing.
 		* @type string
 		*/
 		'COLLAPSED': {
@@ -81,7 +81,7 @@ var Conversations = function(appId, driver, membraneMap){
 			writable: false
 		},
 		/**
-		* in this state all of the message is visible including the body
+		* In this state all of the message is visible including the body.
 		* @type string
 		*/
 		'EXPANDED': {
@@ -97,8 +97,8 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	/**
 	* Registers your handler to be called when the user navigates to a ThreadView. Your handler is given a
 	* ThreadView which you can then further manipulate.
-	* @param {function(threadView)} handler - the handler to call when a ThreadView is displayed. This handler
-	* is passed one parameter, a ThreadView
+	* @param {function(threadView)} handler - The handler to call when a ThreadView is displayed. This handler
+	* is passed one parameter, a ThreadView.
 	* @return {void}
 	*/
 	registerThreadViewHandler: function(handler){
@@ -106,13 +106,13 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	},
 
 	/**
-	* Registers your handler to be called when the user navigates to a MessageView. Your handler is given a
+	* Registers your handler to be called when a MessageView is displayed. Your handler is given a
 	* MessageView which you can then further manipulate.
 	*
 	* IMPORTANT: Your handler will only be called for MessageViews that are "loaded". See docs for
 	* <code>MessageView</code> to understand the distinction.
-	* @param {function(messageView)} handler - the handler to call when a MessageView is displayed. This handler
-	* is passed one parameter, a MessageView
+	* @param {function(messageView)} handler - The handler to call when a MessageView is displayed. This handler
+	* is passed one parameter, a MessageView.
 	* @return {void}
 	*/
 	registerMessageViewHandler: function(handler){
@@ -125,8 +125,8 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	*
 	* IMPORTANT: Your handler will be called for MessageViews that are both "loaded" and "unloaded". See docs for
 	* <code>MessageView</code> to understand the distinction.
-	* @param {function(messageView)} handler - the handler to call when a MessageView is displayed. This handler
-	* is passed one parameter, a MessageView
+	* @param {function(messageView)} handler - The handler to call when a MessageView is displayed. This handler
+	* is passed one parameter, a MessageView.
 	* @return {void}
 	*/
 	registerMessageViewHandlerAll: function(handler){

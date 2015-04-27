@@ -41,8 +41,9 @@ _.extend(Lists.prototype, /** @lends Lists */{
 
 	/**
 	* Registers a handler that gets called whenever a new ThreadRowView becomes visible on screen.
-	* Your handler is guranteed to be called exactly once per thread.
-	* @param {function(ThreadRowView)} handler - the function to call on each new visible ThreadRowView.
+	* Your handler is guaranteed to be called exactly once per thread per route. That is, each time
+	* your user visits a route with {ThreadRowView}s, this handler will get called once for each {ThreadRowView}
+	* @param {function(ThreadRowView)} handler - The function to call on each new visible ThreadRowView.
 	* Your function is passed a ThreadRowView
 	* @return {void}
 	*/

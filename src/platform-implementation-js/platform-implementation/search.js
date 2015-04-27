@@ -26,7 +26,7 @@ _.extend(Search.prototype,  /** @lends Search */{
 	* Registers a search autocomplete suggestion provider. This allows you to add results to Gmails
 	* autocomplete results when a user types into a search box. Each providers results are visually
 	* seperated from each other in the UI.
-	* @param {function(query)} handler - a handler that takes in a string <code>query</code> and
+	* @param {function(query)} handler - A handler that takes in a string <code>query</code> and
 	* returns an <code>Array</code> (or <code>Promise</code> for one) of
 	* <code>AutocompleteSearchResult</code>s.
 	* @return {void}
@@ -48,8 +48,8 @@ _.extend(Search.prototype,  /** @lends Search */{
 	* navigate the user to a specific search results view (using <code>Router</code>) programtically with a
 	* search term of your choosing (so its displayed to the user), and then use <code>registerSearchQueryRewriter</code>
 	* to make sure the results you want are shown.
-	* @param {SearchQueryRewriter} rewriter - a rewriter object that specifies the term to rewrite and a function to
-	* get the new query
+	* @param {SearchQueryRewriter} rewriter - A rewriter object that specifies the term to rewrite and a function to
+	* get the new query.
 	* @return {void}
 	*/
 	registerSearchQueryRewriter: function(rewriter) {
@@ -80,52 +80,52 @@ module.exports = Search;
 var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 
 	/**
-	* The name of the result to display. This property or <code>nameHTML</code> must be set
-	* @type{String}
+	* The name of the result to display. This property or <code>nameHTML</code> must be set.
+	* @type {string}
 	*/
 	name:  null,
 
 	/**
-	* HTML to display in the name area of the result. This property or <code>name</code> must be set
-	* @type{String}
+	* HTML to display in the name area of the result. This property or <code>name</code> must be set.
+	* @type {string}
 	*/
 	nameHTML: null,
 
 	/**
-	* The name of the result to display. This property or <code>nameHTML</code> must be set
+	* The name of the result to display. This property or <code>nameHTML</code> must be set.
 	* ^optional
 	* ^default=empty
-	* @type{String}
+	* @type {string}
 	*/
 	description:  null,
 
 	/**
-	* HTML to display in the name area of the result. This property or <code>name</code> must be set
+	* HTML to display in the name area of the result. This property or <code>name</code> must be set.
 	* ^optional
 	* ^default=empty
-	* @type{String}
+	* @type {string}
 	*/
 	descriptionHTML: null,
 
 
 	/**
-	* URL for the icon to show in the result. Should be a local extension file URL or a HTTPS url
+	* URL for the icon to show in the result. Should be a local extension file URL or a HTTPS url.
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	iconUrl: null,
 
 	/**
-	* The name of the route to navigate to when the autocomplete search result is selected
+	* The name of the route to navigate to when the autocomplete search result is selected.
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	routeName: null,
 
 	/**
-	* The parameters of the route being navigated to when the autocomplete search result is selected
+	* The parameters of the route being navigated to when the autocomplete search result is selected.
 	* ^optional
 	* ^default=[]
 	* @type {String[]}
@@ -133,10 +133,10 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	routeParams: null,
 
 	/**
-	* An external URL to navigate to when the autocomplete search result is selected
+	* An external URL to navigate to when the autocomplete search result is selected.
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	externalURL: null
 };
@@ -146,20 +146,20 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 * @class
 * This type is passed into the
 * <code>Search.registerSearchQueryRewriter</code> method as a way to add
-* rewrite search queries
+* rewrite search queries.
 */
 var SearchQueryRewriter = /** @lends SearchQueryRewriter */ {
 
 	/**
 	* The query term that you'd like to rewrite/replace. No wildcards are currently supported.
 	* Currently it must begin with "app:" or "has:".
-	* @type{String}
+	* @type {string}
 	*/
-	term:  null,
+	term: null,
 
 	/**
-	* A function which takes returns a String (or Promise) with the query to actually perform
-	* @type{function}
+	* A function which takes returns a String (or Promise) with the query to actually perform.
+	* @type {function}
 	*/
 	termReplacer: null
 };

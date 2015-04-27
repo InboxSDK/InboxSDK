@@ -9,7 +9,7 @@ var memberMap = new WeakMap();
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
 * itself as well as change the state of the UI.MessageViews have a view state as well as a loaded state. These
-* 2 properties are orthoganal to each other.
+* 2 properties are orthogonal to each other.
 *
 * A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
 * Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
@@ -40,7 +40,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/**
 	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
 	* preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
-	* @param {AttachmentCardOptions} cardOptions - the configuration of the AttachmentCardView to create
+	* @param {AttachmentCardOptions} cardOptions - The configuration of the AttachmentCardView to create.
 	* @return {AttachmentCardView}
 	*/
 	addAttachmentCardView: function(cardOptions){
@@ -55,7 +55,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* Adds an <code>AttachmentCardView</code> to the message. Using this method instead of <code>addAttachmentCardView</code>
 	* indicates to the SDK that you don't have a preview image available and instead want to show the image of a icon in the
 	* thumbnail area instead. The SDK will then render this appropriately.
-	* @param {AttachmentCardNoPreviewOptions} cardOptions - the configuration of the AttachmentCardView to create
+	* @param {AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
 	* @return {AttachmentCardView}
 	*/
 	addAttachmentCardViewNoPreview: function(cardOptions){
@@ -67,7 +67,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
-	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - the configuration of the AttachmentCardView to create
+	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the AttachmentCardView to create.
 	* @return {void}
 	*/
 	addAttachmentsToolbarButton: function(buttonOptions){
@@ -88,7 +88,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	// returns array of attachment card views
 	/**
 	* Returns all the attachment card views currently visible for this message. Includes Gmail/Inbox native attachment
-	* cards as well as those added by applications
+	* cards as well as those added by applications.
 	* @return {AttachmentCardView[]}
 	*/
 	getAttachmentCardViews: function(){
@@ -138,7 +138,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	/**
-	* Get all the recipients of this message (to, cc, bcc)
+	* Get all the recipients of this message (to, cc, bcc).
 	* @return {Contact[]}
 	*/
 	getRecipients: function(){
@@ -146,7 +146,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	/**
-	* Get the <code>ThreadView</code> that this MessageView is in
+	* Get the <code>ThreadView</code> that this MessageView is in.
 	* @return {ThreadView}
 	*/
 	getThreadView: function(){
@@ -271,7 +271,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	title:null,
 
 	/**
-	* A description of the attachment card displayed subtly
+	* A description of the attachment card displayed subtly.
 	* @type {string}
 	*/
 	description:null,
@@ -279,7 +279,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	/**
 	* The url of an "open" or "preview" action for this attachment. The attachment cards primary action (clicking on the card)
 	* takes the user in a new window to the URL specified here. This is also the URL used if the user right clicks and copies
-	* the link address
+	* the link address.
 	* @type {string}
 	*/
 	previewUrl:null,
@@ -300,7 +300,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	previewOnClick:null,
 
 	/**
-	* The url of the icon of the attachment
+	* The url of the icon of the attachment.
 	* @type {boolean}
 	*/
 	fileIconImageUrl:null,
@@ -312,7 +312,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	buttons:null,
 
 	/**
-	* The color of the attachment card fold and an accompying accent color
+	* The color of the attachment card fold and an accompying accent color.
 	* ^optional
 	* ^default=#BEBEBE
 	* @type {string}
@@ -325,9 +325,10 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* the <code>previewThumbnailUrl</code> images are rendered full bleed to show as much
 	* of the image as possible. As such the hover UI looks slightly different.
 	*
-	* If null, it is assumed that the attachment is NOT an image mime type
+	* If null, it is assumed that the attachment is NOT an image mime type.
 	* ^optional
 	* ^default=null
+	* @type {string}
 	*/
 	mimeType: null
 };
@@ -352,7 +353,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	title:null,
 
 	/**
-	* A description of the attachment card displayed subtly
+	* A description of the attachment card displayed subtly.
 	* @type {string}
 	*/
 	description:null,
@@ -360,7 +361,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	/**
 	* The url of an "open" or "preview" action for this attachment. The attachment cards primary action (clicking on the card)
 	* takes the user in a new window to the URL specified here. This is also the URL used if the user right clicks and copies
-	* the link address
+	* the link address.
 	* @type {string}
 	*/
 	previewUrl:null,
@@ -381,19 +382,19 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	previewOnClick:null,
 
 	/**
-	* The url of the icon of the attachment
+	* The url of the icon of the attachment.
 	* @type {boolean}
 	*/
 	fileIconImageUrl:null,
 
 	/**
-	* An array of buttons to support functionality in addition to the preview functionality
+	* An array of buttons to support functionality in addition to the preview functionality.
 	* @type {DownloadButtonDescriptor[]|CustomButtonDescriptor[]}
 	*/
 	buttons:null,
 
 	/**
-	* The color of the attachment card fold and an accompying accent color
+	* The color of the attachment card fold and an accompying accent color.
 	* ^optional
 	* ^default=#BEBEBE
 	* @type {string}
@@ -423,7 +424,7 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	/**
 	*	Whether the download action should open in a new tab. It may be useful to open a new tab to perform the download if
 	* for example you want to sometimes redirect the user to a login or permission page. By default, the SDK will attempt
-	* to download the file in the same tab and not open a new one. This is typically a better user experience
+	* to download the file in the same tab and not open a new one. This is typically a better user experience.
 	* ^optional
 	* ^default=false
 	* @type {boolean}
@@ -437,13 +438,13 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 
 	/**
-	* The icon to use. Use a white image with transparent background for consistency
+	* The icon to use. Use a white image with transparent background for consistency.
 	* @type {string}
 	*/
 	iconUrl:null,
 
 	/**
-	* The tooltip to show when the user hovers over the button
+	* The tooltip to show when the user hovers over the button.
 	* @type {string}
 	*/
 	tooltip:null,
@@ -464,25 +465,25 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 
 	/**
-	* The anchor text of the link
+	* The anchor text of the link.
 	* @type {string}
 	*/
 	text:null,
 
 	/**
-	* The html string of the link found
+	* The html string of the link found.
 	* @type {string}
 	*/
 	html:null,
 
 	/**
-	* The actual <code>HTMLElement</code> of the link found
+	* The actual <code>HTMLElement</code> of the link found.
 	* @type {function(event)}
 	*/
 	element:null,
 
 	/**
-	* The url of the link
+	* The url of the link.
 	* @type {string}
 	*/
 	href:null,
@@ -500,7 +501,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDescriptor */{
 
 	/**
-	* The tooltip of the button
+	* The tooltip of the button.
 	* @type {string}
 	*/
 	tooltip:null,

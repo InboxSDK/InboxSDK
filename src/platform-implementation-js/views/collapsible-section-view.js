@@ -31,7 +31,8 @@ CollapsibleSectionView.prototype = Object.create(SectionView.prototype);
 _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ {
 
 	/**
-	* @param value {boolean} whether to set the
+	* @param {boolean} value - Whether to collapse (minimize) the section view.
+	* @return {void}
 	*/
 	setCollapsed: function(value){
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
@@ -58,17 +59,17 @@ _.extend(CollapsibleSectionView.prototype, /** @lends CollapsibleSectionView */ 
 	}
 
 	/**
-	* Fires when the CollapsibleSectionView is no longer visible
+	* Fires when the CollapsibleSectionView is no longer visible.
 	* @event CollapsibleSectionView#destroy
 	*/
 
 	/**
-	* Fires when the CollapsibleSectionView is expanded
+	* Fires when the CollapsibleSectionView is expanded.
 	* @event CollapsibleSectionView#expanded
 	*/
 
 	/**
-	* Fires when the CollapsibleSectionView is collapsed
+	* Fires when the CollapsibleSectionView is collapsed.
 	* @event CollapsibleSectionView#collapsed
 	*/
 
