@@ -106,7 +106,7 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	},
 
 	/**
-	* Registers your handler to be called when the user navigates to a MessageView. Your handler is given a
+	* Registers your handler to be called when a MessageView is displayed. Your handler is given a
 	* MessageView which you can then further manipulate.
 	*
 	* IMPORTANT: Your handler will only be called for MessageViews that are "loaded". See docs for
