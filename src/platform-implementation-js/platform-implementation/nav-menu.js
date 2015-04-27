@@ -24,7 +24,7 @@ var memberMap = new WeakMap();
 *
 * Items can also have accessories which provide secondary actions like opening a dropdown (like Gmails labels) or
 * providing a "create new" action. There are several predefined accesories, see <code>CreateAccessoryDescriptor</code>,
-* <code>IconButtonAccessoryDescriptor</code> or <code>DropdownButtonAccessoryDescriptor</code>
+* <code>IconButtonAccessoryDescriptor</code> or <code>DropdownButtonAccessoryDescriptor</code>.
 */
 var NavMenu = function(appId, driver, membraneMap){
 	var members = {};
@@ -43,7 +43,7 @@ _.extend(NavMenu.prototype, /** @lends NavMenu */{
 	/**
 	* Adds a navigation item to the root of the navigation menu. Navigation items from your app are grouped together
 	* where possible but ultimately the SDK optimizes for the best user experience when displaying navigation items.
-	* @param {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
+	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
 	* @return {NavItemView}
 	*/
 	addNavItem: function(navItemDescriptor){
@@ -88,13 +88,13 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	name: null,
 
 	/**
-	* The ID of the route to navigate to when the NavItemView is clicked on
+	* The ID of the route to navigate to when the NavItemView is clicked on.
 	* @type {string}
 	*/
 	routeID: null,
 
 	/**
-	* The parameters of the route being navigated to when the NavItemView is clicked on
+	* The parameters of the route being navigated to when the NavItemView is clicked on.
 	* @type {string[]}
 	*/
 	routeParams: null,
@@ -125,7 +125,7 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	iconUrl: null,
 
 	/**
-	* An optional class to apply to the icon
+	* An optional class to apply to the icon.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -173,13 +173,13 @@ var IconButtonAccessoryDescriptor = /** @lends IconButtonAccessoryDescriptor */ 
 	onClick: null,
 
 	/**
-		* A URL for the icon to be displayed in the button
+		* A URL for the icon to be displayed in the button.
 		* @type {string}
 	*/
 	iconUrl: null,
 
 	/**
-	* An optional class to add to the icon
+	* An optional class to add to the icon.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -201,13 +201,13 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
 	type: 'DROPDOWN_BUTTON',
 
 	/**
-	* The color of the background of the dropdown button
+	* The color of the background of the dropdown button.
 	* @type {string}
 	*/
 	buttonBackgroundColor: null,
 
 	/**
-	* The color of the foreground of the dropdown button
+	* The color of the foreground of the dropdown button.
 	* @type {string}
 	*/
 	buttonForegroundColor: null,

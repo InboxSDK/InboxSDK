@@ -76,7 +76,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Closes the compose window
+	* Closes the compose window.
 	* @return {void}
 	*/
 	close: function(){
@@ -84,7 +84,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns the HTMLElement of the body of the compose view
+	* Returns the HTMLElement of the body of the compose view.
 	* @return {HTMLElement}
 	*/
 	getBodyElement: function(){
@@ -97,7 +97,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns an html string of the contents of the body of the compose view
+	* Returns an html string of the contents of the body of the compose view.
 	* @return {string}
 	*/
 	getHTMLContent: function(){
@@ -121,7 +121,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns a plain string containing the subject of the email
+	* Returns a plain string containing the subject of the email.
 	* @return {string}
 	*/
 	getSubject: function(){
@@ -129,7 +129,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns a plain text string containing all the text of the email body
+	* Returns a plain text string containing all the text of the email body.
 	* @return {string}
 	*/
 	getTextContent: function(){
@@ -137,7 +137,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	 * Returns an array of objects containing the name and email address of all recipients on the TO line
+	 * Returns an array of objects containing the name and email address of all recipients on the TO line.
 	 * @return {Contact[]}
 	 */
 	getToRecipients: function(){
@@ -145,7 +145,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns an array of objects containing the name and email address of all recipients on the CC line
+	* Returns an array of objects containing the name and email address of all recipients on the CC line.
 	* @return {Contact[]}
 	*/
 	getCcRecipients: function(){
@@ -153,7 +153,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Returns an array of objects containing the name and email address of all recipients on the BCC line
+	* Returns an array of objects containing the name and email address of all recipients on the BCC line.
 	* @return {Contact[]}
 	*/
 	getBccRecipients: function(){
@@ -163,9 +163,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
 	* If anything inside the body is selected, it will be replaced.
-	* Returns the root HTMLElement of the inserted link
+	* Returns the root HTMLElement of the inserted link.
 	*
-	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element
+	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element.
 	* @return {HTMLElement}
 	*/
 	insertHTMLIntoBodyAtCursor: function(html){
@@ -181,7 +181,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* @param {string} text - The anchor text of the link to insert.
 	* @param {string} url - The URL of the link to insert.
 	* @param {string} iconUrl - The URL of the icon that will be shown in the chip.
-	* Returns the HTMLElement of the inserted chip
+	* Returns the HTMLElement of the inserted chip.
 	*
 	* @return {HTMLElement}
 	*
@@ -202,7 +202,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places a link inside the body of the message at the cursor or at the beginning of the message
 	* if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
-	* Returns the HTMLElement of the inserted link
+	* Returns the HTMLElement of the inserted link.
 	*
 	* @param {string} text - The anchor text of the link to insert.
 	* @param {string} url - The URL of the link to insert.
@@ -216,7 +216,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not
 	* in the body of the message. If anything inside the body is selected, it will be replaced.
-	* @param {string} text - the text to insert
+	* @param {string} text - The text to insert.
 	* @return {void}
 	*/
 	insertTextIntoBodyAtCursor: function(text){
@@ -225,7 +225,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 
 	/**
-	* whether or not this compose view is an inline reply. Inline replies are used by Gmail and Inbox when responding
+	* Whether or not this compose view is an inline reply. Inline replies are used by Gmail and Inbox when responding
 	* to a message right underneath the original message. You typically will not need to use this.
 	* @return {boolean}
 	*/
@@ -234,7 +234,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
+	* Whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
 	* You typically will not need to use this.
 	* @return {boolean}
 	*/
@@ -296,37 +296,37 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Fires when any of the To/Cc/Bcc fields are changed. The passed in callback will receive an object which splits out
-	* what happened. {to: {added: [{Contact}], removed: [{Contact}]}, cc: {added: [{Contact}], removed: [{Contact}]}, bcc: {added: [{Contact}], removed: [{Contact}]}}
+	* what happened. {to: {added: [{Contact}], removed: [{Contact}]}, cc: {added: [{Contact}], removed: [{Contact}]}, bcc: {added: [{Contact}], removed: [{Contact}]}}.
 	* @event ComposeView#recipientsChanged
 	*/
 
 	/**
-	 * Fires when a to contact is added
+	 * Fires when a to contact is added.
 	 * @event ComposeView#toContactAdded
 	 */
 
 	/**
-	 * Fires when a to contact is removed
+	 * Fires when a to contact is removed.
 	 * @event ComposeView#toContactRemoved
 	 */
 
 	/**
-	 * Fires when a CC contact is added
+	 * Fires when a CC contact is added.
 	 * @event ComposeView#ccContactAdded
 	 */
 
 	/**
-	 * Fires when a CC contact is removed
+	 * Fires when a CC contact is removed.
 	 * @event ComposeView#ccContactRemoved
 	 */
 
 	/**
-	 * Fires when BCC to contact is added
+	 * Fires when BCC to contact is added.
 	 * @event ComposeView#bccContactAdded
 	 */
 
 	/**
-	 * Fires when a BCC contact is removed
+	 * Fires when a BCC contact is removed.
 	 * @event ComposeView#bccContactRemoved
 	 */
 });
@@ -355,7 +355,7 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	iconUrl:null,
 
 	/**
-	* An optional class to apply to the icon
+	* An optional class to apply to the icon.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -381,7 +381,7 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	/**
 	* There are currently two supported types of compose buttons, one which results in the message being sent and
 	* another which just modifies the current message but does not send it. The button is placed according to its
-	* type. The permissable values for type are <code>SEND_ACTION</code> and <code>MODIFIER</code>
+	* type. The permissable values for type are <code>SEND_ACTION</code> and <code>MODIFIER</code>.
 	* ^optional
 	* ^default=MODIFIER
 	* @type {string}
@@ -408,18 +408,18 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 
 /**
  * @class  Contact
- * Simple object that contains the email address and full name if it exists
+ * Simple object that contains the email address and full name if it exists.
  */
 var Contact = /** @lends Contact */ {
 
 	/**
-	 * email address of the contact
+	 * The email address of the contact.
 	 * @type {string}
 	 */
 	emailAddress: null,
 
 	/**
-	 * name of the contact, may be null
+	 * The name of the contact, may be null.
 	 * @type {string}
 	 */
 	name: null

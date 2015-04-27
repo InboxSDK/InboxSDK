@@ -50,7 +50,7 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
 	/**
 	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
-	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
 	* @return {void}
 	*/
 	registerToolbarButtonForList: function(buttonDescriptor){
@@ -59,7 +59,7 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
 	/**
 	* Registers a toolbar button to appear in a conversation view.
-	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - the options for the button
+	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
 	* @return {void}
 	*/
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
@@ -233,7 +233,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	iconUrl:null,
 
 	/**
-	* The section of the toolbar to place the button. Several different positions are defined in <code>Toolbars.ToolbarSections</code>
+	* The section of the toolbar to place the button. Several different positions are defined in <code>Toolbars.ToolbarSections</code>.
 	* @type {ToolbarSections}
 	*/
 	section:null,
@@ -259,7 +259,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	/**
 	* A function that determines when this toolbar button should be hidden. You may want to hide the
 	* toolbar button on certain Routes or in certain conditions. The function should return true when
-	* the toolbar button should be hidden. Your function is passed a <code>RouteView</code>
+	* the toolbar button should be hidden. Your function is passed a <code>RouteView</code>.
 	* ^optional
 	* ^default=null
 	* @type {function(RouteView)}
@@ -267,7 +267,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	hideFor:null,
 
 	/**
-	* The keyboard shortcut that will activate this button
+	* The keyboard shortcut that will activate this button.
 	* ^optional
 	* ^default=null
 	* @type {keyboardShortcutHandle}

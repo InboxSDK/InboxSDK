@@ -15,9 +15,9 @@ var InboxSDK = {
 /**
 * Loads the InboxSDK remotely and prepares it to be used.
 * @function
-* @param {string} version - the version of the SDK to load, the only acceptable value currently is "1"
-* @param {string} appId - the AppId that you registered for on the <a href="/register">AppId Registration page</a>
-* @return {Promise} a promise which resolves when the SDK is loaded and ready to be used
+* @param {string} version - The version of the SDK to load, the only acceptable value currently is "1".
+* @param {string} appId - The AppId that you registered for on the <a href="/register">AppId Registration page</a>.
+* @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
 */
 InboxSDK.load = function(version, appId, opts){
   opts = _.extend({
@@ -50,7 +50,7 @@ InboxSDK.load = function(version, appId, opts){
 /**
 * Loads a remote script into this extension's content script space and evals it
 * @function
-* @param {string} url - the URL of the remote script to load.
+* @param {string} url - The URL of the remote script to load.
 * @return {Promise} a promise which resolves when this script is finished downloading and eval'ing
 */
 

@@ -27,7 +27,7 @@ _.extend(Keyboard.prototype, /** @lends Keyboard */ {
   /**
   * This method creates a shortcut handle. A shortcut handle can be used in various APIs in
   * the SDK to keyboard enable them.
-  * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut
+  * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut.
   * @return {KeyboardShortcutHandle}
   */
   createShortcutHandle: function(shortcutDescriptor){
@@ -53,7 +53,7 @@ var KeyboardShortcutDescriptor = /** @lends KeyboardShortcutDescriptor */ {
   chord:  null,
 
   /**
-  * The description text that shows up in Gmail's keyboard shortcut help (when the user presses '?')
+  * The description text that shows up in Gmail's keyboard shortcut help (when the user presses '?').
   * @type {string}
   */
   description: null,

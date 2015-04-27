@@ -32,17 +32,17 @@ _.extend(ContentPanelView.prototype, /** @lends ContentPanelView */ {
 
     /**
     * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent
-    * times if the panel is presented in a tabbed interface and the ContentPanels tab is selected
+    * times if the panel is presented in a tabbed interface and the ContentPanels tab is selected.
     * @event ContentPanelView#activate
     */
 
     /**
-    * Fires when the content panel is hidden. Typically this occurs when the user switches to another ContentPanel
+    * Fires when the content panel is hidden. Typically this occurs when the user switches to another ContentPanel.
     * @event ContentPanelView#deactivate
     */
 
     /**
-    * Fires when the content panel view is no longer valid (i.e. the user navigates away from the thread with the sidebar)
+    * Fires when the content panel view is no longer valid (i.e. the user navigates away from the thread with the sidebar).
     * @event ContentPanelView#destroy
     */
 

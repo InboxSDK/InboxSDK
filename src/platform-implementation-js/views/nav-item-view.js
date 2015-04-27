@@ -38,7 +38,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 
 	/**
 	* Add a nested child NavItemView
-	* @param {NavItemDescriptor} navItemDescriptor - a single descriptor for the nav item or stream of NavItemDescriptors
+	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
 	* @return {NavItemView}
 	*/
 	addNavItem: function(navItemDescriptor){

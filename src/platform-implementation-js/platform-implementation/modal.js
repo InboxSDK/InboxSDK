@@ -28,7 +28,7 @@ _.extend(Modal.prototype, /** @lends Modal */{
 
   /**
   * This creates a ModalView and immediately calls .show() on it.
-  * @param {ModalOptions} options - The options to configure the returned ModalView
+  * @param {ModalOptions} options - The options to configure the returned ModalView.
   * @return {ModalView}
   */
 	show: function(options){
@@ -52,7 +52,7 @@ module.exports = Modal;
 
 /**
 * @class
-* The options used to configure a modal when calling <code>Modal.show()</code>
+* The options used to configure a modal when calling <code>Modal.show()</code>.
 */
 var ModalOptions = /** @lends ModalOptions */{
 
@@ -99,7 +99,7 @@ var ModalOptions = /** @lends ModalOptions */{
 var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
 
   /**
-  * The text displayed in the button
+  * The text displayed in the button.
   * @type {string}
   */
   text:null,

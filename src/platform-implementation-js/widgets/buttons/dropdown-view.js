@@ -20,7 +20,7 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	this._dropdownViewDriver = dropdownViewDriver;
 
 	/**
-	* The HTML element that is displayed in the dropdown
+	* The HTML element that is displayed in the dropdown.
 	* @type {HTMLElement}
 	*/
 	this.el = dropdownViewDriver.getContentElement();
@@ -73,7 +73,7 @@ _.extend(DropdownView.prototype, /** @lends DropdownView */ {
 	}
 
 	/**
-	* Fires when this DropdownView instance is closed
+	* Fires when this DropdownView instance is closed.
 	* @event DropdownView#destroy
 	*/
 });

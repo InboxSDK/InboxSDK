@@ -18,7 +18,7 @@ var memberMap = new WeakMap();
 * The <code>ComposeView</code> type is how you interact with compose windows in Gmail and Inbox. The most common way to get
 * access to a compose view is to use the {Compose.registerComposeViewHandler} method which calls you back
 * with every existing {ComposeView} and all future {ComposeView}s. From there a typical application will
-* modify the <code>ComposeView</code> as needed by adding buttons, adding content to the message or accessing the recipient data.
+* modify the <code>ComposeView</code> as needed by adding buttons, adding content to the message, or accessing the recipient data.
 * See {ComposeView} for a more comprehensive listing.
 */
 var Compose = function(appId, driver){
@@ -42,7 +42,7 @@ _.extend(Compose.prototype, /** @lends Compose */ {
   * area such as a new compose window or inline reply compose areas. This function returns another function
   * that can be used to unregister - simply call the function to unregister this handler.
   *
-  * @param handler {function(ComposeView)} the function to be called
+  * @param handler {function(ComposeView)} The function to be called.
   * @return {function} a function to call when you want to unregister this handler
   */
   registerComposeViewHandler: function(handler){
