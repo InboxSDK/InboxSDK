@@ -31,7 +31,7 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 	/**
 	* adds a button to this attachment card
-	* @param {DownloadButtonDescriptor|CustomButtonDescriptor}
+	* @param {DownloadButtonDescriptor|CustomButtonDescriptor} buttonDescriptor - the description of the button
 	* @return {void}
 	*/
 	addButton: function(buttonOptions){
