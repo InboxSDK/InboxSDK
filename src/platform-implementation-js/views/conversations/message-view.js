@@ -222,7 +222,7 @@ function _bindToEventStream(messageView, members, stream){
 		})
 		.onValue(function(event){
 			messageView.emit(event.eventName, {
-				contactType: event.type,
+				contactType: event.contactType,
 				contact: event.contact,
 				messageView: messageView,
 				threadView: messageView.getThreadView()
