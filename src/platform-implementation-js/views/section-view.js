@@ -256,7 +256,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	* A link to place in the footer of the SectionView
 	* ^optional
 	* ^default=null
-	* @type {String}
+	* @type {string}
 	*/
 	footerLinkText: null,
 

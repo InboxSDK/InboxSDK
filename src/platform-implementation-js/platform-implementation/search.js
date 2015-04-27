@@ -81,13 +81,13 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 
 	/**
 	* The name of the result to display. This property or <code>nameHTML</code> must be set
-	* @type{String}
+	* @type {string}
 	*/
 	name:  null,
 
 	/**
 	* HTML to display in the name area of the result. This property or <code>name</code> must be set
-	* @type{String}
+	* @type {string}
 	*/
 	nameHTML: null,
 
@@ -95,7 +95,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* The name of the result to display. This property or <code>nameHTML</code> must be set
 	* ^optional
 	* ^default=empty
-	* @type{String}
+	* @type {string}
 	*/
 	description:  null,
 
@@ -103,7 +103,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* HTML to display in the name area of the result. This property or <code>name</code> must be set
 	* ^optional
 	* ^default=empty
-	* @type{String}
+	* @type {string}
 	*/
 	descriptionHTML: null,
 
@@ -112,7 +112,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* URL for the icon to show in the result. Should be a local extension file URL or a HTTPS url
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	iconUrl: null,
 
@@ -120,7 +120,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* The name of the route to navigate to when the autocomplete search result is selected
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	routeName: null,
 
@@ -136,7 +136,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* An external URL to navigate to when the autocomplete search result is selected
 	* ^optional
 	* ^default=empty
-	* @type {String}
+	* @type {string}
 	*/
 	externalURL: null
 };
