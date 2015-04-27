@@ -248,7 +248,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	onClick:null,
 
 	/**
-	* If true, the button will open a dropdown menu below it, and the event object will have a dropdown property that
+	* If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
 	* allows the dropdown to be customized when opened.
 	* ^optional
 	* ^default=false

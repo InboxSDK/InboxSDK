@@ -244,9 +244,12 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   onClick:null,
 
   /**
-  * Whether this button should open a dropdown when clicked
-  * @type {boolean}
-  */
+	* If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
+	* allows the dropdown to be customized when opened.
+	* ^optional
+	* ^default=false
+	* @type {boolean}
+	*/
   hasDropdown:null
 };
 
