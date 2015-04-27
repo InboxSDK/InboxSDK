@@ -355,6 +355,14 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	iconUrl:null,
 
 	/**
+	* An optional class to apply to the icon
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass:null,
+
+	/**
 	* This is called when the button is clicked, and gets passed an event object. The event object will have a composeView
 	* object and optionally a dropdown property if the button had a dropdown.
 	* @type {function(event)}
