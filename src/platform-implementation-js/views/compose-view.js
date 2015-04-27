@@ -77,6 +77,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* closes the compose window
+	* @return {void}
 	*/
 	close: function(){
 		memberMap.get(this).composeViewImplementation.close();

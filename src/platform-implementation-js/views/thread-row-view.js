@@ -107,6 +107,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   /**
   * Gets the number of visible draft messages in the row. This is purely an estimate based on
   * what is visible in the row.
+  * @return {number}
   */
   getVisibleDraftCount: function() {
     return this._threadRowViewDriver.getVisibleDraftCount();
@@ -114,6 +115,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
   * Gets the number of visible messages in the thread based on the visible numeric marker
+  * @return {number}
   */
   getVisibleMessageCount: function() {
     return this._threadRowViewDriver.getVisibleMessageCount();

@@ -142,7 +142,7 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 
 	/**
 	* The element to display in the content panel
-	* @type{Element}
+	* @type {HTMLElement}
 	*/
 	el:  null,
 
@@ -163,7 +163,7 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 	 * If multiple content panels for your app are added then they will be ordered by this value
 	 * ^optional
 	 * ^default=0
-	 * @type{number}
+	 * @type {number}
 	 */
 	orderHint: null
 };

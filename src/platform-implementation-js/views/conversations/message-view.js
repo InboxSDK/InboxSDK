@@ -328,6 +328,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* If null, it is assumed that the attachment is NOT an image mime type
 	* ^optional
 	* ^default=null
+	* @type {string}
 	*/
 	mimeType: null
 };

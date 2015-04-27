@@ -153,13 +153,13 @@ var SearchQueryRewriter = /** @lends SearchQueryRewriter */ {
 	/**
 	* The query term that you'd like to rewrite/replace. No wildcards are currently supported.
 	* Currently it must begin with "app:" or "has:".
-	* @type{String}
+	* @type {string}
 	*/
-	term:  null,
+	term: null,
 
 	/**
 	* A function which takes returns a String (or Promise) with the query to actually perform
-	* @type{function}
+	* @type {function}
 	*/
 	termReplacer: null
 };
