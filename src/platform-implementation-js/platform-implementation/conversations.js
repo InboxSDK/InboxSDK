@@ -14,7 +14,7 @@ var memberMap = new WeakMap();
 * @class
 * This namespace allows you to interact with Gmail and Inbox conversations (typically called threads). The fundamental
 * views you interact with are ThreadView and MessageView and there is a 1 to many relationship between them. The functions
-* in Conversationns.* allow you to obtain these views which you can then further manipulate.
+* in Conversations.* allow you to obtain these views which you can then further manipulate.
 *
 * It's important to note that ThreadViews and MessageViews can be navigated to in various ways by the user depending on their
 * email client and their settings (i.e. preview pane on in Gmail). This is abstracted completely away from you so you can just
