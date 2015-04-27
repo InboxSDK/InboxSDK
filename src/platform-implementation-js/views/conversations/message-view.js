@@ -9,7 +9,7 @@ var memberMap = new WeakMap();
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
 * itself as well as change the state of the UI.MessageViews have a view state as well as a loaded state. These
-* 2 properties are orthoganal to each other.
+* 2 properties are orthogonal to each other.
 *
 * A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
 * Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
