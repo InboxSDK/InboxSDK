@@ -163,9 +163,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
 	* If anything inside the body is selected, it will be replaced.
-	* Returns the root noHTMLElement of the inserted link
+	* Returns the root HTMLElement of the inserted link
 	*
-	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element  (HTMLElement)
+	* @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element
 	* @return {HTMLElement}
 	*/
 	insertHTMLIntoBodyAtCursor: function(html){
