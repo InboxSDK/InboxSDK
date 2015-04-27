@@ -31,8 +31,8 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	/**
 	 * Inserts a content panel into the sidebar of a thread view. A content panel simply displays your content to the user, typically
 	 * in the form of a sidebar. ThreadViewss can have multiple content panels added to them and the SDK will handle creating a tabbed
-	 * interface if needed
-	 * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the thread's sidebar
+	 * interface if needed.
+	 * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the thread's sidebar.
 	 * @return {ContentPanelView}
 	 */
 	addSidebarContentPanel: function(descriptor){
@@ -94,13 +94,13 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 
 
 	/**
-	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}
+	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}.
 	 * @event ThreadView#contactHover
 	 *
 	 */
 
 	/**
-	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread)
+	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread).
 	 * @event ThreadView#destroy
 	 */
 
@@ -141,26 +141,26 @@ function _bindToStreamEvents(threadView, threadViewImplementation){
 var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 
 	/**
-	* The element to display in the content panel
+	* The element to display in the content panel.
 	* @type {HTMLElement}
 	*/
 	el:  null,
 
 	/**
-	 * The text to show in the tab
+	 * The text to show in the tab.
 	 * @type {string}
 	 */
 	title: null,
 
 
 	/**
-	 * URL for the icon to show in the tab. Should be a local extension file URL or a HTTPS url
+	 * URL for the icon to show in the tab. Should be a local extension file URL or a HTTPS url.
 	 * @type {string}
 	 */
 	iconUrl: null,
 
 	/**
-	 * If multiple content panels for your app are added then they will be ordered by this value
+	 * If multiple content panels for your app are added then they will be ordered by this value.
 	 * ^optional
 	 * ^default=0
 	 * @type {number}

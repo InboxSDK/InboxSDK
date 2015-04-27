@@ -33,7 +33,7 @@ SectionView.prototype = Object.create(EventEmitter.prototype);
 _.extend(SectionView.prototype, /** @lends SectionView */ {
 
 	/**
-	* Removes this section from the current Route
+	* Removes this section from the current Route.
 	* @return {void}
 	*/
 	remove: function(){
@@ -53,7 +53,7 @@ _.extend(SectionView.prototype, /** @lends SectionView */ {
 	}
 
 	/**
-	* Fires when the CollapsibleSectionView is no longer visible
+	* Fires when the CollapsibleSectionView is no longer visible.
 	* @event SectionView#destroy
 	*/
 
@@ -135,7 +135,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 	shortDetailText: null,
 
 	/**
-	* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles
+	* Whether the row should be rendered as read or unread similar to Gmail and Inbox styles.
 	* @type {string}
 	*/
 	isRead: null,
@@ -155,7 +155,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 	iconUrl: null,
 
 	/**
-	* An optional class to apply to the icon
+	* An optional class to apply to the icon.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -163,7 +163,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 	iconClass: null,
 
 	/**
-	 * The name of the route to navigate to when the row is clicked on
+	 * The name of the route to navigate to when the row is clicked on.
 	 * ^optional
 	 * ^default=null
 	 * @type {string}
@@ -171,7 +171,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 	routeID: null,
 
 	/**
-	 * The parameters of the route being navigated to when the row is clicked on
+	 * The parameters of the route being navigated to when the row is clicked on.
 	 * ^optional
 	 * ^default=null
 	 * @type {string[]}
@@ -180,7 +180,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 
 
 	/**
-	 * Callback for when the row is clicked on
+	 * Callback for when the row is clicked on.
 	 * ^optional
 	 * ^default=null
 	 * @type {function}
@@ -192,7 +192,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 
 /**
 * @class
-* The properties required to create a SectionView or CollapsibleSectionView
+* The properties required to create a SectionView or CollapsibleSectionView.
 */
 var SectionDescriptor = /** @lends SectionDescriptor */ {
 
@@ -220,7 +220,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	titleLinkText: null,
 
 	/**
-	* A function to call when the title link has been clicked
+	* A function to call when the title link has been clicked.
 	* ^optional
 	* ^default=null
 	* @type {function()}
@@ -228,7 +228,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	onTitleLinkClick: null,
 
 	/**
-	* Whether to display a dropdown arrow for more options on the collapsible section
+	* Whether to display a dropdown arrow for more options on the collapsible section.
 	* ^optional
 	* ^default=false
 	* @type {boolean}
@@ -245,7 +245,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	onDropdownClick: null,
 
 	/**
-	* An arbitrary HTML element to place above the table rows but below the title
+	* An arbitrary HTML element to place above the table rows but below the title.
 	* ^optional
 	* ^default=null
 	* @type {HTMLElement}
@@ -253,7 +253,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	contentElement: null,
 
 	/**
-	* A link to place in the footer of the SectionView
+	* A link to place in the footer of the SectionView.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -261,7 +261,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	footerLinkText: null,
 
 	/**
-	* A function to call when the link in the footer is clicked
+	* A function to call when the link in the footer is clicked.
 	* ^optional
 	* ^default=null
 	* @type {function()}

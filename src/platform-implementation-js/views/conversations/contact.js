@@ -7,13 +7,13 @@
 var Contact = /** @lends Contact */ {
 
 	/**
-	 * The name of the contact
+	 * The name of the contact, may be null.
 	 * @type {string}
 	 */
 	name: null,
 
 	/**
-	 * The email address of the contact
+	 * The email address of the contact.
 	 * @type {string}
 	 */
 	emailAddress: null
