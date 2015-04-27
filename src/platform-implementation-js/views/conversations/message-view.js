@@ -187,15 +187,23 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/**
 	 * Fires when message viewState is changed
 	 * @event MessageView#viewStateChange
+	 * @param {string} newViewState - the new state the message view is in
+	 * @param {string} oldViewState - the old state the message view was in
+	 * @param {MessageView} messageView - the message view whose state changed
 	 */
 
 	/**
-	 * Fires when the user hovers over a contact. {ContactHoverEvent}
+	 * Fires when the user hovers over a contact.
 	 * @event MessageView#contactHover
+	 * @param {Contact} contact - the contact that was hovered over
+	 * @param {string} contactType - whether the hovered contact was a 'sender' or 'recipient'
+	 * @param {MessageView} messageView - the message view that the contact was a part of
+	 * @param {ThreadView} threadView - the thread view that the contact was a part of
 	 */
 
 	 /**
-	* Fires when the data for a message is loaded. This can happen when the message view is first presented or later when the user chooses to expand its view state.
+	* Fires when the data for a message is loaded. This can happen when the message view is
+	* first presented or later when the user chooses to expand its view state.
 	* @event MessageView#load
 	*/
 
