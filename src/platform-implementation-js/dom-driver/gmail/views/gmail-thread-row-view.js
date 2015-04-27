@@ -608,8 +608,8 @@ _.extend(GmailThreadRowView.prototype, {
               }
             };
             dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
-            this._modifications.replacedDate.claimed.push(dateMod);
           }
+          this._modifications.replacedDate.claimed.push(dateMod);
         }
 
         dateMod.el.textContent = opts.text;
