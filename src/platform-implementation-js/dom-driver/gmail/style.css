@@ -187,6 +187,9 @@ div.T-I.inboxsdk__button {
   margin-left: 2px;
 }
 
+span.inboxsdk__thread_row_custom_date + span:not(.inboxsdk__thread_row_custom_date) {
+  display: none;
+}
 
 .inboxsdk__thread_row_attachment_icon {
   margin-left: 3px;
