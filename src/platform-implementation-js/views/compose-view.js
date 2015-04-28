@@ -280,9 +280,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Fires when an AJAX request to Gmail/Inbox has been initiated but the response has not yet been
-	* received. The event object contains a <code>composeView</code> property, however, any modifications
-	* you make will not have an effect as the AJAX request has already been sent. You'd typically use this
-	* event to record stats about what messages are being sent.
+	* received. Any modifications you make to the {ComposeView} at this point will not have an effect
+	* as the AJAX request has already been sent. You'd typically use this event to record stats about
+	* what messages are being sent.
 	* @event ComposeView#sending
 	*/
 
