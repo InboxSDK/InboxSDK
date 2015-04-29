@@ -296,9 +296,14 @@ export default class GmailComposeView {
 		return this._composeID;
 	}
 
-	getDraftID()  {
+	getMessageID()  {
 		const input = this._element.querySelector('input[name="draft"]');
-		return input && input.value;
+		return input && input.value && input.value != 'undefined' ? input.value : null;
+	}
+
+	getThreadID() {
+		const input = this._element.querySelector('input[name="rm"]');
+		return input && input.value && input.value != 'undefined' ? input.value : null;
 	}
 
 	getRecipientRowElements() {

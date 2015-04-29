@@ -97,6 +97,25 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
+	* Returns the message ID of the draft. If Gmail has not assigned a message ID
+	* yet, then this will be null. Note that Gmail regenerates a new message ID
+	* whenever the draft is modified!
+	* @return {string}
+	*/
+	getMessageID: function() {
+		return memberMap.get(this).composeViewImplementation.getMessageID();
+	},
+
+	/**
+	* Returns the thread ID of the draft. If the draft is not a reply, then this
+	* will be null.
+	* @return {string}
+	*/
+	getThreadID: function() {
+		return memberMap.get(this).composeViewImplementation.getThreadID();
+	},
+
+	/**
 	* Returns an html string of the contents of the body of the compose view.
 	* @return {string}
 	*/

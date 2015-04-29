@@ -1,6 +1,8 @@
 InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
+		console.log('thread id', composeView.getThreadID());
+		console.log('message id', composeView.getMessageID());
 
 		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 		var monkeyIndex = 1;
