@@ -139,7 +139,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
 /**
 * @class
-* This type is used to describe labels that you add to <code>ThreadRowView</code> and <code>CollapsibleSectionView</code>.
+* This type is used to describe labels that you add to {ThreadRowView} and {CollapsibleSectionView}.
 */
 var LabelDescriptor = /** @lends LabelDescriptor */{
 
@@ -179,7 +179,7 @@ var LabelDescriptor = /** @lends LabelDescriptor */{
 
 /**
 * @class
-* This type is used to describe images that you add to <code>ThreadRowView</code>.
+* This type is used to describe images that you add to {ThreadRowView}.
 */
 var ImageDescriptor = /** @lends ImageDescriptor */{
 
@@ -217,7 +217,7 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
 
 /**
 * @class
-* This type is used to describe a button you add to a <code>ThreadRowView</code>.
+* This type is used to describe a button you add to a {ThreadRowView}.
 */
 var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
@@ -237,8 +237,8 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
   /**
   * A handler that gets called when the button is clicked on. The event object contains a
-  * <code>threadRowView</code> property and optionally a <code>dropdown</code> property if
-  * the <code>hasDropdown</code> was set to <code>true</code>.
+  * {threadRowView} property and optionally a {dropdown} property if
+  * the {hasDropdown} was set to {true}.
   * @type {func(event)}
   */
   onClick:null,
@@ -256,7 +256,7 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
 /**
 * @class
-* This type is used to describe a button you add to a <code>ThreadRowView</code>.
+* This type is used to describe a button you add to a {ThreadRowView}.
 */
 var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescriptor */{
 
@@ -284,7 +284,7 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
 
 /**
 * @class
-* This type is used to describe a button you add to a <code>ThreadRowView</code>.
+* This type is used to describe a button you add to a {ThreadRowView}.
 */
 var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
 

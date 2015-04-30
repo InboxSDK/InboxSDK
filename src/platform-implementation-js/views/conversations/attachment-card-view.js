@@ -18,10 +18,10 @@ _.extend(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 
 	/**
 	* Returns the type of the attachment card. Permissable values are
-	* <code>FILE</code> (regular file attachments), <code>DRIVE</code> (Drive attachments that are
-	*  present as links in the message), <code>FILE_IMAGE</code> (Image attachments),
-	* <code>CUSTOM</code> (attachment cards added by this or other apps built on the SDK) or
-	* <code>OTHER</code> (other types of attachments rendered by Gmail/Inbox such as YouTube or Yelp links).
+	* {FILE} (regular file attachments), {DRIVE} (Drive attachments that are
+	*  present as links in the message), {FILE_IMAGE} (Image attachments),
+	* {CUSTOM} (attachment cards added by this or other apps built on the SDK) or
+	* {OTHER} (other types of attachments rendered by Gmail/Inbox such as YouTube or Yelp links).
 	* @return {string}
 	*/
 	getAttachmentType: function(){

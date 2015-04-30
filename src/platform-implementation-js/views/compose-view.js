@@ -412,7 +412,7 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	/**
 	* There are currently two supported types of compose buttons, one which results in the message being sent and
 	* another which just modifies the current message but does not send it. The button is placed according to its
-	* type. The permissable values for type are <code>SEND_ACTION</code> and <code>MODIFIER</code>.
+	* type. The permissable values for type are {SEND_ACTION} and {MODIFIER}.
 	* ^optional
 	* ^default=MODIFIER
 	* @type {string}

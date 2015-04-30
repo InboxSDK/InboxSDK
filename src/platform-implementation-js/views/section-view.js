@@ -237,7 +237,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 
 	/**
 	* A function to call when the dropdown is opened. Your function is passed an
-	* event object with a single <code>dropdown</code> property.
+	* event object with a single {dropdown} property.
 	* ^optional
 	* ^default=null
 	* @type {func(event)}
