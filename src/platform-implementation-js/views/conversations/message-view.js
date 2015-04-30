@@ -8,17 +8,17 @@ var memberMap = new WeakMap();
 /**
 * @class
 * Object that represents a visible message in the UI. There are properties to access data about the message
-* itself as well as change the state of the UI.MessageViews have a view state as well as a loaded state. These
+* itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These
 * 2 properties are orthogonal to each other.
 *
-* A messages' view state can be one of <code>EXPANDED</code>, <code>COLLAPPSED</code> or <code>HIDDEN</code>.
+* A messages' view state can be one of {MessageViewViewStates.EXPANDED}, {MessageViewViewStates.COLLAPPSED} or {MessageViewViewStates.HIDDEN}.
 * Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
 * to show a user. These values are described in the enum {MessageViewViewStates}.
 *
 * The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI.
 * In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view
-* state is COLLAPSED or HIDDEN. You should not depend on any relationship between the view state and load state. Instead,
-* use the provided <code>getViewState</code> and <code>isLoaded</code> methods.
+* state is {COLLAPSED} or {HIDDEN}. You should not depend on any relationship between the view state and load state. Instead,
+* use the provided {MessageView.getViewState()} and {MessageView.isLoaded()} methods.
 */
 var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations){
 	EventEmitter.call(this);
@@ -38,7 +38,7 @@ MessageView.prototype = Object.create(EventEmitter.prototype);
 _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/**
-	* Adds an <code>AttachmentCardView</code> to the message. Each message has an area where attachments of that message are shown as a set of
+	* Adds an {AttachmentCardView} to the message. Each message has an area where attachments of that message are shown as a set of
 	* preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
 	* @param {AttachmentCardOptions} cardOptions - The configuration of the AttachmentCardView to create.
 	* @return {AttachmentCardView}
@@ -52,7 +52,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 
 	/**
-	* Adds an <code>AttachmentCardView</code> to the message. Using this method instead of <code>addAttachmentCardView</code>
+	* Adds an {AttachmentCardView} to the message. Using this method instead of {MessageView.addAttachmentCardView()}
 	* indicates to the SDK that you don't have a preview image available and instead want to show the image of a icon in the
 	* thumbnail area instead. The SDK will then render this appropriately.
 	* @param {AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
@@ -100,7 +100,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/**
 	* Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful
-	* when you want to parse through the contents of the <code>HTMLElement</code> returned by <code>getContentsElement</code>
+	* when you want to parse through the contents of the {HTMLElement} returned by {MessageView.getBodyElement()}
 	* and test whether one if its children is in the qouted area (because you'll usually ignore those elements).
 	* @return {boolean}
 	*/
@@ -111,7 +111,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	/**
 	* Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on
 	* this object may return empty results. There is no way to set the load state to true directly. If you require this message
-	* to be loaded, you should set the view state to <code>EXPANDED</code>.
+	* to be loaded, you should set the view state to {MessageViewViewStates.EXPANDED}.
 	* @return {boolean}
 	*/
 	isLoaded: function() {
@@ -146,7 +146,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	/**
-	* Get the <code>ThreadView</code> that this MessageView is in.
+	* Get the {ThreadView} that this MessageView is in.
 	* @return {ThreadView}
 	*/
 	getThreadView: function(){
@@ -156,10 +156,10 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 
 	/**
 	* Returns the view state of this Message view. The possible view states are
-	* <code>Conversations.MessageViewViewStates.HIDDEN</code> (no information visible),
-	* <code>Conversations.MessageViewViewStates.COLLAPSED</code> (partial information visible) or
-	* <code>Conversations.MessageViewViewStates.EXPANDED</code>
-	* @return {Conversation.MessageViewViewState}
+	* {MessageViewViewStates.HIDDEN} (no information visible),
+	* {MessageViewViewStates.COLLAPSED} (partial information visible) or
+	* {MessageViewViewStates.EXPANDED}
+	* @return {MessageViewViewState}
 	*/
 	getViewState: function() {
 		var members = memberMap.get(this);
@@ -265,7 +265,7 @@ module.exports = MessageView;
 
 /**
 * @class
-* This type is required by the <code>MessageView.addAttachmentCard</code> method to insert an <code>AttachmentCardView</code>
+* This type is required by the {MessageView.addAttachmentCard()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
@@ -301,7 +301,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	/**
 	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
 	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
-	* one property - <code>attachmentCardView</code>. It also has a <code>preventDefault()</code> function. Calling
+	* one property - {attachmentCardView}. It also has a {preventDefault()} function. Calling
 	* this function prevents the preview from opening in a new window.
 	* @type {function(event)}
 	*/
@@ -330,7 +330,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	/**
 	* The mime type of the attachment if it has one. This is used to render image
 	* mime types slightly differently to be consistent with Gmail and Inbox. Specifically,
-	* the <code>previewThumbnailUrl</code> images are rendered full bleed to show as much
+	* the {previewThumbnailUrl} images are rendered full bleed to show as much
 	* of the image as possible. As such the hover UI looks slightly different.
 	*
 	* If null, it is assumed that the attachment is NOT an image mime type.
@@ -344,13 +344,13 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 /**
 * @class
-* This type is required by the <code>MessageView.addAttachmentCardNoPreview</code> method to insert an <code>AttachmentCardView</code>
+* This type is required by the {MessageView.addAttachmentCardNoPreview()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
 *
-* These options differ from <code>AttachmentCardOptions</code> in that there is no <code>previewThumbnailUrl</code>, instead you use a
-* iconThumbnailUrl to show a generic icon. These are rendered and positioned slightly differently than preview images.
+* These options differ from {AttachmentCardOptions} in that there is no {previewThumbnailUrl}, instead you use a
+* {iconThumbnailUrl} to show a generic icon. These are rendered and positioned slightly differently than preview images.
 */
 var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions */{
 
@@ -383,7 +383,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	/**
 	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
 	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
-	* one property - <code>attachmentCardView</code>. It also has a <code>preventDefault()</code> function. Calling
+	* one property - {attachmentCardView}. It also has a {preventDefault()} function. Calling
 	* this function prevents the preview from opening in a new window.
 	* @type {function(event)}
 	*/
@@ -485,7 +485,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 	html:null,
 
 	/**
-	* The actual <code>HTMLElement</code> of the link found.
+	* The actual {HTMLElement} of the link found.
 	* @type {function(event)}
 	*/
 	element:null,
@@ -521,8 +521,8 @@ var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDesc
 	iconUrl:null,
 
 	/**
-	* The callback when the button is clicked. The event object has a property <code>event.attachmentCardViews</code> which is an
-	* array of <code>AttachmentCardView</code>s.
+	* The callback when the button is clicked. The event object has a property {event.attachmentCardViews} which is an
+	* array of {AttachmentCardView}s.
 	* @type {function(event)}
 	*/
 	onClick:null

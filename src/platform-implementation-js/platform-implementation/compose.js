@@ -15,11 +15,10 @@ var memberMap = new WeakMap();
 * above the rest of the app content. The second, the Reply UI, appears when users are replying to existing messages
 * from the message they are replying to. This namespace handles both of these variants equivalently.
 *
-* The <code>ComposeView</code> type is how you interact with compose windows in Gmail and Inbox. The most common way to get
-* access to a compose view is to use the {Compose.registerComposeViewHandler} method which calls you back
+* The {ComposeView} type is how you interact with compose windows in Gmail and Inbox. The most common way to get
+* access to a compose view is to use the {Compose.registerComposeViewHandler()} method which calls you back
 * with every existing {ComposeView} and all future {ComposeView}s. From there a typical application will
-* modify the <code>ComposeView</code> as needed by adding buttons, adding content to the message, or accessing the recipient data.
-* See {ComposeView} for a more comprehensive listing.
+* modify the {ComposeView} as needed by adding buttons, adding content to the message, or accessing the recipient data.
 */
 var Compose = function(appId, driver){
     var members = {};
