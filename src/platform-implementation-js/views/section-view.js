@@ -112,7 +112,7 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 
 /**
 * @class
-* Represents the a single row to render in SectionViews and CollapsibleSectionViews
+* Represents the a single row to render in {SectionView}s and {CollapsibleSectionView}s
 */
 var RowDescriptor = /** @lends RowDescriptor */ {
 
@@ -141,7 +141,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 	isRead: null,
 
 	/**
-	* Any labels that should be rendered. A LabelDescriptor simply has title, backgroundColor, and foregroundColor string properties.
+	* Any labels that should be rendered.
 	* @type {LabelDescriptor[]}
 	*/
 	labels: null,
@@ -192,7 +192,7 @@ var RowDescriptor = /** @lends RowDescriptor */ {
 
 /**
 * @class
-* The properties required to create a SectionView or CollapsibleSectionView.
+* The properties required to create a {SectionView} or {CollapsibleSectionView}.
 */
 var SectionDescriptor = /** @lends SectionDescriptor */ {
 

@@ -45,7 +45,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Inserts a button into the compose bar. This method also accepts a stream of {ComposeButtonDescriptor}s so that you can change the appearance of your button after you've added it.
-	* @param {ComposeButtonDescriptor} buttonDescriptor - The details of the button to add to the compose bar.
+	* @param {ComposeButtonDescriptor|Stream(ComposeButtonDescriptor)} buttonDescriptor - The details of the button to add to the compose bar.
 	* @return {void}
 	*/
 	addButton: function(buttonDescriptor){

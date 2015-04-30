@@ -240,7 +240,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 
 	/**
 	* This is called when the button is clicked, and gets passed an event object. The event object will have
-	* a {selectedThreadRowViews} {ThreadRowView[]} property, a {threadRowViews}
+	* a {selectedThreadRowViews} ({ThreadRowView[]}) property, a {threadRowViews}
 	* ({ThreadRowView[]}) property and optionally a {dropdown} ({DropdownView}) property if you set
 	* the {hasDropdown} property to true
 	* @type {func(event)}

@@ -37,7 +37,7 @@ RouteView.prototype = Object.create(EventEmitter.prototype);
 _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
-	 * Get the ID of the RouteView. This is the same routeID that you give {Router.goto()} or {Router.createLink}.
+	 * Get the ID of the RouteView. This is the same routeID that you give {Router.goto()} or {Router.createLink()}.
 	 * @return {string}
 	 */
 	getRouteID: function(){

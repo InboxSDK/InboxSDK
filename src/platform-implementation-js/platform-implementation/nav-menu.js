@@ -77,7 +77,7 @@ module.exports = NavMenu;
 
 /**
 * @class
-* This object represents the set of options to configure a new NavItem.
+* This object represents the set of options to configure a new {NavItemView}.
 */
 var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 
@@ -109,15 +109,15 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	orderHint: null,
 
 	/**
-	* There are several "accessories" which can provide secondary actions for NavItemViews
+	* There are several "accessories" which can provide secondary actions for {NavItemView}s
 	* ^optional
 	* ^default=null
-	* @type {AccessoryDescriptor}
+	* @type {CreateAccessoryDescriptor|IconButtonAccessoryDescriptor|DropdownButtonAccessoryDescriptor}
 	*/
 	accessory: null,
 
 	/**
-	* An optional url to an icon to display an icon alongside the name of the NavItem
+	* An optional url to an icon to display an icon alongside the name of the {NavItemView}
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -141,7 +141,7 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 var CreateAccessoryDescriptor = /** @lends CreateAccessoryDescriptor */ {
 
 	/**
-	* For CreateAccessoryDescriptors this should always be set to 'CREATE'
+	* For CreateAccessoryDescriptors this should always be set to {CREATE}
 	* @type {string}
 	*/
 	type: 'CREATE',
@@ -156,12 +156,12 @@ var CreateAccessoryDescriptor = /** @lends CreateAccessoryDescriptor */ {
 
 /**
 * @class
-* The IconButtonAccessoryDescriptor allows you to add an icon button right next your NavItem which lets the user take a secondary action
+* The IconButtonAccessoryDescriptor allows you to add an icon button right next your {NavItem} which lets the user take a secondary action
 */
 var IconButtonAccessoryDescriptor = /** @lends IconButtonAccessoryDescriptor */ {
 
 	/**
-	* For IconButtonAccessoryDescriptors this should always be set to 'ICON_BUTTON'
+	* For IconButtonAccessoryDescriptors this should always be set to {ICON_BUTTON}
 	* @type {string}
 	*/
 	type: 'ICON_BUTTON',
@@ -190,12 +190,12 @@ var IconButtonAccessoryDescriptor = /** @lends IconButtonAccessoryDescriptor */ 
 
 /**
 * @class
-* The DropdownButtonAccessoryDescriptor allows you to add a dropdown right next your NavItem
+* The DropdownButtonAccessoryDescriptor allows you to add a dropdown right next your {NavItemView}
 */
 var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescriptor */ {
 
 	/**
-	* For DropdownButtonAccessoryDescriptors this should always be set to 'DROPDOWN_BUTTON'
+	* For DropdownButtonAccessoryDescriptors this should always be set to {DROPDOWN_BUTTON}
 	* @type {string}
 	*/
 	type: 'DROPDOWN_BUTTON',
@@ -215,8 +215,6 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
 	/**
 	* A callback when the dropdown button is pressed. The event object passed to you has a
 	* dropdown property which you can fill your content with.
-	*
-	* //TODO document callback params
 	* @type {func(event)}
 	*/
 	onClick: null

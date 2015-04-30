@@ -27,8 +27,8 @@ var Modal = function(appId, driver){
 _.extend(Modal.prototype, /** @lends Modal */{
 
   /**
-  * This creates a {ModalView} and immediately calls {ModalView.show()} on it.
-  * @param {ModalOptions} options - The options to configure the returned ModalView.
+  * This creates a {ModalView} and immediately calls shows it.
+  * @param {ModalOptions} options - The options to configure the returned {ModalView}.
   * @return {ModalView}
   */
 	show: function(options){
@@ -81,7 +81,7 @@ var ModalOptions = /** @lends ModalOptions */{
   /**
   * An array of buttons to add to the modal. The UI will be consistent with native Gmail/Inbox buttons.
   * If none are provided, your el will occupy all of the modal. There may only be one button with a type
-  * of PRIMARY_ACTION, see ModalButtonDescriptors docs
+  * of {PRIMARY_ACTION}, see ModalButtonDescriptors docs
   * ^optional
   * ^default=[]
   * @type {ModalButtonDescriptors[]}
@@ -117,8 +117,8 @@ var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
   onClick:null,
 
   /**
-  * There are currently two supported types of modal buttons, PRIMARY_ACTION and SECONDARY action.
-  * There may only be one PRIMARY_ACTION button per modal.
+  * There are currently two supported types of modal buttons, {PRIMARY_ACTION} and {SECONDARY} action.
+  * There may only be one {PRIMARY_ACTION} button per modal.
   * ^optional
   * ^default=SECONDARY_ACTION
   * @type {string}

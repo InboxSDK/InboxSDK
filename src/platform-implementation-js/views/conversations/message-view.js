@@ -159,7 +159,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* {MessageViewViewStates.HIDDEN} (no information visible),
 	* {MessageViewViewStates.COLLAPSED} (partial information visible) or
 	* {MessageViewViewStates.EXPANDED}
-	* @return {MessageViewViewState}
+	* @return {MessageViewViewStates}
 	*/
 	getViewState: function() {
 		var members = memberMap.get(this);
@@ -265,7 +265,7 @@ module.exports = MessageView;
 
 /**
 * @class
-* This type is required by the {MessageView.addAttachmentCard()} method to insert an {AttachmentCardView}
+* This type is required by the {MessageView.addAttachmentCardView()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
@@ -344,7 +344,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 /**
 * @class
-* This type is required by the {MessageView.addAttachmentCardNoPreview()} method to insert an {AttachmentCardView}
+* This type is required by the {MessageView.addAttachmentCardViewNoPreview()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.

@@ -15,7 +15,7 @@ var InboxSDK = {
 /**
 * Loads the InboxSDK remotely and prepares it to be used.
 * @function
-* @param {string} version - The version of the SDK to load, the only acceptable value currently is "1".
+* @param {string} version - The version of the SDK to load, the only acceptable value currently is "1.0".
 * @param {string} appId - The AppId that you registered for on the <a href="/register">AppId Registration page</a>.
 * @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
 */
