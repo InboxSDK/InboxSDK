@@ -397,7 +397,7 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	/**
 	* This is called when the button is clicked, and gets passed an event object. The event object will have a composeView
 	* object and optionally a dropdown property if the button had a dropdown.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick:null,
 

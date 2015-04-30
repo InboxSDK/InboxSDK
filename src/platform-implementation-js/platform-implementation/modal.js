@@ -112,7 +112,7 @@ var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
 
   /**
   * This is called when the button is clicked, and gets passed an event object. The event object will have a modalView.
-  * @type {function(event)}
+  * @type {func(event)}
   */
   onClick:null,
 

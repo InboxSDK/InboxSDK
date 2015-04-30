@@ -243,7 +243,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	* a {selectedThreadRowViews} {ThreadRowView[]} property, a {threadRowViews}
 	* ({ThreadRowView[]}) property and optionally a {dropdown} ({DropdownView}) property if you set
 	* the {hasDropdown} property to true
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick:null,
 
@@ -262,7 +262,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	* the toolbar button should be hidden. Your function is passed a {RouteView}.
 	* ^optional
 	* ^default=null
-	* @type {function(RouteView)}
+	* @type {func(RouteView)}
 	*/
 	hideFor:null,
 

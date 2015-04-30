@@ -303,7 +303,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
 	* one property - {attachmentCardView}. It also has a {preventDefault()} function. Calling
 	* this function prevents the preview from opening in a new window.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	previewOnClick:null,
 
@@ -385,7 +385,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
 	* one property - {attachmentCardView}. It also has a {preventDefault()} function. Calling
 	* this function prevents the preview from opening in a new window.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	previewOnClick:null,
 
@@ -425,7 +425,7 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	/**
 	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
 	* actually downloading which happens automatically.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick:null,
 
@@ -460,7 +460,7 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 	/**
 	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
 	* actually downloading which happens automatically.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick:null
 };
@@ -486,7 +486,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 
 	/**
 	* The actual {HTMLElement} of the link found.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	element:null,
 
@@ -523,7 +523,7 @@ var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDesc
 	/**
 	* The callback when the button is clicked. The event object has a property {event.attachmentCardViews} which is an
 	* array of {AttachmentCardView}s.
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick:null
 };

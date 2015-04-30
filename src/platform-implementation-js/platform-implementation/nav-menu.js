@@ -217,7 +217,7 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
 	* dropdown property which you can fill your content with.
 	*
 	* //TODO document callback params
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onClick: null
 };

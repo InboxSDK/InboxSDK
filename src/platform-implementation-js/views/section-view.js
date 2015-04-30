@@ -240,7 +240,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	* event object with a single <code>dropdown</code> property.
 	* ^optional
 	* ^default=null
-	* @type {function(event)}
+	* @type {func(event)}
 	*/
 	onDropdownClick: null,
 
@@ -264,7 +264,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	* A function to call when the link in the footer is clicked.
 	* ^optional
 	* ^default=null
-	* @type {function()}
+	* @type {func(event)}
 	*/
 	onFooterLinkClick: null
 };

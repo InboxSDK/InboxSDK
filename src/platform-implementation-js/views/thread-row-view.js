@@ -239,7 +239,7 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   * A handler that gets called when the button is clicked on. The event object contains a
   * <code>threadRowView</code> property and optionally a <code>dropdown</code> property if
   * the <code>hasDropdown</code> was set to <code>true</code>.
-  * @type {function(event)}
+  * @type {func(event)}
   */
   onClick:null,
 
