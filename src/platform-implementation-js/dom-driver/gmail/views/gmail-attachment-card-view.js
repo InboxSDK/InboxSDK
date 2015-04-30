@@ -50,18 +50,20 @@ _.assign(GmailAttachmentCardView.prototype, {
 		});
 	},
 
-	getAttachmentType: function(){
-		if(this._isStandardAttachment()){
+	getAttachmentType() {
+		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
+			return 'CUSTOM';
+		}
+
+		if(this._getButtonContainerElement()){
 			return 'FILE';
 		}
 
-		if(this._isDriveAttachment()){
-			return 'DRIVE';
-		}
+		return 'DRIVE';
+	},
 
-		if(this._isNonNativeAttachment()){
-			return 'CUSTOM';
-		}
+	_isStandardAttachment() {
+		return this.getAttachmentType() === 'FILE';
 	},
 
 	addButton: function(options){
@@ -118,23 +120,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._title = this._extractFileNameFromElement();
 		this._messageId = attachmentUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
 		this._attachmentId = attachmentUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
-	},
-
-	_isStandardAttachment: function(){
-		return !this._isDriveAttachment() && !this._isNonNativeAttachment() && !!this._getButtonContainerElement();
-	},
-
-	_isDriveAttachment: function(){
-		var previewImageUrl = this._getPreviewImageUrl();
-		if(!previewImageUrl){
-			return false;
-		}
-
-		return !!previewImageUrl.match(/https?:\/\/\w+\.googleusercontent\.com/);
-	},
-
-	_isNonNativeAttachment: function() {
-		return _.contains(this._element.classList, 'inboxsdk__attachmentCard');
 	},
 
 	_extractFileNameFromElement: function(){
