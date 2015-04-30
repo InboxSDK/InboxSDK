@@ -98,7 +98,7 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	/**
 	* Registers your handler to be called when the user navigates to a ThreadView. Your handler is given a
 	* ThreadView which you can then further manipulate.
-	* @param {function(ThreadView)} handler - The handler to call when a ThreadView is displayed. This handler
+	* @param {func(ThreadView)} handler - The handler to call when a ThreadView is displayed. This handler
 	* is passed one parameter, a ThreadView.
 	* @return {void}
 	*/
@@ -112,7 +112,7 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	*
 	* IMPORTANT: Your handler will only be called for {MessageView}s that are "loaded". See docs for
 	* {MessageView} to understand the distinction.
-	* @param {function(MessageView)} handler - The handler to call when a MessageView is displayed.
+	* @param {func(MessageView)} handler - The handler to call when a MessageView is displayed.
 	* @return {void}
 	*/
 	registerMessageViewHandler: function(handler){
@@ -125,7 +125,7 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	*
 	* IMPORTANT: Your handler will be called for MessageViews that are both "loaded" and "unloaded". See docs for
 	* {MessageView} to understand the distinction.
-	* @param {function(MessageView)} handler - The handler to call when a message view is displayed.
+	* @param {func(MessageView)} handler - The handler to call when a message view is displayed.
 	* @return {void}
 	*/
 	registerMessageViewHandlerAll: function(handler){

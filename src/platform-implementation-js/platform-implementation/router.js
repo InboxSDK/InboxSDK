@@ -60,7 +60,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
 	* @param {string} routeID - A route specifying where the link should navigate the user to.
-	* @param {Object} params an object containing the parameters that will be encoded in the link and decoded when the user
+	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
 	* @return {string} the encoded URL
@@ -72,7 +72,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	* Change the route to be the one with the given ID and have the given parameters
 	* @param {string} routeID - A route specifying where the link should navigate the user to.
-	* @param {Object} params an object containing the parameters that will be encoded in the link and decoded when the user
+	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
 	* @return {void}
@@ -86,9 +86,9 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
 	* <code>CustomRouteView</code> which you can modify the content.
 	* @param {string} routeID - which route this handler is registering for
-	* @param {function(CustomRouteView)} handler - The callback to call when the route changes to a custom route matching
+	* @param {func(CustomRouteView)} handler - The callback to call when the route changes to a custom route matching
 	* the provided routeID
-	* @return {function} a function which can be called to remove this custom route
+	* @return {function} a function which can be called to to stop handling these routes
 	*/
 	handleCustomRoute: function(routeID, handler){
 		var customRouteDescriptor = {
@@ -111,10 +111,10 @@ _.extend(Router.prototype, /** @lends Router */ {
 
 	/**
 	* Registers a handler (callback) to be called when the user navigates to any route (both customs and built in routes).
-	* Because this can apply to any route, your callback will be given only a generic <code>RouteView</code>. This is typically used
+	* Because this can apply to any route, your callback will be given only a generic {RouteView}. This is typically used
 	* when you want to monitor for page changes but don't necessarily need to modify the page.
-	* @param {function(RouteView)} handler - The callback to call when the route changes
-	* @return {TODO}
+	* @param {func(RouteView)} handler - The callback to call when the route changes
+	* @return {function} a function which can be called to to stop handling these routes
 	*/
 	handleAllRoutes: function(handler){
 		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
@@ -123,11 +123,10 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a list route which matches the routeID you provide.
 	* Gmail and Inbox have several built in routes which are "Lists". These include routes like Inbox, All Mail, Sent, Drafts, etc.
-	* You'll typically use this modify Gmail's and Inbox's built in List routes. Your callback will be passed an instance of a
-	* <code>ListRouteView</code>.
-	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in <code>Router.NativeListRoutes</code>.
-	* @param {function(CustomRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
-	* @return {TODO}
+	* You'll typically use this modify Gmail's and Inbox's built in List routes.
+	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in {Router.NativeListRoutes}.
+	* @param {func(ListRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
+	* @return {function} a function which can be called to stop handling these routes
 	*/
 	handleListRoute: function(routeID, handler){
 		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
@@ -147,8 +146,8 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* The thread IDs can be Gmail Thread IDs or the value of a message's Message-ID header
 	* (which must start with "<" and end with ">").
 	* @param {string} routeID - which route this handler is registering for
-	* @param {function} handler
-	* @return {TODO}
+	* @param {func(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
+	* @return {function} a function which can be called to stop handling these routes
 	*/
 	handleCustomListRoute: function(routeID, handler) {
 		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
