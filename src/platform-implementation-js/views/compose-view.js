@@ -315,8 +315,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
-	* Fires when any of the To/Cc/Bcc fields are changed. The passed in callback will receive an object which splits out
-	* what happened. {to: {added: [{Contact}], removed: [{Contact}]}, cc: {added: [{Contact}], removed: [{Contact}]}, bcc: {added: [{Contact}], removed: [{Contact}]}}.
+	* Fires when any of the To/Cc/Bcc fields are changed.
 	* @event ComposeView#recipientsChanged
 	* @param {Contact[]} to.added - a list of contacts that were added to the "To" recipients
 	* @param {Contact[]} to.removed - a list of contacts that were removed from the "To" recipients
@@ -371,7 +370,7 @@ module.exports = ComposeView;
 
 /**
 * @class
-* This type is passed into the <code>ComposeView.addButton</code> method as a way to configure the button shown.
+* This type is passed into the {ComposeView.addButton()} method as a way to configure the button shown.
 */
 var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	/**

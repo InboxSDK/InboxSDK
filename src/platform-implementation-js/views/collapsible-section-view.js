@@ -7,7 +7,7 @@ var membersMap = new WeakMap();
 
 /**
 * @class
-* CollapsibleSectionViews allow you to display additional content on ListRouteViews. They are
+* CollapsibleSectionViews allow you to display additional content on {ListRouteView}s. They are
 * typically rendered as additional content above the list of threads below. The visual style
 * is similar to that of multiple inbox sections used in native Gmail and Inbox. Note that the
 * rendering may vary slightly depending on the actual ListRouteView that the CollapsibleSectionView
@@ -17,6 +17,7 @@ var membersMap = new WeakMap();
 * You can either render rows (that are visually similar to Gmail/Inbox rows) or custom content in
 * your CollapsibleSectionView. However, until you call one of <code>setTableRows</code> or <code>setContent</code>
 * the CollapsibleSectionView will simply display a "Loading..." indicator.
+* @extends RouteView
 */
 var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
 	var members = {};

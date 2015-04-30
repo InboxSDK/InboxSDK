@@ -14,7 +14,7 @@ var membersMap = new WeakMap();
  * supports like "Sent", "Drafts", or "Inbox"
  *
  * This class mostly just gives you metadata about the route, most of the functionality to modify the route are
- * defined in subclasses like <code>ListRouteView</code> and <code>CustomRouteView</code>, which you get by
+ * defined in subclasses like {ListRouteView} and {CustomRouteView}, which you get by
  * handling those types specifically in the Router.
  */
 var RouteView = function(routeViewDriver){
@@ -37,7 +37,7 @@ RouteView.prototype = Object.create(EventEmitter.prototype);
 _.extend(RouteView.prototype, /** @lends RouteView */{
 
 	/**
-	 * Get the ID of the RouteView. This is the same routeID that you give <code>Router.goto</code> or <code>Router.createLink</code>.
+	 * Get the ID of the RouteView. This is the same routeID that you give {Router.goto()} or {Router.createLink}.
 	 * @return {string}
 	 */
 	getRouteID: function(){

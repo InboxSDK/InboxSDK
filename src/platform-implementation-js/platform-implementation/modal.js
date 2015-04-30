@@ -27,7 +27,7 @@ var Modal = function(appId, driver){
 _.extend(Modal.prototype, /** @lends Modal */{
 
   /**
-  * This creates a ModalView and immediately calls .show() on it.
+  * This creates a {ModalView} and immediately calls {ModalView.show()} on it.
   * @param {ModalOptions} options - The options to configure the returned ModalView.
   * @return {ModalView}
   */
@@ -52,7 +52,7 @@ module.exports = Modal;
 
 /**
 * @class
-* The options used to configure a modal when calling <code>Modal.show()</code>.
+* The options used to configure a modal when calling {Modal.show()}.
 */
 var ModalOptions = /** @lends ModalOptions */{
 

@@ -26,7 +26,7 @@ const memberMap = new WeakMap();
 * implementations of Gmail/Inbox, you should always create new links when trying to set URL on elements or simply use the goto
 * function which naviagtes to the created link automatically.
 *
-* Using the <code>handleX</code> family of methods, you can specify which routes your application can handle. You will be called back with
+* Using the {handleX} family of methods, you can specify which routes your application can handle. You will be called back with
 * and instance of a RouteView or similar when the user navigates to a route you've declared you can handle. For custom routes, you'll typically
 * add your own content and for built in routes, you'll typically modify the existing content.
 *
@@ -84,7 +84,7 @@ _.extend(Router.prototype, /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
 	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
-	* <code>CustomRouteView</code> which you can modify the content.
+	* {CustomRouteView} which you can modify the content.
 	* @param {string} routeID - which route this handler is registering for
 	* @param {func(CustomRouteView)} handler - The callback to call when the route changes to a custom route matching
 	* the provided routeID

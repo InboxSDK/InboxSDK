@@ -23,8 +23,8 @@ var memberMap = new WeakMap();
 * several options to configure the appearance of the items.
 *
 * Items can also have accessories which provide secondary actions like opening a dropdown (like Gmails labels) or
-* providing a "create new" action. There are several predefined accesories, see <code>CreateAccessoryDescriptor</code>,
-* <code>IconButtonAccessoryDescriptor</code> or <code>DropdownButtonAccessoryDescriptor</code>.
+* providing a "create new" action. There are several predefined accesories, see {CreateAccessoryDescriptor},
+* {IconButtonAccessoryDescriptor} or {DropdownButtonAccessoryDescriptor}.
 */
 var NavMenu = function(appId, driver, membraneMap){
 	var members = {};

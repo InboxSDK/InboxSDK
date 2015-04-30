@@ -138,7 +138,7 @@ function _bindToStreamEvents(threadView, threadViewImplementation){
 
 /**
  * @class
- * This type is passed into the <code>ThreadView.addSidebarContentPanel</code> method as a way to configure the content panel shown.
+ * This type is passed into the {ThreadView.addSidebarContentPanel()} method as a way to configure the content panel shown.
  * ContentPanels are typically shown in a sidebar and when multiple are shown they are displayed in a multi tab interface.
  */
 var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {

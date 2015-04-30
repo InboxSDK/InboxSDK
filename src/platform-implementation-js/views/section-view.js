@@ -7,7 +7,7 @@ var membersMap = new WeakMap();
 
 /**
 * @class
-* SectionViews allow you to display additional content on ListRouteViews. They are
+* SectionViews allow you to display additional content on {ListRouteView}s. They are
 * typically rendered as additional content above the list of threads below. The visual style
 * is similar to that of multiple inbox sections used in native Gmail and Inbox. Note that the
 * rendering may vary slightly depending on the actual ListRouteView that the SectionView
@@ -53,7 +53,7 @@ _.extend(SectionView.prototype, /** @lends SectionView */ {
 	}
 
 	/**
-	* Fires when the CollapsibleSectionView is no longer visible.
+	* Fires when the SectionView is no longer visible.
 	* @event SectionView#destroy
 	*/
 

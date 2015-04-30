@@ -26,9 +26,8 @@ _.extend(Search.prototype,  /** @lends Search */{
 	* Registers a search autocomplete suggestion provider. This allows you to add results to Gmails
 	* autocomplete results when a user types into a search box. Each providers results are visually
 	* seperated from each other in the UI.
-	* @param {function(query)} handler - A handler that takes in a string <code>query</code> and
-	* returns an <code>Array</code> (or <code>Promise</code> for one) of
-	* <code>AutocompleteSearchResult</code>s.
+	* @param {function(query)} handler - A handler that takes in a string {query} and
+	* returns an {Array} (or {Promise} for one) of {AutocompleteSearchResult}s.
 	* @return {void}
 	*/
 	registerSearchSuggestionsProvider: function(handler) {
@@ -45,8 +44,8 @@ _.extend(Search.prototype,  /** @lends Search */{
 	* actually executed by Gmails servers will be what you rewrite the query to.
 	*
 	* One common use case is to have a special view that shows emails that your app wants to render. You can
-	* navigate the user to a specific search results view (using <code>Router</code>) programtically with a
-	* search term of your choosing (so its displayed to the user), and then use <code>registerSearchQueryRewriter</code>
+	* navigate the user to a specific search results view (using {Router}) programtically with a
+	* search term of your choosing (so its displayed to the user), and then use {registerSearchQueryRewriter}
 	* to make sure the results you want are shown.
 	* @param {SearchQueryRewriter} rewriter - A rewriter object that specifies the term to rewrite and a function to
 	* get the new query.
@@ -74,25 +73,25 @@ module.exports = Search;
 /**
 * @class
 * This type is returned by the function you pass into the
-* <code>Search.registerSearchSuggestionsProvider</code> method as a way to add
+* {Search.registerSearchSuggestionsProvider()} method as a way to add
 * autocomplete suggestions to the Gmail/Inbox search box.
 */
 var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 
 	/**
-	* The name of the result to display. This property or <code>nameHTML</code> must be set.
+	* The name of the result to display. This property or {nameHTML} must be set.
 	* @type {string}
 	*/
 	name:  null,
 
 	/**
-	* HTML to display in the name area of the result. This property or <code>name</code> must be set.
+	* HTML to display in the name area of the result. This property or {name} must be set.
 	* @type {string}
 	*/
 	nameHTML: null,
 
 	/**
-	* The name of the result to display. This property or <code>nameHTML</code> must be set.
+	* The name of the result to display. This property or {nameHTML} must be set.
 	* ^optional
 	* ^default=empty
 	* @type {string}
@@ -100,7 +99,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	description:  null,
 
 	/**
-	* HTML to display in the name area of the result. This property or <code>name</code> must be set.
+	* HTML to display in the name area of the result. This property or {name} must be set.
 	* ^optional
 	* ^default=empty
 	* @type {string}
@@ -145,7 +144,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 /**
 * @class
 * This type is passed into the
-* <code>Search.registerSearchQueryRewriter</code> method as a way to add
+* {Search.registerSearchQueryRewriter()} method as a way to add
 * rewrite search queries.
 */
 var SearchQueryRewriter = /** @lends SearchQueryRewriter */ {
