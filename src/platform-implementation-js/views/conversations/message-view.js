@@ -11,7 +11,7 @@ var memberMap = new WeakMap();
 * itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These
 * 2 properties are orthogonal to each other.
 *
-* A messages' view state can be one of {MessageViewViewStates.EXPANDED}, {MessageViewViewStates.COLLAPPSED} or {MessageViewViewStates.HIDDEN}.
+* A messages' view state can be one of {MessageViewViewStates.EXPANDED}, {MessageViewViewStates.COLLAPSED} or {MessageViewViewStates.HIDDEN}.
 * Gmail and Inbox visually display messages in a thread in different ways depending on what they are trying
 * to show a user. These values are described in the enum {MessageViewViewStates}.
 *

@@ -40,8 +40,7 @@ _.extend(Compose.prototype, /** @lends Compose */ {
   * that may come into existence. This method is the preferred way to add your application to every compose
   * area such as a new compose window or inline reply compose areas. This function returns another function
   * that can be used to unregister - simply call the function to unregister this handler.
-  *
-  * @param handler {function(ComposeView)} The function to be called.
+  * @param {func(ComposeView)} handler - The function to be called.
   * @return {function} a function to call when you want to unregister this handler
   */
   registerComposeViewHandler: function(handler){

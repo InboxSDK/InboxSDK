@@ -22,7 +22,7 @@ var memberMap = new WeakMap();
 *
 * Finally, when a ThreadView loads, you're not guranteed that every MessageView in it is also loaded. When you call
 * ThreadView.getMessageViews it will return all MessageViews, but its important to remember that the MessageViews might not
-* be loaded. MessageViews can be in several states. Consult the <code>MessageView</code> documentation to learn about what
+* be loaded. MessageViews can be in several states. Consult the {MessageView} documentation to learn about what
 * functionality is available in each state.
 */
 var Conversations = function(appId, driver, membraneMap){
@@ -94,10 +94,11 @@ var Conversations = function(appId, driver, membraneMap){
 
 _.extend(Conversations.prototype, /** @lends Conversations */{
 
+
 	/**
 	* Registers your handler to be called when the user navigates to a ThreadView. Your handler is given a
 	* ThreadView which you can then further manipulate.
-	* @param {function(threadView)} handler - The handler to call when a ThreadView is displayed. This handler
+	* @param {function(ThreadView)} handler - The handler to call when a ThreadView is displayed. This handler
 	* is passed one parameter, a ThreadView.
 	* @return {void}
 	*/
@@ -109,10 +110,9 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	* Registers your handler to be called when a MessageView is displayed. Your handler is given a
 	* MessageView which you can then further manipulate.
 	*
-	* IMPORTANT: Your handler will only be called for MessageViews that are "loaded". See docs for
-	* <code>MessageView</code> to understand the distinction.
-	* @param {function(messageView)} handler - The handler to call when a MessageView is displayed. This handler
-	* is passed one parameter, a MessageView.
+	* IMPORTANT: Your handler will only be called for {MessageView}s that are "loaded". See docs for
+	* {MessageView} to understand the distinction.
+	* @param {function(MessageView)} handler - The handler to call when a MessageView is displayed.
 	* @return {void}
 	*/
 	registerMessageViewHandler: function(handler){
@@ -124,9 +124,8 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 	* MessageView which you can then further manipulate.
 	*
 	* IMPORTANT: Your handler will be called for MessageViews that are both "loaded" and "unloaded". See docs for
-	* <code>MessageView</code> to understand the distinction.
-	* @param {function(messageView)} handler - The handler to call when a MessageView is displayed. This handler
-	* is passed one parameter, a MessageView.
+	* {MessageView} to understand the distinction.
+	* @param {function(MessageView)} handler - The handler to call when a message view is displayed.
 	* @return {void}
 	*/
 	registerMessageViewHandlerAll: function(handler){
