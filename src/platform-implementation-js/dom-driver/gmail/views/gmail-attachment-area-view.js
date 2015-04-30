@@ -6,9 +6,10 @@ var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 var ButtonView = require('../widgets/buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
 
-var GmailAttachmentAreaView = function(element){
+function GmailAttachmentAreaView(element, driver){
 	AttachmentAreaViewDriver.call(this);
 
+	this._driver = driver;
 	this._isNative = !!element;
 
 	if(element){
@@ -18,7 +19,7 @@ var GmailAttachmentAreaView = function(element){
 	else{
 		this._setupElement();
 	}
-};
+}
 
 GmailAttachmentAreaView.prototype = Object.create(AttachmentAreaViewDriver.prototype);
 
@@ -26,6 +27,7 @@ _.extend(GmailAttachmentAreaView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_driver', destroy: false},
 		{name: '_isNative', destroy: false},
 		{name: '_attachmentCardViews', destroy: true, get: true}
 	],
@@ -59,10 +61,10 @@ _.extend(GmailAttachmentAreaView.prototype, {
 	},
 
 	_setupAttachmentCardViews: function(){
-		var attachments = this._element.querySelectorAll('.aQH > span');
-		this._attachmentCardViews = Array.prototype.map.call(attachments, function(attachment){
-			return new GmailAttachmentCardView({element: attachment});
-		});
+		const attachments = this._element.querySelectorAll('.aQH > span');
+		this._attachmentCardViews = Array.prototype.map.call(attachments, attachment =>
+			new GmailAttachmentCardView({element: attachment}, this._driver)
+		);
 	},
 
 	addGmailAttachmentCardView: function(gmailAttachmentCardView){

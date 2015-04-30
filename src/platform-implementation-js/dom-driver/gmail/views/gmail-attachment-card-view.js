@@ -1,18 +1,21 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import RSVP from 'rsvp';
+import util from 'util';
 
-var AttachmentCardViewDriver = require('../../../driver-interfaces/attachment-card-view-driver');
+import AttachmentCardViewDriver from '../../../driver-interfaces/attachment-card-view-driver';
 
-var ButtonView = require('../widgets/buttons/button-view');
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+import ButtonView from '../widgets/buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-var simulateClick = require('../../../lib/dom/simulate-click');
-const streamWaitFor = require('../../../lib/stream-wait-for');
+import simulateClick from '../../../lib/dom/simulate-click';
+import streamWaitFor from '../../../lib/stream-wait-for';
 
-var GmailAttachmentCardView = function(options){
+function GmailAttachmentCardView(options, driver) {
 	AttachmentCardViewDriver.call(this);
 
 	this._eventStream = new Bacon.Bus();
+	this._driver = driver;
 
 	if(options.element){
 		this._element = options.element;
@@ -25,14 +28,15 @@ var GmailAttachmentCardView = function(options){
 	else{
 		this._createNewElement(options);
 	}
-};
+}
 
-GmailAttachmentCardView.prototype = Object.create(AttachmentCardViewDriver.prototype);
+util.inherits(GmailAttachmentCardView, AttachmentCardViewDriver);
 
-_.extend(GmailAttachmentCardView.prototype, {
+_.assign(GmailAttachmentCardView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_driver', destroy: false},
 		{name: '_title', destroy: false, get: true},
 		{name: '_mimeType', destroy: false, get: true},
 		{name: '_messageId', destroy: false},
@@ -76,6 +80,18 @@ _.extend(GmailAttachmentCardView.prototype, {
 		});
 
 		this._addButton(buttonView);
+	},
+
+	getDownloadURL() {
+		return RSVP.Promise.resolve().then(() => {
+			if (!this._isStandardAttachment()) return null;
+			const downloadUrl = this._element.getAttribute('download_url');
+			if (!downloadUrl) return null;
+			const m = /:(https:\/\/[^:]+)/.exec(downloadUrl);
+			if (!m) return null;
+			const url = m[1];
+			return this._driver.resolveUrlRedirects(url);
+		});
 	},
 
 	_extractAttachmentInfo: function(){

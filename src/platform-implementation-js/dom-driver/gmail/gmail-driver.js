@@ -118,6 +118,11 @@ _.extend(GmailDriver.prototype, {
 		return require('./gmail-driver/goto-view')(this, routeID, params);
 	},
 
+	resolveUrlRedirects(url) {
+		return this._pageCommunicatorPromise.then(pageCommunicator =>
+			pageCommunicator.resolveUrlRedirects(url));
+	},
+
 	registerSearchSuggestionsProvider: function(handler) {
 		require('./gmail-driver/register-search-suggestions-provider')(this, handler);
 	},

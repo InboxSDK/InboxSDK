@@ -17,7 +17,7 @@ var GmailElementGetter = require('../../gmail-element-getter');
 import assertInterface from '../../../../lib/assert-interface';
 import addAccessors from '../../../../lib/add-accessors';
 
-function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
+function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver) {
 	this._type = type;
 	this._hash = urlObject.hash;
 	this._name = urlObject.name;
@@ -27,6 +27,7 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor) {
 	this._rowListViews = [];
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
+	this._driver = driver;
 
 	this._eventStream = new Bacon.Bus();
 	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
@@ -51,7 +52,8 @@ addAccessors(GmailRouteView.prototype, [
 	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
 	{name: '_leftNavHeightObserver', destroy: true, destroyMethod: 'disconnect'},
 	{name: '_pageCommunicator', destroy: false, set: true},
-	{name: '_gmailRouteProcessor', destroy: false}
+	{name: '_gmailRouteProcessor', destroy: false},
+	{name: '_driver', destroy: false}
 ]);
 
 _.extend(GmailRouteView.prototype, {
@@ -186,7 +188,7 @@ _.extend(GmailRouteView.prototype, {
 		const threadContainerElement = GmailElementGetter.getThreadContainerElement();
 
 		if(threadContainerElement){
-			var gmailThreadView = new GmailThreadView(threadContainerElement, this);
+			var gmailThreadView = new GmailThreadView(threadContainerElement, this, this._driver);
 
 			this._threadView = gmailThreadView;
 
@@ -207,7 +209,7 @@ _.extend(GmailRouteView.prototype, {
 
 		this._eventStream.plug(
 			elementStream.flatMap(makeElementViewStream((element) => {
-				return new GmailThreadView(element, this, true);
+				return new GmailThreadView(element, this, this._driver, true);
 			})).doAction((view) => {
 				this._threadView = view;
 			}).map((view) => {

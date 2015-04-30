@@ -1,50 +1,72 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import Bacon from 'baconjs';
 
 // This is intended to be instantiated from makeXhrInterceptor, since it depends
 // on the injected script, and if it's not instantiated elsewhere, you know that
 // if you have an instance of this, then the injected script is present and this
 // will work.
-function PageCommunicator() {
-  this.ajaxInterceptStream = Bacon
-    .fromEventTarget(document, 'inboxSDKajaxIntercept')
-    .map('.detail');
-}
+export default class PageCommunicator {
+  constructor() {
+    this.ajaxInterceptStream = Bacon
+      .fromEventTarget(document, 'inboxSDKajaxIntercept')
+      .map('.detail');
+  }
 
-PageCommunicator.prototype = {
-  getThreadIdForThreadRow: function(threadRow) {
-    var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+  resolveUrlRedirects(url) {
+    const promise = Bacon.fromEvent(document, 'inboxSDKresolveURLdone')
+      .filter(event => event.detail && event.detail.url === url)
+      .first()
+      .flatMap(event => {
+        if (event.detail.success) {
+          return Bacon.once(event.detail.responseURL);
+        } else {
+          return Bacon.once(new Bacon.Error("Connection error"));
+        }
+      })
+      .toPromise(RSVP.Promise);
+
+    const event = document.createEvent('CustomEvent');
+    event.initCustomEvent('inboxSDKresolveURL', false, false, {url});
+    document.dispatchEvent(event);
+
+    return promise;
+  }
+
+  getThreadIdForThreadRow(threadRow) {
+    let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
-      var event = document.createEvent('CustomEvent');
+      const event = document.createEvent('CustomEvent');
       event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
       threadRow.dispatchEvent(event);
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
     return threadid;
-  },
+  }
 
-  getCurrentThreadID: function(threadContainerElement, isPreviewedThread){
-    var event = document.createEvent('CustomEvent');
+  getCurrentThreadID(threadContainerElement, isPreviewedThread){
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, {isPreviewedThread: isPreviewedThread});
     threadContainerElement.dispatchEvent(event);
 
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
-  },
+  }
 
-  getUserEmailAddress: _.once(function() {
+  getUserEmailAddress() {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
-  }),
+  }
 
-  getUserLanguage: _.once(function() {
+  getUserLanguage() {
     return document.head.getAttribute('data-inboxsdk-user-language');
-  }),
+  }
 
-  getUserOriginalPreviewPaneMode: _.once(function() {
+  getUserOriginalPreviewPaneMode() {
     return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
-  }),
+  }
 
-  getIkValue: _.once(() => document.head.getAttribute('data-inboxsdk-ik-value')),
+  getIkValue() {
+    return document.head.getAttribute('data-inboxsdk-ik-value');
+  }
 
   isConversationViewDisabled() {
     return new RSVP.Promise((resolve, reject) => {
@@ -54,67 +76,65 @@ PageCommunicator.prototype = {
           resolve(event.detail);
         });
 
-      var event = document.createEvent('CustomEvent');
+      const event = document.createEvent('CustomEvent');
       event.initCustomEvent('inboxSDKtellMeIsConversationViewDisabled', false, false, null);
       document.dispatchEvent(event);
     });
-  },
+  }
 
-  announceSearchAutocompleter: function(providerID) {
-    var event = document.createEvent('CustomEvent');
+  announceSearchAutocompleter(providerID) {
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, {
       providerID
     });
     document.dispatchEvent(event);
-  },
+  }
 
-  provideAutocompleteSuggestions: function(providerID, query, suggestions) {
-    var event = document.createEvent('CustomEvent');
+  provideAutocompleteSuggestions(providerID, query, suggestions) {
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKprovideSuggestions', false, false, {
       providerID, query, suggestions
     });
     document.dispatchEvent(event);
-  },
+  }
 
   setupCustomListResultsQuery(query) {
-    var event = document.createEvent('CustomEvent');
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcustomListRegisterQuery', false, false, {
       query
     });
     document.dispatchEvent(event);
-  },
+  }
 
   setCustomListNewQuery(query, newQuery) {
-    var event = document.createEvent('CustomEvent');
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcustomListNewQuery', false, false, {
       query, newQuery
     });
     document.dispatchEvent(event);
-  },
+  }
 
   setCustomListResults(query, newResults) {
-    var event = document.createEvent('CustomEvent');
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcustomListResults', false, false, {
       query, newResults
     });
     document.dispatchEvent(event);
-  },
+  }
 
-  createCustomSearchTerm: function(term) {
-    var event = document.createEvent('CustomEvent');
+  createCustomSearchTerm(term) {
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKcreateCustomSearchTerm', false, false, {
       term: term
     });
     document.dispatchEvent(event);
-  },
+  }
 
-  setSearchQueryReplacement: function(query, newQuery) {
-    var event = document.createEvent('CustomEvent');
+  setSearchQueryReplacement(query, newQuery) {
+    const event = document.createEvent('CustomEvent');
     event.initCustomEvent('inboxSDKsearchReplacementReady', false, false, {
       query: query, newQuery: newQuery
     });
     document.dispatchEvent(event);
   }
-};
-
-module.exports = PageCommunicator;
+}

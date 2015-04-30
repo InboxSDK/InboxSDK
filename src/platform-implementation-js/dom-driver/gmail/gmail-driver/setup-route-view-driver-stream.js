@@ -101,7 +101,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			driver.showCustomThreadList(options.routeID, customListRouteIDs.get(options.routeID));
 			return;
 		}
-		return new GmailRouteView(options, GmailRouteProcessor);
+		return new GmailRouteView(options, GmailRouteProcessor, driver);
 	})
 	.filter(Boolean)
 	.map((gmailRouteView) => {

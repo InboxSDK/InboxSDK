@@ -10,13 +10,14 @@ var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 var simulateClick = require('../../../lib/dom/simulate-click');
 
-var GmailMessageView = function(element, gmailThreadView){
+var GmailMessageView = function(element, gmailThreadView, driver){
 	MessageViewDriver.call(this);
 
 	this._element = element;
 	this._eventStream = new Bacon.Bus();
 	this._stopper = this._eventStream.filter(false).mapEnd();
 	this._threadViewDriver = gmailThreadView;
+	this._driver = driver;
 
 	// Outputs the same type of stream as makeElementChildStream does.
 	this._replyElementStream = this._eventStream.filter(function(event) {
@@ -37,6 +38,7 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_stopper', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriver', destroy: false, get: true},
+		{name: '_driver', destroy: false},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
 		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
@@ -152,7 +154,7 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	_addAttachmentCard: function(options){
-		var gmailAttachmentCardView = new GmailAttachmentCardView(options);
+		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
 		if(!this._gmailAttachmentAreaView){
 			this._gmailAttachmentAreaView = this._getAttachmentArea();
@@ -359,14 +361,14 @@ _.extend(GmailMessageView.prototype, {
 
 	_getAttachmentArea: function(){
 		if(this._element.querySelector('.hq')){
-			return new GmailAttachmentAreaView(this._element.querySelector('.hq'));
+			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver);
 		}
 
 		return null;
 	},
 
 	_createAttachmentArea: function(){
-		var gmailAttachmentAreaView = new GmailAttachmentAreaView();
+		var gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
 
 		var beforeElement = this._element.querySelector('.hi');
 		beforeElement.parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);

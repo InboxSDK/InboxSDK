@@ -10,18 +10,19 @@ var GmailToolbarView = require('./gmail-toolbar-view');
 
 var GmailContentPanelContainerView = require('../widgets/gmail-content-panel/gmail-content-panel-container-view');
 
-var GmailThreadView = function(element, routeViewDriver, isPreviewedThread){
+function GmailThreadView(element, routeViewDriver, driver, isPreviewedThread=false) {
 	ThreadViewDriver.call(this, element);
 
 	this._element = element;
 	this._routeViewDriver = routeViewDriver;
+	this._driver = driver;
 	this._isPreviewedThread = isPreviewedThread;
 
 	this._eventStream = new Bacon.Bus();
 
 	this._setupToolbarView();
 	this._setupMessageViewStream();
-};
+}
 
 GmailThreadView.prototype = Object.create(ThreadViewDriver.prototype);
 
@@ -29,6 +30,7 @@ _.extend(GmailThreadView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_driver', destroy: false},
 		{name: '_threadID', destroy: false},
 		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_isPreviewedThread', destroy: false, get: true},
@@ -178,7 +180,7 @@ _.extend(GmailThreadView.prototype, {
 	},
 
 	_createMessageView: function(messageElement) {
-		var messageView = new GmailMessageView(messageElement, this);
+		var messageView = new GmailMessageView(messageElement, this, this._driver);
 
 		this._eventStream.plug(messageView.getEventStream());
 

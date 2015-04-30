@@ -3,6 +3,7 @@ if (!global.__InboxSDKInjected) {
 
   const _ = require('lodash');
   const RSVP = require('rsvp');
+  const xhrHelper = require('./xhr-helper');
   const gmailInterceptor = require('./setup-gmail-interceptor');
   const setupGmonkeyHandler = require('./setup-gmonkey-handler');
   const setupDataExposer = require('./setup-data-exposer');
@@ -20,5 +21,6 @@ if (!global.__InboxSDKInjected) {
     throw new Error("Should not happen");
   }
 
+  xhrHelper();
   setupDataExposer();
 }
