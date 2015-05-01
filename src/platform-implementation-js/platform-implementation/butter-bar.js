@@ -179,6 +179,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   /**
   * Hides all messages created by the same app with the given messageKey.
   * @param {Object} messageKey - the key of the message to hide
+  * @return {void}
   */
   hideMessage(messageKey) {
     if (messageKey) {
@@ -192,6 +193,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 
   /**
   * Hides any messages currently displayed by Gmail.
+  * @return {void}
   */
   hideGmailMessage() {
     const members = memberMap.get(this);
