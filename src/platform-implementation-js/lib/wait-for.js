@@ -1,6 +1,7 @@
-const RSVP = require('rsvp');
+import asap from 'asap';
+import RSVP from 'rsvp';
 
-function waitFor(condition, timeout, steptime) {
+export default function waitFor(condition, timeout, steptime) {
 	// make this error here so we have a sensible stack.
 	const timeoutError = new Error("waitFor timeout");
 
@@ -29,8 +30,6 @@ function waitFor(condition, timeout, steptime) {
 				reject(e);
 			}
 		}
-		setTimeout(step, 1);
+		asap(step);
 	});
 }
-
-module.exports = waitFor;
