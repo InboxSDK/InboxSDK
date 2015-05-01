@@ -18,13 +18,28 @@ function GmailAttachmentCardView(options, driver) {
 	this._eventStream = new Bacon.Bus();
 	this._driver = driver;
 
+	this.getAttachmentType = _.once(() => {
+		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
+			return 'CUSTOM';
+		}
+		// FILE attachment cards are never in unloaded state.
+		if (this._element.children.length === 1 && this._element.children[0].children.length === 0) {
+			return 'UNLOADED';
+		}
+		const link = this._getDownloadLink();
+		if (!link || link.match(/^https?:\/\/mail\.google\.com\//)) {
+			// Only files and unloaded ever lack a link.
+			return 'FILE';
+		}
+		if (link.match(/^https?:\/\/([^\/]*\.)?google(usercontent)?\.com\//)) {
+			return 'DRIVE';
+		}
+		return 'UNKNOWN';
+	});
+
 	// Returns a Bacon stream!
 	this.ready = _.once(() =>
-		streamWaitFor(() => {
-			if (!this._isStandardAttachment()) return true;
-			const aQw = this._getButtonContainerElement();
-			return aQw && aQw.children.length > 0;
-		}).toProperty()
+		Bacon.constant(true)
 	);
 
 	if(options.element){
@@ -53,19 +68,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 		{name: '_attachmentId', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
-
-	getAttachmentType() {
-		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
-			return 'CUSTOM';
-		}
-
-		const firstChild = this._element.firstElementChild;
-		if (firstChild && firstChild.classList.contains('aZr')) {
-			return 'DRIVE';
-		}
-
-		return 'FILE';
-	},
 
 	_isStandardAttachment() {
 		return this.getAttachmentType() === 'FILE';
