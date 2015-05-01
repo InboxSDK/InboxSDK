@@ -17,6 +17,15 @@ function GmailAttachmentCardView(options, driver) {
 	this._eventStream = new Bacon.Bus();
 	this._driver = driver;
 
+	// Returns a Bacon stream!
+	this.ready = _.once(() =>
+		streamWaitFor(() => {
+			if (!this._isStandardAttachment()) return true;
+			const aQw = this._getButtonContainerElement();
+			return aQw && aQw.children.length > 0;
+		}).toProperty()
+	);
+
 	if(options.element){
 		this._element = options.element;
 		this.ready()
@@ -44,18 +53,12 @@ _.assign(GmailAttachmentCardView.prototype, {
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
-	ready: function(){
-		return streamWaitFor(() => {
-			return !this._isStandardAttachment() || (this._isStandardAttachment() && this._element.querySelector('.aQw') && this._element.querySelector('.aQw').children.length > 0);
-		});
-	},
-
 	getAttachmentType() {
 		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
 			return 'CUSTOM';
 		}
 
-		if(this._getButtonContainerElement()){
+		if (this._element.hasAttribute('download_url')) {
 			return 'FILE';
 		}
 
