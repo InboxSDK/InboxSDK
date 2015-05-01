@@ -12,9 +12,9 @@ const memberMap = new WeakMap();
 
 /**
  * @class
- * This namespace contains methods for showing informative messages to the user
- * in a small yellow "butter bar" pop-up styled similarly to Gmail's own
- * messages.
+ * This namespace contains methods for showing informative messages to the user. In Gmail this is
+ * a small yellow "butter bar" overlay near the top. In Inbox, the UI is different but the purpose
+ * is the same.
  */
 function ButterBar(appId, driver) {
   const members = {};
@@ -28,10 +28,9 @@ function ButterBar(appId, driver) {
 _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 
   /**
-   * Spawns a message in a yellow block.
-   *
-   * @param options {MessageDescriptor} message options
-   * @return {Object} Object with destroy method that can be called to remove the message.
+   * Spawns a new message. The returned object contains a {destroy} method that can be called to remove the message.
+   * @param {MessageDescriptor} options - message options
+   * @return {Object}
    */
   showMessage(options) {
     _.defaults(options, {
@@ -118,9 +117,9 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   },
 
   /**
-   * Spawns a "Loading..." message in a yellow block that stays until it's destroyed.
-   *
-   * @return {Object} Object with destroy method that can be called to remove the message.
+   * Spawns a "Loading..." message that stays until it's destroyed. The returned object has a
+   * {destroy} method that can be called to remove the message.
+   * @return {Object}
    */
   showLoading(options={}) {
     _.defaults(options, {
@@ -141,9 +140,9 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   },
 
   /**
-  * Spawns a "Saving..." message in a yellow block.
-  *
-  * @return {Object} Object with resolve and reject methods
+  * Spawns a "Saving..." message that stays until it's destroyed. The returned object has a
+  * {destroy} method that can be called to remove the message.
+  * @return {Object}
   */
   showSaving(options={}) {
     _.defaults(options, {
@@ -179,8 +178,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 
   /**
   * Hides all messages created by the same app with the given messageKey.
-  *
-  * @param messageKey {Object}
+  * @param {Object} messageKey - the key of the message to hide
   */
   hideMessage(messageKey) {
     if (messageKey) {
