@@ -304,11 +304,12 @@ function logFiles(filename) {
 }
 
 function isFileEligbleForDocs(filename) {
-  return  endsWith(filename, ".js") &&
-          filename.indexOf('/src/') > -1 &&
-          filename.indexOf('/dist/') == -1 &&
-          filename.indexOf('/dom-driver/') == -1 &&
-          filename.indexOf('platform-implementation-js/lib') == -1;
+  return  filename.endsWith(".js") &&
+          (filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
+          filename.indexOf('src/platform-implementation-js/views') > -1 ||
+          filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
+          filename.indexOf('src/common/constants') > -1 ||
+          filename.indexOf('src/inboxsdk-js/') > -1);
 }
 
 function endsWith(str, suffix) {
