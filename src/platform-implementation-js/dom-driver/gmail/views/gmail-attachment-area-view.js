@@ -67,8 +67,12 @@ _.extend(GmailAttachmentAreaView.prototype, {
 	},
 
 	addGmailAttachmentCardView: function(gmailAttachmentCardView){
-		var lastChild = this._element.querySelector('.aZK');
-		lastChild.parentNode.insertBefore(gmailAttachmentCardView.getElement(), lastChild);
+		const zone = this._element.querySelector('.aXK, .aQH');
+		if (zone) {
+			zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastChild);
+		} else {
+			this._driver.getLogger().error(new Error("Could not find attachment zone"));
+		}
 	},
 
 	addButtonToDownloadAllArea: function(options){
