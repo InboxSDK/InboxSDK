@@ -9,6 +9,7 @@ import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 import simulateClick from '../../../lib/dom/simulate-click';
+import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 function GmailAttachmentCardView(options, driver) {
@@ -58,11 +59,12 @@ _.assign(GmailAttachmentCardView.prototype, {
 			return 'CUSTOM';
 		}
 
-		if (this._element.hasAttribute('download_url')) {
-			return 'FILE';
+		const firstChild = this._element.firstElementChild;
+		if (firstChild && firstChild.classList.contains('aZr')) {
+			return 'DRIVE';
 		}
 
-		return 'DRIVE';
+		return 'FILE';
 	},
 
 	_isStandardAttachment() {
@@ -87,15 +89,26 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._addButton(buttonView);
 	},
 
+	_getDownloadLink() {
+		const download_url = this._element.getAttribute('download_url');
+		if (download_url) {
+			const m = /:(https:\/\/[^:]+)/.exec(download_url);
+			return m && m[1];
+		}
+		// download_url attribute may not be available yet. Use the a link href.
+		const firstChild = this._element.firstElementChild;
+		if (firstChild.tagName !== 'A') return null;
+		return firstChild.href;
+	},
+
+	// Resolves the short-lived cookie-less download URL
 	getDownloadURL() {
 		return RSVP.Promise.resolve().then(() => {
 			if (!this._isStandardAttachment()) return null;
-			const downloadUrl = this._element.getAttribute('download_url');
+			return waitFor(() => this._getDownloadLink());
+		}).then(downloadUrl => {
 			if (!downloadUrl) return null;
-			const m = /:(https:\/\/[^:]+)/.exec(downloadUrl);
-			if (!m) return null;
-			const url = m[1];
-			return this._driver.resolveUrlRedirects(url);
+			return this._driver.resolveUrlRedirects(downloadUrl);
 		});
 	},
 
@@ -104,8 +117,8 @@ _.assign(GmailAttachmentCardView.prototype, {
 			return;
 		}
 
-		var downloadUrl = this._element.getAttribute('download_url');
-		var imageUrl = this._getPreviewImageUrl();
+		const downloadUrl = this._getDownloadLink();
+		const imageUrl = this._getPreviewImageUrl();
 
 		var attachmentUrl = downloadUrl || imageUrl;
 
