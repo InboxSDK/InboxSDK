@@ -21,7 +21,7 @@ export default class PageCommunicator {
         if (event.detail.success) {
           return Bacon.once(event.detail.responseURL);
         } else {
-          return Bacon.once(new Bacon.Error("Connection error"));
+          return Bacon.once(new Bacon.Error(new Error("Connection error")));
         }
       })
       .toPromise(RSVP.Promise);
