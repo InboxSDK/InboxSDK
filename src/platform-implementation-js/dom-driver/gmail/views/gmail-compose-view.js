@@ -4,14 +4,14 @@ import RSVP from 'rsvp';
 import Bacon from 'baconjs';
 
 import simulateClick from '../../../lib/dom/simulate-click';
-
+import Logger from '../../../lib/logger';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
 import waitFor from '../../../lib/wait-for';
 
 import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
-
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import addAccessors from '../../../lib/add-accessors';
 import assertInterface from '../../../lib/assert-interface';
 
@@ -64,6 +64,12 @@ export default class GmailComposeView {
 				return !!this.getBodyElement();
 			}).then(() => {
 				this._composeID = this._element.querySelector('input[name="composeid"]').value;
+				this._messageIDElement = this._element.querySelector('input[name="draft"]');
+				if (!this._messageIDElement) {
+					Logger.error(new Error("Could not find compose message id field"));
+					// stub so other things don't fail
+					this._messageIDElement = document.createElement('div');
+				}
 
 				this._setupStreams();
 				this._setupConsistencyCheckers();
@@ -78,7 +84,14 @@ export default class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(require('./gmail-compose-view/get-minimize-restore-stream')(this));
+		this._eventStream.plug(Bacon.later(10).flatMap(()=>require('./gmail-compose-view/get-minimize-restore-stream')(this)));
+		this._eventStream.plug(
+			makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
+				.map(() => ({
+					eventName: 'messageIDChange',
+					data: this.getMessageID()
+				}))
+		);
 	}
 
 	_setupConsistencyCheckers() {
@@ -296,9 +309,9 @@ export default class GmailComposeView {
 		return this._composeID;
 	}
 
-	getMessageID()  {
-		const input = this._element.querySelector('input[name="draft"]');
-		return input && input.value && input.value != 'undefined' ? input.value : null;
+	getMessageID() {
+		const input = this._messageIDElement;
+		return input.value && input.value != 'undefined' ? input.value : null;
 	}
 
 	getThreadID() {

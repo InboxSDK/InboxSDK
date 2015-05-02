@@ -793,6 +793,12 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   background: none;
 }
 
+/* add some margins between cards so 4+ cards don't hit each other */
+
+.aQw > .T-I.J-J5-Ji.L3 {
+  margin-top: 5px;
+}
+
 /* end attachment card */
 
 

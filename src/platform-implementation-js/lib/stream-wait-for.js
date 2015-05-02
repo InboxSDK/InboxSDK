@@ -1,4 +1,5 @@
-var Bacon = require('baconjs');
+import asap from 'asap';
+import Bacon from 'baconjs';
 
 /**
  * Returns a Bacon stream that repeated calls the condition callback until it
@@ -7,9 +8,9 @@ var Bacon = require('baconjs');
  * thrown so that it gets logged. Well-behaving code should not let the timeout
  * get tripped.
  */
-function streamWaitFor(condition, timeout, steptime) {
+export default function streamWaitFor(condition, timeout, steptime) {
   // make this error here so we have a sensible stack.
-  var timeoutError = new Error("waitFor timeout");
+  const timeoutError = new Error("waitFor timeout");
 
   if (!timeout) {
     timeout = 60*1000;
@@ -18,18 +19,16 @@ function streamWaitFor(condition, timeout, steptime) {
     steptime = 250;
   }
 
-  var timeoutStream = Bacon.later(timeout).flatMap(function() {
+  const timeoutStream = Bacon.later(timeout).flatMap(function() {
     setTimeout(function() {
       throw timeoutError;
     }, 0);
     return new Bacon.Error(timeoutError);
   });
 
-  return Bacon.later(0).merge(
+  return Bacon.fromCallback(asap).merge(
     Bacon.interval(steptime)
   ).flatMap(function() {
     return Bacon.once(condition());
   }).filter(Boolean).merge(timeoutStream).take(1).endOnError();
 }
-
-module.exports = streamWaitFor;

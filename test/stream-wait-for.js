@@ -16,7 +16,9 @@ describe('streamWaitFor', function() {
     }, 10, 1);
 
     var onValueSpy = sinon.spy();
+    let tooEarly = true;
     s.onValue(function(result) {
+      assert(!tooEarly);
       assert.strictEqual(result, true);
       assert.equal(x, 2, 'check that condition has passed');
       assert.equal(conditionSpy.called, 1, 'check that condition failed once');
@@ -29,6 +31,7 @@ describe('streamWaitFor', function() {
       assert.equal(onValueSpy.called, 1, 'check that onValue was called once');
       cb();
     });
+    tooEarly = false;
   });
 
   it('should support Bacon.Error', function(cb) {

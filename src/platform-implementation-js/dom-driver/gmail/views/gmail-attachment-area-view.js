@@ -32,20 +32,6 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		{name: '_attachmentCardViews', destroy: true, get: true}
 	],
 
-	ready: function(){
-		var self = this;
-
-		return RSVP.resolve().then(function(){
-			if(!self._isNative || self._attachmentCardViews.length === 0){
-				return true;
-			}
-
-			return RSVP.all(self._attachmentCardViews.map(function(attachmentCardView){
-				return attachmentCardView.ready();
-			}));
-		});
-	},
-
 	_setupElement: function(){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'hq gt a10');
@@ -68,8 +54,12 @@ _.extend(GmailAttachmentAreaView.prototype, {
 	},
 
 	addGmailAttachmentCardView: function(gmailAttachmentCardView){
-		var lastChild = this._element.querySelector('.aZK');
-		lastChild.parentNode.insertBefore(gmailAttachmentCardView.getElement(), lastChild);
+		const zone = this._element.querySelector('.aXK, .aQH');
+		if (zone) {
+			zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastChild);
+		} else {
+			this._driver.getLogger().error(new Error("Could not find attachment zone"));
+		}
 	},
 
 	addButtonToDownloadAllArea: function(options){

@@ -46,11 +46,21 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			]
 		});
 
-		messageView.getAttachmentCardViews().map(function(card, i) {
+		messageView.getFileAttachmentCardViews().map(function(card, i) {
 			console.log(i, 'attachment card', card);
 			console.log(i, 'type', card.getAttachmentType());
 			card.getDownloadURL().then(function(url) {
 				console.log(i, 'url', url);
+			});
+			card.addButton({
+				iconUrl: chrome.runtime.getURL('zipicon.png'),
+				tooltip: 'Foo',
+				onClick: console.log.bind(console, 'click')
+			});
+			card.addButton({
+				iconUrl: chrome.runtime.getURL('zipicon.png'),
+				tooltip: 'Foo2',
+				onClick: console.log.bind(console, 'click2')
 			});
 		});
 

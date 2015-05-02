@@ -85,18 +85,29 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return memberMap.get(this).messageViewImplementation.getContentsElement();
 	},
 
-	// returns array of attachment card views
+	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
+	// registerAttachmentCardViewHandler function to listen for other types of
+	// attachment cards.
 	/**
-	* Returns all the attachment card views currently visible for this message. Includes Gmail/Inbox native attachment
-	* cards as well as those added by applications.
+	* Returns all the file attachment card views currently visible for this message.
 	* @return {AttachmentCardView[]}
 	*/
-	getAttachmentCardViews: function(){
-		return _.map(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers(), function(attachmentCardViewDriver){
-			return new AttachmentCardView(attachmentCardViewDriver);
-		});
+	getFileAttachmentCardViews: function(){
+		var self = this;
+		return _.chain(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers())
+			.filter(function(cardDriver) {
+				return cardDriver.getAttachmentType() === 'FILE';
+			})
+			.map(function(attachmentCardViewDriver){
+				return new AttachmentCardView(attachmentCardViewDriver, self);
+			})
+			.value();
 	},
 
+	// Deprecated name
+	getAttachmentCardViews: function(){
+		return this.getFileAttachmentCardViews();
+	},
 
 	/**
 	* Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful

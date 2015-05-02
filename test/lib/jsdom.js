@@ -1,47 +1,74 @@
-var _ = require('lodash');
-var jsdom = require('jsdom');
-var assert = require('assert');
+import _ from 'lodash';
+import jsdom from 'jsdom';
+import assert from 'assert';
 
 jsdom.defaultDocumentFeatures = {
   FetchExternalResources: false,
   ProcessExternalResources: false
 };
 
-var hasAddedClassList = false;
+let hasAddedClassList = false;
 
 function notImplemented() {
   throw new Error("mock classList modifiers not implemented");
 }
-var DOMTokenListPrototype = {
+const DOMTokenListPrototype = {
   contains: function(item) {
     return Array.prototype.indexOf.call(this, item) !== -1;
   },
   add: notImplemented, remove: notImplemented, toggle: notImplemented
 };
 
-function main() {
-  var document = jsdom.jsdom.apply(jsdom, arguments);
+export default function main() {
+  const document = jsdom.jsdom.apply(jsdom, arguments);
 
-  // Monkey-patch the Element prototype to have a simple classList getter.
+  // Monkey-patch the Element prototype to have some simple getters that jsdom
+  // lacked.
   if (!hasAddedClassList) {
-    var div = document.createElement("div");
-    var proto = div;
+    const div = document.createElement("div");
+    assert(!('classList' in div));
+    let proto = div;
     do {
       proto = Object.getPrototypeOf(proto);
     } while (!_.has(proto, 'className'));
     Object.defineProperty(proto, 'classList', {
-      get: function() {
+      get() {
         // jshint -W103
-        var list = this.className.split(' ').filter(Boolean);
+        const list = this.className.split(' ').filter(Boolean);
         list.__proto__ = DOMTokenListPrototype;
         return Object.freeze(list);
       }
     });
+    assert(!('firstElementChild' in proto));
+    Object.defineProperty(proto, 'firstElementChild', {
+      get() {
+        for (let i=0, len=this.children.length; i<len; i++) {
+          const child = this.children[i];
+          if (child.nodeType === 1) {
+            return child;
+          }
+        }
+        return null;
+      }
+    });
+    assert(!('lastElementChild' in proto));
+    Object.defineProperty(proto, 'lastElementChild', {
+      get() {
+        for (let i=this.children.length-1; i>=0; i--) {
+          const child = this.children[i];
+          if (child.nodeType === 1) {
+            return child;
+          }
+        }
+        return null;
+      }
+    });
+    hasAddedClassList = true;
   }
 
-  var originalCreateEvent = document.createEvent;
+  const originalCreateEvent = document.createEvent;
   document.createEvent = function(type) {
-    var event = originalCreateEvent.apply(this, arguments);
+    const event = originalCreateEvent.apply(this, arguments);
     if (type == 'CustomEvent') {
       assert(!event.initCustomEvent);
       event.initCustomEvent = function(type, bubbles, cancelable, detail) {
@@ -56,5 +83,3 @@ function main() {
 
   return document;
 }
-
-module.exports = main;

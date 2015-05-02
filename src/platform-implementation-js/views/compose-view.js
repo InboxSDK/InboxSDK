@@ -288,6 +288,12 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
+	* Fires when a compose view gets a new message ID assigned. Compose views get
+	* new message IDs assigned to them whenever the user edits the message.
+	* @event ComposeView#messageIDChange
+	*/
+
+	/**
 	* Fires when the user presses send. During this phase (between the presending and sending events)
 	* you can modify the {ComposeView} before the message actually starts sending. Note that multiple
 	* applications may modify the message. This event is the only one which allows you to modify or

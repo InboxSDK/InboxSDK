@@ -259,23 +259,11 @@ _.extend(GmailMessageView.prototype, {
 		this._gmailAttachmentAreaView = this._getAttachmentArea();
 		var self = this;
 
-		if(this._gmailAttachmentAreaView){
-			this._gmailAttachmentAreaView.ready().then(function(){
-				self._eventStream.push({
-					type: 'internal',
-					eventName: 'messageLoad',
-					view: self
-				});
-			});
-		}
-		else{
-			this._eventStream.push({
-				type: 'internal',
-				eventName: 'messageLoad',
-				view: this
-			});
-		}
-
+		this._eventStream.push({
+			type: 'internal',
+			eventName: 'messageLoad',
+			view: this
+		});
 
 		this._setupReplyStream();
 	},

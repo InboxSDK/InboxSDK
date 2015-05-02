@@ -9,6 +9,7 @@ import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 import simulateClick from '../../../lib/dom/simulate-click';
+import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 function GmailAttachmentCardView(options, driver) {
@@ -17,13 +18,27 @@ function GmailAttachmentCardView(options, driver) {
 	this._eventStream = new Bacon.Bus();
 	this._driver = driver;
 
+	this.getAttachmentType = _.once(() => {
+		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
+			return 'CUSTOM';
+		}
+		// FILE attachment cards are never in unloaded state.
+		if (this._element.children.length === 1 && this._element.children[0].children.length === 0) {
+			return 'UNLOADED';
+		}
+		const link = this._getDownloadLink();
+		if (!link || link.match(/^https?:\/\/mail\.google\.com\//)) {
+			// Only files and unloaded ever lack a link.
+			return 'FILE';
+		}
+		if (link.match(/^https?:\/\/([^\/]*\.)?google(usercontent)?\.com\//)) {
+			return 'DRIVE';
+		}
+		return 'UNKNOWN';
+	});
+
 	if(options.element){
 		this._element = options.element;
-		this.ready()
-			.takeUntil(this._eventStream.filter(false).mapEnd(null))
-			.onValue(() => {
-				this._extractAttachmentInfo();
-			});
 	}
 	else{
 		this._createNewElement(options);
@@ -37,30 +52,8 @@ _.assign(GmailAttachmentCardView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_driver', destroy: false},
-		{name: '_title', destroy: false, get: true},
-		{name: '_mimeType', destroy: false, get: true},
-		{name: '_messageId', destroy: false},
-		{name: '_attachmentId', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
-
-	ready: function(){
-		return streamWaitFor(() => {
-			return !this._isStandardAttachment() || (this._isStandardAttachment() && this._element.querySelector('.aQw') && this._element.querySelector('.aQw').children.length > 0);
-		});
-	},
-
-	getAttachmentType() {
-		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
-			return 'CUSTOM';
-		}
-
-		if(this._getButtonContainerElement()){
-			return 'FILE';
-		}
-
-		return 'DRIVE';
-	},
 
 	_isStandardAttachment() {
 		return this.getAttachmentType() === 'FILE';
@@ -84,42 +77,27 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._addButton(buttonView);
 	},
 
+	_getDownloadLink() {
+		const download_url = this._element.getAttribute('download_url');
+		if (download_url) {
+			const m = /:(https:\/\/[^:]+)/.exec(download_url);
+			return m && m[1];
+		}
+		// download_url attribute may not be available yet. Use the a link href.
+		const firstChild = this._element.firstElementChild;
+		if (firstChild.tagName !== 'A') return null;
+		return firstChild.href;
+	},
+
+	// Resolves the short-lived cookie-less download URL
 	getDownloadURL() {
 		return RSVP.Promise.resolve().then(() => {
 			if (!this._isStandardAttachment()) return null;
-			const downloadUrl = this._element.getAttribute('download_url');
+			return waitFor(() => this._getDownloadLink());
+		}).then(downloadUrl => {
 			if (!downloadUrl) return null;
-			const m = /:(https:\/\/[^:]+)/.exec(downloadUrl);
-			if (!m) return null;
-			const url = m[1];
-			return this._driver.resolveUrlRedirects(url);
+			return this._driver.resolveUrlRedirects(downloadUrl);
 		});
-	},
-
-	_extractAttachmentInfo: function(){
-		if(!this._isStandardAttachment()){
-			return;
-		}
-
-		var downloadUrl = this._element.getAttribute('download_url');
-		var imageUrl = this._getPreviewImageUrl();
-
-		var attachmentUrl = downloadUrl || imageUrl;
-
-		if(downloadUrl){
-			var parts = downloadUrl.split(':');
-			if(parts.length === 4){
-				this._mimeType = parts[0];
-			}
-		}
-		else{
-			this._mimeType = 'unknown';
-		}
-
-
-		this._title = this._extractFileNameFromElement();
-		this._messageId = attachmentUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
-		this._attachmentId = attachmentUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
 	},
 
 	_extractFileNameFromElement: function(){
@@ -219,8 +197,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 				});
 			}
 		});
-
-		this._title = options.fileName;
 	},
 
 	_addHoverEvents: function(){
