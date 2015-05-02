@@ -37,18 +37,8 @@ function GmailAttachmentCardView(options, driver) {
 		return 'UNKNOWN';
 	});
 
-	// Returns a Bacon stream!
-	this.ready = _.once(() =>
-		Bacon.constant(true)
-	);
-
 	if(options.element){
 		this._element = options.element;
-		this.ready()
-			.takeUntil(this._eventStream.filter(false).mapEnd(null))
-			.onValue(() => {
-				this._extractAttachmentInfo();
-			});
 	}
 	else{
 		this._createNewElement(options);
@@ -62,10 +52,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_driver', destroy: false},
-		{name: '_title', destroy: false, get: true},
-		{name: '_mimeType', destroy: false, get: true},
-		{name: '_messageId', destroy: false},
-		{name: '_attachmentId', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
 	],
 
@@ -112,32 +98,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 			if (!downloadUrl) return null;
 			return this._driver.resolveUrlRedirects(downloadUrl);
 		});
-	},
-
-	_extractAttachmentInfo: function(){
-		if(!this._isStandardAttachment()){
-			return;
-		}
-
-		const downloadUrl = this._getDownloadLink();
-		const imageUrl = this._getPreviewImageUrl();
-
-		var attachmentUrl = downloadUrl || imageUrl;
-
-		if(downloadUrl){
-			var parts = downloadUrl.split(':');
-			if(parts.length === 4){
-				this._mimeType = parts[0];
-			}
-		}
-		else{
-			this._mimeType = 'unknown';
-		}
-
-
-		this._title = this._extractFileNameFromElement();
-		this._messageId = attachmentUrl.replace(/.*?th=(\w+?)\&.*/, '$1');
-		this._attachmentId = attachmentUrl.replace(/.*?realattid=(.+)(\&.*|^)/, '$1');
 	},
 
 	_extractFileNameFromElement: function(){
@@ -237,8 +197,6 @@ _.assign(GmailAttachmentCardView.prototype, {
 				});
 			}
 		});
-
-		this._title = options.fileName;
 	},
 
 	_addHoverEvents: function(){

@@ -32,19 +32,6 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		{name: '_attachmentCardViews', destroy: true, get: true}
 	],
 
-	// returns a promise
-	ready() {
-		return RSVP.resolve().then(() => {
-			if(!this._isNative){
-				return true;
-			}
-
-			return RSVP.all(this._attachmentCardViews.map(attachmentCardView =>
-				attachmentCardView.ready().toPromise(RSVP.Promise)
-			));
-		});
-	},
-
 	_setupElement: function(){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'hq gt a10');
