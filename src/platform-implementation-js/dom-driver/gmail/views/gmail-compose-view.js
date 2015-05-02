@@ -84,7 +84,7 @@ export default class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(require('./gmail-compose-view/get-minimize-restore-stream')(this));
+		this._eventStream.plug(Bacon.later(10).flatMap(()=>require('./gmail-compose-view/get-minimize-restore-stream')(this)));
 		this._eventStream.plug(
 			makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
 				.map(() => ({
