@@ -19,7 +19,8 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
     frag.appendChild(chipElement);
     frag.appendChild(document.createTextNode('\u200b'));
 
-    require('../../../../lib/dom/insert-html-at-cursor')(gmailComposeView.getBodyElement(), frag, gmailComposeView.getSelectionRange());
+    require('../../../../lib/dom/insert-html-at-cursor')(
+      gmailComposeView.getBodyElement(), frag, gmailComposeView.getLastSelectionRange());
 
     if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm() && document.activeElement !== gmailComposeView.getBodyElement()){
         gmailComposeView.minimize();

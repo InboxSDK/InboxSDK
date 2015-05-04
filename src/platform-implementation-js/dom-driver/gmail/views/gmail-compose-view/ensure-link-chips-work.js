@@ -404,8 +404,8 @@ function _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes){
 
     chipElement.remove();
 
-    if(document.getSelection().rangeCount === 0 && gmailComposeView.getSelectionRange()){
-        document.getSelection().addRange(gmailComposeView.getSelectionRange());
+    if(document.getSelection().rangeCount === 0 && gmailComposeView.getLastSelectionRange()){
+        document.getSelection().addRange(gmailComposeView.getLastSelectionRange());
     }
 }
 

@@ -215,12 +215,12 @@ export default class GmailComposeView {
 
 	getSelectedBodyHTML() {
 		this.focus();
-		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._selectionRange);
+		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSelectedBodyText() {
 		this.focus();
-		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._selectionRange);
+		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSubject() {
@@ -350,7 +350,7 @@ addAccessors(GmailComposeView.prototype, [
 	{name: '_isInlineReplyForm', destroy: false, set: true},
 	{name: '_isFullscreen', destroy: false, get: true},
 	{name: '_isStandalone', destroy: false, set: true},
-	{name: '_selectionRange', destroy: false, set: true, get: true},
+	{name: '_lastSelectionRange', destroy: false, set: true, get: true},
 	{name: '_buttonViewControllerTooltipMap', destroy: false}
 ]);
 

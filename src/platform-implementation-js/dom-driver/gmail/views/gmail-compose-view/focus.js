@@ -2,7 +2,7 @@
 
 module.exports = function(gmailComposeView){
 
-	let selectionRange = gmailComposeView.getSelectionRange();
+	let selectionRange = gmailComposeView.getLastSelectionRange();
 	gmailComposeView.getBodyElement().focus();
 
 	if(!selectionRange){
