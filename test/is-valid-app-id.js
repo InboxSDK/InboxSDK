@@ -13,10 +13,20 @@ function shouldFail(description, appId) {
   });
 }
 
+const grandfathered = [
+  'streak', 'dropbox', 'Rockwell', 'Screenleap', 'docsend', 'giphy',
+  'stripe', 'godMode'
+];
+
 describe("isValidAppId", function() {
   describe("passes", function() {
     shouldPass("streak",
       "streak");
+    it("all grandfathered appIds", function() {
+      grandfathered.forEach(name => {
+        assert.strictEqual(isValidAppId(name), true);
+      });
+    });
     shouldPass("good hash",
       "sdk_testfoo_2a9c68f994");
     shouldPass("respects case",
