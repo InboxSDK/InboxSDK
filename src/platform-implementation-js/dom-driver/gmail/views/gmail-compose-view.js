@@ -10,6 +10,7 @@ import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
 import waitFor from '../../../lib/wait-for';
+import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -48,6 +49,7 @@ export default class GmailComposeView {
 						eventName: 'buttonAdded'
 					};
 				}),
+				Bacon.fromEvent(this._element, 'resize').map(() => ({eventName: 'resize'})),
 				Bacon
 					.fromEventTarget(this._element, 'composeFullscreenStateChanged')
 					.doAction(() => this._updateComposeFullscreenState())
@@ -184,12 +186,14 @@ export default class GmailComposeView {
 
 	addStatusBar() {
 		const statusBar = addStatusBar(this);
-		this._eventStream.push({eventName:'statusBarAdded'});
-		this._eventStream.plug(
-			Bacon.fromEvent(statusBar, 'destroy')
-				.map(() => ({eventName:'statusBarRemoved'}))
-				.flatMap(delayAsap)
-		);
+		dispatchCustomEvent(this._element, 'resize');
+		Bacon.fromEvent(statusBar, 'destroy')
+			.map(() => ({eventName:'statusBarRemoved'}))
+			.flatMap(delayAsap)
+			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.onValue(() => {
+				dispatchCustomEvent(this._element, 'resize');
+			});
 		return statusBar;
 	}
 

@@ -38,7 +38,7 @@ function manageButtonGrouping(gmailComposeView){
 
 	gmailComposeView.getEventStream()
 					.filter(event =>
-						event.eventName === 'statusBarAdded' || event.eventName === 'statusBarRemoved'
+						event.eventName === 'resize'
 					)
 					.onValue(_fixToolbarPosition, gmailComposeView);
 
