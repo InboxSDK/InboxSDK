@@ -134,6 +134,9 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	getMessageID() {
+		if(!this._messageLoaded){
+			throw new Error('tried to get message id before message is loaded');
+		}
 		const messageEl = this._element.querySelector("div.ii.gt");
 		if (!messageEl) {
 			this._driver.getLogger().error(new Error("Could not find message id element"));
@@ -269,9 +272,8 @@ _.extend(GmailMessageView.prototype, {
 		}
 		this._messageLoaded = true;
 
-
+		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), this.getMessageID());
 		this._gmailAttachmentAreaView = this._getAttachmentArea();
-		var self = this;
 
 		this._eventStream.push({
 			type: 'internal',

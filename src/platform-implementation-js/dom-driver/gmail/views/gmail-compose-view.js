@@ -18,13 +18,14 @@ import assertInterface from '../../../lib/assert-interface';
 import addStatusBar from './gmail-compose-view/add-status-bar';
 
 export default class GmailComposeView {
-	constructor(element, xhrInterceptorStream) {
+	constructor(element, xhrInterceptorStream, driver) {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
 		this._isInlineReplyForm = false;
 		this._isFullscreen = false;
 		this._isStandalone = false;
+		this._driver = driver;
 		this._managedViewControllers = [];
 		this._eventStream = new Bacon.Bus();
 
@@ -314,9 +315,16 @@ export default class GmailComposeView {
 		return input.value && input.value != 'undefined' ? input.value : null;
 	}
 
-	getThreadID() {
+	// If this compose is a reply, then this gets the message ID of the message
+	// we're replying to.
+	getTargetMessageID() {
 		const input = this._element.querySelector('input[name="rm"]');
 		return input && input.value && input.value != 'undefined' ? input.value : null;
+	}
+
+	getThreadID() {
+		const targetID = this.getTargetMessageID();
+		return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
 	}
 
 	getRecipientRowElements() {
@@ -345,6 +353,7 @@ export default class GmailComposeView {
 
 addAccessors(GmailComposeView.prototype, [
 	{name: '_element', destroy: false, get: true},
+	{name: '_driver', destroy: false},
 	{name: '_eventStream', destroy: true, get: true, destroyMethod: 'end'},
 	{name: '_managedViewControllers', destroy: true},
 	{name: '_isInlineReplyForm', destroy: false, set: true},
