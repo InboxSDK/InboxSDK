@@ -36,6 +36,12 @@ function manageButtonGrouping(gmailComposeView){
 					})
 					.onValue(_handleButtonAdded, gmailComposeView);
 
+	gmailComposeView.getEventStream()
+					.filter(event =>
+						event.eventName === 'statusBarAdded' || event.eventName === 'statusBarRemoved'
+					)
+					.onValue(_fixToolbarPosition, gmailComposeView);
+
 	const el = gmailComposeView.getElement();
 	gmailComposeView.getEventStream().onEnd(function(){
 		memberMap.delete(gmailComposeView);

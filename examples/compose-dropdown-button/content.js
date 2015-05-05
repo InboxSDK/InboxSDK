@@ -20,7 +20,16 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 			title: 'Monkeys 2',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			onClick: function(event){
-				statusbar.destroy();
+				if (statusbar) {
+					statusbar.destroy();
+					statusbar = null;
+				} else {
+					statusbar = composeView.addStatusBar();
+					statusbar.el.innerHTML = 'foo <b>bar</b>';
+					statusbar.on('destroy', function() {
+						console.log('statusbar destroyed');
+					});
+				}
 			},
 			section: 'TRAY_LEFT'
 		});

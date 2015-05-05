@@ -3,6 +3,7 @@ import $ from 'jquery';
 import RSVP from 'rsvp';
 import Bacon from 'baconjs';
 
+import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import Logger from '../../../lib/logger';
 import * as GmailResponseProcessor from '../gmail-response-processor';
@@ -182,7 +183,14 @@ export default class GmailComposeView {
 	}
 
 	addStatusBar() {
-		return addStatusBar(this);
+		const statusBar = addStatusBar(this);
+		this._eventStream.push({eventName:'statusBarAdded'});
+		this._eventStream.plug(
+			Bacon.fromEvent(statusBar, 'destroy')
+				.map(() => ({eventName:'statusBarRemoved'}))
+				.flatMap(delayAsap)
+		);
+		return statusBar;
 	}
 
 	close() {
