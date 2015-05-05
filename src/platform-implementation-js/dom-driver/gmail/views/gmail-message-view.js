@@ -133,6 +133,20 @@ _.extend(GmailMessageView.prototype, {
 		this._addedDownloadAllAreaButtonOptions[optionsHash] = true;
 	},
 
+	getMessageID() {
+		const messageEl = this._element.querySelector("div.ii.gt");
+		if (!messageEl) {
+			this._driver.getLogger().error(new Error("Could not find message id element"));
+			return;
+		}
+		const m = messageEl.className.match(/\bm(\w+)\b/);
+		if (!m) {
+			this._driver.getLogger().error(new Error("Could not find message id value"));
+			return;
+		}
+		return m[1];
+	},
+
 	getViewState: function(){
 		if(this._element.classList.contains('kQ')){
 			return 'HIDDEN';

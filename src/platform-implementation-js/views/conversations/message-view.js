@@ -85,6 +85,11 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 		return memberMap.get(this).messageViewImplementation.getContentsElement();
 	},
 
+
+	getMessageID: function() {
+		return memberMap.get(this).messageViewImplementation.getMessageID();
+	},
+
 	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
