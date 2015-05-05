@@ -440,6 +440,12 @@ if (_extensionIsLoggerMaster && global.document) {
   }).map(null).throttle(120*1000).onValue(function() {
     const events = _trackedEventsQueue.removeAll();
 
+    // The trackedEventsQueue is in localStorage, which is shared between
+    // multiple tabs. A different tab could have flushed it already recently.
+    if (events.length === 0) {
+      return;
+    }
+
     ajax({
       url: 'https://www.inboxsdk.com/api/v2/events',
       method: 'POST',
