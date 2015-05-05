@@ -17,8 +17,14 @@ let User = require('./platform-implementation/user');
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
 
+import isValidAppId from './lib/is-valid-app-id';
+
 // returns a promise for the PlatformImplementation object
 export default function makePlatformImplementation(appId, opts) {
+	if (typeof appId !== 'string') {
+		throw new Error("appId must be a string");
+	}
+
 	const pi = {
 		_appId: appId,
 		LOADER_VERSION: opts.VERSION,
@@ -49,6 +55,17 @@ export default function makePlatformImplementation(appId, opts) {
 		return new Promise(function(resolve, reject) {
 			// never resolve
 		});
+	}
+
+	if (!isValidAppId(appId)) {
+		console.error(`
+===========================================================
+InboxSDK: You have loaded InboxSDK with an invalid appId.
+This error will be visible outside of the console to users
+in the future! Registering an appId is free. Please see
+https://www.inboxsdk.com/docs/#RequiredSetup
+===========================================================
+`);
 	}
 
 	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
