@@ -8,7 +8,7 @@ module.exports = function(gmailComposeView){
     .onValue(function(event){
         const body = gmailComposeView.getBodyElement();
         const selection = document.getSelection();
-        if(selection && selection.rangeCount > 0 && body.contains(selection.anchorNode)){
+        if(body && selection && selection.rangeCount > 0 && body.contains(selection.anchorNode)){
             gmailComposeView.setLastSelectionRange(selection.getRangeAt(0));
         }
         else{
