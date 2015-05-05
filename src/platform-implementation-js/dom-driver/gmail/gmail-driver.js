@@ -29,6 +29,8 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	this._customListRouteIDs = new Map();
 	this._customListSearchStringsToRouteIds = new Map();
 
+	this._messageIDsToThreadIDs = new Map();
+
 	this._messageIdManager = new MessageIdManager({
 		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
 			require('./gmail-driver/get-gmail-thread-id-for-rfc-message-id')(this, rfcMessageId),
@@ -54,6 +56,7 @@ addAccessors(GmailDriver.prototype, [
 	{name: '_pageCommunicator', destroy: false, get: true},
 	{name: '_pageCommunicatorPromise', destroy: false, get: true},
 	{name: '_logger', destroy: false, get: true},
+	{name: '_messageIDsToThreadIDs', destroy: false},
 	{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
 	{name: '_messageIdManager', destroy: false, get: true},
 	{name: '_butterBarDriver', destroy: false, get: true},
@@ -267,6 +270,14 @@ _.extend(GmailDriver.prototype, {
 				});
 			})
 		);
+	},
+
+	associateThreadAndMessageIDs(threadID, messageID) {
+		this._messageIDsToThreadIDs.set(messageID, threadID);
+	},
+
+	getThreadIDForMessageID(messageID) {
+		return this._messageIDsToThreadIDs.get(messageID);
 	}
 
 });

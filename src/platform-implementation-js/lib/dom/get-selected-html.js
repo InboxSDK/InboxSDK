@@ -1,25 +1,11 @@
-module.exports = function(element, range){
+export default function(element, lastRange){
 	element.focus();
+	const selection = document.getSelection();
+	const range = selection && selection.rangeCount ? selection.getRangeAt(0) : lastRange;
 
-	if(!range){
-		let selection = document.getSelection();
-		if(!selection){
-			return null;
-		}
+	if (!range) return null;
 
-		if(selection.rangeCount < 1){
-			return null;
-		}
-
-		range = selection.getRangeAt(0);
-		if(!range){
-			return null;
-		}
-	}
-
-	let rangeContentsClone = range.cloneContents();
-	let div = document.createElement('div');
-	div.appendChild(rangeContentsClone);
-
+	const div = document.createElement('div');
+	div.appendChild(range.cloneContents());
 	return div.innerHTML;
-};
+}

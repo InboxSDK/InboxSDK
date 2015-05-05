@@ -25,7 +25,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 		}
 
 		return elementStream.flatMap(makeElementViewStream(function(el) {
-			let composeView = new GmailComposeView(el, xhrInterceptorStream);
+			let composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 			composeView.setIsStandalone(isStandalone);
 
 			return composeView;
@@ -33,7 +33,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 	}).merge(
 		messageViewDriverStream.flatMap(function(gmailMessageView){
 			return gmailMessageView.getReplyElementStream().flatMap(makeElementViewStream(function(el) {
-				var view = new GmailComposeView(el, xhrInterceptorStream);
+				var view = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 				view.setIsInlineReplyForm(true);
 				return view;
 			}));
