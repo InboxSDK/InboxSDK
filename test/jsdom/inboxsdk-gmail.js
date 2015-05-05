@@ -21,13 +21,13 @@ var appOpts = {
 
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
 
-InboxSDK.load(1, "test", appOpts).then(function(inboxsdk) {
+InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
   assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
 
   RSVP.all([
-    InboxSDK.load(1, 'new1', appOpts),
-    InboxSDK.load(1, 'new2', appOpts)
+    InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
+    InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts)
   ]).then(function(apps) {
     assert.notStrictEqual(apps[0], apps[1]);
     assert.strictEqual(apps[0].LOADER_VERSION, 'beep');
