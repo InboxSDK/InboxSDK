@@ -71,8 +71,10 @@ function _isRecipientNode(node){
 
 function _convertToEvent(eventName, addressInfo){
 	return {
-		eventName: eventName,
-		data: addressInfo
+		eventName,
+		data: {
+			contact: addressInfo
+		}
 	};
 }
 
@@ -94,7 +96,7 @@ function _groupChangeEvents(events){
 
 	events.forEach(function(event){
 		var parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
-		grouping[parts[0]][parts[1].toLowerCase()].push(event.data);
+		grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
 	});
 
 	return {
