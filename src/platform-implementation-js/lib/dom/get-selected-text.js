@@ -1,21 +1,6 @@
-module.exports = function(element, range){
-    element.focus();
-
-    if(!range){
-        let selection = document.getSelection();
-        if(!selection){
-            return null;
-        }
-
-        if(selection.rangeCount < 1){
-            return null;
-        }
-
-        range = selection.getRangeAt(0);
-        if(!range){
-            return null;
-        }
-    }
-
-    return range.toString();
-};
+export default function(element, lastRange){
+  element.focus();
+  const selection = document.getSelection();
+  const range = selection && selection.rangeCount ? selection.getRangeAt(0) : lastRange;
+  return range ? range.toString() : null;
+}
