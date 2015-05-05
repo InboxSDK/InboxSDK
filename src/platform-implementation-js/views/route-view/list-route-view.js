@@ -39,7 +39,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 	/**
 	 * Adds a collapsible section to the top of the page.
-	 * @param {SectionDescriptor} options - configuration options of the CollapsibleSectionView
+	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the CollapsibleSectionView
 	 * @returns {CollapsibleSectionView} the CollapsibleSectionView that was added
 	 */
 	addCollapsibleSection: function(collapsibleSectionDescriptor){
@@ -54,7 +54,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 	/**
 	 * Adds a non-collapsible section to the top of the page.
-	 * @param {SectionDescriptor} options - configuration options of the SectionView
+	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the SectionView
 	 * @returns {SectionView} the SectionView that was added
 	 */
 	addSection: function(sectionDescriptor){
