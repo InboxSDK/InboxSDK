@@ -15,9 +15,9 @@ var membersMap = new WeakMap();
 * header styles to match Gmail's style more accurately.
 *
 * You can either render rows (that are visually similar to Gmail/Inbox rows) or custom content in
-* your CollapsibleSectionView. However, until you call one of <code>setTableRows</code> or <code>setContent</code>
-* the CollapsibleSectionView will simply display a "Loading..." indicator.
-* @extends RouteView
+* your CollapsibleSectionView. Until content is provided, the SectionView will simply display
+* a "Loading..." indicator. See {ListRouteView.addCollapsibleSection} for more information.
+* @extends SectionView
 */
 var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
 	var members = {};
