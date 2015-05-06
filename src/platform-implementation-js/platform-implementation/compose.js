@@ -49,7 +49,7 @@ _.extend(Compose.prototype, /** @lends Compose */ {
 
   /**
    * Opens a new compose view. Any handlers you've registered for ComposeViews will be called as well.
-   * @return {Promise(ComposeView)} a promise that will resolve to a ComposeView once the ComposeView has opened
+   * @return {Promise.<ComposeView>} a promise that will resolve to a ComposeView once the ComposeView has opened
    */
   openNewComposeView: function(){
     return this.getComposeView();
