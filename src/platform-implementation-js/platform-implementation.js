@@ -57,8 +57,12 @@ export default function makePlatformImplementation(appId, opts) {
 		});
 	}
 
-	if (!isValidAppId(appId)) {
-		console.error(`
+	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
+	return pi._driver.onready.then(() => {
+		pi._driver.getLogger().eventSdkPassive('load');
+
+		if (!isValidAppId(appId)) {
+			console.error(`
 ===========================================================
 InboxSDK: You have loaded InboxSDK with an invalid appId:
 ${appId}
@@ -66,12 +70,9 @@ This error will be visible outside of the console to users
 in the future! Registering an appId is free. Please see
 https://www.inboxsdk.com/docs/#RequiredSetup
 ===========================================================
-`);
-	}
-
-	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
-	return pi._driver.onready.then(() => {
-		pi._driver.getLogger().eventSdkPassive('load');
+	`);
+			pi._driver.showAppIdWarning();
+		}
 
 		pi.Compose = new Compose(appId, pi._driver, pi._membraneMap);
 		pi.Conversations = new Conversations(appId, pi._driver, pi._membraneMap);

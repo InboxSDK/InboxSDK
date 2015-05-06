@@ -158,6 +158,57 @@ div.T-I.inboxsdk__button {
 
 /* end */
 
+/* appid warning */
+
+.inboxsdk__appid_warning {
+  margin: 0;
+  padding: 9px;
+  color: #4b4b4b;
+  height: 32px;
+  background: #ff6c6c;
+  font-size: 10pt;
+}
+
+.inboxsdk__appid_warning_main {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.inboxsdk__appid_warning .topline {
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+a.inboxsdk__appid_register {
+  color: white;
+  display: inline-block;
+  background: #1989ff;
+  border-radius: 3px;
+  text-decoration: none;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  padding: 7px;
+  font-size: 10pt;
+  vertical-align: middle;
+  margin-left: 1em;
+}
+
+input.inboxsdk__x_close_button {
+  background-color: transparent;
+  background-image: url(https://www.streak.com/build/images/circle_border_x.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 20px;
+  width: 20px;
+  border: none;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+
+  float: right;
+  margin: 5px;
+}
+
 /* thread rows */
 
 .inboxsdk__gmail_label.inboxsdk__label_has_icon .au {

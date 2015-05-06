@@ -1,8 +1,7 @@
-var asap = require('asap');
-var Bacon = require('baconjs');
+import Bacon from 'baconjs';
 
 // Creates a mutation observer watching the given element and emits the events in a stream.
-function makeMutationObserverChunkedStream(element, options) {
+export default function makeMutationObserverChunkedStream(element, options) {
   return Bacon.fromBinder(function(sink) {
     const observer = new MutationObserver(function(mutations) {
       // Work around Safari bug where sometimes mutations is an instance of a
@@ -17,5 +16,3 @@ function makeMutationObserverChunkedStream(element, options) {
     };
   });
 }
-
-module.exports = makeMutationObserverChunkedStream;
