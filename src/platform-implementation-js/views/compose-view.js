@@ -297,7 +297,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	* Fires when the user presses send. During this phase (between the presending and sending events)
 	* you can modify the {ComposeView} before the message actually starts sending. Note that multiple
 	* applications may modify the message. This event is the only one which allows you to modify or
-	* cancel the sent message.
+	* cancel the sent message. This event may be emitted multiple times for one message.
 	* @event ComposeView#presending
 	* @param {function} cancel - a function you can call to cancel the sending of this message. This
 	* will prevent the message from being sent.
