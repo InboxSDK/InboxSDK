@@ -126,13 +126,11 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* You'll typically use this modify Gmail's and Inbox's built in List routes.
 	* @example
 		InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
-
-	    sdk.Router.handleListRoute(Router.NativeListRouteIDs.SEARCH, function(inboxView)
-	    {
-	        console.log(inboxView);
-	    })
+	  	sdk.Router.handleListRoute(Router.NativeListRouteIDs.SEARCH, function(inboxView) {
+	  		console.log(inboxView);
+	  	})
 		});
-	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in {Router.NativeRouteIDs}.
+	* @param {NativeListRouteIDs} routeID - which list route this handler is registering for.
 	* @param {func(ListRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
 	* @return {function} a function which can be called to stop handling these routes
 	*/
