@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "asap": "^2.0.3",
+    "auto-html": "^1.0.3",
     "babel": "^5.1.13",
     "babel-runtime": "^5.1.13",
     "babelify": "^6.0.2",
