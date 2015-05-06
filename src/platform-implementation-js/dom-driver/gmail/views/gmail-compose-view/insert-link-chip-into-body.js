@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const RSVP = require('rsvp');
 const Bacon = require('baconjs');
+import autoHtml from 'auto-html';
 
 function insertLinkChipIntoBody(gmailComposeView, options){
     return _insertLinkChipIntoBody(gmailComposeView, options);
@@ -33,19 +34,21 @@ function _insertLinkChipIntoBody(gmailComposeView, options){
 }
 
 function _getChipElement(options){
-    var chipElement = document.createElement("div");
+    let chipElement = document.createElement("div");
 
-    var chipHTML = [
-        '<div contenteditable="false" class="inboxsdk__compose_linkChip" style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);">',
-            '<span hspace="inboxsdk__chip"></span>',
-            '<a href="' +  _.escape(options.url) + '" target="_blank" style=" display:inline-block; max-width: 366px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-height: 1.2em; text-decoration: none; cursor: pointer; padding: 1px 0; border: none; ">',
-              options.iconUrl ?
-                '<img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="' +  _.escape(options.iconUrl) + '">&nbsp;' :
-                '',
-                '<span dir="ltr" style="color: rgb(17, 85, 204); text-decoration: none; vertical-align: bottom;">' + _.escape(options.text) + '</span>',
-            '</a>',
-        '</div>'
-    ].join('');
+    const iconHtml = options.iconUrl ? autoHtml `
+<img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="${options.iconUrl}">&nbsp;
+` : '';
+    const chipHTML = autoHtml `
+<div contenteditable="false" class="inboxsdk__compose_linkChip"
+style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);">
+  <span hspace="inboxsdk__chip"></span>
+  <a href="${options.url}" target="_blank" style=" display:inline-block; max-width: 366px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-height: 1.2em; text-decoration: none; cursor: pointer; padding: 1px 0; border: none; ">
+    ${{__html:iconHtml}}
+    <span dir="ltr" style="color: rgb(17, 85, 204); text-decoration: none; vertical-align: bottom;">${options.text}</span>
+  </a>
+</div>
+`;
 
     chipElement.innerHTML = chipHTML;
     chipElement = chipElement.children[0];
