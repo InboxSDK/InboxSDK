@@ -32,6 +32,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		.filter(event => event.newURL === document.location.href) // ignore outdated events
 		.map(event => ({new: getURLObject(event.newURL), old: getURLObject(event.oldURL)}))
 		.filter(event => event.new.hash !== event.old.hash)
+		.map(event => event.new)
 		.map(urlObject => {
 			const hash = urlObject.hash;
 			for (let routeIDs of customRouteIDs) {
