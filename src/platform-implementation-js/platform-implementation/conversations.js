@@ -62,32 +62,22 @@ var Conversations = function(appId, driver, membraneMap){
 	* @class
 	* @name MessageViewViewStates
 	*/
-	this.MessageViewViewStates = {};
-	Object.defineProperties(this.MessageViewViewStates, /**@lends MessageViewViewStates */ {
+	this.MessageViewViewStates = Object.freeze(/**@lends MessageViewViewStates */{
 		/**
 		* In this state none of the message is visible except for the outline of its existence.
 		* @type string
 		*/
-		'HIDDEN': {
-			value: "HIDDEN",
-			writable: false
-		},
+		'HIDDEN': "HIDDEN",
 		/**
 		* In this state most of the body of the message is not visible and some recipients may not be showing.
 		* @type string
 		*/
-		'COLLAPSED': {
-			value: "COLLAPSED",
-			writable: false
-		},
+		'COLLAPSED': "COLLAPSED",
 		/**
 		* In this state all of the message is visible including the body.
 		* @type string
 		*/
-		'EXPANDED': {
-			value: "EXPANDED",
-			writable: false
-		}
+		'EXPANDED': "EXPANDED"
 	});
 };
 
