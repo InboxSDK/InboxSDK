@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const ajax = require('../../common/ajax');
-const RSVP = require('rsvp');
-const getStackTrace = require('../../common/get-stack-trace');
-const getExtensionId = require('../../common/get-extension-id');
-const PersistentQueue = require('./persistent-queue');
-const makeMutationObserverStream = require('./dom/make-mutation-observer-stream');
+import _ from 'lodash';
+import ajax from '../../common/ajax';
+import RSVP from 'rsvp';
+import getStackTrace from '../../common/get-stack-trace';
+import getExtensionId from '../../common/get-extension-id';
+import PersistentQueue from './persistent-queue';
+import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -39,7 +39,7 @@ function getAllAppIds() {
 
 const _trackedEventsQueue = new PersistentQueue('events');
 
-class Logger {
+export default class Logger {
   constructor(appId, opts, loaderVersion, implVersion) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
     this._appId = appId;
@@ -110,8 +110,6 @@ class Logger {
     };
   }
 }
-
-module.exports = Logger;
 
 function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
   _extensionAppIds.push(Object.freeze({
@@ -441,6 +439,12 @@ if (_extensionIsLoggerMaster && global.document) {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(120*1000).onValue(function() {
     const events = _trackedEventsQueue.removeAll();
+
+    // The trackedEventsQueue is in localStorage, which is shared between
+    // multiple tabs. A different tab could have flushed it already recently.
+    if (events.length === 0) {
+      return;
+    }
 
     ajax({
       url: 'https://www.inboxsdk.com/api/v2/events',
