@@ -124,7 +124,15 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* Registers a handler (callback) to be called when the user navigates to a list route which matches the routeID you provide.
 	* Gmail and Inbox have several built in routes which are "Lists". These include routes like Inbox, All Mail, Sent, Drafts, etc.
 	* You'll typically use this modify Gmail's and Inbox's built in List routes.
-	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in {Router.NativeListRoutes}.
+	* @example
+		InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
+
+	    sdk.Router.handleListRoute(Router.NativeListRouteIDs.SEARCH, function(inboxView)
+	    {
+	        console.log(inboxView);
+	    })
+		});
+	* @param {string} routeID - which list route this handler is registering for. Permissible values are defined in {Router.NativeRouteIDs}.
 	* @param {func(ListRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
 	* @return {function} a function which can be called to stop handling these routes
 	*/

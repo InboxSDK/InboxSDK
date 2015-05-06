@@ -127,7 +127,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* The parameters of the route being navigated to when the autocomplete search result is selected.
 	* ^optional
 	* ^default=[]
-	* @type {String[]}
+	* @type {string[]}
 	*/
 	routeParams: null,
 
