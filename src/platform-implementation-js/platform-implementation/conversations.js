@@ -69,7 +69,7 @@ var Conversations = function(appId, driver, membraneMap){
 		* @type string
 		*/
 		'HIDDEN': {
-			value: ["HIDDEN"],
+			value: "HIDDEN",
 			writable: false
 		},
 		/**
@@ -77,7 +77,7 @@ var Conversations = function(appId, driver, membraneMap){
 		* @type string
 		*/
 		'COLLAPSED': {
-			value: ["COLLAPSED"],
+			value: "COLLAPSED",
 			writable: false
 		},
 		/**
@@ -85,7 +85,7 @@ var Conversations = function(appId, driver, membraneMap){
 		* @type string
 		*/
 		'EXPANDED': {
-			value: ["EXPANDED"],
+			value: "EXPANDED",
 			writable: false
 		}
 	});
