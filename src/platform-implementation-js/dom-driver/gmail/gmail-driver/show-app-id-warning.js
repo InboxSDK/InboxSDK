@@ -1,3 +1,5 @@
+import fakeWindowResize from '../../../lib/fake-window-resize';
+
 export default function showAppIdWarning(driver) {
   const topDiv = document.createElement('div');
   topDiv.className = 'inboxsdk__appid_warning';
@@ -12,6 +14,8 @@ export default function showAppIdWarning(driver) {
   topDiv.querySelector('.inboxsdk__x_close_button')
     .addEventListener('click', function(e) {
       topDiv.remove();
+      fakeWindowResize();
     });
   document.body.insertBefore(topDiv, document.body.firstChild);
+  fakeWindowResize();
 }
