@@ -158,6 +158,39 @@ div.T-I.inboxsdk__button {
 
 /* end */
 
+/* appid warning */
+
+.inboxsdk__appid_warning {
+  margin: 0;
+  padding: 9px;
+  color: #4b4b4b;
+  height: 32px;
+  background: #ff6c6c;
+  font-size: 11pt;
+}
+
+.inboxsdk__appid_warning_main {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.inboxsdk__appid_warning .topline {
+  font-weight: bold;
+}
+
+a.inboxsdk__appid_register {
+  color: white;
+  display: inline-block;
+  background: #1989ff;
+  border-radius: 3px;
+  text-decoration: none;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  padding: 7px;
+  font-size: 10pt;
+  vertical-align: middle;
+  margin-left: 1em;
+}
+
 /* thread rows */
 
 .inboxsdk__gmail_label.inboxsdk__label_has_icon .au {

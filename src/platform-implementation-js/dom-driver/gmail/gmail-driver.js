@@ -9,6 +9,7 @@ import asap from 'asap';
 
 import addAccessors from '../../lib/add-accessors';
 import assertInterface from '../../lib/assert-interface';
+import showAppIdWarning from './gmail-driver/show-app-id-warning';
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptor = require('./make-xhr-interceptor');
@@ -24,6 +25,7 @@ import MessageIdManager from '../../lib/message-id-manager';
 var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 	require('./custom-style');
 
+	this._appId = appId;
 	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 	this._customRouteIDs = new Set();
 	this._customListRouteIDs = new Map();
@@ -52,6 +54,7 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 };
 
 addAccessors(GmailDriver.prototype, [
+	{name: '_appId', destroy: false, get: true},
 	// This isn't available until the following promise has resolved
 	{name: '_pageCommunicator', destroy: false, get: true},
 	{name: '_pageCommunicatorPromise', destroy: false, get: true},
@@ -270,6 +273,10 @@ _.extend(GmailDriver.prototype, {
 				});
 			})
 		);
+	},
+
+	showAppIdWarning() {
+		showAppIdWarning(this);
 	},
 
 	associateThreadAndMessageIDs(threadID, messageID) {
