@@ -166,7 +166,7 @@ div.T-I.inboxsdk__button {
   color: #4b4b4b;
   height: 32px;
   background: #ff6c6c;
-  font-size: 11pt;
+  font-size: 10pt;
 }
 
 .inboxsdk__appid_warning_main {
@@ -176,6 +176,7 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__appid_warning .topline {
   font-weight: bold;
+  font-size: 11pt;
 }
 
 a.inboxsdk__appid_register {
@@ -189,6 +190,23 @@ a.inboxsdk__appid_register {
   font-size: 10pt;
   vertical-align: middle;
   margin-left: 1em;
+}
+
+input.inboxsdk__x_close_button {
+  background-color: transparent;
+  background-image: url(https://www.streak.com/build/images/circle_border_x.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 20px;
+  width: 20px;
+  border: none;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+
+  float: right;
+  margin: 5px;
 }
 
 /* thread rows */
