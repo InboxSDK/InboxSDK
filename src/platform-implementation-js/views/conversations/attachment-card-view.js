@@ -48,7 +48,7 @@ _.assign(AttachmentCardView.prototype, /** @lends AttachmentCardView */{
 	* Get the URL for the attachment card's download link as a promise for a
 	* string. For Gmail file attachments, the URL will be a short-lived URL that
 	* can be accessed without cookies.
-	* @return {Promise(string)}
+	* @return {Promise.<string>}
 	*/
 	getDownloadURL: function() {
 		return this._attachmentCardImplementation.getDownloadURL();
