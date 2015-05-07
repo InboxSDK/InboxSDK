@@ -2,6 +2,8 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 
+		console.log('got messageView', messageView.getMessageID());
+
 		messageView.addAttachmentCardView({
 
 			title: 'Test image',

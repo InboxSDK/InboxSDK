@@ -86,6 +86,11 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 
+	/**
+	* Gets the ID of the message. This will throw an exception if it is called on a message
+	* that isn't loaded yet.
+	* @return {string}
+	*/
 	getMessageID: function() {
 		return memberMap.get(this).messageViewImplementation.getMessageID();
 	},
