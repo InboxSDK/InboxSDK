@@ -66,11 +66,10 @@ export default function makePlatformImplementation(appId, opts) {
 ===========================================================
 InboxSDK: You have loaded InboxSDK with an invalid appId:
 ${appId}
-This error will be visible outside of the console to users
-in the future! Registering an appId is free. Please see
+Registering an appId is free. Please see
 https://www.inboxsdk.com/docs/#RequiredSetup
 ===========================================================
-	`);
+`);
 			pi._driver.showAppIdWarning();
 		}
 
