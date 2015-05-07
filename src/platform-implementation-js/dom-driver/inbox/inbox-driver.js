@@ -118,6 +118,10 @@ export default class InboxDriver {
     // stub
   }
 
+  showAppIdWarning() {
+    // stub
+  }
+
   createModalViewDriver(a) {
     throw new Error("Not implemented");
   }
