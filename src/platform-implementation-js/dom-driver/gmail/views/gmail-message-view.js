@@ -187,6 +187,15 @@ _.extend(GmailMessageView.prototype, {
 					}
 				} else {
 					const img = getImgElement();
+
+					if (opts.onClick) {
+						img.onclick = opts.onClick;
+						img.style.cursor = "pointer";
+					} else {
+						img.onclick = null;
+						img.style.cursor = "";
+					}
+
 					if(opts.tooltip) {
 						img.setAttribute('data-tooltip', opts.tooltip);
 					} else {

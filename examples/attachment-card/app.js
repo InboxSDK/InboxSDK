@@ -10,7 +10,8 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
-					tooltip: 'thing'
+					tooltip: 'thing',
+					onClick: alert.bind(window, 'foo')
 				},
 				{
 					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',

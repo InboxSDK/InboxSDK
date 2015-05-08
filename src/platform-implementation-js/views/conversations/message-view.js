@@ -582,5 +582,11 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
   * The tooltip text to show when the user hovers over the icon.
   * @type {string}
   */
-  tooltip:null
+  tooltip:null,
+
+	/**
+	* Function to call when the user clicks the icon.
+	* @type {function()}
+	*/
+	onClick: null
 };
