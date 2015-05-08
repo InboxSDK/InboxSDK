@@ -10,12 +10,16 @@ var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 var simulateClick = require('../../../lib/dom/simulate-click');
 
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+
 var GmailMessageView = function(element, gmailThreadView, driver){
 	MessageViewDriver.call(this);
 
 	this._element = element;
 	this._eventStream = new Bacon.Bus();
 	this._stopper = this._eventStream.filter(false).mapEnd();
+	this._kstopper = kefirCast(Kefir, this._stopper);
 	this._threadViewDriver = gmailThreadView;
 	this._driver = driver;
 
@@ -36,6 +40,7 @@ _.extend(GmailMessageView.prototype, {
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
 		{name: '_stopper', destroy: false},
+		{name: '_kstopper', destroy: false},
 		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
 		{name: '_threadViewDriver', destroy: false, get: true},
 		{name: '_driver', destroy: false},
@@ -142,12 +147,67 @@ _.extend(GmailMessageView.prototype, {
 			this._driver.getLogger().error(new Error("Could not find message id element"));
 			return;
 		}
-		const m = messageEl.className.match(/\bm(\w+)\b/);
+		const m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
 		if (!m) {
 			this._driver.getLogger().error(new Error("Could not find message id value"));
 			return;
 		}
 		return m[1];
+	},
+
+	addAttachmentIcon(iconDescriptor) {
+		if (!this._element) {
+			console.warn('addDateIcon called on destroyed message');
+			return;
+		}
+
+		const getImgElement = _.once(() => {
+			const img = document.createElement('img');
+			img.src = 'images/cleardot.gif';
+			return img;
+		});
+
+		let added = false;
+		let currentIconUrl = null;
+
+		this._kstopper.onValue(() => {
+			if (added) {
+				getImgElement().remove();
+				added = false;
+			}
+		});
+
+		kefirCast(Kefir, iconDescriptor)
+			.takeUntilBy(this._kstopper)
+			.onValue(opts => {
+				if (!opts) {
+					if (added) {
+						getImgElement().remove();
+						added = false;
+					}
+				} else {
+					const img = getImgElement();
+					if(opts.tooltip) {
+						img.setAttribute('data-tooltip', opts.tooltip);
+					} else {
+						img.removeAttribute('data-tooltip');
+					}
+
+					img.className =
+						'inboxsdk__message_attachment_icon ' +
+						(opts.iconClass || '');
+					if (currentIconUrl != opts.iconUrl) {
+						img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
+						currentIconUrl = opts.iconUrl;
+					}
+
+					const attachmentDiv = this._element.querySelector('td.gH div.gK span');
+					if (!attachmentDiv.contains(img)) {
+						attachmentDiv.appendChild(img);
+						added = true;
+					}
+				}
+			});
 	},
 
 	getViewState: function(){

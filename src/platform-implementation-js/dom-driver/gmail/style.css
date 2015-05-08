@@ -280,6 +280,20 @@ span.inboxsdk__thread_row_custom_date + span:not(.inboxsdk__thread_row_custom_da
 
 /* end thread rows */
 
+td.gH div.gK span:first-child > img {
+  margin-right: 3px;
+}
+
+td.gH div.gK span:first-child > img:last-child {
+  margin-right: 6px;
+}
+
+.inboxsdk__message_attachment_icon {
+  width: 21px;
+  height: 21px;
+  margin-top: -3px;
+}
+
 /* Work around issue where clicking "Remove formatting" in Compose causes this
  * element to become taller and shift the toolbar down. */
 .gU .aWQ {

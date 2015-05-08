@@ -176,6 +176,15 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	/**
+	* Adds an attachment message's top line near the date.
+	* @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
+	* @return {void}
+	*/
+	addAttachmentIcon: function(iconDescriptor) {
+		return memberMap.get(this).messageViewImplementation.addAttachmentIcon(iconDescriptor);
+	},
+
+	/**
 	* Returns the view state of this Message view. The possible view states are
 	* {MessageViewViewStates.HIDDEN} (no information visible),
 	* {MessageViewViewStates.COLLAPSED} (partial information visible) or
@@ -547,4 +556,31 @@ var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDesc
 	* @type {func(event)}
 	*/
 	onClick:null
+};
+
+/**
+* @class
+* This type is used to describe a button you add to a {MessageView}.
+*/
+var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor */{
+
+  /**
+  * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
+  * @type {string}
+  */
+  iconUrl:null,
+
+  /**
+  * A CSS class to apply to the icon.
+  * ^optional
+  * ^default=MODIFIER
+  * @type {string}
+  */
+  iconClass:null,
+
+  /**
+  * The tooltip text to show when the user hovers over the icon.
+  * @type {string}
+  */
+  tooltip:null
 };

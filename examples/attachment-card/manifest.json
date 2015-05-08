@@ -7,7 +7,8 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
-      "js": ["inboxsdk.js", "app.js"],
+      "js": ["kefir.min.js", "inboxsdk.js", "app.js"],
+      "css": ["app.css"],
       "run_at": "document_end"
     }
   ],

@@ -1,0 +1,11 @@
+.test_icon_thing {
+  background: no-repeat url(https://ssl.gstatic.com/mail/sprites/general_black-16bf964ab5b51c4b7462e4429bfa7fe8.png) 0 -215px;
+}
+
+.eye_icon {
+  -webkit-mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
+  -webkit-mask-size: 21px;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  background-color: rgb(253,148,39);
+}

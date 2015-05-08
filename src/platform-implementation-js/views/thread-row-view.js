@@ -256,7 +256,7 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
 /**
 * @class
-* This type is used to describe a button you add to a {ThreadRowView}.
+* This type is used to describe an icon you add to a {ThreadRowView}.
 */
 var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescriptor */{
 
@@ -284,7 +284,7 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
 
 /**
 * @class
-* This type is used to describe a button you add to a {ThreadRowView}.
+* This type is used to modification you can do to a {ThreadRowView}.
 */
 var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
 
