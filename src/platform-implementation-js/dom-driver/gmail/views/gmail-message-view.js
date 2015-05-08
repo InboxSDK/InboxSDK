@@ -188,8 +188,13 @@ _.extend(GmailMessageView.prototype, {
 				} else {
 					const img = getImgElement();
 
-					if (opts.onClick) {
-						img.onclick = opts.onClick;
+					const onClick = opts.onClick;
+					if (onClick) {
+						img.onclick = function(event) {
+							event.preventDefault();
+							event.stopPropagation();
+							onClick();
+						};
 						img.style.cursor = "pointer";
 					} else {
 						img.onclick = null;
