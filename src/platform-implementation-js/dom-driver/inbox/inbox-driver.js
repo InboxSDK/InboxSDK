@@ -4,7 +4,7 @@ import RSVP from 'rsvp';
 import Bacon from 'baconjs';
 import Kefir from 'kefir';
 
-import addAccessors from '../../lib/add-accessors';
+import addAccessors from 'add-accessors';
 import assertInterface from '../../lib/assert-interface';
 import Driver from '../../driver-interfaces/driver';
 import Logger from '../../lib/logger';

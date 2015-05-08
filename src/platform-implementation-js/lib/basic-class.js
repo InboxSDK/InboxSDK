@@ -12,7 +12,26 @@
 
 import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';
-import {getGetterName, getSetterName, makeGetter, makeSetter} from './add-accessors';
+
+const getGetterName = _.memoize(variableName =>
+  'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
+);
+
+const getSetterName = _.memoize(variableName =>
+  'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
+);
+
+const makeGetter = _.memoize(variableName =>
+  function() {
+    return this[variableName];
+  }
+);
+
+const makeSetter = _.memoize(variableName =>
+  function(x) {
+    this[variableName] = x;
+  }
+);
 
 let shouldMakeMethod;
 {

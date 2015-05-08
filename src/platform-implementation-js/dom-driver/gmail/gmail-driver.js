@@ -7,7 +7,7 @@ const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
 import asap from 'asap';
 
-import addAccessors from '../../lib/add-accessors';
+import addAccessors from 'add-accessors';
 import assertInterface from '../../lib/assert-interface';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
 var Driver = require('../../driver-interfaces/driver');

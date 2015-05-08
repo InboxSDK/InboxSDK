@@ -15,7 +15,7 @@ var GmailCollapsibleSectionView = require('../gmail-collapsible-section-view');
 var GmailElementGetter = require('../../gmail-element-getter');
 
 import assertInterface from '../../../../lib/assert-interface';
-import addAccessors from '../../../../lib/add-accessors';
+import addAccessors from 'add-accessors';
 
 function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver) {
 	this._type = type;

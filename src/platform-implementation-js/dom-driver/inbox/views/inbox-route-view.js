@@ -3,7 +3,7 @@ import Bacon from 'baconjs';
 
 import RouteViewDriver from '../../../driver-interfaces/route-view-driver';
 import assertInterface from '../../../lib/assert-interface';
-import addAccessors from '../../../lib/add-accessors';
+import addAccessors from 'add-accessors';
 
 // only used for constants
 import Router from '../../../platform-implementation/router';

@@ -6,6 +6,7 @@
     ]
   },
   "dependencies": {
+    "add-accessors": "^1.0.2",
     "asap": "^2.0.3",
     "auto-html": "^1.0.3",
     "babel": "^5.1.13",

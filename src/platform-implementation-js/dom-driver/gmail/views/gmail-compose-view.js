@@ -14,7 +14,7 @@ import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import addAccessors from '../../../lib/add-accessors';
+import addAccessors from 'add-accessors';
 import assertInterface from '../../../lib/assert-interface';
 
 import addStatusBar from './gmail-compose-view/add-status-bar';
