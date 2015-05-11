@@ -41,8 +41,13 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				title: 'blah blah'
 			}
 		]));
+		threadRowView.replaceDraftLabel({
+			name: 'Mail Merge',
+			count: 420
+		});
 		threadRowView.replaceDate({
 			text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
+			tooltip: 'foo of bar',
 			textColor: 'green', title: 'beep'});
 		threadRowView.replaceDate(null);
 

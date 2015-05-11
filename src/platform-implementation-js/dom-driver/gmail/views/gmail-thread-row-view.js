@@ -74,7 +74,8 @@ function GmailThreadRowView(element, rowListViewDriver) {
       label: {unclaimed: [], claimed: []},
       button: {unclaimed: [], claimed: []},
       image: {unclaimed: [], claimed: []},
-      replacedDate: {unclaimed: [], claimed: []}
+      replacedDate: {unclaimed: [], claimed: []},
+      replacedDraftLabel: {unclaimed: [], claimed: []}
     };
     cachedModificationsByRow.set(this._elements[0], this._modifications);
   } else {
@@ -197,6 +198,10 @@ _.extend(GmailThreadRowView.prototype, {
       .concat(this._modifications.replacedDate.unclaimed);
     this._modifications.replacedDate.claimed.length = 0;
 
+    this._modifications.replacedDraftLabel.unclaimed = this._modifications.replacedDraftLabel.claimed
+      .concat(this._modifications.replacedDraftLabel.unclaimed);
+    this._modifications.replacedDraftLabel.claimed.length = 0;
+
     _.chain(this._elements)
       .map((el) => el.getElementsByClassName('inboxsdk__thread_row_addition'))
       .map(_.toArray)
@@ -241,6 +246,11 @@ _.extend(GmailThreadRowView.prototype, {
       mod.remove();
     }
     this._modifications.replacedDate.unclaimed.length = 0;
+
+    for (let mod of this._modifications.replacedDraftLabel.unclaimed) {
+      mod.remove();
+    }
+    this._modifications.replacedDraftLabel.unclaimed.length = 0;
   },
 
   // Returns a Kefir stream that emits this object once this object is ready for the
@@ -576,6 +586,66 @@ _.extend(GmailThreadRowView.prototype, {
       const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
       this._expandColumn('col.xX',
         visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+    });
+  },
+
+  replaceDraftLabel(opts) {
+    if (!this._elements) {
+      console.warn('replaceDraftLabel called on destroyed thread row');
+      return;
+    }
+    let labelMod;
+    let draftElement, countElement;
+    const prop = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
+      const originalLabel = this._elements[0].querySelector('td.yX > div.yW');
+      const recipientsContainer = originalLabel.parentElement;
+
+      if (!opts) {
+        if (labelMod) {
+          labelMod.remove();
+          this._modifications.replacedDraftLabel.claimed.splice(
+            this._modifications.replacedDraftLabel.claimed.indexOf(labelMod), 1);
+          labelMod = null;
+        }
+      } else {
+        if (!labelMod) {
+          labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
+          if (!labelMod) {
+            labelMod = {
+              el: _.assign(document.createElement('span'), {className: 'inboxsdk__thread_row_custom_draft_label'}),
+              remove() {
+                this.el.remove();
+              }
+            };
+          }
+          this._modifications.replacedDraftLabel.claimed.push(labelMod);
+        }
+
+        const needToAdd = !_.includes(recipientsContainer.children, labelMod.el);
+
+        if (needToAdd || !draftElement) {
+          labelMod.el.innerHTML = originalLabel.innerHTML;
+          draftElement = labelMod.el.querySelector('font');
+          if (!draftElement) {
+            return;
+          }
+          draftElement.classList.add('inboxsdk__thread_row_custom_draft_part');
+          if (draftElement.nextSibling) {
+            draftElement.nextSibling.remove();
+          }
+          countElement = _.assign(document.createElement('span'), {
+            className: 'inboxsdk__thread_row_custom_draft_count'});
+          labelMod.el.appendChild(countElement);
+        }
+
+        draftElement.textContent = opts.name;
+        countElement.textContent = ` (${opts.count})`;
+
+        if (needToAdd) {
+          recipientsContainer.insertBefore(labelMod.el, originalLabel);
+        }
+      }
     });
   },
 

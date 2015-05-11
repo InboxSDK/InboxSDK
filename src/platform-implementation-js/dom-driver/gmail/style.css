@@ -242,6 +242,10 @@ span.inboxsdk__thread_row_custom_date + span:not(.inboxsdk__thread_row_custom_da
   display: none;
 }
 
+span.inboxsdk__thread_row_custom_draft_label + div.yW {
+  display: none;
+}
+
 .inboxsdk__thread_row_attachment_icon {
   margin-left: 3px;
   width: 16px;

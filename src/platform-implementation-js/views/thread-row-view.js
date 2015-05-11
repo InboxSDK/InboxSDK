@@ -62,6 +62,10 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
     this._threadRowViewDriver.replaceDate(threadRowDateDescriptor);
   },
 
+  replaceDraftLabel: function(draftLabelDescriptor) {
+    this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
+  },
+
   /**
   * Gets the subject of this thread.
   * @return {string} The subject.
