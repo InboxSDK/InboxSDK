@@ -245,6 +245,13 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	onDropdownClick: null,
 
 	/**
+	* The rows that should be shown.
+	* ^optional
+	* @type {RowDescriptor[]}
+	*/
+	tableRows: null,
+
+	/**
 	* An arbitrary HTML element to place above the table rows but below the title.
 	* ^optional
 	* ^default=null
