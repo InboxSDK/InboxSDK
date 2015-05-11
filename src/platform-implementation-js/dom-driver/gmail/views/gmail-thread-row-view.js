@@ -607,7 +607,6 @@ _.extend(GmailThreadRowView.prototype, {
                 this.el.remove();
               }
             };
-            dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
           }
           this._modifications.replacedDate.claimed.push(dateMod);
         }
@@ -621,6 +620,10 @@ _.extend(GmailThreadRowView.prototype, {
           dateMod.el.removeAttribute('aria-label');
         }
         dateMod.el.style.color = opts.textColor || '';
+
+        if (!_.includes(dateContainer.children, dateMod.el)) {
+          dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
+        }
 
         this._fixDateColumnWidth();
       }
