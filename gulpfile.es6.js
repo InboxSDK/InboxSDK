@@ -10,7 +10,6 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var source = require('vinyl-source-stream');
-var mold = require('mold-source-map');
 var streamify = require('gulp-streamify');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
@@ -118,7 +117,6 @@ function browserifyTask(name, deps, entry, destname) {
     function buildBundle() {
       var bundle = bundler.bundle();
       var result = bundle
-        .pipe(mold.transformSourcesRelativeTo('.'))
         .pipe(source(destname))
         .pipe(streamify(sourcemaps.init({loadMaps: true})))
         .pipe(gulpif(args.minify, streamify(uglify({
@@ -145,28 +143,23 @@ function browserifyTask(name, deps, entry, destname) {
     }
 
     if (args.watch) {
-      var rebuilding = new Bacon.Bus();
       bundler = watchify(bundler);
       Bacon
         .fromEventTarget(bundler, 'update')
-        .holdWhen(rebuilding)
         .throttle(10)
         .onValue(function() {
-          rebuilding.push(true);
           gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
           buildBundle().then(function() {
-            if (name == 'sdk') {
+            if (name === 'sdk') {
               return setupExamples();
             }
           }).then(function() {
             gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
-            rebuilding.push(false);
           }, function(err) {
             gutil.log(
               gutil.colors.red("Error")+" rebuilding '"+
               gutil.colors.cyan(name)+"':", err.message
             );
-            rebuilding.push(false);
           });
         });
     }
