@@ -31,6 +31,7 @@ var fs = require('fs');
 var dir = require('node-dir');
 var sys = require('sys');
 var babelify = require("babelify");
+const lazyPipe = require('lazypipe');
 
 var sdkFilename = 'inboxsdk.js';
 
@@ -115,20 +116,21 @@ function browserifyTask(name, deps, entry, destname) {
     }));
 
     function buildBundle() {
-      var bundle = bundler.bundle();
-      var result = bundle
-        .pipe(source(destname))
-        .pipe(streamify(sourcemaps.init({loadMaps: true})))
-        .pipe(gulpif(args.minify, streamify(uglify({
-          preserveComments: 'some'
-        }))))
-        .pipe(streamify(sourcemaps.write(args.production ? '.' : null, {
+      const sourcemapPipeline = lazyPipe()
+        .pipe(sourcemaps.init, {loadMaps: true})
+        .pipe(() => gulpif(args.minify, uglify({preserveComments: 'some'})))
+        .pipe(sourcemaps.write, args.production ? '.' : null, {
           // don't include sourcemap comment in the inboxsdk.js file that we
           // distribute to developers since it'd always be broken.
           addComment: !args.production || name != 'sdk',
           sourceMappingURLPrefix: name == 'injected' ?
             'https://www.inboxsdk.com/build/' : null
-        })))
+        });
+
+      const bundle = bundler.bundle();
+      const result = bundle
+        .pipe(source(destname))
+        .pipe(gulpif(args.minify || args.production, streamify(sourcemapPipeline())))
         .pipe(gulp.dest('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {

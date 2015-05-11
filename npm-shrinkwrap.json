@@ -5079,6 +5079,30 @@
       "from": "kefir-cast@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/kefir-cast/-/kefir-cast-1.0.0.tgz"
     },
+    "lazypipe": {
+      "version": "0.2.3",
+      "from": "lazypipe@*",
+      "resolved": "https://registry.npmjs.org/lazypipe/-/lazypipe-0.2.3.tgz",
+      "dependencies": {
+        "stream-combiner": {
+          "version": "0.2.1",
+          "from": "stream-combiner@*",
+          "resolved": "https://registry.npmjs.org/stream-combiner/-/stream-combiner-0.2.1.tgz",
+          "dependencies": {
+            "duplexer": {
+              "version": "0.1.1",
+              "from": "duplexer@>=0.1.1 <0.2.0",
+              "resolved": "https://registry.npmjs.org/duplexer/-/duplexer-0.1.1.tgz"
+            },
+            "through": {
+              "version": "2.3.7",
+              "from": "through@>=2.3.4 <2.4.0",
+              "resolved": "https://registry.npmjs.org/through/-/through-2.3.7.tgz"
+            }
+          }
+        }
+      }
+    },
     "lodash": {
       "version": "3.8.0",
       "from": "lodash@>=3.8.0 <4.0.0",
