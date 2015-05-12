@@ -19,7 +19,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Adds a label to the thread row view.
-   * @param {LabelDescriptor} labelDescriptor - An options object for the label.
+   * @param {LabelDescriptor|Stream.<LabelDescriptor>} labelDescriptor - An options object for the label.
    * @return {void}
    */
   addLabel: function(labelDescriptor) {
@@ -28,7 +28,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Adds an image to the thread row view.
-   * @param {ImageDescriptor} imageDescriptor - An options object for the image.
+   * @param {ImageDescriptor|Stream.<ImageDescriptor>} imageDescriptor - An options object for the image.
    * @return {void}
    */
   addImage: function(imageDescriptor){
@@ -37,7 +37,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Adds an icon style button to this row, placed right next to the star button.
-   * @param {ThreadRowButtonDescriptor} buttonDescriptor - An options object for the button.
+   * @param {ThreadRowButtonDescriptor|Stream.<ThreadRowButtonDescriptor>} buttonDescriptor - An options object for the button.
    * @return {void}
    */
   addButton: function(buttonDescriptor) {
@@ -46,7 +46,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Adds an attachment icon to the row.
-   * @param {ThreadRowAttachmentIconDescriptor} threadRowAttachmentIconDescriptor - The options for the icon to add.
+   * @param {ThreadRowAttachmentIconDescriptor|Stream.<ThreadRowAttachmentIconDescriptor>} threadRowAttachmentIconDescriptor - The options for the icon to add.
    * @return {void}
    */
   addAttachmentIcon: function(threadRowAttachmentIconDescriptor) {
@@ -55,7 +55,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
    * Replaces the text inside the date column.
-   * @param {ThreadRowDateDescriptor} threadRowDateDescriptor - The options for the date replacement.
+   * @param {ThreadRowDateDescriptor|Stream.<ThreadRowDateDescriptor>} threadRowDateDescriptor - The options for the date replacement.
    * @return {void}
    */
   replaceDate: function(threadRowDateDescriptor) {
@@ -65,7 +65,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
   /**
    * If this row represents a draft, then this allows the word "Draft" and the number next to it
    * to be replaced.
-   * @param {ThreadRowDraftLabelDescriptor} draftLabelDescriptor - The options for the replacement.
+   * @param {ThreadRowDraftLabelDescriptor|Stream.<ThreadRowDraftLabelDescriptor>} draftLabelDescriptor - The options for the replacement.
    */
   replaceDraftLabel: function(draftLabelDescriptor) {
     this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
