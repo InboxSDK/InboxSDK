@@ -609,6 +609,8 @@ _.extend(GmailThreadRowView.prototype, {
           labelMod = null;
         }
       } else {
+        opts = _.assign({count: 1}, opts);
+
         if (!labelMod) {
           labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
           if (!labelMod) {
@@ -640,7 +642,7 @@ _.extend(GmailThreadRowView.prototype, {
         }
 
         draftElement.textContent = opts.name;
-        countElement.textContent = ` (${opts.count})`;
+        countElement.textContent = opts.count !== 1 ? ` (${opts.count})` : '';
 
         if (needToAdd) {
           recipientsContainer.insertBefore(labelMod.el, originalLabel);
