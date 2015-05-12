@@ -155,12 +155,14 @@ var LabelDescriptor = /** @lends LabelDescriptor */{
 
   /**
   * The text color of the label.
+  * ^optional
   * @type {string}
   */
   foregroundColor:null,
 
   /**
   * The background color of the label.
+  * ^optional
   * @type {string}
   */
   backgroundColor:null,
@@ -266,6 +268,7 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
 
   /**
   * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
+  * ^optional
   * @type {string}
   */
   iconUrl:null,
@@ -280,6 +283,7 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
 
   /**
   * The tooltip text to show when the user hovers over the icon.
+  * ^optional
   * @type {string}
   */
   tooltip:null
@@ -300,12 +304,14 @@ var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
 
   /**
   * The text color of the replaced date text.
+  * ^optional
   * @type {string}
   */
   textColor:null,
 
   /**
   * The tooltip text to show when the user hovers over the date.
+  * ^optional
   * @type {string}
   */
   tooltip:null
