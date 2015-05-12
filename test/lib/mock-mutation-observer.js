@@ -1,12 +1,13 @@
 import assert from 'assert';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 export default class MockMutationObserver {
   constructor(callback) {
     this._callback = callback;
     this._records = [];
     this._updateQueued = false;
-    this._stopper = new Kefir.Emitter();
+    this._stopper = kefirBus();
   }
 
   observe(element, options) {

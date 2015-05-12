@@ -1,10 +1,11 @@
-const assert = require('assert');
-const Kefir = require('kefir');
-const EventEmitter = require('events').EventEmitter;
-const Marker = require('../src/common/marker');
-const MockElementParent = require('./lib/mock-element-parent');
+import assert from 'assert';
+import Kefir from 'kefir';
+import {EventEmitter} from 'events';
+import Marker from '../src/common/marker';
+import MockElementParent from './lib/mock-element-parent';
+import kefirBus from 'kefir-bus';
 
-const kefirMakeElementChildStream = require('../src/platform-implementation-js/lib/dom/kefir-make-element-child-stream');
+import kefirMakeElementChildStream from '../src/platform-implementation-js/lib/dom/kefir-make-element-child-stream';
 
 describe('kefirMakeElementChildStream', function() {
   global.MutationObserver = null;
@@ -50,7 +51,7 @@ describe('kefirMakeElementChildStream', function() {
 
   it('triggers removals when no longer listened on', function(done) {
     var child1 = Marker('child1'), child2 = Marker('child2');
-    var stopper = new Kefir.Emitter();
+    var stopper = kefirBus();
 
     const target = new MockElementParent([child1]);
 

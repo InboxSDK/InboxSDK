@@ -1,6 +1,7 @@
 import asap from 'asap';
 import logger from '../logger';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
@@ -13,7 +14,7 @@ export default function kefirMakeElementChildStream(element) {
     const removalStreams = new Map();
 
     function newEl(el) {
-      const removalStream = Kefir.emitter();
+      const removalStream = kefirBus();
       removalStreams.set(el, removalStream);
       emitter.emit({el, removalStream});
     }
