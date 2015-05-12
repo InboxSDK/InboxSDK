@@ -12,9 +12,8 @@ var GmailDropdownView = require('../../widgets/gmail-dropdown-view');
 
 
 function addButton(gmailComposeView, buttonDescriptorStream, groupOrderHint, extraOnClickOptions){
-	var buttonViewController;
-
 	return new RSVP.Promise(function(resolve, reject){
+		let buttonViewController;
 
 		buttonDescriptorStream
 			.takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
@@ -22,12 +21,14 @@ function addButton(gmailComposeView, buttonDescriptorStream, groupOrderHint, ext
 				var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
 
 				if(!buttonViewController){
-					buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
-					resolve({
-						buttonViewController: buttonViewController,
-						composeViewDriver: gmailComposeView,
-						buttonDescriptor: buttonDescriptor
-					});
+					if (buttonOptions) {
+						buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
+						resolve({
+							buttonViewController: buttonViewController,
+							composeViewDriver: gmailComposeView,
+							buttonDescriptor: buttonDescriptor
+						});
+					}
 				}
 				else{
 					buttonViewController.getView().update(buttonOptions);
@@ -117,18 +118,19 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 }
 
 function _getButtonViewController(buttonDescriptor){
-	var buttonViewController = null;
+	const buttonView = new ButtonView(buttonDescriptor);
+	const options = _.assign({buttonView}, buttonDescriptor);
 
-	var buttonView = new ButtonView(buttonDescriptor);
-	buttonDescriptor.buttonView = buttonView;
-
+	let buttonViewController;
 	if(buttonDescriptor.hasDropdown){
-		buttonDescriptor.dropdownViewDriverClass = GmailDropdownView;
-		buttonDescriptor.dropdownPositionOptions = {isBottomAligned: true};
-		buttonViewController = new DropdownButtonViewController(buttonDescriptor);
+		_.assign(options, {
+			dropdownViewDriverClass: GmailDropdownView,
+			dropdownPositionOptions: {isBottomAligned: true}
+		});
+		buttonViewController = new DropdownButtonViewController(options);
 	}
 	else{
-		buttonViewController = new BasicButtonViewController(buttonDescriptor);
+		buttonViewController = new BasicButtonViewController(options);
 	}
 
 	return buttonViewController;
@@ -136,6 +138,10 @@ function _getButtonViewController(buttonDescriptor){
 
 function _processButtonDescriptor(buttonDescriptor, extraOnClickOptions){
 	// clone the descriptor and set defaults.
+	if (!buttonDescriptor) {
+		return null;
+	}
+
 	var buttonOptions = _.extend({
 		type: 'MODIFIER'
 	}, buttonDescriptor);
