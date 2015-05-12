@@ -247,6 +247,7 @@ var SectionDescriptor = /** @lends SectionDescriptor */ {
 	/**
 	* The rows that should be shown.
 	* ^optional
+	* ^default=null
 	* @type {RowDescriptor[]}
 	*/
 	tableRows: null,
