@@ -5078,6 +5078,10 @@
       "from": "kefir-cast@>=2.0.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/kefir-cast/-/kefir-cast-2.0.0.tgz"
     },
+    "kefir-stopper": {
+      "version": "1.0.1",
+      "from": "kefir-stopper@*"
+    },
     "lazypipe": {
       "version": "0.2.3",
       "from": "lazypipe@>=0.2.3 <0.3.0",
