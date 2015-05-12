@@ -1,9 +1,10 @@
-const GmailElementGetter = require('../gmail-element-getter');
-const Bacon = require('baconjs');
-const kefirCast = require('kefir-cast');
-const Kefir = require('kefir');
+import _ from 'lodash';
+import GmailElementGetter from '../gmail-element-getter';
+import Bacon from 'baconjs';
+import kefirCast from 'kefir-cast';
+import Kefir from 'kefir';
 
-function maintainComposeWindowState(gmailDriver){
+export default function maintainComposeWindowState(gmailDriver){
 
 	GmailElementGetter.waitForGmailModeToSettle().then(function(){
 		if(GmailElementGetter.isStandalone()){
@@ -30,7 +31,7 @@ function _setupManagement(gmailDriver){
 				.filterBy(
 					kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
 								.flatMapLatest(() => Kefir.constant(true).merge(Kefir.later(250, false)))
-								.toProperty(false)
+								.toProperty(() => false)
 				)
 				.onValue(gmailComposeView => gmailComposeView.minimize());
 
@@ -43,5 +44,3 @@ function _isClaimed(){
 function _claim(){
 	document.body.setAttribute('data-compose-window-state-managed', 'true');
 }
-
-module.exports = maintainComposeWindowState;

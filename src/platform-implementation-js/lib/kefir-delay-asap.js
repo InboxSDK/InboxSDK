@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 // Returns a stream that emits a value in the next event loop run. Works well
 // with flatmap.
 export default function kefirDelayAsap(value) {
-  return Kefir.fromBinder(emitter => {
+  return Kefir.stream(emitter => {
     asap(() => {
       emitter.emit(value);
       emitter.end();

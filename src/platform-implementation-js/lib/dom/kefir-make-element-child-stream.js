@@ -1,15 +1,15 @@
-const asap = require('asap');
-const logger = require('../logger');
-const Kefir = require('kefir');
+import asap from 'asap';
+import logger from '../logger';
+import Kefir from 'kefir';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-function kefirMakeElementChildStream(element) {
+export default function kefirMakeElementChildStream(element) {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+element);
   }
 
-  return Kefir.fromBinder(function(emitter) {
+  return Kefir.stream(function(emitter) {
     const removalStreams = new Map();
 
     function newEl(el) {
@@ -57,5 +57,3 @@ function kefirMakeElementChildStream(element) {
     };
   });
 }
-
-module.exports = kefirMakeElementChildStream;

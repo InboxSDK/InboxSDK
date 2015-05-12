@@ -124,7 +124,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
 
     this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
       childList: true
-    })).map(()=>null).takeUntilBy(this._stopper).toProperty(null);
+    })).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
 
   if(isVertical){
     this._subjectRefresher = Kefir.constant(null);
@@ -145,7 +145,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
                                 })
                               )
                             )
-                            .map(()=>null).takeUntilBy(this._stopper).toProperty(null);
+                            .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
   }
 
   this.getCounts = _.once(function() {
@@ -420,7 +420,7 @@ _.extend(GmailThreadRowView.prototype, {
 
     var prop = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
-    prop.mapEnd(() => null).onValue(buttonDescriptor => {
+    prop.beforeEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
