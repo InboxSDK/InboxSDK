@@ -5069,6 +5069,10 @@
       "from": "kefir@2.4.0",
       "resolved": "https://registry.npmjs.org/kefir/-/kefir-2.4.0.tgz"
     },
+    "kefir-bus": {
+      "version": "1.0.2",
+      "from": "kefir-bus@*"
+    },
     "kefir-cast": {
       "version": "2.0.0",
       "from": "kefir-cast@>=2.0.0 <3.0.0",
