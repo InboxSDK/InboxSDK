@@ -43,11 +43,11 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		]));
 		threadRowView.replaceDraftLabel(Kefir.repeatedly(1000, [
 			{
-				name: 'Mail Merge',
+				text: 'Mail Merge',
 				count: 420
 			},
 			{
-				name: 'foo'
+				text: 'foo'
 			},
 			null
 		]));

@@ -641,7 +641,7 @@ _.extend(GmailThreadRowView.prototype, {
           labelMod.el.appendChild(countElement);
         }
 
-        draftElement.textContent = opts.name;
+        draftElement.textContent = opts.text;
         countElement.textContent = opts.count !== 1 ? ` (${opts.count})` : '';
 
         if (needToAdd) {

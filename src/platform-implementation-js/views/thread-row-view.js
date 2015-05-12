@@ -62,6 +62,11 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
     this._threadRowViewDriver.replaceDate(threadRowDateDescriptor);
   },
 
+  /**
+   * If this row represents a draft, then this allows the word "Draft" and the number next to it
+   * to be replaced.
+   * @param {ThreadRowDraftLabelDescriptor} draftLabelDescriptor - The options for the replacement.
+   */
   replaceDraftLabel: function(draftLabelDescriptor) {
     this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
   },
@@ -317,6 +322,26 @@ var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
   tooltip:null
 };
 
+/**
+* @class
+* This type is used to modification you can do to a {ThreadRowView}.
+*/
+var ThreadRowDraftLabelDescriptor = /** @lends ThreadRowDraftLabelDescriptor */{
 
+  /**
+  * The text to replace "Draft" with.
+  * @type {string}
+  */
+  text:null,
+
+  /**
+  * The number to show in parentheses next to "Draft". No number will be shown
+  * if this is 1.
+  * ^optional
+  * ^default=1
+  * @type {string}
+  */
+  count:null
+};
 
 module.exports = ThreadRowView;
