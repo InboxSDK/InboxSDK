@@ -15,8 +15,8 @@ export default class MockMutationObserver {
 
     if (element._emitsMutations) {
       Kefir
-        .fromEvent(element, 'mutation')
-        .takeUntilBy( Kefir.fromEvent(element, 'removed') )
+        .fromEvents(element, 'mutation')
+        .takeUntilBy( Kefir.fromEvents(element, 'removed') )
         .takeUntilBy( this._stopper )
         .map(event => {
           const newEvent = {target: event.target};
