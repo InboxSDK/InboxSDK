@@ -1,3 +1,4 @@
+// contactRowIndex values: 0:to, 1:cc, 2:bcc
 module.exports = function(gmailComposeView, contactRowIndex, emailAddresses){
 	var contactRows = _getContactRows(gmailComposeView);
 
