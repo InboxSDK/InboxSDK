@@ -1,8 +1,6 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
-var Map = require('es6-unweak-collections').Map;
-
 var GmailTabContainerView = require('./gmail-tab-container-view');
 var GmailContentPanelView = require('./gmail-content-panel-view');
 

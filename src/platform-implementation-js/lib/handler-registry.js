@@ -1,18 +1,17 @@
-var _ = require('lodash');
-var logger = require('./logger');
-var BasicClass = require('./basic-class');
-var Set = require('es6-unweak-collections').Set;
+import _ from 'lodash';
+import logger from './logger';
+import BasicClass from './basic-class';
 
-var HandlerRegistry = function(){
+export default function HandlerRegistry() {
     BasicClass.call(this);
 
     this._targets = new Set();
     this._handlers = new Set();
-};
+}
 
 HandlerRegistry.prototype = Object.create(BasicClass.prototype);
 
-_.extend(HandlerRegistry.prototype, {
+_.assign(HandlerRegistry.prototype, {
 
     __memberVariables: [
         {name: '_targets', destroy: false},
@@ -68,5 +67,3 @@ _.extend(HandlerRegistry.prototype, {
     }
 
 });
-
-module.exports = HandlerRegistry;

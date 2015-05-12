@@ -1,13 +1,12 @@
-var Bacon = require('baconjs');
-var Map = require('es6-unweak-collections').Map;
-var StopperBus = require('../stopper-bus');
-var delayAsap = require('../delay-asap');
+import Bacon from 'baconjs';
+import StopperBus from '../stopper-bus';
+import delayAsap from '../delay-asap';
 
-function makeElementStreamMerger() {
-  var knownElementStopperBuses = new Map();
+export default function makeElementStreamMerger() {
+  const knownElementStopperBuses = new Map();
 
   return function(event) {
-    var stopperBus = knownElementStopperBuses.get(event.el);
+    let stopperBus = knownElementStopperBuses.get(event.el);
     if (stopperBus) {
       if (stopperBus.getSize() > 1) {
         console.warn('element is part of multiple element streams', stopperBus.getSize(), event.el);
@@ -27,5 +26,3 @@ function makeElementStreamMerger() {
     }
   };
 }
-
-module.exports = makeElementStreamMerger;

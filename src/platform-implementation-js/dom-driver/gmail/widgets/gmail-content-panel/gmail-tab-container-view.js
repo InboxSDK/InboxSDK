@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
-var Map = require('es6-unweak-collections').Map;
 
 var multiCompareSort = require('../../../../lib/multi-compare-sort');
 

@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var RSVP = require('rsvp');
-var Map = require('es6-unweak-collections').Map;
 
 
 var KeyboardShortcutHandle = require('../views/keyboard-shortcut-handle');

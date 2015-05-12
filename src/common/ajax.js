@@ -2,7 +2,6 @@ var _ = require('lodash');
 var RSVP = require('rsvp');
 var assert = require('assert');
 var querystring = require('querystring');
-var Set = require('es6-unweak-collections').Set;
 
 var serversToIgnore = new Set();
 
