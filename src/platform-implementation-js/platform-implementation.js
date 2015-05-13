@@ -1,18 +1,19 @@
-let _ = require('lodash');
+const _ = require('lodash');
 
-let MembraneMap = require('./lib/membrane-map');
+const MembraneMap = require('./lib/membrane-map');
 
-let ButterBar = require('./platform-implementation/butter-bar');
-let Compose = require('./platform-implementation/compose');
-let Conversations = require('./platform-implementation/conversations');
-let Keyboard = require('./platform-implementation/keyboard.js');
-let Modal = require('./platform-implementation/modal');
-let Lists = require('./platform-implementation/lists');
-let NavMenu = require('./platform-implementation/nav-menu');
-let Router = require('./platform-implementation/router');
-let Search = require('./platform-implementation/search');
-let Toolbars = require('./platform-implementation/toolbars');
-let User = require('./platform-implementation/user');
+const ButterBar = require('./platform-implementation/butter-bar');
+const Compose = require('./platform-implementation/compose');
+const Conversations = require('./platform-implementation/conversations');
+const Keyboard = require('./platform-implementation/keyboard.js');
+const Widgets = require('./platform-implementation/widgets');
+const Modal = require('./platform-implementation/modal');
+const Lists = require('./platform-implementation/lists');
+const NavMenu = require('./platform-implementation/nav-menu');
+const Router = require('./platform-implementation/router');
+const Search = require('./platform-implementation/search');
+const Toolbars = require('./platform-implementation/toolbars');
+const User = require('./platform-implementation/user');
 
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
@@ -83,6 +84,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 		pi.Search = new Search(appId, pi._driver, pi._membraneMap);
 		pi.Toolbars = new Toolbars(appId, pi._driver, pi._membraneMap);
 		pi.ButterBar = new ButterBar(appId, pi._driver, pi._membraneMap);
+		pi.Widgets = new Widgets(appId, pi._driver, pi._membraneMap);
 		pi.Modal = new Modal(appId, pi._driver, pi._membraneMap);
 
 		pi.Logger = pi._driver.getLogger().getAppLogger();

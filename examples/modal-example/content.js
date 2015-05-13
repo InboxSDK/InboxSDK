@@ -5,7 +5,8 @@ div.style.backgroundColor = 'red';
 
 InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 
-	var modal = inboxSDK.Modal.show({
+	//var modal = inboxSDK.Modal.show({
+	var modal = inboxSDK.Widgets.showModalView({
 		el: div,
 		chrome: true,
 		buttons: [
@@ -15,7 +16,7 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 				onClick: function(){
 					modal.close();
 				},
-				orderHin: 5
+				orderHint: 5
 			},
 			{
 				text: 'Monkeys 2',
