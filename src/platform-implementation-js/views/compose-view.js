@@ -261,19 +261,28 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return memberMap.get(this).composeViewImplementation.isReply();
 	},
 
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
-	setBccRecipients: function(emails){
-		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
+	/**
+	* Sets the "To" field of the draft, replacing the existing values.
+	* @param {string[]} emails - Array of email addresses to set.
+	*/
+	setToRecipients: function(emails){
+		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
 	},
 
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
+	/**
+	* Sets the "CC" field of the draft, replacing the existing values.
+	* @param {string[]} emails - Array of email addresses to set.
+	*/
 	setCcRecipients: function(emails){
 		memberMap.get(this).composeViewImplementation.setCcRecipients(emails);
 	},
 
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
-	setToRecipients: function(emails){
-		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
+	/**
+	* Sets the "BCC" field of the draft, replacing the existing values.
+	* @param {string[]} emails - Array of email addresses to set.
+	*/
+	setBccRecipients: function(emails){
+		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
 	},
 
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
