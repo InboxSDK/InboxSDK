@@ -285,14 +285,29 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
 	},
 
+	/**
+	 * Gets the contact info of the value selection in the "From" field. Gives
+	 * information about the user even if the From field isn't visible.
+	 * @return {Contact}
+	 */
 	getFromContact: function() {
 		return memberMap.get(this).composeViewImplementation.getFromContact();
 	},
 
+	/**
+	 * Gets all of the options available in the "From" field.
+	 * @return {Contact[]}
+	 */
 	getFromContactChoices: function() {
 		return memberMap.get(this).composeViewImplementation.getFromContactChoices();
 	},
 
+	/**
+	 * Changes the email address picked in the from field. Throws an exception if
+	 * the requested choice isn't available. No error is thrown if the From field
+	 * is not visible if the user's own email address is chosen.
+	 * @param {string} email - Address to set the from field to use.
+	 */
 	setFromEmail: function(email) {
 		memberMap.get(this).composeViewImplementation.setFromEmail(email);
 	},
