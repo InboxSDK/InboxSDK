@@ -9,9 +9,8 @@ var memberMap = new Map();
 
 /**
 * @class
-* This UI component allows you to display modal dialogs. They are styled to look and feel native inside
-* Gmail and Inbox. In order to be useful, you can insert an arbitrary HTMLElement for content of the modal,
-* however, the SDK handles creating the DOM structure for the overall modal and its associated UI.
+* This namespace contains functions for creating various widgets that are
+* styled to look and feel native to Gmail and Inbox.
 */
 function Widgets(appId, driver) {
     var members = {};
@@ -24,10 +23,11 @@ function Widgets(appId, driver) {
 _.assign(Widgets.prototype, /** @lends Widgets */{
 
   /**
-  * This creates a {ModalView} and shows it.
-  * @param {ModalOptions} options - The options to configure the returned {ModalView}.
-  * @return {ModalView}
-  */
+   * This creates a {ModalView} and shows it. You can insert an arbitrary HTMLElement
+   * for content of the modal.
+   * @param {ModalOptions} options - The options to configure the returned {ModalView}.
+   * @return {ModalView}
+   */
 	showModalView: function(options){
     var modalViewDriver = memberMap.get(this).driver.createModalViewDriver(options);
     var modalView = new ModalView({
@@ -36,7 +36,7 @@ _.assign(Widgets.prototype, /** @lends Widgets */{
 		modalView.show();
 
 		return modalView;
-	}
+  }
 
 });
 
@@ -45,7 +45,7 @@ module.exports = Widgets;
 
 /**
 * @class
-* The options used to configure a modal when calling {Modal.show()}.
+* The options used to configure a modal when calling {Widgets.showModalView()}.
 */
 var ModalOptions = /** @lends ModalOptions */{
 
