@@ -2,8 +2,6 @@ import _ from 'lodash';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import simulateKey from '../../../../lib/dom/simulate-key';
 
-_.assign(window, {simulateClick, simulateKey});
-
 // contactRowIndex values: 0:to, 1:cc, 2:bcc
 export default function(gmailComposeView, contactRowIndex, emailAddresses){
 	const contactRows = _getContactRows(gmailComposeView);
@@ -26,22 +24,27 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 
 	emailAddressEntry.value = emailAddresses.join(',');
 
-	const newEvent = document.createEvent('Events');
-	newEvent.initEvent('input', true, true);
-	emailAddressEntry.dispatchEvent(newEvent);
-
+	// Push enter so Gmail interprets the addresses.
 	simulateKey(emailAddressEntry, 13, 0);
 
 	const oldRange = gmailComposeView.getLastSelectionRange();
 
+	// Focus the recipients preview label so Gmail re-renders it.
 	const cover = gmailComposeView.getElement().querySelector('div.aoD.hl');
-	const focusEvent = new FocusEvent('focus');
-	cover.dispatchEvent(focusEvent);
+	cover.dispatchEvent(new FocusEvent('focus'));
 
+	if (contactRowIndex == 1) {
+		const ccButton = gmailComposeView.getElement().querySelector('span.aB.gQ.pE');
+		simulateClick(ccButton);
+	} else if (contactRowIndex == 2) {
+		const bccButton = gmailComposeView.getElement().querySelector('span.aB.gQ.pB');
+		simulateClick(bccButton);
+	}
+
+	// Then restore focus to what it was before.
 	if (document.activeElement) {
 		document.activeElement.blur();
 	}
-
 	if (oldRange) {
 		const sel = document.getSelection();
 		sel.removeAllRanges();
