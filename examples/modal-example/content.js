@@ -11,7 +11,7 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		chrome: true,
 		buttons: [
 			{
-				type: 'PRIMARY_BUTTON',
+				type: 'PRIMARY_ACTION',
 				text: 'Monkeys',
 				onClick: function(){
 					modal.close();
