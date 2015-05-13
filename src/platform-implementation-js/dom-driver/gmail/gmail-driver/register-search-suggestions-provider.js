@@ -1,14 +1,14 @@
-const _ = require('lodash');
-const Bacon = require('baconjs');
-const fromEventTargetCapture = require('../../../lib/from-event-target-capture');
-const simulateClick = require('../../../lib/dom/simulate-click');
-const makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
-const RSVP = require('rsvp');
-const logger = require('../../../lib/logger');
-const makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
-const gmailElementGetter = require('../gmail-element-getter');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import simulateClick from '../../../lib/dom/simulate-click';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import RSVP from 'rsvp';
+import logger from '../../../lib/logger';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import gmailElementGetter from '../gmail-element-getter';
 
-module.exports = function registerSearchSuggestionsProvider(driver, handler) {
+export default function registerSearchSuggestionsProvider(driver, handler) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we
   // watch the DOM for our injected suggestions to show up and attach click and
   // enter handlers to them to let them do custom actions.
@@ -138,4 +138,4 @@ module.exports = function registerSearchSuggestionsProvider(driver, handler) {
         }
       }
     });
-};
+}

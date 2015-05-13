@@ -2,8 +2,6 @@
 
 var _ = require('lodash');
 
-var Map = require('es6-unweak-collections').Map;
-
 var ModalView = require('../widgets/modal-view');
 
 
@@ -15,16 +13,15 @@ var memberMap = new Map();
 * Gmail and Inbox. In order to be useful, you can insert an arbitrary HTMLElement for content of the modal,
 * however, the SDK handles creating the DOM structure for the overall modal and its associated UI.
 */
-var Modal = function(appId, driver){
+function Modal(appId, driver) {
     var members = {};
     memberMap.set(this, members);
 
     members.appId = appId;
     members.driver = driver;
+}
 
-};
-
-_.extend(Modal.prototype, /** @lends Modal */{
+_.assign(Modal.prototype, /** @lends Modal */{
 
   /**
   * This creates a {ModalView} and immediately calls shows it.

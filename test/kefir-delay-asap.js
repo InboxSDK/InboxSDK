@@ -1,6 +1,7 @@
-const assert = require('assert');
-const Kefir = require('kefir');
-const Marker = require('../src/common/marker');
+import assert from 'assert';
+import Kefir from 'kefir';
+import Marker from '../src/common/marker';
+import kefirBus from 'kefir-bus';
 
 import kefirDelayAsap from '../src/platform-implementation-js/lib/kefir-delay-asap';
 
@@ -41,7 +42,7 @@ describe('kefirDelayAsap', function() {
 
   it('works with bufferBy', function(done) {
     const item1 = Marker('item1'), item2 = Marker('item2'), item3 = Marker('item3');
-    const emitter = new Kefir.Emitter();
+    const emitter = kefirBus();
     let step = 0;
     emitter.bufferBy(emitter.flatMap(x => kefirDelayAsap())).onValue(x => {
       switch(step) {

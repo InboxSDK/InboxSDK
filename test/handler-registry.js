@@ -1,6 +1,5 @@
 var assert = require('assert');
 var Marker = require('../src/common/marker');
-var Set = require('es6-unweak-collections').Set;
 
 var HandlerRegistry = require('../src/platform-implementation-js/lib/handler-registry');
 

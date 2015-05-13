@@ -1,12 +1,13 @@
 import assert from 'assert';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 export default class MockMutationObserver {
   constructor(callback) {
     this._callback = callback;
     this._records = [];
     this._updateQueued = false;
-    this._stopper = new Kefir.Emitter();
+    this._stopper = kefirBus();
   }
 
   observe(element, options) {
@@ -15,8 +16,8 @@ export default class MockMutationObserver {
 
     if (element._emitsMutations) {
       Kefir
-        .fromEvent(element, 'mutation')
-        .takeUntilBy( Kefir.fromEvent(element, 'removed') )
+        .fromEvents(element, 'mutation')
+        .takeUntilBy( Kefir.fromEvents(element, 'removed') )
         .takeUntilBy( this._stopper )
         .map(event => {
           const newEvent = {target: event.target};

@@ -95,6 +95,13 @@ _.extend(ButtonView.prototype, {
 	},
 
 	update: function(options){
+		if (!options) {
+			this._element.style.display = "none";
+			return;
+		} else if (this._element.style.display === "none") {
+			this._element.style.display = "";
+		}
+
 		if(options.buttonColor != this._buttonColor && this._buttonColor){
 			this._updateButtonColor(options.buttonColor);
 		}

@@ -5,18 +5,25 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 		console.log('message id', composeView.getMessageID());
 
 		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
-		var monkeyIndex = 1;
+		var monkeyIndex = 0;
 
 		composeView.addButton(Bacon.fromBinder(function(sinkFunction){
 
 			var buttonOptions = {
 				title: 'Monkeys!',
-				iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+				iconUrl: monkeyImages[monkeyIndex],
 				onClick: function(event){
-					monkeyIndex = (monkeyIndex + 1)%2;
-					buttonOptions.iconUrl = monkeyImages[monkeyIndex];
+					monkeyIndex++;
+					buttonOptions.iconUrl = monkeyImages[monkeyIndex%2];
 
-					sinkFunction(buttonOptions);
+					if (monkeyIndex >= 2) {
+						sinkFunction(null);
+						setTimeout(function() {
+							sinkFunction(buttonOptions);
+						}, 2000);
+					} else {
+						sinkFunction(buttonOptions);
+					}
 
 
 					var element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
@@ -36,6 +43,9 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 			iconUrl: chrome.runtime.getURL('lion.png'),
 			onClick: function(event){
 				event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
+				composeView.setToRecipients(['to@example.com', 'to2@example.com']);
+				composeView.setCcRecipients(['cc@example.com', 'cc2@example.com']);
+				composeView.setBccRecipients(['bcc@example.com', 'bcc2@example.com']);
 			},
 			section: 'SEND_RIGHT'
 		});

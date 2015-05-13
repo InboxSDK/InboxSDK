@@ -7,6 +7,7 @@ if (!global.__InboxSDKInjected) {
   const gmailInterceptor = require('./setup-gmail-interceptor');
   const setupGmonkeyHandler = require('./setup-gmonkey-handler');
   const setupDataExposer = require('./setup-data-exposer');
+  const setupEventReemitter = require('./setup-event-reemitter');
 
   RSVP.on('error', function(err) {
     console.error("Possibly uncaught promise rejection", err);
@@ -23,4 +24,5 @@ if (!global.__InboxSDKInjected) {
 
   xhrHelper();
   setupDataExposer();
+  setupEventReemitter();
 }

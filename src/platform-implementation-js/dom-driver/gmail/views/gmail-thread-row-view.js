@@ -3,7 +3,7 @@ var assert = require('assert');
 const Bacon = require('baconjs');
 const Kefir = require('kefir');
 const asap = require('asap');
-
+import kefirBus from 'kefir-bus';
 
 const assertInterface = require('../../../lib/assert-interface');
 var makeMutationObserverChunkedStream = require('../../../lib/dom/make-mutation-observer-chunked-stream');
@@ -11,6 +11,7 @@ var baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 var ThreadRowViewDriver = require('../../../driver-interfaces/thread-row-view-driver');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
+import kefirStopper from 'kefir-stopper';
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 var DropdownView = require('../../../widgets/buttons/dropdown-view');
@@ -88,10 +89,9 @@ function GmailThreadRowView(element, rowListViewDriver) {
   this._cachedThreadID = null; // set in getter
 
 
-  this._eventStream = new Kefir.Bus();
-  this._stopper = new Kefir.Emitter();
+  this._stopper = kefirStopper();
 
-  this._imageFixer = new Kefir.Emitter(); // emit into this to queue an image fixer run
+  this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
   this._imageFixerTask = this._imageFixer
     .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
     .map(x => null)
@@ -124,7 +124,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
 
     this._refresher = kefirCast(Kefir, makeMutationObserverChunkedStream(watchElement, {
       childList: true
-    })).map(()=>null).takeUntilBy(this._stopper).toProperty(null);
+    })).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
 
   if(isVertical){
     this._subjectRefresher = Kefir.constant(null);
@@ -145,7 +145,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
                                 })
                               )
                             )
-                            .map(()=>null).takeUntilBy(this._stopper).toProperty(null);
+                            .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
   }
 
   this.getCounts = _.once(function() {
@@ -170,8 +170,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
 {name: '_userView', destroy: false},
 {name: '_cachedThreadID', destroy: false},
 {name: '_rowListViewDriver', destroy: false},
-{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-{name: '_stopper', destroy: true, destroyFunction: 'push'},
+{name: '_stopper', destroy: true},
 {name: '_refresher', destroy: false}
 */
 
@@ -210,13 +209,8 @@ _.extend(GmailThreadRowView.prototype, {
         el.remove();
       });
 
-    this._eventStream.end();
-    this._stopper.emit(null);
+    this._stopper.destroy();
     this._elements = null;
-  },
-
-  getEventStream() {
-    return this._eventStream;
   },
 
   // Called by GmailDriver
@@ -420,7 +414,7 @@ _.extend(GmailThreadRowView.prototype, {
 
     var prop = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
-    prop.mapEnd(() => null).onValue(buttonDescriptor => {
+    prop.beforeEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
@@ -700,6 +694,10 @@ _.extend(GmailThreadRowView.prototype, {
         this._fixDateColumnWidth();
       }
     });
+  },
+
+  getEventStream() {
+    return this._stopper;
   },
 
   getSubject: function() {
