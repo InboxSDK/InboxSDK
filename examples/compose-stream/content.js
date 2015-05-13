@@ -43,9 +43,22 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 			iconUrl: chrome.runtime.getURL('lion.png'),
 			onClick: function(event){
 				event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
+			}
+		});
+
+		composeView.addButton({
+			title: 'Changer',
+			iconUrl: chrome.runtime.getURL('lion.png'),
+			onClick: function(event){
 				composeView.setToRecipients(['to@example.com', 'to2@example.com']);
 				composeView.setCcRecipients(['cc@example.com', 'cc2@example.com']);
 				composeView.setBccRecipients(['bcc@example.com', 'bcc2@example.com']);
+
+				console.log('current from was', composeView.getFromContact());
+				var choices = composeView.getFromContactChoices();
+				console.log('all from choices were', choices);
+				composeView.setFromEmail(choices[choices.length-1].emailAddress);
+				console.log('new from is', composeView.getFromContact());
 			},
 			section: 'SEND_RIGHT'
 		});

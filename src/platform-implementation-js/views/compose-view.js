@@ -285,6 +285,18 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
 	},
 
+	getFromContact: function() {
+		return memberMap.get(this).composeViewImplementation.getFromContact();
+	},
+
+	getFromContactChoices: function() {
+		return memberMap.get(this).composeViewImplementation.getFromContactChoices();
+	},
+
+	setFromEmail: function(email) {
+		memberMap.get(this).composeViewImplementation.setFromEmail(email);
+	},
+
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement: function(){
 		return memberMap.get(this).composeViewImplementation.getElement();

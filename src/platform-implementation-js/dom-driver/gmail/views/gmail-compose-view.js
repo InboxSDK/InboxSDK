@@ -19,6 +19,8 @@ import assertInterface from '../../../lib/assert-interface';
 
 import addStatusBar from './gmail-compose-view/add-status-bar';
 
+import * as fromManager from './gmail-compose-view/from-manager';
+
 export default class GmailComposeView {
 	constructor(element, xhrInterceptorStream, driver) {
 		this._element = element;
@@ -143,6 +145,18 @@ export default class GmailComposeView {
 
 	setBccRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
+	}
+
+	getFromContact() {
+		return fromManager.getFromContact(this._driver, this);
+	}
+
+	getFromContactChoices() {
+		return fromManager.getFromContactChoices(this._driver, this);
+	}
+
+	setFromEmail(email) {
+		fromManager.setFromEmail(this._driver, this, email);
 	}
 
 	addButton(buttonDescriptor, groupOrderHint, extraOnClickOptions) {
