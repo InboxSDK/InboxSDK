@@ -2,8 +2,6 @@ import _ from 'lodash';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import simulateKey from '../../../../lib/dom/simulate-key';
 
-window.simulateClick = simulateClick;
-
 export function getFromContact(driver, gmailComposeView) {
   const emailAddress = gmailComposeView.getElement().querySelector('input[name="from"]').value ||
     driver.getUserEmailAddress();
