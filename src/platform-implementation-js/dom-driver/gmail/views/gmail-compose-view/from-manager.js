@@ -10,7 +10,7 @@ export function getFromContact(driver, gmailComposeView) {
 }
 
 export function getFromContactChoices(driver, gmailComposeView) {
-  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd[role=menu] > div.SK.AX');
+  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
     // From field isn't present
     const emailAddress = driver.getUserEmailAddress();
@@ -25,7 +25,7 @@ export function getFromContactChoices(driver, gmailComposeView) {
 }
 
 export function setFromEmail(driver, gmailComposeView, email) {
-  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd[role=menu] > div.SK.AX');
+  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
     if (driver.getUserEmailAddress() != email) {
       throw new Error("Chosen email from choice was not found");
