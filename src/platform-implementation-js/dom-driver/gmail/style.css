@@ -479,6 +479,9 @@ div.inboxsdk__compose_statusbar {
 }
 
 .inboxsdk__mole_view_titlebar {
+  position: absolute;
+  left: 0;
+  right: 5px;
   color: white;
   font-size: 12.8px;
   background: #404040;
@@ -505,8 +508,10 @@ div.inboxsdk__compose_statusbar {
 }
 
 .inboxsdk__mole_view_content {
+  margin-top: 36px;
   border: 1px solid #cfcfcf;
   background: white;
+  min-width: 100px;
   min-height: 20px;
   max-height: 80vh;
 }

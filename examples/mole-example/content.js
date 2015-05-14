@@ -9,7 +9,7 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 
 		var mole = inboxSDK.Widgets.showMoleView({
 			el: div,
-			title: 'Mole Example '+(++i)
+			title: 'Mole Example '+(++i)+' aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa aaaaaa'
 		});
 
 		div.onclick = function() {
