@@ -15,7 +15,8 @@ var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptor = require('./make-xhr-interceptor');
 var GmailThreadView = require('./views/gmail-thread-view');
 
-var GmailModalViewDriver = require('./widgets/gmail-modal-view-driver');
+import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
+import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
@@ -147,6 +148,10 @@ _.extend(GmailDriver.prototype, {
 
 	createModalViewDriver: function(options){
 		return new GmailModalViewDriver(options);
+	},
+
+	createMoleViewDriver(options) {
+		return new GmailMoleViewDriver(options);
 	},
 
 	addNavItem: function(appId, navItemDescriptor){

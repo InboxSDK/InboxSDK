@@ -3,7 +3,7 @@
 var _ = require('lodash');
 
 var ModalView = require('../widgets/modal-view');
-
+var MoleView = require('../widgets/mole-view');
 
 var memberMap = new Map();
 
@@ -36,6 +36,23 @@ _.assign(Widgets.prototype, /** @lends Widgets */{
 		modalView.show();
 
 		return modalView;
+	},
+
+  /* // undocumented while beta
+   * This creates a {MoleView} and shows it. A mole view is a modal that is
+   * attached to the bottom of the viewport and has minimize and close buttons
+   * just like a compose view.
+   * @param {MoleOptions} options - The options to configure the returned {MoleView}.
+   * @return {MoleView}
+   */
+  showMoleView: function(options) {
+    var moleViewDriver = memberMap.get(this).driver.createMoleViewDriver(options);
+    var moleView = new MoleView({
+      moleViewDriver: moleViewDriver
+    });
+		moleViewDriver.show();
+
+		return moleView;
   }
 
 });
@@ -82,9 +99,6 @@ var ModalOptions = /** @lends ModalOptions */{
   buttons:null
 };
 
-
-
-
 /**
 * @class
 * The options to use to configure buttons in a modal.
@@ -125,4 +139,24 @@ var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
   * @type {number}
   */
   orderHint:null
+};
+
+/* // undocumented while beta
+* @class
+* The options used to configure a modal when calling {Widgets.showMoleView()}.
+*/
+var MoleOptions = /** @lends MoleOptions */{
+  /**
+  * An HTMLElement representing the content to put inside the mole view.
+  * @type {HTMLElement}
+  */
+  el:null,
+
+  /**
+  * Text that the modal should start with as the title.
+  * ^optional
+  * ^default=''
+  * @type {string}
+  */
+  title:null
 };

@@ -49,6 +49,10 @@ var GmailElementGetter = {
 		return document.querySelector('div.aeF > div.nH');
 	},
 
+	getMoleParent() {
+		return document.body.querySelector('.dw .nH > .nH > .no');
+	},
+
 	isPreviewPane: function(){
 		return !!document.querySelector('.aia');
 	},

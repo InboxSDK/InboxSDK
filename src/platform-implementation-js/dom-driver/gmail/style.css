@@ -452,6 +452,61 @@ div.inboxsdk__compose_statusbar {
 
 /* end modal */
 
+/* mole */
+
+.inboxsdk__moles_in_use {
+  z-index: 3 !important;
+}
+
+.inboxsdk__mole_view {
+  position: relative;
+
+  width: 45vw;
+  min-width: 450px;
+  max-width: 564px;
+
+  height: 100vh;
+  float: left;
+}
+
+.inboxsdk__mole_view_inner {
+  visibility: visible;
+  position: absolute;
+  box-sizing: border-box;
+
+  width: 45vw;
+  min-width: 450px;
+  max-width: 564px;
+
+  min-height: 20px;
+  max-height: 80vh;
+  bottom: 0;
+  padding-right: 5px;
+}
+
+.inboxsdk__mole_view_titlebar {
+  color: white;
+  font-size: 12.8px;
+  background: #404040;
+  box-sizing: border-box;
+  height: 36px;
+  padding-top: 7px;
+  padding-left: 11px;
+}
+
+.inboxsdk__mole_view_titlebar h2 {
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 4px 0 0 0;
+}
+
+.inboxsdk__mole_view_content {
+  border: 1px solid #cfcfcf;
+  background: white;
+}
+
+/* end mole */
+
 
 /* tabs */
 
