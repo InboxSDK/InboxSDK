@@ -458,29 +458,23 @@ div.inboxsdk__compose_statusbar {
   z-index: 3 !important;
 }
 
+/* Fix issue where Compose toolbar can become disconnected when moles are in use */
+.inboxsdk__moles_in_use .aDi {
+  left: auto !important;
+}
+
 .inboxsdk__mole_view {
   position: relative;
-
-  width: 45vw;
-  min-width: 450px;
   max-width: 564px;
-
   height: 100vh;
   float: left;
+  display: flex;
+  align-items: flex-end;
 }
 
 .inboxsdk__mole_view_inner {
   visibility: visible;
-  position: absolute;
   box-sizing: border-box;
-
-  width: 45vw;
-  min-width: 450px;
-  max-width: 564px;
-
-  min-height: 20px;
-  max-height: 80vh;
-  bottom: 0;
   padding-right: 5px;
 }
 
@@ -498,7 +492,9 @@ div.inboxsdk__compose_statusbar {
   font-size: inherit;
   font-weight: inherit;
   margin: 4px 0 0 0;
-  width: calc(100% - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .inboxsdk__mole_title_buttons {
@@ -511,6 +507,8 @@ div.inboxsdk__compose_statusbar {
 .inboxsdk__mole_view_content {
   border: 1px solid #cfcfcf;
   background: white;
+  min-height: 20px;
+  max-height: 80vh;
 }
 
 /* end mole */

@@ -39,6 +39,8 @@ export default class GmailMoleViewDriver {
     setHoverClass(closeBtn, 'Hb');
     closeBtn.addEventListener('click', e => {
       this.destroy();
+      e.preventDefault();
+      e.stopPropagation();
     });
     this._element.querySelector('.inboxsdk__mole_view_content').appendChild(options.el);
     this.setTitle(options.title || '');
