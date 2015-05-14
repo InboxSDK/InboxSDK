@@ -498,6 +498,14 @@ div.inboxsdk__compose_statusbar {
   font-size: inherit;
   font-weight: inherit;
   margin: 4px 0 0 0;
+  width: calc(100% - 40px);
+}
+
+.inboxsdk__mole_title_buttons {
+  white-space: nowrap;
+  float: right;
+  padding-right: 5px;
+  margin-top: -3px;
 }
 
 .inboxsdk__mole_view_content {
