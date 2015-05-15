@@ -120,6 +120,11 @@ div.T-I.inboxsdk__button {
     opacity: 0.55;
 }
 
+.inboxsdk__compose_actionToolbar .inboxsdk__button:focus {
+  border: 1px solid #4d90fe;
+  outline: none;
+}
+
 
   .inboxsdk__compose_actionToolbar .inboxsdk__button.inboxsdk__button_hover > div, .inboxsdk__compose_actionToolbar .inboxsdk__button:focus > div {
     opacity: 1
