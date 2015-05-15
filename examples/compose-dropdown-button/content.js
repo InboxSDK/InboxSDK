@@ -24,7 +24,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 					statusbar.destroy();
 					statusbar = null;
 				} else {
-					statusbar = composeView.addStatusBar();
+					statusbar = composeView.addStatusBar({height:20});
 					statusbar.el.innerHTML = 'foo <b>bar</b>';
 					statusbar.on('destroy', function() {
 						console.log('statusbar destroyed');

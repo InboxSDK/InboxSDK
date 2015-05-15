@@ -202,8 +202,8 @@ export default class GmailComposeView {
 		require('./gmail-compose-view/add-inner-sidebar')(this, options);
 	}
 
-	addStatusBar() {
-		const statusBar = addStatusBar(this);
+	addStatusBar(options={}) {
+		const statusBar = addStatusBar(this, options);
 		dispatchCustomEvent(this._element, 'resize');
 		Bacon.fromEvent(statusBar, 'destroy')
 			.map(() => ({eventName:'statusBarRemoved'}))

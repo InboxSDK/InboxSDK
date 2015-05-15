@@ -4,11 +4,13 @@ import Bacon from 'baconjs';
 import Logger from '../../../../lib/logger';
 import SafeEventEmitter from '../../../../lib/safe-event-emitter';
 
-export default function addStatusBar(gmailComposeView) {
+export default function addStatusBar(gmailComposeView, options) {
+	const height = options.height || 40;
 	const composeEl = gmailComposeView.getElement();
 	const isInline = gmailComposeView.isInlineReplyForm();
 	const el = document.createElement('div');
 	el.className = 'aDh inboxsdk__compose_statusbar';
+	el.style.height = height+'px';
 
 	const statusArea = composeEl.querySelector('.aDg .aDj > .aDh');
 	if (!statusArea) {
@@ -19,7 +21,7 @@ export default function addStatusBar(gmailComposeView) {
 
 		if (isInline) {
 			const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-			composeEl.style.paddingBottom = (currentPad+40)+'px';
+			composeEl.style.paddingBottom = (currentPad+height)+'px';
 		}
 	}
 
@@ -31,7 +33,7 @@ export default function addStatusBar(gmailComposeView) {
 
 			if (isInline) {
 				const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-				composeEl.style.paddingBottom = (currentPad-40)+'px';
+				composeEl.style.paddingBottom = (currentPad-height)+'px';
 			}
 		})
 	});
