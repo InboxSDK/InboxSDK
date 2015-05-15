@@ -22,7 +22,10 @@ function MoleView(options) {
   };
   memberMap.set(this, members);
 
-  members.driver.getStopper().onValue(() => {
+  members.driver.getEventStream().onValue(e => {
+    this.emit(e.eventName, e.detail);
+  });
+  members.driver.getEventStream().onEnd(() => {
     this.emit('destroy');
   });
 }
@@ -40,11 +43,19 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
     members.driver.destroy();
   },
 
+  /**
+   * This allows the title to be changed.
+   * @param  {string} text
+   */
   setTitle: function(text) {
     var members = memberMap.get(this);
     members.driver.setTitle(text);
   },
 
+  /**
+   * This allows the minimize state to be changed.
+   * @param  {boolean} minimized - If true, the mole view will be minimized.
+   */
   setMinimized: function(minimized) {
     var members = memberMap.get(this);
     members.driver.setMinimized(minimized);
@@ -54,6 +65,17 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
    * Fires when this MoleView instance is closed.
    * @event MoleView#destroy
    */
+
+  /**
+   * Fires when this MoleView instance is minimized.
+   * @event MoleView#minimize
+   */
+
+  /**
+   * Fires when this MoleView instance is restored.
+   * @event MoleView#restore
+   */
+
 });
 
 module.exports = MoleView;

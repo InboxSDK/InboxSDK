@@ -15,6 +15,10 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		div.onclick = function() {
 			mole.close();
 		};
+
+		mole.on('destroy', console.log.bind(console, 'mole destroy'));
+		mole.on('minimize', console.log.bind(console, 'mole minimize'));
+		mole.on('restore', console.log.bind(console, 'mole restore'));
 	};
 
 	makeMoleWidget();
