@@ -36,6 +36,12 @@ export default class GmailMoleViewDriver {
 </div>
 `
     });
+    this._element.querySelector('.inboxsdk__mole_view_titlebar').addEventListener('click', e => {
+      this.setMinimized(!this.getMinimized());
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
     const minimizeBtn = this._element.querySelector('.Hl');
     setHoverClass(minimizeBtn, 'Hn');
     minimizeBtn.addEventListener('click', e => {

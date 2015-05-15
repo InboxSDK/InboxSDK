@@ -491,6 +491,7 @@ div.inboxsdk__compose_statusbar {
   height: 36px;
   padding-top: 7px;
   padding-left: 11px;
+  cursor: pointer;
 }
 
 .inboxsdk__mole_view_titlebar h2 {
