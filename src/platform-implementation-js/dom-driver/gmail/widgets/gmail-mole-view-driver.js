@@ -14,6 +14,9 @@ function setHoverClass(el, hoverClass) {
   el.addEventListener('mouseleave', function() {
     el.classList.remove(hoverClass);
   });
+  el.addEventListener('click', function() {
+    el.classList.remove(hoverClass);
+  });
 }
 
 export default class GmailMoleViewDriver {
@@ -25,7 +28,7 @@ export default class GmailMoleViewDriver {
 <div class="inboxsdk__mole_view_inner">
   <div class="inboxsdk__mole_view_titlebar">
     <div class="inboxsdk__mole_title_buttons">
-      <!--<img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
+      <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
     </div>
     <h2></h2>
   </div>
@@ -33,7 +36,22 @@ export default class GmailMoleViewDriver {
 </div>
 `
     });
-    //setHoverClass(this._element.querySelector('.Hl'), 'Hn');
+    const minimizeBtn = this._element.querySelector('.Hl');
+    setHoverClass(minimizeBtn, 'Hn');
+    minimizeBtn.addEventListener('click', e => {
+      this.setMinimized(true);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    const maximizeBtn = this._element.querySelector('.Hk');
+    setHoverClass(maximizeBtn, 'Hn');
+    maximizeBtn.addEventListener('click', e => {
+      this.setMinimized(false);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
     //setHoverClass(this._element.querySelector('.Hq'), 'Hr');
     const closeBtn = this._element.querySelector('.Ha');
     setHoverClass(closeBtn, 'Hb');
@@ -53,6 +71,18 @@ export default class GmailMoleViewDriver {
         moleParent.insertBefore(this._element, _.last(moleParent.children));
         $(moleParent).parents('div.dw').get(0).classList.add('inboxsdk__moles_in_use');
       });
+  }
+
+  setMinimized(minimized) {
+    if (minimized) {
+      this._element.classList.add('inboxsdk__minimized');
+    } else {
+      this._element.classList.remove('inboxsdk__minimized');
+    }
+  }
+
+  getMinimized() {
+    return this._element.classList.contains('inboxsdk__minimized');
   }
 
   setTitle(text) {

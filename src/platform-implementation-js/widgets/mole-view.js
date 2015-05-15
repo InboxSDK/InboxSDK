@@ -43,6 +43,11 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
   setTitle: function(text) {
     var members = memberMap.get(this);
     members.driver.setTitle(text);
+  },
+
+  setMinimized: function(minimized) {
+    var members = memberMap.get(this);
+    members.driver.setMinimized(minimized);
   }
 
   /**
