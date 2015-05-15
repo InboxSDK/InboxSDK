@@ -75,6 +75,12 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return memberMap.get(this).composeViewImplementation.addStatusBar();
 	},
 
+	addRecipientRow: function(options){
+		return {
+			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(baconCast(Bacon, options))
+		};
+	},
+
 	/**
 	* Closes the compose window.
 	* @return {void}

@@ -147,6 +147,10 @@ export default class GmailComposeView {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
 	}
 
+	addRecipientRow(options){
+		return require('./gmail-compose-view/add-recipient-row')(this, options);
+	}
+
 	getFromContact() {
 		return fromManager.getFromContact(this._driver, this);
 	}
@@ -354,7 +358,7 @@ export default class GmailComposeView {
 	}
 
 	getRecipientRowElements() {
-		return this._element.querySelectorAll('.GS tr');
+		return _.filter(this._element.querySelectorAll('.GS tr'), (tr) => !tr.classList.contains('inboxsdk__recipient_row'));
 	}
 
 	addManagedViewController(viewController) {

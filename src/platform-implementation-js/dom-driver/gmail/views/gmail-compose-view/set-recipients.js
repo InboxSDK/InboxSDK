@@ -4,7 +4,7 @@ import simulateKey from '../../../../lib/dom/simulate-key';
 
 // contactRowIndex values: 0:to, 1:cc, 2:bcc
 export default function(gmailComposeView, contactRowIndex, emailAddresses){
-	const contactRows = _getContactRows(gmailComposeView);
+	const contactRows = gmailComposeView.getRecipientRowElements();
 
 	if(!contactRows || contactRows.length === 0 || !contactRows[contactRowIndex]){
 		return;
@@ -50,8 +50,4 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 		sel.removeAllRanges();
 		sel.addRange(oldRange);
 	}
-}
-
-function _getContactRows(gmailComposeView){
-	return gmailComposeView.getElement().querySelectorAll('.GS tr');
 }
