@@ -42,7 +42,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 		return Bacon.mergeAll(
 			baconFlatten(
 				mainSubAddressStream
-					.startWith({
+					.toProperty({
 						addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
 					})
 					.map('.addedNodes')
@@ -99,19 +99,19 @@ function _groupChangeEvents(events){
 
 
 function getFromAddressChangeStream(gmailComposeView){
-
-	const fromInput = gmailComposeView.getElement().querySelector('input[name="from"]');
-	if(!fromInput){
-		return Bacon.later(0).once(_converToEvent('fromContactChanged', gmailComposeView.getFromContact()));
-	}
-
-	return makeMutationObserverStream(
-				fromInput,
-				{attributes: true, attributeFilter: ['value']}
-			)
-			.map(
-				() => _convertToEvent('fromContactChanged', gmailComposeView.getFromContact())
+	return Bacon.later(0).flatMap(() => {
+		const fromInput = gmailComposeView.getElement().querySelector('input[name="from"]');
+		return Bacon.once(_convertToEvent('fromContactChanged', gmailComposeView.getFromContact()))
+			.merge(
+				!fromInput ? Bacon.never() : makeMutationObserverStream(
+					fromInput,
+					{attributes: true, attributeFilter: ['value']}
+				)
+				.map(() =>
+					_convertToEvent('fromContactChanged', gmailComposeView.getFromContact())
+				)
 			);
+	});
 }
 
 function _convertToEvent(eventName, addressInfo){

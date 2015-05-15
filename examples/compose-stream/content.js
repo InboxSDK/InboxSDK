@@ -76,7 +76,6 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 		composeView.on('bccContactAdded', console.log.bind(console, 'bccContactAdded'));
 		composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
 		composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
-
-
+		composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
 	});
 });
