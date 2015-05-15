@@ -71,8 +71,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
 	},
 
-	addStatusBar: function() {
-		return memberMap.get(this).composeViewImplementation.addStatusBar();
+	addStatusBar: function(options) {
+		return memberMap.get(this).composeViewImplementation.addStatusBar(options);
 	},
 
 	addRecipientRow: function(options){
