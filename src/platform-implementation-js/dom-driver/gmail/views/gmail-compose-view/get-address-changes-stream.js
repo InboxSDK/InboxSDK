@@ -21,7 +21,7 @@ module.exports = function(gmailComposeView){
 
 	var umbrellaStream = mergedStream.bufferWithTime(100).map(_groupChangeEvents);
 
-	return Bacon.mergeAll(mergedStream, umbrellaStream);
+	return Bacon.mergeAll(mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView));
 };
 
 function _makeSubAddressStream(addressType, rowElements, rowIndex){
@@ -69,14 +69,6 @@ function _isRecipientNode(node){
 	return node.classList && node.classList.contains('vR');
 }
 
-function _convertToEvent(eventName, addressInfo){
-	return {
-		eventName,
-		data: {
-			contact: addressInfo
-		}
-	};
-}
 
 function _groupChangeEvents(events){
 	var grouping = {
@@ -102,5 +94,31 @@ function _groupChangeEvents(events){
 	return {
 		eventName: 'recipientsChanged',
 		data: grouping
+	};
+}
+
+
+function getFromAddressChangeStream(gmailComposeView){
+
+	const fromInput = gmailComposeView.getElement().querySelector('input[name="from"]');
+	if(!fromInput){
+		return Bacon.later(0).once(_converToEvent('fromContactChanged', gmailComposeView.getFromContact()));
+	}
+
+	return makeMutationObserverStream(
+				fromInput,
+				{attributes: true, attributeFilter: ['value']}
+			)
+			.map(
+				() => _convertToEvent('fromContactChanged', gmailComposeView.getFromContact())
+			);
+}
+
+function _convertToEvent(eventName, addressInfo){
+	return {
+		eventName,
+		data: {
+			contact: addressInfo
+		}
 	};
 }
