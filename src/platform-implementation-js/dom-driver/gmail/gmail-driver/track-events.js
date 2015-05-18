@@ -111,7 +111,7 @@ function _setupAttachmentModalMonitoring(gmailDriver){
 
 	makeElementChildStream(document.body)
 		.map(event => event.el)
-		.filter(node => node.getAttribute('role') === 'alertdialog')
+		.filter(node => node.getAttribute && node.getAttribute('role') === 'alertdialog')
 		.onValue((node) => {
 			const heading = node.querySelector('[role=heading]');
 			if(heading){
