@@ -1,9 +1,19 @@
 import _ from 'lodash';
+
+import getRecipients from './get-recipients';
+
 import simulateClick from '../../../../lib/dom/simulate-click';
 import simulateKey from '../../../../lib/dom/simulate-key';
 
+const ADDRESS_TYPES = ['to', 'cc', 'bcc'];
+
 // contactRowIndex values: 0:to, 1:cc, 2:bcc
 export default function(gmailComposeView, contactRowIndex, emailAddresses){
+	if(_areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses)){
+		return;
+	}
+
+
 	const contactRows = gmailComposeView.getRecipientRowElements();
 
 	if(!contactRows || contactRows.length === 0 || !contactRows[contactRowIndex]){
@@ -50,4 +60,30 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 		sel.removeAllRanges();
 		sel.addRange(oldRange);
 	}
+}
+
+function _areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses){
+	let existingEmailAddresses = _.pluck(getRecipients(gmailComposeView, contactRowIndex, ADDRESS_TYPES[contactRowIndex]), 'emailAddress');
+
+	if(!emailAddresses){
+		return !!existingEmailAddresses;
+	}
+
+	if(!existingEmailAddresses){
+		return !!emailAddresses;
+	}
+
+	if(emailAddresses.length !== existingEmailAddresses.length){
+		return false;
+	}
+
+	for(let ii=0; ii<existingEmailAddresses.length; ii++){
+		let existingEmailAddress = existingEmailAddresses[ii];
+
+		if(emailAddresses.indexOf(existingEmailAddress) === -1){
+			return false;
+		}
+	}
+
+	return true;
 }

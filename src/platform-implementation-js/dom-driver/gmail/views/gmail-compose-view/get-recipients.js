@@ -1,5 +1,6 @@
 var getAddressInformationExtractor = require('./get-address-information-extractor');
 
+// contactRowIndex values: 0:to, 1:cc, 2:bcc
 module.exports = function(gmailComposeView, contactRowIndex, addressType){
 	var contactRows = gmailComposeView.getRecipientRowElements();
 
