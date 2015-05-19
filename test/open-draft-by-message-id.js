@@ -4,16 +4,16 @@ import openDraftByMessageID, {makeNewHash}
 
 describe('openDraftByMessageID', function() {
   describe('makeNewHash', function() {
-    it('0', function() {
+    it('1', function() {
       assert.strictEqual(makeNewHash('', '123'), '#?compose=123');
     });
-    it('1', function() {
+    it('2', function() {
       assert.strictEqual(makeNewHash('#', '123'), '#?compose=123');
     });
-    it('2', function() {
+    it('3', function() {
       assert.strictEqual(makeNewHash('#inbox', '123'), '#inbox?compose=123');
     });
-    it('3', function() {
+    it('4', function() {
       assert.strictEqual(makeNewHash('#inbox?compose=123', '456'), '#inbox?compose=123%2C456');
     });
     it('5', function() {
