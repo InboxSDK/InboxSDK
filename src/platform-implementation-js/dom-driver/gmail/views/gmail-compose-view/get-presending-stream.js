@@ -28,11 +28,6 @@ module.exports =  function(gmailComposeView){
 				return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
 			}),
 
-		fromEventTargetCapture(element, 'mousedown')
-			.filter(function(domEvent){
-				return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
-			}),
-
 		fromEventTargetCapture(element, 'click')
 			.filter(function(domEvent){
 				return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
