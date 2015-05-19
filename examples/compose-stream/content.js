@@ -1,5 +1,9 @@
 InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 
+	window.openDraftByMessageID = function(messageID) {
+		return inboxSDK.Compose.openDraftByMessageID(messageID);
+	};
+
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		console.log('thread id', composeView.getThreadID());
 		console.log('message id', composeView.getMessageID());

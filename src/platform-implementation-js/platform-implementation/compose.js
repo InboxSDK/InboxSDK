@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var RSVP = require('rsvp');
+var Bacon = require('baconjs');
 
 var ComposeView = require('../views/compose-view');
 var HandlerRegistry = require('../lib/handler-registry');
@@ -30,7 +31,19 @@ var Compose = function(appId, driver){
     members.requestedComposeViewDeferred = null;
 
     members.handlerRegistry = new HandlerRegistry();
-    _setupComposeViewDriverWatcher(members);
+    members.composeViewStream = members.driver.getComposeViewDriverStream().map(function(viewDriver){
+        return new ComposeView(viewDriver, members.appId);
+    });
+
+    members.composeViewStream.onValue(function(view){
+        if(members.requestedComposeViewDeferred){
+            var deferred = members.requestedComposeViewDeferred;
+            members.requestedComposeViewDeferred = null;
+            deferred.resolve(view);
+        }
+
+        members.handlerRegistry.addTarget(view);
+    });
 };
 
 _.extend(Compose.prototype, /** @lends Compose */ {
@@ -55,6 +68,19 @@ _.extend(Compose.prototype, /** @lends Compose */ {
     return this.getComposeView();
   },
 
+  openDraftByMessageID: function(messageID) {
+    var members = memberMap.get(this);
+    var newComposePromise = members.composeViewStream
+      .merge(Bacon.later(3000, null))
+      .take(1)
+      .flatMap(function(view) {
+        return view ? Bacon.once(view) : new Bacon.Error(new Error("draft did not open"));
+      })
+      .toPromise(RSVP.Promise);
+    members.driver.openDraftByMessageID(messageID);
+    return newComposePromise;
+  },
+
   getComposeView: function(){
       var members = memberMap.get(this);
       members.requestedComposeViewDeferred = RSVP.defer();
@@ -62,26 +88,6 @@ _.extend(Compose.prototype, /** @lends Compose */ {
 
       return members.requestedComposeViewDeferred.promise;
   }
-
-
 });
-
-
-function _setupComposeViewDriverWatcher(members){
-    members.driver.getComposeViewDriverStream().onValue(function(viewDriver){
-        var view = new ComposeView(viewDriver, members.appId);
-
-        if(members.requestedComposeViewDeferred){
-            var deferred = members.requestedComposeViewDeferred;
-            members.requestedComposeViewDeferred = null;
-            deferred.resolve(view);
-        }
-
-        members.handlerRegistry.addTarget(view);
-    });
-
-}
-
-
 
 module.exports = Compose;

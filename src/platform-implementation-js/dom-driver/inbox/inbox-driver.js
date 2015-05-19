@@ -122,6 +122,10 @@ export default class InboxDriver {
     // stub
   }
 
+  openDraftByMessageID(messageID) {
+    throw new Error("Not implemented");
+  }
+
   createModalViewDriver(a) {
     throw new Error("Not implemented");
   }

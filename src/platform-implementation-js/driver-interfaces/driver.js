@@ -4,6 +4,7 @@ export default {
 	getRowListViewDriverStream: 0,
 	openComposeWindow: 0,
 	getComposeViewDriverStream: 0,
+	openDraftByMessageID: 1,
 	getThreadViewDriverStream: 0,
 	getMessageViewDriverStream: 0,
 	createKeyboardShortcutHandle: 3,

@@ -19,6 +19,7 @@ import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
+import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
@@ -144,6 +145,10 @@ _.extend(GmailDriver.prototype, {
 
 	openComposeWindow: function(){
 		require('./gmail-driver/open-compose-window')(this);
+	},
+
+	openDraftByMessageID(messageID) {
+		return openDraftByMessageID(this, messageID);
 	},
 
 	createModalViewDriver: function(options){
