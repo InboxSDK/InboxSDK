@@ -14,6 +14,7 @@ global.window = document.parentWindow;
 // don't try to inject ajax interceptor
 document.head.setAttribute('data-inboxsdk-script-injected', true);
 document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
+document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 
 var appOpts = {
   globalErrorLogging: false, inboxBeta: true

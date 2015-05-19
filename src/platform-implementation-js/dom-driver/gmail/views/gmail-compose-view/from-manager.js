@@ -2,8 +2,10 @@ import _ from 'lodash';
 import simulateClick from '../../../../lib/dom/simulate-click';
 
 export function getFromContact(driver, gmailComposeView) {
-  const emailAddress = gmailComposeView.getElement().querySelector('input[name="from"]').value ||
-    driver.getUserEmailAddress();
+  const emailAddress = gmailComposeView.getElement().querySelector('input[name="from"]').value;
+  if (!emailAddress) {
+    return driver.getUserContact();
+  }
   const name = _.find(getFromContactChoices(driver, gmailComposeView),
     contact => contact.emailAddress == emailAddress).name;
   return {emailAddress, name};
@@ -13,10 +15,7 @@ export function getFromContactChoices(driver, gmailComposeView) {
   const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
     // From field isn't present
-    const emailAddress = driver.getUserEmailAddress();
-    return [
-      {emailAddress, name: emailAddress}
-    ];
+    return [driver.getUserContact()];
   }
   return _.map(choiceParent.children, item => ({
     emailAddress: item.getAttribute('value'),
@@ -27,7 +26,7 @@ export function getFromContactChoices(driver, gmailComposeView) {
 export function setFromEmail(driver, gmailComposeView, email) {
   const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
-    if (driver.getUserEmailAddress() != email) {
+    if (driver.getUserContact().emailAddress != email) {
       throw new Error("Chosen email from choice was not found");
     }
     return;
