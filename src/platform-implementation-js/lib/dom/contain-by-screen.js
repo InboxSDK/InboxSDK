@@ -188,8 +188,6 @@ module.exports = function(element, anchorPoint, options){
         element.style.left = newLeft + 'px';
         element.style.right = '';
     }
-
-    element.style.maxWidth = elementSizeBox.innerWidth + 'px';
 };
 
 var CONSTANTS = {
