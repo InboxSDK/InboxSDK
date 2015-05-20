@@ -254,8 +254,12 @@ gulp.task('docs', function(cb) {
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
-  return exec("node_modules/.bin/jsdoc " + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json')
-    .then(stdout => {
+  return exec('node_modules/.bin/jsdoc ' + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', {passStdErr: true})
+    .then(({stdout, stderr}) => {
+      const filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
+      if (filteredStderr) {
+        process.stderr.write(filteredStderr);
+      }
       const comments = JSON.parse(stdout);
       comments['filename'] = file;
       return comments;
@@ -300,11 +304,13 @@ function logFiles(filename) {
 
 function isFileEligbleForDocs(filename) {
   return  filename.endsWith(".js") &&
-          (filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
-          filename.indexOf('src/platform-implementation-js/views') > -1 ||
-          filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
-          filename.indexOf('src/common/constants') > -1 ||
-          filename.indexOf('src/inboxsdk-js/') > -1);
+          (
+            filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
+            filename.indexOf('src/platform-implementation-js/views') > -1 ||
+            filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
+            filename.indexOf('src/common/constants') > -1 ||
+            (filename.indexOf('src/inboxsdk-js/') > -1 && filename.indexOf('src/inboxsdk-js/loading') == -1)
+          );
 }
 
 function endsWith(str, suffix) {
