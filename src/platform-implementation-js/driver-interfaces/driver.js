@@ -8,7 +8,7 @@ export default {
 	getThreadViewDriverStream: 0,
 	getMessageViewDriverStream: 0,
 	createKeyboardShortcutHandle: 3,
-	getUserEmailAddress: 0,
+	getUserContact: 0,
 	getThreadRowViewDriverKefirStream: 0,
 	addNavItem: 2,
 	getSentMailNativeNavItem: 0,

@@ -379,6 +379,14 @@ div.inboxsdk__compose_statusbar {
   height: auto;
 }
 
+.inboxsdk__recipient_row td.ok {
+  height: 26px;
+}
+
+.inboxsdk__recipient_row td.az3 {
+  padding: 0px 3px 3px 3px;
+}
+
 /* toolbar visibility */
 
 [data-thread-toolbar=true] [data-rowlist-toolbar=true] {

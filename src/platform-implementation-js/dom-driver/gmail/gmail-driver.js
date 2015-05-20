@@ -178,8 +178,11 @@ _.extend(GmailDriver.prototype, {
 		}
 	},
 
-	getUserEmailAddress: function() {
-		return this._pageCommunicator.getUserEmailAddress();
+	getUserContact() {
+		return {
+			emailAddress: this._pageCommunicator.getUserEmailAddress(),
+			name: this._pageCommunicator.getUserName()
+		};
 	},
 
 	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appIconUrl){
@@ -198,7 +201,7 @@ _.extend(GmailDriver.prototype, {
 		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
 			this._pageCommunicator = pageCommunicator;
 
-			this._logger.setUserEmailAddress(this.getUserEmailAddress());
+			this._logger.setUserEmailAddress(this.getUserContact().emailAddress);
 
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
