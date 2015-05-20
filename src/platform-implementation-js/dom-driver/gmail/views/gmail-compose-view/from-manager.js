@@ -25,6 +25,11 @@ export function getFromContactChoices(driver, gmailComposeView) {
 }
 
 export function setFromEmail(driver, gmailComposeView, email) {
+  let currentFromAddress = gmailComposeView.getFromContact().emailAddress;
+  if(currentFromAddress === email){
+    return;
+  }
+
   const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
     if (driver.getUserEmailAddress() != email) {
