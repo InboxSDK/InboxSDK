@@ -1,17 +1,20 @@
 var _ = require('lodash');
 var asap = require('asap');
+var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var Bacon = require('baconjs');
+var Kefir = require('kefir');
 
+var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
 var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
 
 /**
-* @class
-* This class represents a Dropdown returned by the SDK to the app in various places.
-* The dropdown can be filled with your apps content, but it automatically handles dismissing
-* the dropdown on certain user actions.
-*/
+ * @class
+ * This class represents a Dropdown returned by the SDK to the app in various places.
+ * The dropdown can be filled with your apps content, but it automatically handles dismissing
+ * the dropdown on certain user actions.
+ */
 var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions){
 	EventEmitter.call(this);
 
@@ -20,9 +23,9 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	this._dropdownViewDriver = dropdownViewDriver;
 
 	/**
-	* The HTML element that is displayed in the dropdown.
-	* @type {HTMLElement}
-	*/
+	 * The HTML element that is displayed in the dropdown.
+	 * @type {HTMLElement}
+	 */
 	this.el = dropdownViewDriver.getContentElement();
 	this.closed = false;
 
@@ -48,20 +51,31 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	if(!placementOptions || !placementOptions.manualPosition){
 		asap(function() {
 			if (!self.closed) {
-				containByScreen(dropdownViewDriver.getContainerElement(), anchorElement, placementOptions);
+				var contentEl = dropdownViewDriver.getContainerElement();
+				containByScreen(contentEl, anchorElement, placementOptions);
+
+				kefirMakeMutationObserverChunkedStream(contentEl, {
+					childList: true, attributes: true,
+					characterData: true, subtree: true
+				})
+					.throttle(200)
+					.takeUntilBy(Kefir.fromEvents(self, 'destroy'))
+					.onValue(function() {
+						containByScreen(contentEl, anchorElement, placementOptions);
+					});
 			}
 		});
 	}
 };
 
-DropdownView.prototype = Object.create(EventEmitter.prototype);
+util.inherits(DropdownView, EventEmitter);
 
-_.extend(DropdownView.prototype, /** @lends DropdownView */ {
+_.assign(DropdownView.prototype, /** @lends DropdownView */ {
 
 	/**
-	* Closes the dropdown
-	* @return {void}
-	*/
+	 * Closes the dropdown
+	 * @return {void}
+	 */
 	close: function() {
 		if (!this.closed) {
 			this.closed = true;
@@ -73,9 +87,9 @@ _.extend(DropdownView.prototype, /** @lends DropdownView */ {
 	}
 
 	/**
-	* Fires when this DropdownView instance is closed.
-	* @event DropdownView#destroy
-	*/
+	 * Fires when this DropdownView instance is closed.
+	 * @event DropdownView#destroy
+	 */
 });
 
 module.exports = DropdownView;

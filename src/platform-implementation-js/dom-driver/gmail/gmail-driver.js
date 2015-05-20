@@ -65,6 +65,7 @@ addAccessors(GmailDriver.prototype, [
 	{name: '_customListSearchStringsToRouteIds', destroy: false, get: true},
 	{name: '_messageIdManager', destroy: false, get: true},
 	{name: '_butterBarDriver', destroy: false, get: true},
+	{name: '_butterBar', destroy: false, get: true, set: true},
 	{name: '_customRouteIDs', destroy: false, get: true},
 	{name: '_customListRouteIDs', destroy: false, get: true},
 	{name: '_keyboardShortcutHelpModifier', destroy: true, get: true},

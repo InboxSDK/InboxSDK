@@ -143,7 +143,8 @@ addAccessors(InboxDriver.prototype, [
   {name: '_messageViewDriverStream', get: true},
   {name: '_threadRowViewDriverKefirStream', get: true},
   {name: '_toolbarViewDriverStream', get: true},
-  {name: '_butterBarDriver', get: true}
+  {name: '_butterBarDriver', get: true},
+  {name: '_butterBar', get: true, set: true}
 ]);
 
 assertInterface(InboxDriver.prototype, Driver);
