@@ -51,10 +51,12 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			},
 			null
 		]));
-		threadRowView.replaceDate({
-			text: Math.random() > 0.5 ? 'Returning in: 6 months' : 'aaa',
+		var r = Math.random();
+		threadRowView.replaceDate(r > 0.33 ? {
+			text: r > 0.66 ? 'Returning in: 6 months' : 'aaa',
 			tooltip: 'foo of bar',
-			textColor: 'green'});
+			textColor: 'green'
+		} : null);
 		threadRowView.replaceDate(null);
 
 		// threadRowView.addButton(Kefir.repeatedly(5000, [
