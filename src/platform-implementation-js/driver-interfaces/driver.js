@@ -23,6 +23,7 @@ export default {
 	addToolbarButtonForApp: 1,
 	getToolbarViewDriverStream: 0,
 	getButterBarDriver: 0,
+	setButterBar: 1,
 	showAppIdWarning: 0,
 	createModalViewDriver: 1
 };

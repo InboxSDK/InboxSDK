@@ -142,8 +142,26 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
           .compact()
           .value();
-        const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
-        driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
+        try {
+          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
+        } catch(e) {
+          driver.getLogger().error(e, {
+            response: driver.getAppId() === 'streak' ? response : null,
+            idPairsLength: idPairs.length
+          });
+          driver.getButterBar().showError({
+            text: 'Failed to load custom thread list'
+          });
+          try {
+            driver.getPageCommunicator().setCustomListResults(
+              newQuery, GRP.replaceThreadsInResponse(response, []));
+          } catch(e2) {
+            driver.getLogger().error(e2);
+            // The original response will be used.
+            driver.getPageCommunicator().setCustomListResults(newQuery, null);
+          }
+        }
       });
     });
 

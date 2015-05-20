@@ -88,6 +88,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 		pi.Modal = new Modal(appId, pi._driver, pi._membraneMap);
 
 		pi.Logger = pi._driver.getLogger().getAppLogger();
+		pi._driver.setButterBar(pi.ButterBar);
 
 		return pi;
 	});
