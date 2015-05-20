@@ -235,6 +235,7 @@ gulp.task('docs', function(cb) {
         .flatten(true)
         .filter(isNonEmptyClass)
         .map(transformClass)
+        .forEach(checkForDocIssues)
         .value();
 
       const docsJson = {
@@ -251,6 +252,17 @@ gulp.task('docs', function(cb) {
   });
 
 });
+
+function checkForDocIssues(c) {
+  if (c.functions) {
+    c.functions.forEach(function(func){
+      if (!func.returns) {
+        console.error("WARNING: " + func.name + " in " + c.name + " doesn't have a return tag");
+      }
+    });
+  }
+
+}
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
