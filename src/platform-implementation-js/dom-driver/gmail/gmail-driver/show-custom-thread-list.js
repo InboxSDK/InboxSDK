@@ -99,8 +99,8 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
         }
       } else if (id) {
         const obj = {
-          gtid: typeof id.gtid === 'string' && id.gtid,
-          rfcId: typeof id.rfcId === 'string' && id.rfcId
+          gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
+          rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
         };
         if (obj.gtid || obj.rfcId) {
           return obj;
