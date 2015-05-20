@@ -579,7 +579,7 @@ _.extend(GmailThreadRowView.prototype, {
       // Attachment icons are only in the date column in vertical preivew pane.
       const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
       this._expandColumn('col.xX',
-        visibleDateSpan.offsetWidth + 8 + 6 + dateColumnAttachmentIconCount*16);
+        visibleDateSpan.offsetWidth + 8 + 2 + 20 + dateColumnAttachmentIconCount*16);
     });
   },
 
