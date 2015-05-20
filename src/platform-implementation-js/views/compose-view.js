@@ -270,6 +270,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Sets the "To" field of the draft, replacing the existing values.
 	* @param {string[]} emails - Array of email addresses to set.
+	* @return {void}
 	*/
 	setToRecipients: function(emails){
 		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
@@ -278,6 +279,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Sets the "CC" field of the draft, replacing the existing values.
 	* @param {string[]} emails - Array of email addresses to set.
+	* @return {void}
 	*/
 	setCcRecipients: function(emails){
 		memberMap.get(this).composeViewImplementation.setCcRecipients(emails);
@@ -286,6 +288,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/**
 	* Sets the "BCC" field of the draft, replacing the existing values.
 	* @param {string[]} emails - Array of email addresses to set.
+	* @return {void}
 	*/
 	setBccRecipients: function(emails){
 		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
@@ -313,6 +316,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * the requested choice isn't available. No error is thrown if the From field
 	 * is not visible if the user's own email address is chosen.
 	 * @param {string} email - Address to set the from field to use.
+	* @return {void}
 	 */
 	setFromEmail: function(email) {
 		memberMap.get(this).composeViewImplementation.setFromEmail(email);

@@ -46,6 +46,7 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
   /**
    * This allows the title to be changed.
    * @param  {string} text
+ 	 * @return {void}
    */
   setTitle: function(text) {
     var members = memberMap.get(this);
@@ -55,6 +56,7 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
   /**
    * This allows the minimize state to be changed.
    * @param  {boolean} minimized - If true, the mole view will be minimized.
+ 	 * @return {void}
    */
   setMinimized: function(minimized) {
     var members = memberMap.get(this);

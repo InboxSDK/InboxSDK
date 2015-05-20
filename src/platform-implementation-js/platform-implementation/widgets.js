@@ -141,7 +141,7 @@ var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
   orderHint:null
 };
 
-/* // undocumented while beta
+/**
 * @class
 * The options used to configure a modal when calling {Widgets.showMoleView()}.
 */
