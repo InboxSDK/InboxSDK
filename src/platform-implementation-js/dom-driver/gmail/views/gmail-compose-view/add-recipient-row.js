@@ -38,6 +38,8 @@ function _createRecipientRowElement(gmailComposeView, options){
 	row.setAttribute('class', 'inboxsdk__recipient_row');
 
 	if(options.labelText){
+		labelTD.setAttribute('class', 'ok');
+
 		let span = document.createElement('span');
 		span.setAttribute('class', 'gO');
 
@@ -46,6 +48,7 @@ function _createRecipientRowElement(gmailComposeView, options){
 	}
 
 	if(options.el){
+		contentTD.setAttribute('class', 'az3');
 		contentTD.appendChild(options.el);
 	}
 
