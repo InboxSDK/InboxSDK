@@ -65,8 +65,11 @@ export default class InboxDriver {
     // stub
   }
 
-  getUserEmailAddress() {
-    return document.head.getAttribute('data-inboxsdk-user-email-address');
+  getUserContact() {
+    return {
+      emailAddress: document.head.getAttribute('data-inboxsdk-user-email-address'),
+      name: document.head.getAttribute('data-inboxsdk-user-email-address')
+    };
   }
 
   addNavItem(a, b) {
@@ -120,6 +123,10 @@ export default class InboxDriver {
 
   showAppIdWarning() {
     // stub
+  }
+
+  openDraftByMessageID(messageID) {
+    throw new Error("Not implemented");
   }
 
   createModalViewDriver(a) {

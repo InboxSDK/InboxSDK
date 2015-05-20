@@ -17,11 +17,23 @@ function getSettingValue(settings, name) {
   return entry ? stupidToBool(entry[1]) : false;
 }
 
+function getUserName() {
+  if (global.GLOBALS) {
+    return _.find(GLOBALS[17], e => e[0] === 'mla')[1][0][4];
+  }
+  // pop-out windows, inbox
+  const acctButton = document.querySelector('a.gb_ga.gb_l.gb_r[title]');
+  if (acctButton) {
+    return acctButton.title.match(/:\s+(.*\S)\s+\([^)]+\)/)[1];
+  }
+}
+
 module.exports = function() {
   waitFor(() => global.GLOBALS || global.gbar).then(() => {
     const userEmail = global.GLOBALS ?
       GLOBALS[10] : gbar._CONFIG[0][10][5];
     document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
+    document.head.setAttribute('data-inboxsdk-user-name', getUserName());
 
     const userLanguage = global.GLOBALS ?
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];

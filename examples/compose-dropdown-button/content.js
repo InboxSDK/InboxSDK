@@ -35,6 +35,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 		});
 
 		composeView.on('presending', function(event){
+			console.log('presending', event);
 			event.cancel();
 		});
 
