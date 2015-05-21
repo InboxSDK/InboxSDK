@@ -41,10 +41,10 @@ function checkDependencies(packageObj) {
       _.forOwn(packageObj.devDependencies, checkDependency);
     }
   } catch(e) {
-    var nmDir = path.join(__dirname, '../../node_modules');
+    var pjDir = path.join(__dirname, '../..');
     console.error(
       "Dependencies check failed. To fix, run:\n" +
-      "    rm -rf "+escapeShellArg(nmDir)+" && npm install"
+      "    (cd "+escapeShellArg(pjDir)+" && rm -rf node_modules && npm install)"
     );
     throw e;
   }
