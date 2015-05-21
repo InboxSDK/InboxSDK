@@ -2,6 +2,8 @@ var fs = require('fs');
 var _ = require('lodash');
 var assert = require('assert');
 var semver = require('semver');
+var path = require('path');
+var escapeShellArg = require('./escape-shell-arg');
 
 var optionalDeps = ['fsevents'];
 
@@ -39,9 +41,10 @@ function checkDependencies(packageObj) {
       _.forOwn(packageObj.devDependencies, checkDependency);
     }
   } catch(e) {
+    var nmDir = path.join(__dirname, '../../node_modules');
     console.error(
       "Dependencies check failed. To fix, run:\n" +
-      "    rm -rf node_modules && npm install"
+      "    rm -rf "+escapeShellArg(nmDir)+" && npm install"
     );
     throw e;
   }
