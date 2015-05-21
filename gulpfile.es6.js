@@ -1,41 +1,43 @@
 /*jslint node: true */
 'use strict';
 
-var checkDependencies = require('./src/build/check-dependencies');
+const checkDependencies = require('./src/build/check-dependencies');
 
 checkDependencies(require('./package.json'));
 
-var _ = require('lodash');
-var gulp = require('gulp');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var source = require('vinyl-source-stream');
-var streamify = require('gulp-streamify');
-var gulpif = require('gulp-if');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
-var stdio = require('stdio');
-var gutil = require('gulp-util');
-var rename = require("gulp-rename");
-var extReloader = require('./live/ext-reloader');
-var rimraf = require('rimraf');
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
-var globp = RSVP.denodeify(require('glob'));
-var streamToPromise = require('./src/common/stream-to-promise');
-var envify = require('envify/custom');
-var exec = require('./src/build/exec');
-var spawn = require('./src/build/spawn');
-var escapeShellArg = require('./src/build/escape-shell-arg');
-var fs = require('fs');
-var dir = require('node-dir');
-var sys = require('sys');
-var babelify = require("babelify");
+const _ = require('lodash');
+const gulp = require('gulp');
+const browserify = require('browserify');
+const watchify = require('watchify');
+const source = require('vinyl-source-stream');
+const streamify = require('gulp-streamify');
+const gulpif = require('gulp-if');
+const uglify = require('gulp-uglify');
+const sourcemaps = require('gulp-sourcemaps');
+const stdio = require('stdio');
+const gutil = require('gulp-util');
+const rename = require("gulp-rename");
+const extReloader = require('./live/ext-reloader');
+const rimraf = require('rimraf');
+const Kefir = require('kefir');
+const RSVP = require('rsvp');
+const globp = RSVP.denodeify(require('glob'));
+const streamToPromise = require('./src/common/stream-to-promise');
+const envify = require('envify/custom');
+const exec = require('./src/build/exec');
+const spawn = require('./src/build/spawn');
+const escapeShellArg = require('./src/build/escape-shell-arg');
+const fs = require('fs');
+const dir = require('node-dir');
+const sys = require('sys');
+const babelify = require("babelify");
 const lazyPipe = require('lazypipe');
+const concat = require('gulp-concat');
+const addsrc = require('gulp-add-src');
 
-var sdkFilename = 'inboxsdk.js';
+const sdkFilename = 'inboxsdk.js';
 
-var args = stdio.getopt({
+const args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
   'single': {key: 's', description: 'Single bundle build (for development)'},
@@ -79,7 +81,7 @@ function setupExamples() {
   });
 }
 
-var getVersion = function() {
+let getVersion = function() {
   throw new Error("Can't access before task has run");
 };
 
@@ -88,10 +90,10 @@ gulp.task('version', function() {
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
   ]).then(function(results) {
-    var commit = results[0].toString().trim().slice(0, 16);
-    var isModified = /^\s*M/m.test(results[1].toString());
+    const commit = results[0].toString().trim().slice(0, 16);
+    const isModified = /^\s*M/m.test(results[1].toString());
 
-    var version = require('./package.json').version+'-'+commit;
+    let version = require('./package.json').version+'-'+commit;
     if (isModified) {
       version += '-MODIFIED';
     }
@@ -101,7 +103,7 @@ gulp.task('version', function() {
 
 function browserifyTask(name, deps, entry, destname) {
   gulp.task(name, ['version'].concat(deps), function() {
-    var bundler = browserify({
+    let bundler = browserify({
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
@@ -117,7 +119,9 @@ function browserifyTask(name, deps, entry, destname) {
 
     function buildBundle() {
       const sourcemapPipeline = lazyPipe()
+        .pipe(addsrc.prepend, (args.minify || args.production) ? ["./src/inboxsdk-js/header.js"] : [])
         .pipe(sourcemaps.init, {loadMaps: true})
+        .pipe(concat, destname)
         .pipe(() => gulpif(args.minify, uglify({preserveComments: 'some'})))
         .pipe(sourcemaps.write, args.production ? '.' : null, {
           // don't include sourcemap comment in the inboxsdk.js file that we
@@ -134,7 +138,7 @@ function browserifyTask(name, deps, entry, destname) {
         .pipe(gulp.dest('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {
-        var errCb = _.once(function(err) {
+        const errCb = _.once(function(err) {
           reject(err);
           result.end();
         });
@@ -146,8 +150,8 @@ function browserifyTask(name, deps, entry, destname) {
 
     if (args.watch) {
       bundler = watchify(bundler);
-      Bacon
-        .fromEventTarget(bundler, 'update')
+      Kefir
+        .fromEvents(bundler, 'update')
         .throttle(10)
         .onValue(function() {
           gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
