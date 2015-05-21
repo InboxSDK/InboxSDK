@@ -218,8 +218,8 @@ export function serializeArray(array) {
 
 export function replaceThreadsInResponse(response, replacementThreads) {
   const parsed = deserialize(response);
-  const firstTbIndex = _.findIndex(parsed, item => item[0][0] === 'tb');
-  const [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0][0] === 'tb');
+  const firstTbIndex = _.findIndex(parsed, item => item[0] && item[0][0] === 'tb');
+  const [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0] && item[0][0] === 'tb');
   const tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
   const newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
   const parsedNew = _.flatten([

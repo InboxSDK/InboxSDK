@@ -91,6 +91,23 @@ describe('GmailResponseProcessor', function(){
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
     });
 
+    it('works on responses with empty last part', function() {
+      const data = require('./data/gmail-response-processor/search-response-empty-last-part.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert.strictEqual(threads.length, 2);
+
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // swap two threads
+      threads.push(threads.shift());
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      assert.notEqual(swapped, data.input);
+
+      // put them back
+      threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
+    });
+
     it('can empty a response', function() {
       const data = require('./data/gmail-response-processor/search-response-small.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
@@ -103,6 +120,7 @@ describe('GmailResponseProcessor', function(){
       const refilled = GmailResponseProcessor.replaceThreadsInResponse(emptied, threads);
       const refilledThreads = GmailResponseProcessor.extractThreads(refilled);
       assert.deepEqual(refilledThreads, threads);
+      //assert.strictEqual(refilled, data.input);
     });
 
     it('works on empty responses', function() {
