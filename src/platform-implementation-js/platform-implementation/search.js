@@ -80,26 +80,28 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 
 	/**
 	* The name of the result to display. This property or {nameHTML} must be set.
+	* ^optional
 	* @type {string}
 	*/
-	name:  null,
+	name: null,
 
 	/**
 	* HTML to display in the name area of the result. This property or {name} must be set.
+	* ^optional
 	* @type {string}
 	*/
 	nameHTML: null,
 
 	/**
-	* The name of the result to display. This property or {nameHTML} must be set.
+	* The name of the result to display. This property or {descriptionHTML} must be set.
 	* ^optional
 	* ^default=empty
 	* @type {string}
 	*/
-	description:  null,
+	description: null,
 
 	/**
-	* HTML to display in the name area of the result. This property or {name} must be set.
+	* HTML to display in the name area of the result. This property or {description} must be set.
 	* ^optional
 	* ^default=empty
 	* @type {string}
