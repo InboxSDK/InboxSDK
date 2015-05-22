@@ -42,7 +42,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 				return view;
 			}));
 		})
-	).flatMap(_waitForReady);
+	).flatMap(composeViewDriver => composeViewDriver.ready());
 }
 
 function _setupStandardComposeElementStream() {
@@ -92,13 +92,6 @@ function _informElement(eventName){
 			}
 		}
 	};
-}
-
-
-function _waitForReady(composeView){
-	const rPr = composeView.ready();
-	rPr.catch(e => Logger.error(e));
-	return Bacon.fromPromise(rPr);
 }
 
 module.exports = setupComposeViewDriverStream;

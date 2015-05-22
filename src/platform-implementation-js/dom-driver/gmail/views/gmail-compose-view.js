@@ -9,7 +9,7 @@ import Logger from '../../../lib/logger';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
-import waitFor from '../../../lib/wait-for';
+import streamWaitFor from '../../../lib/stream-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import ComposeViewDriver from '../../../driver-interfaces/compose-view-driver';
@@ -66,9 +66,10 @@ export default class GmailComposeView {
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		this.ready = _.constant(
-			waitFor(() => {
-				return !!this.getBodyElement();
-			}).then(() => {
+			streamWaitFor(() =>
+				!this._element || !!this.getBodyElement()
+			).filter(() => !!this._element)
+			.map(() => {
 				this._composeID = this._element.querySelector('input[name="composeid"]').value;
 				this._messageIDElement = this._element.querySelector('input[name="draft"]');
 				if (!this._messageIDElement) {
@@ -82,7 +83,7 @@ export default class GmailComposeView {
 				this._updateComposeFullscreenState();
 
 				return this;
-			})
+			}).toProperty()
 		);
 	}
 
