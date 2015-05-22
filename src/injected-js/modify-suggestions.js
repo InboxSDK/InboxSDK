@@ -1,9 +1,10 @@
-var _ = require('lodash');
-var htmlToText = require('../common/html-to-text');
-var gmailResponseProcessor = require('../platform-implementation-js/dom-driver/gmail/gmail-response-processor');
+import _ from 'lodash';
+import htmlToText from '../common/html-to-text';
+import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import depWarn from '../platform-implementation-js/lib/dep-warn';
 
 module.exports = function modifySuggestions(responseText, modifications) {
-  let parsed = gmailResponseProcessor.deserialize(responseText);
+  const parsed = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (let modification of modifications) {
     if (_.has(modification, 'name')) {
@@ -26,7 +27,7 @@ module.exports = function modifySuggestions(responseText, modifications) {
         ' <span style="display:none" data-inboxsdk-suggestion="' +
         _.escape(JSON.stringify(data)) + '"></span>';
     }
-    let newItem = [
+    const newItem = [
       "aso.sug", modification.searchTerm || query, modification.nameHTML, null, [], 34, null,
       "asor inboxsdk__custom_suggestion "+modification.owner, 0];
     if (_.has(modification, 'descriptionHTML')) {
@@ -39,12 +40,18 @@ module.exports = function modifySuggestions(responseText, modifications) {
       ];
     }
     if (modification.iconURL) {
-      newItem[6] = ['aso.thn', modification.iconURL];
+      depWarn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
+      if (!modification.iconUrl) {
+        modification.iconUrl = modification.iconURL;
+      }
+    }
+    if (modification.iconUrl) {
+      newItem[6] = ['aso.thn', modification.iconUrl];
       newItem[7] += " inboxsdk__no_bg";
     } else {
       newItem[7] += " asor_i4";
     }
     parsed[0][3].push(newItem);
   }
-  return gmailResponseProcessor.suggestionSerialize(parsed);
+  return GRP.suggestionSerialize(parsed);
 };
