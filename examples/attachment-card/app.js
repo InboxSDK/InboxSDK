@@ -4,18 +4,18 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 		console.log('got messageView', messageView.getMessageID());
 		messageView.addAttachmentIcon({
 			iconClass: 'eye_icon',
-			tooltip: 'thing'
+			tooltip: '1thing'
 		});
 		messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
-					tooltip: 'thing',
+					tooltip: '2thing',
 					onClick: alert.bind(window, 'foo')
 				},
 				{
 					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-					tooltip: 'blah blah'
+					tooltip: '2blah blah'
 				}
 			]);
 		}));

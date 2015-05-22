@@ -107,7 +107,9 @@ export default class GmailComposeView {
 	}
 
 	_updateComposeFullscreenState() {
-		this._isFullscreen = this._isStandalone || GmailElementGetter.getFullscreenComposeWindowContainer().contains(this._element);
+		this._isFullscreen = !this._isInlineReplyForm &&
+			(this._isStandalone ||
+				GmailElementGetter.getFullscreenComposeWindowContainer().contains(this._element));
 	}
 
 	focus() {

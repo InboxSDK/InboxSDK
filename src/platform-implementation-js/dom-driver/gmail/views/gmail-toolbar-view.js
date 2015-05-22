@@ -19,6 +19,8 @@ var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-bu
 
 var GmailDropdownView = require('../widgets/gmail-dropdown-view');
 
+import Logger from '../../../lib/logger';
+
 var GmailToolbarView = function(element, routeViewDriver){
 	ToolbarViewDriver.call(this);
 
@@ -41,7 +43,7 @@ var GmailToolbarView = function(element, routeViewDriver){
 		self._determineToolbarState();
 		self._determineToolbarIconMode();
 		self._setupToolbarStateMonitoring();
- 	});
+	}).catch(e => Logger.error(e));
 };
 
 GmailToolbarView.prototype = Object.create(ToolbarViewDriver.prototype);
