@@ -148,7 +148,7 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
         } catch(e) {
           driver.getLogger().error(e, {
             responseReplacementFailure: true,
-            response: driver.getAppId() === 'streak' ? response : null,
+            //response: driver.getAppId() === 'streak' ? response : null,
             idPairsLength: idPairs.length
           });
           driver.getButterBar().showError({
