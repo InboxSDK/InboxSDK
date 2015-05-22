@@ -625,7 +625,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
 }
-.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ * {
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ .aio * {
   color: inherit !important;
 }
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nU:not(.n1) .n0 {
