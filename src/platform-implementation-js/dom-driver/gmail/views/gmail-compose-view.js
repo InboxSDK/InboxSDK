@@ -118,7 +118,7 @@ export default class GmailComposeView {
 	}
 
 	insertBodyTextAtCursor(text) {
-		return require('../../../lib/dom/insert-text-at-cursor')(this.getBodyElement(), text);
+		return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
 	}
 
 	insertBodyHTMLAtCursor(html) {

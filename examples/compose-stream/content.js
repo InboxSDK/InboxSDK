@@ -51,6 +51,14 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 		});
 
 		composeView.addButton({
+			title: 'text',
+			iconUrl: chrome.runtime.getURL('lion.png'),
+			onClick: function(event){
+				event.composeView.insertTextIntoBodyAtCursor('<b>the xss guy\nfoo bar\nbar foo');
+			}
+		});
+
+		composeView.addButton({
 			title: 'Changer',
 			iconUrl: chrome.runtime.getURL('lion.png'),
 			onClick: function(event){
