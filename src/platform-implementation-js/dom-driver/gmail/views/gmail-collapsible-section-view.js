@@ -621,7 +621,7 @@ function _getRowHTML(result){
 	rowArr = rowArr.concat([
 		'<td class="xY yX inboxsdk__resultsSection_result_title">',
 			'<div>',
-				'<span class="zF">',
+				'<span ' + (result.isRead ? '' : 'class="zF"') + '>',
 					_.escape(result.title),
 				'</span>',
 			'</div>',
@@ -644,7 +644,9 @@ function _getRowHTML(result){
 	}
 
 	rowArr = rowArr.concat([
-					_.escape(result.body || ''),
+					(result.isRead ? '' : '<b>'),
+						_.escape(result.body || ''),
+					(result.isRead ? '' : '</b>'),
 				'</span>',
 			'</div>',
 		'</td>'
