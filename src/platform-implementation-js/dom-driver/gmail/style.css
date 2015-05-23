@@ -375,6 +375,14 @@ div.inboxsdk__compose_statusbar {
   height: 40px;
 }
 
+.inboxsdk__compose_statusbarActive .aoI {
+  height: auto !important;
+}
+
+.inboxsdk__compose_statusbarActive .aDj.aDi {
+  position: static !important;
+}
+
 .inboxsdk__compose_statusbarActive .aDj > .aDh {
   height: auto;
 }
