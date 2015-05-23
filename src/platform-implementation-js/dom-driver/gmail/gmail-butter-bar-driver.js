@@ -6,7 +6,7 @@ import streamWaitFor from '../../lib/stream-wait-for';
 import makeRevocableFunction from '../../lib/make-revocable-function';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-const elements = streamWaitFor(() => document.body.querySelector('div.nn:nth-child(2) .b8'))
+const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
   .map(noticeContainer => {
     const googleNotice = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
     let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');

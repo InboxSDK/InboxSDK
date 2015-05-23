@@ -3,19 +3,28 @@ var RSVP = require('rsvp');
 var cproc = require('child_process');
 
 // Executes a process and captures stdout.
-function exec() {
-  var args = _.toArray(arguments);
+function exec(cmd, {passStdErr=false}={}) {
+
   return new RSVP.Promise(function(resolve, reject) {
-    cproc.exec.apply(cproc, args.concat(function(err, stdout, stderr) {
-      if (stderr) {
-        process.stderr.write(stderr);
-      }
+    cproc.exec(cmd, function(err, stdout, stderr) {
       if (err) {
+        if (stderr) {
+          process.stderr.write(stderr);
+        }
         reject(err);
       } else {
-        resolve(stdout);
+        if (passStdErr) {
+          resolve({stdout, stderr});
+        }
+        else {
+          if (stderr) {
+            process.stderr.write(stderr);
+          }
+          resolve(stdout);
+        }
+
       }
-    }));
+    });
   });
 }
 

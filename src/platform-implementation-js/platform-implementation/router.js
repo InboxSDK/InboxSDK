@@ -149,10 +149,12 @@ _.extend(Router.prototype, /** @lends Router */ {
 	* will be passed the starting offset (if the user sees 50 threads per page and is on
 	* page 2, then the offset will be 50) and it should return an array of up to 50 thread IDs
 	* or a Promise for an array of thread IDs.
-	* The thread IDs can be Gmail Thread IDs or the value of a message's Message-ID header
-	* (which must start with "<" and end with ">").
+	* The thread IDs should each be a string that is a Gmail Thread ID or the value of
+	* a message's Message-ID header (which must start with "<" and end with ">"), or for more
+	* efficiency both of them can be supplied together in an object with "gmailThreadId" and
+	* "rfcMessageId" properties.
 	* @param {string} routeID - which route this handler is registering for
-	* @param {func(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
+	* @param {function(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
 	* @return {function} a function which can be called to stop handling these routes
 	*/
 	handleCustomListRoute: function(routeID, handler) {

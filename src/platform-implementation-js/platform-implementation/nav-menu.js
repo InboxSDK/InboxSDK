@@ -95,7 +95,7 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 
 	/**
 	* The parameters of the route being navigated to when the NavItemView is clicked on.
-	* @type {string[]}
+	* @type {Object}
 	*/
 	routeParams: null,
 

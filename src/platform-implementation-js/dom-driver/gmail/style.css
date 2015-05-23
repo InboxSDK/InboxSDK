@@ -375,6 +375,14 @@ div.inboxsdk__compose_statusbar {
   height: 40px;
 }
 
+.inboxsdk__compose_statusbarActive .aoI {
+  height: auto !important;
+}
+
+.inboxsdk__compose_statusbarActive .aDj.aDi {
+  position: static !important;
+}
+
 .inboxsdk__compose_statusbarActive .aDj > .aDh {
   height: auto;
 }
@@ -625,7 +633,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
 }
-.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ * {
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ .aio * {
   color: inherit !important;
 }
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nU:not(.n1) .n0 {

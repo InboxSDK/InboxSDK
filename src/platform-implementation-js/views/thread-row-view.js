@@ -66,6 +66,7 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
    * If this row represents a draft, then this allows the word "Draft" and the number next to it
    * to be replaced.
    * @param {ThreadRowDraftLabelDescriptor|Stream.<ThreadRowDraftLabelDescriptor>} draftLabelDescriptor - The options for the replacement.
+ 	 * @return {void}
    */
   replaceDraftLabel: function(draftLabelDescriptor) {
     this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);

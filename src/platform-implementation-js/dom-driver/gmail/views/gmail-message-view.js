@@ -7,8 +7,9 @@ var MessageViewDriver = require('../../../driver-interfaces/message-view-driver'
 var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
 var GmailAttachmentCardView = require('./gmail-attachment-card-view');
 
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-var simulateClick = require('../../../lib/dom/simulate-click');
+import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import simulateClick from '../../../lib/dom/simulate-click';
 
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
@@ -368,9 +369,9 @@ _.extend(GmailMessageView.prototype, {
 		var self = this;
 		var currentReplyElementRemovalStream = null;
 
-		makeMutationObserverStream(replyContainer, {
+		makeMutationObserverChunkedStream(replyContainer, {
 			attributes: true, attributeFilter: ['class']
-		}).takeUntil(this._stopper).startWith(null).mapEnd('END').onValue(function(mutation) {
+		}).takeUntil(this._stopper).startWith(null).mapEnd('END').onValue(mutation => {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
 					currentReplyElementRemovalStream = new Bacon.Bus();

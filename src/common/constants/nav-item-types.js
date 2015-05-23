@@ -3,27 +3,15 @@
  * @class
  * @name  NavItemTypes
  */
-let navItemTypes = {};
-Object.defineProperties(navItemTypes, /** @lends NavItemTypes */ {
-
+var navItemTypes = Object.freeze(/** @lends NavItemTypes */ {
 	/**
 	 * standard nav item for navigating
 	 */
-	'NAVIGATION': {
-		value: 'NAVIGATION',
-		writable: false
-	},
-
+	'NAVIGATION': 'NAVIGATION',
 	/**
 	 * nav item that looks like a link and appears at the bottom of the list
 	 */
-	'MANAGE': {
-		value: 'MANAGE',
-		writable: false
-	}
-
+	'MANAGE': 'MANAGE'
 });
-Object.freeze(navItemTypes);
-
 
 module.exports = navItemTypes;

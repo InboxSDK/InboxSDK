@@ -10,6 +10,8 @@ var GmailElementGetter = require('../gmail-element-getter');
 
 var GmailComposeView = require('../views/gmail-compose-view');
 
+import Logger from '../../../lib/logger';
+
 function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrInterceptorStream){
 	return Bacon.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
@@ -20,6 +22,8 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 		if (GmailElementGetter.isStandaloneComposeWindow()) {
 			elementStream = _setupStandaloneComposeElementStream();
 			isStandalone = true;
+		} else if (GmailElementGetter.isStandaloneThreadWindow()) {
+			elementStream = Bacon.never();
 		} else {
 			elementStream = _setupStandardComposeElementStream();
 		}
@@ -38,7 +42,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 				return view;
 			}));
 		})
-	).flatMap(_waitForReady);
+	).flatMap(composeViewDriver => composeViewDriver.ready());
 }
 
 function _setupStandardComposeElementStream() {
@@ -69,17 +73,14 @@ function _setupStandardComposeElementStream() {
 }
 
 function _setupStandaloneComposeElementStream() {
-	return _waitForContainerAndMonitorChildrenStream(function() {
-		return GmailElementGetter.StandaloneCompose.getComposeWindowContainer();
-	});
+	return _waitForContainerAndMonitorChildrenStream(() =>
+		GmailElementGetter.StandaloneCompose.getComposeWindowContainer()
+	);
 }
 
 function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	return streamWaitFor(function() {
-		return containerFn();
-	}).flatMap(function(containerEl) {
-		return makeElementChildStream(containerEl);
-	});
+	return streamWaitFor(() => containerFn())
+		.flatMap(containerEl => makeElementChildStream(containerEl));
 }
 
 function _informElement(eventName){
@@ -91,11 +92,6 @@ function _informElement(eventName){
 			}
 		}
 	};
-}
-
-
-function _waitForReady(composeView){
-	return Bacon.fromPromise(composeView.ready());
 }
 
 module.exports = setupComposeViewDriverStream;
