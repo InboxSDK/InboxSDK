@@ -176,10 +176,10 @@ function _getThreadRowView(membraneMap){
 /**
 * The different toolbar sections that exist
 * @class
-* @name ToolbarSections
+* @name SectionNames
 */
 var sectionNames = {};
-Object.defineProperties(sectionNames, /** @lends ToolbarSections */ {
+Object.defineProperties(sectionNames, /** @lends SectionNames */ {
 
 	/**
 	* The section is for buttons that move emails out of or into the users inbox
@@ -233,8 +233,8 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	iconUrl:null,
 
 	/**
-	* The section of the toolbar to place the button. Several different positions are defined in {Toolbars.ToolbarSections}.
-	* @type {ToolbarSections}
+	* The section of the toolbar to place the button.
+	* @type {SectionNames}
 	*/
 	section:null,
 
