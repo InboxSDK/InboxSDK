@@ -368,6 +368,12 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	*/
 
 	/**
+	 * Fires when the From dropbox value is changed.
+	 * @event ComposeView#fromContactChanged
+	 * @param {Contact} contact - the contact that was added to the "To" recipients
+	 */
+
+	/**
 	* Fires when any of the To/Cc/Bcc fields are changed.
 	* @event ComposeView#recipientsChanged
 	* @param {Contact[]} to.added - a list of contacts that were added to the "To" recipients
