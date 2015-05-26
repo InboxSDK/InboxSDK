@@ -335,7 +335,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/**
 	* Fires when a compose view gets a new message ID assigned. Compose views get
-	* new message IDs assigned to them whenever the user edits the message.
+	* new message IDs assigned to them whenever the user edits the message and the
+	* draft saves as a result
 	* @event ComposeView#messageIDChange
 	*/
 
