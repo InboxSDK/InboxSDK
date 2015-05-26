@@ -17,9 +17,14 @@ function getSettingValue(settings, name) {
   return entry ? stupidToBool(entry[1]) : false;
 }
 
-function getUserName() {
+function getUserNameForEmail(userEmail) {
   if (global.GLOBALS) {
-    return _.find(GLOBALS[17], e => e[0] === 'mla')[1][0][4];
+    return _.chain(GLOBALS[17])
+      .find(e => e[0] === 'mla')
+      .get(1)
+      .find(e => e[0] === userEmail)
+      .get(4)
+      .value();
   }
   // pop-out windows, inbox
   const acctButton = document.querySelector('a.gb_ga.gb_l.gb_r[title]');
@@ -33,7 +38,7 @@ module.exports = function() {
     const userEmail = global.GLOBALS ?
       GLOBALS[10] : gbar._CONFIG[0][10][5];
     document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
-    document.head.setAttribute('data-inboxsdk-user-name', getUserName());
+    document.head.setAttribute('data-inboxsdk-user-name', getUserNameForEmail(userEmail));
 
     const userLanguage = global.GLOBALS ?
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
