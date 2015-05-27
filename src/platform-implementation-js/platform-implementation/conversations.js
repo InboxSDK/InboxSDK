@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var Bacon = require('baconjs');
 
 var ThreadView = require('../views/conversations/thread-view');
 var MessageView = require('../views/conversations/message-view');
@@ -126,7 +127,11 @@ _.extend(Conversations.prototype, /** @lends Conversations */{
 
 function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance, membraneMap){
 	var combinedStream = stream.map(function(viewDriver){
-		var view = membraneMap.get(viewDriver) || new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance);
+		var view = membraneMap.get(viewDriver);
+		if (!view) {
+			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance);
+			membraneMap.set(viewDriver, view);
+		}
 
 		return {
 			viewDriver: viewDriver,
@@ -134,23 +139,12 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 		};
 	});
 
-	combinedStream.onValue(function(event){
-		if(!membraneMap.has(event.viewDriver)){
-			membraneMap.set(event.viewDriver, event.view);
-
-			event.view.on('destroy', function(){
-				membraneMap.delete(event.viewDriver);
-			});
-		}
-	});
-
-
-	combinedStream.delay(0).onValue(function(event){
-		// TODO fix this more properly so the .delay(0) isn't necessary.
-		// Don't emit views that have already been destroyed.
-		if (membraneMap.has(event.viewDriver)) {
-			handlerRegistry.addTarget(event.view);
-		}
+	combinedStream.flatMap(function(event) {
+		return Bacon.later(0)
+			.takeUntil(Bacon.fromEvent(event.view, 'destroy'))
+			.map(() => event);
+	}).onValue(function(event) {
+		handlerRegistry.addTarget(event.view);
 	});
 }
 
