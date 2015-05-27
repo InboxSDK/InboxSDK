@@ -39,7 +39,11 @@ module.exports = function() {
     const userEmail = global.GLOBALS ?
       GLOBALS[10] : gbar._CONFIG[0][10][5];
     document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
-    document.head.setAttribute('data-inboxsdk-user-name', getUserNameForEmail(userEmail));
+    const userName = getUserNameForEmail(userEmail);
+    if (!userName) {
+      logError(new Error("Failed to parse user info"));
+    }
+    document.head.setAttribute('data-inboxsdk-user-name', userName);
 
     const userLanguage = global.GLOBALS ?
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
