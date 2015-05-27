@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('../lib/safe-event-emitter');
 
 var HandlerRegistry = require('../lib/handler-registry');
 
@@ -178,36 +178,26 @@ function _getThreadRowView(membraneMap){
 * @class
 * @name SectionNames
 */
-var sectionNames = {};
-Object.defineProperties(sectionNames, /** @lends SectionNames */ {
+var sectionNames = Object.freeze(/** @lends SectionNames */ {
 
 	/**
 	* The section is for buttons that move emails out of or into the users inbox
 	* @type string
 	*/
-	'INBOX_STATE': {
-		value: 'INBOX_STATE',
-		writable: false
-	},
+	'INBOX_STATE': 'INBOX_STATE',
 
 	/**
 	* This section is for buttons that alter metadata of emails. Common examples are labeling or moving an email.
 	* @type string
 	*/
-	'METADATA_STATE': {
-		value: 'METADATA_STATE',
-		writable: false
-	},
+	'METADATA_STATE': 'METADATA_STATE',
 
 	/**
 	* This sectiom is used for other actions. Typically these will be placed in the "More"
 	* menu in Gmail or in submenus in Inbox.
 	* @type string
 	*/
-	'OTHER': {
-		value: 'OTHER',
-		writable: false
-	}
+	'OTHER': 'OTHER'
 
 });
 
