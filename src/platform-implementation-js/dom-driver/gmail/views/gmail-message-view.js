@@ -100,6 +100,10 @@ _.extend(GmailMessageView.prototype, {
 		});
 	},
 
+	getDateString() {
+		return this._element.querySelector('.ads .gK .g3').title;
+	},
+
 	getAttachmentCardViewDrivers: function(){
 		if(!this._gmailAttachmentAreaView){
 			return [];

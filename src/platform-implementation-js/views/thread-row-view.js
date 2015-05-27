@@ -82,8 +82,8 @@ _.extend(ThreadRowView.prototype, /** @lends ThreadRowView */ {
 
   /**
   * Gets string representation of the timestamp of the most recent message on the thread.
-  * Note: this is the string representation because timezone information is not available
-  * and the accuracy is limited to minutes.
+  * Note: this is the string representation because timezone information is not available,
+  * the accuracy is limited to minutes, and it is formatted to the user's language.
   * @return {string} The date as a string.
   */
   getDateString: function() {

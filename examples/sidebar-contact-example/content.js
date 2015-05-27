@@ -2,7 +2,10 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 
 	sdk.Conversations.registerThreadViewHandler(function(threadView){
 
-		var messages = threadView.getMessageViewsAll();
+		var messages = threadView.getMessageViews();
+		messages.forEach(function(message) {
+			console.log(message.getDateString());
+		});
 		var lastMessage = messages[messages.length - 1];
 
 		var sender = lastMessage.getSender();

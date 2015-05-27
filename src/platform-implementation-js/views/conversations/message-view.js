@@ -176,6 +176,16 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	},
 
 	/**
+	 * Gets Gmail's representation of the timestamp of the message.
+	 * Note: this is the string representation because timezone information is not available,
+	 * the accuracy is limited to minutes, and it is formatted to the user's language.
+	 * @return {string} The date as a string.
+	 */
+	getDateString: function() {
+		return memberMap.get(this).messageViewImplementation.getDateString();
+	},
+
+	/**
 	* Adds an attachment message's top line near the date.
 	* @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
 	* @return {void}
