@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import logError from './log-error';
 import waitFor from '../platform-implementation-js/lib/wait-for';
 
 function stupidToBool(stupid) {
@@ -57,5 +58,5 @@ module.exports = function() {
         document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
       }
     }
-  });
+  }).catch(logError);
 };

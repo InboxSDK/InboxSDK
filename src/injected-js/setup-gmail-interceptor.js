@@ -1,11 +1,11 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var XHRProxyFactory = require('./xhr-proxy-factory');
-var querystring = require('querystring');
-var threadIdentifier = require('./thread-identifier');
-var stringify = querystring.stringify;
-var quotedSplit = require('../common/quoted-split');
-var modifySuggestions = require('./modify-suggestions');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import logError from './log-error';
+import XHRProxyFactory from './xhr-proxy-factory';
+import querystring, {stringify} from 'querystring';
+import threadIdentifier from './thread-identifier';
+import quotedSplit from '../common/quoted-split';
+import modifySuggestions from './modify-suggestions';
 
 function setupGmailInterceptor() {
   const js_frame_wrappers = [], main_wrappers = [];
@@ -16,12 +16,12 @@ function setupGmailInterceptor() {
 
       const js_frame = js_frame_element.contentDocument.defaultView;
       const js_frame_originalXHR = js_frame.XMLHttpRequest;
-      js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers);
+      js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers, {logError});
     }
   }
   {
     const main_originalXHR = top.XMLHttpRequest;
-    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers);
+    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers, {logError});
   }
 
   //email sending notifier
