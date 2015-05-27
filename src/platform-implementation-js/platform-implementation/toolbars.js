@@ -165,7 +165,7 @@ function _getThreadRowView(membraneMap){
 		var threadRowView = membraneMap.get(threadRowViewDriver);
 		if(!threadRowView){
 			threadRowView = new ThreadRowView(threadRowViewDriver);
-			membraneMap.set(threadRowView);
+			membraneMap.set(threadRowViewDriver, threadRowView);
 		}
 
 		return threadRowView;
