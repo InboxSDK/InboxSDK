@@ -41,7 +41,13 @@ module.exports = function() {
     document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
     const userName = getUserNameForEmail(userEmail);
     if (!userName) {
-      logError(new Error("Failed to parse user info"));
+      const mla = global.GLOBALS && GLOBALS[17] && _.find(GLOBALS[17], e => e[0] === 'mla');
+      logError(new Error("Failed to parse user info"), {
+        GLOBALSpresent: !!global.GLOBALS,
+        GLOBALS17present: !!(global.GLOBALS && GLOBALS[17]),
+        mlaPresent: !!mla,
+        mla1Length: mla && mla[1] && mla[1].length
+      });
     }
     document.head.setAttribute('data-inboxsdk-user-name', userName);
 
