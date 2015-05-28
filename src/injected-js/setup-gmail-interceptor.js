@@ -7,6 +7,13 @@ import threadIdentifier from './thread-identifier';
 import quotedSplit from '../common/quoted-split';
 import modifySuggestions from './modify-suggestions';
 
+function logErrorExceptEventListeners(err, details) {
+  // Don't log Gmail's errors
+  if (details !== 'XMLHttpRequest event listener error') {
+    logError(err, details);
+  }
+}
+
 function setupGmailInterceptor() {
   const js_frame_wrappers = [], main_wrappers = [];
   {
@@ -16,12 +23,14 @@ function setupGmailInterceptor() {
 
       const js_frame = js_frame_element.contentDocument.defaultView;
       const js_frame_originalXHR = js_frame.XMLHttpRequest;
-      js_frame.XMLHttpRequest = XHRProxyFactory(js_frame_originalXHR, js_frame_wrappers, {logError});
+      js_frame.XMLHttpRequest = XHRProxyFactory(
+        js_frame_originalXHR, js_frame_wrappers, {logError: logErrorExceptEventListeners});
     }
   }
   {
     const main_originalXHR = top.XMLHttpRequest;
-    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers, {logError});
+    top.XMLHttpRequest = XHRProxyFactory(
+      main_originalXHR, main_wrappers, {logError: logErrorExceptEventListeners});
   }
 
   //email sending notifier
