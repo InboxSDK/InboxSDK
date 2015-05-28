@@ -11,6 +11,11 @@ function logErrorExceptEventListeners(err, details) {
   // Don't log Gmail's errors
   if (details !== 'XMLHttpRequest event listener error') {
     logError(err, details);
+  } else {
+    setTimeout(function() {
+      // let window.onerror log this
+      throw err;
+    }, 1);
   }
 }
 
