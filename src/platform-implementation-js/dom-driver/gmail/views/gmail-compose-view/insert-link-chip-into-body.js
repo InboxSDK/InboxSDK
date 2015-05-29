@@ -10,18 +10,17 @@ function insertLinkChipIntoBody(gmailComposeView, options){
 function _insertLinkChipIntoBody(gmailComposeView, options){
     gmailComposeView.focus();
 
-    var chipElement = _getChipElement(options);
+    const chipElement = _getChipElement(options);
 
     // Gmail compose treats text directly bordering the chipElement weirdly in
     // regards to cursor movement, so surround the chip with newlines which
     // makes Gmail act up a little less.
-    var frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     frag.appendChild(document.createTextNode('\u200b'));
     frag.appendChild(chipElement);
     frag.appendChild(document.createTextNode('\u200b'));
 
-    require('../../../../lib/dom/insert-html-at-cursor')(
-      gmailComposeView.getBodyElement(), frag, gmailComposeView.getLastSelectionRange());
+    gmailComposeView.insertBodyHTMLAtCursor(frag);
 
     if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm() && document.activeElement !== gmailComposeView.getBodyElement()){
         gmailComposeView.minimize();
