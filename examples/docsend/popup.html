@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>DocSend Chrome Extension</title>
+    <link rel="stylesheet" href="libs/font-awesome.min.css">
+
+    <script src="ajaxer.js"></script>
+    <script src="popupApi.js"></script>
+    <script src="popup.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 16px;
+        width: 410px;
+        height: 420px;
+        overflow: scroll;
+      }
+
+      #loading-view {
+        text-align: center;
+        background-color: #02a4ef;
+        height: 100%;
+      }
+
+      #loading-view .fa-spinner {
+        color: #fff;
+        font-size: 45px;
+        margin-top: 155px;
+      }
+
+      #loading-view img {
+        display: block;
+        margin: 10px auto;
+      }
+
+      #loading-view .close {
+        font-size: 22px;
+        color: rgba(0, 0, 0, 0.3);
+      }
+
+      #loading-view .close:hover {
+        color: rgba(0, 0, 0, 0.6);
+      }
+
+      .fa.fa-times.close {
+        color: #9d9d9d;
+        font-size: 20px;
+        position: absolute;
+        right: 8px;
+        top: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <input id='clipboard' style="position:absolute; top: -100px; left: 0px;">
+
+    <div id='loading-view'>
+      <i class="close fa fa-times"></i>
+      <i class="fa fa-spinner fa-spin"></i>
+      <img src='images/docsend-logo-white.png'>
+    </div>
+
+    <div id='login-view' style="display: none;">
+      <div class='banner'>
+        <img src='images/ds-logo.png'>
+        <div class='title'>Log into DocSend</div>
+        <i class="close fa fa-times"></i>
+      </div>
+      <div class='login-instros center'>
+        You must log into DocSend before you can create links.
+        <span id='sign-up-button' class='primary-button button'>
+          <span class='button-text'>
+            Sign Up
+          </span>
+        </span>
+        <span id='login-button' class='secondary-button button'>
+          <span class='button-text'>
+            Log In
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div id='doc-list-view' style="display: none;">
+      <div class='banner'>
+        <img src='images/ds-logo.png'>
+        <div class='title'>Select a Document</div>
+        <i class="close fa fa-times"></i>
+      </div>
+      <input id='doc-filter' type='text' autocomplete='off' placeholder='Search'>
+      <div id='doc-list' class='list-container'></div>
+    </div>
+
+    <div id='add-link-view' style="display: none;">
+      <div class='banner'>
+        <img src='images/ds-logo.png'>
+        <div class='title'>Create Link</div>
+        <i class="close fa fa-times"></i>
+      </div>
+      <div class='link-form list-container'>
+        <div id='doc-id'></div>
+        <div class='doc-name-container'>
+          <span>Document:</span>
+          <span id='doc-name'></span>
+          (<span>change</span>)
+        </div>
+        <div class='link-name'>
+          <label>To:</label>
+          <span><input id='recipient-name' placeholder='email@example.com'></span>
+        </div>
+
+        <div class='link-option clickable'>
+          <i class='checkbox fa fa-square-o' id='link-allow-anon'></i>
+          <label>Allow anonymous viewing</label>
+        </div>
+        <div class='link-option clickable'>
+          <i class='checkbox fa fa-square-o' id='link-allow-download'></i>
+          <label>Allow downloading</label>
+        </div>
+        <div class='link-option'>
+          <span class='label clickable'>
+            <i class='checkbox fa fa-square-o' id='link-expire'></i>
+            <label>Expire:</label>
+          </span>
+          <span class='expire'>
+            <input id='expire-time' class='datetime' type='text' autocomplete='off' placeholder='Pick Time' disabled>
+            <input id='expire-date' class='datetime' type='text' autocomplete='off' placeholder='Pick Date' disabled>
+          </span>
+        </div>
+        <div class='link-option'>
+          <span class='label clickable'>
+            <i class='checkbox fa fa-square-o' id='link-passcode'></i>
+            <label>Passcode:</label>
+          </span>
+          <span><input id='passcode' type='text' autocomplete='off' disabled></span>
+        </div>
+
+        <div class='sync-salesforce link-option clickable' style="display:none;">
+          <i class='checkbox fa fa-square-o' id='link-sync-salesforce'></i>
+          <label>Sync with Salesforce</label>
+        </div>
+
+        <div class='link-option clickable' id='link-create-leads' style="display: none;">
+          <i class='checkbox fa fa-square-o'></i>
+          <label>Create new leads for unmatching emails</label>
+        </div>
+
+        <div id='link-error'></div>
+
+        <div class='center'>
+          <span id='copy-button' class='primary-button button'>
+            <span class='button-text'>
+              Generate &amp; Copy Link
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div id='link-creation-info' style="display: none;">
+      <div class='banner'>
+        <img src='images/ds-logo.png'>
+        <div class='title'>Link Created</div>
+        <i class="close fa fa-times"></i>
+      </div>
+      <div class='center'>
+        <div class='description'>Here's your new link.<br>(It's already on your clipboard!)</div>
+        <input id='link-url' disabled>
+        <div id='copied'>Copied.</div>
+        <span id='post-copy-button' class='primary-button button'>
+          <span class='button-text'>
+            Copy Again
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div id='empty-docs-view' style="display: none;">
+      <div class='banner'>
+        <img src='images/ds-logo.png'>
+        <div class='title'>Select a Document</div>
+        <i class="close fa fa-times"></i>
+      </div>
+      <div class='center'>
+        You have no documents. Upload one now!
+        <span id='upload-doc-button' class='primary-button button'>
+          <span class='button-text'>
+            Upload a Doc
+          </span>
+        </span>
+      </div>
+    </div>
+  </body>
+</html>

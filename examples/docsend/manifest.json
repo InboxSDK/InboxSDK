@@ -1,0 +1,28 @@
+{
+   "background": {
+      "scripts": [ "jquery.js", "contentApi.js", "background.js" ]
+   },
+   "browser_action": {
+      "default_icon": "images/icon.png",
+      "default_popup": "popup.html",
+      "default_title": "Insert DocSend link"
+   },
+   "content_scripts": [ {
+      "js": [ "inboxsdk.js", "ajaxer.js", "contentApi.js", "content.js", "jquery.js", "in-parser.js" ],
+      "matches": [ "https://mail.google.com/*", "https://inbox.google.com/*", "http://*.linkedin.com/*", "https://*.linkedin.com/*" ]
+   } ],
+   "content_security_policy": "script-src 'self' https://*.docsend.com https://*.google.com https://ssl.google-analytics.com https://d2qvtfnm75xrxf.cloudfront.net  https://cdn.segment.com https://*.kissmetrics.com https://api.intercom.io https://js.intercomcdn.com https://widget.intercom.io https://static.intercomcdn.com https://doug1izaerwt3.cloudfront.net https://plus.google.com https://www.google-analytics.com;  object-src 'self';",
+   "description": "Quickly create links to any of your DocSend documents right inside Gmail.",
+   "icons": {
+      "128": "images/icon128.png",
+      "16": "images/icon16.png",
+      "48": "images/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv5MpJrA7+orMQCMhW55LdiqSV4txA1h1lZuA3pryVTZMq01Xd5+yQx3NRv4cpgWEI8H/CYFbq1VD6prHG3vps4A5hyyTa0xzp7L46UfWHkhWVM32ACotE+aBqS5kwea9p0gSM0hAA+AWepPCZN7uF55rtyIuyr6y/2tWSvO98PbenBCfdSc7FGffzM7hR3HK+3mwvhcmqn/oyUC5clzEkb/sLtfSlDQZOL9E0vnOaZ52O4qlTmxLCKp3SOsxgphzvmDZPPxed8WZDDS092bly+uYI+1edW4cznVPcWX9TXzNz25sPJM0DkC4TbLRbIqvMavX+euK7HgNp9hGnA76YwIDAQAB",
+   "manifest_version": 2,
+   "name": "DocSend Extension for Chrome",
+   "permissions": [ "storage", "tabs", "clipboardWrite", "webRequest", "webRequestBlocking", "*://d2qvtfnm75xrxf.cloudfront.net/*", "*://*.linkedin.com/*", "https://api.intercom.io/*", "*://docsend.com/*" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.2.4",
+   "web_accessible_resources": [ "images/*.*", "fonts/*.*", "blank.png", "content.html" ]
+}

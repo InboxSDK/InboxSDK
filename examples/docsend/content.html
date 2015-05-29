@@ -1,0 +1,126 @@
+<div id='loading-view'>
+  <div class="google-loading-image">
+    <img aria-hidden="true" src="//ssl.gstatic.com/ui/v1/activityindicator/loading_bg_f5.gif">
+  </div>
+</div>
+
+<div id='login-view' style="display:none;">
+  <h4>
+    Not logged into DocSend.
+  </h4>
+  <div id='sign-up-button'>
+    <div class='T-I J-J5-Ji ar7 L3 J-Zh-I bbButton T-I-atl' tabindex="0">
+      <div>
+        Sign In Now
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id='doc-list-view' style="display:none;" tabindex="0">
+  <div class="view-header">
+    <b>Select a Document</b>
+  </div>
+  <div class='list-container'>
+    <div class='search-container'>
+      <input id='doc-filter' type='text' autocomplete='off' placeholder='Search' tabindex="3">
+      <div class="A0" style="-webkit-user-select: none; top:0.4em;"></div>
+    </div>
+    <div id='doc-list'></div>
+  </div>
+</div>
+
+<div id='add-link-view' style="display:none;">
+  <div class="view-header">
+    <b>Create Link</b>
+  </div>
+  <div class='link-form list-container'>
+    <div id='doc-id'></div>
+    <div class='doc-name-container' tabindex="0">
+      <span>Document:</span>
+      <span id='doc-name'></span>
+      (<span tabindex="3">change</span>)
+    </div>
+
+    <div class="link-option option-toggle">
+      <div class="allow-anonymous checkbox oZ-jc T-Jo J-J5-Ji" tabindex="4">
+        <div class="T-Jo-auh"></div>
+      </div>
+      <span>Allow anonymous viewing</span>
+    </div>
+
+    <div class="link-option option-toggle">
+      <div class="allow-downloading checkbox oZ-jc T-Jo J-J5-Ji" tabindex="5">
+        <div class="T-Jo-auh"></div>
+      </div>
+      <span>Allow downloading</span>
+    </div>
+
+    <div class='link-option flex-row'>
+      <span class='expire-toggle option-toggle' id='expire-checkbox'>
+        <div class="checkbox oZ-jc T-Jo J-J5-Ji" tabindex="6">
+          <div class="T-Jo-auh"></div>
+        </div>
+        <label>Expire:</label>
+      </span>
+      <span class='expire flex flex-row'>
+        <div class="aco">
+            <input id='expire-time' class='datetime' type='text' autocomplete='off' placeholder='Pick Time'  tabindex="7" disabled>
+        </div>
+        <div class="flex">
+          <div class="aco">
+            <input id='expire-date' class='datetime' type='text' autocomplete='off' placeholder='Pick Date'  tabindex="8" disabled>
+          </div>
+        </div>
+      </span>
+    </div>
+    <div class='link-option flex-row'>
+      <span class='passcode-toggle option-toggle' id='link-passcode'>
+        <div class="checkbox oZ-jc T-Jo J-J5-Ji" tabindex="9">
+          <div class="T-Jo-auh"></div>
+        </div>
+        <label>Passcode:</label>
+      </span> 
+      <div class="flex">
+        <input id='passcode' type='text' autocomplete='off' tabindex="10" disabled>
+      </div>
+    </div>
+
+    <div class="link-option option-toggle" id='sync-sfdc' style="display:none;">
+      <div class="checkbox oZ-jc T-Jo J-J5-Ji" tabindex="11">
+        <div class="T-Jo-auh"></div>
+      </div>
+      <span>Sync with Salesforce</span>
+    </div>
+
+    <div class="link-option option-toggle" id='create-leads' style="display:none;">
+      <div class="checkbox oZ-jc T-Jo J-J5-Ji" tabindex="12">
+        <div class="T-Jo-auh"></div>
+      </div>
+      <span>Create leads for unmatching emails</span>
+    </div>
+
+    <div id='link-error'></div>
+
+    <div class='center insert-link-button' tabindex="15">
+      <div class="T-I J-J5-Ji ar7 L3 J-Zh-I bbButton inboxsdk__button_green_inactive">
+        <div>Insert link</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id='empty-docs-view' style="display:none;">
+  <div class="view-header">
+    <b>Select a Document</b>
+  </div>
+  <div class='upload-instros center'>
+    <div>
+        There aren't any documents in your account. Upload one on DocSend to get started!
+    </div>
+    <div id='upload-doc-button' class="T-I J-J5-Ji ar7 L3 J-Zh-I bbButton inboxsdk__button_green_inactive" tabindex="0">
+      <div>Go to DocSend</div>
+    </div>
+  </div>
+</div>
+<div id="docsend-lower-right-icon"></div>
