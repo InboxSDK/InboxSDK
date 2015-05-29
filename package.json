@@ -44,7 +44,7 @@
     "node-dir": "^0.1.6",
     "rimraf": "^2.3.4",
     "rsvp": "3.0.18",
-    "safari-fix-map": "^1.0.2",
+    "safari-fix-map": "^1.0.3",
     "semver": "^4.3.4",
     "sha256": "0.1.1",
     "sinon": "^1.14.0",
