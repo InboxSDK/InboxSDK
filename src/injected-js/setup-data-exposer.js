@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import logError from './log-error';
 import waitFor from '../platform-implementation-js/lib/wait-for';
 
 function stupidToBool(stupid) {
@@ -38,7 +39,17 @@ module.exports = function() {
     const userEmail = global.GLOBALS ?
       GLOBALS[10] : gbar._CONFIG[0][10][5];
     document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
-    document.head.setAttribute('data-inboxsdk-user-name', getUserNameForEmail(userEmail));
+    const userName = getUserNameForEmail(userEmail);
+    if (!userName) {
+      const mla = global.GLOBALS && GLOBALS[17] && _.find(GLOBALS[17], e => e[0] === 'mla');
+      logError(new Error("Failed to parse user info"), {
+        GLOBALSpresent: !!global.GLOBALS,
+        GLOBALS17present: !!(global.GLOBALS && GLOBALS[17]),
+        mlaPresent: !!mla,
+        mla1Length: mla && mla[1] && mla[1].length
+      });
+    }
+    document.head.setAttribute('data-inboxsdk-user-name', userName);
 
     const userLanguage = global.GLOBALS ?
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
@@ -57,5 +68,5 @@ module.exports = function() {
         document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
       }
     }
-  });
+  }).catch(logError);
 };

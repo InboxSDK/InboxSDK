@@ -24,6 +24,7 @@ export default {
 	getToolbarViewDriverStream: 0,
 	getButterBarDriver: 0,
 	setButterBar: 1,
+	isRunningInPageContext: 0,
 	showAppIdWarning: 0,
 	createModalViewDriver: 1
 };

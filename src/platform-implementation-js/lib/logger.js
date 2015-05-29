@@ -458,4 +458,12 @@ if (_extensionIsLoggerMaster && global.document) {
       })
     });
   });
+
+  document.addEventListener('inboxSDKinjectedError', function(event) {
+    const detail = event.detail;
+    Logger.error(
+      _.assign(new Error(detail.message), {stack: detail.stack}),
+      detail.details
+    );
+  });
 }

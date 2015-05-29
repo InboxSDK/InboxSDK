@@ -6,7 +6,7 @@ function waitFor(condition, timeout, steptime) {
 
 	return new RSVP.Promise(function(resolve, reject) {
 		if (!timeout) {
-			timeout = 60*1000;
+			timeout = 120*1000;
 		}
 		if (!steptime) {
 			steptime = 250;

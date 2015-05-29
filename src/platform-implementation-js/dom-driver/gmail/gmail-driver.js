@@ -289,6 +289,10 @@ _.extend(GmailDriver.prototype, {
 		);
 	},
 
+	isRunningInPageContext() {
+		return !!(global.GLOBALS && global._GM_main);
+	},
+
 	showAppIdWarning() {
 		showAppIdWarning(this);
 	},
