@@ -1,4 +1,13 @@
 (function () {
+  // Don't use remote InboxSDK
+  var localInboxSDK = InboxSDK;
+  Object.defineProperty(window, 'InboxSDK', {
+    get: function() {
+      return localInboxSDK;
+    },
+    set: function() {}
+  });
+
   var reg = /(.*)(mail|inbox)\.google\.com(.*)/;
   var results = reg.exec(window.location.host);
   if(results == null || results.length == 0) {
