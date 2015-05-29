@@ -8,12 +8,8 @@ export default function(gmailComposeView) {
   .onValue(function(event) {
     const body = gmailComposeView.getBodyElement();
     const selection = document.getSelection();
-    if (body && selection.rangeCount > 0) {
-      if (body.contains(selection.anchorNode)) {
-        gmailComposeView.setLastSelectionRange(selection.getRangeAt(0));
-      } else {
-        gmailComposeView.setLastSelectionRange(null);
-      }
+    if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
+      gmailComposeView.setLastSelectionRange(selection.getRangeAt(0));
     }
   });
 }

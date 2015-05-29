@@ -122,7 +122,7 @@ export default class GmailComposeView {
 	}
 
 	insertBodyHTMLAtCursor(html) {
-		return require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html);
+		return require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html, this._lastSelectionRange);
 	}
 
 	insertLinkIntoBody(text, href) {
