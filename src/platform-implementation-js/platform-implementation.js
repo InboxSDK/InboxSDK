@@ -74,6 +74,10 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 			pi._driver.showAppIdWarning();
 		}
 
+		if (pi._driver.isRunningInPageContext()) {
+			console.warn("Running the InboxSDK outside of an extension content script is not recommended!");
+		}
+
 		pi.Compose = new Compose(appId, pi._driver, pi._membraneMap);
 		pi.Conversations = new Conversations(appId, pi._driver, pi._membraneMap);
 		pi.Keyboard = new Keyboard(appId, opts.appIconUrl, pi._driver, pi._membraneMap);

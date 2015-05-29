@@ -121,6 +121,11 @@ export default class InboxDriver {
     // stub
   }
 
+  isRunningInPageContext() {
+    // stub
+    return false;
+  }
+
   showAppIdWarning() {
     // stub
   }
