@@ -5652,14 +5652,13 @@
       "resolved": "https://registry.npmjs.org/rsvp/-/rsvp-3.0.18.tgz"
     },
     "safari-fix-map": {
-      "version": "1.0.2",
-      "from": "safari-fix-map@>=1.0.2 <2.0.0",
-      "resolved": "https://registry.npmjs.org/safari-fix-map/-/safari-fix-map-1.0.2.tgz",
+      "version": "1.0.3",
+      "from": "safari-fix-map@>=1.0.3 <2.0.0",
       "dependencies": {
         "core-js": {
-          "version": "0.8.4",
-          "from": "core-js@>=0.8.3 <0.9.0",
-          "resolved": "https://registry.npmjs.org/core-js/-/core-js-0.8.4.tgz"
+          "version": "0.9.13",
+          "from": "core-js@>=0.9.13 <0.10.0",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-0.9.13.tgz"
         }
       }
     },

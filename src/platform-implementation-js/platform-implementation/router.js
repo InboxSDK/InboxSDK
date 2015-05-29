@@ -179,115 +179,115 @@ _.extend(Router.prototype, /** @lends Router */ {
 */
 var nativeRouteIDs = Object.freeze(/** @lends NativeRouteIDs */ {
 	/**
-	* inbox list
+	* inbox list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'INBOX': 'inbox/:page',
 
 	/**
-	* all mail list
+	* all mail list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'ALL_MAIL': 'all/:page',
 
 	/**
-	* sent list
+	* sent list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'SENT': 'sent/:page',
 
 	/**
-	* starred list
+	* starred list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'STARRED': 'starred/:page',
 
 	/**
-	* drafts list
+	* drafts list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'DRAFTS': 'drafts/:page',
 
 	/**
-	* snoozed list (Inbox)
+	* snoozed list (Inbox only)
 	* @type string
 	*/
 	'SNOOZED': 'snoozed',
 
 	/**
-	* done list (Inbox)
+	* done list (Inbox only)
 	* @type string
 	*/
 	'DONE': 'done',
 
 	/**
-	* reminders list (Inbox)
+	* reminders list (Inbox only)
 	* @type string
 	*/
 	'REMINDERS': 'reminders',
 
 	/**
-	* any label list
+	* any label list, Permissible Route Params: labelName, page (optional),
 	* @type string
 	*/
 	'LABEL': 'label/:labelName/:page',
 
 	/**
-	* trash list
+	* trash list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'TRASH': 'trash/:page',
 
 	/**
-	* spam list
+	* spam list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'SPAM': 'spam/:page',
 
 	/**
-	* built in list of important emails
+	* built in list of important emails, Permissible Route Params: page (optional)
 	* @type string
 	*/
-	'IMPORTANT': 'imp/p:page',
+	'IMPORTANT': 'imp/:page',
 
 	/**
-	* any search results page
+	* any search results page, Permissible Route Params: query, page (optional)
 	* @type string
 	*/
 	'SEARCH': 'search/:query/:page',
 
 	/**
-	* single conversation view
+	* single conversation view, Permissible Route Params: threadID
 	* @type string
 	*/
 	'THREAD': 'inbox/:threadID',
 
 	/**
-	* list of chats
+	* list of chats, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'CHATS': 'chats/:page',
 
 	/**
-	* single chat view
+	* single chat view, Permissible Route Params: chatID
 	* @type string
 	*/
 	'CHAT': 'chats/:chatID',
 
 	/**
-	* google contacts view
+	* google contacts view, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'CONTACTS': 'contacts/:page',
 
 	/**
-	* single google contact view
+	* single google contact view, Permissible Route Params: contactID
 	* @type string
 	*/
 	'CONTACT': 'contacts/:contactID',
 
 	/**
-	* the settings view
+	* the settings view, Permissible Route Params: section
 	* @type string
 	*/
 	'SETTINGS': 'settings/:section',
@@ -306,79 +306,79 @@ var nativeRouteIDs = Object.freeze(/** @lends NativeRouteIDs */ {
 */
 var nativeListRouteIDs = Object.freeze(/** @lends NativeListRouteIDs */ {
 	/**
-	* inbox list
+	* inbox list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'INBOX': nativeRouteIDs.INBOX,
 
 	/**
-	* all mail list
+	* all mail list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'ALL_MAIL': nativeRouteIDs.ALL_MAIL,
 
 	/**
-	* sent list
+	* sent list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'SENT': nativeRouteIDs.SENT,
 
 	/**
-	* starred list
+	* starred list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'STARRED': nativeRouteIDs.STARRED,
 
 	/**
-	* drafts list
+	* drafts list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'DRAFTS': nativeRouteIDs.DRAFTS,
 
 	/**
-	* snoozed list (Inbox)
+	* snoozed list (Inbox only)
 	* @type string
 	*/
 	'SNOOZED': nativeRouteIDs.SNOOZED,
 
 	/**
-	* done list (Inbox)
+	* done list (Inbox only)
 	* @type string
 	*/
 	'DONE': nativeRouteIDs.DONE,
 
 	/**
-	* reminders list (Inbox)
+	* reminders list (Inbox only)
 	* @type string
 	*/
 	'REMINDERS': nativeRouteIDs.REMINDERS,
 
 	/**
-	* label list
+	* any label list, Permissible Route Params: labelName, page (optional),
 	* @type string
 	*/
 	'LABEL': nativeRouteIDs.LABEL,
 
 	/**
-	* trash list
+	* trash list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'TRASH': nativeRouteIDs.TRASH,
 
 	/**
-	* spam list
+	* spam list, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'SPAM': nativeRouteIDs.SPAM,
 
 	/**
-	* important list
+	* built in list of important emails, Permissible Route Params: page (optional)
 	* @type string
 	*/
 	'IMPORTANT': nativeRouteIDs.IMPORTANT,
 
 	/**
-	* any search result list
+	* any search results page, Permissible Route Params: query, page (optional)
 	* @type string
 	*/
 	'SEARCH': nativeRouteIDs.SEARCH,
