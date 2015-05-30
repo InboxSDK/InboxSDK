@@ -28,7 +28,7 @@ var AMBIGUOUS = Marker('ABIGUOUS');
 var threadIdsByKey = {};
 function storeThreadMetadata(threadMetadata) {
   var key = threadMetadataKey(threadMetadata);
-  if (_.has(threadIdsByKey, key)) {
+  if (_.has(threadIdsByKey, [key])) {
     if (threadIdsByKey[key] !== threadMetadata.gmailThreadId) {
       threadIdsByKey[key] = AMBIGUOUS;
     }
@@ -70,7 +70,7 @@ function getThreadIdFromUrl(url) {
 function getGmailThreadIdForThreadRow(threadRow){
   var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
   var key = threadMetadataKey(domRowMetadata);
-  if (_.has(threadIdsByKey, key) && threadIdsByKey[key] !== AMBIGUOUS) {
+  if (_.has(threadIdsByKey, [key]) && threadIdsByKey[key] !== AMBIGUOUS) {
     return threadIdsByKey[key];
   }
 
@@ -80,7 +80,7 @@ function getGmailThreadIdForThreadRow(threadRow){
   var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
   var url = clickAndGetPopupUrl(threadRow);
   var threadId = url && getThreadIdFromUrl(url);
-  if (threadId && !_.has(threadIdsByKey, key)) {
+  if (threadId && !_.has(threadIdsByKey, [key])) {
     threadIdsByKey[key] = threadId;
   }
   if (currentRowSelection) {
