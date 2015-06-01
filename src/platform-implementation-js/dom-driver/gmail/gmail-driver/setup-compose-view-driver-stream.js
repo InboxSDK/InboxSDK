@@ -42,7 +42,20 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 				return view;
 			}));
 		})
-	).flatMap(composeViewDriver => composeViewDriver.ready());
+	).flatMap(composeViewDriver => {
+
+		composeViewDriver.ready().onError(errorObject => {
+
+			Logger.error(
+				errorObject,
+				`hasForm: ${!!composeViewDriver.getElement().querySelector('form')}\n
+				 class: ${composeViewDriver.getElement().getAttribute('class')}`
+			);
+
+		});
+
+		return composeViewDriver.ready();
+	});
 }
 
 function _setupStandardComposeElementStream() {

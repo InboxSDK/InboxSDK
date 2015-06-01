@@ -58,14 +58,24 @@ module.exports = function() {
     if (global.GLOBALS) {
       document.head.setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
 
-      const globalSettings = _.find(GLOBALS[17], (item) => item[0] === 'p')[1];
-      {
-        const previewPaneLabEnabled = getSettingValue(globalSettings, 'bx_lab_1252');
-        const previewPaneEnabled = getSettingValue(globalSettings, 'bx_spa');
-        const previewPaneVertical = getSettingValue(globalSettings, 'bx_spo');
-        const previewPaneMode = (previewPaneLabEnabled && previewPaneEnabled) ?
-          (previewPaneVertical ? 'vertical' : 'horizontal') : 'none';
-        document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
+      const globalSettingsHolder = _.find(GLOBALS[17], (item) => item[0] === 'p');
+
+      if(!globalSettingsHolder){
+        logError(new Error('failed to find globalSettings'), {
+          GLOBALSpresent: !!global.GLOBALS,
+          GLOBALS17present: !!(global.GLOBALS && GLOBALS[17])
+        });
+      }
+      else{
+        const globalSettings = globalSettingsHolder[1];
+        {
+          const previewPaneLabEnabled = getSettingValue(globalSettings, 'bx_lab_1252');
+          const previewPaneEnabled = getSettingValue(globalSettings, 'bx_spa');
+          const previewPaneVertical = getSettingValue(globalSettings, 'bx_spo');
+          const previewPaneMode = (previewPaneLabEnabled && previewPaneEnabled) ?
+            (previewPaneVertical ? 'vertical' : 'horizontal') : 'none';
+          document.head.setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
+        }
       }
     }
   }).catch(logError);

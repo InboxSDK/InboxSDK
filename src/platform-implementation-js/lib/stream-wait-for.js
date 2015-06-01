@@ -7,9 +7,9 @@ import Bacon from 'baconjs';
  * thrown so that it gets logged. Well-behaving code should not let the timeout
  * get tripped.
  */
-export default function streamWaitFor(condition, timeout=60*1000, steptime=250) {
+export default function streamWaitFor(condition, timeout=60*1000, steptime=250, extraErrorDetails='') {
   // make this error here so we have a sensible stack.
-  const timeoutError = new Error("waitFor timeout");
+  const timeoutError = new Error(`waitFor timeout ${extraErrorDetails}`);
 
   const timeoutStream = Bacon.later(timeout).flatMap(() => {
     setTimeout(() => {

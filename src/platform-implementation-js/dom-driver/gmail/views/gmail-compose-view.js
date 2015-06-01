@@ -66,8 +66,11 @@ export default class GmailComposeView {
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		this.ready = _.constant(
-			streamWaitFor(() =>
-				!this._element || !!this.getBodyElement()
+			streamWaitFor(
+				() => !this._element || !!this.getBodyElement(),
+				60 * 1000, //timeout
+				250, //steptime
+				`hasForm: ${!!this._element.querySelector('form')}`
 			).filter(() => !!this._element)
 			.map(() => {
 				this._composeID = this._element.querySelector('input[name="composeid"]').value;
