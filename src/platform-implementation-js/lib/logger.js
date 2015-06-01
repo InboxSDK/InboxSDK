@@ -456,6 +456,8 @@ if (_extensionIsLoggerMaster && global.document) {
         data: events,
         timestamp: Date.now()*1000
       })
+    }).catch(function(err) {
+      //suppress error when logging event
     });
   });
 
