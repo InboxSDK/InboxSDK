@@ -27,6 +27,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	let lastNativeHash = getURLObject(document.location.href).hash;
 	let latestGmailRouteView = null;
 
+	let lastHash = lastNativeHash;
+
 	const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
 		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
 		.filter(event => event.newURL === document.location.href) // ignore outdated events
@@ -58,13 +60,16 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 
 	// If a user goes from a native route to a custom route, and then back to the
 	// same native route, we need to make a new GmailRouteView because
-	// getMainContentElementChangedStream() won't be firing.
+	// getMainContentElementChangedStream() won't be firing, except when going from thread->custom->thread
 	const revertNativeHashChanges = eligibleHashChanges
 		.filter(({type}) => type === 'NATIVE')
 		.filter(({urlObject}) => {
 			const tmp = lastNativeHash;
 			lastNativeHash = urlObject.hash;
 			return tmp === urlObject.hash;
+		})
+		.filter(({urlObject}) => {
+			return urlObject.hash !== lastHash;
 		});
 
 	// Merge everything that can trigger a new RouteView
@@ -78,7 +83,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 				urlObject: getURLObject(document.location.href),
 				type: 'NATIVE'
 			}))
-	]).map(options => {
+	])
+	.map(options => {
 		const {type, urlObject} = options;
 		if (type === 'NATIVE' && urlObject.name === 'search') {
 			const customListRouteId = customListSearchStringsToRouteIds.get(urlObject.params[0]);
@@ -95,7 +101,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			}
 		}
 		return options;
-	}).map(options => {
+	})
+	.map(options => {
 		if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
 			driver.showNativeRouteView();
 		} else if (options.type === 'CUSTOM_LIST_TRIGGER') {
@@ -110,6 +117,8 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 			latestGmailRouteView.destroy();
 		}
 		latestGmailRouteView = gmailRouteView;
+		lastHash = getURLObject(document.location.href).hash;
+
 		return gmailRouteView;
 	});
 }
