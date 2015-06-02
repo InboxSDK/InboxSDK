@@ -52,6 +52,7 @@ var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
 		require('./gmail-driver/track-events')(this);
 		require('./gmail-driver/gmail-load-event')(this);
 		require('./gmail-driver/maintain-compose-window-state')(this);
+		require('./gmail-driver/override-gmail-back-button')(this, this._gmailRouteProcessor);
 	});
 };
 

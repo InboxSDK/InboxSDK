@@ -85,6 +85,15 @@ var GmailElementGetter = {
 		return document.querySelector('[role=main] .g.id table.Bs > tr');
 	},
 
+	getThreadBackButton: function(){
+		let toolbarElement = GmailElementGetter.getToolbarElement();
+		if(!toolbarElement){
+			return null;
+		}
+
+		return toolbarElement.querySelector('.lS');
+	},
+
 	getSidebarContainerElement: function(){
 		return document.querySelector('[role=main] table.Bs > tr .y3');
 	},
