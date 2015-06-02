@@ -81,7 +81,7 @@ function _setupStandardComposeElementStream() {
 			el: event.el.querySelector('[role=dialog]')
 		};
 	}).filter(function(event) {
-		return event && event.el;
+		return event && event.el && Boolean(event.el.querySelector('form'));
 	}).flatMap(makeElementStreamMerger());
 }
 
