@@ -68,7 +68,7 @@ export default class GmailComposeView {
 		this.ready = _.constant(
 			streamWaitFor(
 				() => !this._element || !!this.getBodyElement(),
-				60 * 1000, //timeout
+				3*60 * 1000, //timeout
 				250, //steptime
 				`hasForm: ${!!this._element.querySelector('form')}`
 			).filter(() => !!this._element)
