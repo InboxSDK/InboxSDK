@@ -92,7 +92,7 @@ function _setupStandaloneComposeElementStream() {
 }
 
 function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	return streamWaitFor(() => containerFn())
+	return streamWaitFor(containerFn)
 		.flatMap(containerEl => makeElementChildStream(containerEl));
 }
 
