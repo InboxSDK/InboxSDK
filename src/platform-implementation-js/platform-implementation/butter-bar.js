@@ -132,6 +132,12 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
     return this.showMessage(options);
   },
 
+  /**
+   * Spawns a new error message. The returned object contains a {destroy} method that can be
+   * called to remove the message.
+   * @param {MessageDescriptor} options - message options
+   * @return {Object}
+   */
   showError(options) {
     _.defaults(options, {
       priority: 100
