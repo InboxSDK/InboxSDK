@@ -1,4 +1,4 @@
-var _ = require('lodash');
+import assign from 'lodash/object/assign';
 
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 var checkRequirements = require('./check-requirements');
@@ -19,7 +19,7 @@ var InboxSDK = {
 * @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
 */
 InboxSDK.load = function(version, appId, opts){
-  opts = _.extend({
+  opts = assign({
     // defaults
     globalErrorLogging: true
   }, opts, {

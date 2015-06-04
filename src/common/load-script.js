@@ -1,7 +1,8 @@
-var _ = require('lodash');
-var ajax = require('./ajax');
+import once from 'lodash/function/once';
+import defer from 'lodash/function/defer';
+import ajax from './ajax';
 
-var isContentScript = _.once(function() {
+const isContentScript = once(function() {
   if (typeof chrome != 'undefined' && chrome.extension)
     return true;
   if (typeof safari != 'undefined' && safari.extension)
@@ -26,7 +27,7 @@ function addScriptToPage(url, cors) {
     script.addEventListener('load', function() {
       // Make sure the script has a moment to execute before this promise
       // resolves.
-      _.defer(resolve);
+      defer(resolve);
     }, false);
   });
 

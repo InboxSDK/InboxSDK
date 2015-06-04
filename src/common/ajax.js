@@ -1,7 +1,8 @@
-var _ = require('lodash');
-var querystring = require('querystring');
+import assign from 'lodash/object/assign';
+import forOwn from 'lodash/object/forOwn';
+import querystring from 'querystring';
 
-var serversToIgnore = new Set();
+const serversToIgnore = new Set();
 
 // Simple ajax helper.
 // opts:
@@ -35,7 +36,7 @@ function ajax(opts) {
     }
 
     var xhr = new XMLHttpRequest();
-    _.extend(xhr, opts.xhrFields);
+    assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
       var err = new Error("Failed to load "+opts.url);
       err.event = event;
@@ -55,7 +56,7 @@ function ajax(opts) {
       });
     };
     xhr.open(opts.method, opts.url, true);
-    _.each(opts.headers, function(value, name) {
+    forOwn(opts.headers, function(value, name) {
       xhr.setRequestHeader(name, value);
     });
     xhr.send(opts.data);
