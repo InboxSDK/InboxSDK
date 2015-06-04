@@ -10,11 +10,13 @@ import asap from 'asap';
 import addAccessors from 'add-accessors';
 import assertInterface from '../../lib/assert-interface';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
+
 var Driver = require('../../driver-interfaces/driver');
 var GmailElementGetter = require('./gmail-element-getter');
 var makeXhrInterceptor = require('./make-xhr-interceptor');
 var GmailThreadView = require('./views/gmail-thread-view');
 
+import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
@@ -296,6 +298,10 @@ _.extend(GmailDriver.prototype, {
 
 	showAppIdWarning() {
 		showAppIdWarning(this);
+	},
+
+	createTopMessageBarDriver(optionStream) {
+		return new GmailTopMessageBarDriver(optionStream);
 	},
 
 	associateThreadAndMessageIDs(threadID, messageID) {

@@ -1,9 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import baconCast from 'bacon-cast';
 
-var ModalView = require('../widgets/modal-view');
-var MoleView = require('../widgets/mole-view');
+import ModalView from '../widgets/modal-view';
+import MoleView from '../widgets/mole-view';
+import TopMessageBarView from '../widgets/top-message-bar-view';
 
 var memberMap = new Map();
 
@@ -53,6 +56,14 @@ _.assign(Widgets.prototype, /** @lends Widgets */{
 		moleViewDriver.show();
 
 		return moleView;
+  },
+
+  showTopMessageBarView: function(options){
+    const topMessageBarDriver = memberMap.get(this).driver.createTopMessageBarDriver(baconCast(Bacon, options));
+
+    return new TopMessageBarView({
+      topMessageBarDriver
+    });
   }
 
 });
