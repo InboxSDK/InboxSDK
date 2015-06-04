@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var RSVP = require('rsvp');
 var ajax = require('./ajax');
 
 var isContentScript = _.once(function() {
@@ -17,7 +16,7 @@ function addScriptToPage(url, cors) {
     script.crossOrigin = 'anonymous';
   }
 
-  var promise = new RSVP.Promise(function(resolve, reject) {
+  var promise = new global.Promise(function(resolve, reject) {
     script.addEventListener('error', function(event) {
       reject(event.error ||
         new Error(

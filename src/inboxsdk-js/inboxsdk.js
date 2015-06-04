@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var RSVP = require('rsvp');
 
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 var checkRequirements = require('./check-requirements');
@@ -29,13 +28,6 @@ InboxSDK.load = function(version, appId, opts){
     VERSION: InboxSDK.LOADER_VERSION,
     REQUESTED_API_VERSION: version
   });
-
-  if (!RSVP._errorHandlerSetup) {
-    RSVP._errorHandlerSetup = true;
-    RSVP.on('error', function(err) {
-      console.error("Possibly uncaught promise rejection", err, err && err.stack);
-    });
-  }
 
   checkRequirements(opts);
 

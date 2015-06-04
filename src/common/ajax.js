@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var RSVP = require('rsvp');
 var querystring = require('querystring');
 
 var serversToIgnore = new Set();
@@ -15,7 +14,7 @@ function ajax(opts) {
   if(!opts || typeof opts.url !== 'string') {
     throw new Error('URL must be given');
   }
-  return new RSVP.Promise(function(resolve, reject) {
+  return new global.Promise(function(resolve, reject) {
     if (!opts.method) {
       opts.method = "GET";
     }

@@ -1,9 +1,8 @@
-var RSVP = require('rsvp');
 var _ = require('lodash');
 
 function PlatformImplementationLoader(appId, opts) {
     this.load = _.once(() => {
-        return RSVP.resolve().then(() => {
+        return global.Promise.resolve().then(() => {
             if (!global.__InboxSDKImpLoader) {
                 return this._loadScript().then(() => {
                     if (!global.__InboxSDKImpLoader) {
