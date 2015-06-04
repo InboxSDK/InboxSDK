@@ -7,8 +7,6 @@ import fakeWindowResize from '../../../lib/fake-window-resize';
 
 export default function showAppIdWarning(driver) {
 
-
-
   const topDiv = document.createElement('div');
   topDiv.className = 'inboxsdk__appid_warning';
   topDiv.innerHTML = `
