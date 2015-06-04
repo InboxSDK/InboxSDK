@@ -2,7 +2,7 @@ import assign from 'lodash/object/assign';
 import forOwn from 'lodash/object/forOwn';
 import querystring from 'querystring';
 
-const serversToIgnore = new global.Set();
+const serversToIgnore = {};
 
 // Simple ajax helper.
 // opts:
@@ -30,7 +30,7 @@ function ajax(opts) {
     }
 
     var server = opts.url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//)[1];
-    if (serversToIgnore.has(server)) {
+    if (Object.prototype.hasOwnProperty.call(serversToIgnore, server)) {
       reject(new Error("Server at "+opts.url+" has told us to stop connecting"));
       return;
     }
@@ -45,7 +45,7 @@ function ajax(opts) {
       // give a way for a server to tell us to go away for now. Good fallback
       // in case a bug ever causes clients to spam a server with requests.
       if (xhr.status == 490) {
-        serversToIgnore.add(server);
+        serversToIgnore[server] = true;
       }
       reject(err);
     };
