@@ -2,7 +2,7 @@ import assign from 'lodash/object/assign';
 import forOwn from 'lodash/object/forOwn';
 import querystring from 'querystring';
 
-const serversToIgnore = new Set();
+const serversToIgnore = new global.Set();
 
 // Simple ajax helper.
 // opts:
