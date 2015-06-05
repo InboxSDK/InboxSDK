@@ -27,8 +27,27 @@ module.exports = function(XHR, wrappers, opts) {
 
   function transformEvent(oldTarget, newTarget, event) {
     var newEvent = {};
-    _.each(event, function(value, name) {
-      newEvent[name] = value === oldTarget ? newTarget : value;
+    Object.keys(event).concat([
+      'bubbles', 'cancelBubble', 'cancelable',
+      'defaultPrevented',
+      'preventDefault',
+      'stopPropagation',
+      'stopImmediatePropagation',
+      'lengthComputable', 'loaded', 'total',
+      'type',
+      'currentTarget', 'target',
+      'srcElement',
+      'NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',
+      'eventPhase'
+    ]).filter(name => name in event).forEach(name => {
+      const value = event[name];
+      if (value === oldTarget) {
+        newEvent[name] = newTarget;
+      } else if (typeof value === 'function') {
+        newEvent[name] = value.bind(event);
+      } else {
+        newEvent[name] = value;
+      }
     });
     return newEvent;
   }
@@ -153,7 +172,7 @@ module.exports = function(XHR, wrappers, opts) {
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
       var wasSuccess = self.status == 200;
-      var progressEvent = _.extend({}, event, {
+      var progressEvent = _.extend({}, transformEvent(self._realxhr, self, event), {
         lengthComputable: false, loaded: 0, total: 0
       });
 
