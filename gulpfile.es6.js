@@ -102,6 +102,8 @@ gulp.task('version', function() {
 });
 
 function browserifyTask(name, deps, entry, destname) {
+  const willMinify = args.minify && (args.single || name !== "sdk");
+
   gulp.task(name, ['version'].concat(deps), function() {
     let bundler = browserify({
       entries: entry,
@@ -119,10 +121,10 @@ function browserifyTask(name, deps, entry, destname) {
 
     function buildBundle() {
       const sourcemapPipeline = lazyPipe()
-        .pipe(addsrc.prepend, (args.minify || args.production) ? ["./src/inboxsdk-js/header.js"] : [])
+        .pipe(addsrc.prepend, (willMinify || args.production) ? ["./src/inboxsdk-js/header.js"] : [])
         .pipe(sourcemaps.init, {loadMaps: true})
         .pipe(concat, destname)
-        .pipe(() => gulpif(args.minify, uglify({preserveComments: 'some'})))
+        .pipe(() => gulpif(willMinify, uglify({preserveComments: 'some'})))
         .pipe(sourcemaps.write, args.production ? '.' : null, {
           // don't include sourcemap comment in the inboxsdk.js file that we
           // distribute to developers since it'd always be broken.
@@ -134,7 +136,7 @@ function browserifyTask(name, deps, entry, destname) {
       const bundle = bundler.bundle();
       const result = bundle
         .pipe(source(destname))
-        .pipe(gulpif(args.minify || args.production, streamify(sourcemapPipeline())))
+        .pipe(gulpif(willMinify || args.production, streamify(sourcemapPipeline())))
         .pipe(gulp.dest('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {

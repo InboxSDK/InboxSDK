@@ -1,9 +1,9 @@
-var RSVP = require('rsvp');
-var _ = require('lodash');
+import assign from 'lodash/object/assign';
+import once from 'lodash/function/once';
 
 function PlatformImplementationLoader(appId, opts) {
-    this.load = _.once(() => {
-        return RSVP.resolve().then(() => {
+    this.load = once(() => {
+        return global.Promise.resolve().then(() => {
             if (!global.__InboxSDKImpLoader) {
                 return this._loadScript().then(() => {
                     if (!global.__InboxSDKImpLoader) {
@@ -20,7 +20,7 @@ function PlatformImplementationLoader(appId, opts) {
     });
 }
 
-_.extend(PlatformImplementationLoader.prototype, {
+assign(PlatformImplementationLoader.prototype, {
     _loadScript: function(){
         const loadScript = require('../../common/load-script');
         return loadScript(process.env.IMPLEMENTATION_URL);
