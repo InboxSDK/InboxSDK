@@ -59,10 +59,10 @@ _.assign(Widgets.prototype, /** @lends Widgets */{
   },
 
   showTopMessageBarView: function(options){
-    const topMessageBarDriver = memberMap.get(this).driver.createTopMessageBarDriver(baconCast(Bacon, options));
+    const topMessageBarViewDriver = memberMap.get(this).driver.createTopMessageBarDriver(baconCast(Bacon, options));
 
     return new TopMessageBarView({
-      topMessageBarDriver
+      topMessageBarViewDriver
     });
   }
 
