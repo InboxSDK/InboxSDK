@@ -82,11 +82,20 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
-	* Closes the compose window.
-	* @return {void}
-	*/
+	 * Closes the compose window.
+	 * @return {void}
+	 */
 	close: function(){
 		memberMap.get(this).composeViewImplementation.close();
+	},
+
+
+	/**
+	 * Simulates clicking the compose's send button.
+	 * @return {void}
+	 */
+	send: function() {
+		memberMap.get(this).composeViewImplementation.send();
 	},
 
 	/**

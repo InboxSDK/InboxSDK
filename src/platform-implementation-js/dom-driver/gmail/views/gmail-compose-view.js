@@ -235,6 +235,10 @@ export default class GmailComposeView {
 		simulateClick(this.getCloseButton());
 	}
 
+	send() {
+		simulateClick(this.getSendButton());
+	}
+
 	isReply() {
 		return this._isInlineReplyForm || !!this._element.querySelector('.HQ');
 	}
