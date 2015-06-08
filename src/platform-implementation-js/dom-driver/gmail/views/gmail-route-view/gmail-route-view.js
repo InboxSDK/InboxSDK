@@ -30,7 +30,6 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver)
 	this._driver = driver;
 
 	this._eventStream = new Bacon.Bus();
-	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
 	if (this._type === 'CUSTOM') {
 		this._setupCustomViewElement();

@@ -27,7 +27,6 @@ var GmailToolbarView = function(element, routeViewDriver){
 	this._element = element;
 	this._routeViewDriver = routeViewDriver;
 	this._eventStream = new Bacon.Bus();
-	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
 	var self = this;
 	this._ready = waitFor(function(){
