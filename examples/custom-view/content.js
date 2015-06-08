@@ -1,94 +1,108 @@
 function log() {
-	console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
+  console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.load(1.0, 'custom-view').then(function(inboxSDK){
+InboxSDK.load(1.0, 'custom-view').then(function(sdk) {
+	var threadIds = new Set();
 
+	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
+		threadIds.add(threadRowView.getThreadID());
+	});
 
-inboxSDK.Router.handleCustomRoute('example/:monkeyName', function(customRouteView){
-	customRouteView.getElement().innerHTML = 'hello world!';
-});
+  sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView) {
+    customRouteView.getElement().innerHTML = 'hello world!';
+		var list = document.createElement('ul');
+		threadIds.forEach(function(threadId) {
+			var link = document.createElement('a');
+			link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+			link.onclick = function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				sdk.Router.goto(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+			};
+			link.textContent = threadId;
+			var item = document.createElement('li');
+			item.appendChild(link);
+			list.appendChild(item);
+		});
+		customRouteView.getElement().appendChild(list);
+  });
 
+  sdk.Router.handleAllRoutes(function(routeView) {
+    log(
+      'id', routeView.getRouteID(),
+      'type', routeView.getRouteType(),
+      'params', routeView.getParams()
+    );
+  });
 
-inboxSDK.Router.handleAllRoutes(function(routeView){
-	log(
-		'id', routeView.getRouteID(),
-		'type', routeView.getRouteType(),
-		'params', routeView.getParams()
-	);
-});
+  sdk.NavMenu.SENT_MAIL.addNavItem({
+    name: 'Sent Monkeys'
+  });
 
+  sdk.NavMenu.addNavItem({
+    name: 'beep',
+    iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+    routeID: 'beep'
+  });
 
+  sdk.Router.handleCustomRoute('beep', function(customRouteView) {
+    customRouteView.getElement().innerHTML = 'beep';
+  });
 
-inboxSDK.NavMenu.SENT_MAIL.addNavItem({
-	name: 'Sent Monkeys'
-});
+  var navItem = sdk.NavMenu.addNavItem({
+    name: 'Monkeys',
+    iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+    routeID: 'example/:monkeyName',
+    routeParams: 'george {} {} {}',
+    type: sdk.NavMenu.NavItemTypes.MANAGE,
+    accessory: {
+      type: 'CREATE',
+      onClick: function() {
+        log('create monkeys');
+      }
+    }
+  });
 
+  var lion = navItem.addNavItem({
+    name: 'Lions',
+    routeID: sdk.Router.NativeRouteIDs.THREAD,
+    routeParams: {
+      threadID: '14aa1bcd3deefcf7'
+    },
+    iconUrl: chrome.runtime.getURL('lion.png'),
+    accessory: {
+      type: 'ICON_BUTTON',
+      iconUrl: chrome.runtime.getURL('lion.png'),
+      onClick: function() {
+        log('lions rocks!');
+      }
+    }
+  });
 
-inboxSDK.NavMenu.addNavItem({
-	name: 'beep',
-	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-	routeID: 'beep'
-});
+  var monkey = lion.addNavItem({
+    name: 'Saved View',
+    iconUrl: chrome.runtime.getURL('monkey.png'),
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
 
-inboxSDK.Router.handleCustomRoute('beep', function(customRouteView){
-	customRouteView.getElement().innerHTML = 'beep';
-});
+  sdk.NavMenu.addNavItem({
+    name: 'Saved View 2',
+    orderHint: -1,
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
 
-var navItem = inboxSDK.NavMenu.addNavItem({
-	name: 'Monkeys',
-	iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-	routeID: 'example/:monkeyName',
-	routeParams: 'george {} {} {}',
-	type: inboxSDK.NavMenu.NavItemTypes.MANAGE,
-	accessory: {
-		type: 'CREATE',
-		onClick: function(){
-			log('create monkeys');
-		}
-	}
-});
-
-var lion = navItem.addNavItem({
-	name: 'Lions',
-	routeID: inboxSDK.Router.NativeRouteIDs.THREAD,
-	routeParams: {threadID: '14aa1bcd3deefcf7'},
-	iconUrl: chrome.runtime.getURL('lion.png'),
-	accessory: {
-		type: 'ICON_BUTTON',
-		iconUrl: chrome.runtime.getURL('lion.png'),
-		onClick: function(){
-			log('lions rocks!');
-		}
-	}
-});
-
-var monkey = lion.addNavItem({
-	name: 'Saved View',
-	iconUrl: chrome.runtime.getURL('monkey.png'),
-	accessory: {
-		type: 'DROPDOWN_BUTTON',
-		onClick: function(event){
-			event.dropdown.el.innerHTML = 'Hello world!';
-		}
-	}
-});
-
-inboxSDK.NavMenu.addNavItem({
-	name: 'Saved View 2',
-	orderHint: -1,
-	accessory: {
-		type: 'DROPDOWN_BUTTON',
-		onClick: function(event){
-			event.dropdown.el.innerHTML = 'Hello world!';
-		}
-	}
-});
-
-
-lion.addNavItem({
-	name: 'aved View 2'
-});
-
-
+  lion.addNavItem({
+    name: 'Lion item'
+  });
 });
