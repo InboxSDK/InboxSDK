@@ -43,17 +43,6 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 			}));
 		})
 	).flatMap(composeViewDriver => {
-
-		composeViewDriver.ready().onError(errorObject => {
-
-			Logger.error(
-				errorObject,
-				`hasForm: ${!!composeViewDriver.getElement().querySelector('form')}\n
-				 class: ${composeViewDriver.getElement().getAttribute('class')}`
-			);
-
-		});
-
 		return composeViewDriver.ready();
 	});
 }
