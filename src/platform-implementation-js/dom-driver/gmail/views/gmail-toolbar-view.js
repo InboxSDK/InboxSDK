@@ -187,13 +187,12 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_determineToolbarIconMode: function(){
-		var sectionElement = this._getMoveSectionElement();
-		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.trim().length  === 0){
-			this._element.setAttribute('data-toolbar-icononly', 'true');
-		}
-		else{
-			this._element.setAttribute('data-toolbar-icononly', 'false');
-		}
+		const isIconMode = _.any(
+			this._getMoveSectionElement().querySelectorAll('[role=button]'),
+			buttonElement =>
+				buttonElement.hasAttribute('title') || buttonElement.hasAttribute('data-tooltip')
+		);
+		this._element.setAttribute('data-toolbar-icononly', isIconMode ? 'true' : 'false');
 	},
 
 	_setupToolbarStateMonitoring: function(){

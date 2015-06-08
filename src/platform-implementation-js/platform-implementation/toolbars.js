@@ -211,7 +211,9 @@ var sectionNames = Object.freeze(/** @lends SectionNames */ {
 var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 
 	/**
-	* Text to show when the user hovers the mouse over the button.
+	* Text to show when the user hovers the mouse over the button, or to show on
+	* the button when the user has the Gmail "Button labels" setting set to
+	* "Text".
 	* @type {string}
 	*/
 	title:null,
