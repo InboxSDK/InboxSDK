@@ -8,6 +8,10 @@ InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
 		console.log('thread id', composeView.getThreadID());
 		console.log('message id', composeView.getMessageID());
 
+		window.sendIt = function() {
+			composeView.send();
+		};
+
 		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 		var monkeyIndex = 0;
 

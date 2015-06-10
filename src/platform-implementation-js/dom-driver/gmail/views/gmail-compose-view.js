@@ -5,7 +5,6 @@ import Bacon from 'baconjs';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
-import Logger from '../../../lib/logger';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -69,14 +68,13 @@ export default class GmailComposeView {
 			streamWaitFor(
 				() => !this._element || !!this.getBodyElement(),
 				3*60 * 1000, //timeout
-				250, //steptime
-				`hasForm: ${!!this._element.querySelector('form')}`
+				250 //steptime
 			).filter(() => !!this._element)
 			.map(() => {
 				this._composeID = this._element.querySelector('input[name="composeid"]').value;
 				this._messageIDElement = this._element.querySelector('input[name="draft"]');
 				if (!this._messageIDElement) {
-					Logger.error(new Error("Could not find compose message id field"));
+					driver.getLogger().error(new Error("Could not find compose message id field"));
 					// stub so other things don't fail
 					this._messageIDElement = document.createElement('div');
 				}
@@ -88,6 +86,13 @@ export default class GmailComposeView {
 				return this;
 			}).toProperty()
 		);
+
+		this.ready().onError(errorObject => {
+			driver.getLogger().error(errorObject, {
+				hasForm: !!this.getElement().querySelector('form'),
+				class: this.getElement().getAttribute('class')
+			});
+		});
 	}
 
 	_setupStreams() {
@@ -238,6 +243,10 @@ export default class GmailComposeView {
 		}
 
 		simulateClick(this.getCloseButton());
+	}
+
+	send() {
+		simulateClick(this.getSendButton());
 	}
 
 	isReply() {

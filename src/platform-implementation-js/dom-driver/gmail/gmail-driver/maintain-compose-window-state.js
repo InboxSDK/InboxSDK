@@ -29,7 +29,7 @@ function _setupManagement(gmailDriver){
 								.map(() => gmailComposeView)
 				)
 				.filterBy(
-					kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
+					Kefir.fromEvents(window, 'hashchange')
 								.flatMapLatest(() => Kefir.constant(true).merge(Kefir.later(250, false)))
 								.toProperty(() => false)
 				)

@@ -27,7 +27,6 @@ var GmailToolbarView = function(element, routeViewDriver){
 	this._element = element;
 	this._routeViewDriver = routeViewDriver;
 	this._eventStream = new Bacon.Bus();
-	this._eventStream.onValue(_.noop); // Work-around: don't ignore .end() calls made before listeners are added.
 
 	var self = this;
 	this._ready = waitFor(function(){
@@ -188,13 +187,12 @@ _.extend(GmailToolbarView.prototype, {
 	},
 
 	_determineToolbarIconMode: function(){
-		var sectionElement = this._getMoveSectionElement();
-		if(sectionElement && sectionElement.querySelector('[role=button]').textContent.trim().length  === 0){
-			this._element.setAttribute('data-toolbar-icononly', 'true');
-		}
-		else{
-			this._element.setAttribute('data-toolbar-icononly', 'false');
-		}
+		const isIconMode = _.any(
+			this._getMoveSectionElement().querySelectorAll('[role=button]'),
+			buttonElement =>
+				buttonElement.hasAttribute('title') || buttonElement.hasAttribute('data-tooltip')
+		);
+		this._element.setAttribute('data-toolbar-icononly', isIconMode ? 'true' : 'false');
 	},
 
 	_setupToolbarStateMonitoring: function(){
