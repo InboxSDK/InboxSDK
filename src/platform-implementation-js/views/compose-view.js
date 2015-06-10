@@ -322,6 +322,36 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.setFromEmail(email);
 	},
 
+	/**
+	 * Replaces the entirety of the current subject of the compose
+	 * and replaces the subject with the passed in text
+	 * @param {string} text - text to use for the subject
+	 * @return {void}
+	 */
+	setSubject: function(text){
+		memberMap.get(this).composeViewImplementation.setSubject(text);
+	},
+
+	/**
+	 * Replaces the entirety of the compose's email body with the html
+	 * value passed in.
+	 * @param {string} html - html to use for the body
+	 * @return {void}
+	 */
+	setBodyHTML: function(html){
+		memberMap.get(this).composeViewImplementation.setBodyHTML(html);
+	},
+
+	/**
+	 * Replaces the entirety of the compose's email body with the text
+	 * value passed in.
+	 * @param {string} text - text to use for the body
+	 * @return {void}
+	 */
+	setBodyText: function(text){
+		memberMap.get(this).composeViewImplementation.setBodyText(text);
+	},
+
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement: function(){
 		return memberMap.get(this).composeViewImplementation.getElement();

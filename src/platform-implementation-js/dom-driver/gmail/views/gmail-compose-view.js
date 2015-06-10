@@ -141,6 +141,16 @@ export default class GmailComposeView {
 		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
 	}
 
+	setBodyHTML(html){
+		this.getBodyElement().innerHTML = html;
+		$(this._element).find('input[type=hidden][name=body]').val(html);
+	}
+
+	setBodyText(text){
+		this.getBodyElement().textContent = text;
+		$(this._element).find('input[type=hidden][name=body]').val(text);
+	}
+
 	setToRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 0, emails);
 	}
