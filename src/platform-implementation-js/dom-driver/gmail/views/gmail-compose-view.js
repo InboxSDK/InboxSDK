@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import asap from 'asap';
 import RSVP from 'rsvp';
 import Bacon from 'baconjs';
+
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -32,6 +34,8 @@ export default class GmailComposeView {
 		this._driver = driver;
 		this._managedViewControllers = [];
 		this._eventStream = new Bacon.Bus();
+
+		this._isTriggeringADraftSavePending = false;
 
 		this._eventStream.plug(
 			Bacon.mergeAll(
@@ -431,7 +435,19 @@ export default class GmailComposeView {
 	}
 
 	_triggerDraftSave() {
-		simulateKey(this.getBodyElement(), 13, 0);
+		if(this._isTriggeringADraftSavePending){
+			return;
+		}
+		else{
+			this._isTriggeringADraftSavePending = true;
+			asap(() => {
+				this._isTriggeringADraftSavePending = false;
+
+				if(this.getBodyElement()){
+					simulateKey(this.getBodyElement(), 13, 0);
+				}
+			});
+		}
 	}
 }
 
