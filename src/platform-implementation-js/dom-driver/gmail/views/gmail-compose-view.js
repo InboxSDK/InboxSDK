@@ -5,6 +5,7 @@ import Bacon from 'baconjs';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
+import simulateKey from '../../../lib/dom/simulate-key';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -126,46 +127,70 @@ export default class GmailComposeView {
 	}
 
 	insertBodyTextAtCursor(text) {
-		return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
+		let retVal = this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
+
+		this._triggerDraftSave();
+		return retVal;
 	}
 
 	insertBodyHTMLAtCursor(html) {
-		return require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html, this._lastSelectionRange);
+		let retVal = require('../../../lib/dom/insert-html-at-cursor')(this.getBodyElement(), html, this._lastSelectionRange);
+
+		this._triggerDraftSave();
+		return retVal;
 	}
 
 	insertLinkIntoBody(text, href) {
-		return require('./gmail-compose-view/insert-link-into-body')(this, text, href);
+		let retVal = require('./gmail-compose-view/insert-link-into-body')(this, text, href);
+
+		this._triggerDraftSave();
+		return retVal;
 	}
 
 	insertLinkChipIntoBody(options) {
-		return require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
+		let retVal = require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
+
+		this._triggerDraftSave();
+		return retVal;
 	}
 
 	setSubject(text) {
 		$(this._element).find('input[name=subjectbox]').val(text);
 		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
+
+		this._triggerDraftSave();
 	}
 
 	setBodyHTML(html){
 		this.getBodyElement().innerHTML = html;
 		$(this._element).find('input[type=hidden][name=body]').val(html);
+
+		this._triggerDraftSave();
 	}
 
 	setBodyText(text){
 		this.getBodyElement().textContent = text;
 		$(this._element).find('input[type=hidden][name=body]').val(text);
+
+		this._triggerDraftSave();
 	}
 
 	setToRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 0, emails);
+
+		this._triggerDraftSave();
 	}
 
 	setCcRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 1, emails);
+
+		this._triggerDraftSave();
 	}
 
 	setBccRecipients(emails) {
 		require('./gmail-compose-view/set-recipients')(this, 2, emails);
+
+		this._triggerDraftSave();
 	}
 
 	addRecipientRow(options){
@@ -403,6 +428,10 @@ export default class GmailComposeView {
 
 	restore() {
 		this.minimize(); //minize and restore buttons are the same
+	}
+
+	_triggerDraftSave() {
+		simulateKey(this.getBodyElement(), 13, 0);
 	}
 }
 
