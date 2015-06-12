@@ -82,16 +82,21 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 				 .value();
 	},
 
+	/**
+	 * Gets the subject of this thread.
+	 * @return {string} The subject.
+	 */
 	getSubject: function(){
 		return memberMap.get(this).threadViewImplementation.getSubject();
 	},
 
+	/**
+	 * Gets the Gmail Thread ID of the thread.
+	 * @return {string} The gmail threadID.
+	 */
 	getThreadID: function(){
 		return memberMap.get(this).threadViewImplementation.getThreadID();
 	},
-
-
-
 
 	/**
 	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}.
