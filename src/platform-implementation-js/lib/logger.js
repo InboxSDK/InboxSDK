@@ -32,7 +32,7 @@ var [_extensionIsLoggerMaster, _sessionId] = (function() {
   }
 })();
 
-function getAllAppIds() {
+function getAllAppIds(): string[] {
   if (global.document && document.head.hasAttribute('data-inboxsdk-active-app-ids')) {
     return JSON.parse(document.head.getAttribute('data-inboxsdk-active-app-ids'));
   } else {
@@ -43,8 +43,8 @@ function getAllAppIds() {
 var _trackedEventsQueue = new PersistentQueue('events');
 
 type AppLogger = {
-  error(err: Error, details: any): void;
-  event(name: string, details: any): void;
+  error(err: Error, details?: any): void;
+  event(name: string, details?: any): void;
 };
 
 class Logger {
@@ -72,26 +72,26 @@ class Logger {
     _extensionUserEmailHash = hash(email);
   }
 
-  static error(err: Error, details: any) {
+  static error(err: Error, details?: any) {
     _logError(err, details, null, false);
   }
 
-  error(err: Error, details: any) {
+  error(err: Error, details?: any) {
     _logError(err, details, this._appId, false);
   }
 
-  errorApp(err: Error, details: any) {
+  errorApp(err: Error, details?: any) {
     _logError(err, details, this._appId, true);
   }
 
   // Should only be used by the InboxSDK users for their own app events.
-  eventApp(name: string, details: any) {
+  eventApp(name: string, details?: any) {
     _trackEvent(this._appId, 'app', name, details);
   }
 
   // For tracking app events that are possibly triggered by the user. Extensions
   // can opt out of this with a flag passed to InboxSDK.load().
-  eventSdkActive(name: string, details: any) {
+  eventSdkActive(name: string, details?: any) {
     if (!_extensionUseEventTracking) {
       return;
     }
@@ -101,12 +101,12 @@ class Logger {
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
-  eventSdkPassive(name: string, details: any) {
+  eventSdkPassive(name: string, details?: any) {
     _trackEvent(this._appId, 'sdkPassive', name, details);
   }
 
   // Track Gmail events.
-  eventGmail(name: string, details: any) {
+  eventGmail(name: string, details?: any) {
     // Only the first logger instance reports Gmail events.
     if (!this._isMaster) {
       return;
@@ -123,7 +123,7 @@ class Logger {
 }
 export default Logger;
 
-function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
+function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, implVersion: string) {
   _extensionAppIds.push(Object.freeze({
     appId: appId,
     version: opts.appVersion || undefined
@@ -253,25 +253,25 @@ function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
   }
 }
 
-function haveWeSeenThisErrorAlready(error) {
+function haveWeSeenThisErrorAlready(error: Error): boolean {
   if (error && typeof error == 'object') {
     return _extensionSeenErrors.has(error);
   }
   return false;
 }
 
-function markErrorAsSeen(error) {
+function markErrorAsSeen(error: Error) {
   if (error && typeof error == 'object') {
     _extensionSeenErrors.add(error);
   }
 }
 
-function tooManyErrors(err2, originalArgs) {
+function tooManyErrors(err2: Error, originalArgs: any) {
   console.error("ERROR REPORTING ERROR", err2);
   console.error("ORIGINAL ERROR", originalArgs);
 }
 
-function getAppIdsProperty(causedByAppId, onlyExtensionApps=true) {
+function getAppIdsProperty(causedByAppId: ?string, onlyExtensionApps: boolean=true): any[] {
   var appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
     return appIds;
@@ -288,7 +288,7 @@ function getAppIdsProperty(causedByAppId, onlyExtensionApps=true) {
 }
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
-function _logError(err, details, appId, sentByApp) {
+function _logError(err: Error, details: any, appId: ?string, sentByApp: boolean) {
   if (!global.document) {
     // In tests, just throw the error.
     throw err;
@@ -359,7 +359,7 @@ function _logError(err, details, appId, sentByApp) {
   }
 }
 
-var _sendError = _.throttle(report => {
+var _sendError = _.throttle(function(report: any) {
   var args = arguments;
 
   try {
@@ -378,7 +378,7 @@ var _sendError = _.throttle(report => {
   }
 }, 1000);
 
-function makeLoggedFunction(func, name) {
+function makeLoggedFunction(func: Function, name: ?string): Function {
   var msg = name ? "Uncaught error in "+name : "Uncaught error";
   return function() {
     var functionArgs = arguments;
@@ -392,24 +392,18 @@ function makeLoggedFunction(func, name) {
   };
 }
 
-function replaceFunction(parent, name, newFnMaker) {
+function replaceFunction(parent: any, name: string, newFnMaker: (original: Function) => Function) {
   var newFn = newFnMaker(parent[name]);
   newFn.__original = parent[name];
   parent[name] = newFn;
 }
 
-function hash(str) {
+function hash(str: string): string {
   var sha256 = require('sha256');
   return sha256('inboxsdk:'+str);
 }
 
-function _trackEvent(appId, type, eventName, properties) {
-  if (typeof type != 'string') {
-    throw new Error("type must be string: "+type);
-  }
-  if (typeof eventName != 'string') {
-    throw new Error("eventName must be string: "+eventName);
-  }
+function _trackEvent(appId: ?string, type: string, eventName: string, properties: any) {
   if (properties && typeof properties != 'object') {
     throw new Error("properties must be object or null: "+properties);
   }
@@ -450,7 +444,7 @@ if (_extensionIsLoggerMaster && global.document) {
   makeMutationObserverStream(document.head, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(120*1000).onValue(function() {
-    var events = _trackedEventsQueue.removeAll();
+    var events: any[] = _trackedEventsQueue.removeAll();
 
     // The trackedEventsQueue is in localStorage, which is shared between
     // multiple tabs. A different tab could have flushed it already recently.
