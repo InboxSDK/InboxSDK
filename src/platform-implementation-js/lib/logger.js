@@ -1,3 +1,6 @@
+/* @flow */
+// jshint ignore:start
+
 import _ from 'lodash';
 import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
@@ -8,8 +11,8 @@ import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-const _extensionAppIds = [];
-const _extensionSeenErrors = new WeakSet();
+var _extensionAppIds = [];
+var _extensionSeenErrors: WeakSet<Error> = new WeakSet();
 var _extensionLoaderVersion;
 var _extensionImplVersion;
 var _extensionUserEmailHash;
@@ -17,11 +20,11 @@ var _extensionUseEventTracking;
 
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
-const [_extensionIsLoggerMaster, _sessionId] = (function() {
+var [_extensionIsLoggerMaster, _sessionId] = (function() {
   if (global.document && document.head.hasAttribute('data-inboxsdk-session-id')) {
     return [false, document.head.getAttribute('data-inboxsdk-session-id')];
   } else {
-    const _sessionId = Date.now()+'-'+Math.random();
+    var _sessionId = Date.now()+'-'+Math.random();
     if (global.document) {
       document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
     }
@@ -37,10 +40,18 @@ function getAllAppIds() {
   }
 }
 
-const _trackedEventsQueue = new PersistentQueue('events');
+var _trackedEventsQueue = new PersistentQueue('events');
 
-export default class Logger {
-  constructor(appId, opts, loaderVersion, implVersion) {
+type AppLogger = {
+  error(err: Error, details: any): void;
+  event(name: string, details: any): void;
+};
+
+class Logger {
+  _appId: string;
+  _isMaster: boolean;
+
+  constructor(appId: string, opts: any, loaderVersion: string, implVersion: string) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
     this._appId = appId;
     this._isMaster = (function() {
@@ -51,36 +62,36 @@ export default class Logger {
       )) {
         return false;
       } else {
-        document.head.setAttribute('data-inboxsdk-app-logger-master-chosen', true);
+        document.head.setAttribute('data-inboxsdk-app-logger-master-chosen', 'true');
         return true;
       }
     })();
   }
 
-  setUserEmailAddress(email) {
+  setUserEmailAddress(email: string) {
     _extensionUserEmailHash = hash(email);
   }
 
-  static error(err, details) {
+  static error(err: Error, details: any) {
     _logError(err, details, null, false);
   }
 
-  error(err, details) {
+  error(err: Error, details: any) {
     _logError(err, details, this._appId, false);
   }
 
-  errorApp(err, details) {
+  errorApp(err: Error, details: any) {
     _logError(err, details, this._appId, true);
   }
 
   // Should only be used by the InboxSDK users for their own app events.
-  eventApp(name, details) {
+  eventApp(name: string, details: any) {
     _trackEvent(this._appId, 'app', name, details);
   }
 
   // For tracking app events that are possibly triggered by the user. Extensions
   // can opt out of this with a flag passed to InboxSDK.load().
-  eventSdkActive(name, details) {
+  eventSdkActive(name: string, details: any) {
     if (!_extensionUseEventTracking) {
       return;
     }
@@ -90,12 +101,12 @@ export default class Logger {
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
-  eventSdkPassive(name, details) {
+  eventSdkPassive(name: string, details: any) {
     _trackEvent(this._appId, 'sdkPassive', name, details);
   }
 
   // Track Gmail events.
-  eventGmail(name, details) {
+  eventGmail(name: string, details: any) {
     // Only the first logger instance reports Gmail events.
     if (!this._isMaster) {
       return;
@@ -103,13 +114,14 @@ export default class Logger {
     _trackEvent(null, 'gmail', name, details);
   }
 
-  getAppLogger() {
+  getAppLogger(): AppLogger {
     return {
       error: (err, details) => this.errorApp(err, details),
       event: (name, details) => this.eventApp(name, details)
     };
   }
 }
+export default Logger;
 
 function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
   _extensionAppIds.push(Object.freeze({
@@ -133,8 +145,8 @@ function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
   _extensionUseEventTracking = opts.eventTracking;
 
   if (opts.globalErrorLogging) {
-    if (Error.stackTraceLimit < 40) {
-      Error.stackTraceLimit = 40;
+    if ((Error: any).stackTraceLimit < 40) {
+      (Error: any).stackTraceLimit = 40;
     }
 
     RSVP.on('error', function(err) {
@@ -170,7 +182,7 @@ function _extensionLoggerSetup(appId, opts, loaderVersion, implVersion) {
       };
     });
 
-    const ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
+    var ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
     replaceFunction(ETp, 'addEventListener', function(original) {
       return function wrappedAddEventListener() {
         var args = _.toArray(arguments);
@@ -260,11 +272,11 @@ function tooManyErrors(err2, originalArgs) {
 }
 
 function getAppIdsProperty(causedByAppId, onlyExtensionApps=true) {
-  const appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
+  var appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
     return appIds;
   } else {
-    const appIdsWithCause = _.cloneDeep(appIds);
+    var appIdsWithCause = _.cloneDeep(appIds);
     appIdsWithCause.forEach(function(entry) {
       if (entry.appId === causedByAppId) {
         entry.causedBy = true;
@@ -282,7 +294,7 @@ function _logError(err, details, appId, sentByApp) {
     throw err;
   }
 
-  const args = arguments;
+  var args = arguments;
 
   // It's important that we can't throw an error or leave a rejected promise
   // unheard while logging an error in order to make sure to avoid ever
@@ -301,14 +313,14 @@ function _logError(err, details, appId, sentByApp) {
     }
     sentByApp = !!sentByApp;
 
-    const appIds = getAppIdsProperty(appId);
+    var appIds = getAppIdsProperty(appId);
 
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
-    const nowStack = getStackTrace();
+    var nowStack = getStackTrace();
 
     // Show the error immediately, don't wait on implementation load for that.
-    let stuffToLog = ["Error logged:", err];
+    var stuffToLog: any[] = ["Error logged:", err];
     if (err && err.stack) {
       stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
     }
@@ -325,7 +337,7 @@ function _logError(err, details, appId, sentByApp) {
 
     console.error(...stuffToLog);
 
-    const report = {
+    var report = {
       message: err && err.message || err,
       stack: err && err.stack,
       loggedFrom: nowStack,
@@ -337,7 +349,7 @@ function _logError(err, details, appId, sentByApp) {
       extensionId: getExtensionId(),
       loaderVersion: _extensionLoaderVersion,
       implementationVersion: _extensionImplVersion,
-      origin: document.location.origin,
+      origin: (document.location: any).origin,
       timestamp: Date.now()*1000
     };
 
@@ -347,8 +359,8 @@ function _logError(err, details, appId, sentByApp) {
   }
 }
 
-const _sendError = _.throttle(report => {
-  const args = arguments;
+var _sendError = _.throttle(report => {
+  var args = arguments;
 
   try {
     ajax({
@@ -367,9 +379,9 @@ const _sendError = _.throttle(report => {
 }, 1000);
 
 function makeLoggedFunction(func, name) {
-  const msg = name ? "Uncaught error in "+name : "Uncaught error";
+  var msg = name ? "Uncaught error in "+name : "Uncaught error";
   return function() {
-    const functionArgs = arguments;
+    var functionArgs = arguments;
 
     try {
       return func.apply(this, arguments);
@@ -387,7 +399,7 @@ function replaceFunction(parent, name, newFnMaker) {
 }
 
 function hash(str) {
-  const sha256 = require('sha256');
+  var sha256 = require('sha256');
   return sha256('inboxsdk:'+str);
 }
 
@@ -401,11 +413,11 @@ function _trackEvent(appId, type, eventName, properties) {
   if (properties && typeof properties != 'object') {
     throw new Error("properties must be object or null: "+properties);
   }
-  let event = {
+  var event = {
     type: type,
     event: eventName,
     timestamp: Date.now()*1000,
-    origin: document.location.origin,
+    origin: (document.location: any).origin,
     sessionId: _sessionId,
     emailHash: _extensionUserEmailHash,
     loaderVersion: _extensionLoaderVersion,
@@ -431,14 +443,14 @@ function _trackEvent(appId, type, eventName, properties) {
   _trackedEventsQueue.add(event);
 
   // Signal to the logger master that a new event is ready to be sent.
-  document.head.setAttribute('data-inboxsdk-last-event', Date.now());
+  document.head.setAttribute('data-inboxsdk-last-event', ''+Date.now());
 }
 
 if (_extensionIsLoggerMaster && global.document) {
   makeMutationObserverStream(document.head, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(120*1000).onValue(function() {
-    const events = _trackedEventsQueue.removeAll();
+    var events = _trackedEventsQueue.removeAll();
 
     // The trackedEventsQueue is in localStorage, which is shared between
     // multiple tabs. A different tab could have flushed it already recently.
@@ -462,7 +474,7 @@ if (_extensionIsLoggerMaster && global.document) {
   });
 
   document.addEventListener('inboxSDKinjectedError', function(event) {
-    const detail = event.detail;
+    var detail = event.detail;
     Logger.error(
       _.assign(new Error(detail.message), {stack: detail.stack}),
       detail.details

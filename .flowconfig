@@ -1,0 +1,14 @@
+[include]
+
+[ignore]
+dist/
+.*/examples/.*/inboxsdk\.js.*
+.*/dist/inboxsdk\.js.*
+.*/dist/platform-implementation\.js.*
+.*/dist/injected\.js.*
+.*/flow-libs/.*
+
+[libs]
+flow-libs/
+
+[options]
