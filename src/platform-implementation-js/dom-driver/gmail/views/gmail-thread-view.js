@@ -4,6 +4,7 @@
 import _ from 'lodash';
 import util from 'util';
 import Bacon from 'baconjs';
+import {parse} from 'querystring';
 
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -51,6 +52,7 @@ class GmailThreadView {
 		this._eventStream.end();
 		this._toolbarView.destroy();
 		this._sidebarContentPanelContainerView.destroy();
+		this._messageViewDrivers.length = 0;
 	}
 
 	setPageCommunicator(pc: any) {
@@ -100,6 +102,11 @@ class GmailThreadView {
 			else{
 				this._threadID = this._pageCommunicator.getCurrentThreadID(this._element);
 			}
+		}
+
+		if (!this._threadID) {
+			// Happens if gmonkey isn't available, like on a standalone thread page.
+			this._threadID = parse(document.location.search, null, null).th;
 		}
 
 		return (this._threadID: any);
