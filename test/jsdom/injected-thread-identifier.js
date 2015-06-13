@@ -3,6 +3,8 @@ var RSVP = require('../lib/rsvp');
 var jsdom = require('../lib/jsdom');
 var fs = require('fs');
 
+require('../lib/fake-page-globals')();
+
 global.document = jsdom(fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8'));
 global.window = document.parentWindow;
 

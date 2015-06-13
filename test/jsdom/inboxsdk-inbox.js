@@ -2,6 +2,8 @@ var assert = require('assert');
 var RSVP = require('../lib/rsvp');
 var jsdom = require('../lib/jsdom');
 
+require('../lib/fake-page-globals')();
+
 process.env.VERSION = 'beep';
 
 var InboxSDK = require('./lib/inboxsdk');
