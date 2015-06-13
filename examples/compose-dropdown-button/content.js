@@ -5,6 +5,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
 			onClick: function(event){
+				composeView.setSubject('foo<b>ar');
 				event.dropdown.el.innerHTML = 'hello world!';
 			},
 			section: 'TRAY_LEFT'

@@ -21,3 +21,12 @@ declare class sdkMutationObserver {
     takeRecords(): Array<MutationRecord>;
     disconnect(): void;
 }
+
+declare class CustomEvent extends Event {
+  constructor(typeArg: string, customEventInit?: {
+    bubbles?: boolean;
+    cancelable?: boolean;
+    detail?: any;
+  }): void;
+  detail: any;
+}

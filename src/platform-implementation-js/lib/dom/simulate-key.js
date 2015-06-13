@@ -1,10 +1,13 @@
+/* @flow */
+// jshint ignore:start
+
 import _ from 'lodash';
 
-export default function simulateKey(element, keyCode, charCode) {
-  const ctrlKey = false;
-  const metaKey = false;
-  const altKey = false;
-  const shiftKey = false;
+export default function simulateKey(element: HTMLElement, keyCode: number, charCode: number) {
+  var ctrlKey = false;
+  var metaKey = false;
+  var altKey = false;
+  var shiftKey = false;
 
   triggerRelayEvent(element, {
     type: 'keydown', bubbles: true, cancelable: true,
@@ -31,8 +34,11 @@ export default function simulateKey(element, keyCode, charCode) {
   });
 }
 
-function triggerRelayEvent(element, detail) {
-  const event = document.createEvent("CustomEvent");
-  event.initCustomEvent('inboxsdk_event_relay', true, false, detail);
+function triggerRelayEvent(element: HTMLElement, detail: any) {
+  var event = new CustomEvent('inboxsdk_event_relay', {
+    bubbles: true,
+    cancelable: false,
+    detail
+  });
   element.dispatchEvent(event);
 }

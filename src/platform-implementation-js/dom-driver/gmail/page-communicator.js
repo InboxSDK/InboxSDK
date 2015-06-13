@@ -1,3 +1,15 @@
+/* @flow */
+// jshint ignore:start
+
+type AutoCompleteSuggestion = {
+  name?: ?string;
+  nameHTML?: ?string;
+  routeName?: ?string;
+  externalURL?: ?string;
+  searchTerm?: ?string;
+  owner: string;
+};
+
 import _ from 'lodash';
 import RSVP from 'rsvp';
 import Bacon from 'baconjs';
@@ -7,14 +19,16 @@ import Bacon from 'baconjs';
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class PageCommunicator {
+  ajaxInterceptStream: Bacon.Observable;
+
   constructor() {
     this.ajaxInterceptStream = Bacon
       .fromEventTarget(document, 'inboxSDKajaxIntercept')
       .map('.detail');
   }
 
-  resolveUrlRedirects(url) {
-    const promise = Bacon.fromEvent(document, 'inboxSDKresolveURLdone')
+  resolveUrlRedirects(url: string): Promise<string> {
+    var promise = Bacon.fromEvent(document, 'inboxSDKresolveURLdone')
       .filter(event => event.detail && event.detail.url === url)
       .first()
       .flatMap(event => {
@@ -26,53 +40,62 @@ export default class PageCommunicator {
       })
       .toPromise(RSVP.Promise);
 
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKresolveURL', false, false, {url});
+    var event = new CustomEvent('inboxSDKresolveURL', {
+      bubbles: false,
+      cancelable: false,
+      detail: {url}
+    });
     document.dispatchEvent(event);
 
     return promise;
   }
 
-  getThreadIdForThreadRow(threadRow) {
-    let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+  getThreadIdForThreadRow(threadRow: HTMLElement): string {
+    var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
-      const event = document.createEvent('CustomEvent');
-      event.initCustomEvent('inboxSDKtellMeThisThreadId', true, false, null);
+      var event = new CustomEvent('inboxSDKtellMeThisThreadId', {
+        bubbles: true,
+        cancelable: false,
+        detail: null
+      });
       threadRow.dispatchEvent(event);
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
     return threadid;
   }
 
-  getCurrentThreadID(threadContainerElement, isPreviewedThread){
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKtellMeCurrentThreadId', true, false, {isPreviewedThread: isPreviewedThread});
+  getCurrentThreadID(threadContainerElement: HTMLElement, isPreviewedThread: boolean=false): string {
+    var event = new CustomEvent('inboxSDKtellMeCurrentThreadId', {
+      bubbles: true,
+      cancelable: false,
+      detail: {isPreviewedThread}
+    });
     threadContainerElement.dispatchEvent(event);
 
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
   }
 
-  getUserEmailAddress() {
+  getUserEmailAddress(): string {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }
 
-  getUserName() {
+  getUserName(): string {
     return document.head.getAttribute('data-inboxsdk-user-name');
   }
 
-  getUserLanguage() {
+  getUserLanguage(): string {
     return document.head.getAttribute('data-inboxsdk-user-language');
   }
 
-  getUserOriginalPreviewPaneMode() {
+  getUserOriginalPreviewPaneMode(): string {
     return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
-  getIkValue() {
+  getIkValue(): string {
     return document.head.getAttribute('data-inboxsdk-ik-value');
   }
 
-  isConversationViewDisabled() {
+  isConversationViewDisabled(): Promise<boolean> {
     return new RSVP.Promise((resolve, reject) => {
       Bacon.fromEventTarget(document, 'inboxSDKgmonkeyResponse')
         .take(1)
@@ -80,64 +103,74 @@ export default class PageCommunicator {
           resolve(event.detail);
         });
 
-      const event = document.createEvent('CustomEvent');
-      event.initCustomEvent('inboxSDKtellMeIsConversationViewDisabled', false, false, null);
+      var event = new CustomEvent('inboxSDKtellMeIsConversationViewDisabled', {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      });
       document.dispatchEvent(event);
     });
   }
 
-  announceSearchAutocompleter(providerID) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKregisterSuggestionsModifier', false, false, {
-      providerID
+  announceSearchAutocompleter(providerID: string) {
+    var event = new CustomEvent('inboxSDKregisterSuggestionsModifier', {
+      bubbles: false,
+      cancelable: false,
+      detail: {providerID}
     });
     document.dispatchEvent(event);
   }
 
-  provideAutocompleteSuggestions(providerID, query, suggestions) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKprovideSuggestions', false, false, {
-      providerID, query, suggestions
+  provideAutocompleteSuggestions(providerID: string, query: string, suggestions: AutoCompleteSuggestion[]) {
+    var event = new CustomEvent('inboxSDKprovideSuggestions', {
+      bubbles: false,
+      cancelable: false,
+      detail: {providerID, query, suggestions}
     });
     document.dispatchEvent(event);
   }
 
-  setupCustomListResultsQuery(query) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKcustomListRegisterQuery', false, false, {
-      query
+  setupCustomListResultsQuery(query: string) {
+    var event = new CustomEvent('inboxSDKcustomListRegisterQuery', {
+      bubbles: false,
+      cancelable: false,
+      detail: {query}
     });
     document.dispatchEvent(event);
   }
 
-  setCustomListNewQuery(query, newQuery) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKcustomListNewQuery', false, false, {
-      query, newQuery
+  setCustomListNewQuery(query: string, newQuery: string) {
+    var event = new CustomEvent('inboxSDKcustomListNewQuery', {
+      bubbles: false,
+      cancelable: false,
+      detail: {query, newQuery}
     });
     document.dispatchEvent(event);
   }
 
-  setCustomListResults(query, newResults) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKcustomListResults', false, false, {
-      query, newResults
+  setCustomListResults(query: string, newResults: string) {
+    var event = new CustomEvent('inboxSDKcustomListResults', {
+      bubbles: false,
+      cancelable: false,
+      detail: {query, newResults}
     });
     document.dispatchEvent(event);
   }
 
-  createCustomSearchTerm(term) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKcreateCustomSearchTerm', false, false, {
-      term: term
+  createCustomSearchTerm(term: string) {
+    var event = new CustomEvent('inboxSDKcreateCustomSearchTerm', {
+      bubbles: false,
+      cancelable: false,
+      detail: {term}
     });
     document.dispatchEvent(event);
   }
 
-  setSearchQueryReplacement(query, newQuery) {
-    const event = document.createEvent('CustomEvent');
-    event.initCustomEvent('inboxSDKsearchReplacementReady', false, false, {
-      query: query, newQuery: newQuery
+  setSearchQueryReplacement(query: string, newQuery: string) {
+    var event = new CustomEvent('inboxSDKcreateCustomSearchTerm', {
+      bubbles: false,
+      cancelable: false,
+      detail: {query, newQuery}
     });
     document.dispatchEvent(event);
   }
