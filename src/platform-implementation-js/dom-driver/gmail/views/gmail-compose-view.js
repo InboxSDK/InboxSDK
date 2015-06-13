@@ -444,7 +444,12 @@ export default class GmailComposeView {
 				this._isTriggeringADraftSavePending = false;
 
 				if(this.getBodyElement()){
-					simulateKey(this.getBodyElement(), 13, 0);
+					var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+					try {
+						simulateKey(this.getBodyElement(), 13, 0);
+					} finally {
+						unsilence();
+					}
 				}
 			});
 		}

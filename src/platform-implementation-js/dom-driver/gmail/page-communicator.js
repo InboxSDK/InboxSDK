@@ -11,8 +11,10 @@ type AutoCompleteSuggestion = {
 };
 
 import _ from 'lodash';
+import asap from 'asap';
 import RSVP from 'rsvp';
 import Bacon from 'baconjs';
+import Logger from '../../lib/logger';
 
 // This is intended to be instantiated from makeXhrInterceptor, since it depends
 // on the injected script, and if it's not instantiated elsewhere, you know that
@@ -173,5 +175,29 @@ export default class PageCommunicator {
       detail: {query, newQuery}
     });
     document.dispatchEvent(event);
+  }
+
+  silenceGmailErrorsForAMoment(): ()=>void {
+    document.dispatchEvent(new CustomEvent('inboxSDKsilencePageErrors', {
+      bubbles: false, cancelable: false, detail: null
+    }));
+    // create error here for stacktrace
+    var error = new Error("Forgot to unsilence gmail errors");
+    var unsilenced = false;
+    var unsilence = _.once(() => {
+      unsilenced = true;
+      document.dispatchEvent(new CustomEvent('inboxSDKunsilencePageErrors', {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      }));
+    });
+    asap(() => {
+      if (!unsilenced) {
+        Logger.error(error);
+        unsilence();
+      }
+    });
+    return unsilence;
   }
 }

@@ -10,6 +10,7 @@ if (!global.__InboxSDKInjected) {
     const setupGmonkeyHandler = require('./setup-gmonkey-handler');
     const setupDataExposer = require('./setup-data-exposer');
     const setupEventReemitter = require('./setup-event-reemitter');
+    const setupErrorSilencer = require('./setup-error-silencer');
 
     RSVP.on('error', function(err) {
       console.error("Possibly uncaught promise rejection", err);
@@ -27,6 +28,7 @@ if (!global.__InboxSDKInjected) {
     xhrHelper();
     setupDataExposer();
     setupEventReemitter();
+    setupErrorSilencer();
   } catch(err) {
     logError(err);
   }
