@@ -23,7 +23,7 @@ class GmailThreadView {
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_pageCommunicator: any;
-	_newMessageMutationObserver: sdkMutationObserver;
+	_newMessageMutationObserver: ?sdkMutationObserver;
 	_threadID: ?string;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: any, isPreviewedThread:boolean=false) {
@@ -48,11 +48,18 @@ class GmailThreadView {
 	getMessageViewDrivers(): any[] { return this._messageViewDrivers; }
 
 	destroy() {
-		this._newMessageMutationObserver.disconnect();
 		this._eventStream.end();
 		this._toolbarView.destroy();
-		this._sidebarContentPanelContainerView.destroy();
+		this._messageViewDrivers.forEach(messageView => {
+			messageView.destroy();
+		});
 		this._messageViewDrivers.length = 0;
+		if (this._newMessageMutationObserver) {
+			this._newMessageMutationObserver.disconnect();
+		}
+		if (this._sidebarContentPanelContainerView) {
+			this._sidebarContentPanelContainerView.destroy();
+		}
 	}
 
 	setPageCommunicator(pc: any) {
@@ -184,8 +191,9 @@ class GmailThreadView {
 	}
 
 	_observeNewMessages(messageContainer: any) {
-		this._newMessageMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
-		this._newMessageMutationObserver.observe(
+		var mo: sdkMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
+		this._newMessageMutationObserver = mo;
+		mo.observe(
 			messageContainer,
 			{childList: true}
 		);
