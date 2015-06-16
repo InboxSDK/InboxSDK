@@ -26,6 +26,14 @@ _.extend(User.prototype, /** @lends User */ {
 	 */
 	getUserContact: function() {
 		return this._driver.getUserContact();
+	},
+
+	/**
+	 * Get the details of all of the user's accounts from the account switcher.
+	 * @return {Contact[]}
+	 */
+	getAccountSwitcherContactList: function() {
+		return this._driver.getAccountSwitcherContactList();
 	}
 
 });

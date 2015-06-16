@@ -22,6 +22,7 @@ import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
+import getAccountSwitcherContactList from './gmail-driver/get-account-switcher-contact-list';
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
@@ -187,6 +188,10 @@ _.extend(GmailDriver.prototype, {
 			emailAddress: this._pageCommunicator.getUserEmailAddress(),
 			name: this._pageCommunicator.getUserName()
 		};
+	},
+
+	getAccountSwitcherContactList() {
+		return getAccountSwitcherContactList();
 	},
 
 	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appIconUrl){
