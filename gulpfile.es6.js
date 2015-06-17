@@ -86,6 +86,8 @@ let getVersion = function() {
   throw new Error("Can't access before task has run");
 };
 
+gulp.task('noop', _.noop);
+
 gulp.task('version', function() {
   return RSVP.Promise.all([
     exec('git rev-list HEAD --max-count=1'),
