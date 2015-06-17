@@ -41,7 +41,7 @@ _.assign(Widgets.prototype, /** @lends Widgets */{
 		return modalView;
 	},
 
-  /* // undocumented while beta
+  /**
    * This creates a {MoleView} and shows it. A mole view is a modal that is
    * attached to the bottom of the viewport and has minimize and close buttons
    * just like a compose view.
