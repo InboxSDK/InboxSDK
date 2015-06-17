@@ -1,6 +1,5 @@
 var _ = require('lodash');
 
-
 /**
 * @class
 * This namespace contains methods and types related to the currently logged in user.
@@ -33,7 +32,17 @@ _.extend(User.prototype, /** @lends User */ {
 	 * @return {Contact[]}
 	 */
 	getAccountSwitcherContactList: function() {
-		return this._driver.getAccountSwitcherContactList();
+		var list = this._driver.getAccountSwitcherContactList();
+		var user = this.getUserContact();
+		var listHasUser = !!_.find(list, item => item.emailAddress === user.emailAddress);
+		if (!listHasUser) {
+			this._driver.getLogger().error(
+				new Error("Account switcher list did not contain user"),
+				{listLength: list.length}
+			);
+			list = list.concat([user]);
+		}
+		return list;
 	}
 
 });
