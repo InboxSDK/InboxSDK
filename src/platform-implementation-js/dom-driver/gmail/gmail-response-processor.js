@@ -8,7 +8,9 @@ export function interpretSentEmailResponse(responseString) {
   var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
   return {
     gmailThreadId: gmailThreadId,
-    gmailMessageId: gmailMessageId
+    gmailMessageId: gmailMessageId,
+    threadID: gmailThreadId,
+    messageID: gmailMessageId
   };
 }
 

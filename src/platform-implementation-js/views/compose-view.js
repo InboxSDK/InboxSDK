@@ -404,8 +404,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * object containing gmailMessageId and gmailThreadId properties will be
 	 * passed to the event listeners.
 	 * @event ComposeView#sent
-	 * @param {string} gmailThreadId - the thread ID of the message that was just sent
-	 * @param {string} gmailMessageId - the message ID of the message that was just sent
+	 * @param {string} threadID - the thread ID of the message that was just sent
+	 * @param {string} messageID - the message ID of the message that was just sent
 	 */
 
 	/**
