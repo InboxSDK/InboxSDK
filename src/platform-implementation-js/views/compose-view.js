@@ -31,7 +31,11 @@ var ComposeView = function(composeViewImplementation, appId){
 
 	members.composeViewImplementation.getEventStream().onEnd(function(){
 		self.emit('close'); /* TODO: deprecated */
-		self.emit('destroy');
+
+
+		self.emit('destroy', {
+			messageID: composeViewImplementation.getMessageID()
+		});
 
 		self.removeAllListeners();
 	});
@@ -108,6 +112,10 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	/* NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS */
 	getComposeID: function(){
 		return memberMap.get(this).composeViewImplementation.getComposeID();
+	},
+
+	getInitialMessageID: function(){
+		return memberMap.get(this).composeViewImplementation.getInitialMessageID();
 	},
 
 	/**
