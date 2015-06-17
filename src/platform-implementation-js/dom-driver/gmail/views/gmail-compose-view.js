@@ -84,6 +84,8 @@ export default class GmailComposeView {
 					this._messageIDElement = document.createElement('div');
 				}
 
+				this._setupIDs();
+
 				this._setupStreams();
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
@@ -105,19 +107,23 @@ export default class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
 		this._eventStream.plug(Bacon.later(10).flatMap(()=>require('./gmail-compose-view/get-minimize-restore-stream')(this)));
-		this._eventStream.plug(
-			makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
-				.map(() => ({
-					eventName: 'messageIDChange',
-					data: this.getMessageID()
-				}))
-		);
+
+		makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
+			.map(() => this.getMessageID())
+			.onValue(messageID => this._messageId = messageID);
 	}
 
 	_setupConsistencyCheckers() {
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
 		require('./gmail-compose-view/manage-button-grouping')(this);
+	}
+
+	_setupIDs() {
+		this._initialMessageId = this.getMessageID();
+		this._messageId = this._initialMessageId;
+		this._targetMessageID = this._getTargetMessageID();
+		this._threadID = this._getThreadID();
 	}
 
 	_updateComposeFullscreenState() {
@@ -394,21 +400,26 @@ export default class GmailComposeView {
 		return this._composeID;
 	}
 
-	getMessageID() {
-		const input = this._messageIDElement;
-		return input.value && input.value != 'undefined' ? input.value : null;
+	getInitialMessageID() {
+		return this._initialMessageId;
 	}
 
-	// If this compose is a reply, then this gets the message ID of the message
-	// we're replying to.
+	getMessageID() {
+		const input = this._messageIDElement;
+
+		if(!input){
+			return this._messageId;
+		}
+
+		return input.value && (input.value !== 'undefined' && input.value !== 'null') ? input.value : this._messageId;
+	}
+
 	getTargetMessageID() {
-		const input = this._element.querySelector('input[name="rm"]');
-		return input && input.value && input.value != 'undefined' ? input.value : null;
+		return this._targetMessageID;
 	}
 
 	getThreadID() {
-		const targetID = this.getTargetMessageID();
-		return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+		return this._threadID;
 	}
 
 	getRecipientRowElements() {
@@ -454,6 +465,18 @@ export default class GmailComposeView {
 			});
 		}
 	}
+
+	// If this compose is a reply, then this gets the message ID of the message
+	// we're replying to.
+	_getTargetMessageID() {
+		const input = this._element.querySelector('input[name="rm"]');
+		return input && input.value && input.value != 'undefined' ? input.value : null;
+	}
+
+	_getThreadID() {
+		const targetID = this.getTargetMessageID();
+		return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+	}
 }
 
 addAccessors(GmailComposeView.prototype, [
@@ -465,7 +488,11 @@ addAccessors(GmailComposeView.prototype, [
 	{name: '_isFullscreen', destroy: false, get: true},
 	{name: '_isStandalone', destroy: false, set: true},
 	{name: '_lastSelectionRange', destroy: false, set: true, get: true},
-	{name: '_buttonViewControllerTooltipMap', destroy: false}
+	{name: '_buttonViewControllerTooltipMap', destroy: false},
+	{name: '_initialMessageId', destroy: false},
+	{name: '_messageId', destroy: false},
+	{name: '_targetMessageID', destroy: false},
+	{name: '_threadID', destroy: false}
 ]);
 
 assertInterface(GmailComposeView.prototype, ComposeViewDriver);
