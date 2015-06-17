@@ -63,8 +63,7 @@ function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
   return globp('./examples/*/').then(function(dirs){
     if(args.copy){
-      dirs.push('../extensions/devBuilds/chrome/');
-      dirs.push('../extensions/devBuilds/safari/');
+      dirs.push('../MailFoo/ServerGmailSdk-war/src/main/webapp/build/');
     }
     return dirs;
   }).then(function(dirs) {
