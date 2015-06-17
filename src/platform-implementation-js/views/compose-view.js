@@ -114,16 +114,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return memberMap.get(this).composeViewImplementation.getComposeID();
 	},
 
+	/**
+	 * Returns the initial message ID of the draft. If this is a new compose then the
+	 * message ID will be null. If the user has opened an existing draft then this function
+	 * returns the message ID of the draft when it was first opened
+	 * @return {string}
+	 */
 	getInitialMessageID: function(){
 		return memberMap.get(this).composeViewImplementation.getInitialMessageID();
 	},
 
-	/**
-	 * Returns the message ID of the draft. If Gmail has not assigned a message ID
-	 * yet, then this will be null. Note that Gmail regenerates a new message ID
-	 * whenever the draft is modified!
-	 * @return {string}
-	 */
+	/* deprecated */
 	getMessageID: function() {
 		return memberMap.get(this).composeViewImplementation.getMessageID();
 	},

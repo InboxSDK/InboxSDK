@@ -108,7 +108,18 @@ export default class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
 		this._eventStream.plug(Bacon.later(10).flatMap(()=>require('./gmail-compose-view/get-minimize-restore-stream')(this)));
 
-		makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
+
+		const messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
+		this._eventStream.plug(
+			messageIDChangeStream
+				.map(() => ({
+					eventName: 'messageIDChange',
+					data: this.getMessageID()
+				}))
+		);
+
+		messageIDChangeStream
+			.takeUntil(this._eventStream.filter(false).mapEnd())
 			.map(() => this.getMessageID())
 			.onValue(messageID => this._messageId = messageID);
 	}
@@ -254,6 +265,7 @@ export default class GmailComposeView {
 			console.warn("Trying to add an inner sidebar to an inline reply which doesn't work.");
 			return;
 		}
+
 
 		require('./gmail-compose-view/add-inner-sidebar')(this, options);
 	}
