@@ -2,6 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
+import crypto from 'crypto';
 import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
 import getStackTrace from '../../common/get-stack-trace';
@@ -69,7 +70,7 @@ class Logger {
   }
 
   setUserEmailAddress(email: string) {
-    _extensionUserEmailHash = hash(email);
+    _extensionUserEmailHash = hashEmail(email);
   }
 
   static error(err: Error, details?: any) {
@@ -398,9 +399,10 @@ function replaceFunction(parent: any, name: string, newFnMaker: (original: Funct
   parent[name] = newFn;
 }
 
-function hash(str: string): string {
-  var sha256 = require('sha256');
-  return sha256('inboxsdk:'+str);
+export function hashEmail(str: string): string {
+  var hasher = crypto.createHash('sha256');
+  hasher.update('inboxsdk:'+str);
+  return hasher.digest('hex');
 }
 
 function _trackEvent(appId: ?string, type: string, eventName: string, properties: any) {

@@ -46,7 +46,6 @@
     "rsvp": "3.0.18",
     "safari-fix-map": "^1.0.4",
     "semver": "^4.3.4",
-    "sha256": "0.1.1",
     "sinon": "^1.15.3",
     "stdio": "^0.2.6",
     "vinyl-source-stream": "^1.1.0",

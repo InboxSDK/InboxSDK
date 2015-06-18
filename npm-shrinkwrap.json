@@ -1,6 +1,6 @@
 {
   "name": "inboxsdk",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "dependencies": {
     "add-accessors": {
       "version": "2.0.0",
@@ -28,9 +28,9 @@
           "resolved": "https://registry.npmjs.org/babel-core/-/babel-core-5.5.8.tgz",
           "dependencies": {
             "acorn-jsx": {
-              "version": "1.0.2",
+              "version": "1.0.3",
               "from": "acorn-jsx@>=1.0.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-1.0.2.tgz",
+              "resolved": "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-1.0.3.tgz",
               "dependencies": {
                 "acorn": {
                   "version": "1.2.2",
@@ -71,7 +71,7 @@
                   "dependencies": {
                     "ansi-regex": {
                       "version": "1.1.1",
-                      "from": "ansi-regex@>=1.0.0 <2.0.0",
+                      "from": "ansi-regex@>=1.1.0 <2.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-1.1.1.tgz"
                     },
                     "get-stdin": {
@@ -88,7 +88,7 @@
                   "dependencies": {
                     "ansi-regex": {
                       "version": "1.1.1",
-                      "from": "ansi-regex@>=1.0.0 <2.0.0",
+                      "from": "ansi-regex@>=1.1.0 <2.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-1.1.1.tgz"
                     }
                   }
@@ -466,13 +466,13 @@
               }
             },
             "regexpu": {
-              "version": "1.1.2",
+              "version": "1.2.0",
               "from": "regexpu@>=1.1.2 <2.0.0",
-              "resolved": "https://registry.npmjs.org/regexpu/-/regexpu-1.1.2.tgz",
+              "resolved": "https://registry.npmjs.org/regexpu/-/regexpu-1.2.0.tgz",
               "dependencies": {
                 "recast": {
                   "version": "0.10.12",
-                  "from": "recast@>=0.10.1 <0.11.0",
+                  "from": "recast@>=0.10.6 <0.11.0",
                   "resolved": "https://registry.npmjs.org/recast/-/recast-0.10.12.tgz",
                   "dependencies": {
                     "esprima-fb": {
@@ -945,9 +945,9 @@
           "resolved": "https://registry.npmjs.org/babel-core/-/babel-core-5.5.8.tgz",
           "dependencies": {
             "acorn-jsx": {
-              "version": "1.0.2",
+              "version": "1.0.3",
               "from": "acorn-jsx@>=1.0.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-1.0.2.tgz",
+              "resolved": "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-1.0.3.tgz",
               "dependencies": {
                 "acorn": {
                   "version": "1.2.2",
@@ -988,7 +988,7 @@
                   "dependencies": {
                     "ansi-regex": {
                       "version": "1.1.1",
-                      "from": "ansi-regex@>=1.0.0 <2.0.0",
+                      "from": "ansi-regex@>=1.1.0 <2.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-1.1.1.tgz"
                     },
                     "get-stdin": {
@@ -1005,7 +1005,7 @@
                   "dependencies": {
                     "ansi-regex": {
                       "version": "1.1.1",
-                      "from": "ansi-regex@>=1.0.0 <2.0.0",
+                      "from": "ansi-regex@>=1.1.0 <2.0.0",
                       "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-1.1.1.tgz"
                     }
                   }
@@ -1422,13 +1422,13 @@
               }
             },
             "regexpu": {
-              "version": "1.1.2",
+              "version": "1.2.0",
               "from": "regexpu@>=1.1.2 <2.0.0",
-              "resolved": "https://registry.npmjs.org/regexpu/-/regexpu-1.1.2.tgz",
+              "resolved": "https://registry.npmjs.org/regexpu/-/regexpu-1.2.0.tgz",
               "dependencies": {
                 "recast": {
                   "version": "0.10.12",
-                  "from": "recast@>=0.10.1 <0.11.0",
+                  "from": "recast@>=0.10.6 <0.11.0",
                   "resolved": "https://registry.npmjs.org/recast/-/recast-0.10.12.tgz",
                   "dependencies": {
                     "esprima-fb": {
@@ -1551,7 +1551,7 @@
         },
         "through2": {
           "version": "0.6.5",
-          "from": "through2@>=0.6.3 <0.7.0",
+          "from": "through2@>=0.6.1 <0.7.0",
           "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
           "dependencies": {
             "readable-stream": {
@@ -3080,7 +3080,7 @@
         },
         "vinyl-fs": {
           "version": "0.3.13",
-          "from": "vinyl-fs@>=0.3.0 <0.4.0",
+          "from": "vinyl-fs@>=0.3.11 <0.4.0",
           "resolved": "https://registry.npmjs.org/vinyl-fs/-/vinyl-fs-0.3.13.tgz",
           "dependencies": {
             "defaults": {
@@ -3392,7 +3392,7 @@
           "dependencies": {
             "readable-stream": {
               "version": "1.0.33",
-              "from": "readable-stream@>=1.0.33 <1.1.0",
+              "from": "readable-stream@>=1.0.33-1 <1.1.0-0",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
               "dependencies": {
                 "core-util-is": {
@@ -3431,7 +3431,7 @@
           "dependencies": {
             "readable-stream": {
               "version": "1.0.33",
-              "from": "readable-stream@>=1.0.33-1 <1.1.0-0",
+              "from": "readable-stream@>=1.0.17 <1.1.0",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
               "dependencies": {
                 "core-util-is": {
@@ -3756,7 +3756,7 @@
         },
         "through2": {
           "version": "0.6.5",
-          "from": "through2@>=0.6.3 <0.7.0",
+          "from": "through2@>=0.6.1 <0.7.0",
           "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
           "dependencies": {
             "readable-stream": {
@@ -3955,7 +3955,7 @@
         },
         "through2": {
           "version": "0.6.5",
-          "from": "through2@>=0.6.3 <0.7.0",
+          "from": "through2@>=0.6.1 <0.7.0",
           "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
           "dependencies": {
             "readable-stream": {
@@ -3994,7 +3994,7 @@
         },
         "vinyl": {
           "version": "0.4.6",
-          "from": "vinyl@>=0.4.6 <0.5.0",
+          "from": "vinyl@>=0.4.3 <0.5.0",
           "resolved": "https://registry.npmjs.org/vinyl/-/vinyl-0.4.6.tgz",
           "dependencies": {
             "clone": {
@@ -5442,9 +5442,9 @@
       "resolved": "https://registry.npmjs.org/kefir-stopper/-/kefir-stopper-1.0.1.tgz"
     },
     "lazypipe": {
-      "version": "0.2.3",
+      "version": "0.2.4",
       "from": "lazypipe@>=0.2.3 <0.3.0",
-      "resolved": "https://registry.npmjs.org/lazypipe/-/lazypipe-0.2.3.tgz",
+      "resolved": "https://registry.npmjs.org/lazypipe/-/lazypipe-0.2.4.tgz",
       "dependencies": {
         "stream-combiner": {
           "version": "0.2.2",
@@ -5670,23 +5670,6 @@
       "from": "semver@>=4.3.4 <5.0.0",
       "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.6.tgz"
     },
-    "sha256": {
-      "version": "0.1.1",
-      "from": "sha256@0.1.1",
-      "resolved": "https://registry.npmjs.org/sha256/-/sha256-0.1.1.tgz",
-      "dependencies": {
-        "convert-hex": {
-          "version": "0.1.0",
-          "from": "convert-hex@>=0.1.0 <0.2.0",
-          "resolved": "https://registry.npmjs.org/convert-hex/-/convert-hex-0.1.0.tgz"
-        },
-        "convert-string": {
-          "version": "0.1.0",
-          "from": "convert-string@>=0.1.0 <0.2.0",
-          "resolved": "https://registry.npmjs.org/convert-string/-/convert-string-0.1.0.tgz"
-        }
-      }
-    },
     "sinon": {
       "version": "1.15.3",
       "from": "sinon@>=1.15.3 <2.0.0",
@@ -5733,7 +5716,7 @@
       "dependencies": {
         "vinyl": {
           "version": "0.4.6",
-          "from": "vinyl@>=0.4.6 <0.5.0",
+          "from": "vinyl@>=0.4.3 <0.5.0",
           "resolved": "https://registry.npmjs.org/vinyl/-/vinyl-0.4.6.tgz",
           "dependencies": {
             "clone": {
@@ -5750,7 +5733,7 @@
         },
         "through2": {
           "version": "0.6.5",
-          "from": "through2@>=0.6.3 <0.7.0",
+          "from": "through2@>=0.6.1 <0.7.0",
           "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
           "dependencies": {
             "readable-stream": {
