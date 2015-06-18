@@ -18,8 +18,8 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import InboxRouteView from './views/inbox-route-view';
 
 export default class InboxDriver {
-  constructor(appId, opts, LOADER_VERSION, IMPL_VERSION) {
-    this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+  constructor(appId, opts, LOADER_VERSION, IMPL_VERSION, logger) {
+    this._logger = logger;
     this.onready = injectScript();
 
     // this._customRouteIDs = new Set();

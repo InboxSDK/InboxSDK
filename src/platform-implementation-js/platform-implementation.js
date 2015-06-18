@@ -49,16 +49,18 @@ export default function makePlatformImplementation(appId, opts) {
 	};
 
 	pi._membraneMap = new MembraneMap();
+	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 
 	const DriverClass = DRIVERS_BY_ORIGIN[document.location.origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", document.location.origin);
+		logger.eventSdkPassive('not load');
 		return new Promise(function(resolve, reject) {
 			// never resolve
 		});
 	}
 
-	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
+	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION, logger);
 	return pi._driver.onready.then(() => {
 		pi._driver.getLogger().eventSdkPassive('load');
 

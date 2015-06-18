@@ -27,11 +27,11 @@ const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
 
-var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION) {
+var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION, logger) {
 	require('./custom-style');
 
 	this._appId = appId;
-	this._logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	this._logger = logger;
 	this._customRouteIDs = new Set();
 	this._customListRouteIDs = new Map();
 	this._customListSearchStringsToRouteIds = new Map();
