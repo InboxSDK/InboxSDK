@@ -76,7 +76,9 @@ export default function makePlatformImplementation(appId: string, opts: any): Pr
 	var DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", origin);
-		logger.eventSdkPassive('not load');
+		if (origin === 'https://inbox.google.com') {
+			logger.eventSdkPassive('not load');
+		}
 		return new Promise(function(resolve, reject) {
 			// never resolve
 		});
