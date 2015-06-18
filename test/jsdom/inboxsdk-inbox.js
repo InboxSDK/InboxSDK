@@ -40,4 +40,7 @@ InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
 
     process.exit(0);
   });
+}).catch(err => {
+  console.error("Error", err);
+  process.exit(7);
 });
