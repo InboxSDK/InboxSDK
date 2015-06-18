@@ -42,7 +42,7 @@ function getAllAppIds(): string[] {
 
 var _trackedEventsQueue = new PersistentQueue('events');
 
-type AppLogger = {
+export type AppLogger = {
   error(err: Error, details?: any): void;
   event(name: string, details?: any): void;
 };

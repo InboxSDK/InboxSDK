@@ -1,24 +1,22 @@
-'use strict';
+/* @flow */
+// jshint ignore:start
 
-var _ = require('lodash');
-var BasicClass = require('../../../lib/basic-class');
+import _ from 'lodash';
 
-var GmailKeyboardShortcutHandle = function(chord, removeCallback){
-	BasicClass.call(this);
+export default class GmailKeyboardShortcutHandle {
+	_chord: string;
+	_removeCallback: () => void;
 
-	this._chord = chord;
-	this._removeCallback = removeCallback;
-};
+	constructor(chord: string, removeCallback: () => void) {
+		this._chord = chord;
+		this._removeCallback = _.once(removeCallback);
+	}
 
-GmailKeyboardShortcutHandle.prototype = Object.create(BasicClass.prototype);
+	getChord(): string {
+		return this._chord;
+	}
 
-_.extend(GmailKeyboardShortcutHandle.prototype, {
-
-	__memberVariables: [
-		{name: '_chord', destroy: false, get: true},
-		{name: '_removeCallback', destroy: true}
-	]
-
-});
-
-module.exports = GmailKeyboardShortcutHandle;
+	destroy() {
+		this._removeCallback();
+	}
+}

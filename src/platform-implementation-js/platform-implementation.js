@@ -1,19 +1,22 @@
-const _ = require('lodash');
+/* @flow */
+// jshint ignore:start
 
-const MembraneMap = require('./lib/membrane-map');
+import _ from 'lodash';
 
-const ButterBar = require('./platform-implementation/butter-bar');
-const Compose = require('./platform-implementation/compose');
-const Conversations = require('./platform-implementation/conversations');
-const Keyboard = require('./platform-implementation/keyboard.js');
-const Widgets = require('./platform-implementation/widgets');
-const Modal = require('./platform-implementation/modal');
-const Lists = require('./platform-implementation/lists');
-const NavMenu = require('./platform-implementation/nav-menu');
-const Router = require('./platform-implementation/router');
-const Search = require('./platform-implementation/search');
-const Toolbars = require('./platform-implementation/toolbars');
-const User = require('./platform-implementation/user');
+import MembraneMap from './lib/membrane-map';
+
+import ButterBar from './platform-implementation/butter-bar';
+import Compose from './platform-implementation/compose';
+import Conversations from './platform-implementation/conversations';
+import Keyboard from './platform-implementation/keyboard.js';
+import Widgets from './platform-implementation/widgets';
+import Modal from './platform-implementation/modal';
+import Lists from './platform-implementation/lists';
+import NavMenu from './platform-implementation/nav-menu';
+import Router from './platform-implementation/router';
+import Search from './platform-implementation/search';
+import Toolbars from './platform-implementation/toolbars';
+import User from './platform-implementation/user';
 
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
@@ -21,17 +24,33 @@ import Logger from './lib/logger';
 
 import isValidAppId from './lib/is-valid-app-id';
 
+// Some types
+import {Driver} from './driver-interfaces/driver';
+import {AppLogger} from './lib/logger';
+export type PlatformImplementation = {
+	LOADER_VERSION: string;
+	IMPL_VERSION: string;
+
+	Compose: Compose;
+	Conversations: Conversations;
+	Keyboard: Keyboard;
+	User: User;
+	Lists: Lists;
+	NavMenu: NavMenu;
+	Router: Router;
+	Search: Search;
+	Toolbars: Toolbars;
+	ButterBar: ButterBar;
+	Widgets: Widgets;
+	Modal: Modal;
+	Logger: AppLogger;
+};
+
 // returns a promise for the PlatformImplementation object
-export default function makePlatformImplementation(appId, opts) {
+export default function makePlatformImplementation(appId: string, opts: any): Promise<PlatformImplementation> {
 	if (typeof appId !== 'string') {
 		throw new Error("appId must be a string");
 	}
-
-	const pi = {
-		_appId: appId,
-		LOADER_VERSION: opts.VERSION,
-		IMPL_VERSION: process.env.VERSION
-	};
 
 	opts = _.extend({
 		// defaults
@@ -44,26 +63,29 @@ export default function makePlatformImplementation(appId, opts) {
 		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
-	const DRIVERS_BY_ORIGIN = {
+	var DRIVERS_BY_ORIGIN = {
 		'https://mail.google.com': GmailDriver,
 		'https://inbox.google.com': opts.inboxBeta && InboxDriver
 	};
 
-	pi._membraneMap = new MembraneMap();
-	var logger = new Logger(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
+	var LOADER_VERSION: string = opts.VERSION;
+	var IMPL_VERSION: string = process.env.VERSION;
+	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 
-	const DriverClass = DRIVERS_BY_ORIGIN[document.location.origin];
+	var origin: string = (document.location: any).origin;
+	var DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
-		console.log("InboxSDK: Unsupported origin", document.location.origin);
+		console.log("InboxSDK: Unsupported origin", origin);
 		logger.eventSdkPassive('not load');
 		return new Promise(function(resolve, reject) {
 			// never resolve
 		});
 	}
 
-	pi._driver = new DriverClass(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION, logger);
-	return pi._driver.onready.then(() => {
-		pi._driver.getLogger().eventSdkPassive('load');
+	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
+	return driver.onready.then(() => {
+		logger.eventSdkPassive('load');
+		var membraneMap = new MembraneMap();
 
 		if (!isValidAppId(appId)) {
 			console.error(`
@@ -74,29 +96,37 @@ Registering an appId is free. Please see
 https://www.inboxsdk.com/docs/#RequiredSetup
 ===========================================================
 `);
-			pi._driver.showAppIdWarning();
+			driver.showAppIdWarning();
 		}
 
-		if (pi._driver.isRunningInPageContext()) {
+		if (driver.isRunningInPageContext()) {
 			console.warn("Running the InboxSDK outside of an extension content script is not recommended!");
 		}
 
-		pi.Compose = new Compose(appId, pi._driver, pi._membraneMap);
-		pi.Conversations = new Conversations(appId, pi._driver, pi._membraneMap);
-		pi.Keyboard = new Keyboard(appId, opts.appIconUrl, pi._driver, pi._membraneMap);
-		pi.User = new User(appId, pi._driver, pi._membraneMap);
-		pi.Lists = new Lists(appId, pi._driver, pi._membraneMap);
-		pi.NavMenu = new NavMenu(appId, pi._driver, pi._membraneMap);
-		pi.Router = new Router(appId, pi._driver, pi._membraneMap);
-		pi.Search = new Search(appId, pi._driver, pi._membraneMap);
-		pi.Toolbars = new Toolbars(appId, pi._driver, pi._membraneMap);
-		pi.ButterBar = new ButterBar(appId, pi._driver, pi._membraneMap);
-		pi.Widgets = new Widgets(appId, pi._driver, pi._membraneMap);
-		pi.Modal = new Modal(appId, pi._driver, pi._membraneMap);
+		var butterBar = new ButterBar(appId, driver, membraneMap);
+		driver.setButterBar(butterBar);
 
-		pi.Logger = pi._driver.getLogger().getAppLogger();
-		pi._driver.setButterBar(pi.ButterBar);
+		return {
+			_appId: appId,
+			_membraneMap: membraneMap,
+			_driver: driver,
 
-		return pi;
+			LOADER_VERSION: opts.VERSION,
+			IMPL_VERSION: process.env.VERSION,
+
+			Compose: new Compose(appId, driver, membraneMap),
+			Conversations: new Conversations(appId, driver, membraneMap),
+			Keyboard: new Keyboard(appId, opts.appIconUrl, driver, membraneMap),
+			User: new User(appId, driver, membraneMap),
+			Lists: new Lists(appId, driver, membraneMap),
+			NavMenu: new NavMenu(appId, driver, membraneMap),
+			Router: new Router(appId, driver, membraneMap),
+			Search: new Search(appId, driver, membraneMap),
+			Toolbars: new Toolbars(appId, driver, membraneMap),
+			ButterBar: butterBar,
+			Widgets: new Widgets(appId, driver, membraneMap),
+			Modal: new Modal(appId, driver, membraneMap),
+			Logger: driver.getLogger().getAppLogger()
+		};
 	});
 }
