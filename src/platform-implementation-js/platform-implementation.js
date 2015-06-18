@@ -17,6 +17,7 @@ const User = require('./platform-implementation/user');
 
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
+import Logger from './lib/logger';
 
 import isValidAppId from './lib/is-valid-app-id';
 
@@ -49,7 +50,7 @@ export default function makePlatformImplementation(appId, opts) {
 	};
 
 	pi._membraneMap = new MembraneMap();
-	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	var logger = new Logger(appId, opts, pi.LOADER_VERSION, pi.IMPL_VERSION);
 
 	const DriverClass = DRIVERS_BY_ORIGIN[document.location.origin];
 	if (!DriverClass) {
