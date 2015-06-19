@@ -9,7 +9,12 @@ process.env.VERSION = 'beep';
 var InboxSDK = require('./lib/inboxsdk');
 
 global.MutationObserver = require('../lib/mock-mutation-observer');
-global.document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
+global.document = jsdom(`<!doctype html>
+<html>
+<body>
+<div id="canvas"></div>
+</body>
+</html>`);
 Object.defineProperty(document.location, 'origin', {value:'https://inbox.google.com'});
 global.window = document.parentWindow;
 

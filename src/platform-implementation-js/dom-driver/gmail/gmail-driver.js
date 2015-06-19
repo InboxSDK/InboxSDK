@@ -5,6 +5,7 @@ const Kefir = require('kefir');
 const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
 const Logger = require('../../lib/logger');
+import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
 import addAccessors from 'add-accessors';
@@ -207,7 +208,13 @@ _.extend(GmailDriver.prototype, {
 
 		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
-		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
+		this.onready = this._pageCommunicatorPromise.then(pageCommunicator =>
+			waitFor(() => this.getAccountSwitcherContactList().length > 0, 30*1000)
+				.catch(err => {
+					this._logger.error(err);
+				})
+				.then(() => pageCommunicator)
+		).then(pageCommunicator => {
 			this._pageCommunicator = pageCommunicator;
 
 			this._logger.setUserEmailAddress(this.getUserContact().emailAddress);

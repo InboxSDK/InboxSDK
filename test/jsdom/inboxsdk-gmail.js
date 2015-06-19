@@ -9,7 +9,13 @@ process.env.VERSION = 'beep';
 var InboxSDK = require('./lib/inboxsdk');
 
 global.MutationObserver = require('../lib/mock-mutation-observer');
-global.document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
+global.document = jsdom(`<!doctype html>
+<html>
+<body>
+<div class="gb_K gb_c" aria-hidden="true"><a class="gb_L gb_O gb_P" target="_blank" rel="noreferrer"><img class="gb_Q" src="https://plus.google.com/u/0/_/focus/photos/public/AIbEiAIAAABECLTFjZCok6-J9wEiC3ZjYXJkX3Bob3RvKihkZjczYTJjY2M2ZmEzNzg0OTk0NzdlM2JmYjg4OWY0ZTNmOTFhZmNiMAEiaDfw7v26ir1rp345NanqFU_MhQ?sz=48" alt="Google+ Profile Icon"><div class="gb_N"><div class="gb_R">Chris Cowan</div><div class="gb_S">cowan@streak.com (default)</div></div></a></div>
+<div id="canvas"></div>
+</body>
+</html>`);
 Object.defineProperty(document.location, 'origin', {value:'https://mail.google.com'});
 global.window = document.parentWindow;
 
