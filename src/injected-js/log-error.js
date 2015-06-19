@@ -1,4 +1,7 @@
-export default function logError(err, details) {
+/* @flow */
+// jshint ignore:start
+
+export default function logError(err: Error, details?: any) {
   if (!err) {
     err = new Error("No error given");
   }
@@ -9,11 +12,13 @@ export default function logError(err, details) {
     details = "<failed to jsonify>";
   }
 
-  const event = document.createEvent("CustomEvent");
-  event.initCustomEvent('inboxSDKinjectedError', true, false, {
-    message: err && err.message,
-    stack: err && err.stack,
-    details: details
-  });
-  document.dispatchEvent(event);
+  document.dispatchEvent(new CustomEvent('inboxSDKinjectedError', {
+    bubbles: false,
+    cancelable: false,
+    detail: {
+      message: err && err.message,
+      stack: err && err.stack,
+      details
+    }
+  }));
 }

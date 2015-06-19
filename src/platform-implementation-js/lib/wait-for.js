@@ -1,20 +1,17 @@
-const RSVP = require('rsvp');
+/* @flow */
+// jshint ignore:start
 
-function waitFor(condition, timeout, steptime) {
+import RSVP from 'rsvp';
+
+export default function waitFor<T>(condition: () => ?T, timeout: number=120*1000, steptime: number=250): Promise<T> {
 	// make this error here so we have a sensible stack.
-	const timeoutError = new Error("waitFor timeout");
+	var timeoutError = new Error("waitFor timeout");
 
 	return new RSVP.Promise(function(resolve, reject) {
-		if (!timeout) {
-			timeout = 120*1000;
-		}
-		if (!steptime) {
-			steptime = 250;
-		}
-		let waited = 0;
+		var waited = 0;
 		function step() {
 			try {
-				const result = condition();
+				var result = condition();
 				if (result) {
 					resolve(result);
 				} else {
@@ -32,5 +29,3 @@ function waitFor(condition, timeout, steptime) {
 		setTimeout(step, 1);
 	});
 }
-
-module.exports = waitFor;
