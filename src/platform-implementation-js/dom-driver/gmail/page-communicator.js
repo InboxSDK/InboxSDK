@@ -81,10 +81,6 @@ export default class PageCommunicator {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
   }
 
-  getUserName(): string {
-    return document.head.getAttribute('data-inboxsdk-user-name');
-  }
-
   getUserLanguage(): string {
     return document.head.getAttribute('data-inboxsdk-user-language');
   }

@@ -21,8 +21,7 @@ global.window = document.parentWindow;
 
 // don't try to inject ajax interceptor
 document.head.setAttribute('data-inboxsdk-script-injected', true);
-document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
-document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
+document.head.setAttribute('data-inboxsdk-user-email-address', 'cowan@streak.com');
 
 var appOpts = {
   globalErrorLogging: false
@@ -33,11 +32,14 @@ assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
 InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
   assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
+  assert.deepEqual(inboxsdk.User.getAccountSwitcherContactList(), [
+    {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'}
+  ]);
 
-  assert.deepEqual(inboxsdk.User.getUserContact(), {
-    emailAddress: 'foo@example.com',
-    name: 'Foo Bar'
-  });
+  assert.deepEqual(
+    inboxsdk.User.getUserContact(),
+    {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'}
+  );
 
   RSVP.all([
     InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
