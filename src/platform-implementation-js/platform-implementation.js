@@ -25,8 +25,8 @@ import Logger from './lib/logger';
 import isValidAppId from './lib/is-valid-app-id';
 
 // Some types
-import {Driver} from './driver-interfaces/driver';
-import {AppLogger} from './lib/logger';
+import type {Driver} from './driver-interfaces/driver';
+import type {AppLogger} from './lib/logger';
 export type PlatformImplementation = {
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
