@@ -13,7 +13,7 @@ var ATTRIBUTE_WHITELIST = new Set([
 export default function censorHTMLstring(html: string): string {
   return html.replace(/(^|>)([^<]+)/g, (((match: string, start: string, text: string) =>
     start + (text.trim().length ? '...' : '')
-  ): Function)).replace(/(\S+)\s*=\s*"[^"]+"/g, (((match: string, attr: string) =>
-    ATTRIBUTE_WHITELIST.has(attr) ? match : `${attr}="..."`
+  ): Function)).replace(/\s([^\s=]+)\s*=\s*"[^"]+"/g, (((match: string, attr: string) =>
+    ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`
   ): Function));
 }
