@@ -2,6 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
+import censorHTMLstring from '../../../../common/censor-html-string';
 import Logger from '../../../lib/logger';
 
 export function getUserName(): string {
@@ -9,7 +10,12 @@ export function getUserName(): string {
   if (nameEl) {
     return nameEl.textContent;
   } else {
-    Logger.error(new Error("Failed to read user's name"));
+    Logger.error(new Error("Failed to read user's name"), {
+      switcherListLength: getAccountSwitcherContactList().length,
+      switcherHTML: _.map(
+        document.querySelectorAll('div.gb_K'),
+        (el: HTMLElement) => censorHTMLstring(el.outerHTML))
+    });
     return 'undefined';
   }
 }
