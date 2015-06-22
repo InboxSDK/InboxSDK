@@ -7,10 +7,9 @@ import kefirCast from 'kefir-cast';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
-import escapeRegExp from '../../../../common/escape-reg-exp';
 
 const routeIDtoRegExp = _.memoize(routeID =>
-	new RegExp('^'+escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
+	new RegExp('^'+_.escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
 
 function routeIDmatchesHash(routeID, hash) {

@@ -1,7 +1,10 @@
+/* @flow */
+//jshint ignore:start
+
 // Splits a string on spaces, but ignores spaces inside quotes.
 
-function quotedSplit(s) {
-  var split = [];
+export default function quotedSplit(s: string): string[] {
+  var split: string[] = [];
   var lastEnd = 0;
   var quoteRe = /"[^"]*"/g;
   while (true) {
@@ -17,5 +20,3 @@ function quotedSplit(s) {
   }
   return split;
 }
-
-module.exports = quotedSplit;

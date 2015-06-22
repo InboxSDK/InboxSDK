@@ -1,8 +1,9 @@
-function getExtensionId() {
-  if (typeof chrome != 'undefined' && chrome && chrome.extension && chrome.extension.getURL) {
-    return chrome.extension.getURL('');
+/* @flow */
+//jshint ignore:start
+
+export default function getExtensionId(): ?string {
+  if (global.chrome && global.chrome.extension && global.chrome.extension.getURL) {
+    return global.chrome.extension.getURL('');
   }
   return null;
 }
-
-module.exports = getExtensionId;
