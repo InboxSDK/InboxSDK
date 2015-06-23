@@ -1,15 +1,19 @@
-var GmailElementGetter = require('../gmail-element-getter');
+/* @flow */
+//jshint ignore:start
 
-module.exports = function(gmailDriver, element){
+import _ from 'lodash';
+import GmailElementGetter from '../gmail-element-getter';
+import fakeWindowResize from '../../../lib/fake-window-resize';
 
+export default function showNativeRouteView(gmailDriver: any) {
 	var contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
 		return;
 	}
 
-	var children = contentSectionElement.children;
-	Array.prototype.forEach.call(children, function(child){
+	_.forEach((contentSectionElement:any).children, (child: HTMLElement) => {
 		child.style.display = '';
 	});
 
-};
+	fakeWindowResize();
+}
