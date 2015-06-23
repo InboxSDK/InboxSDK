@@ -184,9 +184,13 @@ _.extend(GmailDriver.prototype, {
 		}
 	},
 
+	getUserEmailAddress() {
+		return this._pageCommunicator.getUserEmailAddress();
+	},
+
 	getUserContact() {
 		return {
-			emailAddress: this._pageCommunicator.getUserEmailAddress(),
+			emailAddress: this.getUserEmailAddress(),
 			name: UserInfo.getUserName()
 		};
 	},
@@ -210,7 +214,7 @@ _.extend(GmailDriver.prototype, {
 
 		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
 			this._pageCommunicator = pageCommunicator;
-			this._logger.setUserEmailAddress(this.getUserContact().emailAddress);
+			this._logger.setUserEmailAddress(this.getUserEmailAddress());
 
 			return waitFor(() => this.getAccountSwitcherContactList().length > 0, 30*1000)
 				.catch(err => {
