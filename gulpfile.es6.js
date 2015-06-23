@@ -111,9 +111,7 @@ function browserifyTask(name, deps, entry, destname) {
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
-    }).transform(babelify.configure({
-      optional: ["runtime"]
-    })).transform(envify({
+    }).transform(babelify).transform(envify({
       NODE_ENV: args.production ? 'production' : 'development',
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
