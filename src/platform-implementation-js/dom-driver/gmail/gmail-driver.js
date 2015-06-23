@@ -208,17 +208,15 @@ _.extend(GmailDriver.prototype, {
 
 		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
-		this.onready = this._pageCommunicatorPromise.then(pageCommunicator =>
-			waitFor(() => this.getAccountSwitcherContactList().length > 0, 30*1000)
-				.catch(err => {
-					this._logger.error(err);
-				})
-				.then(() => pageCommunicator)
-		).then(pageCommunicator => {
+		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
 			this._pageCommunicator = pageCommunicator;
-
 			this._logger.setUserEmailAddress(this.getUserContact().emailAddress);
 
+			return waitFor(() => this.getAccountSwitcherContactList().length > 0, 30*1000)
+				.catch(err => {
+					this._logger.error(err);
+				});
+		}).then(() => {
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
 				baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
