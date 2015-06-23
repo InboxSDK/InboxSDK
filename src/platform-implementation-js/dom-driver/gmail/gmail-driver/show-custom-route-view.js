@@ -1,7 +1,9 @@
-var GmailElementGetter = require('../gmail-element-getter');
+/* @flow */
+//jshint ignore:start
 
-function showCustomRouteView(gmailDriver, element){
+import GmailElementGetter from '../gmail-element-getter';
 
+export default function showCustomRouteView(gmailDriver: any, element: HTMLElement) {
 	var contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
 		return;
@@ -10,8 +12,8 @@ function showCustomRouteView(gmailDriver, element){
 	var customViewContainerElement = _getCustomViewContainerElement(contentSectionElement);
 	customViewContainerElement.appendChild(element);
 
-	var children = contentSectionElement.children;
-	Array.prototype.forEach.call(children, function(child){
+	var children = (contentSectionElement:any).children;
+	Array.prototype.forEach.call(children, (child: HTMLElement) => {
 		if(child.classList.contains('inboxsdk__custom_view')){
 			return;
 		}
@@ -19,11 +21,10 @@ function showCustomRouteView(gmailDriver, element){
 		child.style.display = 'none';
 	});
 
+	document.body.classList.add('inboxsdk__custom_view_active');
 }
 
-
-function _getCustomViewContainerElement(contentSectionElement){
-
+function _getCustomViewContainerElement(contentSectionElement: HTMLElement): HTMLElement {
 	var customViewContainerElement = contentSectionElement.querySelector('.inboxsdk__custom_view');
 	if(customViewContainerElement){
 		return customViewContainerElement;
@@ -36,5 +37,3 @@ function _getCustomViewContainerElement(contentSectionElement){
 
 	return customViewContainerElement;
 }
-
-module.exports = showCustomRouteView;

@@ -15,5 +15,8 @@ export default function showNativeRouteView(gmailDriver: any) {
 		child.style.display = '';
 	});
 
-	fakeWindowResize();
+	if (document.body.classList.contains('inboxsdk__custom_view_active')) {
+		document.body.classList.remove('inboxsdk__custom_view_active');
+		fakeWindowResize();
+	}
 }
