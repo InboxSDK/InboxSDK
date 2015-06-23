@@ -237,7 +237,7 @@ describe("ButterBar", function() {
         assert.notStrictEqual(driver.getButterBarDriver()._currentMessage, options1);
         assert(driver.getButterBarDriver()._currentMessage);
         done();
-      }, 2);
+      }, 4);
     });
 
     it('respects showConfirmation', function(done) {
@@ -261,7 +261,7 @@ describe("ButterBar", function() {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
-      }, 1);
+      }, 4);
     });
 
     it('rejects', function(done) {
@@ -285,7 +285,7 @@ describe("ButterBar", function() {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
-      }, 1);
+      }, 4);
     });
 
     it('has a high priority saved message', function(done) {
@@ -318,7 +318,7 @@ describe("ButterBar", function() {
         assert(driver.getButterBarDriver()._currentMessage);
         message1.destroy();
         done();
-      }, 2);
+      }, 4);
     });
   });
 
