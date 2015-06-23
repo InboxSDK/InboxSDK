@@ -94,6 +94,7 @@ function GmailThreadRowView(element, rowListViewDriver) {
   this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
   this._imageFixerTask = this._imageFixer
     .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
+    .filter(x => x.length > 0)
     .map(x => null)
     .takeUntilBy(this._stopper);
 

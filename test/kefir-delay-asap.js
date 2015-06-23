@@ -44,19 +44,22 @@ describe('kefirDelayAsap', function() {
     const item1 = Marker('item1'), item2 = Marker('item2'), item3 = Marker('item3');
     const emitter = kefirBus();
     let step = 0;
-    emitter.bufferBy(emitter.flatMap(x => kefirDelayAsap())).onValue(x => {
-      switch(step) {
-        case 1:
-          assert.deepEqual(x, [5, 6]);
-          break;
-        case 2:
-          assert.deepEqual(x, [7, 8]);
-          done();
-          break;
-        default:
-          throw new Error("Should not happen");
-      }
-    });
+    emitter
+      .bufferBy(emitter.flatMap(x => kefirDelayAsap()))
+      .filter(x => x.length > 0)
+      .onValue(x => {
+        switch(step) {
+          case 1:
+            assert.deepEqual(x, [5, 6]);
+            break;
+          case 2:
+            assert.deepEqual(x, [7, 8]);
+            done();
+            break;
+          default:
+            throw new Error("Should not happen");
+        }
+      });
     emitter.emit(5);
     emitter.emit(6);
     step = 1;
