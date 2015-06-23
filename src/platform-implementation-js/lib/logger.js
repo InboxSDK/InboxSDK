@@ -12,12 +12,12 @@ import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-var _extensionAppIds = [];
+var _extensionAppIds: Array<{appId: string; version: ?string}> = [];
 var _extensionSeenErrors: WeakSet<Error> = new WeakSet();
-var _extensionLoaderVersion;
-var _extensionImplVersion;
-var _extensionUserEmailHash;
-var _extensionUseEventTracking;
+var _extensionLoaderVersion: ?string;
+var _extensionImplVersion: ?string;
+var _extensionUserEmailHash: ?string;
+var _extensionUseEventTracking: boolean = false;
 
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
