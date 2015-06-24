@@ -6,7 +6,7 @@ import censorHTMLstring from '../../../../common/censor-html-string';
 import Logger from '../../../lib/logger';
 
 export function getUserName(): string {
-  var nameEl = document.querySelector('div.gb_K a.gb_L div.gb_N .gb_R')
+  var nameEl = document.querySelector('div.gb_w div.gb_B .gb_D');
   if (nameEl) {
     return nameEl.textContent;
   } else {
