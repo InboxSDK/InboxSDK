@@ -216,10 +216,7 @@ _.extend(GmailDriver.prototype, {
 			this._pageCommunicator = pageCommunicator;
 			this._logger.setUserEmailAddress(this.getUserEmailAddress());
 
-			return waitFor(() => this.getAccountSwitcherContactList().length > 0, 30*1000)
-				.catch(err => {
-					this._logger.error(err);
-				});
+			return UserInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
