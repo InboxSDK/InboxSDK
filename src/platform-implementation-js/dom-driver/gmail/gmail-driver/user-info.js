@@ -13,7 +13,7 @@ export function getUserName(): string {
     Logger.error(new Error("Failed to read user's name"), {
       switcherListLength: getAccountSwitcherContactList().length,
       switcherHTML: _.map(
-        document.querySelectorAll('div.gb_K'),
+        document.querySelectorAll('div.gb_w'),
         (el: HTMLElement) => censorHTMLstring(el.outerHTML))
     });
     return 'undefined';
