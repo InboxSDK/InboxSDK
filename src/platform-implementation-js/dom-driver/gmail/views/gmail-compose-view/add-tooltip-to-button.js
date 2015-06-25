@@ -54,7 +54,7 @@ function addTooltipToButton(gmailComposeView, buttonViewController, buttonDescri
 				left = rect.left;
 				top = rect.top;
 			})
-			.onValue(gmailTooltipView, 'anchor', buttonViewController.getView().getElement(), 'top');
+			.onValue(gmailTooltipView, 'anchor', buttonViewController.getView().getElement(), {position: 'top'});
 
 
 	stoppedIntervalStream
