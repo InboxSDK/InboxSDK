@@ -13,6 +13,7 @@ export default class UserInfo {
     this._failedWaitFor = false;
   }
 
+  // deprecated
   getUserName(): string {
     var nameEl = document.querySelector('div.gb_w div.gb_B .gb_D');
     if (nameEl) {

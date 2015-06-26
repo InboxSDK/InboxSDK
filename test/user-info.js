@@ -32,7 +32,7 @@ describe('UserInfo', function() {
     ]);
   });
 
-  xit('delegated signed in, plus two normal', async function() {
+  it('delegated signed in, plus two normal', async function() {
     slot.innerHTML = `
 <div class="gb_w gb_ha" aria-label="Account Information" aria-hidden="false" tabindex="0" img-loaded="1"><div class="gb_J"><div>This account is managed by <b>streak.com</b>.</div><a class="gb_x" href="http://www.google.com/support/accounts/bin/answer.py?answer=181692&amp;hl=en" target="_blank">Learn more</a></div><div class="identityUserDelegatedAccount gb_z"><div class="gb_D">tesla@streak.com</div></div><div class="gb_K" aria-hidden="false"><a class="gb_L" href="https://mail.google.com/mail/u/0" target="_blank" rel="noreferrer"><img class="gb_Q" src="https://plus.google.com/u/0/_/focus/g/143/photos/public/AIbEiAIAAABECLTFjZCok6-J9wEiC3ZjYXJkX3Bob3RvKihkZjczYTJjY2M2ZmEzNzg0OTk0NzdlM2JmYjg4OWY0ZTNmOTFhZmNiMAEiaDfw7v26ir1rp345NanqFU_MhQ?sz=48" alt="Google+ Profile Icon"><div class="gb_N"><div class="gb_R">Chris Cowan</div><div class="gb_S">cowan@streak.com (default)</div></div></a><a class="gb_L" href="https://mail.google.com/mail/u/1" target="_blank" rel="noreferrer"><img class="gb_Q" src="https://plus.google.com/u/0/_/focus/g/143/photos/public/AIbEiAIAAABDCL_nn8ag5pLBGCILdmNhcmRfcGhvdG8qKGJmZjExYmU4ODA5YjhlNDc5OTdmMzhmZDI0YWEyMmUxNTdmNTYzNTIwAbWsPITWijXgBmbaAWa7V0IlI8KH?sz=48" alt="Google+ Profile Icon"><div class="gb_N"><div class="gb_R">Jonny Ive</div><div class="gb_S">streak.web.test.1@gmail.com</div></div></a></div><a class="gb_T gb_c" href="https://plus.google.com/u/0/dashboard" aria-hidden="true"><span class="gb_U gb_2"></span><div class="gb_V">All your Google+ pages ›</div></a><div class="gb_F"><div><a class="gb_9b gb_a" href="https://accounts.google.com/AddSession?hl=en&amp;continue=https://mail.google.com/mail&amp;service=mail" target="_blank">Add account</a></div><div><a class="gb_cc gb_jc gb_a" id="gb_71" href="https://mail.google.com/mail/logout?hl=en" target="_top">Sign out</a></div></div></div>
 `;
@@ -41,8 +41,7 @@ describe('UserInfo', function() {
     await userInfo.waitForAccountSwitcherReady();
     assert.deepEqual(userInfo.getAccountSwitcherContactList(), [
       {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
-      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'},
-      {name: 'Nikola Tesla', emailAddress: 'tesla@streak.com'}
+      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'}
     ]);
   });
 });
