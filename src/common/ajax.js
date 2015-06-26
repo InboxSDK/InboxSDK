@@ -1,7 +1,6 @@
 /* @flow */
 //jshint ignore:start
 
-import assign from 'lodash/object/assign';
 import forOwn from 'lodash/object/forOwn';
 import querystring from 'querystring';
 
@@ -50,10 +49,10 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     }
 
     var xhr = new XMLHttpRequest();
-    assign(xhr, opts.xhrFields);
+    Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
-      var err = assign(new Error("Failed to load "+opts.url), {
-        event, xhr
+      var err = Object.assign((new Error("Failed to load "+opts.url): any), {
+        event, xhr, status: xhr.status
       });
 
       // give a way for a server to tell us to go away for now. Good fallback

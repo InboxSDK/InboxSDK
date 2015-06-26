@@ -10,10 +10,13 @@ type AutoCompleteSuggestion = {
   owner: string;
 };
 
+import type {ajaxOpts} from '../../../common/ajax';
+
 import _ from 'lodash';
 import asap from 'asap';
 import RSVP from 'rsvp';
 import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import Logger from '../../lib/logger';
 
 // This is intended to be instantiated from makeXhrInterceptor, since it depends
@@ -30,24 +33,37 @@ export default class PageCommunicator {
   }
 
   resolveUrlRedirects(url: string): Promise<string> {
-    var promise = Bacon.fromEvent(document, 'inboxSDKresolveURLdone')
-      .filter(event => event.detail && event.detail.url === url)
-      .first()
+    return this.pageAjax({url, method: 'HEAD'}).then(result => result.responseURL);
+  }
+
+  pageAjax(opts: ajaxOpts): Promise<{text: string, responseURL: string}> {
+    var id = `${Date.now()}-${Math.random()}`;
+    var promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
+      .filter(event => event.detail && event.detail.id === id)
+      .take(1)
       .flatMap(event => {
-        if (event.detail.success) {
-          return Bacon.once(event.detail.responseURL);
+        if (event.detail.error) {
+          var err = Object.assign(
+            (new Error(event.detail.message || "Connection error"): any),
+            {status: event.detail.status}
+          );
+          if (event.detail.stack) {
+            err.stack = event.detail.stack;
+          }
+          return Kefir.constantError(err);
         } else {
-          return Bacon.once(new Bacon.Error(new Error("Connection error")));
+          return Kefir.constant({
+            text: event.detail.text,
+            responseURL: event.detail.responseURL
+          });
         }
       })
       .toPromise(RSVP.Promise);
 
-    var event = new CustomEvent('inboxSDKresolveURL', {
-      bubbles: false,
-      cancelable: false,
-      detail: {url}
-    });
-    document.dispatchEvent(event);
+    document.dispatchEvent(new CustomEvent('inboxSDKpageAjax', {
+      bubbles: false, cancelable: false,
+      detail: Object.assign({}, opts, {id})
+    }));
 
     return promise;
   }

@@ -1,25 +1,39 @@
+/* @flow */
+//jshint ignore:start
+
+import ajax from '../common/ajax';
+
 export default function xhrHelper() {
-  document.addEventListener('inboxSDKresolveURL', function(event) {
-    const url = event.detail && event.detail.url;
-    const xhr = new XMLHttpRequest();
-    xhr.open('HEAD', url);
-    xhr.onload = function() {
-      const event = document.createEvent('CustomEvent');
-      event.initCustomEvent('inboxSDKresolveURLdone', false, false, {
-        url,
-        success: true,
-        responseURL: xhr.responseURL
-      });
-      document.dispatchEvent(event);
+  document.addEventListener('inboxSDKpageAjax', function(event: any) {
+    var id = event.detail.id;
+    var opts = {
+      url: event.detail.url,
+      method: event.detail.method,
+      headers: event.detail.headers,
+      xhrFields: event.detail.xhrFields,
+      data: event.detail.data
     };
-    xhr.onerror = function(err) {
-      const event = document.createEvent('CustomEvent');
-      event.initCustomEvent('inboxSDKresolveURLdone', false, false, {
-        url,
-        success: false
-      });
-      document.dispatchEvent(event);
-    };
-    xhr.send();
+    ajax(opts).then(({text, xhr}) => {
+      document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
+        bubbles: false, cancelable: false,
+        detail: {
+          id,
+          error: false,
+          text,
+          responseURL: (xhr:any).responseURL
+        }
+      }));
+    }, err => {
+      document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
+        bubbles: false, cancelable: false,
+        detail: {
+          id,
+          error: true,
+          message: err && err.message,
+          stack: err && err.stack,
+          status: err && err.xhr && err.xhr.status
+        }
+      }));
+    });
   });
 }
