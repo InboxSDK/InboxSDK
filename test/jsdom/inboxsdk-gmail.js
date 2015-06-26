@@ -37,10 +37,7 @@ InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
     {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'}
   ]);
 
-  assert.deepEqual(
-    inboxsdk.User.getUserContact(),
-    {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'}
-  );
+  assert.strictEqual(inboxsdk.User.getEmailAddress(), 'cowan@streak.com');
 
   RSVP.all([
     InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
