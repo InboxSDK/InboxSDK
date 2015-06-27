@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var depWarn = require('../lib/dep-warn');
 
 /**
 * @class
@@ -16,14 +17,15 @@ _.extend(User.prototype, /** @lends User */ {
 	 * @return {string} an email address
 	 */
 	getEmailAddress: function() {
-		return this._driver.getUserContact().emailAddress;
+		return this._driver.getUserEmailAddress();
 	},
 
-	/**
+	/*(deprecated)
 	 * Get the details of the currently logged in user.
 	 * @return {Contact}
 	 */
 	getUserContact: function() {
+		depWarn('User.getUserContact is deprecated. Use User.getEmailAddress instead.');
 		return this._driver.getUserContact();
 	},
 
@@ -33,14 +35,14 @@ _.extend(User.prototype, /** @lends User */ {
 	 */
 	getAccountSwitcherContactList: function() {
 		var list = this._driver.getAccountSwitcherContactList();
-		var user = this.getUserContact();
-		var listHasUser = !!_.find(list, item => item.emailAddress === user.emailAddress);
+		var userEmail = this.getEmailAddress();
+		var listHasUser = !!_.find(list, item => item.emailAddress === userEmail);
 		if (!listHasUser) {
 			this._driver.getLogger().error(
 				new Error("Account switcher list did not contain user"),
 				{listLength: list.length}
 			);
-			list = list.concat([user]);
+			list = list.concat([{name: userEmail, emailAddress: userEmail}]);
 		}
 		return list;
 	}

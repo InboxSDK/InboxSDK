@@ -25,6 +25,5 @@ InboxSDK.load('1', 'Hello World!', {inboxBeta: true}).then(function(sdk){
 	});
 
 	console.log('user email', sdk.User.getEmailAddress());
-	console.log('user contact', sdk.User.getUserContact());
 	console.log('all user contacts', sdk.User.getAccountSwitcherContactList());
 });

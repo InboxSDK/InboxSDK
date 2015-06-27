@@ -11,6 +11,7 @@ export default {
 	getThreadViewDriverStream: 0,
 	getMessageViewDriverStream: 0,
 	createKeyboardShortcutHandle: 3,
+	getUserEmailAddress: 0,
 	getUserContact: 0,
 	getThreadRowViewDriverKefirStream: 0,
 	addNavItem: 2,
@@ -52,6 +53,7 @@ export type Driver = {
 	getThreadViewDriverStream(): Bacon.Observable<any>;
 	getMessageViewDriverStream(): Bacon.Observable<any>;
 	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appIconUrl: string): GmailKeyboardShortcutHandle;
+	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getThreadRowViewDriverKefirStream(): any;
 	addNavItem(a: any, b: any): any;

@@ -23,7 +23,7 @@ import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
 var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
 var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
-import * as UserInfo from './gmail-driver/user-info';
+import UserInfo from './gmail-driver/user-info';
 const GmailButterBarDriver = require('./gmail-butter-bar-driver');
 
 import MessageIdManager from '../../lib/message-id-manager';
@@ -191,12 +191,12 @@ _.extend(GmailDriver.prototype, {
 	getUserContact() {
 		return {
 			emailAddress: this.getUserEmailAddress(),
-			name: UserInfo.getUserName()
+			name: this._userInfo.getUserName()
 		};
 	},
 
 	getAccountSwitcherContactList() {
-		return UserInfo.getAccountSwitcherContactList();
+		return this._userInfo.getAccountSwitcherContactList();
 	},
 
 	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appIconUrl){
@@ -215,8 +215,9 @@ _.extend(GmailDriver.prototype, {
 		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
 			this._pageCommunicator = pageCommunicator;
 			this._logger.setUserEmailAddress(this.getUserEmailAddress());
+			this._userInfo = new UserInfo(this);
 
-			return UserInfo.waitForAccountSwitcherReady();
+			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._routeViewDriverStream = new Bacon.Bus();
 			this._routeViewDriverStream.plug(
