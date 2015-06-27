@@ -38,10 +38,7 @@ _.extend(User.prototype, /** @lends User */ {
 		var userEmail = this.getEmailAddress();
 		var listHasUser = !!_.find(list, item => item.emailAddress === userEmail);
 		if (!listHasUser) {
-			this._driver.getLogger().error(
-				new Error("Account switcher list did not contain user"),
-				{listLength: list.length}
-			);
+			// This happens for delegated accounts.
 			list = list.concat([{name: userEmail, emailAddress: userEmail}]);
 		}
 		return list;
