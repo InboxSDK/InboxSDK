@@ -17,7 +17,7 @@ _.extend(User.prototype, /** @lends User */ {
 	 * @return {string} an email address
 	 */
 	getEmailAddress: function() {
-		return this._driver.getUserContact().emailAddress;
+		return this._driver.getUserEmailAddress();
 	},
 
 	/*(deprecated)
