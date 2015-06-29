@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Builder Version</key>
-	<string>9537.85.10.17.1</string>
+	<string>10600.6.3</string>
 	<key>CFBundleDisplayName</key>
 	<string>Basic Safari InboxSDK example</string>
 	<key>CFBundleIdentifier</key>
@@ -32,7 +32,7 @@
 		</array>
 	</dict>
 	<key>DeveloperIdentifier</key>
-	<string>D893858BLJ</string>
+	<string>C44H6MX3V3</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
