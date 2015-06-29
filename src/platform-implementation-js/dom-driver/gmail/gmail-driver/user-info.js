@@ -8,9 +8,11 @@ import waitFor from '../../../lib/wait-for';
 
 export default class UserInfo {
   _failedWaitFor: boolean;
+  _userEmail: string;
 
   constructor(driver: Object) {
     this._failedWaitFor = false;
+    this._userEmail = driver.getUserEmailAddress();
   }
 
   // deprecated
@@ -18,16 +20,14 @@ export default class UserInfo {
     var nameEl = document.querySelector('div.gb_w div.gb_B .gb_D');
     if (nameEl) {
       return nameEl.textContent;
-    } else {
-      Logger.error(new Error("Failed to read user's name"), {
-        failedWaitFor: this._failedWaitFor,
-        switcherListLength: this.getAccountSwitcherContactList().length,
-        switcherHTML: _.map(
-          document.querySelectorAll('div.gb_w'),
-          (el: HTMLElement) => censorHTMLstring(el.outerHTML))
-      });
-      return 'undefined';
     }
+    var contact: Contact = _.find(
+      this.getAccountSwitcherContactList(),
+      (contact: Contact) => contact.emailAddress === this._userEmail);
+    if (contact) {
+      return contact.name;
+    }
+    return this._userEmail;
   }
 
   getAccountSwitcherContactList(): Contact[] {
