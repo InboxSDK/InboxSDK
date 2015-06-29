@@ -26,16 +26,8 @@ module.exports = function(element, html, oldRange){
 		if (editable) {
 			var sel = editable.getSelection();
 			if (sel.getRangeAt && sel.rangeCount) {
-				var range;
-
-				if(oldRange){
-					range = oldRange;
-					range.detach();
-				}
-				else{
-					range = sel.getRangeAt(0);
-					range.deleteContents();
-				}
+				var range = oldRange || sel.getRangeAt(0);
+				range.deleteContents();
 
 				var frag;
 				if (html instanceof DocumentFragment) {
