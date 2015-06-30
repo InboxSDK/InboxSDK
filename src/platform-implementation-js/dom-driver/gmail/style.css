@@ -438,9 +438,12 @@ div.inboxsdk__compose_statusbar {
   bottom: 0px;
   right: 0px;
   z-index: 501;
+  display: flex;
   display: -webkit-flex;
   justify-content: center;
+  -webkit-justify-content: center;
   align-items: center;
+  -webkit-align-items: center;
   padding: 110px 50px 50px 50px;
 }
 
@@ -490,7 +493,9 @@ div.inboxsdk__compose_statusbar {
   height: 100vh;
   float: left;
   display: flex;
+  display: -webkit-flex;
   align-items: flex-end;
+  -webkit-align-items: flex-end;
 }
 
 .inboxsdk__mole_view_inner {
@@ -1019,9 +1024,12 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 /* search suggestions */
 
 .asor.inboxsdk__custom_suggestion {
+  display: flex;
   display: -webkit-flex;
   justify-content: center;
+  -webkit-justify-content: center;
   align-items: center;
+  -webkit-align-items: center;
 }
 
 .inboxsdk__custom_suggestion img {
