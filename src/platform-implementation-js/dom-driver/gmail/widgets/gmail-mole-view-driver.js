@@ -73,12 +73,19 @@ export default class GmailMoleViewDriver {
   }
 
   show() {
-    kefirWaitFor(() => GmailElementGetter.getMoleParent())
-      .takeUntilBy(this._stopper)
-      .onValue(moleParent => {
-        moleParent.insertBefore(this._element, _.last(moleParent.children));
-        $(moleParent).parents('div.dw').get(0).classList.add('inboxsdk__moles_in_use');
-      });
+    var doShow = (moleParent) => {
+      moleParent.insertBefore(this._element, _.last(moleParent.children));
+      $(moleParent).parents('div.dw').get(0).classList.add('inboxsdk__moles_in_use');
+    };
+
+    var moleParent = GmailElementGetter.getMoleParent();
+    if (moleParent) {
+      doShow(moleParent);
+    } else {
+      kefirWaitFor(() => GmailElementGetter.getMoleParent())
+        .takeUntilBy(this._stopper)
+        .onValue(doShow);
+    }
   }
 
   setMinimized(minimized) {
