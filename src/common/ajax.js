@@ -18,7 +18,7 @@ export type ajaxOpts = {
   method?: ?string;
   headers?: any;
   xhrFields?: any;
-  data?: ?string;
+  data?: ?{[index: string]: string}|string;
 };
 
 export type ajaxResponse = {
@@ -32,13 +32,11 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
   }
   return new global.Promise(function(resolve, reject) {
     var method = opts.method ? opts.method : "GET";
+    var stringData: ?string;
     if (opts.data) {
-      if (typeof opts.data != "string") {
-        opts.data = querystring.stringify(opts.data);
-      }
+      stringData = typeof opts.data === "string" ? opts.data : querystring.stringify(opts.data);
       if (method === "GET") {
-        opts.url += (/\?/.test(opts.url) ? "&" : "?") + opts.data;
-        delete opts.data;
+        opts.url += (/\?/.test(opts.url) ? "&" : "?") + stringData;
       }
     }
 
@@ -72,6 +70,6 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     forOwn(opts.headers, function(value, name) {
       xhr.setRequestHeader(name, value);
     });
-    xhr.send(opts.data);
+    xhr.send(stringData);
   });
 }
