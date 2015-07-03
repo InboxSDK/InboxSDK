@@ -6,8 +6,6 @@ require('../lib/fake-page-globals')();
 
 process.env.VERSION = 'beep';
 
-var InboxSDK = require('./lib/inboxsdk');
-
 global.MutationObserver = require('../lib/mock-mutation-observer');
 global.document = jsdom(`<!doctype html>
 <html>
@@ -22,6 +20,8 @@ global.window = document.parentWindow;
 document.head.setAttribute('data-inboxsdk-script-injected', true);
 document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
 document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
+
+var InboxSDK = require('./lib/inboxsdk');
 
 var appOpts = {
   globalErrorLogging: false, inboxBeta: true
