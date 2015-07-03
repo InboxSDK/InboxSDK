@@ -2,7 +2,7 @@ var RSVP = require('rsvp');
 var _ = require('lodash');
 
 module.exports = function(delay) {
-	return function() {
+	return _.once(function() {
 		return new RSVP.Promise(function(resolve, reject) {
 			setTimeout(function() {
 				try {
@@ -13,5 +13,5 @@ module.exports = function(delay) {
 				}
 			}, delay);
 		});
-	};
+	});
 };

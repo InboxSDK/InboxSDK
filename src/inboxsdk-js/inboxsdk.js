@@ -31,8 +31,7 @@ InboxSDK.load = function(version, appId, opts){
 
   checkRequirements(opts);
 
-  var platformImplementationLoader = new PlatformImplementationLoader(appId, opts);
-  var loadPromise = platformImplementationLoader.load();
+  var loadPromise = PlatformImplementationLoader.load(appId, opts);
   loadPromise.catch(function(err) {
     console.error("Failed to load implementation:", err, err && err.stack);
   });
@@ -47,5 +46,9 @@ InboxSDK.load = function(version, appId, opts){
 */
 
 InboxSDK.loadScript = require('../common/load-script');
+
+if (['https://mail.google.com', 'https://inbox.google.com'].indexOf(document.location.origin) != -1) {
+  PlatformImplementationLoader.preload();
+}
 
 module.exports = InboxSDK;

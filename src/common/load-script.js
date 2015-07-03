@@ -1,16 +1,22 @@
+/* @flow */
+//jshint ignore:start
+
 import once from 'lodash/function/once';
 import defer from 'lodash/function/defer';
 import ajax from './ajax';
 
-const isContentScript = once(function() {
-  if (typeof chrome != 'undefined' && chrome.extension)
+declare var chrome: ?Object;
+declare var safari: ?Object;
+
+var isContentScript: () => boolean = once(function() {
+  if (typeof chrome != 'undefined' && chrome && chrome.extension)
     return true;
-  if (typeof safari != 'undefined' && safari.extension)
+  if (typeof safari != 'undefined' && safari && safari.extension)
     return true;
   return false;
 });
 
-function addScriptToPage(url, cors) {
+function addScriptToPage(url: string, cors: boolean): Promise<void> {
   var script = document.createElement('script');
   script.type = 'text/javascript';
   if (cors) {
@@ -36,7 +42,11 @@ function addScriptToPage(url, cors) {
   return promise;
 }
 
-function loadScript(url, opts) {
+export type loadScriptOpts = {
+  nowrap?: boolean;
+};
+
+export default function loadScript(url: string, opts?: loadScriptOpts): Promise<void> {
   if (isContentScript()) {
     return ajax({
       url: url
@@ -66,13 +76,11 @@ function loadScript(url, opts) {
     });
   } else {
     // Try to add script as CORS first so we can get error stack data from it.
-    return addScriptToPage(url, true).catch(function() {
+    return addScriptToPage(url, true).catch(() => {
       // Only show the warning if we successfully load the script on retry.
-      return addScriptToPage(url, false).then(function() {
+      return addScriptToPage(url, false).then(() => {
         console.warn("Script "+url+" included without CORS headers. Error logs might be censored by the browser.");
       });
     });
   }
 }
-
-module.exports = loadScript;
