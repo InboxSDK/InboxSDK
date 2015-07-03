@@ -10,7 +10,7 @@
       ],
       "js": ["inboxsdk.js","kefir.js","content.js"],
       "css": ["content.css"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "permissions": [

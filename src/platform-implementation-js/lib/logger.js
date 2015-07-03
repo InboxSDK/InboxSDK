@@ -22,20 +22,20 @@ var _extensionUseEventTracking: boolean = false;
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
 var [_extensionIsLoggerMaster, _sessionId] = (function() {
-  if (global.document && document.head.hasAttribute('data-inboxsdk-session-id')) {
-    return [false, document.head.getAttribute('data-inboxsdk-session-id')];
+  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-session-id')) {
+    return [false, document.documentElement.getAttribute('data-inboxsdk-session-id')];
   } else {
     var _sessionId = Date.now()+'-'+Math.random();
     if (global.document) {
-      document.head.setAttribute('data-inboxsdk-session-id', _sessionId);
+      document.documentElement.setAttribute('data-inboxsdk-session-id', _sessionId);
     }
     return [true, _sessionId];
   }
 })();
 
 function getAllAppIds(): string[] {
-  if (global.document && document.head.hasAttribute('data-inboxsdk-active-app-ids')) {
-    return JSON.parse(document.head.getAttribute('data-inboxsdk-active-app-ids'));
+  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-active-app-ids')) {
+    return JSON.parse(document.documentElement.getAttribute('data-inboxsdk-active-app-ids'));
   } else {
     return [];
   }
@@ -59,11 +59,11 @@ class Logger {
       if (
         !_extensionUseEventTracking || (
           global.document &&
-          document.head.hasAttribute('data-inboxsdk-app-logger-master-chosen')
+          document.documentElement.hasAttribute('data-inboxsdk-app-logger-master-chosen')
       )) {
         return false;
       } else {
-        document.head.setAttribute('data-inboxsdk-app-logger-master-chosen', 'true');
+        document.documentElement.setAttribute('data-inboxsdk-app-logger-master-chosen', 'true');
         return true;
       }
     })();
@@ -129,7 +129,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     appId: appId,
     version: opts.appVersion || undefined
   }));
-  document.head.setAttribute(
+  document.documentElement.setAttribute(
     'data-inboxsdk-active-app-ids', JSON.stringify(getAllAppIds().concat([
       {
         appId: appId,
@@ -439,11 +439,11 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
   _trackedEventsQueue.add(event);
 
   // Signal to the logger master that a new event is ready to be sent.
-  document.head.setAttribute('data-inboxsdk-last-event', ''+Date.now());
+  document.documentElement.setAttribute('data-inboxsdk-last-event', ''+Date.now());
 }
 
 if (_extensionIsLoggerMaster && global.document) {
-  makeMutationObserverStream(document.head, {
+  makeMutationObserverStream(document.documentElement, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(null).throttle(120*1000).onValue(function() {
     var events: any[] = _trackedEventsQueue.removeAll();
