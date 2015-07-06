@@ -71,24 +71,22 @@ export default class PageCommunicator {
   getThreadIdForThreadRow(threadRow: HTMLElement): string {
     var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
-      var event = new CustomEvent('inboxSDKtellMeThisThreadId', {
+      threadRow.dispatchEvent(new CustomEvent('inboxSDKtellMeThisThreadId', {
         bubbles: true,
         cancelable: false,
         detail: null
-      });
-      threadRow.dispatchEvent(event);
+      }));
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
     return threadid;
   }
 
   getCurrentThreadID(threadContainerElement: HTMLElement, isPreviewedThread: boolean=false): string {
-    var event = new CustomEvent('inboxSDKtellMeCurrentThreadId', {
+    threadContainerElement.dispatchEvent(new CustomEvent('inboxSDKtellMeCurrentThreadId', {
       bubbles: true,
       cancelable: false,
       detail: {isPreviewedThread}
-    });
-    threadContainerElement.dispatchEvent(event);
+    }));
 
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
   }
@@ -117,76 +115,68 @@ export default class PageCommunicator {
           resolve(event.detail);
         });
 
-      var event = new CustomEvent('inboxSDKtellMeIsConversationViewDisabled', {
+      document.dispatchEvent(new CustomEvent('inboxSDKtellMeIsConversationViewDisabled', {
         bubbles: false,
         cancelable: false,
         detail: null
-      });
-      document.dispatchEvent(event);
+      }));
     });
   }
 
   announceSearchAutocompleter(providerID: string) {
-    var event = new CustomEvent('inboxSDKregisterSuggestionsModifier', {
+    document.dispatchEvent(new CustomEvent('inboxSDKregisterSuggestionsModifier', {
       bubbles: false,
       cancelable: false,
       detail: {providerID}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   provideAutocompleteSuggestions(providerID: string, query: string, suggestions: AutoCompleteSuggestion[]) {
-    var event = new CustomEvent('inboxSDKprovideSuggestions', {
+    document.dispatchEvent(new CustomEvent('inboxSDKprovideSuggestions', {
       bubbles: false,
       cancelable: false,
       detail: {providerID, query, suggestions}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   setupCustomListResultsQuery(query: string) {
-    var event = new CustomEvent('inboxSDKcustomListRegisterQuery', {
+    document.dispatchEvent(new CustomEvent('inboxSDKcustomListRegisterQuery', {
       bubbles: false,
       cancelable: false,
       detail: {query}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   setCustomListNewQuery(query: string, newQuery: string) {
-    var event = new CustomEvent('inboxSDKcustomListNewQuery', {
+    document.dispatchEvent(new CustomEvent('inboxSDKcustomListNewQuery', {
       bubbles: false,
       cancelable: false,
       detail: {query, newQuery}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   setCustomListResults(query: string, newResults: string) {
-    var event = new CustomEvent('inboxSDKcustomListResults', {
+    document.dispatchEvent(new CustomEvent('inboxSDKcustomListResults', {
       bubbles: false,
       cancelable: false,
       detail: {query, newResults}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   createCustomSearchTerm(term: string) {
-    var event = new CustomEvent('inboxSDKcreateCustomSearchTerm', {
+    document.dispatchEvent(new CustomEvent('inboxSDKcreateCustomSearchTerm', {
       bubbles: false,
       cancelable: false,
       detail: {term}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   setSearchQueryReplacement(query: string, newQuery: string) {
-    var event = new CustomEvent('inboxSDKsearchReplacementReady', {
+    document.dispatchEvent(new CustomEvent('inboxSDKsearchReplacementReady', {
       bubbles: false,
       cancelable: false,
       detail: {query, newQuery}
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   silenceGmailErrorsForAMoment(): ()=>void {
