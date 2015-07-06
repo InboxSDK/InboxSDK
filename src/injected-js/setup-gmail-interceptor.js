@@ -307,9 +307,10 @@ function setupGmailInterceptor() {
 }
 
 function triggerEvent(detail) {
-  var event = document.createEvent("CustomEvent");
-  event.initCustomEvent('inboxSDKajaxIntercept', true, false, detail);
-  document.dispatchEvent(event);
+  document.dispatchEvent(new CustomEvent('inboxSDKajaxIntercept', {
+    bubbles: true, cancelable: false,
+    detail
+  }));
 }
 
 module.exports = setupGmailInterceptor;
