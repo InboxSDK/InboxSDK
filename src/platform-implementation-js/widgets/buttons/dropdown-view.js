@@ -79,7 +79,6 @@ _.assign(DropdownView.prototype, /** @lends DropdownView */ {
 	close: function() {
 		if (!this.closed) {
 			this.closed = true;
-			this.el = null;
 			this._focusUnsub();
 			this._dropdownViewDriver.destroy();
 			this.emit('destroy');
