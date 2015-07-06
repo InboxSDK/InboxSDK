@@ -181,7 +181,7 @@ export default class PageCommunicator {
   }
 
   setSearchQueryReplacement(query: string, newQuery: string) {
-    var event = new CustomEvent('inboxSDKcreateCustomSearchTerm', {
+    var event = new CustomEvent('inboxSDKsearchReplacementReady', {
       bubbles: false,
       cancelable: false,
       detail: {query, newQuery}

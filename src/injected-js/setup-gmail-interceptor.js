@@ -19,7 +19,7 @@ function logErrorExceptEventListeners(err, details) {
   }
 }
 
-function setupGmailInterceptor() {
+export default function setupGmailInterceptor() {
   const js_frame_wrappers = [], main_wrappers = [];
   {
     const js_frame_element = top.document.getElementById('js_frame');
@@ -312,5 +312,3 @@ function triggerEvent(detail) {
     detail
   }));
 }
-
-module.exports = setupGmailInterceptor;
