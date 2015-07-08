@@ -9,9 +9,9 @@ var KeyboardShortcutHandle = require('../views/keyboard-shortcut-handle');
 var memberMap = new Map();
 
 /**
-* @class
-* This namespace allows you to setup keyboard shortcuts that your application can response to.
-*/
+ * @class
+ * This namespace allows you to setup keyboard shortcuts that your application can response to.
+ */
 var Keyboard = function(appId, appIconUrl, driver){
     var members = {};
     memberMap.set(this, members);
@@ -24,11 +24,11 @@ var Keyboard = function(appId, appIconUrl, driver){
 _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 
   /**
-  * This method creates a shortcut handle. A shortcut handle can be used in various APIs in
-  * the SDK to keyboard enable them.
-  * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut.
-  * @return {KeyboardShortcutHandle}
-  */
+   * This method creates a shortcut handle. A shortcut handle can be used in various APIs in
+   * the SDK to keyboard enable them.
+   * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut.
+   * @return {KeyboardShortcutHandle}
+   */
   createShortcutHandle: function(shortcutDescriptor){
     var members = memberMap.get(this);
 
@@ -45,16 +45,18 @@ _.extend(Keyboard.prototype, /** @lends Keyboard */ {
 var KeyboardShortcutDescriptor = /** @lends KeyboardShortcutDescriptor */ {
 
   /**
-  * The keys the user has to press to activate the shortcut. Simultaneous keypresses can be defined with "+".
-  * For multi-key chords (like Gmail's) include a space between the keys, i.e. "g i".
-  * @type {string}
-  */
-  chord:  null,
+   * The keys the user has to press to activate the shortcut. Simultaneous
+   * keypresses can be defined with "+". For multi-key chords like Gmail's,
+   * include a space between the keys, i.e. "g i". Syntax matches the
+   * <a href="https://www.npmjs.com/package/combokeys">combokeys</a> library.
+   * @type {string}
+   */
+  chord: null,
 
   /**
-  * The description text that shows up in Gmail's keyboard shortcut help (when the user presses '?').
-  * @type {string}
-  */
+   * The description text that shows up in Gmail's keyboard shortcut help (when the user presses '?').
+   * @type {string}
+   */
   description: null,
 };
 
