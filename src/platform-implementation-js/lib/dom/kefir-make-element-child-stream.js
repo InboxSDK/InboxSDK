@@ -1,37 +1,40 @@
+/* @flow */
+//jshint ignore:start
+
 import asap from 'asap';
 import logger from '../logger';
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function kefirMakeElementChildStream(element) {
+export default function kefirMakeElementChildStream(element: HTMLElement): Kefir.Observable {
   if (!element || !element.nodeType) {
-    throw new Error("Expected element, got "+element);
+    throw new Error("Expected element, got "+String(element));
   }
 
   return Kefir.stream(function(emitter) {
-    const removalStreams = new Map();
+    var removalStreams = new Map();
+    var ended = false;
 
     function newEl(el) {
-      const removalStream = kefirBus();
+      var removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
       emitter.emit({el, removalStream});
     }
 
     function removedEl(el) {
-      const removalStream = removalStreams.get(el);
+      var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
       if(removalStream){
-        removalStream.emit(null);
-        removalStream.end();
+        removalStream.destroy();
       } else {
         logger.error(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
-    let observer = new MutationObserver(function(mutations) {
+    var observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation){
         Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
@@ -41,19 +44,18 @@ export default function kefirMakeElementChildStream(element) {
     // We don't want to emit the start children synchronously before all
     // stream listeners are subscribed.
     asap(function() {
-      if (observer) {
-        observer.observe(element, {childList: true});
+      if (!ended) {
+        observer.observe(element, ({childList: true}: any));
         // Clone child list first because it can change
         Array.prototype.slice.call(element.children).forEach(newEl);
       }
     });
 
     return function() {
+      ended = true;
       observer.disconnect();
-      observer = null;
       removalStreams.forEach(function(removalStream, el) {
-        removalStream.emit(null);
-        removalStream.end();
+        removalStream.destroy();
       });
     };
   });

@@ -32,11 +32,11 @@ describe('kefirMakeElementChildStream', function() {
           break;
         case 2:
           assert.strictEqual(event.el, child2);
-          assert(event.removalStream instanceof Kefir.Stream);
+          assert(event.removalStream instanceof Kefir.Observable);
           break;
         case 3:
           assert.strictEqual(event.el, child3);
-          assert(event.removalStream instanceof Kefir.Stream);
+          assert(event.removalStream instanceof Kefir.Observable);
           done();
           break;
         default:
