@@ -1,69 +1,62 @@
+/* @flow */
+//jshint ignore:start
+
 import _ from 'lodash';
-import logger from './logger';
-import BasicClass from './basic-class';
+import Logger from './logger';
 
-export default function HandlerRegistry() {
-    BasicClass.call(this);
+export type Handler<T> = (target: T) => void;
 
+export default class HandlerRegistry<T> {
+  _targets: Set<T>;
+  _handlers: Set<Handler<T>>;
+
+  constructor() {
     this._targets = new Set();
     this._handlers = new Set();
-}
+  }
 
-HandlerRegistry.prototype = Object.create(BasicClass.prototype);
+  registerHandler(handler: Handler<T>): () => void {
+    this._handlers.add(handler);
+    this._informHandlerOfTargets(handler);
 
-_.assign(HandlerRegistry.prototype, {
+    return () => {
+      this._handlers.delete(handler);
+    };
+  }
 
-    __memberVariables: [
-        {name: '_targets', destroy: false},
-        {name: '_handlers', destroy: false}
-    ],
+  addTarget(target: T) {
+    this._targets.add(target);
 
-    registerHandler: function(handler){
-        this._handlers.add(handler);
-
-        this._informHandlerOfTargets(handler);
-
-        var self = this;
-        return function(){
-            self._handlers.delete(handler);
-        };
-    },
-
-    addTarget: function(target){
-        this._targets.add(target);
-
-        if(target.on){
-            target.on('destroy', this.removeTarget.bind(this, target));
-        }
-
-        this._informHandlersOfTarget(target);
-    },
-
-    removeTarget: function(target){
-        this._targets.delete(target);
-    },
-
-    _informHandlerOfTargets: function(handler){
-        this._targets.forEach(function(target) {
-            try{
-                handler(target);
-            }
-            catch(err){
-                logger.error(err);
-            }
-        });
-    },
-
-    _informHandlersOfTarget: function(target){
-        this._handlers.forEach(function(handler){
-            try{
-                handler(target);
-            }
-            catch(err){
-                logger.error(err);
-            }
-
-        });
+    if(target.on) {
+      target.on('destroy', () => {
+        this.removeTarget(target);
+      });
     }
 
-});
+    this._informHandlersOfTarget(target);
+  }
+
+  removeTarget(target: T) {
+    this._targets.delete(target);
+  }
+
+  _informHandlerOfTargets(handler: Handler<T>) {
+    this._targets.forEach(function(target) {
+      try {
+        handler(target);
+      } catch(err) {
+        Logger.error(err);
+      }
+    });
+  }
+
+  _informHandlersOfTarget(target: T) {
+    this._handlers.forEach(function(handler){
+      try {
+        handler(target);
+      } catch(err) {
+        Logger.error(err);
+      }
+    });
+  }
+}
