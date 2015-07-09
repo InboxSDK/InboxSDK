@@ -27,15 +27,15 @@ export function processThreadListResponse(threadListResponse: string) {
 }
 
 var AMBIGUOUS = Marker('ABIGUOUS');
-var threadIdsByKey = {};
+var threadIdsByKey: Map<string, string|Marker> = new Map();
 function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
-  if (_.has(threadIdsByKey, [key])) {
-    if (threadIdsByKey[key] !== threadMetadata.gmailThreadId) {
-      threadIdsByKey[key] = AMBIGUOUS;
+  if (threadIdsByKey.has(key)) {
+    if (threadIdsByKey.get(key) !== threadMetadata.gmailThreadId) {
+      threadIdsByKey.set(key, AMBIGUOUS);
     }
   } else {
-    threadIdsByKey[key] = threadMetadata.gmailThreadId;
+    threadIdsByKey.set(key, threadMetadata.gmailThreadId);
   }
 }
 
@@ -70,8 +70,9 @@ function getThreadIdFromUrl(url: string): ?string {
 function getGmailThreadIdForThreadRow(threadRow: HTMLElement): ?string {
   var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
   var key = threadMetadataKey(domRowMetadata);
-  if (_.has(threadIdsByKey, [key]) && threadIdsByKey[key] !== AMBIGUOUS) {
-    return threadIdsByKey[key];
+  var value = threadIdsByKey.get(key);
+  if (typeof value === 'string') {
+    return value;
   }
 
   // Simulate a ctrl-click on the thread row to get the thread id, then
@@ -84,8 +85,8 @@ function getGmailThreadIdForThreadRow(threadRow: HTMLElement): ?string {
   var currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
   var url = clickAndGetPopupUrl(threadRow);
   var threadId = url && getThreadIdFromUrl(url);
-  if (threadId && !_.has(threadIdsByKey, [key])) {
-    threadIdsByKey[key] = threadId;
+  if (threadId && !threadIdsByKey.has(key)) {
+    threadIdsByKey.set(key, threadId);
   }
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
