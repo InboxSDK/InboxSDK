@@ -3,7 +3,7 @@ import RSVP from 'rsvp';
 import logError from './log-error';
 import XHRProxyFactory from './xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
-import threadIdentifier from './thread-identifier';
+import * as threadIdentifier from './thread-identifier';
 import quotedSplit from '../common/quoted-split';
 import modifySuggestions from './modify-suggestions';
 

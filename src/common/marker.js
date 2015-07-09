@@ -3,7 +3,7 @@
 
 import _ from 'lodash';
 
-export default function Marker(description?: string): {name?: string} {
+export default function Marker(description?: string): {name: ?string} {
   if (this instanceof Marker) {
     throw new TypeError("Can't use new with Marker function");
   }

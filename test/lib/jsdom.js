@@ -87,12 +87,6 @@ export default function main() {
         return null;
       }
     });
-    assert(!('parentElement' in proto));
-    Object.defineProperty(proto, 'parentElement', {
-      get() {
-        return this.parentNode;
-      }
-    });
 
     hasAddedClassList = true;
   }
