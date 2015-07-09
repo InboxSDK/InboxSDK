@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import $ from 'jquery';
 import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
 import logError from '../log-error';
@@ -78,7 +79,7 @@ function getGmailThreadIdForThreadRow(threadRow: HTMLElement): ?string {
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
-  var parent = threadRow.parentElement;
+  var parent: HTMLElement = $(threadRow).closest('div[role="main"]').get(0);
   if (!parent) {
     throw new Error("Can't operate on disconnected thread row");
   }
