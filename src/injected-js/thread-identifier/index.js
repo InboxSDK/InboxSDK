@@ -1,11 +1,14 @@
-var _ = require('lodash');
-var GmailResponseProcessor = require('../../platform-implementation-js/dom-driver/gmail/gmail-response-processor');
-var deparam = require('querystring').parse;
-var threadRowParser = require('./thread-row-parser');
-var clickAndGetPopupUrl = require('./click-and-get-popup-url');
-var Marker = require('../../common/marker');
+/* @flow */
+//jshint ignore:start
 
-function setup() {
+import _ from 'lodash';
+import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import {parse} from 'querystring';
+import * as threadRowParser from './thread-row-parser';
+import clickAndGetPopupUrl from './click-and-get-popup-url';
+import Marker from '../../common/marker';
+
+export function setup() {
   processPreloadedThreads();
 
   document.addEventListener('inboxSDKtellMeThisThreadId', function(event) {
@@ -15,18 +18,16 @@ function setup() {
     }
   });
 }
-exports.setup = setup;
 
-function processThreadListResponse(threadListResponse) {
-  GmailResponseProcessor.extractThreads(threadListResponse).forEach(function(thread) {
+export function processThreadListResponse(threadListResponse: string) {
+  GmailResponseProcessor.extractThreads(threadListResponse).forEach(thread => {
     storeThreadMetadata(thread);
   });
 }
-exports.processThreadListResponse = processThreadListResponse;
 
 var AMBIGUOUS = Marker('ABIGUOUS');
 var threadIdsByKey = {};
-function storeThreadMetadata(threadMetadata) {
+function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
   if (_.has(threadIdsByKey, [key])) {
     if (threadIdsByKey[key] !== threadMetadata.gmailThreadId) {
@@ -37,8 +38,8 @@ function storeThreadMetadata(threadMetadata) {
   }
 }
 
-function threadMetadataKey(threadMetadata) {
-  return threadMetadata.subject.trim()+':'+threadMetadata.timeString.trim()+':'+threadMetadata.peopleHtml.trim();
+function threadMetadataKey(threadRowMetadata: threadRowParser.ThreadRowMetadata): string {
+  return threadRowMetadata.subject.trim()+':'+threadRowMetadata.timeString.trim()+':'+threadRowMetadata.peopleHtml.trim();
 }
 
 function processPreloadedThreads() {
@@ -54,20 +55,20 @@ function processPreloadedThreads() {
   }
 }
 
-function getThreadIdFromUrl(url) {
-  var tid = deparam(url).th;
+function getThreadIdFromUrl(url: string): ?string {
+  var tid = parse(url).th;
   if (!tid) {
     // Draft URLs have the thread id after the hash
     var urlHashMatch = url.match(/#(.*)/);
     if (urlHashMatch) {
       url = decodeURIComponent(decodeURIComponent(urlHashMatch[1]));
-      tid = deparam(url).th;
+      tid = parse(url).th;
     }
   }
   return tid;
 }
 
-function getGmailThreadIdForThreadRow(threadRow){
+function getGmailThreadIdForThreadRow(threadRow: HTMLElement): ?string {
   var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
   var key = threadMetadataKey(domRowMetadata);
   if (_.has(threadIdsByKey, [key]) && threadIdsByKey[key] !== AMBIGUOUS) {
@@ -77,7 +78,11 @@ function getGmailThreadIdForThreadRow(threadRow){
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
-  var currentRowSelection = threadRow.parentNode.querySelector('td.PE') || threadRow.parentNode.querySelector('tr');
+  var parent = threadRow.parentElement;
+  if (!parent) {
+    throw new Error("Can't operate on disconnected thread row");
+  }
+  var currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
   var url = clickAndGetPopupUrl(threadRow);
   var threadId = url && getThreadIdFromUrl(url);
   if (threadId && !_.has(threadIdsByKey, [key])) {

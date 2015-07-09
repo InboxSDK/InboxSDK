@@ -1,7 +1,10 @@
+/* @flow */
+//jshint ignore:start
+
 import _ from 'lodash';
 import htmlToText from '../../../common/html-to-text';
 
-export function interpretSentEmailResponse(responseString) {
+export function interpretSentEmailResponse(responseString: string): Object {
   var emailSentArray = deserialize(responseString);
 
   var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
@@ -14,7 +17,7 @@ export function interpretSentEmailResponse(responseString) {
   };
 }
 
-export function extractGmailMessageIdFromSentEmail(emailSentArray) {
+export function extractGmailMessageIdFromSentEmail(emailSentArray: any): ?string {
   var messageIdArrayMarker = "a";
   var messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, function(markerArray) {
     return markerArray.length > 3 && _.isArray(markerArray[3]) && markerArray[3].length > 0;
@@ -27,7 +30,7 @@ export function extractGmailMessageIdFromSentEmail(emailSentArray) {
   return messageIdArray[3][0];
 }
 
-export function extractGmailThreadIdFromSentEmail(emailSentArray) {
+export function extractGmailThreadIdFromSentEmail(emailSentArray: any): ?string {
   var threadIdArrayMarker = "csd";
   var threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
     return markerArray.length == 3 && _.isArray(markerArray[2]) && markerArray[2].length > 5;
@@ -41,7 +44,7 @@ export function extractGmailThreadIdFromSentEmail(emailSentArray) {
 }
 
 // TODO what is this for?
-/*export*/ function extractHexGmailThreadIdFromMessageIdSearch(responseString) {
+function extractHexGmailThreadIdFromMessageIdSearch(responseString: string): any {
   if(!responseString){
     return null;
   }
@@ -59,7 +62,7 @@ export function extractGmailThreadIdFromSentEmail(emailSentArray) {
   return threadIdArray[1];
 }
 
-export function rewriteSingleQuotes(s) {
+export function rewriteSingleQuotes(s: string): string {
   // The input string contains unquoted, double-quoted, and single-quoted
   // parts. Parse the string for these parts, and transform the single-
   // quoted part into a double-quoted part by swapping the quotes, and
@@ -78,8 +81,8 @@ export function rewriteSingleQuotes(s) {
     // Copy the unquoted part preceding the quoted section we found into the
     // result, and put a double-quote into the result to begin the quoted
     // section we found.
-    result += s.substr(i,m.index) + '"';
-    i += m.index + 1;
+    result += s.substr(i,(m:any).index) + '"';
+    i += (m:any).index + 1;
     if (m[0] == '"') {
       // Match the contents (and end quote) of the entire double-quoted part that
       // we found. Match as many non-double-quote and non-backslash characters as
@@ -111,7 +114,7 @@ export function rewriteSingleQuotes(s) {
   return result;
 }
 
-export function deserialize(threadResponseString) {
+export function deserialize(threadResponseString: string): any {
   var VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
@@ -149,7 +152,7 @@ export function deserialize(threadResponseString) {
   return vData;
 }
 
-export function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
+export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbers: boolean=false): string {
   var response = ")]}'\n\n";
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arraySection = threadResponseArray[ii];
@@ -174,7 +177,7 @@ export function threadListSerialize(threadResponseArray, dontIncludeNumbers) {
   return response;
 }
 
-export function suggestionSerialize(suggestionsArray) {
+export function suggestionSerialize(suggestionsArray: any[]): string {
   var response = "5\n)]}'\n";
   for(var ii=0; ii<suggestionsArray.length; ii++){
     var arraySection = suggestionsArray[ii];
@@ -187,7 +190,7 @@ export function suggestionSerialize(suggestionsArray) {
   return response;
 }
 
-export function serializeArray(array) {
+export function serializeArray(array: any[]): string {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
@@ -218,13 +221,26 @@ export function serializeArray(array) {
   return response;
 }
 
-export function replaceThreadsInResponse(response, replacementThreads) {
-  const parsed = deserialize(response);
-  const firstTbIndex = _.findIndex(parsed, item => item[0] && item[0][0] === 'tb');
-  const [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0] && item[0][0] === 'tb');
-  const tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
-  const newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
-  const parsedNew = _.flatten([
+export type Thread = {
+  subject: string;
+  shortDate: string;
+  timeString: string;
+  peopleHtml: string;
+  timestamp: number;
+  isUnread: boolean;
+  lastEmailAddress: ?string;
+  bodyPreviewHtml: string;
+  someGmailMessageIds: string[];
+  gmailThreadId: string;
+};
+
+export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
+  var parsed = deserialize(response);
+  var firstTbIndex = _.findIndex(parsed, item => item[0] && item[0][0] === 'tb');
+  var [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0] && item[0][0] === 'tb');
+  var tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
+  var newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
+  var parsedNew = _.flatten([
     parsedNoTb.slice(0, firstTbIndex),
     newTbs,
     parsedNoTb.slice(firstTbIndex)
@@ -232,10 +248,10 @@ export function replaceThreadsInResponse(response, replacementThreads) {
   return threadListSerialize(parsedNew);
 }
 
-export function extractThreads(response) {
-  const crapFormatThreads = deserialize(response);
+export function extractThreads(response: string): Thread[] {
+  var crapFormatThreads = deserialize(response);
   return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread =>
-    Object.freeze(Object.defineProperty({
+    Object.freeze((Object:any).defineProperty({
       subject: htmlToText(thread[9]),
       shortDate: htmlToText(thread[14]),
       timeString: htmlToText(thread[15]),
@@ -250,7 +266,7 @@ export function extractThreads(response) {
   );
 }
 
-export function cleanupPeopleLine(peopleHtml) {
+export function cleanupPeopleLine(peopleHtml: string): string {
   // Removes possible headings like "To: " that get added on the Sent page, and
   // removes a class that's specific to the current preview pane setting.
   return peopleHtml
@@ -258,7 +274,7 @@ export function cleanupPeopleLine(peopleHtml) {
     .replace(/(<span[^>]*) class="[^"]*"/g, '$1');
 }
 
-function _extractThreadArraysFromResponseArray(threadResponseArray){
+function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[] {
   return _.chain(threadResponseArray)
     .flatten()
     .filter(item => item[0] === 'tb')
@@ -267,8 +283,8 @@ function _extractThreadArraysFromResponseArray(threadResponseArray){
     .value();
 }
 
-function _threadsToTbStructure(threads, followers=[]) {
-  const tbs = _.chain(threads)
+function _threadsToTbStructure(threads: any[], followers=[]): any[] {
+  var tbs = _.chain(threads)
     .map(thread => thread._originalGmailFormat)
     .chunk(10)
     .map((threadsChunk, i) => [['tb', i*10, threadsChunk]])
@@ -281,12 +297,12 @@ function _threadsToTbStructure(threads, followers=[]) {
   return tbs;
 }
 
-function _doesResponseUseFormatWithSectionNumbers(responseString){
+function _doesResponseUseFormatWithSectionNumbers(responseString: string): boolean {
   var lines = responseString.split(/\n|\r/);
   return !!lines[2].match(/^\d/);
 }
 
-function _searchArray(responseArray, marker, markerArrayValidator){
+function _searchArray(responseArray: any, marker: string, markerArrayValidator: (markerArray: any[]) => boolean): any {
   var pathArray = _searchObject(responseArray, marker, 100);
 
   for(var ii=0; ii<pathArray.length; ii++){
@@ -299,7 +315,7 @@ function _searchArray(responseArray, marker, markerArrayValidator){
   }
 }
 
-function _searchObject(element, query, maxDepth) {
+function _searchObject(element: Object, query: string, maxDepth: number): any {
   var retVal = [];
   var initialNode = {
     el: element,
@@ -330,7 +346,7 @@ function _searchObject(element, query, maxDepth) {
   return retVal;
 }
 
-function _getArrayValueFromPath(responseArray, path){
+function _getArrayValueFromPath(responseArray: any, path: string[]): any {
   var currentArray = responseArray;
   for(var ii=0; ii<path.length; ii++){
     currentArray = currentArray[ path[ii] ];

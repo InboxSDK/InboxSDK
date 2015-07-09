@@ -1,18 +1,26 @@
-var _ = require('lodash');
-var assert = require('assert');
+/* @flow */
+//jshint ignore:start
+
+import _ from 'lodash';
+import assert from 'assert';
+import logError from '../log-error';
 import {cleanupPeopleLine} from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
-function extractMetadataFromThreadRow(threadRow) {
-  var threadMetadata = {};
+export type ThreadRowMetadata = {
+  timeString: string;
+  subject: string;
+  peopleHtml: string;
+};
 
+export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowMetadata {
   var timeSpan, subjectSpan, peopleDiv;
 
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
 
   var threadRowIsVertical = _.intersection(_.toArray(threadRow.classList), ['zA','apv']).length === 2;
   if (threadRowIsVertical) {
-    var threadRow2 = threadRow.nextSibling;
-    var threadRow3 = threadRow2.nextSibling;
+    var threadRow2 = threadRow.nextElementSibling;
+    var threadRow3 = threadRow2.nextElementSibling;
     if (!threadRow3 || !threadRow3.classList.contains('apw')) {
       threadRow3 = null;
     }
@@ -34,16 +42,23 @@ function extractMetadataFromThreadRow(threadRow) {
     peopleDiv = threadRow.querySelector("td.yX > div.yW");
   }
 
-  if (timeSpan) {
-    threadMetadata.timeString = timeSpan.getAttribute('title');
+  var errors = [];
+  if (!timeSpan) {
+    errors.push('failed to find timeSpan');
   }
-  if (subjectSpan) {
-    threadMetadata.subject = subjectSpan.textContent;
+  if (!subjectSpan) {
+    errors.push('failed to find subjectSpan');
   }
-  if (peopleDiv) {
-    threadMetadata.peopleHtml = cleanupPeopleLine(peopleDiv.innerHTML);
+  if (!peopleDiv) {
+    errors.push('failed to find peopleDiv');
+  }
+  if (errors.length) {
+    logError(new Error("Errors in thread row parsing"), {errors});
   }
 
-  return threadMetadata;
+  return {
+    timeString: timeSpan.getAttribute('title') || '',
+    subject: subjectSpan ? subjectSpan.textContent : '',
+    peopleHtml: peopleDiv ? cleanupPeopleLine(peopleDiv.innerHTML) : ''
+  };
 }
-exports.extractMetadataFromThreadRow = extractMetadataFromThreadRow;

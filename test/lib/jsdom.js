@@ -63,6 +63,37 @@ export default function main() {
         return null;
       }
     });
+    assert(!('nextElementSibling' in proto));
+    Object.defineProperty(proto, 'nextElementSibling', {
+      get() {
+        var sibling = this;
+        while ((sibling = sibling.nextSibling)) {
+          if (sibling.nodeType === 1) {
+            return sibling;
+          }
+        }
+        return null;
+      }
+    });
+    assert(!('previousElementSibling' in proto));
+    Object.defineProperty(proto, 'previousElementSibling', {
+      get() {
+        var sibling = this;
+        while ((sibling = sibling.previousSibling)) {
+          if (sibling.nodeType === 1) {
+            return sibling;
+          }
+        }
+        return null;
+      }
+    });
+    assert(!('parentElement' in proto));
+    Object.defineProperty(proto, 'parentElement', {
+      get() {
+        return this.parentNode;
+      }
+    });
+
     hasAddedClassList = true;
   }
 
