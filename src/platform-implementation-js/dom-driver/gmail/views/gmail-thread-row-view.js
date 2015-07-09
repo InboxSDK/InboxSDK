@@ -696,6 +696,10 @@ export default class GmailThreadRowView {
     return this._stopper;
   }
 
+  getStopper() {
+    return this._stopper;
+  }
+
   getSubject() {
     if (this._elements.length > 1) {
       return this._elements[1].querySelector('div.xS div.xT div.y6 > span[id]').textContent;

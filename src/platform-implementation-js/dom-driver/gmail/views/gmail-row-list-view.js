@@ -22,9 +22,11 @@ var GmailRowListView = function(rootElement, routeViewDriver){
 	RowListViewDriver.call(this);
 
 	this._eventStreamBus = new Bacon.Bus();
+	this._kstopper = kefirCast(Kefir, this._eventStreamBus.filter(false).mapEnd(null));
 
 	this._element = rootElement;
 	this._routeViewDriver = routeViewDriver;
+	this._threadRowViewDrivers = new Set();
 
 	this._pendingExpansions = new Map();
 	this._pendingExpansionsSignal = new Bacon.Bus();
@@ -44,7 +46,7 @@ _.extend(GmailRowListView.prototype, {
 		{name: '_pendingExpansions', destroy: false},
 		{name: '_pendingExpansionsSignal', destroy: false},
 		{name: '_toolbarView', destroy: true, get: true},
-		{name: '_threadRowViewDrivers', destroy: true, get: true, defaultValue: []},
+		{name: '_threadRowViewDrivers', destroy: true, get: true},
 		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
 		{name: '_rowViewDriverKefirStream', destroy: false, get: true}
 	],
@@ -141,36 +143,34 @@ _.extend(GmailRowListView.prototype, {
 
 	_startWatchingForRowViews: function(){
 		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
-		const stopper = kefirCast(Kefir, this._eventStreamBus.filter(false).mapEnd(null));
 
 		const elementKefirStream = Kefir.merge(tableDivParents.map(kefirMakeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
 			const tbody = event.el.querySelector('table > tbody');
 
 			// In vertical preview pane mode, each thread row has three <tr>
-			// elements. We just want to pass the first one to GmailThreadRowView().
+			// elements. We just want to pass the first one (which has an id) to
+			// GmailThreadRowView().
 			return kefirMakeElementChildStream(tbody)
 				.takeUntilBy(event.removalStream)
 				.filter(rowEvent => rowEvent.el.id);
 		});
 
 		this._rowViewDriverKefirStream = elementKefirStream
-			.takeUntilBy(stopper)
+			.takeUntilBy(this._kstopper)
 			.map(kefirElementViewMapper(element => new GmailThreadRowView(element, this)));
 
 		this._rowViewDriverKefirStream.onValue(x => this._addThreadRowView(x));
 	},
 
-	_addThreadRowView: function(gmailThreadRowView){
-		this._threadRowViewDrivers.push(gmailThreadRowView);
+	_addThreadRowView(gmailThreadRowView) {
+		this._threadRowViewDrivers.add(gmailThreadRowView);
 
 		gmailThreadRowView
-			.getEventStream()
-			.onEnd(() => {
-				if(this._threadRowViewDrivers){
-					const index = this._threadRowViewDrivers.indexOf(gmailThreadRowView);
-					this._threadRowViewDrivers.splice(index, 1);
-				}
+			.getStopper()
+			.takeUntilBy(this._kstopper)
+			.onValue(() => {
+				this._threadRowViewDrivers.delete(gmailThreadRowView);
 			});
 	}
 });

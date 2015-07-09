@@ -144,20 +144,24 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 }
 
 function _getThreadRowViews(toolbarViewDriver, membraneMap){
-	return toolbarViewDriver
-			.getRowListViewDriver()
-			.getThreadRowViewDrivers()
-			.map(_getThreadRowView(membraneMap));
+	return Array.from(
+			toolbarViewDriver
+				.getRowListViewDriver()
+				.getThreadRowViewDrivers()
+				.values()
+		).map(_getThreadRowView(membraneMap));
 }
 
 function _getSelectedThreadRowViews(toolbarViewDriver, membraneMap){
-	return toolbarViewDriver
-			.getRowListViewDriver()
-			.getThreadRowViewDrivers()
-			.filter(function(threadRowViewDriver){
-				return threadRowViewDriver.isSelected();
-			})
-			.map(_getThreadRowView(membraneMap));
+	return _.chain(Array.from(
+			toolbarViewDriver
+				.getRowListViewDriver()
+				.getThreadRowViewDrivers()
+				.values()
+		))
+		.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
+		.map(_getThreadRowView(membraneMap))
+		.value();
 }
 
 function _getThreadRowView(membraneMap){
