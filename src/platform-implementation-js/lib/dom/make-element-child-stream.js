@@ -1,26 +1,30 @@
-const _ = require('lodash');
-const asap = require('asap');
-const logger = require('../logger');
-const Bacon = require('baconjs');
+/* @flow */
+//jshint ignore:start
+
+import _ from 'lodash';
+import asap from 'asap';
+import Logger from '../logger';
+import Bacon from 'baconjs';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-function makeElementChildStream(element) {
+export default function makeElementChildStream(element: HTMLElement): Bacon.Observable {
   if (!element || !element.nodeType) {
-    throw new Error("Expected element, got "+element);
+    throw new Error("Expected element, got "+String(element));
   }
 
   return Bacon.fromBinder(function(sink) {
-    const removalStreams = new Map();
+    var removalStreams = new Map();
+    var ended = false;
 
     function newEls(els) {
-      const len = els.length;
+      var len = els.length;
       if (len === 0) {
         return;
       }
-      const toSink = new Array(len);
-      for (let i=0; i<len; i++) {
-        const el = els[i], removalStream = new Bacon.Bus();
+      var toSink = new Array(len);
+      for (var i=0; i<len; i++) {
+        var el = els[i], removalStream = new Bacon.Bus();
         removalStreams.set(el, removalStream);
         toSink[i] = new Bacon.Next({el, removalStream});
       }
@@ -28,14 +32,14 @@ function makeElementChildStream(element) {
     }
 
     function removedEl(el) {
-      const removalStream = removalStreams.get(el);
+      var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
       if(removalStream){
         removalStream.push(null);
         removalStream.end();
       } else {
-        logger.error(new Error("Could not find removalStream for element with class "+el.className));
+        Logger.error(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
@@ -49,21 +53,21 @@ function makeElementChildStream(element) {
     // We don't want to emit the start children synchronously before all
     // stream listeners are subscribed.
     asap(function() {
-      if (observer) {
-        observer.observe(element, {childList: true});
+      if (!ended) {
+        observer.observe(element, ({childList: true}: any));
         newEls(element.children);
       }
     });
 
     return function() {
+      ended = true;
       observer.disconnect();
-      observer = null;
-      removalStreams.forEach(function(removalStream, el) {
-        removalStream.push(null);
-        removalStream.end();
+      asap(() => {
+        removalStreams.forEach(function(removalStream, el) {
+          removalStream.push(null);
+          removalStream.end();
+        });
       });
     };
   });
 }
-
-module.exports = makeElementChildStream;

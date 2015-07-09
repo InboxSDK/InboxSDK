@@ -13,7 +13,7 @@ export default function kefirMakeElementChildStream(element: HTMLElement): Kefir
     throw new Error("Expected element, got "+String(element));
   }
 
-  return Kefir.stream(function(emitter) {
+  return Kefir.stream((emitter) => {
     var removalStreams = new Map();
     var ended = false;
 
@@ -35,7 +35,7 @@ export default function kefirMakeElementChildStream(element: HTMLElement): Kefir
     }
 
     var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation){
+      mutations.forEach((mutation) => {
         Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
       });
@@ -43,7 +43,7 @@ export default function kefirMakeElementChildStream(element: HTMLElement): Kefir
 
     // We don't want to emit the start children synchronously before all
     // stream listeners are subscribed.
-    asap(function() {
+    asap(() => {
       if (!ended) {
         observer.observe(element, ({childList: true}: any));
         // Clone child list first because it can change
@@ -54,8 +54,10 @@ export default function kefirMakeElementChildStream(element: HTMLElement): Kefir
     return function() {
       ended = true;
       observer.disconnect();
-      removalStreams.forEach(function(removalStream, el) {
-        removalStream.destroy();
+      asap(() => {
+        removalStreams.forEach((removalStream, el) => {
+          removalStream.destroy();
+        });
       });
     };
   });

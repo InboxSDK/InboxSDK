@@ -85,7 +85,9 @@ describe('makeElementChildStream', function() {
           assert.strictEqual(child2Removed, 0);
           assert(!child1Ended);
           assert(!child2Ended);
+          assert.strictEqual(child1Ended, false, 'sanity check');
           stopper.push();
+          assert.strictEqual(child1Ended, false, 'no sync removal check');
           break;
         default:
           throw new Error("should not happen");
