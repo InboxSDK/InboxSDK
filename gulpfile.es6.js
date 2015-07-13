@@ -64,6 +64,7 @@ function setupExamples() {
   return globp('./examples/*/').then(function(dirs){
     if(args.copy){
       dirs.push('../MailFoo/ServerGmailSdk-war/src/main/webapp/build/');
+      dirs.push('../MailFoo/extensions/devBuilds/chrome/');
     }
     return dirs;
   }).then(function(dirs) {
