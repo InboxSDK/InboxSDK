@@ -328,4 +328,14 @@ _.extend(GmailDriver.prototype, {
 
 assertInterface(GmailDriver.prototype, Driver);
 
+/* TODO Uncomment to check against interface once GmailDriver is Flow typed.
+import type {Driver} from '../../driver-interfaces/driver';
+
+// This function does not get executed. It's only checked by Flow to make sure
+// this class successfully implements the type interface.
+function __interfaceCheck() {
+	var driver: Driver = new GmailDriver('', ({}: any), '', '', ({}: any));
+}
+*/
+
 module.exports = GmailDriver;

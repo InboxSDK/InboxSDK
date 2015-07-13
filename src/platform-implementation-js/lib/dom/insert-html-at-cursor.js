@@ -1,20 +1,23 @@
-const _ = require('lodash');
-const Bacon = require('baconjs');
+/* @flow */
+//jshint ignore:start
 
-module.exports = function(element, html, oldRange){
+import _ from 'lodash';
+import Bacon from 'baconjs';
+
+export default function insertHTMLatCursor(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
 	element.focus();
 
-	if (element.tagName === 'TEXTAREA') {
-		var oldStart = element.selectionStart;
+	if (element instanceof HTMLTextAreaElement) {
+		var oldStart = (element:any).selectionStart;
 		// first delete selected range
 		if (element.selectionStart < element.selectionEnd) {
-			element.value = element.value.substring(0, element.selectionStart) + element.value.substring(element.selectionEnd);
+			element.value = element.value.substring(0, (element:any).selectionStart) + element.value.substring((element:any).selectionEnd);
 		}
 		// insert into position
 		element.value = element.value.substring(0, oldStart) + html + element.value.substring(oldStart);
 		// set caret
-		element.selectionStart = oldStart + html.length;
-		element.selectionEnd = oldStart + html.length;
+		(element:any).selectionStart = oldStart + html.length;
+		(element:any).selectionEnd = oldStart + html.length;
 	} else {
 		var editable = null;
 		if (element.getSelection) {
@@ -24,7 +27,7 @@ module.exports = function(element, html, oldRange){
 		}
 
 		if (editable) {
-			var sel = editable.getSelection();
+			var sel = (editable:any).getSelection();
 			if (sel.getRangeAt && sel.rangeCount) {
 				var range = oldRange || sel.getRangeAt(0);
 				range.deleteContents();
@@ -46,12 +49,12 @@ module.exports = function(element, html, oldRange){
 					}
 				}
 
-				var firstChild = frag.firstChild, lastChild = frag.lastChild;
+				var firstChild: HTMLElement = (frag:any).firstElementChild;
 				range.insertNode(frag);
 
 				// Simulate a mousedown event to kill any existing focus-fixers.
 				var event = document.createEvent('MouseEvents');
-				event.initMouseEvent('mousedown', false, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				(event:any).initMouseEvent('mousedown', false, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 				event.preventDefault();
 				element.dispatchEvent(event);
 
@@ -80,4 +83,4 @@ module.exports = function(element, html, oldRange){
 			}
 		}
 	}
-};
+}

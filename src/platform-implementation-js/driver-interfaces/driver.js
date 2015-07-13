@@ -33,13 +33,13 @@ export default {
 	createModalViewDriver: 1
 };
 
-import Bacon from 'baconjs';
-import GmailKeyboardShortcutHandle from '../dom-driver/gmail/views/gmail-keyboard-shortcut-handle';
+import type Bacon from 'baconjs';
+import type GmailKeyboardShortcutHandle from '../dom-driver/gmail/views/gmail-keyboard-shortcut-handle';
 type ShortcutDescriptor = {
 	chord: string;
 	description: string;
 };
-import Logger from '../lib/logger';
+import type Logger from '../lib/logger';
 
 // TODO fill in some of these any types
 export type Driver = {

@@ -1,8 +1,9 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
-var simulateClick = require('../../../../lib/dom/simulate-click');
+import simulateClick from '../../../../lib/dom/simulate-click';
 
-module.exports = function(gmailComposeViewElement, type){
+export default function ensureGroupingIsOpen(gmailComposeViewElement: HTMLElement, type: string) {
 	if(type === 'SEND_ACTION'){
 		return; //we don't currently group send_actions
 	}
