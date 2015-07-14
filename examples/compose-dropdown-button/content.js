@@ -59,6 +59,24 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 			section: 'TRAY_LEFT'
 		});
 
+		var sr;
+
+		composeView.addButton({
+			title: 'recipient row',
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			onClick: function(event){
+				if (sr) {
+					sr.destroy();
+					sr = null;
+				} else {
+					var el = document.createElement('div');
+					el.innerHTML = 'sr foo <b>bar</b>';
+					sr = composeView.addRecipientRow({labelText: 'Label Text', el:el});
+				}
+			},
+			section: 'TRAY_LEFT'
+		});
+
 		composeView.on('presending', function(event){
 			console.log('presending', event);
 			event.cancel();

@@ -15,10 +15,8 @@ export default function addStatusBar(gmailComposeView, options) {
 	el.setAttribute('data-orderhint', orderHint);
 	el.style.height = height+'px';
 
-	const statusArea = composeEl.querySelector('.aDg .aDj > .aDh');
-	if (!statusArea) {
-		Logger.error(new Error("Failed to find compose status area"));
-	} else {
+	try {
+		const statusArea = gmailComposeView.getStatusArea();
 		composeEl.classList.add('inboxsdk__compose_statusbarActive');
 		const nextEl = _.chain(statusArea.children)
 			.filter(el => el.classList.contains('inboxsdk__compose_statusbar'))
@@ -34,6 +32,8 @@ export default function addStatusBar(gmailComposeView, options) {
 			const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
 			composeEl.style.paddingBottom = (currentPad+height)+'px';
 		}
+	} catch (err) {
+		Logger.error(err);
 	}
 
 	const statusbar = _.assign(new SafeEventEmitter(), {

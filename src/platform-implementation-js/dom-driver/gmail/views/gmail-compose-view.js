@@ -20,6 +20,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
+import sizeFixer from './gmail-compose-view/size-fixer';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -150,6 +151,7 @@ export default class GmailComposeView {
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
 		require('./gmail-compose-view/manage-button-grouping')(this);
+		sizeFixer(this);
 	}
 
 	_setupIDs() {
@@ -386,6 +388,22 @@ export default class GmailComposeView {
 	getFormattingToolbarToggleButton(): HTMLElement {
 		var innerElement = this._element.querySelector('[role=button] .dv');
 		return $(innerElement).closest('[role=button]')[0];
+	}
+
+	getScrollBody(): HTMLElement {
+		var scrollBody = this._element.querySelector('table .GP');
+		if (!scrollBody) {
+			throw new Error("Failed to find scroll body");
+		}
+		return scrollBody;
+	}
+
+	getStatusArea(): HTMLElement {
+		var statusArea = this._element.querySelector('.aDg .aDj > .aDh');
+		if (!statusArea) {
+			throw new Error("Failed to find status area");
+		}
+		return statusArea;
 	}
 
 	getInsertMoreArea(): HTMLElement {
