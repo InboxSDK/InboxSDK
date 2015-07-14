@@ -379,7 +379,8 @@ div.inboxsdk__compose_statusbar {
   height: auto !important;
 }
 
-.inboxsdk__compose_statusbarActive .aDj.aDi {
+/* .dw means not fullscreen */
+.dw .inboxsdk__compose_statusbarActive .aDj.aDi {
   position: static !important;
 }
 
