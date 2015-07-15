@@ -27,7 +27,7 @@ function byId(id: string): string {
 }
 
 export default function sizeFixer(driver: Object, gmailComposeView: GmailComposeView) {
-  if (gmailComposeView.getElement().classList.contains('inboxsdk__size_fixer')) {
+  if (gmailComposeView.isInlineReplyForm() || gmailComposeView.getElement().classList.contains('inboxsdk__size_fixer')) {
     return;
   }
   gmailComposeView.getElement().classList.add('inboxsdk__size_fixer');
