@@ -25,6 +25,7 @@ import sizeFixer from './gmail-compose-view/size-fixer';
 import * as fromManager from './gmail-compose-view/from-manager';
 
 import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/compose-view-driver';
+import type Logger from '../../../lib/logger';
 
 export default class GmailComposeView {
 	_element: HTMLElement;
@@ -148,10 +149,14 @@ export default class GmailComposeView {
 	}
 
 	_setupConsistencyCheckers() {
-		require('./gmail-compose-view/ensure-link-chips-work')(this);
-		require('./gmail-compose-view/monitor-selection-range')(this);
-		require('./gmail-compose-view/manage-button-grouping')(this);
-		sizeFixer(this._driver, this);
+		try {
+			require('./gmail-compose-view/ensure-link-chips-work')(this);
+			require('./gmail-compose-view/monitor-selection-range')(this);
+			require('./gmail-compose-view/manage-button-grouping')(this);
+			sizeFixer(this._driver, this);
+		} catch(err) {
+			(this._driver.getLogger(): Logger).error(err);
+		}
 	}
 
 	_setupIDs() {
