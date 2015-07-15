@@ -327,6 +327,10 @@ export default class GmailComposeView {
 		return this._element.querySelector('.Ap [g_editable=true]');
 	}
 
+	getTopFormElement(): HTMLElement {
+		return this._element.querySelector('td > form');
+	}
+
 	getHTMLContent(): string {
 		return this.getBodyElement().innerHTML;
 	}

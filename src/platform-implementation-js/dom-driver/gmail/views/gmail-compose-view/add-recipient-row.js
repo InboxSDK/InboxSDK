@@ -11,17 +11,20 @@ export default function(gmailComposeView, recipientRowOptionStream){
 				row = null;
 			}
 
-			if(!options){
-				return;
+			if(options) {
+				row = _createRecipientRowElement(gmailComposeView, options);
 			}
-
-
-			row = _createRecipientRowElement(gmailComposeView, options);
+			gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
+				bubbles: false, cancelable: false, detail: null
+			}));
 		});
 
-	return function(){
-		if(row){
+	return () => {
+		if (row) {
 			row.remove();
+			gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
+				bubbles: false, cancelable: false, detail: null
+			}));
 		}
 	};
 }

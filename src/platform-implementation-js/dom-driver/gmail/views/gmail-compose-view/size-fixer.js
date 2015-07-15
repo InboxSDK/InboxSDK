@@ -27,7 +27,13 @@ function byId(id: string): string {
 }
 
 export default function sizeFixer(driver: Object, gmailComposeView: GmailComposeView) {
+  if (gmailComposeView.getElement().classList.contains('inboxsdk__size_fixer')) {
+    return;
+  }
+  gmailComposeView.getElement().classList.add('inboxsdk__size_fixer');
+
   var composeEvents = kefirCast(Kefir, gmailComposeView.getEventStream());
+  var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
     .filter(e => _.includes(['resize', 'composeFullscreenStateChanged'], e.eventName))
     .merge(kefirDelayAsap(null));
@@ -36,6 +42,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   var scrollBody: HTMLElement = gmailComposeView.getScrollBody();
 
   var sheet = getSizeFixerSheet();
+  var topForm = gmailComposeView.getTopFormElement();
   var composeId = gmailComposeView.getElement().id;
   if (!composeId) {
     composeId = gmailComposeView.getElement().id = `x${Math.random()}x${Date.now()}`;
@@ -50,18 +57,27 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
     sheet.insertRule(fullSelector+' { '+rule+' }', 0);
   }
 
+  // Emit resize events when the recipients area is toggled
+  kefirMakeMutationObserverChunkedStream(statusAreaParent, {attributes:true})
+    .takeUntilBy(stopper)
+    .onValue(() => {
+      gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
+        bubbles: false, cancelable: false, detail: null
+      }));
+    });
+
   resizeEvents
     .bufferBy(resizeEvents.flatMap(x => kefirDelayAsap(null)))
     .filter(x => x.length > 0)
     .merge(
       kefirMakeMutationObserverChunkedStream(scrollBody, {attributes:true})
     )
-    .takeUntilBy(composeEvents.filter(() => false).beforeEnd(() => null))
+    .takeUntilBy(stopper)
     .onValue(() => {
-      var statusHeight = statusAreaParent.offsetHeight;
-      var statusUnexpectedHeight = Math.max(statusHeight - 42, 0);
+      var statusAndFormHeight = statusAreaParent.offsetHeight + topForm.offsetHeight;
+      var unexpectedHeight = Math.max(statusAndFormHeight - 42 - 84, 0);
       var gmailScrollBodyHeight = parseInt(scrollBody.style.maxHeight, 10);
-      var newScrollHeight = `${gmailScrollBodyHeight-statusUnexpectedHeight}px`;
+      var newScrollHeight = `${gmailScrollBodyHeight-unexpectedHeight}px`;
 
       setRuleForSelector(byId(scrollBody.id), `
 max-height: ${newScrollHeight} !important;
@@ -70,7 +86,7 @@ height: ${newScrollHeight} !important;
 `);
     });
 
-  composeEvents.onEnd(() => {
+  stopper.onValue(() => {
     // Go through the rules array backwards so that we remove them in backwards
     // order. If we went through in ascending order, we'd have to worry about
     // the list shrinking out from under us.
