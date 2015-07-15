@@ -74,15 +74,14 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
     )
     .takeUntilBy(stopper)
     .onValue(() => {
-      var statusAndFormHeight = statusAreaParent.offsetHeight + topForm.offsetHeight;
-      var unexpectedHeight = Math.max(statusAndFormHeight - 42 - 84, 0);
-      var gmailScrollBodyHeight = parseInt(scrollBody.style.maxHeight, 10);
-      var newScrollHeight = `${gmailScrollBodyHeight-unexpectedHeight}px`;
+      var statusUnexpectedHeight = Math.max(statusAreaParent.offsetHeight - 42, 0);
+      var topFormUnexpectedHeight = Math.max(topForm.offsetHeight - 84, 0);
+      var unexpectedHeight = statusUnexpectedHeight+topFormUnexpectedHeight;
 
       setRuleForSelector(byId(scrollBody.id), `
-max-height: ${newScrollHeight} !important;
-min-height: ${newScrollHeight} !important;
-height: ${newScrollHeight} !important;
+max-height: ${parseInt(scrollBody.style.maxHeight, 10)-unexpectedHeight}px !important;
+min-height: ${parseInt(scrollBody.style.minHeight, 10)-unexpectedHeight}px !important;
+height: ${parseInt(scrollBody.style.height, 10)-unexpectedHeight}px !important;
 `);
     });
 
