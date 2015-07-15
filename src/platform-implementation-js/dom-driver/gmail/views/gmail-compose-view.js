@@ -151,7 +151,7 @@ export default class GmailComposeView {
 		require('./gmail-compose-view/ensure-link-chips-work')(this);
 		require('./gmail-compose-view/monitor-selection-range')(this);
 		require('./gmail-compose-view/manage-button-grouping')(this);
-		sizeFixer(this);
+		sizeFixer(this._driver, this);
 	}
 
 	_setupIDs() {
