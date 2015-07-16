@@ -3,8 +3,6 @@
 
 import _ from 'lodash';
 
-import MembraneMap from './lib/membrane-map';
-
 import ButterBar from './platform-implementation/butter-bar';
 import Compose from './platform-implementation/compose';
 import Conversations from './platform-implementation/conversations';
@@ -87,7 +85,7 @@ export default function makePlatformImplementation(appId: string, opts: any): Pr
 	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
 	return driver.onready.then(() => {
 		logger.eventSdkPassive('load');
-		var membraneMap = new MembraneMap();
+		var membraneMap: WeakMap<Object,Object> = new WeakMap();
 
 		if (!isValidAppId(appId)) {
 			console.error(`
