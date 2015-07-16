@@ -217,7 +217,8 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
 
   /**
   * URL for the icon to show on the button. Should be a local extension file
-  * URL or a HTTPS URL.
+  * URL or a HTTPS URL. The image will be displayed with a height and width of
+  * 24px.
   * @type {string}
   */
   iconUrl:null,

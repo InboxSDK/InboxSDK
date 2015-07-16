@@ -11,18 +11,6 @@ import kefirWaitFor from '../../../lib/kefir-wait-for';
 import type {MoleViewDriver} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 
-function setHoverClass(el: HTMLElement, hoverClass: string) {
-  el.addEventListener('mouseenter', function() {
-    el.classList.add(hoverClass);
-  });
-  el.addEventListener('mouseleave', function() {
-    el.classList.remove(hoverClass);
-  });
-  el.addEventListener('click', function() {
-    el.classList.remove(hoverClass);
-  });
-}
-
 export type MoleButtonDescriptor = {
   title: string;
   iconUrl: string;
@@ -69,7 +57,6 @@ export default class GmailMoleViewDriver {
     });
 
     var minimizeBtn = this._element.querySelector('.Hl');
-    setHoverClass(minimizeBtn, 'Hn');
     minimizeBtn.addEventListener('click', e => {
       this.setMinimized(true);
       e.preventDefault();
@@ -77,16 +64,13 @@ export default class GmailMoleViewDriver {
     });
 
     var maximizeBtn = this._element.querySelector('.Hk');
-    setHoverClass(maximizeBtn, 'Hn');
     maximizeBtn.addEventListener('click', e => {
       this.setMinimized(false);
       e.preventDefault();
       e.stopPropagation();
     });
 
-    //setHoverClass(this._element.querySelector('.Hq'), 'Hr');
     var closeBtn = this._element.querySelector('.Ha');
-    setHoverClass(closeBtn, 'Hb');
     closeBtn.addEventListener('click', e => {
       this.destroy();
       e.preventDefault();
@@ -108,14 +92,16 @@ export default class GmailMoleViewDriver {
       var lastChild: HTMLElement = (titleButtonContainer.lastElementChild:any);
       titleButtons.forEach(titleButton => {
         var img: HTMLImageElement = (document.createElement('img'):any);
-        img.src = titleButton.iconUrl;
         if (titleButton.iconClass) {
           img.className = titleButton.iconClass;
         }
+        img.setAttribute('data-tooltip', titleButton.title);
         img.addEventListener('click', event => {
+          event.preventDefault();
           event.stopPropagation();
           titleButton.onClick.call(null);
         });
+        img.src = titleButton.iconUrl;
         titleButtonContainer.insertBefore(img, lastChild);
       });
     }

@@ -543,6 +543,18 @@ div.inboxsdk__compose_statusbar {
   margin-top: -3px;
 }
 
+.inboxsdk__mole_title_buttons > img {
+  height: 24px;
+  width: 24px;
+  position: relative;
+  top: 2px;
+}
+
+.inboxsdk__mole_title_buttons > img:hover {
+  opacity: 1;
+  background-color: #737373;
+}
+
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content,
 .inboxsdk__mole_view.inboxsdk__minimized.inboxsdk__mole_use_minimize_title h2.inboxsdk__mole_default,
 .inboxsdk__mole_view:not(.inboxsdk__minimized) h2.inboxsdk__mole_minimized,
