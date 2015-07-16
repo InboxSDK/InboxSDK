@@ -16,7 +16,23 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 			className: 'foobartest',
 			title: 'Mole Example '+(++i),
 			//titleEl: titleEl,
-			minimizedTitleEl: minimizedTitleEl
+			minimizedTitleEl: minimizedTitleEl,
+			titleButtons: [
+				{
+					title: 'a1',
+					iconUrl:'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
+					onClick: function() {
+						console.log('click a1');
+					}
+				},
+				{
+					title: 'a2',
+					iconUrl:'https://mailfoogae.appspot.com/build/images/boxIconOnNewCompose.png',
+					onClick: function() {
+						console.log('click a2');
+					}
+				}
+			]
 		});
 
 		div.onclick = function() {

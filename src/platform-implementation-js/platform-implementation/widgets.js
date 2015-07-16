@@ -194,7 +194,7 @@ var MoleOptions = /** @lends MoleOptions */{
   */
   className:null,
 
-  /* TODO
+  /**
   * An array of buttons to add to the mole widget between the minimize and
   * close buttons in the title bar.
   * ^optional
@@ -204,7 +204,7 @@ var MoleOptions = /** @lends MoleOptions */{
   titleButtons:null
 };
 
-/* TODO
+/**
 * @class
 * The options to use to configure buttons in a mole.
 */
@@ -214,6 +214,20 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
   * @type {string}
   */
   title:null,
+
+  /**
+  * URL for the icon to show on the button. Should be a local extension file
+  * URL or a HTTPS URL.
+  * @type {string}
+  */
+  iconUrl:null,
+
+  /**
+  * An optional class to apply to the icon.
+  * ^optional
+  * @type {string}
+  */
+  iconClass:null,
 
   /**
   * This is called when the button is clicked.

@@ -23,13 +23,20 @@ function setHoverClass(el: HTMLElement, hoverClass: string) {
   });
 }
 
+export type MoleButtonDescriptor = {
+  title: string;
+  iconUrl: string;
+  iconClass?: string;
+  onClick: Function;
+};
+
 export type Options = {
   el: HTMLElement;
   className?: string;
   title?: string;
   titleEl?: HTMLElement;
   minimizedTitleEl?: HTMLElement;
-  //titleButtons?: Object[];
+  titleButtons?: MoleButtonDescriptor[];
 };
 
 export default class GmailMoleViewDriver {
@@ -93,6 +100,24 @@ export default class GmailMoleViewDriver {
     }
     if (options.minimizedTitleEl) {
       this._setMinimizedTitleEl(options.minimizedTitleEl);
+    }
+
+    var titleButtons = options.titleButtons;
+    if (titleButtons) {
+      var titleButtonContainer: HTMLElement = this._element.querySelector('.inboxsdk__mole_title_buttons');
+      var lastChild: HTMLElement = (titleButtonContainer.lastElementChild:any);
+      titleButtons.forEach(titleButton => {
+        var img: HTMLImageElement = (document.createElement('img'):any);
+        img.src = titleButton.iconUrl;
+        if (titleButton.iconClass) {
+          img.className = titleButton.iconClass;
+        }
+        img.addEventListener('click', event => {
+          event.stopPropagation();
+          titleButton.onClick.call(null);
+        });
+        titleButtonContainer.insertBefore(img, lastChild);
+      });
     }
   }
 
