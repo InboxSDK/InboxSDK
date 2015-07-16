@@ -34,7 +34,7 @@
     "jquery": "2.1.4",
     "jsdoc": "3.3.0",
     "jsdom": "^3.1.2",
-    "kefir": "~2.7.1",
+    "kefir": "~2.7.2",
     "kefir-bus": "^1.0.3",
     "kefir-cast": "^2.0.0",
     "kefir-stopper": "^1.0.1",
