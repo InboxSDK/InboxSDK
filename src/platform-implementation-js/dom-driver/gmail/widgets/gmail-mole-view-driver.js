@@ -1,14 +1,17 @@
+/* @flow */
+//jshint ignore:start
+
 import _ from 'lodash';
 import $ from 'jquery';
 import addAccessors from 'add-accessors';
+import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import kefirWaitFor from '../../../lib/kefir-wait-for';
-import assertInterface from '../../../lib/assert-interface';
-import MoleViewDriver from '../../../driver-interfaces/mole-view-driver';
+import type {MoleViewDriver} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 
-function setHoverClass(el, hoverClass) {
+function setHoverClass(el: HTMLElement, hoverClass: string) {
   el.addEventListener('mouseenter', function() {
     el.classList.add(hoverClass);
   });
@@ -20,19 +23,33 @@ function setHoverClass(el, hoverClass) {
   });
 }
 
+export type Options = {
+  el: HTMLElement;
+  className?: string;
+  title?: string;
+  titleEl?: HTMLElement;
+  minimizedTitleEl?: HTMLElement;
+  //titleButtons?: Object[];
+};
+
 export default class GmailMoleViewDriver {
-  constructor(options) {
+  _eventStream: kefirBus;
+  _stopper: kefirStopper;
+  _element: HTMLElement;
+
+  constructor(options: Options) {
     this._eventStream = kefirBus();
     this._stopper = kefirStopper();
-    this._element = _.assign(document.createElement('div'), {
-      className: 'inboxsdk__mole_view',
+    this._element = Object.assign(document.createElement('div'), {
+      className: 'inboxsdk__mole_view '+(options.className||''),
       innerHTML: `
 <div class="inboxsdk__mole_view_inner">
   <div class="inboxsdk__mole_view_titlebar">
     <div class="inboxsdk__mole_title_buttons">
       <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
     </div>
-    <h2></h2>
+    <h2 class="inboxsdk__mole_default"></h2>
+    <h2 class="inboxsdk__mole_minimized"></h2>
   </div>
   <div class="inboxsdk__mole_view_content"></div>
 </div>
@@ -44,7 +61,7 @@ export default class GmailMoleViewDriver {
       e.stopPropagation();
     });
 
-    const minimizeBtn = this._element.querySelector('.Hl');
+    var minimizeBtn = this._element.querySelector('.Hl');
     setHoverClass(minimizeBtn, 'Hn');
     minimizeBtn.addEventListener('click', e => {
       this.setMinimized(true);
@@ -52,7 +69,7 @@ export default class GmailMoleViewDriver {
       e.stopPropagation();
     });
 
-    const maximizeBtn = this._element.querySelector('.Hk');
+    var maximizeBtn = this._element.querySelector('.Hk');
     setHoverClass(maximizeBtn, 'Hn');
     maximizeBtn.addEventListener('click', e => {
       this.setMinimized(false);
@@ -61,7 +78,7 @@ export default class GmailMoleViewDriver {
     });
 
     //setHoverClass(this._element.querySelector('.Hq'), 'Hr');
-    const closeBtn = this._element.querySelector('.Ha');
+    var closeBtn = this._element.querySelector('.Ha');
     setHoverClass(closeBtn, 'Hb');
     closeBtn.addEventListener('click', e => {
       this.destroy();
@@ -69,7 +86,14 @@ export default class GmailMoleViewDriver {
       e.stopPropagation();
     });
     this._element.querySelector('.inboxsdk__mole_view_content').appendChild(options.el);
-    this.setTitle(options.title || '');
+    if (options.titleEl) {
+      this._setTitleEl(options.titleEl);
+    } else {
+      this.setTitle(options.title || '');
+    }
+    if (options.minimizedTitleEl) {
+      this._setMinimizedTitleEl(options.minimizedTitleEl);
+    }
   }
 
   show() {
@@ -88,7 +112,7 @@ export default class GmailMoleViewDriver {
     }
   }
 
-  setMinimized(minimized) {
+  setMinimized(minimized: boolean) {
     if (minimized) {
       this._element.classList.add('inboxsdk__minimized');
       this._eventStream.emit({eventName:'minimize'});
@@ -98,19 +122,40 @@ export default class GmailMoleViewDriver {
     }
   }
 
-  getMinimized() {
+  getMinimized(): boolean {
     return this._element.classList.contains('inboxsdk__minimized');
   }
 
-  setTitle(text) {
-    this._element.querySelector('.inboxsdk__mole_view_titlebar h2').textContent = text;
+  setTitle(text: string) {
+    this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default').textContent = text;
+  }
+
+  _setTitleEl(el: HTMLElement) {
+    var container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default');
+    container.textContent = '';
+    container.appendChild(el);
+  }
+
+  _setMinimizedTitleEl(el: HTMLElement) {
+    this._element.classList.add('inboxsdk__mole_use_minimize_title');
+    var container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized');
+    container.textContent = '';
+    container.appendChild(el);
+  }
+
+  getEventStream(): Kefir.Stream {
+    return this._eventStream;
+  }
+
+  destroy() {
+    (this._element:any).remove();
+    this._eventStream.end();
+    this._stopper.destroy();
   }
 }
 
-addAccessors(GmailMoleViewDriver.prototype, [
-  {name: '_element', destroy: true, destroyMethod: 'remove'},
-  {name: '_eventStream', get: true, destroy: true, destroyMethod: 'end'},
-  {name: '_stopper', destroy: true}
-]);
-
-assertInterface(GmailMoleViewDriver.prototype, MoleViewDriver);
+// This function does not get executed. It's only checked by Flow to make sure
+// this class successfully implements the type interface.
+function __interfaceCheck() {
+	var test: MoleViewDriver = new GmailMoleViewDriver(({}:any));
+}

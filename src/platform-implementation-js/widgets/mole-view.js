@@ -61,6 +61,15 @@ _.assign(MoleView.prototype, /** @lends MoleView */ {
   setMinimized: function(minimized) {
     var members = memberMap.get(this);
     members.driver.setMinimized(minimized);
+  },
+
+  /**
+   * This allows the minimize state to be retrieved.
+ 	 * @return {boolean}
+   */
+  getMinimized: function() {
+    var members = memberMap.get(this);
+    return members.driver.getMinimized();
   }
 
   /**

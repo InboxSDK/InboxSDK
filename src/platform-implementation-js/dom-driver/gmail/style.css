@@ -544,6 +544,9 @@ div.inboxsdk__compose_statusbar {
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content,
+.inboxsdk__mole_view.inboxsdk__minimized.inboxsdk__mole_use_minimize_title h2.inboxsdk__mole_default,
+.inboxsdk__mole_view:not(.inboxsdk__minimized) h2.inboxsdk__mole_minimized,
+.inboxsdk__mole_view:not(.inboxsdk__mole_use_minimize_title) h2.inboxsdk__mole_minimized,
 .inboxsdk__mole_view.inboxsdk__minimized .Hl,
 .inboxsdk__mole_view:not(.inboxsdk__minimized) .Hk {
   display: none;

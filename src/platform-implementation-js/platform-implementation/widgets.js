@@ -102,10 +102,10 @@ var ModalOptions = /** @lends ModalOptions */{
   /**
   * An array of buttons to add to the modal. The UI will be consistent with native Gmail/Inbox buttons.
   * If none are provided, your el will occupy all of the modal. There may only be one button with a type
-  * of {PRIMARY_ACTION}, see ModalButtonDescriptors docs
+  * of {PRIMARY_ACTION}, see ModalButtonDescriptor docs
   * ^optional
   * ^default=[]
-  * @type {ModalButtonDescriptors[]}
+  * @type {ModalButtonDescriptor[]}
   */
   buttons:null
 };
@@ -114,7 +114,7 @@ var ModalOptions = /** @lends ModalOptions */{
 * @class
 * The options to use to configure buttons in a modal.
 */
-var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
+var ModalButtonDescriptor = /** @lends ModalButtonDescriptor */{
 
   /**
   * The text displayed in the button.
@@ -129,7 +129,7 @@ var ModalButtonDescriptors = /** @lends ModalButtonDescriptors */{
   title:null,
 
   /**
-  * This is called when the button is clicked, and gets passed an event object. The event object will have a modalView.
+  * This is called when the button is clicked.
   * @type {function(event)}
   */
   onClick:null,
@@ -169,5 +169,55 @@ var MoleOptions = /** @lends MoleOptions */{
   * ^default=''
   * @type {string}
   */
-  title:null
+  title:null,
+
+  /**
+  * An HTMLElement to place in the title bar instead of the title text.
+  * ^optional
+  * @type {HTMLElement}
+  */
+  titleEl:null,
+
+  /**
+  * An HTMLElement to place in the title bar when the mole is minimized instead
+  * of the title text.
+  * ^optional
+  * @type {HTMLElement}
+  */
+  minimizedTitleEl:null,
+
+  /**
+  * Extra CSS class names to add to the mole widget.
+  * ^optional
+  * ^default=''
+  * @type {string}
+  */
+  className:null,
+
+  /* TODO
+  * An array of buttons to add to the mole widget between the minimize and
+  * close buttons in the title bar.
+  * ^optional
+  * ^default=[]
+  * @type {MoleButtonDescriptor[]}
+  */
+  titleButtons:null
+};
+
+/* TODO
+* @class
+* The options to use to configure buttons in a mole.
+*/
+var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
+  /**
+  * Text to show when the user hovers the mouse over the button.
+  * @type {string}
+  */
+  title:null,
+
+  /**
+  * This is called when the button is clicked.
+  * @type {function(event)}
+  */
+  onClick:null
 };

@@ -7,9 +7,16 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		div.style.height = '400px';
 		div.style.backgroundColor = 'red';
 
+		var titleEl = document.createElement('div');
+		titleEl.innerHTML = '<em>Foo</em> Bar';
+		var minimizedTitleEl = document.createElement('div');
+		minimizedTitleEl.innerHTML = '<em>Bar</em> Foo';
 		var mole = inboxSDK.Widgets.showMoleView({
 			el: div,
-			title: 'Mole Example '+(++i)
+			className: 'foobartest',
+			title: 'Mole Example '+(++i),
+			//titleEl: titleEl,
+			minimizedTitleEl: minimizedTitleEl
 		});
 
 		div.onclick = function() {
