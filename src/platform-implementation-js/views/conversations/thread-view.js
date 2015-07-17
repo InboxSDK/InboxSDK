@@ -2,6 +2,7 @@ var _ = require('lodash');
 var EventEmitter = require('../../lib/safe-event-emitter');
 var baconCast = require('bacon-cast');
 var Bacon = require('baconjs');
+var Logger = require('../../lib/logger');
 
 var ContentPanelView = require('../content-panel-view');
 
@@ -59,13 +60,18 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
-				 .filter(function(messageViewDriver){
-				 	return messageViewDriver.isLoaded();
-				 })
-				 .map(function(messageViewDriver){
-				 	return members.membraneMap.get(messageViewDriver);
-				 })
-				 .value();
+			.filter(function(messageViewDriver){
+				return messageViewDriver.isLoaded();
+			})
+			.map(function(messageViewDriver){
+				var messageView = members.membraneMap.get(messageViewDriver);
+				if (!messageView) {
+					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
+				}
+				return messageView;
+			})
+			.filter(Boolean)
+			.value();
 	},
 
 	/**
@@ -76,10 +82,15 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
-				 .map(function(messageViewDriver){
-				 	return members.membraneMap.get(messageViewDriver);
-				 })
-				 .value();
+			.map(function(messageViewDriver){
+				var messageView = members.membraneMap.get(messageViewDriver);
+				if (!messageView) {
+					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
+				}
+				return messageView;
+			})
+			.filter(Boolean)
+			.value();
 	},
 
 	/**
@@ -116,6 +127,22 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 
 module.exports = ThreadView;
 
+function logAboutMissingMV(threadViewDriver, messageViewDriver) {
+	try {
+		Logger.error(new Error("missing messageview"), {
+			messageViewDriver: {
+				hasElement: !!messageViewDriver.getElement(),
+				isLoaded: messageViewDriver.isLoaded()
+			},
+			threadViewDriver: {
+				eventStreamEnded: threadViewDriver.getEventStream().ended,
+				messagesCount: threadViewDriver.getMessageViewDrivers().length
+			}
+		});
+	} catch(err) {
+		Logger.error(err);
+	}
+}
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
 	threadViewImplementation.getEventStream().onEnd(function(){
