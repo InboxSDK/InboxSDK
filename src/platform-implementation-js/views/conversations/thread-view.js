@@ -2,7 +2,7 @@ var _ = require('lodash');
 var EventEmitter = require('../../lib/safe-event-emitter');
 var baconCast = require('bacon-cast');
 var Bacon = require('baconjs');
-var Logger = require('../../lib/logger');
+import Logger from '../../lib/logger';
 
 var ContentPanelView = require('../content-panel-view');
 

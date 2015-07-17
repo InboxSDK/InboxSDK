@@ -21,6 +21,8 @@ import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
 import sizeFixer from './gmail-compose-view/size-fixer';
+import addTooltipToButton from './gmail-compose-view/add-tooltip-to-button';
+import type {TooltipDescriptor, TooltipButtonDescriptor} from './gmail-compose-view/add-tooltip-to-button';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -259,8 +261,8 @@ export default class GmailComposeView {
 		return require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 
-	addTooltipToButton(buttonViewController: Object, buttonDescriptor: {type: string}, tooltipDescriptor: {el?: HTMLElement, title?: string, subtitle?: string, imageUrl?: string, button?: {onClick?: Function}&Object}) {
-		var tooltip = require('./gmail-compose-view/add-tooltip-to-button')(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
+	addTooltipToButton(buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor) {
+		var tooltip = addTooltipToButton(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
 		this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
 	}
 

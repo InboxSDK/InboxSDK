@@ -1,9 +1,25 @@
-var Bacon = require('baconjs');
-var logger = require('../../../../lib/logger');
+/* @flow */
+//jshint ignore:start
 
-var GmailTooltipView = require('../../widgets/gmail-tooltip-view');
+import Bacon from 'baconjs';
+import Logger from '../../../../lib/logger';
 
-function addTooltipToButton(gmailComposeView, buttonViewController, buttonDescriptor, tooltipDescriptor){
+import GmailTooltipView from '../../widgets/gmail-tooltip-view';
+import type GmailComposeView from '../gmail-compose-view';
+
+export type TooltipButtonDescriptor = {
+	type: string
+};
+
+export type TooltipDescriptor = {
+	el?: HTMLElement,
+	title?: string,
+	subtitle?: string,
+	imageUrl?: string,
+	button?: {onClick?: Function}&Object
+};
+
+export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor){
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
 	var tooltipStopperStream = gmailTooltipView.getEventStream().filter(false).mapEnd();
@@ -75,9 +91,6 @@ function _anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController
 		}, 10);
 	}
 	catch(err){
-		logger.error(err);
+		Logger.error(err);
 	}
 }
-
-
-module.exports = addTooltipToButton;

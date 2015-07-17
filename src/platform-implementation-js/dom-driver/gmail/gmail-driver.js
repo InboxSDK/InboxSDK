@@ -4,7 +4,6 @@ const Bacon = require('baconjs');
 const Kefir = require('kefir');
 const baconCast = require('bacon-cast');
 const kefirCast = require('kefir-cast');
-const Logger = require('../../lib/logger');
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
