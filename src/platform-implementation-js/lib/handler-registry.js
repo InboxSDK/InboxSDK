@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import asap from 'asap';
 import Logger from './logger';
 
 export type Handler<T> = (target: T) => void;
@@ -16,10 +17,15 @@ export default class HandlerRegistry<T> {
   }
 
   registerHandler(handler: Handler<T>): () => void {
-    this._handlers.add(handler);
-    this._informHandlerOfTargets(handler);
+    var unsubbed = false;
+    asap(() => {
+      if (unsubbed) return;
+      this._handlers.add(handler);
+      this._informHandlerOfTargets(handler);
+    });
 
     return () => {
+      unsubbed = true;
       this._handlers.delete(handler);
     };
   }
