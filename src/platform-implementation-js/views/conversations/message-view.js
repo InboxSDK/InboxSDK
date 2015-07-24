@@ -342,7 +342,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	 * URL to an image to fallback on in case the previewThumbnailUrl does not load.
 	 * @type {string}
 	 */
-	failoverPreviewThumbnailUrl:null,
+	failoverPreviewIconUrl:null,
 
 	/**
 	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,

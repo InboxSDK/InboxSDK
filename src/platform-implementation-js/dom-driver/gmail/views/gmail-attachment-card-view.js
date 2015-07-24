@@ -198,12 +198,15 @@ _.assign(GmailAttachmentCardView.prototype, {
 			}
 		});
 
-		if(options.previewThumbnailUrl && options.failoverPreviewThumbnailUrl){
+		if(options.previewThumbnailUrl && options.failoverPreviewIconUrl){
 			var previewThumbnailUrlImage = this._element.querySelector('.inboxsdk__attachmentCard_previewThumbnailUrl');
 			previewThumbnailUrlImage.onerror = (e) => {
-				if(previewThumbnailUrlImage.src !== options.failoverPreviewThumbnailUrl){
-					previewThumbnailUrlImage.src = options.failoverPreviewThumbnailUrl;
-				}
+				var iconDiv = document.createElement('div');
+				iconDiv.classList.add('aYv');
+				iconDiv.innerHTML = '<img class="aZG aYw" src="' + options.failoverPreviewIconUrl + '">';
+				previewThumbnailUrlImage.insertAdjacentElement('afterend', iconDiv);
+
+				previewThumbnailUrlImage.remove();
 			};
 		}
 	},
