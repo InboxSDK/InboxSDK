@@ -339,6 +339,12 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	previewThumbnailUrl:null,
 
 	/**
+	 * URL to an image to fallback on in case the previewThumbnailUrl does not load.
+	 * @type {string}
+	 */
+	failoverPreviewThumbnailUrl:null,
+
+	/**
 	* A callback to call when the user clicks on the preview area. Note that if the previewUrl is also set,
 	* the preview will open in a new window <b>in addition</b> to this callback being called. The PreviewEvent has
 	* one property - {attachmentCardView}. It also has a {preventDefault()} function. Calling
