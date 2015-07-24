@@ -128,7 +128,7 @@ _.assign(GmailAttachmentCardView.prototype, {
 		}
 		else{
 			htmlArray = htmlArray.concat([
-				'<img class="aQG aYB" src="' +  options.previewThumbnailUrl + '">'
+				'<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl" src="' +  options.previewThumbnailUrl + '">'
 			]);
 		}
 
@@ -197,6 +197,15 @@ _.assign(GmailAttachmentCardView.prototype, {
 				});
 			}
 		});
+
+		if(options.previewThumbnailUrl && options.failoverPreviewThumbnailUrl){
+			var previewThumbnailUrlImage = this._element.querySelector('.inboxsdk__attachmentCard_previewThumbnailUrl');
+			previewThumbnailUrlImage.onerror = (e) => {
+				if(previewThumbnailUrlImage.src !== options.failoverPreviewThumbnailUrl){
+					previewThumbnailUrlImage.src = options.failoverPreviewThumbnailUrl;
+				}
+			};
+		}
 	},
 
 	_addHoverEvents: function(){

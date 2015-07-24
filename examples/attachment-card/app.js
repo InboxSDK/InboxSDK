@@ -25,7 +25,8 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			title: 'Test image',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
-			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
+			previewThumbnailUrl: chrome.runtime.getURL('partycat.jp'),
+			failoverPreviewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
 			mimeType: 'image/jpg',
 			buttons: [
 				{
