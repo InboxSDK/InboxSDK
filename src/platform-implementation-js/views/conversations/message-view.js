@@ -339,7 +339,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 	previewThumbnailUrl:null,
 
 	/**
-	 * URL to an image to fallback on in case the previewThumbnailUrl does not load.
+	 * URL to an icon to fallback on in case the previewThumbnailUrl fails to load.
 	 * @type {string}
 	 */
 	failoverPreviewIconUrl:null,
