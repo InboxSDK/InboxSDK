@@ -18,7 +18,7 @@ export type AutoCompleteSuggestion = {
 };
 
 export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
-  var parsed = GRP.deserialize(responseText);
+  var parsed = GRP.deserialize(responseText).value;
   var query = parsed[0][1];
   for (var modification of modifications) {
     var name, nameHTML;

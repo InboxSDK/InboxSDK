@@ -34,18 +34,18 @@ describe('GmailResponseProcessor', function() {
     it('message send response', function() {
       /*const*/var data = loadJSON('./data/gmail-response-processor/send-response.json');
 
-      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input);
+      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
       /*const*/var reencoded = GmailResponseProcessor.threadListSerialize(decoded);
-      /*const*/var redecoded = GmailResponseProcessor.deserialize(reencoded);
+      /*const*/var redecoded = GmailResponseProcessor.deserialize(reencoded).value;
       assert.deepEqual(redecoded, data.output, 're-deserialize test');
     });
 
     it('suggestions', function() {
       /*const*/var data = loadJSON('./data/gmail-response-processor/suggestions.json');
 
-      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input);
+      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
       /*const*/var reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
@@ -136,21 +136,38 @@ describe('GmailResponseProcessor', function() {
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
     });
+
+    it("works on action responses", function() {
+      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-archive.json');
+      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+
+      assert.notEqual(threads.length, 0);
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
+
+      // swap two threads
+      threads.push(threads.shift());
+      /*const*/var swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      assert.notEqual(swapped, data.input);
+
+      // put them back
+      threads.unshift(threads.pop());
+      assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
+    });
   });
 
   describe('interpretSentEmailResponse', function() {
     it('can read new thread', async function() {
       /*const*/var rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8');
       /*const*/var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-      assert.strictEqual(response.gmailMessageId, '14a08f7810935cb3');
-      assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
+      assert.strictEqual(response.messageID, '14a08f7810935cb3');
+      assert.strictEqual(response.threadID, '14a08f7810935cb3');
     });
 
     it('can read reply', async function() {
       /*const*/var rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8');
       /*const*/var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-      assert.strictEqual(response.gmailMessageId, '14a090139a3835a4');
-      assert.strictEqual(response.gmailThreadId, '14a08f7810935cb3');
+      assert.strictEqual(response.messageID, '14a090139a3835a4');
+      assert.strictEqual(response.threadID, '14a08f7810935cb3');
     });
   });
 });
