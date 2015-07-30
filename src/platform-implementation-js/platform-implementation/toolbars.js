@@ -68,13 +68,13 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 	/**
 	* Adds a button *and* dropdown to the "Global Toolbar". This is typically used to show a dropdobwn with general information about your application.
 	*
-	* In GMail this refers to the navigation area at the top right of the window and in Inbox it refers to the top level toolbar.
+	* In Gmail this refers to the navigation area at the top right of the window and in Inbox it refers to the top level toolbar.
 	*
 	* Your application can only add one app toolbar button.
 	* @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
 	* @return {AppToolbarButtonView}
 	*/
-	addAppToolbarButton: function(appToolbarButtonDescriptor){
+	setAppToolbarButton: function(appToolbarButtonDescriptor){
 		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
 	},
 
