@@ -47,6 +47,10 @@ export default class InboxRouteView {
     if (this._type === 'CUSTOM') {
     }
   }
+
+  refresh() {
+    // stub
+  }
 }
 
 addAccessors(InboxRouteView.prototype, [

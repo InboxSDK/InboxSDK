@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var util = require('util');
 var RouteView = require('./route-view');
 
 var Bacon = require('baconjs');
@@ -11,17 +12,13 @@ var SectionView = require('../section-view');
 
 var membersMap = new WeakMap();
 
-
-
 /**
 * @class
 * ListRouteViews represent pages within Gmail or Inbox that show a list of emails. Typical examples are the Inbox, Sent Mail,
 * Drafts, etc. However, views like the Conversation view or Settings would *not* be a ListRouteView.
 * @extends RouteView
 */
-var ListRouteView = function(routeViewDriver, driver, appId){
-	_bindToEventStream(routeViewDriver, this);
-
+function ListRouteView(routeViewDriver, driver, appId){
 	RouteView.call(this, routeViewDriver);
 
 	var members = {};
@@ -31,9 +28,11 @@ var ListRouteView = function(routeViewDriver, driver, appId){
 	members.routeViewDriver = routeViewDriver;
 	members.driver = driver;
 	members.appId = appId;
-};
 
-ListRouteView.prototype = Object.create(RouteView.prototype);
+	_bindToEventStream(routeViewDriver, this);
+}
+
+util.inherits(ListRouteView, RouteView);
 
 _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
@@ -65,16 +64,19 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 		members.sectionViews.push(sectionView);
 		return sectionView;
+	},
+
+	/**
+	 * Simulates a click on the Gmail thread list refresh button.
+	 */
+	refresh: function() {
+		membersMap.get(this).routeViewDriver.refresh();
 	}
 
 });
 
 function _bindToEventStream(routeViewDriver, routeView){
 	routeViewDriver.getEventStream().onEnd(function(){
-		if(!membersMap.has(routeView)){
-			return;
-		}
-
 		var members = membersMap.get(routeView);
 
 		members.sectionViews.forEach(function(sectionView){
