@@ -116,7 +116,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 
 			Compose: new Compose(appId, driver, membraneMap),
 			Conversations: new Conversations(appId, driver, membraneMap),
-			Keyboard: new Keyboard(appId, opts.appIconUrl, driver, membraneMap),
+			Keyboard: new Keyboard(appId, opts.appName, opts.appIconUrl, driver, membraneMap),
 			User: new User(appId, driver, membraneMap),
 			Lists: new Lists(appId, driver, membraneMap),
 			NavMenu: new NavMenu(appId, driver, membraneMap),

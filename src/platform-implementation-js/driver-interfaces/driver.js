@@ -10,7 +10,7 @@ export default {
 	openDraftByMessageID: 1,
 	getThreadViewDriverStream: 0,
 	getMessageViewDriverStream: 0,
-	createKeyboardShortcutHandle: 3,
+	createKeyboardShortcutHandle: 4,
 	getUserEmailAddress: 0,
 	getUserContact: 0,
 	getThreadRowViewDriverKefirStream: 0,
