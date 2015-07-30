@@ -30,7 +30,8 @@ export default {
 	setButterBar: 1,
 	isRunningInPageContext: 0,
 	showAppIdWarning: 0,
-	createModalViewDriver: 1
+	createModalViewDriver: 1,
+	destroy: 0
 };
 
 import type Bacon from 'baconjs';
@@ -73,4 +74,5 @@ export type Driver = {
 	isRunningInPageContext(): boolean;
 	showAppIdWarning(): void;
 	createModalViewDriver(a: any): any;
+	destroy(): void;
 };

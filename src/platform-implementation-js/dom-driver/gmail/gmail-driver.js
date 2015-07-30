@@ -1,9 +1,9 @@
-const _ = require('lodash');
-const RSVP = require('rsvp');
-const Bacon = require('baconjs');
-const Kefir = require('kefir');
-const baconCast = require('bacon-cast');
-const kefirCast = require('kefir-cast');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import baconCast from 'bacon-cast';
+import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
@@ -11,54 +11,56 @@ import addAccessors from 'add-accessors';
 import assertInterface from '../../lib/assert-interface';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
 
-var Driver = require('../../driver-interfaces/driver');
-var GmailElementGetter = require('./gmail-element-getter');
-var makeXhrInterceptor = require('./make-xhr-interceptor');
-var GmailThreadView = require('./views/gmail-thread-view');
+import Driver from '../../driver-interfaces/driver';
+import GmailElementGetter from './gmail-element-getter';
+import makeXhrInterceptor from './make-xhr-interceptor';
+import GmailThreadView from './views/gmail-thread-view';
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
-var GmailRouteProcessor = require('./views/gmail-route-view/gmail-route-processor');
-var KeyboardShortcutHelpModifier = require('./gmail-driver/keyboard-shortcut-help-modifier');
+import GmailRouteProcessor from './views/gmail-route-view/gmail-route-processor';
+import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-modifier';
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
-const GmailButterBarDriver = require('./gmail-butter-bar-driver');
+import GmailButterBarDriver from './gmail-butter-bar-driver';
 
 import MessageIdManager from '../../lib/message-id-manager';
 
-var GmailDriver = function(appId, opts, LOADER_VERSION, IMPL_VERSION, logger) {
-	require('./custom-style');
+export default class GmailDriver {
+	constructor(appId, opts, LOADER_VERSION, IMPL_VERSION, logger) {
+		require('./custom-style');
 
-	this._appId = appId;
-	this._logger = logger;
-	this._customRouteIDs = new Set();
-	this._customListRouteIDs = new Map();
-	this._customListSearchStringsToRouteIds = new Map();
+		this._appId = appId;
+		this._logger = logger;
+		this._customRouteIDs = new Set();
+		this._customListRouteIDs = new Map();
+		this._customListSearchStringsToRouteIds = new Map();
 
-	this._messageIDsToThreadIDs = new Map();
+		this._messageIDsToThreadIDs = new Map();
 
-	this._messageIdManager = new MessageIdManager({
-		getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
-			require('./gmail-driver/get-gmail-thread-id-for-rfc-message-id')(this, rfcMessageId),
-		getRfcMessageIdForGmailMessageId: (gmailMessageId) =>
-			require('./gmail-driver/get-rfc-message-id-for-gmail-message-id')(this, gmailMessageId)
-	});
+		this._messageIdManager = new MessageIdManager({
+			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
+				require('./gmail-driver/get-gmail-thread-id-for-rfc-message-id')(this, rfcMessageId),
+			getRfcMessageIdForGmailMessageId: (gmailMessageId) =>
+				require('./gmail-driver/get-rfc-message-id-for-gmail-message-id')(this, gmailMessageId)
+		});
 
-	this._gmailRouteProcessor = new GmailRouteProcessor();
-	this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
-	this._butterBarDriver = new GmailButterBarDriver();
+		this._gmailRouteProcessor = new GmailRouteProcessor();
+		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
+		this._butterBarDriver = new GmailButterBarDriver();
 
-	this._setupEventStreams();
+		this._setupEventStreams();
 
-	this.onready.then(() => {
-		require('./gmail-driver/track-events')(this);
-		require('./gmail-driver/gmail-load-event')(this);
-		require('./gmail-driver/maintain-compose-window-state')(this);
-		require('./gmail-driver/override-gmail-back-button')(this, this._gmailRouteProcessor);
-	});
-};
+		this.onready.then(() => {
+			require('./gmail-driver/track-events')(this);
+			require('./gmail-driver/gmail-load-event')(this);
+			require('./gmail-driver/maintain-compose-window-state')(this);
+			require('./gmail-driver/override-gmail-back-button')(this, this._gmailRouteProcessor);
+		});
+	}
 
+/*
 addAccessors(GmailDriver.prototype, [
 	{name: '_appId', destroy: false, get: true},
 	// This isn't available until the following promise has resolved
@@ -83,97 +85,129 @@ addAccessors(GmailDriver.prototype, [
 	{name: '_messageViewDriverStream', destroy: true, get: true, destroyMethod: 'end'}
 ]);
 
-_.extend(GmailDriver.prototype, {
+*/
+	destroy() {
+		this._routeViewDriverStream.end();
+		this._rowListViewDriverStream.end();
+		this._threadViewDriverStream.end();
+		this._composeViewDriverStream.end();
+		this._xhrInterceptorStream.end();
+		this._messageViewDriverStream.end();
+		this._keyboardShortcutHelpModifier.destroy();
+	}
+
+	getAppId() {return this._appId;}
+	getPageCommunicator() {return this._pageCommunicator;}
+	getPageCommunicatorPromise() {return this._pageCommunicatorPromise;}
+	getLogger() {return this._logger;}
+	getCustomListSearchStringsToRouteIds() {return this._customListSearchStringsToRouteIds;}
+	getMessageIdManager() {return this._messageIdManager;}
+	getButterBarDriver() {return this._butterBarDriver;}
+	getButterBar() {return this._butterBar;}
+	setButterBar(bb) {
+		this._butterBar = bb;
+	}
+	getCustomRouteIDs() {return this._customRouteIDs;}
+	getCustomListRouteIDs() {return this._customListRouteIDs;}
+	getKeyboardShortcutHelpModifier() {return this._keyboardShortcutHelpModifier;}
+	getRouteViewDriverStream() {return this._routeViewDriverStream;}
+	getRowListViewDriverStream() {return this._rowListViewDriverStream;}
+	getThreadRowViewDriverKefirStream() {return this._threadRowViewDriverKefirStream;}
+	getThreadViewDriverStream() {return this._threadViewDriverStream;}
+	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
+	getComposeViewDriverStream() {return this._composeViewDriverStream;}
+	getXhrInterceptorStream() {return this._xhrInterceptorStream;}
+	getMessageViewDriverStream() {return this._messageViewDriverStream;}
 
 	hashChangeNoViewChange(hash) {
 		if (hash[0] !== '#') {
 			throw new Error("bad hash");
 		}
 		window.history.replaceState(null, null, hash);
-		const hce = new HashChangeEvent('hashchange', {
+		/*const*/var hce = new HashChangeEvent('hashchange', {
 			oldURL: document.location.href.replace(/#.*$/, '')+'#inboxsdk-fake-no-vc',
 			newURL: document.location.href.replace(/#.*$/, '')+hash
 		});
 		window.dispatchEvent(hce);
-	},
+	}
 
 	addCustomRouteID(routeID) {
 		this._customRouteIDs.add(routeID);
 		return () => {
 			this._customRouteIDs.delete(routeID);
 		};
-	},
+	}
 
 	addCustomListRouteID(routeID, handler) {
 		this._customListRouteIDs.set(routeID, handler);
 		return () => {
 			this._customListRouteIDs.delete(routeID);
 		};
-	},
+	}
 
 	showCustomThreadList(customRouteID, onActivate) {
 		require('./gmail-driver/show-custom-thread-list')(this, customRouteID, onActivate);
-	},
+	}
 
-	showCustomRouteView: function(element){
+	showCustomRouteView(element) {
 		require('./gmail-driver/show-custom-route-view')(this, element);
-	},
+	}
 
-	showNativeRouteView: function(){
+	showNativeRouteView() {
 		require('./gmail-driver/show-native-route-view')(this);
-	},
+	}
 
-	createLink: function(routeID, params){
+	createLink(routeID, params){
 		return require('./gmail-driver/create-link')(this._gmailRouteProcessor, routeID, params);
-	},
+	}
 
-	goto: function(routeID, params){
+	goto(routeID, params){
 		return require('./gmail-driver/goto-view')(this, routeID, params);
-	},
+	}
 
 	resolveUrlRedirects(url) {
 		return this._pageCommunicatorPromise.then(pageCommunicator =>
 			pageCommunicator.resolveUrlRedirects(url));
-	},
+	}
 
-	registerSearchSuggestionsProvider: function(handler) {
+	registerSearchSuggestionsProvider(handler) {
 		require('./gmail-driver/register-search-suggestions-provider')(this, handler);
-	},
+	}
 
-	registerSearchQueryRewriter: function(obj) {
+	registerSearchQueryRewriter(obj) {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
-	},
+	}
 
-	addToolbarButtonForApp: function(buttonDescriptor){
+	addToolbarButtonForApp(buttonDescriptor) {
 		return require('./gmail-driver/add-toolbar-button-for-app')(this, buttonDescriptor);
-	},
+	}
 
-	openComposeWindow: function(){
+	openComposeWindow() {
 		require('./gmail-driver/open-compose-window')(this);
-	},
+	}
 
 	openDraftByMessageID(messageID) {
 		return openDraftByMessageID(this, messageID);
-	},
+	}
 
-	createModalViewDriver: function(options){
+	createModalViewDriver(options) {
 		return new GmailModalViewDriver(options);
-	},
+	}
 
 	createMoleViewDriver(options) {
 		return new GmailMoleViewDriver(options);
-	},
+	}
 
-	addNavItem: function(appId, navItemDescriptor){
+	addNavItem(appId, navItemDescriptor) {
 		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
-	},
+	}
 
-	getSentMailNativeNavItem: function(){
+	getSentMailNativeNavItem() {
 		return require('./gmail-driver/get-native-nav-item')('sent');
-	},
+	}
 
-	setShowNativeNavMarker: function(value) {
-		const leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
+	setShowNativeNavMarker(value) {
+		/*const*/var leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
 		if(leftNavContainerElement){
 			if (value) {
 				leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
@@ -181,30 +215,30 @@ _.extend(GmailDriver.prototype, {
 				leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
 			}
 		}
-	},
+	}
 
 	getUserEmailAddress() {
 		return this._pageCommunicator.getUserEmailAddress();
-	},
+	}
 
 	getUserContact() {
 		return {
 			emailAddress: this.getUserEmailAddress(),
 			name: this._userInfo.getUserName()
 		};
-	},
+	}
 
 	getAccountSwitcherContactList() {
 		return this._userInfo.getAccountSwitcherContactList();
-	},
+	}
 
-	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appName, appIconUrl){
+	createKeyboardShortcutHandle(shortcutDescriptor, appId, appName, appIconUrl) {
 		return require('./gmail-driver/create-keyboard-shortcut-handle')(this, shortcutDescriptor, appId, appName, appIconUrl);
-	},
+	}
 
-	_setupEventStreams: function(){
-		const result = makeXhrInterceptor();
-		const xhrInterceptStream = result.xhrInterceptStream;
+	_setupEventStreams() {
+		/*const*/var result = makeXhrInterceptor();
+		/*const*/var xhrInterceptStream = result.xhrInterceptStream;
 
 		this._xhrInterceptorStream = new Bacon.Bus();
 		this._xhrInterceptorStream.plug(xhrInterceptStream);
@@ -239,19 +273,19 @@ _.extend(GmailDriver.prototype, {
 			this._setupMessageViewDriverStream();
 			this._setupComposeViewDriverStream();
 		});
-	},
+	}
 
-	_setupComposeViewDriverStream: function() {
+	_setupComposeViewDriverStream() {
 		this._composeViewDriverStream = new Bacon.Bus();
 		this._composeViewDriverStream.plug(
 			require('./gmail-driver/setup-compose-view-driver-stream')(
 				this, this._messageViewDriverStream, this._xhrInterceptorStream
 			)
 		);
-	},
+	}
 
-	_setupRouteSubViewDriver: function(viewName){
-		const bus = new Bacon.Bus();
+	_setupRouteSubViewDriver(viewName) {
+		/*const*/var bus = new Bacon.Bus();
 		bus.plug(
 			this._routeViewDriverStream.flatMap((gmailRouteView) => {
 				return gmailRouteView.getEventStream()
@@ -261,9 +295,9 @@ _.extend(GmailDriver.prototype, {
 		);
 
 		return bus;
-	},
+	}
 
-	_setupThreadRowViewDriverKefirStream: function(){
+	_setupThreadRowViewDriverKefirStream() {
 		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
 												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
 												.flatMap(threadRowViewDriver => {
@@ -271,9 +305,9 @@ _.extend(GmailDriver.prototype, {
 													// Each ThreadRowView may be delayed if the thread id is not known yet.
 													return threadRowViewDriver.waitForReady();
 												});
-	},
+	}
 
-	_setupToolbarViewDriverStream: function(){
+	_setupToolbarViewDriverStream() {
 		this._toolbarViewDriverStream = Bacon.mergeAll(
 											this._rowListViewDriverStream.map(function(gmailRowListView){
 												return gmailRowListView.getToolbarView();
@@ -286,9 +320,9 @@ _.extend(GmailDriver.prototype, {
 										.flatMap(function(gmailToolbarView){
 											return gmailToolbarView.waitForReady();
 										});
-	},
+	}
 
-	_setupMessageViewDriverStream: function(){
+	_setupMessageViewDriverStream() {
 		this._messageViewDriverStream = new Bacon.Bus();
 
 		this._messageViewDriverStream.plug(
@@ -301,29 +335,29 @@ _.extend(GmailDriver.prototype, {
 				});
 			})
 		);
-	},
+	}
 
 	isRunningInPageContext() {
 		return !!(global.GLOBALS && global._GM_main);
-	},
+	}
 
 	showAppIdWarning() {
 		showAppIdWarning(this);
-	},
+	}
 
 	createTopMessageBarDriver(optionStream) {
 		return new GmailTopMessageBarDriver(optionStream);
-	},
+	}
 
 	associateThreadAndMessageIDs(threadID, messageID) {
 		this._messageIDsToThreadIDs.set(messageID, threadID);
-	},
+	}
 
 	getThreadIDForMessageID(messageID) {
 		return this._messageIDsToThreadIDs.get(messageID);
 	}
 
-});
+}
 
 assertInterface(GmailDriver.prototype, Driver);
 
@@ -336,5 +370,3 @@ function __interfaceCheck() {
 	var driver: Driver = new GmailDriver('', ({}: any), '', '', ({}: any));
 }
 */
-
-module.exports = GmailDriver;
