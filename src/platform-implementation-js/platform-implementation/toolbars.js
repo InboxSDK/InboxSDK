@@ -242,6 +242,14 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	iconUrl:null,
 
 	/**
+	* An optional class to apply to the icon.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass: null,
+
+	/**
 	* The section of the toolbar to place the button.
 	* @type {SectionNames}
 	*/
@@ -303,6 +311,14 @@ var AppToolbarButtonDescriptor = /** @lends AppToolbarButtonDescriptor */{
 	* @type {string}
 	*/
 	iconUrl:null,
+
+	/**
+	* An optional class to apply to the icon.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass: null,
 
 	/**
 	* This is called when the button is clicked, and gets passed an event object. The event object will have
