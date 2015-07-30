@@ -134,7 +134,9 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
 
   /**
    * Spawns a new error message. The returned object contains a {destroy} method that can be
-   * called to remove the message.
+   * called to remove the message. Error messages might have a slightly different appearance than
+   * {ButterBar.showMessage} depending on whether the user is using Inbox or Gmail. Error messages
+   * also have a default priority of 100 instead of 0 (as in the case of {ButterBar.showMessage}).
    * @param {MessageDescriptor} options - message options
    * @return {Object}
    */

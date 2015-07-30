@@ -24,7 +24,6 @@ var memberMap = new WeakMap();
 *
 * Since toolbar buttons only apply to emails, they will ONLY appear when an email is selected or you are
 * on a ThreadView.
-
 */
 var Toolbars = function(appId, driver, membraneMap){
 	EventEmitter.call(this);
@@ -65,6 +64,20 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 	registerToolbarButtonForThreadView: function(buttonDescriptor){
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	},
+
+	/**
+	* Adds a button *and* dropdown to the "Global Toolbar". This is typically used to show a dropdobwn with general information about your application.
+	*
+	* In GMail this refers to the navigation area at the top right of the window and in Inbox it refers to the top level toolbar.
+	*
+	* Your application can only add one app toolbar button.
+	* @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
+	* @return {AppToolbarButtonView}
+	*/
+	addAppToolbarButton: function(appToolbarButtonDescriptor){
+		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
+	},
+
 
 	addToolbarButtonForApp: function(buttonDescriptor){
 		var appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptor);
@@ -271,5 +284,41 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	 keyboardShortcutHandle: null
 };
 
+
+/**
+* @class
+* This type is passed into the {Toolbars.addAppToolbarButton()} method as a way to configure
+* the toolbar button shown.
+*/
+var AppToolbarButtonDescriptor = /** @lends AppToolbarButtonDescriptor */{
+
+	/**
+	* Text to show when the user hovers the mouse over the button
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* This is called when the button is clicked, and gets passed an event object. The event object will have
+	* a {dropdown} ({DropdownView}) property.
+	* @type {func(event)}
+	*/
+	onClick:null,
+
+	/**
+	* The color to use for the top arrow of the dropdown. Useful if you want the contents of
+	* your dropdown to have a specific background color
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	arrowColor: null
+};
 
 module.exports = Toolbars;
