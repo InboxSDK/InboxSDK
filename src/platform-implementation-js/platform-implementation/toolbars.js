@@ -66,11 +66,9 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 	},
 
 	/**
-	* Adds a button *and* dropdown to the "Global Toolbar". This is typically used to show a dropdobwn with general information about your application.
-	*
-	* In Gmail this refers to the navigation area at the top right of the window and in Inbox it refers to the top level toolbar.
-	*
-	* Your application can only add one app toolbar button.
+	* Adds a button *and* dropdown to the "Global Toolbar". This is typically used to show a dropdown with general information
+	* about your application. In Gmail this refers to the navigation area at the top right of the window and in
+	*  Inbox it refers to the top level toolbar. Your application can only set one app toolbar button.
 	* @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
 	* @return {AppToolbarButtonView}
 	*/
@@ -295,7 +293,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 
 /**
 * @class
-* This type is passed into the {Toolbars.addAppToolbarButton()} method as a way to configure
+* This type is passed into the {Toolbars.setAppToolbarButton()} method as a way to configure
 * the toolbar button shown.
 */
 var AppToolbarButtonDescriptor = /** @lends AppToolbarButtonDescriptor */{

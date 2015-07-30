@@ -11,7 +11,7 @@ var memberMap = new WeakMap();
 /**
  * @class
  * Object that represents an app toolbar button that has been already added to the top
- * navigation area of Gmail or Inbox. This class is returned by {Toolbars.addAppToolbarButton}.
+ * navigation area of Gmail or Inbox. This class is returned by {Toolbars.setAppToolbarButton()}.
  */
 var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
 	EventEmitter.call(this);
@@ -30,7 +30,7 @@ var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
 
 AppToolbarButtonView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(AppToolbarButtonView.prototype, {
+_.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 
 	/**
 	*	Open the dropdown for the app toolbar button
