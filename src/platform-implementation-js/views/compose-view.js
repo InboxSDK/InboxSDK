@@ -75,8 +75,13 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
 	},
 
-	addStatusBar: function(options) {
-		return memberMap.get(this).composeViewImplementation.addStatusBar(options);
+	/**
+	 * Adds a horizontal bar underneath the control section of the ComposeView. This is useful to add more complex UI interactions but should be used sparingly.
+	 * @param {StatusBarDescriptor} statusBarDescriptor - The details of the status bar to add to the compose view.
+	 * @return {StatusBarView}
+	 */
+	addStatusBar: function(statusBarDescriptor) {
+		return memberMap.get(this).composeViewImplementation.addStatusBar(statusBarDescriptor);
 	},
 
 	addRecipientRow: function(options){
