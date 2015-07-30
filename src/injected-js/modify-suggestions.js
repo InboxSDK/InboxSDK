@@ -1,42 +1,64 @@
+/* @flow */
+//jshint ignore:start
+
 import _ from 'lodash';
 import htmlToText from '../common/html-to-text';
 import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import depWarn from '../platform-implementation-js/lib/dep-warn';
 
-module.exports = function modifySuggestions(responseText, modifications) {
-  const parsed = GRP.deserialize(responseText);
-  const query = parsed[0][1];
-  for (let modification of modifications) {
-    if (_.has(modification, 'name')) {
-      modification.nameHTML = _.escape(modification.name);
+export type AutoCompleteSuggestion = {
+  name?: ?string;
+  nameHTML?: ?string;
+  routeName?: ?string;
+  routeParams?: {[ix: string]: string};
+  externalURL?: ?string;
+  searchTerm?: ?string;
+  iconUrl?: ?string;
+  owner: string;
+};
+
+export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
+  var parsed = GRP.deserialize(responseText).value;
+  var query = parsed[0][1];
+  for (var modification of modifications) {
+    var name, nameHTML;
+    if (typeof modification.name === 'string') {
+      name = modification.name;
+      nameHTML = (_.escape(name): string);
+    } else if (typeof modification.nameHTML === 'string') {
+      nameHTML = modification.nameHTML;
+      name = htmlToText(nameHTML);
     } else {
-      modification.name = htmlToText(modification.nameHTML);
+      throw new Error("name or nameHTML must be provided");
     }
-    if (_.has(modification, 'description')) {
-      modification.descriptionHTML = _.escape(modification.description);
-    } else if (_.has(modification, 'descriptionHTML')) {
-      modification.description = htmlToText(modification.descriptionHTML);
+    var description, descriptionHTML;
+    if (typeof modification.description === 'string') {
+      description = modification.description;
+      descriptionHTML = (_.escape(description): string);
+    } else if (typeof modification.descriptionHTML === 'string') {
+      descriptionHTML = modification.descriptionHTML;
+      description = htmlToText(descriptionHTML);
     }
     if (modification.routeName || modification.externalURL) {
-      const data = {
+      var data = {
         routeName: modification.routeName,
         routeParams: modification.routeParams,
         externalURL: modification.externalURL
       };
-      modification.nameHTML +=
+      nameHTML +=
         ' <span style="display:none" data-inboxsdk-suggestion="' +
         _.escape(JSON.stringify(data)) + '"></span>';
     }
-    const newItem = [
-      "aso.sug", modification.searchTerm || query, modification.nameHTML, null, [], 34, null,
+    var newItem = [
+      "aso.sug", modification.searchTerm || query, nameHTML, null, [], 34, null,
       "asor inboxsdk__custom_suggestion "+modification.owner, 0];
-    if (_.has(modification, 'descriptionHTML')) {
+    if (descriptionHTML != null) {
       newItem[3] = [
         'aso.eme',
-        modification.description,
-        modification.name,
-        modification.descriptionHTML,
-        modification.nameHTML
+        description,
+        name,
+        descriptionHTML,
+        nameHTML
       ];
     }
     if (modification.iconURL) {
@@ -54,4 +76,4 @@ module.exports = function modifySuggestions(responseText, modifications) {
     parsed[0][3].push(newItem);
   }
   return GRP.suggestionSerialize(parsed);
-};
+}

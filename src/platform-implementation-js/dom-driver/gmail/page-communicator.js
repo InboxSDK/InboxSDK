@@ -1,14 +1,7 @@
 /* @flow */
 // jshint ignore:start
 
-type AutoCompleteSuggestion = {
-  name?: ?string;
-  nameHTML?: ?string;
-  routeName?: ?string;
-  externalURL?: ?string;
-  searchTerm?: ?string;
-  owner: string;
-};
+import type {AutoCompleteSuggestion} from '../../../injected-js/modify-suggestions';
 
 import type {ajaxOpts} from '../../../common/ajax';
 

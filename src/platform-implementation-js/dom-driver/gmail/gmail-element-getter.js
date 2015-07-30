@@ -64,8 +64,8 @@ var GmailElementGetter = {
 		return _.toArray(document.querySelectorAll('[gh=tl]'));
 	},
 
-	getSearchInput(): HTMLElement {
-		return document.getElementById('gbqfq');
+	getSearchInput(): HTMLInputElement {
+		return ((document.getElementById('gbqfq'): any): HTMLInputElement);
 	},
 
 	getSearchSuggestionsBoxParent(): HTMLElement {

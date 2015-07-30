@@ -2,13 +2,17 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
 
-export function interpretSentEmailResponse(responseString: string): Object {
-  var emailSentArray = deserialize(responseString);
+export function interpretSentEmailResponse(responseString: string): {threadID: string, messageID: string} {
+  var emailSentArray = deserialize(responseString).value;
 
   var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
   var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
+  if (!gmailMessageId || !gmailThreadId) {
+    throw new Error("Failed to read email response");
+  }
   return {
     gmailThreadId: gmailThreadId,
     gmailMessageId: gmailMessageId,
@@ -49,7 +53,7 @@ function extractHexGmailThreadIdFromMessageIdSearch(responseString: string): any
     return null;
   }
 
-  var threadResponseArray = deserialize(responseString);
+  var threadResponseArray = deserialize(responseString).value;
   var threadIdArrayMarker = "cs";
   var threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, function(markerArray){
     return markerArray.length > 20;
@@ -114,7 +118,16 @@ export function rewriteSingleQuotes(s: string): string {
   return result;
 }
 
-export function deserialize(threadResponseString: string): any {
+export type MessageOptions = {
+  lengths: boolean;
+  suggestionMode: boolean;
+};
+
+export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
+  var options = {
+    lengths: false,
+    suggestionMode: /^5\n/.test(threadResponseString)
+  };
   var VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
@@ -130,10 +143,15 @@ export function deserialize(threadResponseString: string): any {
   var in_string = false;
   VIEW_DATA = VIEW_DATA.replace(/(^|")([^"\\]|\\.)*/g, function(match) {
     if (!in_string) {
+      var beforeNumberStrip = match;
       match = match
-      .replace(/\]\d+\[/g, '],[') // ignore those length values
-      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-      .replace(/\[\s*(?=,)/g, '[null'); // "
+        .replace(/\]\d+\[/g, '],['); // ignore those length values
+      if (match !== beforeNumberStrip) {
+        options.lengths = true;
+      }
+      match = match
+        .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
+        .replace(/\[\s*(?=,)/g, '[null'); // "
     }
     in_string = !in_string;
     return match;
@@ -143,13 +161,21 @@ export function deserialize(threadResponseString: string): any {
 
   var vData;
   try {
-    vData = JSON.parse(VIEW_DATA);
+    vData = (JSON.parse(VIEW_DATA): any[]);
   }
   catch(err){
     throw new Error('deserialization error');
   }
 
-  return vData;
+  return {value: vData, options};
+}
+
+export function serialize(value: any[], options: MessageOptions): string {
+  if (options.suggestionMode) {
+    assert(!options.lengths);
+    return suggestionSerialize(value);
+  }
+  return threadListSerialize(value, !options.lengths);
 }
 
 export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbers: boolean=false): string {
@@ -160,10 +186,10 @@ export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbe
 
     if(dontIncludeNumbers){
       response += arraySectionString;
-      continue;
+    } else {
+      var length = arraySectionString.length + 1;
+      response += length + '\n' + arraySectionString;
     }
-    var length = arraySectionString.length + 1;
-    response += length + '\n' + arraySectionString;
   }
 
   if(dontIncludeNumbers){
@@ -235,9 +261,13 @@ export type Thread = {
 };
 
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
-  var parsed = deserialize(response);
-  var firstTbIndex = _.findIndex(parsed, item => item[0] && item[0][0] === 'tb');
-  var [parsedTb, parsedNoTb] = _.partition(parsed, item => item[0] && item[0][0] === 'tb');
+  var {value, options} = deserialize(response);
+  var actionResponseMode = value.length === 1 &&
+    value[0].length === 2 &&
+    typeof value[0][1] === 'string';
+  var threadValue = actionResponseMode ? value[0][0].map(x => [x]) : value;
+  var firstTbIndex = _.findIndex(threadValue, item => item[0] && item[0][0] === 'tb');
+  var [parsedTb, parsedNoTb] = _.partition(threadValue, item => item[0] && item[0][0] === 'tb');
   var tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
   var newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
   var parsedNew = _.flatten([
@@ -245,11 +275,15 @@ export function replaceThreadsInResponse(response: string, replacementThreads: T
     newTbs,
     parsedNoTb.slice(firstTbIndex)
   ]);
-  return threadListSerialize(parsedNew);
+  var fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
+  return serialize(fullNew, options);
 }
 
 export function extractThreads(response: string): Thread[] {
-  var crapFormatThreads = deserialize(response);
+  var crapFormatThreads = deserialize(response).value;
+  if (crapFormatThreads.length === 1 && crapFormatThreads[0].length === 2 && typeof crapFormatThreads[0][1] === 'string') {
+    crapFormatThreads = [crapFormatThreads[0][0]];
+  }
   return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread =>
     Object.freeze((Object:any).defineProperty({
       subject: htmlToText(thread[9]),

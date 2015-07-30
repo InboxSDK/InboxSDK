@@ -1,3 +1,6 @@
+/* @flow */
+//jshint ignore:start
+
 import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
@@ -5,7 +8,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
 
-const threadListHandlersToSearchStrings = new Map();
+/*const*/var threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
 /*
 Timeline of how a custom thread list works:
@@ -60,13 +63,13 @@ function findIdFailure(id, err) {
 }
 
 // Returns the search string that will trigger the onActivate function.
-function setupSearchReplacing(driver, customRouteID, onActivate) {
-  const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
+function setupSearchReplacing(driver: Object, customRouteID: string, onActivate: Function): string {
+  /*const*/var preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
   }
-  let start;
-  const newQuery = Date.now()+'-'+Math.random();
+  /*let*/var start;
+  /*const*/var newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
     .filter(e =>
@@ -98,7 +101,7 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
           return {gtid: id};
         }
       } else if (id) {
-        const obj = {
+        /*const*/var obj = {
           gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
           rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
         };
@@ -117,7 +120,7 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
     .flatMap(Bacon.fromPromise)
     .map(_.compact)
     .onValue(idPairs => {
-      const query = idPairs.length > 0 ?
+      /*const*/var query = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
@@ -137,13 +140,13 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
           .map('.response')
           .take(1)
       ]).onValue(([idPairs, response]) => {
-        const extractedThreads = GRP.extractThreads(response);
-        const newThreads = _.chain(idPairs)
+        /*const*/var extractedThreads = GRP.extractThreads(response);
+        /*const*/var newThreads = _.chain(idPairs)
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
           .compact()
           .value();
         try {
-          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          /*const*/var newResponse = GRP.replaceThreadsInResponse(response, newThreads);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -171,15 +174,15 @@ function setupSearchReplacing(driver, customRouteID, onActivate) {
   return newQuery;
 }
 
-export default function showCustomThreadList(driver, customRouteID, onActivate) {
-  const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
-  const customHash = document.location.hash;
+export default function showCustomThreadList(driver: Object, customRouteID: string, onActivate: Function) {
+  /*const*/var uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
+  /*const*/var customHash = document.location.hash;
 
-  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
+  /*const*/var nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
-  const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
+  /*const*/var searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
-  const searchInput = GmailElementGetter.getSearchInput();
+  /*const*/var searchInput = GmailElementGetter.getSearchInput();
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
   nextMainContentElementChange.onValue(() => {
@@ -188,7 +191,7 @@ export default function showCustomThreadList(driver, customRouteID, onActivate) 
   });
 
   window.history.replaceState(null, null, searchHash);
-  const hce = new HashChangeEvent('hashchange', {
+  /*const*/var hce = new (window:any).HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });
