@@ -143,7 +143,7 @@ export default class GmailComposeView {
 		);
 
 		messageIDChangeStream
-			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
 			.map(() => this.getMessageID())
 			.onValue(messageID => {
 				this._messageId = messageID;
@@ -302,7 +302,7 @@ export default class GmailComposeView {
 		Bacon.fromEvent(statusBar, 'destroy')
 			.map(() => ({eventName:'statusBarRemoved'}))
 			.flatMap(delayAsap)
-			.takeUntil(this._eventStream.filter(false).mapEnd())
+			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
 			.onValue(() => {
 				dispatchCustomEvent(this._element, 'resize');
 			});

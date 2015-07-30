@@ -26,7 +26,7 @@ declare module baconjs {
     mapEnd<U>(cb: () => U): Observable<T|U>;
     filter(cb: (i: T) => boolean): Observable<T>;
     takeWhile(cb: (i: T) => boolean): Observable<T>;
-    takeUntil(cb: (i: T) => boolean): Observable<T>;
+    takeUntil(other: Observable): Observable<T>;
     take(n: number): Observable<T>;
     first(): Observable<T>;
     last(): Observable<T>;
@@ -79,7 +79,7 @@ declare module baconjs {
   }
 
   declare class Bus<T> extends Observable<T> {
-  	emit(value: T): void;
+  	push(value: T): void;
   	error(e: any): void;
     plug(s: Observable<T>): () => void;
     end(): void;

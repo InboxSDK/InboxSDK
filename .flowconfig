@@ -7,6 +7,7 @@ dist/
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*
 .*/flow-libs/.*
+.*/node_modules/baconjs/.*
 
 [libs]
 flow-libs/
