@@ -61,7 +61,7 @@ export default class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createKeyboardShortcutHandle(a, b, c) {
+  createKeyboardShortcutHandle(a, b, c, d) {
     // stub
   }
 

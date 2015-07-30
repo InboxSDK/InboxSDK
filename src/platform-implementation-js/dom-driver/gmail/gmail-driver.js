@@ -198,8 +198,8 @@ _.extend(GmailDriver.prototype, {
 		return this._userInfo.getAccountSwitcherContactList();
 	},
 
-	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appIconUrl){
-		return require('./gmail-driver/create-keyboard-shortcut-handle')(this, shortcutDescriptor, appId, appIconUrl);
+	createKeyboardShortcutHandle: function(shortcutDescriptor, appId, appName, appIconUrl){
+		return require('./gmail-driver/create-keyboard-shortcut-handle')(this, shortcutDescriptor, appId, appName, appIconUrl);
 	},
 
 	_setupEventStreams: function(){

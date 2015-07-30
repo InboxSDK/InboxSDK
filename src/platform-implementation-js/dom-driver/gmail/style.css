@@ -319,6 +319,12 @@ td.gH div.gK span:first-child > img:last-child {
   margin-top: -3px;
 }
 
+body .dw {
+  /* Fixes issue where a tall compose window opened over a custom view could be
+   * overlapped by Gmail's top bar.
+   */
+  z-index: 6;
+}
 
 .inboxsdk__compose_outerSidebar_wrapper {
   position: absolute;

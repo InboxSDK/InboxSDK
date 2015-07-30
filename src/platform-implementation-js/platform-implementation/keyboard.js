@@ -12,11 +12,12 @@ var memberMap = new Map();
  * @class
  * This namespace allows you to setup keyboard shortcuts that your application can response to.
  */
-var Keyboard = function(appId, appIconUrl, driver){
+var Keyboard = function(appId, appName, appIconUrl, driver){
     var members = {};
     memberMap.set(this, members);
 
     members.appId = appId;
+    members.appName = appName;
     members.appIconUrl = appIconUrl;
     members.driver = driver;
 };
@@ -32,7 +33,7 @@ _.extend(Keyboard.prototype, /** @lends Keyboard */ {
   createShortcutHandle: function(shortcutDescriptor){
     var members = memberMap.get(this);
 
-    var keyboardShortcutHandleDriver = members.driver.createKeyboardShortcutHandle(shortcutDescriptor, members.appId, members.appIconUrl);
+    var keyboardShortcutHandleDriver = members.driver.createKeyboardShortcutHandle(shortcutDescriptor, members.appId, members.appName, members.appIconUrl);
     return new KeyboardShortcutHandle(keyboardShortcutHandleDriver);
   }
 

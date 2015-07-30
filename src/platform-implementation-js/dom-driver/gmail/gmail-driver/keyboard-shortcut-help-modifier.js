@@ -20,12 +20,13 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 
 	__memberVariables: [
 		{name: '_appId', destroy: false},
+		{name: '_appName', destroy: false},
 		{name: '_appIconUrl', destroy: false},
 		{name: '_shortcuts', destroy: false}
 	],
 
-	set: function(gmailKeyboardShortcutHandle, shortcutDescriptor, appId, appIconUrl){
-		this._initializeAppValues(appId, appIconUrl);
+	set: function(gmailKeyboardShortcutHandle, shortcutDescriptor, appId, appName, appIconUrl){
+		this._initializeAppValues(appId, appName, appIconUrl);
 
 		this._shortcuts.set(gmailKeyboardShortcutHandle, shortcutDescriptor);
 	},
@@ -34,9 +35,13 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		this._shortcuts.delete(gmailKeyboardShortcutHandle);
 	},
 
-	_initializeAppValues: function(appId, appIconUrl){
+	_initializeAppValues: function(appId, appName, appIconUrl){
 		if(!this._appId){
 			this._appId = appId;
+		}
+
+		if(!this._appName){
+			this._appName = appName;
 		}
 
 		if(!this._appIconUrl){
@@ -91,7 +96,7 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		header.innerHTML = [
 			'<div class="aow">',
 				'<span class="inboxsdk__shortcutHelp_title">',
-					_.escape(this._appId) + ' keyboard shortcuts',
+					_.escape(this._appName || this._appId) + ' keyboard shortcuts',
 				'</span>',
 			'</div>'
 		].join('');
