@@ -62,9 +62,10 @@ export default function modifySuggestions(responseText: string, modifications: A
       ];
     }
     if (modification.iconURL) {
+      var iconURL = modification.iconURL;
       depWarn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
       if (!modification.iconUrl) {
-        modification.iconUrl = modification.iconURL;
+        modification.iconUrl = iconURL;
       }
     }
     if (modification.iconUrl) {

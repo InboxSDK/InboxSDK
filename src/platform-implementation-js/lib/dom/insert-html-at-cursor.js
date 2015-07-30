@@ -10,7 +10,7 @@ export default function insertHTMLatCursor(element: HTMLElement, html: string, o
 	if (element instanceof HTMLTextAreaElement) {
 		var oldStart = (element:any).selectionStart;
 		// first delete selected range
-		if (element.selectionStart < element.selectionEnd) {
+		if ((element:any).selectionStart < (element:any).selectionEnd) {
 			element.value = element.value.substring(0, (element:any).selectionStart) + element.value.substring((element:any).selectionEnd);
 		}
 		// insert into position
