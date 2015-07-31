@@ -89,11 +89,35 @@ describe('HandlerRegistry', function() {
     var reg = new HandlerRegistry();
     reg.addTarget(target1);
 
-    var calls = 0;
     var unsub = reg.registerHandler(function(target) {
       throw new Error('Should not happen');
     });
     unsub();
+    reg.addTarget(target2);
+    await delay(1);
+  });
+
+  it('dumpHandlers works', async function() {
+    // Make sure it can handle dumping handlers that have fired already and
+    // ones that haven't passed the initial asap delay.
+    var i = 0;
+    var target1 = Marker('target1');
+    var target2 = Marker('target2');
+
+    var reg = new HandlerRegistry();
+    reg.addTarget(target1);
+
+    reg.registerHandler(function(target) {
+      if (i++ !== 0)
+        throw new Error('Should not happen');
+    });
+
+    await delay(2);
+
+    reg.registerHandler(function(target) {
+      throw new Error('Should not happen');
+    });
+    reg.dumpHandlers();
     reg.addTarget(target2);
     await delay(1);
   });

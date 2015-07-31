@@ -57,7 +57,7 @@ _.extend(Compose.prototype, /** @lends Compose */ {
   * @return {function} a function to call when you want to unregister this handler
   */
   registerComposeViewHandler: function(handler){
-      return memberMap.get(this).handlerRegistry.registerHandler(handler);
+    return memberMap.get(this).handlerRegistry.registerHandler(handler);
   },
 
   /**

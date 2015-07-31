@@ -9,23 +9,28 @@ export type Handler<T> = (target: T) => void;
 
 export default class HandlerRegistry<T> {
   _targets: Set<T>;
+  _pendingHandlers: Set<Handler<T>>;
   _handlers: Set<Handler<T>>;
 
   constructor() {
     this._targets = new Set();
+    this._pendingHandlers = new Set();
     this._handlers = new Set();
   }
 
   registerHandler(handler: Handler<T>): () => void {
-    var unsubbed = false;
+    this._pendingHandlers.add(handler);
+
     asap(() => {
-      if (unsubbed) return;
-      this._handlers.add(handler);
-      this._informHandlerOfTargets(handler);
+      this._pendingHandlers.forEach(handler => {
+        this._handlers.add(handler);
+        this._informHandlerOfTargets(handler);
+      });
+      this._pendingHandlers.clear();
     });
 
     return () => {
-      unsubbed = true;
+      this._pendingHandlers.delete(handler);
       this._handlers.delete(handler);
     };
   }
@@ -44,6 +49,11 @@ export default class HandlerRegistry<T> {
 
   removeTarget(target: T) {
     this._targets.delete(target);
+  }
+
+  dumpHandlers() {
+    this._pendingHandlers.clear();
+    this._handlers.clear();
   }
 
   _informHandlerOfTargets(handler: Handler<T>) {

@@ -15,7 +15,7 @@ var memberMap = new WeakMap();
  * The fields can be easily read and modified, and certain elements can
  * be attached to it. This includes buttons and sidebars.
  */
-var ComposeView = function(composeViewImplementation, appId){
+function ComposeView(composeViewImplementation, appId) {
 	EventEmitter.call(this);
 
 	var members = {};
@@ -32,16 +32,13 @@ var ComposeView = function(composeViewImplementation, appId){
 	members.composeViewImplementation.getEventStream().onEnd(function(){
 		self.emit('close'); /* TODO: deprecated */
 
-
 		self.emit('destroy', {
 			messageID: composeViewImplementation.getMessageID()
 		});
 
 		self.removeAllListeners();
 	});
-};
-
-
+}
 
 ComposeView.prototype = Object.create(EventEmitter.prototype);
 
