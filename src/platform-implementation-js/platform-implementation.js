@@ -31,6 +31,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
 	_membraneMap: WeakMap<Object, Object>;
+	destroyed: boolean;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
 
@@ -53,6 +54,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._appId = appId;
 		this._driver = driver;
 		this._membraneMap = new WeakMap();
+		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
 		this.IMPL_VERSION = process.env.VERSION;
 
@@ -74,8 +76,11 @@ export class PlatformImplementation extends SafeEventEmitter {
 	}
 
 	destroy() {
-		this._driver.destroy();
-		this.emit('destroy');
+		if (!this.destroyed) {
+			this.destroyed = true;
+			this._driver.destroy();
+			this.emit('destroy');
+		}
 	}
 }
 
