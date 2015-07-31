@@ -39,6 +39,11 @@ var Toolbars = function(appId, driver, membraneMap){
 	members.listButtonHandlerRegistry = new HandlerRegistry();
 	members.threadViewHandlerRegistry = new HandlerRegistry();
 
+	driver.getStopper().onValue(function() {
+		members.listButtonHandlerRegistry.dumpHandlers();
+		members.threadViewHandlerRegistry.dumpHandlers();
+	});
+
 	this.SectionNames = sectionNames;
 
 	_setupToolbarViewDriverWatcher(this, members);

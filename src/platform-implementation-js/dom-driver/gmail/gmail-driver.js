@@ -5,6 +5,7 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
@@ -64,6 +65,7 @@ export default class GmailDriver {
 	_composeViewDriverStream: Bacon.Bus<Object>;
 	_xhrInterceptorStream: Bacon.Bus<Object>;
 	_messageViewDriverStream: Bacon.Bus<Object>;
+	_stopper: Object;
 	_userInfo: UserInfo;
 
 	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
@@ -76,6 +78,7 @@ export default class GmailDriver {
 		this._customListSearchStringsToRouteIds = new Map();
 
 		this._messageIDsToThreadIDs = new Map();
+		this._stopper = kefirStopper();
 
 		this._messageIdManager = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
@@ -105,6 +108,7 @@ export default class GmailDriver {
 		this._xhrInterceptorStream.end();
 		this._messageViewDriverStream.end();
 		this._keyboardShortcutHelpModifier.destroy();
+		this._stopper.destroy();
 	}
 
 	getAppId(): string {return this._appId;}
@@ -129,6 +133,7 @@ export default class GmailDriver {
 	getComposeViewDriverStream(): Bacon.Observable<Object> {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Bacon.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
+	getStopper(): Kefir.Stream {return this._stopper;}
 
 	hashChangeNoViewChange(hash: string) {
 		if (hash[0] !== '#') {

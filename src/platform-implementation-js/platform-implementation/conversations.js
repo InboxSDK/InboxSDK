@@ -39,6 +39,11 @@ var Conversations = function(appId, driver, membraneMap){
 		all: new HandlerRegistry(),
 		loaded: new HandlerRegistry()
 	};
+	driver.getStopper().onValue(function() {
+		members.threadViewHandlerRegistry.dumpHandlers();
+		members.messageViewHandlerRegistries.all.dumpHandlers();
+		members.messageViewHandlerRegistries.loaded.dumpHandlers();
+	});
 
 	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap);
 	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap);

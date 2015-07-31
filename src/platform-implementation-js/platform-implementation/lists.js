@@ -24,6 +24,9 @@ var Lists = function(appId, driver, membraneMap){
 	members.membraneMap = membraneMap;
 
 	members.threadRowViewRegistry = new HandlerRegistry();
+	driver.getStopper().onValue(function() {
+		members.threadRowViewRegistry.dumpHandlers();
+	});
 
 	members.driver.getThreadRowViewDriverKefirStream().onValue(function(viewDriver){
 		var view = membraneMap.get(viewDriver);

@@ -31,6 +31,9 @@ var Compose = function(appId, driver){
     members.requestedComposeViewDeferred = null;
 
     members.handlerRegistry = new HandlerRegistry();
+    driver.getStopper().onValue(function() {
+      members.handlerRegistry.dumpHandlers();
+    });
     members.composeViewStream = members.driver.getComposeViewDriverStream().map(function(viewDriver){
         return new ComposeView(viewDriver, members.appId);
     });
