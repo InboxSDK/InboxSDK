@@ -5,7 +5,7 @@ import assign from 'lodash/object/assign';
 import once from 'lodash/function/once';
 import loadScript from '../../common/load-script';
 
-import type PlatformImplementation from '../../platform-implementation-js/platform-implementation';
+import type {PlatformImplementation} from '../../platform-implementation-js/platform-implementation';
 
 var PlatformImplementationLoader = {
   load(appId: string, opts: Object): Promise<PlatformImplementation> {

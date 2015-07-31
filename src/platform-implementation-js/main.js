@@ -23,7 +23,7 @@ if (!global.__InboxSDKImpLoader) {
       }
 
       return onready.then(() => {
-        const makePlatformImplementation = require('./platform-implementation');
+        const {makePlatformImplementation} = require('./platform-implementation');
         return makePlatformImplementation(appId, opts);
       });
     }

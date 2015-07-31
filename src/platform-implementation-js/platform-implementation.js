@@ -25,7 +25,11 @@ import isValidAppId from './lib/is-valid-app-id';
 // Some types
 import type {Driver} from './driver-interfaces/driver';
 import type {AppLogger} from './lib/logger';
-export type PlatformImplementation = {
+
+export class PlatformImplementation {
+	_driver: Driver;
+	_appId: string;
+	_membraneMap: WeakMap<Object, Object>;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
 
@@ -43,11 +47,37 @@ export type PlatformImplementation = {
 	Modal: Modal;
 	Logger: AppLogger;
 
-	destroy(): void;
-};
+	constructor(driver: Driver, appId: string, appName: ?string, appIconUrl: ?string, LOADER_VERSION: string) {
+		this._appId = appId;
+		this._driver = driver;
+		this._membraneMap = new WeakMap();
+		this.LOADER_VERSION = LOADER_VERSION;
+		this.IMPL_VERSION = process.env.VERSION;
+
+		this.ButterBar = new ButterBar(appId, driver, this._membraneMap);
+		driver.setButterBar(this.ButterBar);
+
+		this.Compose = new Compose(appId, driver, this._membraneMap);
+		this.Conversations = new Conversations(appId, driver, this._membraneMap);
+		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver, this._membraneMap);
+		this.User = new User(appId, driver, this._membraneMap);
+		this.Lists = new Lists(appId, driver, this._membraneMap);
+		this.NavMenu = new NavMenu(appId, driver, this._membraneMap);
+		this.Router = new Router(appId, driver, this._membraneMap);
+		this.Search = new Search(appId, driver, this._membraneMap);
+		this.Toolbars = new Toolbars(appId, driver, this._membraneMap);
+		this.Widgets = new Widgets(appId, driver, this._membraneMap);
+		this.Modal = new Modal(appId, driver, this._membraneMap);
+		this.Logger = driver.getLogger().getAppLogger();
+	}
+
+	destroy() {
+		this._driver.destroy();
+	}
+}
 
 // returns a promise for the PlatformImplementation object
-export default function makePlatformImplementation(appId: string, opts: any): Promise<PlatformImplementation> {
+export function makePlatformImplementation(appId: string, opts: any): Promise<PlatformImplementation> {
 	if (typeof appId !== 'string') {
 		throw new Error("appId must be a string");
 	}
@@ -87,7 +117,6 @@ export default function makePlatformImplementation(appId: string, opts: any): Pr
 	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
 	return driver.onready.then(() => {
 		logger.eventSdkPassive('load');
-		var membraneMap: WeakMap<Object,Object> = new WeakMap();
 
 		if (!isValidAppId(appId)) {
 			console.error(`
@@ -105,34 +134,6 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 			console.warn("Running the InboxSDK outside of an extension content script is not recommended!");
 		}
 
-		var butterBar = new ButterBar(appId, driver, membraneMap);
-		driver.setButterBar(butterBar);
-
-		return {
-			_appId: appId,
-			_membraneMap: membraneMap,
-			_driver: driver,
-
-			LOADER_VERSION: opts.VERSION,
-			IMPL_VERSION: process.env.VERSION,
-
-			Compose: new Compose(appId, driver, membraneMap),
-			Conversations: new Conversations(appId, driver, membraneMap),
-			Keyboard: new Keyboard(appId, opts.appName, opts.appIconUrl, driver, membraneMap),
-			User: new User(appId, driver, membraneMap),
-			Lists: new Lists(appId, driver, membraneMap),
-			NavMenu: new NavMenu(appId, driver, membraneMap),
-			Router: new Router(appId, driver, membraneMap),
-			Search: new Search(appId, driver, membraneMap),
-			Toolbars: new Toolbars(appId, driver, membraneMap),
-			ButterBar: butterBar,
-			Widgets: new Widgets(appId, driver, membraneMap),
-			Modal: new Modal(appId, driver, membraneMap),
-			Logger: driver.getLogger().getAppLogger(),
-
-			destroy() {
-				driver.destroy();
-			}
-		};
+		return new PlatformImplementation(driver, appId, opts.appName, opts.appIconUrl, opts.VERSION);
 	});
 }

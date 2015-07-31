@@ -1,4 +1,6 @@
 InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
+	window._sdk = inboxSDK;
+
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		composeView.addButton({
 			title: 'Monkeys!',
