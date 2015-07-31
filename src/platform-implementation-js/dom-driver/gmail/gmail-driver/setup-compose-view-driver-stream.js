@@ -1,23 +1,27 @@
-var Bacon = require('baconjs');
-var streamWaitFor = require('../../../lib/stream-wait-for');
+/* @flow */
+//jshint ignore:start
 
-var dispatchCustomEvent = require('../../../lib/dom/dispatch-custom-event');
+import * as Bacon from 'baconjs';
+import streamWaitFor from '../../../lib/stream-wait-for';
 
-var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
-var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
-var makeElementStreamMerger = require('../../../lib/dom/make-element-stream-merger');
-var GmailElementGetter = require('../gmail-element-getter');
+import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
-var GmailComposeView = require('../views/gmail-compose-view');
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
+import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
+import GmailElementGetter from '../gmail-element-getter';
+
+import GmailComposeView from '../views/gmail-compose-view';
 
 import Logger from '../../../lib/logger';
+import type GmailDriver from '../gmail-driver';
 
-function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrInterceptorStream){
+export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Bacon.Observable, xhrInterceptorStream: Bacon.Observable){
 	return Bacon.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(function() {
-		let elementStream;
-		let isStandalone = false;
+		var elementStream;
+		var isStandalone = false;
 
 		if (GmailElementGetter.isStandaloneComposeWindow()) {
 			elementStream = _setupStandaloneComposeElementStream();
@@ -29,7 +33,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 		}
 
 		return elementStream.flatMap(makeElementViewStream(function(el) {
-			let composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
+			var composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 			composeView.setIsStandalone(isStandalone);
 
 			return composeView;
@@ -47,7 +51,7 @@ function setupComposeViewDriverStream(gmailDriver, messageViewDriverStream, xhrI
 	});
 }
 
-function _setupStandardComposeElementStream() {
+function _setupStandardComposeElementStream(): Bacon.Observable {
 	return _waitForContainerAndMonitorChildrenStream(function() {
 		return GmailElementGetter.getComposeWindowContainer();
 	}).flatMap(function(composeGrandParent) {
@@ -87,13 +91,9 @@ function _waitForContainerAndMonitorChildrenStream(containerFn) {
 
 function _informElement(eventName){
 	return function(event){
-		if(event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]')){
-			var composeEl = event.el.querySelector('[role=dialog]');
-			if(composeEl){
-				dispatchCustomEvent(composeEl, eventName);
-			}
+		var composeEl = event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]');
+		if(composeEl){
+			dispatchCustomEvent(composeEl, eventName);
 		}
 	};
 }
-
-module.exports = setupComposeViewDriverStream;

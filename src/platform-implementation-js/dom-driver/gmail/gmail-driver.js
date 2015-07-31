@@ -34,6 +34,7 @@ import showCustomRouteView from './gmail-driver/show-custom-route-view';
 import showNativeRouteView from './gmail-driver/show-native-route-view';
 import registerSearchSuggestionsProvider from './gmail-driver/register-search-suggestions-provider';
 import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcut-handle';
+import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './page-communicator';
@@ -57,15 +58,16 @@ export default class GmailDriver {
 	_pageCommunicatorPromise: Promise<PageCommunicator>;
 	_butterBar: ?ButterBar;
 	_butterBarDriver: GmailButterBarDriver;
-	_routeViewDriverStream: Bacon.Bus<Object>;
-	_rowListViewDriverStream: Bacon.Bus<Object>;
+	_routeViewDriverStream: Bacon.Observable<Object>;
+	_rowListViewDriverStream: Bacon.Observable<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Stream<Object>;
 	_threadViewDriverStream: Bacon.Observable<Object>;
 	_toolbarViewDriverStream: Bacon.Observable<Object>;
-	_composeViewDriverStream: Bacon.Bus<Object>;
-	_xhrInterceptorStream: Bacon.Bus<Object>;
-	_messageViewDriverStream: Bacon.Bus<Object>;
-	_stopper: Object;
+	_composeViewDriverStream: Bacon.Observable<Object>;
+	_xhrInterceptorStream: Bacon.Observable<Object>;
+	_messageViewDriverStream: Bacon.Observable<Object>;
+	_stopper: Kefir.Stream&{destroy:()=>void};
+	_bStopper: Bacon.Observable;
 	_userInfo: UserInfo;
 
 	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
@@ -79,6 +81,7 @@ export default class GmailDriver {
 
 		this._messageIDsToThreadIDs = new Map();
 		this._stopper = kefirStopper();
+		this._bStopper = baconCast(Bacon, this._stopper).toProperty();
 
 		this._messageIdManager = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
@@ -102,11 +105,6 @@ export default class GmailDriver {
 	}
 
 	destroy() {
-		this._routeViewDriverStream.end();
-		this._rowListViewDriverStream.end();
-		this._composeViewDriverStream.end();
-		this._xhrInterceptorStream.end();
-		this._messageViewDriverStream.end();
 		this._keyboardShortcutHelpModifier.destroy();
 		this._stopper.destroy();
 	}
@@ -253,11 +251,9 @@ export default class GmailDriver {
 	}
 
 	_setupEventStreams() {
-		/*const*/var result = makeXhrInterceptor();
-		/*const*/var xhrInterceptStream = result.xhrInterceptStream;
+		var result = makeXhrInterceptor();
 
-		this._xhrInterceptorStream = new Bacon.Bus();
-		this._xhrInterceptorStream.plug(xhrInterceptStream);
+		this._xhrInterceptorStream = result.xhrInterceptStream.takeUntil(this._bStopper);
 
 		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
@@ -268,22 +264,19 @@ export default class GmailDriver {
 
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
-			this._routeViewDriverStream = new Bacon.Bus();
-			this._routeViewDriverStream.plug(
-				baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
-					this._gmailRouteProcessor, this
-				)).doAction(routeViewDriver => {
-					routeViewDriver.setPageCommunicator(this._pageCommunicator);
-				})
-			);
+			this._routeViewDriverStream = baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
+				this._gmailRouteProcessor, this
+			)).doAction(routeViewDriver => {
+				routeViewDriver.setPageCommunicator(this._pageCommunicator);
+			}).takeUntil(this._bStopper);
 
-			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView');
+			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntil(this._bStopper);
 
 			this._setupThreadRowViewDriverKefirStream();
 			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
 												.doAction(gmailThreadView => {
 													gmailThreadView.setPageCommunicator(this._pageCommunicator);
-												});
+												}).takeUntil(this._bStopper);
 
 			this._setupToolbarViewDriverStream();
 			this._setupMessageViewDriverStream();
@@ -292,25 +285,17 @@ export default class GmailDriver {
 	}
 
 	_setupComposeViewDriverStream() {
-		this._composeViewDriverStream = new Bacon.Bus();
-		this._composeViewDriverStream.plug(
-			require('./gmail-driver/setup-compose-view-driver-stream')(
-				this, this._messageViewDriverStream, this._xhrInterceptorStream
-			)
-		);
+		this._composeViewDriverStream = setupComposeViewDriverStream(
+			this, this._messageViewDriverStream, this._xhrInterceptorStream
+		).takeUntil(this._bStopper);
 	}
 
-	_setupRouteSubViewDriver(viewName: string): Bacon.Bus<Object> {
-		/*const*/var bus = new Bacon.Bus();
-		bus.plug(
-			this._routeViewDriverStream.flatMap((gmailRouteView) => {
-				return gmailRouteView.getEventStream()
-					.filter(event => event.eventName === viewName)
-					.map(event => event.view);
-			})
-		);
-
-		return bus;
+	_setupRouteSubViewDriver(viewName: string): Bacon.Observable<Object> {
+		return this._routeViewDriverStream.flatMap((gmailRouteView) => {
+			return gmailRouteView.getEventStream()
+				.filter(event => event.eventName === viewName)
+				.map(event => event.view);
+		});
 	}
 
 	_setupThreadRowViewDriverKefirStream() {
@@ -320,7 +305,8 @@ export default class GmailDriver {
 													threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
 													// Each ThreadRowView may be delayed if the thread id is not known yet.
 													return threadRowViewDriver.waitForReady();
-												});
+												})
+												.takeUntilBy(this._stopper);
 	}
 
 	_setupToolbarViewDriverStream() {
@@ -335,22 +321,19 @@ export default class GmailDriver {
 										.filter(Boolean)
 										.flatMap(function(gmailToolbarView){
 											return gmailToolbarView.waitForReady();
-										});
+										})
+										.takeUntil(this._bStopper);
 	}
 
 	_setupMessageViewDriverStream() {
-		this._messageViewDriverStream = new Bacon.Bus();
-
-		this._messageViewDriverStream.plug(
-			this._threadViewDriverStream.flatMap(function(gmailThreadView){
-				return gmailThreadView.getEventStream().filter(function(event){
-					return event.eventName === 'messageCreated';
-				})
-				.map(function(event){
-					return event.view;
-				});
+		this._messageViewDriverStream = this._threadViewDriverStream.flatMap(function(gmailThreadView){
+			return gmailThreadView.getEventStream().filter(function(event){
+				return event.eventName === 'messageCreated';
 			})
-		);
+			.map(function(event){
+				return event.view;
+			});
+		}).takeUntil(this._bStopper);
 	}
 
 	isRunningInPageContext(): boolean {

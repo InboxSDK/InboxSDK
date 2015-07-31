@@ -1,4 +1,7 @@
-import Bacon from 'baconjs';
+/* @flow */
+//jshint ignore:start
+
+import * as Bacon from 'baconjs';
 
 /**
  * Returns a Bacon stream that repeatedly calls the condition callback until it
@@ -7,11 +10,11 @@ import Bacon from 'baconjs';
  * thrown so that it gets logged. Well-behaving code should not let the timeout
  * get tripped.
  */
-export default function streamWaitFor(condition, timeout=3*60*1000, steptime=250) {
+export default function streamWaitFor<T>(condition: () => ?T, timeout:number=3*60*1000, steptime:number=250): Bacon.Observable<T> {
   // make this error here so we have a sensible stack.
-  const timeoutError = new Error("waitFor timeout");
+  var timeoutError = new Error("waitFor timeout");
 
-  const timeoutStream = Bacon.later(timeout).flatMap(() => {
+  var timeoutStream = Bacon.later(timeout).flatMap(() => {
     setTimeout(() => {
       throw timeoutError;
     }, 0);
@@ -21,6 +24,6 @@ export default function streamWaitFor(condition, timeout=3*60*1000, steptime=250
   return Bacon.later(0).merge(
     Bacon.interval(steptime)
   ).flatMap(() =>
-    Bacon.once(condition())
+    Bacon.once((condition():any))
   ).filter(Boolean).merge(timeoutStream).take(1).endOnError();
 }

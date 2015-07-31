@@ -3,6 +3,7 @@ function log() {
 }
 
 InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
+	window._sdk = inboxSDK;
 	var i = 0;
 
 	inboxSDK.Router.handleAllRoutes(function(routeView) {

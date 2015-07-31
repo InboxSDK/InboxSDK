@@ -1,22 +1,25 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
-var deparam = require('querystring').parse;
-var PageCommunicator = require('./page-communicator');
+import {parse} from 'querystring';
+import PageCommunicator from './page-communicator';
 
 import injectScript from '../../lib/inject-script';
 
-function makeXhrInterceptor() {
+export default function makeXhrInterceptor(): {xhrInterceptStream: Bacon.Observable, pageCommunicatorPromise: Promise<PageCommunicator>} {
   var pageCommunicator = new PageCommunicator();
   var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
 
-  const pageCommunicatorPromise = injectScript().then(() => pageCommunicator);
+  var pageCommunicatorPromise = injectScript().then(() => pageCommunicator);
 
   var interceptStream = Bacon.mergeAll(
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSending';
     }).map(function(detail) {
-      var body = deparam(detail.body);
+      var body = parse(detail.body);
       return {
         type: 'emailSending',
         composeId: body.composeid,
@@ -26,7 +29,7 @@ function makeXhrInterceptor() {
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSent';
     }).map(function(detail) {
-      var body = deparam(detail.originalSendBody);
+      var body = parse(detail.originalSendBody);
       var response = detail.responseText;
       return {
         type: 'emailSent',
@@ -42,5 +45,3 @@ function makeXhrInterceptor() {
     pageCommunicatorPromise
   };
 }
-
-module.exports = makeXhrInterceptor;
