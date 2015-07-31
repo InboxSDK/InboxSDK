@@ -16,6 +16,7 @@ var GmailElementGetter = require('../../gmail-element-getter');
 
 import assertInterface from '../../../../lib/assert-interface';
 import addAccessors from 'add-accessors';
+import simulateClick from '../../../../lib/dom/simulate-click';
 
 function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver) {
 	this._type = type;
@@ -382,6 +383,22 @@ _.extend(GmailRouteView.prototype, {
 			return this._gmailRouteProcessor.NativeRouteIDs.THREAD;
 		} else {
 			return this._gmailRouteProcessor.getRouteID(this._name);
+		}
+	},
+
+	// Used to click gmail refresh button in thread lists
+	refresh() {
+		var el = GmailElementGetter.getToolbarElement().querySelector('div.T-I.nu');
+		if (el) {
+			var prevActive = document.activeElement;
+			var prevClassName = el.className;
+			simulateClick(el);
+			el.className = prevClassName; // remove the gmail focus class
+			if (prevActive) {
+				prevActive.focus();
+			} else {
+				el.blur();
+			}
 		}
 	},
 

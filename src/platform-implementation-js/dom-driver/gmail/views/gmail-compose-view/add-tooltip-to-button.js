@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import Bacon from 'baconjs';
+import * as Bacon from 'baconjs';
 import Logger from '../../../../lib/logger';
 
 import GmailTooltipView from '../../widgets/gmail-tooltip-view';
@@ -19,7 +19,7 @@ export type TooltipDescriptor = {
 	button?: {onClick?: Function}&Object
 };
 
-export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor){
+export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
 	var tooltipStopperStream = gmailTooltipView.getEventStream().filter(false).mapEnd();
@@ -39,7 +39,7 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 							.filter(({eventName}) => eventName === 'imageLoaded')
 					)
 					.debounce(10)
-					.onValue(_anchorTooltip, gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
+					.onValue(_anchorTooltip.bind(null, gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor));
 
 	buttonViewController
 		.getView()
@@ -48,7 +48,7 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 		.filter(function(event){
 			return event.eventName === 'click';
 		})
-		.onValue(gmailTooltipView, 'destroy');
+		.onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
 
 
 	var stoppedIntervalStream = Bacon.interval(50).takeUntil(gmailTooltipView.getEventStream().filter(false).mapEnd());
@@ -70,14 +70,14 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 				left = rect.left;
 				top = rect.top;
 			})
-			.onValue(gmailTooltipView, 'anchor', buttonViewController.getView().getElement(), {position: 'top'});
+			.onValue(gmailTooltipView.anchor.bind(gmailTooltipView, buttonViewController.getView().getElement(), {position: 'top'}));
 
 
 	stoppedIntervalStream
 		.filter(function(){
 			return !buttonViewController.getView() || !buttonViewController.getView().getElement().offsetParent;
 		})
-		.onValue(gmailTooltipView, 'destroy');
+		.onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
 
 
 	return gmailTooltipView;

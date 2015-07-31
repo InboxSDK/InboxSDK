@@ -3,5 +3,6 @@ export default {
 	getRouteID: 0,
 	getParams: 0,
 	getEventStream: 0,
-	getCustomViewElement: 0
+	getCustomViewElement: 0,
+	refresh: 0
 };

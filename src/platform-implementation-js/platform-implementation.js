@@ -42,6 +42,8 @@ export type PlatformImplementation = {
 	Widgets: Widgets;
 	Modal: Modal;
 	Logger: AppLogger;
+
+	destroy(): void;
 };
 
 // returns a promise for the PlatformImplementation object
@@ -126,7 +128,11 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 			ButterBar: butterBar,
 			Widgets: new Widgets(appId, driver, membraneMap),
 			Modal: new Modal(appId, driver, membraneMap),
-			Logger: driver.getLogger().getAppLogger()
+			Logger: driver.getLogger().getAppLogger(),
+
+			destroy() {
+				driver.destroy();
+			}
 		};
 	});
 }

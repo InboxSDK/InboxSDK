@@ -19,6 +19,10 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		);
 	});
 
+	sdk.Router.handleListRoute(sdk.Router.NativeListRouteIDs.ANY_LIST, function(listRouteView) {
+		window.lastListRouteView = listRouteView;
+	});
+
 	sdk.Router.handleCustomRoute('tlexample/:monkeyName', function(customRouteView){
 		customRouteView.getElement().innerHTML = 'hello world!';
 	});

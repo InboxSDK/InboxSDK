@@ -1,16 +1,20 @@
-import ajax from '../../../../common/ajax';
+/* @flow */
+//jshint ignore:start
 
-export default function getRfcMessageIdForGmailMessageId(driver, gmailMessageId) {
+import ajax from '../../../../common/ajax';
+import type GmailDriver from '../gmail-driver';
+
+export default function getRfcMessageIdForGmailMessageId(driver: GmailDriver, gmailMessageId: string): Promise<string> {
   return ajax({
     method: 'GET',
-    url: location.origin+location.pathname,
+    url: (document.location:any).origin+document.location.pathname,
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',
       th: gmailMessageId
     }
   }).then(response => {
-    const match = response.text.match(/^Message-ID:\s+(\S+)\s*$/im);
+    var match = response.text.match(/^Message-ID:\s+(\S+)\s*$/im);
     if (!match) {
       throw new Error("Failed to find rfc id for gmail message id. Message may not exist in user's account.");
     }

@@ -4,8 +4,9 @@
 import RSVP from 'rsvp';
 import {extractThreads} from '../gmail-response-processor';
 import ajax from '../../../../common/ajax';
+import type GmailDriver from '../gmail-driver';
 
-export default function getGmailThreadIdForRfcMessageId(driver: Object, rfcMessageId: string) {
+export default function getGmailThreadIdForRfcMessageId(driver: GmailDriver, rfcMessageId: string): Promise<string> {
   var searchString = 'rfc822msgid:'+rfcMessageId;
   return ajax({
     method: 'GET',
