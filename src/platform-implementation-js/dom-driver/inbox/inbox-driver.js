@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import RSVP from 'rsvp';
 
-import Bacon from 'baconjs';
-import Kefir from 'kefir';
+import * as Bacon from 'baconjs';
+import * as Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 
 import addAccessors from 'add-accessors';
 import assertInterface from '../../lib/assert-interface';
@@ -20,6 +21,7 @@ import InboxRouteView from './views/inbox-route-view';
 export default class InboxDriver {
   constructor(appId, opts, LOADER_VERSION, IMPL_VERSION, logger) {
     this._logger = logger;
+    this._stopper = kefirStopper();
     this.onready = injectScript();
 
     // this._customRouteIDs = new Set();
@@ -145,6 +147,7 @@ export default class InboxDriver {
 
 addAccessors(InboxDriver.prototype, [
   {name: '_logger', get: true},
+  {name: '_stopper', get: true, destroy: true},
   {name: '_routeViewDriverStream', get: true},
   {name: '_rowListViewDriverStream', get: true},
   {name: '_composeViewDriverStream', get: true},
