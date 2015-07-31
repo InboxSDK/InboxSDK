@@ -2,6 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
+import SafeEventEmitter from './lib/safe-event-emitter';
 
 import ButterBar from './platform-implementation/butter-bar';
 import Compose from './platform-implementation/compose';
@@ -26,7 +27,7 @@ import isValidAppId from './lib/is-valid-app-id';
 import type {Driver} from './driver-interfaces/driver';
 import type {AppLogger} from './lib/logger';
 
-export class PlatformImplementation {
+export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
 	_membraneMap: WeakMap<Object, Object>;
@@ -48,6 +49,7 @@ export class PlatformImplementation {
 	Logger: AppLogger;
 
 	constructor(driver: Driver, appId: string, appName: ?string, appIconUrl: ?string, LOADER_VERSION: string) {
+		super();
 		this._appId = appId;
 		this._driver = driver;
 		this._membraneMap = new WeakMap();
@@ -73,6 +75,7 @@ export class PlatformImplementation {
 
 	destroy() {
 		this._driver.destroy();
+		this.emit('destroy');
 	}
 }
 
@@ -115,7 +118,7 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 	}
 
 	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
-	return driver.onready.then(() => {
+	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
 		logger.eventSdkPassive('load');
 
 		if (!isValidAppId(appId)) {
