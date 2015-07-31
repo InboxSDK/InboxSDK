@@ -2,7 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import * as Bacon from 'baconjs';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import simulateClick from '../../../lib/dom/simulate-click';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
@@ -10,8 +10,9 @@ import RSVP from 'rsvp';
 import Logger from '../../../lib/logger';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import gmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
-export default function registerSearchSuggestionsProvider(driver: any, handler: Function) {
+export default function registerSearchSuggestionsProvider(driver: GmailDriver, handler: Function) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we
   // watch the DOM for our injected suggestions to show up and attach click and
   // enter handlers to them to let them do custom actions.
@@ -25,7 +26,7 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
   // inject into the AJAX responses.
   pageCommunicator.ajaxInterceptStream
     .filter((event) => event.type === 'suggestionsRequest')
-    .map('.query')
+    .map(x => x.query)
     .flatMapLatest((query) =>
       Bacon.fromPromise(RSVP.Promise.resolve(handler(query)), true)
         .flatMap((suggestions) => {
@@ -70,18 +71,18 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
-  var searchBoxStream = driver.getRouteViewDriverStream().startWith(null)
+  var searchBoxStream: Bacon.Observable<HTMLInputElement> = driver.getRouteViewDriverStream().startWith(null)
     .map(() => gmailElementGetter.getSearchInput())
     .filter(Boolean)
     .take(1).toProperty();
 
   // Wait for the search box to be focused before looking for the suggestions box.
-  var suggestionsBoxTbodyStream = searchBoxStream
-    .flatMapLatest((searchBox) => Bacon.fromEventTarget(searchBox, 'focus'))
+  var suggestionsBoxTbodyStream: Bacon.Observable<HTMLElement> = searchBoxStream
+    .flatMapLatest((searchBox) => Bacon.fromEvent(searchBox, 'focus'))
     .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
     .filter(Boolean)
     .flatMapLatest(makeElementChildStream)
-    .map('.el.firstElementChild')
+    .map(x => x.el.firstElementChild)
     .take(1).toProperty();
 
   // This stream emits an event after every time Gmail changes the suggestions
@@ -89,7 +90,7 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
   var suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
     .flatMap((suggestionsBoxTbody) =>
       makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).startWith(null)
-    ).map(null);
+    ).map(() => null);
 
   // We listen to the event on the document node so that the event can be
   // canceled before Gmail receives it.
@@ -100,7 +101,7 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
     );
 
   // Stream of arrays of row elements belonging to this provider.
-  var providedRows = suggestionsBoxTbodyStream
+  var providedRows: Bacon.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
     .map(suggestionsBoxTbody =>
       _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
@@ -108,14 +109,18 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
 
   providedRows.onValue(rows => {
     if (rows[0] && rows[0].previousElementSibling) {
-      rows[0].previousElementSibling.firstElementChild.classList.add(
-        'inboxsdk__suggestions_separator_before');
-      rows[0].firstElementChild.classList.add(
-        'inboxsdk__suggestions_separator_after');
+      var prevFirstChild = rows[0].previousElementSibling.firstElementChild;
+      if (prevFirstChild) {
+        prevFirstChild.classList.add('inboxsdk__suggestions_separator_before');
+      }
+      var firstChild = rows[0].firstElementChild;
+      if (firstChild) {
+        firstChild.classList.add('inboxsdk__suggestions_separator_after');
+      }
     }
   });
 
-  var rowSelectionEvents = providedRows.flatMapLatest(rows =>
+  var rowSelectionEvents: Bacon.Observable<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
     Bacon.mergeAll(rows.map(row =>
       Bacon.mergeAll(
         fromEventTargetCapture(row, 'click'),
@@ -125,9 +130,9 @@ export default function registerSearchSuggestionsProvider(driver: any, handler: 
     ))
   );
 
-  Bacon.combineAsArray(rowSelectionEvents, searchBoxStream)
+  Bacon.combineAsArray([rowSelectionEvents, searchBoxStream])
     .onValue(([{event, row}, searchBox]) => {
-      var itemDataSpan = (row: HTMLElement).querySelector('span[data-inboxsdk-suggestion]');
+      var itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
       var itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;
       if (itemData) {
         event.stopImmediatePropagation();

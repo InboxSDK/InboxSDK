@@ -1,16 +1,16 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
-var GmailKeyboardShortcutHandle = require('../views/gmail-keyboard-shortcut-handle');
+import GmailKeyboardShortcutHandle from '../views/gmail-keyboard-shortcut-handle';
+import type GmailDriver from '../gmail-driver';
+import type {ShortcutDescriptor} from '../../../driver-interfaces/driver';
 
-module.exports = function(gmailDriver, shortcutDescriptor, appId, appName, appIconUrl){
-
+export default function createKeyboardShortcutHandle(gmailDriver: GmailDriver, shortcutDescriptor: ShortcutDescriptor, appId: ?string, appName: ?string, appIconUrl: ?string): GmailKeyboardShortcutHandle {
 	var gmailKeyboardShortcutHandle = new GmailKeyboardShortcutHandle(shortcutDescriptor.chord,  function(){
-		gmailDriver.getKeyboardShortcutHelpManager().delete(gmailKeyboardShortcutHandle);
+		gmailDriver.getKeyboardShortcutHelpModifier().delete(gmailKeyboardShortcutHandle);
 	});
 
 	gmailDriver.getKeyboardShortcutHelpModifier().set(gmailKeyboardShortcutHandle, shortcutDescriptor, appId, appName, appIconUrl);
 
 	return gmailKeyboardShortcutHandle;
-
-};
-
+}
