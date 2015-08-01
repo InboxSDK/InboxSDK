@@ -1,7 +1,11 @@
-const gmailElementGetter = require('../gmail-element-getter');
+/* @flow */
+//jshint ignore:start
 
-module.exports = function gmailLoadEvent(driver) {
-  const pageCommunicator = driver.getPageCommunicator();
+import gmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
+
+export default function gmailLoadEvent(driver: GmailDriver) {
+  var pageCommunicator = driver.getPageCommunicator();
 
   pageCommunicator.isConversationViewDisabled().then(isConversationViewDisabled => {
     driver.getLogger().eventGmail('gmailSettings', {
@@ -14,4 +18,4 @@ module.exports = function gmailLoadEvent(driver) {
       isConversationViewDisabled
     });
   });
-};
+}

@@ -82,7 +82,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
     .filter(Boolean)
     .flatMapLatest(makeElementChildStream)
-    .map(x => x.el.firstElementChild)
+    .map(x => (x.el:any).firstElementChild)
     .take(1).toProperty();
 
   // This stream emits an event after every time Gmail changes the suggestions

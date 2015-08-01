@@ -74,7 +74,7 @@ function _setupStandardComposeElementStream(): Bacon.Observable {
 			el: event.el.querySelector('[role=dialog]')
 		};
 	}).filter(function(event) {
-		return event && event.el && Boolean(event.el.querySelector('form'));
+		return Boolean(event && event.el && event.el.querySelector('form'));
 	}).flatMap(makeElementStreamMerger());
 }
 

@@ -1,3 +1,6 @@
+/* @flow */
+//jshint ignore:start
+
 var Bacon = require('baconjs');
 
 // Built for flatMapping a stream from makeElementChildStream(). This doesn't
@@ -5,7 +8,10 @@ var Bacon = require('baconjs');
 // filter/map/merge that stream however you want before passing it here. Make
 // sure that this stream (and therefore the source makeElementChildStream) stops
 // being listened to at some point to trigger the destruction of the views!
-function makeElementViewStream(viewFn) {
+type View = {destroy: () => void};
+type TimedElement = {el: HTMLElement, removalStream: Bacon.Observable};
+
+export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => T): (event: TimedElement) => Bacon.Observable<T> {
   return function(event) {
     var view = viewFn(event.el);
     if (view) {
@@ -18,5 +24,3 @@ function makeElementViewStream(viewFn) {
     }
   };
 }
-
-module.exports = makeElementViewStream;

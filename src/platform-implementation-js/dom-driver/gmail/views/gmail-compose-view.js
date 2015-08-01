@@ -5,7 +5,9 @@ import _ from 'lodash';
 import $ from 'jquery';
 import asap from 'asap';
 import RSVP from 'rsvp';
-import Bacon from 'baconjs';
+import * as Bacon from 'baconjs';
+import * as Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -45,6 +47,7 @@ export default class GmailComposeView {
 	_initialMessageId: ?string;
 	_targetMessageID: ?string;
 	_threadID: ?string;
+	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Object;
 	ready: () => Bacon.Observable;
 
@@ -56,6 +59,7 @@ export default class GmailComposeView {
 		this._isFullscreen = false;
 		this._isStandalone = false;
 		this._driver = driver;
+		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
 		this._eventStream = new Bacon.Bus();
 
@@ -125,6 +129,16 @@ export default class GmailComposeView {
 			});
 		});
 	}
+
+	destroy() {
+		this._eventStream.end();
+		this._managedViewControllers.forEach(vc => {
+			vc.destroy();
+		});
+		this._stopper.destroy();
+	}
+
+	getStopper(): Kefir.Stream {return this._stopper;}
 
 	_setupStreams() {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
@@ -562,13 +576,6 @@ export default class GmailComposeView {
 
 	setLastSelectionRange(lastSelectionRange: ?Object) {
 		this._lastSelectionRange = lastSelectionRange;
-	}
-
-	destroy() {
-		this._eventStream.end();
-		this._managedViewControllers.forEach(vc => {
-			vc.destroy();
-		});
 	}
 }
 

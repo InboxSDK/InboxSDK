@@ -4,11 +4,11 @@
 import _ from 'lodash';
 import asap from 'asap';
 import Logger from '../logger';
-import Bacon from 'baconjs';
+import * as Bacon from 'baconjs';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function makeElementChildStream(element: HTMLElement): Bacon.Observable {
+export default function makeElementChildStream(element: HTMLElement): Bacon.Observable<{el: HTMLElement, removalStream: Bacon.Observable}> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }

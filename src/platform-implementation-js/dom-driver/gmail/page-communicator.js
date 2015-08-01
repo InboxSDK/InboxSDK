@@ -8,7 +8,7 @@ import type {ajaxOpts} from '../../../common/ajax';
 import _ from 'lodash';
 import asap from 'asap';
 import RSVP from 'rsvp';
-import Bacon from 'baconjs';
+import * as Bacon from 'baconjs';
 import Kefir from 'kefir';
 import Logger from '../../lib/logger';
 
@@ -22,7 +22,7 @@ export default class PageCommunicator {
   constructor() {
     this.ajaxInterceptStream = Bacon
       .fromEventTarget(document, 'inboxSDKajaxIntercept')
-      .map('.detail');
+      .map(x => x.detail);
   }
 
   resolveUrlRedirects(url: string): Promise<string> {

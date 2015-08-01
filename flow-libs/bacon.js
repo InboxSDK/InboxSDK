@@ -10,8 +10,9 @@ declare module baconjs {
     error: any;
   }
 
-  declare class Error extends Event {
-  }
+  declare class Next extends Event {}
+  declare class Error extends Event {}
+  declare class End extends Event {}
 
   // represents EventStreams and Properties. Yeah, kinda hacky that they're mixed.
   declare class Observable<T> {
@@ -27,8 +28,8 @@ declare module baconjs {
     errors(): Observable<any>;
     skipErrors(): Observable<T>;
     mapEnd<U>(cb: () => U): Observable<T|U>;
-    filter(cb: (i: T) => boolean): Observable<T>;
-    takeWhile(cb: (i: T) => boolean): Observable<T>;
+    filter(cb: (i: T) => boolean|any): Observable<T>;
+    takeWhile(cb: (i: T) => boolean|any): Observable<T>;
     takeUntil(other: Observable): Observable<T>;
     take(n: number): Observable<T>;
     first(): Observable<T>;
@@ -42,11 +43,11 @@ declare module baconjs {
     doAction(cb: (i: T) => void): Observable<T>;
     doError(cb: (e: any) => void): Observable<T>;
     not(): Observable<boolean>;
-    flatMap<U>(cb: (i: T) => Observable<U>|Event<U>): Observable<U>;
-    flatMapLatest<U>(cb: (i: T) => Observable<U>|Event<U>): Observable<U>;
-    flatMapError<U>(cb: (e: any) => Observable<U>|Event<U>): Observable<T|U>;
-    flatMapWithConcurrencyLimit<U>(n: number, cb: (i: T) => Observable<U>|Event<U>): Observable<U>;
-    flatMapConcat<U>(cb: (i: T) => Observable<U>|Event<U>): Observable<U>;
+    flatMap<U>(cb: (i: T) => Observable<U>|Event<U>|U): Observable<U>;
+    flatMapLatest<U>(cb: (i: T) => Observable<U>|Event<U>|U): Observable<U>;
+    flatMapError<U>(cb: (e: any) => Observable<U>|Event<U>|U): Observable<T|U>;
+    flatMapWithConcurrencyLimit<U>(n: number, cb: (i: T) => Observable<U>|Event<U>|U): Observable<U>;
+    flatMapConcat<U>(cb: (i: T) => Observable<U>|Event<U>|U): Observable<U>;
     scan<U>(seed: U, cb: (last: U, current: T) => U): Observable<U>;
     fold<U>(seed: U, cb: (last: U, current: T) => U): Observable<U>;
     zip<U,V>(other: Observable<U>, cb: (a: T, b: U) => V): Observable<V>;
@@ -92,6 +93,7 @@ declare module baconjs {
   declare function fromArray<T>(items: T[]): Observable<T>;
   declare function fromPromise<T>(promise: Promise<T>): Observable<T>;
   declare function fromEvent(target: Object, eventName: string, transformer?: (event: any) => any): Observable;
+  declare function fromEventTarget(target: Object, eventName: string, transformer?: (event: any) => any): Observable;
   declare function fromCallback(f: Function, ...args: any[]): Observable;
   declare function fromNodeCallback(f: Function, ...args: any[]): Observable;
   declare function fromPoll<T>(interval: number, f: () => T): Observable<T>;
@@ -116,4 +118,6 @@ declare module baconjs {
   declare function zipAsArray<T>(streams: Observable<T>[]): Observable<T[]>;
   declare function zipAsArray<T>(...streams: Observable<T>[]): Observable<T[]>;
   declare function zipWith<T,U>(fn: (values: T[]) => U, ...streams: Observable<T>[]): Observable<U>;
+
+  declare var noMore: {};
 }

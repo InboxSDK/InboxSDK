@@ -445,7 +445,7 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
 if (_extensionIsLoggerMaster && global.document) {
   makeMutationObserverStream(document.documentElement, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
-  }).map(null).throttle(120*1000).onValue(function() {
+  }).map(()=>null).throttle(120*1000).onValue(function() {
     var events: any[] = _trackedEventsQueue.removeAll();
 
     // The trackedEventsQueue is in localStorage, which is shared between

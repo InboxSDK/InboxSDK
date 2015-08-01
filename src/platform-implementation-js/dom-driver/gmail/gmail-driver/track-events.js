@@ -1,18 +1,24 @@
-import _ from 'lodash';
-import Bacon from 'baconjs';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+/* @flow */
+//jshint ignore:start
 
-export default function trackEvents(gmailDriver) {
+import _ from 'lodash';
+import * as Bacon from 'baconjs';
+import * as Kefir from 'kefir';
+import baconCast from 'bacon-cast';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import type GmailDriver from '../gmail-driver';
+
+export default function trackEvents(gmailDriver: GmailDriver) {
 	_setupComposeMonitoring(gmailDriver);
 	_setupAttachmentModalMonitoring(gmailDriver);
 	_setupDragDropMonitoring(gmailDriver);
 }
 
-function _setupComposeMonitoring(gmailDriver){
+function _setupComposeMonitoring(gmailDriver: GmailDriver){
 	gmailDriver.getComposeViewDriverStream().onValue(
 		(composeViewDriver) => {
 
-			const logFunction = _getLogFunction(gmailDriver, composeViewDriver);
+			var logFunction = _getLogFunction(gmailDriver, composeViewDriver);
 			logFunction('compose open');
 
 			_monitorComposeSpecificEvents(composeViewDriver, logFunction);
@@ -21,9 +27,9 @@ function _setupComposeMonitoring(gmailDriver){
 }
 
 
-function _getLogFunction(gmailDriver, composeViewDriver){
-	const logger = gmailDriver.getLogger();
-	const composeStats = {
+function _getLogFunction(gmailDriver, composeViewDriver) {
+	var logger = gmailDriver.getLogger();
+	var composeStats = {
 		isInlineReply: composeViewDriver.isInlineReplyForm(),
 		isReply: composeViewDriver.isReply()
 	};
@@ -41,12 +47,14 @@ function _monitorComposeSpecificEvents(composeViewDriver, logFunction){
 
 function _monitorAttachmentButton(composeViewDriver, logFunction){
 
-	let attachmentButton = composeViewDriver.getElement().querySelector('.a1');
+	var attachmentButton = composeViewDriver.getElement().querySelector('.a1');
 	if(attachmentButton){
-		attachmentButton.addEventListener('mousedown', () => {
-			logFunction('attachment button clicked');
-			_monitorAttachmentAdded(composeViewDriver, logFunction);
-		});
+		Kefir.fromEvents(attachmentButton, 'mousedown')
+			.takeUntilBy(composeViewDriver.getStopper())
+			.onValue(() => {
+				logFunction('attachment button clicked');
+				_monitorAttachmentAdded(composeViewDriver, logFunction);
+			});
 	}
 
 }
@@ -54,43 +62,46 @@ function _monitorAttachmentButton(composeViewDriver, logFunction){
 function _monitorAttachmentAdded(composeViewDriver, logFunction) {
 	makeElementChildStream(document.body)
 		.map(event => event.el)
-		.filter(node => node && node.type === 'file')
+		.filter(node => node && (node:any).type === 'file')
 		.take(1)
 		.flatMap((node) => {
-			return Bacon.fromEventTarget(node, 'change')
-						.map(true)
+			return Bacon.fromEvent(node, 'change')
+						.map(()=>true)
 						.merge(
-							Bacon.fromEventTarget(composeViewDriver.getBodyElement(), 'focus')
-									.map(false)
+							Bacon.fromEvent(composeViewDriver.getBodyElement(), 'focus')
+									.map(()=>false)
 									.delay(1000)
 						);
 		})
 		.take(1)
 		.filter(Boolean)
+		.takeUntil(baconCast(Bacon, composeViewDriver.getStopper()))
 		.onValue(() => logFunction('attachment uploaded'));
 }
 
 function _monitorDriveButton(composeViewDriver, logFunction){
 
-	let driveButton = composeViewDriver.getElement().querySelector('.aA7');
+	var driveButton = composeViewDriver.getElement().querySelector('.aA7');
 	if(driveButton){
-		driveButton.addEventListener('mousedown', () => {
-			logFunction('drive button clicked');
-			_monitorDriveFileAdded(composeViewDriver, logFunction);
-		});
+		Kefir.fromEvents(driveButton, 'mousedown')
+			.takeUntilBy(composeViewDriver.getStopper())
+			.onValue(() => {
+				logFunction('drive button clicked');
+				_monitorDriveFileAdded(composeViewDriver, logFunction);
+			});
 	}
 
 }
 
 function _monitorDriveFileAdded(composeViewDriver, logFunction){
-	const numberCurrentDriveChips = composeViewDriver.getBodyElement().querySelectorAll('.gmail_drive_chip').length;
+	var numberCurrentDriveChips = composeViewDriver.getBodyElement().querySelectorAll('.gmail_drive_chip').length;
 
 	makeElementChildStream(document.body)
 		.map(event => event.el)
 		.filter(node => node && node.classList.contains('picker-dialog'))
 		.take(1)
 		.flatMap((node) => {
-			return Bacon.fromEventTarget(composeViewDriver.getBodyElement(), 'focus')
+			return Bacon.fromEvent(composeViewDriver.getBodyElement(), 'focus')
 						.delay(1000)
 						.map(() => {
 							if(composeViewDriver.getBodyElement()){
@@ -104,16 +115,18 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 		})
 		.take(1)
 		.filter(Boolean)
+		.takeUntil(baconCast(Bacon, composeViewDriver.getStopper()))
 		.onValue(() => logFunction('drive file added'));
 }
 
-function _setupAttachmentModalMonitoring(gmailDriver){
+function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver){
 
 	makeElementChildStream(document.body)
 		.map(event => event.el)
 		.filter(node => node.getAttribute && node.getAttribute('role') === 'alertdialog')
+		.takeUntil(gmailDriver.getBaconStopper())
 		.onValue((node) => {
-			const heading = node.querySelector('[role=heading]');
+			var heading = node.querySelector('[role=heading]');
 			if(heading){
 				if(heading.textContent.indexOf('exceeds the 25MB') > -1){
 					gmailDriver.getLogger().eventGmail('large attachment suggest drive');
@@ -121,7 +134,7 @@ function _setupAttachmentModalMonitoring(gmailDriver){
 				}
 			}
 
-			const body = node.querySelector('.Kj-JD-Jz');
+			var body = node.querySelector('.Kj-JD-Jz');
 			if(body){
 				if(body.textContent.indexOf('exceeds the maximum') > -1){
 					gmailDriver.getLogger().eventGmail('large attachment from drag and drop');
@@ -131,27 +144,29 @@ function _setupAttachmentModalMonitoring(gmailDriver){
 		});
 }
 
-function _setupDragDropMonitoring(gmailDriver){
+function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Bacon.fromEventTarget(document.body, 'dragenter')
+					return Bacon.fromEvent(document.body, 'dragenter')
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 
 				})
+				.takeUntil(gmailDriver.getBaconStopper())
 				.onValue(() => gmailDriver.getLogger().eventGmail('compose drag file'));
 
 
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Bacon.fromEventTarget(document.body, 'drop')
+					return Bacon.fromEvent(document.body, 'drop')
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 
 				})
+				.takeUntil(gmailDriver.getBaconStopper())
 				.onValue(() => gmailDriver.getLogger().eventGmail('compose drop file'));
 
 }

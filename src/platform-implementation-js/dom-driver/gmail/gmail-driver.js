@@ -35,6 +35,10 @@ import showNativeRouteView from './gmail-driver/show-native-route-view';
 import registerSearchSuggestionsProvider from './gmail-driver/register-search-suggestions-provider';
 import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcut-handle';
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
+import trackEvents from './gmail-driver/track-events';
+import gmailLoadEvent from './gmail-driver/gmail-load-event';
+import maintainComposeWindowState from './gmail-driver/maintain-compose-window-state';
+import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './page-communicator';
@@ -97,10 +101,10 @@ export default class GmailDriver {
 		this._setupEventStreams();
 
 		this.onready.then(() => {
-			require('./gmail-driver/track-events')(this);
-			require('./gmail-driver/gmail-load-event')(this);
-			require('./gmail-driver/maintain-compose-window-state')(this);
-			require('./gmail-driver/override-gmail-back-button')(this, this._gmailRouteProcessor);
+			trackEvents(this);
+			gmailLoadEvent(this);
+			maintainComposeWindowState(this);
+			overrideGmailBackButton(this, this._gmailRouteProcessor);
 		});
 	}
 
@@ -132,6 +136,7 @@ export default class GmailDriver {
 	getXhrInterceptorStream(): Bacon.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
+	getBaconStopper(): Bacon.Observable {return this._bStopper;}
 
 	hashChangeNoViewChange(hash: string) {
 		if (hash[0] !== '#') {
