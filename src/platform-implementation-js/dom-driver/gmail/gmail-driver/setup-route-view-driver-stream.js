@@ -26,6 +26,13 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	let lastNativeHash = getURLObject(document.location.href).hash;
 	let latestGmailRouteView = null;
 
+	driver.getStopper()
+		.onValue(() => {
+			if (latestGmailRouteView) {
+				latestGmailRouteView.destroy();
+			}
+		});
+
 	let lastHash = lastNativeHash;
 
 	const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')

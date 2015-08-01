@@ -55,7 +55,7 @@ function tweakColor(color) {
 }
 
 export default class GmailThreadRowView {
-  constructor(element, rowListViewDriver) {
+  constructor(element, rowListViewDriver, gmailDriver) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
 
     const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
@@ -160,6 +160,13 @@ export default class GmailThreadRowView {
       const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
       return {messageCount, draftCount};
     });
+
+    gmailDriver.getStopper()
+      .takeUntilBy(this._stopper.delay(15))
+      .delay(15)
+      .onValue(() => {
+        this._removeUnclaimedModifications();
+      });
   }
 
 /* Members:
@@ -242,6 +249,8 @@ export default class GmailThreadRowView {
       mod.remove();
     }
     this._modifications.replacedDraftLabel.unclaimed.length = 0;
+
+    // TODO fix column width to deal with removed buttons
   }
 
   // Returns a Kefir stream that emits this object once this object is ready for the

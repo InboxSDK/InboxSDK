@@ -20,8 +20,8 @@ declare module kefir {
     offEnd(cb: () => void): void;
     onAny(cb: (event: Event<T>) => void): void;
     offAny(cb: (event: Event<T>) => void): void;
-    log(name?: string): void;
-    offLog(name?: string): void;
+    log(name?: string): Stream<T>;
+    offLog(name?: string): Stream<T>;
     toPromise(PromiseConstructor?: Function): Promise<T>;
 
     map<U>(cb: (i: T) => U): Stream<U>;

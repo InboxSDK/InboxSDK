@@ -8,22 +8,22 @@ import kefirStopper from 'kefir-stopper';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function kefirMakeElementChildStream(element: HTMLElement): Kefir.Observable {
+export default function kefirMakeElementChildStream(element: HTMLElement): Kefir.Observable<{el: HTMLElement, removalStream: Kefir.Stream}> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }
 
   return Kefir.stream((emitter) => {
-    var removalStreams = new Map();
+    var removalStreams: Map<HTMLElement, Object> = new Map();
     var ended = false;
 
-    function newEl(el) {
+    function newEl(el: HTMLElement) {
       var removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
       emitter.emit({el, removalStream});
     }
 
-    function removedEl(el) {
+    function removedEl(el: HTMLElement) {
       var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 

@@ -18,11 +18,12 @@ const kefirMakeElementChildStream = require('../../../lib/dom/kefir-make-element
 const kefirElementViewMapper = require('../../../lib/dom/kefir-element-view-mapper');
 
 
-var GmailRowListView = function(rootElement, routeViewDriver){
+var GmailRowListView = function(rootElement, routeViewDriver, gmailDriver){
 	RowListViewDriver.call(this);
 
 	this._eventStreamBus = new Bacon.Bus();
 	this._kstopper = kefirCast(Kefir, this._eventStreamBus.filter(false).mapEnd(null));
+	this._gmailDriver = gmailDriver;
 
 	this._element = rootElement;
 	this._routeViewDriver = routeViewDriver;
@@ -42,6 +43,7 @@ _.extend(GmailRowListView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_gmailDriver', destroy: false},
 		{name: '_routeViewDriver', destroy: false, get: true},
 		{name: '_pendingExpansions', destroy: false},
 		{name: '_pendingExpansionsSignal', destroy: false},
@@ -158,7 +160,7 @@ _.extend(GmailRowListView.prototype, {
 
 		this._rowViewDriverKefirStream = elementKefirStream
 			.takeUntilBy(this._kstopper)
-			.map(kefirElementViewMapper(element => new GmailThreadRowView(element, this)));
+			.map(kefirElementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)));
 
 		this._rowViewDriverKefirStream.onValue(x => this._addThreadRowView(x));
 	},

@@ -167,7 +167,7 @@ _.extend(GmailRouteView.prototype, {
 
 	_processRowListElement: function(rowListElement){
 		const rootElement = rowListElement.parentElement;
-		const gmailRowListView = new GmailRowListView(rootElement, this);
+		const gmailRowListView = new GmailRowListView(rootElement, this, this._driver);
 
 		this._rowListViews.push(gmailRowListView);
 
