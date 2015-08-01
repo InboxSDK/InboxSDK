@@ -6,6 +6,7 @@ import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import kefirBus from 'kefir-bus';
 import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
@@ -72,6 +73,7 @@ export default class GmailDriver {
 	_messageViewDriverStream: Bacon.Observable<Object>;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_bStopper: Bacon.Observable;
+	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
 
 	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
@@ -85,6 +87,7 @@ export default class GmailDriver {
 
 		this._messageIDsToThreadIDs = new Map();
 		this._stopper = kefirStopper();
+		this._navMarkerHiddenChanged = kefirBus();
 		this._bStopper = baconCast(Bacon, this._stopper).toProperty();
 
 		this._messageIdManager = new MessageIdManager({
@@ -226,12 +229,16 @@ export default class GmailDriver {
 	}
 
 	setShowNativeNavMarker(value: boolean) {
-		/*const*/var leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
+		this._navMarkerHiddenChanged.emit(null);
+		var leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
 		if(leftNavContainerElement){
 			if (value) {
 				leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
 			} else {
 				leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
+				this._stopper.takeUntilBy(this._navMarkerHiddenChanged).onValue(() => {
+					leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
+				});
 			}
 		}
 	}

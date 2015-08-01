@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
+var kefirStopper = require('kefir-stopper');
 const asap = require('asap');
 
 var makeElementChildStream = require('../../../../lib/dom/make-element-child-stream');
@@ -25,6 +26,7 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver)
 	this._paramsArray = urlObject.params;
 	this._customRouteID = routeID;
 
+	this._stopper = kefirStopper();
 	this._rowListViews = [];
 
 	this._gmailRouteProcessor = gmailRouteProcessor;
@@ -34,6 +36,10 @@ function GmailRouteView({urlObject, type, routeID}, gmailRouteProcessor, driver)
 
 	if (this._type === 'CUSTOM') {
 		this._setupCustomViewElement();
+		driver.getStopper().takeUntilBy(this._stopper.delay(0)).onValue(() => {
+			driver.showNativeRouteView();
+			window.location.hash = '#inbox';
+		});
 	} else if (_.includes(['NATIVE', 'CUSTOM_LIST'], this._type)) {
 		this._setupSubViews();
 	}
@@ -45,6 +51,7 @@ addAccessors(GmailRouteView.prototype, [
 	{name: '_hash', get: true, destroy: false},
 	{name: '_type', get: true, destroy: false},
 	{name: '_customRouteID', destroy: false},
+	{name: '_stopper', destroy: true},
 	{name: '_customViewElement', destroy: true, get: true, destroyMethod: 'remove'},
 	{name: '_rowListViews', destroy: true, get: true},
 	{name: '_threadView', destroy: true, get: true},
