@@ -1,4 +1,5 @@
 InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
+	window._sdk = inboxSDK;
 
 	inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
 

@@ -30,6 +30,8 @@ var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 	members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
 	members.deferred = RSVP.defer();
 	members.navItemViews = [];
+
+	driver.getStopper().onValue(this.remove.bind(this));
 };
 
 NavItemView.prototype = Object.create(EventEmitter.prototype);
@@ -88,6 +90,8 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 		if(!members.navItemViews){
 			return;
 		}
+
+		this.emit('destroy');
 
 		members.navItemViews.forEach(function(navItemView){
 			navItemView.remove();
