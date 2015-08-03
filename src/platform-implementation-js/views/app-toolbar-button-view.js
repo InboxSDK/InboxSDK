@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var asap = require('asap');
 
 var EventEmitter = require('../lib/safe-event-emitter');
 
@@ -42,9 +41,7 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 	open: function(){
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
-			asap(function(){
-				appToolbarButtonViewDriver.open();
-			});
+			appToolbarButtonViewDriver.open();
 		});
 	},
 
@@ -55,9 +52,7 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 	close: function(){
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
-			asap(function(){
-				appToolbarButtonViewDriver.close();
-			});
+			appToolbarButtonViewDriver.close();
 		});
 	},
 

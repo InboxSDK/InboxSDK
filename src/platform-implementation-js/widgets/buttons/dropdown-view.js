@@ -2,11 +2,10 @@ var _ = require('lodash');
 var asap = require('asap');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
-var Bacon = require('baconjs');
 var Kefir = require('kefir');
 
 var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
-var fromEventTargetCapture = require('../../lib/from-event-target-capture');
+var kefirFromEventTargetCapture = require('../../lib/kefir-from-event-target-capture');
 var containByScreen = require('../../lib/dom/contain-by-screen');
 
 /**
@@ -17,8 +16,6 @@ var containByScreen = require('../../lib/dom/contain-by-screen');
  */
 var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions){
 	EventEmitter.call(this);
-
-	var self = this;
 
 	this._dropdownViewDriver = dropdownViewDriver;
 
@@ -40,17 +37,20 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	}
 	this._dropdownViewDriver.getContainerElement().focus();
 
-	this._focusUnsub = Bacon.mergeAll(
-		fromEventTargetCapture(document, 'focus'),
-		fromEventTargetCapture(document, 'click')
-	).filter(function(event) {
-		return !anchorElement.contains(event.target) &&
-			!self._dropdownViewDriver.getContainerElement().contains(event.target);
-	}).onValue(self, 'close');
+	Kefir.merge([
+		kefirFromEventTargetCapture(document, 'focus'),
+		kefirFromEventTargetCapture(document, 'click')
+	]).filter(event =>
+		!anchorElement.contains(event.target) &&
+			!this._dropdownViewDriver.getContainerElement().contains(event.target)
+	).takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+	.onValue(() => {
+		this.close();
+	});
 
 	if(!placementOptions || !placementOptions.manualPosition){
-		asap(function() {
-			if (!self.closed) {
+		asap(() => {
+			if (!this.closed) {
 				var contentEl = dropdownViewDriver.getContainerElement();
 				containByScreen(contentEl, anchorElement, placementOptions);
 
@@ -59,7 +59,7 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 					characterData: true, subtree: true
 				})
 					.throttle(200)
-					.takeUntilBy(Kefir.fromEvents(self, 'destroy'))
+					.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
 					.onValue(function() {
 						containByScreen(contentEl, anchorElement, placementOptions);
 					});
@@ -79,9 +79,8 @@ _.assign(DropdownView.prototype, /** @lends DropdownView */ {
 	close: function() {
 		if (!this.closed) {
 			this.closed = true;
-			this._focusUnsub();
-			this._dropdownViewDriver.destroy();
 			this.emit('destroy');
+			this._dropdownViewDriver.destroy();
 		}
 	}
 

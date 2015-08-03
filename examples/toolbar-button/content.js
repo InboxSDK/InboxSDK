@@ -65,6 +65,7 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		title: 'App Monkey',
 		arrowColor: 'green',
 		onClick: function(event){
+			console.log('app toolbar click', event);
 			var div = document.createElement("div");
 			div.textContent = 'Hello World!';
 			div.style.backgroundColor = 'green';
@@ -72,6 +73,7 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 			event.dropdown.el.appendChild(div);
 		}
 	});
+	window._button = button;
 
 	setTimeout(function(){
 		button.open();

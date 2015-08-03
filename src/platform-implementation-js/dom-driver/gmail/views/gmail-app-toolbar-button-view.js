@@ -1,6 +1,5 @@
 'use strict';
 
-var asap = require('asap');
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
@@ -18,145 +17,125 @@ var DropdownView = require('../../../widgets/buttons/dropdown-view');
 
 
 var GmailAppToolbarButtonView = function(inButtonDescriptor){
-	BasicClass.call(this);
+  BasicClass.call(this);
 
-	this._stopper = kefirStopper();
-	var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
-	buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
+  this._stopper = kefirStopper();
+  var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
+  buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
 };
 
 GmailAppToolbarButtonView.prototype = Object.create(BasicClass.prototype);
 
 _.extend(GmailAppToolbarButtonView.prototype, {
 
-	__memberVariables: [
-		{name: '_stopper', destroy: true},
-		{name: '_buttonDescriptorProperty', destroy: false},
-		{name: '_buttonDescriptor', destroy: false},
-		{name: '_element', destroy: true, get: true},
-		{name: '_activeDropdown', destroy: true},
-		{name: '_iconSettings', destroy: false, defaultValue: {}}
-	],
+  __memberVariables: [
+    {name: '_stopper', destroy: true},
+    {name: '_buttonDescriptorProperty', destroy: false},
+    {name: '_buttonDescriptor', destroy: false},
+    {name: '_element', destroy: true, get: true},
+    {name: '_activeDropdown', destroy: true, destroyFunction: 'close'},
+    {name: '_iconSettings', destroy: false, defaultValue: {}}
+  ],
 
-	getStopper() {return this._stopper;},
+  getStopper() {return this._stopper;},
 
-	open: function(){
-		if(!this._activeDropdown){
-			this._handleClick();
-		}
-	},
+  open() {
+    if(!this._activeDropdown){
+      this._handleClick();
+    }
+  },
 
+  close() {
+    if(this._activeDropdown){
+      this._handleClick();
+    }
+  },
 
-	close: function(){
-		if(this._activeDropdown){
-			this._handleClick();
-		}
-	},
+  _handleButtonDescriptor(buttonDescriptor) {
+    if(!buttonDescriptor){
+      return;
+    }
 
-	_handleButtonDescriptor: function(buttonDescriptor){
-		if(!buttonDescriptor){
-			return;
-		}
+    if(!this._element && buttonDescriptor){
+      this._element = _createAppButtonElement();
+    }
 
-		if(!this._element && buttonDescriptor){
-			this._element = _createAppButtonElement();
-		}
+    this._buttonDescriptor = buttonDescriptor;
 
-		this._buttonDescriptor = buttonDescriptor;
+    var currentTitle = null;
 
-		var currentTitle = null;
+    updateIcon(this._iconSettings, this._element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+    _updateTitle(this._element.querySelector('span'), currentTitle, buttonDescriptor.title);
+    currentTitle = buttonDescriptor.title;
 
-		updateIcon(this._iconSettings, this._element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-		_updateTitle(this._element.querySelector('span'), currentTitle, buttonDescriptor.title);
-		currentTitle = buttonDescriptor.title;
+    this._element.onclick = (event) => {
+      event.preventDefault();
+      this._handleClick();
+    };
+  },
 
-		this._element.onclick = (event) => {
-			event.preventDefault();
+  _handleClick() {
+    if (this._activeDropdown) {
+      this._activeDropdown.close();
+    } else {
+      var appEvent = {};
+      var tooltipView = new GmailTooltipView();
+      tooltipView.getContainerElement().classList.add('inboxsdk__appButton_tooltip');
+      tooltipView.getContentElement().innerHTML = '';
 
-			this._handleClick();
-		};
-	},
+      if(this._buttonDescriptor.arrowColor){
+        tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = this._buttonDescriptor.arrowColor;
+      }
 
-	_handleClick: function(){
-		if(this._activeDropdown){
-			this._activeDropdown.close();
-			this._activeDropdown = null;
-		}
-		else{
-			var appEvent = {};
-			var tooltipView = new GmailTooltipView();
-			tooltipView.getContainerElement().classList.add('inboxsdk__appButton_tooltip');
-			tooltipView.getContentElement().innerHTML = '';
+      appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, this._element, {manualPosition: true});
+      appEvent.dropdown.on('destroy', () => {
+        this._activeDropdown = null;
+      });
 
-			if(this._buttonDescriptor.arrowColor){
-				tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = this._buttonDescriptor.arrowColor;
-			}
+      if(this._buttonDescriptor.onClick){
+        this._buttonDescriptor.onClick.call(null, appEvent);
+      }
 
-			appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, this._element, {manualPosition: true});
-			appEvent.dropdown.on('destroy', function(){
-              setTimeout(() => {
-                this._activeDropdown = null;
-              }, 1);
-            });
-
-            if(this._buttonDescriptor.onClick){
-            	this._buttonDescriptor.onClick(appEvent);
-            }
-
-            asap(() => {
-            	tooltipView.anchor(
-            		this._element,
-            		{
-            			position: 'bottom',
-            			offset: {
-            				top: 8
-            			}
-            		}
-            	);
-            });
-
-		}
-	}
-
+      tooltipView.anchor(
+        this._element,
+        {position: 'bottom', offset: {top: 8}}
+      );
+    }
+  }
 });
 
-function _createAppButtonElement(){
+function _createAppButtonElement() {
+  var element = document.createElement('div');
+  element.setAttribute('class', 'inboxsdk__appButton');
 
-	var element = document.createElement('div');
-	element.setAttribute('class', 'inboxsdk__appButton');
+  element.innerHTML = `<a href="#">
+               <span class="inboxsdk__appButton_title"></span>
+             </a>`;
 
-	element.innerHTML = `<a href="#">
-							 <span class="inboxsdk__appButton_title"></span>
-						 </a>`;
+  var topAccountContainer = GmailElementGetter.getTopAccountContainer();
+  if(!topAccountContainer){
+    return;
+  }
 
+  var insertionElement = topAccountContainer.children[0];
+  if(!insertionElement){
+    return;
+  }
 
+  if(!GmailElementGetter.isGplusEnabled()){
+    element.classList.add('inboxsdk__appButton_noGPlus');
+  }
 
-	var topAccountContainer = GmailElementGetter.getTopAccountContainer();
-	if(!topAccountContainer){
-		return;
-	}
-
-	var insertionElement = topAccountContainer.children[0];
-	if(!insertionElement){
-		return;
-	}
-
-	if(!GmailElementGetter.isGplusEnabled()){
-		element.classList.add('inboxsdk__appButton_noGPlus');
-	}
-
-	insertionElement.insertBefore(element, insertionElement.firstElementChild);
-
-	return element;
-
+  insertionElement.insertBefore(element, insertionElement.firstElementChild);
+  return element;
 }
 
 function _updateTitle(element, currentTitle, newTitle){
-	if(currentTitle === newTitle){
-		return;
-	}
+  if(currentTitle === newTitle){
+    return;
+  }
 
-	element.textContent = newTitle;
+  element.textContent = newTitle;
 }
 
 module.exports = GmailAppToolbarButtonView;
