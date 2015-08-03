@@ -27,6 +27,8 @@ import isValidAppId from './lib/is-valid-app-id';
 import type {Driver} from './driver-interfaces/driver';
 import type {AppLogger} from './lib/logger';
 
+var loadedAppIds: Set<string> = new Set();
+
 export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
@@ -114,7 +116,8 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 	var DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", origin);
-		if (origin === 'https://inbox.google.com') {
+		if (origin === 'https://inbox.google.com' && !loadedAppIds.has(appId)) {
+			loadedAppIds.add(appId);
 			logger.eventSdkPassive('not load');
 		}
 		return new Promise(function(resolve, reject) {
@@ -124,7 +127,11 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 
 	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
-		logger.eventSdkPassive('load');
+		if (!loadedAppIds.has(appId)) {
+			loadedAppIds.add(appId);
+			logger.eventSdkPassive('load');
+		}
+		logger.eventSdkPassive('instantiate');
 
 		if (!isValidAppId(appId)) {
 			console.error(`

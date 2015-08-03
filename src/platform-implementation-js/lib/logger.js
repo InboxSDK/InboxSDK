@@ -278,8 +278,10 @@ function getAppIdsProperty(causedByAppId: ?string, onlyExtensionApps: boolean=tr
     return appIds;
   } else {
     var appIdsWithCause = _.cloneDeep(appIds);
+    var hasSetCause = false;
     appIdsWithCause.forEach(function(entry) {
-      if (entry.appId === causedByAppId) {
+      if (!hasSetCause && entry.appId === causedByAppId) {
+        hasSetCause = true;
         entry.causedBy = true;
       }
       Object.freeze(entry);
@@ -465,7 +467,7 @@ if (_extensionIsLoggerMaster && global.document) {
         timestamp: Date.now()*1000
       })
     }).catch(function(err) {
-      //suppress error when logging event
+      console.error("Failed to log event", err);
     });
   });
 
