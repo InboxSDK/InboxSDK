@@ -12,7 +12,7 @@ var memberMap = new WeakMap();
  * Object that represents an app toolbar button that has been already added to the top
  * navigation area of Gmail or Inbox. This class is returned by {Toolbars.setAppToolbarButton()}.
  */
-var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
+var AppToolbarButtonView = function(driver, appToolbarButtonViewDriverPromise){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -26,6 +26,10 @@ var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
 		appToolbarButtonViewDriver.getStopper().onValue(function() {
 			self.emit('destroy');
 		});
+	});
+
+	driver.getStopper().onValue(() => {
+		this.remove();
 	});
 };
 

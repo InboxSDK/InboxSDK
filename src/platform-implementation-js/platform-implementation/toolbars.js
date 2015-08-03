@@ -84,7 +84,7 @@ _.extend(Toolbars.prototype, /** @lends Toolbars */ {
 
 	addToolbarButtonForApp: function(buttonDescriptor){
 		var appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptor);
-		var appToolbarButtonView = new AppToolbarButtonView(appToolbarButtonViewDriverPromise);
+		var appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
 
 		return appToolbarButtonView;
 	}

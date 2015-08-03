@@ -1,80 +1,86 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var Kefir = require('kefir');
 var baconCast = require('bacon-cast');
 import kefirStopper from 'kefir-stopper';
+import updateIcon from '../lib/update-icon/update-icon';
+import GmailElementGetter from '../gmail-element-getter';
+import GmailTooltipView from '../widgets/gmail-tooltip-view';
+import DropdownView from '../../../widgets/buttons/dropdown-view';
 
-var BasicClass = require('../../../lib/basic-class');
+export default class GmailAppToolbarButtonView {
+	_stopper: Kefir.Stream&{destroy:()=>void};
+	_iconSettings: Object;
+	_element: ?HTMLElement;
+	_activeDropdown: ?DropdownView;
+	_buttonDescriptor: ?Object;
 
+	constructor(inButtonDescriptor: Object) {
+	  this._stopper = kefirStopper();
+		this._iconSettings = {};
+	  var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
+	  buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
+	}
 
-var updateIcon = require('../lib/update-icon/update-icon');
-
-var GmailElementGetter = require('../gmail-element-getter');
-var GmailTooltipView = require('../widgets/gmail-tooltip-view');
-
-var DropdownView = require('../../../widgets/buttons/dropdown-view');
-
-
-var GmailAppToolbarButtonView = function(inButtonDescriptor){
-  BasicClass.call(this);
-
-  this._stopper = kefirStopper();
-  var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
-  buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
-};
-
-GmailAppToolbarButtonView.prototype = Object.create(BasicClass.prototype);
-
-_.extend(GmailAppToolbarButtonView.prototype, {
-
+/*
   __memberVariables: [
     {name: '_stopper', destroy: true},
-    {name: '_buttonDescriptorProperty', destroy: false},
     {name: '_buttonDescriptor', destroy: false},
     {name: '_element', destroy: true, get: true},
     {name: '_activeDropdown', destroy: true, destroyFunction: 'close'},
     {name: '_iconSettings', destroy: false, defaultValue: {}}
   ],
+*/
+	destroy() {
+		this._stopper.destroy();
+		if (this._element) {
+			(this._element:any).remove();
+		}
+		if (this._activeDropdown) {
+			this._activeDropdown.close();
+		}
+	}
 
-  getStopper() {return this._stopper;},
+  getStopper(): Kefir.Stream {return this._stopper;}
+	getElement(): ?HTMLElement {return this._element;}
 
   open() {
     if(!this._activeDropdown){
       this._handleClick();
     }
-  },
+  }
 
   close() {
     if(this._activeDropdown){
       this._handleClick();
     }
-  },
+  }
 
-  _handleButtonDescriptor(buttonDescriptor) {
+  _handleButtonDescriptor(buttonDescriptor: Object) {
     if(!buttonDescriptor){
       return;
     }
 
-    if(!this._element && buttonDescriptor){
-      this._element = _createAppButtonElement();
-    }
-
+    var element = this._element = this._element || _createAppButtonElement();
     this._buttonDescriptor = buttonDescriptor;
-
     var currentTitle = null;
-
-    updateIcon(this._iconSettings, this._element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-    _updateTitle(this._element.querySelector('span'), currentTitle, buttonDescriptor.title);
+    updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+    _updateTitle(element.querySelector('span'), currentTitle, buttonDescriptor.title);
     currentTitle = buttonDescriptor.title;
 
-    this._element.onclick = (event) => {
+    element.addEventListener('click', (event) => {
       event.preventDefault();
       this._handleClick();
-    };
-  },
+    });
+  }
 
   _handleClick() {
+		if (!this._buttonDescriptor) throw new Error("Should not happen");
+		var buttonDescriptor = this._buttonDescriptor;
+
     if (this._activeDropdown) {
       this._activeDropdown.close();
     } else {
@@ -83,8 +89,8 @@ _.extend(GmailAppToolbarButtonView.prototype, {
       tooltipView.getContainerElement().classList.add('inboxsdk__appButton_tooltip');
       tooltipView.getContentElement().innerHTML = '';
 
-      if(this._buttonDescriptor.arrowColor){
-        tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = this._buttonDescriptor.arrowColor;
+      if(buttonDescriptor.arrowColor){
+        tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
       }
 
       appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, this._element, {manualPosition: true});
@@ -92,8 +98,8 @@ _.extend(GmailAppToolbarButtonView.prototype, {
         this._activeDropdown = null;
       });
 
-      if(this._buttonDescriptor.onClick){
-        this._buttonDescriptor.onClick.call(null, appEvent);
+      if(buttonDescriptor.onClick){
+        buttonDescriptor.onClick.call(null, appEvent);
       }
 
       tooltipView.anchor(
@@ -102,9 +108,9 @@ _.extend(GmailAppToolbarButtonView.prototype, {
       );
     }
   }
-});
+}
 
-function _createAppButtonElement() {
+function _createAppButtonElement(): HTMLElement {
   var element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
 
@@ -114,28 +120,26 @@ function _createAppButtonElement() {
 
   var topAccountContainer = GmailElementGetter.getTopAccountContainer();
   if(!topAccountContainer){
-    return;
+    throw new Error("Could not make button");
   }
 
   var insertionElement = topAccountContainer.children[0];
   if(!insertionElement){
-    return;
+		throw new Error("Could not make button");
   }
 
   if(!GmailElementGetter.isGplusEnabled()){
     element.classList.add('inboxsdk__appButton_noGPlus');
   }
 
+	if (!insertionElement.firstElementChild) throw new Error("Could not make button");
   insertionElement.insertBefore(element, insertionElement.firstElementChild);
   return element;
 }
 
-function _updateTitle(element, currentTitle, newTitle){
+function _updateTitle(element: HTMLElement, currentTitle: ?string, newTitle: string) {
   if(currentTitle === newTitle){
     return;
   }
-
   element.textContent = newTitle;
 }
-
-module.exports = GmailAppToolbarButtonView;
