@@ -54,7 +54,7 @@ export type Driver = {
 	openDraftByMessageID(messageID: string): void;
 	getThreadViewDriverStream(): Bacon.Observable<Object>;
 	getMessageViewDriverStream(): Bacon.Observable<Object>;
-	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: ?string, appIconUrl: ?string): GmailKeyboardShortcutHandle;
+	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appIconUrl: ?string): GmailKeyboardShortcutHandle;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object>;

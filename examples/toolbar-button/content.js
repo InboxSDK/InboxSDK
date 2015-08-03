@@ -1,4 +1,5 @@
 InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
+	window._sdk = inboxSDK;
 
 	var shortcutHandle = inboxSDK.Keyboard.createShortcutHandle({
 		chord: 'w b',

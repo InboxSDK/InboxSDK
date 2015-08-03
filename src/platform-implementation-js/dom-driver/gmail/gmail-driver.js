@@ -258,7 +258,7 @@ export default class GmailDriver {
 		return this._userInfo.getAccountSwitcherContactList();
 	}
 
-	createKeyboardShortcutHandle(shortcutDescriptor: Object, appId: ?string, appName: ?string, appIconUrl: ?string): GmailKeyboardShortcutHandle {
+	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string): GmailKeyboardShortcutHandle {
 		return createKeyboardShortcutHandle(this, shortcutDescriptor, appId, appName, appIconUrl);
 	}
 

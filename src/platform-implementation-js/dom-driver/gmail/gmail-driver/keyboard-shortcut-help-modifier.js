@@ -1,41 +1,47 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
-import BasicClass from '../../../lib/basic-class';
-import baconFlatten from '../../../lib/bacon-flatten';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import * as Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+import kefirMakeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import type GmailKeyboardShortcutHandle from '../views/gmail-keyboard-shortcut-handle';
+import type {ShortcutDescriptor} from '../../../driver-interfaces/driver';
 
-function KeyboardShortcutHelpModifier() {
-	BasicClass.call(this);
+export default class KeyboardShortcutHelpModifier {
+	_appId: ?string;
+	_appName: ?string;
+	_appIconUrl: ?string;
+	_stopper: Kefir.Stream&{destroy:()=>void};
+	_shortcuts: Map<GmailKeyboardShortcutHandle, ShortcutDescriptor>;
 
-	this._shortcuts = new Map();
-	this._monitorKeyboardHelp();
-}
+	constructor() {
+		this._appId = null; // TODO have these passed to the constructor
+		this._appName = null;
+		this._appIconUrl = null;
 
-KeyboardShortcutHelpModifier.prototype = Object.create(BasicClass.prototype);
+		this._stopper = kefirStopper();
+		this._shortcuts = new Map();
+		this._monitorKeyboardHelp();
+	}
 
-_.extend(KeyboardShortcutHelpModifier.prototype, {
+	destroy() {
+		this._stopper.destroy();
+		this._shortcuts.clear();
+	}
 
-	__memberVariables: [
-		{name: '_appId', destroy: false},
-		{name: '_appName', destroy: false},
-		{name: '_appIconUrl', destroy: false},
-		{name: '_shortcuts', destroy: false}
-	],
-
-	set: function(gmailKeyboardShortcutHandle, shortcutDescriptor, appId, appName, appIconUrl){
+	set(gmailKeyboardShortcutHandle: GmailKeyboardShortcutHandle, shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string){
 		this._initializeAppValues(appId, appName, appIconUrl);
 
 		this._shortcuts.set(gmailKeyboardShortcutHandle, shortcutDescriptor);
-	},
+	}
 
-	delete: function(gmailKeyboardShortcutHandle){
+	delete(gmailKeyboardShortcutHandle: GmailKeyboardShortcutHandle){
 		this._shortcuts.delete(gmailKeyboardShortcutHandle);
-	},
+	}
 
-	_initializeAppValues: function(appId, appName, appIconUrl){
+	_initializeAppValues(appId: string, appName: ?string, appIconUrl: ?string) {
 		if(!this._appId){
 			this._appId = appId;
 		}
@@ -47,26 +53,25 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		if(!this._appIconUrl){
 			this._appIconUrl = appIconUrl;
 		}
-	},
+	}
 
-	_monitorKeyboardHelp: function(){
-		makeElementChildStream(document.body)
+	_monitorKeyboardHelp() {
+		kefirMakeElementChildStream(document.body)
 			.map(event => event.el)
 			.filter(node =>
 				node && node.classList && node.classList.contains('wa')
 			)
 			.flatMap(node =>
-				makeMutationObserverChunkedStream(node, {attributes: true, attributeFilter: ['class']})
-					.filter(() =>
-						!node.classList.contains('aou')
-					)
+				kefirMakeMutationObserverChunkedStream(node, {attributes: true, attributeFilter: ['class']})
+					.filter(() => !node.classList.contains('aou'))
+					.toProperty(() => null)
 					.map(() => node)
-					.toProperty(node)
 			)
-			.onValue(this, '_renderHelp');
-	},
+			.takeUntilBy(this._stopper)
+			.onValue(node => this._renderHelp(node));
+	}
 
-	_renderHelp: function(node){
+	_renderHelp(node: HTMLElement) {
 		if(this._shortcuts.size === 0){
 			return;
 		}
@@ -78,19 +83,18 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 
 		var bodies = table.querySelectorAll('tbody tbody');
 
-		var self = this;
 		var index = 0;
-		this._shortcuts.forEach(function(shortcutDescriptor){
-			self._renderShortcut(bodies[index % 2], shortcutDescriptor);
+		this._shortcuts.forEach(shortcutDescriptor => {
+			this._renderShortcut(bodies[index % 2], shortcutDescriptor);
 			index++;
 		});
 
 		var firstHeader = node.querySelector('.aov');
-		firstHeader.insertAdjacentElement('beforebegin', header);
-		firstHeader.insertAdjacentElement('beforebegin', table);
-	},
+		(firstHeader:any).insertAdjacentElement('beforebegin', header);
+		(firstHeader:any).insertAdjacentElement('beforebegin', table);
+	}
 
-	_renderHeader: function(){
+	_renderHeader(): HTMLElement {
 		var header = document.createElement('div');
 		header.setAttribute('class', 'aov  aox');
 		header.innerHTML = [
@@ -103,7 +107,9 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 
 		if(this._appIconUrl){
 			var img = document.createElement('img');
-			img.src = this._appIconUrl;
+			if (this._appIconUrl) {
+				img.src = this._appIconUrl;
+			}
 			img.setAttribute('class', 'inboxsdk__icon');
 
 			var title = header.querySelector('.inboxsdk__shortcutHelp_title');
@@ -111,9 +117,9 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		}
 
 		return header;
-	},
+	}
 
-	_renderTable: function(){
+	_renderTable(): HTMLElement {
 		var table = document.createElement('table');
 		table.setAttribute('cellpadding', '0');
 		table.setAttribute('class', 'cf wd inboxsdk__shortcutHelp_table');
@@ -140,9 +146,9 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 		].join('');
 
 		return table;
-	},
+	}
 
-	_renderShortcut: function(tableBody, shortcutDescriptor){
+	_renderShortcut(tableBody: HTMLElement, shortcutDescriptor: ShortcutDescriptor) {
 		var shortcutRow = document.createElement('tr');
 		shortcutRow.innerHTML = [
 			'<td class="wg Dn"> ',
@@ -155,10 +161,9 @@ _.extend(KeyboardShortcutHelpModifier.prototype, {
 
 		tableBody.appendChild(shortcutRow);
 	}
+}
 
-});
-
-function _getShortcutHTML(chord){
+function _getShortcutHTML(chord: string): string {
 	var retArray = [];
 
 	var parts = chord.split(/[\s+]/g);
@@ -174,7 +179,7 @@ function _getShortcutHTML(chord){
 	return retArray.join('');
 }
 
-function _getAngledBracket(chordChar){
+function _getAngledBracket(chordChar: string): string {
 	switch(chordChar.toLowerCase()){
 		case 'shift':
 			return '<Shift>';
@@ -188,7 +193,7 @@ function _getAngledBracket(chordChar){
 	}
 }
 
-function _getSeparatorHTML(separator){
+function _getSeparatorHTML(separator: string): string {
 	switch (separator) {
 		case ' ':
 			return  '<span class="wb">then</span> ';
@@ -198,5 +203,3 @@ function _getSeparatorHTML(separator){
 			return '';
 	}
 }
-
-module.exports = KeyboardShortcutHelpModifier;
