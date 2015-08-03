@@ -1,24 +1,18 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
+import GmailElementGetter from '../gmail-element-getter';
+import GmailAppToolbarButtonView from '../views/gmail-app-toolbar-button-view';
+import type GmailDriver from '../gmail-driver';
 
-var GmailElementGetter = require('../gmail-element-getter');
-
-var GmailAppToolbarButtonView = require('../views/gmail-app-toolbar-button-view');
-
-module.exports = function(gmailDriver, buttonDescriptor){
-	return GmailElementGetter.waitForGmailModeToSettle().then(function(){
-
-		if(GmailElementGetter.isStandalone()){
-			return new Promise(function(resolve, reject){
+export default function addToolbarButtonForApp(gmailDriver: GmailDriver, buttonDescriptor: Object): Promise<GmailAppToolbarButtonView> {
+	return GmailElementGetter.waitForGmailModeToSettle().then(() => {
+		if(GmailElementGetter.isStandalone()) {
+			return new Promise((resolve, reject) => {
 				//never complete
 			});
-		}
-		else{
+		} else {
 			return new GmailAppToolbarButtonView(buttonDescriptor);
 		}
-
 	});
-
-};
+}

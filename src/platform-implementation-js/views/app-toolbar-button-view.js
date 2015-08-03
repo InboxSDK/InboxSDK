@@ -24,6 +24,9 @@ var AppToolbarButtonView = function(appToolbarButtonViewDriverPromise){
 	var self = this;
 	members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 		members.appToolbarButtonViewDriver = appToolbarButtonViewDriver;
+		appToolbarButtonViewDriver.getStopper().onValue(function() {
+			self.emit('destroy');
+		});
 	});
 };
 
@@ -37,11 +40,6 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 	* @return {void}
 	*/
 	open: function(){
-		if(!memberMap.has(this)){
-			console.error('Tried to open after the button is destroyed');
-			return;
-		}
-
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			asap(function(){
@@ -55,11 +53,6 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 	* @return {void}
 	*/
 	close: function(){
-		if(!memberMap.has(this)){
-			console.error('Tried to close after the button is destroyed');
-			return;
-		}
-
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			asap(function(){
@@ -73,15 +66,11 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 	* @return {void}
 	*/
 	remove: function(){
-		_destroy(this);
+		var members = memberMap.get(this);
+		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
+			appToolbarButtonViewDriver.destroy();
+		});
 	}
-
 });
-
-function _destroy(appToolbarButtonViewInstance){
-	appToolbarButtonViewInstance.emit('destroy');
-
-	appToolbarButtonViewInstance.removeAllListeners();
-}
 
 module.exports = AppToolbarButtonView;

@@ -18,6 +18,7 @@ import showAppIdWarning from './gmail-driver/show-app-id-warning';
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
 import GmailThreadView from './views/gmail-thread-view';
+import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
@@ -40,6 +41,7 @@ import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
 import maintainComposeWindowState from './gmail-driver/maintain-compose-window-state';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
+import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './page-communicator';
@@ -200,8 +202,8 @@ export default class GmailDriver {
 		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
 	}
 
-	addToolbarButtonForApp(buttonDescriptor: Object): Promise<Object> {
-		return require('./gmail-driver/add-toolbar-button-for-app')(this, buttonDescriptor);
+	addToolbarButtonForApp(buttonDescriptor: Object): Promise<GmailAppToolbarButtonView> {
+		return addToolbarButtonForApp(this, buttonDescriptor);
 	}
 
 	openComposeWindow() {

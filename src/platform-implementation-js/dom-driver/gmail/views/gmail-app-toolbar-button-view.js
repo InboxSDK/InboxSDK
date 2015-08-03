@@ -4,7 +4,7 @@ var asap = require('asap');
 var _ = require('lodash');
 var Bacon = require('baconjs');
 var baconCast = require('bacon-cast');
-
+import kefirStopper from 'kefir-stopper';
 
 var BasicClass = require('../../../lib/basic-class');
 
@@ -20,6 +20,7 @@ var DropdownView = require('../../../widgets/buttons/dropdown-view');
 var GmailAppToolbarButtonView = function(inButtonDescriptor){
 	BasicClass.call(this);
 
+	this._stopper = kefirStopper();
 	var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
 	buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
 };
@@ -29,6 +30,7 @@ GmailAppToolbarButtonView.prototype = Object.create(BasicClass.prototype);
 _.extend(GmailAppToolbarButtonView.prototype, {
 
 	__memberVariables: [
+		{name: '_stopper', destroy: true},
 		{name: '_buttonDescriptorProperty', destroy: false},
 		{name: '_buttonDescriptor', destroy: false},
 		{name: '_element', destroy: true, get: true},
@@ -36,11 +38,14 @@ _.extend(GmailAppToolbarButtonView.prototype, {
 		{name: '_iconSettings', destroy: false, defaultValue: {}}
 	],
 
+	getStopper() {return this._stopper;},
+
 	open: function(){
 		if(!this._activeDropdown){
 			this._handleClick();
 		}
 	},
+
 
 	close: function(){
 		if(this._activeDropdown){

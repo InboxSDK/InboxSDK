@@ -5,6 +5,8 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 import waitFor from '../../lib/wait-for';
 
+import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
+
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle(): Promise<void> {
@@ -12,7 +14,7 @@ var GmailElementGetter = {
 	},
 
 	getMainContentElementChangedStream: _.once(function(){
-		return require('./gmail-element-getter/get-main-content-element-changed-stream')(this);
+		return getMainContentElementChangedStream(this);
 	}),
 
 	isStandalone(): boolean {
