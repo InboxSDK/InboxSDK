@@ -90,8 +90,10 @@ export default class KeyboardShortcutHelpModifier {
 		});
 
 		var firstHeader = node.querySelector('.aov');
-		(firstHeader:any).insertAdjacentElement('beforebegin', header);
-		(firstHeader:any).insertAdjacentElement('beforebegin', table);
+		var parent = firstHeader.parentElement;
+		if (!parent) throw new Error("Could not find parent");
+		parent.insertBefore(header, firstHeader);
+		parent.insertBefore(table, firstHeader);
 	}
 
 	_renderHeader(): HTMLElement {
