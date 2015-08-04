@@ -239,13 +239,15 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	title:null,
 
 	/**
-	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL. While iconUrl is an optional parameter at least one of iconUrl or iconClass is required.
+	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	iconUrl:null,
 
 	/**
-	* An optional class to apply to the icon.
+	* An optional class to apply to the icon. While iconClass is an optional parameter at least one of iconUrl or iconClass is required.
 	* ^optional
 	* ^default=null
 	* @type {string}
