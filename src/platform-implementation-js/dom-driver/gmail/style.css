@@ -321,9 +321,10 @@ td.gH div.gK span:first-child > img:last-child {
 
 body .dw {
   /* Fixes issue where a tall compose window opened over a custom view could be
-   * overlapped by Gmail's top bar.
+   * overlapped by Gmail's top bar. Also fixes issue where mole widgets are
+   * only visible while a compose window is open.
    */
-  z-index: 6;
+  z-index: 6 !important;
 }
 
 .inboxsdk__compose_outerSidebar_wrapper {
@@ -489,10 +490,6 @@ div.inboxsdk__compose_statusbar {
 /* end modal */
 
 /* mole */
-
-.inboxsdk__moles_in_use {
-  z-index: 3 !important;
-}
 
 /* Fix issue where Compose toolbar can become disconnected when moles are in use */
 .inboxsdk__moles_in_use .aDi {
