@@ -1,11 +1,13 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
-
 var isNumber = require('isnumber');
 
-module.exports = function(checkElement, childElements, dataAttributes){
+export default function getInsertBeforeElement(checkElement: HTMLElement, childElements: any, dataAttributes: string[]): ?HTMLElement {
 	var checkValues = {};
-	var insertBeforeElement = null;
+	var insertBeforeElement: ?HTMLElement = null;
 
 	dataAttributes.forEach(function(attribute){
 		var value = checkElement.getAttribute(attribute);
@@ -13,7 +15,7 @@ module.exports = function(checkElement, childElements, dataAttributes){
 	});
 
 	for(var ii=0; ii<childElements.length; ii++){
-		var child = childElements[ii];
+		var child: HTMLElement = (childElements[ii]:any);
 
 		if(_isChildAfter(checkValues, child, dataAttributes)){
 			insertBeforeElement = child;
@@ -21,11 +23,10 @@ module.exports = function(checkElement, childElements, dataAttributes){
 		}
 	}
 
-
 	return insertBeforeElement;
-};
+}
 
-function _isChildAfter(checkValues, child, dataAttributes){
+function _isChildAfter(checkValues: Object, child: HTMLElement, dataAttributes: string[]): boolean {
 	for(var ii=0; ii<dataAttributes.length; ii++){
 		var attribute = dataAttributes[ii];
 		var value = child.getAttribute(attribute);

@@ -6,17 +6,16 @@ import util from 'util';
 import Bacon from 'baconjs';
 import {parse} from 'querystring';
 
+import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
-
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
-
 import GmailContentPanelContainerView from '../widgets/gmail-content-panel/gmail-content-panel-container-view';
 
 class GmailThreadView {
 	_element: HTMLElement;
 	_routeViewDriver: any;
-	_driver: any;
+	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
 	_eventStream: Bacon.Bus;
 	_sidebarContentPanelContainerView: any;
@@ -26,7 +25,7 @@ class GmailThreadView {
 	_newMessageMutationObserver: ?sdkMutationObserver;
 	_threadID: ?string;
 
-	constructor(element: HTMLElement, routeViewDriver: any, driver: any, isPreviewedThread:boolean=false) {
+	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
 		this._element = element;
 		this._routeViewDriver = routeViewDriver;
 		this._driver = driver;
