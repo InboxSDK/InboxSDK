@@ -12,18 +12,18 @@ import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 
 export default class GmailAppToolbarButtonView {
-	_stopper: Kefir.Stream&{destroy:()=>void};
-	_iconSettings: Object;
-	_element: ?HTMLElement;
-	_activeDropdown: ?DropdownView;
-	_buttonDescriptor: ?Object;
+  _stopper: Kefir.Stream&{destroy:()=>void};
+  _iconSettings: Object;
+  _element: ?HTMLElement;
+  _activeDropdown: ?DropdownView;
+  _buttonDescriptor: ?Object;
 
-	constructor(inButtonDescriptor: Object) {
-	  this._stopper = kefirStopper();
-		this._iconSettings = {};
-	  var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
-	  buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
-	}
+  constructor(inButtonDescriptor: Object) {
+    this._stopper = kefirStopper();
+    this._iconSettings = {};
+    var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
+    buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
+  }
 
 /*
   __memberVariables: [
@@ -34,18 +34,18 @@ export default class GmailAppToolbarButtonView {
     {name: '_iconSettings', destroy: false, defaultValue: {}}
   ],
 */
-	destroy() {
-		this._stopper.destroy();
-		if (this._element) {
-			(this._element:any).remove();
-		}
-		if (this._activeDropdown) {
-			this._activeDropdown.close();
-		}
-	}
+  destroy() {
+    this._stopper.destroy();
+    if (this._element) {
+      (this._element:any).remove();
+    }
+    if (this._activeDropdown) {
+      this._activeDropdown.close();
+    }
+  }
 
   getStopper(): Kefir.Stream {return this._stopper;}
-	getElement(): ?HTMLElement {return this._element;}
+  getElement(): ?HTMLElement {return this._element;}
 
   open() {
     if(!this._activeDropdown){
@@ -64,22 +64,17 @@ export default class GmailAppToolbarButtonView {
       return;
     }
 
-    var element = this._element = this._element || _createAppButtonElement();
+    var element = this._element = this._element || _createAppButtonElement(() => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
     var currentTitle = null;
     updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
     _updateTitle(element.querySelector('span'), currentTitle, buttonDescriptor.title);
     currentTitle = buttonDescriptor.title;
-
-    element.addEventListener('click', (event) => {
-      event.preventDefault();
-      this._handleClick();
-    });
   }
 
   _handleClick() {
-		if (!this._buttonDescriptor) throw new Error("Should not happen");
-		var buttonDescriptor = this._buttonDescriptor;
+    if (!this._buttonDescriptor) throw new Error("Should not happen");
+    var buttonDescriptor = this._buttonDescriptor;
 
     if (this._activeDropdown) {
       this._activeDropdown.close();
@@ -110,13 +105,18 @@ export default class GmailAppToolbarButtonView {
   }
 }
 
-function _createAppButtonElement(): HTMLElement {
+function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement {
   var element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
 
   element.innerHTML = `<a href="#">
                <span class="inboxsdk__appButton_title"></span>
              </a>`;
+
+  element.addEventListener('click', (event) => {
+    event.preventDefault();
+    onclick(event);
+  });
 
   var topAccountContainer = GmailElementGetter.getTopAccountContainer();
   if(!topAccountContainer){
@@ -125,14 +125,14 @@ function _createAppButtonElement(): HTMLElement {
 
   var insertionElement = topAccountContainer.children[0];
   if(!insertionElement){
-		throw new Error("Could not make button");
+    throw new Error("Could not make button");
   }
 
   if(!GmailElementGetter.isGplusEnabled()){
     element.classList.add('inboxsdk__appButton_noGPlus');
   }
 
-	if (!insertionElement.firstElementChild) throw new Error("Could not make button");
+  if (!insertionElement.firstElementChild) throw new Error("Could not make button");
   insertionElement.insertBefore(element, insertionElement.firstElementChild);
   return element;
 }
