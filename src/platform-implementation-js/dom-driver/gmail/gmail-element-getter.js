@@ -111,6 +111,10 @@ var GmailElementGetter = {
 		return document.querySelector('.aeN');
 	},
 
+	getGtalkButtons(): ?HTMLElement {
+		return document.querySelector('.aeN .aj5.J-KU-Jg');
+	},
+
 	getNavItemMenuInjectionContainer(): HTMLElement {
 		return document.querySelector('.aeN .n3');
 	},
