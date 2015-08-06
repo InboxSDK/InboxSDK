@@ -55,13 +55,13 @@ export default class UserInfo {
   }
 
   waitForAccountSwitcherReady(): Promise<void> {
-    return waitFor(() => this.getAccountSwitcherContactList().length > 0, 2*1000)
+    return waitFor(() => this.getAccountSwitcherContactList().length > 0, 10*1000)
       .catch(err => {
         this._failedWaitFor = true;
         Logger.error(err, {
           reason: "waiting for user account switcher",
           switcherHTML: _.map(
-            document.querySelectorAll('div.gb_w'),
+            document.querySelectorAll('div.gb_w[aria-label], div.gb_va[aria-label]'),
             (el: HTMLElement) => censorHTMLstring(el.outerHTML))
         });
       });
