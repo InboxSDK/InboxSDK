@@ -8,7 +8,7 @@ import jsdom from './lib/jsdom';
 import UserInfo from '../src/platform-implementation-js/dom-driver/gmail/gmail-driver/user-info';
 
 describe('UserInfo', function() {
-  var document = jsdom(`<!doctype html><html><body><div id="slot"></div></body></html>`);
+  var document = jsdom(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
   var slot = document.getElementById('slot');
   var driver = {getUserEmailAddress: _.constant('cowan@streak.com')};
 
@@ -74,6 +74,18 @@ describe('UserInfo', function() {
       assert.deepEqual(userInfo.getAccountSwitcherContactList(), [
         {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
         {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'}
+      ]);
+    });
+
+    it('single user', async function() {
+      slot.innerHTML = `
+<div class="gb_va gb_1b" aria-label="Account Information" aria-hidden="false" tabindex="0" img-loaded="1"><div class="gb_ya"><div class="gb_Aa"><div class="gb_Ca">PeopleAggregate Test</div><div class="gb_Da">peopleaggregatetest@gmail.com</div><div class="gb_xa"><a href="https://plus.google.com/u/0/up/accounts/upgrade?gpsrc=ogjgp&amp;tab=mX" target="_blank">Join Google+</a>–<a href="http://www.google.com/intl/en/policies/privacy/" target="_blank">Privacy</a></div><a class="gb_Mc gbp1 gb_7" href="https://myaccount.google.com/?utm_source=OGB" target="_blank">My Account</a></div></div><div class="gb_Ja gb_ea" aria-hidden="true"></div><a class="gb_Sa gb_ea" href="https://plus.google.com/u/0/dashboard" aria-hidden="true"><span class="gb_Ta gb_5a"></span><div class="gb_Ua">All your Google+ pages ›</div></a><div class="gb_Ea"><div><a class="gb_Kc gb_7" href="https://accounts.google.com/AddSession?hl=en&amp;continue=https://mail.google.com/mail&amp;service=mail" target="_blank">Add account</a></div><div><a class="gb_Nc gb_Uc gb_7" id="gb_71" href="https://mail.google.com/mail/logout?hl=en" target="_top">Sign out</a></div></div></div>
+      `;
+
+      var userInfo = new UserInfo(driver);
+      await userInfo.waitForAccountSwitcherReady();
+      assert.deepEqual(userInfo.getAccountSwitcherContactList(), [
+        {name: 'PeopleAggregate Test', emailAddress: 'peopleaggregatetest@gmail.com'}
       ]);
     });
   });
