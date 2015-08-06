@@ -1,121 +1,119 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
 
-var GmailTabContainerView = require('./gmail-tab-container-view');
-var GmailContentPanelView = require('./gmail-content-panel-view');
+import GmailTabContainerView from './gmail-tab-container-view';
+import GmailContentPanelView from './gmail-content-panel-view';
 
-var BasicClass = require('../../../../lib/basic-class');
+export default class GmailContentPanelContainerView {
+  _eventStream: Bacon.Bus;
+  _descriptorToViewMap: Map<Object, GmailContentPanelView>;
+  _viewToDescriptorMap: Map<GmailContentPanelView, Object>;
+  _element: HTMLElement;
+  _gmailTabContainerView: GmailTabContainerView;
+  _gmailContentPanelViews: any[];
+  _tabContainer: HTMLElement;
+  _contentContainer: HTMLElement;
 
-var GmailContentPanelContainerView = function(element){
-     BasicClass.call(this);
+  constructor(element: ?HTMLElement) {
+    this._eventStream = new Bacon.Bus();
+    this._descriptorToViewMap = new Map();
+    this._viewToDescriptorMap = new Map();
+    this._gmailContentPanelViews = [];
 
-     this._eventStream = new Bacon.Bus();
-     this._descriptorToViewMap = new Map();
-     this._viewToDescriptorMap = new Map();
+    if (!element) {
+      this._setupElement();
+    } else {
+      this._setupExistingElement(element);
+    }
 
-     if(!element){
-          this._setupElement();
-     }
-     else{
-          this._setupExistingElement(element);
-     }
+    this._setupGmailTabContainerView();
+  }
 
-     this._setupGmailTabContainerView();
+  destroy() {
+    (this._element:any).remove();
+    this._gmailTabContainerView.destroy();
+    this._gmailContentPanelViews.slice().forEach(x => {x.destroy();});
+    this._gmailContentPanelViews.length = 0;
+  }
 
-};
+  getElement(): HTMLElement {return this._element;}
 
-GmailContentPanelContainerView.prototype = Object.create(BasicClass.prototype);
+  addContentPanel(descriptor: Object, appId: string) {
+    var gmailContentPanelView = new GmailContentPanelView(descriptor, this, appId);
+    this._gmailContentPanelViews.push(gmailContentPanelView);
+    this._descriptorToViewMap.set(descriptor, gmailContentPanelView);
+    this._viewToDescriptorMap.set(gmailContentPanelView, descriptor);
+    this._gmailTabContainerView.addTab(descriptor, appId);
 
-_.extend(GmailContentPanelContainerView.prototype, {
+    return gmailContentPanelView;
+  }
 
-     __memberVariables: [
-          {name: '_element', destroy: true, get: true},
-          {name: '_tabContainer', destroy: false},
-          {name: '_contentContainer', destroy: false},
-          {name: '_gmailTabContainerView', destroy: true},
-          {name: '_gmailContentPanelViews', destroy: true, defaultValue: []},
-          {name: '_descriptorToViewMap', destroy: false},
-          {name: '_viewToDescriptorMap', destroy: false}
-     ],
+  remove(gmailContentPanelView: GmailContentPanelView) {
+    _.remove(this._gmailContentPanelViews, gmailContentPanelView);
+    var descriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
 
-     addContentPanel: function(descriptor, appId){
-          var gmailContentPanelView = new GmailContentPanelView(descriptor, this, appId);
-          this._gmailContentPanelViews.push(gmailContentPanelView);
-          this._descriptorToViewMap.set(descriptor, gmailContentPanelView);
-          this._viewToDescriptorMap.set(gmailContentPanelView, descriptor);
-          this._gmailTabContainerView.addTab(descriptor, appId);
+    if (this._gmailTabContainerView) {
+      this._gmailTabContainerView.remove(descriptor);
+    }
 
-          return gmailContentPanelView;
-     },
+    if (this._viewToDescriptorMap) {
+      this._viewToDescriptorMap.delete(gmailContentPanelView);
+    }
 
-     remove: function(gmailContentPanelView){
-          _.remove(this._gmailContentPanelViews, gmailContentPanelView);
-          var descriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
+    if (this._descriptorToViewMap) {
+      this._descriptorToViewMap.delete(descriptor);
+    }
+  }
 
-          if(this._gmailTabContainerView){
-               this._gmailTabContainerView.remove(descriptor);
-          }
+  _setupElement() {
+    this._element = document.createElement('div');
+    this._element.classList.add('inboxsdk__contentPanelContainer');
 
-          if(this._viewToDescriptorMap){
-               this._viewToDescriptorMap.delete(gmailContentPanelView);
-          }
+    this._tabContainer = document.createElement('div');
+    this._tabContainer.classList.add('inboxsdk__contentPanelContainer_tabContainer');
 
-          if(this._descriptorToViewMap){
-               this._descriptorToViewMap.delete(descriptor);
-          }
-     },
+    this._contentContainer = document.createElement('div');
+    this._contentContainer.classList.add('inboxsdk__contentPanelContainer_contentContainer');
 
-     _setupElement: function(){
-          this._element = document.createElement('div');
-          this._element.classList.add('inboxsdk__contentPanelContainer');
+    this._element.appendChild(this._tabContainer);
+    this._element.appendChild(this._contentContainer);
+  }
 
-          this._tabContainer = document.createElement('div');
-          this._tabContainer.classList.add('inboxsdk__contentPanelContainer_tabContainer');
+  _setupExistingElement(element: HTMLElement) {
+    this._element = element;
+    this._tabContainer = element.querySelector('.inboxsdk__contentPanelContainer_tabContainer');
+    this._contentContainer = element.querySelector('.inboxsdk__contentPanelContainer_contentContainer');
+  }
 
-          this._contentContainer = document.createElement('div');
-          this._contentContainer.classList.add('inboxsdk__contentPanelContainer_contentContainer');
+  _setupGmailTabContainerView() {
+    var existingTabContainerElement: HTMLElement = (this._tabContainer.children[0]:any);
+    this._gmailTabContainerView = new GmailTabContainerView(existingTabContainerElement);
 
-          this._element.appendChild(this._tabContainer);
-          this._element.appendChild(this._contentContainer);
-     },
+    if (!existingTabContainerElement) {
+      this._tabContainer.appendChild(this._gmailTabContainerView.getElement());
+    }
 
-     _setupExistingElement: function(element){
-          this._element = element;
-          this._tabContainer = element.querySelector('.inboxsdk__contentPanelContainer_tabContainer');
-          this._contentContainer = element.querySelector('.inboxsdk__contentPanelContainer_contentContainer');
-     },
+    this._gmailTabContainerView
+      .getEventStream()
+      .filter(_isEventName.bind(null, 'tabActivate'))
+      .map(x => x.descriptor)
+      .map(x => this._descriptorToViewMap.get(x))
+      .doAction(x => {x.activate();})
+      .map(x => x.getElement())
+      .onValue(el => {this._contentContainer.appendChild(el);});
 
-     _setupGmailTabContainerView: function(){
-          var existingTabContainerElement = this._tabContainer.children[0];
-          this._gmailTabContainerView = new GmailTabContainerView(existingTabContainerElement);
-
-          if(!existingTabContainerElement){
-               this._tabContainer.appendChild(this._gmailTabContainerView.getElement());
-          }
-
-          this._gmailTabContainerView
-               .getEventStream()
-               .filter(_isEventName.bind(null, 'tabActivate'))
-               .map('.descriptor')
-               .map(this._descriptorToViewMap, 'get')
-               .doAction('.activate')
-               .map('.getElement')
-               .onValue(this._contentContainer, 'appendChild');
-
-          this._gmailTabContainerView
-               .getEventStream()
-               .filter(_isEventName.bind(null, 'tabDeactivate'))
-               .map('.descriptor')
-               .map(this._descriptorToViewMap, 'get')
-               .onValue('.deactivate');
-     }
-
-
- });
-
-function _isEventName(checkEventName, event){
-     return event && event.eventName === checkEventName;
+    this._gmailTabContainerView
+      .getEventStream()
+      .filter(_isEventName.bind(null, 'tabDeactivate'))
+      .map(x => x.descriptor)
+      .map(x => this._descriptorToViewMap.get(x))
+      .onValue(x => {x.deactivate(x);});
+  }
 }
 
-
-module.exports = GmailContentPanelContainerView;
+function _isEventName(checkEventName: string, event: ?{eventName: string}): boolean {
+  return Boolean(event && event.eventName === checkEventName);
+}

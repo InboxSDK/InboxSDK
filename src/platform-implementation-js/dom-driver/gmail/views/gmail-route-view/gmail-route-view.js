@@ -152,7 +152,8 @@ _.extend(GmailRouteView.prototype, {
 
 	_setCustomViewElementHeight: function(){
 		var leftNav = GmailElementGetter.getLeftNavContainerElement();
-		this._customViewElement.style.height = leftNav.style.height;
+		var gtalkButtons = GmailElementGetter.getGtalkButtons();
+		this._customViewElement.style.height = `${parseInt(leftNav.style.height,10) + (gtalkButtons ? gtalkButtons.offsetHeight : 0)}px`;
 	},
 
 	_setupSubViews: function(){

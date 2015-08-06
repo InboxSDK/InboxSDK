@@ -24,7 +24,62 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	});
 
 	sdk.Router.handleCustomRoute('tlexample/:monkeyName', function(customRouteView){
-		customRouteView.getElement().innerHTML = 'hello world!';
+		customRouteView.getElement().innerHTML = 'hello world!' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar' +
+			'<br>foo<br>bar<br>END';
 	});
 
 	sdk.Router.handleCustomListRoute('tlbeep', function(page) {

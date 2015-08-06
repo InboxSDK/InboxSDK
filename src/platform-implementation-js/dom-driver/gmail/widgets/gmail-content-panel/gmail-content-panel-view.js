@@ -1,53 +1,54 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
+import type GmailContentPanelContainerView from './gmail-content-panel-container-view';
 
-var ContentPanelViewDriver = require('../../../../driver-interfaces/content-panel-view-driver');
+export default class GmailContentPanelView {
+  destroyed: boolean;
+  _eventStream: Bacon.Bus;
+  _element: HTMLElement;
+  _gmailContentPanelContainerView: Object;
 
-var GmailContentPanelView = function(contentPanelDescriptor, gmailContentPanelContainerView){
-     ContentPanelViewDriver.call(this);
+  constructor(contentPanelDescriptor: Object, gmailContentPanelContainerView: GmailContentPanelContainerView) {
+    this.destroyed = false;
+    this._eventStream = new Bacon.Bus();
+    this._element = document.createElement('div');
 
-     this._eventStream = new Bacon.Bus();
-     this._element = document.createElement('div');
+    this._gmailContentPanelContainerView = gmailContentPanelContainerView;
+    contentPanelDescriptor
+      .takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
+      .map(x => x.el)
+      .onValue(el => {this._element.appendChild(el);});
+  }
 
-     this._gmailContentPanelContainerView = gmailContentPanelContainerView;
-     contentPanelDescriptor
-          .takeUntil(this._eventStream.filter(false).mapEnd())
-          .map('.el')
-          .onValue(this._element, 'appendChild');
-};
+  destroy() {
+    if (!this.destroyed) {
+      this.destroyed = true;
+      this._eventStream.end();
+      (this._element:any).remove();
+      this._gmailContentPanelContainerView.remove(this);
+    }
+  }
 
-GmailContentPanelView.prototype = Object.create(ContentPanelViewDriver.prototype);
+  getEventStream(): Bacon.Observable {return this._eventStream;}
+  getElement(): HTMLElement {return this._element;}
 
-_.extend(GmailContentPanelView.prototype, {
+  activate() {
+    this._eventStream.push({
+      eventName: 'activate'
+    });
+  }
 
-     __memberVariables: [
-          {name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-          {name: '_element', destroy: true, get: true},
-          {name: '_gmailContentPanelContainerView', destroy: false}
-     ],
+  deactivate() {
+    this._eventStream.push({
+      eventName: 'deactivate'
+    });
+    (this._element:any).remove();
+  }
 
-     activate: function(){
-          this._eventStream.push({eventName: 'activate'});
-     },
-
-     deactivate: function(){
-          this._eventStream.push({eventName: 'deactivate'});
-          this._element.remove();
-     },
-
-     remove: function(){
-          this.destroy();
-     },
-
-     destroy: function(){
-          if(this._gmailContentPanelContainerView){
-               this._gmailContentPanelContainerView.remove(this);
-          }
-
-          ContentPanelViewDriver.prototype.destroy.call(this);
-     }
-
-});
-
-
-module.exports = GmailContentPanelView;
+  remove() {
+    this.destroy();
+  }
+}
