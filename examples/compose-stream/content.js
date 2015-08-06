@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'compose-stream-example').then(function(inboxSDK) {
+InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inboxSDK) {
 
 	window.openDraftByMessageID = function(messageID) {
 		return inboxSDK.Compose.openDraftByMessageID(messageID);

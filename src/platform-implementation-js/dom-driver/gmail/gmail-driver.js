@@ -226,7 +226,7 @@ export default class GmailDriver {
 		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
 	}
 
-	getSentMailNativeNavItem(): Object {
+	getSentMailNativeNavItem(): Promise<Object> {
 		return require('./gmail-driver/get-native-nav-item')('sent');
 	}
 

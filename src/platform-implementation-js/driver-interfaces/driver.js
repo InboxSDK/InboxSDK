@@ -1,39 +1,6 @@
 /* @flow */
 // jshint ignore:start
 
-export default {
-	getLogger: 0,
-	getRouteViewDriverStream: 0,
-	getRowListViewDriverStream: 0,
-	openComposeWindow: 0,
-	getComposeViewDriverStream: 0,
-	openDraftByMessageID: 1,
-	getThreadViewDriverStream: 0,
-	getMessageViewDriverStream: 0,
-	createKeyboardShortcutHandle: 4,
-	getUserEmailAddress: 0,
-	getUserContact: 0,
-	getThreadRowViewDriverKefirStream: 0,
-	addNavItem: 2,
-	getSentMailNativeNavItem: 0,
-	createLink: 2,
-	goto: 2,
-	addCustomRouteID: 1,
-	addCustomListRouteID: 2,
-	showCustomRouteView: 1,
-	setShowNativeNavMarker: 1,
-	registerSearchSuggestionsProvider: 1,
-	registerSearchQueryRewriter: 1,
-	addToolbarButtonForApp: 1,
-	getToolbarViewDriverStream: 0,
-	getButterBarDriver: 0,
-	setButterBar: 1,
-	isRunningInPageContext: 0,
-	showAppIdWarning: 0,
-	createModalViewDriver: 1,
-	destroy: 0
-};
-
 import type Bacon from 'baconjs';
 import type Kefir from 'kefir';
 import type GmailKeyboardShortcutHandle from '../dom-driver/gmail/views/gmail-keyboard-shortcut-handle';
@@ -59,7 +26,7 @@ export type Driver = {
 	getUserContact(): Contact;
 	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object>;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
-	getSentMailNativeNavItem(): Object;
+	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;
 	goto(routeID: string, params: any): void;
 	addCustomRouteID(routeID: string): () => void;
