@@ -32,10 +32,10 @@ export default class UserInfo {
 
   getAccountSwitcherContactList(): Contact[] {
     return _.map(
-      document.querySelectorAll('div.gb_K a.gb_L div.gb_N'),
+      document.querySelectorAll('[role=banner] div[aria-label] div > a[target="_blank"] > img + div'),
       (el: HTMLElement) => ({
-        name: el.querySelector('.gb_R').textContent,
-        emailAddress: el.querySelector('.gb_S').textContent.match(/\S+/)[0]
+        name: el.children[0].textContent,
+        emailAddress: el.children[1].textContent.match(/\S+/)[0]
       }));
   }
 
