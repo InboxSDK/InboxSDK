@@ -23,7 +23,8 @@ module.exports = function(label){
 		return labelElement.__nativeGmailNavItemView;
 	}).catch(function(err){
 		if(GmailElementGetter.isStandalone()){
-			return;
+			// never resolve
+			return new Promise((resolve, reject) => {});
 		}
 
 		throw err;
