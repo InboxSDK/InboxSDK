@@ -43,7 +43,9 @@ export default class InboxDriver {
   constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
     this._logger = logger;
     this._stopper = kefirStopper();
-    this.onready = injectScript();
+    this.onready = injectScript().then(() => {
+      this._logger.setUserEmailAddress(this.getUserEmailAddress());
+    });
 
     // this._customRouteIDs = new Set();
     // this._customListRouteIDs = new Map();

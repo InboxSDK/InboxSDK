@@ -21,8 +21,8 @@ declare module baconjs {
     onValues(cb: (value: any) => void): () => void;
     onError(cb: (e: any) => void): () => void;
     onEnd(cb: () => void): () => void;
-    toPromise(): Promise<T>;
-    firstToPromise(): Promise<T>;
+    toPromise(PromiseConstructor?: Function): Promise<T>;
+    firstToPromise(PromiseConstructor?: Function): Promise<T>;
     map<U>(cb: (i: T) => U): Observable<U>;
     mapError<U>(cb: (e: any) => U): Observable<T|U>;
     errors(): Observable<any>;
