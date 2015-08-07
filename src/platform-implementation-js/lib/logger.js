@@ -106,8 +106,8 @@ class Logger {
     _trackEvent(this._appId, 'sdkPassive', name, details);
   }
 
-  // Track Gmail events.
-  eventGmail(name: string, details?: any) {
+  // Track Site events.
+  eventSite(name: string, details?: any) {
     // Only the first logger instance reports Gmail events.
     if (!this._isMaster) {
       return;

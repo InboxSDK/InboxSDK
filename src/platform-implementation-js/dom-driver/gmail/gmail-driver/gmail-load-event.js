@@ -8,7 +8,7 @@ export default function gmailLoadEvent(driver: GmailDriver) {
   var pageCommunicator = driver.getPageCommunicator();
 
   pageCommunicator.isConversationViewDisabled().then(isConversationViewDisabled => {
-    driver.getLogger().eventGmail('gmailSettings', {
+    driver.getLogger().eventSite('gmailSettings', {
       screenWidth: window.screen && window.screen.width,
       screenHeight: window.screen && window.screen.height,
       windowWidth: window.innerWidth,
