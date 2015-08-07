@@ -1,4 +1,5 @@
 InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inboxSDK) {
+	window._sdk = inboxSDK;
 
 	window.openDraftByMessageID = function(messageID) {
 		return inboxSDK.Compose.openDraftByMessageID(messageID);
@@ -6,7 +7,6 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		console.log('thread id', composeView.getThreadID());
-		console.log('message id', composeView.getMessageID());
 
 		window.sendIt = function() {
 			composeView.send();
@@ -79,7 +79,6 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 			section: 'SEND_RIGHT'
 		});
 
-		composeView.on('messageIDChange', console.log.bind(console, 'messageIDChange'));
 		composeView.on('destroy', console.log.bind(console, 'destroy'));
 		composeView.on('presending', console.log.bind(console, 'presending'));
 		composeView.on('sending', console.log.bind(console, 'sending'));

@@ -4,7 +4,6 @@
 import _ from 'lodash';
 import htmlToText from '../common/html-to-text';
 import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
-import depWarn from '../platform-implementation-js/lib/dep-warn';
 
 export type AutoCompleteSuggestion = {
   name?: ?string;
@@ -63,7 +62,7 @@ export default function modifySuggestions(responseText: string, modifications: A
     }
     if (modification.iconURL) {
       var iconURL = modification.iconURL;
-      depWarn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
+      console.warn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
       if (!modification.iconUrl) {
         modification.iconUrl = iconURL;
       }

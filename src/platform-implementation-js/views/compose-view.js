@@ -15,16 +15,26 @@ var memberMap = new WeakMap();
  * The fields can be easily read and modified, and certain elements can
  * be attached to it. This includes buttons and sidebars.
  */
-function ComposeView(composeViewImplementation, appId) {
+function ComposeView(driver, composeViewImplementation, appId) {
 	EventEmitter.call(this);
 
-	var members = {};
+	var members = {
+		driver: driver,
+		composeViewImplementation: composeViewImplementation,
+		appId: appId
+	};
 	memberMap.set(this, members);
 
-	members.composeViewImplementation = composeViewImplementation;
-	members.appId = appId;
-
 	var self = this;
+
+	this.on('newListener', function(eventName) {
+		if (eventName === 'close') {
+			driver.getLogger().deprecationWarning('composeView close event', 'composeView destroy event');
+		} else if (eventName === 'messageIDChange') {
+			driver.getLogger().deprecationWarning('composeView messageIDChange event');
+		}
+	});
+
 	members.composeViewImplementation.getEventStream().onValue(function(event){
 		self.emit(event.eventName, event.data);
 	});
@@ -57,20 +67,17 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		return new ComposeButtonView(composeButtonObject);
 	},
 
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
+	/*
+	// Incomplete
 	addInnerSidebar: function(options){
 		memberMap.get(this).composeViewImplementation.addInnerSidebar(options);
 	},
 
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
-	addMessageSendModifier: function(modifier){
-		memberMap.get(this).composeViewImplementation.addMessageSendModifier(modifier);
-	},
-
-	//NOT DOCUMENTED BECAUSE NOT TESTED YET
+	// Incomplete
 	addOuterSidebar: function(options){
 		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
 	},
+	*/
 
 	/**
 	 * Adds a horizontal bar underneath the control section of the ComposeView. This is useful to add more complex UI interactions but should be used sparingly.
@@ -113,6 +120,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/* NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS */
 	getComposeID: function(){
+		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.getComposeID');
 		return memberMap.get(this).composeViewImplementation.getComposeID();
 	},
 
@@ -128,6 +136,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	/* deprecated */
 	getMessageID: function() {
+		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.getMessageID');
 		return memberMap.get(this).composeViewImplementation.getMessageID();
 	},
 
@@ -383,13 +392,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * Fires when the compose view is closed. This can be triggered by the .close method, the user
 	 * clicking the close or discard buttons, the message being sent, etc.
 	 * @event ComposeView#destroy
-	 */
-
-	/**
-	 * Fires when a compose view gets a new message ID assigned. Compose views get
-	 * new message IDs assigned to them whenever the user edits the message and the
-	 * draft saves as a result
-	 * @event ComposeView#messageIDChange
+	 * @param {string} messageID - The draft's message ID after it saved.
 	 */
 
 	/**

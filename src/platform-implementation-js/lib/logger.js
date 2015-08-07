@@ -115,6 +115,11 @@ class Logger {
     _trackEvent(null, 'gmail', name, details);
   }
 
+  deprecationWarning(name: string, suggestion?: ?string) {
+    console.warn(`InboxSDK: ${name} is deprecated.`+(suggestion?` Please use ${suggestion} instead.`:''));
+    this.eventSdkPassive(`deprecated.${name}`);
+  }
+
   getAppLogger(): AppLogger {
     return {
       error: (err, details) => this.errorApp(err, details),

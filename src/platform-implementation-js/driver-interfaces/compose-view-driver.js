@@ -10,10 +10,12 @@ export type StatusBar = EventEmitter & {
 };
 
 export type ComposeViewDriver = {
+	destroy(): void;
+	getEventStream(): Kefir.Stream;
+	getStopper(): Kefir.Stream;
 	insertBodyTextAtCursor(text: string): ?HTMLElement;
 	insertBodyHTMLAtCursor(text: string): ?HTMLElement;
 	insertLinkIntoBody(text: string, href: string): ?HTMLElement;
-
 	setSubject(text: string): void;
 	setBodyHTML(text: string): void;
 	setBodyText(text: string): void;
@@ -38,7 +40,4 @@ export type ComposeViewDriver = {
 	getCcRecipients(): Contact[];
 	getBccRecipients(): Contact[];
 	getComposeID(): string;
-	getEventStream(): Kefir.Stream;
-	getStopper(): Kefir.Stream;
-	destroy(): void;
 };
