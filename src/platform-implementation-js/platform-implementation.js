@@ -105,7 +105,7 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 
 	var DRIVERS_BY_ORIGIN = {
 		'https://mail.google.com': GmailDriver,
-		'https://inbox.google.com': opts.inboxBeta && InboxDriver
+		'https://inbox.google.com': InboxDriver
 	};
 
 	var LOADER_VERSION: string = opts.VERSION;
@@ -116,23 +116,12 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 	var DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", origin);
-		if (origin === 'https://inbox.google.com' && !loadedAppIds.has(appId)) {
-			loadedAppIds.add(appId);
-			logger.eventSdkPassive('not load');
-		}
-		return new Promise(function(resolve, reject) {
-			// never resolve
-		});
+		// never resolve
+		return new Promise((resolve, reject) => {});
 	}
 
 	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
-		if (!loadedAppIds.has(appId)) {
-			loadedAppIds.add(appId);
-			logger.eventSdkPassive('load');
-		}
-		logger.eventSdkPassive('instantiate');
-
 		if (!isValidAppId(appId)) {
 			console.error(`
 ===========================================================
@@ -149,6 +138,21 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 			console.warn("Running the InboxSDK outside of an extension content script is not recommended!");
 		}
 
-		return new PlatformImplementation(driver, appId, opts.appName, opts.appIconUrl, opts.VERSION);
+		logger.eventSdkPassive('instantiate');
+		var pi = new PlatformImplementation(driver, appId, opts.appName, opts.appIconUrl, opts.VERSION);
+		if (origin === 'https://inbox.google.com' && !opts.inboxBeta) {
+			console.log("InboxSDK: Unsupported origin", origin);
+			if (!loadedAppIds.has(appId)) {
+				loadedAppIds.add(appId);
+				logger.eventSdkPassive('not load');
+			}
+			// never resolve and give pi to app
+			return new Promise((resolve, reject) => {});
+		}
+		if (!loadedAppIds.has(appId)) {
+			loadedAppIds.add(appId);
+			logger.eventSdkPassive('load');
+		}
+		return pi;
 	});
 }

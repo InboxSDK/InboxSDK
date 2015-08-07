@@ -97,6 +97,7 @@ export default class InboxDriver {
           return new InboxComposeView(this, composeEl)
         }))
         .filter(Boolean)
+        .takeUntilBy(this._stopper)
     );
     this._threadViewDriverStream = Bacon.never();
     this._messageViewDriverStream = Bacon.never();
@@ -194,8 +195,7 @@ export default class InboxDriver {
   }
 
   isRunningInPageContext(): boolean {
-    // stub
-    return false;
+    return !!(global.gbar && global.gbar._CONFIG);
   }
 
   showAppIdWarning() {
