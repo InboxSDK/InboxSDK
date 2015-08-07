@@ -6,6 +6,7 @@ var RSVP = require('rsvp');
 
 var Bacon = require('baconjs');
 var Kefir = require('kefir');
+import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
 
 import addAccessors from 'add-accessors';

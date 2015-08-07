@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import type Bacon from 'baconjs';
+import type Kefir from 'kefir';
 import type {EventEmitter} from 'events';
 
 export type StatusBar = EventEmitter & {
@@ -21,7 +21,8 @@ export type ComposeViewDriver = {
 	setCcRecipients(emails: string[]): void;
 	setBccRecipients(emails: string[]): void;
 	close(): void;
-	addButton(buttonDescriptor: Bacon.Observable, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object>;
+	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object>;
+	addRecipientRow(options: Kefir.Stream): () => void;
 	addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar;
@@ -37,6 +38,7 @@ export type ComposeViewDriver = {
 	getCcRecipients(): Contact[];
 	getBccRecipients(): Contact[];
 	getComposeID(): string;
-	getEventStream(): Bacon.Observable;
+	getEventStream(): Kefir.Stream;
+	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

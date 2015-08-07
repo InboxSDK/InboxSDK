@@ -2,8 +2,8 @@
 
 var _ = require('lodash');
 var EventEmitter = require('../lib/safe-event-emitter');
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
+var Kefir = require('kefir');
+var kefirCast = require('kefir-cast');
 
 var ComposeButtonView = require('./compose-button-view');
 
@@ -29,7 +29,7 @@ function ComposeView(composeViewImplementation, appId) {
 		self.emit(event.eventName, event.data);
 	});
 
-	members.composeViewImplementation.getEventStream().onEnd(function(){
+	members.composeViewImplementation.getStopper().onValue(function(){
 		self.emit('close'); /* TODO: deprecated */
 
 		self.emit('destroy', {
@@ -51,7 +51,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 */
 	addButton: function(buttonDescriptor){
 		var members = memberMap.get(this);
-		var buttonDescriptorStream = baconCast(Bacon, buttonDescriptor);
+		var buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 
 		var composeButtonObject = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
 		return new ComposeButtonView(composeButtonObject);
@@ -83,7 +83,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 
 	addRecipientRow: function(options){
 		return {
-			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(baconCast(Bacon, options))
+			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(kefirCast(Kefir, options))
 		};
 	},
 

@@ -324,11 +324,11 @@ function isFileEligbleForDocs(filename) {
   return  filename.endsWith(".js") &&
           filename.indexOf("src/platform-implementation-js/platform-implementation.js") == -1 &&
           (
-            filename.indexOf('src/platform-implementation-js/dom-driver/gmail/views/gmail-compose-view/add-status-bar.js') > -1 ||
             filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
             filename.indexOf('src/platform-implementation-js/views') > -1 ||
             filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
             filename.indexOf('src/common/constants') > -1 ||
+            filename.indexOf('src/docs/') > -1 ||
             (filename.indexOf('src/inboxsdk-js/') > -1 && filename.indexOf('src/inboxsdk-js/loading') == -1)
           );
 }

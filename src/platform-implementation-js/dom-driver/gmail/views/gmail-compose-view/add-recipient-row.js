@@ -1,13 +1,18 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
-export default function(gmailComposeView, recipientRowOptionStream){
-	let row;
+var Bacon = require('baconjs');
+var Kefir = require('kefir');
+import type GmailComposeView from '../gmail-compose-view';
+
+export default function addRecipientRow(gmailComposeView: GmailComposeView, recipientRowOptionStream: Kefir.Stream): ()=>void {
+	var row;
 
 	recipientRowOptionStream
-		.takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+		.takeUntilBy(gmailComposeView.getStopper())
 		.onValue((options) => {
 			if(row){
-				row.remove();
+				(row:any).remove();
 				row = null;
 			}
 
@@ -21,7 +26,7 @@ export default function(gmailComposeView, recipientRowOptionStream){
 
 	return () => {
 		if (row) {
-			row.remove();
+			(row:any).remove();
 			gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
 				bubbles: false, cancelable: false, detail: null
 			}));
@@ -29,11 +34,10 @@ export default function(gmailComposeView, recipientRowOptionStream){
 	};
 }
 
-function _createRecipientRowElement(gmailComposeView, options){
-
-	let row = document.createElement('tr');
-	let labelTD = document.createElement('td');
-	let contentTD = document.createElement('td');
+function _createRecipientRowElement(gmailComposeView: GmailComposeView, options: Object): HTMLElement {
+	var row = document.createElement('tr');
+	var labelTD = document.createElement('td');
+	var contentTD = document.createElement('td');
 
 	row.appendChild(labelTD);
 	row.appendChild(contentTD);
@@ -43,7 +47,7 @@ function _createRecipientRowElement(gmailComposeView, options){
 	if(options.labelText){
 		labelTD.setAttribute('class', 'ok');
 
-		let span = document.createElement('span');
+		var span = document.createElement('span');
 		span.setAttribute('class', 'gO');
 
 		labelTD.appendChild(span);
@@ -55,7 +59,9 @@ function _createRecipientRowElement(gmailComposeView, options){
 		contentTD.appendChild(options.el);
 	}
 
-	gmailComposeView.getRecipientRowElements()[0].insertAdjacentElement('afterend', row);
+	var firstRowElement = gmailComposeView.getRecipientRowElements()[0];
+	var parent: HTMLElement = (firstRowElement.parentElement:any);
+	parent.insertBefore(row, firstRowElement.nextSibling);
 
 	return row;
 }

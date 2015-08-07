@@ -1,7 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-import * as Bacon from 'baconjs';
+var Bacon = require('baconjs');
+import baconCast from 'bacon-cast';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
@@ -47,7 +48,7 @@ export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, m
 			}));
 		})
 	).flatMap(composeViewDriver => {
-		return composeViewDriver.ready();
+		return baconCast(Bacon, composeViewDriver.ready());
 	});
 }
 
