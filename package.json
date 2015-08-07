@@ -9,7 +9,7 @@
     "add-accessors": "^2.0.0",
     "asap": "^2.0.3",
     "auto-html": "^1.0.3",
-    "babel": "^5.8.20",
+    "babel": "^5.8.21",
     "babel-runtime": "^5.8.20",
     "babelify": "^6.1.2",
     "bacon-cast": "^1.1.1",
