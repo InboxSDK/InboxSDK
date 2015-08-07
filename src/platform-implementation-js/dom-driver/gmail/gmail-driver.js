@@ -48,6 +48,7 @@ import type PageCommunicator from './page-communicator';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-handle';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
+import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 
 export default class GmailDriver {
@@ -138,7 +139,7 @@ export default class GmailDriver {
 	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
 	getThreadViewDriverStream(): Bacon.Observable<Object> {return this._threadViewDriverStream;}
 	getToolbarViewDriverStream(): Bacon.Observable<Object> {return this._toolbarViewDriverStream;}
-	getComposeViewDriverStream(): Bacon.Observable<GmailComposeView> {return this._composeViewDriverStream;}
+	getComposeViewDriverStream(): Bacon.Observable<ComposeViewDriver> {return (this._composeViewDriverStream:any);}
 	getXhrInterceptorStream(): Bacon.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}

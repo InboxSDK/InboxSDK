@@ -9,6 +9,7 @@ export type ShortcutDescriptor = {
 	description: string;
 };
 import type Logger from '../lib/logger';
+import type {ComposeViewDriver} from './compose-view-driver';
 
 // TODO fill in some of these any types
 export type Driver = {
@@ -17,7 +18,7 @@ export type Driver = {
 	getRouteViewDriverStream(): Bacon.Observable<Object>;
 	getRowListViewDriverStream(): Bacon.Observable<Object>;
 	openComposeWindow(): void;
-	getComposeViewDriverStream(): Bacon.Observable<Object>;
+	getComposeViewDriverStream(): Bacon.Observable<ComposeViewDriver>;
 	openDraftByMessageID(messageID: string): void;
 	getThreadViewDriverStream(): Bacon.Observable<Object>;
 	getMessageViewDriverStream(): Bacon.Observable<Object>;

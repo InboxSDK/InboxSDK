@@ -13,6 +13,7 @@ export type ComposeViewDriver = {
 	destroy(): void;
 	getEventStream(): Kefir.Stream;
 	getStopper(): Kefir.Stream;
+	getElement(): HTMLElement;
 	insertBodyTextAtCursor(text: string): ?HTMLElement;
 	insertBodyHTMLAtCursor(text: string): ?HTMLElement;
 	insertLinkIntoBody(text: string, href: string): ?HTMLElement;
@@ -40,4 +41,6 @@ export type ComposeViewDriver = {
 	getCcRecipients(): Contact[];
 	getBccRecipients(): Contact[];
 	getComposeID(): string;
+	getMessageID(): ?string;
+	getThreadID(): ?string;
 };

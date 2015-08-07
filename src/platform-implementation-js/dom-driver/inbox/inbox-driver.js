@@ -9,21 +9,22 @@ var Kefir = require('kefir');
 import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
 
-import addAccessors from 'add-accessors';
-import assertInterface from '../../lib/assert-interface';
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
-
+import censorHTMLstring from '../../../common/censor-html-string';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
+import kefirElementViewMapper from '../../lib/dom/kefir-element-view-mapper';
 import kmakeMutationObserverStream from '../../lib/dom/kefir-make-mutation-observer-stream';
 import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 
 import InboxRouteView from './views/inbox-route-view';
+import InboxComposeView from './views/inbox-compose-view';
 
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
+import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 
 export default class InboxDriver {
   _logger: Logger;
@@ -31,7 +32,7 @@ export default class InboxDriver {
   onready: Promise;
   _routeViewDriverStream: Bacon.Observable;
   _rowListViewDriverStream: Bacon.Observable;
-  _composeViewDriverStream: Bacon.Observable;
+  _composeViewDriverStream: Bacon.Observable<ComposeViewDriver>;
   _threadViewDriverStream: Bacon.Observable;
   _messageViewDriverStream: Bacon.Observable;
   _threadRowViewDriverKefirStream: Kefir.Stream;
@@ -83,11 +84,17 @@ export default class InboxDriver {
           kefirDelayAsap(event)
             .takeUntilBy(event.removalStream)
         )
-        .map(({el, removalStream}) => {
-          console.log('got compose element', el);
-          removalStream.onValue(() => {console.log('compose removed');});
-        })
-        .filter(() => false)
+        .map(kefirElementViewMapper((el: HTMLElement) => {
+          var composeEl = el.querySelector('div[role=dialog]');
+          if (!composeEl) {
+            this._logger.error(new Error("compose dialog element not found"), {
+              html: censorHTMLstring(el.innerHTML)
+            });
+            return null;
+          }
+          return new InboxComposeView(this, composeEl)
+        }))
+        .filter(Boolean)
     );
     this._threadViewDriverStream = Bacon.never();
     this._messageViewDriverStream = Bacon.never();
