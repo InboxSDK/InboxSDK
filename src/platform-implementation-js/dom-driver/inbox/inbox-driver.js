@@ -14,10 +14,11 @@ import assertInterface from '../../lib/assert-interface';
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
 
-import streamWaitFor from '../../lib/stream-wait-for';
-import makeElementChildStream from '../../lib/dom/make-element-child-stream';
-import makeMutationObserverStream from '../../lib/dom/make-mutation-observer-stream';
-import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import kefirWaitFor from '../../lib/kefir-wait-for';
+import kefirDelayAsap from '../../lib/kefir-delay-asap';
+import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
+import kmakeMutationObserverStream from '../../lib/dom/kefir-make-mutation-observer-stream';
+import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 
 import InboxRouteView from './views/inbox-route-view';
 
@@ -47,6 +48,7 @@ export default class InboxDriver {
     // this._customListRouteIDs = new Map();
     // this._customListSearchStringsToRouteIds = new Map();
 
+    /*
     var mainAdds = streamWaitFor(() => document.getElementById('mQ'))
       .flatMap(el => makeElementChildStream(el));
 
@@ -68,10 +70,25 @@ export default class InboxDriver {
         el.classList.contains('i5') && el.classList.contains('xpv2f')
       )
       .map(({el}) => new InboxRouteView(el));
+    */
 
-    this._routeViewDriverStream = Bacon.mergeAll(mainViews, searchViews);
+    this._routeViewDriverStream = Bacon.never(); //Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
-    this._composeViewDriverStream = Bacon.never();
+    this._composeViewDriverStream = baconCast(Bacon,
+      kefirWaitFor(() => document.querySelector('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:first-child'))
+        .flatMap(kmakeElementChildStream)
+        .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
+        .flatMap(event =>
+          // ignore the composes that get removed immediately
+          kefirDelayAsap(event)
+            .takeUntilBy(event.removalStream)
+        )
+        .map(({el, removalStream}) => {
+          console.log('got compose element', el);
+          removalStream.onValue(() => {console.log('compose removed');});
+        })
+        .filter(() => false)
+    );
     this._threadViewDriverStream = Bacon.never();
     this._messageViewDriverStream = Bacon.never();
     this._threadRowViewDriverKefirStream = Kefir.never();

@@ -25,7 +25,7 @@ declare module kefir {
     toPromise(PromiseConstructor?: Function): Promise<T>;
 
     map<U>(cb: (i: T) => U): Stream<U>;
-    filter(cb?: (i: T) => boolean): Stream<T>;
+    filter(cb?: (i: T) => any): Stream<T>;
     take(n: number): Stream<T>;
     takeWhile(cb?: (i: T) => boolean): Stream<T>;
     last(): Stream<T>;
