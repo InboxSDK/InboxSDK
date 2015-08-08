@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var depWarn = require('../lib/dep-warn');
 
 /**
 * @class
@@ -25,7 +24,7 @@ _.extend(User.prototype, /** @lends User */ {
 	 * @return {Contact}
 	 */
 	getUserContact: function() {
-		depWarn('User.getUserContact is deprecated. Use User.getEmailAddress instead.');
+		this._driver.getLogger().deprecationWarning('User.getUserContact', 'User.getEmailAddress');
 		return this._driver.getUserContact();
 	},
 

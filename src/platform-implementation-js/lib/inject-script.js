@@ -1,19 +1,22 @@
-import _ from 'lodash';
-import Bacon from 'baconjs';
-import RSVP from 'rsvp';
+/* @flow */
+//jshint ignore:start
+
+var _ = require('lodash');
+var Bacon = require('baconjs');
+var RSVP = require('rsvp');
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
 var fs = require('fs');
 
-const injectScript = _.once(function() {
+var injectScript: () => Promise = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
-    const url = 'https://www.inboxsdk.com/build/injected.js';
+    var url = 'https://www.inboxsdk.com/build/injected.js';
 
-    const script = document.createElement('script');
+    var script = document.createElement('script');
     script.type = 'text/javascript';
     script.text = fs.readFileSync(__dirname+'/../../../dist/injected.js', 'utf8')+'\n//# sourceURL='+url+'\n';
     document.head.appendChild(script).parentNode.removeChild(script);
-    document.head.setAttribute('data-inboxsdk-script-injected', true);
+    document.head.setAttribute('data-inboxsdk-script-injected', 'true');
   }
 
   return Bacon.later(0, null)

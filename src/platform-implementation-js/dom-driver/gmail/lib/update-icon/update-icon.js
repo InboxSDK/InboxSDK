@@ -1,4 +1,7 @@
-function createIconElement(iconSettings, containerElement, append){
+/* @flow */
+//jshint ignore:start
+
+function createIconElement(iconSettings: Object, containerElement: HTMLElement, append: boolean){
 	iconSettings.iconElement = document.createElement('div');
 	iconSettings.iconElement.classList.add('inboxsdk__button_icon');
 	iconSettings.iconElement.innerHTML = '&nbsp;';
@@ -7,11 +10,11 @@ function createIconElement(iconSettings, containerElement, append){
 		containerElement.appendChild(iconSettings.iconElement);
 	}
 	else{
-		containerElement.insertBefore(iconSettings.iconElement, containerElement.firstElementChild);
+		containerElement.insertBefore(iconSettings.iconElement, (containerElement:any).firstElementChild);
 	}
 }
 
-function createIconImgElement(iconSettings, containerElement, append){
+function createIconImgElement(iconSettings: Object, containerElement: HTMLElement, append: boolean){
 	if(!iconSettings.iconElement){
 		createIconElement(iconSettings, containerElement, append);
 	}
@@ -26,7 +29,7 @@ function createIconImgElement(iconSettings, containerElement, append){
 }
 
 // TODO make this return a class instead of taking the iconSettings state object
-module.exports = function updateIcon(iconSettings, containerElement, append, newIconClass, newIconUrl){
+export default function updateIcon(iconSettings: Object, containerElement: HTMLElement, append: boolean, newIconClass: ?string, newIconUrl: ?string){
 	if(!iconSettings.iconUrl && newIconUrl){
 		iconSettings.iconUrl = newIconUrl;
 		createIconImgElement(iconSettings, containerElement, append);

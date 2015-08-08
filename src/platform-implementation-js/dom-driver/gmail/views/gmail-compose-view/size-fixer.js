@@ -32,7 +32,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   }
   gmailComposeView.getElement().classList.add('inboxsdk__size_fixer');
 
-  var composeEvents = kefirCast(Kefir, gmailComposeView.getEventStream());
+  var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
     .filter(e => _.includes(['resize', 'composeFullscreenStateChanged'], e.eventName))

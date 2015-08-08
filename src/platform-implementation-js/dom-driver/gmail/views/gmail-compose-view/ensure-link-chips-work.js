@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Bacon = require('baconjs');
+var baconCast = require('bacon-cast');
 var RSVP = require('rsvp');
 
 var extId = ''+Math.random();
@@ -17,14 +18,13 @@ module.exports = function(gmailComposeView){
     var bodyElement = gmailComposeView.getBodyElement();
     var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
 
-    gmailComposeView
-        .getEventStream()
+    baconCast(Bacon, gmailComposeView.getEventStream())
         .startWith({eventName: 'bodyChanged'})
         .filter(function(event){
             return event.eventName === 'bodyChanged';
         })
         .debounceImmediate(100)
-        .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+        .takeUntil(baconCast(Bacon, gmailComposeView.getStopper()))
         .onValue(function(){
             var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
             var chipContainerChain =  _.chain(chips).map(_getChipContainer);
@@ -111,8 +111,9 @@ function _addEnhancements(chipElement){
 }
 
 function _fixupCursor(gmailComposeView){
+  var stopper = baconCast(Bacon, gmailComposeView.getStopper());
     var keydownStream = Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'keydown')
-                            .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd());
+                            .takeUntil(stopper);
 
     keydownStream
             .filter(_isBackspaceOrDelete)
@@ -128,7 +129,7 @@ function _fixupCursor(gmailComposeView){
             .onValue(_fixupRange);
 
     Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'mouseup')
-         .takeUntil(gmailComposeView.getEventStream().filter(false).mapEnd())
+         .takeUntil(stopper)
          .delay(1)
          .filter(_rangeStillExists)
          .map('VERTICAL')

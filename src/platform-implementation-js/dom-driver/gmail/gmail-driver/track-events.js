@@ -36,7 +36,7 @@ function _getLogFunction(gmailDriver, composeViewDriver) {
 
 
 	return function(eventName, extraOptions){
-		logger.eventGmail(eventName, _.extend({}, composeStats, extraOptions));
+		logger.eventSite(eventName, _.extend({}, composeStats, extraOptions));
 	};
 }
 
@@ -129,7 +129,7 @@ function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver){
 			var heading = node.querySelector('[role=heading]');
 			if(heading){
 				if(heading.textContent.indexOf('exceeds the 25MB') > -1){
-					gmailDriver.getLogger().eventGmail('large attachment suggest drive');
+					gmailDriver.getLogger().eventSite('large attachment suggest drive');
 					return;
 				}
 			}
@@ -137,7 +137,7 @@ function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver){
 			var body = node.querySelector('.Kj-JD-Jz');
 			if(body){
 				if(body.textContent.indexOf('exceeds the maximum') > -1){
-					gmailDriver.getLogger().eventGmail('large attachment from drag and drop');
+					gmailDriver.getLogger().eventSite('large attachment from drag and drop');
 					return;
 				}
 			}
@@ -155,7 +155,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 
 				})
 				.takeUntil(gmailDriver.getBaconStopper())
-				.onValue(() => gmailDriver.getLogger().eventGmail('compose drag file'));
+				.onValue(() => gmailDriver.getLogger().eventSite('compose drag file'));
 
 
 	gmailDriver.getComposeViewDriverStream()
@@ -167,6 +167,6 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 
 				})
 				.takeUntil(gmailDriver.getBaconStopper())
-				.onValue(() => gmailDriver.getLogger().eventGmail('compose drop file'));
+				.onValue(() => gmailDriver.getLogger().eventSite('compose drop file'));
 
 }
