@@ -4,6 +4,7 @@ var _ = require('lodash');
 var BasicClass = require('../../../lib/basic-class');
 var Bacon = require('baconjs');
 var asap = require('asap');
+var kefirStopper = require('kefir-stopper');
 
 var ButtonView = require('./buttons/button-view');
 var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
@@ -17,7 +18,7 @@ var GmailTooltipView = function(options){
 	BasicClass.call(this);
 
 	this._eventStream = new Bacon.Bus();
-
+	this._stopper = kefirStopper();
 	this._setupElement(options || {});
 };
 
@@ -27,7 +28,8 @@ _.extend(GmailTooltipView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', get: true, destroy: true},
-		{name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'}
+		{name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'},
+		{name: '_stopper', get: true, destroy: true}
 	],
 
 	anchor: function(anchorElement, placementOptions){
