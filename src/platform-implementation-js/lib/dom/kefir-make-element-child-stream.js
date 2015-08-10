@@ -3,12 +3,12 @@
 
 import asap from 'asap';
 import logger from '../logger';
-import Kefir from 'kefir';
+var Kefir = require('kefir');
 import kefirStopper from 'kefir-stopper';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function kefirMakeElementChildStream(element: HTMLElement): Kefir.Observable<{el: HTMLElement, removalStream: Kefir.Stream}> {
+export default function kefirMakeElementChildStream(element: HTMLElement): Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }

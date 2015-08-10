@@ -7,6 +7,8 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 
 import delayAsap from '../../../lib/delay-asap';
@@ -15,7 +17,7 @@ import simulateKey from '../../../lib/dom/simulate-key';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
-import streamWaitFor from '../../../lib/stream-wait-for';
+import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -24,19 +26,24 @@ import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
 import sizeFixer from './gmail-compose-view/size-fixer';
 import addTooltipToButton from './gmail-compose-view/add-tooltip-to-button';
+import addRecipientRow from './gmail-compose-view/add-recipient-row';
+import addButton from './gmail-compose-view/add-button';
+import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
+import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor, TooltipButtonDescriptor} from './gmail-compose-view/add-tooltip-to-button';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
 import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/compose-view-driver';
 import type Logger from '../../../lib/logger';
+import type GmailDriver from '../gmail-driver';
 
 export default class GmailComposeView {
 	_element: HTMLElement;
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
 	_isStandalone: boolean;
-	_driver: Object;
+	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
 	_eventStream: Bacon.Bus;
 	_isTriggeringADraftSavePending: boolean;
@@ -49,9 +56,10 @@ export default class GmailComposeView {
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Object;
-	ready: () => Bacon.Observable;
+	ready: () => Kefir.Stream<GmailComposeView>;
+	getEventStream: () => Kefir.Stream;
 
-	constructor(element: HTMLElement, xhrInterceptorStream: Bacon.Observable, driver: Object) {
+	constructor(element: HTMLElement, xhrInterceptorStream: Bacon.Observable, driver: GmailDriver) {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
@@ -62,6 +70,7 @@ export default class GmailComposeView {
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
 		this._eventStream = new Bacon.Bus();
+		this.getEventStream = _.constant(kefirCast(Kefir, this._eventStream));
 
 		this._isTriggeringADraftSavePending = false;
 
@@ -98,10 +107,9 @@ export default class GmailComposeView {
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		this.ready = _.constant(
-			streamWaitFor(
+			kefirWaitFor(
 				() => !this._element || !!this.getBodyElement(),
-				3*60 * 1000, //timeout
-				250 //steptime
+				3*60 * 1000 //timeout
 			).filter(() => !!this._element)
 			.map(() => {
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
@@ -167,11 +175,11 @@ export default class GmailComposeView {
 	_setupConsistencyCheckers() {
 		try {
 			require('./gmail-compose-view/ensure-link-chips-work')(this);
-			require('./gmail-compose-view/monitor-selection-range')(this);
-			require('./gmail-compose-view/manage-button-grouping')(this);
+			monitorSelectionRange(this);
+			manageButtonGrouping(this);
 			sizeFixer(this._driver, this);
 		} catch(err) {
-			(this._driver.getLogger(): Logger).error(err);
+			this._driver.getLogger().error(err);
 		}
 	}
 
@@ -255,8 +263,8 @@ export default class GmailComposeView {
 		this._triggerDraftSave();
 	}
 
-	addRecipientRow(options: Bacon.Observable): () => void {
-		return require('./gmail-compose-view/add-recipient-row')(this, options);
+	addRecipientRow(options: Kefir.Stream): () => void {
+		return addRecipientRow(this, options);
 	}
 
 	getFromContact() {
@@ -271,8 +279,8 @@ export default class GmailComposeView {
 		fromManager.setFromEmail(this._driver, this, email);
 	}
 
-	addButton(buttonDescriptor: Bacon.Observable, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
-		return require('./gmail-compose-view/add-button')(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
+	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
+		return addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 
 	addTooltipToButton(buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor) {
@@ -554,10 +562,6 @@ export default class GmailComposeView {
 		return this._element;
 	}
 
-	getEventStream(): Bacon.Observable {
-		return this._eventStream;
-	}
-
 	setIsInlineReplyForm(inline: boolean) {
 		this._isInlineReplyForm = inline;
 	}
@@ -582,5 +586,5 @@ export default class GmailComposeView {
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var test: ComposeViewDriver = new GmailComposeView(document.body, ({}:any), {});
+	var test: ComposeViewDriver = new GmailComposeView(document.body, ({}:any), ({}:any));
 }

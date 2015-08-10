@@ -27,7 +27,7 @@ var ComposeButtonView = function(optionsPromise){
 		members.buttonDescriptor = options.buttonDescriptor;
 		members.composeViewDriver = options.composeViewDriver;
 
-		members.composeViewDriver.getEventStream().onEnd(_destroy, self);
+		members.composeViewDriver.getStopper().onValue(() => {_destroy(self);});
 	});
 };
 

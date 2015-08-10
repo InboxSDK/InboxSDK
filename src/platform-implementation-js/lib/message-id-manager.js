@@ -1,13 +1,31 @@
-import _ from 'lodash';
-import RSVP from 'rsvp';
+/* @flow */
+//jshint ignore:start
+
+var _ = require('lodash');
+var RSVP = require('rsvp');
 import ajax from '../../common/ajax';
 
+type Options = {
+  getGmailThreadIdForRfcMessageId(s: string): Promise<string>;
+  getRfcMessageIdForGmailMessageId(s: string): Promise<string>;
+  storage?: Storage;
+  saveThrottle?: number;
+};
+
 export default class MessageIdManager {
-  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId, storage, saveThrottle}) {
+  _getGmailThreadIdForRfcMessageId: (s: string) => Promise<string>;
+  _getRfcMessageIdForGmailMessageId: (s: string) => Promise<string>;
+  _storage: ?Storage;
+  _rfcIdsTimestamps: Map<string, number>;
+  _rfcIdsToThreadIds: Map<string, string>;
+  _threadIdsToRfcIds: Map<string, string>;
+  _saveCache: () => void;
+
+  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId, storage, saveThrottle}: Options) {
     this._getGmailThreadIdForRfcMessageId = getGmailThreadIdForRfcMessageId;
     this._getRfcMessageIdForGmailMessageId = getRfcMessageIdForGmailMessageId;
-    this._storage = storage || (typeof localStorage !== 'undefined' && localStorage);
-    if (saveThrottle === undefined) {
+    this._storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
+    if (saveThrottle == null) {
       saveThrottle = 3000;
     }
 
@@ -16,28 +34,31 @@ export default class MessageIdManager {
     this._threadIdsToRfcIds = new Map();
 
     this._saveCache = _.throttle(() => {
-      if (!this._storage) return;
+      var storage = this._storage;
+      if (!storage) return;
       // If there are other SDK extensions running too, it's important we load
       // everything from localStorage first before overwriting it.
       this._loadCache();
 
-      const item = [];
+      var item = [];
       this._rfcIdsToThreadIds.forEach((gmailThreadId, rfcId) => {
-        const timestamp = this._rfcIdsTimestamps.get(rfcId);
+        var timestamp = this._rfcIdsTimestamps.get(rfcId);
         item.push([rfcId, gmailThreadId, timestamp]);
       });
-      this._storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
+      storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
     }, saveThrottle, {leading:false});
 
     this._loadCache();
   }
 
   _loadCache() {
-    if (!this._storage) return;
+    var storage = this._storage;
+    if (!storage) return;
     try {
-      const item = JSON.parse(this._storage.getItem('inboxsdk__cached_thread_ids'));
+      var item = JSON.parse(storage.getItem('inboxsdk__cached_thread_ids')||'null');
       if (item) {
-        for (let [rfcId, gmailThreadId, timestamp] of item) {
+        for (var x of item) {
+          var [rfcId, gmailThreadId, timestamp] = x;
           this._rfcIdsTimestamps.set(rfcId, timestamp);
           this._rfcIdsToThreadIds.set(rfcId, gmailThreadId);
           this._threadIdsToRfcIds.set(gmailThreadId, rfcId);
@@ -48,25 +69,25 @@ export default class MessageIdManager {
     }
   }
 
-  _rememberPair(rfcMessageId, gmailThreadId) {
+  _rememberPair(rfcMessageId: string, gmailThreadId: string) {
     this._rfcIdsTimestamps.set(rfcMessageId, Date.now());
     this._rfcIdsToThreadIds.set(rfcMessageId, gmailThreadId);
     this._threadIdsToRfcIds.set(gmailThreadId, rfcMessageId);
     this._saveCache();
   }
 
-  _update(rfcMessageId) {
+  _update(rfcMessageId: string) {
     this._rfcIdsTimestamps.set(rfcMessageId, Date.now());
     this._saveCache();
   }
 
-  getGmailThreadIdForRfcMessageId(rfcMessageId) {
+  getGmailThreadIdForRfcMessageId(rfcMessageId: string): Promise<string> {
     if (this._rfcIdsToThreadIds.has(rfcMessageId)) {
       this._update(rfcMessageId);
       return RSVP.Promise.resolve(this._rfcIdsToThreadIds.get(rfcMessageId));
     }
 
-    const promise = this._getGmailThreadIdForRfcMessageId(rfcMessageId);
+    var promise = this._getGmailThreadIdForRfcMessageId(rfcMessageId);
     promise.then(gmailThreadId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
     }, _.noop);
@@ -74,14 +95,14 @@ export default class MessageIdManager {
   }
 
   // Returns an rfc message id of one of the messages in the given thread.
-  getRfcMessageIdForGmailThreadId(gmailThreadId) {
+  getRfcMessageIdForGmailThreadId(gmailThreadId: string): Promise<string> {
     if (this._threadIdsToRfcIds.has(gmailThreadId)) {
-      const rfcMessageId = this._threadIdsToRfcIds.get(gmailThreadId);
+      var rfcMessageId = this._threadIdsToRfcIds.get(gmailThreadId);
       this._update(rfcMessageId);
       return RSVP.Promise.resolve(rfcMessageId);
     }
 
-    const promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
+    var promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
     promise.then(rfcMessageId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
     }, _.noop);

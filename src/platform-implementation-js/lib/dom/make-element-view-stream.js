@@ -11,10 +11,11 @@ var Bacon = require('baconjs');
 type View = {destroy: () => void};
 type TimedElement = {el: HTMLElement, removalStream: Bacon.Observable};
 
-export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => T): (event: TimedElement) => Bacon.Observable<T> {
+export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => Bacon.Observable<T> {
   return function(event) {
-    var view = viewFn(event.el);
-    if (view) {
+    var mview = viewFn(event.el);
+    if (mview) {
+      var view = mview;
       event.removalStream.onValue(function() {
         view.destroy();
       });
