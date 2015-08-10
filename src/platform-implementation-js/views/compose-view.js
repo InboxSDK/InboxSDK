@@ -392,7 +392,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * Fires when the compose view is closed. This can be triggered by the .close method, the user
 	 * clicking the close or discard buttons, the message being sent, etc.
 	 * @event ComposeView#destroy
-	 * @param {string} messageID - The draft's message ID after it saved.
+	 * @param {string} messageID - If the composeView was closed without being sent and the draft
+	 * was saved, then this property will have the draft's message ID after it saved. Otherwise it
+	 * will be null.
 	 */
 
 	/**

@@ -43,6 +43,7 @@ export default class GmailComposeView {
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
 	_isStandalone: boolean;
+	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
 	_eventStream: Bacon.Bus;
@@ -66,6 +67,8 @@ export default class GmailComposeView {
 		this._isInlineReplyForm = false;
 		this._isFullscreen = false;
 		this._isStandalone = false;
+		this._emailWasSent = false;
+		this._messageId = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
@@ -85,6 +88,7 @@ export default class GmailComposeView {
 					return event.type === 'emailSent' && event.composeId === this.getComposeID();
 				}).map((event) => {
 					var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+					this._emailWasSent = true;
 					return {eventName: 'sent', data: response};
 				}),
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
@@ -485,12 +489,13 @@ export default class GmailComposeView {
 	}
 
 	getMessageID(): ?string {
+		if (this._emailWasSent) {
+			return null;
+		}
 		var input = this._messageIDElement;
-
-		if(!input){
+		if (!input) {
 			return this._messageId;
 		}
-
 		return input.value && (input.value !== 'undefined' && input.value !== 'null') ? input.value : this._messageId;
 	}
 
