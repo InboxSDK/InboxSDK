@@ -1,100 +1,106 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var Bacon = require('baconjs');
-
-var BasicClass = require('../../../../lib/basic-class');
-var simulateHover = require('../../../../lib/dom/simulate-hover');
-var isKeyboardKey = require('../../../../lib/dom/is-keyboard-key');
-var not = require('../../../../lib/not');
-
+import simulateHover from '../../../../lib/dom/simulate-hover';
 var keyboardShortcutStream = require('../../../../lib/dom/keyboard-shortcut-stream');
+import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 
 var BUTTON_COLOR_CLASSES = require('./button-color-classes');
 
-/*
- * options = {
- * 	hasButtonToLeft: true/false,
- * 	haseButtonToRight: true/false,
- * 	iconClass: string,
- * 	buttonColor: string [optional]
- * }
- */
-
-var ButtonView = function(options){
-	BasicClass.call(this);
-
-	this._iconClass = options.iconClass;
-	this._iconUrl = options.iconUrl;
-
-	this._title = options.text || options.title;
-	this._tooltip = options.tooltip || options.title;
-
-	this._hasDropdown = options.hasDropdown;
-
-	this._buttonColor = options.buttonColor || this._buttonColor;
-
-	this._keyboardShortcutHandle = options.keyboardShortcutHandle;
-
-	this._createElement(options);
-
-	this._eventStream = new Bacon.Bus();
-	this._setupEventStream();
-	this._setupAestheticEvents();
-	this._setupKeyboardShortcutEvent();
+export type ButtonViewOptions = {
+	hasButtonToLeft?: ?boolean;
+	hasButtonToRight?: ?boolean;
+	iconClass?: ?string;
+	iconUrl?: ?string;
+	text?: ?string;
+	title?: ?string;
+	tooltip?: ?string;
+	hasDropdown?: ?boolean;
+	buttonColor?: ?string;
+	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
 };
 
-ButtonView.prototype = Object.create(BasicClass.prototype);
+export default class ButtonView {
+	_element: HTMLElement;
+	_innerElement: any;
+	_textElement: any;
+	_iconElement: any;
+	_iconImgElement: any;
+	_iconClass: ?string;
+	_iconUrl: ?string;
+	_title: ?string;
+	_tooltip: ?string;
+	_hasDropdown: boolean;
+	_buttonColor: string;
+	_isEnabled: boolean;
+	_keyboardShortcutHandle: ?KeyboardShortcutHandle;
+	_eventStream: Bacon.Bus;
 
-_.extend(ButtonView.prototype, {
+	constructor(options: ButtonViewOptions){
+		this._hasDropdown = false;
+		this._isEnabled = true;
 
-	__memberVariables: [
-		{name: '_element', destroy: true, get: true},
-		{name: '_innerElement', destroy: true},
-		{name: '_textElement', destroy: true},
-		{name: '_arrowElement', destroy: true},
-		{name: '_iconElement', destroy: true},
-		{name: '_iconImgElement', destroy: true},
-		{name: '_iconClass', destroy: false},
-		{name: '_iconUrl', destroy: false},
-		{name: '_title', destroy: false},
-		{name: '_tooltip', destroy: false},
-		{name: '_hasDropdown', destroy: false, defaultValue: false},
-		{name: '_buttonColor', destroy: false, defaultValue: 'default'},
-		{name: '_isEnabled', destroy: false, defaultValue: true},
-		{name: '_keyboardShortcutHandle', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
+		this._iconClass = options.iconClass;
+		this._iconUrl = options.iconUrl;
 
-	activate: function(){
+		this._title = options.text || options.title;
+		this._tooltip = options.tooltip || options.title;
+
+		this._hasDropdown = !!options.hasDropdown;
+
+		this._buttonColor = options.buttonColor || 'default';
+
+		this._keyboardShortcutHandle = options.keyboardShortcutHandle;
+
+		this._createElement(options);
+
+		this._eventStream = new Bacon.Bus();
+		this._setupEventStream();
+		this._setupAestheticEvents();
+		this._setupKeyboardShortcutEvent();
+	}
+
+	destroy() {
+		(this._element:Object).remove();
+		this._eventStream.end();
+	}
+
+	getElement(): HTMLElement {return this._element;}
+	getEventStream(): Bacon.Observable {return this._eventStream;}
+
+	activate(){
 		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
 		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
-	},
+	}
 
-	deactivate: function(){
+	deactivate(){
 		this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
 		this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
-	},
+	}
 
-	addClass: function(className){
+	addClass(className: string){
 		this._element.classList.add(className);
-	},
+	}
 
-	removeClass: function(className){
+	removeClass(className: string){
 		this._element.classList.remove(className);
-	},
+	}
 
-	simulateHover: function(){
-		simulateHover(element);
-	},
+	simulateHover(){
+		simulateHover(this._element);
+	}
 
-	setEnabled: function(value){
+	setEnabled(value: boolean){
 		this._setEnabled(value);
-	},
+	}
 
-	isEnabled: function(){
+	isEnabled(): boolean {
 		return this._isEnabled;
-	},
+	}
 
-	update: function(options){
+	update(options: ?Object){
 		if (!options) {
 			this._element.style.display = "none";
 			return;
@@ -125,18 +131,18 @@ _.extend(ButtonView.prototype, {
 		if(options.enabled === false || options.enabled === true){
 			this._setEnabled(options.enabled);
 		}
-	},
+	}
 
-	_createElement: function(options){
+	_createElement(options: ButtonViewOptions){
 		this._createMainElement(options);
 
 		this._createInnerElement(options);
 
 		this._createTextElement(options);
 		this._createIconElement(options);
-	},
+	}
 
-	_createMainElement: function(options){
+	_createMainElement(options: ButtonViewOptions){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 inboxsdk__button ' + BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
 
@@ -149,11 +155,11 @@ _.extend(ButtonView.prototype, {
 		}
 
 		if(options.tooltip || options.title){
-			this._element.setAttribute('data-tooltip',options.tooltip || options.title);
+			this._element.setAttribute('data-tooltip', String(options.tooltip || options.title));
 		}
-	},
+	}
 
-	_createInnerElement: function(options){
+	_createInnerElement(options: ButtonViewOptions){
 		this._innerElement = document.createElement('div');
 
 		if(this._hasDropdown && !options.noArrow){
@@ -161,9 +167,9 @@ _.extend(ButtonView.prototype, {
 		}
 
 		this._element.appendChild(this._innerElement);
-	},
+	}
 
-	_createTextElement: function(){
+	_createTextElement(){
 		if(!this._title){
 			return;
 		}
@@ -173,14 +179,15 @@ _.extend(ButtonView.prototype, {
 		this._textElement.textContent = this._title;
 
 		if(this._iconElement){
-			this._iconElement.insertAdjacentElement('afterend', this._textElement);
-		}
-		else{
+			var parent = this._iconElement.parentElement;
+			if (!parent) throw new Error("Could not find parent");
+			parent.insertBefore(this._textElement, this._iconElement.nextSibling);
+		} else {
 			this._innerElement.insertBefore(this._textElement, this._innerElement.firstElementChild);
 		}
-	},
+	}
 
-	_createIconElement: function(options){
+	_createIconElement(){
 		if(!this._iconClass && !this._iconUrl){
 			return;
 		}
@@ -198,9 +205,9 @@ _.extend(ButtonView.prototype, {
 		}
 
 		this._innerElement.insertBefore(this._iconElement, this._innerElement.firstElementChild);
-	},
+	}
 
-	_createIconImgElement: function(){
+	_createIconImgElement(){
 		this._iconElement.innerHTML = '';
 
 		this._iconImgElement = document.createElement('img');
@@ -209,32 +216,32 @@ _.extend(ButtonView.prototype, {
 		this._iconImgElement.src = this._iconUrl;
 
 		this._iconElement.appendChild(this._iconImgElement);
-	},
+	}
 
-	_updateButtonColor: function(newButtonColor){
+	_updateButtonColor(newButtonColor: string){
 		this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
 		this._buttonColor = newButtonColor;
 
 		this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
-	},
+	}
 
-	_updateTitle: function(newTitle){
+	_updateTitle(newTitle: ?string){
 		if(!this._title && newTitle){
 			this._title = newTitle;
 			this._createTextElement();
 		}
-		else if(this._title && !newTitle){
-			this._textElement.remove();
+		else if(this._title && !newTitle && this._textElement){
+			(this._textElement:Object).remove();
 			this._textElement = null;
 			this._title = newTitle;
 		}
-		else{
+		else if (this._textElement){
 			this._textElement.textContent = newTitle;
 			this._title = newTitle;
 		}
-	},
+	}
 
-	_updateTooltip: function(newTooltip){
+	_updateTooltip(newTooltip: ?string){
 		this._tooltip = newTooltip;
 
 		if(newTooltip){
@@ -243,15 +250,15 @@ _.extend(ButtonView.prototype, {
 		else{
 			this._element.removeAttribute('data-tooltip');
 		}
-	},
+	}
 
-	_updateIconUrl: function(newIconUrl){
+	_updateIconUrl(newIconUrl: ?string){
 		if(!this._iconUrl && newIconUrl){
 			this._iconUrl = newIconUrl;
 			this._createIconImgElement();
 		}
 		else if(this._iconUrl && !newIconUrl){
-			this._iconImgElement.remove();
+			(this._iconImgElement:Object).remove();
 			this._iconImgElement = null;
 			this._iconUrl = newIconUrl;
 		}
@@ -259,15 +266,15 @@ _.extend(ButtonView.prototype, {
 			this._iconImgElement.src = newIconUrl;
 			this._iconUrl = newIconUrl;
 		}
-	},
+	}
 
-	_updateIconClass: function(newIconClass){
+	_updateIconClass(newIconClass: ?string){
 		if(!this._iconElement && newIconClass){
 			this._createIconElement();
 		}
 		else if(this._iconClass && !newIconClass){
 			if(!this._iconUrl){
-				this._iconElement.remove();
+				(this._iconElement:Object).remove();
 				this._iconClass = newIconClass;
 			}
 			else{
@@ -275,13 +282,13 @@ _.extend(ButtonView.prototype, {
 				this._iconClass = newIconClass;
 			}
 		}
-		else {
+		else if (!this._iconClass && newIconClass) {
 			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
 			this._iconClass = newIconClass;
 		}
-	},
+	}
 
-	_setEnabled: function(value){
+	_setEnabled(value: boolean){
 		if(this._isEnabled === value){
 			return;
 		}
@@ -302,9 +309,9 @@ _.extend(ButtonView.prototype, {
 		if(this._isEnabled){
 			this._setupKeyboardShortcutEvent();
 		}
-	},
+	}
 
-	_setupEventStream: function(){
+	_setupEventStream(){
 		var self = this;
 
 		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
@@ -315,7 +322,7 @@ _.extend(ButtonView.prototype, {
 		});
 
 		this._eventStream.plug(
-			clickEventStream.filter(this, 'isEnabled').map(function(event){
+			clickEventStream.filter(() => this.isEnabled()).map(function(event){
 				return {
 					eventName: 'click',
 					domEvent: event
@@ -323,8 +330,8 @@ _.extend(ButtonView.prototype, {
 			})
 		);
 
-		var isEnterOrSpace = isKeyboardKey.bind(null, 32 /* space */, 13 /* enter */);
-		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').filter(this, 'isEnabled');
+		var isEnterOrSpace = event => _.includes([32 /* space */, 13 /* enter */], event.which);
+		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').filter(() => this.isEnabled());
 		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
 		this._eventStream.plug(
@@ -341,12 +348,13 @@ _.extend(ButtonView.prototype, {
 			event.preventDefault();
 		});
 
-	},
+	}
 
-	_setupKeyboardShortcutEvent: function(){
-		if(this._keyboardShortcutHandle){
+	_setupKeyboardShortcutEvent(){
+		var keyboardShortcutHandle = this._keyboardShortcutHandle;
+		if(keyboardShortcutHandle){
 			this._eventStream.plug(
-				keyboardShortcutStream(this._keyboardShortcutHandle.chord)
+				keyboardShortcutStream(keyboardShortcutHandle.chord)
 					.takeUntil(
 						this._eventStream.filter(function(event){
 							return event.eventName === 'enabledChanged' && event.isEnabled === false;
@@ -360,26 +368,22 @@ _.extend(ButtonView.prototype, {
 					})
 			);
 		}
-	},
+	}
 
-	_setupAestheticEvents: function(){
-		var self = this;
+	_setupAestheticEvents(){
 		Bacon.fromEventTarget(this._element, 'mouseenter')
-			 .filter(this, 'isEnabled')
-			 .onValue(function(event){
-				self._element.classList.add(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
-				self._element.classList.add('inboxsdk__button_hover');
-			  });
+			.filter(() => this.isEnabled())
+			.onValue(event => {
+				this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
+				this._element.classList.add('inboxsdk__button_hover');
+			});
 
 
 		Bacon.fromEventTarget(this._element, 'mouseleave')
-			 .filter(this, 'isEnabled')
-			 .onValue(function(event){
-				self._element.classList.remove(BUTTON_COLOR_CLASSES[self._buttonColor].HOVER_CLASS);
-				self._element.classList.remove('inboxsdk__button_hover');
-			 });
+			.filter(() => this.isEnabled())
+			.onValue(event => {
+				this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
+				this._element.classList.remove('inboxsdk__button_hover');
+			});
 	}
-
-});
-
-module.exports = ButtonView;
+}
