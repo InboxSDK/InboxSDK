@@ -11,6 +11,7 @@ import kefirStopper from 'kefir-stopper';
 
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
+import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
@@ -21,7 +22,7 @@ import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutatio
 
 import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
-
+import InboxPageCommunicator from './inbox-page-communicator';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -39,10 +40,13 @@ export default class InboxDriver {
   _toolbarViewDriverStream: Bacon.Observable;
   _butterBarDriver: Object;
   _butterBar: ButterBar;
+  _pageCommunicator: InboxPageCommunicator;
 
   constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
+    customStyle();
     this._logger = logger;
     this._stopper = kefirStopper();
+    this._pageCommunicator = new InboxPageCommunicator();
     this.onready = injectScript().then(() => {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
@@ -121,6 +125,7 @@ export default class InboxDriver {
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
+  getPageCommunicator(): InboxPageCommunicator {return this._pageCommunicator;}
 
   openComposeWindow(): void {
     throw new Error("Not implemented");
