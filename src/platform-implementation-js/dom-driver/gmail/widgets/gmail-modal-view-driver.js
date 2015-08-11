@@ -92,7 +92,7 @@ _.extend(GmailModalViewDriver.prototype, {
             '<div class="Kj-JD inboxsdk__modal_container" tabindex="0" role="alertdialog">',
                 '<div class="Kj-JD-K7 Kj-JD-K7-GIHV4">',
                     '<span class="Kj-JD-K7-K0" role="heading"></span>',
-                    '<span class="Kj-JD-K7-Jq inboxsdk__modal_close" role="button" tabindex="0"></span>',
+                    '<span class="Kj-JD-K7-Jq inboxsdk__modal_close" role="button"></span>',
                 '</div>',
                 '<div class="Kj-JD-Jz inboxsdk__modal_content">',
                 '</div>',
