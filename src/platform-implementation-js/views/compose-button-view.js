@@ -10,11 +10,10 @@ var memberMap = new WeakMap();
 var ComposeButtonView = function(optionsPromise){
 	EventEmitter.call(this);
 
-	var members = {};
+	var members = {
+		optionsPromise: optionsPromise
+	};
 	memberMap.set(this, members);
-
-	members.optionsPromise = optionsPromise;
-
 
 	var self = this;
 	members.optionsPromise.then(function(options){

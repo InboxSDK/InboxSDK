@@ -35,10 +35,9 @@ export default function simulateKey(element: HTMLElement, keyCode: number, charC
 }
 
 function triggerRelayEvent(element: HTMLElement, detail: any) {
-  var event = new CustomEvent('inboxsdk_event_relay', {
+  element.dispatchEvent(new CustomEvent('inboxsdk_event_relay', {
     bubbles: true,
     cancelable: false,
     detail
-  });
-  element.dispatchEvent(event);
+  }));
 }

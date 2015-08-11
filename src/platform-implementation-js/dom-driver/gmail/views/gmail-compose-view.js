@@ -143,6 +143,9 @@ export default class GmailComposeView {
 	}
 
 	destroy() {
+		this._eventStream.push({eventName: 'destroy', data: {
+			messageID: this.getMessageID()
+		}});
 		this._eventStream.end();
 		this._managedViewControllers.forEach(vc => {
 			vc.destroy();

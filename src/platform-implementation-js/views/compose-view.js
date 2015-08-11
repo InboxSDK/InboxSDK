@@ -41,12 +41,6 @@ function ComposeView(driver, composeViewImplementation, appId) {
 
 	members.composeViewImplementation.getStopper().onValue(function(){
 		self.emit('close'); /* TODO: deprecated */
-
-		self.emit('destroy', {
-			messageID: composeViewImplementation.getMessageID()
-		});
-
-		self.removeAllListeners();
 	});
 }
 
