@@ -44,7 +44,7 @@ import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
 
 import type Logger from '../../lib/logger';
-import type PageCommunicator from './page-communicator';
+import type PageCommunicator from './gmail-page-communicator';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-handle';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';

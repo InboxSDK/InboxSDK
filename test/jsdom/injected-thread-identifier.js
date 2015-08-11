@@ -9,7 +9,7 @@ global.document = jsdom(fs.readFileSync(__dirname+'/injected-thread-identifier.h
 global.window = document.parentWindow;
 
 var threadIdentifier = require('../../src/injected-js/thread-identifier');
-var PageCommunicator = require('../../src/platform-implementation-js/dom-driver/gmail/page-communicator');
+var PageCommunicator = require('../../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator');
 
 var pageCommunicator = new PageCommunicator();
 
