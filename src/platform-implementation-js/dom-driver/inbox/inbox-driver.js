@@ -107,6 +107,20 @@ export default class InboxDriver {
     this._messageViewDriverStream = Bacon.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Bacon.never();
+
+    this._composeViewDriverStream.onError(err => {
+      // If we get here, it's probably because of a waitFor timeout caused by
+      // us failing to find the compose parent. Let's log the results of a few
+      // similar selectors to see if our selector was maybe slightly wrong.
+      this._logger.error(err, {
+        regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:first-child').length,
+        noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:not([jsan])').length,
+        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][jstcache] div[jstcache] div[id][jstcache]:not([jsan]):not([class])').length,
+        classLength: document.querySelectorAll('div.ek div.md > div').length,
+        classEkLength: document.querySelectorAll('.ek').length,
+        classMdLength: document.querySelectorAll('.md').length
+      });
+    });
   }
 
   destroy() {
