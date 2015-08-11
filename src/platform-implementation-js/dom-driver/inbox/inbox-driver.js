@@ -116,6 +116,8 @@ export default class InboxDriver {
         regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:first-child').length,
         noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:not([jsan])').length,
         noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][jstcache] div[jstcache] div[id][jstcache]:not([jsan]):not([class])').length,
+        // We can use class names for logging heuristics. Don't want to use
+        // them anywhere else.
         classLength: document.querySelectorAll('div.ek div.md > div').length,
         classEkLength: document.querySelectorAll('.ek').length,
         classMdLength: document.querySelectorAll('.md').length
