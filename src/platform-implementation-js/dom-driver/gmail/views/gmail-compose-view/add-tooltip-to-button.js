@@ -9,19 +9,9 @@ import Logger from '../../../../lib/logger';
 import GmailTooltipView from '../../widgets/gmail-tooltip-view';
 import type GmailComposeView from '../gmail-compose-view';
 
-export type TooltipButtonDescriptor = {
-	type: string
-};
+import type {TooltipDescriptor} from '../../../../views/compose-button-view';
 
-export type TooltipDescriptor = {
-	el?: HTMLElement,
-	title?: string,
-	subtitle?: string,
-	imageUrl?: string,
-	button?: {onClick?: Function}&Object
-};
-
-export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
+export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
 	var tooltipStopperStream: Bacon.Observable = gmailTooltipView.getEventStream().filter(false).mapEnd();
