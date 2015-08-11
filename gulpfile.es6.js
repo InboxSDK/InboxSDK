@@ -1,43 +1,42 @@
-/*jslint node: true */
-'use strict';
+/* @flow */
+//jshint ignore:start
 
-const checkDependencies = require('./src/build/check-dependencies');
+var checkDependencies = require('./src/build/check-dependencies');
 
-checkDependencies(require('./package.json'));
+checkDependencies(require('./package'+'.json'));
 
-const _ = require('lodash');
-const gulp = require('gulp');
-const browserify = require('browserify');
-const watchify = require('watchify');
-const source = require('vinyl-source-stream');
-const streamify = require('gulp-streamify');
-const gulpif = require('gulp-if');
-const uglify = require('gulp-uglify');
-const sourcemaps = require('gulp-sourcemaps');
-const stdio = require('stdio');
-const gutil = require('gulp-util');
-const rename = require("gulp-rename");
-const extReloader = require('./live/ext-reloader');
-const rimraf = require('rimraf');
-const Kefir = require('kefir');
-const RSVP = require('rsvp');
-const globp = RSVP.denodeify(require('glob'));
-const streamToPromise = require('./src/common/stream-to-promise');
-const envify = require('envify/custom');
-const exec = require('./src/build/exec');
-const spawn = require('./src/build/spawn');
-const escapeShellArg = require('./src/build/escape-shell-arg');
-const fs = require('fs');
-const dir = require('node-dir');
-const sys = require('sys');
-const babelify = require("babelify");
-const lazyPipe = require('lazypipe');
-const concat = require('gulp-concat');
-const addsrc = require('gulp-add-src');
+var _ = require('lodash');
+var gulp = require('gulp');
+var browserify = require('browserify');
+var watchify = require('watchify');
+var source = require('vinyl-source-stream');
+var streamify = require('gulp-streamify');
+var gulpif = require('gulp-if');
+var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
+var stdio = require('stdio');
+var gutil = require('gulp-util');
+var rename = require("gulp-rename");
+import extReloader from './live/ext-reloader';
+var rimraf = require('rimraf');
+var Kefir = require('kefir');
+var RSVP = require('rsvp');
+var globp = RSVP.denodeify(require('glob'));
+import streamToPromise from './src/common/stream-to-promise';
+var envify = require('envify/custom');
+import exec from './src/build/exec';
+import spawn from './src/build/spawn';
+import escapeShellArg from './src/build/escape-shell-arg';
+var fs = require('fs');
+var dir = require('node-dir');
+var babelify = require("babelify");
+var lazyPipe = require('lazypipe');
+var concat = require('gulp-concat');
+var addsrc = require('gulp-add-src');
 
-const sdkFilename = 'inboxsdk.js';
+var sdkFilename = 'inboxsdk.js';
 
-const args = stdio.getopt({
+var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
   'single': {key: 's', description: 'Single bundle build (for development)'},
@@ -81,7 +80,7 @@ function setupExamples() {
   });
 }
 
-let getVersion = function() {
+var getVersion = function() {
   throw new Error("Can't access before task has run");
 };
 
@@ -92,10 +91,10 @@ gulp.task('version', function() {
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
   ]).then(function(results) {
-    const commit = results[0].toString().trim().slice(0, 16);
-    const isModified = /^\s*M/m.test(results[1].toString());
+    var commit = results[0].toString().trim().slice(0, 16);
+    var isModified = /^\s*M/m.test(results[1].toString());
 
-    let version = `${require('./package.json').version}-${Date.now()}-${commit}`;
+    var version = `${require('./package'+'.json').version}-${Date.now()}-${commit}`;
     if (isModified) {
       version += '-MODIFIED';
     }
@@ -104,10 +103,10 @@ gulp.task('version', function() {
 });
 
 function browserifyTask(name, deps, entry, destname) {
-  const willMinify = args.minify && (args.single || name !== "sdk");
+  var willMinify = args.minify && (args.single || name !== "sdk");
 
   gulp.task(name, ['version'].concat(deps), function() {
-    let bundler = browserify({
+    var bundler = browserify({
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
@@ -120,7 +119,7 @@ function browserifyTask(name, deps, entry, destname) {
     }));
 
     function buildBundle() {
-      const sourcemapPipeline = lazyPipe()
+      var sourcemapPipeline = lazyPipe()
         .pipe(addsrc.prepend, (willMinify || args.production) ? ["./src/inboxsdk-js/header.js"] : [])
         .pipe(sourcemaps.init, {loadMaps: true})
         .pipe(concat, destname)
@@ -133,14 +132,14 @@ function browserifyTask(name, deps, entry, destname) {
             'https://www.inboxsdk.com/build/' : null
         });
 
-      const bundle = bundler.bundle();
-      const result = bundle
+      var bundle = bundler.bundle();
+      var result = bundle
         .pipe(source(destname))
         .pipe(gulpif(willMinify || args.production, streamify(sourcemapPipeline())))
         .pipe(gulp.dest('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {
-        const errCb = _.once(function(err) {
+        var errCb = _.once(function(err) {
           reject(err);
           result.end();
         });
@@ -235,7 +234,7 @@ gulp.task('docs', function(cb) {
       .map(parseCommentsInFile)
       .value()
     ).then(files => {
-      const classes = _.chain(files)
+      var classes = _.chain(files)
         .filter(Boolean)
         .pluck('classes')
         .flatten(true)
@@ -244,7 +243,7 @@ gulp.task('docs', function(cb) {
         .forEach(checkForDocIssues)
         .value();
 
-      const docsJson = {
+      var docsJson = {
         classes: _.chain(classes)
           .map(function(ele) {
             return [ele.name, ele];
@@ -274,11 +273,11 @@ function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
   return exec('node_modules/.bin/jsdoc ' + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', {passStdErr: true})
     .then(({stdout, stderr}) => {
-      const filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
+      var filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
       if (filteredStderr) {
         process.stderr.write(filteredStderr);
       }
-      const comments = JSON.parse(stdout);
+      var comments = JSON.parse(stdout);
       comments['filename'] = file;
       return comments;
     }, err => {
