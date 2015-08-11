@@ -8,7 +8,7 @@ export default function setupErrorSilencer() {
     oldErrorHandlers.push(window.onerror);
     window.onerror = function(...args) {
       if (process.env.NODE_ENV !== 'production') {
-        console.error("Page error:", ...args);
+        console.error("(Silenced in production) Page error:", ...args);
       }
       return true;
     };
