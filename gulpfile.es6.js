@@ -95,7 +95,7 @@ gulp.task('version', function() {
     const commit = results[0].toString().trim().slice(0, 16);
     const isModified = /^\s*M/m.test(results[1].toString());
 
-    let version = require('./package.json').version+'-'+commit;
+    let version = `${require('./package.json').version}-${Date.now()}-${commit}`;
     if (isModified) {
       version += '-MODIFIED';
     }
