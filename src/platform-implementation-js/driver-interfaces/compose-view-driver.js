@@ -36,7 +36,7 @@ export type ComposeViewDriver = {
 	setBccRecipients(emails: string[]): void;
 	close(): void;
 	send(): void;
-	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object>;
+	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Stream): () => void;
 	addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	addInnerSidebar(options: {el: HTMLElement}): void;

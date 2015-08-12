@@ -8,6 +8,7 @@ var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import getInsertBeforeElement from '../../../lib/get-insert-before-element';
 import type InboxDriver from '../inbox-driver';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
@@ -151,14 +152,21 @@ export default class InboxComposeView {
   send(): void {
     simulateClick(this._sendBtn);
   }
-  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
+  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var div = document.createElement('div');
+    div.setAttribute('role', 'button');
+    div.tabIndex = 0;
     div.className = 'inboxsdk__button_icon';
     var img = document.createElement('img');
     img.className = 'inboxsdk__button_iconImg';
     var onClick = _.noop;
-    img.addEventListener('click', () => {
-      onClick({});
+    Kefir.merge([
+      Kefir.fromEvents(div, 'click'),
+      Kefir.fromEvents(div, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+    ]).onValue(event => {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick(Object.assign({}, extraOnClickOptions));
     });
     var lastOrderHint = null;
 
@@ -181,7 +189,8 @@ export default class InboxComposeView {
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
         div.setAttribute('data-order-hint', String(orderHint));
-        this._getModifierButtonContainer().appendChild(div);
+        this._getModifierButtonContainer().insertBefore(
+          div, (getInsertBeforeElement(this._getModifierButtonContainer(), orderHint):any));
       }
     });
     return new Promise((resolve, reject) => {});

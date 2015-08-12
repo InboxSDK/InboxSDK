@@ -1,11 +1,16 @@
-.inboxsdk__button_iconImg {
-  height: 24px;
-  width: 24px;
-  vertical-align: middle;
-  margin: 6px 2px;
+.inboxsdk__compose_actionToolbar {
+  display: inline-block;
 }
 
-.inboxsdk__compose_actionToolbar,
-.inboxsdk__button_icon {
+.inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
   display: inline-block;
+  width: 28px;
+  height: 36px;
+}
+
+.inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin: 6px 2px;
 }
