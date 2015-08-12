@@ -13,6 +13,7 @@ import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
+import censorHTMLtree from '../../../common/censor-html-tree';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
@@ -120,7 +121,8 @@ export default class InboxDriver {
         // them anywhere else.
         classLength: document.querySelectorAll('div.ek div.md > div').length,
         classEkLength: document.querySelectorAll('.ek').length,
-        classMdLength: document.querySelectorAll('.md').length
+        classMdLength: document.querySelectorAll('.md').length,
+        composeHtml: _.map(document.querySelectorAll('div.ek div.md > div'), el => censorHTMLtree(el))
       });
     });
   }
