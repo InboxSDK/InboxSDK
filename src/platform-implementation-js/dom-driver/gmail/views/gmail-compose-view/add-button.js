@@ -10,10 +10,11 @@ import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
+import getInsertBeforeElement from '../../../../lib/get-insert-before-element';
 
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Stream, groupOrderHint: string, extraOnClickOptions: ?Object){
+export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Stream, groupOrderHint: string, extraOnClickOptions: Object){
 	return new RSVP.Promise(function(resolve, reject){
 		var buttonViewController;
 
@@ -40,7 +41,7 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 
 }
 
-function _addButton(gmailComposeView: GmailComposeView, buttonDescriptor: Object, groupOrderHint: string, extraOnClickOptions: ?Object){
+function _addButton(gmailComposeView: GmailComposeView, buttonDescriptor: Object, groupOrderHint: string, extraOnClickOptions: Object){
 	if(!gmailComposeView.getElement() || !gmailComposeView.getFormattingToolbar()){
 		return;
 	}
@@ -64,15 +65,15 @@ function _addButton(gmailComposeView: GmailComposeView, buttonDescriptor: Object
 function _addButtonToModifierArea(gmailComposeView: GmailComposeView, buttonDescriptor: Object, groupOrderHint: string){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('wG');
-	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
-	buttonViewController.getView().getElement().setAttribute('data-order-hint', buttonDescriptor.orderHint);
+	buttonViewController.getView().getElement().setAttribute('tabindex', '1');
+	buttonViewController.getView().getElement().setAttribute('data-order-hint', String(buttonDescriptor.orderHint||0));
 	buttonViewController.getView().getElement().setAttribute('data-group-order-hint', groupOrderHint);
 
 	var formattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
 	var element: HTMLElement = buttonViewController.getView().getElement();
 	var actionToolbar: HTMLElement = gmailComposeView.getAdditionalActionToolbar();
 
-	var insertBeforeElement: ?HTMLElement = _getInsertBeforeElement(actionToolbar, buttonDescriptor.orderHint, groupOrderHint);
+	var insertBeforeElement: ?HTMLElement = getInsertBeforeElement(actionToolbar, buttonDescriptor.orderHint, groupOrderHint);
 
 	actionToolbar.insertBefore(element, (insertBeforeElement:any));
 	gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
@@ -80,26 +81,6 @@ function _addButtonToModifierArea(gmailComposeView: GmailComposeView, buttonDesc
 	gmailComposeView.addManagedViewController(buttonViewController);
 
 	return buttonViewController;
-}
-
-
-function _getInsertBeforeElement(containerElement, checkOrderHint, checkGroupOrderHint): ?HTMLElement {
-	var buttonElements = containerElement.querySelectorAll('[data-order-hint]');
-	var insertBeforeElement = null;
-
-
-	for(var ii=0; ii<buttonElements.length; ii++){
-		var buttonElement = buttonElements[ii];
-		var orderHint = buttonElement.getAttribute('data-order-hint');
-		var groupOrderHint = buttonElement.getAttribute('data-group-order-hint');
-
-		if(groupOrderHint > checkGroupOrderHint || (groupOrderHint === checkGroupOrderHint && orderHint > checkOrderHint) ){
-			insertBeforeElement = buttonElement;
-			break;
-		}
-	}
-
-	return insertBeforeElement;
 }
 
 function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
@@ -138,7 +119,7 @@ function _getButtonViewController(buttonDescriptor: Object){
 	return buttonViewController;
 }
 
-function _processButtonDescriptor(buttonDescriptor: ?Object, extraOnClickOptions: ?Object): ?Object {
+function _processButtonDescriptor(buttonDescriptor: ?Object, extraOnClickOptions: Object): ?Object {
 	// clone the descriptor and set defaults.
 	if (!buttonDescriptor) {
 		return null;

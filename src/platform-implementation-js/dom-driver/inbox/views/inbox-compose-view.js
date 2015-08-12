@@ -1,14 +1,16 @@
 /* @flow */
 //jshint ignore:start
 
+var _ = require('lodash');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import getInsertBeforeElement from '../../../lib/get-insert-before-element';
 import type InboxDriver from '../inbox-driver';
-import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/compose-view-driver';
+import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
 export default class InboxComposeView {
   _element: HTMLElement;
@@ -18,21 +20,25 @@ export default class InboxComposeView {
   _closeBtn: HTMLElement;
   _minimizeBtn: HTMLElement;
   _sendBtn: HTMLElement;
+  _attachBtn: HTMLElement;
   _bodyEl: HTMLElement;
   _bodyPlaceholder: HTMLElement;
   _subjectEl: HTMLInputElement;
   _queueDraftSave: () => void;
+  _modifierButtonContainer: ?HTMLElement;
 
   constructor(driver: InboxDriver, el: HTMLElement) {
     this._element = el;
     this._driver = driver;
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
+    this._modifierButtonContainer = null;
 
     var hadError = false;
     var bottomAreaElementCount = null;
     var topBtns = this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button');
     var sendBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
+    var attachBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
     var bodyEls = this._element.querySelectorAll('div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
     var subjectEls = this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
     try {
@@ -49,6 +55,9 @@ export default class InboxComposeView {
       this._sendBtn = sendBtns[0];
       var bottomArea: HTMLElement = (this._sendBtn.parentElement:any);
       bottomAreaElementCount = bottomArea.childElementCount;
+      if (attachBtns.length !== 1)
+        throw new Error("compose wrong number of attach buttons");
+      this._attachBtn = attachBtns[0];
       if (bodyEls.length !== 1)
         throw new Error("compose wrong number of body elements");
       this._bodyEl = bodyEls[0];
@@ -67,6 +76,7 @@ export default class InboxComposeView {
       this._driver.getLogger().error(err, {
         topBtnsLength: topBtns.length,
         sendBtnsLength: sendBtns.length,
+        attachBtnsLength: attachBtns.length,
         bodyElsLength: bodyEls.length,
         subjectElsLength: subjectEls.length
       });
@@ -142,19 +152,69 @@ export default class InboxComposeView {
   send(): void {
     simulateClick(this._sendBtn);
   }
-  addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
-    buttonDescriptor.take(1).onValue(buttonDescriptor => {
-      var img = document.createElement('img');
-      img.className = 'inboxsdk__button_iconImg';
-      img.title = buttonDescriptor.title;
-      img.src = buttonDescriptor.iconUrl;
-      img.addEventListener('click', () => {
-        alert('clicked');
-      });
-      var sendParent: HTMLElement = (this._sendBtn.parentElement:any);
-      sendParent.insertBefore(img, this._sendBtn.nextSibling);
+  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
+    var div = document.createElement('div');
+    div.setAttribute('role', 'button');
+    div.tabIndex = 0;
+    div.className = 'inboxsdk__button_icon';
+    var img = document.createElement('img');
+    img.className = 'inboxsdk__button_iconImg';
+    var onClick = _.noop;
+    Kefir.merge([
+      Kefir.fromEvents(div, 'click'),
+      Kefir.fromEvents(div, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+    ]).onValue(event => {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick(Object.assign({}, extraOnClickOptions));
+    });
+    var lastOrderHint = null;
+
+    buttonDescriptor.takeUntilBy(this._stopper).onValue(buttonDescriptor => {
+      if (!buttonDescriptor) {
+        div.style.display = 'none';
+        return;
+      }
+      div.style.display = '';
+      div.title = buttonDescriptor.title;
+      div.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
+      onClick = buttonDescriptor.onClick;
+      if (buttonDescriptor.iconUrl) {
+        img.src = buttonDescriptor.iconUrl;
+        div.appendChild(img);
+      } else {
+        (img:Object).remove();
+      }
+      var orderHint = buttonDescriptor.orderHint||0;
+      if (lastOrderHint !== orderHint) {
+        lastOrderHint = orderHint;
+        div.setAttribute('data-order-hint', String(orderHint));
+        this._getModifierButtonContainer().insertBefore(
+          div, (getInsertBeforeElement(this._getModifierButtonContainer(), orderHint):any));
+      }
     });
     return new Promise((resolve, reject) => {});
+  }
+  _getModifierButtonContainer(): HTMLElement {
+    if (this._modifierButtonContainer) {
+      return this._modifierButtonContainer;
+    }
+    var div = document.createElement('div');
+    div.className = 'inboxsdk__compose_actionToolbar';
+
+    var hiddenAttachBtn = this._attachBtn.nextSibling;
+    if (hiddenAttachBtn && hiddenAttachBtn.style.position === 'absolute') {
+      hiddenAttachBtn.style.display = 'none';
+    } else {
+      this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
+    }
+
+    var sendParent = this._sendBtn.parentElement;
+    if (!sendParent) throw new Error("Could not find send button parent");
+    sendParent.insertBefore(div, this._sendBtn.nextSibling);
+
+    this._modifierButtonContainer = div;
+    return div;
   }
   addRecipientRow(options: Kefir.Stream): () => void {
     throw new Error("Not implemented");

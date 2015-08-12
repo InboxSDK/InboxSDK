@@ -488,6 +488,8 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 
 	/**
 	 * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	 * ^optional
+	 * ^default=null
 	 * @type {string}
 	 */
 	iconUrl:null,

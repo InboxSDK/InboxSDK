@@ -47,8 +47,9 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		}));
 
 		composeView.addButton({
-			title: 'Lion',
+			title: 'Lion -1',
 			iconUrl: chrome.runtime.getURL('lion.png'),
+			orderHint: -1,
 			onClick: function(event){
 				event.composeView.insertLinkIntoBodyAtCursor('monkeys', 'http://www.google.com');
 			}

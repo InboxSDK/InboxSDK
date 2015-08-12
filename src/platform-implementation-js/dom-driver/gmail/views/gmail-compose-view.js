@@ -30,7 +30,7 @@ import addRecipientRow from './gmail-compose-view/add-recipient-row';
 import addButton from './gmail-compose-view/add-button';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
-import type {TooltipDescriptor, TooltipButtonDescriptor} from './gmail-compose-view/add-tooltip-to-button';
+import type {TooltipDescriptor} from '../../../views/compose-button-view';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -286,11 +286,11 @@ export default class GmailComposeView {
 		fromManager.setFromEmail(this._driver, this, email);
 	}
 
-	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
+	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
 		return addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 
-	addTooltipToButton(buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor) {
+	addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
 		var tooltip = addTooltipToButton(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
 		this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
 	}
