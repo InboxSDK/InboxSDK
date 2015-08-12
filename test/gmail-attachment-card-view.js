@@ -1,11 +1,11 @@
 import assert from "assert";
-import jsdom from "./lib/jsdom";
+import jsdomDoc from "./lib/jsdom-doc";
 import GmailAttachmentCardView from "../src/platform-implementation-js/dom-driver/gmail/views/gmail-attachment-card-view";
 
 const driver = {};
 
 describe("GmailAttachmentCardView", function() {
-  const document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
+  const document = jsdomDoc('<!doctype html><html><body><div id="canvas"></div></body></html>');
 
   describe("getAttachmentType", function() {
     describe("UNLOADED", function() {

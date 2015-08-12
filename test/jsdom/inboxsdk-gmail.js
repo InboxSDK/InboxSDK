@@ -1,13 +1,13 @@
 var assert = require('assert');
 var RSVP = require('../lib/rsvp');
-var jsdom = require('../lib/jsdom');
+var jsdomDoc = require('../lib/jsdom-doc');
 
 require('../lib/fake-page-globals')();
 
 process.env.VERSION = 'beep';
 
 global.MutationObserver = require('../lib/mock-mutation-observer');
-global.document = jsdom(`<!doctype html>
+global.document = jsdomDoc(`<!doctype html>
 <html>
 <body>
 <div role="banner">

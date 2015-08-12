@@ -1,9 +1,9 @@
 var assert = require('assert');
-var jsdom = require('./lib/jsdom');
+var jsdomDoc = require('./lib/jsdom-doc');
 var threadRowParser = require('../src/injected-js/thread-identifier/thread-row-parser');
 
 describe('threadRowParser', function() {
-  var document = jsdom('<!doctype html><html><body><div id="canvas"></div></body></html>');
+  var document = jsdomDoc('<!doctype html><html><body><div id="canvas"></div></body></html>');
 
   describe('extractMetadataFromThreadRow', function() {
     it('can read row', function() {
