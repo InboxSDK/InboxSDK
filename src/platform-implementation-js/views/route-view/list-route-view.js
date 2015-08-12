@@ -68,6 +68,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 
 	/**
 	 * Simulates a click on the Gmail thread list refresh button.
+	 * @returns {void}
 	 */
 	refresh: function() {
 		membersMap.get(this).routeViewDriver.refresh();
