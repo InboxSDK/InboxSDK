@@ -4,3 +4,8 @@
   vertical-align: middle;
   margin: 6px 2px;
 }
+
+.inboxsdk__compose_actionToolbar,
+.inboxsdk__button_icon {
+  display: inline-block;
+}
