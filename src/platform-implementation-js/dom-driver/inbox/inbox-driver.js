@@ -83,7 +83,10 @@ export default class InboxDriver {
     this._routeViewDriverStream = Bacon.never(); //Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
     this._composeViewDriverStream = baconCast(Bacon,
-      kefirWaitFor(() => document.querySelector('body > div[id][class][jsan] > div[id][class] > div[class] > div[id]:first-child'))
+      kefirWaitFor(() => {
+        var els = document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child');
+        return els.length === 1 ? els[0] : null;
+      })
         .flatMap(kmakeElementChildStream)
         .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
         .flatMap(event =>
@@ -95,7 +98,7 @@ export default class InboxDriver {
           var composeEl = el.querySelector('div[role=dialog]');
           if (!composeEl) {
             this._logger.error(new Error("compose dialog element not found"), {
-              html: censorHTMLstring(el.innerHTML)
+              html: censorHTMLtree(el)
             });
             return null;
           }
@@ -114,9 +117,9 @@ export default class InboxDriver {
       // us failing to find the compose parent. Let's log the results of a few
       // similar selectors to see if our selector was maybe slightly wrong.
       this._logger.error(err, {
-        regularLength: document.querySelectorAll('body > div[id][class][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
-        noFirstChildLength: document.querySelectorAll('body > div[id][class][jsan] > div[id][class] > div[class] > div[id]').length,
-        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][class][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
+        regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
+        noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]').length,
+        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
         // We can use class names for logging heuristics. Don't want to use
         // them anywhere else.
         classLength: document.querySelectorAll('div.ek div.md > div').length,
