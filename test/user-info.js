@@ -4,11 +4,11 @@
 import _ from 'lodash';
 import assert from 'assert';
 
-import jsdom from './lib/jsdom';
+import jsdomDoc from './lib/jsdom-doc';
 import UserInfo from '../src/platform-implementation-js/dom-driver/gmail/gmail-driver/user-info';
 
 describe('UserInfo', function() {
-  var document = jsdom(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
+  var document = jsdomDoc(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
   var slot = document.getElementById('slot');
   var driver = {getUserEmailAddress: _.constant('cowan@streak.com')};
 

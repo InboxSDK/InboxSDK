@@ -172,20 +172,20 @@ module.exports = function(element, anchorPoint, options){
     }
 
     if( !(newBottom == null) ){
-        element.style.bottom = newBottom + 'px';
+        element.style.bottom = _.round(newBottom) + 'px';
         element.style.top = '';
     }
     else if(!(newTop == null)){
-        element.style.top = newTop + 'px';
+        element.style.top = _.round(newTop) + 'px';
         element.style.bottom = '';
     }
 
     if(!(newRight == null)){
-        element.style.right = newRight + 'px';
+        element.style.right = _.round(newRight) + 'px';
         element.style.left = '';
     }
     else if( !(newLeft == null)){
-        element.style.left = newLeft + 'px';
+        element.style.left = _.round(newLeft) + 'px';
         element.style.right = '';
     }
 };

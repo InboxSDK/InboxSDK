@@ -76,6 +76,7 @@ div.T-I.inboxsdk__button {
   min-height: 1em;
   padding: 0px;
   overflow: visible;
+  max-height: none;
 }
 
 /* end */

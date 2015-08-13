@@ -80,13 +80,9 @@ function setupExamples() {
   });
 }
 
-var getVersion = function() {
-  throw new Error("Can't access before task has run");
-};
-
 gulp.task('noop', _.noop);
 
-gulp.task('version', function() {
+function getVersion(): Promise<string> {
   return RSVP.Promise.all([
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
@@ -98,14 +94,17 @@ gulp.task('version', function() {
     if (isModified) {
       version += '-MODIFIED';
     }
-    getVersion = _.constant(version);
+    if (args.watch) {
+      version += '-WATCH';
+    }
+    return version;
   });
-});
+}
 
 function browserifyTask(name, deps, entry, destname) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
-  gulp.task(name, ['version'].concat(deps), function() {
+  gulp.task(name, deps, async function() {
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -115,7 +114,7 @@ function browserifyTask(name, deps, entry, destname) {
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
-      VERSION: getVersion()
+      VERSION: await getVersion()
     }));
 
     function buildBundle() {
