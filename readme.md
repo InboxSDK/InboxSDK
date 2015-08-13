@@ -58,4 +58,5 @@ about Inbox should be referred to instead for it.
 Like Gmail, Inbox uses a lot of randomly generated class names, but the class
 names appear to be regenerated every few weeks. CSS class names, id values,
 jstcache properties, and jsl properties are not dependable for using to find
-elements.
+elements. The presence of the class and id properties can be used. CSS child
+and sibling selectors are useful to use.
