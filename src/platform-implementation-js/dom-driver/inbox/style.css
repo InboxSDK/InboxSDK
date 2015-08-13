@@ -2,6 +2,12 @@
   display: inline-block;
 }
 
+.inboxsdk__button_icon {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
   display: inline-block;
   position: relative;
@@ -10,6 +16,7 @@
   opacity: 0.6;
   margin: 8px 2px 4px;
 }
+.inboxsdk__compose_actionToolbar .inboxsdk__button_icon.inboxsdk__active,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:hover,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:focus {
   opacity: 1;
@@ -26,6 +33,7 @@
   padding: 4px;
   border-radius: 50%;
 }
+.inboxsdk__compose_actionToolbar .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.1);
 }
@@ -34,4 +42,19 @@
   width: 24px;
   height: 24px;
   vertical-align: middle;
+}
+
+.inboxsdk__dropdown {
+  padding-bottom: 5px;
+  overflow: visible;
+  z-index: 100;
+  outline: none;
+}
+.inboxsdk__dropdown_content {
+  background: white;
+  min-width: 1em;
+  min-height: 1em;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
 }

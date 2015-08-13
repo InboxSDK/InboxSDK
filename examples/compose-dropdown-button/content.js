@@ -1,4 +1,7 @@
-InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
+InboxSDK.load(1, 'simple-example', {
+	iconImageUrl: chrome.runtime.getURL('monkey.png'),
+	inboxBeta: true
+}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
@@ -9,8 +12,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 			onClick: function(event){
 				composeView.setSubject('foo<b>ar');
 				event.dropdown.el.innerHTML = 'hello world!';
-			},
-			section: 'TRAY_LEFT'
+			}
 		});
 
 		var s1 = composeView.addStatusBar({height:20});
@@ -33,8 +35,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 						console.log('s1 destroyed');
 					});
 				}
-			},
-			section: 'TRAY_LEFT'
+			}
 		});
 
 		var s2 = composeView.addStatusBar({orderHint:2});
@@ -57,8 +58,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 						console.log('s2 destroyed');
 					});
 				}
-			},
-			section: 'TRAY_LEFT'
+			}
 		});
 
 		var sr;
@@ -75,8 +75,7 @@ InboxSDK.load(1, 'simple-example', {iconImageUrl: chrome.runtime.getURL('monkey.
 					el.innerHTML = 'sr foo <b>bar</b>';
 					sr = composeView.addRecipientRow({labelText: 'Label Text', el:el});
 				}
-			},
-			section: 'TRAY_LEFT'
+			}
 		});
 
 		composeView.on('presending', function(event){

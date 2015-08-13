@@ -1,6 +1,6 @@
 {
-  "name": "Compose Dropdown Example Extension",
-  "description": "Compose dropdown button example!",
+  "name": "Compose Tooltip Example Extension",
+  "description": "inboxsdk example",
   "version": "0.1",
   "content_scripts": [
     {

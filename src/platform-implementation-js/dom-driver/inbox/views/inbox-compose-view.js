@@ -8,8 +8,8 @@ var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
-import getInsertBeforeElement from '../../../lib/get-insert-before-element';
 import type InboxDriver from '../inbox-driver';
+import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
 export default class InboxComposeView {
@@ -153,49 +153,10 @@ export default class InboxComposeView {
     simulateClick(this._sendBtn);
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
-    var div = document.createElement('div');
-    div.setAttribute('role', 'button');
-    div.tabIndex = 0;
-    div.className = 'inboxsdk__button_icon';
-    var img = document.createElement('img');
-    img.className = 'inboxsdk__button_iconImg';
-    var onClick = _.noop;
-    Kefir.merge([
-      Kefir.fromEvents(div, 'click'),
-      Kefir.fromEvents(div, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
-    ]).onValue(event => {
-      event.preventDefault();
-      event.stopPropagation();
-      onClick(Object.assign({}, extraOnClickOptions));
-    });
-    var lastOrderHint = null;
-
-    buttonDescriptor.takeUntilBy(this._stopper).onValue(buttonDescriptor => {
-      if (!buttonDescriptor) {
-        div.style.display = 'none';
-        return;
-      }
-      div.style.display = '';
-      div.title = buttonDescriptor.title;
-      div.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
-      onClick = buttonDescriptor.onClick;
-      if (buttonDescriptor.iconUrl) {
-        img.src = buttonDescriptor.iconUrl;
-        div.appendChild(img);
-      } else {
-        (img:Object).remove();
-      }
-      var orderHint = buttonDescriptor.orderHint||0;
-      if (lastOrderHint !== orderHint) {
-        lastOrderHint = orderHint;
-        div.setAttribute('data-order-hint', String(orderHint));
-        this._getModifierButtonContainer().insertBefore(
-          div, (getInsertBeforeElement(this._getModifierButtonContainer(), orderHint):any));
-      }
-    });
+    var button = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
     return new Promise((resolve, reject) => {});
   }
-  _getModifierButtonContainer(): HTMLElement {
+  getModifierButtonContainer(): HTMLElement {
     if (this._modifierButtonContainer) {
       return this._modifierButtonContainer;
     }
