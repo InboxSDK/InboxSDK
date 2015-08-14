@@ -3,6 +3,7 @@
 
 import type Kefir from 'kefir';
 import type {EventEmitter} from 'events';
+import type {TooltipDescriptor} from '../views/compose-button-view';
 
 export type StatusBar = EventEmitter & {
 	el: HTMLElement,
@@ -56,4 +57,6 @@ export type ComposeViewDriver = {
 	getInitialMessageID(): ?string;
 	getMessageID(): ?string;
 	getThreadID(): ?string;
+	addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): void;
+	closeButtonTooltip(buttonViewController: Object): void;
 };

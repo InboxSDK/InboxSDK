@@ -57,8 +57,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 		var members = memberMap.get(this);
 		var buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 
-		var composeButtonObject = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
-		return new ComposeButtonView(composeButtonObject);
+		var optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
+		return new ComposeButtonView(optionsPromise, members.composeViewImplementation);
 	},
 
 	/*

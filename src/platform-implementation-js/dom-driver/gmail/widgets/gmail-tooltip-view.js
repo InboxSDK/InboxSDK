@@ -6,8 +6,8 @@ var Bacon = require('baconjs');
 var asap = require('asap');
 var kefirStopper = require('kefir-stopper');
 
-var ButtonView = require('./buttons/button-view');
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+import ButtonView from './buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 var ARROW_HORIZONTAL_HEIGHT = 9;
 var ARROW_HORIZONTAL_WIDTH = 18;

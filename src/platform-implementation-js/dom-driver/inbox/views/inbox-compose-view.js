@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
@@ -9,6 +10,7 @@ import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import type InboxDriver from '../inbox-driver';
+import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
@@ -153,8 +155,11 @@ export default class InboxComposeView {
     simulateClick(this._sendBtn);
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
-    var button = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
-    return new Promise((resolve, reject) => {});
+    var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
+    return RSVP.Promise.resolve({
+      buttonViewController,
+      buttonDescriptor: {}
+    });
   }
   getModifierButtonContainer(): HTMLElement {
     if (this._modifierButtonContainer) {
@@ -237,6 +242,12 @@ export default class InboxComposeView {
   }
   getThreadID(): ?string {
     return null;
+  }
+  addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
+    (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
+  }
+  closeButtonTooltip(buttonViewController: Object) {
+    (buttonViewController:InboxComposeButtonView).closeTooltip();
   }
 }
 

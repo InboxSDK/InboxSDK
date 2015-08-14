@@ -7,6 +7,7 @@ import type InboxComposeView from './inbox-compose-view';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
+import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import type {ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
 var insertionOrderHint: number = 0;
@@ -75,5 +76,13 @@ export default class InboxComposeButtonView {
         insertElementInOrder(composeView.getModifierButtonContainer(), div);
       }
     });
+  }
+
+  showTooltip(tooltipDescriptor: TooltipDescriptor) {
+
+  }
+
+  closeTooltip() {
+
   }
 }

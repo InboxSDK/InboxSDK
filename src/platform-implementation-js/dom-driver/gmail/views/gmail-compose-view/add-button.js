@@ -28,7 +28,6 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 						buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
 						resolve({
 							buttonViewController: buttonViewController,
-							composeViewDriver: gmailComposeView,
 							buttonDescriptor: buttonDescriptor
 						});
 					}
@@ -36,6 +35,10 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 				else{
 					buttonViewController.getView().update(buttonOptions);
 				}
+			})
+			.onEnd(() => {
+				// Just in case things end without ever resolving above.
+				resolve(null);
 			});
 	});
 

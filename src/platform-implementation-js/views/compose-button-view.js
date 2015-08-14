@@ -2,21 +2,21 @@
 //jshint ignore:start
 
 var _ = require('lodash');
-var asap = require('asap');
 import EventEmitter from '../lib/safe-event-emitter';
+import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 export type TooltipDescriptor = {
-	el?: HTMLElement,
-	title?: string,
-	subtitle?: string,
-	imageUrl?: string,
-	button?: {onClick?: Function}&Object
+	el?: ?HTMLElement,
+	title?: ?string,
+	subtitle?: ?string,
+	imageUrl?: ?string,
+	button?: ?{onClick?: Function}&Object
 };
 
 export default class ComposeButtonView extends EventEmitter {
-	constructor(optionsPromise: Promise<?Object>) {
+	constructor(optionsPromise: Promise<?Object>, composeViewDriver: ComposeViewDriver) {
 		super();
-		var members: Object = {optionsPromise};
+		var members = {optionsPromise, composeViewDriver};
 		memberMap.set(this, members);
 
 		members.optionsPromise.then(options => {
@@ -24,10 +24,6 @@ export default class ComposeButtonView extends EventEmitter {
 				_destroy(this);
 				return;
 			}
-
-			members.buttonViewController = options.buttonViewController;
-			members.buttonDescriptor = options.buttonDescriptor;
-			members.composeViewDriver = options.composeViewDriver;
 
 			members.composeViewDriver.getStopper().onValue(() => {
 				_destroy(this);
@@ -37,24 +33,29 @@ export default class ComposeButtonView extends EventEmitter {
 
 	showTooltip(tooltipDescriptor: TooltipDescriptor) {
 		var members = memberMap.get(this);
-		members.optionsPromise.then(function(){
-			asap(() => {
-				members.composeViewDriver.addTooltipToButton(members.buttonViewController, members.buttonDescriptor, tooltipDescriptor);
-			});
+		members.optionsPromise.then(options => {
+			if (!options) return;
+			members.composeViewDriver.addTooltipToButton(options.buttonViewController, options.buttonDescriptor, tooltipDescriptor);
 		});
 	}
 
 	closeTooltip() {
 		var members = memberMap.get(this);
-		members.optionsPromise.then(function(){
-			asap(() => {
-				members.composeViewDriver.closeButtonTooltip(members.buttonViewController);
-			});
+		members.optionsPromise.then(options => {
+			if (!options) return;
+			members.composeViewDriver.closeButtonTooltip(options.buttonViewController);
 		});
 	}
 }
 
-var memberMap: WeakMap<ComposeButtonView, Object> = new WeakMap();
+type Options = {
+	buttonDescriptor: Object,
+	buttonViewController: Object
+};
+var memberMap: WeakMap<ComposeButtonView, {
+	composeViewDriver: ComposeViewDriver,
+	optionsPromise: Promise<?Options>
+}> = new WeakMap();
 
 function _destroy(composeButtonViewInstance: ComposeButtonView) {
 	composeButtonViewInstance.emit('destroy');
