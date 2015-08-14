@@ -27,9 +27,11 @@ import InboxPageCommunicator from './inbox-page-communicator';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
+import type {EnvData} from '../../platform-implementation';
 
 export default class InboxDriver {
   _logger: Logger;
+  _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
   onready: Promise;
   _routeViewDriverStream: Bacon.Observable;
@@ -43,9 +45,10 @@ export default class InboxDriver {
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
 
-  constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
+  constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
     this._logger = logger;
+    this._envData = envData;
     this._stopper = kefirStopper();
     this._pageCommunicator = new InboxPageCommunicator();
     this.onready = injectScript().then(() => {
@@ -244,5 +247,5 @@ export default class InboxDriver {
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var driver: Driver = new InboxDriver('', ({}: any), '', '', ({}: any));
+	var driver: Driver = new InboxDriver('', ({}:any), '', '', ({}:any), ({}:any));
 }

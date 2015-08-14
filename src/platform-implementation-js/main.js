@@ -1,4 +1,5 @@
 if (!global.__InboxSDKImpLoader) {
+  var piMainStarted = Date.now();
   var oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
@@ -30,6 +31,7 @@ if (!global.__InboxSDKImpLoader) {
           throw new Error("Unsupported InboxSDK version");
         }
 
+        var piLoadStarted = Date.now();
         return onready.then(() => {
           var oldDefine;
           try {
@@ -40,7 +42,9 @@ if (!global.__InboxSDKImpLoader) {
               define = null;
             }
             const {makePlatformImplementation} = require('./platform-implementation');
-            return makePlatformImplementation(appId, opts);
+            return makePlatformImplementation(appId, opts, {
+              piMainStarted, piLoadStarted
+            });
           } finally {
             if (oldDefine) {
               define = oldDefine;
