@@ -14,7 +14,7 @@
     "babelify": "^6.1.2",
     "bacon-cast": "^1.1.1",
     "baconjs": "0.7.71",
-    "brfs": "^1.4.0",
+    "brfs": "^1.4.1",
     "browserify": "^11.0.1",
     "co": "^4.6.0",
     "combokeys-capture": "^2.4.2",
