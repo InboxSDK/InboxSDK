@@ -125,7 +125,7 @@ export default class InboxDriver {
         classLength: document.querySelectorAll('div.ek div.md > div').length,
         classEkLength: document.querySelectorAll('.ek').length,
         classMdLength: document.querySelectorAll('.md').length,
-        composeHtml: _.map(document.querySelectorAll('div.ek div.md > div'), el => censorHTMLtree(el))
+        composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
       });
     });
   }
