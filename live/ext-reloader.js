@@ -1,3 +1,6 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var cproc = require('child_process');
@@ -36,7 +39,7 @@ var getChromeLocation = _.memoize(function(chromeSuffix) {
   });
 });
 
-function extensionReload() {
+export default function extensionReload() {
   return getchromeSuffixWithReloaderExtension().then(function(chromeSuffix) {
     if (chromeSuffix != null) {
       return getChromeLocation(chromeSuffix).then(function(chrome) {
@@ -47,5 +50,3 @@ function extensionReload() {
     }
   });
 }
-
-module.exports = extensionReload;

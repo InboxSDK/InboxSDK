@@ -86,8 +86,13 @@ export class PlatformImplementation extends SafeEventEmitter {
 	}
 }
 
+export type EnvData = {
+	piMainStarted: number;
+	piLoadStarted: number;
+};
+
 // returns a promise for the PlatformImplementation object
-export function makePlatformImplementation(appId: string, opts: any): Promise<PlatformImplementation> {
+export function makePlatformImplementation(appId: string, opts: any, envData: EnvData): Promise<PlatformImplementation> {
 	if (typeof appId !== 'string') {
 		throw new Error("appId must be a string");
 	}
@@ -120,7 +125,7 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 		return new Promise((resolve, reject) => {});
 	}
 
-	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
+	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger, envData);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
 		if (!isValidAppId(appId)) {
 			console.error(`

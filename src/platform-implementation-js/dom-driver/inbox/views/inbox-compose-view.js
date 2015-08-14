@@ -1,11 +1,16 @@
 /* @flow */
 //jshint ignore:start
 
+var _ = require('lodash');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
+import kefirDelayAsap from '../../../lib/kefir-delay-asap';
+import simulateClick from '../../../lib/dom/simulate-click';
+import simulateKey from '../../../lib/dom/simulate-key';
 import type InboxDriver from '../inbox-driver';
-import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/compose-view-driver';
+import InboxComposeButtonView from './inbox-compose-button-view';
+import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 
 export default class InboxComposeView {
   _element: HTMLElement;
@@ -15,17 +20,27 @@ export default class InboxComposeView {
   _closeBtn: HTMLElement;
   _minimizeBtn: HTMLElement;
   _sendBtn: HTMLElement;
+  _attachBtn: HTMLElement;
+  _bodyEl: HTMLElement;
+  _bodyPlaceholder: HTMLElement;
+  _subjectEl: HTMLInputElement;
+  _queueDraftSave: () => void;
+  _modifierButtonContainer: ?HTMLElement;
 
   constructor(driver: InboxDriver, el: HTMLElement) {
     this._element = el;
     this._driver = driver;
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
+    this._modifierButtonContainer = null;
 
     var hadError = false;
     var bottomAreaElementCount = null;
     var topBtns = this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button');
     var sendBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
+    var attachBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
+    var bodyEls = this._element.querySelectorAll('div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
+    var subjectEls = this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
     try {
       if (topBtns.length !== 2)
         throw new Error("compose wrong number of top buttons");
@@ -40,23 +55,71 @@ export default class InboxComposeView {
       this._sendBtn = sendBtns[0];
       var bottomArea: HTMLElement = (this._sendBtn.parentElement:any);
       bottomAreaElementCount = bottomArea.childElementCount;
+      if (attachBtns.length !== 1)
+        throw new Error("compose wrong number of attach buttons");
+      this._attachBtn = attachBtns[0];
+      if (bodyEls.length !== 1)
+        throw new Error("compose wrong number of body elements");
+      this._bodyEl = bodyEls[0];
+      var bodyPlaceholder = this._bodyEl.previousElementSibling;
+      if (!(bodyPlaceholder instanceof HTMLElement) || bodyPlaceholder.nodeName !== 'LABEL')
+        throw new Error(`compose body placeholder wrong type ${bodyPlaceholder && bodyPlaceholder.nodeName}`);
+      this._bodyPlaceholder = bodyPlaceholder;
+      if (subjectEls.length !== 1)
+        throw new Error("compose wrong number of subject elements");
+      var subjectEl = subjectEls[0];
+      if (!(subjectEl instanceof HTMLInputElement))
+        throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
+      this._subjectEl = subjectEl;
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
         topBtnsLength: topBtns.length,
-        sendBtnsLength: sendBtns.length
+        sendBtnsLength: sendBtns.length,
+        attachBtnsLength: attachBtns.length,
+        bodyElsLength: bodyEls.length,
+        subjectElsLength: subjectEls.length
       });
     }
 
     this._driver.getLogger().eventSite('compose open', {hadError, bottomAreaElementCount});
+
+    var draftSaveTriggerer = kefirBus();
+    this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
+    draftSaveTriggerer
+      .bufferBy(draftSaveTriggerer.flatMap(() => kefirDelayAsap(null)))
+      .filter(x => x.length > 0)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+        try {
+          simulateKey(this.getBodyElement(), 13, 0);
+        } finally {
+          unsilence();
+        }
+      });
   }
   destroy() {
+    this._eventStream.emit({eventName: 'destroy', data: {}});
     this._eventStream.end();
     this._stopper.destroy();
   }
   getEventStream(): Kefir.Stream {return this._eventStream;}
   getStopper(): Kefir.Stream {return this._stopper;}
   getElement(): HTMLElement {return this._element;}
+  // Call this whenever we change the body directly by mucking with the
+  // elements.
+  _informBodyChanged() {
+    if (this._bodyEl.textContent.length > 0) {
+      this._bodyPlaceholder.style.display = "none";
+    } else {
+      // To do this properly, we have to re-add whatever the visible class is.
+      // It's a bit of work for a pretty minor detail (making the placeholder
+      // re-appear immediately when SDK methods are used to clear a compose).
+      //this._bodyPlaceholder.style.display = "";
+    }
+    this._queueDraftSave();
+  }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
     throw new Error("Not implemented");
   }
@@ -66,14 +129,13 @@ export default class InboxComposeView {
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
     throw new Error("Not implemented");
   }
-  setSubject(text: string): void {
-    throw new Error("Not implemented");
-  }
-  setBodyHTML(text: string): void {
-    throw new Error("Not implemented");
+  setBodyHTML(html: string): void {
+    this._bodyEl.innerHTML = html;
+    this._informBodyChanged();
   }
   setBodyText(text: string): void {
-    throw new Error("Not implemented");
+    this._bodyEl.textContent = text;
+    this._informBodyChanged();
   }
   setToRecipients(emails: string[]): void {
     throw new Error("Not implemented");
@@ -85,11 +147,35 @@ export default class InboxComposeView {
     throw new Error("Not implemented");
   }
   close(): void {
-    throw new Error("Not implemented");
+    simulateClick(this._closeBtn);
   }
-  addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
-    // stub
+  send(): void {
+    simulateClick(this._sendBtn);
+  }
+  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
+    var button = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
     return new Promise((resolve, reject) => {});
+  }
+  getModifierButtonContainer(): HTMLElement {
+    if (this._modifierButtonContainer) {
+      return this._modifierButtonContainer;
+    }
+    var div = document.createElement('div');
+    div.className = 'inboxsdk__compose_actionToolbar';
+
+    var hiddenAttachBtn = this._attachBtn.nextSibling;
+    if (hiddenAttachBtn && hiddenAttachBtn.style.position === 'absolute') {
+      hiddenAttachBtn.style.display = 'none';
+    } else {
+      this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
+    }
+
+    var sendParent = this._sendBtn.parentElement;
+    if (!sendParent) throw new Error("Could not find send button parent");
+    sendParent.insertBefore(div, this._sendBtn.nextSibling);
+
+    this._modifierButtonContainer = div;
+    return div;
   }
   addRecipientRow(options: Kefir.Stream): () => void {
     throw new Error("Not implemented");
@@ -107,16 +193,17 @@ export default class InboxComposeView {
     throw new Error("Not implemented");
   }
   isInlineReplyForm(): boolean {
-    throw new Error("Not implemented");
+    // inline reply form support isn't in yet, so it can't be one.
+    return false;
   }
   getBodyElement(): HTMLElement {
-    throw new Error("Not implemented");
+    return this._bodyEl;
   }
   getHTMLContent(): string {
-    throw new Error("Not implemented");
+    return this.getBodyElement().innerHTML;
   }
   getTextContent(): string {
-    throw new Error("Not implemented");
+    return this.getBodyElement().textContent;
   }
   getSelectedBodyHTML(): ?string {
     throw new Error("Not implemented");
@@ -125,7 +212,10 @@ export default class InboxComposeView {
     throw new Error("Not implemented");
   }
   getSubject(): string {
-    throw new Error("Not implemented");
+    return this._subjectEl.value;
+  }
+  setSubject(text: string): void {
+    this._subjectEl.value = text;
   }
   getToRecipients(): Contact[] {
     throw new Error("Not implemented");
@@ -137,14 +227,15 @@ export default class InboxComposeView {
     throw new Error("Not implemented");
   }
   getComposeID(): string {
-    throw new Error("Not implemented");
+    throw new Error("This method was discontinued");
+  }
+  getInitialMessageID(): ?string {
+    throw new Error("composeView.getInitialMessageID is not implemented in Inbox")
   }
   getMessageID(): ?string {
-    // stub
-    return null;
+    throw new Error("composeView.getMessageID is not implemented in Inbox")
   }
   getThreadID(): ?string {
-    // stub
     return null;
   }
 }

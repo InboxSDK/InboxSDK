@@ -1,15 +1,15 @@
 var assert = require('assert');
 var RSVP = require('../lib/rsvp');
-var jsdom = require('../lib/jsdom');
+var jsdomDoc = require('../lib/jsdom-doc');
 var fs = require('fs');
 
 require('../lib/fake-page-globals')();
 
-global.document = jsdom(fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8'));
+global.document = jsdomDoc(fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8'));
 global.window = document.parentWindow;
 
 var threadIdentifier = require('../../src/injected-js/thread-identifier');
-var PageCommunicator = require('../../src/platform-implementation-js/dom-driver/gmail/page-communicator');
+var PageCommunicator = require('../../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator');
 
 var pageCommunicator = new PageCommunicator();
 

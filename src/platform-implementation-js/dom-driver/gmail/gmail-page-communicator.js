@@ -2,8 +2,7 @@
 // jshint ignore:start
 
 import type {AutoCompleteSuggestion} from '../../../injected-js/modify-suggestions';
-
-import type {ajaxOpts} from '../../../common/ajax';
+import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 import _ from 'lodash';
 import asap from 'asap';
@@ -16,49 +15,14 @@ import Logger from '../../lib/logger';
 // on the injected script, and if it's not instantiated elsewhere, you know that
 // if you have an instance of this, then the injected script is present and this
 // will work.
-export default class PageCommunicator {
+export default class GmailPageCommunicator extends CommonPageCommunicator {
   ajaxInterceptStream: Bacon.Observable;
 
   constructor() {
+    super();
     this.ajaxInterceptStream = Bacon
       .fromEventTarget(document, 'inboxSDKajaxIntercept')
       .map(x => x.detail);
-  }
-
-  resolveUrlRedirects(url: string): Promise<string> {
-    return this.pageAjax({url, method: 'HEAD'}).then(result => result.responseURL);
-  }
-
-  pageAjax(opts: ajaxOpts): Promise<{text: string, responseURL: string}> {
-    var id = `${Date.now()}-${Math.random()}`;
-    var promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
-      .filter(event => event.detail && event.detail.id === id)
-      .take(1)
-      .flatMap(event => {
-        if (event.detail.error) {
-          var err = Object.assign(
-            (new Error(event.detail.message || "Connection error"): any),
-            {status: event.detail.status}
-          );
-          if (event.detail.stack) {
-            err.stack = event.detail.stack;
-          }
-          return Kefir.constantError(err);
-        } else {
-          return Kefir.constant({
-            text: event.detail.text,
-            responseURL: event.detail.responseURL
-          });
-        }
-      })
-      .toPromise(RSVP.Promise);
-
-    document.dispatchEvent(new CustomEvent('inboxSDKpageAjax', {
-      bubbles: false, cancelable: false,
-      detail: Object.assign({}, opts, {id})
-    }));
-
-    return promise;
   }
 
   getThreadIdForThreadRow(threadRow: HTMLElement): string {
@@ -82,14 +46,6 @@ export default class PageCommunicator {
     }));
 
     return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
-  }
-
-  getUserEmailAddress(): string {
-    return document.head.getAttribute('data-inboxsdk-user-email-address');
-  }
-
-  getUserLanguage(): string {
-    return document.head.getAttribute('data-inboxsdk-user-language');
   }
 
   getUserOriginalPreviewPaneMode(): string {
@@ -170,29 +126,5 @@ export default class PageCommunicator {
       cancelable: false,
       detail: {query, newQuery}
     }));
-  }
-
-  silenceGmailErrorsForAMoment(): ()=>void {
-    document.dispatchEvent(new CustomEvent('inboxSDKsilencePageErrors', {
-      bubbles: false, cancelable: false, detail: null
-    }));
-    // create error here for stacktrace
-    var error = new Error("Forgot to unsilence gmail errors");
-    var unsilenced = false;
-    var unsilence = _.once(() => {
-      unsilenced = true;
-      document.dispatchEvent(new CustomEvent('inboxSDKunsilencePageErrors', {
-        bubbles: false,
-        cancelable: false,
-        detail: null
-      }));
-    });
-    asap(() => {
-      if (!unsilenced) {
-        Logger.error(error);
-        unsilence();
-      }
-    });
-    return unsilence;
   }
 }

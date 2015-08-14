@@ -5,7 +5,7 @@ var _ = require('lodash');
 var Bacon = require('baconjs');
 var fs = require('fs');
 import {parse} from 'querystring';
-import PageCommunicator from './page-communicator';
+import PageCommunicator from './gmail-page-communicator';
 
 import injectScript from '../../lib/inject-script';
 

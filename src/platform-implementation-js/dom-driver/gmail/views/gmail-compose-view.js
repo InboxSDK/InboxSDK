@@ -30,7 +30,7 @@ import addRecipientRow from './gmail-compose-view/add-recipient-row';
 import addButton from './gmail-compose-view/add-button';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
-import type {TooltipDescriptor, TooltipButtonDescriptor} from './gmail-compose-view/add-tooltip-to-button';
+import type {TooltipDescriptor} from '../../../views/compose-button-view';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -43,6 +43,7 @@ export default class GmailComposeView {
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
 	_isStandalone: boolean;
+	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
 	_eventStream: Bacon.Bus;
@@ -66,6 +67,8 @@ export default class GmailComposeView {
 		this._isInlineReplyForm = false;
 		this._isFullscreen = false;
 		this._isStandalone = false;
+		this._emailWasSent = false;
+		this._messageId = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
@@ -85,6 +88,7 @@ export default class GmailComposeView {
 					return event.type === 'emailSent' && event.composeId === this.getComposeID();
 				}).map((event) => {
 					var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+					this._emailWasSent = true;
 					return {eventName: 'sent', data: response};
 				}),
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
@@ -139,6 +143,9 @@ export default class GmailComposeView {
 	}
 
 	destroy() {
+		this._eventStream.push({eventName: 'destroy', data: {
+			messageID: this.getMessageID()
+		}});
 		this._eventStream.end();
 		this._managedViewControllers.forEach(vc => {
 			vc.destroy();
@@ -279,11 +286,11 @@ export default class GmailComposeView {
 		fromManager.setFromEmail(this._driver, this, email);
 	}
 
-	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions?: Object): Promise<?Object> {
+	addButton(buttonDescriptor: Kefir.Stream, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
 		return addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 
-	addTooltipToButton(buttonViewController: Object, buttonDescriptor: TooltipButtonDescriptor, tooltipDescriptor: TooltipDescriptor) {
+	addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
 		var tooltip = addTooltipToButton(this, buttonViewController, buttonDescriptor, tooltipDescriptor);
 		this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
 	}
@@ -485,12 +492,13 @@ export default class GmailComposeView {
 	}
 
 	getMessageID(): ?string {
+		if (this._emailWasSent) {
+			return null;
+		}
 		var input = this._messageIDElement;
-
-		if(!input){
+		if (!input) {
 			return this._messageId;
 		}
-
 		return input.value && (input.value !== 'undefined' && input.value !== 'null') ? input.value : this._messageId;
 	}
 

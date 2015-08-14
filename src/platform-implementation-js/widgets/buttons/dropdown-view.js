@@ -32,8 +32,9 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 
 	document.body.insertBefore(this._dropdownViewDriver.getContainerElement(), document.body.firstElementChild);
 
-	if(this._dropdownViewDriver.getContainerElement().getAttribute('tabindex') == null){
-		this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', -1);
+	if(!this._dropdownViewDriver.getContainerElement().hasAttribute('tabindex')){
+		// makes the element focusable, but not tab-focusable
+		this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', '-1');
 	}
 	this._dropdownViewDriver.getContainerElement().focus();
 

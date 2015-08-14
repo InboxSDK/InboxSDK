@@ -298,7 +298,7 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
 
 /**
 * @class
-* This type is used to modification you can do to a {ThreadRowView}.
+* This type is used to modify {ThreadRowView}'s which represent drafts.
 */
 var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
 

@@ -1,9 +1,13 @@
 /* @flow */
 //jshint ignore:start
 
-var ATTRIBUTE_WHITELIST = new Set([
-  "class", "rel", "target", "aria-hidden", "type", "tabindex", "id",
-  "style", "role"
+export var ATTRIBUTE_WHITELIST: Set<string> = new Set([
+  // standard html props
+  "class", "rel", "target", "type", "tabindex", "id", "style", "role",
+  "contenteditable",
+  "aria-expanded", "aria-hidden", "aria-labelledby",
+  // inbox props
+  "g_editable", "jsnamespace", "jsaction"
 ]);
 
 // Takes an HTML string, and returns it with all of the text nodes and

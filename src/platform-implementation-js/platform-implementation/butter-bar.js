@@ -148,8 +148,10 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
   },
 
   /**
-  * Spawns a "Saving..." message that stays until it's destroyed. The returned object has a
-  * {destroy} method that can be called to remove the message.
+  * Spawns a "Saving..." message that stays until it's removed. The returned object has a
+  * {resolve} method that can be called to show a "Saved" confirmation message, and
+  * a {reject} method that can be called to remove the message immediately with no
+  * confirmation.
   * @return {Object}
   */
   showSaving(options={}) {

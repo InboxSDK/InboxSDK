@@ -41,12 +41,6 @@ function ComposeView(driver, composeViewImplementation, appId) {
 
 	members.composeViewImplementation.getStopper().onValue(function(){
 		self.emit('close'); /* TODO: deprecated */
-
-		self.emit('destroy', {
-			messageID: composeViewImplementation.getMessageID()
-		});
-
-		self.removeAllListeners();
 	});
 }
 
@@ -392,7 +386,9 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * Fires when the compose view is closed. This can be triggered by the .close method, the user
 	 * clicking the close or discard buttons, the message being sent, etc.
 	 * @event ComposeView#destroy
-	 * @param {string} messageID - The draft's message ID after it saved.
+	 * @param {string} messageID - If the composeView was closed without being sent and the draft
+	 * was saved, then this property will have the draft's message ID after it saved. Otherwise it
+	 * will be null.
 	 */
 
 	/**
@@ -492,6 +488,8 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 
 	/**
 	 * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+	 * ^optional
+	 * ^default=null
 	 * @type {string}
 	 */
 	iconUrl:null,

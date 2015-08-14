@@ -15,7 +15,14 @@ export default function gmailLoadEvent(driver: GmailDriver) {
       windowHeight: window.innerHeight,
       language: pageCommunicator.getUserLanguage(),
       previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
-      isConversationViewDisabled
+      isConversationViewDisabled,
+      timings: Object.assign(({
+        responseStart: global.performance&&global.performance.timing.responseStart,
+        responseEnd: global.performance&&global.performance.timing.responseEnd,
+        domLoading: global.performance&&global.performance.timing.domLoading,
+        domInteractive: global.performance&&global.performance.timing.domInteractive,
+        domComplete: global.performance&&global.performance.timing.domComplete
+      }:any), driver.getTimings())
     });
   });
 }

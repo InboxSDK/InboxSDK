@@ -156,7 +156,7 @@ function _createGroupToggleButtonView(){
 
 	buttonView.addClass('wG');
 	buttonView.addClass('inboxsdk__compose_groupedActionButton');
-	buttonView.getElement().setAttribute('tabindex', 1);
+	buttonView.getElement().setAttribute('tabindex', '1');
 
 	return buttonView;
 }

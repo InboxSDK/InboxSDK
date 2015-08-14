@@ -2,7 +2,14 @@ if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
 
   const logError = require('./log-error');
+  var oldDefine;
   try {
+    if (typeof define !== "undefined" && define && define.amd) {
+      // work around amd compatibility issue
+      // https://groups.google.com/forum/#!msg/inboxsdk/U_bq82Exmwc/I3iIinxxCAAJ
+      oldDefine = define;
+      define = null;
+    }
     const _ = require('lodash');
     const RSVP = require('rsvp');
     const xhrHelper = require('./xhr-helper');
@@ -31,5 +38,9 @@ if (!global.__InboxSDKInjected) {
     setupErrorSilencer();
   } catch(err) {
     logError(err);
+  } finally {
+    if (oldDefine) {
+      define = oldDefine;
+    }
   }
 }
