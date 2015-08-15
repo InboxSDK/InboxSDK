@@ -1,5 +1,7 @@
 if (!global.__InboxSDKImpLoader) {
   var piMainStarted = Date.now();
+  var wasAccountSwitcherReadyAtStart = !!document.querySelector('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]');
+
   var oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
@@ -43,7 +45,7 @@ if (!global.__InboxSDKImpLoader) {
             }
             const {makePlatformImplementation} = require('./platform-implementation');
             return makePlatformImplementation(appId, opts, {
-              piMainStarted, piLoadStarted
+              piMainStarted, piLoadStarted, wasAccountSwitcherReadyAtStart
             });
           } finally {
             if (oldDefine) {

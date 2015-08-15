@@ -151,6 +151,7 @@ export default class GmailDriver {
 	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getBaconStopper(): Bacon.Observable {return this._bStopper;}
+	getEnvData(): EnvData {return this._envData;}
 
 	getTimings(): {[ix:string]:?number} {
 		return {

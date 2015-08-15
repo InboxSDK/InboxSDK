@@ -89,6 +89,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 export type EnvData = {
 	piMainStarted: number;
 	piLoadStarted: number;
+	wasAccountSwitcherReadyAtStart: boolean;
 };
 
 // returns a promise for the PlatformImplementation object

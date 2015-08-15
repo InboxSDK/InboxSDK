@@ -16,6 +16,7 @@ export default function gmailLoadEvent(driver: GmailDriver) {
       language: pageCommunicator.getUserLanguage(),
       previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
       isConversationViewDisabled,
+      wasAccountSwitcherReadyAtStart: driver.getEnvData().wasAccountSwitcherReadyAtStart,
       timings: Object.assign(({
         responseStart: global.performance&&global.performance.timing.responseStart,
         responseEnd: global.performance&&global.performance.timing.responseEnd,
