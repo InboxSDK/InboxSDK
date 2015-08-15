@@ -1,3 +1,11 @@
+.inboxsdk__notransition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
+
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
 }
@@ -57,4 +65,40 @@
   padding: 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   border: 1px solid rgba(0,0,0,0.2);
+}
+
+.inboxsdk__tooltip {
+  z-index: 1300;
+  position: fixed;
+  transition: left 200ms ease, top 200ms ease;
+  background: white;
+  min-width: 1em;
+  min-height: 1em;
+  padding: 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.inboxsdk__tooltip_arrow {
+  z-index: 1301;
+  position: fixed;
+  width: 0;
+  height: 0;
+  border: 8px solid;
+  border-color: rgba(0,0,0,0.2) transparent;
+  border-bottom-width: 0;
+}
+.inboxsdk__tooltip_arrow::before{
+  content: ' ';
+  border: 7px solid;
+  border-color: white transparent;
+  border-bottom-width: 0;
+  position: absolute;
+  top: -8px;
+  left: -7px;
+}
+
+.inboxsdk__tooltip_img {
+  max-width: 500px;
+  max-height: 300px;
 }

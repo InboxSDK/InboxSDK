@@ -23,6 +23,8 @@ type Coord = {
 
 type BoundingBox = [Coord, Coord];
 
+// You may want to try ./contain-by-screen2 instead.
+
 export default function containByScreen(element: HTMLElement, anchorPoint: HTMLElement, _options?: ?Options){
 	if(element.style.position !== 'fixed'){
 		return;

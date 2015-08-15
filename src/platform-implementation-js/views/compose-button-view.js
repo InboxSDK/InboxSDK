@@ -10,7 +10,7 @@ export type TooltipDescriptor = {
 	title?: ?string,
 	subtitle?: ?string,
 	imageUrl?: ?string,
-	button?: ?{onClick?: Function}&Object
+	button?: ?{onClick?: Function, title: string}&Object
 };
 
 export default class ComposeButtonView extends EventEmitter {

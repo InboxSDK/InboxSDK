@@ -9,6 +9,7 @@ import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import type {ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
+import InboxTooltipView from './inbox-tooltip-view';
 
 var insertionOrderHint: number = 0;
 
@@ -16,9 +17,10 @@ export default class InboxComposeButtonView {
   _composeView: InboxComposeView;
   _buttonEl: HTMLElement;
   _iconEl: HTMLImageElement;
-  _dropdown: DropdownView;
+  _tooltip: ?InboxTooltipView;
 
   constructor(composeView: InboxComposeView, buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object) {
+    this._tooltip = null;
     this._composeView = composeView;
     var div = this._buttonEl = document.createElement('div');
     div.setAttribute('role', 'button');
@@ -76,13 +78,27 @@ export default class InboxComposeButtonView {
         insertElementInOrder(composeView.getModifierButtonContainer(), div);
       }
     });
+
+    composeView.getStopper().onValue(() => {
+      this.closeTooltip();
+    })
   }
 
   showTooltip(tooltipDescriptor: TooltipDescriptor) {
-
+    if (this._tooltip) {
+      this.closeTooltip();
+    }
+    var tooltip = this._tooltip = new InboxTooltipView(this._buttonEl, tooltipDescriptor);
+    tooltip.getStopper().onValue(() => {
+      if (this._tooltip === tooltip) {
+        this._tooltip = null;
+      }
+    });
   }
 
   closeTooltip() {
-
+    if (this._tooltip) {
+      this._tooltip.destroy();
+    }
   }
 }
