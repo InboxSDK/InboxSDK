@@ -79,24 +79,41 @@ export default class GmailComposeView {
 
 		this._eventStream.plug(
 			Bacon.mergeAll(
-				xhrInterceptorStream.filter((event) => {
-					return event.type === 'emailSending' && event.composeId === this.getComposeID();
-				}).map((event) => {
-					return {eventName: 'sending'};
-				}),
-				xhrInterceptorStream.filter((event) => {
-					return event.type === 'emailSent' && event.composeId === this.getComposeID();
-				}).map((event) => {
-					var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-					this._emailWasSent = true;
-					return {eventName: 'sent', data: response};
-				}),
+				xhrInterceptorStream
+					.filter(event => event.composeId === this.getComposeID())
+					.map((event) => {
+						switch(event.type){
+							case 'emailSending':
+								return {eventName: 'sending'};
+
+							case 'emailSent':
+							case 'emailDraftReceived':
+								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								this._emailWasSent = true;
+
+								if(response.messageID){
+									this._messageId = response.messageID;
+								}
+
+								return {
+									eventName: event.type === 'emailDraftReceived' ? 'draftSaved' : 'sent',
+									data: response
+								};
+
+							default:
+								return null;
+						}
+					})
+					.filter(Boolean),
+
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
 					return {
 						eventName: 'buttonAdded'
 					};
 				}),
+
 				Bacon.fromEvent(this._element, 'resize').map(() => ({eventName: 'resize'})),
+
 				Bacon
 					.fromEventTarget(this._element, 'composeFullscreenStateChanged')
 					.doAction(() => this._updateComposeFullscreenState())
@@ -344,7 +361,16 @@ export default class GmailComposeView {
 			return;
 		}
 
-		simulateClick(this.getCloseButton());
+		if(this._isFullscreen){
+			this._eventStream
+				.filter(({eventName}) => eventName === 'composeFullscreenStateChanged')
+				.onValue(() => simulateClick(this.getCloseButton()));
+
+			simulateClick(this.getMoleSwitchButton());
+		}
+		else{
+			simulateClick(this.getCloseButton());
+		}
 	}
 
 	send() {
@@ -475,6 +501,10 @@ export default class GmailComposeView {
 		return this._element.querySelectorAll('.Hm > img')[2];
 	}
 
+	getMoleSwitchButton(): HTMLElement {
+		return this._element.querySelectorAll('.Hm > img')[1];
+	}
+
 	getBottomBarTable(): HTMLElement {
 		return this._element.querySelector('.aoP .aDh > table');
 	}
@@ -493,7 +523,7 @@ export default class GmailComposeView {
 
 	getMessageID(): ?string {
 		if (this._emailWasSent) {
-			return null;
+			return this._messageId;
 		}
 		var input = this._messageIDElement;
 		if (!input) {

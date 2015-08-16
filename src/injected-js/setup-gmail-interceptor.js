@@ -62,6 +62,27 @@ export default function setupGmailInterceptor() {
 
   js_frame_wrappers.push({
     isRelevantTo: function(connection) {
+      return connection.params.act === 'sd';
+    },
+    originalSendBodyLogger: function(connection, body) {
+      triggerEvent({
+        type: 'emailDraftSaveSending',
+        body: body
+      });
+    },
+    afterListeners: function(connection) {
+      if(connection.status === 200) {
+        triggerEvent({
+          type: 'emailDraftReceived',
+          responseText: connection.originalResponseText,
+          originalSendBody: connection.originalSendBody
+        });
+      }
+    }
+  });
+
+  js_frame_wrappers.push({
+    isRelevantTo: function(connection) {
       return connection.params.search && connection.params.view === 'tl';
     },
     responseTextChanger: function(connection, responseText) {

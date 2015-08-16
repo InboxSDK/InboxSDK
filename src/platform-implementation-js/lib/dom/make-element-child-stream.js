@@ -23,7 +23,7 @@ export default function makeElementChildStream(element: HTMLElement): Bacon.Obse
         return;
       }
       var toSink = new Array(len);
-      for (var i=0; i<len; i++) {
+      for (var i=0; i < len; i++) {
         var el = els[i], removalStream = new Bacon.Bus();
         removalStreams.set(el, removalStream);
         toSink[i] = new Bacon.Next({el, removalStream});
