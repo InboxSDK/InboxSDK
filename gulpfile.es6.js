@@ -39,6 +39,7 @@ var sdkFilename = 'inboxsdk.js';
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
+  'hot': {key: 'h', description: 'hot module replacement'},
   'single': {key: 's', description: 'Single bundle build (for development)'},
   'minify': {key: 'm', description: 'Minify build'},
   'production': {key: 'p', description: 'Production build'},
@@ -117,6 +118,14 @@ function browserifyTask(name, deps, entry, destname) {
         'http://localhost:4567/platform-implementation.js',
       VERSION
     }));
+
+    if (args.hot && name === (args.single ? 'sdk' : 'imp')) {
+      bundler.plugin(require('browserify-hmr'), {
+        url: name === 'sdk' ?
+          'http://localhost:4567/inboxsdk.js' :
+          'http://localhost:4567/platform-implementation.js'
+      });
+    }
 
     function buildBundle() {
       var sourcemapPipeline = lazyPipe()
