@@ -5,6 +5,13 @@ import _ from 'lodash';
 
 var ignoreErrors = _.constant(true);
 
+function getIfOwn(object: Object, prop: string): any {
+  if (Object.prototype.hasOwnProperty.call(object, prop)) {
+    return object[prop];
+  }
+  return null;
+}
+
 // Simulates a control+meta click on an element, intercepts the call to
 // window.open, and returns the attempted popup's URL.
 export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
@@ -21,10 +28,11 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
 
   var url;
   var oldWindowOpen = window.open, oldWindowOnerror = window.onerror,
-    oldFocus = window.Element.prototype.focus, oldBlur = window.Element.prototype.blur;
+    oldFocus = getIfOwn(window.HTMLElement.prototype, 'focus'),
+    oldBlur = getIfOwn(window.HTMLElement.prototype, 'blur');
   try {
-    window.Element.prototype.focus = _.noop;
-    window.Element.prototype.blur = _.noop;
+    window.HTMLElement.prototype.focus = _.noop;
+    window.HTMLElement.prototype.blur = _.noop;
     window.onerror = ignoreErrors;
     window.open = function(_url, _title, _options) {
       url = _url;
@@ -39,8 +47,16 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
     };
     element.dispatchEvent(event);
   } finally {
-    window.Element.prototype.focus = oldFocus;
-    window.Element.prototype.blur = oldBlur;
+    if (oldFocus) {
+      window.HTMLElement.prototype.focus = oldFocus;
+    } else {
+      delete window.HTMLElement.prototype.focus;
+    }
+    if (oldBlur) {
+      window.HTMLElement.prototype.blur = oldBlur;
+    } else {
+      delete window.HTMLElement.prototype.blur;
+    }
     window.onerror = oldWindowOnerror;
     window.open = oldWindowOpen;
   }
