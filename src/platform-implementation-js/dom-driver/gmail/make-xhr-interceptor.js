@@ -37,6 +37,28 @@ export default function makeXhrInterceptor(): {xhrInterceptStream: Bacon.Observa
         draft: body.draft,
         response: response
       };
+    }),
+    rawInterceptStream.filter(function(detail) {
+      return detail.type === 'emailDraftSaveSending';
+    }).map(function(detail) {
+      var body = parse(detail.body);
+      return {
+        type: 'emailDraftSaveSending',
+        composeId: body.composeid,
+        draft: body.draft
+      };
+    }),
+    rawInterceptStream.filter(function(detail) {
+      return detail.type === 'emailDraftReceived';
+    }).map(function(detail) {
+      var body = parse(detail.originalSendBody);
+      var response = detail.responseText;
+      return {
+        type: 'emailDraftReceived',
+        composeId: body.composeid,
+        draft: body.draft,
+        response: response
+      };
     })
   );
 
