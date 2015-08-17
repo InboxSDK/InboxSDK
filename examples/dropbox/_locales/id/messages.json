@@ -1,31 +1,31 @@
 {
    "add_file": {
       "description": "Tooltip of the Dropbox button in the Gmail compose view",
-      "message": "Add file using Dropbox"
+      "message": "Tambahkan file memakai Dropbox"
    },
    "description": {
       "description": "Description of the extension",
-      "message": "Send and preview Dropbox files and links without leaving your Gmail window."
+      "message": "Kirim dan pratinjau file dan tautan Dropbox tanpa meninggalkan jendela Gmail."
    },
    "name": {
       "description": "Name of the extension",
-      "message": "Dropbox for Gmail"
+      "message": "Dropbox untuk Gmail"
    },
    "onboarding_title": {
       "description": "The title of the onboarding tooltip",
-      "message": "\u003Cspan class='onboarding-emphasis'>New!\u003C/span> Attach files with Dropbox"
+      "message": "\u003Cspan class='onboarding-emphasis'>Baru!\u003C/span> Lampirkan file dengan Dropbox"
    },
    "saver_button_tooltip": {
-      "description": "Button to save an attachment or a link to Dropbox",
-      "message": "Save to Dropbox"
+      "description": "Button to add a link directly to Dropbox",
+      "message": "Simpan di Dropbox"
    },
    "saver_error": {
       "description": "Error message displayed if saving the link fails",
-      "message": "Failed to save the file to Dropbox; please try again."
+      "message": "Gagal menyimpan file ke Dropbox; coba lagi."
    },
    "saver_success": {
       "description": "Success message displayed if saving attachment to dropbox finished",
-      "message": "Successfully saved to Dropbox."
+      "message": "Berhasil disimpan ke Dropbox."
    },
    "short_name": {
       "description": "Short name of the extension - up to 12 characters",
@@ -33,42 +33,42 @@
    },
    "tooltip_button": {
       "description": "Button that dismisses the onboarding tooltip",
-      "message": "Got it"
+      "message": "Paham"
    },
    "tooltip_confirm": {
       "description": "Text for the confirm button in onboarding tooltip",
-      "message": "Get Started"
+      "message": "Memulai"
    },
    "tooltip_disable": {
       "description": "Text on a button to remove the chrome extension",
-      "message": "I don't want this"
+      "message": "Saya tidak membutuhkannya"
    },
    "tooltip_dismiss": {
       "description": "Text for the dismiss button in onboarding tooltip",
-      "message": "Not now"
+      "message": "Lain kali saja"
    },
    "tooltip_instant": {
       "description": "One of the tips in the onboarding tooltip list",
-      "message": "Attach them instantly"
+      "message": "Lampirkan seketika"
    },
    "tooltip_large_files": {
       "description": "One of the tips in the onboarding tooltip list",
-      "message": "Send large files"
+      "message": "Kirim file besar"
    },
    "tooltip_learn_more": {
       "description": "Opens a tab with more information about the extension.",
-      "message": "Learn more"
+      "message": "Ketahui lebih lanjut"
    },
    "tooltip_safe": {
       "description": "One of the tips in the onboarding tooltip list",
-      "message": "Keep files safe"
+      "message": "Amankan file"
    },
    "tooltip_subtitle": {
       "description": "Subtitle of the onboarding tooltip",
-      "message": "Click on the icon to send any files from Dropbox"
+      "message": "Klik pada ikon untuk mengirim file apa saja dari Dropbox"
    },
    "tooltip_title": {
       "description": "Title of the onboarding tooltip",
-      "message": "Your Dropbox is just a click away"
+      "message": "Dropbox Anda tinggal diklik saja"
    }
 }

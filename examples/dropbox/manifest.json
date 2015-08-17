@@ -4,6 +4,7 @@
   "short_name": "__MSG_short_name__",
   "description": "__MSG_description__",
   "version": "0.3",
+  "content_security_policy": "script-src 'self'; object-src 'self';",
   "default_locale": "en",
 
   "icons": {
@@ -18,6 +19,7 @@
   },
   "content_scripts": [
     {
+      "css": [ "onboarding.css" ],
       "matches": [
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
@@ -32,13 +34,5 @@
     "https://inbox.google.com/",
     "https://*.dropbox.com/"
   ],
-  "web_accessible_resources": [
-    "images/logo.png",
-    "images/icon16.png",
-    "images/icon48.png",
-    "images/icon128.png",
-    "images/white_icon48.png",
-    "images/onboarding.png",
-    "blank.html"
-  ]
+  "web_accessible_resources": [ "images/logo.png", "images/icon16.png", "images/icon48.png", "images/icon128.png", "images/white_icon48.png", "images/onboarding.png", "images/checkmark.png", "images/x.png", "blank.html" ]
 }
