@@ -523,7 +523,7 @@ export default class GmailComposeView {
 
 	getMessageID(): ?string {
 		if (this._emailWasSent) {
-			return this._messageId;
+			return null;
 		}
 		var input = this._messageIDElement;
 		if (!input) {
