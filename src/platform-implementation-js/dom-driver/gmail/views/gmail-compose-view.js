@@ -87,19 +87,18 @@ export default class GmailComposeView {
 								return {eventName: 'sending'};
 
 							case 'emailSent':
-							case 'emailDraftReceived':
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								this._emailWasSent = true;
-
 								if(response.messageID){
 									this._messageId = response.messageID;
 								}
-
-								return {
-									eventName: event.type === 'emailDraftReceived' ? 'draftSaved' : 'sent',
-									data: response
-								};
-
+								return {eventName: 'sent', data: response};
+							case 'emailDraftReceived':
+								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								if(response.messageID){
+									this._messageId = response.messageID;
+								}
+								return {eventName: 'draftSaved', data: response};
 							default:
 								return null;
 						}
