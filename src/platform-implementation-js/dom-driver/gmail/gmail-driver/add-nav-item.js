@@ -1,16 +1,16 @@
-'use strict';
+/* @flow */
+//jshint ignore:start
 
 var $ = require('jquery');
+var Bacon = require('baconjs');
+import GmailElementGetter from '../gmail-element-getter';
+import GmailNavItemView from '../views/gmail-nav-item-view';
+import waitFor from '../../../lib/wait-for';
+import eventNameFilter from '../../../lib/event-name-filter';
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
+import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 
-var GmailElementGetter = require('../gmail-element-getter');
-var GmailNavItemView = require('../views/gmail-nav-item-view');
-
-var waitFor = require('../../../lib/wait-for');
-var eventNameFilter = require('../../../lib/event-name-filter');
-var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
-var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
-
-module.exports = function(orderGroup, navItemDescriptor){
+export default function addNavItem(orderGroup: string, navItemDescriptor: Bacon.Observable<Object>) {
 	var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
 
 	var attacher = _attachNavItemView(gmailNavItemView);
@@ -31,11 +31,11 @@ module.exports = function(orderGroup, navItemDescriptor){
 	gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
 	return gmailNavItemView;
-};
+}
 
-function _waitForNavItemsHolder(){
+function _waitForNavItemsHolder(): Promise {
 	if(GmailElementGetter.isStandalone()){
-		return;
+		return Promise.resolve();
 	}
 
 	return waitFor(function(){
@@ -45,15 +45,12 @@ function _waitForNavItemsHolder(){
 
 function _attachNavItemView(gmailNavItemView){
 	return function(){
-		var holder = _getNavItemsHolder();
-
-		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), holder.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
-		holder.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
+		insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
 	};
 }
 
 
-function _getNavItemsHolder(){
+function _getNavItemsHolder(): HTMLElement {
 	var holder = document.querySelector('.inboxsdk__navMenu');
 	if(!holder){
 		return _createNavItemsHolder();
@@ -63,13 +60,13 @@ function _getNavItemsHolder(){
 	}
 }
 
-function _createNavItemsHolder(){
+function _createNavItemsHolder(): HTMLElement {
 	var holder = document.createElement('div');
 	holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
 	holder.innerHTML = '<div class="TK"></div>';
 
 	var navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
-	navMenuInjectionContainer.children[2].insertAdjacentElement('beforebegin', holder);
+	navMenuInjectionContainer.insertBefore(holder, navMenuInjectionContainer.children[2]);
 
 	makeMutationObserverStream(holder, {attributes: true, attributeFilter: ['class']}).onValue(function(){
 		if(holder.classList.contains('TA')){

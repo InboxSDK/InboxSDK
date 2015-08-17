@@ -31,6 +31,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
+import addNavItem from './gmail-driver/add-nav-item';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
 import showNativeRouteView from './gmail-driver/show-native-route-view';
@@ -243,7 +244,7 @@ export default class GmailDriver {
 	}
 
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
+		return addNavItem(appId, navItemDescriptor);
 	}
 
 	getSentMailNativeNavItem(): Promise<Object> {
