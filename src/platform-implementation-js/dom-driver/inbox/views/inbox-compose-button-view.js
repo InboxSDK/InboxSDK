@@ -38,6 +38,7 @@ export default class InboxComposeButtonView {
     ]).onValue(event => {
       event.preventDefault();
       event.stopPropagation();
+      this.closeTooltip();
       if (hasDropdown) {
         if (dropdown) {
           dropdown.close();
