@@ -201,7 +201,7 @@ browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js');
 
 gulp.task('examples', ['sdk'], setupExamples);
 
-gulp.task('server', ['imp'], function() {
+gulp.task('server', [args.single ? 'sdk' : 'imp'], function() {
   require('./live/app').run();
 });
 

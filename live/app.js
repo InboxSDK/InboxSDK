@@ -12,17 +12,18 @@ function delayFilter(fn) {
 }
 
 module.exports.run = function() {
-  var server = http.createServer(delayFilter(function (req, res) {
+  var server = http.createServer(/*delayFilter*/(function (req, res) {
     if (req.url.indexOf('..') == -1 &&
-      req.url.match(/^\/.*\.js(\.map)?$/))
+      req.url.match(/^\/.*\.js(\.map)?(\?.*)?$/))
     {
+      var fileUrl = req.url.split('?')[0];
       if (req.method === 'GET') {
-        var file = fs.createReadStream(__dirname+'/../dist'+req.url);
+        var file = fs.createReadStream(__dirname+'/../dist'+fileUrl);
         file.on('error', function(e) {
           if (e.code == 'ENOENT') {
             res.writeHead(404);
           } else {
-            console.error("Error retrieving", req.url, e);
+            console.error("Error retrieving", fileUrl, e);
             res.writeHead(503);
           }
           res.end();
