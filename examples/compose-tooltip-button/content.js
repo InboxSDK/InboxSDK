@@ -9,6 +9,9 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(function(inboxSDK) {
 			hasDropdown: true,
 			onClick: function(event){
 				event.dropdown.el.innerHTML = 'hello world!';
+				event.dropdown.el.addEventListener('click', function() {
+					console.log('selection', composeView.getSelectedBodyText());
+				});
 			},
 			section: 'TRAY_LEFT'
 		});

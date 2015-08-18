@@ -31,6 +31,7 @@ import addButton from './gmail-compose-view/add-button';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
+import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -401,13 +402,11 @@ export default class GmailComposeView {
 	}
 
 	getSelectedBodyHTML(): ?string {
-		this.focus();
-		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._lastSelectionRange);
+		return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSelectedBodyText(): ?string {
-		this.focus();
-		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._lastSelectionRange);
+		return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSubject(): string {
