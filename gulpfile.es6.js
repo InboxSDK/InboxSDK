@@ -105,6 +105,7 @@ function browserifyTask(name, deps, entry, destname) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
   gulp.task(name, deps, async function() {
+    var VERSION = await getVersion();
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -114,7 +115,7 @@ function browserifyTask(name, deps, entry, destname) {
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
-      VERSION: await getVersion()
+      VERSION
     }));
 
     function buildBundle() {
