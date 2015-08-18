@@ -123,7 +123,8 @@ function browserifyTask(name, deps, entry, destname) {
       bundler.plugin(require('browserify-hmr'), {
         url: name === 'sdk' ?
           'http://localhost:4567/inboxsdk.js' :
-          'http://localhost:4567/platform-implementation.js'
+          'http://localhost:4567/platform-implementation.js',
+        cacheBust: false
       });
     }
 

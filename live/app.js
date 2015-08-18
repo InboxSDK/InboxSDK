@@ -1,54 +1,17 @@
-var http = require('http');
-var fs = require('fs');
+/* @flow */
+//jshint ignore:start
+
+var hs = require('http-server');
+var path = require('path');
 var _ = require('lodash');
 
-function delayFilter(fn) {
-  return function() {
-    var self = this, args = arguments;
-    setTimeout(function() {
-      fn.apply(self, args);
-    }, 500);
-  };
-}
-
-module.exports.run = function() {
-  var server = http.createServer(/*delayFilter*/(function (req, res) {
-    if (req.url.indexOf('..') == -1 &&
-      req.url.match(/^\/.*\.js(\.map)?(\?.*)?$/))
-    {
-      var fileUrl = req.url.split('?')[0];
-      if (req.method === 'GET') {
-        var file = fs.createReadStream(__dirname+'/../dist'+fileUrl);
-        file.on('error', function(e) {
-          if (e.code == 'ENOENT') {
-            res.writeHead(404);
-          } else {
-            console.error("Error retrieving", fileUrl, e);
-            res.writeHead(503);
-          }
-          res.end();
-        });
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET'
-        });
-        file.pipe(res);
-      } else if (req.method === 'OPTIONS') {
-        res.writeHead(200, {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET'
-        });
-        res.end();
-      } else {
-        res.writeHead(405);
-        res.end();
-      }
-    } else {
-      res.writeHead(404);
-      res.end();
-    }
-  }));
-
+export function run() {
+  var server = hs.createServer({
+    root: path.join(__dirname, '..', 'dist'),
+    cache: 2,
+    showDir: 'false',
+    cors: true,
+    robots: true
+  });
   server.listen(4567, 'localhost');
-};
+}
