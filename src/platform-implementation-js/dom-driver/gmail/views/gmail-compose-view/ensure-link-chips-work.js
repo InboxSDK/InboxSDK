@@ -11,37 +11,56 @@ var extId = ''+Math.random();
 
 var Z_SPACE_CHAR = '\u200b';
 
-module.exports = function(gmailComposeView: GmailComposeView){
+var updatable = {setupFixer, doFixing};
+
+function setupFixer(gmailComposeView: GmailComposeView){
     var mainElement = gmailComposeView.getElement();
     if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
         return;
     }
     mainElement.classList.add('inboxsdk__ensure_link_active');
 
-
     var bodyElement = gmailComposeView.getBodyElement();
     var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
 
     baconCast(Bacon, gmailComposeView.getEventStream())
         .startWith({eventName: 'bodyChanged'})
-        .filter(function(event){
-            return event.eventName === 'bodyChanged';
-        })
+        .filter(event =>
+            event.eventName === 'bodyChanged'
+        )
         .debounceImmediate(100)
         .takeUntil(baconCast(Bacon, gmailComposeView.getStopper()))
-        .onValue(function(){
-            var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-            var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
-
-            chipContainerChain
-                .filter(_isNotEnhanced)
-                .each(_addEnhancements)
-                .each(fixupCursorFunction).value();
-
-            chipContainerChain
-                .filter(_isOurEnhanced)
-                .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView)).value();
+        .onValue(() => {
+            updatable.doFixing(gmailComposeView, bodyElement, fixupCursorFunction);
         });
+}
+
+function doFixing(gmailComposeView: GmailComposeView, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
+    var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
+    var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
+
+    chipContainerChain
+        .filter(_isNotEnhanced)
+        .each(_addEnhancements)
+        .each(fixupCursorFunction).value();
+
+    chipContainerChain
+        .filter(_isOurEnhanced)
+        .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView)).value();
+};
+
+if ((module:any).hot) {
+    if ((module:any).hot.data) {
+        updatable = Object.assign((module:any).hot.data.updatable, updatable);
+    }
+    (module:any).hot.accept();
+    (module:any).hot.dispose(data => {
+        data.updatable = updatable;
+    });
+}
+
+module.exports = function(gmailComposeView: GmailComposeView) {
+    return updatable.setupFixer(gmailComposeView);
 };
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
@@ -52,7 +71,7 @@ function _isNotEnhanced(chipElement: HTMLElement): boolean {
     return claim == null;
 }
 
-function _addEnhancements(chipElement){
+function _addEnhancements(chipElement: HTMLElement) {
     var anchor = chipElement.querySelector('a');
     if (anchor) {
       anchor.addEventListener('mousedown', function(e) {
@@ -68,7 +87,7 @@ function _addEnhancements(chipElement){
     xElement = xElement.children[0];
 
     xElement.addEventListener('mousedown', function(e){
-        chipElement.remove();
+        (chipElement:any).remove();
     }, true);
 
     xElement.addEventListener('click', function(e){
@@ -100,9 +119,9 @@ function _addEnhancements(chipElement){
         }
     );
 
-    chipElement.contentEditable = false;
+    chipElement.contentEditable = 'false';
     chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
-    chipElement._linkChipEnhancedByThisExtension = true;
+    (chipElement:any)._linkChipEnhancedByThisExtension = true;
 
     (chipElement:any)._previousSpacerTextNode = chipElement.previousSibling;
     (chipElement:any)._nextSpacerTextNode = chipElement.nextSibling;
