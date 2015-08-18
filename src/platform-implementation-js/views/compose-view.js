@@ -213,6 +213,16 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
+	 * Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not
+	 * in the body of the message. If anything inside the body is selected, it will be replaced.
+	 * @param {string} text - The text to insert.
+	 * @return {void}
+	 */
+	insertTextIntoBodyAtCursor: function(text){
+		return memberMap.get(this).composeViewImplementation.insertBodyTextAtCursor(text);
+	},
+
+	/**
 	 * Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
 	 * If anything inside the body is selected, it will be replaced.
 	 * Returns the root HTMLElement of the inserted link.
@@ -262,16 +272,6 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 */
 	insertLinkIntoBodyAtCursor: function(text, url){
 		return memberMap.get(this).composeViewImplementation.insertLinkIntoBody(text, url);
-	},
-
-	/**
-	 * Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not
-	 * in the body of the message. If anything inside the body is selected, it will be replaced.
-	 * @param {string} text - The text to insert.
-	 * @return {void}
-	 */
-	insertTextIntoBodyAtCursor: function(text){
-		return memberMap.get(this).composeViewImplementation.insertBodyTextAtCursor(text);
 	},
 
 	/**

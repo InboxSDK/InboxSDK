@@ -9,6 +9,7 @@ var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -138,10 +139,12 @@ export default class InboxComposeView {
     this._queueDraftSave();
   }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
-    throw new Error("Not implemented");
+    return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
   }
-  insertBodyHTMLAtCursor(text: string): ?HTMLElement {
-    throw new Error("Not implemented");
+  insertBodyHTMLAtCursor(html: string): ?HTMLElement {
+    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
+		this._informBodyChanged();
+		return retVal;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
     throw new Error("Not implemented");
