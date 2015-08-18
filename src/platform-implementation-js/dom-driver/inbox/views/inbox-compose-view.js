@@ -13,6 +13,7 @@ import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
+import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 
 export default class InboxComposeView {
   _element: HTMLElement;
@@ -28,6 +29,7 @@ export default class InboxComposeView {
   _subjectEl: HTMLInputElement;
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
+  _lastSelectionRange: ?Range;
 
   constructor(driver: InboxDriver, el: HTMLElement) {
     this._element = el;
@@ -35,6 +37,7 @@ export default class InboxComposeView {
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
+    this._lastSelectionRange = null;
 
     var hadError = false;
     var bottomAreaElementCount = null;
@@ -98,6 +101,18 @@ export default class InboxComposeView {
           simulateKey(this.getBodyElement(), 13, 0);
         } finally {
           unsilence();
+        }
+      });
+
+    Kefir.merge([
+        Kefir.fromEvents(document.body, 'mousedown'),
+        Kefir.fromEvents(document.body, 'keydown')
+      ]).takeUntilBy(this.getStopper())
+      .onValue(event => {
+        var body = this.getBodyElement();
+        var selection = (document:any).getSelection();
+        if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
+          this._lastSelectionRange = selection.getRangeAt(0);
         }
       });
   }
@@ -211,10 +226,10 @@ export default class InboxComposeView {
     return this.getBodyElement().textContent;
   }
   getSelectedBodyHTML(): ?string {
-    throw new Error("Not implemented");
+    return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSelectedBodyText(): ?string {
-    throw new Error("Not implemented");
+    return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSubject(): string {
     return this._subjectEl.value;
@@ -241,6 +256,7 @@ export default class InboxComposeView {
     throw new Error("composeView.getMessageID is not implemented in Inbox")
   }
   getThreadID(): ?string {
+    // TODO
     return null;
   }
   addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {

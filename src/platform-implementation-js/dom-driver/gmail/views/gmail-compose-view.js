@@ -57,7 +57,7 @@ export default class GmailComposeView {
 	_targetMessageID: ?string;
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
-	_lastSelectionRange: ?Object;
+	_lastSelectionRange: ?Range;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -610,11 +610,11 @@ export default class GmailComposeView {
 		this._isStandalone = isStandalone;
 	}
 
-	getLastSelectionRange(): ?Object {
+	getLastSelectionRange(): ?Range {
 		return this._lastSelectionRange;
 	}
 
-	setLastSelectionRange(lastSelectionRange: ?Object) {
+	setLastSelectionRange(lastSelectionRange: ?Range) {
 		this._lastSelectionRange = lastSelectionRange;
 	}
 }
