@@ -64,7 +64,7 @@ export default class InboxTooltipView {
     document.body.appendChild(this._arrowEl);
     this._updatePosition(true);
     this._el.addEventListener('load', event => {
-      this._updatePosition();
+      this._updatePosition(true);
     }, true);
   }
 
