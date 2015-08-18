@@ -14,7 +14,11 @@ import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
-import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
+import {
+  isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
+} from '../../../lib/dom/get-selection';
+
+window._sc = simulateClick;
 
 export default class InboxComposeView {
   _element: HTMLElement;
@@ -25,6 +29,7 @@ export default class InboxComposeView {
   _minimizeBtn: HTMLElement;
   _sendBtn: HTMLElement;
   _attachBtn: HTMLElement;
+  _formatBtn: HTMLElement;
   _bodyEl: HTMLElement;
   _bodyPlaceholder: HTMLElement;
   _subjectEl: HTMLInputElement;
@@ -45,6 +50,7 @@ export default class InboxComposeView {
     var topBtns = this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button');
     var sendBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
     var attachBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
+    var formatBtns = this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]');
     var bodyEls = this._element.querySelectorAll('div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
     var subjectEls = this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
     try {
@@ -77,12 +83,16 @@ export default class InboxComposeView {
       if (!(subjectEl instanceof HTMLInputElement))
         throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
       this._subjectEl = subjectEl;
+      if (formatBtns.length !== 1)
+        throw new Error("compose wrong number of format buttons");
+      this._formatBtn = formatBtns[0];
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
         topBtnsLength: topBtns.length,
         sendBtnsLength: sendBtns.length,
         attachBtnsLength: attachBtns.length,
+        formatBtnsLength: formatBtns.length,
         bodyElsLength: bodyEls.length,
         subjectElsLength: subjectEls.length
       });
@@ -138,6 +148,17 @@ export default class InboxComposeView {
     }
     this._queueDraftSave();
   }
+  focus() {
+    this._bodyEl.focus();
+    var selection = (document:any).getSelection();
+    if (
+      this._lastSelectionRange &&
+      (!selection.rangeCount || isRangeEmpty(selection.getRangeAt(0)))
+    ) {
+      selection.removeAllRanges();
+      selection.addRange(this._lastSelectionRange);
+    }
+  }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
     return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
   }
@@ -146,7 +167,56 @@ export default class InboxComposeView {
 		this._informBodyChanged();
 		return retVal;
   }
+  // returns the format area if it's found and open
+  _getFormatArea(): ?HTMLElement {
+    var formatArea = this._element.querySelector('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"] + div > div');
+    if (formatArea && formatArea.children.length > 1) {
+      return formatArea;
+    }
+    return null;
+  }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
+    this.focus();
+    var formatArea = this._getFormatArea();
+    var formatAreaOpenAtStart = !!formatArea;
+    if (!formatArea) {
+      simulateClick(this._formatBtn);
+      formatArea = this._getFormatArea();
+    }
+    if (!formatArea) throw new Error("Couldn't open format area");
+    try {
+      var linkButton = formatArea.querySelector('div[role=button][id$="link"]');
+      if (!linkButton) throw new Error("Couldn't find link button");
+      simulateClick(linkButton);
+      var dialog = document.body.querySelector('body > div[role=dialog]');
+      if (!dialog) {
+        // If the cursor was next to a link, then the first click unlinks that.
+        // Same thing in Gmail. TODO fix.
+        simulateClick(linkButton);
+        dialog = document.body.querySelector('body > div[role=dialog]');
+      }
+      if (!dialog) throw new Error("Couldn't find dialog");
+      var ok = dialog.querySelector('button[name=ok]');
+      if (!ok) throw new Error("Couldn't find ok");
+      var textInput = dialog.querySelector('input#linkdialog-text');
+      if (!textInput || !(textInput instanceof HTMLInputElement))
+        throw new Error("Couldn't find text input");
+      var urlInput = dialog.querySelector('input[type=url]');
+      if (!urlInput || !(urlInput instanceof HTMLInputElement))
+        throw new Error("Couldn't find url input");
+      textInput.value = text;
+      textInput.dispatchEvent(new Event("input"));
+      urlInput.value = href;
+      urlInput.dispatchEvent(new Event("input"));
+      simulateClick(ok);
+    } finally {
+      if (!formatAreaOpenAtStart) {
+        simulateClick(this._formatBtn);
+      }
+    }
+    this._informBodyChanged();
+  }
+  insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
     throw new Error("Not implemented");
   }
   setBodyHTML(html: string): void {

@@ -29,6 +29,7 @@ export type ComposeViewDriver = {
 	insertBodyTextAtCursor(text: string): ?HTMLElement;
 	insertBodyHTMLAtCursor(html: string): ?HTMLElement;
 	insertLinkIntoBody(text: string, href: string): ?HTMLElement;
+	insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement;
 	setSubject(text: string): void;
 	setBodyHTML(html: string): void;
 	setBodyText(text: string): void;
