@@ -3016,12 +3016,12 @@
       }
     },
     "browserify-hmr": {
-      "version": "0.1.7",
-      "from": "browserify-hmr@>=0.1.7 <0.2.0",
+      "version": "0.1.8",
+      "from": "browserify-hmr@latest",
       "dependencies": {
         "convert-source-map": {
           "version": "1.1.1",
-          "from": "convert-source-map@>=1.0.0 <2.0.0",
+          "from": "convert-source-map@>=1.1.1 <2.0.0",
           "resolved": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-1.1.1.tgz"
         },
         "source-map": {
