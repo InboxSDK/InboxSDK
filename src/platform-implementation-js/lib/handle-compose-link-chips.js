@@ -2,40 +2,41 @@
 //jshint ignore:start
 
 var _ = require('lodash');
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
-var RSVP = require('rsvp');
-import type GmailComposeView from '../gmail-compose-view';
+var Kefir = require('kefir');
+import * as HMR from '../../common/hmr-util';
+import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 var extId = ''+Math.random();
 
 var Z_SPACE_CHAR = '\u200b';
 
-var updatable = {setupFixer, doFixing};
+var updatable = HMR.makeUpdatable(module, {setupFixer, doFixing});
 
-function setupFixer(gmailComposeView: GmailComposeView){
-    var mainElement = gmailComposeView.getElement();
+export default function handleComposeLinkChips(composeView: ComposeViewDriver) {
+    return updatable.setupFixer(composeView);
+}
+
+function setupFixer(composeView: ComposeViewDriver){
+    var mainElement = composeView.getElement();
     if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
         return;
     }
     mainElement.classList.add('inboxsdk__ensure_link_active');
 
-    var bodyElement = gmailComposeView.getBodyElement();
-    var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
+    var bodyElement = composeView.getBodyElement();
+    var fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
 
-    baconCast(Bacon, gmailComposeView.getEventStream())
-        .startWith({eventName: 'bodyChanged'})
-        .filter(event =>
-            event.eventName === 'bodyChanged'
-        )
-        .debounceImmediate(100)
-        .takeUntil(baconCast(Bacon, gmailComposeView.getStopper()))
+    composeView.getEventStream()
+        .filter(event => event.eventName === 'bodyChanged')
+        .toProperty(()=>null)
+        .debounce(100, {immediate:true})
+        .takeUntilBy(composeView.getStopper())
         .onValue(() => {
-            updatable.doFixing(gmailComposeView, bodyElement, fixupCursorFunction);
+            updatable.doFixing(composeView, bodyElement, fixupCursorFunction);
         });
 }
 
-function doFixing(gmailComposeView: GmailComposeView, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
+function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
     var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
     var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
 
@@ -46,21 +47,7 @@ function doFixing(gmailComposeView: GmailComposeView, bodyElement: HTMLElement, 
 
     chipContainerChain
         .filter(_isOurEnhanced)
-        .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView)).value();
-};
-
-if ((module:any).hot) {
-    if ((module:any).hot.data) {
-        updatable = Object.assign((module:any).hot.data.updatable, updatable);
-    }
-    (module:any).hot.accept();
-    (module:any).hot.dispose(data => {
-        data.updatable = updatable;
-    });
-}
-
-module.exports = function(gmailComposeView: GmailComposeView) {
-    return updatable.setupFixer(gmailComposeView);
+        .each(_checkAndRemoveBrokenChip.bind(null, composeView)).value();
 };
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
@@ -127,30 +114,30 @@ function _addEnhancements(chipElement: HTMLElement) {
     (chipElement:any)._nextSpacerTextNode = chipElement.nextSibling;
 }
 
-function _fixupCursor(gmailComposeView: GmailComposeView){
-  var stopper = baconCast(Bacon, gmailComposeView.getStopper());
-    var keydownStream = Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'keydown')
-                            .takeUntil(stopper);
+function _fixupCursor(composeView: ComposeViewDriver){
+    var stopper = composeView.getStopper();
+    var keydownStream = Kefir.fromEvents(composeView.getBodyElement(), 'keydown')
+      .takeUntilBy(stopper);
 
     keydownStream
             .filter(_isBackspaceOrDelete)
             .delay(1)
             .filter(_rangeStillExists)
-            .onValue(_checkChipZSpaceSharing.bind(null, gmailComposeView));
+            .onValue(() => _checkChipZSpaceSharing(composeView));
 
     keydownStream
             .filter(_isArrowKey)
             .delay(1)
             .filter(_rangeStillExists)
             .map(_getMovementType)
-            .onValue(_fixupRange);
+            .onValue(type => _fixupRange(type));
 
-    Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'mouseup')
-         .takeUntil(stopper)
+    Kefir.fromEvents(composeView.getBodyElement(), 'mouseup')
+         .takeUntilBy(stopper)
          .delay(1)
          .filter(_rangeStillExists)
          .map(x => 'VERTICAL')
-         .onValue(_fixupRange);
+         .onValue(type => _fixupRange(type));
 }
 
 function _isArrowKey(event){
@@ -247,7 +234,7 @@ function _isOurEnhanced(chipElement: HTMLElement): boolean {
     return !!(chipElement:any)._linkChipEnhancedByThisExtension;
 }
 
-function _checkChipZSpaceSharing(gmailComposeView: GmailComposeView){
+function _checkChipZSpaceSharing(composeView: ComposeViewDriver){
     var range = (document:any).getSelection().getRangeAt(0);
 
     if(range.startContainer.nodeType !== Node.TEXT_NODE){
@@ -257,25 +244,25 @@ function _checkChipZSpaceSharing(gmailComposeView: GmailComposeView){
     var triggerZone = _getTriggerZone(range.startContainer, range.startOffset);
 
     if(triggerZone === 'Z_SPACE_0'){
-        _cleanOutBrokenChip(gmailComposeView,
+        _cleanOutBrokenChip(composeView,
                             range.startContainer.nextSibling /* chip element */,
                             ['MISSING_PREVIOUS_SIBLING'] /* don't remove ambiguous z_space */);
     }
     else if(triggerZone === 'Z_SPACE_1'){
-        _cleanOutBrokenChip(gmailComposeView,
+        _cleanOutBrokenChip(composeView,
                             range.startContainer.previousSibling /* chip element */,
                             ['MISSING_NEXT_SIBLING'] /* don't remove ambiguous z_space */);
     }
 }
 
-function _checkAndRemoveBrokenChip(gmailComposeView: GmailComposeView, chipElement: HTMLElement) {
+function _checkAndRemoveBrokenChip(composeView: ComposeViewDriver, chipElement: HTMLElement) {
     _fixupBlockquotes(chipElement);
     _fixupStyling(chipElement);
     _fixupTriggerZones(chipElement);
     var brokenModes = _getBrokenModes(chipElement);
 
     if(brokenModes.length > 0){
-        _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes);
+        _cleanOutBrokenChip(composeView, chipElement, brokenModes);
     }
 }
 
@@ -414,7 +401,7 @@ function _getBrokenModes(chipElement: HTMLElement): string[] {
     return brokenModes;
 }
 
-function _cleanOutBrokenChip(gmailComposeView: GmailComposeView, chipElement: HTMLElement, brokenModes: string[]) {
+function _cleanOutBrokenChip(composeView: ComposeViewDriver, chipElement: HTMLElement, brokenModes: string[]) {
     if(_doesZSpaceZeroExist(brokenModes)){
         _removeZSpaceZero(chipElement);
     }
@@ -424,10 +411,7 @@ function _cleanOutBrokenChip(gmailComposeView: GmailComposeView, chipElement: HT
     }
 
     (chipElement:any).remove();
-
-    if((document:any).getSelection().rangeCount === 0 && gmailComposeView.getLastSelectionRange()){
-        (document:any).getSelection().addRange(gmailComposeView.getLastSelectionRange());
-    }
+    composeView.focus();
 }
 
 function _doesZSpaceZeroExist(brokenModes: string[]): boolean {

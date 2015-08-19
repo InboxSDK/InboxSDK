@@ -1,44 +1,51 @@
-const _ = require('lodash');
-const RSVP = require('rsvp');
-const Bacon = require('baconjs');
+/* @flow */
+//jshint ignore:start
+
+var _ = require('lodash');
+var RSVP = require('rsvp');
+var Bacon = require('baconjs');
+import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
+import * as HMR from '../../common/hmr-util';
 import autoHtml from 'auto-html';
 
-function insertLinkChipIntoBody(gmailComposeView, options){
-    return _insertLinkChipIntoBody(gmailComposeView, options);
+var updatable = HMR.makeUpdatable(module, {imp});
+
+export default function insertLinkChipIntoBody(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
+    return updatable.imp(composeViewDriver, options);
 }
 
-function _insertLinkChipIntoBody(gmailComposeView, options){
-    gmailComposeView.focus();
+function imp(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
+    composeViewDriver.focus();
 
-    const chipElement = _getChipElement(options);
+    var chipElement = _getChipElement(options);
 
     // Gmail compose treats text directly bordering the chipElement weirdly in
     // regards to cursor movement, so surround the chip with newlines which
     // makes Gmail act up a little less.
-    const frag = document.createDocumentFragment();
+    var frag = (document:any).createDocumentFragment();
     frag.appendChild(document.createTextNode('\u200b'));
     frag.appendChild(chipElement);
     frag.appendChild(document.createTextNode('\u200b'));
 
-    gmailComposeView.insertBodyHTMLAtCursor(frag);
+    composeViewDriver.insertBodyHTMLAtCursor(frag);
 
-    if(!gmailComposeView.getIsFullscreen() && !gmailComposeView.isInlineReplyForm() && document.activeElement !== gmailComposeView.getBodyElement()){
-        gmailComposeView.minimize();
-        gmailComposeView.restore();
+    if(!composeViewDriver.getIsFullscreen() && !composeViewDriver.isInlineReplyForm() && document.activeElement !== composeViewDriver.getBodyElement()){
+        composeViewDriver.minimize();
+        composeViewDriver.restore();
     }
 
-    gmailComposeView.focus();
+    composeViewDriver.focus();
 
     return chipElement;
 }
 
-function _getChipElement(options){
-    let chipElement = document.createElement("div");
+function _getChipElement(options: Object): HTMLElement {
+    var chipElement = document.createElement("div");
 
-    const iconHtml = options.iconUrl ? autoHtml `
+    var iconHtml: string = options.iconUrl ? autoHtml `
 <img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="${options.iconUrl}">&nbsp;
 ` : '';
-    const chipHTML = autoHtml `
+    var chipHTML: string = autoHtml `
 <div contenteditable="false" class="inboxsdk__compose_linkChip"
 style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);">
   <span hspace="inboxsdk__chip"></span>
@@ -48,11 +55,6 @@ style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34
   </a>
 </div>
 `;
-
     chipElement.innerHTML = chipHTML;
-    chipElement = chipElement.children[0];
-
-    return chipElement;
+    return (chipElement.children[0]:any);
 }
-
-module.exports = insertLinkChipIntoBody;

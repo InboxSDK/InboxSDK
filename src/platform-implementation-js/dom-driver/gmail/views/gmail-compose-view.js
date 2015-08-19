@@ -21,6 +21,8 @@ import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
+import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
@@ -198,7 +200,7 @@ export default class GmailComposeView {
 
 	_setupConsistencyCheckers() {
 		try {
-			require('./gmail-compose-view/ensure-link-chips-work')(this);
+			handleComposeLinkChips(this);
 			monitorSelectionRange(this);
 			manageButtonGrouping(this);
 			sizeFixer(this._driver, this);
@@ -242,8 +244,7 @@ export default class GmailComposeView {
 	}
 
 	insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
-		var retVal = require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
-
+		var retVal = insertLinkChipIntoBody(this, options);
 		this._triggerDraftSave();
 		return retVal;
 	}

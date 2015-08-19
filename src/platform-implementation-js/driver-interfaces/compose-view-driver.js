@@ -36,8 +36,12 @@ export type ComposeViewDriver = {
 	setToRecipients(emails: string[]): void;
 	setCcRecipients(emails: string[]): void;
 	setBccRecipients(emails: string[]): void;
+	focus(): void;
 	close(): void;
 	send(): void;
+	minimize(): void;
+	restore(): void;
+	getIsFullscreen(): boolean;
 	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Stream): () => void;
 	addOuterSidebar(options: {title: string, el: HTMLElement}): void;

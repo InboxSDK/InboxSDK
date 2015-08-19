@@ -7,9 +7,12 @@ var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
+import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
+import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -126,6 +129,13 @@ export default class InboxComposeView {
           this._lastSelectionRange = selection.getRangeAt(0);
         }
       });
+
+    this._eventStream.plug(
+      kefirMakeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+        .map(() => ({eventName: 'bodyChanged'}))
+    );
+
+    handleComposeLinkChips(this);
   }
   destroy() {
     this._eventStream.emit({eventName: 'destroy', data: {}});
@@ -217,7 +227,9 @@ export default class InboxComposeView {
     this._informBodyChanged();
   }
   insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
-    throw new Error("Not implemented");
+    var retval = insertLinkChipIntoBody(this, options);
+    this._informBodyChanged();
+    return retval;
   }
   setBodyHTML(html: string): void {
     this._bodyEl.innerHTML = html;
@@ -236,11 +248,17 @@ export default class InboxComposeView {
   setBccRecipients(emails: string[]): void {
     throw new Error("Not implemented");
   }
-  close(): void {
+  close() {
     simulateClick(this._closeBtn);
   }
-  send(): void {
+  send() {
     simulateClick(this._sendBtn);
+  }
+  minimize() {
+    // TODO
+  }
+  restore() {
+    // TODO
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
@@ -287,6 +305,10 @@ export default class InboxComposeView {
   }
   isInlineReplyForm(): boolean {
     // inline reply form support isn't in yet, so it can't be one.
+    return false;
+  }
+  getIsFullscreen(): boolean {
+    // TODO
     return false;
   }
   getBodyElement(): HTMLElement {

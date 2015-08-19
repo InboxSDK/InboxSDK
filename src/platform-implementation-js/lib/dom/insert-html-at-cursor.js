@@ -3,8 +3,15 @@
 
 import _ from 'lodash';
 import Bacon from 'baconjs';
+import * as HMR from '../../../common/hmr-util';
+
+var updatable = HMR.makeUpdatable(module, {imp});
 
 export default function insertHTMLatCursor(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
+	return updatable.imp(element, html, oldRange);
+}
+
+function imp(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
 	element.focus();
 
 	if (element instanceof HTMLTextAreaElement) {
