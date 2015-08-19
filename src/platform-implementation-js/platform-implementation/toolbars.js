@@ -261,10 +261,10 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	section:null,
 
 	/**
-	* This is called when the button is clicked, and gets passed an event object. The event object will have
-	* a {selectedThreadRowViews} ({ThreadRowView[]}) property, a {threadRowViews}
-	* ({ThreadRowView[]}) property and optionally a {dropdown} ({DropdownView}) property if you set
-	* the {hasDropdown} property to true
+	* This is called when the button is clicked, and gets passed an event object. If this was registered with {Toolbars.registerToolbarButtonForList()}, then
+	* the event object will have a {selectedThreadRowViews} ({ThreadRowView[]}) property and a {threadRowViews} ({ThreadRowView[]}) property.
+	* If this was registered with {Toolbars.registerToolbarButtonForThreadView()}, then the event object will have a {threadView} ({ThreadView}) property.
+	* In both cases the event object will optionally have a {dropdown} ({DropdownView}) property if you set the {hasDropdown} property to true on the descriptor
 	* @type {func(event)}
 	*/
 	onClick:null,
