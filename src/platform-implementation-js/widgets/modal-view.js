@@ -67,6 +67,12 @@ _.extend(ModalView.prototype, /** @lends ModalView */{
     addButton: function(options){
         throw new Error("not implemented");
     }
+
+    /**
+     * Fires when this ModalView instance is closed.
+     * @event ModalView#destroy
+     */
+
 });
 
 module.exports = ModalView;
