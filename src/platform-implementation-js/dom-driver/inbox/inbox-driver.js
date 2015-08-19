@@ -14,6 +14,7 @@ import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
+import * as HMR from '../../../common/hmr-util';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
@@ -29,7 +30,7 @@ import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';
 
-export default class InboxDriver {
+var InboxDriver = HMR.makeUpdatableFn(module, class InboxDriver {
   _logger: Logger;
   _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
@@ -45,7 +46,7 @@ export default class InboxDriver {
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
 
-  constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
+  constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
     this._logger = logger;
     this._envData = envData;
@@ -242,10 +243,11 @@ export default class InboxDriver {
   createModalViewDriver(options: Object): Object {
     throw new Error("Not implemented");
   }
-}
+});
+export default InboxDriver;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var driver: Driver = new InboxDriver('', ({}:any), '', '', ({}:any), ({}:any));
+	var driver: Driver = new InboxDriver('', '', '', ({}:any), ({}:any));
 }

@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('lodash');
-var Bacon = require('baconjs');
-var fromEventTargetCapture = require('../lib/from-event-target-capture');
+var Kefir = require('kefir');
+var kefirFromEventTargetCapture = require('../lib/kefir-from-event-target-capture');
 
 var EventEmitter = require('../lib/safe-event-emitter');
 
@@ -12,11 +12,17 @@ var EventEmitter = require('../lib/safe-event-emitter');
 */
 function ModalView(options){
     EventEmitter.call(this);
-
+    var self = this;
     this._driver = options.modalViewDriver;
     this._driver.getEventStream().filter(function(event){
         return event.eventName === 'closeClick';
-    }).onValue(this, 'close');
+    }).onValue(function() {
+        self.close();
+    });
+    this._driver.getEventStream().onEnd(function() {
+        self._driver = null;
+        self.emit('destroy');
+    });
 }
 
 ModalView.prototype = Object.create(EventEmitter.prototype);
@@ -35,20 +41,17 @@ _.extend(ModalView.prototype, /** @lends ModalView */{
 
         var self = this;
 
-        fromEventTargetCapture(document.body, 'keydown')
+        kefirFromEventTargetCapture(document.body, 'keydown')
             .filter(function(domEvent){
                 return domEvent.keyCode === 27;
             })
-            .takeWhile(function(){
-                return !!self._driver;
-            })
-            .doAction(function(domEvent){
+            .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+            .onValue(function(domEvent){
                 domEvent.stopImmediatePropagation();
                 domEvent.stopPropagation();
                 domEvent.preventDefault();
-             })
-             .onValue(this, 'close');
-
+                self.close();
+            });
     },
 
     /**
@@ -57,10 +60,7 @@ _.extend(ModalView.prototype, /** @lends ModalView */{
     */
     close: function(){
         if (this._driver) {
-            this._driver.getOverlayElement().remove();
-            this._driver.getModalContainerElement().remove();
-            this._driver = null;
-            this.emit('destroy');
+            this._driver.destroy();
         }
     },
 

@@ -87,7 +87,7 @@ export default class GmailDriver {
 	_timestampGlobalsFound: ?number;
 	_timestampOnready: ?number;
 
-	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
+	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
 		customStyle();
 
 		this._appId = appId;
@@ -399,5 +399,5 @@ export default class GmailDriver {
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var driver: Driver = new GmailDriver('', ({}:any), '', '', ({}:any), ({}:any));
+	var driver: Driver = new GmailDriver('', '', '', ({}:any), ({}:any));
 }

@@ -30,6 +30,16 @@ import type {AppLogger} from './lib/logger';
 
 var loadedAppIds: Set<string> = new Set();
 
+export type PiOpts = {
+	appName: ?string;
+	appIconUrl: ?string;
+	VERSION: string;
+	globalErrorLogging: boolean;
+	eventTracking: boolean;
+	inboxBeta: boolean;
+	REQUESTED_API_VERSION: number;
+};
+
 export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
@@ -49,11 +59,13 @@ export class PlatformImplementation extends SafeEventEmitter {
 	Toolbars: Toolbars;
 	ButterBar: ButterBar;
 	Widgets: Widgets;
-	Modal: Modal;
+	Modal: ?Modal;
 	Logger: AppLogger;
 
-	constructor(driver: Driver, appId: string, appName: ?string, appIconUrl: ?string, LOADER_VERSION: string) {
+	constructor(driver: Driver, appId: string, piOpts: PiOpts) {
 		super();
+		var {appName, appIconUrl, VERSION:LOADER_VERSION} = piOpts;
+
 		this._appId = appId;
 		this._driver = driver;
 		this._membraneMap = new WeakMap();
@@ -74,7 +86,11 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.Search = new Search(appId, driver, this._membraneMap);
 		this.Toolbars = new Toolbars(appId, driver, this._membraneMap);
 		this.Widgets = new Widgets(appId, driver, this._membraneMap);
-		this.Modal = new Modal(appId, driver, this._membraneMap);
+		if (piOpts.REQUESTED_API_VERSION === 1) {
+			// Modal is deprecated; just drop it when apps switch to the next version
+			// whenever we start that.
+			this.Modal = new Modal(appId, driver, piOpts);
+		}
 		this.Logger = driver.getLogger().getAppLogger();
 	}
 
@@ -94,16 +110,16 @@ export type EnvData = {
 };
 
 // returns a promise for the PlatformImplementation object
-export function makePlatformImplementation(appId: string, opts: any, envData: EnvData): Promise<PlatformImplementation> {
+export function makePlatformImplementation(appId: string, _opts: Object, envData: EnvData): Promise<PlatformImplementation> {
 	if (typeof appId !== 'string') {
 		throw new Error("appId must be a string");
 	}
 
-	opts = _.extend({
+	var opts: PiOpts = _.extend({
 		// defaults
 		globalErrorLogging: true, eventTracking: true,
 		inboxBeta: false
-	}, opts);
+	}, _opts);
 
 	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
 	if (opts.REQUESTED_API_VERSION !== 1) {
@@ -128,7 +144,7 @@ export function makePlatformImplementation(appId: string, opts: any, envData: En
 		return new Promise((resolve, reject) => {});
 	}
 
-	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger, envData);
+	var driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, envData);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
 		if (!isValidAppId(appId)) {
 			console.error(`
@@ -147,7 +163,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 		}
 
 		logger.eventSdkPassive('instantiate');
-		var pi = new PlatformImplementation(driver, appId, opts.appName, opts.appIconUrl, opts.VERSION);
+		var pi = new PlatformImplementation(driver, appId, opts);
 		if (origin === 'https://inbox.google.com' && !opts.inboxBeta) {
 			console.log("InboxSDK: Unsupported origin", origin);
 			if (!loadedAppIds.has(appId)) {
