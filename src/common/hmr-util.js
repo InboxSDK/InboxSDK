@@ -4,8 +4,6 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 var moduleUsedUpdatableKeys: WeakMap<typeof module, Set<string>> = new WeakMap();
-var modulesWithShared: WeakSet<typeof module> = new WeakSet();
-var modulesWithUpdatableStream: WeakSet<typeof module> = new WeakSet();
 
 export function acceptSelf(module: typeof module) {
   if ((module:any).hot) {
@@ -51,7 +49,16 @@ export function makeShared<T>(module: typeof module, fn: ()=>T, key:string='defa
 export function makeUpdatable<T: Object>(module: typeof module, object: T, key:string='default-updatable'): T {
   var sharedObject = makeShared(module, ()=>object, key);
   if (sharedObject !== object) {
-    Object.assign(sharedObject, object);
+    Object.defineProperties(
+      sharedObject,
+      _.chain(Object.getOwnPropertyNames(object))
+        .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
+        .map(([name, {value,enumerable}]) =>
+          [name, {value,enumerable,writable:true,configurable:true}]
+        )
+        .zipObject()
+        .value()
+    );
   }
   return sharedObject;
 }
@@ -82,4 +89,34 @@ export function makeUpdatableStream<T>(module: typeof module, value: T, key:stri
   }, key);
   sharedObject.emit(value);
   return sharedObject.property;
+}
+
+export function makeUpdatableFn<T: Function>(module: typeof module, fn: T): T {
+  var updatable = makeUpdatable(module, {fn}, 'updatable-fn-'+fn.name);
+  if ((module:any).hot) {
+    var paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
+    var wrappedFn: any = new Function(
+      'updatable',
+      `
+      var wrapper = function ${fn.name}__hmr_wrapper(${paramsList}){
+        if (this instanceof wrapper) {
+          var obj = Object.create(updatable.fn.prototype);
+          obj.constructor = wrapper;
+          var retval = updatable.fn.apply(obj, arguments);
+          if (typeof retval === 'object') {
+            obj = retval;
+          }
+          return obj;
+        }
+        return updatable.fn.apply(this, arguments);
+      };
+      return wrapper;
+      `
+    )(updatable);
+
+    var updatableProto = makeUpdatable(module, fn.prototype, 'updatable-fn-proto-'+fn.name);
+    wrappedFn.prototype = updatable.fn.prototype = updatableProto;
+    return wrappedFn;
+  }
+  return fn;
 }

@@ -19,7 +19,7 @@ import GmailElementGetter from '../gmail-element-getter';
 
 import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
-
+import * as HMR from '../../../../common/hmr-util';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
@@ -41,7 +41,7 @@ import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/comp
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
-export default class GmailComposeView {
+var GmailComposeView = HMR.makeUpdatableFn(module, class GmailComposeView {
 	_element: HTMLElement;
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
@@ -618,7 +618,8 @@ export default class GmailComposeView {
 	setLastSelectionRange(lastSelectionRange: ?Range) {
 		this._lastSelectionRange = lastSelectionRange;
 	}
-}
+});
+export default GmailComposeView;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
