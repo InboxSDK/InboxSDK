@@ -13,6 +13,7 @@ import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
+import censorHTMLtree from '../../../common/censor-html-tree';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
@@ -26,9 +27,11 @@ import InboxPageCommunicator from './inbox-page-communicator';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
+import type {EnvData} from '../../platform-implementation';
 
 export default class InboxDriver {
   _logger: Logger;
+  _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
   onready: Promise;
   _routeViewDriverStream: Bacon.Observable;
@@ -42,9 +45,10 @@ export default class InboxDriver {
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
 
-  constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
+  constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
     this._logger = logger;
+    this._envData = envData;
     this._stopper = kefirStopper();
     this._pageCommunicator = new InboxPageCommunicator();
     this.onready = injectScript().then(() => {
@@ -82,7 +86,10 @@ export default class InboxDriver {
     this._routeViewDriverStream = Bacon.never(); //Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
     this._composeViewDriverStream = baconCast(Bacon,
-      kefirWaitFor(() => document.querySelector('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:first-child'))
+      kefirWaitFor(() => {
+        var els = document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child');
+        return els.length === 1 ? els[0] : null;
+      })
         .flatMap(kmakeElementChildStream)
         .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
         .flatMap(event =>
@@ -94,7 +101,7 @@ export default class InboxDriver {
           var composeEl = el.querySelector('div[role=dialog]');
           if (!composeEl) {
             this._logger.error(new Error("compose dialog element not found"), {
-              html: censorHTMLstring(el.innerHTML)
+              html: censorHTMLtree(el)
             });
             return null;
           }
@@ -113,14 +120,15 @@ export default class InboxDriver {
       // us failing to find the compose parent. Let's log the results of a few
       // similar selectors to see if our selector was maybe slightly wrong.
       this._logger.error(err, {
-        regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:first-child').length,
-        noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][jstcache] > div[jstcache] > div[id][jstcache]:not([jsan])').length,
-        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][jstcache] div[jstcache] div[id][jstcache]:not([jsan]):not([class])').length,
+        regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
+        noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]').length,
+        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
         // We can use class names for logging heuristics. Don't want to use
         // them anywhere else.
         classLength: document.querySelectorAll('div.ek div.md > div').length,
         classEkLength: document.querySelectorAll('.ek').length,
-        classMdLength: document.querySelectorAll('.md').length
+        classMdLength: document.querySelectorAll('.md').length,
+        composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
       });
     });
   }
@@ -239,5 +247,5 @@ export default class InboxDriver {
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var driver: Driver = new InboxDriver('', ({}: any), '', '', ({}: any));
+	var driver: Driver = new InboxDriver('', ({}:any), '', '', ({}:any), ({}:any));
 }

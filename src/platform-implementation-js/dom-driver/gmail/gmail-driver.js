@@ -31,6 +31,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
+import addNavItem from './gmail-driver/add-nav-item';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
 import showNativeRouteView from './gmail-driver/show-native-route-view';
@@ -39,6 +40,7 @@ import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcu
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
+import customStyle from './custom-style';
 import maintainComposeWindowState from './gmail-driver/maintain-compose-window-state';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
@@ -50,10 +52,12 @@ import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-ha
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
+import type {EnvData} from '../../platform-implementation';
 
 export default class GmailDriver {
 	_appId: string;
 	_logger: Logger;
+	_envData: EnvData;
 	_customRouteIDs: Set<string>;
 	_customListRouteIDs: Map<string, Function>;
 	_customListSearchStringsToRouteIds: Map<string, string>;
@@ -79,12 +83,16 @@ export default class GmailDriver {
 	_bStopper: Bacon.Observable;
 	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
+	_timestampAccountSwitcherReady: ?number;
+	_timestampGlobalsFound: ?number;
+	_timestampOnready: ?number;
 
-	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger) {
-		require('./custom-style');
+	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
+		customStyle();
 
 		this._appId = appId;
 		this._logger = logger;
+		this._envData = envData;
 		this._customRouteIDs = new Set();
 		this._customListRouteIDs = new Map();
 		this._customListSearchStringsToRouteIds = new Map();
@@ -108,6 +116,7 @@ export default class GmailDriver {
 		this._setupEventStreams();
 
 		this.onready.then(() => {
+			this._timestampOnready = Date.now();
 			trackEvents(this);
 			gmailLoadEvent(this);
 			maintainComposeWindowState(this);
@@ -144,6 +153,17 @@ export default class GmailDriver {
 	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getBaconStopper(): Bacon.Observable {return this._bStopper;}
+	getEnvData(): EnvData {return this._envData;}
+
+	getTimings(): {[ix:string]:?number} {
+		return {
+			piMainStarted: this._envData.piMainStarted,
+			piLoadStarted: this._envData.piLoadStarted,
+			globalsFound: this._timestampGlobalsFound,
+			accountSwitcherReady: this._timestampAccountSwitcherReady,
+			onready: this._timestampOnready
+		};
+	}
 
 	hashChangeNoViewChange(hash: string) {
 		if (hash[0] !== '#') {
@@ -225,7 +245,7 @@ export default class GmailDriver {
 	}
 
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return require('./gmail-driver/add-nav-item')(appId, navItemDescriptor);
+		return addNavItem(appId, navItemDescriptor);
 	}
 
 	getSentMailNativeNavItem(): Promise<Object> {
@@ -274,12 +294,14 @@ export default class GmailDriver {
 		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
 		this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
+			this._timestampGlobalsFound = Date.now();
 			this._pageCommunicator = pageCommunicator;
 			this._logger.setUserEmailAddress(this.getUserEmailAddress());
 			this._userInfo = new UserInfo(this);
 
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
+			this._timestampAccountSwitcherReady = Date.now();
 			this._routeViewDriverStream = baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
 				this._gmailRouteProcessor, this
 			)).doAction(routeViewDriver => {
@@ -377,5 +399,5 @@ export default class GmailDriver {
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var driver: Driver = new GmailDriver('', ({}: any), '', '', ({}: any));
+	var driver: Driver = new GmailDriver('', ({}:any), '', '', ({}:any), ({}:any));
 }

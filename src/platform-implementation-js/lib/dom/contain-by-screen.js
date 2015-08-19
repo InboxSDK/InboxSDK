@@ -1,12 +1,36 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
 var $ = require('jquery');
 
-module.exports = function(element, anchorPoint, options){
+export type Options = {
+	widthBuffer?: ?number;
+	heightBuffer?: ?number;
+	leftBuffer?: ?number;
+	topBuffer?: ?number;
+	isBottomAligned?: ?boolean;
+	isTopAligned?: ?boolean;
+	isRightAligned?: ?boolean;
+	isAligned?: ?boolean;
+	forceFit?: ?boolean;
+};
+
+type Coord = {
+	x: number;
+	y: number;
+};
+
+type BoundingBox = [Coord, Coord];
+
+// You may want to try ./contain-by-screen2 instead.
+
+export default function containByScreen(element: HTMLElement, anchorPoint: HTMLElement, _options?: ?Options){
 	if(element.style.position !== 'fixed'){
 		return;
 	}
 
-    options = options || {};
+    var options: Options = _options || {};
 
     var $element = $(element);
     var $anchorPoint = $(anchorPoint);
@@ -61,7 +85,7 @@ module.exports = function(element, anchorPoint, options){
         },
         {
             x: elementLeft + elementSizeBox.width,
-            y: elementTop + elementSizeBox.top
+            y: elementTop + elementSizeBox.height
         }
     ];
 
@@ -124,7 +148,7 @@ module.exports = function(element, anchorPoint, options){
         trialBoundingBox[1].y = trialBoundingBox[0].y + elementSizeBox.height;
 
         if(isYBounded(screenBoundingBox, trialBoundingBox)){
-            newTop = trialBoundingbox[0].y;
+            newTop = trialBoundingBox[0].y;
         }
     }
 
@@ -171,30 +195,30 @@ module.exports = function(element, anchorPoint, options){
         }
     }
 
-    if( !(newBottom == null) ){
-        element.style.bottom = newBottom + 'px';
+    if(newBottom != null){
+        element.style.bottom = _.round(newBottom) + 'px';
         element.style.top = '';
     }
-    else if(!(newTop == null)){
-        element.style.top = newTop + 'px';
+    else if(newTop != null){
+        element.style.top = _.round(newTop) + 'px';
         element.style.bottom = '';
     }
 
-    if(!(newRight == null)){
-        element.style.right = newRight + 'px';
+    if(newRight != null){
+        element.style.right = _.round(newRight) + 'px';
         element.style.left = '';
     }
-    else if( !(newLeft == null)){
-        element.style.left = newLeft + 'px';
+    else if(newLeft != null){
+        element.style.left = _.round(newLeft) + 'px';
         element.style.right = '';
     }
-};
+}
 
 var CONSTANTS = {
     BUFFER: 10
 };
 
-function isYBounded(containerBB, containedBB){
+function isYBounded(containerBB: BoundingBox, containedBB: BoundingBox): boolean {
     if(containerBB[0].y - CONSTANTS.BUFFER > containedBB[0].y){
         return false;
     }
@@ -206,7 +230,7 @@ function isYBounded(containerBB, containedBB){
     return true;
 }
 
-function isXBounded(containerBB, containedBB){
+function isXBounded(containerBB: BoundingBox, containedBB: BoundingBox): boolean {
     if(containerBB[0].x - CONSTANTS.BUFFER > containedBB[0].x){
         return false;
     }

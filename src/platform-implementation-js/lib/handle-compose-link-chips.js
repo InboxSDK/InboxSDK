@@ -1,60 +1,64 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
-var RSVP = require('rsvp');
+var Kefir = require('kefir');
+import * as HMR from '../../common/hmr-util';
+import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 var extId = ''+Math.random();
 
 var Z_SPACE_CHAR = '\u200b';
 
-module.exports = function(gmailComposeView){
-    var mainElement = gmailComposeView.getElement();
+var updatable = HMR.makeUpdatable(module, {setupFixer, doFixing});
+
+export default function handleComposeLinkChips(composeView: ComposeViewDriver) {
+    return updatable.setupFixer(composeView);
+}
+
+function setupFixer(composeView: ComposeViewDriver){
+    var mainElement = composeView.getElement();
     if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
         return;
     }
     mainElement.classList.add('inboxsdk__ensure_link_active');
 
+    var bodyElement = composeView.getBodyElement();
+    var fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
 
-    var bodyElement = gmailComposeView.getBodyElement();
-    var fixupCursorFunction = _.once(_fixupCursor.bind(null, gmailComposeView));
-
-    baconCast(Bacon, gmailComposeView.getEventStream())
-        .startWith({eventName: 'bodyChanged'})
-        .filter(function(event){
-            return event.eventName === 'bodyChanged';
-        })
-        .debounceImmediate(100)
-        .takeUntil(baconCast(Bacon, gmailComposeView.getStopper()))
-        .onValue(function(){
-            var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-            var chipContainerChain =  _.chain(chips).map(_getChipContainer);
-
-            chipContainerChain
-                .filter(_isNotEnhanced)
-                .each(_addEnhancements)
-                .each(fixupCursorFunction).value();
-
-            chipContainerChain
-                .filter(_isOurEnhanced)
-                .each(_checkAndRemoveBrokenChip.bind(null, gmailComposeView)).value();
+    composeView.getEventStream()
+        .filter(event => event.eventName === 'bodyChanged')
+        .toProperty(()=>null)
+        .debounce(100, {immediate:true})
+        .takeUntilBy(composeView.getStopper())
+        .onValue(() => {
+            updatable.doFixing(composeView, bodyElement, fixupCursorFunction);
         });
-
-};
-
-function _getChipContainer(span){
-    return span.parentElement;
 }
 
-function _isNotEnhanced(chipElement){
+function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
+    var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
+    var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
+
+    chipContainerChain
+        .filter(_isNotEnhanced)
+        .each(_addEnhancements)
+        .each(fixupCursorFunction).value();
+
+    chipContainerChain
+        .filter(_isOurEnhanced)
+        .each(_checkAndRemoveBrokenChip.bind(null, composeView)).value();
+};
+
+function _isNotEnhanced(chipElement: HTMLElement): boolean {
     var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
     if (extId === claim) {
-      return !chipElement._linkChipEnhancedByThisExtension;
+      return !(chipElement:any)._linkChipEnhancedByThisExtension;
     }
     return claim == null;
 }
 
-
-function _addEnhancements(chipElement){
+function _addEnhancements(chipElement: HTMLElement) {
     var anchor = chipElement.querySelector('a');
     if (anchor) {
       anchor.addEventListener('mousedown', function(e) {
@@ -70,7 +74,7 @@ function _addEnhancements(chipElement){
     xElement = xElement.children[0];
 
     xElement.addEventListener('mousedown', function(e){
-        chipElement.remove();
+        (chipElement:any).remove();
     }, true);
 
     xElement.addEventListener('click', function(e){
@@ -90,7 +94,7 @@ function _addEnhancements(chipElement){
     chipElement.addEventListener(
         'mouseleave',
         function(){
-            xElement.remove();
+            (xElement:any).remove();
             chipElement.querySelector('a > span').style.textDecoration = 'none';
         }
     );
@@ -102,38 +106,38 @@ function _addEnhancements(chipElement){
         }
     );
 
-    chipElement.contentEditable = false;
+    chipElement.contentEditable = 'false';
     chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
-    chipElement._linkChipEnhancedByThisExtension = true;
+    (chipElement:any)._linkChipEnhancedByThisExtension = true;
 
-    chipElement._previousSpacerTextNode = chipElement.previousSibling;
-    chipElement._nextSpacerTextNode = chipElement.nextSibling;
+    (chipElement:any)._previousSpacerTextNode = chipElement.previousSibling;
+    (chipElement:any)._nextSpacerTextNode = chipElement.nextSibling;
 }
 
-function _fixupCursor(gmailComposeView){
-  var stopper = baconCast(Bacon, gmailComposeView.getStopper());
-    var keydownStream = Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'keydown')
-                            .takeUntil(stopper);
+function _fixupCursor(composeView: ComposeViewDriver){
+    var stopper = composeView.getStopper();
+    var keydownStream = Kefir.fromEvents(composeView.getBodyElement(), 'keydown')
+      .takeUntilBy(stopper);
 
     keydownStream
             .filter(_isBackspaceOrDelete)
             .delay(1)
             .filter(_rangeStillExists)
-            .onValue(_checkChipZSpaceSharing.bind(null, gmailComposeView));
+            .onValue(() => _checkChipZSpaceSharing(composeView));
 
     keydownStream
             .filter(_isArrowKey)
             .delay(1)
             .filter(_rangeStillExists)
             .map(_getMovementType)
-            .onValue(_fixupRange);
+            .onValue(type => _fixupRange(type));
 
-    Bacon.fromEventTarget(gmailComposeView.getBodyElement(), 'mouseup')
-         .takeUntil(stopper)
+    Kefir.fromEvents(composeView.getBodyElement(), 'mouseup')
+         .takeUntilBy(stopper)
          .delay(1)
          .filter(_rangeStillExists)
-         .map('VERTICAL')
-         .onValue(_fixupRange);
+         .map(x => 'VERTICAL')
+         .onValue(type => _fixupRange(type));
 }
 
 function _isArrowKey(event){
@@ -145,7 +149,7 @@ function _isBackspaceOrDelete(event){
 }
 
 function _rangeStillExists(){
-    return document.getSelection() && document.getSelection().rangeCount > 0;
+    return (document:any).getSelection() && (document:any).getSelection().rangeCount > 0;
 }
 
 function _getMovementType(event){
@@ -161,8 +165,8 @@ function _getMovementType(event){
 }
 
 
-function _fixupRange(movementType){
-    var range = document.getSelection().getRangeAt(0);
+function _fixupRange(movementType: string) {
+    var range = (document:any).getSelection().getRangeAt(0);
 
     _checkAndFixRange(range, range.startContainer, range.startOffset, 'setStart', movementType);
     _checkAndFixRange(range, range.endContainer, range.endOffset, 'setEnd', movementType);
@@ -222,16 +226,16 @@ function _fixRangeOutOfTriggerZone(triggerZone, range, textNode, boundaryAction,
         }
     }
 
-    document.getSelection().removeAllRanges();
-    document.getSelection().addRange(range);
+    (document:any).getSelection().removeAllRanges();
+    (document:any).getSelection().addRange(range);
 }
 
-function _isOurEnhanced(chipElement){
-    return chipElement._linkChipEnhancedByThisExtension;
+function _isOurEnhanced(chipElement: HTMLElement): boolean {
+    return !!(chipElement:any)._linkChipEnhancedByThisExtension;
 }
 
-function _checkChipZSpaceSharing(gmailComposeView){
-    var range = document.getSelection().getRangeAt(0);
+function _checkChipZSpaceSharing(composeView: ComposeViewDriver){
+    var range = (document:any).getSelection().getRangeAt(0);
 
     if(range.startContainer.nodeType !== Node.TEXT_NODE){
         return;
@@ -240,46 +244,49 @@ function _checkChipZSpaceSharing(gmailComposeView){
     var triggerZone = _getTriggerZone(range.startContainer, range.startOffset);
 
     if(triggerZone === 'Z_SPACE_0'){
-        _cleanOutBrokenChip(gmailComposeView,
+        _cleanOutBrokenChip(composeView,
                             range.startContainer.nextSibling /* chip element */,
                             ['MISSING_PREVIOUS_SIBLING'] /* don't remove ambiguous z_space */);
     }
     else if(triggerZone === 'Z_SPACE_1'){
-        _cleanOutBrokenChip(gmailComposeView,
+        _cleanOutBrokenChip(composeView,
                             range.startContainer.previousSibling /* chip element */,
                             ['MISSING_NEXT_SIBLING'] /* don't remove ambiguous z_space */);
     }
 }
 
-function _checkAndRemoveBrokenChip(gmailComposeView, chipElement){
+function _checkAndRemoveBrokenChip(composeView: ComposeViewDriver, chipElement: HTMLElement) {
     _fixupBlockquotes(chipElement);
     _fixupStyling(chipElement);
     _fixupTriggerZones(chipElement);
     var brokenModes = _getBrokenModes(chipElement);
 
     if(brokenModes.length > 0){
-        _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes);
+        _cleanOutBrokenChip(composeView, chipElement, brokenModes);
     }
 }
 
-function _fixupBlockquotes(chipElement){
+function _fixupBlockquotes(chipElement: HTMLElement) {
     //our text nodes have a previous and next sibling, so it's not the blockquote case
-    if(chipElement._previousSpacerTextNode.nextSibling || chipElement._nextSpacerTextNode.previousSibling){
+    if (
+      (chipElement:any)._previousSpacerTextNode.nextSibling ||
+      (chipElement:any)._nextSpacerTextNode.previousSibling
+    ) {
         return;
     }
 
-    chipElement.insertAdjacentText('beforebegin', Z_SPACE_CHAR);
-    chipElement.insertAdjacentText('afterend', Z_SPACE_CHAR);
+    (chipElement:any).insertAdjacentText('beforebegin', Z_SPACE_CHAR);
+    (chipElement:any).insertAdjacentText('afterend', Z_SPACE_CHAR);
 
-    chipElement._previousSpacerTextNode = chipElement.previousSibling;
-    chipElement._nextSpacerTextNode = chipElement.nextSibling;
+    (chipElement:any)._previousSpacerTextNode = chipElement.previousSibling;
+    (chipElement:any)._nextSpacerTextNode = chipElement.nextSibling;
 }
 
-function _fixupStyling(chipElement){
+function _fixupStyling(chipElement: HTMLElement){
     chipElement.setAttribute('style', 'width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);');
 }
 
-function _fixupTriggerZones(chipElement){
+function _fixupTriggerZones(chipElement: HTMLElement) {
     var inNonTextNode = false;
     var children;
     var ii;
@@ -295,7 +302,7 @@ function _fixupTriggerZones(chipElement){
             if(previousSibling.nodeValue.charAt(previousSibling.nodeValue.length - 1) === Z_SPACE_CHAR){
                 if(inNonTextNode){
                     previousSibling.nodeValue = previousSibling.nodeValue.substring(0, previousSibling.nodeValue.length - 1);
-                    chipElement.insertAdjacentText('beforebegin', Z_SPACE_CHAR);
+                    (chipElement:any).insertAdjacentText('beforebegin', Z_SPACE_CHAR);
                 }
             }
             break;
@@ -321,7 +328,7 @@ function _fixupTriggerZones(chipElement){
             if(nextSibling.nodeValue.charAt(0) === Z_SPACE_CHAR){
                 if(inNonTextNode){
                     nextSibling.nodeValue = nextSibling.nodeValue.substring(1);
-                    chipElement.insertAdjacentText('afterend', Z_SPACE_CHAR);
+                    (chipElement:any).insertAdjacentText('afterend', Z_SPACE_CHAR);
                 }
             }
 
@@ -339,7 +346,7 @@ function _fixupTriggerZones(chipElement){
 }
 
 /* purposefully doesn't handle ambiguous case where you have Z_SPACE linkChip Z_SPACE linkChip Z_SPACE */
-function _getBrokenModes(chipElement){
+function _getBrokenModes(chipElement: HTMLElement): string[] {
     var brokenModes = [];
     var children;
     var ii;
@@ -352,7 +359,7 @@ function _getBrokenModes(chipElement){
         }
 
         if(previousSibling.nodeType === Node.TEXT_NODE){
-            if(previousSibling.nodeValue.charAt(previousSibling.length - 1) !== Z_SPACE_CHAR){
+            if(previousSibling.nodeValue.charAt(previousSibling.nodeValue.length - 1) !== Z_SPACE_CHAR){
                 brokenModes.push('PREVIOUS_SIBLING_MISSING_Z_SPACE_CHAR');
             }
             break;
@@ -394,7 +401,7 @@ function _getBrokenModes(chipElement){
     return brokenModes;
 }
 
-function _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes){
+function _cleanOutBrokenChip(composeView: ComposeViewDriver, chipElement: HTMLElement, brokenModes: string[]) {
     if(_doesZSpaceZeroExist(brokenModes)){
         _removeZSpaceZero(chipElement);
     }
@@ -403,14 +410,11 @@ function _cleanOutBrokenChip(gmailComposeView, chipElement, brokenModes){
         _removeZSpaceOne(chipElement);
     }
 
-    chipElement.remove();
-
-    if(document.getSelection().rangeCount === 0 && gmailComposeView.getLastSelectionRange()){
-        document.getSelection().addRange(gmailComposeView.getLastSelectionRange());
-    }
+    (chipElement:any).remove();
+    composeView.focus();
 }
 
-function _doesZSpaceZeroExist(brokenModes){
+function _doesZSpaceZeroExist(brokenModes: string[]): boolean {
     return brokenModes.indexOf('MISSING_PREVIOUS_SIBLING') === -1 &&
             brokenModes.indexOf('PREVIOUS_SIBLING_NOT_TEXT_NODE') === -1 &&
             brokenModes.indexOf('PREVIOUS_SIBLING_MISSING_Z_SPACE_CHAR') === -1;
@@ -422,14 +426,13 @@ function _removeZSpaceZero(chipElement, range){
     textNode.nodeValue = textNode.nodeValue.substring(0, textNode.textContent.length - 1);
 }
 
-function _doesZSpaceOneExist(brokenModes){
+function _doesZSpaceOneExist(brokenModes: string[]): boolean {
     return brokenModes.indexOf('MISSING_NEXT_SIBLING') === -1 &&
             brokenModes.indexOf('NEXT_SIBLING_NOT_TEXT_NODE') === -1 &&
             brokenModes.indexOf('NEXT_SIBLING_MISSING_Z_SPACE_CHAR') === -1;
 }
 
-function _removeZSpaceOne(chipElement){
+function _removeZSpaceOne(chipElement: HTMLElement){
     var textNode = chipElement.nextSibling;
-
     textNode.textContent = textNode.textContent.substring(1);
 }

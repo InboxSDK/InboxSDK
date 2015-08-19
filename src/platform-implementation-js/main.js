@@ -1,4 +1,7 @@
 if (!global.__InboxSDKImpLoader) {
+  var piMainStarted = Date.now();
+  var wasAccountSwitcherReadyAtStart = !!document.querySelector('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]');
+
   var oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
@@ -30,6 +33,7 @@ if (!global.__InboxSDKImpLoader) {
           throw new Error("Unsupported InboxSDK version");
         }
 
+        var piLoadStarted = Date.now();
         return onready.then(() => {
           var oldDefine;
           try {
@@ -40,7 +44,9 @@ if (!global.__InboxSDKImpLoader) {
               define = null;
             }
             const {makePlatformImplementation} = require('./platform-implementation');
-            return makePlatformImplementation(appId, opts);
+            return makePlatformImplementation(appId, opts, {
+              piMainStarted, piLoadStarted, wasAccountSwitcherReadyAtStart
+            });
           } finally {
             if (oldDefine) {
               define = oldDefine;

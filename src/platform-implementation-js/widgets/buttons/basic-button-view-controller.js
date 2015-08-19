@@ -1,40 +1,46 @@
+/* @flow */
+//jshint ignore:start
+
 var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
 
-var BasicButtonViewController = function(options){
-	BasicClass.call(this);
-
-	this._activateFunction = options.activateFunction || options.onClick;
-	this._view = options.buttonView;
-
-	this._bindToViewEvents();
+export type Options = {
+	activateFunction?: ?()=>void;
+	onClick?: ?()=>void;
+	buttonView: Object;
 };
 
-BasicButtonViewController.prototype = Object.create(BasicClass.prototype);
+export default class BasicButtonViewController {
+	_activateFunction: ?()=>void;
+	_view: Object;
 
-_.extend(BasicButtonViewController.prototype, {
+	constructor(options: Options) {
+		this._activateFunction = options.activateFunction || options.onClick;
+		this._view = options.buttonView;
 
-	__memberVariables: [
-		{name: '_view', destroy: true, get: true},
-		{name: '_activateFunction', destroy: false, set: true}
-	],
+		this._view
+			.getEventStream()
+			.filter(event => event.eventName === 'click')
+			.onValue(e => {
+				this.activate(e);
+			});
+	}
 
-	activate: function(){
+	destroy() {
+		this._activateFunction = null;
+		this._view.destroy();
+	}
+
+	getView(): Object {
+		return this._view;
+	}
+
+	setActivateFunction(f: ()=>void) {
+		this._activateFunction = f;
+	}
+
+	activate(){
 		if(this._activateFunction){
 			this._activateFunction();
 		}
-
-	},
-
-	_bindToViewEvents: function(){
-		this._view
-			.getEventStream()
-			.filter(function(event){
-				return event.eventName === 'click';
-			})
-			.onValue(this, 'activate');
 	}
-
-});
-
-module.exports = BasicButtonViewController;
+}

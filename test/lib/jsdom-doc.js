@@ -1,49 +1,52 @@
-import _ from 'lodash';
-import jsdom from 'jsdom';
-import assert from 'assert';
+/* @flow */
+//jshint ignore:start
+
+var _ = require('lodash');
+var jsdom = require('jsdom');
+var assert = require('assert');
 
 jsdom.defaultDocumentFeatures = {
   FetchExternalResources: false,
   ProcessExternalResources: false
 };
 
-let hasAddedClassList = false;
+var/*let*/ hasAddedClassList = false;
 
 function notImplemented() {
   throw new Error("mock classList modifiers not implemented");
 }
-const DOMTokenListPrototype = {
-  contains: function(item) {
+var/*const*/ DOMTokenListPrototype = {
+  contains(item) {
     return Array.prototype.indexOf.call(this, item) !== -1;
   },
   add: notImplemented, remove: notImplemented, toggle: notImplemented
 };
 
-export default function main() {
-  const document = jsdom.jsdom.apply(jsdom, arguments);
+export default function jsdomDoc(html: string): Document {
+  var/*const*/ document: Document = (jsdom.jsdom(html): any);
 
   // Monkey-patch the Element prototype to have some simple getters that jsdom
   // lacked.
   if (!hasAddedClassList) {
-    const div = document.createElement("div");
+    var/*const*/ div = document.createElement("div");
     assert(!('classList' in div));
-    let proto = div;
+    var/*let*/ proto: Object = div;
     do {
       proto = Object.getPrototypeOf(proto);
     } while (!_.has(proto, 'className'));
-    Object.defineProperty(proto, 'classList', {
+    (Object:any).defineProperty(proto, 'classList', {
       get() {
         // jshint -W103
-        const list = this.className.split(' ').filter(Boolean);
+        var/*const*/ list = this.className.split(' ').filter(Boolean);
         list.__proto__ = DOMTokenListPrototype;
         return Object.freeze(list);
       }
     });
     assert(!('firstElementChild' in proto));
-    Object.defineProperty(proto, 'firstElementChild', {
+    (Object:any).defineProperty(proto, 'firstElementChild', {
       get() {
-        for (let i=0, len=this.children.length; i<len; i++) {
-          const child = this.children[i];
+        for (var/*let*/ i=0, len=this.children.length; i<len; i++) {
+          var/*const*/ child = this.children[i];
           if (child.nodeType === 1) {
             return child;
           }
@@ -52,10 +55,10 @@ export default function main() {
       }
     });
     assert(!('lastElementChild' in proto));
-    Object.defineProperty(proto, 'lastElementChild', {
+    (Object:any).defineProperty(proto, 'lastElementChild', {
       get() {
-        for (let i=this.children.length-1; i>=0; i--) {
-          const child = this.children[i];
+        for (var/*let*/ i=this.children.length-1; i>=0; i--) {
+          var/*const*/ child = this.children[i];
           if (child.nodeType === 1) {
             return child;
           }
@@ -64,7 +67,7 @@ export default function main() {
       }
     });
     assert(!('nextElementSibling' in proto));
-    Object.defineProperty(proto, 'nextElementSibling', {
+    (Object:any).defineProperty(proto, 'nextElementSibling', {
       get() {
         var sibling = this;
         while ((sibling = sibling.nextSibling)) {
@@ -76,7 +79,7 @@ export default function main() {
       }
     });
     assert(!('previousElementSibling' in proto));
-    Object.defineProperty(proto, 'previousElementSibling', {
+    (Object:any).defineProperty(proto, 'previousElementSibling', {
       get() {
         var sibling = this;
         while ((sibling = sibling.previousSibling)) {
@@ -91,12 +94,12 @@ export default function main() {
     hasAddedClassList = true;
   }
 
-  const originalCreateEvent = document.createEvent;
-  document.createEvent = function(type) {
-    const event = originalCreateEvent.apply(this, arguments);
+  var/*const*/ originalCreateEvent = document.createEvent;
+  (document:any).createEvent = function(type) {
+    var/*const*/ event = originalCreateEvent.apply(this, arguments);
     if (type == 'CustomEvent') {
-      assert(!event.initCustomEvent);
-      event.initCustomEvent = function(type, bubbles, cancelable, detail) {
+      assert(!(event:any).initCustomEvent);
+      (event:any).initCustomEvent = function(type, bubbles, cancelable, detail) {
         if (detail) {
           throw new Error("mock initCustomEvent doesn't support detail parameter");
         }

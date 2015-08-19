@@ -12,14 +12,14 @@ declare module kefir {
     toProperty<U>(getCurrent: ?() => U): Stream<T|U>;
     changes(): Stream<T>;
 
-    onValue(cb: (i: T) => void): void;
-    offValue(cb: (i: T) => void): void;
-    onError(cb: (err: any) => void): void;
-    offError(cb: (err: any) => void): void;
-    onEnd(cb: () => void): void;
-    offEnd(cb: () => void): void;
-    onAny(cb: (event: Event<T>) => void): void;
-    offAny(cb: (event: Event<T>) => void): void;
+    onValue(cb: (i: T) => void): Stream<T>;
+    offValue(cb: (i: T) => void): Stream<T>;
+    onError(cb: (err: any) => void): Stream<T>;
+    offError(cb: (err: any) => void): Stream<T>;
+    onEnd(cb: () => void): Stream<T>;
+    offEnd(cb: () => void): Stream<T>;
+    onAny(cb: (event: Event<T>) => void): Stream<T>;
+    offAny(cb: (event: Event<T>) => void): Stream<T>;
     log(name?: string): Stream<T>;
     offLog(name?: string): Stream<T>;
     toPromise(PromiseConstructor?: Function): Promise<T>;

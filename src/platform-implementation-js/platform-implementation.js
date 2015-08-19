@@ -17,6 +17,7 @@ import Search from './platform-implementation/search';
 import Toolbars from './platform-implementation/toolbars';
 import User from './platform-implementation/user';
 
+import HMRManager from '../common/hmr-manager';
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
 import Logger from './lib/logger';
@@ -86,8 +87,14 @@ export class PlatformImplementation extends SafeEventEmitter {
 	}
 }
 
+export type EnvData = {
+	piMainStarted: number;
+	piLoadStarted: number;
+	wasAccountSwitcherReadyAtStart: boolean;
+};
+
 // returns a promise for the PlatformImplementation object
-export function makePlatformImplementation(appId: string, opts: any): Promise<PlatformImplementation> {
+export function makePlatformImplementation(appId: string, opts: any, envData: EnvData): Promise<PlatformImplementation> {
 	if (typeof appId !== 'string') {
 		throw new Error("appId must be a string");
 	}
@@ -111,6 +118,7 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 	var LOADER_VERSION: string = opts.VERSION;
 	var IMPL_VERSION: string = process.env.VERSION;
 	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	HMRManager.startWatch();
 
 	var origin: string = (document.location: any).origin;
 	var DriverClass = DRIVERS_BY_ORIGIN[origin];
@@ -120,7 +128,7 @@ export function makePlatformImplementation(appId: string, opts: any): Promise<Pl
 		return new Promise((resolve, reject) => {});
 	}
 
-	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger);
+	var driver: Driver = new DriverClass(appId, opts, LOADER_VERSION, IMPL_VERSION, logger, envData);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
 		if (!isValidAppId(appId)) {
 			console.error(`

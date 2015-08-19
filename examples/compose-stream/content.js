@@ -64,6 +64,14 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		});
 
 		composeView.addButton({
+			title: 'link chip',
+			iconUrl: chrome.runtime.getURL('lion.png'),
+			onClick: function(event){
+				event.composeView.insertLinkChipIntoBodyAtCursor('name', 'https://rpominov.github.io/kefir/', "https://cf.dropboxstatic.com/static/images/gmail_attachment_logo.png");
+			}
+		});
+
+		composeView.addButton({
 			title: 'Changer',
 			iconUrl: chrome.runtime.getURL('lion.png'),
 			onClick: function(event){

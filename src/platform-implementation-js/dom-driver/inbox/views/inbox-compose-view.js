@@ -2,15 +2,26 @@
 //jshint ignore:start
 
 var _ = require('lodash');
+var RSVP = require('rsvp');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
-import getInsertBeforeElement from '../../../lib/get-insert-before-element';
+import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
+import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
+import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import type InboxDriver from '../inbox-driver';
+import type {TooltipDescriptor} from '../../../views/compose-button-view';
+import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
+import {
+  isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
+} from '../../../lib/dom/get-selection';
+
+window._sc = simulateClick;
 
 export default class InboxComposeView {
   _element: HTMLElement;
@@ -21,11 +32,13 @@ export default class InboxComposeView {
   _minimizeBtn: HTMLElement;
   _sendBtn: HTMLElement;
   _attachBtn: HTMLElement;
+  _formatBtn: HTMLElement;
   _bodyEl: HTMLElement;
   _bodyPlaceholder: HTMLElement;
   _subjectEl: HTMLInputElement;
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
+  _lastSelectionRange: ?Range;
 
   constructor(driver: InboxDriver, el: HTMLElement) {
     this._element = el;
@@ -33,12 +46,14 @@ export default class InboxComposeView {
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
+    this._lastSelectionRange = null;
 
     var hadError = false;
     var bottomAreaElementCount = null;
     var topBtns = this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button');
     var sendBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
     var attachBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
+    var formatBtns = this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]');
     var bodyEls = this._element.querySelectorAll('div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
     var subjectEls = this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
     try {
@@ -71,12 +86,16 @@ export default class InboxComposeView {
       if (!(subjectEl instanceof HTMLInputElement))
         throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
       this._subjectEl = subjectEl;
+      if (formatBtns.length !== 1)
+        throw new Error("compose wrong number of format buttons");
+      this._formatBtn = formatBtns[0];
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
         topBtnsLength: topBtns.length,
         sendBtnsLength: sendBtns.length,
         attachBtnsLength: attachBtns.length,
+        formatBtnsLength: formatBtns.length,
         bodyElsLength: bodyEls.length,
         subjectElsLength: subjectEls.length
       });
@@ -98,6 +117,25 @@ export default class InboxComposeView {
           unsilence();
         }
       });
+
+    Kefir.merge([
+        Kefir.fromEvents(document.body, 'mousedown'),
+        Kefir.fromEvents(document.body, 'keydown')
+      ]).takeUntilBy(this.getStopper())
+      .onValue(event => {
+        var body = this.getBodyElement();
+        var selection = (document:any).getSelection();
+        if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
+          this._lastSelectionRange = selection.getRangeAt(0);
+        }
+      });
+
+    this._eventStream.plug(
+      kefirMakeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+        .map(() => ({eventName: 'bodyChanged'}))
+    );
+
+    handleComposeLinkChips(this);
   }
   destroy() {
     this._eventStream.emit({eventName: 'destroy', data: {}});
@@ -120,14 +158,78 @@ export default class InboxComposeView {
     }
     this._queueDraftSave();
   }
-  insertBodyTextAtCursor(text: string): ?HTMLElement {
-    throw new Error("Not implemented");
+  focus() {
+    this._bodyEl.focus();
+    var selection = (document:any).getSelection();
+    if (
+      this._lastSelectionRange &&
+      (!selection.rangeCount || isRangeEmpty(selection.getRangeAt(0)))
+    ) {
+      selection.removeAllRanges();
+      selection.addRange(this._lastSelectionRange);
+    }
   }
-  insertBodyHTMLAtCursor(text: string): ?HTMLElement {
-    throw new Error("Not implemented");
+  insertBodyTextAtCursor(text: string): ?HTMLElement {
+    return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
+  }
+  insertBodyHTMLAtCursor(html: string): ?HTMLElement {
+    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
+    this._informBodyChanged();
+    return retVal;
+  }
+  // returns the format area if it's found and open
+  _getFormatArea(): ?HTMLElement {
+    var formatArea = this._element.querySelector('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"] + div > div');
+    if (formatArea && formatArea.children.length > 1) {
+      return formatArea;
+    }
+    return null;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
-    throw new Error("Not implemented");
+    this.focus();
+    var formatArea = this._getFormatArea();
+    var formatAreaOpenAtStart = !!formatArea;
+    if (!formatArea) {
+      simulateClick(this._formatBtn);
+      formatArea = this._getFormatArea();
+    }
+    if (!formatArea) throw new Error("Couldn't open format area");
+    try {
+      var linkButton = formatArea.querySelector('div[role=button][id$="link"]');
+      if (!linkButton) throw new Error("Couldn't find link button");
+      simulateClick(linkButton);
+      var dialog = document.body.querySelector('body > div[role=dialog]');
+      if (!dialog) {
+        // If the cursor was next to a link, then the first click unlinks that.
+        // Same thing in Gmail. TODO fix.
+        simulateClick(linkButton);
+        dialog = document.body.querySelector('body > div[role=dialog]');
+      }
+      if (!dialog) throw new Error("Couldn't find dialog");
+      var ok = dialog.querySelector('button[name=ok]');
+      if (!ok) throw new Error("Couldn't find ok");
+      var textInput = dialog.querySelector('input#linkdialog-text');
+      if (!textInput || !(textInput instanceof HTMLInputElement))
+        throw new Error("Couldn't find text input");
+      var urlInput = dialog.querySelector('input[type=url]');
+      if (!urlInput || !(urlInput instanceof HTMLInputElement))
+        throw new Error("Couldn't find url input");
+      textInput.value = text;
+      textInput.dispatchEvent(new Event("input"));
+      urlInput.value = href;
+      urlInput.dispatchEvent(new Event("input"));
+      simulateClick(ok);
+    } finally {
+      if (!formatAreaOpenAtStart) {
+        simulateClick(this._formatBtn);
+      }
+    }
+    this._informBodyChanged();
+  }
+  insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
+    var retval = insertLinkChipIntoBody(this, options);
+    this._informBodyChanged();
+    return retval;
   }
   setBodyHTML(html: string): void {
     this._bodyEl.innerHTML = html;
@@ -146,56 +248,26 @@ export default class InboxComposeView {
   setBccRecipients(emails: string[]): void {
     throw new Error("Not implemented");
   }
-  close(): void {
+  close() {
     simulateClick(this._closeBtn);
   }
-  send(): void {
+  send() {
     simulateClick(this._sendBtn);
   }
-  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
-    var div = document.createElement('div');
-    div.setAttribute('role', 'button');
-    div.tabIndex = 0;
-    div.className = 'inboxsdk__button_icon';
-    var img = document.createElement('img');
-    img.className = 'inboxsdk__button_iconImg';
-    var onClick = _.noop;
-    Kefir.merge([
-      Kefir.fromEvents(div, 'click'),
-      Kefir.fromEvents(div, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
-    ]).onValue(event => {
-      event.preventDefault();
-      event.stopPropagation();
-      onClick(Object.assign({}, extraOnClickOptions));
-    });
-    var lastOrderHint = null;
-
-    buttonDescriptor.takeUntilBy(this._stopper).onValue(buttonDescriptor => {
-      if (!buttonDescriptor) {
-        div.style.display = 'none';
-        return;
-      }
-      div.style.display = '';
-      div.title = buttonDescriptor.title;
-      div.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
-      onClick = buttonDescriptor.onClick;
-      if (buttonDescriptor.iconUrl) {
-        img.src = buttonDescriptor.iconUrl;
-        div.appendChild(img);
-      } else {
-        (img:Object).remove();
-      }
-      var orderHint = buttonDescriptor.orderHint||0;
-      if (lastOrderHint !== orderHint) {
-        lastOrderHint = orderHint;
-        div.setAttribute('data-order-hint', String(orderHint));
-        this._getModifierButtonContainer().insertBefore(
-          div, (getInsertBeforeElement(this._getModifierButtonContainer(), orderHint):any));
-      }
-    });
-    return new Promise((resolve, reject) => {});
+  minimize() {
+    // TODO
   }
-  _getModifierButtonContainer(): HTMLElement {
+  restore() {
+    // TODO
+  }
+  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
+    var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
+    return RSVP.Promise.resolve({
+      buttonViewController,
+      buttonDescriptor: {}
+    });
+  }
+  getModifierButtonContainer(): HTMLElement {
     if (this._modifierButtonContainer) {
       return this._modifierButtonContainer;
     }
@@ -235,6 +307,10 @@ export default class InboxComposeView {
     // inline reply form support isn't in yet, so it can't be one.
     return false;
   }
+  getIsFullscreen(): boolean {
+    // TODO
+    return false;
+  }
   getBodyElement(): HTMLElement {
     return this._bodyEl;
   }
@@ -245,10 +321,10 @@ export default class InboxComposeView {
     return this.getBodyElement().textContent;
   }
   getSelectedBodyHTML(): ?string {
-    throw new Error("Not implemented");
+    return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSelectedBodyText(): ?string {
-    throw new Error("Not implemented");
+    return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSubject(): string {
     return this._subjectEl.value;
@@ -275,7 +351,14 @@ export default class InboxComposeView {
     throw new Error("composeView.getMessageID is not implemented in Inbox")
   }
   getThreadID(): ?string {
+    // TODO
     return null;
+  }
+  addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
+    (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
+  }
+  closeButtonTooltip(buttonViewController: Object) {
+    (buttonViewController:InboxComposeButtonView).closeTooltip();
   }
 }
 

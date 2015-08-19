@@ -10,7 +10,7 @@ import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
-import getInsertBeforeElement from '../../../../lib/get-insert-before-element';
+import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 
 import type GmailComposeView from '../gmail-compose-view';
 
@@ -28,7 +28,6 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 						buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
 						resolve({
 							buttonViewController: buttonViewController,
-							composeViewDriver: gmailComposeView,
 							buttonDescriptor: buttonDescriptor
 						});
 					}
@@ -36,6 +35,10 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 				else{
 					buttonViewController.getView().update(buttonOptions);
 				}
+			})
+			.onEnd(() => {
+				// Just in case things end without ever resolving above.
+				resolve(null);
 			});
 	});
 
@@ -73,9 +76,7 @@ function _addButtonToModifierArea(gmailComposeView: GmailComposeView, buttonDesc
 	var element: HTMLElement = buttonViewController.getView().getElement();
 	var actionToolbar: HTMLElement = gmailComposeView.getAdditionalActionToolbar();
 
-	var insertBeforeElement: ?HTMLElement = getInsertBeforeElement(actionToolbar, buttonDescriptor.orderHint, groupOrderHint);
-
-	actionToolbar.insertBefore(element, (insertBeforeElement:any));
+	insertElementInOrder(actionToolbar, element);
 	gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
 
 	gmailComposeView.addManagedViewController(buttonViewController);

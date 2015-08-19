@@ -39,6 +39,7 @@ var sdkFilename = 'inboxsdk.js';
 var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
+  'hot': {key: 'h', description: 'hot module replacement'},
   'single': {key: 's', description: 'Single bundle build (for development)'},
   'minify': {key: 'm', description: 'Minify build'},
   'production': {key: 'p', description: 'Production build'},
@@ -80,13 +81,9 @@ function setupExamples() {
   });
 }
 
-var getVersion = function() {
-  throw new Error("Can't access before task has run");
-};
-
 gulp.task('noop', _.noop);
 
-gulp.task('version', function() {
+function getVersion(): Promise<string> {
   return RSVP.Promise.all([
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
@@ -98,14 +95,18 @@ gulp.task('version', function() {
     if (isModified) {
       version += '-MODIFIED';
     }
-    getVersion = _.constant(version);
+    if (args.watch) {
+      version += '-WATCH';
+    }
+    return version;
   });
-});
+}
 
 function browserifyTask(name, deps, entry, destname) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
-  gulp.task(name, ['version'].concat(deps), function() {
+  gulp.task(name, deps, async function() {
+    var VERSION = await getVersion();
     var bundler = browserify({
       entries: entry,
       debug: true,
@@ -115,8 +116,17 @@ function browserifyTask(name, deps, entry, destname) {
       IMPLEMENTATION_URL: args.production ?
         'https://www.inboxsdk.com/build/platform-implementation.js' :
         'http://localhost:4567/platform-implementation.js',
-      VERSION: getVersion()
+      VERSION
     }));
+
+    if (args.hot && name === (args.single ? 'sdk' : 'imp')) {
+      bundler.plugin(require('browserify-hmr'), {
+        url: name === 'sdk' ?
+          'http://localhost:4567/inboxsdk.js' :
+          'http://localhost:4567/platform-implementation.js',
+        cacheBust: false
+      });
+    }
 
     function buildBundle() {
       var sourcemapPipeline = lazyPipe()
@@ -176,13 +186,13 @@ function browserifyTask(name, deps, entry, destname) {
 }
 
 if (args.single) {
-  gulp.task('default', ['sdk', 'examples']);
+  gulp.task('default', ['sdk', 'examples', args.watch&&args.hot&&'server'].filter(Boolean));
   browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
-  gulp.task('default', ['sdk', 'imp', 'examples']);
+  gulp.task('default', ['sdk', 'imp', 'examples', args.watch&&args.hot&&'server'].filter(Boolean));
   browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
   browserifyTask('imp', ['injected'],
     './src/platform-implementation-js/main.js', 'platform-implementation.js');
@@ -192,8 +202,8 @@ browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js');
 
 gulp.task('examples', ['sdk'], setupExamples);
 
-gulp.task('server', ['imp'], function() {
-  require('./live/app').run();
+gulp.task('server', [args.single ? 'sdk' : 'imp'], function() {
+  return require('./live/app').run();
 });
 
 gulp.task('clean', function(cb) {

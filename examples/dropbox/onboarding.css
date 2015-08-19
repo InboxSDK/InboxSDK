@@ -1,0 +1,79 @@
+/* See http://stackoverflow.com/questions/6997826/alternative-to-domnodeinserted */
+@keyframes tooltip_appeared {
+  from {
+    opacity: 0.9; }
+  to {
+    opacity: 1.0; } }
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Assuming InboxSDK keeps their setting of z-index of inbox__sdk div to be 1300
+     (although we have a slight buffer) */
+  z-index: 1199;
+  opacity: 0; }
+
+.onboarding-flyout-container {
+  animation-duration: 0.01s;
+  animation-name: tooltip_appeared;
+  width: 350px;
+  cursor: default; }
+  .onboarding-flyout-container .onboarding-dismiss-x {
+    position: absolute;
+    right: 10px;
+    margin-top: -20px;
+    cursor: pointer; }
+  .onboarding-flyout-container .onboarding-title {
+    font-size: 27px;
+    font-weight: 100;
+    margin: 30px; }
+    .onboarding-flyout-container .onboarding-title .onboarding-emphasis {
+      color: #007EE5;
+      display: inline-block; }
+  .onboarding-flyout-container .onboarding-tip-list {
+    margin-left: 30px;
+    text-align: left;
+    list-style-image: url("chrome-extension://__MSG_@@extension_id__/images/checkmark.png"); }
+    .onboarding-flyout-container .onboarding-tip-list li {
+      margin-bottom: 20px; }
+  .onboarding-flyout-container .onboarding-buttons {
+    margin: 30px; }
+    .onboarding-flyout-container .onboarding-buttons .button-primary, .onboarding-flyout-container .onboarding-buttons .button-tertiary {
+      border-radius: 2px;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 13px;
+      padding: 6px 16px;
+      text-align: center;
+      outline: 0px; }
+    .onboarding-flyout-container .onboarding-buttons .button-primary {
+      background-color: #007EE5;
+      border: 1px solid #0c6ebe;
+      color: white;
+      margin-right: 10px; }
+      .onboarding-flyout-container .onboarding-buttons .button-primary:hover {
+        background-color: #168eef; }
+      .onboarding-flyout-container .onboarding-buttons .button-primary:active {
+        background-color: #1b80d3; }
+    .onboarding-flyout-container .onboarding-buttons .button-tertiary {
+      background-color: #fff;
+      border: 1px solid #bbb; }
+      .onboarding-flyout-container .onboarding-buttons .button-tertiary:hover {
+        background-color: #f7f7f7; }
+      .onboarding-flyout-container .onboarding-buttons .button-tertiary:active {
+        background-color: #f2f2f2; }
+  .onboarding-flyout-container .onboarding-footer-divider {
+    height: 1px;
+    background-color: lightgray;
+    margin: 10px; }
+  .onboarding-flyout-container .onboarding-footer {
+    margin-bottom: 20px;
+    font-size: 12px; }
+    .onboarding-flyout-container .onboarding-footer a {
+      text-decoration: none;
+      color: #007EE5;
+      padding: 10px; }
+
+/*# sourceMappingURL=onboarding.css.map */

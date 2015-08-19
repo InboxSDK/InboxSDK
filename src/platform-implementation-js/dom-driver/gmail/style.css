@@ -1,3 +1,11 @@
+.inboxsdk__notransition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
+
 /* suggestions */
 
 .inboxsdk__suggestions_separator_before {
@@ -76,6 +84,7 @@ div.T-I.inboxsdk__button {
   min-height: 1em;
   padding: 0px;
   overflow: visible;
+  max-height: none;
 }
 
 /* end */

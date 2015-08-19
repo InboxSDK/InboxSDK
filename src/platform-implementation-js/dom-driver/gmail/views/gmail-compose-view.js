@@ -21,6 +21,8 @@ import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
+import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
@@ -31,6 +33,7 @@ import addButton from './gmail-compose-view/add-button';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
+import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -56,7 +59,7 @@ export default class GmailComposeView {
 	_targetMessageID: ?string;
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
-	_lastSelectionRange: ?Object;
+	_lastSelectionRange: ?Range;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -79,24 +82,40 @@ export default class GmailComposeView {
 
 		this._eventStream.plug(
 			Bacon.mergeAll(
-				xhrInterceptorStream.filter((event) => {
-					return event.type === 'emailSending' && event.composeId === this.getComposeID();
-				}).map((event) => {
-					return {eventName: 'sending'};
-				}),
-				xhrInterceptorStream.filter((event) => {
-					return event.type === 'emailSent' && event.composeId === this.getComposeID();
-				}).map((event) => {
-					var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-					this._emailWasSent = true;
-					return {eventName: 'sent', data: response};
-				}),
+				xhrInterceptorStream
+					.filter(event => event.composeId === this.getComposeID())
+					.map((event) => {
+						switch(event.type){
+							case 'emailSending':
+								return {eventName: 'sending'};
+
+							case 'emailSent':
+								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								this._emailWasSent = true;
+								if(response.messageID){
+									this._messageId = response.messageID;
+								}
+								return {eventName: 'sent', data: response};
+							case 'emailDraftReceived':
+								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								if(response.messageID){
+									this._messageId = response.messageID;
+								}
+								return {eventName: 'draftSaved', data: response};
+							default:
+								return null;
+						}
+					})
+					.filter(Boolean),
+
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
 					return {
 						eventName: 'buttonAdded'
 					};
 				}),
+
 				Bacon.fromEvent(this._element, 'resize').map(() => ({eventName: 'resize'})),
+
 				Bacon
 					.fromEventTarget(this._element, 'composeFullscreenStateChanged')
 					.doAction(() => this._updateComposeFullscreenState())
@@ -181,7 +200,7 @@ export default class GmailComposeView {
 
 	_setupConsistencyCheckers() {
 		try {
-			require('./gmail-compose-view/ensure-link-chips-work')(this);
+			handleComposeLinkChips(this);
 			monitorSelectionRange(this);
 			manageButtonGrouping(this);
 			sizeFixer(this._driver, this);
@@ -225,8 +244,7 @@ export default class GmailComposeView {
 	}
 
 	insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
-		var retVal = require('./gmail-compose-view/insert-link-chip-into-body')(this, options);
-
+		var retVal = insertLinkChipIntoBody(this, options);
 		this._triggerDraftSave();
 		return retVal;
 	}
@@ -344,7 +362,16 @@ export default class GmailComposeView {
 			return;
 		}
 
-		simulateClick(this.getCloseButton());
+		if(this._isFullscreen){
+			this._eventStream
+				.filter(({eventName}) => eventName === 'composeFullscreenStateChanged')
+				.onValue(() => simulateClick(this.getCloseButton()));
+
+			simulateClick(this.getMoleSwitchButton());
+		}
+		else{
+			simulateClick(this.getCloseButton());
+		}
 	}
 
 	send() {
@@ -376,13 +403,11 @@ export default class GmailComposeView {
 	}
 
 	getSelectedBodyHTML(): ?string {
-		this.focus();
-		return require('../../../lib/dom/get-selected-html')(this.getBodyElement(), this._lastSelectionRange);
+		return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSelectedBodyText(): ?string {
-		this.focus();
-		return require('../../../lib/dom/get-selected-text')(this.getBodyElement(), this._lastSelectionRange);
+		return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
 	}
 
 	getSubject(): string {
@@ -473,6 +498,10 @@ export default class GmailComposeView {
 
 	getCloseButton(): HTMLElement {
 		return this._element.querySelectorAll('.Hm > img')[2];
+	}
+
+	getMoleSwitchButton(): HTMLElement {
+		return this._element.querySelectorAll('.Hm > img')[1];
 	}
 
 	getBottomBarTable(): HTMLElement {
@@ -582,11 +611,11 @@ export default class GmailComposeView {
 		this._isStandalone = isStandalone;
 	}
 
-	getLastSelectionRange(): ?Object {
+	getLastSelectionRange(): ?Range {
 		return this._lastSelectionRange;
 	}
 
-	setLastSelectionRange(lastSelectionRange: ?Object) {
+	setLastSelectionRange(lastSelectionRange: ?Range) {
 		this._lastSelectionRange = lastSelectionRange;
 	}
 }
