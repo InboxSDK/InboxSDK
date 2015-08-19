@@ -1,8 +1,10 @@
 /* @flow */
 //jshint ignore:start
 
-var isWatching = false;
-var POLL_TIME = 2000;
+import * as HMR from './hmr-util';
+
+var shared = HMR.makeShared(module, ()=>({isWatching: false}));
+var updatable = HMR.makeUpdatable(module, {POLL_TIME: 2000});
 
 function doCheck() {
   (module:any).hot.check((err, outdated) => {
@@ -16,18 +18,18 @@ function doCheck() {
         } else {
           console.log('[HMR] Replaced modules', updated);
         }
-        setTimeout(doCheck, POLL_TIME);
+        setTimeout(doCheck, updatable.POLL_TIME);
       });
     } else {
-      setTimeout(doCheck, POLL_TIME);
+      setTimeout(doCheck, updatable.POLL_TIME);
     }
   });
 };
 
 var HMRManager = {
   startWatch() {
-    if (isWatching || !(module:any).hot) return;
-    isWatching = true;
+    if (shared.isWatching || !(module:any).hot) return;
+    shared.isWatching = true;
     doCheck();
   }
 };

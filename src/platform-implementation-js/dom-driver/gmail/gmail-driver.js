@@ -40,6 +40,7 @@ import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcu
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
+import customStyle from './custom-style';
 import maintainComposeWindowState from './gmail-driver/maintain-compose-window-state';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
@@ -87,7 +88,7 @@ export default class GmailDriver {
 	_timestampOnready: ?number;
 
 	constructor(appId: string, opts: Object, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
-		require('./custom-style');
+		customStyle();
 
 		this._appId = appId;
 		this._logger = logger;
