@@ -7,7 +7,7 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 
 	window._sdk = inboxSDK;
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView) {
-		var modal = window._modal = inboxSDK.Modal.show({
+		var modal = window._modal = inboxSDK.Widgets.showModalView({
 			el: div,
 			chrome: true,
 			buttons: [
