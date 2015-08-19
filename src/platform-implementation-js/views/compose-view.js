@@ -157,7 +157,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * @return {string}
 	 */
 	getSelectedBodyHTML: function(){
-		return memberMap.get(this).composeViewImplementation.getSelectedBodyHTML();
+		return memberMap.get(this).composeViewImplementation.getSelectedBodyHTML() || '';
 	},
 
 	/**
@@ -166,7 +166,7 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * @return {string}
 	 */
 	getSelectedBodyText: function(){
-		return memberMap.get(this).composeViewImplementation.getSelectedBodyText();
+		return memberMap.get(this).composeViewImplementation.getSelectedBodyText() || '';
 	},
 
 	/**

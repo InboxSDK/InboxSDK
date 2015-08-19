@@ -333,6 +333,7 @@ function isFileEligbleForDocs(filename) {
   return  filename.endsWith(".js") &&
           filename.indexOf("src/platform-implementation-js/platform-implementation.js") == -1 &&
           filename.indexOf('views/compose-button-view.js') == -1 &&
+          filename.indexOf('widgets/buttons/basic-button-view-controller.js') == -1 &&
           (
             filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
             filename.indexOf('src/platform-implementation-js/views') > -1 ||
