@@ -174,8 +174,8 @@ export default class InboxComposeView {
   }
   insertBodyHTMLAtCursor(html: string): ?HTMLElement {
     var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
-		this._informBodyChanged();
-		return retVal;
+    this._informBodyChanged();
+    return retVal;
   }
   // returns the format area if it's found and open
   _getFormatArea(): ?HTMLElement {
