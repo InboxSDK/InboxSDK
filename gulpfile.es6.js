@@ -7,6 +7,7 @@ checkDependencies(require('./package'+'.json'));
 
 var _ = require('lodash');
 var gulp = require('gulp');
+var destAtomic = require('gulp-dest-atomic');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var source = require('vinyl-source-stream');
@@ -69,7 +70,7 @@ function setupExamples() {
   }).then(function(dirs) {
     return dirs.reduce(
       function(stream, dir) {
-        return stream.pipe(gulp.dest(dir));
+        return stream.pipe(destAtomic(dir));
       },
       gulp.src('./dist/'+sdkFilename)
         .pipe(rename('inboxsdk.js'))
@@ -146,7 +147,7 @@ function browserifyTask(name, deps, entry, destname) {
       var result = bundle
         .pipe(source(destname))
         .pipe(gulpif(willMinify || args.production, streamify(sourcemapPipeline())))
-        .pipe(gulp.dest('./dist/'));
+        .pipe(destAtomic('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {
         var errCb = _.once(function(err) {
@@ -155,7 +156,7 @@ function browserifyTask(name, deps, entry, destname) {
         });
         bundle.on('error', errCb);
         result.on('error', errCb);
-        result.on('end', resolve);
+        result.on('finish', resolve);
       });
     }
 
