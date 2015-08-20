@@ -22,7 +22,7 @@
   width: 24px;
   height: 24px;
   opacity: 0.6;
-  margin: 8px 2px 4px;
+  margin: 8px 12px 4px 2px;
 }
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon.inboxsdk__active,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:hover,
