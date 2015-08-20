@@ -269,6 +269,10 @@ export default class InboxComposeView {
     if (this._modifierButtonContainer) {
       return this._modifierButtonContainer;
     }
+    this._modifierButtonContainer = this._element.querySelector('.inboxsdk__compose_actionToolbar');
+    if (this._modifierButtonContainer) {
+      return this._modifierButtonContainer;
+    }
     var div = document.createElement('div');
     div.className = 'inboxsdk__compose_actionToolbar';
 

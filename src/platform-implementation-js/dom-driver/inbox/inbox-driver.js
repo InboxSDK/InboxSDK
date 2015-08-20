@@ -15,6 +15,7 @@ import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
+import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
@@ -88,29 +89,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
     this._routeViewDriverStream = Bacon.never(); //Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
     this._composeViewDriverStream = baconCast(Bacon,
-      kefirWaitFor(() => {
-        var els = document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child');
-        return els.length === 1 ? els[0] : null;
-      })
-        .flatMap(kmakeElementChildStream)
-        .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
-        .flatMap(event =>
-          // ignore the composes that get removed immediately
-          kefirDelayAsap(event)
-            .takeUntilBy(event.removalStream)
-        )
-        .map(kefirElementViewMapper((el: HTMLElement) => {
-          var composeEl = el.querySelector('div[role=dialog]');
-          if (!composeEl) {
-            this._logger.error(new Error("compose dialog element not found"), {
-              html: censorHTMLtree(el)
-            });
-            return null;
-          }
-          return new InboxComposeView(this, composeEl)
-        }))
-        .filter(Boolean)
-        .takeUntilBy(this._stopper)
+      getComposeViewDriverStream(this).takeUntilBy(this._stopper)
     );
     this._threadViewDriverStream = Bacon.never();
     this._messageViewDriverStream = Bacon.never();

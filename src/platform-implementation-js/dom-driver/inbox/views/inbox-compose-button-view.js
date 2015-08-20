@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 var _ = require('lodash');
+var ud = require('ud');
 var Kefir = require('kefir');
 import type InboxComposeView from './inbox-compose-view';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
@@ -13,7 +14,7 @@ import InboxTooltipView from './inbox-tooltip-view';
 
 var insertionOrderHint: number = 0;
 
-export default class InboxComposeButtonView {
+var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
   _composeView: InboxComposeView;
   _buttonEl: HTMLElement;
   _iconEl: HTMLImageElement;
@@ -82,6 +83,10 @@ export default class InboxComposeButtonView {
 
     composeView.getStopper().onValue(() => {
       this.closeTooltip();
+      (div:any).remove();
+      if (dropdown) {
+        dropdown.close();
+      }
     })
   }
 
@@ -102,4 +107,5 @@ export default class InboxComposeButtonView {
       this._tooltip.destroy();
     }
   }
-}
+});
+export default InboxComposeButtonView;
