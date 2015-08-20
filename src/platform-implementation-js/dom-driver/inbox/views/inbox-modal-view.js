@@ -66,10 +66,15 @@ var InboxModalView = HMR.makeUpdatableFn(module, class InboxModalView {
 
   setButtons(buttons: Object[]) {
     var buttonContainer = this._modalContainerElement.querySelector('.inboxsdk__modal_buttons');
+
     buttonContainer.innerHTML = '';
-    _.sortBy(buttons, button => button.orderHint || 0)
+    _.sortByAll(buttons, [
+      button => button.type === 'PRIMARY_ACTION' ? 0 : 1,
+      button => button.orderHint || 0
+    ])
       .forEach(buttonDescriptor => {
         var buttonEl = document.createElement('input');
+        buttonEl.className = buttonDescriptor.type === 'PRIMARY_ACTION' ? 'inboxsdk__primary' : '';
         buttonEl.type = 'button';
         buttonEl.value = buttonDescriptor.text;
         buttonEl.addEventListener('click', event => {

@@ -177,3 +177,9 @@
 .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_content {
   margin: 0px;
 }
+.inboxsdk__modal_buttons input {
+  margin-right: 5px;
+}
+.inboxsdk__modal_buttons input.inboxsdk__primary {
+  margin-right: 7px;
+}
