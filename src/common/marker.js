@@ -14,6 +14,7 @@ export default function Marker(description?: string): {name: ?string} {
     name: description
   }, {
     length: {value: 1},
+    nodeType: {value: 1},
     inspect: strFnOpts, toString: strFnOpts, valueOf: strFnOpts
   }));
 }

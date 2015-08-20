@@ -22,11 +22,14 @@ export default function makeElementChildStream(element: HTMLElement): Bacon.Obse
       if (len === 0) {
         return;
       }
-      var toSink = new Array(len);
+      var toSink = [];
       for (var i=0; i < len; i++) {
-        var el = els[i], removalStream = new Bacon.Bus();
-        removalStreams.set(el, removalStream);
-        toSink[i] = new Bacon.Next({el, removalStream});
+        var el = els[i];
+        if (el.nodeType === 1) {
+          var removalStream = new Bacon.Bus();
+          removalStreams.set(el, removalStream);
+          toSink.push(new Bacon.Next({el, removalStream}));
+        }
       }
       sink(toSink);
     }

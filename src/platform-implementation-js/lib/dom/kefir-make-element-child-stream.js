@@ -18,9 +18,11 @@ export default function kefirMakeElementChildStream(element: HTMLElement): Kefir
     var ended = false;
 
     function newEl(el: HTMLElement) {
-      var removalStream = kefirStopper();
-      removalStreams.set(el, removalStream);
-      emitter.emit({el, removalStream});
+      if (el.nodeType === 1) {
+        var removalStream = kefirStopper();
+        removalStreams.set(el, removalStream);
+        emitter.emit({el, removalStream});
+      }
     }
 
     function removedEl(el: HTMLElement) {
