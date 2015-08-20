@@ -10,7 +10,7 @@ export default function streamToPromise(stream: Stream): Promise<void> {
     stream.on('error', function(err) {
       reject(err);
     });
-    stream.on('end', function() {
+    stream.on('finish', function() {
       resolve();
     });
   });
