@@ -6,7 +6,8 @@ var Kefir = require('kefir');
 var ud = require('ud');
 
 // On the first run, creates a property that emits a given value. On subsequent
-// loads, it returns the same property as last time, but
+// loads, it returns the same property as last time and emits the new value
+// into it.
 export function makeUpdatableStream<T>(module: typeof module, value: T, key:string='default-stream'): Kefir.Stream<T> {
   var sharedObject = ud.defonce(module, () => {
     var emitter;
@@ -14,6 +15,8 @@ export function makeUpdatableStream<T>(module: typeof module, value: T, key:stri
       emitter = _emitter;
     });
     var property = stream.toProperty();
+
+    // force the property to be active to set and remember its current value.
     property.onValue(_.noop);
     return {
       property,
