@@ -21,8 +21,6 @@ import {
   isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
-window._sc = simulateClick;
-
 export default class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
