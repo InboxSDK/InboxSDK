@@ -4,10 +4,10 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 var kefirBus = require('kefir-bus');
+var ud = require('ud');
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
-import * as HMR from '../../../../common/hmr-util';
 
-var InboxModalView = HMR.makeUpdatableFn(module, class InboxModalView {
+var InboxModalView = ud.defn(module, class InboxModalView {
   _eventStream: Kefir.Bus;
   _modalContainerElement: HTMLElement;
   _overlayElement: HTMLElement;

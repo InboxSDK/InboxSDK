@@ -3,20 +3,14 @@
 
 var _ = require('lodash');
 var Kefir = require('kefir');
-import * as HMR from '../../common/hmr-util';
+var ud = require('ud');
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 var extId = ''+Math.random();
 
 var Z_SPACE_CHAR = '\u200b';
 
-var updatable = HMR.makeUpdatable(module, {setupFixer, doFixing});
-
-export default function handleComposeLinkChips(composeView: ComposeViewDriver) {
-    return updatable.setupFixer(composeView);
-}
-
-function setupFixer(composeView: ComposeViewDriver){
+var handleComposeLinkChips = ud.defn(module, function handleComposeLinkChips(composeView: ComposeViewDriver) {
     var mainElement = composeView.getElement();
     if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
         return;
@@ -32,11 +26,12 @@ function setupFixer(composeView: ComposeViewDriver){
         .debounce(100, {immediate:true})
         .takeUntilBy(composeView.getStopper())
         .onValue(() => {
-            updatable.doFixing(composeView, bodyElement, fixupCursorFunction);
+            doFixing(composeView, bodyElement, fixupCursorFunction);
         });
-}
+});
+export default handleComposeLinkChips;
 
-function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
+var doFixing = ud.defn(module, function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
     var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
     var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
 
@@ -48,7 +43,7 @@ function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixu
     chipContainerChain
         .filter(_isOurEnhanced)
         .each(_checkAndRemoveBrokenChip.bind(null, composeView)).value();
-};
+});
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
     var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');

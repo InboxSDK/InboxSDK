@@ -1,17 +1,11 @@
 /* @flow */
 //jshint ignore:start
 
-import _ from 'lodash';
-import Bacon from 'baconjs';
-import * as HMR from '../../../common/hmr-util';
+var _ = require('lodash');
+var ud = require('ud');
+var Bacon = require('baconjs');
 
-var updatable = HMR.makeUpdatable(module, {imp});
-
-export default function insertHTMLatCursor(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
-	return updatable.imp(element, html, oldRange);
-}
-
-function imp(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
+var insertHTMLatCursor = ud.defn(module, function insertHTMLatCursor(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
 	element.focus();
 
 	if (element instanceof HTMLTextAreaElement) {
@@ -90,4 +84,5 @@ function imp(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElemen
 			}
 		}
 	}
-}
+});
+export default insertHTMLatCursor;

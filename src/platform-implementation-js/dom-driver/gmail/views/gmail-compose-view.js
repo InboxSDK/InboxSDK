@@ -7,6 +7,7 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
+var ud = require('ud');
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -19,7 +20,6 @@ import GmailElementGetter from '../gmail-element-getter';
 
 import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
-import * as HMR from '../../../../common/hmr-util';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
@@ -41,7 +41,7 @@ import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/comp
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
-var GmailComposeView = HMR.makeUpdatableFn(module, class GmailComposeView {
+var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_element: HTMLElement;
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;

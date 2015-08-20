@@ -4,11 +4,11 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 var kefirBus = require('kefir-bus');
-import * as HMR from '../../../../common/hmr-util';
+var ud = require('ud');
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDriver {
+var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
   _eventStream: Kefir.Bus;
   _modalContainerElement: HTMLElement;
   _overlayElement: HTMLElement;

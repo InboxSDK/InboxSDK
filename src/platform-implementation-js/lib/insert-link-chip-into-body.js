@@ -4,11 +4,11 @@
 var _ = require('lodash');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
+var ud = require('ud');
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
-import * as HMR from '../../common/hmr-util';
 import autoHtml from 'auto-html';
 
-var updatable = HMR.makeUpdatable(module, {imp});
+var updatable = ud.defobj(module, {imp});
 
 export default function insertLinkChipIntoBody(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
     return updatable.imp(composeViewDriver, options);

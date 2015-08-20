@@ -8,13 +8,13 @@ var Bacon = require('baconjs');
 var Kefir = require('kefir');
 import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
+var ud = require('ud');
 
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
-import * as HMR from '../../../common/hmr-util';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
@@ -31,7 +31,7 @@ import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';
 
-var InboxDriver = HMR.makeUpdatableFn(module, class InboxDriver {
+var InboxDriver = ud.defn(module, class InboxDriver {
   _logger: Logger;
   _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
