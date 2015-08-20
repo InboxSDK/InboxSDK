@@ -23,6 +23,15 @@ function ModalView(options){
         self._driver = null;
         self.emit('destroy');
     });
+
+    if(
+      _.chain(options.buttons||[])
+       .pluck('type')
+       .filter(function(type){return type === 'PRIMARY_ACTION';})
+       .value().length > 1
+     ) {
+       throw new Error('At most one primary button is allowed');
+     }
 }
 
 ModalView.prototype = Object.create(EventEmitter.prototype);

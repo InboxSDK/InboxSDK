@@ -25,6 +25,7 @@ import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutatio
 import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
 import InboxPageCommunicator from './inbox-page-communicator';
+import InboxModalView from './views/inbox-modal-view';
 import type ButterBar from '../../platform-implementation/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -240,8 +241,8 @@ var InboxDriver = HMR.makeUpdatableFn(module, class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createModalViewDriver(options: Object): Object {
-    throw new Error("Not implemented");
+  createModalViewDriver(options: Object): InboxModalView {
+    return new InboxModalView(options);
   }
 });
 export default InboxDriver;

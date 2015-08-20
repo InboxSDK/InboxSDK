@@ -4,11 +4,10 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 var kefirBus = require('kefir-bus');
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import * as HMR from '../../../../common/hmr-util';
-import ButtonView from './buttons/button-view';
-import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDriver {
+var InboxModalView = HMR.makeUpdatableFn(module, class InboxModalView {
   _eventStream: Kefir.Bus;
   _modalContainerElement: HTMLElement;
   _overlayElement: HTMLElement;
@@ -19,7 +18,15 @@ var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDrive
 
     this._processOptions(options);
     this._eventStream = kefirBus();
-    this._setupEventStream();
+
+    var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
+
+    closeElement.addEventListener('click', event => {
+      this._eventStream.emit({
+        eventName: 'closeClick',
+        domEvent: event
+      });
+    });
   }
 
   destroy() {
@@ -58,16 +65,19 @@ var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDrive
   }
 
   setButtons(buttons: Object[]) {
-    this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').innerHTML = '';
-
-    if (buttons.length === 0) {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = 'none';
-    } else {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = '';
-    }
-
+    var buttonContainer = this._modalContainerElement.querySelector('.inboxsdk__modal_buttons');
+    buttonContainer.innerHTML = '';
     _.sortBy(buttons, button => button.orderHint || 0)
-      .forEach(this._addButton.bind(this, this._modalContainerElement.querySelector('.inboxsdk__modal_buttons')));
+      .forEach(buttonDescriptor => {
+        var buttonEl = document.createElement('input');
+        buttonEl.type = 'button';
+        buttonEl.value = buttonDescriptor.text;
+        buttonEl.addEventListener('click', event => {
+          event.preventDefault();
+          buttonDescriptor.onClick.call(null);
+        });
+        buttonContainer.appendChild(buttonEl);
+      });
   }
 
   setChrome(chrome: boolean) {
@@ -80,7 +90,7 @@ var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDrive
 
   _setupOverlayElement() {
     this._overlayElement = document.createElement('div');
-    this._overlayElement.className = 'Kj-JD-Jh inboxsdk__modal_overlay';
+    this._overlayElement.className = 'inboxsdk__modal_overlay';
   }
 
   _setupModalContainerElement() {
@@ -88,46 +98,19 @@ var GmailModalViewDriver = HMR.makeUpdatableFn(module, class GmailModalViewDrive
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
 
     var htmlString = `
-    <div class="Kj-JD inboxsdk__modal_container" tabindex="0" role="alertdialog">
-      <div class="Kj-JD-K7 Kj-JD-K7-GIHV4 inboxsdk__modal_toprow">
-        <span class="Kj-JD-K7-K0" role="heading"></span>
-        <span class="Kj-JD-K7-Jq inboxsdk__modal_close" tabindex="0" role="button"></span>
+    <div class="inboxsdk__modal_container" tabindex="0" role="alertdialog">
+      <div class="inboxsdk__modal_toprow">
+        <span role="heading"></span>
+        <span class="inboxsdk__modal_close" tabindex="0" role="button"></span>
       </div>
-      <div class="Kj-JD-Jz inboxsdk__modal_content">
+      <div class="inboxsdk__modal_content">
       </div>
-      <div class="Kj-JD-Jl inboxsdk__modal_buttons"></div>
+      <div class="inboxsdk__modal_buttons"></div>
     </div>
     `;
 
     this._modalContainerElement.innerHTML = htmlString;
   }
-
-  _addButton(buttonContainer: HTMLElement, buttonDescriptor: Object) {
-    var buttonOptions = _.clone(buttonDescriptor);
-    buttonOptions.buttonColor = (buttonDescriptor.type === 'PRIMARY_ACTION' ? 'blue' : 'default');
-
-    var buttonView = new ButtonView(buttonOptions);
-
-    buttonOptions.buttonView = buttonView;
-    var buttonViewController = new BasicButtonViewController(buttonOptions);
-
-    if (buttonDescriptor.type === 'PRIMARY_ACTION') {
-      buttonContainer.insertBefore(buttonView.getElement(), (buttonContainer.firstElementChild:any));
-    } else {
-      buttonContainer.appendChild(buttonView.getElement());
-    }
-  }
-
-  _setupEventStream() {
-    var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
-
-    closeElement.addEventListener('click', event => {
-      this._eventStream.emit({
-        eventName: 'closeClick',
-        domEvent: event
-      });
-    });
-  }
 });
 
-export default GmailModalViewDriver;
+export default InboxModalView;
