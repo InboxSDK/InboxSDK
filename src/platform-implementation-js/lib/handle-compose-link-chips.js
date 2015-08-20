@@ -31,7 +31,7 @@ var handleComposeLinkChips = ud.defn(module, function handleComposeLinkChips(com
 });
 export default handleComposeLinkChips;
 
-var doFixing = ud.defn(module, function doFixing(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
+var doFixing = ud.defn(module, function(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
     var chips = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
     var chipContainerChain =  _.chain(chips).map(x => x.parentElement);
 
@@ -43,7 +43,7 @@ var doFixing = ud.defn(module, function doFixing(composeView: ComposeViewDriver,
     chipContainerChain
         .filter(_isOurEnhanced)
         .each(_checkAndRemoveBrokenChip.bind(null, composeView)).value();
-});
+}, 'doFixing');
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
     var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');

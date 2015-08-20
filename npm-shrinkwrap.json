@@ -5946,8 +5946,8 @@
       "resolved": "https://registry.npmjs.org/stdio/-/stdio-0.2.7.tgz"
     },
     "ud": {
-      "version": "1.0.0",
-      "from": "ud@>=1.0.0 <2.0.0"
+      "version": "1.0.1",
+      "from": "ud@>=1.0.1 <2.0.0"
     },
     "vinyl-source-stream": {
       "version": "1.1.0",
