@@ -8,13 +8,7 @@ var ud = require('ud');
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 import autoHtml from 'auto-html';
 
-var updatable = ud.defobj(module, {imp});
-
-export default function insertLinkChipIntoBody(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
-    return updatable.imp(composeViewDriver, options);
-}
-
-function imp(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
+var insertLinkChipIntoBody = ud.defn(module, function(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement {
     composeViewDriver.focus();
 
     var chipElement = _getChipElement(options);
@@ -37,7 +31,8 @@ function imp(composeViewDriver: ComposeViewDriver, options: Object): HTMLElement
     composeViewDriver.focus();
 
     return chipElement;
-}
+});
+export default insertLinkChipIntoBody;
 
 function _getChipElement(options: Object): HTMLElement {
     var chipElement = document.createElement("div");

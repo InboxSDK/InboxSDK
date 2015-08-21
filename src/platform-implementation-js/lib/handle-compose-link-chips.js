@@ -16,10 +16,8 @@ var handleComposeLinkChips = ud.defn(module, function handleComposeLinkChips(com
   _waitToClaim(mainElement)
     .takeUntilBy(composeView.getStopper())
     .onValue(() => {
-      console.log('+ claimed link chip handling');
       mainElement.classList.add('inboxsdk__ensure_link_active');
       composeView.getStopper().onValue(() => {
-        console.log('- unclaimed link chip handling');
         mainElement.classList.remove('inboxsdk__ensure_link_active');
       });
 
@@ -286,8 +284,8 @@ function _fixupBlockquotes(chipElement: HTMLElement) {
         return;
     }
 
-    (chipElement:any).insertAdjacentText('beforebegin', Z_SPACE_CHAR);
-    (chipElement:any).insertAdjacentText('afterend', Z_SPACE_CHAR);
+    chipElement.insertAdjacentHTML('beforebegin', Z_SPACE_CHAR);
+    chipElement.insertAdjacentHTML('afterend', Z_SPACE_CHAR);
 
     (chipElement:any)._previousSpacerTextNode = chipElement.previousSibling;
     (chipElement:any)._nextSpacerTextNode = chipElement.nextSibling;
@@ -313,7 +311,7 @@ function _fixupTriggerZones(chipElement: HTMLElement) {
             if(previousSibling.nodeValue.charAt(previousSibling.nodeValue.length - 1) === Z_SPACE_CHAR){
                 if(inNonTextNode){
                     previousSibling.nodeValue = previousSibling.nodeValue.substring(0, previousSibling.nodeValue.length - 1);
-                    (chipElement:any).insertAdjacentText('beforebegin', Z_SPACE_CHAR);
+                    chipElement.insertAdjacentHTML('beforebegin', Z_SPACE_CHAR);
                 }
             }
             break;
@@ -339,7 +337,7 @@ function _fixupTriggerZones(chipElement: HTMLElement) {
             if(nextSibling.nodeValue.charAt(0) === Z_SPACE_CHAR){
                 if(inNonTextNode){
                     nextSibling.nodeValue = nextSibling.nodeValue.substring(1);
-                    (chipElement:any).insertAdjacentText('afterend', Z_SPACE_CHAR);
+                    chipElement.insertAdjacentHTML('afterend', Z_SPACE_CHAR);
                 }
             }
 
