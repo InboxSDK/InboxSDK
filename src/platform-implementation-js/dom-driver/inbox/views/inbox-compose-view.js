@@ -28,17 +28,18 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   _driver: InboxDriver;
   _eventStream: Kefir.Bus;
   _stopper: Kefir.Stream&{destroy:()=>void};
-  _closeBtn: HTMLElement;
-  _minimizeBtn: HTMLElement;
+  _closeBtn: ?HTMLElement;
+  _minimizeBtn: ?HTMLElement;
   _sendBtn: HTMLElement;
   _attachBtn: HTMLElement;
-  _formatBtn: HTMLElement;
+  _formatBtn: ?HTMLElement;
   _bodyEl: HTMLElement;
-  _bodyPlaceholder: HTMLElement;
-  _subjectEl: HTMLInputElement;
+  _bodyPlaceholder: ?HTMLElement;
+  _subjectEl: ?HTMLInputElement;
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastSelectionRange: ?Range;
+  _isInline: boolean;
 
   constructor(driver: InboxDriver, el: HTMLElement) {
     this._element = el;
@@ -47,24 +48,60 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
     this._lastSelectionRange = null;
+    this._isInline = /\.quick_compose_focus$/.test(this._element.getAttribute('jsaction'));
+
+    console.log('new compose, inline:', this._isInline);
+    console.log('el',el);
 
     var hadError = false;
     var bottomAreaElementCount = null;
-    var topBtns = this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button');
-    var sendBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
-    var attachBtns = this._element.querySelectorAll('div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
-    var formatBtns = this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]');
-    var bodyEls = this._element.querySelectorAll('div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
-    var subjectEls = this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
+    var sendBtns = this._element.querySelectorAll(
+      this._isInline ?
+      'div[jsaction] > div[role=button]:not([jsaction])' :
+      'div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
+    var attachBtns = this._element.querySelectorAll(
+      this._isInline ?
+      'div[jsaction] > div[role=button][jsaction$=".attach"]' :
+      'div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
+    var bodyEls = this._element.querySelectorAll(
+      this._isInline ?
+      'div[contenteditable][role=textbox]' :
+      'div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
+
+    var topBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button') : [];
+    var formatBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]') : [];
+    var subjectEls = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]') : [];
+
     try {
-      if (topBtns.length !== 2)
-        throw new Error("compose wrong number of top buttons");
-      if (!/\.close_mole$/.test(topBtns[0].getAttribute('jsaction')))
-        throw new Error("compose close button wrong jsaction")
-      this._closeBtn = topBtns[0];
-      if (!/\.minimize_mole$/.test(topBtns[1].getAttribute('jsaction')))
-        throw new Error("compose minimize button wrong jsaction")
-      this._minimizeBtn = topBtns[1];
+      if (this._isInline) {
+        this._closeBtn = null;
+        this._minimizeBtn = null;
+        this._formatBtn = null;
+        this._bodyPlaceholder = null;
+        this._subjectEl = null;
+      } else {
+        if (topBtns.length !== 2)
+          throw new Error("compose wrong number of top buttons");
+        if (!/\.close_mole$/.test(topBtns[0].getAttribute('jsaction')))
+          throw new Error("compose close button wrong jsaction")
+        this._closeBtn = topBtns[0];
+        if (!/\.minimize_mole$/.test(topBtns[1].getAttribute('jsaction')))
+          throw new Error("compose minimize button wrong jsaction")
+        this._minimizeBtn = topBtns[1];
+        if (formatBtns.length !== 1)
+          throw new Error("compose wrong number of format buttons");
+        this._formatBtn = formatBtns[0];
+        var bodyPlaceholder = this._bodyEl.previousElementSibling;
+        if (!(bodyPlaceholder instanceof HTMLElement) || bodyPlaceholder.nodeName !== 'LABEL')
+          throw new Error(`compose body placeholder wrong type ${bodyPlaceholder && bodyPlaceholder.nodeName}`);
+        this._bodyPlaceholder = bodyPlaceholder;
+        if (subjectEls.length !== 1)
+          throw new Error("compose wrong number of subject elements");
+        var subjectEl = subjectEls[0];
+        if (!(subjectEl instanceof HTMLInputElement))
+          throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
+        this._subjectEl = subjectEl;
+      }
       if (sendBtns.length !== 1)
         throw new Error("compose wrong number of send buttons");
       this._sendBtn = sendBtns[0];
@@ -76,19 +113,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       if (bodyEls.length !== 1)
         throw new Error("compose wrong number of body elements");
       this._bodyEl = bodyEls[0];
-      var bodyPlaceholder = this._bodyEl.previousElementSibling;
-      if (!(bodyPlaceholder instanceof HTMLElement) || bodyPlaceholder.nodeName !== 'LABEL')
-        throw new Error(`compose body placeholder wrong type ${bodyPlaceholder && bodyPlaceholder.nodeName}`);
-      this._bodyPlaceholder = bodyPlaceholder;
-      if (subjectEls.length !== 1)
-        throw new Error("compose wrong number of subject elements");
-      var subjectEl = subjectEls[0];
-      if (!(subjectEl instanceof HTMLInputElement))
-        throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
-      this._subjectEl = subjectEl;
-      if (formatBtns.length !== 1)
-        throw new Error("compose wrong number of format buttons");
-      this._formatBtn = formatBtns[0];
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
@@ -135,6 +159,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         .map(() => ({eventName: 'bodyChanged'}))
     );
 
+    console.log('bodyEl', this._bodyEl);
     handleComposeLinkChips(this);
   }
   destroy() {
@@ -148,13 +173,15 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   // Call this whenever we change the body directly by mucking with the
   // elements.
   _informBodyChanged() {
-    if (this._bodyEl.textContent.length > 0) {
-      this._bodyPlaceholder.style.display = "none";
-    } else {
-      // To do this properly, we have to re-add whatever the visible class is.
-      // It's a bit of work for a pretty minor detail (making the placeholder
-      // re-appear immediately when SDK methods are used to clear a compose).
-      //this._bodyPlaceholder.style.display = "";
+    if (this._bodyPlaceholder) {
+      if (this._bodyEl.textContent.length > 0) {
+        this._bodyPlaceholder.style.display = "none";
+      } else {
+        // To do this properly, we have to re-add whatever the visible class is.
+        // It's a bit of work for a pretty minor detail (making the placeholder
+        // re-appear immediately when SDK methods are used to clear a compose).
+        //this._bodyPlaceholder.style.display = "";
+      }
     }
     this._queueDraftSave();
   }
@@ -179,6 +206,9 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   }
   // returns the format area if it's found and open
   _getFormatArea(): ?HTMLElement {
+    if (this._isInline) {
+      throw new Error("Inline compose views don't have formatting tools");
+    }
     var formatArea = this._element.querySelector('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"] + div > div');
     if (formatArea && formatArea.children.length > 1) {
       return formatArea;
@@ -212,15 +242,26 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     throw new Error("Not implemented");
   }
   close() {
-    simulateClick(this._closeBtn);
+    if (this._isInline) {
+      throw new Error("Not implemented for inline compose");
+    }
+    if (this._closeBtn) {
+      simulateClick(this._closeBtn);
+    }
   }
   send() {
     simulateClick(this._sendBtn);
   }
   minimize() {
+    if (this._isInline) {
+      throw new Error("Not implemented for inline compose views");
+    }
     // TODO
   }
   restore() {
+    if (this._isInline) {
+      throw new Error("Not implemented for inline compose views");
+    }
     // TODO
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
@@ -268,11 +309,11 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     throw new Error("Not implemented");
   }
   isReply(): boolean {
+    if (this._isInline) return true;
     throw new Error("Not implemented");
   }
   isInlineReplyForm(): boolean {
-    // inline reply form support isn't in yet, so it can't be one.
-    return false;
+    return this._isInline;
   }
   getIsFullscreen(): boolean {
     // TODO
@@ -294,9 +335,18 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSubject(): string {
+    if (!this._subjectEl) {
+      throw new Error("InboxSDK: Could not locate subject field");
+    }
     return this._subjectEl.value;
   }
   setSubject(text: string): void {
+    if (this._isInline) {
+      throw new Error("setSubject is not supported for inline compose views");
+    }
+    if (!this._subjectEl) {
+      throw new Error("InboxSDK: Could not locate subject field");
+    }
     this._subjectEl.value = text;
   }
   getToRecipients(): Contact[] {

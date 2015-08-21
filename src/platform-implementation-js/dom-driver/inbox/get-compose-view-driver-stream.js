@@ -29,7 +29,18 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
         // ignore the composes that get removed immediately
         kefirDelayAsap(event)
           .takeUntilBy(event.removalStream)
-      ),
+      )
+      .map(({el,removalStream}) => {
+        var composeEl = el.querySelector('div[role=dialog]');
+        if (!composeEl) {
+          driver.getLogger().error(new Error("compose dialog element not found"), {
+            html: censorHTMLtree(el)
+          });
+          return null;
+        }
+        return {el:composeEl,removalStream};
+      })
+      .filter(Boolean),
     // Inline
     kefirWaitFor(() => document.querySelector('[role=main]'))
       .flatMap(kmakeElementChildStream)
@@ -88,22 +99,10 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
         var closes = expanded.filter(x => !x);
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       })
-      .map(({el,removalStream}) => {
-        console.log('inline compose opened', el.children.length, el);
-        removalStream.take(1).log('inline compose closed')
-      })
-      .filter(()=>false)
   ])
-    .map(kefirElementViewMapper((el: HTMLElement) => {
-      var composeEl = el.querySelector('div[role=dialog]');
-      if (!composeEl) {
-        driver.getLogger().error(new Error("compose dialog element not found"), {
-          html: censorHTMLtree(el)
-        });
-        return null;
-      }
-      return new InboxComposeView(driver, composeEl)
-    }))
+    .map(kefirElementViewMapper((el: HTMLElement) =>
+      new InboxComposeView(driver, el)
+    ))
     .filter(Boolean);
 }
 
