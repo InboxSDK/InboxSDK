@@ -3,7 +3,7 @@
 
 var _ = require('lodash');
 var Kefir = require('kefir');
-import * as HMR from '../../../common/hmr-util';
+import udKefir from 'ud-kefir';
 import kefirWaitFor from '../../lib/kefir-wait-for';
 import kefirDelayAsap from '../../lib/kefir-delay-asap';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -14,7 +14,7 @@ import InboxComposeView from './views/inbox-compose-view';
 import type InboxDriver from './inbox-driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 
-var impStream = HMR.makeUpdatableStream(module, imp);
+var impStream = udKefir(module, imp);
 
 function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return Kefir.merge([
