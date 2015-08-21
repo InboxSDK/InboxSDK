@@ -50,9 +50,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     this._lastSelectionRange = null;
     this._isInline = /\.quick_compose_focus$/.test(this._element.getAttribute('jsaction'));
 
-    console.log('new compose, inline:', this._isInline);
-    console.log('el',el);
-
     var hadError = false;
     var bottomAreaElementCount = null;
     var sendBtns = this._element.querySelectorAll(
@@ -73,6 +70,17 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var subjectEls = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]') : [];
 
     try {
+      if (bodyEls.length !== 1)
+        throw new Error("compose wrong number of body elements");
+      this._bodyEl = bodyEls[0];
+      if (sendBtns.length !== 1)
+        throw new Error("compose wrong number of send buttons");
+      this._sendBtn = sendBtns[0];
+      var bottomArea: HTMLElement = (this._sendBtn.parentElement:any);
+      bottomAreaElementCount = bottomArea.childElementCount;
+      if (attachBtns.length !== 1)
+        throw new Error("compose wrong number of attach buttons");
+      this._attachBtn = attachBtns[0];
       if (this._isInline) {
         this._closeBtn = null;
         this._minimizeBtn = null;
@@ -102,17 +110,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
           throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
         this._subjectEl = subjectEl;
       }
-      if (sendBtns.length !== 1)
-        throw new Error("compose wrong number of send buttons");
-      this._sendBtn = sendBtns[0];
-      var bottomArea: HTMLElement = (this._sendBtn.parentElement:any);
-      bottomAreaElementCount = bottomArea.childElementCount;
-      if (attachBtns.length !== 1)
-        throw new Error("compose wrong number of attach buttons");
-      this._attachBtn = attachBtns[0];
-      if (bodyEls.length !== 1)
-        throw new Error("compose wrong number of body elements");
-      this._bodyEl = bodyEls[0];
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
@@ -216,6 +213,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return null;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
+    // TODO does this work if text is selected
     var html = autoHtml `<a href="${href}">${text}</a>`;
     return this.insertBodyHTMLAtCursor(html);
   }
@@ -282,11 +280,13 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var div = document.createElement('div');
     div.className = 'inboxsdk__compose_actionToolbar';
 
-    var hiddenAttachBtn = this._attachBtn.nextSibling;
-    if (hiddenAttachBtn && hiddenAttachBtn.style.position === 'absolute') {
-      hiddenAttachBtn.style.display = 'none';
-    } else {
-      this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
+    if (!this._isInline) {
+      var hiddenAttachBtn = this._attachBtn.nextSibling;
+      if (hiddenAttachBtn && hiddenAttachBtn.style.position === 'absolute') {
+        hiddenAttachBtn.style.display = 'none';
+      } else {
+        this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
+      }
     }
 
     var sendParent = this._sendBtn.parentElement;
