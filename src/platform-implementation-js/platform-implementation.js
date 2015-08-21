@@ -3,6 +3,7 @@
 
 import _ from 'lodash';
 import SafeEventEmitter from './lib/safe-event-emitter';
+import {BUILD_VERSION} from '../common/version';
 
 import ButterBar from './platform-implementation/butter-bar';
 import Compose from './platform-implementation/compose';
@@ -71,7 +72,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._membraneMap = new WeakMap();
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
-		this.IMPL_VERSION = process.env.VERSION;
+		this.IMPL_VERSION = BUILD_VERSION;
 
 		this.ButterBar = new ButterBar(appId, driver, this._membraneMap);
 		driver.setButterBar(this.ButterBar);
@@ -132,7 +133,7 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 	};
 
 	var LOADER_VERSION: string = opts.VERSION;
-	var IMPL_VERSION: string = process.env.VERSION;
+	var IMPL_VERSION: string = BUILD_VERSION;
 	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 	HMRManager.startWatch();
 

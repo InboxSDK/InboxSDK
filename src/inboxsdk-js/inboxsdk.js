@@ -2,13 +2,14 @@ import assign from 'lodash/object/assign';
 
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 var checkRequirements = require('./check-requirements');
+var BUILD_VERSION = require('../common/version').BUILD_VERSION;
 
 /**
 * @class
 * The functions in this class are only used for load related functionality like loading the SDK itself or other external scripts.
 */
 var InboxSDK = {
-  LOADER_VERSION: process.env.VERSION
+  LOADER_VERSION: BUILD_VERSION
 };
 
 /**
