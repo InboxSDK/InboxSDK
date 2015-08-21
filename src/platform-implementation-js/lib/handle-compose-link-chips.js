@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 var ud = require('ud');
+import kmakeMutationObserverChunkedStream from './dom/kefir-make-mutation-observer-chunked-stream';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 var extId = ''+Math.random();
@@ -11,23 +12,29 @@ var extId = ''+Math.random();
 var Z_SPACE_CHAR = '\u200b';
 
 var handleComposeLinkChips = ud.defn(module, function handleComposeLinkChips(composeView: ComposeViewDriver) {
-    var mainElement = composeView.getElement();
-    if(mainElement.classList.contains('inboxsdk__ensure_link_active')){
-        return;
-    }
-    mainElement.classList.add('inboxsdk__ensure_link_active');
+  var mainElement = composeView.getElement();
+  _waitToClaim(mainElement)
+    .takeUntilBy(composeView.getStopper())
+    .onValue(() => {
+      console.log('+ claimed link chip handling');
+      mainElement.classList.add('inboxsdk__ensure_link_active');
+      composeView.getStopper().onValue(() => {
+        console.log('- unclaimed link chip handling');
+        mainElement.classList.remove('inboxsdk__ensure_link_active');
+      });
 
-    var bodyElement = composeView.getBodyElement();
-    var fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
+      var bodyElement = composeView.getBodyElement();
+      var fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
 
-    composeView.getEventStream()
+      composeView.getEventStream()
         .filter(event => event.eventName === 'bodyChanged')
         .toProperty(()=>null)
         .debounce(100, {immediate:true})
         .takeUntilBy(composeView.getStopper())
         .onValue(() => {
-            doFixing(composeView, bodyElement, fixupCursorFunction);
+          doFixing(composeView, bodyElement, fixupCursorFunction);
         });
+    });
 });
 export default handleComposeLinkChips;
 
@@ -44,6 +51,15 @@ var doFixing = ud.defn(module, function(composeView: ComposeViewDriver, bodyElem
         .filter(_isOurEnhanced)
         .each(_checkAndRemoveBrokenChip.bind(null, composeView)).value();
 }, 'doFixing');
+
+function _waitToClaim(el: HTMLElement): Kefir.Stream {
+	return Kefir.later(0).merge(
+			kmakeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['class']})
+		)
+		.map(() => !el.classList.contains('inboxsdk__ensure_link_active'))
+		.filter(Boolean)
+		.take(1);
+}
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
     var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
