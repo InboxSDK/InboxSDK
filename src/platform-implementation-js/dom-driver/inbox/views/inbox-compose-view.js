@@ -2,10 +2,12 @@
 //jshint ignore:start
 
 var _ = require('lodash');
+var ud = require('ud');
 var RSVP = require('rsvp');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
+var autoHtml = require('auto-html');
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -21,7 +23,7 @@ import {
   isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
-export default class InboxComposeView {
+var InboxComposeView = ud.defn(module, class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _eventStream: Kefir.Bus;
@@ -184,45 +186,8 @@ export default class InboxComposeView {
     return null;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
-    this.focus();
-    var formatArea = this._getFormatArea();
-    var formatAreaOpenAtStart = !!formatArea;
-    if (!formatArea) {
-      simulateClick(this._formatBtn);
-      formatArea = this._getFormatArea();
-    }
-    if (!formatArea) throw new Error("Couldn't open format area");
-    try {
-      var linkButton = formatArea.querySelector('div[role=button][id$="link"]');
-      if (!linkButton) throw new Error("Couldn't find link button");
-      simulateClick(linkButton);
-      var dialog = document.body.querySelector('body > div[role=dialog]');
-      if (!dialog) {
-        // If the cursor was next to a link, then the first click unlinks that.
-        // Same thing in Gmail. TODO fix.
-        simulateClick(linkButton);
-        dialog = document.body.querySelector('body > div[role=dialog]');
-      }
-      if (!dialog) throw new Error("Couldn't find dialog");
-      var ok = dialog.querySelector('button[name=ok]');
-      if (!ok) throw new Error("Couldn't find ok");
-      var textInput = dialog.querySelector('input#linkdialog-text');
-      if (!textInput || !(textInput instanceof HTMLInputElement))
-        throw new Error("Couldn't find text input");
-      var urlInput = dialog.querySelector('input[type=url]');
-      if (!urlInput || !(urlInput instanceof HTMLInputElement))
-        throw new Error("Couldn't find url input");
-      textInput.value = text;
-      textInput.dispatchEvent(new Event("input"));
-      urlInput.value = href;
-      urlInput.dispatchEvent(new Event("input"));
-      simulateClick(ok);
-    } finally {
-      if (!formatAreaOpenAtStart) {
-        simulateClick(this._formatBtn);
-      }
-    }
-    this._informBodyChanged();
+    var html = autoHtml `<a href="${href}">${text}</a>`;
+    return this.insertBodyHTMLAtCursor(html);
   }
   insertLinkChipIntoBody(options: {iconUrl?: string, url: string, text: string}): HTMLElement {
     var retval = insertLinkChipIntoBody(this, options);
@@ -362,7 +327,8 @@ export default class InboxComposeView {
   closeButtonTooltip(buttonViewController: Object) {
     (buttonViewController:InboxComposeButtonView).closeTooltip();
   }
-}
+});
+export default InboxComposeView;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
