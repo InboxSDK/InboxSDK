@@ -156,7 +156,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         .map(() => ({eventName: 'bodyChanged'}))
     );
 
-    console.log('bodyEl', this._bodyEl);
     handleComposeLinkChips(this);
   }
   destroy() {
