@@ -113,6 +113,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     } catch(err) {
       hadError = true;
       this._driver.getLogger().error(err, {
+        isInline: this._isInline,
         topBtnsLength: topBtns.length,
         sendBtnsLength: sendBtns.length,
         attachBtnsLength: attachBtns.length,
@@ -122,7 +123,10 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       });
     }
 
-    this._driver.getLogger().eventSite('compose open', {hadError, bottomAreaElementCount});
+    this._driver.getLogger().eventSite('compose open', {
+      hadError, bottomAreaElementCount,
+      isInline: this._isInline
+    });
 
     var draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
@@ -212,7 +216,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return null;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
-    // TODO does this work if text is selected
     var html = autoHtml `<a href="${href}">${text}</a>`;
     return this.insertBodyHTMLAtCursor(html);
   }

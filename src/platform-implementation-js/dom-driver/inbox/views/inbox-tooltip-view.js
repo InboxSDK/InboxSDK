@@ -2,12 +2,13 @@
 //jshint ignore:start
 
 var _ = require('lodash');
+var ud = require('ud');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import containByScreen from '../../../lib/dom/contain-by-screen2';
 
-export default class InboxTooltipView {
+var InboxTooltipView = ud.defn(module, class InboxTooltipView {
   _target: HTMLElement;
   _el: HTMLElement;
   _contentEl: HTMLElement;
@@ -66,6 +67,17 @@ export default class InboxTooltipView {
     this._el.addEventListener('load', event => {
       this._updatePosition(true);
     }, true);
+
+    Kefir.interval(200)
+      .takeUntilBy(this._stopper)
+      .map(() => target.getBoundingClientRect())
+      .skipDuplicates((a:ClientRect,b:ClientRect) =>
+        a.top === b.top && a.left === b.left && a.right === b.right &&
+        a.bottom === b.bottom
+      )
+      .onValue(() => {
+        this._updatePosition();
+      });
   }
 
   destroy() {
@@ -98,6 +110,10 @@ export default class InboxTooltipView {
       forceVAlign: true,
       buffer: 4
     });
+    ['top','bottom','left','right'].forEach(x => {
+      this._arrowEl.classList.remove('inboxsdk__'+x);
+    });
+    this._arrowEl.classList.add('inboxsdk__'+position);
     if (noTransition) {
       this._el.offsetHeight; // Trigger a reflow, flushing the CSS changes
       this._arrowEl.offsetHeight;
@@ -106,4 +122,5 @@ export default class InboxTooltipView {
       this._arrowEl.classList.remove('inboxsdk__notransition');
     }
   }
-}
+});
+export default InboxTooltipView;
