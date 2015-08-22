@@ -23,6 +23,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 				onClick: function(event){
 					monkeyIndex++;
 					buttonOptions.iconUrl = monkeyImages[monkeyIndex%2];
+					buttonOptions.iconClass = monkeyIndex%2 ? 'special_style' : '';
 
 					if (monkeyIndex >= 2) {
 						sinkFunction(null);
@@ -44,6 +45,19 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 
 			return function(){};
 
+		}));
+
+		composeView.addButton(Bacon.fromBinder(function(sink){
+			var buttonOptions = {
+				title: 'no image',
+				iconClass: 'cssbutton',
+				onClick: function(event) {
+					buttonOptions.iconClass = buttonOptions.iconClass==='cssbutton' ? 'cssbutton afterclick' : 'cssbutton';
+					sink(buttonOptions);
+				}
+			};
+			sink(buttonOptions);
+			return function(){};
 		}));
 
 		composeView.addButton({

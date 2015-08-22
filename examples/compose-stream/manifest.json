@@ -8,8 +8,9 @@
         "https://mail.google.com/*",
         "https://inbox.google.com/*"
       ],
+      "css": ["content.css"],
       "js": ["inboxsdk.js","bacon.js", "content.js"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "permissions": [

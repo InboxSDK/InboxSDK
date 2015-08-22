@@ -3,6 +3,8 @@
 
 var _ = require('lodash');
 var Bacon = require('baconjs');
+import Logger from '../../../../lib/logger';
+import * as ud from 'ud';
 import simulateHover from '../../../../lib/dom/simulate-hover';
 var keyboardShortcutStream = require('../../../../lib/dom/keyboard-shortcut-stream');
 import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
@@ -22,12 +24,12 @@ export type ButtonViewOptions = {
 	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
 };
 
-export default class ButtonView {
+var ButtonView = ud.defn(module, class ButtonView {
 	_element: HTMLElement;
 	_innerElement: any;
 	_textElement: any;
-	_iconElement: any;
-	_iconImgElement: any;
+	_iconElement: ?HTMLElement;
+	_iconImgElement: ?HTMLImageElement;
 	_iconClass: ?string;
 	_iconUrl: ?string;
 	_title: ?string;
@@ -192,30 +194,39 @@ export default class ButtonView {
 			return;
 		}
 
-		this._iconElement = document.createElement('div');
-		this._iconElement.classList.add('inboxsdk__button_icon');
-		this._iconElement.innerHTML = '&nbsp;';
+		var iconElement = this._iconElement = document.createElement('div');
+		iconElement.classList.add('inboxsdk__button_icon');
+		iconElement.innerHTML = '&nbsp;';
 
 		if(this._iconClass){
-			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);
+			iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);
 		}
 
 		if(this._iconUrl){
 			this._createIconImgElement();
 		}
 
-		this._innerElement.insertBefore(this._iconElement, this._innerElement.firstElementChild);
+		this._innerElement.insertBefore(iconElement, this._innerElement.firstElementChild);
 	}
 
 	_createIconImgElement(){
-		this._iconElement.innerHTML = '';
+		if (!this._iconElement) {
+			this._createIconElement();
+		}
+		var iconElement = this._iconElement;
+		if (!iconElement) throw new Error("Should not happen");
+		iconElement.innerHTML = '';
 
-		this._iconImgElement = document.createElement('img');
-		this._iconImgElement.classList.add('inboxsdk__button_iconImg');
+		var iconImgElement = this._iconImgElement = document.createElement('img');
+		iconImgElement.classList.add('inboxsdk__button_iconImg');
 
-		this._iconImgElement.src = this._iconUrl;
+		if (this._iconUrl) {
+			iconImgElement.src = this._iconUrl;
+		} else {
+			Logger.error(new Error('_createIconImgElement should not be called with null _iconUrl'));
+		}
 
-		this._iconElement.appendChild(this._iconImgElement);
+		iconElement.appendChild(iconImgElement);
 	}
 
 	_updateButtonColor(newButtonColor: string){
@@ -253,38 +264,28 @@ export default class ButtonView {
 	}
 
 	_updateIconUrl(newIconUrl: ?string){
-		if(!this._iconUrl && newIconUrl){
-			this._iconUrl = newIconUrl;
-			this._createIconImgElement();
-		}
-		else if(this._iconUrl && !newIconUrl){
+		this._iconUrl = newIconUrl;
+		if (this._iconImgElement && !newIconUrl) {
 			(this._iconImgElement:Object).remove();
 			this._iconImgElement = null;
-			this._iconUrl = newIconUrl;
+		} else if (!this._iconImgElement && newIconUrl) {
+			this._createIconImgElement();
 		}
-		else{
+		if (this._iconImgElement && newIconUrl) {
 			this._iconImgElement.src = newIconUrl;
-			this._iconUrl = newIconUrl;
 		}
 	}
 
 	_updateIconClass(newIconClass: ?string){
-		if(!this._iconElement && newIconClass){
+		if (this._iconElement && !newIconClass && !this._iconUrl) {
+			(this._iconElement:Object).remove();
+			this._iconElement = null;
+		} else if (!this._iconElement && newIconClass) {
 			this._createIconElement();
 		}
-		else if(this._iconClass && !newIconClass){
-			if(!this._iconUrl){
-				(this._iconElement:Object).remove();
-				this._iconClass = newIconClass;
-			}
-			else{
-				this._iconElement.setAttribute('class', 'inboxsdk__button_icon ');
-				this._iconClass = newIconClass;
-			}
-		}
-		else if (!this._iconClass && newIconClass) {
-			this._iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
-			this._iconClass = newIconClass;
+		this._iconClass = newIconClass;
+		if (this._iconElement) {
+			this._iconElement.setAttribute('class', 'inboxsdk__button_icon '+(newIconClass||''));
 		}
 	}
 
@@ -386,4 +387,5 @@ export default class ButtonView {
 				this._element.classList.remove('inboxsdk__button_hover');
 			});
 	}
-}
+});
+export default ButtonView;
