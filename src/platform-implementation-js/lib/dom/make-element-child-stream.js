@@ -25,16 +25,16 @@ export default function makeElementChildStream(element: HTMLElement): Bacon.Obse
       var toSink = [];
       for (var i=0; i < len; i++) {
         var el = els[i];
-        if (el.nodeType === 1) {
-          var removalStream = new Bacon.Bus();
-          removalStreams.set(el, removalStream);
-          toSink.push(new Bacon.Next({el, removalStream}));
-        }
+        if (el.nodeType !== 1) continue;
+        var removalStream = new Bacon.Bus();
+        removalStreams.set(el, removalStream);
+        toSink.push(new Bacon.Next({el, removalStream}));
       }
       sink(toSink);
     }
 
     function removedEl(el) {
+      if (el.nodeType !== 1) return;
       var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
