@@ -3,7 +3,7 @@
 
 import _ from 'lodash';
 import assert from 'assert';
-import logError from '../log-error';
+import * as logger from '../injected-logger';
 import {cleanupPeopleLine} from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 export type ThreadRowMetadata = {
@@ -53,7 +53,7 @@ export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowM
     errors.push('failed to find peopleDiv');
   }
   if (errors.length) {
-    logError(new Error("Errors in thread row parsing"), {errors});
+    logger.error(new Error("Errors in thread row parsing"), {errors});
   }
 
   return {

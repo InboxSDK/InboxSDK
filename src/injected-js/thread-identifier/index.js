@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
-import logError from '../log-error';
+import * as logger from '../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
 import Marker from '../../common/marker';
@@ -49,7 +49,7 @@ function processPreloadedThreads() {
     return script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1;
   });
   if (!preloadScript) {
-    logError(new Error("Could not read preloaded VIEW_DATA"));
+    logger.error(new Error("Could not read preloaded VIEW_DATA"));
   } else {
     processThreadListResponse(preloadScript.text);
   }

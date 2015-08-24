@@ -55,7 +55,7 @@ class Logger {
   constructor(appId: string, opts: any, loaderVersion: string, implVersion: string) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
     this._appId = appId;
-    this._isMaster = (function() {
+    this._isMaster = (() => {
       if (
         !_extensionUseEventTracking || (
           global.document &&
@@ -67,6 +67,21 @@ class Logger {
         return true;
       }
     })();
+
+    if (this._isMaster && global.document) {
+      document.addEventListener('inboxSDKinjectedError', event => {
+        var detail = event.detail;
+        this.error(
+          _.assign(new Error(detail.message), {stack: detail.stack}),
+          detail.details
+        );
+      });
+
+      document.addEventListener('inboxSDKinjectedEventSdkPassive', event => {
+        var detail = event.detail;
+        this.eventSdkPassive(detail.name, detail.details);
+      });
+    }
   }
 
   setUserEmailAddress(email: string) {
@@ -474,13 +489,5 @@ if (_extensionIsLoggerMaster && global.document) {
     }).catch(function(err) {
       console.error("Failed to log event", err);
     });
-  });
-
-  document.addEventListener('inboxSDKinjectedError', function(event) {
-    var detail = event.detail;
-    Logger.error(
-      _.assign(new Error(detail.message), {stack: detail.stack}),
-      detail.details
-    );
   });
 }

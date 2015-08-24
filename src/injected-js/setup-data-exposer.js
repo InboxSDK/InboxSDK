@@ -2,7 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
-import logError from './log-error';
+import * as logger from './injected-logger';
 import waitFor from '../platform-implementation-js/lib/wait-for';
 
 declare var GLOBALS: any[];
@@ -40,7 +40,7 @@ module.exports = function() {
       var globalSettingsHolder = _.find(GLOBALS[17], (item) => item[0] === 'p');
 
       if(!globalSettingsHolder){
-        logError(new Error('failed to find globalSettings'), {
+        logger.error(new Error('failed to find globalSettings'), {
           GLOBALSpresent: !!global.GLOBALS,
           GLOBALS17present: !!(global.GLOBALS && GLOBALS[17])
         });
@@ -57,5 +57,21 @@ module.exports = function() {
         }
       }
     }
-  }).catch(logError);
+  }).catch(err => {
+    function getStatus() {
+      return {
+        hasGLOBALS: !!global.GLOBALS,
+        hasGbar: !!global.gbar
+      };
+    }
+    var startStatus = getStatus();
+    var waitTime = 180*1000;
+    setTimeout(() => {
+      var laterStatus =  getStatus();
+      logger.eventSdkPassive('global waitfor data', {
+        startStatus, waitTime, laterStatus
+      });
+    }, waitTime);
+    throw err;
+  }).catch(logger.error);
 };

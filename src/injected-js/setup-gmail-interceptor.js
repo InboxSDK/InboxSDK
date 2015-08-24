@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import RSVP from 'rsvp';
-import logError from './log-error';
+import * as logger from './injected-logger';
 import XHRProxyFactory from './xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
@@ -10,7 +10,7 @@ import modifySuggestions from './modify-suggestions';
 function logErrorExceptEventListeners(err, details) {
   // Don't log Gmail's errors
   if (details !== 'XMLHttpRequest event listener error') {
-    logError(err, details);
+    logger.error(err, details);
   } else {
     setTimeout(function() {
       // let window.onerror log this

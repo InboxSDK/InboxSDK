@@ -1,7 +1,7 @@
 if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
 
-  const logError = require('./log-error');
+  const logger = require('./injected-logger');
   var oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
@@ -37,7 +37,7 @@ if (!global.__InboxSDKInjected) {
     setupEventReemitter();
     setupErrorSilencer();
   } catch(err) {
-    logError(err);
+    logger.error(err);
   } finally {
     if (oldDefine) {
       define = oldDefine;

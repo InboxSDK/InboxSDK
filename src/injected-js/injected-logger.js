@@ -1,7 +1,7 @@
 /* @flow */
 // jshint ignore:start
 
-export default function logError(err: Error, details?: any) {
+export function error(err: Error, details?: any) {
   if (!err) {
     err = new Error("No error given");
   }
@@ -20,5 +20,19 @@ export default function logError(err: Error, details?: any) {
       stack: err && err.stack,
       details
     }
+  }));
+}
+
+export function eventSdkPassive(name: string, details?: any) {
+  try {
+    JSON.stringify(details);
+  } catch (e) {
+    details = "<failed to jsonify>";
+  }
+
+  document.dispatchEvent(new CustomEvent('inboxSDKinjectedEventSdkPassive', {
+    bubbles: false,
+    cancelable: false,
+    detail: {name, details}
   }));
 }
