@@ -21,6 +21,10 @@ source files for changes to trigger rebuilds of the bundle automatically
 (`--reload`). (Note that in order to run gulp manually, you'll need to install
 it globally by running `npm install -g gulp` first.)
 
+The `-h` (`--hot`) flag is also available, which uses
+[Browserify-HMR](https://github.com/AgentME/browserify-hmr) to make code
+changes be hot-reloadable into a running extension.
+
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
 
