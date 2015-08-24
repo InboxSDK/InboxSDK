@@ -100,17 +100,30 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       // If we get here, it's probably because of a waitFor timeout caused by
       // us failing to find the compose parent. Let's log the results of a few
       // similar selectors to see if our selector was maybe slightly wrong.
-      this._logger.error(err, {
-        regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
-        noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]').length,
-        noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
-        // We can use class names for logging heuristics. Don't want to use
-        // them anywhere else.
-        classLength: document.querySelectorAll('div.ek div.md > div').length,
-        classEkLength: document.querySelectorAll('.ek').length,
-        classMdLength: document.querySelectorAll('.md').length,
-        composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
-      });
+      function getStatus() {
+        return {
+          mainLength: document.querySelectorAll('[role=main]').length,
+          regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
+          noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]').length,
+          noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
+          // We can use class names for logging heuristics. Don't want to use
+          // them anywhere else.
+          classLength: document.querySelectorAll('div.ek div.md > div').length,
+          classEkLength: document.querySelectorAll('.ek').length,
+          classMdLength: document.querySelectorAll('.md').length,
+          composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
+        };
+      }
+
+      var startStatus = getStatus();
+      var waitTime = 180*1000;
+      this._logger.error(err, startStatus);
+      setTimeout(() => {
+        var laterStatus =  getStatus();
+        this._logger.eventSdkPassive('waitfor compose data', {
+          startStatus, waitTime, laterStatus
+        });
+      }, waitTime);
     });
   }
 

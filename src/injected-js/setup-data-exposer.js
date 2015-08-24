@@ -68,7 +68,7 @@ module.exports = function() {
     var waitTime = 180*1000;
     setTimeout(() => {
       var laterStatus =  getStatus();
-      logger.eventSdkPassive('global waitfor data', {
+      logger.eventSdkPassive('waitfor global data', {
         startStatus, waitTime, laterStatus
       });
     }, waitTime);
