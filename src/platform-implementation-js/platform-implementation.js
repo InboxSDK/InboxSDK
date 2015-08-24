@@ -18,7 +18,6 @@ import Search from './platform-implementation/search';
 import Toolbars from './platform-implementation/toolbars';
 import User from './platform-implementation/user';
 
-import HMRManager from '../common/hmr-manager';
 import GmailDriver from './dom-driver/gmail/gmail-driver';
 import InboxDriver from './dom-driver/inbox/inbox-driver';
 import Logger from './lib/logger';
@@ -135,7 +134,6 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 	var LOADER_VERSION: string = opts.VERSION;
 	var IMPL_VERSION: string = BUILD_VERSION;
 	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
-	HMRManager.startWatch();
 
 	var origin: string = (document.location: any).origin;
 	var DriverClass = DRIVERS_BY_ORIGIN[origin];
