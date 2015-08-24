@@ -8,6 +8,7 @@ var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
 var autoHtml = require('auto-html');
+import censorHTMLstring from '../../../../common/censor-html-string';
 import kefirDelayAsap from '../../../lib/kefir-delay-asap';
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -119,7 +120,8 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         attachBtnsLength: attachBtns.length,
         formatBtnsLength: formatBtns.length,
         bodyElsLength: bodyEls.length,
-        subjectElsLength: subjectEls.length
+        subjectElsLength: subjectEls.length,
+        html: censorHTMLstring(this._element.innerHTML)
       });
     }
 
