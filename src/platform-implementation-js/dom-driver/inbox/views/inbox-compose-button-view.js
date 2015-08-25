@@ -91,6 +91,9 @@ var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
   }
 
   showTooltip(tooltipDescriptor: TooltipDescriptor) {
+    if (this._composeView.isInlineReplyForm()) {
+      throw new Error("Tooltips not supported in Inbox inline compose");
+    }
     if (this._tooltip) {
       this.closeTooltip();
     }

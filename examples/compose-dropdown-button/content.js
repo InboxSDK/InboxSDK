@@ -10,7 +10,9 @@ InboxSDK.load(1, 'simple-example', {
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
 			onClick: function(event){
-				composeView.setSubject('foo<b>ar');
+				if (!composeView.isInlineReplyForm() || document.location.origin !== 'https://inbox.google.com') {
+					composeView.setSubject('foo<b>ar');
+				}
 				event.dropdown.el.innerHTML = 'hello world!';
 			}
 		});
