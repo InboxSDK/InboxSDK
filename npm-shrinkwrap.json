@@ -6733,8 +6733,8 @@
       "resolved": "https://registry.npmjs.org/stdio/-/stdio-0.2.7.tgz"
     },
     "ud": {
-      "version": "1.0.3",
-      "from": "ud@>=1.0.3 <2.0.0"
+      "version": "1.0.4",
+      "from": "ud@>=1.0.4 <2.0.0"
     },
     "ud-kefir": {
       "version": "1.0.0",
