@@ -2,6 +2,7 @@ var _ = require('lodash');
 var asap = require('asap');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+var ud = require('ud');
 var Kefir = require('kefir');
 
 var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
@@ -52,17 +53,17 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	if(!placementOptions || !placementOptions.manualPosition){
 		asap(() => {
 			if (!this.closed) {
-				var contentEl = dropdownViewDriver.getContainerElement();
-				containByScreen(contentEl, anchorElement, placementOptions);
+				var containerEl = dropdownViewDriver.getContainerElement();
 
-				kefirMakeMutationObserverChunkedStream(contentEl, {
+				kefirMakeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
 					childList: true, attributes: true,
 					characterData: true, subtree: true
 				})
+					.toProperty(()=>null)
 					.throttle(200)
 					.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-					.onValue(function() {
-						containByScreen(contentEl, anchorElement, placementOptions);
+					.onValue(function(event) {
+						containByScreen(containerEl, anchorElement, placementOptions);
 					});
 			}
 		});
@@ -90,5 +91,7 @@ _.assign(DropdownView.prototype, /** @lends DropdownView */ {
 	 * @event DropdownView#destroy
 	 */
 });
+
+DropdownView = ud.defn(module, DropdownView);
 
 module.exports = DropdownView;
