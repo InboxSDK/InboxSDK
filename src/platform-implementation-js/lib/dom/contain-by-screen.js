@@ -35,7 +35,7 @@ export default function containByScreen(element: HTMLElement, anchorPoint: HTMLE
     var $element = $(element);
     var $anchorPoint = $(anchorPoint);
 
-    var elementOffset = $element.offset();
+    var elementOffset = toOffset(element.getBoundingClientRect());
     var elementSizeBox = {
         width: $element.outerWidth(),
         height: $element.outerHeight(),
@@ -50,7 +50,7 @@ export default function containByScreen(element: HTMLElement, anchorPoint: HTMLE
         elementSizeBox.height += options.heightBuffer;
     }
 
-    var anchorOffset = $anchorPoint.offset();
+    var anchorOffset = toOffset(anchorPoint.getBoundingClientRect());
     var anchorSizeBox = {
         width: $anchorPoint.outerWidth(),
         height: $anchorPoint.outerHeight()
@@ -240,4 +240,8 @@ function isXBounded(containerBB: BoundingBox, containedBB: BoundingBox): boolean
     }
 
     return true;
+}
+
+function toOffset(obj: {top: number, left: number}) {
+	return {top: obj.top, left: obj.left};
 }
