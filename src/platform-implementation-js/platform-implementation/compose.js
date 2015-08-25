@@ -1,13 +1,14 @@
 'use strict';
 
 var _ = require('lodash');
+var ud = require('ud');
 var RSVP = require('rsvp');
 var Bacon = require('baconjs');
 
 var ComposeView = require('../views/compose-view');
 var HandlerRegistry = require('../lib/handler-registry');
 
-var memberMap = new WeakMap();
+var memberMap = ud.defonce(module, ()=>new WeakMap());
 
 /**
 * @class
@@ -28,24 +29,16 @@ var Compose = function(appId, driver){
     members.appId = appId;
     members.driver = driver;
 
-    members.requestedComposeViewDeferred = null;
-
     members.handlerRegistry = new HandlerRegistry();
-    driver.getStopper().onValue(function() {
+    driver.getStopper().onValue(() => {
       members.handlerRegistry.dumpHandlers();
     });
-    members.composeViewStream = members.driver.getComposeViewDriverStream().map(function(viewDriver){
-        return new ComposeView(driver, viewDriver, members.appId);
-    });
+    members.composeViewStream = members.driver.getComposeViewDriverStream().map(viewDriver =>
+      new ComposeView(driver, viewDriver, members.appId, members.composeViewStream)
+    );
 
-    members.composeViewStream.onValue(function(view){
-        if(members.requestedComposeViewDeferred){
-            var deferred = members.requestedComposeViewDeferred;
-            members.requestedComposeViewDeferred = null;
-            deferred.resolve(view);
-        }
-
-        members.handlerRegistry.addTarget(view);
+    members.composeViewStream.onValue(view => {
+      members.handlerRegistry.addTarget(view);
     });
 };
 
@@ -85,12 +78,13 @@ _.extend(Compose.prototype, /** @lends Compose */ {
   },
 
   getComposeView: function(){
-      var members = memberMap.get(this);
-      members.requestedComposeViewDeferred = RSVP.defer();
-      members.driver.openComposeWindow();
-
-      return members.requestedComposeViewDeferred.promise;
+    var members = memberMap.get(this);
+    var promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
+    members.driver.openComposeWindow();
+    return promise;
   }
 });
+
+Compose = ud.defn(module, Compose);
 
 module.exports = Compose;

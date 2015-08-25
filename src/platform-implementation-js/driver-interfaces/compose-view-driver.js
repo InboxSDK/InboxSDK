@@ -41,6 +41,7 @@ export type ComposeViewDriver = {
 	send(): void;
 	minimize(): void;
 	restore(): void;
+	popOut(): void;
 	getIsFullscreen(): boolean;
 	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Stream): () => void;

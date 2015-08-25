@@ -378,6 +378,14 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		simulateClick(this.getSendButton());
 	}
 
+	popOut() {
+		if (!this.isInlineReplyForm()) {
+			throw new Error("Can only pop out inline reply compose views");
+		}
+		var popOutBtn = this._element.querySelector('.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child');
+		simulateClick(popOutBtn);
+	}
+
 	isReply(): boolean {
 		return this._isInlineReplyForm || !!this._element.querySelector('.HQ');
 	}

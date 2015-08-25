@@ -3,11 +3,13 @@
 var _ = require('lodash');
 var EventEmitter = require('../lib/safe-event-emitter');
 var Kefir = require('kefir');
+var ud = require('ud');
 var kefirCast = require('kefir-cast');
+var RSVP = require('rsvp');
 
 var ComposeButtonView = require('./compose-button-view');
 
-var memberMap = new WeakMap();
+var memberMap = ud.defonce(module, ()=>new WeakMap());
 
 /**
  * @class
@@ -15,13 +17,14 @@ var memberMap = new WeakMap();
  * The fields can be easily read and modified, and certain elements can
  * be attached to it. This includes buttons and sidebars.
  */
-function ComposeView(driver, composeViewImplementation, appId) {
+var ComposeView = function(driver, composeViewImplementation, appId, composeViewStream) {
 	EventEmitter.call(this);
 
 	var members = {
 		driver: driver,
 		composeViewImplementation: composeViewImplementation,
-		appId: appId
+		appId: appId,
+		composeViewStream: composeViewStream
 	};
 	memberMap.set(this, members);
 
@@ -42,7 +45,7 @@ function ComposeView(driver, composeViewImplementation, appId) {
 	members.composeViewImplementation.getStopper().onValue(function(){
 		self.emit('close'); /* TODO: deprecated */
 	});
-}
+};
 
 ComposeView.prototype = Object.create(EventEmitter.prototype);
 
@@ -284,6 +287,18 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	},
 
 	/**
+	 * If the compose is an inline reply form, this triggers it to be converted
+	 * to a full compose view. Note that the current ComposeView object will emit
+	 * its destroy event, and a new ComposeView object will be created. This
+	 * function returns a promise for the new ComposeView.
+	 * @return {Promise.<ComposeView>}
+	 */
+	popOut: function() {
+		memberMap.get(this).composeViewImplementation.popOut();
+		return memberMap.get(this).composeViewStream.take(1).toPromise(RSVP.Promise);
+	},
+
+	/**
 	 * Whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
 	 * You typically will not need to use this.
 	 * @return {boolean}
@@ -471,6 +486,8 @@ _.extend(ComposeView.prototype, /** @lends ComposeView */ {
 	 * @param {Contact} contact - the contact that was removed from the "BCC" recipients
 	 */
 });
+
+ComposeView = ud.defn(module, ComposeView);
 
 module.exports = ComposeView;
 

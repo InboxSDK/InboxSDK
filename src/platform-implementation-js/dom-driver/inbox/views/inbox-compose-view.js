@@ -34,6 +34,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   _sendBtn: HTMLElement;
   _attachBtn: HTMLElement;
   _formatBtn: ?HTMLElement;
+  _popOutBtn: ?HTMLElement;
   _bodyEl: HTMLElement;
   _bodyPlaceholder: ?HTMLElement;
   _subjectEl: ?HTMLInputElement;
@@ -61,6 +62,8 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var bodyEls = this._element.querySelectorAll(
       'div[contenteditable][g_editable][role=textbox]');
 
+    var popOutBtns = this._isInline ? this._element.querySelectorAll('button[jsaction$=".quick_compose_popout_mole"]') : [];
+
     var topBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button') : [];
     var formatBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]') : [];
     var subjectEls = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]') : [];
@@ -83,6 +86,9 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         this._formatBtn = null;
         this._bodyPlaceholder = null;
         this._subjectEl = null;
+        if (popOutBtns.length !== 1)
+          throw new Error("compose wrong number pop out buttons");
+        this._popOutBtn = popOutBtns[0];
       } else {
         if (topBtns.length !== 2)
           throw new Error("compose wrong number of top buttons");
@@ -105,6 +111,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         if (!(subjectEl instanceof HTMLInputElement))
           throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
         this._subjectEl = subjectEl;
+        this._popOutBtn = null;
       }
     } catch(err) {
       hadError = true;
@@ -313,6 +320,15 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   }
   isInlineReplyForm(): boolean {
     return this._isInline;
+  }
+  popOut() {
+    if (!this._isInline) {
+      throw new Error("Can only pop out inline reply compose views");
+    }
+    if (!this._popOutBtn) {
+      throw new Error("Should not happen");
+    }
+    simulateClick(this._popOutBtn);
   }
   getIsFullscreen(): boolean {
     // TODO
