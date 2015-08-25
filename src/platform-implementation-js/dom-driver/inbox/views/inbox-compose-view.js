@@ -54,9 +54,8 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var hadError = false;
     var bottomAreaElementCount = null;
     var sendBtns = this._element.querySelectorAll(
-      this._isInline ?
-      'div[jsaction] > div[role=button]:not([jsaction])' :
-      'div[jstcache] > div[role=button][jsan][jsaction$=".send"]');
+      'div[jstcache] > div[role=button][jsaction$=".send"], '+
+      'div[jsaction] > div[role=button][disabled]');
     var attachBtns = this._element.querySelectorAll(
       this._isInline ?
       'div[jsaction] > div[role=button][jsaction$=".attach"]' :
