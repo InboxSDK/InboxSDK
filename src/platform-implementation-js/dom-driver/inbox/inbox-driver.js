@@ -103,15 +103,15 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       function getStatus() {
         return {
           mainLength: document.querySelectorAll('[role=main]').length,
-          regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child').length,
-          noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]').length,
+          regularLength: document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]:first-child').length,
+          noFirstChildLength: document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]').length,
           noDirectNoFirstChildLength: document.querySelectorAll('body div[id][jsan] div[id][class] div[class] div[id]:first-child:not([jsan]):not([class])').length,
           // We can use class names for logging heuristics. Don't want to use
           // them anywhere else.
           classLength: document.querySelectorAll('div.ek div.md > div').length,
           classEkLength: document.querySelectorAll('.ek').length,
           classMdLength: document.querySelectorAll('.md').length,
-          composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
+          composeHtml: _.map(document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]:first-child, div.ek div.md > div'), el => censorHTMLtree(el))
         };
       }
 

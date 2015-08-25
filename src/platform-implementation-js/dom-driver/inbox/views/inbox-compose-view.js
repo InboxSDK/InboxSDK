@@ -57,13 +57,9 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       'div[jstcache] > div[role=button][jsaction$=".send"], '+
       'div[jsaction] > div[role=button][disabled]');
     var attachBtns = this._element.querySelectorAll(
-      this._isInline ?
-      'div[jsaction] > div[role=button][jsaction$=".attach"]' :
-      'div[jstcache] > div[role=button][jsan][jsaction$=".attach"]');
+      'div[role=button][jsaction$=".attach"]');
     var bodyEls = this._element.querySelectorAll(
-      this._isInline ?
-      'div[contenteditable][role=textbox]' :
-      'div[jstcache][jsan] > div > div[contenteditable][role=textbox]');
+      'div[contenteditable][g_editable][role=textbox]');
 
     var topBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button') : [];
     var formatBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]') : [];

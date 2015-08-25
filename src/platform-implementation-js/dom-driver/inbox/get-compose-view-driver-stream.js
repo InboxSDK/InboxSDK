@@ -20,7 +20,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return Kefir.merge([
     // Regular
     kefirWaitFor(() => {
-      var els = document.querySelectorAll('body > div[id][jsan] > div[id][class] > div[class] > div[id]:first-child');
+      var els = document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]:first-child');
       return els.length === 1 ? els[0] : null;
     })
       .flatMap(kmakeElementChildStream)
