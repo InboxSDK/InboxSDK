@@ -8,6 +8,7 @@ import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 var ud = require('ud');
+import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -34,6 +35,7 @@ import monitorSelectionRange from './gmail-compose-view/monitor-selection-range'
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
+import getMinimizeRestoreStream from './gmail-compose-view/get-minimize-restore-stream';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -178,8 +180,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(Bacon.later(10).flatMap(()=>require('./gmail-compose-view/get-minimize-restore-stream')(this)));
-
+		this._eventStream.plug(baconCast(Bacon, Kefir.later(10).flatMap(()=>getMinimizeRestoreStream(this))));
 
 		var messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 		this._eventStream.plug(

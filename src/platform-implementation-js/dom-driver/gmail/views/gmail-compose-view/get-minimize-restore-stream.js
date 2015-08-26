@@ -1,35 +1,28 @@
-const _ = require('lodash');
-const makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
+/* @flow */
+//jshint ignore:start
 
-function getMinimizeRestoreStream(gmailComposeView){
+var _ = require('lodash');
+var Kefir = require('kefir');
+import udKefir from 'ud-kefir';
+import kmakeMutationObserverStream from '../../../../lib/dom/kefir-make-mutation-observer-stream';
+import type GmailComposeView from '../gmail-compose-view';
 
-	const element = gmailComposeView.getElement();
-	const bodyElement = gmailComposeView.getBodyElement();
-	const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
-	const heightChanger = gmailComposeView.getElement().querySelector('.aoI');
+var fnStream = udKefir(module, getMinimizeRestoreStream_);
 
-
-	const heightChangerStream = makeMutationObserverStream(heightChanger, {attributes: true, attributeFilter: ['style']});
-
-	heightChangerStream
-		.filter(() => heightChanger.style.height === '0px')
-		.onValue(() => heightChanger.style.height = '');
-
-	return heightChangerStream
-			.map(() => heightChanger.style.height === '' ? true : false) //true = isMinimized
-			.merge(
-				makeMutationObserverStream(bodyContainer, {attributes: true, attributeFilter: ['style']})
-					.map(() => bodyContainer.style.display === '' ? false : true)
-			)
-			.map(
-				(isMinimized) => isMinimized ?
-					{eventName: 'minimized'} :
-					{eventName: 'restored'}
-			)
-			.throttle(10, {leading: true});
-
-
-
+export default function getMinimizeRestoreStream(gmailComposeView: GmailComposeView): Kefir.Stream {
+	return fnStream.flatMapLatest(fn => fn(gmailComposeView));
 }
 
-module.exports = getMinimizeRestoreStream;
+function getMinimizeRestoreStream_(gmailComposeView: GmailComposeView): Kefir.Stream {
+	var element = gmailComposeView.getElement();
+	var bodyElement = gmailComposeView.getBodyElement();
+	var bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+
+	return kmakeMutationObserverStream(bodyContainer, {attributes: true, attributeFilter: ['style']})
+		.map(() => bodyContainer.style.display !== '')
+		.map(
+			(isMinimized) => isMinimized ?
+				{eventName: 'minimized'} :
+				{eventName: 'restored'}
+		);
+}
