@@ -1,7 +1,17 @@
-import _ from 'lodash';
+/* @flow */
+//jshint ignore:start
 
-export default function getURLObject(url) {
-	const m = url.match(/#([^?]*)(?:\?(.*))?/);
+var _ = require('lodash');
+
+export type URLObject = {
+	name: string;
+	params: string[];
+	query: ?string;
+	hash: string;
+};
+
+export default function getURLObject(url: string): URLObject {
+	var m = url.match(/#([^?]*)(?:\?(.*))?/);
 	if (!m) {
 		return {
 			name: 'inbox',
@@ -11,8 +21,8 @@ export default function getURLObject(url) {
 		};
 	}
 
-	const hash = m[1];
-	const hashParts = hash.split('/');
+	var hash = m[1];
+	var hashParts = hash.split('/');
 
 	return {
 		name: decodeURIComponent(hashParts[0]),

@@ -32,6 +32,7 @@ import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
 import addNavItem from './gmail-driver/add-nav-item';
+import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
 import showNativeRouteView from './gmail-driver/show-native-route-view';
@@ -208,7 +209,7 @@ export default class GmailDriver {
 	}
 
 	goto(routeID: string, params: ?{[ix: string]: string}) {
-		return require('./gmail-driver/goto-view')(this, routeID, params);
+		return gotoView(this, routeID, params);
 	}
 
 	resolveUrlRedirects(url: string): Promise<string> {

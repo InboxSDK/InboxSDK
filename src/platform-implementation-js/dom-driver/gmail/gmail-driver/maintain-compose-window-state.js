@@ -1,13 +1,15 @@
 /* @flow */
 //jshint ignore:start
 
-import _ from 'lodash';
+var _ = require('lodash');
+var Kefir = require('kefir');
+var ud = require('ud');
+var udKefir = require('ud-kefir');
 import GmailElementGetter from '../gmail-element-getter';
-import * as Bacon from 'baconjs';
 import kefirCast from 'kefir-cast';
-import * as Kefir from 'kefir';
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import type GmailDriver from '../gmail-driver';
+import type GmailComposeView from '../views/gmail-compose-view';
 
 export default function maintainComposeWindowState(gmailDriver: GmailDriver){
 
@@ -28,21 +30,32 @@ export default function maintainComposeWindowState(gmailDriver: GmailDriver){
 	});
 }
 
-function _setupManagement(gmailDriver){
+function getWorkStream(gmailDriver: GmailDriver): Kefir.Stream<()=>void> {
+	return (kefirCast(Kefir, gmailDriver.getComposeViewDriverStream()): Kefir.Stream<GmailComposeView>)
+		.flatMap((gmailComposeView: GmailComposeView) =>
+			gmailComposeView.getEventStream()
+				.filter(({eventName}) => eventName === 'restored')
+				.map(() => gmailComposeView)
+		)
+		.filterBy(
+			Kefir.fromEvents(window, 'hashchange')
+				.flatMapLatest(() => Kefir.constant(true).merge(Kefir.later(250, false)))
+				.toProperty(() => false)
+		)
+		.map(gmailComposeView => {
+			console.log('got restore from compose', gmailComposeView.getElement());
+			return () => {
+				gmailComposeView.minimize();
+			};
+		})
+}
 
-	kefirCast(Kefir, gmailDriver.getComposeViewDriverStream())
-				.flatMap((gmailComposeView) =>
-							kefirCast(Kefir, gmailComposeView.getEventStream())
-								.filter(({eventName}) => eventName === 'restored')
-								.map(() => gmailComposeView)
-				)
-				.filterBy(
-					Kefir.fromEvents(window, 'hashchange')
-								.flatMapLatest(() => Kefir.constant(true).merge(Kefir.later(250, false)))
-								.toProperty(() => false)
-				)
-				.onValue(gmailComposeView => gmailComposeView.minimize());
+var fnStream = udKefir(module, getWorkStream);
 
+function _setupManagement(gmailDriver: GmailDriver) {
+	fnStream
+		.flatMapLatest(fn => fn(gmailDriver))
+		.onValue(work => work());
 }
 
 function waitToClaim(): Kefir.Stream {
