@@ -1,27 +1,30 @@
-import Bacon from 'baconjs';
-import StopperBus from '../stopper-bus';
-import delayAsap from '../delay-asap';
+/* @flow */
+//jshint ignore:start
 
-export default function makeElementStreamMerger() {
-  const knownElementStopperBuses = new Map();
+var Kefir = require('kefir');
+import StopperPool from '../stopper-pool';
+import delayAsap from '../kefir-delay-asap';
+
+export default function makeElementStreamMerger(): (event: {el: HTMLElement, removalStream: Kefir.Stream}) => Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
+  var knownElementStopperPools: Map<HTMLElement, StopperPool> = new Map();
 
   return function(event) {
-    let stopperBus = knownElementStopperBuses.get(event.el);
-    if (stopperBus) {
-      if (stopperBus.getSize() > 1) {
-        console.warn('element is part of multiple element streams', stopperBus.getSize(), event.el);
+    var stopperPool = knownElementStopperPools.get(event.el);
+    if (stopperPool) {
+      if (stopperPool.getSize() > 1) {
+        console.warn('element is part of multiple element streams', stopperPool.getSize(), event.el);
       }
-      stopperBus.add(event.removalStream.flatMap(delayAsap));
-      return Bacon.never();
+      stopperPool.add(event.removalStream.flatMap(delayAsap));
+      return Kefir.never();
     } else {
-      stopperBus = new StopperBus(event.removalStream.flatMap(delayAsap));
-      stopperBus.stream.onValue(function() {
-        knownElementStopperBuses.delete(event.el);
+      stopperPool = new StopperPool(event.removalStream.flatMap(delayAsap));
+      stopperPool.stream.onValue(function() {
+        knownElementStopperPools.delete(event.el);
       });
-      knownElementStopperBuses.set(event.el, stopperBus);
-      return Bacon.once({
+      knownElementStopperPools.set(event.el, stopperPool);
+      return Kefir.constant({
         el: event.el,
-        removalStream: stopperBus.stream
+        removalStream: stopperPool.stream
       });
     }
   };

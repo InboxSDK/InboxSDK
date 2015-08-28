@@ -322,9 +322,9 @@ export default class GmailDriver {
 	}
 
 	_setupComposeViewDriverStream() {
-		this._composeViewDriverStream = setupComposeViewDriverStream(
-			this, this._messageViewDriverStream, this._xhrInterceptorStream
-		).takeUntil(this._bStopper);
+		this._composeViewDriverStream = baconCast(Bacon, setupComposeViewDriverStream(
+			this, kefirCast(Kefir, this._messageViewDriverStream), this._xhrInterceptorStream
+		).takeUntilBy(this._stopper));
 	}
 
 	_setupRouteSubViewDriver(viewName: string): Bacon.Observable<Object> {

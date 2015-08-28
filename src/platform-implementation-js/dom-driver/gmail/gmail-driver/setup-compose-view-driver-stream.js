@@ -1,14 +1,15 @@
 /* @flow */
 //jshint ignore:start
 
-var Bacon = require('baconjs');
-import baconCast from 'bacon-cast';
-import streamWaitFor from '../../../lib/stream-wait-for';
+var Kefir = require('kefir');
+var kefirCast = require('kefir-cast');
+import kefirWaitFor from '../../../lib/kefir-wait-for';
+import type Bacon from 'baconjs';
 
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
+import makeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
+import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
 import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -17,10 +18,10 @@ import GmailComposeView from '../views/gmail-compose-view';
 import Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
-export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Bacon.Observable, xhrInterceptorStream: Bacon.Observable){
-	return Bacon.fromPromise(
+export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Bacon.Observable): Kefir.Stream<GmailComposeView> {
+	return Kefir.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
-	).flatMap(function() {
+	).flatMap(() => {
 		var elementStream;
 		var isStandalone = false;
 
@@ -28,47 +29,48 @@ export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, m
 			elementStream = _setupStandaloneComposeElementStream();
 			isStandalone = true;
 		} else if (GmailElementGetter.isStandaloneThreadWindow()) {
-			elementStream = Bacon.never();
+			elementStream = Kefir.never();
 		} else {
 			elementStream = _setupStandardComposeElementStream();
 		}
 
-		return elementStream.flatMap(makeElementViewStream(function(el) {
+		return elementStream.map(kefirElementViewMapper(el => {
 			var composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 			composeView.setIsStandalone(isStandalone);
 
 			return composeView;
 		}));
 	}).merge(
-		messageViewDriverStream.flatMap(function(gmailMessageView){
-			return gmailMessageView.getReplyElementStream().flatMap(makeElementViewStream(function(el) {
-				var view = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
-				view.setIsInlineReplyForm(true);
-				return view;
-			}));
-		})
-	).flatMap(composeViewDriver => {
-		return baconCast(Bacon, composeViewDriver.ready());
-	});
+		messageViewDriverStream.flatMap(gmailMessageView =>
+			kefirCast(Kefir, gmailMessageView.getReplyElementStream())
+				.map(kefirElementViewMapper(el => {
+					var view = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
+					view.setIsInlineReplyForm(true);
+					return view;
+				}))
+		)
+	).flatMap((composeViewDriver:any) =>
+		composeViewDriver.ready()
+	);
 }
 
-function _setupStandardComposeElementStream(): Bacon.Observable {
+function _setupStandardComposeElementStream(): Kefir.Stream {
 	return _waitForContainerAndMonitorChildrenStream(function() {
 		return GmailElementGetter.getComposeWindowContainer();
 	}).flatMap(function(composeGrandParent) {
 		var composeParentEl = composeGrandParent.el.querySelector('div.AD');
 		if (composeParentEl) {
 			return makeElementChildStream(composeParentEl)
-					.takeUntil(composeGrandParent.removalStream)
-					.doAction(_informElement('composeFullscreenStateChanged'));
+					.takeUntilBy(composeGrandParent.removalStream)
+					.map(_informElement('composeFullscreenStateChanged'));
 		} else {
-			return Bacon.never();
+			return Kefir.never();
 		}
 	}).merge(
 		_waitForContainerAndMonitorChildrenStream(function() {
 			return GmailElementGetter.getFullscreenComposeWindowContainer();
 		})
-		.doAction(_informElement('composeFullscreenStateChanged'))
+		.map(_informElement('composeFullscreenStateChanged'))
 	).map(function(event) {
 		return {
 			removalStream: event.removalStream,
@@ -86,15 +88,16 @@ function _setupStandaloneComposeElementStream() {
 }
 
 function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	return streamWaitFor(containerFn)
+	return kefirWaitFor(containerFn)
 		.flatMap(containerEl => makeElementChildStream(containerEl));
 }
 
-function _informElement(eventName){
-	return function(event){
+function _informElement(eventName) {
+	return function(event) {
 		var composeEl = event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]');
 		if(composeEl){
 			dispatchCustomEvent(composeEl, eventName);
 		}
+		return event;
 	};
 }

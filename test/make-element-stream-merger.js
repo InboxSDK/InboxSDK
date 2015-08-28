@@ -1,22 +1,26 @@
-var assert = require('assert');
-var Bacon = require('baconjs');
-var sinon = require('sinon');
-var Marker = require('../src/common/marker');
+/* @flow */
+//jshint ignore:start
 
-var makeElementStreamMerger = require('../src/platform-implementation-js/lib/dom/make-element-stream-merger');
+var assert = require('assert');
+var Kefir = require('kefir');
+var kefirBus: ()=>Kefir.Bus = require('kefir-bus');
+var sinon = require('sinon');
+var Marker: any = require('../src/common/marker');
+
+import makeElementStreamMerger from '../src/platform-implementation-js/lib/dom/make-element-stream-merger';
 
 describe('makeElementStreamMerger', function() {
   it('passes through unrelated events', function(done) {
     var e1 = {
       el: Marker('e1.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e2 = {
       el: Marker('e2.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var i = 0;
-    Bacon.fromArray([e1, e2]).flatMap(makeElementStreamMerger()).onValue(function(event) {
+    Kefir.sequentially(0, [e1, e2]).flatMap(makeElementStreamMerger()).onValue(function(event) {
       switch (++i) {
         case 1:
           assert.strictEqual(event.el, e1.el);
@@ -30,7 +34,7 @@ describe('makeElementStreamMerger', function() {
           event.removalStream.onValue(function() {
             throw new Error("Should not be removed");
           });
-          e1.removalStream.push(null);
+          e1.removalStream.emit(null);
           e1.removalStream.end();
           break;
         default:
@@ -47,29 +51,29 @@ describe('makeElementStreamMerger', function() {
     // and should get its own event.
     var e1 = {
       el: Marker('e1.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e2 = {
       el: Marker('e2.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e3 = {
       el: e1.el,
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e4 = {
       el: e1.el,
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e5 = {
       el: Marker('e5.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e6 = {
       el: e1.el,
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
-    var bus = new Bacon.Bus(), i = 0, elWasRemoved = false;
+    var bus = kefirBus(), i = 0, elWasRemoved = false;
     bus.flatMap(makeElementStreamMerger()).onValue(function(event) {
       switch(++i) {
         case 1:
@@ -82,10 +86,10 @@ describe('makeElementStreamMerger', function() {
         case 2:
           assert.strictEqual(event.el, e2.el);
           setTimeout(function() {
-            e3.removalStream.push(null);
+            e3.removalStream.emit(null);
             e3.removalStream.end();
-            bus.push(e4);
-            bus.push(e5);
+            bus.emit(e4);
+            bus.emit(e5);
           }, 0);
           break;
         case 3:
@@ -93,11 +97,11 @@ describe('makeElementStreamMerger', function() {
 
           // This should finally trigger the first event's removal stream in
           // case 1.
-          e4.removalStream.push(null);
+          e4.removalStream.emit(null);
           e4.removalStream.end();
 
           setTimeout(function() {
-            bus.push(e6);
+            bus.emit(e6);
           }, 0);
           break;
         case 4:
@@ -109,12 +113,12 @@ describe('makeElementStreamMerger', function() {
           throw new Error("Should not happen");
       }
     });
-    bus.push(e1);
+    bus.emit(e1);
     setTimeout(function() {
-      e1.removalStream.push(null);
+      e1.removalStream.emit(null);
       e1.removalStream.end();
-      bus.push(e2);
-      bus.push(e3);
+      bus.emit(e2);
+      bus.emit(e3);
     }, 0);
   });
 
@@ -125,28 +129,30 @@ describe('makeElementStreamMerger', function() {
     });
     var e1 = {
       el: Marker('e1.el'),
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e2 = {
       el: e1.el,
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var e3 = {
       el: e1.el,
-      removalStream: new Bacon.Bus()
+      removalStream: kefirBus()
     };
     var i = 0;
-    Bacon.fromArray([e1, e2, e3]).flatMap(makeElementStreamMerger()).onValue(function(event) {
-      switch(++i) {
-        case 1:
-          setTimeout(function() {
-            assert(console.warn.called > 0, 'console.warn was called');
-            done();
-          }, 5);
-          break;
-        default:
-          throw new Error("Should not happen");
-      }
-    });
+    Kefir.sequentially(0, [e1, e2, e3])
+      .flatMap(makeElementStreamMerger())
+      .onValue(event => {
+        switch(++i) {
+          case 1:
+            setTimeout(() => {
+              assert(console.warn.called > 0, 'console.warn was called');
+              done();
+            }, 5);
+            break;
+          default:
+            throw new Error("Should not happen");
+        }
+      });
   });
 });
