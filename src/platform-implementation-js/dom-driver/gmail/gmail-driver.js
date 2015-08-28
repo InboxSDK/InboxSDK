@@ -42,7 +42,6 @@ import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driv
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
 import customStyle from './custom-style';
-import maintainComposeWindowState from './gmail-driver/maintain-compose-window-state';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
 
@@ -120,7 +119,6 @@ export default class GmailDriver {
 			this._timestampOnready = Date.now();
 			trackEvents(this);
 			gmailLoadEvent(this);
-			maintainComposeWindowState(this);
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
 		});
 	}
