@@ -46,7 +46,7 @@ declare module kefir {
     errorsToValues(): Stream<any>;
     errorsToValues<U>(handler: (error: any) => {convert: boolean, value?: U}): Stream<T|U>;
     mapErrors(fn: (error: any) => any): Stream<T>;
-    filterErrors(fn: (error: any) => boolean): Stream<T>;
+    filterErrors(fn: (error: any) => any): Stream<T>;
     endOnError(): Stream<T>;
     skipValues(): Stream;
     skipErrors(): Stream<T>;

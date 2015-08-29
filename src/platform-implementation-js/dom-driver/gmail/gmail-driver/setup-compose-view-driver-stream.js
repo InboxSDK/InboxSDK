@@ -8,7 +8,7 @@ import kefirWaitFor from '../../../lib/kefir-wait-for';
 import type Bacon from 'baconjs';
 
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
-
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
 import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
 import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
@@ -64,30 +64,42 @@ function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xh
 
 
 function _setupStandardComposeElementStream(): Kefir.Stream {
-	return _waitForContainerAndMonitorChildrenStream(function() {
-		return GmailElementGetter.getComposeWindowContainer();
-	}).flatMap(function(composeGrandParent) {
+	return _waitForContainerAndMonitorChildrenStream(() =>
+		GmailElementGetter.getComposeWindowContainer()
+	).flatMap(composeGrandParent => {
 		var composeParentEl = composeGrandParent.el.querySelector('div.AD');
 		if (composeParentEl) {
 			return makeElementChildStream(composeParentEl)
-					.takeUntilBy(composeGrandParent.removalStream)
-					.map(_informElement('composeFullscreenStateChanged'));
+				.takeUntilBy(composeGrandParent.removalStream)
+				.map(_informElement('composeFullscreenStateChanged'));
 		} else {
 			return Kefir.never();
 		}
 	}).merge(
-		_waitForContainerAndMonitorChildrenStream(function() {
-			return GmailElementGetter.getFullscreenComposeWindowContainer();
-		})
+		_waitForContainerAndMonitorChildrenStream(() =>
+			GmailElementGetter.getFullscreenComposeWindowContainer()
+		)
 		.map(_informElement('composeFullscreenStateChanged'))
-	).map(function(event) {
+		.map(({el, removalStream}) => {
+			// If you close a fullscreen compose while it's still saving, Gmail never
+			// removes it from the DOM!
+			var hiddenStream = kefirMakeMutationObserverChunkedStream(
+					el, {attributes: true, attributeFilter: ['style']}
+				)
+				.filter(() => el.style.display === 'none')
+				.map(() => null);
+			return {
+				el, removalStream: removalStream.merge(hiddenStream).take(1)
+			};
+		})
+	).map(event => {
 		return {
 			removalStream: event.removalStream,
 			el: event.el.querySelector('[role=dialog]')
 		};
-	}).filter(function(event) {
-		return Boolean(event && event.el && event.el.querySelector('form'));
-	}).flatMap(makeElementStreamMerger());
+	}).filter(event =>
+		event && event.el && event.el.querySelector('form')
+	).flatMap(makeElementStreamMerger());
 }
 
 function _setupStandaloneComposeElementStream() {
