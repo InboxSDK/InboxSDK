@@ -139,16 +139,20 @@ describe('makeElementStreamMerger', function() {
       el: e1.el,
       removalStream: kefirBus()
     };
+    var e4 = {
+      el: Marker('e4.el'),
+      removalStream: kefirBus()
+    };
     var i = 0;
-    Kefir.sequentially(0, [e1, e2, e3])
+    Kefir.sequentially(0, [e1, e2, e3, e4])
       .flatMap(makeElementStreamMerger())
       .onValue(event => {
         switch(++i) {
           case 1:
-            setTimeout(() => {
-              assert(console.warn.called > 0, 'console.warn was called');
-              done();
-            }, 5);
+            break;
+          case 2:
+            assert(console.warn.called > 0, 'console.warn was called');
+            done();
             break;
           default:
             throw new Error("Should not happen");
