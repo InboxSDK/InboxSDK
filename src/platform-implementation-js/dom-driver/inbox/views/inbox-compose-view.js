@@ -33,7 +33,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   _minimizeBtn: ?HTMLElement;
   _sendBtn: HTMLElement;
   _attachBtn: HTMLElement;
-  _formatBtn: ?HTMLElement;
   _popOutBtn: ?HTMLElement;
   _bodyEl: HTMLElement;
   _bodyPlaceholder: ?HTMLElement;
@@ -65,7 +64,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var popOutBtns = this._isInline ? this._element.querySelectorAll('button[jsaction$=".quick_compose_popout_mole"]') : [];
 
     var topBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button') : [];
-    var formatBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"]') : [];
     var subjectEls = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]') : [];
 
     try {
@@ -83,7 +81,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       if (this._isInline) {
         this._closeBtn = null;
         this._minimizeBtn = null;
-        this._formatBtn = null;
         this._bodyPlaceholder = null;
         this._subjectEl = null;
         if (popOutBtns.length !== 1)
@@ -98,9 +95,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         if (!/\.minimize_mole$/.test(topBtns[1].getAttribute('jsaction')))
           throw new Error("compose minimize button wrong jsaction")
         this._minimizeBtn = topBtns[1];
-        if (formatBtns.length !== 1)
-          throw new Error("compose wrong number of format buttons");
-        this._formatBtn = formatBtns[0];
         var bodyPlaceholder = this._bodyEl.previousElementSibling;
         if (!(bodyPlaceholder instanceof HTMLElement) || bodyPlaceholder.nodeName !== 'LABEL')
           throw new Error(`compose body placeholder wrong type ${bodyPlaceholder && bodyPlaceholder.nodeName}`);
@@ -120,7 +114,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         topBtnsLength: topBtns.length,
         sendBtnsLength: sendBtns.length,
         attachBtnsLength: attachBtns.length,
-        formatBtnsLength: formatBtns.length,
         bodyElsLength: bodyEls.length,
         subjectElsLength: subjectEls.length,
         html: censorHTMLstring(this._element.innerHTML)
@@ -207,17 +200,6 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
     this._informBodyChanged();
     return retVal;
-  }
-  // returns the format area if it's found and open
-  _getFormatArea(): ?HTMLElement {
-    if (this._isInline) {
-      throw new Error("Inline compose views don't have formatting tools");
-    }
-    var formatArea = this._element.querySelector('div[jstcache] > div > div[jsan][jsaction$=".open_format_bar;"] + div > div');
-    if (formatArea && formatArea.children.length > 1) {
-      return formatArea;
-    }
-    return null;
   }
   insertLinkIntoBody(text: string, href: string): ?HTMLElement {
     var html = autoHtml `<a href="${href}">${text}</a>`;
