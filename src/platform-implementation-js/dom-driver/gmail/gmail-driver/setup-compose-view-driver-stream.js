@@ -3,6 +3,7 @@
 
 var Kefir = require('kefir');
 var kefirCast = require('kefir-cast');
+var udKefir = require('ud-kefir');
 import kefirWaitFor from '../../../lib/kefir-wait-for';
 import type Bacon from 'baconjs';
 
@@ -18,7 +19,14 @@ import GmailComposeView from '../views/gmail-compose-view';
 import Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
+var impStream = udKefir(module, imp);
+
 export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Bacon.Observable): Kefir.Stream<GmailComposeView> {
+	return impStream.flatMapLatest(imp =>
+		imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream));
+}
+
+function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Bacon.Observable): Kefir.Stream<GmailComposeView> {
 	return Kefir.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(() => {
@@ -53,6 +61,7 @@ export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, m
 		composeViewDriver.ready()
 	);
 }
+
 
 function _setupStandardComposeElementStream(): Kefir.Stream {
 	return _waitForContainerAndMonitorChildrenStream(function() {
