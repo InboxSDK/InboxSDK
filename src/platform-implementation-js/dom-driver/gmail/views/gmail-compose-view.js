@@ -171,6 +171,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._managedViewControllers.forEach(vc => {
 			vc.destroy();
 		});
+		this._managedViewControllers.length = 0;
 		this._stopper.destroy();
 	}
 
