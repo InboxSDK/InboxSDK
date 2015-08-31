@@ -219,15 +219,15 @@ gulp.task('test-jsdom', [
 ]);
 
 gulp.task('test-jsdom-inboxsdk-gmail', function() {
-  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk-gmail.js']);
+  return spawn('node', ['-e', 'require("babel/register-without-polyfill"); require("./test/jsdom/inboxsdk-gmail.js");']);
 });
 
 gulp.task('test-jsdom-inboxsdk-inbox', function() {
-  return spawn('node_modules/.bin/babel-node', ['test/jsdom/inboxsdk-inbox.js']);
+  return spawn('node', ['-e', 'require("babel/register-without-polyfill"); require("./test/jsdom/inboxsdk-inbox.js");']);
 });
 
 gulp.task('test-jsdom-iti', function() {
-  return spawn('node_modules/.bin/babel-node', ['test/jsdom/injected-thread-identifier.js']);
+  return spawn('node', ['-e', 'require("babel/register-without-polyfill"); require("./test/jsdom/injected-thread-identifier.js");']);
 });
 
 gulp.task('docs', function(cb) {
