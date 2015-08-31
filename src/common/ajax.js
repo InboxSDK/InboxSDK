@@ -4,6 +4,7 @@
 import forOwn from 'lodash/object/forOwn';
 import querystring from 'querystring';
 
+var MAX_TIMEOUT = 64*1000; //64 seconds
 var serversToIgnore = {};
 
 // Simple ajax helper.
@@ -19,6 +20,7 @@ export type ajaxOpts = {
   headers?: any;
   xhrFields?: any;
   data?: ?{[index: string]: string}|string;
+  retryTimeout?: number;
 };
 
 export type ajaxResponse = {
@@ -49,6 +51,11 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     var xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
+      if(xhr.status === 502){
+        _retry(resolve, reject, opts);
+        return;
+      }
+
       var err = Object.assign((new Error("Failed to load "+opts.url): any), {
         event, xhr, status: xhr.status
       });
@@ -72,4 +79,18 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     });
     xhr.send(stringData);
   });
+}
+
+function _retry(resolve: (response: ajaxResponse) => void, reject: (error: any) => void, opts: ajaxOpts){
+  if(!opts.retryTimeout){
+    opts.retryTimeout = 2*1000; //2 seconds
+  }
+  else {
+    opts.retryTimeout = Math.min(opts.retryTimeout*2, MAX_TIMEOUT);
+  }
+
+  setTimeout(
+    () => ajax(opts).then(resolve, reject),
+    opts.retryTimeout
+  );
 }
