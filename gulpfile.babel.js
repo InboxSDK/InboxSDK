@@ -182,13 +182,13 @@ function browserifyTask(name, deps, entry, destname) {
 }
 
 if (args.single) {
-  gulp.task('default', ['sdk', 'examples', args.watch&&args.hot&&'server'].filter(Boolean));
+  gulp.task('default', ['sdk', 'examples']);
   browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
 } else {
-  gulp.task('default', ['sdk', 'imp', 'examples', args.watch&&args.hot&&'server'].filter(Boolean));
+  gulp.task('default', ['sdk', 'imp', 'examples']);
   browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
   browserifyTask('imp', ['injected'],
     './src/platform-implementation-js/main.js', 'platform-implementation.js');
