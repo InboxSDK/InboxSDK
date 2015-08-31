@@ -24,7 +24,8 @@ document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 var InboxSDK = require('./lib/inboxsdk');
 
 var appOpts = {
-  globalErrorLogging: false, inboxBeta: true
+  globalErrorLogging: false, inboxBeta: true,
+  TEMPORARY_INTERNAL_skipWeakMapRequirement: true // node 0.10 compat
 };
 
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');

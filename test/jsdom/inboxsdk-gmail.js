@@ -26,7 +26,8 @@ document.head.setAttribute('data-inboxsdk-user-email-address', 'cowan@streak.com
 var InboxSDK = require('./lib/inboxsdk');
 
 var appOpts = {
-  globalErrorLogging: false
+  globalErrorLogging: false,
+  TEMPORARY_INTERNAL_skipWeakMapRequirement: true // node 0.10 compat
 };
 
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
