@@ -7,4 +7,5 @@ export default function fakePageGlobals() {
     event.initCustomEvent(type, options.bubbles, options.cancelable, options.detail);
     return event;
   };
+  global.Promise = Promise; // node 0.10 compat
 }
