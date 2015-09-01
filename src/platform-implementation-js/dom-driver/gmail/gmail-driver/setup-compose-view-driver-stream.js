@@ -82,17 +82,22 @@ function _setupStandardComposeElementStream(): Kefir.Stream {
 		.map(_informElement('composeFullscreenStateChanged'))
 		.map(({el, removalStream}) => {
 			// If you close a fullscreen compose while it's still saving, Gmail never
-			// removes it from the DOM!
+			// removes it from the DOM, and instead only removes a specific child
+			// element. Ugh. Watch for its removal too.
+			var targetEl = el.querySelector('[role=dialog] div.aaZ');
+			if (!targetEl) return null;
 			var hiddenStream = kefirMakeMutationObserverChunkedStream(
-					el, {attributes: true, attributeFilter: ['style']}
+					targetEl, {childList: true}
 				)
-				.filter(() => el.style.display === 'none')
+				.filter(() => targetEl.childElementCount === 0)
 				.map(() => null);
 			return {
 				el, removalStream: removalStream.merge(hiddenStream).take(1)
 			};
 		})
+		.filter(Boolean)
 	).map(event => {
+		if (!event) throw new Error("Should not happen");
 		return {
 			removalStream: event.removalStream,
 			el: event.el.querySelector('[role=dialog]')
