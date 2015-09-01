@@ -3,6 +3,7 @@
 
 import forOwn from 'lodash/object/forOwn';
 import querystring from 'querystring';
+import delay from './delay';
 
 var MAX_TIMEOUT = 64*1000; //64 seconds
 var serversToIgnore = {};
@@ -32,7 +33,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
   if(!opts || typeof opts.url !== 'string') {
     throw new Error('URL must be given');
   }
-  return new global.Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     var method = opts.method ? opts.method : "GET";
     var stringData: ?string;
     if (opts.data) {
@@ -52,7 +53,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
       if(xhr.status === 502){
-        _retry(resolve, reject, opts);
+        resolve(_retry(opts));
         return;
       }
 
@@ -81,16 +82,16 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
   });
 }
 
-function _retry(resolve: (response: ajaxResponse) => void, reject: (error: any) => void, opts: ajaxOpts){
-  if(!opts.retryTimeout){
-    opts.retryTimeout = 2*1000; //2 seconds
+function _retry(opts: ajaxOpts): Promise<ajaxResponse>{
+  var retryTimeout = opts.retryTimeout;
+  if(!retryTimeout){
+    retryTimeout = 2*1000; //2 seconds
   }
   else {
-    opts.retryTimeout = Math.min(opts.retryTimeout*2, MAX_TIMEOUT);
+    retryTimeout = Math.min(retryTimeout*2, MAX_TIMEOUT);
   }
 
-  setTimeout(
-    () => ajax(opts).then(resolve, reject),
-    opts.retryTimeout
-  );
+  opts.retryTimeout = retryTimeout;
+
+  return delay(retryTimeout).then(() => ajax(opts));
 }
