@@ -52,10 +52,10 @@
     "semver": "^5.0.1",
     "sinon": "^1.15.4",
     "stdio": "^0.2.6",
-    "ud": "^1.0.4",
-    "ud-kefir": "^1.0.0",
+    "ud": "^2.0.1",
+    "ud-kefir": "^1.0.1",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.3.1"
+    "watchify": "^3.4.0"
   },
   "description": "Library for browser extensions to interact with Gmail.",
   "license": "All Rights Reserved",
