@@ -3,6 +3,7 @@
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
+import * as ud from 'ud';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -54,7 +55,7 @@ import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-drive
 import type GmailComposeView from './views/gmail-compose-view';
 import type {EnvData} from '../../platform-implementation';
 
-export default class GmailDriver {
+var GmailDriver = ud.defn(module, class GmailDriver {
 	_appId: string;
 	_logger: Logger;
 	_envData: EnvData;
@@ -393,7 +394,8 @@ export default class GmailDriver {
 		return this._messageIDsToThreadIDs.get(messageID);
 	}
 
-}
+});
+export default GmailDriver;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
