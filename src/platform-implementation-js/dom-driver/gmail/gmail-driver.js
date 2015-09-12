@@ -45,6 +45,7 @@ import gmailLoadEvent from './gmail-driver/gmail-load-event';
 import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
+import setupRouteViewDriverStream from './gmail-driver/setup-route-view-driver-stream';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
@@ -302,7 +303,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
-			this._routeViewDriverStream = baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
+			this._routeViewDriverStream = baconCast(Bacon, setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
 			)).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(this._pageCommunicator);

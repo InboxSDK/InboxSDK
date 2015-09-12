@@ -4,8 +4,8 @@
 import * as Bacon from 'baconjs';
 
 type Emitter = {
-  addEventListener(type: string, listener: (event: any) => void, useCapture?: boolean): void;
-  removeEventListener(type: string, listener: (event: any) => void, useCapture?: boolean): void;
+  addEventListener: Function;
+  removeEventListener: Function;
 };
 
 export default function fromEventTargetCapture(target: Emitter, eventName: string): Bacon.Observable<any> {

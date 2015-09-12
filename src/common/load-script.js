@@ -24,7 +24,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   }
 
   var promise = new global.Promise(function(resolve, reject) {
-    script.addEventListener('error', function(event) {
+    script.addEventListener('error', function(event:any) {
       reject(event.error ||
         new Error(
           event.message || "Load failure: "+url,
