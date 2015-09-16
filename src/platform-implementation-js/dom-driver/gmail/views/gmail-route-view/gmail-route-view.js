@@ -66,6 +66,17 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		} else if (_.includes(['NATIVE', 'CUSTOM_LIST'], this._type)) {
 			this._setupSubViews();
 		}
+
+		if (this._type === 'CUSTOM_LIST') {
+			Kefir.later(500)
+				.takeUntilBy(this._stopper)
+				.onValue(() => {
+					var last = driver.getLastCustomThreadListActivity();
+					if (!last || last.customRouteID !== this._customRouteID || Date.now()-last.timestamp > 5000) {
+						this.refresh();
+					}
+				});
+		}
 	}
 
 	destroy() {

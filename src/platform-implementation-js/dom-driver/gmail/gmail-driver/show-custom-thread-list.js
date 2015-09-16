@@ -7,6 +7,7 @@ import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
+import type GmailDriver from '../gmail-driver';
 
 var/*const*/ threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
@@ -63,7 +64,7 @@ function findIdFailure(id, err) {
 }
 
 // Returns the search string that will trigger the onActivate function.
-function setupSearchReplacing(driver: Object, customRouteID: string, onActivate: Function): string {
+function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActivate: Function): string {
   var/*const*/ preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
@@ -78,6 +79,7 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
     )
     .flatMap(e => {
       start = e.start;
+      driver.signalCustomThreadListActivity(customRouteID);
       try {
         return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
       } catch(e) {
@@ -137,9 +139,11 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
             e.type === 'searchResultsResponse' &&
             e.query === newQuery && e.start === start
           )
-          .map('.response')
+          .map(x => x.response)
           .take(1)
       ]).onValue(([idPairs, response]) => {
+        driver.signalCustomThreadListActivity(customRouteID);
+
         var/*const*/ extractedThreads = GRP.extractThreads(response);
         var/*const*/ newThreads = _.chain(idPairs)
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
@@ -174,7 +178,7 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
   return newQuery;
 }
 
-export default function showCustomThreadList(driver: Object, customRouteID: string, onActivate: Function) {
+export default function showCustomThreadList(driver: GmailDriver, customRouteID: string, onActivate: Function) {
   var/*const*/ uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
   var/*const*/ customHash = document.location.hash;
 

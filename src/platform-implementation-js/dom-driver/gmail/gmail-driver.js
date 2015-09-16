@@ -88,6 +88,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
 	_timestampOnready: ?number;
+	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
 		customStyle();
@@ -190,6 +191,16 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		return () => {
 			this._customListRouteIDs.delete(routeID);
 		};
+	}
+
+	signalCustomThreadListActivity(customRouteID: string) {
+		this._lastCustomThreadListActivity = {customRouteID, timestamp: new Date()};
+	}
+
+	// Returns the last time a request for a custom thread list search has gone
+	// out or we got a response, and the customRouteID for that.
+	getLastCustomThreadListActivity(): ?{customRouteID: string, timestamp: Date} {
+		return this._lastCustomThreadListActivity;
 	}
 
 	showCustomThreadList(customRouteID: string, onActivate: Function) {
