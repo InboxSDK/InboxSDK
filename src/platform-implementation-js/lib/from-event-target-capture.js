@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import * as Bacon from 'baconjs';
+var Bacon = require('baconjs');
 
 type Emitter = {
   addEventListener: Function;

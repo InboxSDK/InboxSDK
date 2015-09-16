@@ -1,7 +1,10 @@
-const _ = require('lodash');
-const assert = require('assert');
+var _ = require('lodash');
+var assert = require('assert');
 
-function assertInterface(object, interface_) {
+// Deprecated. Use Flow types instead! See the __interfaceCheck function in
+// gmail-driver.js.
+
+export default function assertInterface(object, interface_) {
   // Currently there's no way at runtime to query what interfaces an object
   // implements. If we ever want to do that in the future, here's an example of
   // a good way to.
@@ -9,18 +12,17 @@ function assertInterface(object, interface_) {
   //   object.interfaces = new Set();
   // }
   if (process.env.NODE_ENV !== 'production') {
-    for (let [name, value] of _.pairs(interface_)) {
+    var name, value;
+    for ([name, value] of _.pairs(interface_)) {
       assert.strictEqual(typeof object[name], 'function',
-        'check object has '+name+' method');
+        `check object has ${name} method`);
       if (value) {
-        const argCount = typeof value === 'number' ? value : value.length;
+        var argCount = typeof value === 'number' ? value : value.length;
         assert.strictEqual(object[name].length, argCount,
-          "check that object's "+name+" method has right number of parameters");
+          `check that object's ${name} method has right number of parameters`);
       }
     }
   }
 
   // object.interfaces.add(interface_);
 }
-
-module.exports = assertInterface;
