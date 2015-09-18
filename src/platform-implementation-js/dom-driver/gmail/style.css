@@ -473,6 +473,10 @@ div.inboxsdk__compose_statusbar {
     margin-top: 30px; margin-bottom: 30px;
 }
 
+.inboxsdk__modal_close {
+  outline: none;
+}
+
 .inboxsdk__modal_fullscreen .inboxsdk__modal_container {
   position: relative;
   margin-top: -60px;
