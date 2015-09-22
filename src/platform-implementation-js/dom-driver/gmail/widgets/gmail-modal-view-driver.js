@@ -62,8 +62,10 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
 
     if (buttons.length === 0) {
       this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = 'none';
+      this._modalContainerElement.querySelector('.inboxsdk__modal_content').classList.add('inboxsdk__modal_content_no_buttons');
     } else {
       this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = '';
+      this._modalContainerElement.querySelector('.inboxsdk__modal_content').classList.remove('inboxsdk__modal_content_no_buttons');
     }
 
     _.sortBy(buttons, button => button.orderHint || 0)
