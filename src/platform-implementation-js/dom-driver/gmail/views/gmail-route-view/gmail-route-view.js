@@ -262,7 +262,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 
 		this._eventStream.plug(
 			elementStream.flatMap(makeElementViewStream((element) => {
-				return new GmailThreadView(element, this, this._driver, true);
+				return new (GmailThreadView:any)(element, this, this._driver, true);
 			})).doAction((view) => {
 				this._threadView = view;
 			}).map((view) => {

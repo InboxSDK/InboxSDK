@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-import assign from 'lodash/object/assign';
-import once from 'lodash/function/once';
+const assign = require('lodash/object/assign');
+const once = require('lodash/function/once');
 import loadScript from '../../common/load-script';
 
 import type {PlatformImplementation} from '../../platform-implementation-js/platform-implementation';

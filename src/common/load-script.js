@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-import once from 'lodash/function/once';
-import defer from 'lodash/function/defer';
+const once = require('lodash/function/once');
+const defer = require('lodash/function/defer');
 import ajax from './ajax';
 
 declare var chrome: ?Object;
