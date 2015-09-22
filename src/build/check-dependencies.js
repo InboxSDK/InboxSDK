@@ -5,7 +5,11 @@ var semver = require('semver');
 var path = require('path');
 var escapeShellArg = require('./escape-shell-arg');
 
-var optionalDeps = ['fsevents', 'browserify-hmr'];
+// Some of these have issues on linux machines or circleci specifically.
+var optionalDeps = [
+  'fsevents',
+  'browserify-hmr', 'bufferutil', 'bindings', 'utf-8-validate'
+];
 
 function checkDependency(version, depname) {
   var depPackage = require(depname+'/package.json');
