@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-import once from 'lodash/function/once';
-import defer from 'lodash/function/defer';
+const once = require('lodash/function/once');
+const defer = require('lodash/function/defer');
 import ajax from './ajax';
 
 declare var chrome: ?Object;
@@ -24,7 +24,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   }
 
   var promise = new global.Promise(function(resolve, reject) {
-    script.addEventListener('error', function(event) {
+    script.addEventListener('error', function(event:any) {
       reject(event.error ||
         new Error(
           event.message || "Load failure: "+url,

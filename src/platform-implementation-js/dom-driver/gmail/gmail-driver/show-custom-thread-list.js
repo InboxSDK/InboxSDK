@@ -7,8 +7,9 @@ import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
+import type GmailDriver from '../gmail-driver';
 
-/*const*/var threadListHandlersToSearchStrings: Map<Function, string> = new Map();
+var/*const*/ threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
 /*
 Timeline of how a custom thread list works:
@@ -63,13 +64,13 @@ function findIdFailure(id, err) {
 }
 
 // Returns the search string that will trigger the onActivate function.
-function setupSearchReplacing(driver: Object, customRouteID: string, onActivate: Function): string {
-  /*const*/var preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
+function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActivate: Function): string {
+  var/*const*/ preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
   }
-  /*let*/var start;
-  /*const*/var newQuery = Date.now()+'-'+Math.random();
+  var/*let*/ start;
+  var/*const*/ newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
     .filter(e =>
@@ -78,6 +79,7 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
     )
     .flatMap(e => {
       start = e.start;
+      driver.signalCustomThreadListActivity(customRouteID);
       try {
         return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
       } catch(e) {
@@ -101,7 +103,7 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
           return {gtid: id};
         }
       } else if (id) {
-        /*const*/var obj = {
+        var/*const*/ obj = {
           gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
           rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
         };
@@ -120,7 +122,7 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
     .flatMap(Bacon.fromPromise)
     .map(_.compact)
     .onValue(idPairs => {
-      /*const*/var query = idPairs.length > 0 ?
+      var/*const*/ query = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
@@ -137,16 +139,18 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
             e.type === 'searchResultsResponse' &&
             e.query === newQuery && e.start === start
           )
-          .map('.response')
+          .map(x => x.response)
           .take(1)
       ]).onValue(([idPairs, response]) => {
-        /*const*/var extractedThreads = GRP.extractThreads(response);
-        /*const*/var newThreads = _.chain(idPairs)
+        driver.signalCustomThreadListActivity(customRouteID);
+
+        var/*const*/ extractedThreads = GRP.extractThreads(response);
+        var/*const*/ newThreads = _.chain(idPairs)
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
           .compact()
           .value();
         try {
-          /*const*/var newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          var/*const*/ newResponse = GRP.replaceThreadsInResponse(response, newThreads);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -174,15 +178,15 @@ function setupSearchReplacing(driver: Object, customRouteID: string, onActivate:
   return newQuery;
 }
 
-export default function showCustomThreadList(driver: Object, customRouteID: string, onActivate: Function) {
-  /*const*/var uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
-  /*const*/var customHash = document.location.hash;
+export default function showCustomThreadList(driver: GmailDriver, customRouteID: string, onActivate: Function) {
+  var/*const*/ uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
+  var/*const*/ customHash = document.location.hash;
 
-  /*const*/var nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
+  var/*const*/ nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
-  /*const*/var searchHash = '#search/'+encodeURIComponent(uniqueSearch);
+  var/*const*/ searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
-  /*const*/var searchInput = GmailElementGetter.getSearchInput();
+  var/*const*/ searchInput = GmailElementGetter.getSearchInput();
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
   nextMainContentElementChange.onValue(() => {
@@ -191,7 +195,7 @@ export default function showCustomThreadList(driver: Object, customRouteID: stri
   });
 
   window.history.replaceState(null, null, searchHash);
-  /*const*/var hce = new (window:any).HashChangeEvent('hashchange', {
+  var/*const*/ hce = new (window:any).HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });

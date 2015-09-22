@@ -130,7 +130,7 @@ function _createGroupToggleButtonViewController(gmailComposeView: GmailComposeVi
 
 	members.groupedActionToolbarContainer.addEventListener(
 		'keydown',
-		function(event){
+		(function(event){
 			if(event.which === 27) { //escape
 				buttonViewController.activate();
 
@@ -139,7 +139,7 @@ function _createGroupToggleButtonViewController(gmailComposeView: GmailComposeVi
 				event.preventDefault();
 				event.stopPropagation();
 			}
-		}
+		}:any)
 	);
 
 	memberMap.get(gmailComposeView).groupedToolbarButtonViewController = buttonViewController;

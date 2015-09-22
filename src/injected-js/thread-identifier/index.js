@@ -13,7 +13,7 @@ import Marker from '../../common/marker';
 export function setup() {
   processPreloadedThreads();
 
-  document.addEventListener('inboxSDKtellMeThisThreadId', function(event) {
+  document.addEventListener('inboxSDKtellMeThisThreadId', function(event:any) {
     var threadId = getGmailThreadIdForThreadRow(event.target);
     if (threadId) {
       event.target.setAttribute('data-inboxsdk-threadid', threadId);

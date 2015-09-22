@@ -3,6 +3,7 @@
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
+import * as ud from 'ud';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -44,6 +45,7 @@ import gmailLoadEvent from './gmail-driver/gmail-load-event';
 import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
+import setupRouteViewDriverStream from './gmail-driver/setup-route-view-driver-stream';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
@@ -54,7 +56,7 @@ import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-drive
 import type GmailComposeView from './views/gmail-compose-view';
 import type {EnvData} from '../../platform-implementation';
 
-export default class GmailDriver {
+var GmailDriver = ud.defn(module, class GmailDriver {
 	_appId: string;
 	_logger: Logger;
 	_envData: EnvData;
@@ -86,6 +88,7 @@ export default class GmailDriver {
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
 	_timestampOnready: ?number;
+	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
 		customStyle();
@@ -188,6 +191,16 @@ export default class GmailDriver {
 		return () => {
 			this._customListRouteIDs.delete(routeID);
 		};
+	}
+
+	signalCustomThreadListActivity(customRouteID: string) {
+		this._lastCustomThreadListActivity = {customRouteID, timestamp: new Date()};
+	}
+
+	// Returns the last time a request for a custom thread list search has gone
+	// out or we got a response, and the customRouteID for that.
+	getLastCustomThreadListActivity(): ?{customRouteID: string, timestamp: Date} {
+		return this._lastCustomThreadListActivity;
 	}
 
 	showCustomThreadList(customRouteID: string, onActivate: Function) {
@@ -301,7 +314,7 @@ export default class GmailDriver {
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
-			this._routeViewDriverStream = baconCast(Bacon, require('./gmail-driver/setup-route-view-driver-stream')(
+			this._routeViewDriverStream = baconCast(Bacon, setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
 			)).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(this._pageCommunicator);
@@ -393,7 +406,8 @@ export default class GmailDriver {
 		return this._messageIDsToThreadIDs.get(messageID);
 	}
 
-}
+});
+export default GmailDriver;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

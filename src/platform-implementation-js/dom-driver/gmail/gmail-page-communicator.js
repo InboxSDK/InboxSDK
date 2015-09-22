@@ -104,7 +104,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     }));
   }
 
-  setCustomListResults(query: string, newResults: string) {
+  setCustomListResults(query: string, newResults: ?string) {
     document.dispatchEvent(new CustomEvent('inboxSDKcustomListResults', {
       bubbles: false,
       cancelable: false,

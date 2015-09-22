@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import forOwn from 'lodash/object/forOwn';
+const forOwn = require('lodash/object/forOwn');
 import querystring from 'querystring';
 import delay from './delay';
 

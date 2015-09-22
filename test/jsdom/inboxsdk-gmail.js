@@ -17,7 +17,7 @@ global.document = jsdomDoc(`<!doctype html>
 </body>
 </html>`);
 Object.defineProperty(document.location, 'origin', {value:'https://mail.google.com'});
-global.window = document.parentWindow;
+global.window = document.defaultView;
 
 // don't try to inject ajax interceptor
 document.head.setAttribute('data-inboxsdk-script-injected', true);

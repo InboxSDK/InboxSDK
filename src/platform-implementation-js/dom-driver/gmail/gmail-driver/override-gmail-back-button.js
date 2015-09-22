@@ -5,7 +5,7 @@ import _ from 'lodash';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
-import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import kefirFromEventTargetCapture from '../../../lib/kefir-from-event-target-capture';
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from '../views/gmail-route-view/gmail-route-view';
@@ -80,11 +80,11 @@ function _bindToBackButton(gmailDriver: GmailDriver, gmailRouteView: GmailRouteV
 		return;
 	}
 
-	fromEventTargetCapture(backButton, 'mousedown')
-	.takeUntil(gmailRouteView.getEventStream().filter(false).mapEnd())
-	.onValue(e => {
-		gmailDriver.goto(routeID, routeParams);
-		e.preventDefault();
-		e.stopImmediatePropagation();
-	});
+	kefirFromEventTargetCapture(backButton, 'mousedown')
+		.takeUntilBy(gmailRouteView.getStopper())
+		.onValue(e => {
+			gmailDriver.goto(routeID, routeParams);
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		});
 }

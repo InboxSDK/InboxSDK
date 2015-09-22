@@ -69,7 +69,7 @@ class Logger {
     })();
 
     if (this._isMaster && global.document) {
-      document.addEventListener('inboxSDKinjectedError', event => {
+      document.addEventListener('inboxSDKinjectedError', (event:any) => {
         var detail = event.detail;
         this.error(
           _.assign(new Error(detail.message), {stack: detail.stack}),
@@ -77,7 +77,7 @@ class Logger {
         );
       });
 
-      document.addEventListener('inboxSDKinjectedEventSdkPassive', event => {
+      document.addEventListener('inboxSDKinjectedEventSdkPassive', (event:any) => {
         var detail = event.detail;
         this.eventSdkPassive(detail.name, detail.details);
       });

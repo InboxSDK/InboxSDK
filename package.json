@@ -5,6 +5,9 @@
       "brfs"
     ]
   },
+  "optionalDependencies": {
+    "browserify-hmr": "^0.2.2"
+  },
   "dependencies": {
     "add-accessors": "^2.0.0",
     "asap": "^2.0.3",
@@ -14,10 +17,9 @@
     "babel-runtime": "^5.8.20",
     "babelify": "^6.3.0",
     "bacon-cast": "^1.1.1",
-    "baconjs": "0.7.71",
+    "baconjs": "0.7.73",
     "brfs": "^1.4.1",
     "browserify": "^11.0.1",
-    "browserify-hmr": "^0.2.2",
     "co": "^4.6.0",
     "combokeys-capture": "^2.4.2",
     "entities": "1.1.1",
@@ -37,7 +39,7 @@
     "isnumber": "^1.0.0",
     "jquery": "2.1.4",
     "jsdoc": "3.3.2",
-    "jsdom": "^3.1.2",
+    "jsdom": "^6.5.1",
     "kefir": "~2.8.1",
     "kefir-bus": "^1.0.4",
     "kefir-cast": "^2.0.0",
