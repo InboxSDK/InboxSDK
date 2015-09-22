@@ -5,7 +5,7 @@ var semver = require('semver');
 var path = require('path');
 var escapeShellArg = require('./escape-shell-arg');
 
-var optionalDeps = ['fsevents'];
+var optionalDeps = ['fsevents', 'browserify-hmr'];
 
 function checkDependency(version, depname) {
   var depPackage = require(depname+'/package.json');
