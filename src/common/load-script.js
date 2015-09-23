@@ -112,5 +112,6 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
       url,
       message: 'Failed to load script'
     }, {});
+    throw err;
   });
 }
