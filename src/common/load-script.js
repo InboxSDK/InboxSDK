@@ -3,6 +3,7 @@
 
 const once = require('lodash/function/once');
 const defer = require('lodash/function/defer');
+import logError from './log-error';
 import ajax from './ajax';
 import delay from './delay';
 
@@ -48,14 +49,15 @@ export type loadScriptOpts = {
 };
 
 export default function loadScript(url: string, opts?: loadScriptOpts): Promise<void> {
+  let pr;
   if (isContentScript()) {
-    function attempt(num: number, lastErr: ?Error): Promise<void> {
-      if (num > 3) {
+    function attempt(retryNum: number, lastErr: ?Error): Promise<void> {
+      if (retryNum > 3) {
         throw lastErr || new Error("Ran out of loadScript attempts for unknown reason");
       }
 
       return ajax({
-        url, cachebust: num > 0
+        url, cachebust: retryNum > 0
       }).then(response => {
         // jshint evil:true
 
@@ -80,8 +82,13 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
           program = indirectEval(code+"\n//# sourceURL="+url+"\n");
         } catch(err) {
           if (err && err.name === 'SyntaxError') {
-            console.warn(`SyntaxError in loading ${url}. Did we not load it fully? Trying again...`, err);
-            return delay(5000).then(() => attempt(num+1, err));
+            logError(err, {
+              retryNum,
+              caughtSyntaxError: true,
+              url,
+              message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`
+            }, {});
+            return delay(5000).then(() => attempt(retryNum+1, err));
           }
           throw err;
         }
@@ -90,14 +97,20 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
         }
       });
     }
-    return attempt(0, null);
+    pr = attempt(0, null);
   } else {
     // Try to add script as CORS first so we can get error stack data from it.
-    return addScriptToPage(url, true).catch(() => {
+    pr = addScriptToPage(url, true).catch(() => {
       // Only show the warning if we successfully load the script on retry.
       return addScriptToPage(url, false).then(() => {
         console.warn("Script "+url+" included without CORS headers. Error logs might be censored by the browser.");
       });
     });
   }
+  return pr.catch(err => {
+    logError(err, {
+      url,
+      message: 'Failed to load script'
+    }, {});
+  });
 }

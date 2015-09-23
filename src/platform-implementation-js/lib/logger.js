@@ -7,13 +7,13 @@ import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
 import getStackTrace from '../../common/get-stack-trace';
 import getExtensionId from '../../common/get-extension-id';
+import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
 var _extensionAppIds: Array<{appId: string; version: ?string}> = [];
-var _extensionSeenErrors: WeakSet<Error> = new WeakSet();
 var _extensionLoaderVersion: ?string;
 var _extensionImplVersion: ?string;
 var _extensionUserEmailHash: ?string;
@@ -274,24 +274,6 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
   }
 }
 
-function haveWeSeenThisErrorAlready(error: Error): boolean {
-  if (error && typeof error == 'object') {
-    return _extensionSeenErrors.has(error);
-  }
-  return false;
-}
-
-function markErrorAsSeen(error: Error) {
-  if (error && typeof error == 'object') {
-    _extensionSeenErrors.add(error);
-  }
-}
-
-function tooManyErrors(err2: Error, originalArgs: any) {
-  console.error("ERROR REPORTING ERROR", err2);
-  console.error("ORIGINAL ERROR", originalArgs);
-}
-
 function getAppIdsProperty(causedByAppId: ?string, onlyExtensionApps: boolean=true): any[] {
   var appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
@@ -312,94 +294,15 @@ function getAppIdsProperty(causedByAppId: ?string, onlyExtensionApps: boolean=tr
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
 function _logError(err: Error, details: any, appId: ?string, sentByApp: boolean) {
-  if (!global.document) {
-    // In tests, just throw the error.
-    throw err;
-  }
-
-  var args = arguments;
-
-  // It's important that we can't throw an error or leave a rejected promise
-  // unheard while logging an error in order to make sure to avoid ever
-  // getting into an infinite loop of reporting uncaught errors.
-  try {
-    if (haveWeSeenThisErrorAlready(err)) {
-      return;
-    } else {
-      markErrorAsSeen(err);
-    }
-
-    if (!(err instanceof Error)) {
-      console.warn('First parameter to Logger.error was not an error object:', err);
-      err = new Error("Logger.error called with non-error: "+err);
-      markErrorAsSeen(err);
-    }
-    sentByApp = !!sentByApp;
-
-    var appIds = getAppIdsProperty(appId);
-
-    // Might not have been passed a useful error object with a stack, so get
-    // our own current stack just in case.
-    var nowStack = getStackTrace();
-
-    // Show the error immediately, don't wait on implementation load for that.
-    var stuffToLog: any[] = ["Error logged:", err];
-    if (err && err.stack) {
-      stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
-    }
-    stuffToLog = stuffToLog.concat(["\n\nError logged from:\n"+nowStack]);
-    if (details) {
-      stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
-    }
-    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", JSON.stringify(appIds, null, 2)]);
-    stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
-    stuffToLog = stuffToLog.concat(["\nSession Id:", _sessionId]);
-    stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", _extensionLoaderVersion]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", _extensionImplVersion]);
-
-    console.error(...stuffToLog);
-
-    var report = {
-      message: err && err.message || err,
-      stack: err && err.stack,
-      loggedFrom: nowStack,
-      details: details,
-      appIds: appIds,
-      sentByApp: sentByApp,
-      sessionId: _sessionId,
-      emailHash: _extensionUserEmailHash,
-      extensionId: getExtensionId(),
-      loaderVersion: _extensionLoaderVersion,
-      implementationVersion: _extensionImplVersion,
-      origin: (document.location: any).origin,
-      timestamp: Date.now()*1000
-    };
-
-    _sendError(report);
-  } catch(err2) {
-    tooManyErrors(err2, args);
-  }
+  logError(err, details, {
+    appId, sentByApp,
+    appIds: getAppIdsProperty(appId),
+    sessionId: _sessionId,
+    loaderVersion: _extensionLoaderVersion,
+    implVersion: _extensionImplVersion,
+    userEmailHash: _extensionUserEmailHash
+  });
 }
-
-var _sendError = _.throttle(function(report: any) {
-  var args = arguments;
-
-  try {
-    ajax({
-      url: 'https://www.inboxsdk.com/api/v2/errors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify(report)
-    }).catch(function(err2) {
-      tooManyErrors(err2, args);
-    });
-  } catch(err2) {
-    tooManyErrors(err2, args);
-  }
-}, 1000);
 
 function makeLoggedFunction(func: Function, name: ?string): Function {
   var msg = name ? "Uncaught error in "+name : "Uncaught error";

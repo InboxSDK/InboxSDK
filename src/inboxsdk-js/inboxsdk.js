@@ -1,4 +1,5 @@
-import assign from 'lodash/object/assign';
+var assign = require('lodash/object/assign');
+var logError = require('../common/log-error');
 
 var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
 var checkRequirements = require('./check-requirements');
@@ -36,6 +37,11 @@ InboxSDK.load = function(version, appId, opts){
   var loadPromise = PlatformImplementationLoader.load(appId, opts);
   loadPromise.catch(function(err) {
     console.error("Failed to load implementation:", err, err && err.stack);
+    logError(err, {
+      type: "Failed to load implementation:"
+    }, {
+      appId
+    });
   });
   return loadPromise;
 };
