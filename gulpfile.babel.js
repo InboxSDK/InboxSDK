@@ -283,9 +283,15 @@ function parseCommentsInFile(file) {
       if (filteredStderr) {
         process.stderr.write(filteredStderr);
       }
-      var comments = JSON.parse(stdout);
-      comments['filename'] = file;
-      return comments;
+      try {
+        var comments = JSON.parse(stdout);
+        comments['filename'] = file;
+        return comments;
+      } catch(err) {
+        console.error('error in file', file, err);
+        console.error('char count:', stdout.length);
+        throw err;
+      }
     }, err => {
       console.error(err);
       return null;
