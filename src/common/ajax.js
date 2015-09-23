@@ -4,22 +4,25 @@
 const forOwn = require('lodash/object/forOwn');
 import querystring from 'querystring';
 import delay from './delay';
+import cachebustUrl from './cachebust-url';
 
-var MAX_TIMEOUT = 64*1000; //64 seconds
-var serversToIgnore = {};
+const MAX_TIMEOUT = 64*1000; //64 seconds
+const serversToIgnore = {};
 
 // Simple ajax helper.
 // opts:
 // * url
 // * [method]
+// * [cachebust] - boolean
 // * [headers] - object
 // * [xhrFields] - object
 // * [data]
 export type ajaxOpts = {
   url: string;
   method?: ?string;
-  headers?: any;
-  xhrFields?: any;
+  cachebust?: ?boolean;
+  headers?: ?{[index: string]: string};
+  xhrFields?: ?Object;
   data?: ?{[index: string]: string}|string;
   retryTimeout?: number;
 };
@@ -34,22 +37,28 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     throw new Error('URL must be given');
   }
   return new Promise(function(resolve, reject) {
-    var method = opts.method ? opts.method : "GET";
-    var stringData: ?string;
+    const method = opts.method ? opts.method : "GET";
+    let url = opts.url;
+    let stringData: ?string;
     if (opts.data) {
       stringData = typeof opts.data === "string" ? opts.data : querystring.stringify(opts.data);
-      if (method === "GET") {
-        opts.url += (/\?/.test(opts.url) ? "&" : "?") + stringData;
+      if (method === "GET" || method === "HEAD") {
+        url += (/\?/.test(url) ? "&" : "?") + stringData;
+        stringData = null;
       }
     }
 
-    var server = opts.url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//)[1];
+    const server = url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//)[1];
     if (Object.prototype.hasOwnProperty.call(serversToIgnore, server)) {
-      reject(new Error("Server at "+opts.url+" has told us to stop connecting"));
+      reject(new Error(`Server at ${url} has told us to stop connecting`));
       return;
     }
 
-    var xhr = new XMLHttpRequest();
+    if (opts.cachebust) {
+      url = cachebustUrl(url);
+    }
+
+    const xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
       if(xhr.status === 502){
@@ -57,7 +66,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
         return;
       }
 
-      var err = Object.assign((new Error("Failed to load "+opts.url): any), {
+      const err = Object.assign((new Error(`Failed to load ${url}`): any), {
         event, xhr, status: xhr.status
       });
 
@@ -70,12 +79,12 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     };
     xhr.onload = function(event) {
       resolve({
-        text: xhr.responseText,
-        xhr: xhr
+        xhr,
+        text: xhr.responseText
       });
     };
-    xhr.open(method, opts.url, true);
-    forOwn(opts.headers, function(value, name) {
+    xhr.open(method, url, true);
+    forOwn(opts.headers, (value, name) => {
       xhr.setRequestHeader(name, value);
     });
     xhr.send(stringData);
@@ -83,7 +92,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
 }
 
 function _retry(opts: ajaxOpts): Promise<ajaxResponse>{
-  var retryTimeout = opts.retryTimeout;
+  let retryTimeout = opts.retryTimeout;
   if(!retryTimeout){
     retryTimeout = 2*1000; //2 seconds
   }
@@ -91,7 +100,5 @@ function _retry(opts: ajaxOpts): Promise<ajaxResponse>{
     retryTimeout = Math.min(retryTimeout*2, MAX_TIMEOUT);
   }
 
-  opts.retryTimeout = retryTimeout;
-
-  return delay(retryTimeout).then(() => ajax(opts));
+  return delay(retryTimeout).then(() => ajax({...opts, retryTimeout}));
 }
