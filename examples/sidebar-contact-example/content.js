@@ -4,9 +4,9 @@ InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 	sdk.Conversations.registerThreadViewHandler(function(threadView){
 		console.log('threadView id', threadView.getThreadID());
 
-		var messages = threadView.getMessageViews();
+		var messages = threadView.getMessageViewsAll();
 		messages.forEach(function(message) {
-			console.log(message.getDateString());
+			console.log(message, message.isLoaded(), message.getViewState(), message.isLoaded() && message.getMessageID(), message.isLoaded() && message.getBodyElement());
 		});
 		var lastMessage = messages[messages.length - 1];
 

@@ -324,21 +324,7 @@ _.extend(GmailMessageView.prototype, {
 	},
 
 	_processInitialState: function(){
-		var self = this;
-
-		setTimeout(
-			function(){
-				if (self._element) {
-					self._eventStream.push({
-						type: 'internal',
-						eventName: 'messageCreated',
-						view: self
-					});
-					self._checkMessageOpenState(self._element.classList);
-				}
-			},
-			1
-		);
+		this._checkMessageOpenState(this._element.classList);
 	},
 
 	_checkMessageOpenState: function(classList){

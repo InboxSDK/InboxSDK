@@ -1,6 +1,7 @@
 /* @flow */
 // jshint ignore:start
 
+const asap = require('asap');
 import _ from 'lodash';
 import util from 'util';
 import Bacon from 'baconjs';
@@ -35,7 +36,10 @@ class GmailThreadView {
 		this._messageViewDrivers = [];
 
 		this._setupToolbarView();
-		this._setupMessageViewStream();
+		asap(() => {
+			// Don't emit anything before anyone has had a chance to start listening!
+			this._setupMessageViewStream();
+		});
 	}
 
 	getEventStream(): Bacon.Observable { return this._eventStream; }
@@ -213,6 +217,11 @@ class GmailThreadView {
 		this._eventStream.plug(messageView.getEventStream());
 
 		this._messageViewDrivers.push(messageView);
+		this._eventStream.push({
+			type: 'internal',
+			eventName: 'messageCreated',
+			view: messageView
+		});
 	}
 }
 
