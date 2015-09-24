@@ -1,18 +1,19 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var $ = require('jquery');
+const _ = require('lodash');
+const Bacon = require('baconjs');
+const $ = require('jquery');
+const asap = require('asap');
 
-var MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
+const MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
 
-var GmailAttachmentAreaView = require('./gmail-attachment-area-view');
-var GmailAttachmentCardView = require('./gmail-attachment-card-view');
+const GmailAttachmentAreaView = require('./gmail-attachment-area-view');
+const GmailAttachmentCardView = require('./gmail-attachment-card-view');
 
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 
-import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
+const Kefir = require('kefir');
+const kefirCast = require('kefir-cast');
 
 var GmailMessageView = function(element, gmailThreadView, driver){
 	MessageViewDriver.call(this);
@@ -30,8 +31,10 @@ var GmailMessageView = function(element, gmailThreadView, driver){
 	}).map('.change');
 
 	this._setupMessageStateStream();
-	this._processInitialState();
 	this._monitorEmailAddressHovering();
+	asap(() => {
+		this._processInitialState();
+	});
 };
 
 GmailMessageView.prototype = Object.create(MessageViewDriver.prototype);
