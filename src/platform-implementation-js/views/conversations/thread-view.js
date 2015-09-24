@@ -53,7 +53,8 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	},
 
 	/**
-	* Gets all the loaded MessageView objects in the thread. See MessageView for more information on what "loaded" means.
+	* Gets all the loaded MessageView objects currently in the thread. See MessageView for more information on what "loaded" means. Note that Gmail may load more messages into the thread later!
+	* If it's important to get future messages, use {Conversations.registerMessageViewHandler} instead.
 	* @return {MessageView[]} an array of message view objects
 	*/
 	getMessageViews: function(){
@@ -75,7 +76,8 @@ _.extend(ThreadView.prototype, /** @lends ThreadView */ {
 	},
 
 	/**
-	* Gets all the {MessageView} objects in the thread regardless of their load state. See {MessageView} for more information on what "loaded" means.
+	* Gets all the {MessageView} objects in the thread regardless of their load state. See {MessageView} for more information on what "loaded" means. Note that Gmail may load more messages into the thread later!
+	* If it's important to get future messages, use {Conversations.registerMessageViewHandlerAll} instead.
 	* @return {MessageView[]} an array of message view objects
 	*/
 	getMessageViewsAll: function(){
