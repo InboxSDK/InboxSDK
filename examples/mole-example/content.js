@@ -42,6 +42,8 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		mole.on('destroy', console.log.bind(console, 'mole destroy'));
 		mole.on('minimize', console.log.bind(console, 'mole minimize'));
 		mole.on('restore', console.log.bind(console, 'mole restore'));
+
+		return mole;
 	};
 
 	makeMoleWidget();

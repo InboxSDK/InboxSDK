@@ -3,6 +3,7 @@
 
 import _ from 'lodash';
 import $ from 'jquery';
+import {defn} from 'ud';
 import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -27,7 +28,7 @@ export type Options = {
   titleButtons?: MoleButtonDescriptor[];
 };
 
-export default class GmailMoleViewDriver {
+const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   _eventStream: kefirBus;
   _stopper: kefirStopper;
   _element: HTMLElement;
@@ -129,6 +130,14 @@ export default class GmailMoleViewDriver {
       this._eventStream.emit({eventName:'minimize'});
     } else {
       this._element.classList.remove('inboxsdk__minimized');
+
+      // If the mole is off the left edge of the screen, then move it to the
+      // right.
+      const moleParent = this._element.parentElement;
+      if (moleParent && this._element.getBoundingClientRect().left < 0) {
+        moleParent.insertBefore(this._element, _.last(moleParent.children));
+      }
+
       this._eventStream.emit({eventName:'restore'});
     }
   }
@@ -163,7 +172,8 @@ export default class GmailMoleViewDriver {
     this._eventStream.end();
     this._stopper.destroy();
   }
-}
+});
+export default GmailMoleViewDriver;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
