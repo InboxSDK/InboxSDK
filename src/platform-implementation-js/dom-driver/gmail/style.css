@@ -520,6 +520,9 @@ div.inboxsdk__compose_statusbar {
 .inboxsdk__moles_in_use .nH > .nH > .no {
   white-space: nowrap;
 }
+.inboxsdk__moles_in_use .nH > .nH > .no > * {
+  white-space: initial;
+}
 .inboxsdk__moles_in_use .nH > .nH > .no > .nn {
   display: inline-block;
   float: none;
