@@ -515,13 +515,22 @@ div.inboxsdk__compose_statusbar {
   left: auto !important;
 }
 
+/* Make it so the compose/mole layer doesn't wrap, so we don't have to do a lot
+ * of fancy logic to hide moles ourselves when things get too crowded. */
+.inboxsdk__moles_in_use .nH > .nH > .no {
+  white-space: nowrap;
+}
+.inboxsdk__moles_in_use .nH > .nH > .no > .nn {
+  display: inline-block;
+  float: none;
+}
+
 .inboxsdk__mole_view {
   position: relative;
   max-width: 564px;
   height: 100vh;
-  float: left;
-  display: flex;
-  display: -webkit-flex;
+  display: inline-flex;
+  display: -webkit-inline-flex;
   align-items: flex-end;
   -webkit-align-items: flex-end;
 }
