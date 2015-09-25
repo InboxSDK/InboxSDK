@@ -1,12 +1,20 @@
 InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
 	window._sdk = sdk;
 
-	sdk.Conversations.registerThreadViewHandler(function(threadView){
-		console.log('threadView id', threadView.getThreadID());
+	sdk.Conversations.registerMessageViewHandlerAll(function(messageView) {
+		console.log('messageView all, loaded', messageView.isLoaded(), messageView);
+	});
 
-		var messages = threadView.getMessageViews();
+	sdk.Conversations.registerMessageViewHandler(function(messageView) {
+		console.log('messageView id', messageView.getMessageID(), messageView);
+	});
+
+	sdk.Conversations.registerThreadViewHandler(function(threadView){
+		console.log('threadView id', threadView.getThreadID(), threadView.getMessageViewsAll().length, threadView.getMessageViews().length);
+
+		var messages = threadView.getMessageViewsAll();
 		messages.forEach(function(message) {
-			console.log(message.getDateString());
+			//console.log(message, message.isLoaded(), message.getViewState(), message.isLoaded() && message.getMessageID(), message.isLoaded() && message.getBodyElement());
 		});
 		var lastMessage = messages[messages.length - 1];
 
