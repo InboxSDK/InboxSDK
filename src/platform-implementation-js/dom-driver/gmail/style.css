@@ -532,6 +532,7 @@ div.inboxsdk__compose_statusbar {
   position: relative;
   max-width: 564px;
   height: 100vh;
+  vertical-align: top;
   display: inline-flex;
   display: -webkit-inline-flex;
   align-items: flex-end;
