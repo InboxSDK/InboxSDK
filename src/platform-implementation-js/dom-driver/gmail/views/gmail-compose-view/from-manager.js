@@ -1,8 +1,14 @@
-import _ from 'lodash';
-import simulateClick from '../../../../lib/dom/simulate-click';
+/* @flow */
+//jshint ignore:start
 
-export function getFromContact(driver, gmailComposeView) {
-  const emailAddress = gmailComposeView.getElement().querySelector('input[name="from"]').value;
+const _ = require('lodash');
+import simulateClick from '../../../../lib/dom/simulate-click';
+import type GmailDriver from '../../gmail-driver';
+import type GmailComposeView from '../../views/gmail-compose-view';
+
+export function getFromContact(driver: GmailDriver, gmailComposeView: GmailComposeView): Contact {
+  const nameInput: ?HTMLInputElement = (gmailComposeView.getElement().querySelector('input[name="from"]'):any);
+  const emailAddress = nameInput ? nameInput.value : null;
   if (!emailAddress) {
     return driver.getUserContact();
   }
@@ -11,7 +17,7 @@ export function getFromContact(driver, gmailComposeView) {
   return {emailAddress, name};
 }
 
-export function getFromContactChoices(driver, gmailComposeView) {
+export function getFromContactChoices(driver: GmailDriver, gmailComposeView: GmailComposeView): Contact[] {
   const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
   if (!choiceParent) {
     // From field isn't present
@@ -23,7 +29,7 @@ export function getFromContactChoices(driver, gmailComposeView) {
   }));
 }
 
-export function setFromEmail(driver, gmailComposeView, email) {
+export function setFromEmail(driver: GmailDriver, gmailComposeView: GmailComposeView, email: string) {
   let currentFromAddress = gmailComposeView.getFromContact().emailAddress;
   if(currentFromAddress === email){
     return;
