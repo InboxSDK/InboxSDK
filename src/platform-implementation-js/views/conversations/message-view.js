@@ -126,7 +126,7 @@ _.extend(MessageView.prototype, /** @lends MessageView */{
 	* @return {boolean}
 	*/
 	isElementInQuotedArea: function(element){
-		memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
+		return memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
 	},
 
 	/**
