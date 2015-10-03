@@ -1,18 +1,28 @@
 /* @flow */
 //jshint ignore:start
 
+import {defn} from 'ud';
 import GmailElementGetter from '../gmail-element-getter';
 
-export default function showCustomRouteView(gmailDriver: any, element: HTMLElement) {
-	var contentSectionElement = GmailElementGetter.getContentSectionElement();
+const showCustomRouteView = defn(module, function showCustomRouteView(gmailDriver: any, element: HTMLElement) {
+	const contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
 		return;
 	}
 
-	var customViewContainerElement = _getCustomViewContainerElement(contentSectionElement);
+	const selection = (document:any).getSelection();
+	for (let i=0; i<selection.rangeCount; i++) {
+		const range: Range = selection.getRangeAt(i);
+		if (range.intersectsNode && range.intersectsNode(contentSectionElement)) {
+			selection.removeAllRanges();
+			break;
+		}
+	}
+
+	const customViewContainerElement = _getCustomViewContainerElement(contentSectionElement);
 	customViewContainerElement.appendChild(element);
 
-	var children = (contentSectionElement:any).children;
+	const children = (contentSectionElement:any).children;
 	Array.prototype.forEach.call(children, (child: HTMLElement) => {
 		if(child.classList.contains('inboxsdk__custom_view')){
 			return;
@@ -22,10 +32,11 @@ export default function showCustomRouteView(gmailDriver: any, element: HTMLEleme
 	});
 
 	document.body.classList.add('inboxsdk__custom_view_active');
-}
+});
+export default showCustomRouteView;
 
 function _getCustomViewContainerElement(contentSectionElement: HTMLElement): HTMLElement {
-	var customViewContainerElement = contentSectionElement.querySelector('.inboxsdk__custom_view');
+	let customViewContainerElement = contentSectionElement.querySelector('.inboxsdk__custom_view');
 	if(customViewContainerElement){
 		return customViewContainerElement;
 	}
