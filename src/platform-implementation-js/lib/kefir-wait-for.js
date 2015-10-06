@@ -25,5 +25,5 @@ export default function kefirWaitFor<T>(condition:() => ?T, timeout:number=60*10
     Kefir.interval(steptime, null)
   ).map(() =>
     (condition():any)
-  ).filter(Boolean).merge(timeoutStream).take(1).endOnError();
+  ).filter(Boolean).merge(timeoutStream).take(1).takeErrors(1);
 }

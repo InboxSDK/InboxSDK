@@ -2,9 +2,9 @@
 
 declare module kefir {
   declare type Event<T> =
-    {type: 'value', value: T, current: boolean} |
-    {type: 'error', value: any, current: boolean} |
-    {type: 'end', value: void, current: boolean};
+    {type: 'value', value: T} |
+    {type: 'error', value: any} |
+    {type: 'end', value: void};
 
   // represents EventStreams and Properties. Yeah, kinda hacky that they're mixed.
   declare class Stream<T> {
@@ -41,16 +41,12 @@ declare module kefir {
     delay(n: number): Stream<T>;
     throttle(n: number, options?: {leading?: boolean, trailing?: boolean}): Stream<T>;
     debounce(n: number, options?: {immediate?: boolean}): Stream<T>;
-    valuesToErrors(): Stream;
-    valuesToErrors(handler: (value: T) => {convert: boolean, error?: any}): Stream<T>;
-    errorsToValues(): Stream<any>;
-    errorsToValues<U>(handler: (error: any) => {convert: boolean, value?: U}): Stream<T|U>;
     mapErrors(fn: (error: any) => any): Stream<T>;
     filterErrors(fn: (error: any) => any): Stream<T>;
-    endOnError(): Stream<T>;
-    skipValues(): Stream;
-    skipErrors(): Stream<T>;
-    skipEnd(): Stream<T>;
+    takeErrors(n: number): Stream<T>;
+    ignoreValues(): Stream;
+    ignoreErrors(): Stream<T>;
+    ignoreEnd(): Stream<T>;
     beforeEnd<U>(fn: () => U): Stream<T|U>;
     slidingWindow(max: number, min?: number): Stream<T[]>;
     bufferWhile(predicate?: (value: T) => boolean, options?: {flushOnEnd?: boolean}): Stream<T[]>;
@@ -78,13 +74,10 @@ declare module kefir {
     flatMapErrors<U>(transform: (error: any) => Stream<U>): Stream<T|U>;
 
     filterBy(otherObs: Stream): Stream<T>;
-    sampledBy(otherObs: Stream): Stream<T>;
-    sampledBy<U,Z>(otherObs: Stream<U>, combinator: (t: T, u: U) => Z): Stream<Z>;
     skipUntilBy(otherObs: Stream): Stream<T>;
     takeUntilBy(otherObs: Stream): Stream<T>;
     bufferBy(otherObs: Stream, options?: {flushOnEnd?: boolean}): Stream<T[]>;
     bufferWhileBy(otherObs: Stream, options?: {flushOnEnd?: boolean, flushOnChange?: boolean}): Stream<T[]>;
-    awaiting(otherObs: Stream): Stream<boolean>;
   }
 
   declare class Emitter<T> extends Stream<T> {
@@ -116,6 +109,9 @@ declare module kefir {
   declare function constant<T>(value: T): Stream<T>;
   declare function constantError(err: any): Stream;
   declare function fromPromise<T>(promise: Promise<T>): Stream<T>;
+
+  declare function fromESObservable(observable: {subscribe: Function}): Stream;
+  declare function toESObservable(): {subscribe: Function};
 
   declare function combine<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function combine<T,U>(obss: Stream<T>[], passiveObss?: Stream<U>[]): Stream<Array<T|U>>;
