@@ -76,7 +76,9 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 			members.driver.getRouteViewDriverStream()
 		)
 			.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
-			.onValue(_handleRouteViewChange, navItemViewDriver);
+			.onValue(x => {
+				_handleRouteViewChange(navItemViewDriver, x);
+			});
 
 		members.deferred.resolve(navItemViewDriver);
 	},

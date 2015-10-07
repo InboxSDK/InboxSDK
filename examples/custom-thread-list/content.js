@@ -134,12 +134,22 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		}
 	});
 
-	var customNavItem = sdk.NavMenu.addNavItem({
-		name: 'TL Custom View',
-		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-		routeID: 'tlexample/:monkeyName',
-		routeParams: {monkeyName: 'george {} {} {}'},
-	});
+	var parentItem = sdk.NavMenu.addNavItem({name: 'Parent'});
+	var parent2Item;
+	function initItems() {
+		if (parent2Item) parent2Item.remove();
+		parent2Item = parentItem.addNavItem({
+			name: 'Parent2'
+		});
+		var customNavItem = parent2Item.addNavItem({
+			name: 'TL Custom View',
+			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+			routeID: 'tlexample/:monkeyName',
+			routeParams: {monkeyName: 'george {} {} {}'},
+		});
+	}
+	initItems();
+	setInterval(initItems, 10000);
 
 	var listNavItem = sdk.NavMenu.addNavItem({
 		name: 'TL Custom List',

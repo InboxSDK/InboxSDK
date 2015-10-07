@@ -68,7 +68,7 @@ _.extend(ButterBar.prototype, /** @lends ButterBar */ {
       // called.
       stopper.plug(
         Bacon.later(0, null).flatMap(
-          members.driver.getRouteViewDriverStream()
+          members.driver.getRouteViewDriverStream().changes()
         ).map(null)
       );
     }

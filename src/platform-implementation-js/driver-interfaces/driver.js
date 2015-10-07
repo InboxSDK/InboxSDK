@@ -15,7 +15,7 @@ import type {ComposeViewDriver} from './compose-view-driver';
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
-	getRouteViewDriverStream(): Bacon.Observable<Object>;
+	getRouteViewDriverStream(): Bacon.Observable<Object>; // should be a property
 	getRowListViewDriverStream(): Bacon.Observable<Object>;
 	openComposeWindow(): void;
 	getComposeViewDriverStream(): Bacon.Observable<ComposeViewDriver>;

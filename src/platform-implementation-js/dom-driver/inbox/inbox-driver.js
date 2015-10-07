@@ -86,7 +86,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       .map(({el}) => new InboxRouteView(el));
     */
 
-    this._routeViewDriverStream = Bacon.never(); //Bacon.mergeAll(mainViews, searchViews);
+    this._routeViewDriverStream = Bacon.never().toProperty(); //Bacon.mergeAll(mainViews, searchViews);
     this._rowListViewDriverStream = Bacon.never();
     this._composeViewDriverStream = baconCast(Bacon,
       getComposeViewDriverStream(this).takeUntilBy(this._stopper)

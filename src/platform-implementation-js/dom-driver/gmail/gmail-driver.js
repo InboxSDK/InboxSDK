@@ -318,7 +318,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 				this._gmailRouteProcessor, this
 			)).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(this._pageCommunicator);
-			}).takeUntil(this._bStopper);
+			}).takeUntil(this._bStopper).toProperty();
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntil(this._bStopper);
 
