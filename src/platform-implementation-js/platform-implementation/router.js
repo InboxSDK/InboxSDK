@@ -47,12 +47,12 @@ var Router = function(appId, driver, membraneMap){
 
 	members.membraneMap = membraneMap;
 
-	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
-
 	members.listRouteHandlerRegistries = {};
 	_.forOwn(this.NativeListRouteIDs, value => {
 		members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 	});
+
+	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
 
 	driver.getStopper().onValue(function() {
 		members.allRoutesHandlerRegistry.dumpHandlers();
