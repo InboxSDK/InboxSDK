@@ -46,7 +46,7 @@ describe("ButterBar", function() {
     it("doesn't fail", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
       const options = {text: 'a'};
@@ -58,22 +58,23 @@ describe("ButterBar", function() {
     });
 
     it("destroys on route change", function(done) {
+      const routeViewDriverStream = new Bacon.Bus();
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(new Bacon.Bus())
+        getRouteViewDriverStream: _.constant(routeViewDriverStream.toProperty())
       };
       const butterBar = new ButterBar('test', driver);
       const message = butterBar.showMessage({text: 'a'});
       // Route view changes shouldn't be listened to immediately by butterbar.
       // This first route view change shouldn't kill things.
-      driver.getRouteViewDriverStream().push({});
+      routeViewDriverStream.push({});
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
       assert(driver.getButterBarDriver()._currentMessage);
 
       setTimeout(() => {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert(driver.getButterBarDriver()._currentMessage);
-        driver.getRouteViewDriverStream().push({});
+        routeViewDriverStream.push({});
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
@@ -83,7 +84,7 @@ describe("ButterBar", function() {
     it("destroys after given time passes", function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
       const message = butterBar.showMessage({text: 'a', time:1});
@@ -101,7 +102,7 @@ describe("ButterBar", function() {
     it("low priority messages don't interrupt higher priority messages", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
       const options1 = {text: 'a', priority: 2};
@@ -121,7 +122,7 @@ describe("ButterBar", function() {
     it("low priority persistent messages queue up", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
       const options1 = {text: 'a', priority: 2};
@@ -157,7 +158,7 @@ describe("ButterBar", function() {
     it("messages of equal or higher priority interrupt others", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -186,7 +187,7 @@ describe("ButterBar", function() {
     it("interrupted messages come back if they're persistent", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -218,7 +219,7 @@ describe("ButterBar", function() {
     it('resolves', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -243,7 +244,7 @@ describe("ButterBar", function() {
     it('respects showConfirmation', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -267,7 +268,7 @@ describe("ButterBar", function() {
     it('rejects', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -291,7 +292,7 @@ describe("ButterBar", function() {
     it('has a high priority saved message', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -326,7 +327,7 @@ describe("ButterBar", function() {
     it("works", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
@@ -352,7 +353,7 @@ describe("ButterBar", function() {
     it("calls driver", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never())
+        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
       };
       const butterBar = new ButterBar('test', driver);
 
