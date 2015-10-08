@@ -42,22 +42,20 @@ export default function containByScreen(element: HTMLElement, anchorPoint: HTMLE
   var elRect: Rect = element.getBoundingClientRect();
   var anchorRect: Rect = anchorPoint.getBoundingClientRect();
 
-  {
-    const buffer = options.buffer || 0;
-    const topBuffer = options.topBuffer || 0;
-    const bottomBuffer = options.bottomBuffer || 0;
-    const leftBuffer = options.leftBuffer || 0;
-    const rightBuffer = options.rightBuffer || 0;
+  const buffer = options.buffer || 0;
+  const topBuffer = options.topBuffer || 0;
+  const bottomBuffer = options.bottomBuffer || 0;
+  const leftBuffer = options.leftBuffer || 0;
+  const rightBuffer = options.rightBuffer || 0;
 
-    anchorRect = {
-      top: anchorRect.top-buffer-topBuffer,
-      bottom: anchorRect.bottom+buffer+bottomBuffer,
-      height: anchorRect.height+2*buffer+topBuffer+bottomBuffer,
-      left: anchorRect.left-buffer-leftBuffer,
-      right: anchorRect.right+buffer+rightBuffer,
-      width: anchorRect.width+2*buffer+leftBuffer+rightBuffer
-    };
-  }
+  anchorRect = {
+    top: anchorRect.top-buffer-topBuffer,
+    bottom: anchorRect.bottom+buffer+bottomBuffer,
+    height: anchorRect.height+2*buffer+topBuffer+bottomBuffer,
+    left: anchorRect.left-buffer-leftBuffer,
+    right: anchorRect.right+buffer+rightBuffer,
+    width: anchorRect.width+2*buffer+leftBuffer+rightBuffer
+  };
 
   var positions: Position[] = options.position && options.forcePosition ?
     [options.position] :
@@ -108,8 +106,8 @@ export default function containByScreen(element: HTMLElement, anchorPoint: HTMLE
     };
   }
 
-  element.style.top = `${choiceAndCoord.coord.top}px`;
-  element.style.left = `${choiceAndCoord.coord.left}px`;
+  element.style.top = `${choiceAndCoord.coord.top + buffer + topBuffer}px`;
+  element.style.left = `${choiceAndCoord.coord.left + buffer + leftBuffer}px`;
 
   return choiceAndCoord.choice;
 }
