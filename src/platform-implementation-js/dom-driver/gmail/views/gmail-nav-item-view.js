@@ -297,6 +297,9 @@ _.extend(GmailNavItemView.prototype, {
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
+		buttonOptions.dropdownPositionOptions = {
+			position: 'bottom', hAlign: 'left', vAlign: 'top'
+		};
 
 		var accessoryViewController = new DropdownButtonViewController(buttonOptions);
 		this._accessoryViewController = accessoryViewController;
