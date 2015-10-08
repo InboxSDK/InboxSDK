@@ -501,7 +501,10 @@ export default class GmailThreadRowView {
               } else {
                 this._elements[0].classList.add('inboxsdk__dropdown_active');
                 appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
-                appEvent.dropdown.on('destroy', function() {
+                activeDropdown.setPlacementOptions({
+                  position: 'bottom', hAlign: 'left', vAlign: 'top'
+                });
+                activeDropdown.on('destroy', function() {
                   setTimeout(function() {
                     activeDropdown = null;
                   }, 1);

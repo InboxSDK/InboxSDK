@@ -7,7 +7,7 @@ var Kefir = require('kefir');
 
 var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
 var kefirFromEventTargetCapture = require('../../lib/kefir-from-event-target-capture');
-var containByScreen = require('../../lib/dom/contain-by-screen');
+var containByScreen2 = require('../../lib/dom/contain-by-screen2');
 
 /**
  * @class
@@ -15,10 +15,14 @@ var containByScreen = require('../../lib/dom/contain-by-screen');
  * The dropdown can be filled with your apps content, but it automatically handles dismissing
  * the dropdown on certain user actions.
  */
-var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions){
+var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	EventEmitter.call(this);
 
 	this._dropdownViewDriver = dropdownViewDriver;
+	this._userPlacementOptions = {hAlign: 'left'};
+
+	// type options: ?{manualPosition?: boolean}
+	this._options = options || {};
 
 	/**
 	 * The HTML element that is displayed in the dropdown.
@@ -26,10 +30,6 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	 */
 	this.el = dropdownViewDriver.getContentElement();
 	this.closed = false;
-
-	if(!placementOptions || !placementOptions.manualPosition){
-		this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
-	}
 
 	document.body.insertBefore(this._dropdownViewDriver.getContainerElement(), document.body.firstElementChild);
 
@@ -40,32 +40,36 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 	this._dropdownViewDriver.getContainerElement().focus();
 
 	Kefir.merge([
-		kefirFromEventTargetCapture(document, 'focus'),
-		kefirFromEventTargetCapture(document, 'click')
-	]).filter(event =>
-		!anchorElement.contains(event.target) &&
-			!this._dropdownViewDriver.getContainerElement().contains(event.target)
-	).takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-	.onValue(() => {
-		this.close();
-	});
+			kefirFromEventTargetCapture(document, 'focus'),
+			kefirFromEventTargetCapture(document, 'click')
+		])
+		.filter(event =>
+			!anchorElement.contains(event.target) &&
+				!this._dropdownViewDriver.getContainerElement().contains(event.target)
+		)
+		.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+		.onValue(() => {
+			this.close();
+		});
 
-	if(!placementOptions || !placementOptions.manualPosition){
+	if(!this._options.manualPosition){
+		this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
+
 		asap(() => {
-			if (!this.closed) {
-				var containerEl = dropdownViewDriver.getContainerElement();
+			if (this.closed) return;
+			var containerEl = dropdownViewDriver.getContainerElement();
 
-				kefirMakeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
-					childList: true, attributes: true,
-					characterData: true, subtree: true
-				})
-					.toProperty(()=>null)
-					.throttle(200)
-					.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-					.onValue(function(event) {
-						containByScreen(containerEl, anchorElement, placementOptions);
-					});
-			}
+			kefirMakeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
+				childList: true, attributes: true,
+				characterData: true, subtree: true
+			})
+				.merge(Kefir.fromEvents(this, '_placementOptionsUpdated'))
+				.toProperty(()=>null)
+				.throttle(200)
+				.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+				.onValue(event => {
+					containByScreen2(containerEl, anchorElement, this._userPlacementOptions);
+				});
 		});
 	}
 };
@@ -73,6 +77,12 @@ var DropdownView = function(dropdownViewDriver, anchorElement, placementOptions)
 util.inherits(DropdownView, EventEmitter);
 
 _.assign(DropdownView.prototype, /** @lends DropdownView */ {
+
+	// Takes options that containByScreen2 accepts
+	setPlacementOptions: function(options) {
+		Object.assign(this._userPlacementOptions, options);
+		this.emit('_placementOptionsUpdated');
+	},
 
 	/**
 	 * Closes the dropdown

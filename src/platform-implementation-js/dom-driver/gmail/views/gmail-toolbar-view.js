@@ -128,7 +128,7 @@ _.extend(GmailToolbarView.prototype, {
 				dropdownViewDriverClass: GmailDropdownView,
 				dropdownShowFunction: buttonDescriptor.onClick,
 				dropdownPositionOptions: {
-					isRightAligned: true
+					hAlign: 'right'
 				}
 			});
 		}

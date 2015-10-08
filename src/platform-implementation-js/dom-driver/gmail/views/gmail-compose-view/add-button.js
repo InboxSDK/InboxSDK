@@ -109,7 +109,7 @@ function _getButtonViewController(buttonDescriptor: Object){
 	if(buttonDescriptor.hasDropdown){
 		_.assign(options, {
 			dropdownViewDriverClass: GmailDropdownView,
-			dropdownPositionOptions: {isBottomAligned: true}
+			dropdownPositionOptions: {vAlign: 'top'}
 		});
 		buttonViewController = new DropdownButtonViewController(options);
 	}

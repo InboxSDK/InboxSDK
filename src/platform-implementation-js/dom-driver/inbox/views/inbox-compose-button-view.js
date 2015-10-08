@@ -46,7 +46,10 @@ var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
           return;
         } else {
           this._buttonEl.classList.add('inboxsdk__active');
-          dropdown = new DropdownView(new InboxDropdownView(), div, {isBottomAligned: true});
+          dropdown = new DropdownView(new InboxDropdownView(), div);
+          dropdown.setPlacementOptions({
+            vAlign: 'bottom'
+          });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
             dropdown = null;

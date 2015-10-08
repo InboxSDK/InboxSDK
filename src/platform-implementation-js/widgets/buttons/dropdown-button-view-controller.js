@@ -30,7 +30,10 @@ _.extend(DropdownButtonViewController.prototype, {
 
 	showDropdown: function(){
 		this._view.activate();
-		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), this._dropdownPositionOptions);
+		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), null);
+		if (this._dropdownPositionOptions) {
+			this._dropdownView.setPlacementOptions(this._dropdownPositionOptions);
+		}
 
 		this._dropdownView.on('destroy', this._dropdownClosed.bind(this));
 
