@@ -15,6 +15,10 @@ export type Options = {
   vAlign?: ?VAlign;
   forceVAlign?: ?boolean;
   buffer?: ?number;
+  topBuffer?: ?number;
+  bottomBuffer?: ?number;
+  leftBuffer?: ?number;
+  rightBuffer?: ?number;
 };
 
 type Rect = { // Similar to ClientRect
@@ -37,15 +41,21 @@ export default function containByScreen(element: HTMLElement, anchorPoint: HTMLE
 
   var elRect: Rect = element.getBoundingClientRect();
   var anchorRect: Rect = anchorPoint.getBoundingClientRect();
-  if (options.buffer) {
-    var buffer = options.buffer;
+
+  {
+    const buffer = options.buffer || 0;
+    const topBuffer = options.topBuffer || 0;
+    const bottomBuffer = options.bottomBuffer || 0;
+    const leftBuffer = options.leftBuffer || 0;
+    const rightBuffer = options.rightBuffer || 0;
+
     anchorRect = {
-      top: anchorRect.top-buffer,
-      bottom: anchorRect.bottom+buffer,
-      height: anchorRect.height+2*buffer,
-      left: anchorRect.left-buffer,
-      right: anchorRect.right+buffer,
-      width: anchorRect.width+2*buffer
+      top: anchorRect.top-buffer-topBuffer,
+      bottom: anchorRect.bottom+buffer+bottomBuffer,
+      height: anchorRect.height+2*buffer+topBuffer+bottomBuffer,
+      left: anchorRect.left-buffer-leftBuffer,
+      right: anchorRect.right+buffer+rightBuffer,
+      width: anchorRect.width+2*buffer+leftBuffer+rightBuffer
     };
   }
 
