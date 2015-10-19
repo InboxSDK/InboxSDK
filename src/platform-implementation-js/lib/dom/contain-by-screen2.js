@@ -7,6 +7,7 @@ type Position = 'top'|'bottom'|'left'|'right';
 type HAlign = 'center'|'left'|'right';
 type VAlign = 'center'|'top'|'bottom';
 
+// see src/docs/position-options.js for a description
 export type Options = {
   position?: ?Position;
   forcePosition?: ?boolean;

@@ -78,7 +78,11 @@ util.inherits(DropdownView, EventEmitter);
 
 _.assign(DropdownView.prototype, /** @lends DropdownView */ {
 
-	// Takes options that containByScreen2 accepts
+	/**
+	 * This allows the position settings of the dropdown to be changed.
+	 * @param  {PositionOptions} options
+	 * @return {void}
+	 */
 	setPlacementOptions: function(options) {
 		Object.assign(this._userPlacementOptions, options);
 		this.emit('_placementOptionsUpdated');
