@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2014-2014, Rewardly, Inc.
  *
  *
@@ -6,9 +6,8 @@
  * member variables. Also adds a "destroy" function to help clear out references and
  * prevent memory leaks
  *
- * DEPRECATED, Superseded by add-accessors.js
- *
  */
+// DEPRECATED, superseded by add-accessors.js
 
 import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';

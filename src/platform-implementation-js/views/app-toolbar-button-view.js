@@ -6,12 +6,7 @@ var EventEmitter = require('../lib/safe-event-emitter');
 
 var memberMap = new WeakMap();
 
-
-/**
- * @class
- * Object that represents an app toolbar button that has been already added to the top
- * navigation area of Gmail or Inbox. This class is returned by {Toolbars.setAppToolbarButton()}.
- */
+// Documented in src/docs/app-toolbar-button-view.js
 var AppToolbarButtonView = function(driver, appToolbarButtonViewDriverPromise){
 	EventEmitter.call(this);
 
@@ -36,12 +31,8 @@ var AppToolbarButtonView = function(driver, appToolbarButtonViewDriverPromise){
 
 AppToolbarButtonView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
+_.extend(AppToolbarButtonView.prototype, {
 
-	/**
-	*	Open the dropdown for the app toolbar button
-	* @return {void}
-	*/
 	open: function(){
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
@@ -49,10 +40,6 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 		});
 	},
 
-	/**
-	*	Close the dropdown for the app toolbar button
-	* @return {void}
-	*/
 	close: function(){
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
@@ -60,10 +47,6 @@ _.extend(AppToolbarButtonView.prototype, /** @lends AppToolbarButtonView */ {
 		});
 	},
 
-	/**
-	*	Remove the app toolbar button from Gmail/Inbox
-	* @return {void}
-	*/
 	remove: function(){
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){

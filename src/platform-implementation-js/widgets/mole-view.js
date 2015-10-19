@@ -9,11 +9,7 @@ var EventEmitter = require('../lib/safe-event-emitter');
 
 var memberMap = new WeakMap();
 
-/**
- * @class
- * Represents a mole view. These are modals attached to the bottom of the
- * viewport, like a compose view.
- */
+// documented in src/docs/
 function MoleView(options) {
   EventEmitter.call(this);
 
@@ -32,60 +28,27 @@ function MoleView(options) {
 
 util.inherits(MoleView, EventEmitter);
 
-_.assign(MoleView.prototype, /** @lends MoleView */ {
+_.assign(MoleView.prototype, {
 
-  /**
-   * This closes the mole view. Does nothing if already closed.
-   * @return {void}
-   */
-  close: function() {
+  close() {
     var members = memberMap.get(this);
     members.driver.destroy();
   },
 
-  /**
-   * This allows the title to be changed.
-   * @param  {string} text
- 	 * @return {void}
-   */
-  setTitle: function(text) {
+  setTitle(text) {
     var members = memberMap.get(this);
     members.driver.setTitle(text);
   },
 
-  /**
-   * This allows the minimize state to be changed.
-   * @param  {boolean} minimized - If true, the mole view will be minimized.
- 	 * @return {void}
-   */
-  setMinimized: function(minimized) {
+  setMinimized(minimized) {
     var members = memberMap.get(this);
     members.driver.setMinimized(minimized);
   },
 
-  /**
-   * This allows the minimize state to be retrieved.
- 	 * @return {boolean}
-   */
-  getMinimized: function() {
+  getMinimized() {
     var members = memberMap.get(this);
     return members.driver.getMinimized();
   }
-
-  /**
-   * Fires when this MoleView instance is closed.
-   * @event MoleView#destroy
-   */
-
-  /**
-   * Fires when this MoleView instance is minimized.
-   * @event MoleView#minimize
-   */
-
-  /**
-   * Fires when this MoleView instance is restored.
-   * @event MoleView#restore
-   */
 
 });
 

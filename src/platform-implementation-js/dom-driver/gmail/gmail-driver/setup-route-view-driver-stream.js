@@ -130,7 +130,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	});
 }
 
-/**
+/*
  * TODO: Split up "role=main" DOM watching and hash change watching.
  *
  * SDK only cares about hash change when the hash goes to a route that the app registered as custom.

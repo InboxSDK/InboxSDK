@@ -12,12 +12,7 @@ var SectionView = require('../section-view');
 
 var membersMap = new WeakMap();
 
-/**
-* @class
-* ListRouteViews represent pages within Gmail or Inbox that show a list of emails. Typical examples are the Inbox, Sent Mail,
-* Drafts, etc. However, views like the Conversation view or Settings would *not* be a ListRouteView.
-* @extends RouteView
-*/
+// documented in src/docs/
 function ListRouteView(routeViewDriver, driver, appId){
 	RouteView.call(this, routeViewDriver);
 
@@ -34,14 +29,9 @@ function ListRouteView(routeViewDriver, driver, appId){
 
 util.inherits(ListRouteView, RouteView);
 
-_.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
+_.extend(ListRouteView.prototype, {
 
-	/**
-	 * Adds a collapsible section to the top of the page.
-	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the CollapsibleSectionView
-	 * @returns {CollapsibleSectionView} the CollapsibleSectionView that was added
-	 */
-	addCollapsibleSection: function(collapsibleSectionDescriptor){
+	addCollapsibleSection(collapsibleSectionDescriptor){
 		var members = membersMap.get(this);
 
 		var collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(baconCast(Bacon, collapsibleSectionDescriptor).toProperty(), members.appId);
@@ -51,12 +41,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 		return collapsibleSectionView;
 	},
 
-	/**
-	 * Adds a non-collapsible section to the top of the page.
-	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the SectionView
-	 * @returns {SectionView} the SectionView that was added
-	 */
-	addSection: function(sectionDescriptor){
+	addSection(sectionDescriptor){
 		var members = membersMap.get(this);
 
 		var sectionViewDriver = members.routeViewDriver.addSection(baconCast(Bacon, sectionDescriptor).toProperty(), members.appId);
@@ -66,11 +51,7 @@ _.extend(ListRouteView.prototype, /** @lends ListRouteView */ {
 		return sectionView;
 	},
 
-	/**
-	 * Simulates a click on the Gmail thread list refresh button.
-	 * @returns {void}
-	 */
-	refresh: function() {
+	refresh() {
 		membersMap.get(this).routeViewDriver.refresh();
 	}
 

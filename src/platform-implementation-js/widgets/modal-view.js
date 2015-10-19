@@ -5,10 +5,7 @@ var Kefir = require('kefir');
 
 var EventEmitter = require('../lib/safe-event-emitter');
 
-/**
-* @class
-* Represents a modal dialog.
-*/
+// documented in src/docs/
 function ModalView(options){
     EventEmitter.call(this);
     var self = this;
@@ -35,9 +32,9 @@ function ModalView(options){
 
 ModalView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(ModalView.prototype, /** @lends ModalView */{
+_.extend(ModalView.prototype, {
 
-    show: function(){
+    show(){
         if(!this._driver){
             throw new Error('Modal can not be shown after being hidden');
         }
@@ -81,7 +78,7 @@ _.extend(ModalView.prototype, /** @lends ModalView */{
             });
     },
 
-    setTitle: function(title){
+    setTitle(title){
         if(!this._driver){
             throw new Error('Modal can not be shown after being hidden');
         }
@@ -89,24 +86,15 @@ _.extend(ModalView.prototype, /** @lends ModalView */{
         this._driver.setTitle(title);
     },
 
-    /**
-    * This closes the modal. Does nothing if already closed.
-    * @return {void}
-    */
-    close: function(){
+    close(){
         if (this._driver) {
             this._driver.destroy();
         }
     },
 
-    addButton: function(options){
+    addButton(options){
         throw new Error("not implemented");
     }
-
-    /**
-     * Fires when this ModalView instance is closed.
-     * @event ModalView#destroy
-     */
 
 });
 

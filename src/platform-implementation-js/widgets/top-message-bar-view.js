@@ -21,7 +21,7 @@ function TopMessageBarView(options) {
 
 util.inherits(TopMessageBarView, EventEmitter);
 
-_.assign(TopMessageBarView.prototype, /** @lends TopMessageBarView */ {
+_.assign(TopMessageBarView.prototype, {
 
   remove: function(){
   	memberMap.get(this).driver.remove();

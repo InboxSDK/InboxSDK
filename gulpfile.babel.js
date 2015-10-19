@@ -283,6 +283,7 @@ function parseCommentsInFile(file) {
       var filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
       if (filteredStderr) {
         process.stderr.write(filteredStderr);
+        throw new Error("Got stderr");
       }
       try {
         var comments = JSON.parse(stdout);
@@ -295,7 +296,7 @@ function parseCommentsInFile(file) {
       }
     }, err => {
       console.error(err);
-      return null;
+      throw err;
     });
 }
 
@@ -333,18 +334,10 @@ function logFiles(filename) {
 }
 
 function isFileEligbleForDocs(filename) {
-  return  filename.endsWith(".js") &&
-          filename.indexOf("src/platform-implementation-js/platform-implementation.js") == -1 &&
-          filename.indexOf('views/compose-button-view.js') == -1 &&
-          filename.indexOf('widgets/buttons/basic-button-view-controller.js') == -1 &&
-          (
-            filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
-            filename.indexOf('src/platform-implementation-js/views') > -1 ||
-            filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
-            filename.indexOf('src/common/constants') > -1 ||
-            filename.indexOf('src/docs/') > -1 ||
-            (filename.indexOf('src/inboxsdk-js/') > -1 && filename.indexOf('src/inboxsdk-js/loading') == -1)
-          );
+  return filename.endsWith(".js") && (
+    filename.indexOf("src/docs/") > -1 ||
+    filename.indexOf("src/common/constants/") > -1
+  );
 }
 
 function endsWith(str, suffix) {
