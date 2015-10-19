@@ -6,19 +6,7 @@ var baconCast = require('bacon-cast');
 
 var memberMap = new WeakMap();
 
-/**
-* @class
-* NavItemsViews are the elements placed inside a NavMenu. Each NavItemView
-* represents an entry in the left navigation of Gmail or Inbox. These NavItemViews
-* can be nested.
-*
-* Typically the main action of a NavItemView is performed when the user clicks on the
-* main text. However, you can also provide accessories which are secondary actions which
-* typically appear on the right side of the NavItemView but may be rendered in other ways.
-
-* For nested NavItemViews, the SDK will handle collapsing and expanding children depending
-* on user input.
-*/
+// documented in src/docs/
 var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 	EventEmitter.call(this);
 
@@ -36,14 +24,9 @@ var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 
 NavItemView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(NavItemView.prototype, /** @lends NavItemView */ {
+_.extend(NavItemView.prototype, {
 
-	/**
-	* Add a nested child NavItemView
-	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
-	* @return {NavItemView}
-	*/
-	addNavItem: function(navItemDescriptor){
+	addNavItem(navItemDescriptor){
 		var members = memberMap.get(this);
 		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
@@ -57,7 +40,8 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 		return navItemView;
 	},
 
-	setNavItemViewDriver: function(navItemViewDriver){
+	// TODO make this not a public method
+	setNavItemViewDriver(navItemViewDriver){
 		var members = memberMap.get(this);
 		if(!members.driver){
 			members.deferred.resolve(navItemViewDriver);
@@ -83,11 +67,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 		members.deferred.resolve(navItemViewDriver);
 	},
 
-	/**
-	* Remove this NavItemView from its parent
-	* @return {void}
-	*/
-	remove: function(){
+	remove(){
 		var members = memberMap.get(this);
 		if(!members.navItemViews){
 			return;
@@ -110,11 +90,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 		});
 	},
 
-	/**
-	* Whether the NavItemView is currently collapsed and hiding its children
-	* @return {boolean}
-	*/
-	isCollapsed: function(){
+	isCollapsed(){
 		if(memberMap.get(this).navItemViewDriver){
 			return memberMap.get(this).navItemViewDriver.isCollapsed();
 		}
@@ -123,12 +99,7 @@ _.extend(NavItemView.prototype, /** @lends NavItemView */ {
 		}
 	},
 
-	/**
-	* Collapse or uncollapse this NavItemView
-	* @param {boolean} collapseValue - whether to collapse or uncollapse
-	* @return {void}
-	*/
-	setCollapsed: function(collapseValue){
+	setCollapsed(collapseValue){
 		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){
 			navItemViewDriver.setCollapsed(collapseValue);
 		});

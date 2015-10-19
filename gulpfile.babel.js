@@ -277,11 +277,13 @@ function checkForDocIssues(c) {
 
 function parseCommentsInFile(file) {
   gutil.log("Parsing: " + gutil.colors.cyan(file));
-  return exec('node_modules/.bin/jsdoc ' + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', {passStdErr: true})
+  // cat is used to work around https://github.com/jsdoc3/jsdoc/issues/1070
+  return exec('node_modules/.bin/jsdoc ' + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json | cat', {passStdErr: true})
     .then(({stdout, stderr}) => {
       var filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
       if (filteredStderr) {
         process.stderr.write(filteredStderr);
+        throw new Error("Got stderr");
       }
       try {
         var comments = JSON.parse(stdout);
@@ -294,7 +296,7 @@ function parseCommentsInFile(file) {
       }
     }, err => {
       console.error(err);
-      return null;
+      throw err;
     });
 }
 
@@ -332,18 +334,10 @@ function logFiles(filename) {
 }
 
 function isFileEligbleForDocs(filename) {
-  return  filename.endsWith(".js") &&
-          filename.indexOf("src/platform-implementation-js/platform-implementation.js") == -1 &&
-          filename.indexOf('views/compose-button-view.js') == -1 &&
-          filename.indexOf('widgets/buttons/basic-button-view-controller.js') == -1 &&
-          (
-            filename.indexOf('src/platform-implementation-js/platform-implementation') > -1 ||
-            filename.indexOf('src/platform-implementation-js/views') > -1 ||
-            filename.indexOf('src/platform-implementation-js/widgets') > -1 ||
-            filename.indexOf('src/common/constants') > -1 ||
-            filename.indexOf('src/docs/') > -1 ||
-            (filename.indexOf('src/inboxsdk-js/') > -1 && filename.indexOf('src/inboxsdk-js/loading') == -1)
-          );
+  return filename.endsWith(".js") && (
+    filename.indexOf("src/docs/") > -1 ||
+    filename.indexOf("src/common/constants/") > -1
+  );
 }
 
 function endsWith(str, suffix) {

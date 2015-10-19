@@ -7,16 +7,7 @@ var RSVP = require('rsvp');
 
 var membersMap = new WeakMap();
 
-/**
- * @class
- * RouteViews represent pages within Gmail or Inbox that a user can navigate to. RouteViews can be "custom", those
- * that the application developer registers, or they can be "builtin" which are those that the email client natively
- * supports like "Sent", "Drafts", or "Inbox"
- *
- * This class mostly just gives you metadata about the route, most of the functionality to modify the route are
- * defined in subclasses like {ListRouteView} and {CustomRouteView}, which you get by
- * handling those types specifically in the Router.
- */
+// documented in src/docs/
 var RouteView = function(routeViewDriver){
 	EventEmitter.call(this);
 
@@ -34,13 +25,9 @@ var RouteView = function(routeViewDriver){
 
 RouteView.prototype = Object.create(EventEmitter.prototype);
 
-_.extend(RouteView.prototype, /** @lends RouteView */{
+_.extend(RouteView.prototype, {
 
-	/**
-	 * Get the ID of the RouteView. This is the same routeID that you give {Router.goto()} or {Router.createLink()}.
-	 * @return {string}
-	 */
-	getRouteID: function(){
+	getRouteID(){
 		var members = membersMap.get(this);
 
 		if(!members.routeID){
@@ -50,11 +37,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return members.routeID;
 	},
 
-	/**
-	* Get the type of the route, either custom or native
-	* @return {string}
-	*/
-	getRouteType: function(){
+	getRouteType(){
 		var members = membersMap.get(this);
 
 		if(!members.routeType){
@@ -64,11 +47,7 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 		return members.routeType;
 	},
 
-	/**
-	 * Get the URL parameters of this RouteView instance
-	 * @return {string[]}
-	 */
-	getParams: function(){
+	getParams(){
 		var members = membersMap.get(this);
 
 		if(!members.params){
@@ -77,11 +56,6 @@ _.extend(RouteView.prototype, /** @lends RouteView */{
 
 		return members.params;
 	}
-
-	/**
-	* Fires when this RouteView instance is navigated away from
-	* @event RouteView#destroy
-	*/
 
 });
 

@@ -6,13 +6,7 @@ var RSVP = require('rsvp');
 
 var memberMap = new WeakMap();
 
-/**
-* @class
-* This class registers a keyboard shortcut. It just defines the key combination itself but not what to
-* when that shortcut is executed. In order to actually do something when this handle is executed, you need
-* to pass this handle to other functions that accept {KeyboardShortcutHandle} like the toolbar
-* button registration functions.
-*/
+// documented in src/docs/
 var KeyboardShortcutHandle = function(keyboardShortcutHandleDriver){
     var members = {};
     memberMap.set(this, members);
@@ -27,14 +21,9 @@ var KeyboardShortcutHandle = function(keyboardShortcutHandleDriver){
     });
 };
 
-_.extend(KeyboardShortcutHandle.prototype, /** @lends KeyboardShortcutHandle */ {
+_.extend(KeyboardShortcutHandle.prototype, {
 
-
-  /**
-  * Deactivates the keyboard shortcut.
-  * @return {void}
-  */
-	remove: function(){
+	remove(){
 		var members = memberMap.get(this);
 		if(members){
 			members.keyboardShortcutHandleDriver.destroy();
@@ -42,7 +31,5 @@ _.extend(KeyboardShortcutHandle.prototype, /** @lends KeyboardShortcutHandle */ 
 	}
 
 });
-
-
 
 module.exports = KeyboardShortcutHandle;

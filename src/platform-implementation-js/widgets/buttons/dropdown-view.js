@@ -9,12 +9,7 @@ var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-m
 var kefirFromEventTargetCapture = require('../../lib/kefir-from-event-target-capture');
 var containByScreen2 = require('../../lib/dom/contain-by-screen2');
 
-/**
- * @class
- * This class represents a Dropdown returned by the SDK to the app in various places.
- * The dropdown can be filled with your apps content, but it automatically handles dismissing
- * the dropdown on certain user actions.
- */
+// documented in src/docs/
 var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	EventEmitter.call(this);
 
@@ -24,10 +19,6 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	// type options: ?{manualPosition?: boolean}
 	this._options = options || {};
 
-	/**
-	 * The HTML element that is displayed in the dropdown.
-	 * @type {HTMLElement}
-	 */
 	this.el = dropdownViewDriver.getContentElement();
 	this.closed = false;
 
@@ -76,30 +67,20 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 
 util.inherits(DropdownView, EventEmitter);
 
-_.assign(DropdownView.prototype, /** @lends DropdownView */ {
+_.assign(DropdownView.prototype, {
 
-	// Takes options that containByScreen2 accepts
-	setPlacementOptions: function(options) {
+	setPlacementOptions(options) {
 		Object.assign(this._userPlacementOptions, options);
 		this.emit('_placementOptionsUpdated');
 	},
 
-	/**
-	 * Closes the dropdown
-	 * @return {void}
-	 */
-	close: function() {
+	close() {
 		if (!this.closed) {
 			this.closed = true;
 			this.emit('destroy');
 			this._dropdownViewDriver.destroy();
 		}
 	}
-
-	/**
-	 * Fires when this DropdownView instance is closed.
-	 * @event DropdownView#destroy
-	 */
 });
 
 DropdownView = ud.defn(module, DropdownView);

@@ -5,11 +5,7 @@ var RouteView = require('./route-view');
 
 var membersMap = new WeakMap();
 
-/**
-* @class
-* CustomRouteViews represent your own custom pages of content.
-* @extends RouteView
-*/
+// documented in src/docs/
 var CustomRouteView = function(routeViewDriver){
 	RouteView.call(this, routeViewDriver);
 
@@ -20,14 +16,9 @@ var CustomRouteView = function(routeViewDriver){
 
 CustomRouteView.prototype = Object.create(RouteView.prototype);
 
-_.extend(CustomRouteView.prototype, /** @lends CustomRouteView */{
+_.extend(CustomRouteView.prototype, {
 
-
-	/**
-	* Gets the element representing the content area of this CustomRouteView
-	* @return {HTMLElement} the main element of your custom route
-	*/
-	getElement: function(){
+	getElement(){
 		return membersMap.get(this).routeViewDriver.getCustomViewElement();
 	}
 

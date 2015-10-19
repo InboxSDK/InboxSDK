@@ -1,4 +1,4 @@
-/****
+/*
  *
  * This class only serves for internal bookkeeping purposes and isn't exposed to the apps right now
  *
