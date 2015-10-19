@@ -68,7 +68,7 @@ Promise.all([
     if (!skip_onboarding) {
       skip_onboarding = true;
       chrome.storage.sync.get("seen_onboarding_tooltip", function(results) {
-        if (true/*!results.seen_onboarding_tooltip*/) {
+        if (!results.seen_onboarding_tooltip) {
           log("show_onboarding_tooltip");
           show_onboarding_tooltip(compose_view, button);
         }
@@ -290,64 +290,79 @@ Promise.all([
     }
   };
   display_chooser = function(compose_view) {
-    var chooser, chooser_wrapper, modal, modal_elm;
+    var chooser_wrapper, cleanup, modal, modal_elm, on_cancel, on_message, on_success;
     log("open_chooser");
-    chooser = Dropbox.createChooserWidget({
-      multiselect: true,
-      folderselect: true,
-      success: function(files) {
-        var bounding_box, ext_array, file, i, is_photo, len, mode, photo_elem, thumbnail_link;
-        if (compose_view.getSelectedBodyText() && files.length === 1) {
-          file = files[0];
-          log("insert_link", {
-            ext: Util.get_ext(file.name)
-          });
-          compose_view.insertLinkIntoBodyAtCursor(file.name, file.link);
-        } else {
-          ext_array = [];
-          for (i = 0, len = files.length; i < len; i++) {
-            file = files[i];
-            ext_array.push(Util.get_ext(file.name));
-            thumbnail_link = file.thumbnailLink;
-            is_photo = Util.is_photo(file.name) && thumbnail_link && !file.is_dir;
-            if (thumbnail_link) {
-              bounding_box = is_photo ? "800" : "75";
-              mode = is_photo ? "fit" : "crop";
-              thumbnail_link = thumbnail_link.split("?")[0] + ("?bounding_box=" + bounding_box + "&mode=" + mode);
-            } else if (file.is_dir) {
-              thumbnail_link = CDN_BASE + "/static/images/gmail_attachment_folder_icon.png";
-            } else {
-              thumbnail_link = CDN_BASE + "/static/images/gmail_attachment_logo.png";
-            }
-            if (is_photo) {
-              photo_elem = create_photo_preview_elem(file, thumbnail_link);
-              compose_view.insertHTMLIntoBodyAtCursor(photo_elem);
-            } else {
-              compose_view.insertLinkChipIntoBodyAtCursor(file.name, file.link, thumbnail_link);
-            }
+    on_success = function(files) {
+      var bounding_box, ext_array, file, i, is_photo, len, mode, photo_elem, thumbnail_link;
+      if (compose_view.getSelectedBodyText() && files.length === 1) {
+        file = files[0];
+        log("insert_link", {
+          ext: Util.get_ext(file.name)
+        });
+        compose_view.insertLinkIntoBodyAtCursor(file.name, file.link);
+      } else {
+        ext_array = [];
+        for (i = 0, len = files.length; i < len; i++) {
+          file = files[i];
+          ext_array.push(Util.get_ext(file.name));
+          thumbnail_link = file.thumbnailLink;
+          is_photo = Util.is_photo(file.name) && thumbnail_link && !file.is_dir;
+          if (thumbnail_link) {
+            bounding_box = is_photo ? "800" : "75";
+            mode = is_photo ? "fit" : "crop";
+            thumbnail_link = thumbnail_link.split("?")[0] + ("?bounding_box=" + bounding_box + "&mode=" + mode);
+          } else if (file.is_dir) {
+            thumbnail_link = CDN_BASE + "/static/images/gmail_attachment_folder_icon.png";
+          } else {
+            thumbnail_link = CDN_BASE + "/static/images/gmail_attachment_logo.png";
           }
-          log("insert_link", {
-            exts: JSON.stringify(ext_array)
-          });
+          if (is_photo) {
+            photo_elem = create_photo_preview_elem(file, thumbnail_link);
+            compose_view.insertHTMLIntoBodyAtCursor(photo_elem);
+          } else {
+            compose_view.insertLinkChipIntoBodyAtCursor(file.name, file.link, thumbnail_link);
+          }
         }
-        modal.close();
-        Dropbox.cleanupWidget(chooser);
-      },
-      cancel: function() {
-        modal.close();
-        Dropbox.cleanupWidget(chooser);
+        log("insert_link", {
+          exts: JSON.stringify(ext_array)
+        });
       }
-    });
+      modal.close();
+      cleanup();
+    };
+    on_cancel = function() {
+      modal.close();
+      cleanup();
+    };
+    on_message = function(evt) {
+      var data, dest;
+      if (evt.source.parent === chooser_wrapper.contentWindow) {
+        data = JSON.parse(evt.data);
+        dest = evt.source;
+        switch (data.method) {
+          case "origin_request":
+            evt.source.postMessage(JSON.stringify({
+              method: "origin"
+            }), DROPBOX_BASE);
+            break;
+          case "files_selected":
+            on_success(data.params);
+            break;
+          case "close_dialog":
+            on_cancel();
+        }
+      }
+    };
+    window.addEventListener("message", on_message, false);
+    cleanup = function() {
+      window.removeEventListener("message", on_message, false);
+    };
     chooser_wrapper = document.createElement("iframe");
     chooser_wrapper.src = chrome.runtime.getURL("blank.html");
-    chooser_wrapper.addEventListener("load", function() {
-      chooser_wrapper.contentWindow.document.body.appendChild(chooser);
-    }, false);
-    chooser.style.width = chooser.style.height = "100%";
     chooser_wrapper.style.display = "block";
     chooser_wrapper.style.width = "640px";
     chooser_wrapper.style.height = "552px";
-    chooser_wrapper.style.maxWidth = chooser.style.maxHeight = "100%";
+    chooser_wrapper.style.maxWidth = "100%";
     chooser_wrapper.style.border = "none";
     modal = sdk.Modal.show({
       el: chooser_wrapper,
