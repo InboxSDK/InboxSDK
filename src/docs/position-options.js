@@ -3,7 +3,7 @@
  * @class
  * This object is used to control the positioning of an element (such as a
  * drop-down menu) relative to an anchor element (the button that opened the
- * drop-down menu). It is used by {DropdownView#setPlacementOptions()}.
+ * drop-down menu). It is used by {DropdownView.setPlacementOptions()}.
  */
 var PositionOptions = /** @lends PositionOptions */{
 	/**
