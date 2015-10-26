@@ -48,7 +48,11 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
       }
     }
 
-    const server = url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//)[1];
+    const match = url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//);
+    if (!match) {
+      throw new Error("Failed to match url");
+    }
+    const server = match[1];
     if (Object.prototype.hasOwnProperty.call(serversToIgnore, server)) {
       reject(new Error(`Server at ${url} has told us to stop connecting`));
       return;

@@ -27,7 +27,8 @@ export default function modifySuggestions(responseText: string, modifications: A
     } else if (typeof modification.nameHTML === 'string') {
       nameHTML = modification.nameHTML;
       name = htmlToText(nameHTML);
-    } else {
+    }
+    if (name == null || nameHTML == null) {
       throw new Error("name or nameHTML must be provided");
     }
     var description, descriptionHTML;
@@ -49,8 +50,16 @@ export default function modifySuggestions(responseText: string, modifications: A
         _.escape(JSON.stringify(data)) + '"></span>';
     }
     var newItem = [
-      "aso.sug", modification.searchTerm || query, nameHTML, null, [], 34, null,
-      "asor inboxsdk__custom_suggestion "+modification.owner, 0];
+      "aso.sug",
+      modification.searchTerm || query,
+      nameHTML,
+      (null: ?[string, ?string, string, ?string, string]),
+      [],
+      34,
+      (null: ?[string, string]),
+      "asor inboxsdk__custom_suggestion "+modification.owner,
+      0
+    ];
     if (descriptionHTML != null) {
       newItem[3] = [
         'aso.eme',

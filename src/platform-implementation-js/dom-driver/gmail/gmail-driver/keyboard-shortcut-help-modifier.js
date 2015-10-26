@@ -166,10 +166,13 @@ export default class KeyboardShortcutHelpModifier {
 }
 
 function _getShortcutHTML(chord: string): string {
-	var retArray = [];
+	const retArray = [];
 
-	var parts = chord.split(/[\s+]/g);
-	var separators = chord.match(/[\s+]/g);
+	const parts = chord.split(/[\s+]/g);
+	const separators = chord.match(/[\s+]/g);
+	if (!separators) {
+		throw new Error("Failed to match");
+	}
 
 	for(var ii=0; ii<parts.length; ii++){
 		retArray.push('<span class="wh">' + _.escape(_getAngledBracket(parts[ii])) + '</span>');

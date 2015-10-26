@@ -47,10 +47,16 @@ export default class UserInfo {
       .value();
     var extras: Contact[] = _.map(
       document.querySelectorAll('[role=banner] div[aria-label] div > a[target="_blank"] > img + div'),
-      (el: HTMLElement) => ({
-        name: el.children[0].textContent,
-        emailAddress: el.children[1].textContent.match(/\S+/)[0]
-      }));
+      (el: HTMLElement) => {
+        const match = el.children[1].textContent.match(/\S+/);
+        if (!match) {
+          throw new Error("Failed to match");
+        }
+        return {
+          name: el.children[0].textContent,
+          emailAddress: match[0]
+        };
+      });
     return _.chain([main, extras]).flatten().uniq(x => x.emailAddress.toLowerCase()).value();
   }
 
