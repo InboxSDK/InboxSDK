@@ -316,4 +316,4 @@ _.assign(GmailAttachmentCardView.prototype, {
 
 });
 
-module.exports = GmailAttachmentCardView;
+export default GmailAttachmentCardView;

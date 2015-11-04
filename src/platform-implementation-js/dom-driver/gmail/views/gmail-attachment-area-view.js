@@ -1,38 +1,45 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var AttachmentAreaViewDriver = require('../../../driver-interfaces/attachment-area-view-driver');
+/* @flow */
+//jshint ignore:start
 
-var GmailAttachmentCardView = require('./gmail-attachment-card-view');
-var ButtonView = require('../widgets/buttons/button-view');
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import {defn} from 'ud';
+import type GmailDriver from '../gmail-driver';
+import GmailAttachmentCardView from './gmail-attachment-card-view';
+import ButtonView from '../widgets/buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-function GmailAttachmentAreaView(element, driver){
-	AttachmentAreaViewDriver.call(this);
+const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
+	_element: HTMLElement;
+	_driver: GmailDriver;
+	_attachmentCardViews: Array<Object>;
 
-	this._driver = driver;
-	this._isNative = !!element;
-
-	if(element){
-		this._element = element;
+	constructor(element: ?HTMLElement, driver: GmailDriver) {
+		this._driver = driver;
+		if(element){
+			this._element = element;
+		} else {
+			this._setupElement();
+		}
 		this._setupAttachmentCardViews();
 	}
-	else{
-		this._setupElement();
+
+	destroy() {
+		this._attachmentCardViews.forEach(view => {
+			view.destroy();
+		});
+		this._attachmentCardViews.length = 0;
 	}
-}
 
-GmailAttachmentAreaView.prototype = Object.create(AttachmentAreaViewDriver.prototype);
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-_.extend(GmailAttachmentAreaView.prototype, {
+	getAttachmentCardViews(): Array<Object> {
+		return this._attachmentCardViews;
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_driver', destroy: false},
-		{name: '_isNative', destroy: false},
-		{name: '_attachmentCardViews', destroy: true, get: true}
-	],
-
-	_setupElement: function(){
+	_setupElement(){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'hq gt a10');
 
@@ -44,25 +51,25 @@ _.extend(GmailAttachmentAreaView.prototype, {
 				'<div class="aZK"></div>',
 			'</div>'
 		].join('');
-	},
+	}
 
-	_setupAttachmentCardViews: function(){
+	_setupAttachmentCardViews(){
 		const attachments = this._element.querySelectorAll('.aQH > span');
 		this._attachmentCardViews = Array.prototype.map.call(attachments, attachment =>
 			new GmailAttachmentCardView({element: attachment}, this._driver)
 		);
-	},
+	}
 
-	addGmailAttachmentCardView: function(gmailAttachmentCardView){
+	addGmailAttachmentCardView(gmailAttachmentCardView: GmailAttachmentCardView){
 		const zone = this._element.querySelector('.aXK, .aQH');
 		if (zone) {
 			zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastChild);
 		} else {
 			this._driver.getLogger().error(new Error("Could not find attachment zone"));
 		}
-	},
+	}
 
-	addButtonToDownloadAllArea: function(options){
+	addButtonToDownloadAllArea(options: Object){
 		if(!this._element.querySelector('.aZi')){
 			return;
 		}
@@ -92,4 +99,4 @@ _.extend(GmailAttachmentAreaView.prototype, {
 
 });
 
-module.exports = GmailAttachmentAreaView;
+export default GmailAttachmentAreaView;

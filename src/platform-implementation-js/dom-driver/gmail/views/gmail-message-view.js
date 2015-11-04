@@ -5,8 +5,8 @@ const asap = require('asap');
 
 const MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
 
-const GmailAttachmentAreaView = require('./gmail-attachment-area-view');
-const GmailAttachmentCardView = require('./gmail-attachment-card-view');
+import GmailAttachmentAreaView from './gmail-attachment-area-view';
+import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
