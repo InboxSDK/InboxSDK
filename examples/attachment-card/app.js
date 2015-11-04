@@ -83,6 +83,14 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			});
 		});
 
+		messageView.addAttachmentsToolbarButton({
+			tooltip: 'Tooltip here',
+			iconUrl: 'https://www.streak.com/build/images/circle_exclamation_mark.png',
+			onClick() {
+				alert("FOOO");
+			}
+		});
+
 	});
 
 });
