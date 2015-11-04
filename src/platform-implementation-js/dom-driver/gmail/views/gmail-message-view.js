@@ -50,7 +50,6 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_driver', destroy: false},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
-		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
 		{name: '_messageLoaded', destroy: false, defaultValue: false}
 	],
 
@@ -136,14 +135,7 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		var optionsHash = this._getDownloadAllAreaButtonOptionsHash(options);
-		if(this._addedDownloadAllAreaButtonOptions[optionsHash]){
-			return;
-		}
-
 		gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
-
-		this._addedDownloadAllAreaButtonOptions[optionsHash] = true;
 	},
 
 	getMessageID() {
@@ -425,10 +417,6 @@ _.extend(GmailMessageView.prototype, {
 				 })
 
 		);
-	},
-
-	_getDownloadAllAreaButtonOptionsHash: function(options){
-		return options.iconClass + options.tooltip;
 	},
 
 	_getAttachmentArea: function(){
