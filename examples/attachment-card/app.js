@@ -88,9 +88,10 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 		messageView.addAttachmentsToolbarButton({
 			tooltip: 'Tooltip here',
 			iconUrl: 'https://www.streak.com/build/images/circle_exclamation_mark.png',
-			onClick(cards) {
-				console.log('attachment cards', cards);
-				for (let card of cards) {
+			onClick(event) {
+				const attachmentCardViews = event.attachmentCardViews;
+				console.log('attachment cards', attachmentCardViews);
+				for (let card of attachmentCardViews) {
 					console.log('card type', card.getAttachmentType());
 					console.log('card title', card.getTitle());
 					card.getDownloadURL().then(url => {

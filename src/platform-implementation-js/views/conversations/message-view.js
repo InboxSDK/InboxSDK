@@ -39,7 +39,17 @@ _.extend(MessageView.prototype, {
 	},
 
 	addAttachmentsToolbarButton: function(buttonOptions){
-		memberMap.get(this).messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
+		const {messageViewImplementation} = memberMap.get(this);
+		messageViewImplementation.addButtonToDownloadAllArea({
+			tooltip: buttonOptions.tooltip,
+			iconUrl: buttonOptions.iconUrl,
+			onClick() {
+				const attachmentCardViews = messageViewImplementation.getAttachmentCardViewDrivers().map(cardDriver =>
+					new AttachmentCardView(cardDriver)
+				);
+				buttonOptions.onClick({attachmentCardViews});
+			}
+		});
 	},
 
 	getBodyElement: function(){

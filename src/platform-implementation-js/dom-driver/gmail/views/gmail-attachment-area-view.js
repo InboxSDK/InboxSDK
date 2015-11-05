@@ -106,7 +106,7 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: () => {
 				if(options.onClick){
-					options.onClick(this.getAttachmentCardViews());
+					options.onClick();
 				}
 			},
 			buttonView: buttonView
