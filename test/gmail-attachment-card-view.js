@@ -1,3 +1,6 @@
+/* @flow */
+//jshint ignore:start
+
 import assert from "assert";
 import jsdomDoc from "./lib/jsdom-doc";
 import GmailAttachmentCardView from "../src/platform-implementation-js/dom-driver/gmail/views/gmail-attachment-card-view";

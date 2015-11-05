@@ -20,7 +20,41 @@ function GmailAttachmentCardView(options, driver) {
 	this._eventStream = new Bacon.Bus();
 	this._driver = driver;
 
-	this.getAttachmentType = _.once(() => {
+	if(options.element){
+		this._element = options.element;
+	}
+	else{
+		this._createNewElement(options);
+	}
+}
+
+util.inherits(GmailAttachmentCardView, AttachmentCardViewDriver);
+
+_.assign(GmailAttachmentCardView.prototype, {
+
+	__memberVariables: [
+		{name: '_element', destroy: false, get: true},
+		{name: '_driver', destroy: false},
+		{name: '_cachedType', destroy: false},
+		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
+	],
+
+	_isStandardAttachment() {
+		return this.getAttachmentType() === 'FILE';
+	},
+
+	getAttachmentType() {
+		if (this._cachedType) {
+			return this._cachedType;
+		}
+		const type = this._readAttachmentType();
+		if (type !== 'UNLOADED') {
+			this._cachedType = type;
+		}
+		return type;
+	},
+
+	_readAttachmentType() {
 		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
 			return 'CUSTOM';
 		}
@@ -37,28 +71,6 @@ function GmailAttachmentCardView(options, driver) {
 			return 'DRIVE';
 		}
 		return 'UNKNOWN';
-	});
-
-	if(options.element){
-		this._element = options.element;
-	}
-	else{
-		this._createNewElement(options);
-	}
-}
-
-util.inherits(GmailAttachmentCardView, AttachmentCardViewDriver);
-
-_.assign(GmailAttachmentCardView.prototype, {
-
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_driver', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
-
-	_isStandardAttachment() {
-		return this.getAttachmentType() === 'FILE';
 	},
 
 	addButton: function(options){
