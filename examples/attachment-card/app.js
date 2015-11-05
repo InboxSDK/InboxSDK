@@ -1,4 +1,5 @@
 InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
+	'use strict';
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
@@ -86,8 +87,14 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 		messageView.addAttachmentsToolbarButton({
 			tooltip: 'Tooltip here',
 			iconUrl: 'https://www.streak.com/build/images/circle_exclamation_mark.png',
-			onClick() {
-				alert("FOOO");
+			onClick(cards) {
+				console.log('attachment cards', cards);
+				for (let card of cards) {
+					console.log('card type', card.getAttachmentType());
+					card.getDownloadURL().then(url => {
+						console.log('card url', url);
+					}, err => console.error(err));
+				}
 			}
 		});
 

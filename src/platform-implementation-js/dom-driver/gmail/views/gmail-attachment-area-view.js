@@ -12,31 +12,38 @@ import BasicButtonViewController from '../../../widgets/buttons/basic-button-vie
 const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
-	_attachmentCardViews: Array<Object>;
+	_elsToCardViews: WeakMap<HTMLElement, GmailAttachmentCardView>;
 
 	constructor(element: ?HTMLElement, driver: GmailDriver) {
 		this._driver = driver;
+		this._elsToCardViews = new WeakMap();
 		if(element){
 			this._element = element;
 		} else {
 			this._setupElement();
 		}
-		this._setupAttachmentCardViews();
 	}
 
 	destroy() {
-		this._attachmentCardViews.forEach(view => {
+		this.getAttachmentCardViews().forEach(view => {
 			view.destroy();
 		});
-		this._attachmentCardViews.length = 0;
 	}
 
 	getElement(): HTMLElement {
 		return this._element;
 	}
 
-	getAttachmentCardViews(): Array<Object> {
-		return this._attachmentCardViews;
+	getAttachmentCardViews(): Array<GmailAttachmentCardView> {
+		const attachments = this._element.querySelectorAll('.aQH > span');
+		return _.map(attachments, attachment => {
+			let cardView = this._elsToCardViews.get(attachment);
+			if (!cardView) {
+				cardView = new GmailAttachmentCardView({element: attachment}, this._driver);
+				this._elsToCardViews.set(attachment, cardView);
+			}
+			return cardView;
+		});
 	}
 
 	_setupElement(){
@@ -53,27 +60,39 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		].join('');
 	}
 
-	_setupAttachmentCardViews(){
-		const attachments = this._element.querySelectorAll('.aQH > span');
-		this._attachmentCardViews = Array.prototype.map.call(attachments, attachment =>
-			new GmailAttachmentCardView({element: attachment}, this._driver)
-		);
+	_createAreaToolbarIfNeeded(): HTMLElement {
+		const preexistingToolbar = this._element.querySelector('.ho');
+		if (preexistingToolbar) {
+			return preexistingToolbar;
+		}
+		const toolbar = document.createElement('div');
+		toolbar.className = 'ho';
+		toolbar.innerHTML = `<span class="aVW"><span>${this.getAttachmentCardViews().length}</span> Attachments</span><div class="aZi J-J5-Ji"></div>`;
+		this._element.insertBefore(toolbar, this._element.lastElementChild);
+		this._element.classList.remove('a10');
+		return toolbar;
+	}
+
+	_updateToolbarCardCount() {
+		const cardCount = this.getAttachmentCardViews().length;
+		if (cardCount > 1) {
+			const toolbar = this._createAreaToolbarIfNeeded();
+			const counter = toolbar.querySelector('.aVW > span');
+			counter.textContent = String(cardCount);
+		}
 	}
 
 	addGmailAttachmentCardView(gmailAttachmentCardView: GmailAttachmentCardView){
 		const zone = this._element.querySelector('.aXK, .aQH');
-		if (zone) {
-			zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastChild);
-		} else {
+		if (!zone) {
 			this._driver.getLogger().error(new Error("Could not find attachment zone"));
+			return;
 		}
+		zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastElementChild);
+		this._updateToolbarCardCount();
 	}
 
 	addButtonToDownloadAllArea(options: Object){
-		if(!this._element.querySelector('.aZi')){
-			return;
-		}
-
 		var buttonView = new ButtonView({
 			iconClass: 'T-I-J3',
 			iconUrl: options.iconUrl,
@@ -82,19 +101,19 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		});
 
 		buttonView.addClass('aZj');
-		buttonView.getElement().children[0].setAttribute('class', 'asa');
+		buttonView.getElement().children[0].className = 'asa';
 
-		var self = this;
 		var basicButtonViewController = new BasicButtonViewController({
-			activateFunction: function(){
+			activateFunction: () => {
 				if(options.onClick){
-					options.onClick(self.getAttachmentCardViews());
+					options.onClick(this.getAttachmentCardViews());
 				}
 			},
 			buttonView: buttonView
 		});
 
-		this._element.querySelector('.aZi').appendChild(buttonView.getElement());
+		const toolbar = this._createAreaToolbarIfNeeded();
+		toolbar.querySelector('.aZi').appendChild(buttonView.getElement());
 	}
 
 });

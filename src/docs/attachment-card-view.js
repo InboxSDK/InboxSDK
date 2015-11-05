@@ -22,12 +22,11 @@ var AttachmentCardView = /** @lends AttachmentCardView */{
 	*/
 	addButton: function(){},
 
-	// If/when we expose other types of attachment cards, re-add this sentence:
-	// "For other types of attachment cards, the promise may resolve to null."
 	/**
 	* Get the URL for the attachment card's download link as a promise for a
-	* string. For Gmail file attachments, the URL will be a short-lived URL that
-	* can be accessed without cookies.
+	* string. For FILE attachment cards, the URL will be a short-lived URL that
+	* can be accessed without cookies. Other attachment card types may not have
+	* a download URL, and the promise may resolve to null.
 	* @return {Promise.<string>}
 	*/
 	getDownloadURL: function() {},

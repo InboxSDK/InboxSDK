@@ -58,7 +58,7 @@ var MessageView = /** @lends MessageView */{
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
 	/**
-	* Returns all the file attachment card views currently visible for this message.
+	* Returns all the attachment card views of type FILE currently visible for this message.
 	* @return {AttachmentCardView[]}
 	*/
 	getFileAttachmentCardViews: function(){},
