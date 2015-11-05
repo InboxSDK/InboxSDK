@@ -2,6 +2,7 @@ import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
 import util from 'util';
+import autoHtml from 'auto-html';
 import {defn} from 'ud';
 
 import AttachmentCardViewDriver from '../../../driver-interfaces/attachment-card-view-driver';
@@ -120,53 +121,53 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._element.classList.add('aZo');
 		this._element.classList.add('inboxsdk__attachmentCard');
 
-		var htmlArray = [
-			'<a target="_blank" role="link" class="aQy e" href="">',
-				'<div aria-hidden="true">',
-					'<div class="aSG"></div>',
-					'<div class="aVY aZn">',
-						'<div class="aZm"></div>',
-					'</div>',
-					'<div class="aSH">'
+		var htmlArray = [autoHtml `
+			<a target="_blank" role="link" class="aQy e" href="">
+				<div aria-hidden="true">
+					<div class="aSG"></div>
+					<div class="aVY aZn">
+						<div class="aZm"></div>
+					</div>
+					<div class="aSH">`
 		];
 
 		if(options.iconThumbnailUrl){
-			htmlArray = htmlArray.concat([
-				'<div class="aYv">',
-					'<img class="aZG aYw" src="' + options.iconThumbnailUrl + '">',
-				'</div>'
+			htmlArray = htmlArray.concat([autoHtml `
+				<div class="aYv">
+					<img class="aZG aYw" src="${options.iconThumbnailUrl}">
+				</div>`
 			]);
 		}
 		else{
-			htmlArray = htmlArray.concat([
-				'<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl" src="' +  options.previewThumbnailUrl + '">'
+			htmlArray = htmlArray.concat([autoHtml `
+				<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl"
+					src="${options.previewThumbnailUrl}">`
 			]);
 		}
 
-		htmlArray = htmlArray.concat([
-						'<div class="aYy">',
-							'<div class="aYA">',
-								'<img class="aSM" src="' + options.fileIconImageUrl + '">',
-							'</div>',
-							'<div class="aYz">',
-								'<div class="a12">',
-									'<div class="aQA">',
-										'<span class="aV3 a6U"></span>',
-									'</div>',
-									'<div class="aYp">',
-										'<span class="SaH2Ve"></span>',
-									'</div>',
-								'</div>',
-							'</div>',
-						'</div>',
-					'</div>',
-					'<div class="aSI">',
-						'<div class="aSJ"></div>',
-					'</div>',
-				'</div>',
-			'</a>',
-			'<div class="aQw">',
-			'</div>'
+		htmlArray = htmlArray.concat([autoHtml `
+			<div class="aYy">
+				<div class="aYA">
+					<img class="aSM" src="${options.fileIconImageUrl}">
+				</div>
+				<div class="aYz">
+					<div class="a12">
+						<div class="aQA">
+							<span class="aV3 a6U"></span>
+						</div>
+						<div class="aYp">
+							<span class="SaH2Ve"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="aSI">
+			<div class="aSJ"></div>
+		</div>
+	</div>
+</a>
+<div class="aQw"></div>`
 		]);
 
 		this._element.innerHTML = htmlArray.join('');
