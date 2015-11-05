@@ -4,9 +4,7 @@
 */
 var AttachmentCardView = /** @lends AttachmentCardView */{
 
-	// There aren't ways to get non-FILE attachment cards presently, so this
-	// jsdoc comment is disabled for now.
-	/*
+	/**
 	* Returns the type of the attachment card. Permissable values are
 	* {FILE} (regular file attachments), {DRIVE} (Drive attachments that are
 	*  present as links in the message), {FILE_IMAGE} (Image attachments),
