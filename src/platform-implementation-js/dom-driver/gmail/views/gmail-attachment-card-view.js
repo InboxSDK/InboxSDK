@@ -2,6 +2,7 @@ import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
 import util from 'util';
+import {defn} from 'ud';
 
 import AttachmentCardViewDriver from '../../../driver-interfaces/attachment-card-view-driver';
 
@@ -81,7 +82,7 @@ _.assign(GmailAttachmentCardView.prototype, {
 		const download_url = this._element.getAttribute('download_url');
 		if (download_url) {
 			const m = /:(https:\/\/[^:]+)/.exec(download_url);
-			return m && m[1];
+			return m ? m[1] : null;
 		}
 		// download_url attribute may not be available yet. Use the a link href.
 		const firstChild = this._element.firstElementChild;
@@ -92,11 +93,16 @@ _.assign(GmailAttachmentCardView.prototype, {
 	// Resolves the short-lived cookie-less download URL
 	getDownloadURL() {
 		return RSVP.Promise.resolve().then(() => {
-			if (!this._isStandardAttachment()) return null;
-			return waitFor(() => this._getDownloadLink());
-		}).then(downloadUrl => {
-			if (!downloadUrl) return null;
-			return this._driver.resolveUrlRedirects(downloadUrl);
+			if (this._isStandardAttachment()) {
+				return waitFor(() => this._getDownloadLink()).then(downloadUrl => {
+					if (!downloadUrl) return null;
+					return this._driver.resolveUrlRedirects(downloadUrl);
+				});
+			} else {
+				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
+				return downloadButton ?
+					downloadButton.getAttribute('data-inboxsdk-download-url') : null;
+			}
 		});
 	},
 
@@ -235,6 +241,8 @@ _.assign(GmailAttachmentCardView.prototype, {
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
 
+		buttonView.getElement().setAttribute('data-inboxsdk-download-url', options.downloadUrl);
+
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
 				var prevented = false;
@@ -316,4 +324,4 @@ _.assign(GmailAttachmentCardView.prototype, {
 
 });
 
-export default GmailAttachmentCardView;
+export default defn(module, GmailAttachmentCardView);

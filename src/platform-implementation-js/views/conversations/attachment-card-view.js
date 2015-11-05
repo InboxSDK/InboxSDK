@@ -1,6 +1,7 @@
-var _ = require('lodash');
-var util = require('util');
-var EventEmitter = require('../../lib/safe-event-emitter');
+import _ from 'lodash';
+import util from 'util';
+import RSVP from 'rsvp';
+import EventEmitter from '../../lib/safe-event-emitter';
 
 // documented in src/docs/
 function AttachmentCardView(attachmentCardImplementation, messageView) {
