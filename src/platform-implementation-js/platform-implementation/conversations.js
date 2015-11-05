@@ -30,8 +30,8 @@ var Conversations = function(appId, driver, membraneMap){
 		members.messageViewHandlerRegistries.loaded.dumpHandlers();
 	});
 
-	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap);
-	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap);
+	_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap, driver);
+	_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap, driver);
 
 	_setupViewDriverWatcher(
 		appId,
@@ -45,7 +45,8 @@ var Conversations = function(appId, driver, membraneMap){
 		MessageView,
 		members.messageViewHandlerRegistries.loaded,
 		this,
-		membraneMap
+		membraneMap,
+		driver
 	);
 
 	this.MessageViewViewStates = Object.freeze({
@@ -72,11 +73,11 @@ _.extend(Conversations.prototype, {
 
 });
 
-function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance, membraneMap){
+function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance, membraneMap, driver){
 	var combinedStream = stream.map(function(viewDriver){
 		var view = membraneMap.get(viewDriver);
 		if (!view) {
-			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance);
+			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance, driver);
 			membraneMap.set(viewDriver, view);
 		}
 

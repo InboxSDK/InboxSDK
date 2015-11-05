@@ -1,38 +1,52 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var AttachmentAreaViewDriver = require('../../../driver-interfaces/attachment-area-view-driver');
+/* @flow */
+//jshint ignore:start
 
-var GmailAttachmentCardView = require('./gmail-attachment-card-view');
-var ButtonView = require('../widgets/buttons/button-view');
-var BasicButtonViewController = require('../../../widgets/buttons/basic-button-view-controller');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import {defn} from 'ud';
+import type GmailDriver from '../gmail-driver';
+import GmailAttachmentCardView from './gmail-attachment-card-view';
+import ButtonView from '../widgets/buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-function GmailAttachmentAreaView(element, driver){
-	AttachmentAreaViewDriver.call(this);
+const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
+	_element: HTMLElement;
+	_driver: GmailDriver;
+	_elsToCardViews: WeakMap<HTMLElement, GmailAttachmentCardView>;
 
-	this._driver = driver;
-	this._isNative = !!element;
-
-	if(element){
-		this._element = element;
-		this._setupAttachmentCardViews();
+	constructor(element: ?HTMLElement, driver: GmailDriver) {
+		this._driver = driver;
+		this._elsToCardViews = new WeakMap();
+		if(element){
+			this._element = element;
+		} else {
+			this._setupElement();
+		}
 	}
-	else{
-		this._setupElement();
+
+	destroy() {
+		this.getAttachmentCardViews().forEach(view => {
+			view.destroy();
+		});
 	}
-}
 
-GmailAttachmentAreaView.prototype = Object.create(AttachmentAreaViewDriver.prototype);
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-_.extend(GmailAttachmentAreaView.prototype, {
+	getAttachmentCardViews(): Array<GmailAttachmentCardView> {
+		const attachments = this._element.querySelectorAll('.aQH > span');
+		return _.map(attachments, attachment => {
+			let cardView = this._elsToCardViews.get(attachment);
+			if (!cardView) {
+				cardView = new GmailAttachmentCardView({element: attachment}, this._driver);
+				this._elsToCardViews.set(attachment, cardView);
+			}
+			return cardView;
+		});
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_driver', destroy: false},
-		{name: '_isNative', destroy: false},
-		{name: '_attachmentCardViews', destroy: true, get: true}
-	],
-
-	_setupElement: function(){
+	_setupElement(){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'hq gt a10');
 
@@ -44,29 +58,41 @@ _.extend(GmailAttachmentAreaView.prototype, {
 				'<div class="aZK"></div>',
 			'</div>'
 		].join('');
-	},
+	}
 
-	_setupAttachmentCardViews: function(){
-		const attachments = this._element.querySelectorAll('.aQH > span');
-		this._attachmentCardViews = Array.prototype.map.call(attachments, attachment =>
-			new GmailAttachmentCardView({element: attachment}, this._driver)
-		);
-	},
-
-	addGmailAttachmentCardView: function(gmailAttachmentCardView){
-		const zone = this._element.querySelector('.aXK, .aQH');
-		if (zone) {
-			zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastChild);
-		} else {
-			this._driver.getLogger().error(new Error("Could not find attachment zone"));
+	_createAreaToolbarIfNeeded(): HTMLElement {
+		const preexistingToolbar = this._element.querySelector('.ho');
+		if (preexistingToolbar) {
+			return preexistingToolbar;
 		}
-	},
+		const toolbar = document.createElement('div');
+		toolbar.className = 'ho';
+		toolbar.innerHTML = `<span class="aVW"><span>${this.getAttachmentCardViews().length}</span> Attachments</span><div class="aZi J-J5-Ji"></div>`;
+		this._element.insertBefore(toolbar, this._element.lastElementChild);
+		this._element.classList.remove('a10');
+		return toolbar;
+	}
 
-	addButtonToDownloadAllArea: function(options){
-		if(!this._element.querySelector('.aZi')){
+	_updateToolbarCardCount() {
+		const cardCount = this.getAttachmentCardViews().length;
+		if (cardCount > 1) {
+			const toolbar = this._createAreaToolbarIfNeeded();
+			const counter = toolbar.querySelector('.aVW > span');
+			counter.textContent = String(cardCount);
+		}
+	}
+
+	addGmailAttachmentCardView(gmailAttachmentCardView: GmailAttachmentCardView){
+		const zone = this._element.querySelector('.aXK, .aQH');
+		if (!zone) {
+			this._driver.getLogger().error(new Error("Could not find attachment zone"));
 			return;
 		}
+		zone.insertBefore(gmailAttachmentCardView.getElement(), zone.lastElementChild);
+		this._updateToolbarCardCount();
+	}
 
+	addButtonToDownloadAllArea(options: Object){
 		var buttonView = new ButtonView({
 			iconClass: 'T-I-J3',
 			iconUrl: options.iconUrl,
@@ -75,21 +101,21 @@ _.extend(GmailAttachmentAreaView.prototype, {
 		});
 
 		buttonView.addClass('aZj');
-		buttonView.getElement().children[0].setAttribute('class', 'asa');
+		buttonView.getElement().children[0].className = 'asa';
 
-		var self = this;
 		var basicButtonViewController = new BasicButtonViewController({
-			activateFunction: function(){
+			activateFunction: () => {
 				if(options.onClick){
-					options.onClick(self.getAttachmentCardViews());
+					options.onClick();
 				}
 			},
 			buttonView: buttonView
 		});
 
-		this._element.querySelector('.aZi').appendChild(buttonView.getElement());
+		const toolbar = this._createAreaToolbarIfNeeded();
+		toolbar.querySelector('.aZi').appendChild(buttonView.getElement());
 	}
 
 });
 
-module.exports = GmailAttachmentAreaView;
+export default GmailAttachmentAreaView;

@@ -6,7 +6,7 @@ var AttachmentCardView = require('./attachment-card-view');
 var memberMap = new WeakMap();
 
 // documented in src/docs/
-var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations){
+var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations, driver){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -15,6 +15,7 @@ var MessageView = function(messageViewImplementation, appId, membraneMap, Conver
 	members.messageViewImplementation = messageViewImplementation;
 	members.membraneMap = membraneMap;
 	members.Conversations = Conversations;
+	members.driver = driver;
 
 	_bindToEventStream(this, members, messageViewImplementation.getEventStream());
 };
@@ -38,7 +39,17 @@ _.extend(MessageView.prototype, {
 	},
 
 	addAttachmentsToolbarButton: function(buttonOptions){
-		memberMap.get(this).messageViewImplementation.addButtonToDownloadAllArea(buttonOptions);
+		const {messageViewImplementation} = memberMap.get(this);
+		messageViewImplementation.addButtonToDownloadAllArea({
+			tooltip: buttonOptions.tooltip,
+			iconUrl: buttonOptions.iconUrl,
+			onClick() {
+				const attachmentCardViews = messageViewImplementation.getAttachmentCardViewDrivers().map(cardDriver =>
+					new AttachmentCardView(cardDriver)
+				);
+				buttonOptions.onClick({attachmentCardViews});
+			}
+		});
 	},
 
 	getBodyElement: function(){
@@ -66,6 +77,7 @@ _.extend(MessageView.prototype, {
 
 	// Deprecated name
 	getAttachmentCardViews: function(){
+		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
 		return this.getFileAttachmentCardViews();
 	},
 

@@ -1,4 +1,5 @@
 InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
+	'use strict';
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
@@ -25,7 +26,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			title: 'Test image',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
-			previewThumbnailUrl: chrome.runtime.getURL('partycat.jp'),
+			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
 			failoverPreviewIconUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
 			buttons: [
@@ -65,9 +66,10 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			]
 		});
 
-		messageView.getFileAttachmentCardViews().map(function(card, i) {
+		messageView.getFileAttachmentCardViews().forEach(function(card, i) {
 			console.log(i, 'attachment card', card);
 			console.log(i, 'type', card.getAttachmentType());
+			console.log(i, 'title', card.getTitle());
 			card.getDownloadURL().then(function(url) {
 				console.log(i, 'url', url);
 			});
@@ -81,6 +83,22 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 				tooltip: 'Foo2',
 				onClick: console.log.bind(console, 'click2')
 			});
+		});
+
+		messageView.addAttachmentsToolbarButton({
+			tooltip: 'Tooltip here',
+			iconUrl: 'https://www.streak.com/build/images/circle_exclamation_mark.png',
+			onClick(event) {
+				const attachmentCardViews = event.attachmentCardViews;
+				console.log('attachment cards', attachmentCardViews);
+				for (let card of attachmentCardViews) {
+					console.log('card type', card.getAttachmentType());
+					console.log('card title', card.getTitle());
+					card.getDownloadURL().then(url => {
+						console.log('card url', url);
+					}, err => console.error(err));
+				}
+			}
 		});
 
 	});

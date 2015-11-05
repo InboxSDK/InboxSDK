@@ -2,6 +2,8 @@ import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
 import util from 'util';
+import autoHtml from 'auto-html';
+import {defn} from 'ud';
 
 import AttachmentCardViewDriver from '../../../driver-interfaces/attachment-card-view-driver';
 
@@ -77,11 +79,16 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._addButton(buttonView);
 	},
 
+	getTitle() {
+		const title = this._element.querySelector('span .aV3');
+		return title ? title.textContent : "";
+	},
+
 	_getDownloadLink() {
 		const download_url = this._element.getAttribute('download_url');
 		if (download_url) {
 			const m = /:(https:\/\/[^:]+)/.exec(download_url);
-			return m && m[1];
+			return m ? m[1] : null;
 		}
 		// download_url attribute may not be available yet. Use the a link href.
 		const firstChild = this._element.firstElementChild;
@@ -92,11 +99,16 @@ _.assign(GmailAttachmentCardView.prototype, {
 	// Resolves the short-lived cookie-less download URL
 	getDownloadURL() {
 		return RSVP.Promise.resolve().then(() => {
-			if (!this._isStandardAttachment()) return null;
-			return waitFor(() => this._getDownloadLink());
-		}).then(downloadUrl => {
-			if (!downloadUrl) return null;
-			return this._driver.resolveUrlRedirects(downloadUrl);
+			if (this._isStandardAttachment()) {
+				return waitFor(() => this._getDownloadLink()).then(downloadUrl => {
+					if (!downloadUrl) return null;
+					return this._driver.resolveUrlRedirects(downloadUrl);
+				});
+			} else {
+				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
+				return downloadButton ?
+					downloadButton.getAttribute('data-inboxsdk-download-url') : null;
+			}
 		});
 	},
 
@@ -109,53 +121,53 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._element.classList.add('aZo');
 		this._element.classList.add('inboxsdk__attachmentCard');
 
-		var htmlArray = [
-			'<a target="_blank" role="link" class="aQy e" href="">',
-				'<div aria-hidden="true">',
-					'<div class="aSG"></div>',
-					'<div class="aVY aZn">',
-						'<div class="aZm"></div>',
-					'</div>',
-					'<div class="aSH">'
+		var htmlArray = [autoHtml `
+			<a target="_blank" role="link" class="aQy e" href="">
+				<div aria-hidden="true">
+					<div class="aSG"></div>
+					<div class="aVY aZn">
+						<div class="aZm"></div>
+					</div>
+					<div class="aSH">`
 		];
 
 		if(options.iconThumbnailUrl){
-			htmlArray = htmlArray.concat([
-				'<div class="aYv">',
-					'<img class="aZG aYw" src="' + options.iconThumbnailUrl + '">',
-				'</div>'
+			htmlArray = htmlArray.concat([autoHtml `
+				<div class="aYv">
+					<img class="aZG aYw" src="${options.iconThumbnailUrl}">
+				</div>`
 			]);
 		}
 		else{
-			htmlArray = htmlArray.concat([
-				'<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl" src="' +  options.previewThumbnailUrl + '">'
+			htmlArray = htmlArray.concat([autoHtml `
+				<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl"
+					src="${options.previewThumbnailUrl}">`
 			]);
 		}
 
-		htmlArray = htmlArray.concat([
-						'<div class="aYy">',
-							'<div class="aYA">',
-								'<img class="aSM" src="' + options.fileIconImageUrl + '">',
-							'</div>',
-							'<div class="aYz">',
-								'<div class="a12">',
-									'<div class="aQA">',
-										'<span class="aV3 a6U"></span>',
-									'</div>',
-									'<div class="aYp">',
-										'<span class="SaH2Ve"></span>',
-									'</div>',
-								'</div>',
-							'</div>',
-						'</div>',
-					'</div>',
-					'<div class="aSI">',
-						'<div class="aSJ"></div>',
-					'</div>',
-				'</div>',
-			'</a>',
-			'<div class="aQw">',
-			'</div>'
+		htmlArray = htmlArray.concat([autoHtml `
+			<div class="aYy">
+				<div class="aYA">
+					<img class="aSM" src="${options.fileIconImageUrl}">
+				</div>
+				<div class="aYz">
+					<div class="a12">
+						<div class="aQA">
+							<span class="aV3 a6U"></span>
+						</div>
+						<div class="aYp">
+							<span class="SaH2Ve"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="aSI">
+			<div class="aSJ"></div>
+		</div>
+	</div>
+</a>
+<div class="aQw"></div>`
 		]);
 
 		this._element.innerHTML = htmlArray.join('');
@@ -234,6 +246,8 @@ _.assign(GmailAttachmentCardView.prototype, {
 			tooltip: 'Download',
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
+
+		buttonView.getElement().setAttribute('data-inboxsdk-download-url', options.downloadUrl);
 
 		var basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
@@ -316,4 +330,4 @@ _.assign(GmailAttachmentCardView.prototype, {
 
 });
 
-module.exports = GmailAttachmentCardView;
+export default defn(module, GmailAttachmentCardView);

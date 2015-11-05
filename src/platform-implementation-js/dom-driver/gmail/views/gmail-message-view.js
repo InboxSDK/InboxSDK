@@ -5,8 +5,8 @@ const asap = require('asap');
 
 const MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
 
-const GmailAttachmentAreaView = require('./gmail-attachment-area-view');
-const GmailAttachmentCardView = require('./gmail-attachment-card-view');
+import GmailAttachmentAreaView from './gmail-attachment-area-view';
+import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -50,7 +50,6 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_driver', destroy: false},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
-		{name: '_addedDownloadAllAreaButtonOptions', destroy: false, defaultValue: {}},
 		{name: '_messageLoaded', destroy: false, defaultValue: false}
 	],
 
@@ -136,14 +135,7 @@ _.extend(GmailMessageView.prototype, {
 			return;
 		}
 
-		var optionsHash = this._getDownloadAllAreaButtonOptionsHash(options);
-		if(this._addedDownloadAllAreaButtonOptions[optionsHash]){
-			return;
-		}
-
 		gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
-
-		this._addedDownloadAllAreaButtonOptions[optionsHash] = true;
 	},
 
 	getMessageID() {
@@ -425,10 +417,6 @@ _.extend(GmailMessageView.prototype, {
 				 })
 
 		);
-	},
-
-	_getDownloadAllAreaButtonOptionsHash: function(options){
-		return options.iconClass + options.tooltip;
 	},
 
 	_getAttachmentArea: function(){
