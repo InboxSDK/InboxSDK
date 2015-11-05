@@ -66,9 +66,10 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 			]
 		});
 
-		messageView.getFileAttachmentCardViews().map(function(card, i) {
+		messageView.getFileAttachmentCardViews().forEach(function(card, i) {
 			console.log(i, 'attachment card', card);
 			console.log(i, 'type', card.getAttachmentType());
+			console.log(i, 'title', card.getTitle());
 			card.getDownloadURL().then(function(url) {
 				console.log(i, 'url', url);
 			});
@@ -91,6 +92,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
 				console.log('attachment cards', cards);
 				for (let card of cards) {
 					console.log('card type', card.getAttachmentType());
+					console.log('card title', card.getTitle());
 					card.getDownloadURL().then(url => {
 						console.log('card url', url);
 					}, err => console.error(err));

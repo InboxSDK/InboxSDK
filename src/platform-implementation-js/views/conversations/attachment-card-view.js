@@ -24,6 +24,10 @@ _.assign(AttachmentCardView.prototype, {
 		this._attachmentCardImplementation.addButton(buttonOptions);
 	},
 
+	getTitle() {
+		return this._attachmentCardImplementation.getTitle();
+	},
+
 	getDownloadURL() {
 		return this._attachmentCardImplementation.getDownloadURL();
 	},

@@ -78,6 +78,11 @@ _.assign(GmailAttachmentCardView.prototype, {
 		this._addButton(buttonView);
 	},
 
+	getTitle() {
+		const title = this._element.querySelector('span .aV3');
+		return title ? title.textContent : "";
+	},
+
 	_getDownloadLink() {
 		const download_url = this._element.getAttribute('download_url');
 		if (download_url) {

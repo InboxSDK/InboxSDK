@@ -23,6 +23,12 @@ var AttachmentCardView = /** @lends AttachmentCardView */{
 	addButton: function(){},
 
 	/**
+	* Reads the title on the attachment card. Typically this will be a filename.
+	* @return {string}
+	*/
+	getTitle: function() {},
+
+	/**
 	* Get the URL for the attachment card's download link as a promise for a
 	* string. For FILE attachment cards, the URL will be a short-lived URL that
 	* can be accessed without cookies. Other attachment card types may not have
