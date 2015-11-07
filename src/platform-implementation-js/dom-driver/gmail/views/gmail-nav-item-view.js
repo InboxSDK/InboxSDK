@@ -218,7 +218,7 @@ _.extend(GmailNavItemView.prototype, {
 
 		var navItemNameElement = this._element.querySelector('.inboxsdk__navItem_name');
 		navItemNameElement.textContent = name;
-		navItemNameElement.setAttribute('data-tooltip', name);
+		navItemNameElement.setAttribute('title', name);
 		this._name = name;
 	},
 
