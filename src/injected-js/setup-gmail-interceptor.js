@@ -409,7 +409,7 @@ function triggerEvent(detail) {
 
 function stringifyComposeParams(inComposeParams){
   let composeParams = _.cloneDeep(inComposeParams);
-  let string = "=&" + querystring.stringify(composeParams.to) + "&=&" + querystring.stringify(composeParams.cc) + "&=&" + querystring.stringify(composeParams.bcc);
+  let string = `=${stringifyComposeRecipientParam(composeParams.to, 'to')}&=${stringifyComposeRecipientParam(composeParams.cc, 'cc')}&=${stringifyComposeRecipientParam(composeParams.bcc, 'bcc')}`;
 
   delete composeParams.to;
   delete composeParams.bcc;
@@ -417,5 +417,20 @@ function stringifyComposeParams(inComposeParams){
 
   return string + "&" + querystring.stringify(composeParams);
 
+}
+
+function stringifyComposeRecipientParam(value, paramType){
+  let string = "";
+
+  if(Array.isArray(value)){
+    for(let ii =0; ii<value.length; ii++){
+      string += `&${paramType}=${encodeURIComponent(value[ii])}`;
+    }
+  }
+  else{
+    string += `&${paramType}=${encodeURIComponent(value)}`;
+  }
+
+  return string;
 }
 
