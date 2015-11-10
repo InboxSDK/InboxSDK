@@ -83,7 +83,7 @@ export default function setupGmailInterceptor() {
                                             .filter(({detail}) => detail.composeid === composeid && detail.modifierId === modifierId)
                                             .take(1)
                                             .map(({detail}) => detail.composeParams)
-                                            .toPromise();
+                                            .toPromise(Promise);
 
           triggerEvent({
             type: 'inboxSDKmodifyComposeRequest',
