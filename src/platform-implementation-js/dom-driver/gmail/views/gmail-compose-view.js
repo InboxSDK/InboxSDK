@@ -636,7 +636,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	}
 
 	registerRequestModifier(modifier: (composeParams: Object) => Object | Promise<Object>){
-		const modifierId = (new Date()).getTime() + '_' + Object.keys(this._requestModifiers).length;
+		const modifierId = (new Date()).getTime() + '_' + this._driver.getAppId() + '_' + Object.keys(this._requestModifiers).length;
 		this._requestModifiers[modifierId] = modifier;
 
 		this._driver.getPageCommunicator().registerComposeRequestModifier(this.getComposeID(), modifierId);
