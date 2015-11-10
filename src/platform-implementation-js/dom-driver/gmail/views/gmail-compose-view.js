@@ -62,6 +62,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Range;
+	_requestModifiers: {[key: string]: (composeParams: Object) => Object | Promise<Object>};
+	_ajaxInterceptStream: ?() => void;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -77,6 +79,9 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
+		this._requestModifiers = {};
+		this._ajaxInterceptStream = null;
+
 		this._eventStream = new Bacon.Bus();
 		this.getEventStream = _.constant(kefirCast(Kefir, this._eventStream));
 
@@ -104,6 +109,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 									this._messageId = response.messageID;
 								}
 								return {eventName: 'draftSaved', data: response};
+
 							default:
 								return null;
 						}
@@ -627,6 +633,49 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	setLastSelectionRange(lastSelectionRange: ?Range) {
 		this._lastSelectionRange = lastSelectionRange;
+	}
+
+	registerRequestModifier(modifier: (composeParams: Object) => Object | Promise<Object>){
+		const modifierId = (new Date()).getTime() + '_' + Object.keys(this._requestModifiers).length;
+		this._requestModifiers[modifierId] = modifier;
+
+		this._driver.getPageCommunicator().registerComposeRequestModifier(this.getComposeID(), modifierId);
+		this._startListeningForModificationRequests();
+	}
+
+	_startListeningForModificationRequests(){
+		if(this._ajaxInterceptStream){
+			return;
+		}
+
+		this._ajaxInterceptStream =
+				this._driver
+					.getPageCommunicator()
+					.ajaxInterceptStream
+					.takeUntil(baconCast(Bacon, this._stopper))
+					.filter(({type, composeid, modifierId}) =>
+								type === 'inboxSDKmodifyComposeRequest' &&
+								composeid === this.getComposeID())
+					.onValue(({composeid, modifierId, composeParams}) => {
+
+						const modifier = this._requestModifiers[modifierId];
+						if(!modifier){
+							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams);
+						}
+						else{
+							const result = modifier(composeParams);
+
+							if(result.then){
+								result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, newComposeParams || composeParams))
+										.catch(() => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams));
+							}
+							else{
+								this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, result || composeParams);
+							}
+						}
+					});
+
+
 	}
 });
 export default GmailComposeView;

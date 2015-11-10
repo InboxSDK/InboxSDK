@@ -220,6 +220,10 @@ _.extend(ComposeView.prototype, {
 		return memberMap.get(this).composeViewImplementation.getElement();
 	},
 
+	registerRequestModifier(modifier){
+		memberMap.get(this).composeViewImplementation.registerRequestModifier(modifier);
+	}
+
 });
 
 ComposeView = ud.defn(module, ComposeView);
