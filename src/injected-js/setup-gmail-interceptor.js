@@ -89,10 +89,13 @@ export default function setupGmailInterceptor() {
             type: 'inboxSDKmodifyComposeRequest',
             composeid,
             modifierId,
-            composeParams
+            composeParams: {
+              body: composeParams.body
+            }
           });
 
-          composeParams = await modificationPromise;
+          let newComposeParams = await modificationPromise;
+          composeParams = Object.assign({}, composeParams, newComposeParams);
 
         }
 
@@ -105,10 +108,10 @@ export default function setupGmailInterceptor() {
             responseText: connection.originalResponseText,
             originalSendBody: connection.originalSendBody
           });
-        }
 
-        const composeParams = querystring.parse(connection.originalSendBody);
-        delete modifiers[composeParams.composeid];
+          const composeParams = querystring.parse(connection.originalSendBody);
+          delete modifiers[composeParams.composeid];
+        }
       }
     });
   }
@@ -404,8 +407,8 @@ function triggerEvent(detail) {
   }));
 }
 
-function stringifyComposeParams(composeParams){
-
+function stringifyComposeParams(inComposeParams){
+  let composeParams = _.cloneDeep(inComposeParams);
   let string = "=&" + querystring.stringify(composeParams.to) + "&=&" + querystring.stringify(composeParams.cc) + "&=&" + querystring.stringify(composeParams.bcc);
 
   delete composeParams.to;

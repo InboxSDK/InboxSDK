@@ -128,12 +128,16 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     }));
   }
 
-  registerComposeRequestModifier(composeid: string, modifierId: string){
+  registerComposeRequestModifier(composeid: string, appId: string): string{
+    const modifierId = (new Date()).getTime() + '_' + appId + '_' + Math.random();
+
     document.dispatchEvent(new CustomEvent('inboxSDKregisterComposeRequestModifier', {
       bubbles: false,
       cancelable: false,
       detail: {composeid, modifierId}
     }));
+
+    return modifierId;
   }
 
   modifyComposeRequest(composeid: string, modifierId: string, composeParams: Object){

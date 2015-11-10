@@ -62,8 +62,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Range;
-	_requestModifiers: {[key: string]: (composeParams: Object) => Object | Promise<Object>};
-	_ajaxInterceptStream: ?() => void;
+	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
+	_ajaxInterceptStreamUnbinder: ?() => void;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -80,7 +80,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
 		this._requestModifiers = {};
-		this._ajaxInterceptStream = null;
+		this._ajaxInterceptStreamUnbinder = null;
 
 		this._eventStream = new Bacon.Bus();
 		this.getEventStream = _.constant(kefirCast(Kefir, this._eventStream));
@@ -635,44 +635,36 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._lastSelectionRange = lastSelectionRange;
 	}
 
-	registerRequestModifier(modifier: (composeParams: Object) => Object | Promise<Object>){
-		const modifierId = (new Date()).getTime() + '_' + this._driver.getAppId() + '_' + Object.keys(this._requestModifiers).length;
+	registerRequestModifier(modifier: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>){
+		const modifierId = this._driver.getPageCommunicator().registerComposeRequestModifier(this.getComposeID(), this._driver.getAppId());
 		this._requestModifiers[modifierId] = modifier;
-
-		this._driver.getPageCommunicator().registerComposeRequestModifier(this.getComposeID(), modifierId);
 		this._startListeningForModificationRequests();
 	}
 
 	_startListeningForModificationRequests(){
-		if(this._ajaxInterceptStream){
+		if(this._ajaxInterceptStreamUnbinder){
 			return;
 		}
 
-		this._ajaxInterceptStream =
+		this._ajaxInterceptStreamUnbinder =
 				this._driver
 					.getPageCommunicator()
 					.ajaxInterceptStream
 					.takeUntil(baconCast(Bacon, this._stopper))
 					.filter(({type, composeid, modifierId}) =>
 								type === 'inboxSDKmodifyComposeRequest' &&
-								composeid === this.getComposeID())
+								composeid === this.getComposeID() &&
+								Boolean(this._requestModifiers[modifierId]))
 					.onValue(({composeid, modifierId, composeParams}) => {
 
 						const modifier = this._requestModifiers[modifierId];
-						if(!modifier){
-							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams);
-						}
-						else{
-							const result = modifier(composeParams);
+						const result = new Promise(resolve => resolve(modifier(composeParams)));
 
-							if(result.then){
-								result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, newComposeParams || composeParams))
-										.catch(() => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams));
-							}
-							else{
-								this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, result || composeParams);
-							}
-						}
+						result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, newComposeParams || composeParams))
+								.catch((err) => {
+									this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams)
+									 this._driver.getLogger().error(err);
+								});
 					});
 
 
