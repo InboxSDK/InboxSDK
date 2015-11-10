@@ -642,7 +642,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	}
 
 	_startListeningForModificationRequests(){
-		if(this._isListeningToAjaxInterceptStream{
+		if(this._isListeningToAjaxInterceptStream){
 			return;
 		}
 
