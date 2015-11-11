@@ -73,7 +73,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isInlineReplyForm = false;
 		this._isFullscreen = false;
 		this._isStandalone = false;
-		this._emailWasSent = false;
 		this._messageId = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
