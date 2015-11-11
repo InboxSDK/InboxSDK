@@ -98,6 +98,9 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 							case 'emailSent':
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								if(response.messageID === 'tr'){
+									return; //this happens when a message is cancelled
+								}
 								this._emailWasSent = true;
 								if(response.messageID){
 									this._messageId = response.messageID;
