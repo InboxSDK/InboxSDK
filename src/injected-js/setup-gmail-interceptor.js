@@ -1,5 +1,8 @@
+/* @flow */
+
 import _ from 'lodash';
 import RSVP from 'rsvp';
+import Kefir from 'kefir';
 import * as logger from './injected-logger';
 import XHRProxyFactory from './xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
@@ -38,27 +41,80 @@ export default function setupGmailInterceptor() {
       main_originalXHR, main_wrappers, {logError: logErrorExceptEventListeners});
   }
 
-  //email sending notifier
-  js_frame_wrappers.push({
-    isRelevantTo: function(connection) {
-      return connection.params.act === 'sm';
-    },
-    originalSendBodyLogger: function(connection, body) {
-      triggerEvent({
-        type: 'emailSending',
-        body: body
-      });
-    },
-    afterListeners: function(connection) {
-      if(connection.status === 200) {
+  //email sending modifier/notifier
+  {
+    let modifiers: {[key: string]: Array<string>} = {};
+
+
+    Kefir.fromEvents(document, 'inboxSDKregisterComposeRequestModifier')
+          .onValue(({detail}) => {
+            if(!modifiers[detail.compoesid]){
+              modifiers[detail.composeid] = [];
+            }
+
+            modifiers[detail.composeid].push(detail.modifierId);
+          });
+
+
+    js_frame_wrappers.push({
+      isRelevantTo: function(connection) {
+        return connection.params.act === 'sm';
+      },
+      originalSendBodyLogger: function(connection, body) {
         triggerEvent({
-          type: 'emailSent',
-          responseText: connection.originalResponseText,
-          originalSendBody: connection.originalSendBody
+          type: 'emailSending',
+          body: body
         });
+      },
+      requestChanger: async function(connection, request) {
+
+        let composeParams = querystring.parse(request.body);
+        const composeid = composeParams.composeid;
+        const composeModifierIds = modifiers[composeParams.composeid];
+
+        if(!composeModifierIds || composeModifierIds.length === 0){
+          return request;
+        }
+
+        for(let ii=0; ii<composeModifierIds.length; ii++) {
+          const modifierId = composeModifierIds[ii];
+
+          const modificationPromise = Kefir.fromEvents(document, 'inboxSDKcomposeRequestModified')
+                                            .filter(({detail}) => detail.composeid === composeid && detail.modifierId === modifierId)
+                                            .take(1)
+                                            .map(({detail}) => detail.composeParams)
+                                            .toPromise(Promise);
+
+          triggerEvent({
+            type: 'inboxSDKmodifyComposeRequest',
+            composeid,
+            modifierId,
+            composeParams: {
+              body: composeParams.body
+            }
+          });
+
+          let newComposeParams = await modificationPromise;
+          composeParams = Object.assign({}, composeParams, newComposeParams);
+
+        }
+
+        return Object.assign({}, request, {body: stringifyComposeParams(composeParams)});
+      },
+      afterListeners: function(connection) {
+        if(connection.status === 200) {
+          triggerEvent({
+            type: 'emailSent',
+            responseText: connection.originalResponseText,
+            originalSendBody: connection.originalSendBody
+          });
+
+          const composeParams = querystring.parse(connection.originalSendBody);
+          delete modifiers[composeParams.composeid];
+        }
       }
-    }
-  });
+    });
+  }
 
   js_frame_wrappers.push({
     isRelevantTo: function(connection) {
@@ -113,14 +169,26 @@ export default function setupGmailInterceptor() {
     let suggestionModifications;
     let currentQueryDefer;
 
-    document.addEventListener('inboxSDKregisterSuggestionsModifier', function({detail}) {
+    document.addEventListener('inboxSDKregisterSuggestionsModifier', function({detail}: any) {
       providers[detail.providerID] = {position: Object.keys(providers).length};
     });
 
-    document.addEventListener('inboxSDKprovideSuggestions', function({detail}) {
+    document.addEventListener('inboxSDKprovideSuggestions', function({detail}: any) {
       if (detail.query === currentQuery) {
-        suggestionModifications[providers[detail.providerID].position] = detail.suggestions;
+        const provider = providers[detail.providerID];
+        if(!provider){
+          throw new Error('provider does not exist for providerID');
+        }
+
+        if(suggestionModifications == null){
+          throw new Error('tried to modified a null suggestionModifications');
+        }
+
+        suggestionModifications[provider.position] = detail.suggestions;
         if (suggestionModifications.filter(Boolean).length === Object.keys(providers).length) {
+          if(currentQueryDefer == null){
+            throw new Error('tried to resolve a null currentQueryDefer');
+          }
           currentQueryDefer.resolve(_.flatten(suggestionModifications));
           currentQueryDefer = currentQuery = suggestionModifications = null;
         }
@@ -169,6 +237,10 @@ export default function setupGmailInterceptor() {
   }
 
   {
+    // TODO: simplify this code
+    // the triggerEvent call should happen in the requestChanger callback
+    // and a lot of these state variables can be stored in the closure
+
     // Search query replacer.
     // The content script tells us search terms to watch for. Whenever we see a
     // search query containing the term, we delay it being sent out, trigger an
@@ -177,11 +249,11 @@ export default function setupGmailInterceptor() {
     const customSearchTerms = [];
     let queryReplacement;
 
-    document.addEventListener('inboxSDKcreateCustomSearchTerm', function(event) {
+    document.addEventListener('inboxSDKcreateCustomSearchTerm', function(event: any) {
       customSearchTerms.push(event.detail.term);
     });
 
-    document.addEventListener('inboxSDKsearchReplacementReady', function(event) {
+    document.addEventListener('inboxSDKsearchReplacementReady', function(event: any) {
       if (queryReplacement.query === event.detail.query) {
         queryReplacement.newQuery.resolve(event.detail.newQuery);
       }
@@ -220,6 +292,7 @@ export default function setupGmailInterceptor() {
               start: params.start,
               newQuery: RSVP.defer()
             };
+
             triggerEvent({
               type: 'searchQueryForReplacement',
               term: customSearchTerm,
@@ -253,17 +326,17 @@ export default function setupGmailInterceptor() {
     const customSearchQueries = [];
     let customListJob;
 
-    document.addEventListener('inboxSDKcustomListRegisterQuery', event => {
+    document.addEventListener('inboxSDKcustomListRegisterQuery', (event: any) => {
       customSearchQueries.push(event.detail.query);
     });
 
-    document.addEventListener('inboxSDKcustomListNewQuery', event => {
+    document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
       if (customListJob.query === event.detail.query) {
         customListJob.newQuery.resolve(event.detail.newQuery);
       }
     });
 
-    document.addEventListener('inboxSDKcustomListResults', event => {
+    document.addEventListener('inboxSDKcustomListResults', (event: any) => {
       if (customListJob.query === event.detail.query) {
         customListJob.newResults.resolve(event.detail.newResults);
       }
@@ -333,3 +406,31 @@ function triggerEvent(detail) {
     detail
   }));
 }
+
+function stringifyComposeParams(inComposeParams){
+  let composeParams = _.cloneDeep(inComposeParams);
+  let string = `=${stringifyComposeRecipientParam(composeParams.to, 'to')}&=${stringifyComposeRecipientParam(composeParams.cc, 'cc')}&=${stringifyComposeRecipientParam(composeParams.bcc, 'bcc')}`;
+
+  delete composeParams.to;
+  delete composeParams.bcc;
+  delete composeParams.cc;
+
+  return string + "&" + querystring.stringify(composeParams);
+
+}
+
+function stringifyComposeRecipientParam(value, paramType){
+  let string = "";
+
+  if(Array.isArray(value)){
+    for(let ii =0; ii<value.length; ii++){
+      string += `&${paramType}=${encodeURIComponent(value[ii])}`;
+    }
+  }
+  else{
+    string += `&${paramType}=${encodeURIComponent(value)}`;
+  }
+
+  return string;
+}
+

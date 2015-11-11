@@ -127,4 +127,24 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       detail: {query, newQuery}
     }));
   }
+
+  registerComposeRequestModifier(composeid: string, appId: string): string{
+    const modifierId = (new Date()).getTime() + '_' + appId + '_' + Math.random();
+
+    document.dispatchEvent(new CustomEvent('inboxSDKregisterComposeRequestModifier', {
+      bubbles: false,
+      cancelable: false,
+      detail: {composeid, modifierId}
+    }));
+
+    return modifierId;
+  }
+
+  modifyComposeRequest(composeid: string, modifierId: string, composeParams: Object){
+    document.dispatchEvent(new CustomEvent('inboxSDKcomposeRequestModified', {
+      bubbles: false,
+      cancelable: false,
+      detail:{composeid, modifierId, composeParams}
+    }));
+  }
 }
