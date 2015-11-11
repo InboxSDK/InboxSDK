@@ -48,7 +48,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
 	_isStandalone: boolean;
-	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
 	_eventStream: Bacon.Bus;
@@ -74,7 +73,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isInlineReplyForm = false;
 		this._isFullscreen = false;
 		this._isStandalone = false;
-		this._emailWasSent = false;
 		this._messageId = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
@@ -98,7 +96,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 							case 'emailSent':
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-								this._emailWasSent = true;
 								if(response.messageID){
 									this._messageId = response.messageID;
 								}
@@ -171,7 +168,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	destroy() {
 		this._eventStream.push({eventName: 'destroy', data: {
-			messageID: this.getMessageID()
+			messageID: this.getMessageID(),
+			threadID: this._getThreadID() || this.getMessageID()
 		}});
 		this._eventStream.end();
 		this._managedViewControllers.forEach(vc => {
@@ -537,9 +535,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	}
 
 	getMessageID(): ?string {
-		if (this._emailWasSent) {
-			return null;
-		}
 		var input = this._messageIDElement;
 		if (!input) {
 			return this._messageId;
