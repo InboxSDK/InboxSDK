@@ -150,6 +150,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 				.flatMapLatest(() => {
 
 					return Bacon.fromEvent(document.body, 'dragenter')
+								.filter((event) => event.toElement) // ignore events caused by dragFilesIntoCompose
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 
@@ -162,6 +163,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 				.flatMapLatest(() => {
 
 					return Bacon.fromEvent(document.body, 'drop')
+								.filter((event) => event.toElement)
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 

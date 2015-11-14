@@ -250,6 +250,13 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 	setBodyText: function(){},
 
+	/**
+	 * Simulates dragging and dropping file objects into the compose.
+	 * @param {Blob[]} files
+	 * @return {void}
+	 */
+	dragFilesIntoCompose: function(files){},
+
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement: function(){},
 

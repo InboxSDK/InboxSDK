@@ -215,6 +215,13 @@ _.extend(ComposeView.prototype, {
 		memberMap.get(this).composeViewImplementation.setBodyText(text);
 	},
 
+	dragFilesIntoCompose(files) {
+		if (!(files[0] instanceof global.Blob)) {
+			throw new Error("parameter must be Blob object");
+		}
+		memberMap.get(this).composeViewImplementation.dragFilesIntoCompose(files);
+	},
+
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement(){
 		return memberMap.get(this).composeViewImplementation.getElement();
