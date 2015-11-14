@@ -21,6 +21,7 @@ import {simulateDragOver, simulateDrop} from '../../../lib/dom/simulate-drag-and
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
+import waitFor from '../../../lib/wait-for';
 import kefirWaitFor from '../../../lib/kefir-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -422,7 +423,9 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	async dragFilesIntoCompose(files: Blob[]): Promise<void> {
 		simulateDragOver(this._element, files);
-		await delay(1);
+		await waitFor(
+			() => $('body > .aC7:not(.aWP)').filter(':visible').length > 0,
+			20*1000);
 		const dropzone = this._findDropzoneForThisCompose();
 		simulateDrop(dropzone, files);
 	}
