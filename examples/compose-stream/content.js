@@ -1,4 +1,6 @@
 InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inboxSDK) {
+	'use strict';
+
 	window._sdk = inboxSDK;
 
 	window.openDraftByMessageID = function(messageID) {
@@ -83,6 +85,36 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 			onClick: function(event){
 				event.composeView.insertLinkChipIntoBodyAtCursor('name', 'https://rpominov.github.io/kefir/', "https://cf.dropboxstatic.com/static/images/gmail_attachment_logo.png");
 			}
+		});
+
+		const dataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
+
+		function dataURItoBlob(dataURI) {
+			// convert base64/URLEncoded data component to raw binary data held in a string
+			var byteString;
+			if (dataURI.split(',')[0].indexOf('base64') >= 0)
+				byteString = atob(dataURI.split(',')[1]);
+			else
+				byteString = unescape(dataURI.split(',')[1]);
+			// separate out the mime component
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+			// write the bytes of the string to a typed array
+			var ia = new Uint8Array(byteString.length);
+			for (var i = 0; i < byteString.length; i++) {
+				ia[i] = byteString.charCodeAt(i);
+			}
+			return new Blob([ia], {type:mimeString});
+		}
+
+		composeView.addButton({
+			title: 'Attach image',
+			iconUrl: dataUri,
+			onClick(event) {
+				const file = dataURItoBlob(dataUri);
+				file.name = 'foo.png';
+				composeView.dragFilesIntoCompose([file]);
+			},
+			section: 'SEND_RIGHT'
 		});
 
 		composeView.addButton({

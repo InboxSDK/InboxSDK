@@ -2,6 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
+import triggerRelayEvent from './trigger-relay-event';
 
 export default function simulateKey(element: HTMLElement, keyCode: number, charCode: number) {
   var ctrlKey = false;
@@ -32,12 +33,4 @@ export default function simulateKey(element: HTMLElement, keyCode: number, charC
       ctrlKey, metaKey, altKey, shiftKey
     }
   });
-}
-
-function triggerRelayEvent(element: HTMLElement, detail: any) {
-  element.dispatchEvent(new CustomEvent('inboxsdk_event_relay', {
-    bubbles: true,
-    cancelable: false,
-    detail
-  }));
 }

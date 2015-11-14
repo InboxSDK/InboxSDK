@@ -12,10 +12,12 @@ import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import delay from '../../../../common/delay';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import {simulateDragOver, simulateDrop} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -395,6 +397,34 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		}
 		var popOutBtn = this._element.querySelector('.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child');
 		simulateClick(popOutBtn);
+	}
+
+	_findDropzoneForThisCompose(): HTMLElement {
+		// Iterate through all the dropzones and find the one visually contained by
+		// this compose.
+		const rect = this._element.getBoundingClientRect();
+		const el = _.chain($('body > .aC7:not(.aWP)').filter(':visible'))
+			.filter(dropzone => {
+				const top = parseInt(dropzone.style.top, 10);
+				const bottom = top + parseInt(dropzone.style.height, 10);
+				const left = parseInt(dropzone.style.left, 10);
+				const right = left + parseInt(dropzone.style.width, 10);
+				return top > rect.top && left > rect.left &&
+					right < rect.right && bottom < rect.bottom;
+			})
+			.first()
+			.value();
+		if (!el) {
+			throw new Error("Failed to find dropzone");
+		}
+		return el;
+	}
+
+	async dragFilesIntoCompose(files: Blob[]): Promise<void> {
+		simulateDragOver(this._element, files);
+		await delay(1);
+		const dropzone = this._findDropzoneForThisCompose();
+		simulateDrop(dropzone, files);
 	}
 
 	isReply(): boolean {
