@@ -5,7 +5,9 @@
 var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
-   * Adds a label to the thread row view.
+   * Adds a label to the thread row view. This label will appear like a normal
+   * Gmail label, but it is purely a temporary visual modification. This method
+   * does not cause any change to persist to the user's thread in Gmail.
    * @param {LabelDescriptor|Stream.<LabelDescriptor>} labelDescriptor - An options object for the label.
    * @return {void}
    */
