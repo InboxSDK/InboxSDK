@@ -400,11 +400,18 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		simulateClick(popOutBtn);
 	}
 
-	_findDropzoneForThisCompose(): HTMLElement {
+	_waitForDropzonesVisible(): Promise {
+		return waitFor(
+			() => $('body > .aC7:not(.aWP)').filter(':visible').length > 0,
+		20*1000);
+	}
+
+	_findDropzoneForThisCompose(inline: boolean): HTMLElement {
 		// Iterate through all the dropzones and find the one visually contained by
 		// this compose.
 		const rect = this._element.getBoundingClientRect();
-		const el = _.chain($('body > .aC7:not(.aWP)').filter(':visible'))
+		const dropzoneClass = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
+		const el = _.chain($(dropzoneClass).filter(':visible'))
 			.filter(dropzone => {
 				const top = parseInt(dropzone.style.top, 10);
 				const bottom = top + parseInt(dropzone.style.height, 10);
@@ -421,12 +428,17 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		return el;
 	}
 
-	async dragFilesIntoCompose(files: Blob[]): Promise<void> {
+	async attachFiles(files: Blob[]): Promise<void> {
 		simulateDragOver(this._element, files);
-		await waitFor(
-			() => $('body > .aC7:not(.aWP)').filter(':visible').length > 0,
-			20*1000);
-		const dropzone = this._findDropzoneForThisCompose();
+		await this._waitForDropzonesVisible();
+		const dropzone = this._findDropzoneForThisCompose(false);
+		simulateDrop(dropzone, files);
+	}
+
+	async attachInlineFiles(files: Blob[]): Promise<void> {
+		simulateDragOver(this._element, files);
+		await this._waitForDropzonesVisible();
+		const dropzone = this._findDropzoneForThisCompose(true);
 		simulateDrop(dropzone, files);
 	}
 

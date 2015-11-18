@@ -251,11 +251,21 @@ var ComposeView = /** @lends ComposeView */ {
 	setBodyText: function(){},
 
 	/**
-	 * Simulates dragging and dropping file objects into the compose.
+	 * Attaches a set of files into the compose view. The parameter must be an
+	 * array of File objects, or Blob objects with their name properties set.
 	 * @param {Blob[]} files
 	 * @return {void}
 	 */
-	dragFilesIntoCompose: function(files){},
+	attachFiles: function(files){},
+
+	/**
+	 * Attaches a set of files into the compose view inline in the message if
+	 * possible. This works with images. The parameter must be an array of File
+	 * objects, or Blob objects with their name properties set.
+	 * @param {Blob[]} files
+	 * @return {void}
+	 */
+	attachInlineFiles: function(files){},
 
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement: function(){},

@@ -215,11 +215,33 @@ _.extend(ComposeView.prototype, {
 		memberMap.get(this).composeViewImplementation.setBodyText(text);
 	},
 
-	dragFilesIntoCompose(files) {
-		if (!(files[0] instanceof global.Blob)) {
-			throw new Error("parameter must be Blob object");
+	attachFiles(files) {
+		if (files.length === 0) {
+			return;
 		}
-		memberMap.get(this).composeViewImplementation.dragFilesIntoCompose(files);
+		if (!(files[0] instanceof global.Blob)) {
+			throw new Error("parameter must be an array of Blob objects");
+		}
+		memberMap.get(this).composeViewImplementation.attachFiles(files);
+	},
+
+	attachInlineFiles(files) {
+		if (files.length === 0) {
+			return;
+		}
+		if (!(files[0] instanceof global.Blob)) {
+			throw new Error("parameter must be an array of Blob objects");
+		}
+		memberMap.get(this).composeViewImplementation.attachInlineFiles(files);
+	},
+
+	// Old alias that we should keep around until we're sure no one is using it.
+	dragFilesIntoCompose(files) {
+		const driver = memberMap.get(this).driver;
+		driver.getLogger().deprecationWarning(
+			'ComposeView.dragFilesIntoCompose', 'ComposeView.attachInlineFiles');
+
+		return this.attachInlineFiles(files);
 	},
 
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
