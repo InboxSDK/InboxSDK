@@ -34,7 +34,7 @@ var Widgets = /** @lends Widgets */{
 var ModalOptions = /** @lends ModalOptions */{
 
   /**
-  * An HTMLElement representing the content you\'d like to put inside the modal
+  * An HTMLElement representing the content you'd like to put inside the modal
   * @type {HTMLElement}
   */
   el:null,
