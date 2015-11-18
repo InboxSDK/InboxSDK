@@ -113,7 +113,6 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 				const file = dataURItoBlob(dataUri);
 				file.name = 'foo.png';
 				composeView.attachInlineFiles([file]);
-				composeView.attachFiles([file]);
 			},
 			section: 'SEND_RIGHT'
 		});

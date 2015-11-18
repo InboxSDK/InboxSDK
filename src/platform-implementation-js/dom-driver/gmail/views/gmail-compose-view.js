@@ -20,6 +20,7 @@ import simulateKey from '../../../lib/dom/simulate-key';
 import {simulateDragOver, simulateDrop} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
+import setCss from '../../../lib/dom/set-css';
 
 import waitFor from '../../../lib/wait-for';
 import kefirWaitFor from '../../../lib/kefir-wait-for';
@@ -400,10 +401,16 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		simulateClick(popOutBtn);
 	}
 
-	_waitForDropzonesVisible(): Promise {
-		return waitFor(
-			() => $('body > .aC7:not(.aWP)').filter(':visible').length > 0,
-		20*1000);
+	_hideDropzones() {
+		setCss('compose dropzone hider', 'body > .aC7 .aC9 {visibility: hidden;}')
+	}
+
+	_reenableDropzones() {
+		setCss('compose dropzone hider', null);
+	}
+
+	_dropzonesVisible(): boolean {
+		return $('body > .aC7:not(.aWP)').filter(':visible').length > 0;
 	}
 
 	_findDropzoneForThisCompose(inline: boolean): HTMLElement {
@@ -429,17 +436,23 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	}
 
 	async attachFiles(files: Blob[]): Promise<void> {
+		this._hideDropzones();
 		simulateDragOver(this._element, files);
-		await this._waitForDropzonesVisible();
+		await waitFor(() => this._dropzonesVisible(), 20*1000);
 		const dropzone = this._findDropzoneForThisCompose(false);
 		simulateDrop(dropzone, files);
+		await waitFor(() => !this._dropzonesVisible(), 20*1000);
+		this._reenableDropzones();
 	}
 
 	async attachInlineFiles(files: Blob[]): Promise<void> {
+		this._hideDropzones();
 		simulateDragOver(this._element, files);
-		await this._waitForDropzonesVisible();
+		await waitFor(() => this._dropzonesVisible(), 20*1000);
 		const dropzone = this._findDropzoneForThisCompose(true);
 		simulateDrop(dropzone, files);
+		await waitFor(() => !this._dropzonesVisible(), 20*1000);
+		this._reenableDropzones();
 	}
 
 	isReply(): boolean {
