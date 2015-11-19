@@ -1129,18 +1129,21 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   line-height: 24px;
 }
 
+.inboxsdk__appButton.inboxsdk__appButton_noGPlus a {
+  line-height: 30px;
+}
+
+.inboxsdk__appButton a:hover {
+  text-decoration: underline;
+  color: #000;
+}
+
 .inboxsdk__gmail_dark_theme .inboxsdk__appButton a {
   color: #eee;
 }
-
-  .inboxsdk__appButton.inboxsdk__appButton_noGPlus a {
-    line-height: 30px;
-  }
-
-  .inboxsdk__appButton a:hover {
-    text-decoration: underline;
-    color: #000;
-  }
+.inboxsdk__gmail_dark_theme .inboxsdk__appButton a:hover {
+  color: #fff;
+}
 
 .inboxsdk__appButton_tooltip {
   outline: none;
