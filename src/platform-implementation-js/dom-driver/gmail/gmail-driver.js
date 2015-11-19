@@ -29,6 +29,7 @@ import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
+import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
@@ -123,6 +124,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			trackEvents(this);
 			gmailLoadEvent(this);
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
+			trackGmailStyles();
 		});
 	}
 
