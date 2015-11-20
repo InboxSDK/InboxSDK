@@ -50,6 +50,9 @@ _.extend(Toolbars.prototype, {
 	},
 
 	setAppToolbarButton(appToolbarButtonDescriptor){
+		const driver = memberMap.get(this).driver;
+		driver.getLogger().deprecationWarning(
+			'Toolbars.setAppToolbarButton', 'Toolbars.addToolbarButtonForApp');
 		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
 	},
 

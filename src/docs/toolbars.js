@@ -33,9 +33,6 @@ var Toolbars = /** @lends Toolbars */ {
 	* @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
 	* @return {AppToolbarButtonView}
 	*/
-	setAppToolbarButton: function(){},
-
-  // TODO document or remove?
 	addToolbarButtonForApp: function(){}
 
 };
@@ -147,7 +144,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 
 /**
 * @class
-* This type is passed into the {Toolbars.setAppToolbarButton()} method as a way to configure
+* This type is passed into the {Toolbars.addToolbarButtonForApp()} method as a way to configure
 * the toolbar button shown.
 */
 var AppToolbarButtonDescriptor = /** @lends AppToolbarButtonDescriptor */{
