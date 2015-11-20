@@ -47,6 +47,9 @@ function isDarkTheme(): boolean {
 }
 
 export default function trackGmailStyles() {
+  if (document.head.hasAttribute('data-inboxsdk-gmail-style-tracker')) return;
+  document.head.setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
+
   let currentDensity = null;
   let currentDarkTheme = null;
 

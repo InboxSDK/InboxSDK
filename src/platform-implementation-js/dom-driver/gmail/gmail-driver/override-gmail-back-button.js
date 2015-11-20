@@ -15,6 +15,9 @@ import type GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 
 export default function overrideGmailBackButton(gmailDriver: GmailDriver, gmailRouteProcessor: GmailRouteProcessor){
+	if (document.head.hasAttribute('data-inboxsdk-gmail-back-button-fixer')) return;
+	document.head.setAttribute('data-inboxsdk-gmail-back-button-fixer', 'true');
+
 	GmailElementGetter.waitForGmailModeToSettle().then(function(){
 		if(GmailElementGetter.isStandalone()){
 			return;
