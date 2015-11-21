@@ -27,7 +27,7 @@ function _setupManagement(gmailDriver, gmailRouteProcessor){
 	kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
 		.scan((prev: ?{gmailRouteView: GmailRouteView}, gmailRouteView: GmailRouteView) => {
 			let lastCustomRouteID, lastCustomRouteParams;
-			if (prev && prev.gmailRouteView.getType() === 'CUSTOM') {
+			if (prev && prev.gmailRouteView.isCustomRouteBelongingToApp()) {
 				lastCustomRouteID = prev.gmailRouteView.getRouteID();
 				lastCustomRouteParams = prev.gmailRouteView.getParams();
 			}

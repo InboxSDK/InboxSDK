@@ -9,6 +9,9 @@ function delay(time, value) {
 }
 
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
+});
+
+InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	window._sdk = sdk;
 
 	sdk.Router.handleAllRoutes(function(routeView){
@@ -23,8 +26,20 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		window.lastListRouteView = listRouteView;
 	});
 
+	sdk.Router.handleCustomRoute('text', function(customRouteView){
+		const el = document.createElement('span');
+		el.textContent = 'tlexample';
+		el.style.textDecoration = 'underline';
+		el.style.color = 'blue';
+		el.onclick = function() {
+			sdk.Router.goto('tlexample/:monkeyName', {monkeyName: 'bar'});
+		};
+		customRouteView.getElement().appendChild(el);
+	});
+
 	sdk.Router.handleCustomRoute('tlexample/:monkeyName', function(customRouteView){
 		customRouteView.getElement().innerHTML = 'hello world!' +
+			'<br><a href="#inbox/1509087e25de0fbc">thing</a>' +
 			'<br>foo<br>bar' +
 			'<br>foo<br>bar' +
 			'<br>foo<br>bar' +
@@ -134,6 +149,11 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		}
 	});
 
+	sdk.NavMenu.addNavItem({
+		name: 'text',
+		routeID: 'text'
+	});
+
 	var parentItem = sdk.NavMenu.addNavItem({name: 'Parent'});
 	var parent2Item;
 	function initItems() {
@@ -156,4 +176,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 		routeID: 'tlbeep',
 	});
+});
+
+InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 });

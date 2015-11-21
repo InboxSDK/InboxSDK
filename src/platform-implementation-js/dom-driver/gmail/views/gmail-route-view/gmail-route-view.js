@@ -97,7 +97,6 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	getHash(): string {return this._hash;}
-	getType(): string {return this._type;}
 	getEventStream(): Bacon.Observable {return this._eventStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getCustomViewElement(): ?HTMLElement {return this._customViewElement;}
@@ -114,6 +113,10 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		} else {
 			return this._type;
 		}
+	}
+
+	isCustomRouteBelongingToApp(): boolean {
+		return this._type === 'CUSTOM';
 	}
 
 	getParams(): {[ix:string]: string} {
