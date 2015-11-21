@@ -9,6 +9,9 @@ function delay(time, value) {
 }
 
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
+});
+
+InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	window._sdk = sdk;
 
 	sdk.Router.handleAllRoutes(function(routeView){

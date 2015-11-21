@@ -15,9 +15,6 @@ import type GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 
 export default function overrideGmailBackButton(gmailDriver: GmailDriver, gmailRouteProcessor: GmailRouteProcessor){
-	if (document.head.hasAttribute('data-inboxsdk-gmail-back-button-fixer')) return;
-	document.head.setAttribute('data-inboxsdk-gmail-back-button-fixer', 'true');
-
 	GmailElementGetter.waitForGmailModeToSettle().then(function(){
 		if(GmailElementGetter.isStandalone()){
 			return;
@@ -30,7 +27,7 @@ function _setupManagement(gmailDriver, gmailRouteProcessor){
 	kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
 		.scan((prev: ?{gmailRouteView: GmailRouteView}, gmailRouteView: GmailRouteView) => {
 			let lastCustomRouteID, lastCustomRouteParams;
-			if (prev && prev.gmailRouteView.getType() === 'CUSTOM') {
+			if (prev && prev.gmailRouteView.isCustomRouteBelongingToApp()) {
 				lastCustomRouteID = prev.gmailRouteView.getRouteID();
 				lastCustomRouteParams = prev.gmailRouteView.getParams();
 			}
