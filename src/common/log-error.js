@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-const throttle = require('lodash/function/throttle');
 import ajax from './ajax';
+import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
 import {BUILD_VERSION} from './version';
@@ -111,7 +111,8 @@ function markErrorAsSeen(error: Error) {
   }
 }
 
-const sendError = throttle(async function(report: Object) {
+// Only let 10 errors be sent per minute.
+const sendError = rateLimit(async function(report: Object) {
   const args = arguments;
 
   try {
@@ -126,7 +127,7 @@ const sendError = throttle(async function(report: Object) {
   } catch(err2) {
     tooManyErrors(err2, args);
   }
-}, 1000);
+}, 60*1000, 10);
 
 function tooManyErrors(err2: Error, originalArgs: any) {
   console.error("ERROR REPORTING ERROR", err2);
