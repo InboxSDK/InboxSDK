@@ -82,10 +82,14 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
       reject(err);
     };
     xhr.onload = function(event) {
-      resolve({
-        xhr,
-        text: xhr.responseText
-      });
+      if (xhr.status === 200) {
+        resolve({
+          xhr,
+          text: xhr.responseText
+        });
+      } else {
+        xhr.onerror(event);
+      }
     };
     xhr.open(method, url, true);
     forOwn(opts.headers, (value, name) => {
