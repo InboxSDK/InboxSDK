@@ -107,11 +107,11 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
       });
     });
   }
-  return pr.catch(err => {
+  pr.catch(err => {
     logError(err, {
       url,
       message: 'Failed to load script'
     }, {});
-    throw err;
   });
+  return pr;
 }
