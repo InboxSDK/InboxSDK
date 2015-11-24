@@ -69,7 +69,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
       if ((opts.retryNum || 0) < MAX_RETRIES) {
         if (
           xhr.status === 502 ||
-          (xhr.status === 0 && (method === "GET" || method === "HEAD"))
+          ((xhr.status === 0 || xhr.status >= 500) && (method === "GET" || method === "HEAD"))
         ) {
           resolve(_retry(opts));
           return;
