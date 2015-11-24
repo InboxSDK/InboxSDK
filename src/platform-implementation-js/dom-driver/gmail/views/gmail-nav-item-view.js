@@ -126,6 +126,10 @@ _.extend(GmailNavItemView.prototype, {
 		}
 	},
 
+	isCollapsed() {
+		return this._isCollapsed;
+	},
+
 	remove: function(){
 		this.destroy();
 	},
