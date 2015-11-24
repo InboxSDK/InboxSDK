@@ -90,6 +90,10 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
             }, {});
             return delay(5000).then(() => attempt(retryNum+1, err));
           }
+          // SyntaxErrors are the only errors that can happen during eval that we
+          // retry because sometimes AppEngine doesn't serve the full javascript.
+          // No other error is retried because other errors aren't likely to be
+          // transient.
           throw err;
         }
         if (!opts || !opts.nowrap) {
