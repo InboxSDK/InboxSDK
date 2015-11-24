@@ -12,7 +12,7 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		section: inboxSDK.Toolbars.SectionNames.METADATA_STATE,
 		hasDropdown: true,
 		onClick: function(event){
-			event.dropdown.el.innerHTML = 'Subject: ' + event.threadView.getSubject() + '\n' + 'Messages: ' + event.threadView.getMessageViews().length;
+			event.dropdown.el.textContent = 'Subject: ' + event.threadView.getSubject() + '\n' + 'Messages: ' + event.threadView.getMessageViews().length;
 		},
 		keyboardShortcutHandle: shortcutHandle
 	});
