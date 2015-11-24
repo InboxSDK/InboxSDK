@@ -7,6 +7,7 @@ import delay from './delay';
 import cachebustUrl from './cachebust-url';
 
 const MAX_TIMEOUT = 64*1000; //64 seconds
+const MAX_RETRIES = 5;
 const serversToIgnore = {};
 
 // Simple ajax helper.
@@ -24,7 +25,7 @@ export type ajaxOpts = {
   headers?: ?{[index: string]: string};
   xhrFields?: ?Object;
   data?: ?{[index: string]: string}|string;
-  retryTimeout?: number;
+  retryNum?: number;
 };
 
 export type ajaxResponse = {
@@ -65,9 +66,14 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
     const xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
-      if(xhr.status === 502){
-        resolve(_retry(opts));
-        return;
+      if ((opts.retryNum || 0) < MAX_RETRIES) {
+        if (
+          xhr.status === 502 ||
+          ((xhr.status === 0 || xhr.status >= 500) && (method === "GET" || method === "HEAD"))
+        ) {
+          resolve(_retry(opts));
+          return;
+        }
       }
 
       const err = Object.assign((new Error(`Failed to load ${url}`): any), {
@@ -82,10 +88,14 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
       reject(err);
     };
     xhr.onload = function(event) {
-      resolve({
-        xhr,
-        text: xhr.responseText
-      });
+      if (xhr.status === 200) {
+        resolve({
+          xhr,
+          text: xhr.responseText
+        });
+      } else {
+        xhr.onerror(event);
+      }
     };
     xhr.open(method, url, true);
     forOwn(opts.headers, (value, name) => {
@@ -96,13 +106,10 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
 }
 
 function _retry(opts: ajaxOpts): Promise<ajaxResponse>{
-  let retryTimeout = opts.retryTimeout;
-  if(!retryTimeout){
-    retryTimeout = 2*1000; //2 seconds
-  }
-  else {
-    retryTimeout = Math.min(retryTimeout*2, MAX_TIMEOUT);
-  }
+  const retryNum = (opts.retryNum || 0) + 1;
 
-  return delay(retryTimeout).then(() => ajax({...opts, retryTimeout}));
+  // 2000 4000 8000...
+  const retryTimeout = Math.min(Math.pow(2, retryNum)*1000, MAX_TIMEOUT);
+
+  return delay(retryTimeout).then(() => ajax({...opts, retryNum}));
 }

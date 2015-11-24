@@ -1,21 +1,23 @@
 /* @flow */
 //jshint ignore:start
 
-const throttle = require('lodash/function/throttle');
 import ajax from './ajax';
+import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
+import getSessionId from './get-session-id';
 import {BUILD_VERSION} from './version';
 
 export type LogErrorContext = {
   appId?: ?string;
   appIds?: ?any[];
   sentByApp?: ?boolean;
-  sessionId?: ?string;
   loaderVersion?: ?string;
   implVersion?: ?string;
   userEmailHash?: ?string;
 };
+
+const sessionId = getSessionId();
 
 // code inside the platform-implementation should use logger.js instead of
 // interacting with this directly!
@@ -42,7 +44,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       err = new Error("Logger.error called with non-error: "+err);
       markErrorAsSeen(err);
     }
-    var {appId, appIds, sessionId, implVersion, userEmailHash} = context;
+    var {appId, appIds, implVersion, userEmailHash} = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
@@ -111,7 +113,8 @@ function markErrorAsSeen(error: Error) {
   }
 }
 
-const sendError = throttle(async function(report: Object) {
+// Only let 10 errors be sent per minute.
+const sendError = rateLimit(async function(report: Object) {
   const args = arguments;
 
   try {
@@ -126,7 +129,7 @@ const sendError = throttle(async function(report: Object) {
   } catch(err2) {
     tooManyErrors(err2, args);
   }
-}, 1000);
+}, 60*1000, 10);
 
 function tooManyErrors(err2: Error, originalArgs: any) {
   console.error("ERROR REPORTING ERROR", err2);

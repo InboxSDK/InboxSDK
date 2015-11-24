@@ -7,29 +7,33 @@ import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
 import getStackTrace from '../../common/get-stack-trace';
 import getExtensionId from '../../common/get-extension-id';
+import getSessionId from '../../common/get-session-id';
 import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
-var _extensionAppIds: Array<{appId: string; version: ?string}> = [];
-var _extensionLoaderVersion: ?string;
-var _extensionImplVersion: ?string;
-var _extensionUserEmailHash: ?string;
-var _extensionUseEventTracking: boolean = false;
+let _extensionAppIds: Array<{appId: string; version: ?string}> = [];
+let _extensionLoaderVersion: ?string;
+let _extensionImplVersion: ?string;
+let _extensionUserEmailHash: ?string;
+let _extensionUseEventTracking: boolean = false;
+
+const _sessionId = getSessionId();
 
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
-var [_extensionIsLoggerMaster, _sessionId] = (function() {
-  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-session-id')) {
-    return [false, document.documentElement.getAttribute('data-inboxsdk-session-id')];
+const _extensionIsLoggerMaster = (function() {
+  if (!global.document) {
+    return true; // for unit tests
+  }
+
+  if (document.documentElement.hasAttribute('data-inboxsdk-master-claimed')) {
+    return false;
   } else {
-    var _sessionId = Date.now()+'-'+Math.random();
-    if (global.document) {
-      document.documentElement.setAttribute('data-inboxsdk-session-id', _sessionId);
-    }
-    return [true, _sessionId];
+    document.documentElement.setAttribute('data-inboxsdk-master-claimed', 'true');
+    return true;
   }
 })();
 
@@ -297,7 +301,6 @@ function _logError(err: Error, details: any, appId: ?string, sentByApp: boolean)
   logError(err, details, {
     appId, sentByApp,
     appIds: getAppIdsProperty(appId),
-    sessionId: _sessionId,
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
     userEmailHash: _extensionUserEmailHash

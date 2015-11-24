@@ -3,6 +3,7 @@
 
 const once = require('lodash/function/once');
 const defer = require('lodash/function/defer');
+import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';
 import delay from './delay';
@@ -90,6 +91,10 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
             }, {});
             return delay(5000).then(() => attempt(retryNum+1, err));
           }
+          // SyntaxErrors are the only errors that can happen during eval that we
+          // retry because sometimes AppEngine doesn't serve the full javascript.
+          // No other error is retried because other errors aren't likely to be
+          // transient.
           throw err;
         }
         if (!opts || !opts.nowrap) {
@@ -107,11 +112,16 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
       });
     });
   }
-  return pr.catch(err => {
-    logError(err, {
-      url,
-      message: 'Failed to load script'
-    }, {});
-    throw err;
+  pr.catch(err => {
+    return connectivityTest().then(connectivityTestResults => {
+      logError(err, {
+        url,
+        connectivityTestResults,
+        status: err && err.status,
+        response: (err && err.xhr) ? err.xhr.responseText : null,
+        message: 'Failed to load script'
+      }, {});
+    })
   });
+  return pr;
 }
