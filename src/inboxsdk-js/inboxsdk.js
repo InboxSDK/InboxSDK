@@ -22,16 +22,7 @@ InboxSDK.load = function(version, appId, opts){
 
   checkRequirements(opts);
 
-  var loadPromise = PlatformImplementationLoader.load(appId, opts);
-  loadPromise.catch(function(err) {
-    console.error("Failed to load implementation:", err, err && err.stack);
-    logError(err, {
-      type: "Failed to load implementation:"
-    }, {
-      appId
-    });
-  });
-  return loadPromise;
+  return PlatformImplementationLoader.load(appId, opts);
 };
 
 InboxSDK.loadScript = require('../common/load-script');
