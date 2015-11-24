@@ -3,6 +3,7 @@
 
 const once = require('lodash/function/once');
 const defer = require('lodash/function/defer');
+import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';
 import delay from './delay';
@@ -112,10 +113,15 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
     });
   }
   pr.catch(err => {
-    logError(err, {
-      url,
-      message: 'Failed to load script'
-    }, {});
+    return connectivityTest().then(connectivityTestResults => {
+      logError(err, {
+        url,
+        connectivityTestResults,
+        status: err && err.status,
+        response: (err && err.xhr) ? err.xhr.responseText : null,
+        message: 'Failed to load script'
+      }, {});
+    })
   });
   return pr;
 }
