@@ -176,6 +176,8 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 		routeID: 'tlbeep',
 	});
+
+	window.parentItem = parentItem;
 });
 
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
