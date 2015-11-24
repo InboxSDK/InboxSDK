@@ -5,17 +5,19 @@ import ajax from './ajax';
 import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
+import getSessionId from './get-session-id';
 import {BUILD_VERSION} from './version';
 
 export type LogErrorContext = {
   appId?: ?string;
   appIds?: ?any[];
   sentByApp?: ?boolean;
-  sessionId?: ?string;
   loaderVersion?: ?string;
   implVersion?: ?string;
   userEmailHash?: ?string;
 };
+
+const sessionId = getSessionId();
 
 // code inside the platform-implementation should use logger.js instead of
 // interacting with this directly!
@@ -42,7 +44,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       err = new Error("Logger.error called with non-error: "+err);
       markErrorAsSeen(err);
     }
-    var {appId, appIds, sessionId, implVersion, userEmailHash} = context;
+    var {appId, appIds, implVersion, userEmailHash} = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
