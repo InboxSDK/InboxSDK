@@ -5,9 +5,6 @@
       "brfs"
     ]
   },
-  "optionalDependencies": {
-    "browserify-hmr": "^0.3.1"
-  },
   "dependencies": {
     "add-accessors": "^2.0.0",
     "asap": "^2.0.3",
@@ -63,10 +60,13 @@
   "license": "All Rights Reserved",
   "main": "src/inboxsdk-js/inboxsdk.js",
   "name": "inboxsdk",
+  "optionalDependencies": {
+    "browserify-hmr": "^0.3.1"
+  },
   "private": true,
   "scripts": {
     "start": "gulp default --single --watch --reloader",
     "test": "gulp test"
   },
-  "version": "0.7.13"
+  "version": "0.7.14"
 }
