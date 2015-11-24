@@ -25,7 +25,11 @@ const _sessionId = getSessionId();
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
 const _extensionIsLoggerMaster = (function() {
-  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-master-claimed')) {
+  if (!global.document) {
+    return true; // for unit tests
+  }
+
+  if (document.documentElement.hasAttribute('data-inboxsdk-master-claimed')) {
     return false;
   } else {
     document.documentElement.setAttribute('data-inboxsdk-master-claimed', 'true');
