@@ -11,7 +11,7 @@ export default function rateLimit<T: Function>(fn: T, period: number, count: num
     if (calls.length >= count) {
       throw new Error("Function rate limit exceeded");
     }
-    calls.push(Date.now());
+    calls.push(now);
     return fn.apply(this, arguments);
   }: any);
 }
