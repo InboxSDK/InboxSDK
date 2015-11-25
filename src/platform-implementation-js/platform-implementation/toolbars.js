@@ -85,10 +85,9 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 
 function _setupToolbarViewDriverWatcher(toolbars, members){
 	members.driver.getToolbarViewDriverStream()
-			.filter(function(toolbarViewDriver){
-				return !!toolbarViewDriver.getEventStream();
-			})
-		   	.onValue(_handleNewToolbarViewDriver, toolbars, members);
+		 		.onValue(toolbarViewDriver => {
+					_handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver);
+				});
 }
 
 function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){

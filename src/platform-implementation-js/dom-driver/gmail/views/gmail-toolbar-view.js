@@ -3,8 +3,10 @@
 var _ = require('lodash');
 var $ = require('jquery');
 var Bacon = require('baconjs');
+import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 
-var waitFor = require('../../../lib/wait-for');
+import kefirWaitFor from '../../../lib/kefir-wait-for';
 var makeMutationObserverStream = require('../../../lib/dom/make-mutation-observer-stream');
 var getInsertBeforeElement = require('../../../lib/dom/get-insert-before-element');
 
@@ -25,24 +27,21 @@ var GmailToolbarView = function(element, routeViewDriver){
 	ToolbarViewDriver.call(this);
 
 	this._element = element;
+	this._stopper = kefirStopper();
 	this._routeViewDriver = routeViewDriver;
 	this._eventStream = new Bacon.Bus();
 
-	var self = this;
-	this._ready = waitFor(function(){
-		// Resolve if we're destroyed, so that this waitFor doesn't ever wait forever.
-		return !self._element || !!self._getMoveSectionElement();
-	}).then(function(){
-		return self;
-	});
+	this._ready = kefirWaitFor(() => !!this._getMoveSectionElement())
+		.takeUntilBy(this._stopper)
+		.map(() => this)
+		.toProperty();
 
-	this._ready.then(function(){
-		if (!self._element) return;
-		self._startMonitoringMoreMenu();
-		self._determineToolbarState();
-		self._determineToolbarIconMode();
-		self._setupToolbarStateMonitoring();
-	}).catch(e => Logger.error(e));
+	this._ready.onValue(() => {
+		this._startMonitoringMoreMenu();
+		this._determineToolbarState();
+		this._determineToolbarIconMode();
+		this._setupToolbarStateMonitoring();
+	});
 };
 
 GmailToolbarView.prototype = Object.create(ToolbarViewDriver.prototype);
@@ -51,6 +50,7 @@ _.extend(GmailToolbarView.prototype, {
 
 	__memberVariables: [
 		{name: '_element', destroy: false, get: true},
+		{name: '_stopper', destroy: true},
 		{name: '_threadViewDriver', destroy: false, set: true, get: true},
 		{name: '_rowListViewDriver', destroy: false, set: true, get: true},
 		{name: '_buttonViewControllers', destroy: true, defaultValue: []},
@@ -65,56 +65,46 @@ _.extend(GmailToolbarView.prototype, {
 	setThreadViewDriver: function(threadViewDriver){
 		this._threadViewDriver = threadViewDriver;
 
-		var self = this;
-		this._ready.then(function(){
-			if (!self._element) return;
-			self._element.setAttribute('data-thread-toolbar', 'true');
+		this._ready.onValue(() => {
+			this._element.setAttribute('data-thread-toolbar', 'true');
 		});
 	},
 
 	setRowListViewDriver: function(rowListViewDriver){
 		this._rowListViewDriver = rowListViewDriver;
 
-		var self = this;
-		this._ready.then(function(){
-			if (!self._element) return;
-			self._element.setAttribute('data-rowlist-toolbar', 'true');
+		this._ready.onValue(() => {
+			this._element.setAttribute('data-rowlist-toolbar', 'true');
 		});
 	},
 
 
 	addButton: function(buttonDescriptor, toolbarSections, appId){
-		var self = this;
-		this._ready.then(
-			function(){
-				if (!self._element) return;
+		this._ready.onValue(() => {
+			if(buttonDescriptor.section === toolbarSections.OTHER){
+				this._moreMenuItems.push({
+					buttonDescriptor: buttonDescriptor,
+					appId: appId
+				});
+				this._addToOpenMoreMenu(buttonDescriptor, appId);
+			}
+			else{
+				var sectionElement = this._getSectionElement(buttonDescriptor.section, toolbarSections);
+				if (sectionElement) {
+					var buttonViewController = this._createButtonViewController(buttonDescriptor);
+					this._buttonViewControllers.push(buttonViewController);
 
-				if(buttonDescriptor.section === toolbarSections.OTHER){
-					self._moreMenuItems.push({
-						buttonDescriptor: buttonDescriptor,
-						appId: appId
-					});
-					self._addToOpenMoreMenu(buttonDescriptor, appId);
-				}
-				else{
-					var sectionElement = self._getSectionElement(buttonDescriptor.section, toolbarSections);
-					if (sectionElement) {
-						var buttonViewController = self._createButtonViewController(buttonDescriptor);
-						self._buttonViewControllers.push(buttonViewController);
+					sectionElement.appendChild(buttonViewController.getView().getElement());
 
-						sectionElement.appendChild(buttonViewController.getView().getElement());
-
-						self._updateButtonClasses(self._element);
-						buttonViewController.getView().setEnabled(self._toolbarState === 'EXPANDED');
-					}
+					this._updateButtonClasses(this._element);
+					buttonViewController.getView().setEnabled(this._toolbarState === 'EXPANDED');
 				}
 			}
-		);
+		});
 	},
 
-	waitForReady: function() {
-		return Bacon.fromPromise(this._ready)
-			.takeUntil(this._eventStream.filter(false).mapEnd());
+	waitForReady() {
+		return this._ready;
 	},
 
 	_createButtonViewController: function(buttonDescriptor){
