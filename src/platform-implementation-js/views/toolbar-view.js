@@ -1,35 +1,32 @@
+/* @flow */
+//jshint ignore:start
+
 /*
  *
  * This class only serves for internal bookkeeping purposes and isn't exposed to the apps right now
  *
  */
 
-'use strict';
+import EventEmitter from '../lib/safe-event-emitter';
 
-var _ = require('lodash');
-var EventEmitter = require('../lib/safe-event-emitter');
+export default class ToolbarView extends EventEmitter {
+	_toolbarViewDriver: ?Object;
 
-var ToolbarView = function(toolbarViewDriver){
-	EventEmitter.call(this);
+	constructor(toolbarViewDriver: Object) {
+		super();
+		this._toolbarViewDriver = toolbarViewDriver;
 
-	var self = this;
-	toolbarViewDriver.getEventStream().onEnd(function(){
-		self.emit('destroy');
-		self.removeAllListeners();
-		self._toolbarViewDriver = null;
-	});
-
-	this._toolbarViewDriver = toolbarViewDriver;
-};
-
-ToolbarView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(ToolbarView.prototype, {
-
-	getToolbarViewDriver: function(){
-		return this._toolbarViewDriver;
+		toolbarViewDriver.getStopper().onValue(() => {
+			this.emit('destroy');
+			this._toolbarViewDriver = null;
+		});
 	}
 
-});
-
-module.exports = ToolbarView;
+	// Remove this method if this class ever becomes public.
+	getToolbarViewDriver(): Object {
+		if (!this._toolbarViewDriver) {
+			throw new Error("ToolbarView was already destroyed");
+		}
+		return this._toolbarViewDriver;
+	}
+}

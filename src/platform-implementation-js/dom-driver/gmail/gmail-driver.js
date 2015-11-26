@@ -372,7 +372,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 										)
 										.filter(Boolean)
 										.flatMap(function(gmailToolbarView){
-											return gmailToolbarView.waitForReady();
+											return baconCast(Bacon, gmailToolbarView.waitForReady());
 										})
 										.takeUntil(this._bStopper);
 	}
