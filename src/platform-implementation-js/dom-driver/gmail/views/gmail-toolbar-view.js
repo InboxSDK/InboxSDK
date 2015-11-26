@@ -52,20 +52,6 @@ export default class GmailToolbarView {
 		});
 	}
 
-/*
-	__memberVariables: [
-		{name: '_element', destroy: false},
-		{name: '_stopper', destroy: true},
-		{name: '_threadViewDriver', destroy: false},
-		{name: '_rowListViewDriver', destroy: false},
-		{name: '_buttonViewControllers', destroy: false},
-		{name: '_parentElement', destroy: false},
-		{name: '_toolbarState', destroy: false},
-		{name: '_routeViewDriver', destroy: false},
-		{name: '_moreMenuItems', destroy: false}
-	],
-*/
-
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getElement(): HTMLElement {return this._element;}
 	getRouteViewDriver(): RouteViewDriver {return this._routeViewDriver;}
