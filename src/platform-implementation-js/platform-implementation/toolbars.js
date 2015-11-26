@@ -66,6 +66,9 @@ _.extend(Toolbars.prototype, {
 });
 
 function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
+	// Used to help track our duplicate toolbar button issue.
+	const id = `${Date.now()}-${Math.random()}-${buttonDescriptor.title}`;
+
 	return function(toolbarView){
 		var members = memberMap.get(toolbarsInstance);
 
@@ -78,7 +81,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 			}
 		}
 
-		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames, members.appId);
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames, members.appId, id);
 	};
 }
 
