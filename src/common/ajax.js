@@ -40,7 +40,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
   return new Promise(function(resolve, reject) {
     const method = opts.method ? opts.method : "GET";
     let url = opts.url;
-    let stringData: ?string;
+    let stringData: ?string = undefined;
     if (opts.data) {
       stringData = typeof opts.data === "string" ? opts.data : querystring.stringify(opts.data);
       if (method === "GET" || method === "HEAD") {

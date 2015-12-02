@@ -1,11 +1,11 @@
 /* @flow */
 //jshint ignore:start
 
-import type {Stream} from 'stream';
-var RSVP = require('rsvp');
+import type {EventEmitter} from 'events';
+import RSVP from 'rsvp';
 
 // for nodejs streams
-export default function streamToPromise(stream: Stream): Promise<void> {
+export default function streamToPromise(stream: EventEmitter): Promise<void> {
   return new RSVP.Promise(function(resolve, reject) {
     stream.on('error', function(err) {
       reject(err);

@@ -1,4 +1,4 @@
-/* @xflow */
+/* @flow */
 //jshint ignore:start
 
 import type Kefir from 'kefir';
@@ -8,14 +8,13 @@ import type Kefir from 'kefir';
 // returns a falsey value, then this will return null. If you're using a viewFn
 // that can do that, then you may want to call .filter(Boolean) on the
 // resulting stream.
-type View = {destroy: () => void};
+type View = {destroy: Function};
 type TimedElement = {el: HTMLElement, removalStream: Kefir.Stream};
 
 export default function kefirElementViewMapper<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => ?T {
   return (event) => {
-    var mview = viewFn(event.el);
-    if (mview) {
-      var view = mview;
+    const view = viewFn(event.el);
+    if (view) {
       event.removalStream.take(1).onValue(() => {
         view.destroy();
       });

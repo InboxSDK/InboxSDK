@@ -9,6 +9,7 @@ import simulateClick from '../../../../lib/dom/simulate-click';
 import waitFor from '../../../../lib/wait-for';
 import positionFormattingToolbar from './position-formatting-toolbar';
 import type GmailComposeView from '../gmail-compose-view';
+import get from '../../../../../common/get-or-fail';
 
 var memberMap = new Map();
 
@@ -57,7 +58,7 @@ function _handleComposeFullscreenStateChanged(gmailComposeView){
 }
 
 function _ungroupButtons(gmailComposeView){
-	var members = memberMap.get(gmailComposeView);
+	var members = get(memberMap, gmailComposeView);
 	members.groupedToolbarButtonViewController.destroy();
 	members.formattingToolbarMutationObserver.disconnect();
 
@@ -105,7 +106,7 @@ function _createGroupedActionToolbarContainer(gmailComposeView: GmailComposeView
 	groupedActionToolbarContainer.innerHTML = '<div class="inboxsdk__compose_groupedActionToolbar_arrow"> </div>';
 
 
-	memberMap.get(gmailComposeView).groupedActionToolbarContainer = groupedActionToolbarContainer;
+	get(memberMap, gmailComposeView).groupedActionToolbarContainer = groupedActionToolbarContainer;
 
 	groupedActionToolbarContainer.style.display = 'none';
 
@@ -113,7 +114,7 @@ function _createGroupedActionToolbarContainer(gmailComposeView: GmailComposeView
 }
 
 function _createGroupToggleButtonViewController(gmailComposeView: GmailComposeView){
-	var members = memberMap.get(gmailComposeView);
+	var members = get(memberMap, gmailComposeView);
 
 	var buttonView = _createGroupToggleButtonView();
 
@@ -123,7 +124,7 @@ function _createGroupToggleButtonViewController(gmailComposeView: GmailComposeVi
 			_toggleGroupButtonToolbar(gmailComposeView, buttonViewController);
 
 			if(_isToggleExpanded()){
-				memberMap.get(gmailComposeView).groupedActionToolbarContainer.querySelectorAll('.inboxsdk__button')[0].focus();
+				get(memberMap, gmailComposeView).groupedActionToolbarContainer.querySelectorAll('.inboxsdk__button')[0].focus();
 			}
 		}
 	});
@@ -142,7 +143,7 @@ function _createGroupToggleButtonViewController(gmailComposeView: GmailComposeVi
 		}:any)
 	);
 
-	memberMap.get(gmailComposeView).groupedToolbarButtonViewController = buttonViewController;
+	get(memberMap, gmailComposeView).groupedToolbarButtonViewController = buttonViewController;
 
 	return buttonViewController;
 }
@@ -170,7 +171,7 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController){
 	newActionToolbar.appendChild(buttonViewController.getView().getElement());
 
 	actionToolbarContainer.appendChild(newActionToolbar);
-	var groupedActionToolbarContainer: HTMLElement = memberMap.get(gmailComposeView).groupedActionToolbarContainer;
+	var groupedActionToolbarContainer: HTMLElement = get(memberMap, gmailComposeView).groupedActionToolbarContainer;
 	groupedActionToolbarContainer.insertBefore(actionToolbar, (groupedActionToolbarContainer.firstElementChild:any));
 	actionToolbarContainer.appendChild(groupedActionToolbarContainer);
 }
@@ -186,14 +187,14 @@ function _checkAndSetInitialState(gmailComposeView, groupToggleButtonViewControl
 
 function _toggleGroupButtonToolbar(gmailComposeView, buttonViewController){
 	if(_isToggleExpanded()){ //collapse
-		memberMap.get(gmailComposeView).groupedActionToolbarContainer.style.display = 'none';
+		get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = 'none';
 		gmailComposeView.getElement().classList.remove('inboxsdk__compose_groupedActionToolbar_visible');
 
 		buttonViewController.getView().deactivate();
 		localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
 	}
 	else{ //expand
-		memberMap.get(gmailComposeView).groupedActionToolbarContainer.style.display = '';
+		get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = '';
 		gmailComposeView.getElement().classList.add('inboxsdk__compose_groupedActionToolbar_visible');
 
 		buttonViewController.getView().activate();
@@ -287,7 +288,7 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 			({attributes: true, attributeFilter: ['style']}:any)
 		);
 
-		memberMap.get(gmailComposeView).formattingToolbarMutationObserver = mutationObserver;
+		get(memberMap, gmailComposeView).formattingToolbarMutationObserver = mutationObserver;
 
 		gmailComposeView.getStopper().onValue(() => mutationObserver.disconnect());
 

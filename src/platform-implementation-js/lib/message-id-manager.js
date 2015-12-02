@@ -82,9 +82,10 @@ export default class MessageIdManager {
   }
 
   getGmailThreadIdForRfcMessageId(rfcMessageId: string): Promise<string> {
-    if (this._rfcIdsToThreadIds.has(rfcMessageId)) {
+    const gmailThreadId = this._rfcIdsToThreadIds.get(rfcMessageId);
+    if (gmailThreadId) {
       this._update(rfcMessageId);
-      return RSVP.Promise.resolve(this._rfcIdsToThreadIds.get(rfcMessageId));
+      return RSVP.Promise.resolve(gmailThreadId);
     }
 
     var promise = this._getGmailThreadIdForRfcMessageId(rfcMessageId);
@@ -96,13 +97,13 @@ export default class MessageIdManager {
 
   // Returns an rfc message id of one of the messages in the given thread.
   getRfcMessageIdForGmailThreadId(gmailThreadId: string): Promise<string> {
-    if (this._threadIdsToRfcIds.has(gmailThreadId)) {
-      var rfcMessageId = this._threadIdsToRfcIds.get(gmailThreadId);
+    const rfcMessageId = this._threadIdsToRfcIds.get(gmailThreadId);
+    if (rfcMessageId) {
       this._update(rfcMessageId);
       return RSVP.Promise.resolve(rfcMessageId);
     }
 
-    var promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
+    const promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
     promise.then(rfcMessageId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
     }, _.noop);

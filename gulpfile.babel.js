@@ -1,9 +1,11 @@
 /* @flow */
 //jshint ignore:start
 
+var fs = require('fs');
 var checkDependencies = require('./src/build/check-dependencies');
+const packageJson = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
 
-checkDependencies(require('./package'+'.json'));
+checkDependencies(packageJson);
 
 var _ = require('lodash');
 var gulp = require('gulp');
@@ -28,7 +30,6 @@ var envify = require('envify/custom');
 import exec from './src/build/exec';
 import spawn from './src/build/spawn';
 import escapeShellArg from './src/build/escape-shell-arg';
-var fs = require('fs');
 var dir = require('node-dir');
 var babelify = require("babelify");
 var lazyPipe = require('lazypipe');
@@ -92,7 +93,7 @@ function getVersion(): Promise<string> {
     var commit = results[0].toString().trim().slice(0, 16);
     var isModified = /^\s*M/m.test(results[1].toString());
 
-    var version = `${require('./package'+'.json').version}-${Date.now()}-${commit}`;
+    var version = `${packageJson.version}-${Date.now()}-${commit}`;
     if (isModified) {
       version += '-MODIFIED';
     }
