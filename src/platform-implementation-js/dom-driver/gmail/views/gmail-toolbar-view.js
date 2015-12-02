@@ -3,9 +3,9 @@
 
 import _ from 'lodash';
 import $ from 'jquery';
+import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import getStackTrace from '../../../../common/get-stack-trace';
 
 import kefirWaitFor from '../../../lib/kefir-wait-for';
 import kefirMakeMutationObserverStream from '../../../lib/dom/kefir-make-mutation-observer-stream';
@@ -22,7 +22,7 @@ import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver
 
 import Logger from '../../../lib/logger';
 
-export default class GmailToolbarView {
+class GmailToolbarView {
 	_element: HTMLElement;
 	_ready: Kefir.Stream<GmailToolbarView>;
 	_stopper: Kefir.Stream&{destroy:Function};
@@ -76,8 +76,6 @@ export default class GmailToolbarView {
 	}
 
 	addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string){
-		const stack = getStackTrace();
-
 		this._ready.onValue(() => {
 			if(buttonDescriptor.section === toolbarSections.OTHER){
 				this._moreMenuItems.push({
@@ -93,19 +91,43 @@ export default class GmailToolbarView {
 					this._buttonViewControllers.push(buttonViewController);
 
 					// Debugging code to track our duplicate toolbar button issue.
-					buttonViewController.getView().getElement().__addButton_id = id;
-					buttonViewController.getView().getElement().__addButton_stack = stack;
-					const duplicates = _.chain(sectionElement.children)
-						.filter(el => el.__addButton_id === id)
-						.map(el => el.__addButton_stack)
-						.value();
-					if (duplicates.length) {
-						Logger.error(new Error("Duplicate toolbar button"), {
-							stack, duplicates
-						});
-					}
+					buttonViewController.getView().getElement().__addButton_ownedByExtension = true;
+					buttonViewController.getView().getElement().setAttribute(
+						'data-add-button-debug',
+						JSON.stringify({
+							id,
+							title: buttonDescriptor.title
+						})
+					);
 
 					sectionElement.appendChild(buttonViewController.getView().getElement());
+
+					Kefir.merge([
+							Kefir.constant(null),
+							Kefir.later(1000)
+						])
+						.map(() => {
+							const duplicates: Object[] = _.chain(sectionElement.children)
+								.filter(el => el.hasAttribute('data-add-button-debug'))
+								.map(el =>
+									Object.assign({
+										ownedByExtension: !!el.__addButton_ownedByExtension
+									}, JSON.parse(el.getAttribute('data-add-button-debug')))
+								)
+								.filter(({title}) =>
+									title === buttonDescriptor.title
+								)
+								.value();
+							return duplicates;
+						})
+						.filter(duplicates => duplicates.length > 1)
+						.take(1)
+						.takeUntilBy(this._stopper)
+						.onValue(duplicates => {
+							Logger.error(new Error("Duplicate toolbar button"), {
+								duplicates
+							});
+						});
 
 					this._updateButtonClasses(this._element);
 					buttonViewController.getView().setEnabled(this._toolbarState === 'EXPANDED');
@@ -445,3 +467,5 @@ export default class GmailToolbarView {
 		this._updateButtonClasses(element);
 	}
 }
+
+export default defn(module, GmailToolbarView);
