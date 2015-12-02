@@ -51,8 +51,8 @@
     "semver": "^5.0.1",
     "sinon": "^1.17.1",
     "stdio": "^0.2.6",
-    "ud": "^2.0.2",
-    "ud-kefir": "^2.0.0",
+    "ud": "^3.0.0",
+    "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0"
   },

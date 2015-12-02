@@ -6,6 +6,7 @@ var Bacon = require('baconjs');
 
 import GmailTabContainerView from './gmail-tab-container-view';
 import GmailContentPanelView from './gmail-content-panel-view';
+import get from '../../../../../common/get-or-fail';
 
 export default class GmailContentPanelContainerView {
   _eventStream: Bacon.Bus;
@@ -54,6 +55,9 @@ export default class GmailContentPanelContainerView {
   remove(gmailContentPanelView: GmailContentPanelView) {
     _.remove(this._gmailContentPanelViews, gmailContentPanelView);
     var descriptor = this._viewToDescriptorMap.get(gmailContentPanelView);
+    if (!descriptor) {
+      return;
+    }
 
     if (this._gmailTabContainerView) {
       this._gmailTabContainerView.remove(descriptor);
@@ -100,7 +104,7 @@ export default class GmailContentPanelContainerView {
       .getEventStream()
       .filter(_isEventName.bind(null, 'tabActivate'))
       .map(x => x.descriptor)
-      .map(x => this._descriptorToViewMap.get(x))
+      .map(x => get(this._descriptorToViewMap, x))
       .doAction(x => {x.activate();})
       .map(x => x.getElement())
       .onValue(el => {this._contentContainer.appendChild(el);});
@@ -109,7 +113,7 @@ export default class GmailContentPanelContainerView {
       .getEventStream()
       .filter(_isEventName.bind(null, 'tabDeactivate'))
       .map(x => x.descriptor)
-      .map(x => this._descriptorToViewMap.get(x))
+      .map(x => get(this._descriptorToViewMap, x))
       .onValue(x => {x.deactivate(x);});
   }
 }

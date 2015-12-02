@@ -13,7 +13,7 @@ import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
-import addAccessors from 'add-accessors';
+import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
 
 import GmailElementGetter from './gmail-element-getter';
@@ -405,7 +405,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	getThreadIDForMessageID(messageID: string): string {
-		return this._messageIDsToThreadIDs.get(messageID);
+		return get(this._messageIDsToThreadIDs, messageID);
 	}
 
 });

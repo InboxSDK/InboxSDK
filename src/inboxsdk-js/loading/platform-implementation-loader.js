@@ -23,7 +23,7 @@ var PlatformImplementationLoader = {
   },
 
   _loadScript: once(function() {
-    return loadScript(process.env.IMPLEMENTATION_URL);
+    return loadScript((process.env.IMPLEMENTATION_URL:any));
   }),
 
   preload() {

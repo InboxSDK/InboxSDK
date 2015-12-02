@@ -7,12 +7,10 @@ dist/
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*
 .*/flow-libs/.*
-.*/node_modules/ud/.*
 .*/node_modules/baconjs/.*
 .*/node_modules/kefir/.*
 
 [libs]
 flow-libs/
-node_modules/ud/flow-lib.js
 
 [options]

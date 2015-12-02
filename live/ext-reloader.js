@@ -9,8 +9,12 @@ var globp = RSVP.denodeify(require('glob'));
 // Support Chrome Extensions Reloader
 // https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid
 
-function getUserHome() {
-  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+function getUserHome(): string {
+  const userHome = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+  if (!userHome) {
+    throw new Error("Could not determine user home directory");
+  }
+  return userHome;
 }
 
 // Returns null if no Chrome profiles have the extension installed. If it the
