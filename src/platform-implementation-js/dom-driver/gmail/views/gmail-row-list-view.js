@@ -82,24 +82,13 @@ _.extend(GmailRowListView.prototype, {
 	},
 
 	_isToolbarContainerRelevant: function(toolbarContainerElement){
-		if(
+		const relevant =
 			/* regular */
 			toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
 			/* multiple inbox main section */
 			toolbarContainerElement.parentElement.parentElement ===
-			this._element.parentElement
-		) {
-			return true;
-		}
-
-		if ( false&&
-			toolbarContainerElement.parentElement.getAttribute('role') !== 'main' &&
-			this._element.parentElement.getAttribute('role') !== 'main'
-		) {
-			return true;
-		}
-
-		return false;
+			this._element.parentElement;
+		return relevant;
 	},
 
 	// When a new table is added to a row list, if an existing table has had its
