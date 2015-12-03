@@ -96,7 +96,9 @@ class GmailToolbarView {
 						'data-add-button-debug',
 						JSON.stringify({
 							id,
-							title: buttonDescriptor.title
+							title: buttonDescriptor.title,
+							hasThreadViewDriver: !!this.getThreadViewDriver(),
+							hasRowListViewDriver: !!this.getRowListViewDriver()
 						})
 					);
 
@@ -111,7 +113,9 @@ class GmailToolbarView {
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
-										ownedByExtension: !!el.__addButton_ownedByExtension
+										ownedByExtension: !!el.__addButton_ownedByExtension,
+										dataThreadToolbar: el.getAttribute('data-thread-toolbar'),
+										dataRowlistToolbar: el.getAttribute('data-rowlist-toolbar')
 									}, JSON.parse(el.getAttribute('data-add-button-debug')))
 								)
 								.filter(({title}) =>
