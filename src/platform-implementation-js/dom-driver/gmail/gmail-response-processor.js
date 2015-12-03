@@ -92,12 +92,7 @@ export function rewriteSingleQuotes(s: string): string {
     resultParts.push('"');
     i = nextQuoteIndex + 1;
     if (s[nextQuoteIndex] === '"') {
-      // Match the contents (and end quote) of the entire double-quoted part that
-      // we found. Match as many non-double-quote and non-backslash characters as
-      // we can, and also match any character (including a double-quote) that
-      // follows a backslash. Then these tokens must be followed by a double
-      // quote. This allows us to correctly detect the end of the quoted part,
-      // without stopping early on an escaped double quote.
+      // Find the next quotation mark not preceded by a backslash.
       var nextDoubleQuoteIndex = findNextUnescapedCharacter(s, i, '"');
       if (nextDoubleQuoteIndex < 0) {
         throw new Error("Unclosed double quote");
