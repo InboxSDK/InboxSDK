@@ -17,16 +17,17 @@ describe('GmailResponseProcessor', function() {
   disallowEval();
 
   describe('rewriteSingleQuotes', function() {
+    const r = s => GmailResponseProcessor.rewriteSingleQuotes(s);
+
     it('test1', function() {
-      const r = GmailResponseProcessor.rewriteSingleQuotes.bind(GmailResponseProcessor);
-      assert.strictEqual('"ab"', r('\'ab\''), 'basic');
-      assert.strictEqual('"a\\"b"', r('\'a"b\''), 'double quote escape');
-      assert.strictEqual('."a\\"b"', r('.\'a"b\''), 'double quote escape');
-      assert.strictEqual('"a\\"b"', r('"a\\"b"'), 'nop');
-      assert.strictEqual('"a\\"b\'c"d"\'e"', r('"a\\"b\'c"d"\'e"'),
+      assert.strictEqual(r('\'ab\''), '"ab"', 'basic');
+      assert.strictEqual(r('\'a"b\''), '"a\\"b"', 'double quote escape');
+      assert.strictEqual(r('.\'a"b\''), '."a\\"b"', 'double quote escape');
+      assert.strictEqual(r('"a\\"b"'), '"a\\"b"', 'nop');
+      assert.strictEqual(r('"a\\"b\'c"d"\'e"'), '"a\\"b\'c"d"\'e"',
         "check double quote surrounded by single quotes (in double quote parts) isn't escaped");
-      assert.strictEqual('"a\\\\\\\\\\"b"', r('"a\\\\\\\\\\"b"'), 'escape testing 1');
-      assert.strictEqual('"a\\\\\\\\\\"b"', r('\'a\\\\\\\\"b\''), 'escape testing 2');
+      assert.strictEqual(r('"a\\\\\\\\\\"b"'), '"a\\\\\\\\\\"b"', 'escape testing 1');
+      assert.strictEqual(r('\'a\\\\\\\\"b\''), '"a\\\\\\\\\\"b"', 'escape testing 2');
     });
   });
 
