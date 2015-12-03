@@ -113,9 +113,7 @@ class GmailToolbarView {
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
-										ownedByExtension: !!el.__addButton_ownedByExtension,
-										dataThreadToolbar: el.getAttribute('data-thread-toolbar'),
-										dataRowlistToolbar: el.getAttribute('data-rowlist-toolbar')
+										ownedByExtension: !!el.__addButton_ownedByExtension
 									}, JSON.parse(el.getAttribute('data-add-button-debug')))
 								)
 								.filter(({title}) =>
@@ -129,7 +127,9 @@ class GmailToolbarView {
 						.takeUntilBy(this._stopper)
 						.onValue(({delay, duplicates}) => {
 							Logger.error(new Error("Duplicate toolbar button"), {
-								delay, duplicates
+								delay, duplicates,
+								dataThreadToolbar: this._element.getAttribute('data-thread-toolbar'),
+								dataRowlistToolbar: this._element.getAttribute('data-rowlist-toolbar')
 							});
 						});
 
