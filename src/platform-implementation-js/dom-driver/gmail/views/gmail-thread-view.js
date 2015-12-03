@@ -23,7 +23,7 @@ class GmailThreadView {
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_pageCommunicator: any;
-	_newMessageMutationObserver: ?sdkMutationObserver;
+	_newMessageMutationObserver: ?MutationObserver;
 	_threadID: ?string;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
@@ -119,7 +119,7 @@ class GmailThreadView {
 			this._threadID = parse(document.location.search, null, null).th;
 		}
 
-		return (this._threadID: any);
+		return this._threadID;
 	}
 
 	_setupToolbarView() {
@@ -136,7 +136,7 @@ class GmailThreadView {
 
 		if(!existingContentPanelContainer){
 			sidebarElement.classList.add('inboxsdk__sidebar');
-			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), (sidebarElement.firstElementChild: any));
+			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
 		}
 	}
 
@@ -180,7 +180,7 @@ class GmailThreadView {
 			return;
 		}
 
-		var messageContainer: HTMLElement = (openMessage: any).parentElement;
+		var messageContainer: HTMLElement = (openMessage.parentElement: any);
 
 		this._initializeExistingMessages(messageContainer);
 		this._observeNewMessages(messageContainer);
@@ -195,9 +195,8 @@ class GmailThreadView {
 	}
 
 	_observeNewMessages(messageContainer: any) {
-		var mo: sdkMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
-		this._newMessageMutationObserver = mo;
-		mo.observe(
+		this._newMessageMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
+		this._newMessageMutationObserver.observe(
 			messageContainer,
 			{childList: true}
 		);
