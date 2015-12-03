@@ -77,6 +77,9 @@ export function rewriteSingleQuotes(s: string): string {
   var i = 0, result = "";
   while (true) {
     // Find the position of the next singly or doubly quoted part.
+    // `i` is increasing monotonically every round of this loop, and the loop
+    // ends as soon as no matches are found after the `i`th position in the
+    // string, so this while loop can't be infinite.
     var m = s.substr(i).match(/['"]/);
     if (!m) {
       result += s.substr(i);
