@@ -74,13 +74,13 @@ export function rewriteSingleQuotes(s: string): string {
 
   // i is our position in the input string. result is our result string that
   // we'll copy the parts of the input to as we interpret them.
-  var i = 0, resultParts = [];
+  let i = 0, resultParts = [];
   while (true) {
     // Find the position of the next singly or doubly quoted part.
     // `i` is increasing monotonically every round of this loop, and the loop
     // ends as soon as no matches are found after the `i`th position in the
     // string, so this while loop can't be infinite.
-    var nextQuoteIndex = findNextQuote(s, i);
+    const nextQuoteIndex = findNextQuote(s, i);
     if (nextQuoteIndex < 0) {
       resultParts.push(s.substr(i));
       break;
@@ -93,7 +93,7 @@ export function rewriteSingleQuotes(s: string): string {
     i = nextQuoteIndex + 1;
     if (s[nextQuoteIndex] === '"') {
       // Find the next quotation mark not preceded by a backslash.
-      var nextDoubleQuoteIndex = findNextUnescapedCharacter(s, i, '"');
+      const nextDoubleQuoteIndex = findNextUnescapedCharacter(s, i, '"');
       if (nextDoubleQuoteIndex < 0) {
         throw new Error("Unclosed double quote");
       }
@@ -102,14 +102,14 @@ export function rewriteSingleQuotes(s: string): string {
       i = nextDoubleQuoteIndex + 1;
     } else {
       // Same logic as above, but for a single-quoted part.
-      var nextSingleQuoteIndex = findNextUnescapedCharacter(s, i, "'");
+      const nextSingleQuoteIndex = findNextUnescapedCharacter(s, i, "'");
       if (nextSingleQuoteIndex < 0) {
         throw new Error("Unclosed single quote");
       }
       // Escape all double-quotes inside the part, and then write it out
       // into the result with the ending single-quote replaced with a
       // double-quote.
-      var part = s.slice(i,nextSingleQuoteIndex).replace(/"/g, '\\"');
+      const part = s.slice(i,nextSingleQuoteIndex).replace(/"/g, '\\"');
       resultParts.push(part);
       resultParts.push('"');
       i = nextSingleQuoteIndex + 1;
@@ -119,7 +119,7 @@ export function rewriteSingleQuotes(s: string): string {
 }
 
 function findNextQuote(s: string, start: number): number {
-  for (var i=start, len=s.length; i<len; i++) {
+  for (let i=start, len=s.length; i<len; i++) {
     if (s[i] === '"' || s[i] === "'") {
       return i;
     }
@@ -128,7 +128,7 @@ function findNextQuote(s: string, start: number): number {
 }
 
 function findNextUnescapedCharacter(s: string, start: number, char: string): number {
-  for (var i=start, len=s.length; i<len; i++) {
+  for (let i=start, len=s.length; i<len; i++) {
     if (s[i] === '\\') {
       i++;
     } else if (s[i] === char) {
