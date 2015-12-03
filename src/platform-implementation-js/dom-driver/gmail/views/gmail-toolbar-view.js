@@ -96,7 +96,9 @@ class GmailToolbarView {
 						'data-add-button-debug',
 						JSON.stringify({
 							id,
-							title: buttonDescriptor.title
+							title: buttonDescriptor.title,
+							hasThreadViewDriver: !!this.getThreadViewDriver(),
+							hasRowListViewDriver: !!this.getRowListViewDriver()
 						})
 					);
 
@@ -104,9 +106,9 @@ class GmailToolbarView {
 
 					Kefir.merge([
 							Kefir.constant(null),
-							Kefir.later(1000)
+							Kefir.later(1000, 1000)
 						])
-						.map(() => {
+						.map(delay => {
 							const duplicates: Object[] = _.chain(sectionElement.children)
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
@@ -118,14 +120,16 @@ class GmailToolbarView {
 									title === buttonDescriptor.title
 								)
 								.value();
-							return duplicates;
+							return {delay, duplicates};
 						})
-						.filter(duplicates => duplicates.length > 1)
+						.filter(({duplicates}) => duplicates.length > 1)
 						.take(1)
 						.takeUntilBy(this._stopper)
-						.onValue(duplicates => {
+						.onValue(({delay, duplicates}) => {
 							Logger.error(new Error("Duplicate toolbar button"), {
-								duplicates
+								delay, duplicates,
+								dataThreadToolbar: this._element.getAttribute('data-thread-toolbar'),
+								dataRowlistToolbar: this._element.getAttribute('data-rowlist-toolbar')
 							});
 						});
 
