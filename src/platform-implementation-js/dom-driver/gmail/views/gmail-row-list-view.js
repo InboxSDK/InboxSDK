@@ -1,3 +1,5 @@
+import {defn} from 'ud';
+
 var _ = require('lodash');
 const asap = require('asap');
 var assert = require('assert');
@@ -166,4 +168,4 @@ _.extend(GmailRowListView.prototype, {
 	}
 });
 
-module.exports = GmailRowListView;
+module.exports = defn(module, GmailRowListView);
