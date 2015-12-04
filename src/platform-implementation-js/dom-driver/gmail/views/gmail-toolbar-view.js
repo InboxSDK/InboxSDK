@@ -113,12 +113,19 @@ class GmailToolbarView {
 					sectionElement.appendChild(buttonViewController.getView().getElement());
 
 					Kefir.merge([
-							Kefir.constant(null),
+							Kefir.constant(-1),
 							Kefir.later(1000, 1000)
 						])
 						.map(delay => {
 							const duplicates: Object[] = _.chain(sectionElement.children)
-								.filter(el => $(el).is(':visible'))
+								.filter(el =>
+									buttonViewController.getView().getElement()
+										.getAttribute('data-rowlist-toolbar') ===
+									el.getAttribute('data-rowlist-toolbar') &&
+									buttonViewController.getView().getElement()
+										.getAttribute('data-toolbar-expanded') ===
+									el.getAttribute('data-toolbar-expanded')
+								)
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
