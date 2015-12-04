@@ -118,6 +118,7 @@ class GmailToolbarView {
 						])
 						.map(delay => {
 							const duplicates: Object[] = _.chain(sectionElement.children)
+								.filter(el => $(el).is(':visible'))
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
