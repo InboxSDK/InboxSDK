@@ -126,8 +126,7 @@ class GmailThreadView {
 		const toolbarElement = this._findToolbarElement();
 		if (!toolbarElement) throw new Error("No toolbar element found");
 
-		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
-		this._toolbarView.setThreadViewDriver(this);
+		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
 	}
 
 	_setupSidebarView(sidebarElement: HTMLElement) {
