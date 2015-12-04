@@ -17,8 +17,6 @@ import ButtonView from '../widgets/buttons/button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
-import GmailThreadView from './gmail-thread-view';
-import GmailRowListView from './gmail-row-list-view';
 
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
@@ -32,17 +30,10 @@ class GmailToolbarView {
 	_buttonViewControllers: Object[];
 	_moreMenuItems: Object[];
 	_toolbarState: ?string;
-	_threadViewDriver: ?GmailThreadView;
-	_rowListViewDriver: ?GmailRowListView;
+	_threadViewDriver: ?Object;
+	_rowListViewDriver: ?Object;
 
-	constructor(element: HTMLElement, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
-		// Important: Multiple GmailToolbarViews will be created for the same
-		// toolbar element in preview pane mode! When a GmailToolbarView is
-		// created, it adds some attributes to the element corresponding to the
-		// GmailToolbarView's type. When addButton is called, the buttons get the
-		// same attributes as the GmailToolbarView added. CSS rules are used to
-		// hide the buttons with attributes that don't currently match the toolbar
-		// element.
+	constructor(element: HTMLElement, routeViewDriver: RouteViewDriver){
 		this._element = element;
 		this._stopper = kefirStopper();
 		this._routeViewDriver = routeViewDriver;
@@ -60,28 +51,29 @@ class GmailToolbarView {
 			this._determineToolbarIconMode();
 			this._setupToolbarStateMonitoring();
 		});
-
-		if (parent instanceof GmailThreadView) {
-			this._threadViewDriver = parent;
-			this._ready.onValue(() => {
-				this._element.setAttribute('data-thread-toolbar', 'true');
-			});
-		} else if (parent instanceof GmailRowListView) {
-			this._rowListViewDriver = parent;
-			this._ready.onValue(() => {
-				this._element.setAttribute('data-rowlist-toolbar', 'true');
-			});
-		} else {
-			throw new Error("Invalid parent");
-		}
 	}
 
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getElement(): HTMLElement {return this._element;}
 	getRouteViewDriver(): RouteViewDriver {return this._routeViewDriver;}
 
-	getThreadViewDriver(): ?GmailThreadView {return this._threadViewDriver;}
-	getRowListViewDriver(): ?GmailRowListView {return this._rowListViewDriver;}
+	getThreadViewDriver(): ?Object {return this._threadViewDriver;}
+	setThreadViewDriver(threadViewDriver: Object) {
+		this._threadViewDriver = threadViewDriver;
+
+		this._ready.onValue(() => {
+			this._element.setAttribute('data-thread-toolbar', 'true');
+		});
+	}
+
+	getRowListViewDriver(): ?Object {return this._rowListViewDriver;}
+	setRowListViewDriver(rowListViewDriver: Object) {
+		this._rowListViewDriver = rowListViewDriver;
+
+		this._ready.onValue(() => {
+			this._element.setAttribute('data-rowlist-toolbar', 'true');
+		});
+	}
 
 	addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string){
 		this._ready.onValue(() => {
@@ -118,7 +110,6 @@ class GmailToolbarView {
 						])
 						.map(delay => {
 							const duplicates: Object[] = _.chain(sectionElement.children)
-								.filter(el => $(el).is(':visible'))
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
@@ -436,22 +427,21 @@ class GmailToolbarView {
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
-				 buttonDescriptor.iconUrl ? '<img src="' + _.escape(buttonDescriptor.iconUrl) + '" />' : '',
-				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + _.escape(buttonDescriptor.iconClass) + '"></span>' : '',
+				 buttonDescriptor.iconUrl ? '<img src="' + buttonDescriptor.iconUrl + '" />' : '',
+				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + buttonDescriptor.iconClass + '"></span>' : '',
 				_.escape(buttonDescriptor.title),
 			'</div>'
 		].join('');
 
-		// :any cast to work around https://github.com/facebook/flow/issues/1155
-		(itemElement:any).addEventListener('mouseenter', function(){
+		itemElement.addEventListener('mouseenter', function(){
 			itemElement.classList.add('J-N-JT');
 		});
 
-		(itemElement:any).addEventListener('mouseleave', function(){
+		itemElement.addEventListener('mouseleave', function(){
 			itemElement.classList.remove('J-N-JT');
 		});
 
-		(itemElement:any).addEventListener('click', function(){
+		itemElement.addEventListener('click', function(){
 
 			if(buttonDescriptor.onClick){
 				buttonDescriptor.onClick();

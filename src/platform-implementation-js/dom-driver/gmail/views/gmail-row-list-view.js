@@ -1,23 +1,21 @@
-import {defn} from 'ud';
-
-import _ from 'lodash';
-import asap from 'asap';
-import assert from 'assert';
-import Bacon from 'baconjs';
+var _ = require('lodash');
+const asap = require('asap');
+var assert = require('assert');
+var Bacon = require('baconjs');
 
 var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
 
-import GmailToolbarView from './gmail-toolbar-view';
-import GmailThreadRowView from './gmail-thread-row-view';
+var GmailToolbarView = require('./gmail-toolbar-view');
+var GmailThreadRowView = require('./gmail-thread-row-view');
 
-import streamWaitFor from '../../../lib/stream-wait-for';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
+var streamWaitFor = require('../../../lib/stream-wait-for');
+var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
+var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
 
-import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
-import kefirMakeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
-import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
+const Kefir = require('kefir');
+const kefirCast = require('kefir-cast');
+const kefirMakeElementChildStream = require('../../../lib/dom/kefir-make-element-child-stream');
+const kefirElementViewMapper = require('../../../lib/dom/kefir-element-view-mapper');
 
 
 var GmailRowListView = function(rootElement, routeViewDriver, gmailDriver){
@@ -63,23 +61,45 @@ _.extend(GmailRowListView.prototype, {
 		var toolbarElement = this._findToolbarElement();
 
 		if (toolbarElement) {
-			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
+			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
+			this._toolbarView.setRowListViewDriver(this);
 		} else {
 			this._toolbarView = null;
 		}
 	},
 
 	_findToolbarElement: function(){
-		const toolbar =
-			/* multiple inbox extra section */
-			this._element.querySelector('[gh=mtb]') ||
-			/* multiple inbox main section */
-			this._element.parentElement.querySelector('[gh=mtb]') ||
+		/* multiple inbox extra section */
+		const firstTry = this._element.querySelector('[gh=mtb]');
+		if (firstTry) {
+			return firstTry;
+		}
+		const toolbarContainerElements = document.querySelectorAll('[gh=tm]');
+		const el = _.find(toolbarContainerElements, toolbarContainerElement =>
+			this._isToolbarContainerRelevant(toolbarContainerElement)
+		);
+		return el ? el.querySelector('[gh=mtb]') : null;
+	},
+
+	_isToolbarContainerRelevant: function(toolbarContainerElement){
+		if(
 			/* regular */
-			this._element
-				.parentElement.parentElement.parentElement.parentElement.parentElement
-				.querySelector('[gh=mtb]');
-		return toolbar;
+			toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
+			/* multiple inbox main section */
+			toolbarContainerElement.parentElement.parentElement ===
+			this._element.parentElement
+		) {
+			return true;
+		}
+
+		if ( false&&
+			toolbarContainerElement.parentElement.getAttribute('role') !== 'main' &&
+			this._element.parentElement.getAttribute('role') !== 'main'
+		) {
+			return true;
+		}
+
+		return false;
 	},
 
 	// When a new table is added to a row list, if an existing table has had its
@@ -157,4 +177,4 @@ _.extend(GmailRowListView.prototype, {
 	}
 });
 
-module.exports = defn(module, GmailRowListView);
+module.exports = GmailRowListView;
