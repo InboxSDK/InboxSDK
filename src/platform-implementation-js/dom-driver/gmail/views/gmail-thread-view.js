@@ -23,7 +23,7 @@ class GmailThreadView {
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_pageCommunicator: any;
-	_newMessageMutationObserver: ?MutationObserver;
+	_newMessageMutationObserver: ?sdkMutationObserver;
 	_threadID: ?string;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
@@ -119,14 +119,15 @@ class GmailThreadView {
 			this._threadID = parse(document.location.search, null, null).th;
 		}
 
-		return this._threadID;
+		return (this._threadID: any);
 	}
 
 	_setupToolbarView() {
 		const toolbarElement = this._findToolbarElement();
 		if (!toolbarElement) throw new Error("No toolbar element found");
 
-		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
+		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
+		this._toolbarView.setThreadViewDriver(this);
 	}
 
 	_setupSidebarView(sidebarElement: HTMLElement) {
@@ -135,7 +136,7 @@ class GmailThreadView {
 
 		if(!existingContentPanelContainer){
 			sidebarElement.classList.add('inboxsdk__sidebar');
-			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), (sidebarElement.firstElementChild: any));
 		}
 	}
 
@@ -179,7 +180,7 @@ class GmailThreadView {
 			return;
 		}
 
-		var messageContainer: HTMLElement = (openMessage.parentElement: any);
+		var messageContainer: HTMLElement = (openMessage: any).parentElement;
 
 		this._initializeExistingMessages(messageContainer);
 		this._observeNewMessages(messageContainer);
@@ -194,8 +195,9 @@ class GmailThreadView {
 	}
 
 	_observeNewMessages(messageContainer: any) {
-		this._newMessageMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
-		this._newMessageMutationObserver.observe(
+		var mo: sdkMutationObserver = (new MutationObserver(this._handleNewMessageMutations.bind(this)): any);
+		this._newMessageMutationObserver = mo;
+		mo.observe(
 			messageContainer,
 			{childList: true}
 		);
