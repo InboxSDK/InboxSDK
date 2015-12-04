@@ -7,21 +7,6 @@ declare class HTMLIFrameElement extends HTMLElement {
   };
 }
 
-declare class sdkMutationObserver {
-    constructor(callback: (arr: Array<MutationRecord>, observer: sdkMutationObserver)=>any): void;
-    observe(target: Node, options: {
-        childList?: boolean;
-        attributes?: boolean;
-        characterData?: boolean;
-        subtree?: boolean;
-        attributeOldValue?: boolean;
-        characterDataOldValue?: boolean;
-        attributeFilter?: Array<string>;
-    }): void;
-    takeRecords(): Array<MutationRecord>;
-    disconnect(): void;
-}
-
 declare class CustomEvent extends Event {
   constructor(typeArg: string, customEventInit?: {
     bubbles?: boolean;
