@@ -427,8 +427,8 @@ class GmailToolbarView {
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
-				 buttonDescriptor.iconUrl ? '<img src="' + buttonDescriptor.iconUrl + '" />' : '',
-				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + buttonDescriptor.iconClass + '"></span>' : '',
+				 buttonDescriptor.iconUrl ? '<img src="' + _.escape(buttonDescriptor.iconUrl) + '" />' : '',
+				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + _.escape(buttonDescriptor.iconClass) + '"></span>' : '',
 				_.escape(buttonDescriptor.title),
 			'</div>'
 		].join('');
