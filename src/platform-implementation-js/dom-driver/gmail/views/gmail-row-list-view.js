@@ -71,26 +71,16 @@ _.extend(GmailRowListView.prototype, {
 	},
 
 	_findToolbarElement: function(){
-		/* multiple inbox extra section */
-		const firstTry = this._element.querySelector('[gh=mtb]');
-		if (firstTry) {
-			return firstTry;
-		}
-		const toolbarContainerElements = document.querySelectorAll('[gh=tm]');
-		const el = _.find(toolbarContainerElements, toolbarContainerElement =>
-			this._isToolbarContainerRelevant(toolbarContainerElement)
-		);
-		return el ? el.querySelector('[gh=mtb]') : null;
-	},
-
-	_isToolbarContainerRelevant: function(toolbarContainerElement){
-		const relevant =
-			/* regular */
-			toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
+		const toolbar =
+			/* multiple inbox extra section */
+			this._element.querySelector('[gh=mtb]') ||
 			/* multiple inbox main section */
-			toolbarContainerElement.parentElement.parentElement ===
-			this._element.parentElement;
-		return relevant;
+			this._element.parentElement.querySelector('[gh=mtb]') ||
+			/* regular */
+			this._element
+				.parentElement.parentElement.parentElement.parentElement.parentElement
+				.querySelector('[gh=mtb]');
+		return toolbar;
 	},
 
 	// When a new table is added to a row list, if an existing table has had its
