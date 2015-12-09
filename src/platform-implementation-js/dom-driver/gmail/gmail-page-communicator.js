@@ -53,7 +53,14 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   getIkValue(): string {
-    return document.head.getAttribute('data-inboxsdk-ik-value');
+    const ownIk = document.head.getAttribute('data-inboxsdk-ik-value');
+    if (ownIk) {
+      return ownIk;
+    }
+    // For standalone windows.
+    if (window.opener) {
+      return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
+    }
   }
 
   isConversationViewDisabled(): Promise<boolean> {
