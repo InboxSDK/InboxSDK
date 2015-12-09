@@ -29,7 +29,8 @@ var ComposeView = function(driver, composeViewImplementation, appId, composeView
 		if (eventName === 'close') {
 			driver.getLogger().deprecationWarning('composeView close event', 'composeView destroy event');
 		} else if (eventName === 'messageIDChange') {
-			driver.getLogger().deprecationWarning('composeView messageIDChange event');
+			driver.getLogger().deprecationWarning(
+				'composeView messageIDChange event', 'composeView.getDraftID');
 		}
 	});
 
@@ -101,12 +102,17 @@ _.extend(ComposeView.prototype, {
 
 	/* deprecated */
 	getMessageID() {
-		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.getMessageID');
+		memberMap.get(this).driver.getLogger().deprecationWarning(
+			'composeView.getMessageID', 'composeView.getDraftID');
 		return memberMap.get(this).composeViewImplementation.getMessageID();
 	},
 
 	getThreadID() {
 		return memberMap.get(this).composeViewImplementation.getThreadID();
+	},
+
+	getDraftID() {
+		return memberMap.get(this).composeViewImplementation.getDraftID();
 	},
 
 	getHTMLContent(){

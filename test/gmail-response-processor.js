@@ -54,6 +54,20 @@ describe('GmailResponseProcessor', function() {
     });
   });
 
+  describe('readDraftId', function() {
+    it("works on standalone response", function() {
+      const data = loadJSON('./data/gmail-response-processor/draft-response.json');
+      const draftId = GmailResponseProcessor.readDraftId(data.input, '15183c01ef55eefe');
+      assert.strictEqual(draftId, '1520030853245562622');
+    });
+
+    it("works on reply response", function() {
+      const data = loadJSON('./data/gmail-response-processor/draft-reply-response.json');
+      const draftId = GmailResponseProcessor.readDraftId(data.input, '1518401ace55c655');
+      assert.strictEqual(draftId, '1520035358112597589');
+    });
+  });
+
   describe('extractThreads', function() {
     it('works', function() {
       const data = loadJSON('./data/gmail-response-processor/search-response.json');

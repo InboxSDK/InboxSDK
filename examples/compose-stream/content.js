@@ -10,9 +10,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		console.log('thread id', composeView.getThreadID());
 
-		window.sendIt = function() {
-			composeView.send();
-		};
+		window._lastComposeView = composeView;
 
 		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 		var monkeyIndex = 0;
