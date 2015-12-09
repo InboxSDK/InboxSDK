@@ -133,6 +133,11 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		});
 
 		composeView.on('destroy', console.log.bind(console, 'destroy'));
+		composeView.on('destroy', function() {
+			composeView.getDraftID().then(function(draftID) {
+				console.log('destroyed, draftID =', draftID);
+			});
+		});
 		composeView.on('presending', console.log.bind(console, 'presending'));
 		composeView.on('sending', console.log.bind(console, 'sending'));
 		composeView.on('sent', console.log.bind(console, 'sent'));
