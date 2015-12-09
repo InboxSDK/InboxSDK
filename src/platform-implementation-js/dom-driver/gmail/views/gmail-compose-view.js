@@ -652,9 +652,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 			}
 			lastMessageId = messageId;
 
-			console.log('delaying...');
-			await delay(10*1000);
-			console.log('delay done');
 			const response = await ajax({
 				method: 'GET',
 				url: (document.location:any).origin+document.location.pathname,
