@@ -64,6 +64,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_messageId: ?string;
 	_initialMessageId: ?string;
 	_targetMessageID: ?string;
+	_draftSaving: boolean;
 	_draftIDpromise: ?Promise<?string>;
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
@@ -82,6 +83,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isStandalone = false;
 		this._emailWasSent = false;
 		this._messageId = null;
+		this._draftSaving = false;
 		this._draftIDpromise = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
@@ -113,7 +115,11 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 									this._messageId = response.messageID;
 								}
 								return {eventName: 'sent', data: response};
+							case 'emailDraftSaveSending':
+								this._draftSaving = true;
+								return {eventName: 'draftSaving'};
 							case 'emailDraftReceived':
+								this._draftSaving = false;
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								if(response.messageID){
 									this._messageId = response.messageID;
@@ -648,6 +654,18 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 				return null;
 			}
 			if (lastMessageId === messageId) {
+				// It's possible that the server received a draft save request from us
+				// already, causing the draft id lookup to fail, but we haven't gotten
+				// the draft save response yet. Wait for that response to finish and
+				// keep trying if it looks like that might be the case.
+				if (this._draftSaving) {
+					await this._eventStream
+						.filter(event => event.eventName === 'messageIDChange')
+						.mapEnd(() => null)
+						.take(1)
+						.toPromise(RSVP.Promise);
+					continue;
+				}
 				throw new Error("Failed to read draft ID");
 			}
 			lastMessageId = messageId;
