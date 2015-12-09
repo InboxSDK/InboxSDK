@@ -676,7 +676,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 				data: {
 					ui: '2',
 					ik: this._driver.getPageCommunicator().getIkValue(),
-					rid: 'cc3..',
 					view: 'cv',
 					th: messageId,
 					prf: '1',
