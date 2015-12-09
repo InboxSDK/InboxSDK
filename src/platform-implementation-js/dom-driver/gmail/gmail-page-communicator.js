@@ -61,6 +61,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     if (window.opener) {
       return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
     }
+    throw new Error("Failed to look up Gmail 'ik' value");
   }
 
   isConversationViewDisabled(): Promise<boolean> {
