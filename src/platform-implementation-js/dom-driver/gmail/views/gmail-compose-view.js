@@ -7,12 +7,13 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
-var ud = require('ud');
+import * as ud from 'ud';
 import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from '../../../../common/delay';
+import ajax from '../../../../common/ajax';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -63,6 +64,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_messageId: ?string;
 	_initialMessageId: ?string;
 	_targetMessageID: ?string;
+	_draftSaving: boolean;
+	_draftIDpromise: ?Promise<?string>;
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Range;
@@ -80,6 +83,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isStandalone = false;
 		this._emailWasSent = false;
 		this._messageId = null;
+		this._draftSaving = false;
+		this._draftIDpromise = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
@@ -110,7 +115,11 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 									this._messageId = response.messageID;
 								}
 								return {eventName: 'sent', data: response};
+							case 'emailDraftSaveSending':
+								this._draftSaving = true;
+								return {eventName: 'draftSaving'};
 							case 'emailDraftReceived':
+								this._draftSaving = false;
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								if(response.messageID){
 									this._messageId = response.messageID;
@@ -614,6 +623,73 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	getThreadID(): ?string {
 		return this._threadID;
+	}
+
+	async getDraftID(): Promise<?string> {
+		if (!this._draftIDpromise) {
+			this._draftIDpromise = this._getDraftIDimplementation();
+		}
+		return this._draftIDpromise;
+	}
+
+	async _getDraftIDimplementation(): Promise<?string> {
+		// If this compose view doesn't have a message id yet, wait until it gets
+		// one or it's closed.
+		if (!this.getMessageID()) {
+			await this._eventStream
+				.filter(event => event.eventName === 'messageIDChange')
+				.mapEnd(() => null)
+				.take(1)
+				.toPromise(RSVP.Promise);
+		}
+
+		// We make an AJAX request against gmail to find the draft ID for our
+		// current message ID. However, our message ID can change before that
+		// request finishes. If we fail to get our draft ID and we see that our
+		// message ID has changed since we made the request, then we try again.
+		let lastMessageId = null;
+		while (true) {
+			const messageId = this.getMessageID();
+			if (!messageId) {
+				return null;
+			}
+			if (lastMessageId === messageId) {
+				// It's possible that the server received a draft save request from us
+				// already, causing the draft id lookup to fail, but we haven't gotten
+				// the draft save response yet. Wait for that response to finish and
+				// keep trying if it looks like that might be the case.
+				if (this._draftSaving) {
+					await this._eventStream
+						.filter(event => event.eventName === 'messageIDChange')
+						.mapEnd(() => null)
+						.take(1)
+						.toPromise(RSVP.Promise);
+					continue;
+				}
+				throw new Error("Failed to read draft ID");
+			}
+			lastMessageId = messageId;
+
+			const response = await ajax({
+				method: 'GET',
+				url: (document.location:any).origin+document.location.pathname,
+				data: {
+					ui: '2',
+					ik: this._driver.getPageCommunicator().getIkValue(),
+					view: 'cv',
+					th: messageId,
+					prf: '1',
+					nsc: '1',
+					mb: '0',
+					rt: 'j',
+					search: 'drafts'
+				}
+			});
+			const draftID = GmailResponseProcessor.readDraftId(response.text, messageId);
+			if (draftID) {
+				return draftID;
+			}
+		}
 	}
 
 	getRecipientRowElements(): HTMLElement[] {

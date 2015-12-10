@@ -280,6 +280,22 @@ export type Thread = {
   gmailThreadId: string;
 };
 
+export function readDraftId(response: string, messageID: string): ?string {
+  const decoded = deserialize(response).value;
+  const msgA = _.chain(decoded)
+    .flatten()
+    .filter(x => Array.isArray(x))
+    .flatten()
+    .filter(x => x[0] === 'ms' && x[1] === messageID)
+    .map(x => x[60])
+    .first()
+    .value();
+  if (msgA) {
+    return msgA.split(':')[1];
+  }
+  return null;
+}
+
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
   var {value, options} = deserialize(response);
   var actionResponseMode = value.length === 1 &&

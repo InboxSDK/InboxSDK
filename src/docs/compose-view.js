@@ -63,6 +63,16 @@ var ComposeView = /** @lends ComposeView */ {
 	getThreadID: function() {},
 
 	/**
+	 * Returns a Promise for the compose view's draft ID. If this is called on an
+	 * empty draft that doesn't have a draft ID assigned yet, then the promise
+	 * won't resolve until the draft gets assigned an ID, or the promise may
+	 * resolve to null if the draft remains empty and is closed before being
+	 * assigned an ID.
+	 * @return {Promise.<string>}
+	 */
+	getDraftID: function() {},
+
+	/**
 	 * Returns an html string of the contents of the body of the compose view.
 	 * @return {string}
 	 */
