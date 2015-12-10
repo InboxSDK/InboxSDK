@@ -289,7 +289,7 @@ export default class GmailThreadRowView {
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
-          if (this._elements)
+          if (this._elements.length)
             this._removeUnclaimedModifications();
         });
         return Kefir.constant(this);
@@ -322,7 +322,7 @@ export default class GmailThreadRowView {
   }
 
   addLabel(label: Object) {
-    if (!this._elements) {
+    if (!this._elements.length) {
       console.warn('addLabel called on destroyed thread row');
       return;
     }
@@ -366,7 +366,7 @@ export default class GmailThreadRowView {
   }
 
   addImage(inIconDescriptor: Object){
-    if (!this._elements) {
+    if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
       return;
     }
@@ -435,7 +435,7 @@ export default class GmailThreadRowView {
   }
 
   addButton(buttonDescriptor: Object) {
-    if (!this._elements) {
+    if (!this._elements.length) {
       console.warn('addButton called on destroyed thread row');
       return;
     }
@@ -484,7 +484,7 @@ export default class GmailThreadRowView {
             buttonSpan = document.createElement('span');
             buttonSpan.className = 'inboxsdk__thread_row_button';
             buttonSpan.setAttribute('tabindex', "-1");
-            buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
+            (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);
 
             // Don't let the whole column count as the star for click and mouse over purposes.
             // Click events that aren't directly on the star should be stopped.
@@ -606,7 +606,7 @@ export default class GmailThreadRowView {
 
   _fixDateColumnWidth() {
     asap(() => {
-      if (!this._elements) return;
+      if (!this._elements.length) return;
 
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       if (!dateContainer) return;
