@@ -13,7 +13,6 @@ import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from '../../../../common/delay';
-import ajax from '../../../../common/ajax';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -670,22 +669,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 			}
 			lastMessageId = messageId;
 
-			const response = await ajax({
-				method: 'GET',
-				url: (document.location:any).origin+document.location.pathname,
-				data: {
-					ui: '2',
-					ik: this._driver.getPageCommunicator().getIkValue(),
-					view: 'cv',
-					th: messageId,
-					prf: '1',
-					nsc: '1',
-					mb: '0',
-					rt: 'j',
-					search: 'drafts'
-				}
-			});
-			const draftID = GmailResponseProcessor.readDraftId(response.text, messageId);
+			const draftID = this._driver.getDraftIDForMessageID(messageId);
 			if (draftID) {
 				return draftID;
 			}

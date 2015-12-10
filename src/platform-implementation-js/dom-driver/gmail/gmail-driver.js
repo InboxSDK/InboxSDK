@@ -33,6 +33,7 @@ import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
+import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
@@ -406,6 +407,10 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 
 	getThreadIDForMessageID(messageID: string): string {
 		return get(this._messageIDsToThreadIDs, messageID);
+	}
+
+	getDraftIDForMessageID(messageID: string): Promise<?string> {
+		return getDraftIDForMessageID(this, messageID);
 	}
 
 });
