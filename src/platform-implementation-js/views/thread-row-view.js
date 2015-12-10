@@ -12,7 +12,7 @@ export default class ThreadRowView extends EventEmitter {
   constructor(threadRowViewDriver: GmailThreadRowView){
     super();
     this._threadRowViewDriver = threadRowViewDriver;
-    this._threadRowViewDriver.getEventStream().onEnd(() => this.emit('destroy'));
+    this._threadRowViewDriver.getEventStream().onEnd(() => {this.emit('destroy')});
     this._threadRowViewDriver.setUserView(this);
   }
 
@@ -59,6 +59,10 @@ export default class ThreadRowView extends EventEmitter {
       return null;
     }
   }
+
+  // getDraftID(): Promise<?string> {
+  //   return this._threadRowViewDriver.getDraftID();
+  // }
 
   getVisibleDraftCount(): number {
     return this._threadRowViewDriver.getVisibleDraftCount();
