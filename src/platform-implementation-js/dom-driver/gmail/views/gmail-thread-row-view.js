@@ -772,10 +772,12 @@ class GmailThreadRowView {
       return threadID;
     }
 
-    const composeView = this._driver.getThreadRowIdentifierHelper()
-      .findComposeForThreadRow(this);
-    if (composeView) {
-      return composeView.getMessageID();
+    if (this.getVisibleMessageCount() == 0 || this.getVisibleDraftCount() > 0) {
+      const composeView = this._driver.getThreadRowIdentifierHelper()
+        .findComposeForThreadRow(this);
+      if (composeView) {
+        return composeView.getMessageID();
+      }
     }
     return null;
   }
