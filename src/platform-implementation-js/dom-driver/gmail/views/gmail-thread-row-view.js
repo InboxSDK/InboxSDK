@@ -29,14 +29,14 @@ type LabelMod = {gmailLabelView: Object, remove(): void};
 type ButtonMod = {buttonSpan: HTMLElement, iconSettings: Object, remove(): void};
 type ImageMod = {iconSettings: Object, iconWrapper: HTMLElement, remove(): void};
 type ReplacedDateMod = {el: HTMLElement, remove(): void};
-type replacedDraftLabelMod = ReplacedDateMod;
+type ReplacedDraftLabelMod = ReplacedDateMod;
 
 type Mods = {
   label: {unclaimed: LabelMod[], claimed: LabelMod[]};
   button: {unclaimed: ButtonMod[], claimed: ButtonMod[]};
   image: {unclaimed: ImageMod[], claimed: ImageMod[]};
   replacedDate: {unclaimed: ReplacedDateMod[], claimed: ReplacedDateMod[]};
-  replacedDraftLabel: {unclaimed: replacedDraftLabelMod[], claimed: replacedDraftLabelMod[]};
+  replacedDraftLabel: {unclaimed: ReplacedDraftLabelMod[], claimed: ReplacedDraftLabelMod[]};
 };
 
 const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = new WeakMap();
