@@ -18,7 +18,9 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
 		console.log('got threadRowView', new Date().toString());
 		if (threadRowView.getVisibleMessageCount() == 0) {
-			threadRowView.getDraftID().then(draftID => console.log('draft id', draftID));
+			threadRowView.addLabel(Kefir.fromPromise(threadRowView.getDraftID()).map(id => ({
+				title: ''+id
+			})));
 		}
 
 		threadRowView.addImage(Kefir.constant({

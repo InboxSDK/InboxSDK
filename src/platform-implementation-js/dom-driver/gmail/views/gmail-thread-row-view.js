@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import {defn} from 'ud';
 import assert from 'assert';
 import Bacon from 'baconjs';
 import Kefir from 'kefir';
@@ -74,7 +75,7 @@ function tweakColor(color) {
   return color;
 }
 
-export default class GmailThreadRowView {
+class GmailThreadRowView {
   _elements: HTMLElement[];
   _modifications: Mods;
   _alreadyHadModifications: boolean;
@@ -768,8 +769,15 @@ export default class GmailThreadRowView {
     const threadID = this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
     if (threadID) {
       this._cachedThreadID = threadID;
+      return threadID;
     }
-    return threadID;
+
+    const composeView = this._driver.getThreadRowIdentifierHelper()
+      .findComposeForThreadRow(this);
+    if (composeView) {
+      return composeView.getMessageID();
+    }
+    return null;
   }
 
   getThreadID(): string {
@@ -783,6 +791,11 @@ export default class GmailThreadRowView {
   async getDraftID(): Promise<?string> {
     if (this.getVisibleMessageCount() > 0 || this.getVisibleDraftCount() == 0) {
       return null;
+    }
+    const composeView = this._driver.getThreadRowIdentifierHelper()
+      .findComposeForThreadRow(this);
+    if (composeView) {
+      return composeView.getDraftID();
     }
     return this._driver.getDraftIDForMessageID(this.getThreadID());
   }
@@ -819,3 +832,5 @@ export default class GmailThreadRowView {
 }
 
 assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
+
+export default defn(module, GmailThreadRowView);

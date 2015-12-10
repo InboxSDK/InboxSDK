@@ -19,6 +19,7 @@ import showAppIdWarning from './gmail-driver/show-app-id-warning';
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
 import GmailThreadView from './views/gmail-thread-view';
+import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
@@ -44,6 +45,7 @@ import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcu
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
+import ThreadRowIdentifierHelper from './gmail-driver/thread-row-identifier-helper';
 import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
@@ -67,6 +69,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_customListSearchStringsToRouteIds: Map<string, string>;
 	_messageIDsToThreadIDs: Map<string, string>;
 	_messageIdManager: MessageIdManager;
+	_threadRowIdentifierHelper: ThreadRowIdentifierHelper;
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
 	_butterBarDriver: GmailButterBarDriver;
@@ -120,6 +123,11 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 
 		this._setupEventStreams();
 
+		this._threadRowIdentifierHelper = new ThreadRowIdentifierHelper(
+			Kefir.fromPromise(this.onready)
+				.flatMap(() => kefirCast(Kefir, this._composeViewDriverStream))
+		);
+
 		this.onready.then(() => {
 			this._timestampOnready = Date.now();
 			trackEvents(this);
@@ -140,6 +148,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getLogger(): Logger {return this._logger;}
 	getCustomListSearchStringsToRouteIds(): Map<string, string> {return this._customListSearchStringsToRouteIds;}
 	getMessageIdManager(): MessageIdManager {return this._messageIdManager;}
+	getThreadRowIdentifierHelper(): ThreadRowIdentifierHelper {return this._threadRowIdentifierHelper;}
 	getButterBarDriver(): GmailButterBarDriver {return this._butterBarDriver;}
 	getButterBar(): ButterBar {return this._butterBar;}
 	setButterBar(bb: ButterBar) {
