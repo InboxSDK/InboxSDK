@@ -42,12 +42,16 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 
 	/**
 	* The ID of the route to navigate to when the NavItemView is clicked on.
+	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	routeID: null,
 
 	/**
 	* The parameters of the route being navigated to when the NavItemView is clicked on.
+	* ^optional
+	* ^default=null
 	* @type {Object}
 	*/
 	routeParams: null,
