@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
-import {defn} from 'ud';
+import {defn, defonce} from 'ud';
 import assert from 'assert';
 import Bacon from 'baconjs';
 import Kefir from 'kefir';
@@ -40,7 +40,7 @@ type Mods = {
   replacedDraftLabel: {unclaimed: ReplacedDraftLabelMod[], claimed: ReplacedDraftLabelMod[]};
 };
 
-const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = new WeakMap();
+const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(module, () => new WeakMap());
 
 function focusAndNoPropagation(event) {
   this.focus();
