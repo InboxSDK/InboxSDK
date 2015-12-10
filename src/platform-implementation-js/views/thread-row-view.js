@@ -60,9 +60,9 @@ export default class ThreadRowView extends EventEmitter {
     }
   }
 
-  // getDraftID(): Promise<?string> {
-  //   return this._threadRowViewDriver.getDraftID();
-  // }
+  getDraftID(): Promise<?string> {
+    return this._threadRowViewDriver.getDraftID();
+  }
 
   getVisibleDraftCount(): number {
     return this._threadRowViewDriver.getVisibleDraftCount();

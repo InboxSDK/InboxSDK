@@ -780,6 +780,13 @@ export default class GmailThreadRowView {
     return threadID;
   }
 
+  async getDraftID(): Promise<?string> {
+    if (this.getVisibleMessageCount() > 0 || this.getVisibleDraftCount() == 0) {
+      return null;
+    }
+    return this._driver.getDraftIDForMessageID(this.getThreadID());
+  }
+
   getVisibleDraftCount(): number {
     return this.getCounts().draftCount;
   }
