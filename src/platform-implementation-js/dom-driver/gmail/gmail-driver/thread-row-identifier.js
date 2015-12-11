@@ -83,11 +83,15 @@ class ThreadRowIdentifier {
   }
 
   _findComposeForThreadRow(gmailThreadRowView: GmailThreadRowView): ?GmailComposeView {
+    const candidates = [];
     const subject = gmailThreadRowView.getSubject();
     for (let gmailComposeView of this._composeViews) {
       if (subject === gmailComposeView.getSubject()) {
-        return gmailComposeView;
+        candidates.push(gmailComposeView);
       }
+    }
+    if (candidates.length == 1) {
+      return candidates[0];
     }
     return null;
   }
