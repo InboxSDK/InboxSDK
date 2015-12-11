@@ -28,14 +28,23 @@ class ThreadRowIdentifier {
   }
 
   getThreadIdForThreadRow(gmailThreadRowView: GmailThreadRowView, elements: HTMLElement[]): ?string {
+    {
+      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByDatabase(elements[0]);
+      if (threadID) {
+        return threadID;
+      }
+    }
+
     const minimizeStates = new Map();
     for (let composeView of this._composeViews) {
       minimizeStates.set(composeView, composeView.getMinimized());
     }
 
-    const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRow(elements[0]);
-    if (threadID) {
-      return threadID;
+    {
+      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByClick(elements[0]);
+      if (threadID) {
+        return threadID;
+      }
     }
 
     for (let [composeView, minimized] of minimizeStates) {

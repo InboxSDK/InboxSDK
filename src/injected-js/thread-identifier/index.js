@@ -13,8 +13,15 @@ import Marker from '../../common/marker';
 export function setup() {
   processPreloadedThreads();
 
-  document.addEventListener('inboxSDKtellMeThisThreadId', function(event:any) {
-    var threadId = getGmailThreadIdForThreadRow(event.target);
+  document.addEventListener('inboxSDKtellMeThisThreadIdByDatabase', function(event:any) {
+    const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
+    if (threadId) {
+      event.target.setAttribute('data-inboxsdk-threadid', threadId);
+    }
+  });
+
+  document.addEventListener('inboxSDKtellMeThisThreadIdByClick', function(event:any) {
+    const threadId = getGmailThreadIdForThreadRowByClick(event.target);
     if (threadId) {
       event.target.setAttribute('data-inboxsdk-threadid', threadId);
     }
@@ -68,24 +75,28 @@ function getThreadIdFromUrl(url: string): ?string {
   return tid;
 }
 
-function getGmailThreadIdForThreadRow(threadRow: HTMLElement): ?string {
-  var domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
-  var key = threadMetadataKey(domRowMetadata);
-  var value = threadIdsByKey.get(key);
+function getGmailThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
+  const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
+  const key = threadMetadataKey(domRowMetadata);
+  const value = threadIdsByKey.get(key);
   if (typeof value === 'string') {
     return value;
   }
+}
 
+function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
-  var parent: HTMLElement = $(threadRow).closest('div[role="main"]').get(0);
+  const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
+  const key = threadMetadataKey(domRowMetadata);
+  const parent: HTMLElement = $(threadRow).closest('div[role="main"]').get(0);
   if (!parent) {
     throw new Error("Can't operate on disconnected thread row");
   }
-  var currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
-  var url = clickAndGetPopupUrl(threadRow);
-  var threadId = url && getThreadIdFromUrl(url);
+  const currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
+  const url = clickAndGetPopupUrl(threadRow);
+  const threadId = url && getThreadIdFromUrl(url);
   if (threadId && !threadIdsByKey.has(key)) {
     threadIdsByKey.set(key, threadId);
   }
