@@ -630,7 +630,7 @@ class GmailThreadRowView {
     let draftElement, countElement;
     const prop = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
-      const originalLabel = this._elements[0].querySelector('td.yX > div.yW');
+      const originalLabel = this._elements[0].querySelector('td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
       if (!recipientsContainer) throw new Error("Should not happen");
 
