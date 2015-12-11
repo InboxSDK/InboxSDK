@@ -39,7 +39,7 @@ import monitorSelectionRange from './gmail-compose-view/monitor-selection-range'
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
-import getMinimizeRestoreStream from './gmail-compose-view/get-minimize-restore-stream';
+import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -58,6 +58,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_eventStream: Bacon.Bus;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
+	_minimized: boolean;
 	_composeID: string;
 	_messageIDElement: HTMLElement;
 	_messageId: ?string;
@@ -202,7 +203,17 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(baconCast(Bacon, Kefir.later(10).flatMap(()=>getMinimizeRestoreStream(this))));
+
+		const minimizedStream = Kefir.later(10).flatMap(()=>getMinimizedStream(this));
+		this._eventStream.plug(baconCast(Bacon, minimizedStream.changes().map(minimized =>
+			({eventName: minimized ? 'minimized' : 'restored'})
+		)));
+
+		minimizedStream
+			.takeUntilBy(this._stopper)
+			.onValue(minimized => {
+				this._minimized = minimized;
+			});
 
 		var messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 		this._eventStream.plug(
@@ -517,6 +528,10 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	updateInsertMoreAreaLeft(oldFormattingAreaOffsetLeft: number) {
 		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
+	}
+
+	getMinimized(): boolean {
+		return this._minimized;
 	}
 
 	_getFormattingAreaOffsetLeft(): number {
