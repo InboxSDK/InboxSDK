@@ -25,10 +25,23 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       .map(x => x.detail);
   }
 
-  getThreadIdForThreadRow(threadRow: HTMLElement): string {
-    var threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+  getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
+    let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
-      threadRow.dispatchEvent(new CustomEvent('inboxSDKtellMeThisThreadId', {
+      threadRow.dispatchEvent(new CustomEvent('inboxSDKtellMeThisThreadIdByDatabase', {
+        bubbles: true,
+        cancelable: false,
+        detail: null
+      }));
+      threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+    }
+    return threadid;
+  }
+
+  getThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
+    let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
+    if (!threadid) {
+      threadRow.dispatchEvent(new CustomEvent('inboxSDKtellMeThisThreadIdByClick', {
         bubbles: true,
         cancelable: false,
         detail: null

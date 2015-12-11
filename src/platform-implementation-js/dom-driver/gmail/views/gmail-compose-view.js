@@ -13,7 +13,6 @@ import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from '../../../../common/delay';
-import ajax from '../../../../common/ajax';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -40,7 +39,7 @@ import monitorSelectionRange from './gmail-compose-view/monitor-selection-range'
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
-import getMinimizeRestoreStream from './gmail-compose-view/get-minimize-restore-stream';
+import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -203,7 +202,11 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(baconCast(Bacon, Kefir.later(10).flatMap(()=>getMinimizeRestoreStream(this))));
+
+		const minimizedStream = Kefir.later(10).flatMap(()=>getMinimizedStream(this));
+		this._eventStream.plug(baconCast(Bacon, minimizedStream.changes().map(minimized =>
+			({eventName: minimized ? 'minimized' : 'restored'})
+		)));
 
 		var messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 		this._eventStream.plug(
@@ -670,22 +673,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 			}
 			lastMessageId = messageId;
 
-			const response = await ajax({
-				method: 'GET',
-				url: (document.location:any).origin+document.location.pathname,
-				data: {
-					ui: '2',
-					ik: this._driver.getPageCommunicator().getIkValue(),
-					view: 'cv',
-					th: messageId,
-					prf: '1',
-					nsc: '1',
-					mb: '0',
-					rt: 'j',
-					search: 'drafts'
-				}
-			});
-			const draftID = GmailResponseProcessor.readDraftId(response.text, messageId);
+			const draftID = this._driver.getDraftIDForMessageID(messageId);
 			if (draftID) {
 				return draftID;
 			}
@@ -704,15 +692,29 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		ensureGroupingIsOpen(this._element, type);
 	}
 
-	minimize() {
-		var minimizeButton = this._element.querySelector('.Hm > img');
-		if(minimizeButton){
-			simulateClick(minimizeButton);
+	getMinimized(): boolean {
+		const element = this.getElement();
+		const bodyElement = this.getBodyElement();
+		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+
+		return bodyContainer.style.display !== '';
+	}
+
+	setMinimized(minimized: boolean) {
+		if (minimized !== this.getMinimized()) {
+			const minimizeButton = this._element.querySelector('.Hm > img');
+			if (minimizeButton) {
+				simulateClick(minimizeButton);
+			}
 		}
 	}
 
+	minimize() {
+		this.setMinimized(true);
+	}
+
 	restore() {
-		this.minimize(); //minize and restore buttons are the same
+		this.setMinimized(false);
 	}
 
 	_triggerDraftSave() {

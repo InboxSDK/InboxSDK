@@ -12,6 +12,8 @@ type Options = {
   saveThrottle?: number;
 };
 
+// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
+// localStorage. Used for custom thread lists.
 export default class MessageIdManager {
   _getGmailThreadIdForRfcMessageId: (s: string) => Promise<string>;
   _getRfcMessageIdForGmailMessageId: (s: string) => Promise<string>;
