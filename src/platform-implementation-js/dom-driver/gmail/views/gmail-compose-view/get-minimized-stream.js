@@ -19,6 +19,5 @@ function getMinimizedStream_(gmailComposeView: GmailComposeView): Kefir.Stream<b
 	const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
 
 	return kmakeMutationObserverStream(bodyContainer, {attributes: true, attributeFilter: ['style']})
-		.toProperty()
-		.map(() => bodyContainer.style.display !== '');
+		.map(() => gmailComposeView.getMinimized());
 }

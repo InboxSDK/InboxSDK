@@ -58,7 +58,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_eventStream: Bacon.Bus;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
-	_minimized: boolean;
 	_composeID: string;
 	_messageIDElement: HTMLElement;
 	_messageId: ?string;
@@ -208,12 +207,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._eventStream.plug(baconCast(Bacon, minimizedStream.changes().map(minimized =>
 			({eventName: minimized ? 'minimized' : 'restored'})
 		)));
-
-		minimizedStream
-			.takeUntilBy(this._stopper)
-			.onValue(minimized => {
-				this._minimized = minimized;
-			});
 
 		var messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 		this._eventStream.plug(
@@ -530,10 +523,6 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
 	}
 
-	getMinimized(): boolean {
-		return this._minimized;
-	}
-
 	_getFormattingAreaOffsetLeft(): number {
 		return require('./gmail-compose-view/get-formatting-area-offset-left')(this);
 	}
@@ -703,15 +692,29 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		ensureGroupingIsOpen(this._element, type);
 	}
 
-	minimize() {
-		var minimizeButton = this._element.querySelector('.Hm > img');
-		if(minimizeButton){
-			simulateClick(minimizeButton);
+	getMinimized(): boolean {
+		const element = this.getElement();
+		const bodyElement = this.getBodyElement();
+		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+
+		return bodyContainer.style.display !== '';
+	}
+
+	setMinimized(minimized: boolean) {
+		if (minimized !== this.getMinimized()) {
+			const minimizeButton = this._element.querySelector('.Hm > img');
+			if (minimizeButton) {
+				simulateClick(minimizeButton);
+			}
 		}
 	}
 
+	minimize() {
+		this.setMinimized(true);
+	}
+
 	restore() {
-		this.minimize(); //minize and restore buttons are the same
+		this.setMinimized(false);
 	}
 
 	_triggerDraftSave() {

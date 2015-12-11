@@ -763,23 +763,12 @@ class GmailThreadRowView {
     if (this._cachedThreadID) {
       return this._cachedThreadID;
     }
-    if (!this._pageCommunicator) {
-      throw new Error("Should not happen: pageCommunicator was null");
-    }
-    const threadID = this._pageCommunicator.getThreadIdForThreadRow(this._elements[0]);
+    const threadID = this._driver.getThreadRowIdentifier()
+      .getThreadIdForThreadRow(this, this._elements);
     if (threadID) {
       this._cachedThreadID = threadID;
-      return threadID;
     }
-
-    if (this.getVisibleMessageCount() == 0 || this.getVisibleDraftCount() > 0) {
-      const composeView = this._driver.getThreadRowIdentifierHelper()
-        .findComposeForThreadRow(this);
-      if (composeView) {
-        return composeView.getMessageID();
-      }
-    }
-    return null;
+    return threadID;
   }
 
   getThreadID(): string {
@@ -790,16 +779,8 @@ class GmailThreadRowView {
     return threadID;
   }
 
-  async getDraftID(): Promise<?string> {
-    if (this.getVisibleMessageCount() > 0 || this.getVisibleDraftCount() == 0) {
-      return null;
-    }
-    const composeView = this._driver.getThreadRowIdentifierHelper()
-      .findComposeForThreadRow(this);
-    if (composeView) {
-      return composeView.getDraftID();
-    }
-    return this._driver.getDraftIDForMessageID(this.getThreadID());
+  getDraftID(): Promise<?string> {
+    return this._driver.getThreadRowIdentifier().getDraftIdForThreadRow(this);
   }
 
   getVisibleDraftCount(): number {
