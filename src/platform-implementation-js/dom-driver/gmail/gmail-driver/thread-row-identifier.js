@@ -35,22 +35,6 @@ class ThreadRowIdentifier {
       }
     }
 
-    const minimizeStates = new Map();
-    for (let composeView of this._composeViews) {
-      minimizeStates.set(composeView, composeView.getMinimized());
-    }
-
-    {
-      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByClick(elements[0]);
-      if (threadID) {
-        return threadID;
-      }
-    }
-
-    for (let [composeView, minimized] of minimizeStates) {
-      composeView.setMinimized(minimized);
-    }
-
     if (
       gmailThreadRowView.getVisibleMessageCount() == 0 && gmailThreadRowView.getVisibleDraftCount() > 0
     ) {
@@ -59,6 +43,28 @@ class ThreadRowIdentifier {
         return composeView.getMessageID();
       }
     }
+
+    {
+      // Try identifying the row by simulating a ctrl-click on it. Note that if
+      // the thread row corresponds to an open minimized draft, then we won't
+      // get a result, and the compose will be restored, so we counteract that
+      // here if we failed.
+      const minimizedComposes = [];
+      for (let composeView of this._composeViews) {
+        const minimized = composeView.getMinimized();
+        if (minimized) {
+          minimizedComposes.push(composeView);
+        }
+      }
+      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByClick(elements[0]);
+      if (threadID) {
+        return threadID;
+      }
+      for (let composeView of minimizedComposes) {
+        composeView.setMinimized(true);
+      }
+    }
+
     return null;
   }
 
