@@ -73,6 +73,14 @@ var ComposeView = /** @lends ComposeView */ {
 	getDraftID: function() {},
 
 	/**
+	 * Acts the same as {ComposeView.getDraftID()}, except that if the ComposeView
+	 * does not yet have a draft ID assigned, then the returned Promise resolves
+	 * to null immediately instead of waiting.
+	 * @return {Promise.<string>}
+	 */
+	getCurrentDraftID: function() {},
+
+	/**
 	 * Returns an html string of the contents of the body of the compose view.
 	 * @return {string}
 	 */
