@@ -63,6 +63,7 @@ export type ComposeViewDriver = {
 	getInitialMessageID(): ?string;
 	getMessageID(): ?string;
 	getThreadID(): ?string;
+	getCurrentDraftID(): Promise<?string>;
 	getDraftID(): Promise<?string>;
 	addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): void;
 	closeButtonTooltip(buttonViewController: Object): void;

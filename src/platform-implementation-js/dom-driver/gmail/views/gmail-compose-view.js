@@ -628,6 +628,14 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		return this._threadID;
 	}
 
+	async getCurrentDraftID(): Promise<?string> {
+		if (!this.getMessageID()) {
+			return null;
+		} else {
+			return this.getDraftID();
+		}
+	}
+
 	async getDraftID(): Promise<?string> {
 		if (!this._draftIDpromise) {
 			this._draftIDpromise = this._getDraftIDimplementation();

@@ -115,6 +115,10 @@ _.extend(ComposeView.prototype, {
 		return memberMap.get(this).composeViewImplementation.getDraftID();
 	},
 
+	getCurrentDraftID() {
+		return memberMap.get(this).composeViewImplementation.getCurrentDraftID();
+	},
+
 	getHTMLContent(){
 		return memberMap.get(this).composeViewImplementation.getHTMLContent();
 	},
