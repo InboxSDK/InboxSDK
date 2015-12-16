@@ -104,12 +104,27 @@ function getVersion(): Promise<string> {
   });
 }
 
+async function getBrowserifyHmrOptions() {
+  const keyFile = `${process.env.HOME}/stunnel/key.pem`;
+  const certFile = `${process.env.HOME}/stunnel/cert.pem`;
+
+  let url, tlskey, tlscert;
+  if ((await globp(keyFile)).length && (await globp(certFile)).length) {
+    url = 'https://dev.mailfoogae.appspot.com:3123';
+    tlskey = keyFile;
+    tlscert = certFile;
+  }
+  return {url, tlskey, tlscert};
+}
+
 function browserifyTask(name, deps, entry, destname) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
   gulp.task(name, deps, async function() {
-    var VERSION = await getVersion();
-    var bundler = browserify({
+    const VERSION = await getVersion();
+    const browserifyHmrOptions = await getBrowserifyHmrOptions();
+
+    let bundler = browserify({
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}, fullPaths: args.watch
@@ -122,7 +137,7 @@ function browserifyTask(name, deps, entry, destname) {
     }));
 
     if (args.hot && name === (args.single ? 'sdk' : 'imp')) {
-      bundler.plugin(require('browserify-hmr'));
+      bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
     }
 
     function buildBundle() {
