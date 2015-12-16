@@ -42,7 +42,7 @@ export default class GmailContentPanelContainerView {
 
   getElement(): HTMLElement {return this._element;}
 
-  addContentPanel(descriptor: Object, appId: string) {
+  addContentPanel(descriptor: Object, appId: string): GmailContentPanelView {
     var gmailContentPanelView = new GmailContentPanelView(descriptor, this, appId);
     this._gmailContentPanelViews.push(gmailContentPanelView);
     this._descriptorToViewMap.set(descriptor, gmailContentPanelView);

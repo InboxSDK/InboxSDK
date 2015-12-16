@@ -10,7 +10,7 @@ import eventNameFilter from '../../../lib/event-name-filter';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 
-export default function addNavItem(orderGroup: string, navItemDescriptor: Bacon.Observable<Object>) {
+export default function addNavItem(orderGroup: string, navItemDescriptor: Bacon.Observable<Object>): GmailNavItemView {
 	var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
 
 	var attacher = _attachNavItemView(gmailNavItemView);
