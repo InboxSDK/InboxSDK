@@ -61,6 +61,8 @@ if (args.production && (args.watch || args.single)) {
   throw new Error("--production can not be used with --watch or --single");
 }
 
+process.env.NODE_ENV = args.production ? 'production' : 'development';
+
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
   return globp('./examples/*/').then(function(dirs){
