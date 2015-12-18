@@ -771,13 +771,18 @@ class GmailComposeView {
 	// If this compose is a reply, then this gets the message ID of the message
 	// we're replying to.
 	_getTargetMessageID(): ?string {
-		var input = this._element.querySelector('input[name="rm"]');
+		const input = this._element.querySelector('input[name="rm"]');
 		return input && input.value && input.value != 'undefined' ? input.value : null;
 	}
 
 	_getThreadID(): ?string {
-		var targetID = this.getTargetMessageID();
-		return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+		const targetID = this.getTargetMessageID();
+		try {
+			return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+		} catch(err) {
+			this._driver.getLogger().error(err);
+			return null;
+		}
 	}
 
 	getElement(): HTMLElement {
