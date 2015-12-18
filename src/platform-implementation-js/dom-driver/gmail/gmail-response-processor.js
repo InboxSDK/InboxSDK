@@ -144,11 +144,11 @@ export type MessageOptions = {
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
-  var options = {
+  let options = {
     lengths: false,
     suggestionMode: /^5\n/.test(threadResponseString)
   };
-  var VIEW_DATA = threadResponseString.substring(
+  let VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
   VIEW_DATA = VIEW_DATA.replace(/[\r\n\t]/g, '');
@@ -160,20 +160,16 @@ export function deserialize(threadResponseString: string): {value: any[], option
 
   // Fix some things with the data. (It's in a weird minified JSON-like
   // format). Make sure we don't modify any data inside of strings!
-  var in_string = false;
-  VIEW_DATA = VIEW_DATA.replace(/(^|")([^"\\]|\\.)*/g, function(match) {
-    if (!in_string) {
-      var beforeNumberStrip = match;
-      match = match
-        .replace(/\]\d+\[/g, '],['); // ignore those length values
-      if (match !== beforeNumberStrip) {
-        options.lengths = true;
-      }
-      match = match
-        .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-        .replace(/\[\s*(?=,)/g, '[null'); // "
+  VIEW_DATA = transformUnquotedSections(VIEW_DATA, match => {
+    const beforeNumberStrip = match;
+    match = match
+      .replace(/\]\d+\[/g, '],['); // ignore those length values
+    if (match !== beforeNumberStrip) {
+      options.lengths = true;
     }
-    in_string = !in_string;
+    match = match
+      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
+      .replace(/\[\s*(?=,)/g, '[null'); // "
     return match;
   });
 
@@ -188,6 +184,27 @@ export function deserialize(threadResponseString: string): {value: any[], option
   }
 
   return {value: vData, options};
+}
+
+function transformUnquotedSections(str: string, cb: (str: string) => string): string {
+  const parts = [];
+  let nextQuote;
+  let position = 0;
+  let in_string = false;
+  while ((nextQuote = findNextUnescapedCharacter(str, position, '"')) !== -1) {
+    if (in_string) {
+      parts.push(str.slice(position, nextQuote+1));
+    } else {
+      parts.push(cb(str.slice(position, nextQuote+1)));
+    }
+    position = nextQuote+1;
+    in_string = !in_string;
+  }
+  if (in_string) {
+    throw new Error("string ended inside quoted section");
+  }
+  parts.push(cb(str.slice(position)));
+  return parts.join('');
 }
 
 export function serialize(value: any[], options: MessageOptions): string {

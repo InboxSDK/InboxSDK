@@ -52,6 +52,13 @@ describe('GmailResponseProcessor', function() {
       const reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
       assert.strictEqual(reencoded, data.input, 'serialize test');
     });
+
+    it('can deserialize huge messages', function() {
+      this.slow();
+      const message = `['${_.repeat('a', 8000000)}']`;
+      const decoded = GmailResponseProcessor.deserialize(message).value;
+      assert.strictEqual(message.length, 8000004);
+    });
   });
 
   describe('readDraftId', function() {

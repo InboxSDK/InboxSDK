@@ -125,12 +125,20 @@ class GmailComposeView {
 								this._draftSaving = false;
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								const events = [{eventName: 'draftSaved', data: response}];
-								if(response.messageID && this._messageId !== response.messageID){
-									this._messageId = response.messageID;
-									events.push({
-										eventName: 'messageIDChange',
-										data: this._messageId
-									});
+								if (!response.messageID) {
+									this._driver.getLogger().error(new Error("Missing message id from emailDraftReceived"));
+								} else if(response.messageID && this._messageId !== response.messageID){
+									if (/^[0-9a-f]+$/i.test(response.messageID)) {
+										this._messageId = response.messageID;
+										events.push({
+											eventName: 'messageIDChange',
+											data: this._messageId
+										});
+									} else {
+										this._driver.getLogger().error(new Error("Invalid message id from emailDraftReceived"), {
+											value: response.messageID
+										});
+									}
 								}
 								return events;
 
@@ -617,12 +625,15 @@ class GmailComposeView {
 	}
 
 	_getMessageIDfromForm(): ?string {
-		if (
-			this._messageIDElement && this._messageIDElement.value &&
-			this._messageIDElement.value !== 'undefined' &&
-			this._messageIDElement.value !== 'null'
-		) {
-			return this._messageIDElement.value;
+		const value = this._messageIDElement && this._messageIDElement.value || null;
+		if (value && value !== 'undefined' && value !== 'null') {
+			if (/^[0-9a-f]+$/i.test(value)) {
+				return value;
+			} else {
+				this._driver.getLogger().error(new Error("Invalid message id in element"), {
+					value
+				});
+			}
 		}
 		return null;
 	}
