@@ -141,6 +141,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		composeView.on('presending', console.log.bind(console, 'presending'));
 		composeView.on('sending', console.log.bind(console, 'sending'));
 		composeView.on('sent', console.log.bind(console, 'sent'));
+		composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
 		composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
 		composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));
