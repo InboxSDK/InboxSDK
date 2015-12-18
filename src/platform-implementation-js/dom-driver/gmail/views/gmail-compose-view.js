@@ -109,8 +109,8 @@ class GmailComposeView {
 
 							case 'emailSent':
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-								if(response.messageID === 'tr'){
-									return []; //this happens when a message is cancelled
+								if(_.includes(['tr','eu'], response.messageID)){
+									return [{eventName: 'sendCanceled'}];
 								}
 								this._emailWasSent = true;
 								if(response.messageID){
@@ -124,6 +124,9 @@ class GmailComposeView {
 							case 'emailDraftReceived':
 								this._draftSaving = false;
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								if (response.messageID === 'eu') {
+									return []; // save was canceled
+								}
 								const events = [{eventName: 'draftSaved', data: response}];
 								if (!response.messageID) {
 									this._driver.getLogger().error(new Error("Missing message id from emailDraftReceived"));
