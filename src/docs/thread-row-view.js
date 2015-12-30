@@ -45,7 +45,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * If this row represents a draft, then this allows the word "Draft" and the number next to it
    * to be replaced.
    * @param {ThreadRowDraftLabelDescriptor|Stream.<ThreadRowDraftLabelDescriptor>} draftLabelDescriptor - The options for the replacement.
- 	 * @return {void}
+    * @return {void}
    */
   replaceDraftLabel: function(){},
 
@@ -71,13 +71,20 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
   * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads
-  * such as those with only a signle Draft message in them will occasionally change their
+  * such as those with only a single Draft message in them will occasionally change their
   * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
   * if you're not careful about this fact. This method provides you with an easy way to tell if
   * the thread has a stable ID. It will only return a thread ID if it is expected to stay the same.
   * @return {string} The gmail threadID or null if its not stable.
   */
   getThreadIDIfStable: function(){},
+
+  /**
+   * Returns a Promise for the thread row's draft ID, if the thread row
+   * represents a single draft. Otherwise the promise may resolve to null.
+   * @return {Promise.<string>}
+   */
+  getDraftID: function() {},
 
   /**
   * Gets the number of visible draft messages in the row. This is purely an estimate based on
@@ -179,11 +186,11 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
   tooltip:null,
 
   /**
-	 * If multiple images from your app are added then they will be ordered by this value,
-	 * ^optional
-	 * ^default=0
-	 * @type {number}
-	 */
+   * If multiple images from your app are added then they will be ordered by this value,
+   * ^optional
+   * ^default=0
+   * @type {number}
+   */
   orderHint:null
 };
 
@@ -217,12 +224,12 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   onClick:null,
 
   /**
-	* If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
-	* allows the dropdown to be customized when opened.
-	* ^optional
-	* ^default=false
-	* @type {boolean}
-	*/
+  * If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
+  * allows the dropdown to be customized when opened.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
   hasDropdown:null
 };
 

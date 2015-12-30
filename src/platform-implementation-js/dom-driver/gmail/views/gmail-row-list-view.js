@@ -1,21 +1,23 @@
-var _ = require('lodash');
-const asap = require('asap');
-var assert = require('assert');
-var Bacon = require('baconjs');
+import {defn} from 'ud';
+
+import _ from 'lodash';
+import asap from 'asap';
+import assert from 'assert';
+import Bacon from 'baconjs';
 
 var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
 
-var GmailToolbarView = require('./gmail-toolbar-view');
-var GmailThreadRowView = require('./gmail-thread-row-view');
+import GmailToolbarView from './gmail-toolbar-view';
+import GmailThreadRowView from './gmail-thread-row-view';
 
-var streamWaitFor = require('../../../lib/stream-wait-for');
-var makeElementChildStream = require('../../../lib/dom/make-element-child-stream');
-var makeElementViewStream = require('../../../lib/dom/make-element-view-stream');
+import streamWaitFor from '../../../lib/stream-wait-for';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
 
-const Kefir = require('kefir');
-const kefirCast = require('kefir-cast');
-const kefirMakeElementChildStream = require('../../../lib/dom/kefir-make-element-child-stream');
-const kefirElementViewMapper = require('../../../lib/dom/kefir-element-view-mapper');
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+import kefirMakeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
+import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
 
 
 var GmailRowListView = function(rootElement, routeViewDriver, gmailDriver){
@@ -61,8 +63,7 @@ _.extend(GmailRowListView.prototype, {
 		var toolbarElement = this._findToolbarElement();
 
 		if (toolbarElement) {
-			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver);
-			this._toolbarView.setRowListViewDriver(this);
+			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
 		} else {
 			this._toolbarView = null;
 		}
@@ -74,32 +75,13 @@ _.extend(GmailRowListView.prototype, {
 		if (firstTry) {
 			return firstTry;
 		}
-		const toolbarContainerElements = document.querySelectorAll('[gh=tm]');
-		const el = _.find(toolbarContainerElements, toolbarContainerElement =>
-			this._isToolbarContainerRelevant(toolbarContainerElement)
-		);
-		return el ? el.querySelector('[gh=mtb]') : null;
-	},
-
-	_isToolbarContainerRelevant: function(toolbarContainerElement){
-		if(
-			/* regular */
-			toolbarContainerElement.parentElement.parentElement === this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
-			/* multiple inbox main section */
+		const el = _.find(document.querySelectorAll('[gh=tm]'), toolbarContainerElement =>
+			toolbarContainerElement.parentElement.parentElement ===
+			this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
 			toolbarContainerElement.parentElement.parentElement ===
 			this._element.parentElement
-		) {
-			return true;
-		}
-
-		if ( false&&
-			toolbarContainerElement.parentElement.getAttribute('role') !== 'main' &&
-			this._element.parentElement.getAttribute('role') !== 'main'
-		) {
-			return true;
-		}
-
-		return false;
+		);
+		return el ? el.querySelector('[gh=mtb]') : null;
 	},
 
 	// When a new table is added to a row list, if an existing table has had its
@@ -177,4 +159,4 @@ _.extend(GmailRowListView.prototype, {
 	}
 });
 
-module.exports = GmailRowListView;
+module.exports = defn(module, GmailRowListView);

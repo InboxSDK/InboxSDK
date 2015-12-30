@@ -1,74 +1,78 @@
-var _ = require('lodash');
-var EventEmitter = require('../lib/safe-event-emitter');
+/* @flow */
+//jshint ignore:start
+
+import _ from 'lodash';
+import EventEmitter from '../lib/safe-event-emitter';
+import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view.js';
 
 // documented in src/docs/
-var ThreadRowView = function(threadRowViewDriver){
-  EventEmitter.call(this);
+export default class ThreadRowView extends EventEmitter {
+  _threadRowViewDriver: GmailThreadRowView;
 
-  this._threadRowViewDriver = threadRowViewDriver;
-  this._threadRowViewDriver.getEventStream().onEnd(() => this.emit('destroy'));
-  this._threadRowViewDriver.setUserView(this);
-};
+  constructor(threadRowViewDriver: GmailThreadRowView){
+    super();
+    this._threadRowViewDriver = threadRowViewDriver;
+    this._threadRowViewDriver.getEventStream().onEnd(() => {this.emit('destroy')});
+    this._threadRowViewDriver.setUserView(this);
+  }
 
-ThreadRowView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(ThreadRowView.prototype, {
-
-  addLabel: function(labelDescriptor) {
+  addLabel(labelDescriptor: Object) {
     this._threadRowViewDriver.addLabel(labelDescriptor);
-  },
+  }
 
-  addImage: function(imageDescriptor){
+  addImage(imageDescriptor: Object){
     this._threadRowViewDriver.addImage(imageDescriptor);
-  },
+  }
 
-  addButton: function(buttonDescriptor) {
+  addButton(buttonDescriptor: Object) {
     this._threadRowViewDriver.addButton(buttonDescriptor);
-  },
+  }
 
-  addAttachmentIcon: function(threadRowAttachmentIconDescriptor) {
+  addAttachmentIcon(threadRowAttachmentIconDescriptor: Object) {
     this._threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
-  },
+  }
 
-  replaceDate: function(threadRowDateDescriptor) {
+  replaceDate(threadRowDateDescriptor: Object) {
     this._threadRowViewDriver.replaceDate(threadRowDateDescriptor);
-  },
+  }
 
-  replaceDraftLabel: function(draftLabelDescriptor) {
+  replaceDraftLabel(draftLabelDescriptor: Object) {
     this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
-  },
+  }
 
-  getSubject: function() {
+  getSubject(): string {
     return this._threadRowViewDriver.getSubject();
-  },
+  }
 
-  getDateString: function() {
+  getDateString(): string {
     return this._threadRowViewDriver.getDateString();
-  },
+  }
 
-  getThreadID: function() {
+  getThreadID(): string {
     return this._threadRowViewDriver.getThreadID();
-  },
+  }
 
-  getThreadIDIfStable: function() {
+  getThreadIDIfStable(): ?string {
     if (this.getVisibleMessageCount() > 0) {
       return this.getThreadID();
     } else {
       return null;
     }
-  },
+  }
 
-  getVisibleDraftCount: function() {
+  getDraftID(): Promise<?string> {
+    return this._threadRowViewDriver.getDraftID();
+  }
+
+  getVisibleDraftCount(): number {
     return this._threadRowViewDriver.getVisibleDraftCount();
-  },
+  }
 
-  getVisibleMessageCount: function() {
+  getVisibleMessageCount(): number {
     return this._threadRowViewDriver.getVisibleMessageCount();
-  },
+  }
 
-  getContacts: function(){
+  getContacts(): Contact[] {
     return this._threadRowViewDriver.getContacts();
   }
-});
-
-module.exports = ThreadRowView;
+}

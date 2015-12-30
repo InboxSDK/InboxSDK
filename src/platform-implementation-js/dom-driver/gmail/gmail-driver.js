@@ -19,6 +19,7 @@ import showAppIdWarning from './gmail-driver/show-app-id-warning';
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
 import GmailThreadView from './views/gmail-thread-view';
+import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
@@ -33,6 +34,7 @@ import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
+import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
@@ -43,6 +45,7 @@ import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcu
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
+import ThreadRowIdentifier from './gmail-driver/thread-row-identifier';
 import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
@@ -66,6 +69,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_customListSearchStringsToRouteIds: Map<string, string>;
 	_messageIDsToThreadIDs: Map<string, string>;
 	_messageIdManager: MessageIdManager;
+	_threadRowIdentifier: ThreadRowIdentifier;
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
 	_butterBarDriver: GmailButterBarDriver;
@@ -139,6 +143,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getLogger(): Logger {return this._logger;}
 	getCustomListSearchStringsToRouteIds(): Map<string, string> {return this._customListSearchStringsToRouteIds;}
 	getMessageIdManager(): MessageIdManager {return this._messageIdManager;}
+	getThreadRowIdentifier(): ThreadRowIdentifier {return this._threadRowIdentifier;}
 	getButterBarDriver(): GmailButterBarDriver {return this._butterBarDriver;}
 	getButterBar(): ButterBar {return this._butterBar;}
 	setButterBar(bb: ButterBar) {
@@ -333,6 +338,8 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			this._setupToolbarViewDriverStream();
 			this._setupMessageViewDriverStream();
 			this._setupComposeViewDriverStream();
+
+			this._threadRowIdentifier = new ThreadRowIdentifier(this);
 		});
 	}
 
@@ -406,6 +413,10 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 
 	getThreadIDForMessageID(messageID: string): string {
 		return get(this._messageIDsToThreadIDs, messageID);
+	}
+
+	getDraftIDForMessageID(messageID: string): Promise<?string> {
+		return getDraftIDForMessageID(this, messageID);
 	}
 
 });

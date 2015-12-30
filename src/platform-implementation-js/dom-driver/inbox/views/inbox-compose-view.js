@@ -368,6 +368,12 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     // TODO
     return null;
   }
+  getCurrentDraftID(): Promise<?string> {
+    throw new Error("Not yet implemented");    
+  }
+  getDraftID(): Promise<?string> {
+    throw new Error("Not yet implemented");
+  }
   addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
     (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
   }

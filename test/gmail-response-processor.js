@@ -5,58 +5,80 @@ import assert from "assert";
 import _ from "lodash";
 import fs from 'fs';
 import RSVP from './lib/rsvp';
-var readFile = RSVP.denodeify(fs.readFile.bind(fs));
+const readFile = RSVP.denodeify(fs.readFile.bind(fs));
 import co from 'co';
 
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import disallowEval from './lib/disallow-eval';
 
-var loadJSON = require;
+const loadJSON = require;
 
 describe('GmailResponseProcessor', function() {
   disallowEval();
 
   describe('rewriteSingleQuotes', function() {
+    const r = s => GmailResponseProcessor.rewriteSingleQuotes(s);
+
     it('test1', function() {
-      var r = GmailResponseProcessor.rewriteSingleQuotes.bind(GmailResponseProcessor);
-      assert.strictEqual('"ab"', r('\'ab\''), 'basic');
-      assert.strictEqual('"a\\"b"', r('\'a"b\''), 'double quote escape');
-      assert.strictEqual('."a\\"b"', r('.\'a"b\''), 'double quote escape');
-      assert.strictEqual('"a\\"b"', r('"a\\"b"'), 'nop');
-      assert.strictEqual('"a\\"b\'c"d"\'e"', r('"a\\"b\'c"d"\'e"'),
+      assert.strictEqual(r('\'ab\''), '"ab"', 'basic');
+      assert.strictEqual(r('\'a"b\''), '"a\\"b"', 'double quote escape');
+      assert.strictEqual(r('.\'a"b\''), '."a\\"b"', 'double quote escape');
+      assert.strictEqual(r('"a\\"b"'), '"a\\"b"', 'nop');
+      assert.strictEqual(r('"a\\"b\'c"d"\'e"'), '"a\\"b\'c"d"\'e"',
         "check double quote surrounded by single quotes (in double quote parts) isn't escaped");
-      assert.strictEqual('"a\\\\\\\\\\"b"', r('"a\\\\\\\\\\"b"'), 'escape testing 1');
-      assert.strictEqual('"a\\\\\\\\\\"b"', r('\'a\\\\\\\\"b\''), 'escape testing 2');
+      assert.strictEqual(r('"a\\\\\\\\\\"b"'), '"a\\\\\\\\\\"b"', 'escape testing 1');
+      assert.strictEqual(r('\'a\\\\\\\\"b\''), '"a\\\\\\\\\\"b"', 'escape testing 2');
     });
   });
 
   describe('serialization', function() {
     it('message send response', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/send-response.json');
+      const data = loadJSON('./data/gmail-response-processor/send-response.json');
 
-      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input).value;
+      const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
-      /*const*/var reencoded = GmailResponseProcessor.threadListSerialize(decoded);
-      /*const*/var redecoded = GmailResponseProcessor.deserialize(reencoded).value;
+      const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
+      const redecoded = GmailResponseProcessor.deserialize(reencoded).value;
       assert.deepEqual(redecoded, data.output, 're-deserialize test');
     });
 
     it('suggestions', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/suggestions.json');
+      const data = loadJSON('./data/gmail-response-processor/suggestions.json');
 
-      /*const*/var decoded = GmailResponseProcessor.deserialize(data.input).value;
+      const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
-      /*const*/var reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
+      const reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
       assert.strictEqual(reencoded, data.input, 'serialize test');
+    });
+
+    it('can deserialize huge messages', function() {
+      this.slow();
+      const message = `['${_.repeat('a', 8000000)}']`;
+      const decoded = GmailResponseProcessor.deserialize(message).value;
+      assert.strictEqual(message.length, 8000004);
+    });
+  });
+
+  describe('readDraftId', function() {
+    it("works on standalone response", function() {
+      const data = loadJSON('./data/gmail-response-processor/draft-response.json');
+      const draftId = GmailResponseProcessor.readDraftId(data.input, '15183c01ef55eefe');
+      assert.strictEqual(draftId, '1520030853245562622');
+    });
+
+    it("works on reply response", function() {
+      const data = loadJSON('./data/gmail-response-processor/draft-reply-response.json');
+      const draftId = GmailResponseProcessor.readDraftId(data.input, '1518401ace55c655');
+      assert.strictEqual(draftId, '1520035358112597589');
     });
   });
 
   describe('extractThreads', function() {
     it('works', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.deepEqual(threads, data.output, 'deserialize test');
     });
   });
@@ -65,14 +87,14 @@ describe('GmailResponseProcessor', function() {
     it('seems to work', function() {
       this.slow(100);
 
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
 
       // swap two threads
       threads.push(threads.shift());
-      /*const*/var swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
 
       // put them back
@@ -81,14 +103,14 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('works with small number of threads', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-small.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
 
       // swap two threads
       threads.push(threads.shift());
-      /*const*/var swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
 
       // put them back
@@ -97,15 +119,15 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('works on responses with empty last part', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-empty-last-part.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response-empty-last-part.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.strictEqual(threads.length, 2);
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
 
       // swap two threads
       threads.push(threads.shift());
-      /*const*/var swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
 
       // put them back
@@ -114,23 +136,23 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('can empty a response', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-small.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.strictEqual(threads.length, 2);
 
-      /*const*/var emptied = GmailResponseProcessor.replaceThreadsInResponse(data.input, []);
-      /*const*/var emptiedThreads = GmailResponseProcessor.extractThreads(emptied);
+      const emptied = GmailResponseProcessor.replaceThreadsInResponse(data.input, []);
+      const emptiedThreads = GmailResponseProcessor.extractThreads(emptied);
       assert.strictEqual(emptiedThreads.length, 0);
 
-      /*const*/var refilled = GmailResponseProcessor.replaceThreadsInResponse(emptied, threads);
-      /*const*/var refilledThreads = GmailResponseProcessor.extractThreads(refilled);
+      const refilled = GmailResponseProcessor.replaceThreadsInResponse(emptied, threads);
+      const refilledThreads = GmailResponseProcessor.extractThreads(refilled);
       assert.deepEqual(refilledThreads, threads);
       //assert.strictEqual(refilled, data.input);
     });
 
     it('works on empty responses', function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-empty.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response-empty.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
       assert(Array.isArray(threads));
       assert.strictEqual(threads.length, 0);
 
@@ -138,15 +160,15 @@ describe('GmailResponseProcessor', function() {
     });
 
     it("works on action responses", function() {
-      /*const*/var data = loadJSON('./data/gmail-response-processor/search-response-archive.json');
-      /*const*/var threads = GmailResponseProcessor.extractThreads(data.input);
+      const data = loadJSON('./data/gmail-response-processor/search-response-archive.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.notEqual(threads.length, 0);
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
 
       // swap two threads
       threads.push(threads.shift());
-      /*const*/var swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
 
       // put them back
@@ -157,15 +179,15 @@ describe('GmailResponseProcessor', function() {
 
   describe('interpretSentEmailResponse', function() {
     it('can read new thread', async function() {
-      /*const*/var rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8');
-      /*const*/var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
+      const rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response.txt', 'utf8');
+      const response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
       assert.strictEqual(response.messageID, '14a08f7810935cb3');
       assert.strictEqual(response.threadID, '14a08f7810935cb3');
     });
 
     it('can read reply', async function() {
-      /*const*/var rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8');
-      /*const*/var response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
+      const rawResponse = await readFile(__dirname+'/data/gmail-response-processor/sent-response2.txt', 'utf8');
+      const response = GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
       assert.strictEqual(response.messageID, '14a090139a3835a4');
       assert.strictEqual(response.threadID, '14a08f7810935cb3');
     });

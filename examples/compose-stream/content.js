@@ -10,9 +10,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 	inboxSDK.Compose.registerComposeViewHandler(function(composeView){
 		console.log('thread id', composeView.getThreadID());
 
-		window.sendIt = function() {
-			composeView.send();
-		};
+		window._lastComposeView = composeView;
 
 		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 		var monkeyIndex = 0;
@@ -135,9 +133,15 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		});
 
 		composeView.on('destroy', console.log.bind(console, 'destroy'));
+		composeView.on('destroy', function() {
+			composeView.getDraftID().then(function(draftID) {
+				console.log('destroyed, draftID =', draftID);
+			});
+		});
 		composeView.on('presending', console.log.bind(console, 'presending'));
 		composeView.on('sending', console.log.bind(console, 'sending'));
 		composeView.on('sent', console.log.bind(console, 'sent'));
+		composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
 		composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));
 		composeView.on('toContactRemoved', console.log.bind(console, 'toContactRemoved'));

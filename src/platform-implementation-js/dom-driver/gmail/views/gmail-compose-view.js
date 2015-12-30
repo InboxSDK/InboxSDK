@@ -7,7 +7,7 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
-var ud = require('ud');
+import * as ud from 'ud';
 import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
@@ -24,6 +24,7 @@ import setCss from '../../../lib/dom/set-css';
 
 import waitFor from '../../../lib/wait-for';
 import kefirWaitFor from '../../../lib/kefir-wait-for';
+import baconFlatten from '../../../lib/bacon-flatten';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
@@ -39,7 +40,7 @@ import monitorSelectionRange from './gmail-compose-view/monitor-selection-range'
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
-import getMinimizeRestoreStream from './gmail-compose-view/get-minimize-restore-stream';
+import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -47,7 +48,7 @@ import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/comp
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
-var GmailComposeView = ud.defn(module, class GmailComposeView {
+class GmailComposeView {
 	_element: HTMLElement;
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
@@ -55,14 +56,17 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
-	_eventStream: Bacon.Bus;
+	_eventStream: Bacon.Bus<any>;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
 	_composeID: string;
 	_messageIDElement: HTMLElement;
 	_messageId: ?string;
+	_finalMessageId: ?string; // Set only after the message is sent.
 	_initialMessageId: ?string;
 	_targetMessageID: ?string;
+	_draftSaving: boolean;
+	_draftIDpromise: ?Promise<?string>;
 	_threadID: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
 	_lastSelectionRange: ?Range;
@@ -80,6 +84,9 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isStandalone = false;
 		this._emailWasSent = false;
 		this._messageId = null;
+		this._finalMessageId = null;
+		this._draftSaving = false;
+		this._draftIDpromise = null;
 		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._managedViewControllers = [];
@@ -93,35 +100,55 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 		this._eventStream.plug(
 			Bacon.mergeAll(
-				xhrInterceptorStream
+				baconFlatten(xhrInterceptorStream
 					.filter(event => event.composeId === this.getComposeID())
 					.map((event) => {
 						switch(event.type){
 							case 'emailSending':
-								return {eventName: 'sending'};
+								return [{eventName: 'sending'}];
 
 							case 'emailSent':
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-								if(response.messageID === 'tr'){
-									return; //this happens when a message is cancelled
+								if(_.includes(['tr','eu'], response.messageID)){
+									return [{eventName: 'sendCanceled'}];
 								}
 								this._emailWasSent = true;
 								if(response.messageID){
-									this._messageId = response.messageID;
+									this._finalMessageId = response.messageID;
 								}
-								return {eventName: 'sent', data: response};
+								this._messageId = null;
+								return [{eventName: 'sent', data: response}];
+							case 'emailDraftSaveSending':
+								this._draftSaving = true;
+								return [{eventName: 'draftSaving'}];
 							case 'emailDraftReceived':
+								this._draftSaving = false;
 								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-								if(response.messageID){
-									this._messageId = response.messageID;
+								if (response.messageID === 'eu') {
+									return []; // save was canceled
 								}
-								return {eventName: 'draftSaved', data: response};
+								const events = [{eventName: 'draftSaved', data: response}];
+								if (!response.messageID) {
+									this._driver.getLogger().error(new Error("Missing message id from emailDraftReceived"));
+								} else if(response.messageID && this._messageId !== response.messageID){
+									if (/^[0-9a-f]+$/i.test(response.messageID)) {
+										this._messageId = response.messageID;
+										events.push({
+											eventName: 'messageIDChange',
+											data: this._messageId
+										});
+									} else {
+										this._driver.getLogger().error(new Error("Invalid message id from emailDraftReceived"), {
+											value: response.messageID
+										});
+									}
+								}
+								return events;
 
 							default:
-								return null;
+								return [];
 						}
-					})
-					.filter(Boolean),
+					})),
 
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
 					return {
@@ -194,22 +221,26 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
-		this._eventStream.plug(baconCast(Bacon, Kefir.later(10).flatMap(()=>getMinimizeRestoreStream(this))));
 
-		var messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
-		this._eventStream.plug(
-			messageIDChangeStream
-				.map(() => ({
-					eventName: 'messageIDChange',
-					data: this.getMessageID()
-				}))
-		);
+		const minimizedStream = Kefir.later(10).flatMap(()=>getMinimizedStream(this));
+		this._eventStream.plug(baconCast(Bacon, minimizedStream.changes().map(minimized =>
+			({eventName: minimized ? 'minimized' : 'restored'})
+		)));
+
+		const messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 
 		messageIDChangeStream
 			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
-			.map(() => this.getMessageID())
+			.map(() => this._getMessageIDfromForm())
+			.filter(messageID =>
+				messageID && !this._emailWasSent && this._messageId !== messageID
+			)
 			.onValue(messageID => {
 				this._messageId = messageID;
+				this._eventStream.push({
+					eventName: 'messageIDChange',
+					data: this._messageId
+				});
 			});
 	}
 
@@ -225,8 +256,7 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	}
 
 	_setupIDs() {
-		this._initialMessageId = this.getMessageID();
-		this._messageId = this._initialMessageId;
+		this._messageId = this._initialMessageId = this._getMessageIDfromForm();
 		this._targetMessageID = this._getTargetMessageID();
 		this._threadID = this._getThreadID();
 	}
@@ -597,15 +627,22 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		return this._initialMessageId;
 	}
 
+	_getMessageIDfromForm(): ?string {
+		const value = this._messageIDElement && this._messageIDElement.value || null;
+		if (value && value !== 'undefined' && value !== 'null') {
+			if (/^[0-9a-f]+$/i.test(value)) {
+				return value;
+			} else {
+				this._driver.getLogger().error(new Error("Invalid message id in element"), {
+					value
+				});
+			}
+		}
+		return null;
+	}
+
 	getMessageID(): ?string {
-		if (this._emailWasSent) {
-			return null;
-		}
-		var input = this._messageIDElement;
-		if (!input) {
-			return this._messageId;
-		}
-		return input.value && (input.value !== 'undefined' && input.value !== 'null') ? input.value : this._messageId;
+		return this._messageId;
 	}
 
 	getTargetMessageID(): ?string {
@@ -614,6 +651,66 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 
 	getThreadID(): ?string {
 		return this._threadID;
+	}
+
+	async getCurrentDraftID(): Promise<?string> {
+		if (!this.getMessageID()) {
+			return null;
+		} else {
+			return this.getDraftID();
+		}
+	}
+
+	async getDraftID(): Promise<?string> {
+		if (!this._draftIDpromise) {
+			this._draftIDpromise = this._getDraftIDimplementation();
+		}
+		return this._draftIDpromise;
+	}
+
+	async _getDraftIDimplementation(): Promise<?string> {
+		// If this compose view doesn't have a message id yet, wait until it gets
+		// one or it's closed.
+		if (!this._messageId) {
+			await this._eventStream
+				.filter(event => event.eventName === 'messageIDChange')
+				.mapEnd(() => null)
+				.take(1)
+				.toPromise(RSVP.Promise);
+		}
+
+		// We make an AJAX request against gmail to find the draft ID for our
+		// current message ID. However, our message ID can change before that
+		// request finishes. If we fail to get our draft ID and we see that our
+		// message ID has changed since we made the request, then we try again.
+		let lastMessageId = null;
+		while (true) {
+			const messageId = this._messageId;
+			if (!messageId) {
+				return null;
+			}
+			if (lastMessageId === messageId) {
+				// It's possible that the server received a draft save request from us
+				// already, causing the draft id lookup to fail, but we haven't gotten
+				// the draft save response yet. Wait for that response to finish and
+				// keep trying if it looks like that might be the case.
+				if (this._draftSaving) {
+					await this._eventStream
+						.filter(event => event.eventName === 'messageIDChange')
+						.mapEnd(() => null)
+						.take(1)
+						.toPromise(RSVP.Promise);
+					continue;
+				}
+				throw new Error("Failed to read draft ID");
+			}
+			lastMessageId = messageId;
+
+			const draftID = this._driver.getDraftIDForMessageID(messageId);
+			if (draftID) {
+				return draftID;
+			}
+		}
 	}
 
 	getRecipientRowElements(): HTMLElement[] {
@@ -628,15 +725,29 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		ensureGroupingIsOpen(this._element, type);
 	}
 
-	minimize() {
-		var minimizeButton = this._element.querySelector('.Hm > img');
-		if(minimizeButton){
-			simulateClick(minimizeButton);
+	getMinimized(): boolean {
+		const element = this.getElement();
+		const bodyElement = this.getBodyElement();
+		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+
+		return bodyContainer.style.display !== '';
+	}
+
+	setMinimized(minimized: boolean) {
+		if (minimized !== this.getMinimized()) {
+			const minimizeButton = this._element.querySelector('.Hm > img');
+			if (minimizeButton) {
+				simulateClick(minimizeButton);
+			}
 		}
 	}
 
+	minimize() {
+		this.setMinimized(true);
+	}
+
 	restore() {
-		this.minimize(); //minize and restore buttons are the same
+		this.setMinimized(false);
 	}
 
 	_triggerDraftSave() {
@@ -663,13 +774,18 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 	// If this compose is a reply, then this gets the message ID of the message
 	// we're replying to.
 	_getTargetMessageID(): ?string {
-		var input = this._element.querySelector('input[name="rm"]');
+		const input = this._element.querySelector('input[name="rm"]');
 		return input && input.value && input.value != 'undefined' ? input.value : null;
 	}
 
 	_getThreadID(): ?string {
-		var targetID = this.getTargetMessageID();
-		return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+		const targetID = this.getTargetMessageID();
+		try {
+			return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
+		} catch(err) {
+			this._driver.getLogger().error(err);
+			return null;
+		}
 	}
 
 	getElement(): HTMLElement {
@@ -730,8 +846,8 @@ var GmailComposeView = ud.defn(module, class GmailComposeView {
 		this._isListeningToAjaxInterceptStream = true;
 
 	}
-});
-export default GmailComposeView;
+}
+export default ud.defn(module, GmailComposeView);
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

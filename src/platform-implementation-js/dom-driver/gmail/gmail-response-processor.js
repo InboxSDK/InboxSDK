@@ -74,48 +74,68 @@ export function rewriteSingleQuotes(s: string): string {
 
   // i is our position in the input string. result is our result string that
   // we'll copy the parts of the input to as we interpret them.
-  var i = 0, result = "";
+  let i = 0, resultParts = [];
   while (true) {
     // Find the position of the next singly or doubly quoted part.
-    var m = s.substr(i).match(/['"]/);
-    if (!m) {
-      result += s.substr(i);
+    // `i` is increasing monotonically every round of this loop, and the loop
+    // ends as soon as no matches are found after the `i`th position in the
+    // string, so this while loop can't be infinite.
+    const nextQuoteIndex = findNextQuote(s, i);
+    if (nextQuoteIndex < 0) {
+      resultParts.push(s.substr(i));
       break;
     }
     // Copy the unquoted part preceding the quoted section we found into the
     // result, and put a double-quote into the result to begin the quoted
     // section we found.
-    result += s.substr(i,(m:any).index) + '"';
-    i += (m:any).index + 1;
-    if (m[0] == '"') {
-      // Match the contents (and end quote) of the entire double-quoted part that
-      // we found. Match as many non-double-quote and non-backslash characters as
-      // we can, and also match any character (including a double-quote) that
-      // follows a backslash. Then these tokens must be followed by a double
-      // quote. This allows us to correctly detect the end of the quoted part,
-      // without stopping early on an escaped double quote.
-      m = s.substr(i).match(/^([^"\\]|\\.)*"/);
-      if (!m) {
+    resultParts.push(s.substr(i,nextQuoteIndex-i))
+    resultParts.push('"');
+    i = nextQuoteIndex + 1;
+    if (s[nextQuoteIndex] === '"') {
+      // Find the next quotation mark not preceded by a backslash.
+      const nextDoubleQuoteIndex = findNextUnescapedCharacter(s, i, '"');
+      if (nextDoubleQuoteIndex < 0) {
         throw new Error("Unclosed double quote");
       }
       // Add that entire double-quoted part to the result.
-      result += s.substr(i,m[0].length);
-      i += m[0].length;
+      resultParts.push(s.slice(i,nextDoubleQuoteIndex+1));
+      i = nextDoubleQuoteIndex + 1;
     } else {
       // Same logic as above, but for a single-quoted part.
-      m = s.substr(i).match(/^([^'\\]|\\.)*'/);
-      if (!m) {
+      const nextSingleQuoteIndex = findNextUnescapedCharacter(s, i, "'");
+      if (nextSingleQuoteIndex < 0) {
         throw new Error("Unclosed single quote");
       }
       // Escape all double-quotes inside the part, and then write it out
       // into the result with the ending single-quote replaced with a
       // double-quote.
-      var part = s.substr(i,m[0].length-1).replace(/"/g, '\\"');
-      result += part + '"';
-      i += m[0].length;
+      const part = s.slice(i,nextSingleQuoteIndex).replace(/"/g, '\\"');
+      resultParts.push(part);
+      resultParts.push('"');
+      i = nextSingleQuoteIndex + 1;
     }
   }
-  return result;
+  return resultParts.join('');
+}
+
+function findNextQuote(s: string, start: number): number {
+  for (let i=start, len=s.length; i<len; i++) {
+    if (s[i] === '"' || s[i] === "'") {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function findNextUnescapedCharacter(s: string, start: number, char: string): number {
+  for (let i=start, len=s.length; i<len; i++) {
+    if (s[i] === '\\') {
+      i++;
+    } else if (s[i] === char) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 export type MessageOptions = {
@@ -125,11 +145,11 @@ export type MessageOptions = {
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
-  var options = {
+  let options = {
     lengths: false,
     suggestionMode: /^5\n/.test(threadResponseString)
   };
-  var VIEW_DATA = threadResponseString.substring(
+  let VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
   VIEW_DATA = VIEW_DATA.replace(/[\r\n\t]/g, '');
@@ -141,20 +161,16 @@ export function deserialize(threadResponseString: string): {value: any[], option
 
   // Fix some things with the data. (It's in a weird minified JSON-like
   // format). Make sure we don't modify any data inside of strings!
-  var in_string = false;
-  VIEW_DATA = VIEW_DATA.replace(/(^|")([^"\\]|\\.)*/g, function(match) {
-    if (!in_string) {
-      var beforeNumberStrip = match;
-      match = match
-        .replace(/\]\d+\[/g, '],['); // ignore those length values
-      if (match !== beforeNumberStrip) {
-        options.lengths = true;
-      }
-      match = match
-        .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-        .replace(/\[\s*(?=,)/g, '[null'); // "
+  VIEW_DATA = transformUnquotedSections(VIEW_DATA, match => {
+    const beforeNumberStrip = match;
+    match = match
+      .replace(/\]\d+\[/g, '],['); // ignore those length values
+    if (match !== beforeNumberStrip) {
+      options.lengths = true;
     }
-    in_string = !in_string;
+    match = match
+      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
+      .replace(/\[\s*(?=,)/g, '[null'); // "
     return match;
   });
 
@@ -169,6 +185,27 @@ export function deserialize(threadResponseString: string): {value: any[], option
   }
 
   return {value: vData, options};
+}
+
+function transformUnquotedSections(str: string, cb: (str: string) => string): string {
+  const parts = [];
+  let nextQuote;
+  let position = 0;
+  let in_string = false;
+  while ((nextQuote = findNextUnescapedCharacter(str, position, '"')) !== -1) {
+    if (in_string) {
+      parts.push(str.slice(position, nextQuote+1));
+    } else {
+      parts.push(cb(str.slice(position, nextQuote+1)));
+    }
+    position = nextQuote+1;
+    in_string = !in_string;
+  }
+  if (in_string) {
+    throw new Error("string ended inside quoted section");
+  }
+  parts.push(cb(str.slice(position)));
+  return parts.join('');
 }
 
 export function serialize(value: any[], options: MessageOptions): string {
@@ -263,6 +300,22 @@ export type Thread = {
   someGmailMessageIds: string[];
   gmailThreadId: string;
 };
+
+export function readDraftId(response: string, messageID: string): ?string {
+  const decoded = deserialize(response).value;
+  const msgA = _.chain(decoded)
+    .flatten()
+    .filter(x => Array.isArray(x))
+    .flatten()
+    .filter(x => x[0] === 'ms' && x[1] === messageID)
+    .map(x => x[60])
+    .first()
+    .value();
+  if (msgA) {
+    return msgA.split(':')[1];
+  }
+  return null;
+}
 
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
   var {value, options} = deserialize(response);
