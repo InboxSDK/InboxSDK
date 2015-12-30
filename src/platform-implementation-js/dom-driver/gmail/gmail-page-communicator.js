@@ -56,6 +56,10 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return document.head.getAttribute('data-inboxsdk-ik-value');
   }
 
+  getActionTokenValue(): string {
+    return document.head.getAttribute('data-inboxsdk-action-token-value');
+  }
+
   isConversationViewDisabled(): Promise<boolean> {
     return new RSVP.Promise((resolve, reject) => {
       Bacon.fromEventTarget(document, 'inboxSDKgmonkeyResponse')

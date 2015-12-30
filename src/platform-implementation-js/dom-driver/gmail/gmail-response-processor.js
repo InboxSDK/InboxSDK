@@ -121,6 +121,7 @@ export function rewriteSingleQuotes(s: string): string {
 export type MessageOptions = {
   lengths: boolean;
   suggestionMode: boolean;
+  noArrayNewLines?: boolean;
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
@@ -175,20 +176,23 @@ export function serialize(value: any[], options: MessageOptions): string {
     assert(!options.lengths);
     return suggestionSerialize(value);
   }
-  return threadListSerialize(value, !options.lengths);
+  return threadListSerialize(value, options);
 }
 
-export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbers: boolean=false): string {
-  var response = ")]}'\n\n";
+export function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
+  var dontIncludeNumbers = options && !options.lengths;
+  var noArrayNewLines = options && options.noArrayNewLines;
+
+  var response = ")]}'\n" + (noArrayNewLines ? '' : '\n');
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arraySection = threadResponseArray[ii];
-    var arraySectionString = serializeArray(arraySection);
+    var arraySectionString = serializeArray(arraySection, !noArrayNewLines);
 
     if(dontIncludeNumbers){
       response += arraySectionString;
     } else {
-      var length = arraySectionString.length + 1;
-      response += length + '\n' + arraySectionString;
+      var length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
+      response += (noArrayNewLines ? '\n' : '') + length + '\n' + arraySectionString;
     }
   }
 
@@ -200,7 +204,7 @@ export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbe
     response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
   }
 
-  return response;
+  return response + (noArrayNewLines ? '\n' : '');
 }
 
 export function suggestionSerialize(suggestionsArray: any[]): string {
@@ -216,14 +220,14 @@ export function suggestionSerialize(suggestionsArray: any[]): string {
   return response;
 }
 
-export function serializeArray(array: any[]): string {
+export function serializeArray(array: any[], includeNewLine: boolean = true): string {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
 
     var addition;
     if(_.isArray(item)){
-      addition = serializeArray(item);
+      addition = serializeArray(item, includeNewLine);
     }
     else if(item == null) {
       addition = '';
@@ -242,7 +246,7 @@ export function serializeArray(array: any[]): string {
     response += addition;
   }
 
-  response += ']\n';
+  response += ']' + (includeNewLine ? '\n' : '');
 
   return response;
 }
@@ -262,6 +266,11 @@ export type Thread = {
 
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
   var {value, options} = deserialize(response);
+
+  if(serialize(value, options) !== response){
+    options.noArrayNewLines = true;
+  }
+
   var actionResponseMode = value.length === 1 &&
     value[0].length === 2 &&
     typeof value[0][1] === 'string';

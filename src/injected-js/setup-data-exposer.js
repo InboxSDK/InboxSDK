@@ -36,6 +36,7 @@ module.exports = function() {
 
     if (global.GLOBALS) {
       document.head.setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
+      document.head.setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
 
       var globalSettingsHolder = _.find(GLOBALS[17], (item) => item[0] === 'p');
 
