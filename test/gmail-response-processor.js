@@ -175,6 +175,16 @@ describe('GmailResponseProcessor', function() {
       threads.unshift(threads.pop());
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
     });
+
+    it("works on newer response", function() {
+      const data = loadJSON('./data/gmail-response-processor/search-response-new.json');
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert.strictEqual(threads.length, 1);
+
+      const replaced = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
+      assert.strictEqual(GmailResponseProcessor.extractThreads(replaced).length, 1);
+      assert.strictEqual(replaced, data.input);
+    });
   });
 
   describe('interpretSentEmailResponse', function() {
