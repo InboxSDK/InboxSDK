@@ -141,13 +141,14 @@ function findNextUnescapedCharacter(s: string, start: number, char: string): num
 export type MessageOptions = {
   lengths: boolean;
   suggestionMode: boolean;
-  noArrayNewLines?: boolean;
+  noArrayNewLines: boolean;
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
   let options = {
     lengths: false,
-    suggestionMode: /^5\n/.test(threadResponseString)
+    suggestionMode: /^5\n/.test(threadResponseString),
+    noArrayNewLines: !/^[,\]]/m.test(threadResponseString)
   };
   let VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
@@ -319,10 +320,6 @@ export function readDraftId(response: string, messageID: string): ?string {
 
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
   const {value, options} = deserialize(response);
-
-  if(serialize(value, options) !== response){
-    options.noArrayNewLines = true;
-  }
 
   const actionResponseMode = value.length === 1 &&
     value[0].length === 2 &&
