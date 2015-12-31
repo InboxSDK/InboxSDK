@@ -1,13 +1,14 @@
 /* @flow */
 //jshint ignore:start
 
-import ajax from '../../../../common/ajax';
+import gmailLimitedAjax from '../gmail-limited-ajax';
 import type GmailDriver from '../gmail-driver';
 
 export default function getRfcMessageIdForGmailMessageId(driver: GmailDriver, gmailMessageId: string): Promise<string> {
-  return ajax({
+  return gmailLimitedAjax({
     method: 'GET',
     url: (document.location:any).origin+document.location.pathname,
+    canRetry: true,
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',

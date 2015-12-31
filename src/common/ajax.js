@@ -25,6 +25,7 @@ export type ajaxOpts = {
   headers?: ?{[index: string]: string};
   xhrFields?: ?Object;
   data?: ?{[index: string]: string}|string;
+  canRetry?: ?boolean;
   retryNum?: number;
 };
 
@@ -69,7 +70,8 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
       if ((opts.retryNum || 0) < MAX_RETRIES) {
         if (
           xhr.status === 502 ||
-          ((xhr.status === 0 || xhr.status >= 500) && (method === "GET" || method === "HEAD"))
+          ((xhr.status === 0 || xhr.status >= 500) &&
+            (method === "GET" || method === "HEAD" || opts.canRetry === true))
         ) {
           resolve(_retry(opts));
           return;

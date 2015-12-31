@@ -7,7 +7,7 @@ export default function rateLimit<T: Function>(fn: T, period: number, count: num
   let calls: number[] = [];
   return (function() {
     const now = Date.now();
-    calls = calls.filter(time => time >= now-period);
+    calls = calls.filter(time => time > now-period);
     if (calls.length >= count) {
       throw new Error("Function rate limit exceeded");
     }
