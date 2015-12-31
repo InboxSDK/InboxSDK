@@ -3,12 +3,12 @@
 
 import RSVP from 'rsvp';
 import {extractThreads} from '../gmail-response-processor';
-import rateLimitedAjax from '../../../../common/rate-limited-ajax';
+import gmailLimitedAjax from '../gmail-limited-ajax';
 import type GmailDriver from '../gmail-driver';
 
 export default function getGmailThreadIdForRfcMessageId(driver: GmailDriver, rfcMessageId: string): Promise<string> {
   var searchString = 'rfc822msgid:'+rfcMessageId;
-  return rateLimitedAjax({
+  return gmailLimitedAjax({
     method: 'POST',
     url: (document.location:any).origin+document.location.pathname,
     data: {
