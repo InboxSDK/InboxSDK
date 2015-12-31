@@ -22,7 +22,7 @@ describe("rateLimitQueuer", function() {
     const t3 = Date.now();
     assert(t3 - t2 < 15);
   });
-  it("going over rate limit queues", async function() {
+  it("going over rate limit sequentially queues", async function() {
     this.slow();
 
     let x = 5;
@@ -41,11 +41,64 @@ describe("rateLimitQueuer", function() {
     assert.strictEqual(await fn(), 8);
     const t5 = Date.now();
     assert(t5 - t4 < 10);
+
     assert.strictEqual(await fn(), 9);
     const t6 = Date.now();
     assert(t6 - t5 >= 10);
     assert.strictEqual(await fn(), 10);
     const t7 = Date.now();
     assert(t7 - t6 < 10);
+  });
+  it("going over rate limit simultaneously queues", async function() {
+    this.slow();
+
+    let x = 5;
+    const fn = rateLimitQueuer(async () => x++, 15, 2);
+
+    const start = Date.now();
+    await Promise.all([
+      fn().then(r => {
+        assert.strictEqual(r, 5);
+        assert(Date.now() - start < 10);
+      }),
+      fn().then(r => {
+        assert.strictEqual(r, 6);
+        assert(Date.now() - start < 10);
+      }),
+
+      fn().then(r => {
+        assert.strictEqual(r, 7);
+        assert(Date.now() - start >= 10);
+        assert(Date.now() - start < 25);
+      }),
+      fn().then(r => {
+        assert.strictEqual(r, 8);
+        assert(Date.now() - start >= 10);
+        assert(Date.now() - start < 25);
+      }),
+
+      fn().then(r => {
+        assert.strictEqual(r, 9);
+        assert(Date.now() - start >= 25);
+      }),
+      delay(15).then(() => fn()).then(r => {
+        assert.strictEqual(r, 10);
+        assert(Date.now() - start >= 25);
+      })
+    ]);
+  });
+  it("recursive rate limited functions work", async function() {
+    this.slow();
+
+    let x = 0;
+    const fn = rateLimitQueuer(async (expectedX) => {
+      assert.strictEqual(expectedX, x);
+      x++;
+      if (expectedX === 0) {
+        await Promise.all([fn(1), fn(2)]);
+      }
+    }, 15, 2);
+    await fn(0);
+    await delay(30);
   });
 });

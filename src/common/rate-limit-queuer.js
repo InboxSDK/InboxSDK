@@ -6,29 +6,59 @@
 export default function rateLimitQueuer<T: (...args: any) => Promise<any>>(fn: T, period: number, count: number): T {
   let callTimestamps: Array<number> = [];
   let queue: Array<()=>void> = [];
-  return (function() {
+  let runningQueue = false;
+
+  function runJob() {
+    const job = queue.shift();
+    job();
+    if (queue.length) {
+      runQueue();
+    } else {
+      runningQueue = false;
+    }
+  }
+
+  function runQueue() {
+    runningQueue = true;
+
+    const timeToWait = getTimeToUnqueueItem();
+    if (timeToWait > 0) {
+      setTimeout(runJob, timeToWait);
+    } else {
+      runJob();
+    }
+  }
+
+  function getTimeToUnqueueItem(): number {
     const now = Date.now();
     const periodAgo = now-period;
     callTimestamps = callTimestamps.filter(time => time > periodAgo);
 
     if (callTimestamps.length >= count) {
-      setTimeout(() => {
-        const job = queue.shift();
-        job();
-      }, callTimestamps[0] - periodAgo);
+      return callTimestamps[0] - periodAgo;
+    }
+    return -1;
+  }
 
-      return new Promise((resolve, reject) => {
-        queue.push(() => {
-          callTimestamps.push(Date.now());
+  return (function attempt() {
+    let job;
+    const promise = new Promise((resolve, reject) => {
+      job = () => {
+        callTimestamps.push(Date.now());
+        try {
           resolve(fn.apply(this, arguments));
-        });
-      });
+        } catch(err) {
+          reject(err);
+        }
+      };
+    });
+    if (!job) throw new Error("Should not happen");
+
+    queue.push(job);
+    if (!runningQueue) {
+      runQueue();
     }
-    callTimestamps.push(now);
-    const retVal = fn.apply(this, arguments);
-    if (process.env.NODE_ENV !== 'production' && (!retVal || typeof retVal.then !== 'function')) {
-      throw new Error("rateLimitQueuer can only be used with functions that return a Promise");
-    }
-    return retVal;
+
+    return promise;
   }: any);
 }
