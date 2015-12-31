@@ -43,9 +43,9 @@ describe("rateLimitQueuer", function() {
     assert(t5 - t4 < 10);
     assert.strictEqual(await fn(), 9);
     const t6 = Date.now();
-    assert(t6 - t5 < 10);
+    assert(t6 - t5 >= 10);
     assert.strictEqual(await fn(), 10);
     const t7 = Date.now();
-    assert(t7 - t6 >= 10);
+    assert(t7 - t6 < 10);
   });
 });
