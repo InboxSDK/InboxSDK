@@ -141,12 +141,14 @@ function findNextUnescapedCharacter(s: string, start: number, char: string): num
 export type MessageOptions = {
   lengths: boolean;
   suggestionMode: boolean;
+  noArrayNewLines: boolean;
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
   let options = {
     lengths: false,
-    suggestionMode: /^5\n/.test(threadResponseString)
+    suggestionMode: /^5\n/.test(threadResponseString),
+    noArrayNewLines: !/^[,\]]/m.test(threadResponseString)
   };
   let VIEW_DATA = threadResponseString.substring(
     threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
@@ -212,20 +214,23 @@ export function serialize(value: any[], options: MessageOptions): string {
     assert(!options.lengths);
     return suggestionSerialize(value);
   }
-  return threadListSerialize(value, !options.lengths);
+  return threadListSerialize(value, options);
 }
 
-export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbers: boolean=false): string {
-  var response = ")]}'\n\n";
+export function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
+  var dontIncludeNumbers = options && !options.lengths;
+  var noArrayNewLines = options && options.noArrayNewLines;
+
+  var response = ")]}'\n" + (noArrayNewLines ? '' : '\n');
   for(var ii=0; ii<threadResponseArray.length; ii++){
     var arraySection = threadResponseArray[ii];
-    var arraySectionString = serializeArray(arraySection);
+    var arraySectionString = serializeArray(arraySection, !noArrayNewLines);
 
     if(dontIncludeNumbers){
       response += arraySectionString;
     } else {
-      var length = arraySectionString.length + 1;
-      response += length + '\n' + arraySectionString;
+      var length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
+      response += (noArrayNewLines ? '\n' : '') + length + '\n' + arraySectionString;
     }
   }
 
@@ -237,7 +242,7 @@ export function threadListSerialize(threadResponseArray: any[], dontIncludeNumbe
     response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
   }
 
-  return response;
+  return response + (noArrayNewLines ? '\n' : '');
 }
 
 export function suggestionSerialize(suggestionsArray: any[]): string {
@@ -253,14 +258,14 @@ export function suggestionSerialize(suggestionsArray: any[]): string {
   return response;
 }
 
-export function serializeArray(array: any[]): string {
+export function serializeArray(array: any[], includeNewLine: boolean = true): string {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
 
     var addition;
     if(_.isArray(item)){
-      addition = serializeArray(item);
+      addition = serializeArray(item, includeNewLine);
     }
     else if(item == null) {
       addition = '';
@@ -279,7 +284,7 @@ export function serializeArray(array: any[]): string {
     response += addition;
   }
 
-  response += ']\n';
+  response += ']' + (includeNewLine ? '\n' : '');
 
   return response;
 }
@@ -314,21 +319,99 @@ export function readDraftId(response: string, messageID: string): ?string {
 }
 
 export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
-  var {value, options} = deserialize(response);
-  var actionResponseMode = value.length === 1 &&
+  const {value, options} = deserialize(response);
+
+  const actionResponseMode = value.length === 1 &&
     value[0].length === 2 &&
     typeof value[0][1] === 'string';
-  var threadValue = actionResponseMode ? value[0][0].map(x => [x]) : value;
-  var firstTbIndex = _.findIndex(threadValue, item => item[0] && item[0][0] === 'tb');
-  var [parsedTb, parsedNoTb] = _.partition(threadValue, item => item[0] && item[0][0] === 'tb');
-  var tbFollowers = _.chain(parsedTb).flatten().filter(item => item[0] !== 'tb').value();
-  var newTbs = _threadsToTbStructure(replacementThreads, tbFollowers);
-  var parsedNew = _.flatten([
-    parsedNoTb.slice(0, firstTbIndex),
+  const threadValue = actionResponseMode ? value[0][0].map(x => [x]) : value;
+
+/*
+threadValue looks like this:
+[
+  [ // group
+    ["blah", ...], // item
+    ["blah", ...]  // item
+  ],
+  [ // group
+    ["blah", ...],
+    ["tb", [...]],
+    ["tb", [...]]
+  ],
+  [
+    ["tb", [...]],
+    ["blah", ...]
+  ],
+  [
+    ["blah", ...],
+    ["blah", ...]
+  ],
+]
+
+threadValue is an array of groups. Each group is an array of items. An item is
+an array which has an identifier string as its first item. Each "tb" item
+contains an array of up to 10 threads. All of the "tb" items will be sequential
+but may overflow to other groups.
+
+We want to replace all of the "tb" items, while trying to stick close to the
+original structure. We prepare by creating an array of groups that come before
+any groups containing a "tb" item, an array of groups that come after any
+groups containing a "tb" item, an array of items that come before any "tb"
+items in the first "tb" group, and an array of items that come after any "tb"
+items in the last "tb" group. Then we generate the new "tb" items, and splice
+it all back together.
+
+*/
+
+  let preTbGroups = [];
+  let postTbGroups = [];
+  let preTbItems = [];
+  let postTbItems = [];
+
+  let hasSeenTb = false;
+  threadValue.forEach(group => {
+    let tbSeenInThisGroup = false;
+    const preTbGroup = [];
+    const postTbGroup = [];
+    group.forEach(item => {
+      if (item[0] === 'tb') {
+        hasSeenTb = tbSeenInThisGroup = true;
+        if (preTbGroup.length) {
+          preTbItems = preTbGroup;
+        }
+        postTbItems = postTbGroup;
+      } else if (!hasSeenTb) {
+        preTbGroup.push(item);
+      } else {
+        postTbGroup.push(item);
+      }
+    });
+    if (!tbSeenInThisGroup) {
+      if (!hasSeenTb) {
+        preTbGroups.push(preTbGroup);
+      } else {
+        postTbGroups.push(postTbGroup);
+      }
+    }
+  });
+
+  const newTbs = _threadsToTbGroups(replacementThreads);
+  if (preTbItems.length) {
+    newTbs[0] = preTbItems.concat(newTbs[0] || []);
+  }
+  if (postTbItems.length) {
+    if (newTbs.length) {
+      newTbs[newTbs.length-1] = newTbs[newTbs.length-1].concat(postTbItems);
+    } else {
+      newTbs.push(postTbItems);
+    }
+  }
+  const parsedNew = _.flatten([
+    preTbGroups,
     newTbs,
-    parsedNoTb.slice(firstTbIndex)
+    postTbGroups
   ]);
-  var fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
+  const fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
   return serialize(fullNew, options);
 }
 
@@ -370,18 +453,12 @@ function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[
     .value();
 }
 
-function _threadsToTbStructure(threads: any[], followers=[]): any[] {
-  var tbs = _.chain(threads)
+function _threadsToTbGroups(threads: any[]): Array<Array<any>> {
+  return _.chain(threads)
     .map(thread => thread._originalGmailFormat)
     .chunk(10)
     .map((threadsChunk, i) => [['tb', i*10, threadsChunk]])
     .value();
-  if (tbs.length > 0) {
-    tbs[tbs.length-1] = tbs[tbs.length-1].concat(followers);
-  } else if (followers.length > 0) {
-    tbs.push(followers);
-  }
-  return tbs;
 }
 
 function _doesResponseUseFormatWithSectionNumbers(responseString: string): boolean {

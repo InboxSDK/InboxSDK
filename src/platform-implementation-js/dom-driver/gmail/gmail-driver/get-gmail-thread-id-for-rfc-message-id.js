@@ -9,20 +9,24 @@ import type GmailDriver from '../gmail-driver';
 export default function getGmailThreadIdForRfcMessageId(driver: GmailDriver, rfcMessageId: string): Promise<string> {
   var searchString = 'rfc822msgid:'+rfcMessageId;
   return ajax({
-    method: 'GET',
+    method: 'POST',
     url: (document.location:any).origin+document.location.pathname,
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
+      at: driver.getPageCommunicator().getActionTokenValue(),
       ui: '2',
       view: 'tl',
       start: '0',
       num: '1',
       rt: 'c',
-      pcd: '1',
-      mb: '0',
-      search: 'apps',
-      apps: 'apps',
-      q: searchString
+      search: 'query',
+      q: searchString,
+    },
+    xhrFields: {
+      withCredentials: true
+    },
+    headers: {
+      "content-type": 'application/x-www-form-urlencoded;charset=UTF-8'
     }
   }).then(response => {
     var threads = extractThreads(response.text);
