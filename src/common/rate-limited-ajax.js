@@ -26,8 +26,8 @@ async function rateLimitedAjax(opts: ajaxOpts, limit: RateLimit={max: 10, period
       recentRequestsByDomain.set(domain, requestsWithinPeriod);
       break;
     }
-    // Wait until the oldest request within the given period is done.
-    await requestsWithinPeriod[0] + limit.period;
+    // Wait until the oldest request within the given period is out of it.
+    await delay(limit.period - (now - requestsWithinPeriod[0]));
   }
   return ajax(opts);
 }
