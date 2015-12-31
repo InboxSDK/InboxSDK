@@ -8,6 +8,7 @@ export default function getRfcMessageIdForGmailMessageId(driver: GmailDriver, gm
   return rateLimitedAjax({
     method: 'GET',
     url: (document.location:any).origin+document.location.pathname,
+    canRetry: true,
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',

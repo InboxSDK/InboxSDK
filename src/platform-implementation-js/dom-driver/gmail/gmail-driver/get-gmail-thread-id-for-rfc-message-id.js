@@ -25,6 +25,7 @@ export default function getGmailThreadIdForRfcMessageId(driver: GmailDriver, rfc
     xhrFields: {
       withCredentials: true
     },
+    canRetry: true,
     headers: {
       "content-type": 'application/x-www-form-urlencoded;charset=UTF-8'
     }
