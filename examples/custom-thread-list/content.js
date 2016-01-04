@@ -110,7 +110,6 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 			'<001a113843cac079f205282298aa@google.com>',
 			'<001a1136b7d82272b3052822690d@google.com>',
 			'<001a11c215129742ad0511fdbedb@google.com>',
-			'<CAGtu8GdkoMY1kCaV4ZvxTCqsK4tqM0esU-0OrRXTaSg28Hh1gg@mail.gmail.com>',
 			'<047d7bd908ee50d1d6051c089b72@google.com>',
 			'<001a113678d82ec311051c08933b@google.com>',
 			'<001a11c2e51ccba39c051c083e7d@google.com>',

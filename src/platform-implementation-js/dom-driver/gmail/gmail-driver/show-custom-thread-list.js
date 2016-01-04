@@ -9,7 +9,7 @@ import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
 
-var/*const*/ threadListHandlersToSearchStrings: Map<Function, string> = new Map();
+const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
 /*
 Timeline of how a custom thread list works:
@@ -65,12 +65,12 @@ function findIdFailure(id, err) {
 
 // Returns the search string that will trigger the onActivate function.
 function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActivate: Function): string {
-  var/*const*/ preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
+  const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
   }
-  var/*let*/ start;
-  var/*const*/ newQuery = Date.now()+'-'+Math.random();
+  let start;
+  const newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
     .filter(e =>
@@ -103,7 +103,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
           return {gtid: id};
         }
       } else if (id) {
-        var/*const*/ obj = {
+        const obj = {
           gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
           rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
         };
@@ -122,7 +122,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
     .flatMap(Bacon.fromPromise)
     .map(_.compact)
     .onValue(idPairs => {
-      var/*const*/ query = idPairs.length > 0 ?
+      const query = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
@@ -144,13 +144,13 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       ]).onValue(([idPairs, response]) => {
         driver.signalCustomThreadListActivity(customRouteID);
 
-        var/*const*/ extractedThreads = GRP.extractThreads(response);
-        var/*const*/ newThreads = _.chain(idPairs)
+        const extractedThreads = GRP.extractThreads(response);
+        const newThreads = _.chain(idPairs)
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
           .compact()
           .value();
         try {
-          var/*const*/ newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -179,14 +179,14 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
 }
 
 export default function showCustomThreadList(driver: GmailDriver, customRouteID: string, onActivate: Function) {
-  var/*const*/ uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
-  var/*const*/ customHash = document.location.hash;
+  const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
+  const customHash = document.location.hash;
 
-  var/*const*/ nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
+  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
-  var/*const*/ searchHash = '#search/'+encodeURIComponent(uniqueSearch);
+  const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
-  var/*const*/ searchInput = GmailElementGetter.getSearchInput();
+  const searchInput = GmailElementGetter.getSearchInput();
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
   nextMainContentElementChange.onValue(() => {
@@ -195,7 +195,7 @@ export default function showCustomThreadList(driver: GmailDriver, customRouteID:
   });
 
   window.history.replaceState(null, null, searchHash);
-  var/*const*/ hce = new (window:any).HashChangeEvent('hashchange', {
+  const hce = new (window:any).HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
   });
