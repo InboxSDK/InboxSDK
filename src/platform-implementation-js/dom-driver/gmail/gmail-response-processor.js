@@ -139,14 +139,14 @@ function findNextUnescapedCharacter(s: string, start: number, char: string): num
 }
 
 export type MessageOptions = {
-  lengths: boolean;
+  includeLengths: boolean;
   suggestionMode: boolean;
   noArrayNewLines: boolean;
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
   let options = {
-    lengths: false,
+    includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
     noArrayNewLines: !/^[,\]]/m.test(threadResponseString)
   };
@@ -167,7 +167,7 @@ export function deserialize(threadResponseString: string): {value: any[], option
     match = match
       .replace(/\]\d+\[/g, '],['); // ignore those length values
     if (match !== beforeNumberStrip) {
-      options.lengths = true;
+      options.includeLengths = true;
     }
     match = match
       .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
@@ -211,22 +211,22 @@ function transformUnquotedSections(str: string, cb: (str: string) => string): st
 
 export function serialize(value: any[], options: MessageOptions): string {
   if (options.suggestionMode) {
-    assert(!options.lengths);
+    assert(!options.includeLengths);
     return suggestionSerialize(value);
   }
   return threadListSerialize(value, options);
 }
 
 export function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
-  const lengths = options ? options.lengths : true;
+  const includeLengths = options ? options.includeLengths : true;
   const noArrayNewLines = options ? options.noArrayNewLines : false;
 
-  let response = ")]}'\n" + (noArrayNewLines && lengths ? '' : '\n');
+  let response = ")]}'\n" + (noArrayNewLines && includeLengths ? '' : '\n');
   for(let ii=0; ii<threadResponseArray.length; ii++){
     const arraySection = threadResponseArray[ii];
     const arraySectionString = serializeArray(arraySection, noArrayNewLines);
 
-    if(!lengths){
+    if(!includeLengths){
       response += arraySectionString;
     } else {
       const length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
@@ -234,7 +234,7 @@ export function threadListSerialize(threadResponseArray: any[], options?: Messag
     }
   }
 
-  if(!lengths){
+  if(!includeLengths){
     if (!noArrayNewLines) {
       const lines = response.split(/\r|\n/);
       const firstLines = _.dropRight(lines, 3);
@@ -248,7 +248,7 @@ export function threadListSerialize(threadResponseArray: any[], options?: Messag
     }
   }
 
-  return response + (noArrayNewLines && lengths ? '\n' : '');
+  return response + (noArrayNewLines && includeLengths ? '\n' : '');
 }
 
 export function suggestionSerialize(suggestionsArray: any[]): string {
