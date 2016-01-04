@@ -218,31 +218,37 @@ export function serialize(value: any[], options: MessageOptions): string {
 }
 
 export function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
-  var dontIncludeNumbers = options && !options.lengths;
-  var noArrayNewLines = options && options.noArrayNewLines;
+  const lengths = options ? options.lengths : true;
+  const noArrayNewLines = options ? options.noArrayNewLines : false;
 
-  var response = ")]}'\n" + (noArrayNewLines ? '' : '\n');
-  for(var ii=0; ii<threadResponseArray.length; ii++){
-    var arraySection = threadResponseArray[ii];
-    var arraySectionString = serializeArray(arraySection, !noArrayNewLines);
+  let response = ")]}'\n" + (noArrayNewLines && lengths ? '' : '\n');
+  for(let ii=0; ii<threadResponseArray.length; ii++){
+    const arraySection = threadResponseArray[ii];
+    const arraySectionString = serializeArray(arraySection, noArrayNewLines);
 
-    if(dontIncludeNumbers){
+    if(!lengths){
       response += arraySectionString;
     } else {
-      var length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
+      const length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
       response += (noArrayNewLines ? '\n' : '') + length + '\n' + arraySectionString;
     }
   }
 
-  if(dontIncludeNumbers){
-    var lines = response.split(/\r|\n/);
-    var firstLines = _.dropRight(lines, 3);
-    var lastLines = _.takeRight(lines, 3);
-    response = firstLines.join('\n');
-    response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
+  if(!lengths){
+    if (!noArrayNewLines) {
+      const lines = response.split(/\r|\n/);
+      const firstLines = _.dropRight(lines, 3);
+      const lastLines = _.takeRight(lines, 3);
+      response = firstLines.join('\n');
+      response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
+    } else {
+      const prev = response;
+      response = response.replace(/"([0-9a-f]{16})"\]$/, "'$1']");
+      if (response === prev) throw new Error("failed to change");
+    }
   }
 
-  return response + (noArrayNewLines ? '\n' : '');
+  return response + (noArrayNewLines && lengths ? '\n' : '');
 }
 
 export function suggestionSerialize(suggestionsArray: any[]): string {
@@ -258,14 +264,14 @@ export function suggestionSerialize(suggestionsArray: any[]): string {
   return response;
 }
 
-export function serializeArray(array: any[], includeNewLine: boolean = true): string {
+export function serializeArray(array: any[], noArrayNewLines: boolean = false): string {
   var response = '[';
   for(var ii=0; ii<array.length; ii++){
     var item = array[ii];
 
     var addition;
     if(_.isArray(item)){
-      addition = serializeArray(item, includeNewLine);
+      addition = serializeArray(item, noArrayNewLines);
     }
     else if(item == null) {
       addition = '';
@@ -284,7 +290,7 @@ export function serializeArray(array: any[], includeNewLine: boolean = true): st
     response += addition;
   }
 
-  response += ']' + (includeNewLine ? '\n' : '');
+  response += ']' + (noArrayNewLines ? '' : '\n');
 
   return response;
 }
