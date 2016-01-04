@@ -42,6 +42,8 @@ import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 
+import getRecipients from './gmail-compose-view/get-recipients';
+
 import * as fromManager from './gmail-compose-view/from-manager';
 
 import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/compose-view-driver';
@@ -216,6 +218,10 @@ class GmailComposeView {
 	}
 
 	getStopper(): Kefir.Stream {return this._stopper;}
+
+	getLogger(): Logger {
+		return this._driver.getLogger();
+	}
 
 	_setupStreams() {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
@@ -522,15 +528,15 @@ class GmailComposeView {
 	}
 
 	getToRecipients(): Contact[] {
-		return require('./gmail-compose-view/get-recipients')(this, 0, "to");
+		return getRecipients(this, 0, "to");
 	}
 
 	getCcRecipients(): Contact[] {
-		return require('./gmail-compose-view/get-recipients')(this, 1, "cc");
+		return getRecipients(this, 1, "cc");
 	}
 
 	getBccRecipients(): Contact[] {
-		return require('./gmail-compose-view/get-recipients')(this, 2, "bcc");
+		return getRecipients(this, 2, "bcc");
 	}
 
 	getAdditionalActionToolbar(): HTMLElement {

@@ -1,13 +1,12 @@
 /* @flow */
 
-type Contact = {
-	emailAddress: ?string;
-	name: ?string;
-};
+import type Logger from '../../../../lib/logger';
 
-export default function getAddressInformationExtractor(addressType: string): (node: HTMLElement) => Contact {
-	return function(node: HTMLElement): Contact {
+
+export default function getAddressInformationExtractor(logger: Logger, addressType: string): (node: HTMLElement) => ?Contact {
+	return function(node: HTMLElement): ?Contact {
 		var contactNode = node.querySelector('input[name=' + addressType + ']');
+
 		var emailAddress = null;
 		var name = null;
 
@@ -22,11 +21,18 @@ export default function getAddressInformationExtractor(addressType: string): (no
 			else{
 				emailAddress = contactInfoParts[0];
 			}
-		}
 
-		return {
-			emailAddress: emailAddress,
-			name: name
-		};
+			return {
+				emailAddress: emailAddress,
+				name: name
+			};
+		}
+		else{
+			logger.error(new Error('contactNode cant be found'), {
+				addressType
+			});
+
+			return null;
+		}
 	};
 };
