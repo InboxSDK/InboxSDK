@@ -219,10 +219,6 @@ class GmailComposeView {
 
 	getStopper(): Kefir.Stream {return this._stopper;}
 
-	getLogger(): Logger {
-		return this._driver.getLogger();
-	}
-
 	_setupStreams() {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
