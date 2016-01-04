@@ -752,7 +752,9 @@ class GmailThreadRowView {
   }
 
   getDateString(): string {
-    return this._elements[0].querySelector('td.xW > span, td.yf.apt > div.apm > span').title;
+    return this._elements[0].querySelector(
+      'td.xW > span[title]:not(.inboxsdk__thread_row_custom_date), td.yf.apt > div.apm > span[title]:not(.inboxsdk__thread_row_custom_date)'
+    ).title;
   }
 
   _threadIdReady(): boolean {
