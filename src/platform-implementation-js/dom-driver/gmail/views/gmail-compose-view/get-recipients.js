@@ -1,7 +1,11 @@
-var getAddressInformationExtractor = require('./get-address-information-extractor');
+/* @flow */
+
+import GmailComposeView from '../gmail-compose-view';
+
+import getAddressInformationExtractor from './get-address-information-extractor';
 
 // contactRowIndex values: 0:to, 1:cc, 2:bcc
-module.exports = function(gmailComposeView, contactRowIndex, addressType){
+export default function getRecipients(gmailComposeView: GmailComposeView, contactRowIndex: number, addressType: string): Contact[]{
 	var contactRows = gmailComposeView.getRecipientRowElements();
 
 	if(!contactRows || contactRows.length === 0){
@@ -12,7 +16,15 @@ module.exports = function(gmailComposeView, contactRowIndex, addressType){
 		return [];
 	}
 
-	return _extractPeopleContacts(contactRows[contactRowIndex], addressType);
+	const contacts = [];
+	const candidateContacts = _extractPeopleContacts(contactRows[contactRowIndex], addressType);
+	candidateContacts.forEach(contact => {
+		if(contact != null){
+			contacts.push(contact);
+		}
+	})
+
+	return contacts;
 };
 
 

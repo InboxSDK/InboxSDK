@@ -24,7 +24,7 @@ export default class UserInfo {
     var contact: Contact = _.find(
       this.getAccountSwitcherContactList(),
       (contact: Contact) => contact.emailAddress === this._userEmail);
-    if (contact) {
+    if (contact && contact.name != null) {
       return contact.name;
     }
     return this._userEmail;

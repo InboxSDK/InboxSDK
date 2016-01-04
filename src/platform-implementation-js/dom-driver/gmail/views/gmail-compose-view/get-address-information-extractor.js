@@ -1,23 +1,37 @@
-module.exports = function(addressType, node){
-	return function(node){
+/* @flow */
+
+import Logger from '../../../../lib/logger';
+
+export default function getAddressInformationExtractor(addressType: string): (node: HTMLElement) => ?Contact {
+	return function(node: HTMLElement): ?Contact {
 		var contactNode = node.querySelector('input[name=' + addressType + ']');
-		var contactInfoString = contactNode.value;
 
 		var emailAddress = null;
 		var name = null;
 
-		var contactInfoParts = contactInfoString.split('<');
-		if(contactInfoParts.length > 1){
-			name = contactInfoParts[0].trim();
-			emailAddress = contactInfoParts[1].split('>')[0].trim();
+		if(contactNode){
+			var contactInfoString = (contactNode: any).value;
+
+			var contactInfoParts = contactInfoString.split('<');
+			if(contactInfoParts.length > 1){
+				name = contactInfoParts[0].trim();
+				emailAddress = contactInfoParts[1].split('>')[0].trim();
+			}
+			else{
+				emailAddress = contactInfoParts[0];
+			}
+
+			return {
+				emailAddress: emailAddress,
+				name: name
+			};
 		}
 		else{
-			emailAddress = contactInfoParts[0];
-		}
+			Logger.error(new Error('contactNode cant be found'), {
+				addressType
+			});
 
-		return {
-			emailAddress: emailAddress,
-			name: name
-		};
+			return null;
+		}
 	};
 };

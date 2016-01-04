@@ -463,6 +463,7 @@ var Contact = /** @lends Contact */ {
 
 	/**
 	 * The name of the contact, may be null.
+	 * ^optional
 	 * @type {string}
 	 */
 	name: null
