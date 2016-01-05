@@ -11,7 +11,7 @@ var Widgets = /** @lends Widgets */{
    * @param {ModalOptions} options - The options to configure the returned {ModalView}.
    * @return {ModalView}
    */
-	showModalView: function(){},
+  showModalView: function(){},
 
   /**
    * This creates a {MoleView} and shows it. A mole view is a modal that is
@@ -187,7 +187,8 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
   iconClass:null,
 
   /**
-  * This is called when the button is clicked.
+  * This is called when the button is clicked, and gets passed an event object.
+  * The event object will have a modalView property.
   * @type {function(event)}
   */
   onClick:null

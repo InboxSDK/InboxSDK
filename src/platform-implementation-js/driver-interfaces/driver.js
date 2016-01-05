@@ -44,6 +44,7 @@ export type Driver = {
 	showAppIdWarning(): void;
 	createModalViewDriver(options: Object): Object;
 	createMoleViewDriver(options: Object): Object;
+	createTopMessageBarDriver(options: Object): Object;
 	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

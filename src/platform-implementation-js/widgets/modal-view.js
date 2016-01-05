@@ -1,101 +1,90 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var Kefir = require('kefir');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import {defn} from 'ud';
+import EventEmitter from '../lib/safe-event-emitter';
 
-var EventEmitter = require('../lib/safe-event-emitter');
+import type GmailModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-view-driver';
 
 // documented in src/docs/
-function ModalView(options){
-    EventEmitter.call(this);
-    var self = this;
-    this._driver = options.modalViewDriver;
-    this._driver.getEventStream().filter(function(event){
-        return event.eventName === 'closeClick';
-    }).onValue(function() {
-        self.close();
-    });
-    this._driver.getEventStream().onEnd(function() {
-        self._driver = null;
-        self.emit('destroy');
-    });
-
-    if(
-      _.chain(options.buttons||[])
-       .pluck('type')
-       .filter(function(type){return type === 'PRIMARY_ACTION';})
-       .value().length > 1
-     ) {
-       throw new Error('At most one primary button is allowed');
-     }
-}
-
-ModalView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(ModalView.prototype, {
+class ModalView extends EventEmitter {
+    _driver: ?GmailModalViewDriver;
+    constructor(options: {modalViewDriver: GmailModalViewDriver}) {
+        super();
+        this._driver = options.modalViewDriver;
+        options.modalViewDriver.getEventStream().filter(event =>
+            event.eventName === 'closeClick'
+        ).onValue(() => {
+            this.close();
+        });
+        options.modalViewDriver.getEventStream().onEnd(() => {
+            this._driver = null;
+            this.emit('destroy');
+        });
+    }
 
     show(){
-        if(!this._driver){
+        const driver = this._driver;
+        if(!driver){
             throw new Error('Modal can not be shown after being hidden');
         }
 
-        document.body.appendChild(this._driver.getOverlayElement());
-        document.body.appendChild(this._driver.getModalContainerElement());
+        document.body.appendChild(driver.getOverlayElement());
+        document.body.appendChild(driver.getModalContainerElement());
 
-        this._driver.getModalContainerElement().focus();
-
-        var self = this;
+        driver.getModalContainerElement().focus();
 
         Kefir.fromEvents(document.body, 'keydown')
-            .filter(function(domEvent){
-                return domEvent.keyCode === 27;
-            })
+            .filter(domEvent =>
+                domEvent.keyCode === 27
+            )
             .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-            .onValue(function(domEvent){
+            .onValue(domEvent => {
                 domEvent.stopImmediatePropagation();
                 domEvent.stopPropagation();
                 domEvent.preventDefault();
-                self.close();
+                this.close();
             });
 
         //don't bubble key events to gmail
         Kefir.fromEvents(document.body, 'keydown')
             .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-            .onValue(function(domEvent){
+            .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
 
         Kefir.fromEvents(document.body, 'keyup')
             .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-            .onValue(function(domEvent){
+            .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
 
         Kefir.fromEvents(document.body, 'keypress')
             .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
-            .onValue(function(domEvent){
+            .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
-    },
+    }
 
-    setTitle(title){
+    setTitle(title: string){
         if(!this._driver){
             throw new Error('Modal can not be shown after being hidden');
         }
 
         this._driver.setTitle(title);
-    },
+    }
 
     close(){
         if (this._driver) {
             this._driver.destroy();
         }
-    },
+    }
 
-    addButton(options){
+    addButton(options: any): void {
         throw new Error("not implemented");
     }
 
-});
+}
 
-module.exports = ModalView;
+export default defn(module, ModalView);

@@ -14,8 +14,8 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 				{
 					type: 'PRIMARY_ACTION',
 					text: 'Monkeys',
-					onClick: function(){
-						modal.close();
+					onClick: function(e){
+						e.modalView.close();
 					},
 					orderHint: 5
 				},
