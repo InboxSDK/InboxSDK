@@ -1,58 +1,52 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
+import _ from 'lodash';
+import EventEmitter from '../lib/safe-event-emitter';
+import type {Driver} from '../driver-interfaces/driver';
+import type GmailAppToolbarButtonView from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
 
-var EventEmitter = require('../lib/safe-event-emitter');
-
-var memberMap = new WeakMap();
+const memberMap = new WeakMap();
 
 // Documented in src/docs/app-toolbar-button-view.js
-var AppToolbarButtonView = function(driver, appToolbarButtonViewDriverPromise){
-	EventEmitter.call(this);
+export default class AppToolbarButtonView extends EventEmitter {
+	constructor(driver: Driver, appToolbarButtonViewDriverPromise: Promise<GmailAppToolbarButtonView>) {
+		super();
+		const members = {
+			appToolbarButtonViewDriverPromise,
+			appToolbarButtonViewDriver: (null: ?GmailAppToolbarButtonView)
+		};
+		memberMap.set(this, members);
 
-	var members = {};
-	memberMap.set(this, members);
-
-	members.appToolbarButtonViewDriverPromise = appToolbarButtonViewDriverPromise;
-
-	var self = this;
-	members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
-		members.appToolbarButtonViewDriver = appToolbarButtonViewDriver;
-		appToolbarButtonViewDriver.getStopper().onValue(function() {
-			self.emit('destroy');
+		members.appToolbarButtonViewDriverPromise.then(appToolbarButtonViewDriver => {
+			members.appToolbarButtonViewDriver = appToolbarButtonViewDriver;
+			appToolbarButtonViewDriver.getStopper().onValue(() => {
+				this.emit('destroy');
+			});
 		});
-	});
 
-	driver.getStopper().onValue(() => {
-		this.remove();
-	});
-};
+		driver.getStopper().onValue(() => {
+			this.remove();
+		});
+	}
 
-
-AppToolbarButtonView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(AppToolbarButtonView.prototype, {
-
-	open: function(){
+	open() {
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.open();
 		});
-	},
+	}
 
-	close: function(){
+	close() {
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.close();
 		});
-	},
+	}
 
-	remove: function(){
+	remove() {
 		var members = memberMap.get(this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.destroy();
 		});
 	}
-});
-
-module.exports = AppToolbarButtonView;
+}
