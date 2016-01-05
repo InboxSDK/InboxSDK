@@ -10,7 +10,7 @@ import type GmailModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-v
 // documented in src/docs/
 class ModalView extends EventEmitter {
     _driver: ?GmailModalViewDriver;
-    constructor(options: {modalViewDriver: GmailModalViewDriver, buttons?: ?any[]}) {
+    constructor(options: {modalViewDriver: GmailModalViewDriver}) {
         super();
         this._driver = options.modalViewDriver;
         options.modalViewDriver.getEventStream().filter(event =>
@@ -22,15 +22,6 @@ class ModalView extends EventEmitter {
             this._driver = null;
             this.emit('destroy');
         });
-
-        if(
-          _.chain(options.buttons||[])
-           .pluck('type')
-           .filter(type => type === 'PRIMARY_ACTION')
-           .value().length > 1
-         ) {
-           throw new Error('At most one primary button is allowed');
-         }
     }
 
     show(){

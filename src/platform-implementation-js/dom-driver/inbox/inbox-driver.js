@@ -236,6 +236,10 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   createModalViewDriver(options: Object): InboxModalView {
     return new InboxModalView(options);
   }
+
+  createTopMessageBarDriver(options: Object): Object {
+    throw new Error("Not implemented");
+  }
 });
 export default InboxDriver;
 
