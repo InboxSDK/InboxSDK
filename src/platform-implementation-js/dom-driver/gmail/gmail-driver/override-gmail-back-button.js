@@ -52,11 +52,11 @@ const handleGmailRouteView = defn(module, function handleGmailRouteView(
 		lastCustomRouteID &&
 		gmailRouteView.getRouteType() === gmailRouteProcessor.RouteTypes.THREAD
 	){
-		_bindToBackButton(gmailDriver, gmailRouteView, lastCustomRouteID, lastCustomRouteParams);
+		_bindToBackButton(gmailDriver, gmailRouteView);
 	}
 });
 
-function _bindToBackButton(gmailDriver: GmailDriver, gmailRouteView: GmailRouteView, routeID: string, routeParams: ?Object){
+function _bindToBackButton(gmailDriver: GmailDriver, gmailRouteView: GmailRouteView){
 	const backButton = GmailElementGetter.getThreadBackButton();
 
 	if(!backButton){
@@ -67,7 +67,7 @@ function _bindToBackButton(gmailDriver: GmailDriver, gmailRouteView: GmailRouteV
 		.takeUntilBy(gmailRouteView.getStopper())
 		.filter(e => !e.defaultPrevented)
 		.onValue(e => {
-			gmailDriver.goto(routeID, routeParams);
+			window.history.back();
 			e.preventDefault();
 			e.stopImmediatePropagation();
 		});
