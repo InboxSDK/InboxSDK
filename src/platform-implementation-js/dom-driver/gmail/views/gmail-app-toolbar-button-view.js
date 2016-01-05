@@ -1,10 +1,12 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var Kefir = require('kefir');
-var baconCast = require('bacon-cast');
+import Logger from '../../../lib/logger';
+import censorHTMLtree from '../../../../common/censor-html-tree';
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
 import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
@@ -22,7 +24,13 @@ export default class GmailAppToolbarButtonView {
     this._stopper = kefirStopper();
     this._iconSettings = {};
     var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
-    buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
+    buttonDescriptorProperty.onValue((buttonDescriptor) => {
+      try {
+        this._handleButtonDescriptor(buttonDescriptor);
+      } catch(err) {
+        Logger.error(err);
+      }
+    });
   }
 
 /*
@@ -106,7 +114,7 @@ export default class GmailAppToolbarButtonView {
 }
 
 function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement {
-  var element = document.createElement('div');
+  const element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
 
   element.innerHTML = `<a href="#">
@@ -118,23 +126,37 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
     onclick(event);
   });
 
-  var topAccountContainer = GmailElementGetter.getTopAccountContainer();
+  const topAccountContainer = GmailElementGetter.getTopAccountContainer();
   if(!topAccountContainer){
     throw new Error("Could not make button");
   }
 
-  var insertionElement = topAccountContainer.children[0];
+  const insertionElement: ?HTMLElement = (topAccountContainer.children[0]: any);
   if(!insertionElement){
-    throw new Error("Could not make button");
+    try {
+      throw new Error("Could not make button");
+    } catch(err) {
+      Logger.error(err, {
+        topAccountContainerHTML: censorHTMLtree(topAccountContainer)
+      });
+      throw err;
+    }
   }
 
-  if(!GmailElementGetter.isGplusEnabled()){
-    element.classList.add('inboxsdk__appButton_noGPlus');
-  }
+  try {
+    if(!GmailElementGetter.isGplusEnabled()){
+      element.classList.add('inboxsdk__appButton_noGPlus');
+    }
 
-  if (!insertionElement.firstElementChild) throw new Error("Could not make button");
-  insertionElement.insertBefore(element, insertionElement.firstElementChild);
-  return element;
+    if (!insertionElement.firstElementChild) throw new Error("Could not make button");
+    insertionElement.insertBefore(element, insertionElement.firstElementChild);
+    return element;
+  } catch(err) {
+    Logger.error(err, {
+      insertionElementHTML: censorHTMLtree(insertionElement)
+    });
+    throw err;
+  }
 }
 
 function _updateTitle(element: HTMLElement, currentTitle: ?string, newTitle: string) {
