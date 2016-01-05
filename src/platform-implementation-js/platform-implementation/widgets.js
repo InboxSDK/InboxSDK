@@ -19,8 +19,19 @@ class Widgets {
   }
 
   showModalView(options: Object): ModalView {
-    var modalViewDriver = get(memberMap, this).driver.createModalViewDriver(options);
-    var modalView = new ModalView({
+    if (options.buttons) {
+      options.buttons = options.buttons.map(button => {
+        if (button.onClick) {
+          const appOnClick = button.onClick;
+          return Object.assign({}, button, {
+            onClick() { appOnClick({modalView}); }
+          });
+        }
+        return button;
+      });
+    }
+    const modalViewDriver = get(memberMap, this).driver.createModalViewDriver(options);
+    const modalView = new ModalView({
       modalViewDriver: modalViewDriver
     });
     modalView.show();
