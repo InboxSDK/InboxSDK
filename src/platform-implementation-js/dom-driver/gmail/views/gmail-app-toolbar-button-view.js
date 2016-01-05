@@ -133,7 +133,14 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
 
   const insertionElement: ?HTMLElement = (topAccountContainer.children[0]: any);
   if(!insertionElement){
-    throw new Error("Could not make button");
+    try {
+      throw new Error("Could not make button");
+    } catch(err) {
+      Logger.error(err, {
+        topAccountContainerHTML: censorHTMLtree(topAccountContainer)
+      });
+      throw err;
+    }
   }
 
   try {
