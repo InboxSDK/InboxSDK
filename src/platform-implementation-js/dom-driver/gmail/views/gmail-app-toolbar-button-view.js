@@ -148,7 +148,6 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
       element.classList.add('inboxsdk__appButton_noGPlus');
     }
 
-    if (!insertionElement.firstElementChild) throw new Error("Could not make button");
     insertionElement.insertBefore(element, insertionElement.firstElementChild);
     return element;
   } catch(err) {
