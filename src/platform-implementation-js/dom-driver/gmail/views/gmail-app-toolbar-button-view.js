@@ -24,7 +24,13 @@ export default class GmailAppToolbarButtonView {
     this._stopper = kefirStopper();
     this._iconSettings = {};
     var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
-    buttonDescriptorProperty.onValue((buttonDescriptor) => this._handleButtonDescriptor(buttonDescriptor));
+    buttonDescriptorProperty.onValue((buttonDescriptor) => {
+      try {
+        this._handleButtonDescriptor(buttonDescriptor);
+      } catch(err) {
+        Logger.error(err);
+      }
+    });
   }
 
 /*
