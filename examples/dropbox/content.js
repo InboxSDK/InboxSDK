@@ -28,14 +28,14 @@ log_error = function(err, log_func) {
   if (log_func != null) {
     log_func("unknown_app_error", extra);
   } else {
-    Util.log("unknown_error", null, null, EXTENSION_VERSION, extra, null);
+    //Util.log("unknown_error", null, null, EXTENSION_VERSION, extra, null);
   }
   return console.error(err);
 };
 
-onboarding_event = promise_message_handler("onboarding_tab");
+onboarding_event = new Promise(function(resolve, reject){window._start_onboard = resolve;});//promise_message_handler("onboarding_tab");
 
-close_onboarding = promise_message_handler("close_onboarding");
+close_onboarding = new Promise(function(){});//promise_message_handler("close_onboarding");
 
 Promise.all([
   InboxSDK.load('1', SDK_APP_ID), InboxSDK.loadScript(DROPINS_URL), new Promise(function(resolve, reject) {
@@ -60,7 +60,7 @@ Promise.all([
     if (extra == null) {
       extra = {};
     }
-    return Util.log(event_name, log_guid, log_key, EXTENSION_VERSION, extra, callback);
+    //return Util.log(event_name, log_guid, log_key, EXTENSION_VERSION, extra, callback);
   };
   register_all_handlers = function() {
     sdk.Compose.registerComposeViewHandler(compose_view_handler);
