@@ -1,83 +1,91 @@
-var _ = require('lodash');
-var BasicClass = require('../../lib/basic-class');
-var RSVP = require('rsvp');
+/* @flow */
 
-var DropdownView = require('./dropdown-view');
+import _ from 'lodash';
+import {defn} from 'ud';
 
-var DropdownButtonViewController = function(options){
-	BasicClass.call(this);
+import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view.js';
+import DropdownView from './dropdown-view';
 
-	this._dropdownShowFunction = options.dropdownShowFunction;
-	this._DropdownViewDriverClass = options.dropdownViewDriverClass;
+class DropdownButtonViewController {
+	_view: ButtonView;
+	_dropdownShowFunction: ?Function;
+	_dropdownView: ?DropdownView;
+	_DropdownViewDriverClass: Class<any>;
+	_dropdownPositionOptions: Object;
 
-	this._view = options.buttonView;
-	this._dropdownPositionOptions = options.dropdownPositionOptions;
+	constructor(options: Object){
+		this._dropdownShowFunction = options.dropdownShowFunction;
+		this._DropdownViewDriverClass = options.dropdownViewDriverClass;
 
-	this._bindToViewEvents();
-};
+		this._view = options.buttonView;
+		this._dropdownPositionOptions = options.dropdownPositionOptions;
 
-DropdownButtonViewController.prototype = Object.create(BasicClass.prototype);
+		this._bindToViewEvents();
+	}
 
-_.extend(DropdownButtonViewController.prototype, {
+	destroy() {
+		this._view.destroy();
+		if (this._dropdownView) {
+			this._dropdownView.close();
+			this._dropdownView = null;
+		}
+	}
 
-	__memberVariables: [
-		{name: '_view', destroy: true, get: true},
-		{name: '_dropdownShowFunction', destroy: false, set: true},
-		{name: '_dropdownView', destroy: true, destroyFunction: 'close'},
-		{name: '_DropdownViewDriverClass', destroy: false},
-		{name: '_dropdownPositionOptions', destroy: true}
-	],
+	getView(): ButtonView {
+		return this._view;
+	}
 
-	showDropdown: function(){
+	setDropdownShowFunction(func: ?Function) {
+		this._dropdownShowFunction = func;
+	}
+
+	showDropdown() {
 		this._view.activate();
-		this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), null);
+		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), null);
 		if (this._dropdownPositionOptions) {
-			this._dropdownView.setPlacementOptions(this._dropdownPositionOptions);
+			dropdownView.setPlacementOptions(this._dropdownPositionOptions);
 		}
 
-		this._dropdownView.on('destroy', this._dropdownClosed.bind(this));
+		dropdownView.on('destroy', this._dropdownClosed.bind(this));
 
 		if(this._dropdownShowFunction){
 			this._dropdownShowFunction({dropdown: this._dropdownView});
 		}
-	},
+	}
 
-	hideDropdown: function(){
+	hideDropdown() {
 		if(this._dropdownView){
 			this._dropdownView.close();
 		}
-	},
+	}
 
-	isDropdownVisible: function(){
+	isDropdownVisible(): boolean {
 		return !!this._dropdownView;
-	},
+	}
 
-	_bindToViewEvents: function(){
+	_bindToViewEvents() {
 		this._view
 			.getEventStream()
-			.filter(function(event){
-				return event.eventName === 'click';
-			})
-			.onValue(this, '_toggleDropdownState');
-	},
+			.filter(event => event.eventName === 'click')
+			.onValue(() => {this._toggleDropdownState();});
+	}
 
-	_toggleDropdownState: function(){
+	_toggleDropdownState() {
 		if(this._dropdownView){
 			this._dropdownView.close();
 		}
 		else{
 			this.showDropdown();
 		}
-	},
+	}
 
-	_dropdownClosed: function(){
+	_dropdownClosed() {
 		if(this._view){
 			this._view.deactivate();
 		}
 
 		this._dropdownView = null;
 	}
+}
 
-});
-
-module.exports = DropdownButtonViewController;
+export default (DropdownButtonViewController);

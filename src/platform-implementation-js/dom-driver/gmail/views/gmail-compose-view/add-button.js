@@ -88,7 +88,7 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
 	buttonViewController.getView().addClass('aoO');
-	buttonViewController.getView().getElement().setAttribute('tabindex', 1);
+	buttonViewController.getView().getElement().setAttribute('tabindex', '1');
 
 	var sendButtonElement = gmailComposeView.getSendButton();
 
