@@ -151,6 +151,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 			this._element.setAttribute('aria-label', options.tooltip);
 		}
 		this._element.setAttribute('role', 'button');
+		this._element.setAttribute('tabindex', '0');
 
 		if(options.hasButtonToRight){
 			this._element.classList.add('T-I-Js-IF');
