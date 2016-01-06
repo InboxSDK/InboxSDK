@@ -97,4 +97,4 @@ class DropdownButtonViewController {
 	}
 }
 
-export default (DropdownButtonViewController);
+export default defn(module, DropdownButtonViewController);
