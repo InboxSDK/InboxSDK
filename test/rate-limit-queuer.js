@@ -26,7 +26,7 @@ describe("rateLimitQueuer", function() {
     this.slow();
 
     let x = 5;
-    const fn = rateLimitQueuer(async () => x++, 15, 2);
+    const fn = rateLimitQueuer(async () => x++, 30, 2);
     const t1 = Date.now();
     assert.strictEqual(await fn(), 5);
     const t2 = Date.now();
