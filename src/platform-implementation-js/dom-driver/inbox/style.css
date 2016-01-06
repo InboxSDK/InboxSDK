@@ -16,6 +16,12 @@
   user-select: none;
 }
 
+.inboxsdk__button_iconImg {
+  user-drag: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+}
+
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
   display: inline-block;
   position: relative;

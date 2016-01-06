@@ -45,6 +45,9 @@ div.T-I.inboxsdk__button {
   width: 16px;
   vertical-align: middle;
   margin-top: -2px;
+  user-drag: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .inboxsdk__button_green_inactive {
