@@ -328,6 +328,11 @@ td.gH div.gK span:first-child > img:last-child {
   margin-top: -3px;
 }
 
+/* Message view attachments toolbar */
+.aZi .aZj .asa .inboxsdk__button_iconImg {
+  margin: 0;
+}
+
 body .dw {
   /* Fixes issue where a tall compose window opened over a custom view could be
    * overlapped by Gmail's top bar. Also fixes issue where mole widgets are
