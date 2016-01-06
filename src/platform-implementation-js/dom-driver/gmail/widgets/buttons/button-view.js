@@ -147,6 +147,8 @@ var ButtonView = ud.defn(module, class ButtonView {
 	_createMainElement(options: ButtonViewOptions){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 inboxsdk__button ' + BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
+		this._element.setAttribute('aria-label', options.tooltip);
+		this._element.setAttribute('role', 'button');
 
 		if(options.hasButtonToRight){
 			this._element.classList.add('T-I-Js-IF');

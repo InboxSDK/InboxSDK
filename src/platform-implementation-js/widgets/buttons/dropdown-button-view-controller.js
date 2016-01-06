@@ -20,6 +20,10 @@ class DropdownButtonViewController {
 		this._view = options.buttonView;
 		this._dropdownPositionOptions = options.dropdownPositionOptions;
 
+		this._view.getElement().setAttribute('aria-haspopup', 'true');
+		this._view.getElement().setAttribute('aria-pressed', 'false');
+		this._view.getElement().setAttribute('aria-expanded', 'false');
+
 		this._bindToViewEvents();
 	}
 
@@ -51,6 +55,9 @@ class DropdownButtonViewController {
 		if(this._dropdownShowFunction){
 			this._dropdownShowFunction({dropdown: this._dropdownView});
 		}
+
+		this._view.getElement().setAttribute('aria-pressed', 'true');
+		this._view.getElement().setAttribute('aria-expanded', 'true');
 	}
 
 	hideDropdown() {
@@ -83,8 +90,10 @@ class DropdownButtonViewController {
 		if(this._view){
 			this._view.deactivate();
 		}
-
 		this._dropdownView = null;
+
+		this._view.getElement().setAttribute('aria-pressed', 'false');
+		this._view.getElement().setAttribute('aria-expanded', 'false');
 	}
 }
 
