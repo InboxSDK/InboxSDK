@@ -156,13 +156,15 @@ _.extend(NativeGmailNavItemView.prototype, {
 	},
 
 	_createExpando: function(){
-		var expandoElement = document.createElement('div');
+		const link = this._element.querySelector('a');
+
+		const expandoElement = document.createElement('div');
 		expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
 		expandoElement.setAttribute('role', 'link');
+		expandoElement.title = `Expand ${link ? link.title || link.textContent : ''}`;
 
-		var self = this;
-		expandoElement.addEventListener('click', function(e){
-			self._toggleCollapse();
+		expandoElement.addEventListener('click', e => {
+			this._toggleCollapse();
 			e.stopPropagation();
 			e.preventDefault();
 			e.stopImmediatePropagation();

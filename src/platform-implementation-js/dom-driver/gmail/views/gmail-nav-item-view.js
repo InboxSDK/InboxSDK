@@ -202,7 +202,7 @@ _.extend(GmailNavItemView.prototype, {
 		switch(type){
 			case NAV_ITEM_TYPES.NAVIGATION:
 				if(!nameElement || nameElement.tagName !== 'SPAN'){
-					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<span class="nU n1 inboxsdk__navItem_name">${_.escape(this._name)}</span>`;
+					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<span class="nU n1 inboxsdk__navItem_name" role="link">${_.escape(this._name)}</span>`;
 				}
 			break;
 			case NAV_ITEM_TYPES.MANAGE:
@@ -223,6 +223,9 @@ _.extend(GmailNavItemView.prototype, {
 		var navItemNameElement = this._element.querySelector('.inboxsdk__navItem_name');
 		navItemNameElement.textContent = name;
 		navItemNameElement.setAttribute('title', name);
+		if (this._expandoElement) {
+			this._expandoElement.title = `Expand ${name}`;
+		}
 		this._name = name;
 	},
 
@@ -391,6 +394,7 @@ _.extend(GmailNavItemView.prototype, {
 		this._expandoElement = document.createElement('div');
 		this._expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
 		this._expandoElement.setAttribute('role', 'link');
+		this._expandoElement.title = `Expand ${this._name || ''}`;
 
 		var self = this;
 		this._expandoElement.addEventListener('click', function(e){
