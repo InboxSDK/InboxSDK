@@ -7,7 +7,7 @@ import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view.
 import DropdownView from './dropdown-view';
 
 class DropdownButtonViewController {
-	_view: ButtonView;
+	_view: ?ButtonView;
 	_dropdownShowFunction: ?Function;
 	_dropdownView: ?DropdownView;
 	_DropdownViewDriverClass: Class<any>;
@@ -17,18 +17,21 @@ class DropdownButtonViewController {
 		this._dropdownShowFunction = options.dropdownShowFunction;
 		this._DropdownViewDriverClass = options.dropdownViewDriverClass;
 
-		this._view = options.buttonView;
+		const view = this._view = options.buttonView;
 		this._dropdownPositionOptions = options.dropdownPositionOptions;
 
-		this._view.getElement().setAttribute('aria-haspopup', 'true');
-		this._view.getElement().setAttribute('aria-pressed', 'false');
-		this._view.getElement().setAttribute('aria-expanded', 'false');
+		view.getElement().setAttribute('aria-haspopup', 'true');
+		view.getElement().setAttribute('aria-pressed', 'false');
+		view.getElement().setAttribute('aria-expanded', 'false');
 
 		this._bindToViewEvents();
 	}
 
 	destroy() {
-		this._view.destroy();
+		if (this._view) {
+			this._view.destroy();
+			this._view = null;
+		}
 		if (this._dropdownView) {
 			this._dropdownView.close();
 			this._dropdownView = null;
@@ -36,6 +39,7 @@ class DropdownButtonViewController {
 	}
 
 	getView(): ButtonView {
+		if (!this._view) throw new Error("Already destroyed");
 		return this._view;
 	}
 
@@ -44,8 +48,10 @@ class DropdownButtonViewController {
 	}
 
 	showDropdown() {
-		this._view.activate();
-		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), this._view.getElement(), null);
+		const view = this._view;
+		if (!view) throw new Error("Already destroyed");
+		view.activate();
+		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), view.getElement(), null);
 		if (this._dropdownPositionOptions) {
 			dropdownView.setPlacementOptions(this._dropdownPositionOptions);
 		}
@@ -56,8 +62,8 @@ class DropdownButtonViewController {
 			this._dropdownShowFunction({dropdown: this._dropdownView});
 		}
 
-		this._view.getElement().setAttribute('aria-pressed', 'true');
-		this._view.getElement().setAttribute('aria-expanded', 'true');
+		view.getElement().setAttribute('aria-pressed', 'true');
+		view.getElement().setAttribute('aria-expanded', 'true');
 	}
 
 	hideDropdown() {
@@ -71,6 +77,7 @@ class DropdownButtonViewController {
 	}
 
 	_bindToViewEvents() {
+		if (!this._view) throw new Error("Already destroyed");
 		this._view
 			.getEventStream()
 			.filter(event => event.eventName === 'click')
@@ -87,13 +94,14 @@ class DropdownButtonViewController {
 	}
 
 	_dropdownClosed() {
-		if(this._view){
-			this._view.deactivate();
-		}
-		this._dropdownView = null;
+		const view = this._view;
+		if (view) {
+			view.deactivate();
+			this._dropdownView = null;
 
-		this._view.getElement().setAttribute('aria-pressed', 'false');
-		this._view.getElement().setAttribute('aria-expanded', 'false');
+			view.getElement().setAttribute('aria-pressed', 'false');
+			view.getElement().setAttribute('aria-expanded', 'false');
+		}
 	}
 }
 
