@@ -2,12 +2,14 @@
 
 import _ from 'lodash';
 import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
 import {defn} from 'ud';
 import type GmailDriver from '../gmail-driver';
 
+import fromEventTargetCapture from '../../../lib/kefir-from-event-target-capture';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
@@ -245,20 +247,31 @@ class GmailAttachmentCardView {
 	}
 
 	_addHoverEvents(){
-		var self = this;
-		this._element.addEventListener(
-			'mouseenter',
-			function(){
-				self._element.classList.add('aZp');
-			}
-		);
+		Kefir.merge([
+				Kefir.fromEvents(this._element, 'mouseenter'),
+				fromEventTargetCapture(this._element, 'focus')
+			])
+			.onValue(() => {
+				this._element.classList.add('aZp');
+			});
 
-		this._element.addEventListener(
-			'mouseleave',
-			function(){
-				self._element.classList.remove('aZp');
-			}
-		);
+		Kefir.merge([
+				Kefir.fromEvents(this._element, 'mouseleave'),
+				fromEventTargetCapture(this._element, 'blur')
+			])
+			.onValue(() => {
+				this._element.classList.remove('aZp');
+			});
+
+		const anchor = this._element.querySelector('a');
+		Kefir.fromEvents(anchor, 'focus')
+			.onValue(() => {
+				anchor.classList.add('a1U');
+			});
+		Kefir.fromEvents(anchor, 'blur')
+			.onValue(() => {
+				anchor.classList.remove('a1U');
+			});
 	}
 
 	_addDownloadButton(options: Object) {
@@ -349,5 +362,4 @@ class GmailAttachmentCardView {
 	}
 }
 
-// export default defn(module, GmailAttachmentCardView);
-export default GmailAttachmentCardView;
+export default defn(module, GmailAttachmentCardView);
