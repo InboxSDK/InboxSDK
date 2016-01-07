@@ -20,7 +20,7 @@
     "description" : "Title of the onboarding tooltip"
   },
   "tooltip_subtitle" : {
-    "message" : "Klikk på ikonet for å sende enhver fil fra Dropbox",
+    "message" : "Klikk på ikonet for å sende en fil fra Dropbox",
     "description" : "Subtitle of the onboarding tooltip"
   },
   "tooltip_button" : {
@@ -29,7 +29,15 @@
   },
   "saver_button_tooltip" : {
     "message" : "Lagre til Dropbox",
-    "description" : "Button to add a link directly to Dropbox"
+    "description" : "Button to save an attachment or a link to Dropbox"
+  },
+  "saver_save_all_button_tooltip" : {
+    "message" : "Lagre alle filer i Dropbox",
+    "description" : "Button to save all attachments and links to Dropbox"
+  },
+  "seperator" : {
+    "message" : ", ",
+    "description" : "List seperator, used to seperate a list of filenames, etc"
   },
   "saver_error" : {
     "message" : "Kunne ikke lagre filen i Dropbox. Prøv igjen.",
@@ -58,6 +66,10 @@
   "tooltip_dismiss" : {
     "message" : "Ikke nå",
     "description" : "Text for the dismiss button in onboarding tooltip"
+  },
+  "saver_in_progress" : {
+    "message" : "Lagrer i Dropboxen din ...",
+    "description" : "We are currently saving attachment to dropbox, and it is still in progress."
   },
   "saver_success" : {
     "message" : "Vedlegget ble lagret i Dropbox.",

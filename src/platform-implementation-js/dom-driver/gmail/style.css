@@ -45,6 +45,9 @@ div.T-I.inboxsdk__button {
   width: 16px;
   vertical-align: middle;
   margin-top: -2px;
+  user-drag: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .inboxsdk__button_green_inactive {
@@ -326,6 +329,11 @@ td.gH div.gK span:first-child > img:last-child {
   display: inline-block;
   vertical-align: middle;
   margin-top: -3px;
+}
+
+/* Message view attachments toolbar */
+.aZi .aZj .asa .inboxsdk__button_iconImg {
+  margin: 0;
 }
 
 body .dw {

@@ -1,12 +1,15 @@
+/* @flow */
+
 import _ from 'lodash';
 import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
 import {defn} from 'ud';
+import type GmailDriver from '../gmail-driver';
 
-import AttachmentCardViewDriver from '../../../driver-interfaces/attachment-card-view-driver';
-
+import fromEventTargetCapture from '../../../lib/kefir-from-event-target-capture';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
@@ -14,36 +17,41 @@ import simulateClick from '../../../lib/dom/simulate-click';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
-function GmailAttachmentCardView(options, driver) {
-	AttachmentCardViewDriver.call(this);
+class GmailAttachmentCardView {
+	_element: HTMLElement;
+	_driver: GmailDriver;
+	_cachedType: any;
+	_eventStream: Bacon.Bus;
 
-	this._eventStream = new Bacon.Bus();
-	this._driver = driver;
+	constructor(options: Object, driver: GmailDriver) {
+		this._eventStream = new Bacon.Bus();
+		this._driver = driver;
 
-	if(options.element){
-		this._element = options.element;
+		if(options.element){
+			this._element = options.element;
+		}
+		else{
+			this._createNewElement(options);
+		}
 	}
-	else{
-		this._createNewElement(options);
+
+	destroy() {
+		this._eventStream.end();
 	}
-}
 
-util.inherits(GmailAttachmentCardView, AttachmentCardViewDriver);
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-_.assign(GmailAttachmentCardView.prototype, {
+	getEventStream(): Bacon.Observable {
+		return this._eventStream;
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_driver', destroy: false},
-		{name: '_cachedType', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
-
-	_isStandardAttachment() {
+	_isStandardAttachment(): boolean {
 		return this.getAttachmentType() === 'FILE';
-	},
+	}
 
-	getAttachmentType() {
+	getAttachmentType(): string {
 		if (this._cachedType) {
 			return this._cachedType;
 		}
@@ -52,9 +60,9 @@ _.assign(GmailAttachmentCardView.prototype, {
 			this._cachedType = type;
 		}
 		return type;
-	},
+	}
 
-	_readAttachmentType() {
+	_readAttachmentType(): string {
 		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
 			return 'CUSTOM';
 		}
@@ -71,9 +79,9 @@ _.assign(GmailAttachmentCardView.prototype, {
 			return 'DRIVE';
 		}
 		return 'UNKNOWN';
-	},
+	}
 
-	addButton: function(options){
+	addButton(options: Object) {
 		var buttonView = new ButtonView({
 			iconUrl: options.iconUrl,
 			tooltip: options.tooltip
@@ -89,27 +97,28 @@ _.assign(GmailAttachmentCardView.prototype, {
 		});
 
 		this._addButton(buttonView);
-	},
+	}
 
-	getTitle() {
+	getTitle(): string {
 		const title = this._element.querySelector('span .aV3');
 		return title ? title.textContent : "";
-	},
+	}
 
-	_getDownloadLink() {
+	_getDownloadLink(): ?string {
 		const download_url = this._element.getAttribute('download_url');
 		if (download_url) {
 			const m = /:(https:\/\/[^:]+)/.exec(download_url);
 			return m ? m[1] : null;
 		}
 		// download_url attribute may not be available yet. Use the a link href.
-		const firstChild = this._element.firstElementChild;
+		const firstChild: ?HTMLAnchorElement = (this._element.firstElementChild: any);
+		if (!firstChild) throw new Error("Failed to find link");
 		if (firstChild.tagName !== 'A') return null;
 		return firstChild.href;
-	},
+	}
 
 	// Resolves the short-lived cookie-less download URL
-	getDownloadURL() {
+	getDownloadURL(): Promise<?string> {
 		return RSVP.Promise.resolve().then(() => {
 			if (this._isStandardAttachment()) {
 				return waitFor(() => this._getDownloadLink()).then(downloadUrl => {
@@ -122,13 +131,13 @@ _.assign(GmailAttachmentCardView.prototype, {
 					downloadButton.getAttribute('data-inboxsdk-download-url') : null;
 			}
 		});
-	},
+	}
 
-	_extractFileNameFromElement: function(){
+	_extractFileNameFromElement(): string {
 		return this._element.querySelector('.aQA > span').textContent;
-	},
+	}
 
-	_createNewElement: function(options){
+	_createNewElement(options: Object) {
 		this._element = document.createElement('span');
 		this._element.classList.add('aZo');
 		this._element.classList.add('inboxsdk__attachmentCard');
@@ -184,7 +193,7 @@ _.assign(GmailAttachmentCardView.prototype, {
 
 		this._element.innerHTML = htmlArray.join('');
 
-		this._element.children[0].href = options.previewUrl;
+		(this._element.children[0]:any).href = options.previewUrl;
 
 		if(options.mimeType && options.mimeType.split('/')[0] === 'image'){
 			this._element.children[0].classList.add('aZI');
@@ -228,32 +237,44 @@ _.assign(GmailAttachmentCardView.prototype, {
 				var iconDiv = document.createElement('div');
 				iconDiv.classList.add('aYv');
 				iconDiv.innerHTML = '<img class="aZG aYw" src="' + options.failoverPreviewIconUrl + '">';
-				previewThumbnailUrlImage.insertAdjacentElement('afterend', iconDiv);
+				const parent = previewThumbnailUrlImage.parentElement;
+				if (!parent) throw new Error("Could not find parent element");
+				parent.insertBefore(iconDiv, previewThumbnailUrlImage.nextElementSibling);
 
 				previewThumbnailUrlImage.remove();
 			};
 		}
-	},
+	}
 
-	_addHoverEvents: function(){
-		var self = this;
-		this._element.addEventListener(
-			'mouseenter',
-			function(){
-				self._element.classList.add('aZp');
-			}
-		);
+	_addHoverEvents(){
+		Kefir.merge([
+				Kefir.fromEvents(this._element, 'mouseenter'),
+				fromEventTargetCapture(this._element, 'focus')
+			])
+			.onValue(() => {
+				this._element.classList.add('aZp');
+			});
 
-		this._element.addEventListener(
-			'mouseleave',
-			function(){
-				self._element.classList.remove('aZp');
-			}
-		);
+		Kefir.merge([
+				Kefir.fromEvents(this._element, 'mouseleave'),
+				fromEventTargetCapture(this._element, 'blur')
+			])
+			.onValue(() => {
+				this._element.classList.remove('aZp');
+			});
 
-	},
+		const anchor = this._element.querySelector('a');
+		Kefir.fromEvents(anchor, 'focus')
+			.onValue(() => {
+				anchor.classList.add('a1U');
+			});
+		Kefir.fromEvents(anchor, 'blur')
+			.onValue(() => {
+				anchor.classList.remove('a1U');
+			});
+	}
 
-	_addDownloadButton: function(options){
+	_addDownloadButton(options: Object) {
 		var buttonView = new ButtonView({
 			tooltip: 'Download',
 			iconClass: 'aSK J-J5-Ji aYr'
@@ -298,9 +319,9 @@ _.assign(GmailAttachmentCardView.prototype, {
 		});
 
 		this._addButton(buttonView);
-	},
+	}
 
-	_addMoreButtons: function(buttonDescriptors){
+	_addMoreButtons(buttonDescriptors: ?Object[]){
 		_.chain(buttonDescriptors)
 			.filter(function(buttonDescriptor){
 				return !buttonDescriptor.downloadUrl;
@@ -315,31 +336,30 @@ _.assign(GmailAttachmentCardView.prototype, {
 				return buttonView;
 			})
 			.each(this._addButton.bind(this)).value();
-	},
+	}
 
-	_addButton: function(buttonView){
+	_addButton(buttonView: ButtonView) {
 		buttonView.addClass('aQv');
 
 		this._getButtonContainerElement().appendChild(buttonView.getElement());
-	},
+	}
 
-	_getPreviewImageUrl: function(){
+	_getPreviewImageUrl(): ?string {
 		var previewImage = this._getPreviewImage();
 		if(!previewImage){
 			return null;
 		}
 
 		return previewImage.src;
-	},
-
-	_getPreviewImage: function(){
-		return this._element.querySelector('img.aQG');
-	},
-
-	_getButtonContainerElement: function(){
-		return this._element.querySelector('.aQw');
 	}
 
-});
+	_getPreviewImage(): HTMLImageElement {
+		return (this._element.querySelector('img.aQG'): any);
+	}
+
+	_getButtonContainerElement(): HTMLElement {
+		return this._element.querySelector('.aQw');
+	}
+}
 
 export default defn(module, GmailAttachmentCardView);
