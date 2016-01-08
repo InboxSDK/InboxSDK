@@ -1,54 +1,52 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var EventEmitter = require('../../lib/safe-event-emitter');
-var RSVP = require('rsvp');
+import _ from 'lodash';
+import EventEmitter from '../../lib/safe-event-emitter';
+import RSVP from 'rsvp';
+import {defn} from 'ud';
+import get from '../../../common/get-or-fail';
+import type {RouteViewDriver} from '../../driver-interfaces/route-view-driver';
 
-
-var membersMap = new WeakMap();
+const membersMap = new WeakMap();
 
 // documented in src/docs/
-var RouteView = function(routeViewDriver){
-	EventEmitter.call(this);
+class RouteView extends EventEmitter {
+	constructor(routeViewDriver: RouteViewDriver) {
+		super();
 
-	var members = {
-		routeID: null,
-		routeType: null,
-		params: null
-	};
-	membersMap.set(this, members);
+		const members = {
+			routeID: (null: ?string),
+			routeType: (null: ?string),
+			params: (null: ?{[ix:string]:string}),
+			routeViewDriver
+		};
+		membersMap.set(this, members);
 
-	members.routeViewDriver = routeViewDriver;
+		_bindToEventStream(routeViewDriver, this);
+	}
 
-	_bindToEventStream(routeViewDriver, this);
-};
-
-RouteView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(RouteView.prototype, {
-
-	getRouteID(){
-		var members = membersMap.get(this);
+	getRouteID(): string {
+		const members = get(membersMap, this);
 
 		if(!members.routeID){
 			members.routeID = members.routeViewDriver.getRouteID();
 		}
 
 		return members.routeID;
-	},
+	}
 
-	getRouteType(){
-		var members = membersMap.get(this);
+	getRouteType(): string {
+		const members = get(membersMap, this);
 
 		if(!members.routeType){
 			members.routeType = members.routeViewDriver.getRouteType();
 		}
 
 		return members.routeType;
-	},
+	}
 
-	getParams(){
-		var members = membersMap.get(this);
+	getParams(): {[ix:string]:string} {
+		const members = get(membersMap, this);
 
 		if(!members.params){
 			members.params = members.routeViewDriver.getParams();
@@ -56,9 +54,7 @@ _.extend(RouteView.prototype, {
 
 		return members.params;
 	}
-
-});
-
+}
 
 function _bindToEventStream(routeViewDriver, routeView){
 	routeViewDriver.getEventStream().onEnd(function(){
@@ -67,4 +63,4 @@ function _bindToEventStream(routeViewDriver, routeView){
 	});
 }
 
-module.exports = RouteView;
+export default defn(module, RouteView);

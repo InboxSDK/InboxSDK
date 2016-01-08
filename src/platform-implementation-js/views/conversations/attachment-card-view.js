@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import {defn} from 'ud';
 import util from 'util';
 import RSVP from 'rsvp';
 import EventEmitter from '../../lib/safe-event-emitter';
@@ -46,4 +47,4 @@ class AttachmentCardView extends EventEmitter {
 	}
 }
 
-export default AttachmentCardView;
+export default defn(module, AttachmentCardView);

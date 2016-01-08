@@ -1,28 +1,27 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var RouteView = require('./route-view');
-
-var membersMap = new WeakMap();
+import _ from 'lodash';
+import {defn} from 'ud';
+import RouteView from './route-view';
+import type {RouteViewDriver} from '../../driver-interfaces/route-view-driver';
+import get from '../../../common/get-or-fail';
 
 // documented in src/docs/
-var CustomRouteView = function(routeViewDriver){
-	RouteView.call(this, routeViewDriver);
+class CustomRouteView extends RouteView {
+	constructor(routeViewDriver: RouteViewDriver) {
+		super(routeViewDriver);
 
-	var members = {};
-	membersMap.set(this, members);
-	members.routeViewDriver = routeViewDriver;
-};
-
-CustomRouteView.prototype = Object.create(RouteView.prototype);
-
-_.extend(CustomRouteView.prototype, {
-
-	getElement(){
-		return membersMap.get(this).routeViewDriver.getCustomViewElement();
+		const members = {routeViewDriver};
+		membersMap.set(this, members);
 	}
 
-});
+	getElement(): HTMLElement {
+		const el = get(membersMap, this).routeViewDriver.getCustomViewElement();
+		if (!el) throw new Error("Should not happen");
+		return el;
+	}
+}
 
+const membersMap: WeakMap<CustomRouteView, {routeViewDriver: RouteViewDriver}> = new WeakMap();
 
-module.exports = CustomRouteView;
+export default defn(module, CustomRouteView);
