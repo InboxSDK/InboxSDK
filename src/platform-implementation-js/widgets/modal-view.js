@@ -9,9 +9,11 @@ import type GmailModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-v
 
 // documented in src/docs/
 class ModalView extends EventEmitter {
+    destroyed: boolean;
     _driver: ?GmailModalViewDriver;
     constructor(options: {modalViewDriver: GmailModalViewDriver}) {
         super();
+        this.destroyed = false;
         this._driver = options.modalViewDriver;
         options.modalViewDriver.getEventStream().filter(event =>
             event.eventName === 'closeClick'
@@ -20,6 +22,7 @@ class ModalView extends EventEmitter {
         });
         options.modalViewDriver.getEventStream().onEnd(() => {
             this._driver = null;
+            this.destroyed = true;
             this.emit('destroy');
         });
     }

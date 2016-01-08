@@ -11,11 +11,14 @@ const membersMap = new WeakMap();
 
 // documented in src/docs/
 class CollapsibleSectionView extends EventEmitter {
+	destroyed: boolean;
+
 	constructor(collapsibleSectionViewDriver: GmailCollapsibleSectionView, driver: Driver) {
 		super();
 		const members = {collapsibleSectionViewDriver};
 		membersMap.set(this, members);
 
+		this.destroyed = false;
 		_bindToEventStream(this, collapsibleSectionViewDriver, driver);
 	}
 
@@ -80,7 +83,10 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 			}
 		});
 
-	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'destroy');
+	collapsibleSectionViewDriver.getEventStream().onEnd(() => {
+		collapsibleSectionView.destroyed = true;
+		collapsibleSectionView.emit('destroy');
+	});
 }
 
 export default defn(module, CollapsibleSectionView);

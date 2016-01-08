@@ -7,12 +7,17 @@ import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-
 
 // documented in src/docs/
 export default class ThreadRowView extends EventEmitter {
+  destroyed: boolean;
   _threadRowViewDriver: GmailThreadRowView;
 
   constructor(threadRowViewDriver: GmailThreadRowView){
     super();
+    this.destroyed = false;
     this._threadRowViewDriver = threadRowViewDriver;
-    this._threadRowViewDriver.getEventStream().onEnd(() => {this.emit('destroy')});
+    this._threadRowViewDriver.getEventStream().onEnd(() => {
+      this.destroyed = true;
+      this.emit('destroy');
+    });
     this._threadRowViewDriver.setUserView(this);
   }
 

@@ -10,6 +10,7 @@ var memberMap = new WeakMap();
 var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
 	EventEmitter.call(this);
 
+	this.destroyed = false;
 	var members = {};
 	memberMap.set(this, members);
 
@@ -73,6 +74,7 @@ _.extend(NavItemView.prototype, {
 			return;
 		}
 
+		this.destroyed = true;
 		this.emit('destroy');
 
 		members.navItemViews.forEach(function(navItemView){

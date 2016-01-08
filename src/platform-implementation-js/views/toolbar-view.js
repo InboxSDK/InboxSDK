@@ -10,13 +10,16 @@
 import EventEmitter from '../lib/safe-event-emitter';
 
 export default class ToolbarView extends EventEmitter {
+	destroyed: boolean;
 	_toolbarViewDriver: ?Object;
 
 	constructor(toolbarViewDriver: Object) {
 		super();
+		this.destroyed = false;
 		this._toolbarViewDriver = toolbarViewDriver;
 
 		toolbarViewDriver.getStopper().onValue(() => {
+			this.destroyed = true;
 			this.emit('destroy');
 			this._toolbarViewDriver = null;
 		});

@@ -20,7 +20,7 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	this._options = options || {};
 
 	this.el = dropdownViewDriver.getContentElement();
-	this.closed = false;
+	this.destroyed = this.closed/*deprecated*/ = false;
 
 	document.body.insertBefore(this._dropdownViewDriver.getContainerElement(), document.body.firstElementChild);
 
@@ -75,8 +75,8 @@ _.assign(DropdownView.prototype, {
 	},
 
 	close() {
-		if (!this.closed) {
-			this.closed = true;
+		if (!this.destroyed) {
+			this.destroyed = this.closed = true;
 			this.emit('destroy');
 			this._dropdownViewDriver.destroy();
 		}

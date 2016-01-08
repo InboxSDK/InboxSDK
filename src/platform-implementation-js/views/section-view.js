@@ -11,11 +11,14 @@ const membersMap = new WeakMap();
 
 // documented in src/docs/
 class SectionView extends EventEmitter {
+	destroyed: boolean;
+
 	constructor(sectionViewDriver: GmailCollapsibleSectionView, driver: Driver) {
 		super();
 		const members = {sectionViewDriver};
 		membersMap.set(this, members);
 
+		this.destroyed = false;
 		_bindToEventStream(this, sectionViewDriver, driver);
 	}
 
@@ -77,7 +80,10 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 			}
 		});
 
-	sectionViewDriver.getEventStream().onEnd(sectionView, 'emit', 'destroy');
+	sectionViewDriver.getEventStream().onEnd(() => {
+		sectionView.destroyed = true;
+		sectionView.emit('destroy');
+	});
 }
 
 export default defn(module, SectionView);
