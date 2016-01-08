@@ -14,7 +14,13 @@ var StatusBarView = /** @lends StatusBarView */{
 	* destroys the status bar
 	* @return {void}
 	*/
-	destroy: function() {}
+	destroy: function() {},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	 * Fires when the status bar is destroyed. This can be triggered by the .destroy method, or if

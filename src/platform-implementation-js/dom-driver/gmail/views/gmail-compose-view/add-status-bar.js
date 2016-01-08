@@ -42,7 +42,9 @@ export default function addStatusBar(gmailComposeView: GmailComposeView, options
 
 	var statusbar = _.assign(new SafeEventEmitter(), {
 		el,
+		destroyed: false,
 		destroy: _.once(() => {
+			statusbar.destroyed = true;
 			statusbar.emit('destroy');
 			(el:any).remove();
 
