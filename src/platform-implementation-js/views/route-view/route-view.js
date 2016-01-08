@@ -11,6 +11,8 @@ const membersMap = new WeakMap();
 
 // documented in src/docs/
 class RouteView extends EventEmitter {
+	destroyed: boolean;
+
 	constructor(routeViewDriver: RouteViewDriver) {
 		super();
 
@@ -22,6 +24,7 @@ class RouteView extends EventEmitter {
 		};
 		membersMap.set(this, members);
 
+		this.destroyed = false;
 		_bindToEventStream(routeViewDriver, this);
 	}
 
@@ -57,7 +60,8 @@ class RouteView extends EventEmitter {
 }
 
 function _bindToEventStream(routeViewDriver, routeView){
-	routeViewDriver.getEventStream().onEnd(function(){
+	routeViewDriver.getEventStream().onEnd(() => {
+		routeView.destroyed = true;
 		routeView.emit('destroy');
 		routeView.removeAllListeners();
 	});

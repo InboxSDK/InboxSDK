@@ -9,6 +9,8 @@ const memberMap = new WeakMap();
 
 // Documented in src/docs/app-toolbar-button-view.js
 export default class AppToolbarButtonView extends EventEmitter {
+	destroyed: boolean;
+
 	constructor(driver: Driver, appToolbarButtonViewDriverPromise: Promise<GmailAppToolbarButtonView>) {
 		super();
 		const members = {
@@ -17,9 +19,11 @@ export default class AppToolbarButtonView extends EventEmitter {
 		};
 		memberMap.set(this, members);
 
+		this.destroyed = false;
 		members.appToolbarButtonViewDriverPromise.then(appToolbarButtonViewDriver => {
 			members.appToolbarButtonViewDriver = appToolbarButtonViewDriver;
 			appToolbarButtonViewDriver.getStopper().onValue(() => {
+				this.destroyed = true;
 				this.emit('destroy');
 			});
 		});
