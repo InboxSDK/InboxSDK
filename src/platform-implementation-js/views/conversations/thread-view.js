@@ -19,6 +19,8 @@ var ThreadView = function(threadViewImplementation, appId, membraneMap){
 	members.appId = appId;
 	members.membraneMap = membraneMap;
 
+	this.destroyed = false;
+
 	_bindToStreamEvents(this, threadViewImplementation);
 };
 
@@ -106,6 +108,7 @@ function logAboutMissingMV(threadViewDriver, messageViewDriver) {
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
 	threadViewImplementation.getEventStream().onEnd(function(){
+		threadView.destroyed = true;
 		threadView.emit('destroy');
 
 		threadView.removeAllListeners();
