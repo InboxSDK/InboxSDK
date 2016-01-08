@@ -17,22 +17,19 @@ var DropdownView = /** @lends DropdownView */ {
 	 * @param  {PositionOptions} options
 	 * @return {void}
 	 */
-	setPlacementOptions: function(options) {
-		Object.assign(this._userPlacementOptions, options);
-		this.emit('_placementOptionsUpdated');
-	},
+	setPlacementOptions: function() {},
 
 	/**
 	 * Closes the dropdown
 	 * @return {void}
 	 */
-	close: function() {
-		if (!this.closed) {
-			this.closed = true;
-			this.emit('destroy');
-			this._dropdownViewDriver.destroy();
-		}
-	}
+	close: function() {},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	 * Fires when this DropdownView instance is closed.

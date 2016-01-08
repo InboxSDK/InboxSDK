@@ -154,6 +154,12 @@ var MessageView = /** @lends MessageView */{
 	*/
 
 	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
+
+	/**
 	 * Fires when the view card is destroyed
 	 * @event MessageView#destroy
 	 */

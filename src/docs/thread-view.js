@@ -49,6 +49,12 @@ var ThreadView = /** @lends ThreadView */ {
 	 */
 
 	/**
+ 	 * This property is set to true once the view is destroyed.
+ 	 * @type {boolean}
+ 	 */
+ 	destroyed: false,
+
+	/**
 	 * Fires when the thread view is no longer visible (i.e. the user navigates away from the thread).
 	 * @event ThreadView#destroy
 	 */

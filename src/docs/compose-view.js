@@ -289,6 +289,12 @@ var ComposeView = /** @lends ComposeView */ {
 	getElement: function(){},
 
 	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
+
+	/**
 	 * Fires when the compose view is closed. This can be triggered by the .close method, the user
 	 * clicking the close or discard buttons, the message being sent, etc.
 	 * @event ComposeView#destroy

@@ -44,7 +44,13 @@ var AttachmentCardView = /** @lends AttachmentCardView */{
 	 * Get the MessageView that this attachment card belongs to.
 	 * @return {MessageView}
 	 */
-	getMessageView: function() {}
+	getMessageView: function() {},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	 * Fires when the view card is destroyed.

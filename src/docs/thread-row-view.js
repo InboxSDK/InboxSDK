@@ -104,9 +104,13 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   * participants on the thread as this information is not visible.
   * @return {Contact[]} the visible contact objects
   */
-  getContacts: function(){
-    return this._threadRowViewDriver.getContacts();
-  }
+  getContacts: function(){},
+
+  /**
+   * This property is set to true once the view is destroyed.
+   * @type {boolean}
+   */
+  destroyed: false,
 
   /**
    * Fires when the thread row is no longer visible.

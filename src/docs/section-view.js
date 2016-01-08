@@ -19,7 +19,13 @@ var SectionView = /** @lends SectionView */ {
 	*/
 	remove: function(){},
 
-	destroy: function(){}
+	destroy: function(){},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	* Fires when the SectionView is no longer visible.
