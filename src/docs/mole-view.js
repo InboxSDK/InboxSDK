@@ -29,7 +29,13 @@ var MoleView = /** @lends MoleView */ {
    * This allows the minimize state to be retrieved.
  	 * @return {boolean}
    */
-  getMinimized: function(){}
+  getMinimized: function(){},
+
+  /**
+   * This property is set to true once the view is destroyed.
+   * @type {boolean}
+   */
+  destroyed: false,
 
   /**
    * Fires when this MoleView instance is closed.

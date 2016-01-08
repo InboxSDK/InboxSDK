@@ -11,6 +11,12 @@ var ContentPanelView = /** @lends ContentPanelView */ {
     remove: function(){},
 
     /**
+     * This property is set to true once the view is destroyed.
+     * @type {boolean}
+     */
+    destroyed: false,
+
+    /**
     * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent
     * times if the panel is presented in a tabbed interface and the ContentPanels tab is selected.
     * @event ContentPanelView#activate

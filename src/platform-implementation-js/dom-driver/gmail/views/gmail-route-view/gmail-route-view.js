@@ -141,11 +141,11 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return routeParams;
 	}
 
-	addCollapsibleSection(sectionDescriptorProperty: Object, groupOrderHint: any): GmailCollapsibleSectionView {
+	addCollapsibleSection(sectionDescriptorProperty: Bacon.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
 	}
 
-	addSection(sectionDescriptorProperty: Object, groupOrderHint: any): GmailCollapsibleSectionView {
+	addSection(sectionDescriptorProperty: Bacon.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, false);
 	}
 

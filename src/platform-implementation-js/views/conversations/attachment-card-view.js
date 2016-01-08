@@ -1,41 +1,50 @@
+/* @flow */
+
 import _ from 'lodash';
+import {defn} from 'ud';
 import util from 'util';
 import RSVP from 'rsvp';
 import EventEmitter from '../../lib/safe-event-emitter';
 
+import type MessageView from './message-view';
+import type GmailAttachmentCardView from '../../dom-driver/gmail/views/gmail-attachment-card-view'
+
 // documented in src/docs/
-function AttachmentCardView(attachmentCardImplementation, messageView) {
-	EventEmitter.call(this);
+class AttachmentCardView extends EventEmitter {
+	_messageView: MessageView;
+	_attachmentCardImplementation: GmailAttachmentCardView;
+	destroyed: boolean;
 
-	this._messageView = messageView;
-	this._attachmentCardImplementation = attachmentCardImplementation;
-	this._attachmentCardImplementation.getEventStream().onEnd(this, 'emit', 'destroy');
-}
-
-util.inherits(AttachmentCardView, EventEmitter);
-
-_.assign(AttachmentCardView.prototype, {
-
-	getAttachmentType(){
-		return this._attachmentCardImplementation.getAttachmentType();
-	},
-
-	addButton(buttonOptions){
-		this._attachmentCardImplementation.addButton(buttonOptions);
-	},
-
-	getTitle() {
-		return this._attachmentCardImplementation.getTitle();
-	},
-
-	getDownloadURL() {
-		return this._attachmentCardImplementation.getDownloadURL();
-	},
-
-	getMessageView() {
-		return this._messageView;
+	constructor(attachmentCardImplementation: GmailAttachmentCardView, messageView: MessageView) {
+		super();
+		this.destroyed = false;
+		this._messageView = messageView;
+		this._attachmentCardImplementation = attachmentCardImplementation;
+		this._attachmentCardImplementation.getEventStream().onEnd(() => {
+			this.destroyed = true;
+			this.emit('destroy');
+		});
 	}
 
-});
+	getAttachmentType(): string {
+		return this._attachmentCardImplementation.getAttachmentType();
+	}
 
-module.exports = AttachmentCardView;
+	addButton(buttonOptions: Object) {
+		this._attachmentCardImplementation.addButton(buttonOptions);
+	}
+
+	getTitle(): string {
+		return this._attachmentCardImplementation.getTitle();
+	}
+
+	getDownloadURL(): Promise<?string> {
+		return this._attachmentCardImplementation.getDownloadURL();
+	}
+
+	getMessageView(): MessageView {
+		return this._messageView;
+	}
+}
+
+export default defn(module, AttachmentCardView);

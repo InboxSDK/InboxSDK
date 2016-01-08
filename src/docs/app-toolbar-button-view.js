@@ -21,5 +21,16 @@ var AppToolbarButtonView = /** @lends AppToolbarButtonView */ {
 	*	Remove the app toolbar button from Gmail/Inbox
 	* @return {void}
 	*/
-	remove: function(){}
+	remove: function(){},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
+
+	/**
+	 * Fires when this view has been removed.
+	 * @event AppToolbarButtonView#destroy
+	 */
 };

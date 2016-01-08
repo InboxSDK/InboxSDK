@@ -26,7 +26,13 @@ var CollapsibleSectionView = /** @lends CollapsibleSectionView */ {
 	*/
 	remove: function(){},
 
-	destroy: function(){}
+	destroy: function(){},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	* Fires when the CollapsibleSectionView is no longer visible.

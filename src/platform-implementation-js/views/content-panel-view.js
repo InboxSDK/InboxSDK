@@ -5,6 +5,7 @@ var EventEmitter = require('../lib/safe-event-emitter');
 var ContentPanelView = function(contentPanelViewImplementation){
     EventEmitter.call(this);
 
+    this.destroyed = false;
     this._contentPanelViewImplementation = contentPanelViewImplementation;
     this._bindToStreamEvents();
 };
@@ -19,7 +20,10 @@ _.extend(ContentPanelView.prototype, {
 
     _bindToStreamEvents(){
         this._contentPanelViewImplementation.getEventStream().map('.eventName').onValue(this, 'emit');
-        this._contentPanelViewImplementation.getEventStream().onEnd(this, 'emit', 'destroy');
+        this._contentPanelViewImplementation.getEventStream().onEnd(() => {
+            this.destroyed = true;
+            this.emit('destroy');
+        });
     }
 
 });

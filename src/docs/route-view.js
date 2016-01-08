@@ -26,7 +26,13 @@ var RouteView = /** @lends RouteView */{
 	 * Get the URL parameters of this RouteView instance
 	 * @return {string[]}
 	 */
-	getParams: function(){}
+	getParams: function(){},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
 
 	/**
 	* Fires when this RouteView instance is navigated away from

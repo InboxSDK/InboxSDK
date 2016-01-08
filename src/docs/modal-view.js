@@ -15,6 +15,12 @@ var ModalView = /** @lends ModalView */{
     close: function(){},
 
     /**
+     * This property is set to true once the view is destroyed.
+     * @type {boolean}
+     */
+    destroyed: false,
+
+    /**
      * Fires when this ModalView instance is closed.
      * @event ModalView#destroy
      */

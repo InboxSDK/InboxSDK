@@ -1,45 +1,41 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
+/* @flow */
 
-var SectionView = require('./section-view');
+import _ from 'lodash';
+import {defn} from 'ud';
+import RSVP from 'rsvp';
+import EventEmitter from '../lib/safe-event-emitter';
+import type {Driver} from '../driver-interfaces/driver';
+import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
 
-var membersMap = new WeakMap();
+const membersMap = new WeakMap();
 
 // documented in src/docs/
-var CollapsibleSectionView = function(collapsibleSectionViewDriver, driver){
-	var members = {};
-	membersMap.set(this, members);
-	members.collapsibleSectionViewDriver = collapsibleSectionViewDriver;
+class CollapsibleSectionView extends EventEmitter {
+	destroyed: boolean;
 
-	_bindToEventStream(this, collapsibleSectionViewDriver, driver);
-};
+	constructor(collapsibleSectionViewDriver: GmailCollapsibleSectionView, driver: Driver) {
+		super();
+		const members = {collapsibleSectionViewDriver};
+		membersMap.set(this, members);
 
-CollapsibleSectionView.prototype = Object.create(SectionView.prototype);
+		this.destroyed = false;
+		_bindToEventStream(this, collapsibleSectionViewDriver, driver);
+	}
 
-_.extend(CollapsibleSectionView.prototype, {
-
-	setCollapsed(value){
+	setCollapsed(value: boolean) {
 		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
-	},
+	}
 
 	remove(){
 		this.destroy();
-	},
-
-	destroy(){
-		if(!membersMap.has(this)){
-			return;
-		}
-
-		var members = membersMap.get(this);
-
-		members.collapsibleSectionViewDriver.destroy();
-
-		this.removeAllListeners();
 	}
 
-});
-
+	destroy(){
+		const members = membersMap.get(this);
+		members.collapsibleSectionViewDriver.destroy();
+		this.removeAllListeners();
+	}
+}
 
 function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver, driver){
 	collapsibleSectionViewDriver
@@ -87,7 +83,10 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 			}
 		});
 
-	collapsibleSectionViewDriver.getEventStream().onEnd(collapsibleSectionView, 'emit', 'destroy');
+	collapsibleSectionViewDriver.getEventStream().onEnd(() => {
+		collapsibleSectionView.destroyed = true;
+		collapsibleSectionView.emit('destroy');
+	});
 }
 
-module.exports = CollapsibleSectionView;
+export default defn(module, CollapsibleSectionView);

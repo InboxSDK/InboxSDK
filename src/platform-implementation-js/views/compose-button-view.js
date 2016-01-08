@@ -14,8 +14,11 @@ export type TooltipDescriptor = {
 };
 
 export default class ComposeButtonView extends EventEmitter {
+	destroyed: boolean;
+
 	constructor(optionsPromise: Promise<?Object>, composeViewDriver: ComposeViewDriver) {
 		super();
+		this.destroyed = false;
 		var members = {optionsPromise, composeViewDriver};
 		memberMap.set(this, members);
 
@@ -58,5 +61,6 @@ var memberMap: WeakMap<ComposeButtonView, {
 }> = new WeakMap();
 
 function _destroy(composeButtonViewInstance: ComposeButtonView) {
+	composeButtonViewInstance.destroyed = true;
 	composeButtonViewInstance.emit('destroy');
 }

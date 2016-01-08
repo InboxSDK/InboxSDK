@@ -15,6 +15,7 @@ var memberMap = ud.defonce(module, ()=>new WeakMap());
 var ComposeView = function(driver, composeViewImplementation, appId, composeViewStream) {
 	EventEmitter.call(this);
 
+	this.destroyed = false;
 	var members = {
 		driver: driver,
 		composeViewImplementation: composeViewImplementation,
@@ -22,8 +23,6 @@ var ComposeView = function(driver, composeViewImplementation, appId, composeView
 		composeViewStream: composeViewStream
 	};
 	memberMap.set(this, members);
-
-	var self = this;
 
 	this.on('newListener', function(eventName) {
 		if (eventName === 'close') {
@@ -34,12 +33,12 @@ var ComposeView = function(driver, composeViewImplementation, appId, composeView
 		}
 	});
 
-	members.composeViewImplementation.getEventStream().onValue(function(event){
-		self.emit(event.eventName, event.data);
-	});
-
-	members.composeViewImplementation.getStopper().onValue(function(){
-		self.emit('close'); /* TODO: deprecated */
+	members.composeViewImplementation.getEventStream().onValue(event => {
+		if (event.eventName === 'destroy') {
+			this.destroyed = true;
+			this.emit('close'); /* TODO: deprecated */
+		}
+		this.emit(event.eventName, event.data);
 	});
 };
 

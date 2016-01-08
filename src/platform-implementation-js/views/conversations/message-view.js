@@ -17,6 +17,8 @@ var MessageView = function(messageViewImplementation, appId, membraneMap, Conver
 	members.Conversations = Conversations;
 	members.driver = driver;
 
+	this.destroyed = false;
+
 	_bindToEventStream(this, members, messageViewImplementation.getEventStream());
 };
 
@@ -142,6 +144,7 @@ _.extend(MessageView.prototype, {
 
 function _bindToEventStream(messageView, members, stream){
 	stream.onEnd(function(){
+		messageView.destroyed = true;
 		messageView.emit('destroy');
 
 		messageView.removeAllListeners();

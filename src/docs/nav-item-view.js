@@ -37,6 +37,17 @@ var NavItemView = /** @lends NavItemView */ {
 	* @param {boolean} collapseValue - whether to collapse or uncollapse
 	* @return {void}
 	*/
-	setCollapsed: function(){}
+	setCollapsed: function(){},
+
+	/**
+	 * This property is set to true once the view is destroyed.
+	 * @type {boolean}
+	 */
+	destroyed: false,
+
+	/**
+	 * Fires when this view is destroyed.
+	 * @event NavItemView#destroy
+	 */
 
 };

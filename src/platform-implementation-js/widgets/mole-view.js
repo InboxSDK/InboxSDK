@@ -13,6 +13,7 @@ var memberMap = new WeakMap();
 function MoleView(options) {
   EventEmitter.call(this);
 
+  this.destroyed = false;
   var members = {
     driver: options.moleViewDriver
   };
@@ -22,6 +23,7 @@ function MoleView(options) {
     this.emit(e.eventName, e.detail);
   });
   members.driver.getEventStream().onEnd(() => {
+    this.destroyed = true;
     this.emit('destroy');
   });
 }
