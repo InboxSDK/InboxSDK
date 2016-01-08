@@ -53,37 +53,37 @@ describe("rateLimitQueuer", function() {
     this.slow();
 
     let x = 5;
-    const fn = rateLimitQueuer(async () => x++, 15, 2);
+    const fn = rateLimitQueuer(async () => x++, 60, 2);
 
     const start = Date.now();
     await Promise.all([
       fn().then(r => {
         assert.strictEqual(r, 5);
-        assert(Date.now() - start < 10);
+        assert(Date.now() - start < 20);
       }),
       fn().then(r => {
         assert.strictEqual(r, 6);
-        assert(Date.now() - start < 10);
+        assert(Date.now() - start < 20);
       }),
 
       fn().then(r => {
         assert.strictEqual(r, 7);
-        assert(Date.now() - start >= 10);
-        assert(Date.now() - start < 25);
+        assert(Date.now() - start >= 50);
+        assert(Date.now() - start < 100);
       }),
       fn().then(r => {
         assert.strictEqual(r, 8);
-        assert(Date.now() - start >= 10);
-        assert(Date.now() - start < 25);
+        assert(Date.now() - start >= 50);
+        assert(Date.now() - start < 100);
       }),
 
       fn().then(r => {
         assert.strictEqual(r, 9);
-        assert(Date.now() - start >= 25);
+        assert(Date.now() - start >= 100);
       }),
       delay(15).then(() => fn()).then(r => {
         assert.strictEqual(r, 10);
-        assert(Date.now() - start >= 25);
+        assert(Date.now() - start >= 100);
       })
     ]);
   });
