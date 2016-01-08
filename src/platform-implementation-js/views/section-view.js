@@ -1,42 +1,34 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
+/* @flow */
 
-var EventEmitter = require('../lib/safe-event-emitter');
+import _ from 'lodash';
+import {defn} from 'ud';
+import RSVP from 'rsvp';
+import EventEmitter from '../lib/safe-event-emitter';
+import type {Driver} from '../driver-interfaces/driver';
+import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
 
-var membersMap = new WeakMap();
+const membersMap = new WeakMap();
 
 // documented in src/docs/
-var SectionView = function(sectionViewDriver, driver){
-	EventEmitter.call(this);
+class SectionView extends EventEmitter {
+	constructor(sectionViewDriver: GmailCollapsibleSectionView, driver: Driver) {
+		super();
+		const members = {sectionViewDriver};
+		membersMap.set(this, members);
 
-	var members = {};
-	membersMap.set(this, members);
-	members.sectionViewDriver = sectionViewDriver;
-
-	_bindToEventStream(this, sectionViewDriver, driver);
-};
-
-SectionView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(SectionView.prototype, {
+		_bindToEventStream(this, sectionViewDriver, driver);
+	}
 
 	remove(){
 		this.destroy();
-	},
-
-	destroy(){
-		if(!membersMap.has(this)){
-			return;
-		}
-
-		var members = membersMap.get(this);
-
-		members.sectionViewDriver.destroy();
-
-		this.removeAllListeners();
 	}
 
-});
+	destroy(){
+		const members = membersMap.get(this);
+		members.sectionViewDriver.destroy();
+		this.removeAllListeners();
+	}
+}
 
 
 function _bindToEventStream(sectionView, sectionViewDriver, driver){
@@ -88,4 +80,4 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 	sectionViewDriver.getEventStream().onEnd(sectionView, 'emit', 'destroy');
 }
 
-module.exports = SectionView;
+export default defn(module, SectionView);
