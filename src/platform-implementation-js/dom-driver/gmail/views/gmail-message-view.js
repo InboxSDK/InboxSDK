@@ -11,6 +11,7 @@ import GmailAttachmentCardView from './gmail-attachment-card-view';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
+import extractContactFromString from '../../../lib/extract-contact-from-string';
 
 const Kefir = require('kefir');
 const kefirCast = require('kefir-cast');
@@ -393,7 +394,8 @@ _.extend(GmailMessageView.prototype, {
 				 	return element && element.getAttribute('email');
 				 })
 				 .map(function(element){
-				 	var addressInformation = _extractContactInformation(element);
+				 	var addressInformation = _extractContactInformation(element, self._element);
+
 				 	var contactType = null;
 
 					if(!self._element.classList.contains('h7')){
@@ -407,6 +409,7 @@ _.extend(GmailMessageView.prototype, {
 							contactType = 'recipient';
 						}
 					}
+
 
 				 	return {
 				 		eventName: 'contactHover',
@@ -438,11 +441,37 @@ _.extend(GmailMessageView.prototype, {
 
 });
 
-function _extractContactInformation(span){
-	return {
+function _extractContactInformation(span, messageElement){
+	const contact = {
 		name: span.getAttribute('name'),
 		emailAddress: span.getAttribute('email')
 	};
+
+	const menuButtonElement = messageElement.querySelector('.ajy[aria-haspopup=true]');
+	if(menuButtonElement){
+		simulateClick(menuButtonElement);
+
+		const nameSpans = document.querySelectorAll('.ajC [email]');
+		let foundNameSpan;
+		for(let ii=0; ii<nameSpans.length; ii++){
+			const nameSpan = nameSpans[ii];
+			if(nameSpan.getAttribute('email') === contact.emailAddress){
+				foundNameSpan = nameSpan;
+				break;
+			}
+		}
+
+		if(foundNameSpan){
+			const stringContact = extractContactFromString(foundNameSpan.textContent);
+			if(contact.emailAddress === stringContact.emailAddress){
+				contact.name = stringContact.name || contact.name;
+			}
+		}
+
+		simulateClick(menuButtonElement);
+	}
+
+	return contact;
 }
 
 module.exports = GmailMessageView;
