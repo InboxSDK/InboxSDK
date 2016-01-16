@@ -11,7 +11,7 @@ import GmailAttachmentCardView from './gmail-attachment-card-view';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
-import extractContactFromString from '../../../lib/extract-contact-from-string';
+import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
 
 const Kefir = require('kefir');
 const kefirCast = require('kefir-cast');
@@ -87,19 +87,19 @@ _.extend(GmailMessageView.prototype, {
 
 	getSender: function(){
 		var senderSpan = this._element.querySelector('h3.iw span[email]');
-		return {
+		return this._getUpdatedContact({
 			name: senderSpan.getAttribute('name'),
 			emailAddress: senderSpan.getAttribute('email')
-		};
+		});
 	},
 
 	getRecipients: function(){
 		var receipientSpans = this._element.querySelectorAll('.hb span[email]');
-		return _.map(receipientSpans, function(span){
-			return {
+		return _.map(receipientSpans, (span) => {
+			return this._getUpdatedContact({
 				name: span.getAttribute('name'),
 				emailAddress: span.getAttribute('email')
-			};
+			});
 		});
 	},
 
@@ -394,7 +394,7 @@ _.extend(GmailMessageView.prototype, {
 				 	return element && element.getAttribute('email');
 				 })
 				 .map(function(element){
-				 	var addressInformation = _extractContactInformation(element, self._element);
+				 	var addressInformation = self._getUpdatedContact(_extractContactInformation(element, self._element));
 
 				 	var contactType = null;
 
@@ -437,41 +437,52 @@ _.extend(GmailMessageView.prototype, {
 		beforeElement.parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);
 
 		return gmailAttachmentAreaView;
+	},
+
+	_getUpdatedContact: function(inContact){
+		const contact = _.clone(inContact);
+
+		const menuButtonElement = this._element.querySelector('.ajy[aria-haspopup=true]');
+		if(menuButtonElement){
+			let modalContactName = this._getModalContactName(contact.emailAddress);
+			if(!modalContactName){
+				//the modal that contains this email address is not visible, so we need to bring the modal up
+				simulateClick(menuButtonElement);
+				modalContactName = this._getModalContactName(contact.emailAddress);
+				simulateClick(menuButtonElement);
+			}
+
+			contact.name = modalContactName || contact.name;
+		}
+
+		return contact;
+	},
+
+	_getModalContactName(emailAddress) {
+		const nameSpans = document.querySelectorAll('.ajC [email]');
+		let foundNameSpan = _.find(nameSpans, span => span.getAttribute('email') === emailAddress);
+		if(foundNameSpan){
+			if(foundNameSpan.getAttribute('name')){
+				return foundNameSpan.getAttribute('name');
+			}
+			else{
+				const stringContact = extractContactFromEmailContactString(foundNameSpan.textContent);
+				if(emailAddress === stringContact.emailAddress){
+					return stringContact.name;
+				}
+			}
+		}
+
+		return null;
 	}
 
 });
 
 function _extractContactInformation(span, messageElement){
-	const contact = {
+	return {
 		name: span.getAttribute('name'),
 		emailAddress: span.getAttribute('email')
 	};
-
-	const menuButtonElement = messageElement.querySelector('.ajy[aria-haspopup=true]');
-	if(menuButtonElement){
-		simulateClick(menuButtonElement);
-
-		const nameSpans = document.querySelectorAll('.ajC [email]');
-		let foundNameSpan;
-		for(let ii=0; ii<nameSpans.length; ii++){
-			const nameSpan = nameSpans[ii];
-			if(nameSpan.getAttribute('email') === contact.emailAddress){
-				foundNameSpan = nameSpan;
-				break;
-			}
-		}
-
-		if(foundNameSpan){
-			const stringContact = extractContactFromString(foundNameSpan.textContent);
-			if(contact.emailAddress === stringContact.emailAddress){
-				contact.name = stringContact.name || contact.name;
-			}
-		}
-
-		simulateClick(menuButtonElement);
-	}
-
-	return contact;
 }
 
 module.exports = GmailMessageView;

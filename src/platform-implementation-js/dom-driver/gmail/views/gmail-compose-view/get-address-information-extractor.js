@@ -1,7 +1,7 @@
 /* @flow */
 
 import Logger from '../../../../lib/logger';
-import extractContactFromString from '../../../../lib/extract-contact-from-string';
+import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
 export default function getAddressInformationExtractor(addressType: string): (node: HTMLElement) => ?Contact {
 	return function(node: HTMLElement): ?Contact {
@@ -13,7 +13,7 @@ export default function getAddressInformationExtractor(addressType: string): (no
 		if(contactNode){
 			var contactInfoString = (contactNode: any).value;
 
-			return extractContactFromString(contactInfoString);			
+			return extractContactFromEmailContactString(contactInfoString);			
 		}
 		else{
 			Logger.error(new Error('contactNode cant be found'), {
