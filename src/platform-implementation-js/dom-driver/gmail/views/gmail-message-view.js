@@ -394,7 +394,7 @@ _.extend(GmailMessageView.prototype, {
 				 	return element && element.getAttribute('email');
 				 })
 				 .map(function(element){
-				 	var addressInformation = self._getUpdatedContact(_extractContactInformation(element, self._element));
+				 	var addressInformation = self._getUpdatedContact(_extractContactInformation(element));
 
 				 	var contactType = null;
 
@@ -478,7 +478,7 @@ _.extend(GmailMessageView.prototype, {
 
 });
 
-function _extractContactInformation(span, messageElement){
+function _extractContactInformation(span){
 	return {
 		name: span.getAttribute('name'),
 		emailAddress: span.getAttribute('email')
