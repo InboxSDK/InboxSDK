@@ -48,9 +48,11 @@ class DropdownButtonViewController {
 	}
 
 	showDropdown() {
+		this.hideDropdown();
 		const view = this._view;
 		if (!view) throw new Error("Already destroyed");
 		view.activate();
+		
 		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), view.getElement(), null);
 		if (this._dropdownPositionOptions) {
 			dropdownView.setPlacementOptions(this._dropdownPositionOptions);
