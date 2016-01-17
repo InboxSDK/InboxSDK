@@ -35,8 +35,9 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 			kefirFromEventTargetCapture(document, 'click')
 		])
 		.filter(event =>
+			event.isTrusted &&
 			!anchorElement.contains(event.target) &&
-				!this._dropdownViewDriver.getContainerElement().contains(event.target)
+			!this._dropdownViewDriver.getContainerElement().contains(event.target)
 		)
 		.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
 		.onValue(() => {

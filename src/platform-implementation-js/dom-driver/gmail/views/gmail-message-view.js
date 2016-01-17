@@ -447,9 +447,13 @@ _.extend(GmailMessageView.prototype, {
 			let modalContactName = this._getModalContactName(contact.emailAddress);
 			if(!modalContactName){
 				//the modal that contains this email address is not visible, so we need to bring the modal up
+
+				function block(event){event.stopPropagation();};
+				this._element.addEventListener('click', block);
 				simulateClick(menuButtonElement);
 				modalContactName = this._getModalContactName(contact.emailAddress);
 				simulateClick(menuButtonElement);
+				this._element.removeEventListener('click', block);
 			}
 
 			contact.name = modalContactName || contact.name;
