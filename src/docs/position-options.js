@@ -114,7 +114,7 @@ var PositionOptions = /** @lends PositionOptions */{
 
 	/**
 	 * See buffer property. This specifies an additional buffer space only for
-	 * the top edge.
+	 * the right edge.
 	 * ^optional
 	 * ^default=0
 	 * @type {number}
