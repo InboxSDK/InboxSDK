@@ -1,9 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-const _ = require('lodash');
 const jsdom = require('jsdom');
-const assert = require('assert');
 
 jsdom.defaultDocumentFeatures = {
   FetchExternalResources: false,
