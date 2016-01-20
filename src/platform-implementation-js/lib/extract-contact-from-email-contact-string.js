@@ -16,7 +16,7 @@ export default function extractContactFromEmailContactString(contactInfoString: 
       emailAddress = contactInfoParts[0];
     }
     else{
-      throw new Error('must have a valid email address in it');
+      throw new Error(contactInfoParts[0] + ' is not a valid email address');
     }
   }
 
