@@ -6,6 +6,7 @@ require('../lib/fake-page-globals')();
 
 process.env.VERSION = 'beep';
 
+global.Object = Object;
 global.MutationObserver = require('../lib/mock-mutation-observer');
 global.document = jsdomDoc(`<!doctype html>
 <html>
@@ -18,6 +19,11 @@ global.document = jsdomDoc(`<!doctype html>
 </html>`);
 Object.defineProperty(document.location, 'origin', {value:'https://mail.google.com'});
 global.window = document.defaultView;
+global.window.Object = Object;
+const originalGlobals = Object.keys(global);
+const originalWindowProperties = Object.keys(window);
+
+const _ = require('lodash');
 
 // don't try to inject ajax interceptor
 document.head.setAttribute('data-inboxsdk-script-injected', true);
@@ -33,6 +39,13 @@ var appOpts = {
 assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
 
 InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
+  const newGlobals = _.flatten([
+    _.difference(Object.keys(global), originalGlobals, ['__InboxSDKImpLoader']),
+    _.difference(Object.keys(window), originalWindowProperties, ['inboxsdk__style'])
+      .map(x => `window.${x}`)
+  ]);
+  assert.deepEqual(newGlobals, []);
+
   assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
   assert.deepEqual(inboxsdk.User.getAccountSwitcherContactList(), [
