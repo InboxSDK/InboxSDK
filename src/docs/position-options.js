@@ -1,4 +1,6 @@
-// These are the options passed to contain-by-screen2.
+// These are the options passed to contain-by-screen, which is also documented
+// at https://www.npmjs.com/package/contain-by-screen
+
 /**
  * @class
  * This object is used to control the positioning of an element (such as a
@@ -74,11 +76,12 @@ var PositionOptions = /** @lends PositionOptions */{
 
 	/**
 	 * This property specifies a number of pixels to be used as a buffer zone
-	 * around the element. The element will be treated as if it was this much
-	 * larger in all directions, requiring it to be placed with the given amount
-	 * of space between it, the anchor element, and the edges of the screen. The
-	 * buffer option is useful if the element has children which are positioned
-	 * such that they escape the boundaries of the element.
+	 * around the element. For screen-fitting purposes, the element will be
+	 * treated as if it was this much larger in all directions, requiring it to
+	 * be placed with the given amount of space between it, the anchor element,
+	 * and the edges of the screen. The buffer option is useful if the element
+	 * has children which are positioned such that they escape the boundaries of
+	 * the element. Buffers do not affect alignment with the anchor element.
 	 * ^optional
 	 * ^default=0
 	 * @type {number}

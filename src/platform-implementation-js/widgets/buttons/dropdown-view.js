@@ -7,7 +7,7 @@ var Kefir = require('kefir');
 
 var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
 var kefirFromEventTargetCapture = require('../../lib/kefir-from-event-target-capture');
-var containByScreen2 = require('../../lib/dom/contain-by-screen2');
+var containByScreen2 = require('contain-by-screen');
 
 // documented in src/docs/
 var DropdownView = function(dropdownViewDriver, anchorElement, options){

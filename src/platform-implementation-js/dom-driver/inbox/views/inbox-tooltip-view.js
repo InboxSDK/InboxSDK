@@ -6,7 +6,7 @@ var ud = require('ud');
 var Kefir = require('kefir');
 var kefirStopper = require('kefir-stopper');
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
-import containByScreen from '../../../lib/dom/contain-by-screen2';
+import containByScreen from 'contain-by-screen';
 
 var InboxTooltipView = ud.defn(module, class InboxTooltipView {
   _target: HTMLElement;

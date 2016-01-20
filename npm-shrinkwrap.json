@@ -703,6 +703,22 @@
       "from": "constants-browserify@>=1.0.0 <1.1.0",
       "resolved": "https://registry.npmjs.org/constants-browserify/-/constants-browserify-1.0.0.tgz"
     },
+    "contain-by-screen": {
+      "version": "1.0.2",
+      "from": "contain-by-screen@latest",
+      "dependencies": {
+        "babel-runtime": {
+          "version": "6.3.19",
+          "from": "babel-runtime@>=6.3.19 <7.0.0",
+          "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-6.3.19.tgz"
+        },
+        "lodash": {
+          "version": "4.0.0",
+          "from": "lodash@>=4.0.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.0.0.tgz"
+        }
+      }
+    },
     "content-disposition": {
       "version": "0.5.0",
       "from": "content-disposition@0.5.0",
