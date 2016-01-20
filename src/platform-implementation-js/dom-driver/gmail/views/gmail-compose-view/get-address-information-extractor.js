@@ -13,7 +13,17 @@ export default function getAddressInformationExtractor(addressType: string): (no
 		if(contactNode){
 			var contactInfoString = (contactNode: any).value;
 
-			return extractContactFromEmailContactString(contactInfoString);			
+			try{
+				return extractContactFromEmailContactString(contactInfoString);
+			}
+			catch(err){
+				Logger.error(new Error('problem extracting address information'), {
+					message: err.message
+				});
+
+				return null;
+			}
+
 		}
 		else{
 			Logger.error(new Error('contactNode cant be found'), {
