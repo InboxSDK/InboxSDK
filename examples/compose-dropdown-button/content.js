@@ -8,6 +8,16 @@ InboxSDK.load(1, 'simple-example', {
 		window._cv = composeView;
 
 		composeView.addButton({
+			title: 'wow',
+			iconClass: 'send_modifier_icon',
+			type: 'SEND_ACTION',
+			hasDropdown: true,
+			onClick(event) {
+				event.dropdown.el.textContent = 'very dropdown';
+			}
+		});
+
+		composeView.addButton({
 			title: 'Monkeys!',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
@@ -15,7 +25,7 @@ InboxSDK.load(1, 'simple-example', {
 				if (!composeView.isInlineReplyForm() || document.location.origin !== 'https://inbox.google.com') {
 					composeView.setSubject('foo<b>ar');
 				}
-				event.dropdown.el.innerHTML = 'hello world!';
+				event.dropdown.el.textContent = 'hello world!';
 			}
 		});
 
