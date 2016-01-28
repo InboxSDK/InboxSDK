@@ -1,6 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
+import {defn, defonce} from 'ud';
 import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
@@ -11,9 +12,9 @@ import positionFormattingToolbar from './position-formatting-toolbar';
 import type GmailComposeView from '../gmail-compose-view';
 import get from '../../../../../common/get-or-fail';
 
-var memberMap = new Map();
+var memberMap = defonce(module, () => new Map());
 
-export default function manageButtonGrouping(gmailComposeView: GmailComposeView){
+export default defn(module, function manageButtonGrouping(gmailComposeView: GmailComposeView){
 	if(gmailComposeView.getElement().getAttribute('data-button-grouping-managed') === 'true'){
 		return;
 	}
@@ -47,7 +48,7 @@ export default function manageButtonGrouping(gmailComposeView: GmailComposeView)
 		memberMap.delete(gmailComposeView);
 		el.setAttribute('data-button-grouping-managed', 'false');
 	});
-}
+});
 
 function _handleComposeFullscreenStateChanged(gmailComposeView){
 	if(gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar')){
@@ -241,23 +242,13 @@ function _positionGroupToolbar(gmailComposeView){
 	if((groupedToolbarButton.offsetLeft + groupedToolbarButton.clientWidth) > groupedActionToolbarContainer.offsetWidth){
 		var marginLeft = groupedToolbarButton.clientWidth/2 - groupedActionToolbarContainer.offsetWidth/2 - 3;
 
-		groupedActionToolbarContainer.style.left = groupedToolbarButton.offsetLeft + 'px';
-		groupedActionToolbarContainer.style.marginLeft = marginLeft + 'px';
+		groupedActionToolbarContainer.style.left = (groupedToolbarButton.offsetLeft + marginLeft) + 'px';
 
-		if(gmailComposeView.isInlineReplyForm()){
-			groupedActionToolbarArrow.style.left = (groupedActionToolbarContainer.offsetWidth/2) + 'px';
-			groupedActionToolbarArrow.style.marginLeft = (-1*(groupedActionToolbarArrow.offsetWidth/2) + 3) + 'px'; //magic number 3 is the margin on the toolbar container
-		}
-		else{
-			groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
-			groupedActionToolbarArrow.style.marginLeft = (marginLeft + groupedActionToolbarArrow.offsetWidth/2 - 3) + 'px';
-		}
+		groupedActionToolbarArrow.style.left = -marginLeft + 'px';
 	}
 	else{
 		groupedActionToolbarContainer.style.left = '';
-		groupedActionToolbarContainer.style.marginLeft = '';
 		groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
-		groupedActionToolbarArrow.style.marginLeft = '';
 	}
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
