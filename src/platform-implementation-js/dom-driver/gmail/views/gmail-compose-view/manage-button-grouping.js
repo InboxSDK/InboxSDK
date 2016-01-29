@@ -244,11 +244,11 @@ function _positionGroupToolbar(gmailComposeView){
 
 		groupedActionToolbarContainer.style.left = (groupedToolbarButton.offsetLeft + marginLeft) + 'px';
 
-		groupedActionToolbarArrow.style.left = -marginLeft + 'px';
+		groupedActionToolbarArrow.style.left = -(marginLeft+1) + 'px';
 	}
 	else{
 		groupedActionToolbarContainer.style.left = '';
-		groupedActionToolbarArrow.style.left = groupedToolbarButton.offsetLeft + 'px';
+		groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft-1) + 'px';
 	}
 
 	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
