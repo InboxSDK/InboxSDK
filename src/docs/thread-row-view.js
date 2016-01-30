@@ -154,10 +154,16 @@ var LabelDescriptor = /** @lends LabelDescriptor */{
   /**
   * A CSS class to apply to the icon.
   * ^optional
-  * ^default=MODIFIER
   * @type {string}
   */
-  iconClass:null
+  iconClass:null,
+
+  /**
+  * A background color to put on the icon element if present.
+  * ^optional
+  * @type {string}
+  */
+  iconBackgroundColor:null
 };
 
 
@@ -214,7 +220,6 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   /**
   * A CSS class to apply to the icon button.
   * ^optional
-  * ^default=MODIFIER
   * @type {string}
   */
   iconClass:null,
@@ -254,7 +259,6 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
   /**
   * A CSS class to apply to the icon.
   * ^optional
-  * ^default=MODIFIER
   * @type {string}
   */
   iconClass:null,
