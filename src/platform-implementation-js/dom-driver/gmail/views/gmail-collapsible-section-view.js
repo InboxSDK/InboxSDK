@@ -1,15 +1,15 @@
 'use strict';
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
+import {defn} from 'ud';
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import RSVP from 'rsvp';
 
-var BasicClass = require('../../../lib/basic-class');
+import BasicClass from '../../../lib/basic-class';
 
-
-var InboxDropdownButtonView = require('../widgets/buttons/inbox-dropdown-button-view');
-var GmailDropdownView = require('../widgets/gmail-dropdown-view');
-var DropdownButtonViewController = require('../../../widgets/buttons/dropdown-button-view-controller');
+import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-view';
+import GmailDropdownView from '../widgets/gmail-dropdown-view';
+import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 
 
 var GmailCollapsibleSectionView = function(groupOrderHint, isSearch, isCollapsible){
@@ -689,6 +689,6 @@ function _getLabelHTML(label){
 
 	return retArray.join('');
 }
+GmailCollapsibleSectionView = defn(module, GmailCollapsibleSectionView);
 
-
-module.exports = GmailCollapsibleSectionView;
+export default GmailCollapsibleSectionView;
