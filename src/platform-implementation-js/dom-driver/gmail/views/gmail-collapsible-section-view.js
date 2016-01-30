@@ -4,6 +4,7 @@ import {defn} from 'ud';
 import _ from 'lodash';
 import Bacon from 'baconjs';
 import RSVP from 'rsvp';
+import autoHtml from 'auto-html';
 
 import BasicClass from '../../../lib/basic-class';
 
@@ -663,29 +664,31 @@ function _getLabelHTML(label){
 	var foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
 
 	var retArray = [
-		'<div class="ar as" data-tooltip="' + _.escape(label.title) + '">',
-			'<div class="at" style="background-color: ' + backgroundColor + '; border-color: ' + backgroundColor + ';">'
+		autoHtml `<div class="ar as" data-tooltip="${label.title}">
+			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">`
 	];
 
 	if(label.iconClass){
-		retArray = retArray.concat([
-			'<div class="inboxsdk__resultsSection_label_icon ' + label.iconClass + '"></div>'
-		]);
+		retArray.push(
+			autoHtml `<div class="inboxsdk__resultsSection_label_icon ${label.iconClass}"></div>`
+		);
 	}
 	else if(label.iconUrl){
-		retArray = retArray.concat([
-			'<img class="inboxsdk__resultsSection_label_icon" src="' + label.iconUrl + '" />'
-		]);
+		retArray.push(
+			autoHtml `<img class="inboxsdk__resultsSection_label_icon" src="${label.iconUrl}" />`
+		);
 	}
 
 
-	retArray = retArray.concat([
-				'<div class="av" style="color: ' + foregroundColor + '; ">',
-					_.escape(label.title),
-				'</div>',
-			'</div>',
-		'</div>'
-	]);
+	retArray.push(
+		autoHtml `
+				<div class="av" style="color: ${foregroundColor}">
+					${label.title}
+				</div>
+			</div>
+		</div>
+		`
+	);
 
 	return retArray.join('');
 }
