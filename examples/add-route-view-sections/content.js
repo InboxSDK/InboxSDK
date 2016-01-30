@@ -15,6 +15,7 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 							title: 'label',
 							backgroundColor: 'yellow',
 							foregroundColor: 'red',
+							iconBackgroundColor: 'green',
 							iconUrl: chrome.runtime.getURL('monkey.png')
 						}
 					],
