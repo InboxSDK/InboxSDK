@@ -668,14 +668,24 @@ function _getLabelHTML(label){
 			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">`
 	];
 
+	const styleHtml = label.iconBackgroundColor ?
+		autoHtml `style="background-color: ${label.iconBackgroundColor}"` : '';
+
 	if(label.iconClass){
 		retArray.push(
-			autoHtml `<div class="inboxsdk__resultsSection_label_icon ${label.iconClass}"></div>`
+			autoHtml `<div
+				class="inboxsdk__resultsSection_label_icon ${label.iconClass || ''}"
+				${{__html: styleHtml}}
+				>
+			</div>`
 		);
 	}
 	else if(label.iconUrl){
 		retArray.push(
-			autoHtml `<img class="inboxsdk__resultsSection_label_icon" src="${label.iconUrl}" />`
+			autoHtml `<img
+				class="inboxsdk__resultsSection_label_icon"
+				${{__html: styleHtml}}
+				src="${label.iconUrl}" />`
 		);
 	}
 
