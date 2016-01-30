@@ -35,8 +35,10 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
 			title:'a'+(i++),
-			backgroundColor:'white',
-			foregroundColor:'blue'
+			iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
+			backgroundColor: 'white',
+			foregroundColor: 'blue',
+			iconBackgroundColor: 'green'
 		});
 		threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
 			{

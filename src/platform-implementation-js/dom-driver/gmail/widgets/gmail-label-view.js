@@ -59,6 +59,7 @@ class GmailLabelView {
 		}
 		this._updateBackgroundColor(labelDescriptor.backgroundColor);
 		this._updateForegroundColor(labelDescriptor.foregroundColor);
+		this._updateIconBackgroundColor(labelDescriptor.iconBackgroundColor);
 		this._updateTitle(labelDescriptor.title);
 
 		this._labelDescriptor = labelDescriptor;
@@ -84,10 +85,12 @@ class GmailLabelView {
 		const element = this.getElement();
 
 		element.querySelector('.at').style.color = foregroundColor;
+	}
 
-		var iconClassImg = element.querySelector('.inboxsdk__button_icon');
-		if(iconClassImg){
-			iconClassImg.style.backgroundColor = foregroundColor;
+	_updateIconBackgroundColor(iconBackgroundColor: ?string) {
+		const icon = this.getElement().querySelector('.inboxsdk__button_icon');
+		if (icon) {
+			icon.style.backgroundColor = iconBackgroundColor || '';
 		}
 	}
 
