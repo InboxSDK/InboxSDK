@@ -8,8 +8,7 @@ import updateIcon from '../lib/update-icon/update-icon';
 class GmailLabelView {
 	getElement: () => HTMLElement;
 	_labelDescriptor: Object;
-	iconClass: any;
-	iconUrl: any;
+	_iconSettings: Object;
 
 	constructor(opts={}) {
 		this.getElement = once(() => {
@@ -24,8 +23,7 @@ class GmailLabelView {
 			return element;
 		});
 		this._labelDescriptor = {};
-		this.iconClass = null;
-		this.iconUrl = null;
+		this._iconSettings = {};
 	}
 
 	updateLabelDescriptor(labelDescriptor: ?Object) {
@@ -50,7 +48,7 @@ class GmailLabelView {
 		const element = this.getElement();
 
 		updateIcon(
-			this, element.querySelector('.at'),
+			this._iconSettings, element.querySelector('.at'),
 			false, labelDescriptor.iconClass, labelDescriptor.iconUrl);
 		if (labelDescriptor.iconClass || labelDescriptor.iconUrl) {
 			element.classList.add('inboxsdk__label_has_icon');
