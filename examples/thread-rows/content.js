@@ -30,7 +30,7 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 
 		threadRowView.addLabel(Kefir.repeatedly(5000, [
 			{title:'A'},
-			{title:'B', foregroundColor: 'blue', iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png'},
+			{title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
 			{title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
 		]).toProperty({title:'0'}));
 		threadRowView.addLabel({
