@@ -4,19 +4,20 @@ import isValidEmail from './is-valid-email';
 
 export default function extractContactFromEmailContactString(contactInfoString: string): Contact {
   let name = null;
-  let emailAddress = '';
+  let emailAddress = null;
 
-  var contactInfoParts = contactInfoString.split('<');
+  const contactInfoParts = contactInfoString.split('<');
+  const firstPartTrimmed = contactInfoParts[0].trim();
   if(contactInfoParts.length > 1){
-    name = contactInfoParts[0].trim();
+    name = firstPartTrimmed;
     emailAddress = contactInfoParts[1].split('>')[0].trim();
   }
   else{
-    if(isValidEmail(contactInfoParts[0])){
-      emailAddress = contactInfoParts[0];
+    if(isValidEmail(firstPartTrimmed)){
+      emailAddress = firstPartTrimmed;
     }
     else{
-      throw new Error(contactInfoParts[0] + ' is not a valid email address');
+      throw new Error(firstPartTrimmed + ' is not a valid email address');
     }
   }
 
