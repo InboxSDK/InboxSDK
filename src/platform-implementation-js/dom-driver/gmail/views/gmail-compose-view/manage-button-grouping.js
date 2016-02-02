@@ -267,8 +267,8 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 
 
 		var mutationObserver = new MutationObserver(function(mutations){
-
-			if(mutations[0].target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
+			const target = mutations[0].target;
+			if(target.style && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
 				groupToggleButtonViewController.activate();
 			}
 
