@@ -270,7 +270,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
 
     if (!this._isInline) {
       var hiddenAttachBtn = this._attachBtn.nextSibling;
-      if (hiddenAttachBtn && hiddenAttachBtn.style.position === 'absolute') {
+      if (hiddenAttachBtn && hiddenAttachBtn.style && hiddenAttachBtn.style.position === 'absolute') {
         hiddenAttachBtn.style.display = 'none';
       } else {
         this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
@@ -369,7 +369,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return null;
   }
   getCurrentDraftID(): Promise<?string> {
-    throw new Error("Not yet implemented");    
+    throw new Error("Not yet implemented");
   }
   getDraftID(): Promise<?string> {
     throw new Error("Not yet implemented");

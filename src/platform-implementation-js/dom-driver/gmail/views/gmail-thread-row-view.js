@@ -429,7 +429,7 @@ class GmailThreadRowView {
       const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
       if (el) {
         // Make the image reposition itself horizontally.
-        el.style.display = (el.style.display === 'block') ? 'inline-block' : 'block';
+        el.style.display = (el.style && el.style.display === 'block') ? 'inline-block' : 'block';
       }
     });
     this._subscribeTextFixer();

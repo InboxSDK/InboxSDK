@@ -245,7 +245,7 @@ class GmailToolbarView {
 			)
 			.takeUntilBy(this._stopper)
 			.onValue(mutation => {
-				if(mutation.target.style.display === 'none'){
+				if(mutation.target.style && mutation.target.style.display === 'none'){
 					this._toolbarState = 'COLLAPSED';
 				}
 				else{
