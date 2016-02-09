@@ -92,6 +92,10 @@ class Logger {
     _extensionUserEmailHash = hashEmail(email);
   }
 
+  shouldTrackEverything(): boolean {
+    return _extensionUserEmailHash === 'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785';
+  }
+
   static error(err: Error, details?: any) {
     _logError(err, details, null, false);
   }

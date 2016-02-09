@@ -34,6 +34,9 @@ export default function setupGmailInterceptor() {
       js_frame.XMLHttpRequest = XHRProxyFactory(
         js_frame_originalXHR, js_frame_wrappers, {logError: logErrorExceptEventListeners});
     }
+    else{
+      logger.eventSdkPassive('noJSFrameElementFound');
+    }
   }
   {
     const main_originalXHR = top.XMLHttpRequest;
@@ -433,4 +436,3 @@ function stringifyComposeRecipientParam(value, paramType){
 
   return string;
 }
-

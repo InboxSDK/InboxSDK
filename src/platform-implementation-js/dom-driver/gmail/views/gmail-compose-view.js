@@ -150,7 +150,14 @@ class GmailComposeView {
 							default:
 								return [];
 						}
-					})),
+					}))
+					.map(event => {
+						if(this._driver.getLogger().shouldTrackEverything()){
+							driver.getLogger().eventSite(event.eventName);
+						}
+
+						return event;
+					}),
 
 				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
 					return {
@@ -835,10 +842,20 @@ class GmailComposeView {
 						Boolean(this._requestModifiers[modifierId]))
 			.onValue(({composeid, modifierId, composeParams}) => {
 
+				if(this._driver.getLogger().shouldTrackEverything()){
+					this._driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
+				}
+
 				const modifier = this._requestModifiers[modifierId];
 				const result = new Promise(resolve => resolve(modifier(composeParams)));
 
 				result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, newComposeParams || composeParams))
+							.then(x => {
+								if(this._driver.getLogger().shouldTrackEverything()){
+									this._driver.getLogger().eventSite('composeRequestModified');
+								}
+								return x;
+							})
 						.catch((err) => {
 							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams)
 							 this._driver.getLogger().error(err);
