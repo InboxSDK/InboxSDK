@@ -125,7 +125,19 @@ class GmailComposeView {
 								return [{eventName: 'draftSaving'}];
 							case 'emailDraftReceived':
 								this._draftSaving = false;
-								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								var response;
+								try{
+									response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+								}
+								catch(err){
+									if(this._driver.getAppId() === 'sdk_streak_21e9788951'){
+										this._driver.getLogger().error(err, {response: event.response});
+										throw err;
+									}
+									else{
+										throw err;
+									}
+								}
 								if (response.messageID === 'eu') {
 									return []; // save was canceled
 								}
