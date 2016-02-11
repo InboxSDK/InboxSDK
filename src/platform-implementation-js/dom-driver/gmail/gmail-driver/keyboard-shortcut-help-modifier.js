@@ -170,13 +170,12 @@ function _getShortcutHTML(chord: string): string {
 
 	const parts = chord.split(/[\s+]/g);
 	const separators = chord.match(/[\s+]/g);
-	if (!separators) {
-		throw new Error("Failed to match");
-	}
 
 	for(var ii=0; ii<parts.length; ii++){
 		retArray.push('<span class="wh">' + _.escape(_getAngledBracket(parts[ii])) + '</span>');
-		retArray.push(_getSeparatorHTML(separators[ii]));
+		if(separators && separators[ii]){
+			retArray.push(_getSeparatorHTML(separators[ii]));
+		}
 	}
 
 	retArray.push(' :');
