@@ -131,7 +131,7 @@ class GmailComposeView {
 								}
 								catch(err){
 									if(this._driver.getAppId() === 'sdk_streak_21e9788951'){
-										this._driver.getLogger().error(err, {response: event.response});
+										this._driver.getLogger().error(err, {connectionDetails: event.connectionDetails, response: event.response});
 										throw err;
 									}
 									else{

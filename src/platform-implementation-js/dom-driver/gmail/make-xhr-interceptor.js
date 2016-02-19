@@ -57,7 +57,8 @@ export default function makeXhrInterceptor(): {xhrInterceptStream: Bacon.Observa
         type: 'emailDraftReceived',
         composeId: body.composeid,
         draft: body.draft,
-        response: response
+        response: response,
+        connectionDetails: detail.connectionDetails
       };
     })
   );
