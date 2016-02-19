@@ -487,16 +487,6 @@ class GmailThreadRowView {
             buttonSpan.setAttribute('tabindex', "-1");
             (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);
 
-            // Don't let the whole column count as the star for click and mouse over purposes.
-            // Click events that aren't directly on the star should be stopped.
-            // Mouseover events that aren't directly on the star should be stopped and
-            // re-emitted from the thread row, so the thread row still has the mouseover
-            // appearance.
-            // Click events that are on one of our buttons should be stopped. Click events
-            // that aren't on the star button or our buttons should be re-emitted from the
-            // thread row so it counts as clicking on the thread.
-            (starGroup:any).onmouseover = (starGroup:any).onclick = starGroupEventInterceptor;
-
             iconSettings = {
               iconUrl: null,
               iconClass: null,
@@ -549,6 +539,16 @@ class GmailThreadRowView {
         if (!_.contains(starGroup.children, buttonSpan)) {
           starGroup.appendChild(buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
+
+          // Don't let the whole column count as the star for click and mouse over purposes.
+          // Click events that aren't directly on the star should be stopped.
+          // Mouseover events that aren't directly on the star should be stopped and
+          // re-emitted from the thread row, so the thread row still has the mouseover
+          // appearance.
+          // Click events that are on one of our buttons should be stopped. Click events
+          // that aren't on the star button or our buttons should be re-emitted from the
+          // thread row so it counts as clicking on the thread.
+          (starGroup:any).onmouseover = (starGroup:any).onclick = starGroupEventInterceptor;
         }
         this._imageFixer.emit();
       }
