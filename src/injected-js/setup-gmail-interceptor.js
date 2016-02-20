@@ -134,7 +134,13 @@ export default function setupGmailInterceptor() {
         triggerEvent({
           type: 'emailDraftReceived',
           responseText: connection.originalResponseText,
-          originalSendBody: connection.originalSendBody
+          originalSendBody: connection.originalSendBody,
+          connectionDetails: {
+            method: connection.method,
+            url: connection.url,
+            params: connection.params,
+            responseType: connection.responseType
+          }
         });
       }
     }
