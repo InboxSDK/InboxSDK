@@ -73,26 +73,19 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
   }
 
   setChromeClass(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
-    this._modalContainerElement.classList.remove('inboxsdk__modal_chromeless');
-    this._modalContainerElement.classList.remove('inboxsdk__modal_showCloseButton');
-    this._modalContainerElement.classList.remove('inboxsdk__modal_noCloseButton');
-    this._modalContainerElement.classList.remove('inboxsdk__modal_hasButtons');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_hideSides');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_hideTop');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_hideBottom');
 
     if(chrome === false){
-      if(!showCloseButton && !hasButtons){
-        this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
-      }
-      else {
-        if(showCloseButton){
-          this._modalContainerElement.classList.add('inboxsdk__modal_showCloseButton');
-        }
-        else{
-          this._modalContainerElement.classList.add('inboxsdk__modal_noCloseButton');
-        }
+      this._modalContainerElement.classList.add('inboxsdk__modal_hideSides');
 
-        if(hasButtons){
-          this._modalContainerElement.classList.add('inboxsdk__modal_hasButtons');
-        }
+      if(!showCloseButton){
+        this._modalContainerElement.classList.add('inboxsdk__modal_hideTop');
+      }
+
+      if(!hasButtons){
+        this._modalContainerElement.classList.add('inboxsdk__modal_hideBottom');
       }
     }
   }
