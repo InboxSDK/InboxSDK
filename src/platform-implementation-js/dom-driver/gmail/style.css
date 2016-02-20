@@ -480,11 +480,6 @@ div.inboxsdk__compose_statusbar {
     margin-top: 30px; margin-bottom: 30px;
 }
 
-
-  .inboxsdk__modal_content.inboxsdk__modal_content_no_buttons {
-    margin-bottom: 0px;
-  }
-
   .inboxsdk__modal_close {
     outline: none;
   }
@@ -501,7 +496,8 @@ div.inboxsdk__compose_statusbar {
     padding: 0px;
   }
 
-  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_close {
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_close,
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_noCloseButton .inboxsdk__modal_close {
     display: none;
   }
 
@@ -509,8 +505,31 @@ div.inboxsdk__compose_statusbar {
     margin: 0px;
   }
 
-  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .Kj-JD-K7 {
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_noCloseButton .inboxsdk__modal_container {
+    padding-top: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_noCloseButton .inboxsdk__modal_content {
+    margin-top: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .Kj-JD-K7,
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_noCloseButton .Kj-JD-K7 {
     margin: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_showCloseButton .inboxsdk__modal_container,
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_hasButtons .inboxsdk__modal_container {
+    padding-left: 0px;
+    padding-right: 0px
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_content {
+    margin-bottom: 0px;
+  }
+
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_container {
+    padding-bottom: 0px;
   }
 
 /* end modal */

@@ -36,7 +36,7 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
     this.setTitle(options.title);
     this.setContentElement(options.el);
     this.setButtons(options.buttons || []);
-    this.setChrome(options.chrome);
+    this.setChromeClass(options.chrome, options.showCloseButton, (options.buttons || []).length > 0);
   }
 
   setTitle(title: string) {
@@ -62,21 +62,38 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
 
     if (buttons.length === 0) {
       this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = 'none';
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').classList.add('inboxsdk__modal_content_no_buttons');
+      this._modalContainerElement.classList.add('inboxsdk__modal_content_no_buttons');
     } else {
       this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = '';
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').classList.remove('inboxsdk__modal_content_no_buttons');
+      this._modalContainerElement.classList.remove('inboxsdk__modal_content_no_buttons');
     }
 
     _.sortBy(buttons, button => button.orderHint || 0)
       .forEach(this._addButton.bind(this, this._modalContainerElement.querySelector('.inboxsdk__modal_buttons')));
   }
 
-  setChrome(chrome: boolean) {
-    if (chrome === false) {
-      this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
-    } else {
-      this._modalContainerElement.classList.remove('inboxsdk__modal_chromeless');
+  setChromeClass(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
+    this._modalContainerElement.classList.remove('inboxsdk__modal_chromeless');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_showCloseButton');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_noCloseButton');
+    this._modalContainerElement.classList.remove('inboxsdk__modal_hasButtons');
+
+    if(chrome === false){
+      if(!showCloseButton && !hasButtons){
+        this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
+      }
+      else {
+        if(showCloseButton){
+          this._modalContainerElement.classList.add('inboxsdk__modal_showCloseButton');
+        }
+        else{
+          this._modalContainerElement.classList.add('inboxsdk__modal_noCloseButton');
+        }
+
+        if(hasButtons){
+          this._modalContainerElement.classList.add('inboxsdk__modal_hasButtons');
+        }
+      }
     }
   }
 
