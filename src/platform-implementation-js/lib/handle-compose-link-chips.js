@@ -79,7 +79,7 @@ function _addEnhancements(chipElement: HTMLElement) {
     }
 
     var xElement = document.createElement('div');
-    xElement.innerHTML = '<img src="//ssl.gstatic.com/ui/v1/icons/common/x_8px.png" style="opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;">';
+    xElement.innerHTML = '<img src="https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png" style="opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;">';
     xElement = xElement.children[0];
 
     xElement.addEventListener('mousedown', function(e){
