@@ -9,8 +9,19 @@ dist/
 .*/flow-libs/.*
 .*/node_modules/baconjs/.*
 .*/node_modules/kefir/.*
+.*/node_modules/fbjs/.*
+.*/node_modules/jstimezonedetect/.*
+.*/Server.*/.*\.json
+.*/node_modules/babel-.*
+.*/node_modules/binary-extensions/.*
+.*/node_modules/builtin-modules/.*
+.*/node_modules/spdx-.*/.*
+.*/node_modules/.*/\(test\|lib\|example\|samplejson\|tables\)/.*\.json
+.*/test/data/.*\.json
 
 [libs]
 flow-libs/
 
 [options]
+esproposal.class_static_fields=enable
+esproposal.class_instance_fields=enable
