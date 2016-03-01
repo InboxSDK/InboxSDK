@@ -5,7 +5,7 @@ import assert from "assert";
 import _ from "lodash";
 import fs from 'fs';
 import RSVP from './lib/rsvp';
-const readFile = RSVP.denodeify(fs.readFile.bind(fs));
+const readFile = RSVP.denodeify((fs:any).readFile.bind(fs));
 import co from 'co';
 
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
