@@ -395,7 +395,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 
 	/**
 	* The actual {HTMLElement} of the link found.
-	* @type {func(event)}
+	* @type {HTMLElement}
 	*/
 	element:null,
 
