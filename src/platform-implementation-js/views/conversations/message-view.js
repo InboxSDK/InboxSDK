@@ -119,24 +119,6 @@ _.extend(MessageView.prototype, {
 	getViewState: function() {
 		var members = memberMap.get(this);
 		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
-	},
-
-	// TODO remove. This never worked and probably shouldn't be made.
-	setViewState: function(viewState){
-		var MessageViewViewStates = memberMap.get(this).Conversations.MessageViewViewStates;
-		var internalViewState;
-
-		if(viewState === MessageViewViewState.HIDDEN){
-			internalViewState = 'HIDDEN';
-		}
-		else if(viewState === MessageViewViewState.COLLAPSED){
-			internalViewState = 'COLLAPSED';
-		}
-		else{
-			internalViewState = 'EXPANDED';
-		}
-
-		memberMap.get(this).messageViewImplementation.setViewState(internalViewState);
 	}
 
 });

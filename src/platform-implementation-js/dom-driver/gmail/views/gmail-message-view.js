@@ -237,14 +237,6 @@ _.extend(GmailMessageView.prototype, {
 		}
 	},
 
-	setViewState: function(viewState){
-		if(viewState === this.getViewState() || viewState === 'HIDDEN'){
-			return;
-		}
-
-		simulateClick(this._element.querySelector('.iv'));
-	},
-
 	_addAttachmentCard: function(options){
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
