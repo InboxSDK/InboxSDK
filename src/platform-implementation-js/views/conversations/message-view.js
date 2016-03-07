@@ -1,71 +1,71 @@
-var _ = require('lodash');
-var EventEmitter = require('../../lib/safe-event-emitter');
+/* @flow */
 
-var AttachmentCardView = require('./attachment-card-view');
+import _ from 'lodash';
+import {defn, defonce} from 'ud';
+import EventEmitter from '../../lib/safe-event-emitter';
 
-var memberMap = new WeakMap();
+import AttachmentCardView from './attachment-card-view';
+import type ThreadView from './thread-view';
+import type {
+	MessageViewDriver, VIEW_STATE, MessageViewLinkDescriptor
+} from '../../driver-interfaces/message-view-driver';
+import type {Driver} from '../../driver-interfaces/driver';
+
+const memberMap = defonce(module, () => new WeakMap());
 
 // documented in src/docs/
-var MessageView = function(messageViewImplementation, appId, membraneMap, Conversations, driver){
-	EventEmitter.call(this);
+class MessageView extends EventEmitter {
+	destroyed: boolean = false;
 
-	var members = {};
-	memberMap.set(this, members);
+	constructor(messageViewImplementation: MessageViewDriver, appId: string, membraneMap: WeakMap, Conversations: Object, driver: Driver){
+		super();
 
-	members.messageViewImplementation = messageViewImplementation;
-	members.membraneMap = membraneMap;
-	members.Conversations = Conversations;
-	members.driver = driver;
+		const members = {messageViewImplementation, membraneMap, Conversations, driver};
+		memberMap.set(this, members);
 
-	this.destroyed = false;
+		_bindToEventStream(this, members, messageViewImplementation.getEventStream());
+	}
 
-	_bindToEventStream(this, members, messageViewImplementation.getEventStream());
-};
-
-MessageView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(MessageView.prototype, {
-
-	addAttachmentCardView: function(cardOptions){
+	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
 		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver);
+		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
 
 		return attachmentCardView;
-	},
+	}
 
-	addAttachmentCardViewNoPreview: function(cardOptions){
+	addAttachmentCardViewNoPreview(cardOptions: Object): AttachmentCardView {
 		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCardNoPreview(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver);
+		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
 
 		return attachmentCardView;
-	},
+	}
 
-	addAttachmentsToolbarButton: function(buttonOptions){
+	addAttachmentsToolbarButton(buttonOptions: Object){
 		const {messageViewImplementation} = memberMap.get(this);
 		messageViewImplementation.addButtonToDownloadAllArea({
 			tooltip: buttonOptions.tooltip,
 			iconUrl: buttonOptions.iconUrl,
-			onClick() {
+			onClick: () => {
 				const attachmentCardViews = messageViewImplementation.getAttachmentCardViewDrivers().map(cardDriver =>
-					new AttachmentCardView(cardDriver)
+					new AttachmentCardView(cardDriver, this)
 				);
 				buttonOptions.onClick({attachmentCardViews});
 			}
 		});
-	},
+	}
 
-	getBodyElement: function(){
+	getBodyElement(): HTMLElement {
 		return memberMap.get(this).messageViewImplementation.getContentsElement();
-	},
+	}
 
-	getMessageID: function() {
+	getMessageID(): string {
 		return memberMap.get(this).messageViewImplementation.getMessageID();
-	},
+	}
 
 	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
-	getFileAttachmentCardViews: function(){
+	getFileAttachmentCardViews(): Array<AttachmentCardView> {
 		var self = this;
 		return _.chain(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers())
 			.filter(function(cardDriver) {
@@ -75,53 +75,52 @@ _.extend(MessageView.prototype, {
 				return new AttachmentCardView(attachmentCardViewDriver, self);
 			})
 			.value();
-	},
+	}
 
 	// Deprecated name
-	getAttachmentCardViews: function(){
+	getAttachmentCardViews(): Array<AttachmentCardView> {
 		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
 		return this.getFileAttachmentCardViews();
-	},
+	}
 
-	isElementInQuotedArea: function(element){
+	isElementInQuotedArea(element: HTMLElement): boolean {
 		return memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
-	},
+	}
 
-	isLoaded: function() {
+	isLoaded(): boolean {
 		return memberMap.get(this).messageViewImplementation.isLoaded();
-	},
+	}
 
-	getLinksInBody: function(){
+	getLinksInBody(): Array<MessageViewLinkDescriptor> {
 		return memberMap.get(this).messageViewImplementation.getLinks();
-	},
+	}
 
-	getSender: function(){
+	getSender(): Contact {
 		return memberMap.get(this).messageViewImplementation.getSender();
-	},
+	}
 
-	getRecipients: function(){
+	getRecipients(): Array<Contact> {
 		return memberMap.get(this).messageViewImplementation.getRecipients();
-	},
+	}
 
-	getThreadView: function(){
+	getThreadView(): ThreadView {
 		var members = memberMap.get(this);
 		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
-	},
+	}
 
-	getDateString: function() {
+	getDateString(): string {
 		return memberMap.get(this).messageViewImplementation.getDateString();
-	},
+	}
 
-	addAttachmentIcon: function(iconDescriptor) {
-		return memberMap.get(this).messageViewImplementation.addAttachmentIcon(iconDescriptor);
-	},
+	addAttachmentIcon(iconDescriptor: Object) {
+		memberMap.get(this).messageViewImplementation.addAttachmentIcon(iconDescriptor);
+	}
 
-	getViewState: function() {
+	getViewState(): VIEW_STATE {
 		var members = memberMap.get(this);
 		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
 	}
-
-});
+}
 
 
 function _bindToEventStream(messageView, members, stream){
@@ -168,4 +167,5 @@ function _bindToEventStream(messageView, members, stream){
 		});
 }
 
-module.exports = MessageView;
+// export default defn(module, MessageView);
+export default MessageView;

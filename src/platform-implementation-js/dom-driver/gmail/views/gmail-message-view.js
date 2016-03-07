@@ -3,7 +3,7 @@ const Bacon = require('baconjs');
 const $ = require('jquery');
 const asap = require('asap');
 
-const MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
+import MessageViewDriver from '../../../driver-interfaces/message-view-driver';
 
 import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';

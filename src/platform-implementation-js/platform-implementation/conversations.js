@@ -1,12 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Bacon from 'baconjs';
 
-var ThreadView = require('../views/conversations/thread-view');
-var MessageView = require('../views/conversations/message-view');
+import ThreadView from '../views/conversations/thread-view';
+import MessageView from '../views/conversations/message-view';
 
-var HandlerRegistry = require('../lib/handler-registry');
+import HandlerRegistry from '../lib/handler-registry';
 
 var memberMap = new WeakMap();
 
