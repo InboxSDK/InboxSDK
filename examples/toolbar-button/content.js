@@ -1,3 +1,5 @@
+'use strict';
+
 InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
@@ -88,4 +90,13 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		button.open();
 	}, 5*1000);
 
+	inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
+		messageView.addMoreMenuItem({
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			title: 'Foo bar',
+			onClick() {
+				console.log('message more button click');
+			}
+		});
+	});
 });

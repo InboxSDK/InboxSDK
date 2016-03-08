@@ -7,7 +7,8 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import AttachmentCardView from './attachment-card-view';
 import type ThreadView from './thread-view';
 import type {
-	MessageViewDriver, VIEW_STATE, MessageViewLinkDescriptor
+	MessageViewDriver, VIEW_STATE, MessageViewLinkDescriptor,
+	MessageViewMoreMenuItemDescriptor
 } from '../../driver-interfaces/message-view-driver';
 import type {Driver} from '../../driver-interfaces/driver';
 
@@ -52,6 +53,17 @@ class MessageView extends EventEmitter {
 				buttonOptions.onClick({attachmentCardViews});
 			}
 		});
+	}
+
+	addMoreMenuItem(buttonOptions: MessageViewMoreMenuItemDescriptor) {
+		if (
+			typeof buttonOptions.onClick !== 'function' ||
+			typeof buttonOptions.title !== 'string'
+		) {
+			throw new Error("Missing required properties on MessageViewMoreMenuItemDescriptor object");
+		}
+		const {messageViewImplementation} = memberMap.get(this);
+		messageViewImplementation.addMoreMenuItem(buttonOptions);
 	}
 
 	getBodyElement(): HTMLElement {

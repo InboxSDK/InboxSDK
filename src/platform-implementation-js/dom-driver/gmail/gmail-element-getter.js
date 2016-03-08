@@ -4,6 +4,7 @@
 import _ from 'lodash';
 import RSVP from 'rsvp';
 import waitFor from '../../lib/wait-for';
+import {defobj} from 'ud';
 
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
 
@@ -157,4 +158,4 @@ var GmailElementGetter = {
 
 };
 
-export default GmailElementGetter;
+export default defobj(module, GmailElementGetter);

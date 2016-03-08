@@ -30,12 +30,21 @@ export type MessageViewLinkDescriptor = {
 	isInQuotedArea: boolean;
 };
 
+export type MessageViewMoreMenuItemDescriptor = {
+	title: string;
+	iconUrl?: ?string;
+	iconClass?: ?string;
+	onClick(): void;
+	orderHint?: ?number;
+};
+
 export type MessageViewDriver = {
 	getMessageID(): string;
 	getBodyElement(): HTMLElement;
 	getContentsElement(): HTMLElement;
 	getLinks(): Array<MessageViewLinkDescriptor>;
 	isElementInQuotedArea(el: HTMLElement): boolean;
+	addMoreMenuItem(options: MessageViewMoreMenuItemDescriptor): void;
 	addAttachmentIcon(options: Object): void;
 	getAttachmentCardViewDrivers(): Array<Object>;
 	addAttachmentCard(options: Object): Object;
