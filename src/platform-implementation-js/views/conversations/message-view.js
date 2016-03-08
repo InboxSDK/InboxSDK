@@ -179,5 +179,4 @@ function _bindToEventStream(messageView, members, stream){
 		});
 }
 
-// export default defn(module, MessageView);
-export default MessageView;
+export default defn(module, MessageView);

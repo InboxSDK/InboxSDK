@@ -1,34 +1,33 @@
-var _ = require('lodash');
-var EventEmitter = require('../../lib/safe-event-emitter');
-var baconCast = require('bacon-cast');
-var Bacon = require('baconjs');
+/* @flow */
+
+import _ from 'lodash';
+import {defn, defonce} from 'ud';
+import EventEmitter from '../../lib/safe-event-emitter';
+import baconCast from 'bacon-cast';
+import Bacon from 'baconjs';
 import Logger from '../../lib/logger';
 
-var ContentPanelView = require('../content-panel-view');
+import ContentPanelView from '../content-panel-view';
 
-var memberMap = new WeakMap();
+import type MessageView from './message-view';
+import type GmailThreadView from '../../dom-driver/gmail/views/gmail-thread-view';
+
+const memberMap = defonce(module, () => new WeakMap());
 
 // documented in src/docs/
-var ThreadView = function(threadViewImplementation, appId, membraneMap){
-	EventEmitter.call(this);
+class ThreadView extends EventEmitter {
+	destroyed: boolean = false;
 
-	var members = {};
-	memberMap.set(this, members);
+	constructor(threadViewImplementation: GmailThreadView, appId: string, membraneMap: WeakMap) {
+		super();
 
-	members.threadViewImplementation = threadViewImplementation;
-	members.appId = appId;
-	members.membraneMap = membraneMap;
+		const members = {threadViewImplementation, appId, membraneMap};
+		memberMap.set(this, members);
 
-	this.destroyed = false;
+		_bindToStreamEvents(this, threadViewImplementation);
+	}
 
-	_bindToStreamEvents(this, threadViewImplementation);
-};
-
-ThreadView.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(ThreadView.prototype, {
-
-	addSidebarContentPanel(descriptor){
+	addSidebarContentPanel(descriptor: Object): ?ContentPanelView {
 		var descriptorPropertyStream = baconCast(Bacon, descriptor).toProperty();
 		var members = memberMap.get(this);
 
@@ -42,9 +41,9 @@ _.extend(ThreadView.prototype, {
 		}
 
 		return null;
-	},
+	}
 
-	getMessageViews(){
+	getMessageViews(): Array<MessageView> {
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
@@ -60,9 +59,9 @@ _.extend(ThreadView.prototype, {
 			})
 			.filter(Boolean)
 			.value();
-	},
+	}
 
-	getMessageViewsAll(){
+	getMessageViewsAll(): Array<MessageView> {
 		var members = memberMap.get(this);
 
 		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
@@ -75,19 +74,18 @@ _.extend(ThreadView.prototype, {
 			})
 			.filter(Boolean)
 			.value();
-	},
+	}
 
-	getSubject(){
+	getSubject(): string {
 		return memberMap.get(this).threadViewImplementation.getSubject();
-	},
+	}
 
-	getThreadID(){
+	getThreadID(): string {
 		return memberMap.get(this).threadViewImplementation.getThreadID();
-	},
+	}
+}
 
-});
-
-module.exports = ThreadView;
+export default defn(module, ThreadView);
 
 function logAboutMissingMV(threadViewDriver, messageViewDriver) {
 	try {
@@ -97,7 +95,7 @@ function logAboutMissingMV(threadViewDriver, messageViewDriver) {
 				isLoaded: messageViewDriver.isLoaded()
 			},
 			threadViewDriver: {
-				eventStreamEnded: threadViewDriver.getEventStream().ended,
+				eventStreamEnded: (threadViewDriver.getEventStream():any).ended,
 				messagesCount: threadViewDriver.getMessageViewDrivers().length
 			}
 		});
