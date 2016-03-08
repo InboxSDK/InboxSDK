@@ -238,6 +238,14 @@ _.extend(GmailMessageView.prototype, {
 					this._closeActiveEmailMenu();
 					options.onClick();
 				});
+
+				if (options.iconUrl) {
+					const iconEl = document.createElement('img');
+					iconEl.className = 'f4 J-N-JX inboxsdk__message_more_icon';
+					iconEl.src = options.iconUrl;
+					itemEl.insertBefore(iconEl, itemEl.firstChild);
+				}
+
 				this._moreMenuAddedElements.push(itemEl);
 				openMoreMenu.appendChild(itemEl);
 			});

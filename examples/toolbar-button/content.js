@@ -98,5 +98,12 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 				console.log('message more button click on message from', messageView.getSender().name);
 			}
 		});
+		messageView.addMoreMenuItem({
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			title: 'Foo bar 2',
+			onClick() {
+				console.log('2 message more button click on message from', messageView.getSender().name);
+			}
+		});
 	});
 });

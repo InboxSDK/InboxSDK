@@ -484,7 +484,7 @@ var MessageViewMoreMenuItemDescriptor = /** @lends MessageViewMoreMenuItemDescri
   /**
   * URL for the icon to show on the menu item. Should be a local extension file
   * URL or a HTTPS URL. The image will be displayed with a height and width of
-  * 16px (TODO check this).
+  * 16px.
   * @type {string}
   */
   iconUrl:null,
