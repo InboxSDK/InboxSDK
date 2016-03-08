@@ -200,7 +200,7 @@ _.extend(GmailMessageView.prototype, {
 	_getOpenMoreMenu() {
 		// This will find any message's open more menu! The caller needs to make
 		// sure it belongs to this message!
-		return document.body.querySelector('#\\3a 2 td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]');
+		return document.body.querySelector('td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]');
 	},
 
 	_closeActiveEmailMenu() {
