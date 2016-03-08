@@ -218,6 +218,8 @@ _.extend(GmailMessageView.prototype, {
 
 		const openMoreMenu = this._openMoreMenu;
 		if (openMoreMenu && this._moreMenuItemDescriptors.length) {
+			const originalHeight = openMoreMenu.offsetHeight;
+
 			const dividerEl = document.createElement('div');
 			dividerEl.className = 'J-Kh';
 			this._moreMenuAddedElements.push(dividerEl);
@@ -249,6 +251,20 @@ _.extend(GmailMessageView.prototype, {
 				this._moreMenuAddedElements.push(itemEl);
 				openMoreMenu.appendChild(itemEl);
 			});
+
+			const moreButton = this._getMoreButton();
+			if (moreButton) {
+				const moreButtonRect = moreButton.getBoundingClientRect();
+				const menuRect = openMoreMenu.getBoundingClientRect();
+
+				// If the menu is positioned above the button, then adjust the menu
+				// upwards to compensate for the buttons we added.
+				if (menuRect.top < moreButtonRect.top) {
+					const addedHeight = menuRect.height - originalHeight;
+					openMoreMenu.style.top = Math.max(
+						0, parseInt(openMoreMenu.style.top)-addedHeight) + 'px';
+				}
+			}
 		}
 	},
 
