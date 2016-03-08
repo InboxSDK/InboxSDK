@@ -239,10 +239,10 @@ _.extend(GmailMessageView.prototype, {
 					options.onClick();
 				});
 
-				if (options.iconUrl) {
+				if (options.iconUrl || options.iconClass) {
 					const iconEl = document.createElement('img');
-					iconEl.className = 'f4 J-N-JX inboxsdk__message_more_icon';
-					iconEl.src = options.iconUrl;
+					iconEl.className = `f4 J-N-JX inboxsdk__message_more_icon ${options.iconClass||''}`;
+					iconEl.src = options.iconUrl || 'images/cleardot.gif';
 					itemEl.insertBefore(iconEl, itemEl.firstChild);
 				}
 
