@@ -1,20 +1,22 @@
-const _ = require('lodash');
-const Bacon = require('baconjs');
-const $ = require('jquery');
-const asap = require('asap');
+import _ from 'lodash';
+import Bacon from 'baconjs';
+import $ from 'jquery';
+import asap from 'asap';
+import {defn} from 'ud';
 
-const MessageViewDriver = require('../../../driver-interfaces/message-view-driver');
+import MessageViewDriver from '../../../driver-interfaces/message-view-driver';
 
 import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
 
-const Kefir = require('kefir');
-const kefirCast = require('kefir-cast');
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 
 var GmailMessageView = function(element, gmailThreadView, driver){
 	MessageViewDriver.call(this);
@@ -25,6 +27,8 @@ var GmailMessageView = function(element, gmailThreadView, driver){
 	this._kstopper = kefirCast(Kefir, this._stopper);
 	this._threadViewDriver = gmailThreadView;
 	this._driver = driver;
+	this._moreMenuItemDescriptors = [];
+	this._moreMenuAddedElements = [];
 
 	// Outputs the same type of stream as makeElementChildStream does.
 	this._replyElementStream = this._eventStream.filter(function(event) {
@@ -33,6 +37,7 @@ var GmailMessageView = function(element, gmailThreadView, driver){
 
 	this._setupMessageStateStream();
 	this._monitorEmailAddressHovering();
+	this._setupMoreMenuWatching();
 	asap(() => {
 		this._processInitialState();
 	});
@@ -51,8 +56,17 @@ _.extend(GmailMessageView.prototype, {
 		{name: '_driver', destroy: false},
 		{name: '_replyElementStream', destroy: false, get: true},
 		{name: '_gmailAttachmentAreaView', destroy: true},
-		{name: '_messageLoaded', destroy: false, defaultValue: false}
+		{name: '_messageLoaded', destroy: false, defaultValue: false},
+		{name: '_openMoreMenu', destroy: false},
+		{name: '_moreMenuItemDescriptors', destroy: false},
+		{name: '_moreMenuAddedElements', destroy: false}
 	],
+
+	destroy() {
+		this._moreMenuAddedElements.forEach(el => {
+			el.remove();
+		});
+	},
 
 	isLoaded: function(){
 		return this._messageLoaded;
@@ -137,6 +151,121 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
+	},
+
+	addMoreMenuItem(options) {
+		this._moreMenuItemDescriptors = _.sortBy(
+			this._moreMenuItemDescriptors.concat([options]),
+			o => o.orderHint
+		);
+		this._updateMoreMenu();
+	},
+
+	_setupMoreMenuWatching() {
+		// At the start, and whenever the view state changes, watch the
+		// 'aria-expanded' property of the more button, and when that changes,
+		// update the _openMoreMenu property.
+		this._openMoreMenu = null;
+		kefirCast(Kefir, this._eventStream)
+			.filter(e => e.eventName === 'viewStateChange')
+			.toProperty(() => null)
+			.flatMapLatest(() => {
+				const moreButton = this._getMoreButton();
+				if (!moreButton) {
+					return Kefir.constant(null);
+				}
+				return kefirMakeMutationObserverChunkedStream(moreButton, {
+						attributes: true,
+						attributeFilter: ['aria-expanded']
+					})
+					.map(() =>
+						moreButton.getAttribute('aria-expanded') === 'true' ?
+							this._getOpenMoreMenu() : null
+					);
+			})
+			.takeUntilBy(this._kstopper)
+			.onValue(openMoreMenu => {
+				this._openMoreMenu = openMoreMenu;
+				this._updateMoreMenu();
+			});
+	},
+
+	_getMoreButton() {
+		if (this.getViewState() !== 'EXPANDED') {
+			return null;
+		}
+		return this._element.querySelector('tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]');
+	},
+
+	_getOpenMoreMenu() {
+		// This will find any message's open more menu! The caller needs to make
+		// sure it belongs to this message!
+		return document.body.querySelector('td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]');
+	},
+
+	_closeActiveEmailMenu() {
+		const moreButton = this._getMoreButton();
+		if (moreButton) {
+			simulateClick(moreButton);
+		}
+	},
+
+	_updateMoreMenu() {
+		this._moreMenuAddedElements.forEach(el => {
+			el.remove();
+		});
+		this._moreMenuAddedElements.length = 0;
+
+		const openMoreMenu = this._openMoreMenu;
+		if (openMoreMenu && this._moreMenuItemDescriptors.length) {
+			const originalHeight = openMoreMenu.offsetHeight;
+
+			const dividerEl = document.createElement('div');
+			dividerEl.className = 'J-Kh';
+			this._moreMenuAddedElements.push(dividerEl);
+			openMoreMenu.appendChild(dividerEl);
+
+			this._moreMenuItemDescriptors.forEach(options => {
+				const itemEl = document.createElement('div');
+				itemEl.className = 'J-N';
+				itemEl.setAttribute('role', 'menuitem');
+				itemEl.textContent = options.title;
+				itemEl.addEventListener('mouseenter', () => {
+					itemEl.classList.add('J-N-JT');
+				});
+				itemEl.addEventListener('mouseleave', () => {
+					itemEl.classList.remove('J-N-JT');
+				});
+				itemEl.addEventListener('click', () => {
+					this._closeActiveEmailMenu();
+					options.onClick();
+				});
+
+				if (options.iconUrl || options.iconClass) {
+					const iconEl = document.createElement('img');
+					iconEl.className = `f4 J-N-JX inboxsdk__message_more_icon ${options.iconClass||''}`;
+					iconEl.src = options.iconUrl || 'images/cleardot.gif';
+					itemEl.insertBefore(iconEl, itemEl.firstChild);
+				}
+
+				this._moreMenuAddedElements.push(itemEl);
+				openMoreMenu.appendChild(itemEl);
+			});
+
+			const moreButton = this._getMoreButton();
+			if (moreButton) {
+				const moreButtonRect = moreButton.getBoundingClientRect();
+				const menuRect = openMoreMenu.getBoundingClientRect();
+
+				// If the menu is positioned above the button, then adjust the menu
+				// upwards to compensate for the buttons we added.
+				if (menuRect.top < moreButtonRect.top) {
+					const addedHeight = menuRect.height - originalHeight;
+					openMoreMenu.style.top = Math.max(
+						0, parseInt(openMoreMenu.style.top)-addedHeight) + 'px';
+				}
+			}
+		}
 	},
 
 	getMessageID() {
@@ -235,14 +364,6 @@ _.extend(GmailMessageView.prototype, {
 		else{
 			return 'EXPANDED';
 		}
-	},
-
-	setViewState: function(viewState){
-		if(viewState === this.getViewState() || viewState === 'HIDDEN'){
-			return;
-		}
-
-		simulateClick(this._element.querySelector('.iv'));
 	},
 
 	_addAttachmentCard: function(options){
@@ -489,4 +610,4 @@ function _extractContactInformation(span){
 	};
 }
 
-module.exports = GmailMessageView;
+export default defn(module, GmailMessageView);

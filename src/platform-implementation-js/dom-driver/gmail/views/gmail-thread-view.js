@@ -3,6 +3,7 @@
 
 const asap = require('asap');
 import _ from 'lodash';
+import {defn} from 'ud';
 import util from 'util';
 import Bacon from 'baconjs';
 import {parse} from 'querystring';
@@ -224,4 +225,4 @@ class GmailThreadView {
 	}
 }
 
-export default GmailThreadView;
+export default defn(module, GmailThreadView);

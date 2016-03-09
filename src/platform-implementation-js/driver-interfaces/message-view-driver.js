@@ -1,29 +1,63 @@
-var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
+/* @flow */
 
+import _ from 'lodash';
+import BasicClass from '../lib/basic-class';
+import type Bacon from 'baconjs';
 
-var MessageViewDriver = function(){
+var MessageViewDriverObj = function(){
 	BasicClass.call(this);
 };
 
-MessageViewDriver.prototype = Object.create(BasicClass.prototype);
+MessageViewDriverObj.prototype = Object.create(BasicClass.prototype);
 
-_.extend(MessageViewDriver.prototype, {
-
+_.extend(MessageViewDriverObj.prototype, {
 	getContentsElement: null,
-
 	getLinks: null,
-
 	isElementInQuotedArea: null,
-
 	getAttachmentCardViewDrivers: null,
-
 	addAttachmentCard: null,
-
 	addButtonToDownloadAllArea: null,
-
 	getEventStream: null
-
 });
 
-module.exports = MessageViewDriver;
+export type VIEW_STATE = 'HIDDEN'|'COLLAPSED'|'EXPANDED';
+
+export type MessageViewLinkDescriptor = {
+	text: string;
+	html: string;
+	element: HTMLElement;
+	href: string;
+	isInQuotedArea: boolean;
+};
+
+export type MessageViewToolbarButtonDescriptor = {
+	section: 'MORE';
+	title: string;
+	iconUrl?: ?string;
+	iconClass?: ?string;
+	onClick(): void;
+	orderHint?: ?number;
+};
+
+export type MessageViewDriver = {
+	getMessageID(): string;
+	getBodyElement(): HTMLElement;
+	getContentsElement(): HTMLElement;
+	getLinks(): Array<MessageViewLinkDescriptor>;
+	isElementInQuotedArea(el: HTMLElement): boolean;
+	addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void;
+	addAttachmentIcon(options: Object): void;
+	getAttachmentCardViewDrivers(): Array<Object>;
+	addAttachmentCard(options: Object): Object;
+	addAttachmentCardNoPreview(options: Object): Object;
+	addButtonToDownloadAllArea(options: Object): void;
+	getEventStream(): Bacon.Observable;
+	getViewState(): VIEW_STATE;
+	getDateString(): string;
+	getSender(): Contact;
+	getRecipients(): Array<Contact>;
+	getThreadViewDriver(): Object;
+	isLoaded(): boolean;
+};
+
+export default MessageViewDriverObj;

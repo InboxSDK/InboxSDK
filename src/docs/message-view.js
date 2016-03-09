@@ -34,10 +34,17 @@ var MessageView = /** @lends MessageView */{
 
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
-	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the AttachmentCardView to create.
+	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
 	* @return {void}
 	*/
 	addAttachmentsToolbarButton: function(){},
+
+	/**
+	* Adds a button to the message.
+	* @param {MessageViewToolbarButtonDescriptor} options - The configuration of the button to create.
+	* @return {void}
+	*/
+	addToolbarButton: function(){},
 
 	/**
 	* Returns the body element of the message as displayed to the user. This element includes any qouted areas.
@@ -395,7 +402,7 @@ var MessageViewLinkDescriptor = /** @lends MessageViewLinkDescriptor */{
 
 	/**
 	* The actual {HTMLElement} of the link found.
-	* @type {func(event)}
+	* @type {HTMLElement}
 	*/
 	element:null,
 
@@ -443,29 +450,74 @@ var AttachmentsToolbarButtonDescriptor = /** @lends AttachmentsToolbarButtonDesc
 */
 var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor */{
 
-  /**
-  * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
-  * @type {string}
-  */
-  iconUrl:null,
+	/**
+	* URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
+	* @type {string}
+	*/
+	iconUrl:null,
 
-  /**
-  * A CSS class to apply to the icon.
-  * ^optional
-  * ^default=MODIFIER
-  * @type {string}
-  */
-  iconClass:null,
+	/**
+	* A CSS class to apply to the icon.
+	* ^optional
+	* ^default=MODIFIER
+	* @type {string}
+	*/
+	iconClass:null,
 
-  /**
-  * The tooltip text to show when the user hovers over the icon.
-  * @type {string}
-  */
-  tooltip:null,
+	/**
+	* The tooltip text to show when the user hovers over the icon.
+	* @type {string}
+	*/
+	tooltip:null,
 
 	/**
 	* Function to call when the user clicks the icon.
 	* @type {function()}
 	*/
 	onClick: null
+};
+
+/**
+* @class
+* The options to use to configure buttons added to the message.
+*/
+var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDescriptor */{
+	/**
+	* The section of the message to place the button.
+	* @type {MessageViewToolbarSectionNames}
+	*/
+	section: null,
+
+	/**
+	* Text to show on the menu item.
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* URL for the icon to show on the menu item. Should be a local extension file
+	* URL or a HTTPS URL. The image will be displayed with a height and width of
+	* 16px.
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* An optional class to apply to the icon.
+	* ^optional
+	* @type {string}
+	*/
+	iconClass:null,
+
+	/**
+	* This is called when the menu item is clicked.
+	* @type {function}
+	*/
+	onClick:null,
+
+	/**
+	* Used to specify the order of added menu items.
+	* @type {function}
+	*/
+	orderHint: null
 };

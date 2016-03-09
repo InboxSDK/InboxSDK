@@ -69,3 +69,15 @@ var MessageViewViewStates = /**@lends MessageViewViewStates */{
 	*/
 	'EXPANDED': "EXPANDED"
 };
+
+/**
+* The locations that a button can be added to on a MessageView.
+* @class
+*/
+var MessageViewToolbarSectionNames = /**@lends MessageViewToolbarSectionNames */{
+	/**
+	* The button will be added to the message's "More" dropdown menu.
+	* @type string
+	*/
+	"MORE": "MORE"
+};

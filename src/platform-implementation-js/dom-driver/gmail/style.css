@@ -90,6 +90,12 @@ div.T-I.inboxsdk__button {
   max-height: none;
 }
 
+.f4.J-N-JX.inboxsdk__message_more_icon {
+  margin-top: -1px;
+  width: 16px;
+  height: 16px;
+}
+
 /* end */
 
 /* compose buttons */

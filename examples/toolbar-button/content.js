@@ -1,3 +1,5 @@
+'use strict';
+
 InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
@@ -88,4 +90,22 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		button.open();
 	}, 5*1000);
 
+	inboxSDK.Conversations.registerMessageViewHandler(function(messageView) {
+		messageView.addToolbarButton({
+			section: 'MORE',
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			title: 'Foo bar',
+			onClick() {
+				console.log('message more button click on message from', messageView.getSender().name);
+			}
+		});
+		messageView.addToolbarButton({
+			section: inboxSDK.Conversations.MessageViewToolbarSectionNames.MORE,
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			title: 'Foo bar 2',
+			onClick() {
+				console.log('2 message more button click on message from', messageView.getSender().name);
+			}
+		});
+	});
 });

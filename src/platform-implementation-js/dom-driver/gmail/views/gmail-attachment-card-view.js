@@ -220,7 +220,8 @@ class GmailAttachmentCardView {
 		}
 
 		var self = this;
-		this._element.addEventListener('click', function(e){
+		// :any to work around https://github.com/facebook/flow/issues/1155
+		(this._element:any).addEventListener('click', function(e){
 			if(options.previewOnClick){
 				options.previewOnClick({
 					attachmentCardView: self,
@@ -301,7 +302,7 @@ class GmailAttachmentCardView {
 				var downloadLink = document.createElement('a');
 				downloadLink.href = options.downloadUrl;
 
-				downloadLink.addEventListener('click', function(e) {
+				(downloadLink:any).addEventListener('click', function(e) {
 					e.stopImmediatePropagation();
 					e.stopPropagation();
 				}, true);
