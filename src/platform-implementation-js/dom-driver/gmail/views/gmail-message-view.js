@@ -219,6 +219,7 @@ _.extend(GmailMessageView.prototype, {
 		const openMoreMenu = this._openMoreMenu;
 		if (openMoreMenu && this._moreMenuItemDescriptors.length) {
 			const originalHeight = openMoreMenu.offsetHeight;
+			const originalWidth = openMoreMenu.offsetWidth;
 
 			const dividerEl = document.createElement('div');
 			dividerEl.className = 'J-Kh';
@@ -252,10 +253,17 @@ _.extend(GmailMessageView.prototype, {
 				openMoreMenu.appendChild(itemEl);
 			});
 
+			const menuRect = openMoreMenu.getBoundingClientRect();
+
+			const addedWidth = menuRect.width - originalWidth;
+			if (addedWidth > 0) {
+				openMoreMenu.style.left = Math.max(
+					0, parseInt(openMoreMenu.style.left)-addedWidth) + 'px';
+			}
+
 			const moreButton = this._getMoreButton();
 			if (moreButton) {
 				const moreButtonRect = moreButton.getBoundingClientRect();
-				const menuRect = openMoreMenu.getBoundingClientRect();
 
 				// If the menu is positioned above the button, then adjust the menu
 				// upwards to compensate for the buttons we added.
