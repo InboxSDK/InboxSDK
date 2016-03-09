@@ -5,10 +5,11 @@ import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import AttachmentCardView from './attachment-card-view';
+import {MessageViewToolbarSectionNames} from '../../platform-implementation/conversations';
 import type ThreadView from './thread-view';
 import type {
 	MessageViewDriver, VIEW_STATE, MessageViewLinkDescriptor,
-	MessageViewMoreMenuItemDescriptor
+	MessageViewToolbarButtonDescriptor
 } from '../../driver-interfaces/message-view-driver';
 import type {Driver} from '../../driver-interfaces/driver';
 
@@ -55,12 +56,13 @@ class MessageView extends EventEmitter {
 		});
 	}
 
-	addMoreMenuItem(buttonOptions: MessageViewMoreMenuItemDescriptor) {
+	addToolbarButton(buttonOptions: MessageViewToolbarButtonDescriptor) {
 		if (
 			typeof buttonOptions.onClick !== 'function' ||
-			typeof buttonOptions.title !== 'string'
+			typeof buttonOptions.title !== 'string' ||
+			!MessageViewToolbarSectionNames.hasOwnProperty(buttonOptions.section)
 		) {
-			throw new Error("Missing required properties on MessageViewMoreMenuItemDescriptor object");
+			throw new Error("Missing required properties on MessageViewToolbarButtonDescriptor object");
 		}
 		const {messageViewImplementation} = memberMap.get(this);
 		messageViewImplementation.addMoreMenuItem(buttonOptions);

@@ -30,7 +30,8 @@ export type MessageViewLinkDescriptor = {
 	isInQuotedArea: boolean;
 };
 
-export type MessageViewMoreMenuItemDescriptor = {
+export type MessageViewToolbarButtonDescriptor = {
+	section: 'MORE';
 	title: string;
 	iconUrl?: ?string;
 	iconClass?: ?string;
@@ -44,7 +45,7 @@ export type MessageViewDriver = {
 	getContentsElement(): HTMLElement;
 	getLinks(): Array<MessageViewLinkDescriptor>;
 	isElementInQuotedArea(el: HTMLElement): boolean;
-	addMoreMenuItem(options: MessageViewMoreMenuItemDescriptor): void;
+	addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void;
 	addAttachmentIcon(options: Object): void;
 	getAttachmentCardViewDrivers(): Array<Object>;
 	addAttachmentCard(options: Object): Object;

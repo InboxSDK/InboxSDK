@@ -474,7 +474,13 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
 * @class
 * The options to use to configure buttons added to the "More" menu of a message.
 */
-var MessageViewMoreMenuItemDescriptor = /** @lends MessageViewMoreMenuItemDescriptor */{
+var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDescriptor */{
+	/**
+	* The section of the message to place the button.
+	* @type {MessageViewToolbarSectionNames}
+	*/
+	section: null,
+
 	/**
 	* Text to show on the menu item.
 	* @type {string}
