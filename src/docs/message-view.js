@@ -34,10 +34,17 @@ var MessageView = /** @lends MessageView */{
 
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
-	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the AttachmentCardView to create.
+	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
 	* @return {void}
 	*/
 	addAttachmentsToolbarButton: function(){},
+
+	/**
+	* Adds a button to the message.
+	* @param {MessageViewToolbarButtonDescriptor} options - The configuration of the button to create.
+	* @return {void}
+	*/
+	addToolbarButton: function(){},
 
 	/**
 	* Returns the body element of the message as displayed to the user. This element includes any qouted areas.
@@ -472,7 +479,7 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
 
 /**
 * @class
-* The options to use to configure buttons added to the "More" menu of a message.
+* The options to use to configure buttons added to the message.
 */
 var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDescriptor */{
 	/**
