@@ -41,6 +41,7 @@ import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
+import censorHTMLstring from '../../../../common/censor-html-string';
 
 import getRecipients from './gmail-compose-view/get-recipients';
 
@@ -54,6 +55,7 @@ let hasReportedMissingBody = false;
 
 class GmailComposeView {
 	_element: HTMLElement;
+	_seenBodyElement: HTMLElement;
 	_isInlineReplyForm: boolean;
 	_isFullscreen: boolean;
 	_isStandalone: boolean;
@@ -196,11 +198,13 @@ class GmailComposeView {
 
 		this.ready = _.constant(
 			kefirWaitFor(
-				() => !!this.getBodyElement(),
+				() => this.getBodyElement(),
 				3*60 * 1000 //timeout
 			)
 			.takeUntilBy(this._stopper)
-			.map(() => {
+			.map(bodyElement => {
+				this._seenBodyElement = bodyElement;
+
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
 				this._messageIDElement = this._element.querySelector('input[name="draft"]');
 				if (!this._messageIDElement) {
@@ -761,7 +765,10 @@ class GmailComposeView {
 					{
 						bodyElement: !!bodyElement,
 						hasMessageIDElement: !!this._messageIDElement,
-						ended: (this._eventStream:any).ended
+						ended: (this._eventStream:any).ended,
+						bodyElStillInCompose: this._element.contains(this._seenBodyElement),
+						seenBodyElHtml: censorHTMLstring(this._seenBodyElement.outerHTML),
+						composeHtml: censorHTMLstring(element.outerHTML)
 					}
 				);
 			}
