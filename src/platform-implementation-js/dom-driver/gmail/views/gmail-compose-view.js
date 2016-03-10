@@ -50,6 +50,8 @@ import type {ComposeViewDriver, StatusBar} from '../../../driver-interfaces/comp
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 
+let hasReportedMissingBody = false;
+
 class GmailComposeView {
 	_element: HTMLElement;
 	_isInlineReplyForm: boolean;
@@ -750,6 +752,20 @@ class GmailComposeView {
 		const element = this.getElement();
 		const bodyElement = this.getBodyElement();
 		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+		if (!bodyContainer) {
+			if (!hasReportedMissingBody) {
+				hasReportedMissingBody = true;
+				this._driver.getLogger().error(
+					new Error("getMinimized failed to find bodyContainer"),
+					{
+						bodyElement: !!bodyElement,
+						hasMessageIDElement: !!this._messageIDElement,
+						ended: (this._eventStream:any).ended
+					}
+				);
+			}
+			return false;
+		}
 
 		return bodyContainer.style.display !== '';
 	}
