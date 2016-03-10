@@ -66,6 +66,7 @@ _.extend(GmailMessageView.prototype, {
 		this._moreMenuAddedElements.forEach(el => {
 			el.remove();
 		});
+		MessageViewDriver.prototype.destroy.call(this);
 	},
 
 	isLoaded: function(){
