@@ -194,9 +194,10 @@ class GmailComposeView {
 
 		this.ready = _.constant(
 			kefirWaitFor(
-				() => !this._element || !!this.getBodyElement(),
+				() => !!this.getBodyElement(),
 				3*60 * 1000 //timeout
-			).filter(() => !!this._element)
+			)
+			.takeUntilBy(this._stopper)
 			.map(() => {
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
 				this._messageIDElement = this._element.querySelector('input[name="draft"]');
