@@ -331,7 +331,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 
 	/**
-	 * Fires when the From dropbox value is changed.
+	 * Fires when the From value is changed.
 	 * @event ComposeView#fromContactChanged
 	 * @param {Contact} contact - the contact that was added to the "To" recipients
 	 */
@@ -381,6 +381,16 @@ var ComposeView = /** @lends ComposeView */ {
 	 * Fires when a BCC contact is removed.
 	 * @event ComposeView#bccContactRemoved
 	 * @param {Contact} contact - the contact that was removed from the "BCC" recipients
+	 */
+
+	/**
+	 * Fires when the compose view is minimized
+	 * @event ComposeView#minimized
+	 */
+
+	/**
+	 * Fires when the compose view is restored
+	 * @event ComposeView#restored
 	 */
 };
 
