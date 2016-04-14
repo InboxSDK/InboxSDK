@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
@@ -81,15 +81,15 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       start = e.start;
       driver.signalCustomThreadListActivity(customRouteID);
       try {
-        return Bacon.fromPromise(RSVP.Promise.resolve(onActivate(e.start)), true);
+        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start)));
       } catch(e) {
-        return new Bacon.Error(e);
+        return Kefir.constantError(e);
       }
     })
     .flatMap(ids =>
       Array.isArray(ids) ?
-        Bacon.once(ids) :
-        new Bacon.Error(new Error("handleCustomListRoute result must be an array"))
+        Kefir.constant(ids) :
+        Kefir.constantError(new Error("handleCustomListRoute result must be an array"))
     )
     .mapError(e => {
       driver.getLogger().error(e);
@@ -119,16 +119,16 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(pair.gtid)
         .then(rfcId => ({gtid: pair.gtid, rfcId}), findIdFailure.bind(null, pair.gtid))
     )))
-    .flatMap(Bacon.fromPromise)
+    .flatMap(Kefir.fromPromise)
     .map(_.compact)
     .onValue(idPairs => {
       const query = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
-      Bacon.combineAsArray([
+      Kefir.combine([
         // Figure out any gmail thread ids we don't know yet
-        Bacon.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
+        Kefir.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
           pair.gtid ? pair :
           driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
             .then(gtid => ({gtid, rfcId: pair.rfcId}), findIdFailure.bind(null, pair.rfcId))

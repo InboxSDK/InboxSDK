@@ -1,15 +1,18 @@
 /* @flow */
 //jshint ignore:start
 
-var Bacon = require('baconjs');
+var Kefir = require('kefir');
 
 type Emitter = {
   addEventListener: Function;
   removeEventListener: Function;
 };
 
-export default function fromEventTargetCapture(target: Emitter, eventName: string): Bacon.Observable<any> {
-  return Bacon.fromBinder(sink => {
+export default function fromEventTargetCapture(target: Emitter, eventName: string): Kefir.Stream {
+  return Kefir.stream(emitter => {
+    function sink(event) {
+      emitter.emit(event);
+    }
     target.addEventListener(eventName, sink, true);
     return () => {
       target.removeEventListener(eventName, sink, true);

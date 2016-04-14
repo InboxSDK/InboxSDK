@@ -1,14 +1,13 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
+import _ from 'lodash';
+import RSVP from 'rsvp';
 
-var Bacon = require('baconjs');
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
-var ud = require('ud');
+import * as ud from 'ud';
 
 import Logger from '../../lib/logger';
 import injectScript from '../../lib/inject-script';
@@ -16,12 +15,6 @@ import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
-import kefirWaitFor from '../../lib/kefir-wait-for';
-import kefirDelayAsap from '../../lib/kefir-delay-asap';
-import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
-import kefirElementViewMapper from '../../lib/dom/kefir-element-view-mapper';
-import kmakeMutationObserverStream from '../../lib/dom/kefir-make-mutation-observer-stream';
-import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 
 import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
@@ -37,13 +30,13 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
   onready: Promise;
-  _routeViewDriverStream: Bacon.Observable;
-  _rowListViewDriverStream: Bacon.Observable;
-  _composeViewDriverStream: Bacon.Observable<ComposeViewDriver>;
-  _threadViewDriverStream: Bacon.Observable;
-  _messageViewDriverStream: Bacon.Observable;
+  _routeViewDriverStream: Kefir.Stream;
+  _rowListViewDriverStream: Kefir.Stream;
+  _composeViewDriverStream: Kefir.Stream<ComposeViewDriver>;
+  _threadViewDriverStream: Kefir.Stream;
+  _messageViewDriverStream: Kefir.Stream;
   _threadRowViewDriverKefirStream: Kefir.Stream;
-  _toolbarViewDriverStream: Bacon.Observable;
+  _toolbarViewDriverStream: Kefir.Stream;
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
@@ -86,15 +79,13 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       .map(({el}) => new InboxRouteView(el));
     */
 
-    this._routeViewDriverStream = Bacon.never().toProperty(); //Bacon.mergeAll(mainViews, searchViews);
-    this._rowListViewDriverStream = Bacon.never();
-    this._composeViewDriverStream = baconCast(Bacon,
-      getComposeViewDriverStream(this).takeUntilBy(this._stopper)
-    );
-    this._threadViewDriverStream = Bacon.never();
-    this._messageViewDriverStream = Bacon.never();
+    this._routeViewDriverStream = Kefir.never().toProperty(); //Bacon.mergeAll(mainViews, searchViews);
+    this._rowListViewDriverStream = Kefir.never();
+    this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
+    this._threadViewDriverStream = Kefir.never();
+    this._messageViewDriverStream = Kefir.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
-    this._toolbarViewDriverStream = Bacon.never();
+    this._toolbarViewDriverStream = Kefir.never();
 
     this._composeViewDriverStream.onError(err => {
       // If we get here, it's probably because of a waitFor timeout caused by
@@ -133,13 +124,13 @@ var InboxDriver = ud.defn(module, class InboxDriver {
 
   getLogger(): Logger {return this._logger;}
   getStopper(): Kefir.Stream {return this._stopper;}
-  getRouteViewDriverStream(): Bacon.Observable {return this._routeViewDriverStream;}
-  getRowListViewDriverStream(): Bacon.Observable {return this._rowListViewDriverStream;}
-  getComposeViewDriverStream(): Bacon.Observable {return this._composeViewDriverStream;}
-  getThreadViewDriverStream(): Bacon.Observable {return this._threadViewDriverStream;}
-  getMessageViewDriverStream(): Bacon.Observable {return this._messageViewDriverStream;}
+  getRouteViewDriverStream(): Kefir.Stream {return this._routeViewDriverStream;}
+  getRowListViewDriverStream(): Kefir.Stream {return this._rowListViewDriverStream;}
+  getComposeViewDriverStream(): Kefir.Stream {return this._composeViewDriverStream;}
+  getThreadViewDriverStream(): Kefir.Stream {return this._threadViewDriverStream;}
+  getMessageViewDriverStream(): Kefir.Stream {return this._messageViewDriverStream;}
   getThreadRowViewDriverKefirStream(): Kefir.Stream {return this._threadRowViewDriverKefirStream;}
-  getToolbarViewDriverStream(): Bacon.Observable {return this._toolbarViewDriverStream;}
+  getToolbarViewDriverStream(): Kefir.Stream {return this._toolbarViewDriverStream;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
@@ -168,7 +159,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented');
     return {
-      getEventStream: _.constant(Bacon.never())
+      getEventStream: _.constant(Kefir.never())
     };
   }
 

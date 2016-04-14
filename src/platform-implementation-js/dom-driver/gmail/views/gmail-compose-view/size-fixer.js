@@ -4,8 +4,8 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
-import kefirDelayAsap from '../../../../lib/kefir-delay-asap';
-import kefirMakeMutationObserverChunkedStream from '../../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import delayAsap from '../../../../lib/delay-asap';
+import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import cssSelectorEscape from '../../../../lib/css-selector-escape';
 import type GmailComposeView from '../gmail-compose-view';
 
@@ -36,7 +36,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
     .filter(e => _.includes(['resize', 'composeFullscreenStateChanged'], e.eventName))
-    .merge(kefirDelayAsap(null));
+    .merge(delayAsap(null));
 
   var statusAreaParent: HTMLElement = (gmailComposeView.getStatusArea().parentElement:any);
   var scrollBody: HTMLElement = gmailComposeView.getScrollBody();
@@ -58,7 +58,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   }
 
   // Emit resize events when the recipients area is toggled
-  kefirMakeMutationObserverChunkedStream(statusAreaParent, {attributes:true})
+  makeMutationObserverChunkedStream(statusAreaParent, {attributes:true})
     .takeUntilBy(stopper)
     .onValue(() => {
       gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
@@ -67,10 +67,10 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
     });
 
   resizeEvents
-    .bufferBy(resizeEvents.flatMap(x => kefirDelayAsap(null)))
+    .bufferBy(resizeEvents.flatMap(x => delayAsap(null)))
     .filter(x => x.length > 0)
     .merge(
-      kefirMakeMutationObserverChunkedStream(scrollBody, {attributes:true})
+      makeMutationObserverChunkedStream(scrollBody, {attributes:true})
     )
     .takeUntilBy(stopper)
     .onValue(() => {

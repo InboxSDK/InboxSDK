@@ -1,7 +1,6 @@
 /* @flow */
 // jshint ignore:start
 
-import type Bacon from 'baconjs';
 import type Kefir from 'kefir';
 import type GmailKeyboardShortcutHandle from '../dom-driver/gmail/views/gmail-keyboard-shortcut-handle';
 export type ShortcutDescriptor = {
@@ -15,13 +14,13 @@ import type {ComposeViewDriver} from './compose-view-driver';
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
-	getRouteViewDriverStream(): Bacon.Observable<Object>; // should be a property
-	getRowListViewDriverStream(): Bacon.Observable<Object>;
+	getRouteViewDriverStream(): Kefir.Stream<Object>; // should be a property
+	getRowListViewDriverStream(): Kefir.Stream<Object>;
 	openComposeWindow(): void;
-	getComposeViewDriverStream(): Bacon.Observable<ComposeViewDriver>;
+	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver>;
 	openDraftByMessageID(messageID: string): void;
-	getThreadViewDriverStream(): Bacon.Observable<Object>;
-	getMessageViewDriverStream(): Bacon.Observable<Object>;
+	getThreadViewDriverStream(): Kefir.Stream<Object>;
+	getMessageViewDriverStream(): Kefir.Stream<Object>;
 	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appIconUrl: ?string): GmailKeyboardShortcutHandle;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
@@ -37,7 +36,7 @@ export type Driver = {
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
 	addToolbarButtonForApp(buttonDescriptor: Object): Promise<Object>;
-	getToolbarViewDriverStream(): Bacon.Observable<Object>;
+	getToolbarViewDriverStream(): Kefir.Stream<Object>;
 	getButterBarDriver(): any;
 	setButterBar(butterBar: any): void;
 	isRunningInPageContext(): boolean;

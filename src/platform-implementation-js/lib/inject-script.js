@@ -1,9 +1,9 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
 var fs = require('fs');
@@ -19,7 +19,7 @@ var injectScript: () => Promise = _.once(function() {
     document.head.setAttribute('data-inboxsdk-script-injected', 'true');
   }
 
-  return Bacon.later(0, null)
+  return Kefir.later(0, null)
     .merge( makeMutationObserverChunkedStream(document.head, {attributes: true}) )
     .filter(() => document.head.hasAttribute('data-inboxsdk-user-email-address'))
     .take(1)

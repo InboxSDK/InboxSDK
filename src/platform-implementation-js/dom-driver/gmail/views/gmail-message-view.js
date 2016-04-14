@@ -1,87 +1,104 @@
+/* @flow */
+
 import _ from 'lodash';
-import Bacon from 'baconjs';
 import $ from 'jquery';
 import asap from 'asap';
 import {defn} from 'ud';
-
-import MessageViewDriver from '../../../driver-interfaces/message-view-driver';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
+import kefirCast from 'kefir-cast';
 
 import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
 
-import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
+import type GmailDriver from '../gmail-driver';
+import type GmailThreadView from './gmail-thread-view';
+import type GmailToolbarView from './gmail-toolbar-view';
 
-var GmailMessageView = function(element, gmailThreadView, driver){
-	MessageViewDriver.call(this);
+import type {VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
 
-	this._element = element;
-	this._eventStream = new Bacon.Bus();
-	this._stopper = this._eventStream.filter(false).mapEnd();
-	this._kstopper = kefirCast(Kefir, this._stopper);
-	this._threadViewDriver = gmailThreadView;
-	this._driver = driver;
-	this._moreMenuItemDescriptors = [];
-	this._moreMenuAddedElements = [];
 
-	// Outputs the same type of stream as makeElementChildStream does.
-	this._replyElementStream = this._eventStream.filter(function(event) {
-		return event.eventName === 'replyElement';
-	}).map('.change');
+class GmailMessageView {
+	_element: HTMLElement;
+	_driver: GmailDriver;
+	_eventStream: Kefir.Bus;
+	_stopper: Kefir.Stream&{destroy: () => void};
+	_threadViewDriver: GmailThreadView;
+	_moreMenuItemDescriptors: Array<Object>;
+	_moreMenuAddedElements: Array<HTMLElement>;
+	_replyElementStream: Kefir.Stream;
+	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
+	_messageLoaded: boolean = false;
+	_openMoreMenu: ?HTMLElement;
 
-	this._setupMessageStateStream();
-	this._monitorEmailAddressHovering();
-	this._setupMoreMenuWatching();
-	asap(() => {
-		this._processInitialState();
-	});
-};
+	constructor(element: HTMLElement, gmailThreadView: GmailThreadView, driver: GmailDriver){
+		this._element = element;
+		this._eventStream = kefirBus();
+		this._stopper = kefirStopper();
 
-GmailMessageView.prototype = Object.create(MessageViewDriver.prototype);
+		this._threadViewDriver = gmailThreadView;
+		this._driver = driver;
+		this._moreMenuItemDescriptors = [];
+		this._moreMenuAddedElements = [];
 
-_.extend(GmailMessageView.prototype, {
+		// Outputs the same type of stream as makeElementChildStream does.
+		this._replyElementStream = this._eventStream.filter(function(event) {
+			return event.eventName === 'replyElement';
+		}).map(event => event.change);
 
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_stopper', destroy: false},
-		{name: '_kstopper', destroy: false},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'},
-		{name: '_threadViewDriver', destroy: false, get: true},
-		{name: '_driver', destroy: false},
-		{name: '_replyElementStream', destroy: false, get: true},
-		{name: '_gmailAttachmentAreaView', destroy: true},
-		{name: '_messageLoaded', destroy: false, defaultValue: false},
-		{name: '_openMoreMenu', destroy: false},
-		{name: '_moreMenuItemDescriptors', destroy: false},
-		{name: '_moreMenuAddedElements', destroy: false}
-	],
+		this._setupMessageStateStream();
+		this._monitorEmailAddressHovering();
+		this._setupMoreMenuWatching();
+		asap(() => {
+			this._processInitialState();
+		});
+	}
 
 	destroy() {
+		this._stopper.destroy();
+		this._eventStream.end();
+		if(this._gmailAttachmentAreaView) this._gmailAttachmentAreaView.destroy();
+
 		this._moreMenuAddedElements.forEach(el => {
 			el.remove();
 		});
-		MessageViewDriver.prototype.destroy.call(this);
-	},
+	}
 
-	isLoaded: function(){
+	getEventStream(): Kefir.Bus {
+		return this._eventStream;
+	}
+
+	getReplyElementStream(): Kefir.Stream {
+		return this._replyElementStream;
+	}
+
+	getElement(): HTMLElement {
+		return this._element;
+	}
+
+	getThreadViewDriver(): GmailThreadView {
+		return this._threadViewDriver;
+	}
+
+	isLoaded(): boolean {
 		return this._messageLoaded;
-	},
+	}
 
-	getContentsElement: function(){
+	getContentsElement(): HTMLElement {
 		if(!this._messageLoaded){
 			throw new Error('tried to get message contents before message is loaded');
 		}
 
 		return this._element.querySelector('.adP');
-	},
+	}
 
-	getLinks: function(){
+	getLinks(): Array<{text: string, html: string, href: string, element: HTMLElement, isInQuotedArea: boolean}> {
 		var anchors = this.getContentsElement().querySelectorAll('a');
 
 		var self = this;
@@ -94,21 +111,21 @@ _.extend(GmailMessageView.prototype, {
 				isInQuotedArea: self.isElementInQuotedArea(anchor)
 			};
 		});
-	},
+	}
 
-	isElementInQuotedArea: function(element){
+	isElementInQuotedArea(element: HTMLElement): boolean {
 		return $(element).parents('blockquote').length > 0;
-	},
+	}
 
-	getSender: function(){
+	getSender(): Contact {
 		var senderSpan = this._element.querySelector('h3.iw span[email]');
 		return this._getUpdatedContact({
 			name: senderSpan.getAttribute('name'),
 			emailAddress: senderSpan.getAttribute('email')
 		});
-	},
+	}
 
-	getRecipients: function(){
+	getRecipients(): Array<Contact> {
 		var receipientSpans = this._element.querySelectorAll('.hb span[email]');
 		return _.map(receipientSpans, (span) => {
 			return this._getUpdatedContact({
@@ -116,35 +133,35 @@ _.extend(GmailMessageView.prototype, {
 				emailAddress: span.getAttribute('email')
 			});
 		});
-	},
+	}
 
-	getDateString() {
+	getDateString(): string {
 		return this._element.querySelector('.ads .gK .g3').title;
-	},
+	}
 
-	getAttachmentCardViewDrivers: function(){
+	getAttachmentCardViewDrivers(): Array<GmailAttachmentCardView> {
 		if(!this._gmailAttachmentAreaView){
 			return [];
 		}
 
 		return this._gmailAttachmentAreaView.getAttachmentCardViews();
-	},
+	}
 
-	addAttachmentCardNoPreview: function(options){
+	addAttachmentCardNoPreview(options: Object ){
 		var newOptions = _.clone(options);
 
 		return this._addAttachmentCard(newOptions);
-	},
+	}
 
-	addAttachmentCard: function(options){
+	addAttachmentCard(options: Object ){
 		var newOptions = _.clone(options);
 
 		delete newOptions.iconThumbnailUrl;
 
 		return this._addAttachmentCard(newOptions);
-	},
+	}
 
-	addButtonToDownloadAllArea: function(options){
+	addButtonToDownloadAllArea(options: Object ){
 		var gmailAttachmentAreaView = this._getAttachmentArea();
 
 		if(!gmailAttachmentAreaView){
@@ -152,22 +169,22 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
-	},
+	}
 
-	addMoreMenuItem(options) {
+	addMoreMenuItem(options: Object) {
 		this._moreMenuItemDescriptors = _.sortBy(
 			this._moreMenuItemDescriptors.concat([options]),
 			o => o.orderHint
 		);
 		this._updateMoreMenu();
-	},
+	}
 
 	_setupMoreMenuWatching() {
 		// At the start, and whenever the view state changes, watch the
 		// 'aria-expanded' property of the more button, and when that changes,
 		// update the _openMoreMenu property.
 		this._openMoreMenu = null;
-		kefirCast(Kefir, this._eventStream)
+		this._eventStream
 			.filter(e => e.eventName === 'viewStateChange')
 			.toProperty(() => null)
 			.flatMapLatest(() => {
@@ -175,7 +192,7 @@ _.extend(GmailMessageView.prototype, {
 				if (!moreButton) {
 					return Kefir.constant(null);
 				}
-				return kefirMakeMutationObserverChunkedStream(moreButton, {
+				return makeMutationObserverChunkedStream(moreButton, {
 						attributes: true,
 						attributeFilter: ['aria-expanded']
 					})
@@ -184,32 +201,32 @@ _.extend(GmailMessageView.prototype, {
 							this._getOpenMoreMenu() : null
 					);
 			})
-			.takeUntilBy(this._kstopper)
+			.takeUntilBy(this._stopper)
 			.onValue(openMoreMenu => {
 				this._openMoreMenu = openMoreMenu;
 				this._updateMoreMenu();
 			});
-	},
+	}
 
-	_getMoreButton() {
+	_getMoreButton(): ?HTMLElement {
 		if (this.getViewState() !== 'EXPANDED') {
 			return null;
 		}
 		return this._element.querySelector('tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]');
-	},
+	}
 
-	_getOpenMoreMenu() {
+	_getOpenMoreMenu(): HTMLElement {
 		// This will find any message's open more menu! The caller needs to make
 		// sure it belongs to this message!
 		return document.body.querySelector('td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]');
-	},
+	}
 
 	_closeActiveEmailMenu() {
 		const moreButton = this._getMoreButton();
 		if (moreButton) {
 			simulateClick(moreButton);
 		}
-	},
+	}
 
 	_updateMoreMenu() {
 		this._moreMenuAddedElements.forEach(el => {
@@ -275,26 +292,26 @@ _.extend(GmailMessageView.prototype, {
 				}
 			}
 		}
-	},
+	}
 
-	getMessageID() {
+	getMessageID(): ?string {
 		if(!this._messageLoaded){
 			throw new Error('tried to get message id before message is loaded');
 		}
 		const messageEl = this._element.querySelector("div.ii.gt");
 		if (!messageEl) {
 			this._driver.getLogger().error(new Error("Could not find message id element"));
-			return;
+			return null;
 		}
 		const m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
 		if (!m) {
 			this._driver.getLogger().error(new Error("Could not find message id value"));
-			return;
+			return null;
 		}
 		return m[1];
-	},
+	}
 
-	addAttachmentIcon(iconDescriptor) {
+	addAttachmentIcon(iconDescriptor: Object) {
 		if (!this._element) {
 			console.warn('addDateIcon called on destroyed message');
 			return;
@@ -309,7 +326,7 @@ _.extend(GmailMessageView.prototype, {
 		let added = false;
 		let currentIconUrl = null;
 
-		this._kstopper.onValue(() => {
+		this._stopper.onValue(() => {
 			if (added) {
 				getImgElement().remove();
 				added = false;
@@ -317,7 +334,7 @@ _.extend(GmailMessageView.prototype, {
 		});
 
 		kefirCast(Kefir, iconDescriptor)
-			.takeUntilBy(this._kstopper)
+			.takeUntilBy(this._stopper)
 			.onValue(opts => {
 				if (!opts) {
 					if (added) {
@@ -361,9 +378,9 @@ _.extend(GmailMessageView.prototype, {
 					}
 				}
 			});
-	},
+	}
 
-	getViewState: function(){
+	getViewState(): VIEW_STATE {
 		if(this._element.classList.contains('kQ')){
 			return 'HIDDEN';
 		}
@@ -373,9 +390,9 @@ _.extend(GmailMessageView.prototype, {
 		else{
 			return 'EXPANDED';
 		}
-	},
+	}
 
-	_addAttachmentCard: function(options){
+	_addAttachmentCard(options: Object): GmailAttachmentCardView {
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
 		if(!this._gmailAttachmentAreaView){
@@ -389,17 +406,17 @@ _.extend(GmailMessageView.prototype, {
 		this._gmailAttachmentAreaView.addGmailAttachmentCardView(gmailAttachmentCardView);
 
 		return gmailAttachmentCardView;
-	},
+	}
 
-	_setupMessageStateStream: function(){
+	_setupMessageStateStream(){
 		var self = this;
 
 		this._eventStream.plug(
 			makeMutationObserverStream(this._element, {
 				attributes: true, attributeFilter: ['class'], attributeOldValue: true
-			}).takeUntil(this._stopper)
+			}).takeUntilBy(this._stopper)
 			  .map(function(mutation) {
-				var currentClassList = mutation.target.classList;
+				var currentClassList = (mutation.target: any).classList;
 
 				var oldValue;
 				var newValue;
@@ -430,10 +447,12 @@ _.extend(GmailMessageView.prototype, {
 					currentClassList: currentClassList
 				};
 			})
-			.doAction(function(event){
+			.map(function(event){
 				if(event.newValue === 'EXPANDED' && event.oldValue !== 'EXPANDED'){
 					self._checkMessageOpenState(event.currentClassList);
 				}
+
+				return event;
 			})
 			.filter(function(event){
 				return event.newValue !== event.oldValue && !!event.oldValue && !!event.newValue;
@@ -446,14 +465,13 @@ _.extend(GmailMessageView.prototype, {
 				};
 			})
 		);
+	}
 
-	},
-
-	_processInitialState: function(){
+	_processInitialState(){
 		this._checkMessageOpenState(this._element.classList);
-	},
+	}
 
-	_checkMessageOpenState: function(classList){
+	_checkMessageOpenState(classList: Object){
 		if(!classList.contains('h7')){
 			return;
 		}
@@ -461,21 +479,27 @@ _.extend(GmailMessageView.prototype, {
 		if(this._messageLoaded){
 			return;
 		}
+
+		const messageId = this.getMessageID();
+		if(messageId == null){
+			return;
+		}
+
 		this._messageLoaded = true;
 
-		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), this.getMessageID());
+		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), messageId);
 		this._gmailAttachmentAreaView = this._getAttachmentArea();
 
-		this._eventStream.push({
+		this._eventStream.emit({
 			type: 'internal',
 			eventName: 'messageLoad',
 			view: this
 		});
 
 		this._setupReplyStream();
-	},
+	}
 
-	_setupReplyStream: function(){
+	_setupReplyStream(){
 		var replyContainer = this._element.querySelector('.ip');
 
 		if(!replyContainer){
@@ -485,13 +509,20 @@ _.extend(GmailMessageView.prototype, {
 		var self = this;
 		var currentReplyElementRemovalStream = null;
 
-		makeMutationObserverChunkedStream(replyContainer, {
-			attributes: true, attributeFilter: ['class']
-		}).takeUntil(this._stopper).startWith(null).mapEnd('END').onValue(mutation => {
+		makeMutationObserverChunkedStream(
+			replyContainer,
+			{
+				attributes: true, attributeFilter: ['class']
+			}
+		)
+		.takeUntilBy(this._stopper)
+		.toProperty(() => null)
+		.beforeEnd(() => 'END')
+		.onValue(mutation => {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
-					currentReplyElementRemovalStream = new Bacon.Bus();
-					self._eventStream.push({
+					currentReplyElementRemovalStream = kefirBus();
+					self._eventStream.emit({
 						type: 'internal',
 						eventName: 'replyElement',
 						change: {
@@ -513,13 +544,13 @@ _.extend(GmailMessageView.prototype, {
 				}
 			}
 		});
-	},
+	}
 
-	_monitorEmailAddressHovering: function(){
+	_monitorEmailAddressHovering(){
 		var self = this;
 		this._eventStream.plug(
-			Bacon.fromEventTarget(this._element, 'mouseover')
-				 .map('.target')
+			Kefir.fromEvents(this._element, 'mouseover')
+				 .map(e => e.target)
 				 .filter(function(element){
 				 	return element && element.getAttribute('email');
 				 })
@@ -532,7 +563,7 @@ _.extend(GmailMessageView.prototype, {
 						contactType = 'sender';
 					}
 					else{
-						if(self._element.querySelector('h3.iw').contains(element)){
+						if((self._element.querySelector('h3.iw'): any).contains(element)){
 							contactType = 'sender';
 						}
 						else{
@@ -550,26 +581,26 @@ _.extend(GmailMessageView.prototype, {
 				 })
 
 		);
-	},
+	}
 
-	_getAttachmentArea: function(){
+	_getAttachmentArea(): ?GmailAttachmentAreaView {
 		if(this._element.querySelector('.hq')){
 			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver);
 		}
 
 		return null;
-	},
+	}
 
-	_createAttachmentArea: function(){
+	_createAttachmentArea(): GmailAttachmentAreaView{
 		var gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
 
 		var beforeElement = this._element.querySelector('.hi');
 		beforeElement.parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);
 
 		return gmailAttachmentAreaView;
-	},
+	}
 
-	_getUpdatedContact: function(inContact){
+	_getUpdatedContact(inContact: Contact): Contact{
 		const contact = _.clone(inContact);
 
 		const menuButtonElement = this._element.querySelector('.ajy[aria-haspopup=true]');
@@ -590,9 +621,9 @@ _.extend(GmailMessageView.prototype, {
 		}
 
 		return contact;
-	},
+	}
 
-	_getModalContactName(emailAddress) {
+	_getModalContactName(emailAddress: string): ?string {
 		const nameSpans = document.querySelectorAll('.ajC [email]');
 		let foundNameSpan = _.find(nameSpans, span => span.getAttribute('email') === emailAddress);
 		if(foundNameSpan){
@@ -610,7 +641,7 @@ _.extend(GmailMessageView.prototype, {
 		return null;
 	}
 
-});
+}
 
 function _extractContactInformation(span){
 	return {

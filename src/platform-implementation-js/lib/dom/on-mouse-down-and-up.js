@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 const Kefir = require('kefir');
-import fromEventTargetCapture from '../kefir-from-event-target-capture';
+import fromEventTargetCapture from '../from-event-target-capture';
 import {defn} from 'ud';
 
 const pageMouseUps = fromEventTargetCapture(document.body, 'mouseup');

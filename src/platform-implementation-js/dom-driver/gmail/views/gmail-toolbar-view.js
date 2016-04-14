@@ -7,8 +7,8 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
-import kefirWaitFor from '../../../lib/kefir-wait-for';
-import kefirMakeMutationObserverStream from '../../../lib/dom/kefir-make-mutation-observer-stream';
+import streamWaitFor from '../../../lib/stream-wait-for';
+import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 
 import GmailElementGetter from '../gmail-element-getter';
@@ -49,7 +49,7 @@ class GmailToolbarView {
 		this._buttonViewControllers = [];
 		this._moreMenuItems = [];
 
-		this._ready = kefirWaitFor(() => !!this._getMoveSectionElement())
+		this._ready = streamWaitFor(() => !!this._getMoveSectionElement())
 			.takeUntilBy(this._stopper)
 			.map(() => this)
 			.toProperty();
@@ -205,7 +205,7 @@ class GmailToolbarView {
 			return;
 		}
 
-		kefirMakeMutationObserverStream(moreButtonElement, {attributes: true, attributeFilter: ['aria-expanded']})
+		makeMutationObserverStream(moreButtonElement, {attributes: true, attributeFilter: ['aria-expanded']})
 			.toProperty(() => null)
 			.takeUntilBy(this._stopper)
 			.map(() => moreButtonElement.getAttribute('aria-expanded'))
@@ -239,7 +239,7 @@ class GmailToolbarView {
 	_setupToolbarStateMonitoring(){
 		const moveSectionElement = this._getMoveSectionElement();
 		if (!moveSectionElement) throw new Error("No move section element");
-		kefirMakeMutationObserverStream(
+		makeMutationObserverStream(
 				moveSectionElement,
 				{attributes: true, attributeFilter: ['style']}
 			)

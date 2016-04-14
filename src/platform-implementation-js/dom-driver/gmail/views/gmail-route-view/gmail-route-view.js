@@ -11,7 +11,7 @@ import {defn} from 'ud';
 
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import makeElementViewStream from '../../../../lib/dom/make-element-view-stream';
-import kefirMakeMutationObserverChunkedStream from '../../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
 import type {RouteViewDriver} from '../../../../driver-interfaces/route-view-driver';
 import GmailRowListView from '../gmail-row-list-view';
@@ -189,7 +189,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			return;
 		}
 
-		kefirMakeMutationObserverChunkedStream(leftNav, {attributes: true, attributeFilter: ['style']})
+		makeMutationObserverChunkedStream(leftNav, {attributes: true, attributeFilter: ['style']})
 			.takeUntilBy(this._stopper)
 			.onValue(() => {
 				this._setCustomViewElementHeight();

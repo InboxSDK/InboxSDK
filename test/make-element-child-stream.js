@@ -1,12 +1,13 @@
-var assert = require('assert');
-var Bacon = require('baconjs');
-var EventEmitter = require('events').EventEmitter;
-var Marker = require('../src/common/marker');
-const MockElementParent = require('./lib/mock-element-parent');
+import assert from 'assert';
+import Kefir from 'kefir';
+import {EventEmitter} from 'events';
+import Marker from '../src/common/marker';
+import MockElementParent from './lib/mock-element-parent';
+import kefirBus from 'kefir-bus';
 
-var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
+import kefirMakeElementChildStream from '../src/platform-implementation-js/lib/dom/make-element-child-stream';
 
-describe('makeElementChildStream', function() {
+describe('kefirMakeElementChildStream', function() {
   global.MutationObserver = null;
   before(function() {
     global.MutationObserver = require('./lib/mock-mutation-observer');
@@ -21,7 +22,7 @@ describe('makeElementChildStream', function() {
     const target = new MockElementParent([child1, child2]);
 
     var call = 0;
-    makeElementChildStream(target).onValue(function(event) {
+    kefirMakeElementChildStream(target).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);
@@ -31,11 +32,11 @@ describe('makeElementChildStream', function() {
           break;
         case 2:
           assert.strictEqual(event.el, child2);
-          assert(event.removalStream instanceof Bacon.EventStream);
+          assert(event.removalStream instanceof Kefir.Observable);
           break;
         case 3:
           assert.strictEqual(event.el, child3);
-          assert(event.removalStream instanceof Bacon.EventStream);
+          assert(event.removalStream instanceof Kefir.Observable);
           done();
           break;
         default:
@@ -50,14 +51,14 @@ describe('makeElementChildStream', function() {
 
   it('triggers removals when no longer listened on', function(done) {
     var child1 = Marker('child1'), child2 = Marker('child2');
-    var stopper = new Bacon.Bus();
+    var stopper = kefirBus();
 
     const target = new MockElementParent([child1]);
 
     var call = 0;
     var child1Removed = 0, child2Removed = 0;
     var child1Ended = false, child2Ended = false;
-    var stream = makeElementChildStream(target).takeUntil(stopper);
+    var stream = kefirMakeElementChildStream(target).takeUntilBy(stopper);
     stream.onValue(function(event) {
       switch(++call) {
         case 1:
@@ -86,7 +87,7 @@ describe('makeElementChildStream', function() {
           assert(!child1Ended);
           assert(!child2Ended);
           assert.strictEqual(child1Ended, false, 'sanity check');
-          stopper.push();
+          stopper.emit();
           assert.strictEqual(child1Ended, false, 'no sync removal check');
           break;
         default:
@@ -110,7 +111,7 @@ describe('makeElementChildStream', function() {
     const target = new MockElementParent([child1]);
 
     var i = 0;
-    const stream = makeElementChildStream(target);
+    const stream = kefirMakeElementChildStream(target);
     stream.onValue(event => {
       switch(++i) {
         case 1:
@@ -133,7 +134,7 @@ describe('makeElementChildStream', function() {
     const target = new MockElementParent([child1, child2]);
 
     var i = 0;
-    const stream = makeElementChildStream(target);
+    const stream = kefirMakeElementChildStream(target);
     stream.onValue(event => {
       switch(++i) {
         case 1:
@@ -147,37 +148,6 @@ describe('makeElementChildStream', function() {
         default:
           throw new Error("should not happen");
       }
-    });
-  });
-
-  // Make sure https://github.com/baconjs/bacon.js/issues/574 doesn't affect this.
-  it("doesn't cause reentrance issues", function(done) {
-    const child1 = Marker('child1'), child2 = Marker('child2');
-    const someBus = new Bacon.Bus();
-    someBus.onValue(()=>{});
-
-    const target = new MockElementParent([child1, child2]);
-
-    let i = 0, criticalSection = false;
-    const stream = makeElementChildStream(target);
-    stream.onValue(event => {
-      if (criticalSection) {
-        throw new Error("Re-entrance");
-      }
-      criticalSection = true;
-      switch(++i) {
-        case 1:
-          assert.strictEqual(event.el, child1);
-          someBus.end();
-          break;
-        case 2:
-          assert.strictEqual(event.el, child2);
-          done();
-          break;
-        default:
-          throw new Error("should not happen");
-      }
-      criticalSection = false;
     });
   });
 });

@@ -3,7 +3,7 @@
 
 var Kefir = require('kefir');
 import StopperPool from '../stopper-pool';
-import delayAsap from '../kefir-delay-asap';
+import delayAsap from '../delay-asap';
 
 export default function makeElementStreamMerger(): (event: {el: HTMLElement, removalStream: Kefir.Stream}) => Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
   var knownElementStopperPools: Map<HTMLElement, StopperPool> = new Map();

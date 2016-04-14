@@ -1,12 +1,13 @@
 import assert from 'assert';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
 
-import makeMutationObserverStream from '../src/platform-implementation-js/lib/dom/make-mutation-observer-stream';
+import kefirMakeMutationObserverStream from '../src/platform-implementation-js/lib/dom/make-mutation-observer-stream';
 
-describe('makeMutationObserverStream', function() {
+describe('kefirMakeMutationObserverStream', function() {
   global.MutationObserver = null;
   before(function() {
     global.MutationObserver = require('./lib/mock-mutation-observer');
@@ -21,7 +22,7 @@ describe('makeMutationObserverStream', function() {
     const target = new MockElementParent([child1, child2]);
 
     let call = 0;
-    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    kefirMakeMutationObserverStream(target, {childList:true}).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.deepEqual(event.addedNodes, []);
@@ -46,12 +47,12 @@ describe('makeMutationObserverStream', function() {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const target = new MockElementParent([child1, child2]);
-    const someBus = new Bacon.Bus();
+    const someBus = kefirBus();
     someBus.onValue(()=>{});
 
     let call = 0;
     let criticalSection = false;
-    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    kefirMakeMutationObserverStream(target, {childList:true}).onValue(function(event) {
       if (criticalSection) {
         throw new Error("Re-entrance detected!");
       }

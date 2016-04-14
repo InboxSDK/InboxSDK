@@ -4,11 +4,9 @@
 import _ from 'lodash';
 import RSVP from 'rsvp';
 import * as ud from 'ud';
-import * as Bacon from 'baconjs';
-import * as Kefir from 'kefir';
+import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
-import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
@@ -78,16 +76,15 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_pageCommunicatorPromise: Promise<PageCommunicator>;
 	_butterBar: ?ButterBar;
 	_butterBarDriver: GmailButterBarDriver;
-	_routeViewDriverStream: Bacon.Observable<Object>;
-	_rowListViewDriverStream: Bacon.Observable<Object>;
+	_routeViewDriverStream: Kefir.Stream<Object>;
+	_rowListViewDriverStream: Kefir.Stream<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Stream<Object>;
-	_threadViewDriverStream: Bacon.Observable<Object>;
-	_toolbarViewDriverStream: Bacon.Observable<Object>;
-	_composeViewDriverStream: Bacon.Observable<GmailComposeView>;
-	_xhrInterceptorStream: Bacon.Observable<Object>;
-	_messageViewDriverStream: Bacon.Observable<Object>;
+	_threadViewDriverStream: Kefir.Stream<Object>;
+	_toolbarViewDriverStream: Kefir.Stream<Object>;
+	_composeViewDriverStream: Kefir.Stream<GmailComposeView>;
+	_xhrInterceptorStream: Kefir.Stream<Object>;
+	_messageViewDriverStream: Kefir.Stream<Object>;
 	_stopper: Kefir.Stream&{destroy:()=>void};
-	_bStopper: Bacon.Observable;
 	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
@@ -108,7 +105,6 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		this._messageIDsToThreadIDs = new Map();
 		this._stopper = kefirStopper();
 		this._navMarkerHiddenChanged = kefirBus();
-		this._bStopper = baconCast(Bacon, this._stopper).toProperty();
 
 		this._messageIdManager = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
@@ -152,16 +148,15 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
 	getCustomListRouteIDs(): Map<string, Function> {return this._customListRouteIDs;}
 	getKeyboardShortcutHelpModifier(): KeyboardShortcutHelpModifier {return this._keyboardShortcutHelpModifier;}
-	getRouteViewDriverStream(): Bacon.Observable<Object> {return this._routeViewDriverStream;}
-	getRowListViewDriverStream(): Bacon.Observable<Object> {return this._rowListViewDriverStream;}
+	getRouteViewDriverStream(): Kefir.Stream<Object> {return this._routeViewDriverStream;}
+	getRowListViewDriverStream(): Kefir.Stream<Object> {return this._rowListViewDriverStream;}
 	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
-	getThreadViewDriverStream(): Bacon.Observable<Object> {return this._threadViewDriverStream;}
-	getToolbarViewDriverStream(): Bacon.Observable<Object> {return this._toolbarViewDriverStream;}
-	getComposeViewDriverStream(): Bacon.Observable<ComposeViewDriver> {return (this._composeViewDriverStream:any);}
-	getXhrInterceptorStream(): Bacon.Observable<Object> {return this._xhrInterceptorStream;}
-	getMessageViewDriverStream(): Bacon.Observable<Object> {return this._messageViewDriverStream;}
+	getThreadViewDriverStream(): Kefir.Stream<Object> {return this._threadViewDriverStream;}
+	getToolbarViewDriverStream(): Kefir.Stream<Object> {return this._toolbarViewDriverStream;}
+	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver> {return (this._composeViewDriverStream:any);}
+	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}
+	getMessageViewDriverStream(): Kefir.Stream<Object> {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
-	getBaconStopper(): Bacon.Observable {return this._bStopper;}
 	getEnvData(): EnvData {return this._envData;}
 
 	getTimings(): {[ix:string]:?number} {
@@ -308,7 +303,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_setupEventStreams() {
 		var result = makeXhrInterceptor();
 
-		this._xhrInterceptorStream = result.xhrInterceptStream.takeUntil(this._bStopper);
+		this._xhrInterceptorStream = result.xhrInterceptStream.takeUntilBy(this._stopper);
 
 		this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
@@ -321,19 +316,22 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
-			this._routeViewDriverStream = baconCast(Bacon, setupRouteViewDriverStream(
+			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
-			)).doAction(routeViewDriver => {
+			).doAction(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(this._pageCommunicator);
-			}).takeUntil(this._bStopper).toProperty();
+			}).takeUntilBy(this._stopper).toProperty();
 
-			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntil(this._bStopper);
+			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntilBy(this._stopper);
 
 			this._setupThreadRowViewDriverKefirStream();
-			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView')
-												.doAction(gmailThreadView => {
-													gmailThreadView.setPageCommunicator(this._pageCommunicator);
-												}).takeUntil(this._bStopper);
+			this._threadViewDriverStream =
+				this._setupRouteSubViewDriver('newGmailThreadView')
+						.map(gmailThreadView => {
+							gmailThreadView.setPageCommunicator(this._pageCommunicator);
+							return gmailThreadView;
+						})
+						.takeUntilBy(this._stopper);
 
 			this._setupToolbarViewDriverStream();
 			this._setupMessageViewDriverStream();
@@ -344,12 +342,16 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	_setupComposeViewDriverStream() {
-		this._composeViewDriverStream = baconCast(Bacon, setupComposeViewDriverStream(
-			this, kefirCast(Kefir, this._messageViewDriverStream), this._xhrInterceptorStream
-		).takeUntilBy(this._stopper));
+		this._composeViewDriverStream =
+			setupComposeViewDriverStream(
+				this,
+				this._messageViewDriverStream,
+				this._xhrInterceptorStream
+			)
+			.takeUntilBy(this._stopper);
 	}
 
-	_setupRouteSubViewDriver(viewName: string): Bacon.Observable<Object> {
+	_setupRouteSubViewDriver(viewName: string): Kefir.Stream<Object> {
 		return this._routeViewDriverStream.flatMap((gmailRouteView) => {
 			return gmailRouteView.getEventStream()
 				.filter(event => event.eventName === viewName)
@@ -369,19 +371,19 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	_setupToolbarViewDriverStream() {
-		this._toolbarViewDriverStream = Bacon.mergeAll(
+		this._toolbarViewDriverStream = Kefir.merge([
 											this._rowListViewDriverStream.map(function(gmailRowListView){
 												return gmailRowListView.getToolbarView();
 											}),
 											this._threadViewDriverStream.map(function(gmailThreadView){
 												return gmailThreadView.getToolbarView();
 											})
-										)
+										])
 										.filter(Boolean)
 										.flatMap(function(gmailToolbarView){
-											return baconCast(Bacon, gmailToolbarView.waitForReady());
+											return gmailToolbarView.waitForReady();
 										})
-										.takeUntil(this._bStopper);
+										.takeUntilBy(this._stopper);
 	}
 
 	_setupMessageViewDriverStream() {
@@ -392,7 +394,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			.map(function(event){
 				return event.view;
 			});
-		}).takeUntil(this._bStopper);
+		}).takeUntilBy(this._stopper);
 	}
 
 	isRunningInPageContext(): boolean {
@@ -403,7 +405,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		showAppIdWarning(this);
 	}
 
-	createTopMessageBarDriver(optionStream: Bacon.Observable): GmailTopMessageBarDriver {
+	createTopMessageBarDriver(optionStream: Kefir.Stream): GmailTopMessageBarDriver {
 		return new GmailTopMessageBarDriver(optionStream);
 	}
 

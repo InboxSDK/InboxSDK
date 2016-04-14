@@ -1,7 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
@@ -76,7 +76,7 @@ class Conversations {
 }
 
 function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, ConversationsInstance, membraneMap, driver){
-	var combinedStream: Bacon.Observable<Object> = stream.map(function(viewDriver){
+	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
 		var view = membraneMap.get(viewDriver);
 		if (!view) {
 			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance, driver);
@@ -90,8 +90,8 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 	});
 
 	combinedStream.flatMap(function(event) {
-		return Bacon.later(0)
-			.takeUntil(Bacon.fromEvent(event.view, 'destroy'))
+		return Kefir.later(0)
+			.takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
 			.map(() => event);
 	}).onValue(function(event) {
 		handlerRegistry.addTarget(event.view);

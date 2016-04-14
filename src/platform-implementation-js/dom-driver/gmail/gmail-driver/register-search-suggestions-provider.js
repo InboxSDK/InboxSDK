@@ -2,7 +2,7 @@
 // jshint ignore:start
 
 import _ from 'lodash';
-import * as Bacon from 'baconjs';
+import Kefir from 'kefir';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import simulateClick from '../../../lib/dom/simulate-click';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
@@ -28,7 +28,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     .filter((event) => event.type === 'suggestionsRequest')
     .map(x => x.query)
     .flatMapLatest((query) =>
-      Bacon.fromPromise(RSVP.Promise.resolve(handler(query)), true)
+      Kefir.fromPromise(RSVP.Promise.resolve(handler(query)))
         .flatMap((suggestions) => {
           try {
             // Strip out anything not JSONifiable.
@@ -53,9 +53,9 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
               }
             }
           } catch(e) {
-            return new Bacon.Error(e);
+            return Kefir.constantError(e);
           }
-          return Bacon.once(suggestions);
+          return Kefir.constant(suggestions);
         })
         .mapError((err) => {
           Logger.error(err);
@@ -71,14 +71,16 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
-  var searchBoxStream: Bacon.Observable<HTMLInputElement> = driver.getRouteViewDriverStream().startWith(null)
-    .map(() => gmailElementGetter.getSearchInput())
-    .filter(Boolean)
-    .take(1).toProperty();
+  var searchBoxStream: Kefir.Stream<HTMLInputElement> =
+    driver.getRouteViewDriverStream()
+      .toProperty(() => null)
+      .map(() => gmailElementGetter.getSearchInput())
+      .filter(Boolean)
+      .take(1);
 
   // Wait for the search box to be focused before looking for the suggestions box.
-  var suggestionsBoxTbodyStream: Bacon.Observable<HTMLElement> = searchBoxStream
-    .flatMapLatest((searchBox) => Bacon.fromEvent(searchBox, 'focus'))
+  var suggestionsBoxTbodyStream: Kefir.Stream<HTMLElement> = searchBoxStream
+    .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
     .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
     .filter(Boolean)
     .flatMapLatest(makeElementChildStream)
@@ -89,7 +91,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
   // list.
   var suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
     .flatMap((suggestionsBoxTbody) =>
-      makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).startWith(null)
+      makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).toProperty(() => null)
     ).map(() => null);
 
   // We listen to the event on the document node so that the event can be
@@ -101,7 +103,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     );
 
   // Stream of arrays of row elements belonging to this provider.
-  var providedRows: Bacon.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
+  var providedRows: Kefir.Stream<HTMLElement[]> = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
     .map(suggestionsBoxTbody =>
       _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
@@ -120,17 +122,17 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     }
   });
 
-  var rowSelectionEvents: Bacon.Observable<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
-    Bacon.mergeAll(rows.map(row =>
-      Bacon.mergeAll(
+  var rowSelectionEvents: Kefir.Stream<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
+    Kefir.merge(rows.map(row =>
+      Kefir.merge([
         fromEventTargetCapture(row, 'click'),
         suggestionsBoxEnterPresses
           .filter(() => row.classList.contains('gssb_i'))
-      ).map(event => ({event, row}))
+      ]).map(event => ({event, row}))
     ))
   );
 
-  Bacon.combineAsArray([rowSelectionEvents, searchBoxStream])
+  Kefir.combine([rowSelectionEvents, searchBoxStream])
     .onValue(([{event, row}, searchBox]) => {
       var itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
       var itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;

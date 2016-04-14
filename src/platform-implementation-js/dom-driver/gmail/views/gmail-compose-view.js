@@ -5,10 +5,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import asap from 'asap';
 import RSVP from 'rsvp';
-import * as Bacon from 'baconjs';
 import * as Kefir from 'kefir';
 import * as ud from 'ud';
-import baconCast from 'bacon-cast';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -23,8 +21,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import setCss from '../../../lib/dom/set-css';
 
 import waitFor from '../../../lib/wait-for';
-import kefirWaitFor from '../../../lib/kefir-wait-for';
-import baconFlatten from '../../../lib/bacon-flatten';
+import streamWaitFor from '../../../lib/stream-wait-for';
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
@@ -62,7 +59,7 @@ class GmailComposeView {
 	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
-	_eventStream: Bacon.Bus<any>;
+	_eventStream: Kefir.Bus<any>;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
 	_composeID: string;
@@ -81,7 +78,7 @@ class GmailComposeView {
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
-	constructor(element: HTMLElement, xhrInterceptorStream: Bacon.Observable, driver: GmailDriver) {
+	constructor(element: HTMLElement, xhrInterceptorStream: Kefir.Stream, driver: GmailDriver) {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
@@ -99,14 +96,14 @@ class GmailComposeView {
 		this._requestModifiers = {};
 		this._isListeningToAjaxInterceptStream = false;
 
-		this._eventStream = new Bacon.Bus();
-		this.getEventStream = _.constant(kefirCast(Kefir, this._eventStream));
+		this._eventStream = kefirBus();
 
 		this._isTriggeringADraftSavePending = false;
 
 		this._eventStream.plug(
-			Bacon.mergeAll(
-				baconFlatten(xhrInterceptorStream
+			Kefir.merge([
+				xhrInterceptorStream
+					.flatten()
 					.filter(event => event.composeId === this.getComposeID())
 					.map((event) => {
 						switch(event.type){
@@ -166,7 +163,7 @@ class GmailComposeView {
 							default:
 								return [];
 						}
-					}))
+					})
 					.map(event => {
 						if(this._driver.getLogger().shouldTrackEverything()){
 							driver.getLogger().eventSite(event.eventName);
@@ -175,29 +172,32 @@ class GmailComposeView {
 						return event;
 					}),
 
-				Bacon.fromEventTarget(this._element, 'buttonAdded').map(() => {
-					return {
-						eventName: 'buttonAdded'
-					};
-				}),
-
-				Bacon.fromEvent(this._element, 'resize').map(() => ({eventName: 'resize'})),
-
-				Bacon
-					.fromEventTarget(this._element, 'composeFullscreenStateChanged')
-					.doAction(() => this._updateComposeFullscreenState())
+				Kefir
+					.fromEvents(this._element, 'buttonAdded')
 					.map(() => {
+						return {
+							eventName: 'buttonAdded'
+						};
+					}
+				),
+
+				Kefir.fromEvents(this._element, 'resize').map(() => ({eventName: 'resize'})),
+
+				Kefir
+					.fromEvents(this._element, 'composeFullscreenStateChanged')
+					.map(() => {
+						this._updateComposeFullscreenState();
 						return {
 							eventName: 'composeFullscreenStateChanged'
 						};
 					})
-			)
+			])
 		);
 
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		this.ready = _.constant(
-			kefirWaitFor(
+			streamWaitFor(
 				() => this.getBodyElement(),
 				3*60 * 1000 //timeout
 			)
@@ -232,7 +232,7 @@ class GmailComposeView {
 	}
 
 	destroy() {
-		this._eventStream.push({eventName: 'destroy', data: {
+		this._eventStream.emit({eventName: 'destroy', data: {
 			messageID: this.getMessageID()
 		}});
 		this._eventStream.end();
@@ -245,27 +245,34 @@ class GmailComposeView {
 
 	getStopper(): Kefir.Stream {return this._stopper;}
 
+	getEventStream(): Kefir.Stream {return this._eventStream;}
+
 	_setupStreams() {
 		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
 		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
 
-		const minimizedStream = Kefir.later(10).flatMap(()=>getMinimizedStream(this));
-		this._eventStream.plug(baconCast(Bacon, minimizedStream.changes().map(minimized =>
-			({eventName: minimized ? 'minimized' : 'restored'})
-		)));
+		this._eventStream.plug(
+			Kefir
+				.later(10)
+				.flatMap(()=>getMinimizedStream(this))
+				.changes()
+				.map(minimized =>
+					({eventName: minimized ? 'minimized' : 'restored'})
+				)
+		);
 
 		const messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
 
 		messageIDChangeStream
-			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
+			.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
 			.map(() => this._getMessageIDfromForm())
 			.filter(messageID =>
 				messageID && !this._emailWasSent && this._messageId !== messageID
 			)
 			.onValue(messageID => {
 				this._messageId = messageID;
-				this._eventStream.push({
+				this._eventStream.emit({
 					eventName: 'messageIDChange',
 					data: this._messageId
 				});
@@ -419,13 +426,14 @@ class GmailComposeView {
 	addStatusBar(options: {height?: number, orderHint?: number}={}): StatusBar {
 		var statusBar = addStatusBar(this, options);
 		dispatchCustomEvent(this._element, 'resize');
-		Bacon.fromEvent(statusBar, 'destroy')
+		Kefir.fromEvents(statusBar, 'destroy')
 			.map(() => ({eventName:'statusBarRemoved'}))
 			.flatMap(delayAsap)
-			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
+			.takeUntilBy(this._stopper)
 			.onValue(() => {
 				dispatchCustomEvent(this._element, 'resize');
 			});
+
 		return statusBar;
 	}
 
@@ -702,7 +710,7 @@ class GmailComposeView {
 		if (!this._messageId) {
 			await this._eventStream
 				.filter(event => event.eventName === 'messageIDChange')
-				.mapEnd(() => null)
+				.beforeEnd(() => null)
 				.take(1)
 				.toPromise(RSVP.Promise);
 		}
@@ -725,7 +733,7 @@ class GmailComposeView {
 				if (this._draftSaving) {
 					await this._eventStream
 						.filter(event => event.eventName === 'messageIDChange')
-						.mapEnd(() => null)
+						.beforeEnd(() => null)
 						.take(1)
 						.toPromise(RSVP.Promise);
 					continue;
@@ -871,7 +879,7 @@ class GmailComposeView {
 		this._driver
 			.getPageCommunicator()
 			.ajaxInterceptStream
-			.takeUntil(baconCast(Bacon, this._stopper))
+			.takeUntilBy(this._stopper)
 			.filter(({type, composeid, modifierId}) =>
 						type === 'inboxSDKmodifyComposeRequest' &&
 						composeid === this.getComposeID() &&

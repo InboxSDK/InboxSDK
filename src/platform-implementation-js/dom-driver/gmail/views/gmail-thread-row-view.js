@@ -4,17 +4,15 @@
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import assert from 'assert';
-import Bacon from 'baconjs';
 import Kefir from 'kefir';
 import asap from 'asap';
 import kefirBus from 'kefir-bus';
 
 import assertInterface from '../../../lib/assert-interface';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
-import baconCast from 'bacon-cast';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import kefirCast from 'kefir-cast';
 import ThreadRowViewDriver from '../../../driver-interfaces/thread-row-view-driver';
-import kefirDelayAsap from '../../../lib/kefir-delay-asap';
+import delayAsap from '../../../lib/delay-asap';
 import kefirStopper from 'kefir-stopper';
 
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
@@ -137,7 +135,7 @@ class GmailThreadRowView {
 
     this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
     this._imageFixerTask = this._imageFixer
-      .bufferBy(this._imageFixer.flatMap(x => kefirDelayAsap()))
+      .bufferBy(this._imageFixer.flatMap(x => delayAsap()))
       .filter(x => x.length > 0)
       .map(x => null)
       .takeUntilBy(this._stopper);
@@ -166,7 +164,7 @@ class GmailThreadRowView {
     const watchElement: HTMLElement = this._elements.length === 1 ?
       this._elements[0] : (this._elements[0].children[2]: any);
 
-    this._refresher = kefirMakeMutationObserverChunkedStream(watchElement, {
+    this._refresher = makeMutationObserverChunkedStream(watchElement, {
       childList: true
     }).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
 
@@ -174,11 +172,11 @@ class GmailThreadRowView {
       this._subjectRefresher = Kefir.constant(null);
     } else {
       const subjectElement = watchElement.querySelector('.y6');
-      this._subjectRefresher = kefirMakeMutationObserverChunkedStream(subjectElement, {
+      this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
           childList: true
         })
         .merge(
-          kefirMakeMutationObserverChunkedStream(watchElement, {
+          makeMutationObserverChunkedStream(watchElement, {
             attributes: true, attributeFilter: ['class']
           })
         )

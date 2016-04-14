@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 
 import streamWaitFor from '../../lib/stream-wait-for';
@@ -36,7 +36,7 @@ const sdkRemovedNotice = elements
   )
   .filter(id => id == null);
 
-const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
+const noticeAvailableStream = Kefir.merge([googleRemovedNotice, sdkRemovedNotice]);
 
 function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
@@ -48,8 +48,8 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
 
 export default class GmailButterBarDriver {
   constructor() {
-    Bacon.combineAsArray(elements, googleAddedNotice)
-      .onValues(({googleNotice, sdkNotice}) => {
+    Kefir.combine([elements, googleAddedNotice])
+      .onValue(({googleNotice, sdkNotice}) => {
         googleNotice.style.display = '';
         sdkNotice.style.display = 'none';
         sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');

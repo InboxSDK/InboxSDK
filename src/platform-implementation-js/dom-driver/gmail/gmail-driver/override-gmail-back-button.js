@@ -2,13 +2,9 @@
 //jshint ignore:start
 
 const _ = require('lodash');
-const Bacon = require('baconjs');
 const Kefir = require('kefir');
-const kefirCast = require('kefir-cast');
 import {defn} from 'ud';
 import GmailElementGetter from '../gmail-element-getter';
-import kefirFromEventTargetCapture from '../../../lib/kefir-from-event-target-capture';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
 import onMouseDownAndUp from '../../../lib/dom/on-mouse-down-and-up';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from '../views/gmail-route-view/gmail-route-view';
@@ -24,7 +20,7 @@ export default function overrideGmailBackButton(gmailDriver: GmailDriver, gmailR
 }
 
 function _setupManagement(gmailDriver, gmailRouteProcessor){
-	kefirCast(Kefir, gmailDriver.getRouteViewDriverStream())
+	gmailDriver.getRouteViewDriverStream()
 		.scan((prev: ?{gmailRouteView: GmailRouteView}, gmailRouteView: GmailRouteView) => {
 			let lastCustomRouteID, lastCustomRouteParams;
 			if (prev && prev.gmailRouteView.isCustomRouteBelongingToApp()) {

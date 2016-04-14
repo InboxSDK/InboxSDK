@@ -1,21 +1,21 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var fs = require('fs');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import fs from 'fs';
 import {parse} from 'querystring';
 import PageCommunicator from './gmail-page-communicator';
 
 import injectScript from '../../lib/inject-script';
 
-export default function makeXhrInterceptor(): {xhrInterceptStream: Bacon.Observable, pageCommunicatorPromise: Promise<PageCommunicator>} {
+export default function makeXhrInterceptor(): {xhrInterceptStream: Kefir.Stream, pageCommunicatorPromise: Promise<PageCommunicator>} {
   var pageCommunicator = new PageCommunicator();
   var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
 
   var pageCommunicatorPromise = injectScript().then(() => pageCommunicator);
 
-  var interceptStream = Bacon.mergeAll(
+  var interceptStream = Kefir.merge([
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSending';
     }).map(function(detail) {
@@ -61,7 +61,7 @@ export default function makeXhrInterceptor(): {xhrInterceptStream: Bacon.Observa
         connectionDetails: detail.connectionDetails
       };
     })
-  );
+  ]);
 
   return {
     xhrInterceptStream: interceptStream,

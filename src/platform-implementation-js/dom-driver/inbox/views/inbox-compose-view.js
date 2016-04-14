@@ -9,8 +9,8 @@ var kefirStopper = require('kefir-stopper');
 var kefirBus = require('kefir-bus');
 var autoHtml = require('auto-html');
 import censorHTMLstring from '../../../../common/censor-html-string';
-import kefirDelayAsap from '../../../lib/kefir-delay-asap';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import delayAsap from '../../../lib/delay-asap';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
@@ -128,7 +128,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     var draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
     draftSaveTriggerer
-      .bufferBy(draftSaveTriggerer.flatMap(() => kefirDelayAsap(null)))
+      .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
       .filter(x => x.length > 0)
       .takeUntilBy(this._stopper)
       .onValue(() => {
@@ -153,7 +153,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       });
 
     this._eventStream.plug(
-      kefirMakeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+      makeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
         .map(() => ({eventName: 'bodyChanged'}))
     );
 
