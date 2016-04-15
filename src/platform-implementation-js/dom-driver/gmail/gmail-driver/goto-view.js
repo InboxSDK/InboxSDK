@@ -11,7 +11,7 @@ import type GmailDriver from '../gmail-driver';
 const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, viewName: string, params: ?{[ix: string]: string}) {
 	const newHash = gmailDriver.createLink(viewName, params);
 
-	if (_.contains(Router.NativeRouteIDs, viewName)) {
+	if (_.contains((Router: any).NativeRouteIDs, viewName)) {
 		// Create a fake link and simulate a click event on it to let Gmail handle
 		// the view change. If we just set window.location.hash ourselves to the
 		// newHash, it's a Gmail hash, and any composes are open, then Gmail will

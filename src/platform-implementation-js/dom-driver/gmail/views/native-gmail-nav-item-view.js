@@ -111,13 +111,13 @@ export default class NativeGmailNavItemView {
 			.filter(el =>
 				el.classList.contains('ain')
 			)
-			.onValue(this, '_createActiveMarkerElement');
+			.onValue((e) => this._createActiveMarkerElement(e));
 
 		classChangeStream
 			.filter(el =>
 				!el.classList.contains('ain')
 			)
-			.onValue(this, '_removeActiveMarkerElement');
+			.onValue((e) => this._removeActiveMarkerElement(e));
 
 		const parentElement = element.parentElement;
 		if(parentElement){

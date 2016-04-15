@@ -249,13 +249,13 @@ class GmailMessageView {
 				itemEl.className = 'J-N';
 				itemEl.setAttribute('role', 'menuitem');
 				itemEl.textContent = options.title;
-				itemEl.addEventListener('mouseenter', () => {
+				(itemEl: any).addEventListener('mouseenter', () => {
 					itemEl.classList.add('J-N-JT');
 				});
-				itemEl.addEventListener('mouseleave', () => {
+				(itemEl: any).addEventListener('mouseleave', () => {
 					itemEl.classList.remove('J-N-JT');
 				});
-				itemEl.addEventListener('click', () => {
+				(itemEl: any).addEventListener('click', () => {
 					this._closeActiveEmailMenu();
 					options.onClick();
 				});
@@ -610,11 +610,11 @@ class GmailMessageView {
 				//the modal that contains this email address is not visible, so we need to bring the modal up
 
 				function block(event){event.stopPropagation();};
-				this._element.addEventListener('click', block);
+				(this._element: any).addEventListener('click', block);
 				simulateClick(menuButtonElement);
 				modalContactName = this._getModalContactName(contact.emailAddress);
 				simulateClick(menuButtonElement);
-				this._element.removeEventListener('click', block);
+				(this._element: any).removeEventListener('click', block);
 			}
 
 			contact.name = modalContactName || contact.name;

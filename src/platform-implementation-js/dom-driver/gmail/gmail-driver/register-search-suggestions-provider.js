@@ -26,8 +26,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
   // inject into the AJAX responses.
   pageCommunicator.ajaxInterceptStream
     .filter((event) => event.type === 'suggestionsRequest')
-    .map(x => x.query)
-    .flatMapLatest((query) =>
+    .flatMapLatest(({query}) =>
       Kefir.fromPromise(RSVP.Promise.resolve(handler(query)))
         .flatMap((suggestions) => {
           try {
@@ -57,14 +56,14 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
           }
           return Kefir.constant(suggestions);
         })
-        .mapError((err) => {
+        .mapErrors((err) => {
           Logger.error(err);
           return [];
         })
-        .doAction((suggestions) => {
+        .map((suggestions) => {
           suggestions.forEach((suggestion) => {suggestion.owner = id;});
+          return {query, suggestions};
         })
-        .map((suggestions) => ({query, suggestions}))
     )
     .onValue((event) => {
       pageCommunicator.provideAutocompleteSuggestions(id, event.query, event.suggestions);

@@ -69,7 +69,7 @@ export default class NavItemView extends EventEmitter {
 				members.navItemDescriptorPropertyStream,
 				driver.getRouteViewDriverStream()
 			])
-			.takeUntilBy(navItemViewDriver.getEventStream().filter(false).beforeEnd(() => null))
+			.takeUntilBy(navItemViewDriver.getEventStream().filter(() => false).beforeEnd(() => null))
 			.onValue(x => {
 				_handleRouteViewChange(navItemViewDriver, x);
 			});

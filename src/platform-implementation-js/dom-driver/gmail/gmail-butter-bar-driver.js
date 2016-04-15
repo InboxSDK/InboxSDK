@@ -14,7 +14,7 @@ const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="a
     let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
     if (!sdkNotice) {
       sdkNotice = googleNotice.cloneNode(false);
-      sdkNotice.classList.add('inboxsdk__butterbar');
+      (sdkNotice: any).classList.add('inboxsdk__butterbar');
       googleNotice.parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
     return {noticeContainer, googleNotice, sdkNotice};
@@ -44,8 +44,8 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
-  sdkNotice.style.display = 'none';
-  sdkNotice.removeAttribute('data-inboxsdk-id');
+  (sdkNotice: any).style.display = 'none';
+  (sdkNotice: any).removeAttribute('data-inboxsdk-id');
 }
 
 export default class GmailButterBarDriver {
@@ -62,23 +62,23 @@ export default class GmailButterBarDriver {
     noticeAvailableStream.onValue(_.noop);
   }
 
-  getNoticeAvailableStream() {
+  getNoticeAvailableStream(): Kefir.Stream {
     return noticeAvailableStream;
   }
 
-  getSharedMessageQueue() {
+  getSharedMessageQueue(): Array<Object> {
     const attr = document.head.getAttribute('data-inboxsdk-butterbar-queue');
     return attr ? JSON.parse(attr) : [];
   }
 
-  setSharedMessageQueue(queue) {
+  setSharedMessageQueue(queue: Object) {
     const attr = JSON.stringify(queue);
     document.head.setAttribute('data-inboxsdk-butterbar-queue', attr);
   }
 
   // Immediately displays the message, overriding anything else on the screen.
   // Priority and queuing logic is handled by butter-bar.js above this.
-  showMessage(rawOptions) {
+  showMessage(rawOptions: Object): {destroy(): void} {
     const instanceId = Date.now()+'-'+Math.random();
 
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
@@ -87,19 +87,20 @@ export default class GmailButterBarDriver {
 
       googleNotice.style.display = 'none';
 
+      const sdkNoticeAsElement = (sdkNotice: any);
       if (rawOptions.html) {
-        sdkNotice.innerHTML = rawOptions.html;
+        sdkNoticeAsElement.innerHTML = rawOptions.html;
       } else {
-        sdkNotice.textContent = rawOptions.text;
+        sdkNoticeAsElement.textContent = rawOptions.text;
       }
-      sdkNotice.style.display = '';
-      sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
+      sdkNoticeAsElement.style.display = '';
+      sdkNoticeAsElement.setAttribute('data-inboxsdk-id', instanceId);
     });
 
     return {
       destroy() {
         elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
+          if ((sdkNotice: any).getAttribute('data-inboxsdk-id') === instanceId) {
             hideMessage(noticeContainer, googleNotice, sdkNotice);
           }
         });
@@ -109,7 +110,7 @@ export default class GmailButterBarDriver {
 
   hideGmailMessage() {
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-      if (sdkNotice.getAttribute('data-inboxsdk-id') === 'gmail') {
+      if ((sdkNotice: any).getAttribute('data-inboxsdk-id') === 'gmail') {
         hideMessage(noticeContainer, googleNotice, sdkNotice);
       }
     });

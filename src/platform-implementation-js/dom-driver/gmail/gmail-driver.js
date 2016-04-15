@@ -141,7 +141,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getMessageIdManager(): MessageIdManager {return this._messageIdManager;}
 	getThreadRowIdentifier(): ThreadRowIdentifier {return this._threadRowIdentifier;}
 	getButterBarDriver(): GmailButterBarDriver {return this._butterBarDriver;}
-	getButterBar(): ButterBar {return this._butterBar;}
+	getButterBar(): ?ButterBar {return this._butterBar;}
 	setButterBar(bb: ButterBar) {
 		this._butterBar = bb;
 	}
@@ -318,8 +318,9 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 			this._timestampAccountSwitcherReady = Date.now();
 			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
-			).doAction(routeViewDriver => {
+			).map(routeViewDriver => {
 				routeViewDriver.setPageCommunicator(this._pageCommunicator);
+				return routeViewDriver;
 			}).takeUntilBy(this._stopper).toProperty();
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntilBy(this._stopper);
@@ -360,8 +361,8 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	_setupThreadRowViewDriverKefirStream() {
-		this._threadRowViewDriverKefirStream = kefirCast(Kefir, this._rowListViewDriverStream)
-												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverKefirStream())
+		this._threadRowViewDriverKefirStream = this._rowListViewDriverStream
+												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())
 												.flatMap(threadRowViewDriver => {
 													threadRowViewDriver.setPageCommunicator(this._pageCommunicator);
 													// Each ThreadRowView may be delayed if the thread id is not known yet.

@@ -23,12 +23,12 @@ function _setupManagement(gmailDriver, gmailRouteProcessor){
 	gmailDriver.getRouteViewDriverStream()
 		.scan((prev: ?{gmailRouteView: GmailRouteView}, gmailRouteView: GmailRouteView) => {
 			let lastCustomRouteID, lastCustomRouteParams;
-			if (prev && prev.gmailRouteView.isCustomRouteBelongingToApp()) {
+			if (prev && prev.gmailRouteView && prev.gmailRouteView.isCustomRouteBelongingToApp()) {
 				lastCustomRouteID = prev.gmailRouteView.getRouteID();
 				lastCustomRouteParams = prev.gmailRouteView.getParams();
 			}
 			return {gmailRouteView, lastCustomRouteID, lastCustomRouteParams};
-		}, null)
+		}, undefined)
 		.changes()
 		.onValue(({gmailRouteView, lastCustomRouteID, lastCustomRouteParams}) => {
 			handleGmailRouteView(

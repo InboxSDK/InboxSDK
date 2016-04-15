@@ -33,21 +33,34 @@ type BoundingBoxWrapper = {
 	smallestDistance?: number;
 };
 
+
 export default class GmailTooltipView {
 	_element: HTMLElement;
 	_eventStream: Kefir.Bus;
-	_stopper: {destroy(): void};
+	_stopper: Kefir.Stopper;
 
-	constructor(options: Object){
+	constructor(options?: Object = {}){
 		this._eventStream = kefirBus();
 		this._stopper = kefirStopper();
-		this._setupElement(options || {});
+		this._setupElement(options);
 	}
 
 	destroy(){
 		this._eventStream.end();
 		this._stopper.destroy();
 		this._element.remove();
+	}
+
+	getElement(): HTMLElement {
+		return this._element;
+	}
+
+	getStopper(): Kefir.Stopper {
+		return this._stopper;
+	}
+
+	getEventStream(): Kefir.Stream {
+		return this._eventStream;
 	}
 
 	anchor(anchorElement: HTMLElement, placementOptions: Object){

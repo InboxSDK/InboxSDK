@@ -5,8 +5,8 @@ var EventEmitter = require('events').EventEmitter;
 var ud = require('ud');
 var Kefir = require('kefir');
 
-var kefirMakeMutationObserverChunkedStream = require('../../lib/dom/kefir-make-mutation-observer-chunked-stream');
-var kefirFromEventTargetCapture = require('../../lib/kefir-from-event-target-capture');
+var makeMutationObserverChunkedStream = require('../../lib/dom/make-mutation-observer-chunked-stream');
+var fromEventTargetCapture = require('../../lib/from-event-target-capture');
 var containByScreen2 = require('contain-by-screen');
 
 // documented in src/docs/
@@ -31,8 +31,8 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 	this._dropdownViewDriver.getContainerElement().focus();
 
 	Kefir.merge([
-			kefirFromEventTargetCapture(document, 'focus'),
-			kefirFromEventTargetCapture(document, 'click')
+			fromEventTargetCapture(document, 'focus'),
+			fromEventTargetCapture(document, 'click')
 		])
 		.filter(event =>
 			event.isTrusted &&
@@ -51,7 +51,7 @@ var DropdownView = function(dropdownViewDriver, anchorElement, options){
 			if (this.closed) return;
 			var containerEl = dropdownViewDriver.getContainerElement();
 
-			kefirMakeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
+			makeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
 				childList: true, attributes: true,
 				characterData: true, subtree: true
 			})

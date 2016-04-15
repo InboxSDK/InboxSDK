@@ -15,7 +15,7 @@ import type {Handler} from '../lib/handler-registry';
 const memberMap = new WeakMap();
 
 // documented in src/docs/
-export default class Router {
+class Router {
 	static NativeRouteIDs: Object;
 	static NativeListRouteIDs: Object;
 	static RouteTypes: Object;
@@ -202,6 +202,8 @@ function _updateNavMenu(members, newRouteViewDriver){
 	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM);
 }
 
-Router.NativeRouteIDs = NATIVE_ROUTE_IDS;
-Router.NativeListRouteIDs = NATIVE_LIST_ROUTE_IDS;
-Router.RouteTypes = ROUTE_TYPES;
+Router.NativeRouteIDs = (Router: any).prototype.NativeRouteIDs = NATIVE_ROUTE_IDS;
+Router.NativeListRouteIDs = (Router: any).prototype.NativeListRouteIDs = NATIVE_LIST_ROUTE_IDS;
+Router.RouteTypes = (Router: any).prototype.RouteTypes = ROUTE_TYPES;
+
+export default Router;

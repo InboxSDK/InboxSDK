@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -5,9 +7,9 @@ import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
 
-import kefirMakeMutationObserverStream from '../src/platform-implementation-js/lib/dom/make-mutation-observer-stream';
+import makeMutationObserverStream from '../src/platform-implementation-js/lib/dom/make-mutation-observer-stream';
 
-describe('kefirMakeMutationObserverStream', function() {
+describe('makeMutationObserverStream', function() {
   global.MutationObserver = null;
   before(function() {
     global.MutationObserver = require('./lib/mock-mutation-observer');
@@ -22,7 +24,7 @@ describe('kefirMakeMutationObserverStream', function() {
     const target = new MockElementParent([child1, child2]);
 
     let call = 0;
-    kefirMakeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.deepEqual(event.addedNodes, []);
@@ -42,8 +44,7 @@ describe('kefirMakeMutationObserverStream', function() {
     target.removeChild(child1);
   });
 
-  it("doesn't emit events while current events are processed", function(done) {
-    // See https://github.com/baconjs/bacon.js/issues/574
+  it("doesn't emit events while current events are processed", function(done) {    
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const target = new MockElementParent([child1, child2]);
@@ -52,7 +53,7 @@ describe('kefirMakeMutationObserverStream', function() {
 
     let call = 0;
     let criticalSection = false;
-    kefirMakeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
       if (criticalSection) {
         throw new Error("Re-entrance detected!");
       }

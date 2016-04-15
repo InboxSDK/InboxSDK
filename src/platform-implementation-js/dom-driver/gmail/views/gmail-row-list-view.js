@@ -7,7 +7,6 @@ import asap from 'asap';
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 
 import GmailToolbarView from './gmail-toolbar-view';

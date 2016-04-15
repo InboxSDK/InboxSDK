@@ -40,7 +40,11 @@ import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/d
 import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 import censorHTMLstring from '../../../../common/censor-html-string';
 
+import insertLinkIntoBody from './gmail-compose-view/insert-link-into-body';
+import getAddressChangesStream from './gmail-compose-view/get-address-changes-stream';
+import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
+import getPresendingStream from './gmail-compose-view/get-presending-stream';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -103,7 +107,6 @@ class GmailComposeView {
 		this._eventStream.plug(
 			Kefir.merge([
 				xhrInterceptorStream
-					.flatten()
 					.filter(event => event.composeId === this.getComposeID())
 					.map((event) => {
 						switch(event.type){
@@ -164,6 +167,7 @@ class GmailComposeView {
 								return [];
 						}
 					})
+					.flatten()
 					.map(event => {
 						if(this._driver.getLogger().shouldTrackEverything()){
 							driver.getLogger().eventSite(event.eventName);
@@ -248,9 +252,9 @@ class GmailComposeView {
 	getEventStream(): Kefir.Stream {return this._eventStream;}
 
 	_setupStreams() {
-		this._eventStream.plug(require('./gmail-compose-view/get-body-changes-stream')(this));
-		this._eventStream.plug(require('./gmail-compose-view/get-address-changes-stream')(this));
-		this._eventStream.plug(require('./gmail-compose-view/get-presending-stream')(this));
+		this._eventStream.plug(getBodyChangesStream(this));
+		this._eventStream.plug(getAddressChangesStream(this));
+		this._eventStream.plug(getPresendingStream(this));
 
 		this._eventStream.plug(
 			Kefir
@@ -317,7 +321,7 @@ class GmailComposeView {
 	}
 
 	insertLinkIntoBody(text: string, href: string): ?HTMLElement {
-		var retVal = require('./gmail-compose-view/insert-link-into-body')(this, text, href);
+		var retVal = insertLinkIntoBody(this, text, href);
 
 		this._triggerDraftSave();
 		return retVal;

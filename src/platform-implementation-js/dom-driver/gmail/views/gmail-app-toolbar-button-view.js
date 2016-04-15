@@ -15,7 +15,7 @@ import DropdownView from '../../../widgets/buttons/dropdown-view';
 export default class GmailAppToolbarButtonView {
   _stopper: Kefir.Stream&{destroy:()=>void};
   _iconSettings: Object;
-  _element: ?HTMLElement;
+  _element: ?HTMLElement = null;
   _activeDropdown: ?DropdownView;
   _buttonDescriptor: ?Object;
 
@@ -104,10 +104,12 @@ export default class GmailAppToolbarButtonView {
         buttonDescriptor.onClick.call(null, appEvent);
       }
 
-      tooltipView.anchor(
-        this._element,
-        {position: 'bottom', offset: {top: 8}}
-      );
+      if(this._element){
+        tooltipView.anchor(
+          this._element,
+          {position: 'bottom', offset: {top: 8}}
+        );
+      }      
     }
   }
 }

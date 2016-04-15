@@ -1,11 +1,14 @@
-var assert = require('assert');
-var Bacon = require('baconjs');
-var EventEmitter = require('events').EventEmitter;
-var Marker = require('../src/common/marker');
+/* @flow */
+
+import assert from 'assert';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import {EventEmitter} from 'events';
+import Marker from '../src/common/marker';
 const MockElementParent = require('./lib/mock-element-parent');
 
-var makeElementViewStream = require('../src/platform-implementation-js/lib/dom/make-element-view-stream');
-var makeElementChildStream = require('../src/platform-implementation-js/lib/dom/make-element-child-stream');
+import makeElementViewStream from '../src/platform-implementation-js/lib/dom/make-element-view-stream';
+import makeElementChildStream from '../src/platform-implementation-js/lib/dom/make-element-child-stream';
 
 describe('makeElementViewStream', function() {
   global.MutationObserver = null;
@@ -19,14 +22,14 @@ describe('makeElementViewStream', function() {
   it('should work with makeElementChildStream', function(done) {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
-    const stopper = new Bacon.Bus();
+    const stopper = kefirBus();
     var activeViewCount = 0;
 
     const target = new MockElementParent([child1, child2]);
 
     var call = 0;
     makeElementChildStream(target)
-      .takeUntil(stopper)
+      .takeUntilBy(stopper)
       .flatMap(makeElementViewStream(function(el) {
         activeViewCount++;
         return {
@@ -50,7 +53,7 @@ describe('makeElementViewStream', function() {
             break;
           case 3:
             assert.strictEqual(view.el, child3);
-            stopper.push('beep');
+            stopper.emit('beep');
             break;
           default:
             throw new Error("should not happen");

@@ -158,9 +158,12 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
             //response: driver.getAppId() === 'streak' ? response : null,
             idPairsLength: idPairs.length
           });
-          driver.getButterBar().showError({
-            text: 'Failed to load custom thread list'
-          });
+          const butterBar = driver.getButterBar()
+          if(butterBar){
+            butterBar.showError({
+              text: 'Failed to load custom thread list'
+            });
+          }
           try {
             driver.getPageCommunicator().setCustomListResults(
               newQuery, GRP.replaceThreadsInResponse(response, []));

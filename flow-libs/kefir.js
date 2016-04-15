@@ -97,6 +97,10 @@ declare module kefir {
     plug(s: Stream<T>): () => void;
   }
 
+  declare class Stopper<T> extends Stream<T> {
+    destroy(): void;
+  }
+
   declare function never(): Stream;
   declare function later<T>(delay: number, value: T): Stream<T>;
   declare function interval<T>(interval: number, value: T): Stream<T>;

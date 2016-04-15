@@ -67,7 +67,7 @@ export default class ButterBar {
       // called.
       stopper.plug(
         Kefir.later(0, null).flatMap(
-          members.driver.getRouteViewDriverStream().changes()
+          () => members.driver.getRouteViewDriverStream().changes()
         ).map(() => null)
       );
     }
@@ -93,11 +93,11 @@ export default class ButterBar {
     });
 
     butterBarDriver.getNoticeAvailableStream()
-      .toProperty(null)
+      .toProperty(() => null)
       .takeUntilBy(stopper)
       .filter(() => {
         const queue = butterBarDriver.getSharedMessageQueue();
-        if (!queue[0]) stopper.push();
+        if (!queue[0]) stopper.emit();
         return queue[0] && queue[0].messageId === messageId;
       })
       .onValue(() => {
@@ -108,7 +108,7 @@ export default class ButterBar {
       });
 
     const message = {
-      destroy() { stopper.push(); }
+      destroy() { stopper.emit(); }
     };
     if (options.messageKey) {
       members.messagesByKey.set(options.messageKey, message);
@@ -134,7 +134,7 @@ export default class ButterBar {
     return this.showMessage(options);
   }
 
-  showSaving(options: Object={}): Message {
+  showSaving(options: Object={}): Object {
     _.defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
@@ -166,7 +166,7 @@ export default class ButterBar {
     return defer;
   }
 
-  hideMessage(messageKey: string) {
+  hideMessage(messageKey: Object | string) {
     if (messageKey) {
       const members = memberMap.get(this);
       const message = members.messagesByKey.get(messageKey);
