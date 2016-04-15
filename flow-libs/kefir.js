@@ -79,6 +79,7 @@ declare module kefir {
     bufferBy(otherObs: Stream, options?: {flushOnEnd?: boolean}): Stream<T[]>;
     bufferWhileBy(otherObs: Stream, options?: {flushOnEnd?: boolean, flushOnChange?: boolean}): Stream<T[]>;
     sampledBy(otherObs: Stream<U>, combinator?: (obsValue: T, otherObsValue: U) => Y): Stream<T | Y>;
+    bufferWithTimeOrCount(time: number, count: number, options?: {flushOnEnd: boolean}): Stream<T>;
   }
 
   declare class Emitter<T> extends Stream<T> {

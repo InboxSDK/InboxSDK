@@ -1,3 +1,5 @@
+/* @flow */
+
 import _ from 'lodash';
 import Kefir from 'kefir';
 import RSVP from 'rsvp';

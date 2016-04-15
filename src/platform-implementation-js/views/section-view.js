@@ -37,7 +37,7 @@ class SectionView extends EventEmitter {
 function _bindToEventStream(sectionView, sectionViewDriver, driver){
 	sectionViewDriver
 		.getEventStream()
-		.map('.eventName')
+		.map(e => e.eventName)
 		.onValue(sectionView, 'emit');
 
 	sectionViewDriver
@@ -45,7 +45,7 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 		.filter(function(event){
 			return event.eventName === 'rowClicked';
 		})
-		.map('.rowDescriptor')
+		.map(e => e.rowDescriptor)
 		.onValue(function(rowDescriptor){
 			if(rowDescriptor.routeID){
 				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
@@ -61,7 +61,7 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 		.filter(function(event){
 			return event.eventName === 'summaryClicked';
 		})
-		.map('.sectionDescriptor')
+		.map(e => e.sectionDescriptor)
 		.onValue(function(sectionDescriptor){
 			if(sectionDescriptor.onTitleLinkClick){
 				sectionDescriptor.onTitleLinkClick(sectionView);
@@ -73,7 +73,7 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 		.filter(function(event){
 			return event.eventName === 'footerClicked';
 		})
-		.map('.sectionDescriptor')
+		.map(e => e.sectionDescriptor)
 		.onValue(function(sectionDescriptor){
 			if(sectionDescriptor.onFooterLinkClick){
 				sectionDescriptor.onFooterLinkClick(sectionView);

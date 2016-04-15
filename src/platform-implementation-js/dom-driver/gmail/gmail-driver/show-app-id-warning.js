@@ -1,7 +1,7 @@
 'use strict';
 
-import Bacon from 'baconjs';
-import baconCast from 'bacon-cast';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 
 import fakeWindowResize from '../../../lib/fake-window-resize';
 
@@ -18,7 +18,7 @@ export default function showAppIdWarning(driver) {
 <input type="button" value="" title="Close" class="inboxsdk__x_close_button" />
 `;
 
- const topMessageBarDriver = driver.createTopMessageBarDriver(baconCast(Bacon, {el: topDiv}));
+ const topMessageBarDriver = driver.createTopMessageBarDriver(kefirCast(Kefir, {el: topDiv}));
 
   topDiv.querySelector('.inboxsdk__x_close_button')
     .addEventListener('click', function(e) {

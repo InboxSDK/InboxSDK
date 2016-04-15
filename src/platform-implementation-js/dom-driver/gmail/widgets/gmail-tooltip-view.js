@@ -1,38 +1,56 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var BasicClass = require('../../../lib/basic-class');
-var Bacon = require('baconjs');
-var asap = require('asap');
-var kefirStopper = require('kefir-stopper');
+import _ from 'lodash';
+import asap from 'asap';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-var ARROW_HORIZONTAL_HEIGHT = 9;
-var ARROW_HORIZONTAL_WIDTH = 18;
-var ARROW_VERTICAL_HEIGHT = 18;
-var ARROW_VERTICAL_WIDTH = 9;
+const ARROW_HORIZONTAL_HEIGHT = 9;
+const ARROW_HORIZONTAL_WIDTH = 18;
+const ARROW_VERTICAL_HEIGHT = 18;
+const ARROW_VERTICAL_WIDTH = 9;
 
-var GmailTooltipView = function(options){
-	BasicClass.call(this);
+type BoundingBox = [
+	{
+		x:number;
+		y:number;
+	},
+	{
+		x:number;
+		y:number;
+	}
+];
 
-	this._eventStream = new Bacon.Bus();
-	this._stopper = kefirStopper();
-	this._setupElement(options || {});
+type PositionType = 'left' | 'right' | 'top' | 'bottom';
+
+type BoundingBoxWrapper = {
+	type: PositionType;
+	value: BoundingBox;
+	smallestDistance?: number;
 };
 
-GmailTooltipView.prototype = Object.create(BasicClass.prototype);
+export default class GmailTooltipView {
+	_element: HTMLElement;
+	_eventStream: Kefir.Bus;
+	_stopper: {destroy(): void};
 
-_.extend(GmailTooltipView.prototype, {
+	constructor(options: Object){
+		this._eventStream = kefirBus();
+		this._stopper = kefirStopper();
+		this._setupElement(options || {});
+	}
 
-	__memberVariables: [
-		{name: '_element', get: true, destroy: true},
-		{name: '_eventStream', get: true, destroy: true, destroyFunction: 'end'},
-		{name: '_stopper', get: true, destroy: true}
-	],
+	destroy(){
+		this._eventStream.end();
+		this._stopper.destroy();
+		this._element.remove();
+	}
 
-	anchor: function(anchorElement, placementOptions){
+	anchor(anchorElement: HTMLElement, placementOptions: Object){
 		if(!anchorElement){
 			return;
 		}
@@ -61,28 +79,27 @@ _.extend(GmailTooltipView.prototype, {
 				break;
 			}
 		}
-		else{
-			theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(targetBoundingBox, tipBoundingBox);
-		}
+
+		if(!theBoundingBoxWrapperToUse) theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(targetBoundingBox, tipBoundingBox);
 
 		var containedBoundingBox = this._containBoundingBox(theBoundingBoxWrapperToUse.value, placementOptions && placementOptions.offset);
 		this._setPositionAtBoundingBox(containedBoundingBox);
 		this._setArrowPosition(theBoundingBoxWrapperToUse.type, containedBoundingBox, targetBoundingBox);
-	},
+	}
 
-	getContainerElement: function(){
+	getContainerElement(): HTMLElement{
 		return this._element;
-	},
+	}
 
-	getContentElement: function(){
+	getContentElement(): HTMLElement {
 		return this._element.querySelector('.aRM');
-	},
+	}
 
-	close: function(){
+	close(){
 		this.destroy();
-	},
+	}
 
-	_setupElement: function(options){
+	_setupElement(options: Object ){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'inboxsdk__tooltip');
 
@@ -149,7 +166,7 @@ _.extend(GmailTooltipView.prototype, {
 
 				image.addEventListener('load', (domEvent) => {
 					asap(() => {
-						this._eventStream.push({
+						this._eventStream.emit({
 							eventName: 'imageLoaded'
 						});
 					});
@@ -175,9 +192,9 @@ _.extend(GmailTooltipView.prototype, {
 				this._element.querySelector('.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
 			}
 		}
-	},
+	}
 
-	_getAutomaticPlacementBoundingBox: function(targetBoundingBox, tipBoundingBox){
+	_getAutomaticPlacementBoundingBox(targetBoundingBox: ClientRect, tipBoundingBox: ClientRect): BoundingBoxWrapper {
 		var boundingBoxWrappers = [
 			{
 				type: 'top',
@@ -199,9 +216,9 @@ _.extend(GmailTooltipView.prototype, {
 
 		var bestBoundingBoxWrapper = this._figureOutBestBoundingBox(boundingBoxWrappers);
 		return bestBoundingBoxWrapper;
-	},
+	}
 
-	_getTopPositionBoundingBox: function(targetBoundingBox, tipBoundingBox){
+	_getTopPositionBoundingBox(targetBoundingBox: ClientRect, tipBoundingBox: ClientRect): BoundingBox{
 		var top = targetBoundingBox.top - tipBoundingBox.height - ARROW_HORIZONTAL_HEIGHT;
 		var left = targetBoundingBox.left + targetBoundingBox.width/2 - tipBoundingBox.width/2;
 
@@ -215,9 +232,9 @@ _.extend(GmailTooltipView.prototype, {
 				y:top+tipBoundingBox.height
 			}
 		];
-	},
+	}
 
-	_getRightPositionBoundingBox: function(targetBoundingBox, tipBoundingBox){
+	_getRightPositionBoundingBox(targetBoundingBox: ClientRect, tipBoundingBox: ClientRect): BoundingBox {
 		var left = targetBoundingBox.right + ARROW_VERTICAL_WIDTH;
 		var top = targetBoundingBox.top + targetBoundingBox.height/2 - tipBoundingBox.height/2;
 
@@ -231,9 +248,9 @@ _.extend(GmailTooltipView.prototype, {
 				y:top+tipBoundingBox.height
 			}
 		];
-	},
+	}
 
-	_getBottomPositionBoundingBox: function(targetBoundingBox, tipBoundingBox){
+	_getBottomPositionBoundingBox(targetBoundingBox: ClientRect, tipBoundingBox: ClientRect): BoundingBox {
 		var top = targetBoundingBox.bottom + ARROW_HORIZONTAL_HEIGHT;
 		var left = targetBoundingBox.left + targetBoundingBox.width/2 - tipBoundingBox.width/2;
 
@@ -247,9 +264,9 @@ _.extend(GmailTooltipView.prototype, {
 				y:top+tipBoundingBox.height
 			}
 		];
-	},
+	}
 
-	_getLeftPositionBoundingBox: function(targetBoundingBox, tipBoundingBox){
+	_getLeftPositionBoundingBox(targetBoundingBox: ClientRect, tipBoundingBox: ClientRect): BoundingBox {
 		var left = targetBoundingBox.left - ARROW_VERTICAL_WIDTH - tipBoundingBox.width;
 		var top = targetBoundingBox.top + targetBoundingBox.height/2 - tipBoundingBox.height/2;
 
@@ -263,9 +280,9 @@ _.extend(GmailTooltipView.prototype, {
 				y:top+tipBoundingBox.height
 			}
 		];
-	},
+	}
 
-	_figureOutBestBoundingBox: function(boundingBoxWrappers){
+	_figureOutBestBoundingBox(boundingBoxWrappers: Array<BoundingBoxWrapper>): BoundingBoxWrapper {
 		for(var ii=0; ii<boundingBoxWrappers.length; ii++){
 			boundingBoxWrappers[ii].smallestDistance = this._getSmallestDistance(boundingBoxWrappers[ii]);
 		}
@@ -273,9 +290,9 @@ _.extend(GmailTooltipView.prototype, {
 		return _.sortBy(boundingBoxWrappers, function(boundingBoxWrapper){
 			return boundingBoxWrapper.smallestDistance;
 		}).reverse()[0];
-	},
+	}
 
-	_getSmallestDistance: function(boundingBoxWrapper){
+	_getSmallestDistance(boundingBoxWrapper: BoundingBoxWrapper): number {
 		var distances = [
 			boundingBoxWrapper.value[0].y, //top
 			boundingBoxWrapper.value[0].x, //left
@@ -286,9 +303,9 @@ _.extend(GmailTooltipView.prototype, {
 		return _.sortBy(distances, function(distance){
 			return distance;
 		})[0];
-	},
+	}
 
-	_containBoundingBox: function(boundingBox, offset){
+	_containBoundingBox(boundingBox: BoundingBox , offset?: {left?: number, top?: number}): BoundingBox {
 		var boundingBoxHeight = boundingBox[1].y - boundingBox[0].y;
 		var boundingBoxWidth = boundingBox[1].x - boundingBox[0].x;
 
@@ -323,14 +340,14 @@ _.extend(GmailTooltipView.prototype, {
 		}
 
 		return boundingBox;
-	},
+	}
 
-	_setPositionAtBoundingBox: function(boundingBox){
+	_setPositionAtBoundingBox(boundingBox: BoundingBox){
 		this._element.style.left = boundingBox[0].x + 'px';
 		this._element.style.top = boundingBox[0].y + 'px';
-	},
+	}
 
-	_setArrowPosition: function(type, containedBoundingBox, targetBoundingBox){
+	_setArrowPosition(type: PositionType, containedBoundingBox: BoundingBox, targetBoundingBox: ClientRect){
 		var position = {};
 
 		switch(type){
@@ -358,9 +375,7 @@ _.extend(GmailTooltipView.prototype, {
 		arrow.style.top = position.top + 'px';
 	}
 
-});
-
-module.exports = GmailTooltipView;
+}
 
 /*
 <div class="T-P aRL" style="visibility: visible; left: 949px; top: 511px; opacity: 1;">

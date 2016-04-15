@@ -2,9 +2,8 @@
 //jshint ignore:start
 
 import _ from 'lodash';
-import * as Bacon from 'baconjs';
-import * as Kefir from 'kefir';
-import baconCast from 'bacon-cast';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 
@@ -115,7 +114,7 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 		})
 		.take(1)
 		.filter(Boolean)
-		.takeUntil(baconCast(Bacon, composeViewDriver.getStopper()))
+		.takeUntilBy(composeViewDriver.getStopper())
 		.onValue(() => logFunction('drive file added'));
 }
 

@@ -5,7 +5,6 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
-import baconCast from 'bacon-cast';
 import kefirStopper from 'kefir-stopper';
 import * as ud from 'ud';
 
@@ -79,7 +78,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       .map(({el}) => new InboxRouteView(el));
     */
 
-    this._routeViewDriverStream = Kefir.never().toProperty(); //Bacon.mergeAll(mainViews, searchViews);
+    this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
     this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
     this._threadViewDriverStream = Kefir.never();

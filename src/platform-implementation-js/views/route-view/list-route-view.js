@@ -3,8 +3,8 @@
 import _ from 'lodash';
 import {defn} from 'ud';
 import RouteView from './route-view';
-import Bacon from 'baconjs';
-import baconCast from 'bacon-cast';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 import CollapsibleSectionView from '../collapsible-section-view';
 import SectionView from '../section-view';
 import get from '../../../common/get-or-fail';
@@ -28,7 +28,7 @@ class ListRouteView extends RouteView {
 	addCollapsibleSection(collapsibleSectionDescriptor: ?Object): CollapsibleSectionView {
 		const members = get(membersMap, this);
 
-		const collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(baconCast(Bacon, collapsibleSectionDescriptor).toProperty(), members.appId);
+		const collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(kefirCast(Kefir, collapsibleSectionDescriptor).toProperty(), members.appId);
 		const collapsibleSectionView = new CollapsibleSectionView(collapsibleSectionViewDriver, members.driver);
 
 		members.sectionViews.push(collapsibleSectionView);
@@ -38,7 +38,7 @@ class ListRouteView extends RouteView {
 	addSection(sectionDescriptor: ?Object): SectionView {
 		const members = get(membersMap, this);
 
-		const sectionViewDriver = members.routeViewDriver.addSection(baconCast(Bacon, sectionDescriptor).toProperty(), members.appId);
+		const sectionViewDriver = members.routeViewDriver.addSection(kefirCast(Kefir, sectionDescriptor).toProperty(), members.appId);
 		const sectionView = new SectionView(sectionViewDriver, members.driver);
 
 		members.sectionViews.push(sectionView);

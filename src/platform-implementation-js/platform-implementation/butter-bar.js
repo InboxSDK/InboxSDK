@@ -1,7 +1,12 @@
-const _ = require('lodash');
-const RSVP = require('rsvp');
-const Bacon = require('baconjs');
-const getStackTrace = require('../../common/get-stack-trace');
+/* @flow */
+
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import getStackTrace from '../../common/get-stack-trace';
+
+import type {Driver} from '../driver-interfaces/driver';
 
 const ancientComplainTime = 2 * 60 * 1000;
 const dummyPacket = Object.freeze({
@@ -10,19 +15,23 @@ const dummyPacket = Object.freeze({
 
 const memberMap = new WeakMap();
 
+type Message = {
+  destroy(): void;
+};
+
 // documented in src/docs/
-function ButterBar(appId, driver) {
-  const members = {};
-  memberMap.set(this, members);
+export default class ButterBar {
 
-  members.driver = driver;
-  members.messagesByKey = new Map();
-  members.queuedPackets = [];
-}
+  constructor(appId: string, driver: Driver) {
+    const members = {};
+    memberMap.set(this, members);
 
-_.extend(ButterBar.prototype, {
+    members.driver = driver;
+    members.messagesByKey = new Map();
+    members.queuedPackets = [];
+  }
 
-  showMessage(options) {
+  showMessage(options: Object): Message {
     _.defaults(options, {
       priority: 0,
       time: 15*1000,
@@ -48,7 +57,7 @@ _.extend(ButterBar.prototype, {
       }
     }
 
-    const stopper = new Bacon.Bus();
+    const stopper = kefirBus();
 
     if (options.hideOnViewChanged) {
       // Set hideOnViewChanged to true only after this run of the event
@@ -57,20 +66,21 @@ _.extend(ButterBar.prototype, {
       // would die immediately as the rest of the event's handlers are
       // called.
       stopper.plug(
-        Bacon.later(0, null).flatMap(
+        Kefir.later(0, null).flatMap(
           members.driver.getRouteViewDriverStream().changes()
-        ).map(null)
+        ).map(() => null)
       );
     }
 
     if (isFinite(options.time)) {
-      stopper.plug(Bacon.later(options.time, null));
+      stopper.plug(Kefir.later(options.time, null));
     }
 
     // Error made here for sensible stack
     const timeoutErr = new Error("Butter bar message timed out");
-    stopper.plug(Bacon.later(ancientComplainTime, null).doAction(() => {
+    stopper.plug(Kefir.later(ancientComplainTime, null).map((x) => {
       members.driver.getLogger().errorApp(timeoutErr);
+      return x;
     }));
 
     stopper.take(1).onValue(() => {
@@ -84,7 +94,7 @@ _.extend(ButterBar.prototype, {
 
     butterBarDriver.getNoticeAvailableStream()
       .toProperty(null)
-      .takeUntil(stopper)
+      .takeUntilBy(stopper)
       .filter(() => {
         const queue = butterBarDriver.getSharedMessageQueue();
         if (!queue[0]) stopper.push();
@@ -104,9 +114,9 @@ _.extend(ButterBar.prototype, {
       members.messagesByKey.set(options.messageKey, message);
     }
     return message;
-  },
+  }
 
-  showLoading(options={}) {
+  showLoading(options: Object ={}): Message {
     _.defaults(options, {
       text: 'Loading...',
       priority: -3,
@@ -115,16 +125,16 @@ _.extend(ButterBar.prototype, {
       hideOnViewChanged: true
     });
     return this.showMessage(options);
-  },
+  }
 
-  showError(options) {
+  showError(options: Object): Message {
     _.defaults(options, {
       priority: 100
     });
     return this.showMessage(options);
-  },
+  }
 
-  showSaving(options={}) {
+  showSaving(options: Object={}): Message {
     _.defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
@@ -154,9 +164,9 @@ _.extend(ButterBar.prototype, {
     });
 
     return defer;
-  },
+  }
 
-  hideMessage(messageKey) {
+  hideMessage(messageKey: string) {
     if (messageKey) {
       const members = memberMap.get(this);
       const message = members.messagesByKey.get(messageKey);
@@ -164,7 +174,7 @@ _.extend(ButterBar.prototype, {
         message.destroy();
       }
     }
-  },
+  }
 
   hideGmailMessage() {
     const members = memberMap.get(this);
@@ -173,6 +183,4 @@ _.extend(ButterBar.prototype, {
     butterBarDriver.hideGmailMessage();
   }
 
-});
-
-module.exports = ButterBar;
+}

@@ -1,17 +1,17 @@
-'use strict';
+/* @flow */
 
-var Bacon = require('baconjs');
-var fromEventTargetCapture = require('../../../../lib/from-event-target-capture');
+import Kefir from 'kefir';
+import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
 
+import type GmailComposeView from '../gmail-compose-view';
 
-
-module.exports =  function(gmailComposeView){
+export default function(gmailComposeView: GmailComposeView): Kefir.Stream {
 
 	var element = gmailComposeView.getElement();
 	var sendButtonElement = gmailComposeView.getSendButton();
 	var sendAndArchiveButtonElement = gmailComposeView.getSendAndArchiveButton();
 
-	var domEventStream = Bacon.mergeAll(
+	var domEventStream = Kefir.merge([
 		fromEventTargetCapture(element, 'keydown')
 			.filter(function(domEvent){
 				return domEvent.ctrlKey || domEvent.metaKey;
@@ -32,7 +32,7 @@ module.exports =  function(gmailComposeView){
 			.filter(function(domEvent){
 				return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
 			})
-	);
+	]);
 
 	return domEventStream.map(function(domEvent){
 							return {
@@ -47,4 +47,4 @@ module.exports =  function(gmailComposeView){
 							};
 						});
 
-};
+}

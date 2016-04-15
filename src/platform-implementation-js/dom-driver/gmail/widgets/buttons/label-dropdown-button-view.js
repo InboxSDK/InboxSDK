@@ -1,31 +1,36 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+/* @flow */
 
-var BasicClass = require('../../../../lib/basic-class');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
-var LabelDropdownButtonView = function(options){
-	BasicClass.call(this);
 
-	this._eventStream = new Bacon.Bus();
+export default class LabelDropdownButtonView {
+	_element: HTMLElement;
+	_eventStream: Kefir.Stream;
 
-	this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
-	this._setupEventStream();
-};
+	constructor(options: Object){
+		this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
+		this._setupEventStream();
+	}
 
-LabelDropdownButtonView.prototype = Object.create(BasicClass.prototype);
+	destroy(){
+		this._element.remove();
+	}
 
-_.extend(LabelDropdownButtonView.prototype, {
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: true, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
+	getEventStream(): Kefir.Stream {
+		return this._eventStream;
+	}
 
-	activate: function(){/* do nothing */},
+	activate(){/* do nothing */}
 
-	deactivate: function(){/* do nothing */},
+	deactivate(){/* do nothing */}
 
-	_setupElement: function(backgroundColor, foregroundColor){
+	_setupElement(backgroundColor: string, foregroundColor: string){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'nL aig');
 
@@ -46,26 +51,22 @@ _.extend(LabelDropdownButtonView.prototype, {
 				'</div>',
 			'</div>'
 		].join('');
-	},
+	}
 
-	_setupEventStream: function(){
-		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
+	_setupEventStream(){
+		var clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
 			event.preventDefault();
 		});
 
-		this._eventStream.plug(
+		this._eventStream =
 			clickEventStream.map(function(event){
 				return {
 					eventName: 'click',
 					domEvent: event
 				};
-			})
-		);
+			});
 	}
-
-});
-
-module.exports = LabelDropdownButtonView;
+}

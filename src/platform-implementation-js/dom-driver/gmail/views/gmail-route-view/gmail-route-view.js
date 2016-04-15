@@ -1,12 +1,13 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
-var Kefir = require('kefir');
-var kefirStopper = require('kefir-stopper');
-var asap = require('asap');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+import kefirBus from 'kefir-bus';
+
+import asap from 'asap';
 import {defn} from 'ud';
 
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
@@ -36,7 +37,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_rowListViews: GmailRowListView[];
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_driver: GmailDriver;
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 	_customViewElement: ?HTMLElement;
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
@@ -55,7 +56,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		this._gmailRouteProcessor = gmailRouteProcessor;
 		this._driver = driver;
 
-		this._eventStream = new Bacon.Bus();
+		this._eventStream = kefirBus();
 
 		if (this._type === 'CUSTOM') {
 			this._setupCustomViewElement();
@@ -97,7 +98,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	getHash(): string {return this._hash;}
-	getEventStream(): Bacon.Observable {return this._eventStream;}
+	getEventStream(): Kefir.Stream {return this._eventStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getCustomViewElement(): ?HTMLElement {return this._customViewElement;}
 	getRowListViews(): GmailRowListView[] {return this._rowListViews;}
@@ -141,11 +142,11 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return routeParams;
 	}
 
-	addCollapsibleSection(sectionDescriptorProperty: Bacon.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
+	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
 	}
 
-	addSection(sectionDescriptorProperty: Bacon.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
+	addSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, false);
 	}
 
@@ -223,11 +224,12 @@ var GmailRouteView = defn(module, class GmailRouteView {
 
 	_processRowListElement(rowListElement: HTMLElement){
 		var rootElement = rowListElement.parentElement;
-		var gmailRowListView = new GmailRowListView(rootElement, this, this._driver);
+		if(!rootElement) throw new Error('no rootElement');
+		var gmailRowListView = new GmailRowListView((rootElement: any), this, this._driver);
 
 		this._rowListViews.push(gmailRowListView);
 
-		this._eventStream.push({
+		this._eventStream.emit({
 			eventName: 'newGmailRowListView',
 			view: gmailRowListView
 		});
@@ -248,7 +250,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 
 			this._threadView = gmailThreadView;
 
-			this._eventStream.push({
+			this._eventStream.emit({
 				eventName: 'newGmailThreadView',
 				view: gmailThreadView
 			});
@@ -266,9 +268,8 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		this._eventStream.plug(
 			elementStream.flatMap(makeElementViewStream((element) => {
 				return new (GmailThreadView:any)(element, this, this._driver, true);
-			})).doAction((view) => {
+			})).map((view) => {
 				this._threadView = view;
-			}).map((view) => {
 				return {
 					eventName: 'newGmailThreadView',
 					view: view

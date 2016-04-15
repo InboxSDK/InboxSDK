@@ -1,32 +1,36 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
+import _ from 'lodash';
 
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 
-var NavItemView = require('../views/nav-item-view');
-var NativeNavItemView = require('../views/native-nav-item-view');
+import NavItemView from '../views/nav-item-view';
+import NativeNavItemView from '../views/native-nav-item-view';
 
-var memberMap = new WeakMap();
+import type {Driver} from '../driver-interfaces/driver';
 
-var NavMenu = function(appId, driver, membraneMap){
-	var members = {};
-	memberMap.set(this, members);
+const memberMap = new WeakMap();
 
-	members.appId = appId;
-	members.driver = driver;
-	members.navItemViews = [];
+export default class NavMenu {
+	NavItemTypes: Object;
+	SENT_MAIL: NativeNavItemView;
 
-	this.SENT_MAIL = _setupSentMail(appId, driver);
-	this.NavItemTypes = require('../../common/constants/nav-item-types');
-};
+	constructor(appId: string , driver: Driver, membraneMap: WeakMap){
+		var members = {};
+		memberMap.set(this, members);
 
-_.extend(NavMenu.prototype, {
+		members.appId = appId;
+		members.driver = driver;
+		members.navItemViews = [];
 
-	addNavItem(navItemDescriptor){
+		this.SENT_MAIL = _setupSentMail(appId, driver);
+		this.NavItemTypes = require('../../common/constants/nav-item-types');
+	}
+
+	addNavItem(navItemDescriptor: Object): NavItemView {
 		var members = memberMap.get(this);
-		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
+		var navItemDescriptorPropertyStream = kefirCast(Kefir, navItemDescriptor).toProperty();
 
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
@@ -35,14 +39,13 @@ _.extend(NavMenu.prototype, {
 
 		members.navItemViews.push(navItemView);
 		return navItemView;
-	},
+	}
 
-	SENT_MAIL: null
-
-});
+	static SENT_MAIL: ?Object = null;
+}
 
 function _setupSentMail(appId, driver){
-	var nativeNavItemView = new NativeNavItemView(appId, driver);
+	var nativeNavItemView = new NativeNavItemView(appId, driver, 'sent');
 
 	driver.getSentMailNativeNavItem().then(function(sentMailNavItemViewDriver){
 		nativeNavItemView.setNavItemViewDriver(sentMailNavItemViewDriver);
@@ -50,5 +53,3 @@ function _setupSentMail(appId, driver){
 
 	return nativeNavItemView;
 }
-
-module.exports = NavMenu;

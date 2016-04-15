@@ -1,83 +1,93 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var RSVP = require('rsvp');
-var EventEmitter = require('../lib/safe-event-emitter');
-var baconCast = require('bacon-cast');
+/* @flow */
 
-var memberMap = new WeakMap();
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+import RSVP from 'rsvp';
+import EventEmitter from '../lib/safe-event-emitter';
+
+import type {Driver} from '../driver-interfaces/driver';
+
+const memberMap = new WeakMap();
 
 // documented in src/docs/
-var NavItemView = function(appId, driver, navItemDescriptorPropertyStream){
-	EventEmitter.call(this);
 
-	this.destroyed = false;
-	var members = {};
-	memberMap.set(this, members);
+export default class NavItemView extends EventEmitter {
+	destroyed: boolean = false;
 
-	members.appId = appId;
-	members.driver = driver;
-	members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
-	members.deferred = RSVP.defer();
-	members.navItemViews = [];
+	constructor(appId: string, driver: Driver, navItemDescriptorPropertyStream: Object){
+		super();
 
-	driver.getStopper().onValue(this.remove.bind(this));
-};
+		var members = {};
+		memberMap.set(this, members);
 
-NavItemView.prototype = Object.create(EventEmitter.prototype);
+		members.appId = appId;
+		members.driver = driver;
+		members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
+		members.deferred = RSVP.defer();
+		members.navItemViews = [];
 
-_.extend(NavItemView.prototype, {
+		driver.getStopper().onValue(this.remove.bind(this));
+	}
 
-	addNavItem(navItemDescriptor){
+	addNavItem(navItemDescriptor: Object): NavItemView {
 		var members = memberMap.get(this);
-		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
-		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
+		if(!members || !members.driver || !members.appId || !members.navItemViews) throw new Error('this nav item view does not exist');
+		const driver = members.driver;
+		const appId = members.appId;
+		const navItemViews = members.navItemViews;
+
+		var navItemDescriptorPropertyStream = kefirCast(Kefir, navItemDescriptor).toProperty();
+		var navItemView = new NavItemView(appId, driver, navItemDescriptorPropertyStream);
 
 		members.deferred.promise.then(function(navItemViewDriver){
 			var childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
 			navItemView.setNavItemViewDriver(childNavItemViewDriver);
 		});
 
-		members.navItemViews.push(navItemView);
+		navItemViews.push(navItemView);
 		return navItemView;
-	},
+	}
 
 	// TODO make this not a public method
-	setNavItemViewDriver(navItemViewDriver){
+	setNavItemViewDriver(navItemViewDriver: Object){
 		var members = memberMap.get(this);
-		if(!members.driver){
+
+		if(!members || !members.driver){
 			members.deferred.resolve(navItemViewDriver);
 			return; //we have been removed already
 		}
-
+		const driver = members.driver;
 		members.navItemViewDriver = navItemViewDriver;
 
 		members.navItemDescriptorPropertyStream.sampledBy(
 				navItemViewDriver.getEventStream(), (a, b) => [a, b]
 			)
-			.onValue(_handleViewDriverStreamEvent, this, navItemViewDriver, members.driver);
+			.onValue(navItemDescriptor => _handleViewDriverStreamEvent(this, navItemViewDriver, driver, navItemDescriptor));
 
-		Bacon.combineAsArray(
-			members.navItemDescriptorPropertyStream,
-			members.driver.getRouteViewDriverStream()
-		)
-			.takeUntil(navItemViewDriver.getEventStream().filter(false).mapEnd())
+		Kefir.combine([
+				members.navItemDescriptorPropertyStream,
+				driver.getRouteViewDriverStream()
+			])
+			.takeUntilBy(navItemViewDriver.getEventStream().filter(false).beforeEnd(() => null))
 			.onValue(x => {
 				_handleRouteViewChange(navItemViewDriver, x);
 			});
 
 		members.deferred.resolve(navItemViewDriver);
-	},
+	}
 
 	remove(){
 		var members = memberMap.get(this);
-		if(!members.navItemViews){
+		if(!members || !members.navItemViews || !members.driver || !members.navItemViews){
 			return;
 		}
+		const {appId, navItemViews} = members;
 
 		this.destroyed = true;
 		this.emit('destroy');
 
-		members.navItemViews.forEach(function(navItemView){
+		navItemViews.forEach(function(navItemView){
 			navItemView.remove();
 		});
 
@@ -90,24 +100,30 @@ _.extend(NavItemView.prototype, {
 			navItemViewDriver.destroy();
 			members.navItemViewDriver = null;
 		});
-	},
+	}
 
-	isCollapsed(){
-		if(memberMap.get(this).navItemViewDriver){
-			return memberMap.get(this).navItemViewDriver.isCollapsed();
+	isCollapsed(): boolean {
+		const members = memberMap.get(this);
+		if(!members){
+			return false;
+		}
+		const navItemViewDriver = members.navItemViewDriver;
+
+		if(navItemViewDriver){
+			return navItemViewDriver.isCollapsed();
 		}
 		else{
 			return false;
 		}
-	},
+	}
 
-	setCollapsed(collapseValue){
+	setCollapsed(collapseValue: boolean){
 		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){
 			navItemViewDriver.setCollapsed(collapseValue);
 		});
 	}
 
-});
+}
 
 
 
@@ -153,5 +169,3 @@ function _handleRouteViewChange(navItemViewDriver, [navItemDescriptor, routeView
 		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams())
 	);
 }
-
-module.exports = NavItemView;

@@ -1,9 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import * as Bacon from 'baconjs';
-var Kefir = require('kefir');
-import kefirCast from 'kefir-cast';
+import Kefir from 'kefir';
 import Logger from '../../../../lib/logger';
 
 import GmailTooltipView from '../../widgets/gmail-tooltip-view';
@@ -14,7 +12,7 @@ import type {TooltipDescriptor} from '../../../../views/compose-button-view';
 export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
-	var tooltipStopperStream: Bacon.Observable = gmailTooltipView.getEventStream().filter(false).mapEnd();
+	var tooltipStopperStream: Kefir.Stream = gmailTooltipView.getEventStream().filter(() => false).beforeEnd(() => null);
 
 	document.body.appendChild(gmailTooltipView.getElement());
 
@@ -25,11 +23,12 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 						return event.eventName === 'buttonAdded' || event.eventName === 'composeFullscreenStateChanged';
 					})
 					.merge(
-						kefirCast(Kefir, gmailTooltipView.getEventStream())
-							.filter(({eventName}) => eventName === 'imageLoaded')
+							gmailTooltipView
+								.getEventStream()
+								.filter(({eventName}) => eventName === 'imageLoaded')
 					)
 					.debounce(10)
-					.takeUntilBy(kefirCast(Kefir, tooltipStopperStream))
+					.takeUntilBy(tooltipStopperStream)
 					.onValue(_anchorTooltip.bind(null, gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor));
 
 	buttonViewController

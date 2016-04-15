@@ -1,8 +1,9 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 import multiCompareSort from '../../../../lib/multi-compare-sort';
 import dispatchCustomEvent from '../../../../lib/dom/dispatch-custom-event';
@@ -13,7 +14,7 @@ export default class GmailTabContainerView {
   destroyed: boolean;
   _element: HTMLElement;
   _tablistElement: HTMLElement;
-  _eventStream: Bacon.Bus;
+  _eventStream: Kefir.Bus;
   _descriptorToGmailTabViewMap: Map<Object, GmailTabView>;
   _gmailTabViews: GmailTabView[];
   _visibleGmailTabViews: GmailTabView[];
@@ -22,7 +23,7 @@ export default class GmailTabContainerView {
   constructor(element: ?HTMLElement) {
     this.destroyed = false;
     this._activeGmailTabView = null;
-    this._eventStream = new Bacon.Bus();
+    this._eventStream = kefirBus();
     this._descriptorToGmailTabViewMap = new Map();
     this._gmailTabViews = [];
     this._visibleGmailTabViews = [];
@@ -44,7 +45,7 @@ export default class GmailTabContainerView {
   }
 
   getElement(): HTMLElement {return this._element;}
-  getEventStream(): Bacon.Observable {return this._eventStream;}
+  getEventStream(): Kefir.Stream {return this._eventStream;}
 
   addTab(descriptor: Object, groupOrderHint: any) {
     var gmailTabView = new GmailTabView(descriptor, groupOrderHint);
@@ -118,12 +119,12 @@ export default class GmailTabContainerView {
     if (index === 0) {
       this._activateGmailTab(gmailTabView);
 
-      this._eventStream.push({
+      this._eventStream.emit({
         eventName: 'tabActivate',
         descriptor: gmailTabView.getDescriptor()
       });
     } else {
-      this._eventStream.push({
+      this._eventStream.emit({
         eventName: 'tabDeactivate',
         descriptor: gmailTabView.getDescriptor()
       });
@@ -144,8 +145,10 @@ export default class GmailTabContainerView {
       .filter(_isEventName.bind(null, 'tabActivate'))
       .map(x => x.view)
       .filter(x => this._isNotActiveView(x))
-      .doAction(x => {this._activateGmailTab(x);})
-      .map(x => x.getDescriptor())
+      .map(x => {
+        this._activateGmailTab(x);
+        return x.getDescriptor();
+      })
       .map(function(descriptor) {
         return {
           eventName: 'tabActivate',
@@ -160,13 +163,12 @@ export default class GmailTabContainerView {
       .getEventStream()
       .filter(_isEventName.bind(null, 'tabDeactivate'))
       .map(x => x.view)
-      .doAction(function(gmailTabView) {
+      .map(function(gmailTabView) {
         gmailTabView.setInactive();
         if (self._activeGmailTabView === gmailTabView) {
           self._activeGmailTabView = null;
         }
-      })
-      .map(function(gmailTabView) {
+
         return {
           eventName: 'tabDeactivate',
           descriptor: gmailTabView.getDescriptor()

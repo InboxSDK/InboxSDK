@@ -4,9 +4,8 @@
 import Logger from '../../../lib/logger';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import _ from 'lodash';
-import Bacon from 'baconjs';
 import Kefir from 'kefir';
-import baconCast from 'bacon-cast';
+import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
@@ -23,7 +22,7 @@ export default class GmailAppToolbarButtonView {
   constructor(inButtonDescriptor: Object) {
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
+    var buttonDescriptorProperty = kefirCast(Kefir, inButtonDescriptor);
     buttonDescriptorProperty.onValue((buttonDescriptor) => {
       try {
         this._handleButtonDescriptor(buttonDescriptor);

@@ -1,32 +1,39 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+/* @flow */
 
-var BasicClass = require('../basic-class');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
-var GenericButtonView = function(element){
-	BasicClass.call(this);
+export default class GenericButtonView {
+	_eventStream: Kefir.Bus;
+	_element: HTMLElement;
 
-	this._eventStream = new Bacon.Bus();
-	this._element = element;
+	constructor(element: HTMLElement){
+		this._eventStream = kefirBus();
+		this._element = element;
 
-	this._setupEventStream();
-};
+		this._setupEventStream();
+	}
 
-GenericButtonView.prototype = Object.create(BasicClass.prototype);
+	destroy(){
+		this._element.remove();
+		this._eventStream.end();
+	}
 
-_.extend(GenericButtonView.prototype, {
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: true, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
+	getEventStream(): Kefir.Stream {
+		return this._eventStream;
+	}
 
-	activate: function(){/* do nothing */},
+	activate(){/* do nothing */}
 
-	deactivate: function(){/* do nothing */},
+	deactivate(){/* do nothing */}
 
-	_setupEventStream: function(){
-		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
+	_setupEventStream(){
+		var clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
@@ -43,6 +50,4 @@ _.extend(GenericButtonView.prototype, {
 		);
 	}
 
-});
-
-module.exports = GenericButtonView;
+}

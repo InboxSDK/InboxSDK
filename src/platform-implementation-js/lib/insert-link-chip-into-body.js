@@ -1,10 +1,9 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
-var ud = require('ud');
+import _ from 'lodash';
+import RSVP from 'rsvp';
+import * as ud from 'ud';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 import autoHtml from 'auto-html';
 
