@@ -94,7 +94,7 @@ export default function setupGmailInterceptor() {
             modifierId,
             composeParams: {
               body: composeParams.body,
-              isPlainText: !composeParams.ishtml
+              isPlainText: composeParams.ishtml !== '1'
             }
           });
 
