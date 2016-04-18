@@ -74,7 +74,7 @@ function _monitorAttachmentAdded(composeViewDriver, logFunction) {
 		})
 		.take(1)
 		.filter(Boolean)
-		.takeUntil(composeViewDriver.getStopper())
+		.takeUntilBy(composeViewDriver.getStopper())
 		.onValue(() => logFunction('attachment uploaded'));
 }
 

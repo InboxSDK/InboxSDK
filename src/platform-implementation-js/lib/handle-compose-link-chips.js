@@ -307,6 +307,11 @@ function _checkAndRemoveBrokenChip(composeView: ComposeViewDriver, chipElement: 
 }
 
 function _fixupBlockquotes(chipElement: HTMLElement) {
+    if(
+      !(chipElement:any)._previousSpacerTextNode ||
+      (chipElement:any)._nextSpacerTextNode
+    ) return;
+
     //our text nodes have a previous and next sibling, so it's not the blockquote case
     if (
       (chipElement:any)._previousSpacerTextNode.nextSibling ||

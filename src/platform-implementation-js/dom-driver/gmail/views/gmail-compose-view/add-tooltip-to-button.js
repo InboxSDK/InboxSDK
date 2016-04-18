@@ -12,7 +12,17 @@ import type {TooltipDescriptor} from '../../../../views/compose-button-view';
 export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
-	var tooltipStopperStream: Kefir.Stream = gmailTooltipView.getEventStream().filter(() => false).beforeEnd(() => null);
+	var tooltipStopperStream: Kefir.Stream =
+		gmailTooltipView
+			.getStopper()
+			.merge(
+				gmailComposeView.getStopper()
+			);
+
+	gmailComposeView
+		.getStopper()
+		.takeUntilBy(gmailTooltipView.getStopper())
+		.onValue(() => gmailTooltipView.destroy());
 
 	document.body.appendChild(gmailTooltipView.getElement());
 
@@ -34,13 +44,13 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 	buttonViewController
 		.getView()
 		.getEventStream()
-		.takeUntil(tooltipStopperStream)
+		.takeUntilBy(tooltipStopperStream)
 		.filter(function(event){
 			return event.eventName === 'click';
 		})
 		.onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
 
-	var stoppedIntervalStream = Kefir.interval(50).takeUntilBy(gmailTooltipView.getStopper());
+	var stoppedIntervalStream = Kefir.interval(50).takeUntilBy(tooltipStopperStream);
 
 	var left = 0;
 	var top = 0;
@@ -67,6 +77,7 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 			!buttonViewController.getView() || !buttonViewController.getView().getElement().offsetParent
 		)
 		.onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
+
 
 	return gmailTooltipView;
 }

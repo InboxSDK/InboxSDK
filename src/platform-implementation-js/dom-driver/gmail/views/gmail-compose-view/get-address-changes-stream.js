@@ -22,7 +22,7 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Stream {
 		_makeSubAddressStream('bcc', recipientRowElements, 2)
 	]);
 
-	var umbrellaStream = mergedStream.bufferWithTimeOrCount(100, 1000).map(_groupChangeEvents);
+	var umbrellaStream = mergedStream.map(_groupChangeEvents);
 
 	return Kefir.merge([mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView)]);
 }
@@ -45,8 +45,8 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 		return Kefir.merge([
 
 			mainSubAddressStream
-				.toProperty({
-					addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
+				.toProperty(() => {
+					return {addedNodes: rowElements[rowIndex].querySelectorAll('.vR')};
 				})
 				.map(e => e.addedNodes)
 				.map(_.toArray)
@@ -72,8 +72,8 @@ function _isRecipientNode(node){
 }
 
 
-function _groupChangeEvents(events){
-	var grouping = {
+function _groupChangeEvents(event){
+	const grouping = {
 		to: {
 			added: [],
 			removed: []
@@ -88,10 +88,8 @@ function _groupChangeEvents(events){
 		}
 	};
 
-	events.forEach(function(event){
-		var parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
-		grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
-	});
+	const parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
+	grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
 
 	return {
 		eventName: 'recipientsChanged',

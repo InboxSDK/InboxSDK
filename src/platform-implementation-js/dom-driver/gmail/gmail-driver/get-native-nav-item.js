@@ -1,10 +1,12 @@
-var NativeGmailNavItemView = require('../views/native-gmail-nav-item-view');
-var $ = require('jquery');
-var GmailElementGetter = require('../gmail-element-getter');
+/* @flow */
 
-var waitFor = require('../../../lib/wait-for');
+import NativeGmailNavItemView from '../views/native-gmail-nav-item-view';
+import $ from 'jquery';
+import GmailElementGetter from '../gmail-element-getter';
 
-module.exports = function(label){
+import waitFor from '../../../lib/wait-for';
+
+export default function getNativeNavItem(label: string): Promise<NativeGmailNavItemView> {
 	return waitFor(function(){
 		return $(GmailElementGetter.getLeftNavContainerElement()).find('.aim a[href*=#' + label + ']').length > 0;
 	}, 300*1000).then(function(){
@@ -17,7 +19,7 @@ module.exports = function(label){
 		}
 
 		if(!labelElement.__nativeGmailNavItemView){
-			labelElement.__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement);
+			labelElement.__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement, label);
 		}
 
 		return labelElement.__nativeGmailNavItemView;

@@ -91,7 +91,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
         Kefir.constant(ids) :
         Kefir.constantError(new Error("handleCustomListRoute result must be an array"))
     )
-    .mapError(e => {
+    .mapErrors(e => {
       driver.getLogger().error(e);
       return [];
     })

@@ -30,7 +30,7 @@ class GmailRowListView {
 	_threadRowViewDrivers: Set<GmailThreadRowView>;
 	_eventStreamBus: Kefir.Bus;
 	_rowViewDriverStream: Kefir.Stream<GmailThreadRowView>;
-	_stopper: Kefir.Stream&{destroy(): void};
+	_stopper: Kefir.Stopper;
 
 	constructor(rootElement: HTMLElement, routeViewDriver: GmailRouteView, gmailDriver: GmailDriver){
 
@@ -53,6 +53,7 @@ class GmailRowListView {
 	destroy(){
 		this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
 		this._eventStreamBus.end();
+		if(this._toolbarView) this._toolbarView.destroy();
 	}
 
 	getElement(): HTMLElement {

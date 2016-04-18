@@ -250,29 +250,34 @@ class GmailThreadRowView {
   }
 
   _removeUnclaimedModifications() {
-    for (let mod of this._modifications.label.unclaimed) {
+    for (let ii=0; ii<this._modifications.label.unclaimed.length; ii++) {
+      const mod = this._modifications.label.unclaimed[ii];
       //console.log('removing unclaimed label mod', mod);
       mod.remove();
     }
     this._modifications.label.unclaimed.length = 0;
-    for (let mod of this._modifications.button.unclaimed) {
+    for (let ii=0; ii<this._modifications.button.unclaimed.length; ii++) {
+      const mod = this._modifications.button.unclaimed[ii];
       //console.log('removing unclaimed button mod', mod);
       mod.remove();
     }
     this._modifications.button.unclaimed.length = 0;
-    for (let mod of this._modifications.image.unclaimed) {
+    for (let ii=0; ii<this._modifications.image.unclaimed.length; ii++) {
+      const mod = this._modifications.image.unclaimed[ii];
       //console.log('removing unclaimed image mod', mod);
       mod.remove();
     }
     this._modifications.image.unclaimed.length = 0;
 
-    for (let mod of this._modifications.replacedDate.unclaimed) {
+    for (let ii=0; ii<this._modifications.replacedDate.unclaimed.length; ii++) {
+      const mod = this._modifications.replacedDate.unclaimed[ii];
       //console.log('removing unclaimed replacedDate mod', mod);
       mod.remove();
     }
     this._modifications.replacedDate.unclaimed.length = 0;
 
-    for (let mod of this._modifications.replacedDraftLabel.unclaimed) {
+    for (let ii=0; ii<this._modifications.replacedDraftLabel.unclaimed.length; ii++) {
+      const mod = this._modifications.replacedDraftLabel.unclaimed[ii];
       mod.remove();
     }
     this._modifications.replacedDraftLabel.unclaimed.length = 0;

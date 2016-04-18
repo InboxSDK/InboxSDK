@@ -480,12 +480,12 @@ class GmailMessageView {
 			return;
 		}
 
+		this._messageLoaded = true;
+
 		const messageId = this.getMessageID();
 		if(messageId == null){
 			return;
 		}
-
-		this._messageLoaded = true;
 
 		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), messageId);
 		this._gmailAttachmentAreaView = this._getAttachmentArea();

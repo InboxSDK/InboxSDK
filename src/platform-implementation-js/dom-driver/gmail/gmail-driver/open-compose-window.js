@@ -1,9 +1,13 @@
-var simulateClick = require('../../../lib/dom/simulate-click');
-var GmailElementGetter = require('../gmail-element-getter');
+/* @flow */
 
-var waitFor = require('../../../lib/wait-for');
+import simulateClick from '../../../lib/dom/simulate-click';
+import GmailElementGetter from '../gmail-element-getter';
 
-module.exports = function(gmailDriver){
+import waitFor from '../../../lib/wait-for';
+
+import type GmailDriver from '../gmail-driver';
+
+export default function openComposeWindow(gmailDriver: GmailDriver){
 
 	GmailElementGetter.waitForGmailModeToSettle().then(function(){
 

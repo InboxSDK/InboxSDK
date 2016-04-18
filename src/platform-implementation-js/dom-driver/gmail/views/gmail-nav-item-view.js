@@ -388,8 +388,9 @@ export default class GmailNavItemView {
 		this._element.setAttribute('data-group-order-hint', "" + this._orderGroup);
 		this._element.setAttribute('data-insertion-order-hint', "" + this._navItemNumber);
 
+		navItemDescriptor.orderHint = navItemDescriptor.orderHint || navItemDescriptor.orderHint === 0 ? navItemDescriptor.orderHint : Number.MAX_SAFE_INTEGER;
+
 		if(navItemDescriptor.orderHint !== this._orderHint){
-			navItemDescriptor.orderHint = navItemDescriptor.orderHint || navItemDescriptor.orderHint === 0 ? navItemDescriptor.orderHint : Number.MAX_SAFE_INTEGER;
 			this._element.setAttribute('data-order-hint', "" + navItemDescriptor.orderHint);
 
 			this._eventStream.emit({

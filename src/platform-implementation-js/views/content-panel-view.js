@@ -1,32 +1,31 @@
-var _ = require('lodash');
-var EventEmitter = require('../lib/safe-event-emitter');
+/* @flow */
+
+import Kefir from 'kefir';
+import EventEmitter from '../lib/safe-event-emitter';
 
 // documented in src/docs/
-var ContentPanelView = function(contentPanelViewImplementation){
-    EventEmitter.call(this);
+export default class ContentPanelView extends EventEmitter {
+  destroyed: boolean = false;
+  _contentPanelViewImplementation: Object;
 
-    this.destroyed = false;
+  constructor(contentPanelViewImplementation: Object){
+    super()
+
     this._contentPanelViewImplementation = contentPanelViewImplementation;
     this._bindToStreamEvents();
-};
+  }
 
-ContentPanelView.prototype = Object.create(EventEmitter.prototype);
+  remove(){
+    this._contentPanelViewImplementation.remove();
+  }
 
-_.extend(ContentPanelView.prototype, {
+  _bindToStreamEvents(){
+    const stream: Kefir.Stream = this._contentPanelViewImplementation.getEventStream();
+    stream.onValue(({eventName}) => {this.emit(eventName);});
+    stream.onEnd(() => {
+        this.destroyed = true;
+        this.emit('destroy');
+    });
+  }
 
-    remove(){
-        this._contentPanelViewImplementation.remove();
-    },
-
-    _bindToStreamEvents(){
-        this._contentPanelViewImplementation.getEventStream().map('.eventName').onValue(this, 'emit');
-        this._contentPanelViewImplementation.getEventStream().onEnd(() => {
-            this.destroyed = true;
-            this.emit('destroy');
-        });
-    }
-
-});
-
-
-module.exports = ContentPanelView;
+}

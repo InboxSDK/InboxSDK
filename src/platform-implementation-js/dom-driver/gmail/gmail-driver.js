@@ -48,6 +48,10 @@ import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
 import setupRouteViewDriverStream from './gmail-driver/setup-route-view-driver-stream';
+import getNativeNavItem from './gmail-driver/get-native-nav-item';
+import createLink from './gmail-driver/create-link';
+import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
+import openComposeWindow from './gmail-driver/open-compose-window';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
@@ -57,6 +61,7 @@ import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type {EnvData} from '../../platform-implementation';
+import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
 var GmailDriver = ud.defn(module, class GmailDriver {
 	_appId: string;
@@ -218,7 +223,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	createLink(routeID: string, params: ?{[ix: string]: string}) {
-		return require('./gmail-driver/create-link')(this._gmailRouteProcessor, routeID, params);
+		return createLink(this._gmailRouteProcessor, routeID, params);
 	}
 
 	goto(routeID: string, params: ?{[ix: string]: string}) {
@@ -235,7 +240,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	registerSearchQueryRewriter(obj: Object) {
-		require('./gmail-driver/register-search-query-rewriter')(this._pageCommunicator, obj);
+		registerSearchQueryRewriter(this._pageCommunicator, obj);
 	}
 
 	addToolbarButtonForApp(buttonDescriptor: Object): Promise<GmailAppToolbarButtonView> {
@@ -243,7 +248,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	}
 
 	openComposeWindow() {
-		require('./gmail-driver/open-compose-window')(this);
+		openComposeWindow(this);
 	}
 
 	openDraftByMessageID(messageID: string) {
@@ -262,8 +267,8 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		return addNavItem(appId, navItemDescriptor);
 	}
 
-	getSentMailNativeNavItem(): Promise<Object> {
-		return require('./gmail-driver/get-native-nav-item')('sent');
+	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
+		return getNativeNavItem('sent');
 	}
 
 	setShowNativeNavMarker(value: boolean) {

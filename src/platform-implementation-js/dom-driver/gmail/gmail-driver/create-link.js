@@ -1,8 +1,11 @@
-var _ = require('lodash');
+/* @flow */
 
-function createLink(GmailRouteProcessor, routeID, params){
+import _ from 'lodash';
+
+import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
+
+export default function createLink(GmailRouteProcessor: GmailRouteProcessor, routeID: string, params: any): string {
 	params = !!params ? _.clone(params) : {};
-
 	routeID = GmailRouteProcessor.getCompatibleRouteID(routeID);
 
 	if(_.isString(params)){
@@ -46,5 +49,3 @@ function createLink(GmailRouteProcessor, routeID, params){
 
 	return '#' + processedRoute;
 }
-
-module.exports = createLink;

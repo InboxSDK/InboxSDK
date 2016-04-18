@@ -3,6 +3,7 @@ function log() {
 }
 
 InboxSDK.load(1.0, 'custom-view').then(function(sdk) {
+  window.sdk = sdk;
 	var threadIds = new Set();
 
 	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
