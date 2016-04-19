@@ -70,7 +70,7 @@ class GmailCollapsibleSectionView {
 								.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null));
 
 		stoppedProperty.onValue(x => this._updateValues(x));
-		stoppedProperty.take(1).onValue(x => this._isReadyDeferred.resolve(x));
+		stoppedProperty.take(1).onValue(x => this._isReadyDeferred.resolve(this));
 	}
 
 	setCollapsed(value: boolean){
@@ -622,11 +622,11 @@ class GmailCollapsibleSectionView {
 	_recollapse(children: Array<Object> ){
 		_.each(children, function(child){
 			var event = document.createEvent("CustomEvent");
-			(event: any).initCustomEvent('removeCollapsedContainer', false, false);
+			(event: any).initCustomEvent('removeCollapsedContainer', false, false, null);
 			child.dispatchEvent(event);
 
 			event = document.createEvent("CustomEvent");
-			(event: any).initCustomEvent('readdToCollapsedContainer', false, false);
+			(event: any).initCustomEvent('readdToCollapsedContainer', false, false, null);
 			child.dispatchEvent(event);
 		});
 	}
