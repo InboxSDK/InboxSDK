@@ -34,7 +34,7 @@ export default class GmailNavItemView {
 	_iconImgElement: ?HTMLElement = null;
 	_itemContainerElement: ?HTMLElement = null;
 	_expandoElement: ?HTMLElement = null;
-	_isCollapsed: boolean = true;
+	_isCollapsed: boolean = false;
 	_orderGroup: number | string;
 	_orderHint: any;
 	_type: ?string = null;
