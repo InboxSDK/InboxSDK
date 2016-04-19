@@ -539,7 +539,7 @@ class GmailMessageView {
 					// currentReplyElementRemovalStream first.
 					var temp = currentReplyElementRemovalStream;
 					currentReplyElementRemovalStream = null;
-					temp.push(null);
+					temp.emit(null);
 					temp.end();
 				}
 			}
