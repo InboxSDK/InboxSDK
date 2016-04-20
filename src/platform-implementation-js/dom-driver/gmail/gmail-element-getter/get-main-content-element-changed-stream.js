@@ -7,10 +7,9 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-import type GmailElementGetter from '../gmail-element-getter';
+import typeof GmailElementGetter from '../gmail-element-getter';
 
-// Typed as object because of https://github.com/facebook/flow/issues/1691
-export default function getMainContentElementChangedStream(GmailElementGetter: Object): Kefir.Stream<HTMLElement> {
+export default function getMainContentElementChangedStream(GmailElementGetter: GmailElementGetter): Kefir.Stream<HTMLElement> {
 	return waitForMainContentContainer(GmailElementGetter)
 				.flatMap(mainContentContainer =>
 					makeElementChildStream(mainContentContainer)
