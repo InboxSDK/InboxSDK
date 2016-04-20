@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-var Kefir = require('kefir');
-var udKefir = require('ud-kefir');
+import Kefir from 'kefir';
+import udKefir from 'ud-kefir';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
