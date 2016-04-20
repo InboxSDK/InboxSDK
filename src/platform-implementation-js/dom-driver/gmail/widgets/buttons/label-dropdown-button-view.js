@@ -3,11 +3,12 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-
+import kefirStopper from 'kefir-stopper';
 
 export default class LabelDropdownButtonView {
 	_element: HTMLElement;
 	_eventStream: Kefir.Stream;
+	_stopper: Kefir.Stopper = kefirStopper();
 
 	constructor(options: Object){
 		this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
@@ -15,6 +16,7 @@ export default class LabelDropdownButtonView {
 	}
 
 	destroy(){
+		this._stopper.destroy();
 		this._element.remove();
 	}
 
@@ -67,6 +69,7 @@ export default class LabelDropdownButtonView {
 					eventName: 'click',
 					domEvent: event
 				};
-			});
+			})
+			.takeUntilBy(this._stopper);
 	}
 }
