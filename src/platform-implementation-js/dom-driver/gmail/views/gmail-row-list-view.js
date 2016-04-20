@@ -7,6 +7,7 @@ import asap from 'asap';
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import delayAsap from '../../../lib/delay-asap';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 
 import GmailToolbarView from './gmail-toolbar-view';
@@ -44,7 +45,13 @@ class GmailRowListView {
 
 		this._pendingExpansions = new Map();
 		this._pendingExpansionsSignal = kefirBus();
-		this._pendingExpansionsSignal.bufferWithTimeOrCount(1, 1000).onValue(this._expandColumnJob.bind(this));
+		this._pendingExpansionsSignal
+			.bufferBy(
+				this._pendingExpansionsSignal.flatMap(delayAsap)
+			)
+			.filter(x => x.length > 0)
+			.takeUntilBy(this._stopper)
+			.onValue(this._expandColumnJob.bind(this));
 
 		this._setupToolbarView();
 		this._startWatchingForRowViews();
@@ -133,8 +140,6 @@ class GmailRowListView {
 	}
 
 	_expandColumnJob() {
-		if (!this._pendingExpansions) return;
-
 		this._pendingExpansions.forEach((width, colSelector) => {
 			_.each(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
 				const currentWidth = parseInt(col.style.width, 10);
@@ -180,4 +185,4 @@ class GmailRowListView {
 	}
 }
 
-export default GmailRowListView = defn(module, GmailRowListView);
+export default defn(module, GmailRowListView);
