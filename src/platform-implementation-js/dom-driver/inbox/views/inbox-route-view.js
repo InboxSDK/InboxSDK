@@ -60,7 +60,6 @@ export default class InboxRouteView {
   }
 
   destroy(){
-    this._element.remove();
     this._eventStream.end();
     if(this._customViewElement) this._customViewElement.remove();
   }
