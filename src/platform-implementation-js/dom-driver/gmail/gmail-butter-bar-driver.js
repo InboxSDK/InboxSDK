@@ -9,12 +9,12 @@ import makeRevocableFunction from '../../lib/make-revocable-function';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
-  .map(noticeContainer => {
-    const googleNotice = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
-    let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
+  .map((noticeContainer: HTMLElement) => {
+    const googleNotice: HTMLElement = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
+    let sdkNotice: HTMLElement = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
     if (!sdkNotice) {
-      sdkNotice = googleNotice.cloneNode(false);
-      (sdkNotice: any).classList.add('inboxsdk__butterbar');
+      sdkNotice = (googleNotice.cloneNode(false): any);
+      sdkNotice.classList.add('inboxsdk__butterbar');
       googleNotice.parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
     return {noticeContainer, googleNotice, sdkNotice};
@@ -44,8 +44,8 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
-  (sdkNotice: any).style.display = 'none';
-  (sdkNotice: any).removeAttribute('data-inboxsdk-id');
+  sdkNotice.style.display = 'none';
+  sdkNotice.removeAttribute('data-inboxsdk-id');
 }
 
 export default class GmailButterBarDriver {
@@ -89,20 +89,19 @@ export default class GmailButterBarDriver {
 
       googleNotice.style.display = 'none';
 
-      const sdkNoticeAsElement = (sdkNotice: any);
       if (rawOptions.html) {
-        sdkNoticeAsElement.innerHTML = rawOptions.html;
+        sdkNotice.innerHTML = rawOptions.html;
       } else {
-        sdkNoticeAsElement.textContent = rawOptions.text;
+        sdkNotice.textContent = rawOptions.text;
       }
-      sdkNoticeAsElement.style.display = '';
-      sdkNoticeAsElement.setAttribute('data-inboxsdk-id', instanceId);
+      sdkNotice.style.display = '';
+      sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
     });
 
     return {
       destroy() {
         elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-          if ((sdkNotice: any).getAttribute('data-inboxsdk-id') === instanceId) {
+          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
             hideMessage(noticeContainer, googleNotice, sdkNotice);
           }
         });
@@ -112,7 +111,7 @@ export default class GmailButterBarDriver {
 
   hideGmailMessage() {
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-      if ((sdkNotice: any).getAttribute('data-inboxsdk-id') === 'gmail') {
+      if (sdkNotice.getAttribute('data-inboxsdk-id') === 'gmail') {
         hideMessage(noticeContainer, googleNotice, sdkNotice);
       }
     });
