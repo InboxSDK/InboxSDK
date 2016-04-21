@@ -20,7 +20,7 @@ import GmailThreadView from './views/gmail-thread-view';
 import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
-import {clearThreadRowModifications} from './views/gmail-thread-row-view';
+import {removeAllThreadRowUnclaimedModifications} from './views/gmail-thread-row-view';
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
@@ -140,7 +140,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		this._stopper.destroy();
 
 
-		clearThreadRowModifications();
+		removeAllThreadRowUnclaimedModifications();
 	}
 
 	getAppId(): string {return this._appId;}

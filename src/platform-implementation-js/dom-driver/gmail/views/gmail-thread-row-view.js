@@ -87,7 +87,7 @@ class GmailThreadRowView {
   _pageCommunicator: ?GmailPageCommunicator;
   _userView: ?Object;
   _cachedThreadID: ?string;
-  _subscribeTextFixer: ?() => void;
+  _didSubscribeTextFixerRun: boolean = false;
   _imageFixer: ?Kefir.Bus;
   _imageFixerTask: ?Kefir.Stream;
   _stopper: Kefir.Stopper;
@@ -141,7 +141,6 @@ class GmailThreadRowView {
 
     this._imageFixer = null;
     this._imageFixerTask = null;
-    this._subscribeTextFixer = null;
     this._refresher = null;
     this._subjectRefresher = null;
     this._counts = null;
@@ -192,7 +191,7 @@ class GmailThreadRowView {
   }
 
   _removeUnclaimedModifications() {
-    _removeUnclaimedModifications(this._modifications);
+    _removeThreadRowUnclaimedModifications(this._modifications);
 
     // TODO fix column width to deal with removed buttons
   }
@@ -366,7 +365,7 @@ class GmailThreadRowView {
         el.style.display = (el.style && el.style.display === 'block') ? 'inline-block' : 'block';
       }
     });
-    this._getSubscribeTextFixer()();
+    this._subscribeTextFixer();
   }
 
   addButton(buttonDescriptor: Object) {
@@ -772,27 +771,29 @@ class GmailThreadRowView {
     return imageFixerTask;
   }
 
-  _getSubscribeTextFixer(): () => void {
-    let subscribeTextFixer = this._subscribeTextFixer;
-    if(!subscribeTextFixer){
-      subscribeTextFixer = this._subscribeTextFixer = _.once(() => {
-        // Work around the text-corruption issue on Chrome on retina displays that
-        // happens when images are added to the row.
-        this._getImageFixerTask().onValue(() => {
-          const tr = this._elements[0];
-          const computedBgColor = window.getComputedStyle(tr).backgroundColor;
-          tr.style.backgroundColor = tweakColor(computedBgColor);
-          setTimeout(() => {
-            tr.style.backgroundColor = '';
-          }, 0);
-        });
-      });
-    }
+  _subscribeTextFixer() {
+    if(this._didSubscribeTextFixerRun) return;
 
-    return subscribeTextFixer;
+    // Work around the text-corruption issue on Chrome on retina displays that
+    // happens when images are added to the row.
+    this._getImageFixerTask().onValue(() => {
+      const tr = this._elements[0];
+      const computedBgColor = window.getComputedStyle(tr).backgroundColor;
+      tr.style.backgroundColor = tweakColor(computedBgColor);
+      setTimeout(() => {
+        tr.style.backgroundColor = '';
+      }, 0);
+    });
+
+    this._didSubscribeTextFixerRun = true;
   }
 
   _getWatchElement(): HTMLElement {
+    return this._elements.length === 1 ?
+      this._elements[0] : (this._elements[0].children[2]: any);
+  }
+
+  _getRefresher(): Kefir.Stream {
     // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
     // nodes. One time this happens is when you have a new email in your inbox,
     // you read the email, return to the inbox, get another email, and then the
@@ -801,11 +802,6 @@ class GmailThreadRowView {
     // (like addLabel) is called. If none of those methods are called, then the
     // stream is not listened on and no MutationObserver ever gets made, saving
     // us a little bit of work.
-    return this._elements.length === 1 ?
-      this._elements[0] : (this._elements[0].children[2]: any);
-  }
-
-  _getRefresher(): Kefir.Stream {
     let refresher = this._refresher;
     if(!refresher){
       refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
@@ -846,7 +842,7 @@ assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 export default defn(module, GmailThreadRowView);
 
-export function clearThreadRowModifications(){
+export function removeAllThreadRowUnclaimedModifications(){
     // run in a setTimeout so that the thread rows get destroyed
     // and populate the unclaimed modifications
     setTimeout(() => {
@@ -856,7 +852,7 @@ export function clearThreadRowModifications(){
 
         const modifications = cachedModificationsByRow.get(row);
         if(modifications){
-          _removeUnclaimedModifications(modifications);
+          _removeThreadRowUnclaimedModifications(modifications);
         }
 
       });
@@ -868,7 +864,7 @@ export function clearThreadRowModifications(){
 
 
 
-function _removeUnclaimedModifications(modifications){
+function _removeThreadRowUnclaimedModifications(modifications){
   for (let ii=0; ii<modifications.label.unclaimed.length; ii++) {
     const mod = modifications.label.unclaimed[ii];
     //console.log('removing unclaimed label mod', mod);
