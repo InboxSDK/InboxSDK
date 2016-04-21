@@ -97,6 +97,15 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		}
 	}
 
+	gmailDriverDestroy() {
+		var rowListViews = this._rowListViews.slice();
+		rowListViews.forEach(view => {
+			view.gmailDriverDestroy();
+		});
+
+		this.destroy();		
+	}
+
 	getHash(): string {return this._hash;}
 	getEventStream(): Kefir.Stream {return this._eventStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
