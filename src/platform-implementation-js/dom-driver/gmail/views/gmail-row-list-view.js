@@ -63,10 +63,6 @@ class GmailRowListView {
 		if(this._toolbarView) this._toolbarView.destroy();
 	}
 
-	gmailDriverDestroy() {
-		this._threadRowViewDrivers.forEach(threadRow => threadRow.gmailDriverDestroy());
-	}
-
 	getElement(): HTMLElement {
 		return this._element;
 	}

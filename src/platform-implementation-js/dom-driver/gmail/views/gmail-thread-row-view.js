@@ -98,7 +98,7 @@ class GmailThreadRowView {
   constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
 
-    const isVertical = false; // _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
+    const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
     if (isVertical) {
       const threadRow3 = element.nextElementSibling.nextElementSibling;
       const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
@@ -145,6 +145,8 @@ class GmailThreadRowView {
     this._refresher = null;
     this._subjectRefresher = null;
     this._counts = null;
+
+    this._elements[0].classList.add('inboxsdk__thread_row');
   }
 
   destroy() {
@@ -184,48 +186,13 @@ class GmailThreadRowView {
     this._elements.length = 0;
   }
 
-  gmailDriverDestroy() {
-    this.destroy();
-    this._removeUnclaimedModifications();
-  }
-
   // Called by GmailDriver
   setPageCommunicator(pageCommunicator: GmailPageCommunicator) {
     this._pageCommunicator = pageCommunicator;
   }
 
   _removeUnclaimedModifications() {
-    for (let ii=0; ii<this._modifications.label.unclaimed.length; ii++) {
-      const mod = this._modifications.label.unclaimed[ii];
-      //console.log('removing unclaimed label mod', mod);
-      mod.remove();
-    }
-    this._modifications.label.unclaimed.length = 0;
-    for (let ii=0; ii<this._modifications.button.unclaimed.length; ii++) {
-      const mod = this._modifications.button.unclaimed[ii];
-      //console.log('removing unclaimed button mod', mod);
-      mod.remove();
-    }
-    this._modifications.button.unclaimed.length = 0;
-    for (let ii=0; ii<this._modifications.image.unclaimed.length; ii++) {
-      const mod = this._modifications.image.unclaimed[ii];
-      //console.log('removing unclaimed image mod', mod);
-      mod.remove();
-    }
-    this._modifications.image.unclaimed.length = 0;
-
-    for (let ii=0; ii<this._modifications.replacedDate.unclaimed.length; ii++) {
-      const mod = this._modifications.replacedDate.unclaimed[ii];
-      //console.log('removing unclaimed replacedDate mod', mod);
-      mod.remove();
-    }
-    this._modifications.replacedDate.unclaimed.length = 0;
-
-    for (let ii=0; ii<this._modifications.replacedDraftLabel.unclaimed.length; ii++) {
-      const mod = this._modifications.replacedDraftLabel.unclaimed[ii];
-      mod.remove();
-    }
-    this._modifications.replacedDraftLabel.unclaimed.length = 0;
+    _removeUnclaimedModifications(this._modifications);
 
     // TODO fix column width to deal with removed buttons
   }
@@ -878,3 +845,59 @@ class GmailThreadRowView {
 assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 export default defn(module, GmailThreadRowView);
+
+export function clearThreadRowModifications(){
+    // run in a setTimeout so that the thread rows get destroyed
+    // and populate the unclaimed modifications
+    setTimeout(() => {
+
+      const modifiedRows = document.querySelectorAll('.inboxsdk__thread_row');
+      _.each(modifiedRows, row => {
+
+        const modifications = cachedModificationsByRow.get(row);
+        if(modifications){
+          _removeUnclaimedModifications(modifications);
+        }
+
+      });
+
+    }, 15);
+
+
+}
+
+
+
+function _removeUnclaimedModifications(modifications){
+  for (let ii=0; ii<modifications.label.unclaimed.length; ii++) {
+    const mod = modifications.label.unclaimed[ii];
+    //console.log('removing unclaimed label mod', mod);
+    mod.remove();
+  }
+  modifications.label.unclaimed.length = 0;
+  for (let ii=0; ii<modifications.button.unclaimed.length; ii++) {
+    const mod = modifications.button.unclaimed[ii];
+    //console.log('removing unclaimed button mod', mod);
+    mod.remove();
+  }
+  modifications.button.unclaimed.length = 0;
+  for (let ii=0; ii<modifications.image.unclaimed.length; ii++) {
+    const mod = modifications.image.unclaimed[ii];
+    //console.log('removing unclaimed image mod', mod);
+    mod.remove();
+  }
+  modifications.image.unclaimed.length = 0;
+
+  for (let ii=0; ii<modifications.replacedDate.unclaimed.length; ii++) {
+    const mod = modifications.replacedDate.unclaimed[ii];
+    //console.log('removing unclaimed replacedDate mod', mod);
+    mod.remove();
+  }
+  modifications.replacedDate.unclaimed.length = 0;
+
+  for (let ii=0; ii<modifications.replacedDraftLabel.unclaimed.length; ii++) {
+    const mod = modifications.replacedDraftLabel.unclaimed[ii];
+    mod.remove();
+  }
+  modifications.replacedDraftLabel.unclaimed.length = 0;
+}

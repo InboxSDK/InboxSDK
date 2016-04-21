@@ -29,7 +29,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 	driver.getStopper()
 		.onValue(() => {
 			if (latestGmailRouteView) {
-				latestGmailRouteView.gmailDriverDestroy();
+				latestGmailRouteView.destroy();
 			}
 		});
 
