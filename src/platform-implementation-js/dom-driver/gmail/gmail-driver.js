@@ -89,7 +89,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_composeViewDriverStream: Kefir.Stream<GmailComposeView>;
 	_xhrInterceptorStream: Kefir.Stream<Object>;
 	_messageViewDriverStream: Kefir.Stream<Object>;
-	_stopper: Kefir.Stream&{destroy:()=>void};
+	_stopper: Kefir.Stopper;
 	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
