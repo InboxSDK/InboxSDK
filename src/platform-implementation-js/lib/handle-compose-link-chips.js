@@ -4,7 +4,7 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import {defn} from 'ud';
-import kmakeMutationObserverChunkedStream from './dom/kefir-make-mutation-observer-chunked-stream';
+import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 const extId = ''+Math.random();
@@ -83,7 +83,7 @@ function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
 
 function _waitToClaim(el: HTMLElement): Kefir.Stream {
   return Kefir.later(0).merge(
-      kmakeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['class']})
+      makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['class']})
     )
     .map(() => !el.classList.contains('inboxsdk__ensure_link_active'))
     .filter(Boolean)
@@ -307,6 +307,11 @@ function _checkAndRemoveBrokenChip(composeView: ComposeViewDriver, chipElement: 
 }
 
 function _fixupBlockquotes(chipElement: HTMLElement) {
+    if(
+      !(chipElement:any)._previousSpacerTextNode ||
+      (chipElement:any)._nextSpacerTextNode
+    ) return;
+
     //our text nodes have a previous and next sibling, so it's not the blockquote case
     if (
       (chipElement:any)._previousSpacerTextNode.nextSibling ||

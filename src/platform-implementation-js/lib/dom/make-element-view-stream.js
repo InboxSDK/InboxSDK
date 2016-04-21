@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-var Bacon = require('baconjs');
+var Kefir = require('kefir');
 
 // Built for flatMapping a stream from makeElementChildStream(). This doesn't
 // call makeElementChildStream() here -- you can call that yourself so you can
@@ -9,9 +9,9 @@ var Bacon = require('baconjs');
 // sure that this stream (and therefore the source makeElementChildStream) stops
 // being listened to at some point to trigger the destruction of the views!
 type View = {destroy: () => void};
-type TimedElement = {el: HTMLElement, removalStream: Bacon.Observable};
+type TimedElement = {el: HTMLElement, removalStream: Kefir.Stream};
 
-export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => Bacon.Observable<T> {
+export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => Kefir.Stream<T> {
   return function(event) {
     var mview = viewFn(event.el);
     if (mview) {
@@ -19,9 +19,9 @@ export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement)
       event.removalStream.onValue(function() {
         view.destroy();
       });
-      return Bacon.once(view);
+      return Kefir.constant(view);
     } else {
-      return Bacon.never();
+      return Kefir.never();
     }
   };
 }

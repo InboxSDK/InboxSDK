@@ -4,12 +4,12 @@
 var _ = require('lodash');
 var Kefir = require('kefir');
 import udKefir from 'ud-kefir';
-import kefirWaitFor from '../../lib/kefir-wait-for';
-import kefirDelayAsap from '../../lib/kefir-delay-asap';
+import streamWaitFor from '../../lib/stream-wait-for';
+import delayAsap from '../../lib/delay-asap';
 import censorHTMLtree from '../../../common/censor-html-tree';
-import kmakeElementChildStream from '../../lib/dom/kefir-make-element-child-stream';
-import kefirElementViewMapper from '../../lib/dom/kefir-element-view-mapper';
-import kmakeMutationObserverChunkedStream from '../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import makeElementChildStream from '../../lib/dom/make-element-child-stream';
+import elementViewMapper from '../../lib/dom/element-view-mapper';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import InboxComposeView from './views/inbox-compose-view';
 import type InboxDriver from './inbox-driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -19,15 +19,15 @@ var impStream = udKefir(module, imp);
 function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return Kefir.merge([
     // Regular
-    kefirWaitFor(() => {
+    streamWaitFor(() => {
       var els = document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]:first-child');
       return els.length === 1 ? els[0] : null;
     })
-      .flatMap(kmakeElementChildStream)
+      .flatMap(makeElementChildStream)
       .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
       .flatMap(event =>
         // ignore the composes that get removed immediately
-        kefirDelayAsap(event)
+        delayAsap(event)
           .takeUntilBy(event.removalStream)
       )
       .map(({el,removalStream}) => {
@@ -42,19 +42,19 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
       })
       .filter(Boolean),
     // Inline
-    kefirWaitFor(() => document.querySelector('[role=main]'))
-      .flatMap(kmakeElementChildStream)
+    streamWaitFor(() => document.querySelector('[role=main]'))
+      .flatMap(makeElementChildStream)
       .filter(({el}) => el.getAttribute('role') === 'application')
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') === 'list')
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.classList.contains('scroll-list-section-body'))
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       // each el is a bundle now
       .flatMap(({el,removalStream}) => {
-        var expanded = kmakeMutationObserverChunkedStream(el, {
+        var expanded = makeMutationObserverChunkedStream(el, {
             attributes: true, attributeFilter:['aria-expanded']
           })
           .toProperty(()=>null)
@@ -67,11 +67,11 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       })
       // each el is an opened bundle now
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.children.length>0)
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.children.length>0 && el.getAttribute('role') !== 'heading')
-      .flatMap(({el,removalStream}) => kmakeElementChildStream(el).takeUntilBy(removalStream))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
       .map(({el,removalStream}) =>
         ({el: el.firstElementChild, removalStream})
@@ -87,7 +87,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
           });
           return Kefir.never();
         }
-        var expanded = kmakeMutationObserverChunkedStream(buttonEl, {
+        var expanded = makeMutationObserverChunkedStream(buttonEl, {
             attributes: true, attributeFilter:['style']
           })
           .toProperty(()=>null)
@@ -100,7 +100,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       })
   ])
-    .map(kefirElementViewMapper((el: HTMLElement) =>
+    .map(elementViewMapper((el: HTMLElement) =>
       new InboxComposeView(driver, el)
     ))
     .filter(Boolean);

@@ -11,7 +11,7 @@ import type Kefir from 'kefir';
 type View = {destroy: Function};
 type TimedElement = {el: HTMLElement, removalStream: Kefir.Stream};
 
-export default function kefirElementViewMapper<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => ?T {
+export default function elementViewMapper<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => ?T {
   return (event) => {
     const view = viewFn(event.el);
     if (view) {

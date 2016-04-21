@@ -1,5 +1,8 @@
+/* @flow */
+
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 import RouteViewDriver from '../../../driver-interfaces/route-view-driver';
 import assertInterface from '../../../lib/assert-interface';
@@ -32,7 +35,15 @@ function getParams(path) {
 }
 
 export default class InboxRouteView {
-  constructor(el, type) {
+  _element: HTMLElement;
+  _type: string;
+  _routeType: string;
+  _routeID: string;
+  _params: Object;
+  _eventStream: Kefir.Bus;
+  _customViewElement: ?HTMLElement = null;
+
+  constructor(el: HTMLElement, type: string) {
     this._element = el;
 
     this._type = type;
@@ -40,7 +51,7 @@ export default class InboxRouteView {
     this._routeID = getRouteID(path);
     this._params = getParams(path);
     this._routeType = this._routeID === 'UNKNOWN' ? 'UNKNOWN' : 'LIST';
-    this._eventStream = new Bacon.Bus();
+    this._eventStream = kefirBus();
     this._customViewElement = null;
 
     console.log('el jsan', el.getAttribute('jsan'));
@@ -48,19 +59,43 @@ export default class InboxRouteView {
     }
   }
 
+  destroy(){
+    this._eventStream.end();
+    if(this._customViewElement) this._customViewElement.remove();
+  }
+
+  getElement(): HTMLElement {
+    return this._element;
+  }
+
+  getType(): string {
+    return this._type;
+  }
+
+  getRouteType(): string {
+    return this._routeType;
+  }
+
+  getRouteID(): string {
+    return this._routeID;
+  }
+
+  getParams(): Object {
+    return this._params;
+  }
+
+  getEventStream(): Kefir.Stream {
+    return this._eventStream;
+  }
+
+  getCustomViewElement(): ?HTMLElement{
+    return this._customViewElement;
+  }
+
   refresh() {
     // stub
   }
 }
 
-addAccessors(InboxRouteView.prototype, [
-  {name: '_element', get: true},
-  {name: '_type', get: true},
-  {name: '_routeType', get: true},
-  {name: '_routeID', get: true},
-  {name: '_params', get: true},
-  {name: '_eventStream', get: true, destroyMethod: 'end'},
-  {name: '_customViewElement', get: true, destroyMethod: 'remove'}
-]);
 
 assertInterface(InboxRouteView.prototype, RouteViewDriver);

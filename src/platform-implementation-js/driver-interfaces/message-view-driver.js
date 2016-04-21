@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import BasicClass from '../lib/basic-class';
-import type Bacon from 'baconjs';
+import Kefir from 'kefir';
 
 var MessageViewDriverObj = function(){
 	BasicClass.call(this);
@@ -51,7 +51,7 @@ export type MessageViewDriver = {
 	addAttachmentCard(options: Object): Object;
 	addAttachmentCardNoPreview(options: Object): Object;
 	addButtonToDownloadAllArea(options: Object): void;
-	getEventStream(): Bacon.Observable;
+	getEventStream(): Kefir.Stream;
 	getViewState(): VIEW_STATE;
 	getDateString(): string;
 	getSender(): Contact;

@@ -2,9 +2,8 @@
 //jshint ignore:start
 
 import _ from 'lodash';
-import * as Bacon from 'baconjs';
-import * as Kefir from 'kefir';
-import baconCast from 'bacon-cast';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 
@@ -65,17 +64,17 @@ function _monitorAttachmentAdded(composeViewDriver, logFunction) {
 		.filter(node => node && (node:any).type === 'file')
 		.take(1)
 		.flatMap((node) => {
-			return Bacon.fromEvent(node, 'change')
+			return Kefir.fromEvents(node, 'change')
 						.map(()=>true)
 						.merge(
-							Bacon.fromEvent(composeViewDriver.getBodyElement(), 'focus')
+							Kefir.fromEvents(composeViewDriver.getBodyElement(), 'focus')
 									.map(()=>false)
 									.delay(1000)
 						);
 		})
 		.take(1)
 		.filter(Boolean)
-		.takeUntil(baconCast(Bacon, composeViewDriver.getStopper()))
+		.takeUntilBy(composeViewDriver.getStopper())
 		.onValue(() => logFunction('attachment uploaded'));
 }
 
@@ -101,7 +100,7 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 		.filter(node => node && node.classList.contains('picker-dialog'))
 		.take(1)
 		.flatMap((node) => {
-			return Bacon.fromEvent(composeViewDriver.getBodyElement(), 'focus')
+			return Kefir.fromEvents(composeViewDriver.getBodyElement(), 'focus')
 						.delay(1000)
 						.map(() => {
 							if(composeViewDriver.getBodyElement()){
@@ -115,7 +114,7 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 		})
 		.take(1)
 		.filter(Boolean)
-		.takeUntil(baconCast(Bacon, composeViewDriver.getStopper()))
+		.takeUntilBy(composeViewDriver.getStopper())
 		.onValue(() => logFunction('drive file added'));
 }
 
@@ -124,7 +123,7 @@ function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver){
 	makeElementChildStream(document.body)
 		.map(event => event.el)
 		.filter(node => node.getAttribute && node.getAttribute('role') === 'alertdialog')
-		.takeUntil(gmailDriver.getBaconStopper())
+		.takeUntilBy(gmailDriver.getStopper())
 		.onValue((node) => {
 			var heading = node.querySelector('[role=heading]');
 			if(heading){
@@ -149,26 +148,26 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Bacon.fromEvent(document.body, 'dragenter')
+					return Kefir.fromEvents(document.body, 'dragenter')
 								.filter((event) => event.toElement) // ignore events caused by dragFilesIntoCompose
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 
 				})
-				.takeUntil(gmailDriver.getBaconStopper())
+				.takeUntilBy(gmailDriver.getStopper())
 				.onValue(() => gmailDriver.getLogger().eventSite('compose drag file'));
 
 
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Bacon.fromEvent(document.body, 'drop')
+					return Kefir.fromEvents(document.body, 'drop')
 								.filter((event) => event.toElement)
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
 
 				})
-				.takeUntil(gmailDriver.getBaconStopper())
+				.takeUntilBy(gmailDriver.getStopper())
 				.onValue(() => gmailDriver.getLogger().eventSite('compose drop file'));
 
 }

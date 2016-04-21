@@ -2,8 +2,6 @@
 
 var _ = require('lodash');
 var util = require('util');
-var Bacon = require('baconjs');
-var fromEventTargetCapture = require('../lib/from-event-target-capture');
 
 var EventEmitter = require('../lib/safe-event-emitter');
 

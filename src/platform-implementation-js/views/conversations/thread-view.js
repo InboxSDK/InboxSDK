@@ -3,8 +3,8 @@
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
-import baconCast from 'bacon-cast';
-import Bacon from 'baconjs';
+import kefirCast from 'kefir-cast';
+import Kefir from 'kefir';
 import Logger from '../../lib/logger';
 
 import ContentPanelView from '../content-panel-view';
@@ -28,7 +28,7 @@ class ThreadView extends EventEmitter {
 	}
 
 	addSidebarContentPanel(descriptor: Object): ?ContentPanelView {
-		var descriptorPropertyStream = baconCast(Bacon, descriptor).toProperty();
+		var descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
 		var members = memberMap.get(this);
 
 		if(!members){

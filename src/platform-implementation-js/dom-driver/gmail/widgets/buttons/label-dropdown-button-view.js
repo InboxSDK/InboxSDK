@@ -1,31 +1,38 @@
-var _ = require('lodash');
-var Bacon = require('baconjs');
+/* @flow */
 
-var BasicClass = require('../../../../lib/basic-class');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 
-var LabelDropdownButtonView = function(options){
-	BasicClass.call(this);
+export default class LabelDropdownButtonView {
+	_element: HTMLElement;
+	_eventStream: Kefir.Stream;
+	_stopper: Kefir.Stopper = kefirStopper();
 
-	this._eventStream = new Bacon.Bus();
+	constructor(options: Object){
+		this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
+		this._setupEventStream();
+	}
 
-	this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
-	this._setupEventStream();
-};
+	destroy(){
+		this._stopper.destroy();
+		this._element.remove();
+	}
 
-LabelDropdownButtonView.prototype = Object.create(BasicClass.prototype);
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-_.extend(LabelDropdownButtonView.prototype, {
+	getEventStream(): Kefir.Stream {
+		return this._eventStream;
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: true, get: true},
-		{name: '_eventStream', destroy: true, get: true, destroyFunction: 'end'}
-	],
+	activate(){/* do nothing */}
 
-	activate: function(){/* do nothing */},
+	deactivate(){/* do nothing */}
 
-	deactivate: function(){/* do nothing */},
-
-	_setupElement: function(backgroundColor, foregroundColor){
+	_setupElement(backgroundColor: string, foregroundColor: string){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'nL aig');
 
@@ -46,26 +53,23 @@ _.extend(LabelDropdownButtonView.prototype, {
 				'</div>',
 			'</div>'
 		].join('');
-	},
+	}
 
-	_setupEventStream: function(){
-		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
+	_setupEventStream(){
+		var clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
 			event.preventDefault();
 		});
 
-		this._eventStream.plug(
+		this._eventStream =
 			clickEventStream.map(function(event){
 				return {
 					eventName: 'click',
 					domEvent: event
 				};
 			})
-		);
+			.takeUntilBy(this._stopper);
 	}
-
-});
-
-module.exports = LabelDropdownButtonView;
+}

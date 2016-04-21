@@ -1,7 +1,11 @@
-var makeMutationObserverStream = require('../../../../lib/dom/make-mutation-observer-stream');
+/* @flow */
 
+import Kefir from 'kefir';
 
-module.exports = function(gmailComposeView){
+import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
+import type GmailComposeView from '../gmail-compose-view';
+
+export default function(gmailComposeView: GmailComposeView): Kefir.Stream {
     var bodyElement = gmailComposeView.getBodyElement();
 
     return makeMutationObserverStream(bodyElement, {childList: true, subtree: true, characterData: true}).map(function(){

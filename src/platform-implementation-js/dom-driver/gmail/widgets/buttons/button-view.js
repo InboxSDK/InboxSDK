@@ -1,12 +1,13 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import Logger from '../../../../lib/logger';
 import * as ud from 'ud';
 import simulateHover from '../../../../lib/dom/simulate-hover';
-var keyboardShortcutStream = require('../../../../lib/dom/keyboard-shortcut-stream');
+import keyboardShortcutStream from '../../../../lib/dom/keyboard-shortcut-stream';
 import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 
 var BUTTON_COLOR_CLASSES = require('./button-color-classes');
@@ -38,7 +39,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	_buttonColor: string;
 	_isEnabled: boolean;
 	_keyboardShortcutHandle: ?KeyboardShortcutHandle;
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 
 	constructor(options: ButtonViewOptions){
 		this._hasDropdown = false;
@@ -58,7 +59,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 
 		this._createElement(options);
 
-		this._eventStream = new Bacon.Bus();
+		this._eventStream = kefirBus();
 		this._setupEventStream();
 		this._setupAestheticEvents();
 		this._setupKeyboardShortcutEvent();
@@ -70,7 +71,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	}
 
 	getElement(): HTMLElement {return this._element;}
-	getEventStream(): Bacon.Observable {return this._eventStream;}
+	getEventStream(): Kefir.Stream {return this._eventStream;}
 
 	activate(){
 		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
@@ -307,7 +308,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 			this._element.classList.add('inboxsdk__button_disabled');
 		}
 
-		this._eventStream.push({
+		this._eventStream.emit({
 			eventName: 'enabledChanged',
 			isEnabled: this._isEnabled
 		});
@@ -320,7 +321,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	_setupEventStream(){
 		var self = this;
 
-		var clickEventStream = Bacon.fromEventTarget(this._element, 'click');
+		var clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
@@ -337,7 +338,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 		);
 
 		var isEnterOrSpace = event => _.includes([32 /* space */, 13 /* enter */], event.which);
-		var keydownEventStream = Bacon.fromEventTarget(this._element, 'keydown').filter(() => this.isEnabled());
+		var keydownEventStream = Kefir.fromEvents(this._element, 'keydown').filter(() => this.isEnabled());
 		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
 		this._eventStream.plug(
@@ -361,7 +362,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 		if(keyboardShortcutHandle){
 			this._eventStream.plug(
 				keyboardShortcutStream(keyboardShortcutHandle.chord)
-					.takeUntil(
+					.takeUntilBy(
 						this._eventStream.filter(function(event){
 							return event.eventName === 'enabledChanged' && event.isEnabled === false;
 						})
@@ -377,7 +378,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	}
 
 	_setupAestheticEvents(){
-		Bacon.fromEventTarget(this._element, 'mouseenter')
+		Kefir.fromEvents(this._element, 'mouseenter')
 			.filter(() => this.isEnabled())
 			.onValue(event => {
 				this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
@@ -385,7 +386,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 			});
 
 
-		Bacon.fromEventTarget(this._element, 'mouseleave')
+		Kefir.fromEvents(this._element, 'mouseleave')
 			.filter(() => this.isEnabled())
 			.onValue(event => {
 				this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);

@@ -1,12 +1,15 @@
-var _ = require('lodash');
-var $ = require('jquery');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+/* @flow */
 
-var simulateClick = require('../../../../lib/dom/simulate-click');
-var setValueAndDispatchEvent = require('../../../../lib/dom/set-value-and-dispatch-event');
+import _ from 'lodash';
+import $ from 'jquery';
+import RSVP from 'rsvp';
 
-function insertLinkIntoBody(gmailComposeView, text, href){
+import simulateClick from '../../../../lib/dom/simulate-click';
+import setValueAndDispatchEvent from '../../../../lib/dom/set-value-and-dispatch-event';
+
+import type GmailComposeView from '../gmail-compose-view';
+
+export default function insertLinkIntoBody(gmailComposeView: GmailComposeView, text: string, href: string): ?HTMLElement {
 	return _insertLinkIntoBody(gmailComposeView, text, href);
 }
 
@@ -35,5 +38,3 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 
 	return $link[0];
 }
-
-module.exports = insertLinkIntoBody;

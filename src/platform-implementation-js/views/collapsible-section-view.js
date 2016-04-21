@@ -40,16 +40,14 @@ class CollapsibleSectionView extends EventEmitter {
 function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver, driver){
 	collapsibleSectionViewDriver
 		.getEventStream()
-		.map('.eventName')
-		.onValue(collapsibleSectionView, 'emit');
+		.onValue(({eventName}) => {collapsibleSectionView.emit(eventName);});
 
 	collapsibleSectionViewDriver
 		.getEventStream()
 		.filter(function(event){
 			return event.eventName === 'rowClicked';
 		})
-		.map('.rowDescriptor')
-		.onValue(function(rowDescriptor){
+		.onValue(function({rowDescriptor}){
 			if(rowDescriptor.routeID){
 				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
 			}
@@ -64,8 +62,7 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 		.filter(function(event){
 			return event.eventName === 'titleLinkClicked';
 		})
-		.map('.sectionDescriptor')
-		.onValue(function(sectionDescriptor){
+		.onValue(function({sectionDescriptor}){
 			if(sectionDescriptor.onTitleLinkClick){
 				sectionDescriptor.onTitleLinkClick(collapsibleSectionView);
 			}
@@ -76,8 +73,7 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 		.filter(function(event){
 			return event.eventName === 'footerClicked';
 		})
-		.map('.sectionDescriptor')
-		.onValue(function(sectionDescriptor){
+		.onValue(function({sectionDescriptor}){
 			if(sectionDescriptor.onFooterLinkClick){
 				sectionDescriptor.onFooterLinkClick(collapsibleSectionView);
 			}

@@ -1,18 +1,19 @@
 /* @flow */
 //jshint ignore:start
 
-var Bacon = require('baconjs');
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 
 export default class GmailTopMessageBarDriver {
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 	_element: ?HTMLElement;
 
-	constructor(optionStream: Bacon.Observable<?Object>){
-		this._eventStream = new Bacon.Bus();
+	constructor(optionStream: Kefir.Stream<?Object>){
+		this._eventStream = kefirBus();
 
 		optionStream
-			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
+			.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
 			.onValue(option => {
 				if(!option){
 					if(this._element){
@@ -50,7 +51,7 @@ export default class GmailTopMessageBarDriver {
 		fakeWindowResize();
 	}
 
-	getEventStream(): Bacon.Observable {return this._eventStream;}
+	getEventStream(): Kefir.Stream {return this._eventStream;}
 
 	remove() {
 		this.destroy();

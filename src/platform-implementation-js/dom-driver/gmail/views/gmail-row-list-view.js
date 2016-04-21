@@ -1,11 +1,14 @@
+/* @flow */
+
 import {defn} from 'ud';
 
 import _ from 'lodash';
 import asap from 'asap';
 import assert from 'assert';
-import Bacon from 'baconjs';
-
-var RowListViewDriver = require('../../../driver-interfaces/row-list-view-driver');
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import delayAsap from '../../../lib/delay-asap';
+import elementViewMapper from '../../../lib/dom/element-view-mapper';
 
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailThreadRowView from './gmail-thread-row-view';
@@ -14,52 +17,77 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
 
-import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
-import kefirMakeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
-import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
+import type GmailDriver from '../gmail-driver';
+import type GmailRouteView from './gmail-route-view/gmail-route-view';
 
+class GmailRowListView {
 
-var GmailRowListView = function(rootElement, routeViewDriver, gmailDriver){
-	RowListViewDriver.call(this);
+	_element: HTMLElement;
+	_gmailDriver: GmailDriver;
+	_routeViewDriver: GmailRouteView;
+	_pendingExpansions: Map;
+	_pendingExpansionsSignal: Kefir.Bus;
+	_toolbarView: ?GmailToolbarView;
+	_threadRowViewDrivers: Set<GmailThreadRowView>;
+	_eventStreamBus: Kefir.Bus;
+	_rowViewDriverStream: Kefir.Stream<GmailThreadRowView>;
+	_stopper: Kefir.Stopper;
 
-	this._eventStreamBus = new Bacon.Bus();
-	this._kstopper = kefirCast(Kefir, this._eventStreamBus.filter(false).mapEnd(null));
-	this._gmailDriver = gmailDriver;
+	constructor(rootElement: HTMLElement, routeViewDriver: GmailRouteView, gmailDriver: GmailDriver){
 
-	this._element = rootElement;
-	this._routeViewDriver = routeViewDriver;
-	this._threadRowViewDrivers = new Set();
+		this._eventStreamBus = kefirBus();
+		this._stopper = this._eventStreamBus.filter(() => false).beforeEnd(() => null);
+		this._gmailDriver = gmailDriver;
 
-	this._pendingExpansions = new Map();
-	this._pendingExpansionsSignal = new Bacon.Bus();
-	this._pendingExpansionsSignal.bufferWithTime(asap).onValue(this._expandColumnJob.bind(this));
+		this._element = rootElement;
+		this._routeViewDriver = routeViewDriver;
+		this._threadRowViewDrivers = new Set();
 
-	this._setupToolbarView();
-	this._startWatchingForRowViews();
-};
+		this._pendingExpansions = new Map();
+		this._pendingExpansionsSignal = kefirBus();
+		this._pendingExpansionsSignal
+			.bufferBy(
+				this._pendingExpansionsSignal.flatMap(delayAsap)
+			)
+			.filter(x => x.length > 0)
+			.takeUntilBy(this._stopper)
+			.onValue(this._expandColumnJob.bind(this));
 
-GmailRowListView.prototype = Object.create(RowListViewDriver.prototype);
+		this._setupToolbarView();
+		this._startWatchingForRowViews();
+	}
 
-_.extend(GmailRowListView.prototype, {
+	destroy(){
+		this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
+		this._eventStreamBus.end();
+		if(this._toolbarView) this._toolbarView.destroy();
+	}
 
-	__memberVariables: [
-		{name: '_element', destroy: false, get: true},
-		{name: '_gmailDriver', destroy: false},
-		{name: '_routeViewDriver', destroy: false, get: true},
-		{name: '_pendingExpansions', destroy: false},
-		{name: '_pendingExpansionsSignal', destroy: false},
-		{name: '_toolbarView', destroy: true, get: true},
-		{name: '_threadRowViewDrivers', destroy: true, get: true},
-		{name: '_eventStreamBus', destroy: true, destroyFunction: 'end'},
-		{name: '_rowViewDriverKefirStream', destroy: false, get: true}
-	],
+	getElement(): HTMLElement {
+		return this._element;
+	}
 
-	getEventStream: function(){
+	getRouteViewDriver(): GmailRouteView {
+		return this._routeViewDriver;
+	}
+
+	getToolbarView(): ?GmailToolbarView {
+		return this._toolbarView;
+	}
+
+	getThreadRowViewDrivers(): Set<GmailThreadRowView> {
+		return this._threadRowViewDrivers;
+	}
+
+	getRowViewDriverStream(): Kefir.Stream<GmailThreadRowView> {
+		return this._rowViewDriverStream;
+	}
+
+	getEventStream(): Kefir.Stream {
 		return this._eventStreamBus;
-	},
+	}
 
-	_setupToolbarView: function(){
+	_setupToolbarView(){
 		var toolbarElement = this._findToolbarElement();
 
 		if (toolbarElement) {
@@ -67,9 +95,9 @@ _.extend(GmailRowListView.prototype, {
 		} else {
 			this._toolbarView = null;
 		}
-	},
+	}
 
-	_findToolbarElement: function(){
+	_findToolbarElement(){
 		/* multiple inbox extra section */
 		const firstTry = this._element.querySelector('[gh=mtb]');
 		if (firstTry) {
@@ -77,23 +105,23 @@ _.extend(GmailRowListView.prototype, {
 		}
 		const el = _.find(document.querySelectorAll('[gh=tm]'), toolbarContainerElement =>
 			toolbarContainerElement.parentElement.parentElement ===
-			this._element.parentElement.parentElement.parentElement.parentElement.parentElement ||
+			(this._element:any).parentElement.parentElement.parentElement.parentElement.parentElement ||
 			toolbarContainerElement.parentElement.parentElement ===
 			this._element.parentElement
 		);
 		return el ? el.querySelector('[gh=mtb]') : null;
-	},
+	}
 
 	// When a new table is added to a row list, if an existing table has had its
 	// column widths modified (by GmailThreadRowView), then the new table needs to
 	// match.
-	_fixColumnWidths: function(newTableParent) {
+	_fixColumnWidths(newTableParent: ?HTMLElement) {
 		if(!newTableParent || !newTableParent.parentElement){
 			return;
 		}
 
 		const firstTableParent = newTableParent.parentElement.firstElementChild;
-		if (firstTableParent !== newTableParent) {
+		if (firstTableParent !== newTableParent && firstTableParent) {
 			const firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
 			const newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
 			assert.strictEqual(firstCols.length, newCols.length);
@@ -101,19 +129,17 @@ _.extend(GmailRowListView.prototype, {
 				newCol.style.width = firstCol.style.width;
 			});
 		}
-	},
+	}
 
-	expandColumn(colSelector, width) {
+	expandColumn(colSelector: string, width: number) {
 		const pendingWidth = this._pendingExpansions.get(colSelector);
 		if (!pendingWidth || width > pendingWidth) {
 			this._pendingExpansions.set(colSelector, width);
-			this._pendingExpansionsSignal.push();
+			this._pendingExpansionsSignal.emit();
 		}
-	},
+	}
 
 	_expandColumnJob() {
-		if (!this._pendingExpansions) return;
-
 		this._pendingExpansions.forEach((width, colSelector) => {
 			_.each(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
 				const currentWidth = parseInt(col.style.width, 10);
@@ -123,40 +149,40 @@ _.extend(GmailRowListView.prototype, {
 			});
 		});
 		this._pendingExpansions.clear();
-	},
+	}
 
-	_startWatchingForRowViews: function(){
+	_startWatchingForRowViews() {
 		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
 
-		const elementKefirStream = Kefir.merge(tableDivParents.map(kefirMakeElementChildStream)).flatMap(event => {
+		const elementStream = Kefir.merge(tableDivParents.map(makeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
 			const tbody = event.el.querySelector('table > tbody');
 
 			// In vertical preview pane mode, each thread row has three <tr>
 			// elements. We just want to pass the first one (which has an id) to
 			// GmailThreadRowView().
-			return kefirMakeElementChildStream(tbody)
+			return makeElementChildStream(tbody)
 				.takeUntilBy(event.removalStream)
 				.filter(rowEvent => rowEvent.el.id);
 		});
 
-		this._rowViewDriverKefirStream = elementKefirStream
-			.takeUntilBy(this._kstopper)
-			.map(kefirElementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)));
+		this._rowViewDriverStream = elementStream
+			.takeUntilBy(this._stopper)
+			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)));
 
-		this._rowViewDriverKefirStream.onValue(x => this._addThreadRowView(x));
-	},
+		this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
+	}
 
-	_addThreadRowView(gmailThreadRowView) {
+	_addThreadRowView(gmailThreadRowView: GmailThreadRowView) {
 		this._threadRowViewDrivers.add(gmailThreadRowView);
 
 		gmailThreadRowView
 			.getStopper()
-			.takeUntilBy(this._kstopper)
+			.takeUntilBy(this._stopper)
 			.onValue(() => {
 				this._threadRowViewDrivers.delete(gmailThreadRowView);
 			});
 	}
-});
+}
 
-module.exports = defn(module, GmailRowListView);
+export default defn(module, GmailRowListView);

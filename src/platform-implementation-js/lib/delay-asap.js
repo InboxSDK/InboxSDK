@@ -1,14 +1,16 @@
-var asap = require('asap');
-var Bacon = require('baconjs');
+/* @flow */
+//jshint ignore:start
+
+import asap from 'asap';
+var Kefir = require('kefir');
 
 // Returns a stream that emits a value in the next event loop run. Works well
 // with flatmap.
-function delayAsap(value) {
-  return Bacon.fromBinder(function(sink) {
-    asap(function() {
-      sink([value, new Bacon.End()]);
+export default function delayAsap<T>(value: T): Kefir.Stream<T> {
+  return Kefir.stream(emitter => {
+    asap(() => {
+      emitter.emit(value);
+      emitter.end();
     });
   });
 }
-
-module.exports = delayAsap;

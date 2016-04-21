@@ -1,10 +1,11 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
-var TAB_COLOR_CLASSES = [
+const TAB_COLOR_CLASSES = [
   "aIf-aLe",
   "aKe-aLe",
   "aJi-aLe",
@@ -13,10 +14,10 @@ var TAB_COLOR_CLASSES = [
 ];
 
 export default class GmailTabView {
-	_descriptor: Bacon.Observable<?Object>;
+	_descriptor: Kefir.Stream<?Object>;
 	_groupOrderHint: any;
 	_lastDescriptorValue: ?Object;
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 	_element: HTMLElement;
 	_innerElement: HTMLElement;
 	_titleElement: HTMLElement;
@@ -26,17 +27,17 @@ export default class GmailTabView {
 	_iconImgElement: ?HTMLImageElement;
 	_isActive: boolean;
 
-	constructor(descriptorStream: Bacon.Observable, groupOrderHint: any) {
+	constructor(descriptorStream: Kefir.Stream, groupOrderHint: any) {
 	  this._descriptor = descriptorStream;
 	  this._groupOrderHint = groupOrderHint;
 		this._lastDescriptorValue = null;
 		this._isActive = false;
 
-	  this._eventStream = new Bacon.Bus();
+	  this._eventStream = kefirBus();
 
 	  this._setupElement();
 	  descriptorStream
-			.takeUntil(this._eventStream.filter(()=>false).mapEnd(()=>null))
+			.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
 			.onValue(x => {this._updateValues(x);});
 	}
 
@@ -46,10 +47,10 @@ export default class GmailTabView {
 		(this._element:any).remove();
 	}
 
-	getDescriptor(): Bacon.Observable {return this._descriptor;}
+	getDescriptor(): Kefir.Stream {return this._descriptor;}
 	getGroupOrderHint(): any {return this._groupOrderHint;}
 	getElement(): HTMLElement {return this._element;}
-	getEventStream(): Bacon.Observable {return this._eventStream;}
+	getEventStream(): Kefir.Stream {return this._eventStream;}
 
   setInactive() {
     this._element.classList.remove('inboxsdk__tab_selected');
@@ -152,38 +153,38 @@ export default class GmailTabView {
   }
 
   _bindToDOMEvents() {
-    Bacon.fromEventTarget(this._element, 'mouseenter')
+    Kefir.fromEvents(this._element, 'mouseenter')
       .onValue(() => {
         this._innerElement.classList.add('J-KU-Je');
         this._innerElement.classList.add('J-KU-JW');
       });
 
-    Bacon.fromEventTarget(this._element, 'mouseleave')
+    Kefir.fromEvents(this._element, 'mouseleave')
       .onValue(() => {
         this._innerElement.classList.remove('J-KU-Je');
         this._innerElement.classList.remove('J-KU-JW');
       });
 
-    Bacon.fromEventTarget(this._element, 'newColorIndex')
+    Kefir.fromEvents(this._element, 'newColorIndex')
       .map(x => x.detail)
       .onValue(detail => {this._setColorIndex(detail);});
 
     this._eventStream.plug(
-      Bacon.fromEventTarget(this._element, 'click').map(_.constant({
+      Kefir.fromEvents(this._element, 'click').map(_.constant({
         eventName: 'tabActivate',
         view: this
       }))
     );
 
     this._eventStream.plug(
-      Bacon.fromEventTarget(this._element, 'tabActivate').map(_.constant({
+      Kefir.fromEvents(this._element, 'tabActivate').map(_.constant({
         eventName: 'tabActivate',
         view: this
       }))
     );
 
     this._eventStream.plug(
-      Bacon.fromEventTarget(this._element, 'tabDeactivate').map(_.constant({
+      Kefir.fromEvents(this._element, 'tabDeactivate').map(_.constant({
         eventName: 'tabDeactivate',
         view: this
       }))

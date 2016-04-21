@@ -7,7 +7,6 @@ import CommonPageCommunicator from '../../lib/common-page-communicator';
 import _ from 'lodash';
 import asap from 'asap';
 import RSVP from 'rsvp';
-import * as Bacon from 'baconjs';
 import Kefir from 'kefir';
 import Logger from '../../lib/logger';
 
@@ -16,13 +15,13 @@ import Logger from '../../lib/logger';
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
-  ajaxInterceptStream: Bacon.Observable;
+  ajaxInterceptStream: Kefir.Stream;
 
   constructor() {
     super();
-    this.ajaxInterceptStream = Bacon
-      .fromEventTarget(document, 'inboxSDKajaxIntercept')
-      .map(x => x.detail);
+    this.ajaxInterceptStream =
+      Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
+            .map(x => x.detail);
   }
 
   getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
@@ -83,7 +82,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
 
   isConversationViewDisabled(): Promise<boolean> {
     return new RSVP.Promise((resolve, reject) => {
-      Bacon.fromEventTarget(document, 'inboxSDKgmonkeyResponse')
+      Kefir.fromEvents(document, 'inboxSDKgmonkeyResponse')
         .take(1)
         .onValue(event => {
           resolve(event.detail);

@@ -8,7 +8,7 @@ import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-import kefirWaitFor from '../../../lib/kefir-wait-for';
+import streamWaitFor from '../../../lib/stream-wait-for';
 import type {MoleViewDriver} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -118,7 +118,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
     if (moleParent) {
       doShow(moleParent);
     } else {
-      kefirWaitFor(() => GmailElementGetter.getMoleParent())
+      streamWaitFor(() => GmailElementGetter.getMoleParent())
         .takeUntilBy(this._stopper)
         .onValue(doShow);
     }

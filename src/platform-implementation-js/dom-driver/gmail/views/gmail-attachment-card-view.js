@@ -1,15 +1,15 @@
 /* @flow */
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
 import {defn} from 'ud';
 import type GmailDriver from '../gmail-driver';
 
-import fromEventTargetCapture from '../../../lib/kefir-from-event-target-capture';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
@@ -21,10 +21,10 @@ class GmailAttachmentCardView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
 	_cachedType: any;
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 
 	constructor(options: Object, driver: GmailDriver) {
-		this._eventStream = new Bacon.Bus();
+		this._eventStream = kefirBus();
 		this._driver = driver;
 
 		if(options.element){
@@ -43,7 +43,7 @@ class GmailAttachmentCardView {
 		return this._element;
 	}
 
-	getEventStream(): Bacon.Observable {
+	getEventStream(): Kefir.Bus {
 		return this._eventStream;
 	}
 

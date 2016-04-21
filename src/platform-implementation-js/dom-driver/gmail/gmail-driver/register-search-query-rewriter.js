@@ -1,6 +1,10 @@
-var RSVP = require('rsvp');
+/* @flow */
 
-function registerSearchQueryRewriter(pageCommunicator, obj) {
+import RSVP from 'rsvp';
+
+import type PageCommunicator from '../gmail-page-communicator';
+
+export default function registerSearchQueryRewriter(pageCommunicator: PageCommunicator, obj: Object) {
   pageCommunicator.createCustomSearchTerm(obj.term);
 
   pageCommunicator.ajaxInterceptStream.filter(function(event) {
@@ -16,5 +20,3 @@ function registerSearchQueryRewriter(pageCommunicator, obj) {
     });
   });
 }
-
-module.exports = registerSearchQueryRewriter;

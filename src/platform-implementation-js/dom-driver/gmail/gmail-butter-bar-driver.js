@@ -1,5 +1,7 @@
+/* @flow */
+
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 
 import streamWaitFor from '../../lib/stream-wait-for';
@@ -7,11 +9,11 @@ import makeRevocableFunction from '../../lib/make-revocable-function';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
-  .map(noticeContainer => {
-    const googleNotice = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
-    let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
+  .map((noticeContainer: HTMLElement) => {
+    const googleNotice: HTMLElement = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
+    let sdkNotice: HTMLElement = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
     if (!sdkNotice) {
-      sdkNotice = googleNotice.cloneNode(false);
+      sdkNotice = (googleNotice.cloneNode(false): any);
       sdkNotice.classList.add('inboxsdk__butterbar');
       googleNotice.parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
@@ -36,7 +38,7 @@ const sdkRemovedNotice = elements
   )
   .filter(id => id == null);
 
-const noticeAvailableStream = Bacon.mergeAll(googleRemovedNotice, sdkRemovedNotice);
+const noticeAvailableStream = Kefir.merge([googleRemovedNotice, sdkRemovedNotice]);
 
 function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
@@ -48,11 +50,13 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
 
 export default class GmailButterBarDriver {
   constructor() {
-    Bacon.combineAsArray(elements, googleAddedNotice)
-      .onValues(({googleNotice, sdkNotice}) => {
-        googleNotice.style.display = '';
-        sdkNotice.style.display = 'none';
-        sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
+    Kefir.combine([elements, googleAddedNotice])
+      .onValue(({googleNotice, sdkNotice}) => {
+        if(googleNotice) googleNotice.style.display = '';
+        if(sdkNotice){
+          sdkNotice.style.display = 'none';
+          sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
+        }
       });
 
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
@@ -60,23 +64,23 @@ export default class GmailButterBarDriver {
     noticeAvailableStream.onValue(_.noop);
   }
 
-  getNoticeAvailableStream() {
+  getNoticeAvailableStream(): Kefir.Stream {
     return noticeAvailableStream;
   }
 
-  getSharedMessageQueue() {
+  getSharedMessageQueue(): Array<Object> {
     const attr = document.head.getAttribute('data-inboxsdk-butterbar-queue');
     return attr ? JSON.parse(attr) : [];
   }
 
-  setSharedMessageQueue(queue) {
+  setSharedMessageQueue(queue: Object) {
     const attr = JSON.stringify(queue);
     document.head.setAttribute('data-inboxsdk-butterbar-queue', attr);
   }
 
   // Immediately displays the message, overriding anything else on the screen.
   // Priority and queuing logic is handled by butter-bar.js above this.
-  showMessage(rawOptions) {
+  showMessage(rawOptions: Object): {destroy(): void} {
     const instanceId = Date.now()+'-'+Math.random();
 
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {

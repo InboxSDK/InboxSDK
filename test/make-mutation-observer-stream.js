@@ -1,5 +1,8 @@
+/* @flow */
+
 import assert from 'assert';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
@@ -41,12 +44,11 @@ describe('makeMutationObserverStream', function() {
     target.removeChild(child1);
   });
 
-  it("doesn't emit events while current events are processed", function(done) {
-    // See https://github.com/baconjs/bacon.js/issues/574
+  it("doesn't emit events while current events are processed", function(done) {    
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const target = new MockElementParent([child1, child2]);
-    const someBus = new Bacon.Bus();
+    const someBus = kefirBus();
     someBus.onValue(()=>{});
 
     let call = 0;

@@ -1,8 +1,8 @@
 /* @flow */
 
 import _ from 'lodash';
-import Bacon from 'baconjs';
-import baconCast from 'bacon-cast';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 import {defn} from 'ud';
 
 import ModalView from '../widgets/modal-view';
@@ -50,7 +50,7 @@ class Widgets {
   }
 
   showTopMessageBarView(options: Object): TopMessageBarView {
-    const topMessageBarViewDriver = get(memberMap, this).driver.createTopMessageBarDriver(baconCast(Bacon, options));
+    const topMessageBarViewDriver = get(memberMap, this).driver.createTopMessageBarDriver(kefirCast(Kefir, options));
 
     return new TopMessageBarView({
       topMessageBarViewDriver

@@ -1,8 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-var Bacon = require('baconjs');
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function addRecipientRow(gmailComposeView: GmailComposeView, recipientRowOptionStream: Kefir.Stream): ()=>void {

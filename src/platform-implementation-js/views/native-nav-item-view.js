@@ -1,38 +1,39 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
+import _ from 'lodash';
+import RSVP from 'rsvp';
 
-var EventEmitter = require('../lib/safe-event-emitter');
+import EventEmitter from '../lib/safe-event-emitter';
 
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
 
-var NavItemView = require('./nav-item-view');
+import NavItemView from './nav-item-view';
 
-var memberMap = new WeakMap();
+import type {Driver} from '../driver-interfaces/driver';
 
-var NativeNavItemView = function(appId, driver, labelName){
-	EventEmitter.call(this);
-	var members = {};
-	memberMap.set(this, members);
+const memberMap = new WeakMap();
 
-	members.appId = appId;
-	members.driver = driver;
-	members.labelName = labelName;
-	members.deferred = RSVP.defer();
+export default class NativeNavItemView extends EventEmitter {
 
-	members.navItemViews = [];
-};
+	constructor(appId: string, driver: Driver, labelName: string){
+		super();
 
-NativeNavItemView.prototype = Object.create(EventEmitter.prototype);
+		var members = {};
+		memberMap.set(this, members);
 
-_.extend(NativeNavItemView.prototype, {
+		members.appId = appId;
+		members.driver = driver;
+		members.labelName = labelName;
+		members.deferred = RSVP.defer();
 
-	addNavItem: function(navItemDescriptor){
+		members.navItemViews = [];
+	}
+
+	addNavItem(navItemDescriptor: Object): NavItemView {
 		var members = memberMap.get(this);
 
-		var navItemDescriptorPropertyStream = baconCast(Bacon, navItemDescriptor).toProperty();
+		var navItemDescriptorPropertyStream = kefirCast(Kefir, navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
 		members.deferred.promise.then(function(navItemViewDriver){
@@ -42,9 +43,9 @@ _.extend(NativeNavItemView.prototype, {
 
 		members.navItemViews.push(navItemView);
 		return navItemView;
-	},
+	}
 
-	setNavItemViewDriver: function(navItemViewDriver){
+	setNavItemViewDriver(navItemViewDriver: Object){
 		if(!navItemViewDriver){
 			return;
 		}
@@ -52,16 +53,16 @@ _.extend(NativeNavItemView.prototype, {
 		var members = memberMap.get(this);
 
 		members.navItemViewDriver = navItemViewDriver;
-		navItemViewDriver.getEventStream().onValue(_handleStreamEvent, this);
+		navItemViewDriver.getEventStream().onValue((event) => _handleStreamEvent(this, event));
 
 		members.deferred.resolve(navItemViewDriver);
-	},
+	}
 
-	isCollapsed: function(){
+	isCollapsed(): boolean {
 		return localStorage['inboxsdk__nativeNavItem__state_' + memberMap.get(this).labelName] === 'collapsed';
-	},
+	}
 
-	setCollapsed: function(collapseValue){
+	setCollapsed(collapseValue: boolean ){
 		var members = memberMap.get(this);
 
 		if(members.navItemViewDriver){
@@ -72,7 +73,7 @@ _.extend(NativeNavItemView.prototype, {
 		}
 	}
 
-});
+}
 
 function _handleStreamEvent(emitter, event){
 	switch(event.eventName){
@@ -82,5 +83,3 @@ function _handleStreamEvent(emitter, event){
 		break;
 	}
 }
-
-module.exports = NativeNavItemView;

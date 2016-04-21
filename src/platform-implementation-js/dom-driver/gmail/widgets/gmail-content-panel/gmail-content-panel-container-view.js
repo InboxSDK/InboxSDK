@@ -1,15 +1,16 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 
 import GmailTabContainerView from './gmail-tab-container-view';
 import GmailContentPanelView from './gmail-content-panel-view';
 import get from '../../../../../common/get-or-fail';
 
 export default class GmailContentPanelContainerView {
-  _eventStream: Bacon.Bus;
+  _eventStream: Kefir.Bus;
   _descriptorToViewMap: Map<Object, GmailContentPanelView>;
   _viewToDescriptorMap: Map<GmailContentPanelView, Object>;
   _element: HTMLElement;
@@ -19,7 +20,7 @@ export default class GmailContentPanelContainerView {
   _contentContainer: HTMLElement;
 
   constructor(element: ?HTMLElement) {
-    this._eventStream = new Bacon.Bus();
+    this._eventStream = kefirBus();
     this._descriptorToViewMap = new Map();
     this._viewToDescriptorMap = new Map();
     this._gmailContentPanelViews = [];
@@ -104,9 +105,11 @@ export default class GmailContentPanelContainerView {
       .getEventStream()
       .filter(_isEventName.bind(null, 'tabActivate'))
       .map(x => x.descriptor)
-      .map(x => get(this._descriptorToViewMap, x))
-      .doAction(x => {x.activate();})
-      .map(x => x.getElement())
+      .map(x => get(this._descriptorToViewMap, x))      
+      .map(x => {
+        x.activate();
+        return x.getElement();
+      })
       .onValue(el => {this._contentContainer.appendChild(el);});
 
     this._gmailTabContainerView

@@ -1,16 +1,14 @@
 /* @flow */
 //jshint ignore:start
 
-var Kefir = require('kefir');
-var kefirCast = require('kefir-cast');
-var udKefir = require('ud-kefir');
-import kefirWaitFor from '../../../lib/kefir-wait-for';
-import type Bacon from 'baconjs';
+import Kefir from 'kefir';
+import udKefir from 'ud-kefir';
+import streamWaitFor from '../../../lib/stream-wait-for';
 
 import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
-import makeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
-import kefirElementViewMapper from '../../../lib/dom/kefir-element-view-mapper';
+import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import elementViewMapper from '../../../lib/dom/element-view-mapper';
 import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -21,12 +19,12 @@ import type GmailDriver from '../gmail-driver';
 
 var impStream = udKefir(module, imp);
 
-export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Bacon.Observable): Kefir.Stream<GmailComposeView> {
+export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Kefir.Stream): Kefir.Stream<GmailComposeView> {
 	return impStream.flatMapLatest(imp =>
 		imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream));
 }
 
-function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Bacon.Observable): Kefir.Stream<GmailComposeView> {
+function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xhrInterceptorStream: Kefir.Stream): Kefir.Stream<GmailComposeView> {
 	return Kefir.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(() => {
@@ -42,7 +40,7 @@ function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xh
 			elementStream = _setupStandardComposeElementStream();
 		}
 
-		return elementStream.map(kefirElementViewMapper(el => {
+		return elementStream.map(elementViewMapper(el => {
 			var composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 			composeView.setIsStandalone(isStandalone);
 
@@ -50,8 +48,8 @@ function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream, xh
 		}));
 	}).merge(
 		messageViewDriverStream.flatMap(gmailMessageView =>
-			kefirCast(Kefir, gmailMessageView.getReplyElementStream())
-				.map(kefirElementViewMapper(el => {
+			gmailMessageView.getReplyElementStream()
+				.map(elementViewMapper(el => {
 					var view = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
 					view.setIsInlineReplyForm(true);
 					return view;
@@ -114,7 +112,7 @@ function _setupStandaloneComposeElementStream() {
 }
 
 function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	return kefirWaitFor(containerFn)
+	return streamWaitFor(containerFn)
 		.flatMap(containerEl => makeElementChildStream(containerEl));
 }
 

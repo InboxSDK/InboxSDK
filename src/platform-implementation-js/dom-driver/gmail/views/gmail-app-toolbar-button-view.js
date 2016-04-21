@@ -4,9 +4,8 @@
 import Logger from '../../../lib/logger';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import _ from 'lodash';
-import Bacon from 'baconjs';
 import Kefir from 'kefir';
-import baconCast from 'bacon-cast';
+import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
@@ -16,14 +15,14 @@ import DropdownView from '../../../widgets/buttons/dropdown-view';
 export default class GmailAppToolbarButtonView {
   _stopper: Kefir.Stream&{destroy:()=>void};
   _iconSettings: Object;
-  _element: ?HTMLElement;
+  _element: ?HTMLElement = null;
   _activeDropdown: ?DropdownView;
   _buttonDescriptor: ?Object;
 
   constructor(inButtonDescriptor: Object) {
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    var buttonDescriptorProperty = baconCast(Bacon, inButtonDescriptor);
+    var buttonDescriptorProperty = kefirCast(Kefir, inButtonDescriptor);
     buttonDescriptorProperty.onValue((buttonDescriptor) => {
       try {
         this._handleButtonDescriptor(buttonDescriptor);
@@ -105,10 +104,12 @@ export default class GmailAppToolbarButtonView {
         buttonDescriptor.onClick.call(null, appEvent);
       }
 
-      tooltipView.anchor(
-        this._element,
-        {position: 'bottom', offset: {top: 8}}
-      );
+      if(this._element){
+        tooltipView.anchor(
+          this._element,
+          {position: 'bottom', offset: {top: 8}}
+        );
+      }      
     }
   }
 }

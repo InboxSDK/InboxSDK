@@ -1,12 +1,13 @@
 /* @flow */
 // jshint ignore:start
 
-const asap = require('asap');
+import asap from 'asap';
 import _ from 'lodash';
 import {defn} from 'ud';
 import util from 'util';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import {parse} from 'querystring';
+import kefirBus from 'kefir-bus';
 
 import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
@@ -19,7 +20,7 @@ class GmailThreadView {
 	_routeViewDriver: any;
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
-	_eventStream: Bacon.Bus;
+	_eventStream: Kefir.Bus;
 	_sidebarContentPanelContainerView: any;
 	_toolbarView: any;
 	_messageViewDrivers: any[];
@@ -33,7 +34,7 @@ class GmailThreadView {
 		this._driver = driver;
 		this._isPreviewedThread = isPreviewedThread;
 
-		this._eventStream = new Bacon.Bus();
+		this._eventStream = kefirBus();
 		this._messageViewDrivers = [];
 
 		this._setupToolbarView();
@@ -43,7 +44,7 @@ class GmailThreadView {
 		});
 	}
 
-	getEventStream(): Bacon.Observable { return this._eventStream; }
+	getEventStream(): Kefir.Stream { return this._eventStream; }
 	getElement(): HTMLElement { return this._element; }
 	getRouteViewDriver(): any { return this._routeViewDriver; }
 	getIsPreviewedThread(): boolean { return this._isPreviewedThread; }
@@ -217,7 +218,7 @@ class GmailThreadView {
 		this._eventStream.plug(messageView.getEventStream());
 
 		this._messageViewDrivers.push(messageView);
-		this._eventStream.push({
+		this._eventStream.emit({
 			type: 'internal',
 			eventName: 'messageCreated',
 			view: messageView

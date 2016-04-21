@@ -1,9 +1,9 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var ud = require('ud');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import * as ud from 'ud';
+import Kefir from 'kefir';
 
 var insertHTMLatCursor = ud.defn(module, function insertHTMLatCursor(element: HTMLElement, html: string, oldRange: ?Object): ?HTMLElement {
 	element.focus();
@@ -64,17 +64,17 @@ var insertHTMLatCursor = ud.defn(module, function insertHTMLatCursor(element: HT
 				sel.removeAllRanges();
 				sel.addRange(range);
 
-				var nextUserCursorMove = Bacon.mergeAll(
-					Bacon.fromEventTarget(element, 'mousedown'),
-					Bacon.fromEventTarget(element, 'keypress')
-				);
+				var nextUserCursorMove = Kefir.merge([
+					Kefir.fromEvents(element, 'mousedown'),
+					Kefir.fromEvents(element, 'keypress')
+				]);
 
 				// Whenever the body element gets focus, manually make sure the cursor
 				// is in the right position, because Chrome likes to put it in the
 				// previous location instead because it hates us.
-				var focus = Bacon
-					.fromEventTarget(element, 'focus')
-					.takeUntil(nextUserCursorMove)
+				var focus = Kefir
+					.fromEvents(element, 'focus')
+					.takeUntilBy(nextUserCursorMove)
 					.onValue(function() {
 						sel.removeAllRanges();
 						sel.addRange(range);

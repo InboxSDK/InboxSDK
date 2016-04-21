@@ -1,59 +1,64 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
+import _ from 'lodash';
 import RSVP from 'rsvp';
 
-var HandlerRegistry = require('../lib/handler-registry');
+import HandlerRegistry from '../lib/handler-registry';
 
-var RouteView = require('../views/route-view/route-view');
-var ListRouteView = require('../views/route-view/list-route-view');
-var CustomRouteView = require('../views/route-view/custom-route-view');
+import RouteView from '../views/route-view/route-view';
+import ListRouteView from '../views/route-view/list-route-view';
+import CustomRouteView from '../views/route-view/custom-route-view';
+
+import type {Driver} from '../driver-interfaces/driver';
+import type {Handler} from '../lib/handler-registry';
 
 const memberMap = new WeakMap();
 
 // documented in src/docs/
-var Router = function(appId, driver, membraneMap){
-	var members = {};
-	memberMap.set(this, members);
+class Router {
+	static NativeRouteIDs: Object;
+	static NativeListRouteIDs: Object;
+	static RouteTypes: Object;
 
-	members.appId = appId;
-	members.driver = driver;
+	constructor(appId: string , driver: Driver, membraneMap: WeakMap){
+		var members = {};
+		memberMap.set(this, members);
 
-	members.currentRouteViewDriver = null;
+		members.appId = appId;
+		members.driver = driver;
 
-	members.allRoutesHandlerRegistry = new HandlerRegistry();
+		members.currentRouteViewDriver = null;
 
-	members.customRoutes = [];
+		members.allRoutesHandlerRegistry = new HandlerRegistry();
 
-	members.membraneMap = membraneMap;
+		members.customRoutes = [];
 
-	members.listRouteHandlerRegistries = {};
-	_.forOwn(this.NativeListRouteIDs, value => {
-		members.listRouteHandlerRegistries[value] = new HandlerRegistry();
-	});
+		members.membraneMap = membraneMap;
 
-	driver.getRouteViewDriverStream().onValue(_handleRouteViewChange, this, members);
-
-	driver.getStopper().onValue(function() {
-		members.allRoutesHandlerRegistry.dumpHandlers();
-		_.forOwn(members.listRouteHandlerRegistries, reg => {
-			reg.dumpHandlers();
+		members.listRouteHandlerRegistries = {};
+		_.forOwn(NATIVE_LIST_ROUTE_IDS, value => {
+			members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 		});
-	});
-};
 
-_.extend(Router.prototype, {
+		driver.getRouteViewDriverStream().onValue(routeViewDriver => _handleRouteViewChange(this, members, routeViewDriver));
 
-	createLink(routeID, params){
+		driver.getStopper().onValue(function() {
+			members.allRoutesHandlerRegistry.dumpHandlers();
+			_.forOwn(members.listRouteHandlerRegistries, reg => {
+				reg.dumpHandlers();
+			});
+		});
+	}
+
+	createLink(routeID: string, params?: ?Object): string {
 		return memberMap.get(this).driver.createLink(routeID, params);
-	},
+	}
 
-	goto(routeID, params){
+	goto(routeID: string, params?: ?Object){
 		memberMap.get(this).driver.goto(routeID, params);
-	},
+	}
 
-	handleCustomRoute(routeID, handler){
+	handleCustomRoute(routeID: string, handler: Handler): () => void {
 		var customRouteDescriptor = {
 			routeID: routeID,
 			onActivate: handler
@@ -70,33 +75,33 @@ _.extend(Router.prototype, {
 				customRoutes.splice(index, 1);
 			}
 		};
-	},
+	}
 
-	handleAllRoutes(handler){
+	handleAllRoutes(handler: Handler): () => void {
 		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
-	},
+	}
 
-	handleListRoute(routeID, handler){
+	handleListRoute(routeID: string, handler: Handler): () => void {
 		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
 		if(!listRouteHandlerRegistries[routeID]){
 			throw new Error('Invalid routeID specified');
 		}
 
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
-	},
+	}
 
-	handleCustomListRoute(routeID, handler) {
+	handleCustomListRoute(routeID: string, handler: Handler): () => void {
 		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
-	},
+	}
 
-	getCurrentRouteView(){
+	getCurrentRouteView(): RouteView {
 		var members = memberMap.get(this);
 		return members.membraneMap.get(members.currentRouteViewDriver);
 	}
 
-});
+}
 
-var nativeRouteIDs = Object.freeze({
+const NATIVE_ROUTE_IDS = Object.freeze({
 	'INBOX': 'inbox/:page',
 	'ALL_MAIL': 'all/:page',
 	'SENT': 'sent/:page',
@@ -119,24 +124,24 @@ var nativeRouteIDs = Object.freeze({
 	'ANY_LIST': '*'
 });
 
-var nativeListRouteIDs = Object.freeze({
-	'INBOX': nativeRouteIDs.INBOX,
-	'ALL_MAIL': nativeRouteIDs.ALL_MAIL,
-	'SENT': nativeRouteIDs.SENT,
-	'STARRED': nativeRouteIDs.STARRED,
-	'DRAFTS': nativeRouteIDs.DRAFTS,
-	'SNOOZED': nativeRouteIDs.SNOOZED,
-	'DONE': nativeRouteIDs.DONE,
-	'REMINDERS': nativeRouteIDs.REMINDERS,
-	'LABEL': nativeRouteIDs.LABEL,
-	'TRASH': nativeRouteIDs.TRASH,
-	'SPAM': nativeRouteIDs.SPAM,
-	'IMPORTANT': nativeRouteIDs.IMPORTANT,
-	'SEARCH': nativeRouteIDs.SEARCH,
-	'ANY_LIST': nativeRouteIDs.ANY_LIST
+var NATIVE_LIST_ROUTE_IDS = Object.freeze({
+	'INBOX': NATIVE_ROUTE_IDS.INBOX,
+	'ALL_MAIL': NATIVE_ROUTE_IDS.ALL_MAIL,
+	'SENT': NATIVE_ROUTE_IDS.SENT,
+	'STARRED': NATIVE_ROUTE_IDS.STARRED,
+	'DRAFTS': NATIVE_ROUTE_IDS.DRAFTS,
+	'SNOOZED': NATIVE_ROUTE_IDS.SNOOZED,
+	'DONE': NATIVE_ROUTE_IDS.DONE,
+	'REMINDERS': NATIVE_ROUTE_IDS.REMINDERS,
+	'LABEL': NATIVE_ROUTE_IDS.LABEL,
+	'TRASH': NATIVE_ROUTE_IDS.TRASH,
+	'SPAM': NATIVE_ROUTE_IDS.SPAM,
+	'IMPORTANT': NATIVE_ROUTE_IDS.IMPORTANT,
+	'SEARCH': NATIVE_ROUTE_IDS.SEARCH,
+	'ANY_LIST': NATIVE_ROUTE_IDS.ANY_LIST
 });
 
-var routeTypes = Object.freeze({
+var ROUTE_TYPES = Object.freeze({
 	'LIST': 'LIST',
 	'THREAD': 'THREAD',
 	'SETTINGS': 'SETTINGS',
@@ -148,26 +153,26 @@ var routeTypes = Object.freeze({
 
 function _handleRouteViewChange(router, members, routeViewDriver){
 	members.currentRouteViewDriver = routeViewDriver;
-	var routeView = new RouteView(routeViewDriver, members.driver, members.appId);
+	var routeView = new RouteView(routeViewDriver);
 	members.membraneMap.set(routeViewDriver, routeView);
 
 
 	_updateNavMenu(members, routeViewDriver);
 
-	if(routeView.getRouteType() === router.RouteTypes.CUSTOM){
+	if(routeView.getRouteType() === ROUTE_TYPES.CUSTOM){
 		_informRelevantCustomRoutes(members, routeViewDriver, routeView);
 	}
 
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
-	if(routeView.getRouteType() === routeTypes.LIST){
+	if(routeView.getRouteType() === ROUTE_TYPES.LIST){
 		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
 
 		var listRouteHandlerRegistry = members.listRouteHandlerRegistries[routeView.getRouteID()];
 		if (listRouteHandlerRegistry) {
 			listRouteHandlerRegistry.addTarget(listRouteView);
 		}
-		members.listRouteHandlerRegistries[router.NativeRouteIDs.ANY_LIST].addTarget(listRouteView);
+		members.listRouteHandlerRegistries[NATIVE_ROUTE_IDS.ANY_LIST].addTarget(listRouteView);
 	}
 }
 
@@ -194,11 +199,11 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 }
 
 function _updateNavMenu(members, newRouteViewDriver){
-	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== routeTypes.CUSTOM);
+	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM);
 }
 
-Router.NativeRouteIDs = Router.prototype.NativeRouteIDs = nativeRouteIDs;
-Router.NativeListRouteIDs = Router.prototype.NativeListRouteIDs = nativeListRouteIDs;
-Router.RouteTypes = Router.prototype.RouteTypes = routeTypes;
+Router.NativeRouteIDs = (Router: any).prototype.NativeRouteIDs = NATIVE_ROUTE_IDS;
+Router.NativeListRouteIDs = (Router: any).prototype.NativeListRouteIDs = NATIVE_LIST_ROUTE_IDS;
+Router.RouteTypes = (Router: any).prototype.RouteTypes = ROUTE_TYPES;
 
-module.exports = Router;
+export default Router;

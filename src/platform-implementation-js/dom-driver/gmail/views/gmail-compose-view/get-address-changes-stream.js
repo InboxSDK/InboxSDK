@@ -1,32 +1,35 @@
+/* @flow */
+
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 import RSVP from 'rsvp';
 
-import baconFlatten from '../../../../lib/bacon-flatten';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import getAddressInformationExtractor from './get-address-information-extractor';
 
-module.exports = function(gmailComposeView){
+import type GmailComposeView from '../gmail-compose-view';
+
+export default function(gmailComposeView: GmailComposeView): Kefir.Stream {
 	var recipientRowElements = gmailComposeView.getRecipientRowElements();
 
 	if(!recipientRowElements || recipientRowElements.length === 0){
-		return Bacon.never();
+		return Kefir.never();
 	}
 
-	var mergedStream = Bacon.mergeAll(
+	var mergedStream = Kefir.merge([
 		_makeSubAddressStream('to', recipientRowElements, 0),
 		_makeSubAddressStream('cc', recipientRowElements, 1),
 		_makeSubAddressStream('bcc', recipientRowElements, 2)
-	);
+	]);
 
-	var umbrellaStream = mergedStream.bufferWithTime(100).map(_groupChangeEvents);
+	var umbrellaStream = mergedStream.map(_groupChangeEvents);
 
-	return Bacon.mergeAll(mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView));
-};
+	return Kefir.merge([mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView)]);
+}
 
 function _makeSubAddressStream(addressType, rowElements, rowIndex){
 	if(!rowElements[rowIndex]){
-		return Bacon.never();
+		return Kefir.never();
 	}
 
 	var mainSubAddressStream =
@@ -38,29 +41,28 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 			}
 		);
 
-	return Bacon.later(0).flatMap(function() {
-		return Bacon.mergeAll(
-			baconFlatten(
-				mainSubAddressStream
-					.toProperty({
-						addedNodes: rowElements[rowIndex].querySelectorAll('.vR')
-					})
-					.map('.addedNodes')
-					.map(_.toArray)
-				)
+	return Kefir.later(0, null).flatMap(function() {
+		return Kefir.merge([
+
+			mainSubAddressStream
+				.toProperty(() => {
+					return {addedNodes: rowElements[rowIndex].querySelectorAll('.vR')};
+				})
+				.map(e => e.addedNodes)
+				.map(_.toArray)
+				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
 				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
 
-			baconFlatten(
-				mainSubAddressStream
-					.map('.removedNodes')
-					.map(_.toArray)
-				)
+			mainSubAddressStream
+				.map(e => e.removedNodes)
+				.map(_.toArray)
+				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
 				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
-		);
+		]);
 	});
 }
 
@@ -70,8 +72,8 @@ function _isRecipientNode(node){
 }
 
 
-function _groupChangeEvents(events){
-	var grouping = {
+function _groupChangeEvents(event){
+	const grouping = {
 		to: {
 			added: [],
 			removed: []
@@ -86,10 +88,8 @@ function _groupChangeEvents(events){
 		}
 	};
 
-	events.forEach(function(event){
-		var parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
-		grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
-	});
+	const parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
+	grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
 
 	return {
 		eventName: 'recipientsChanged',
@@ -99,11 +99,11 @@ function _groupChangeEvents(events){
 
 
 function getFromAddressChangeStream(gmailComposeView){
-	return Bacon.later(0).flatMap(() => {
+	return Kefir.later(0, null).flatMap(() => {
 		const fromInput = gmailComposeView.getElement().querySelector('input[name="from"]');
-		return Bacon.once(_convertToEvent('fromContactChanged', gmailComposeView.getFromContact()))
+		return Kefir.constant(_convertToEvent('fromContactChanged', gmailComposeView.getFromContact()))
 			.merge(
-				!fromInput ? Bacon.never() : makeMutationObserverStream(
+				!fromInput ? Kefir.never() : makeMutationObserverStream(
 					fromInput,
 					{attributes: true, attributeFilter: ['value']}
 				)

@@ -3,7 +3,7 @@
 
 const _ = require('lodash');
 import * as ud from 'ud';
-const Router = require('../../../../platform-implementation-js/platform-implementation/router');
+import Router from '../../../../platform-implementation-js/platform-implementation/router';
 import simulateClick from '../../../lib/dom/simulate-click';
 import getURLObject from './get-url-object';
 import type GmailDriver from '../gmail-driver';

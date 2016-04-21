@@ -1,11 +1,15 @@
+/* @flow */
+
 import _ from 'lodash';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-export default function getMainContentElementChangedStream(GmailElementGetter) {
+import typeof GmailElementGetter from '../gmail-element-getter';
+
+export default function getMainContentElementChangedStream(GmailElementGetter: GmailElementGetter): Kefir.Stream<HTMLElement> {
 	return waitForMainContentContainer(GmailElementGetter)
 				.flatMap(mainContentContainer =>
 					makeElementChildStream(mainContentContainer)
@@ -17,11 +21,11 @@ export default function getMainContentElementChangedStream(GmailElementGetter) {
 								attributeFilter: ['style']
 							})
 							.map(_.last)
-							.toProperty({
-								target: el
+							.toProperty(() => {
+								return {target: el};
 							})
 							.filter(_isNowVisible)
-							.map('.target')
+							.map(e => e.target)
 						)
 				).toProperty();
 }

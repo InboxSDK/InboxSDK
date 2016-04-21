@@ -1,64 +1,55 @@
 /* @flow */
 //jshint ignore:start
 
-import _ from 'lodash';
 import asap from 'asap';
-import Logger from '../logger';
-import * as Bacon from 'baconjs';
+import logger from '../logger';
+var Kefir = require('kefir');
+import kefirStopper from 'kefir-stopper';
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function makeElementChildStream(element: HTMLElement): Bacon.Observable<{el: HTMLElement, removalStream: Bacon.Observable}> {
+export default function makeElementChildStream(element: HTMLElement): Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }
 
-  return Bacon.fromBinder(function(sink) {
-    var removalStreams = new Map();
+  return Kefir.stream((emitter) => {
+    var removalStreams: Map<HTMLElement, Object> = new Map();
     var ended = false;
 
-    function newEls(els) {
-      var len = els.length;
-      if (len === 0) {
-        return;
-      }
-      var toSink = [];
-      for (var i=0; i < len; i++) {
-        var el = els[i];
-        if (el.nodeType !== 1) continue;
-        var removalStream = new Bacon.Bus();
-        removalStreams.set(el, removalStream);
-        toSink.push(new Bacon.Next({el, removalStream}));
-      }
-      sink(toSink);
+    function newEl(el: HTMLElement) {
+      if (el.nodeType !== 1) return;
+      var removalStream = kefirStopper();
+      removalStreams.set(el, removalStream);
+      emitter.emit({el, removalStream});
     }
 
-    function removedEl(el) {
+    function removedEl(el: HTMLElement) {
       if (el.nodeType !== 1) return;
       var removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
       if(removalStream){
-        removalStream.push(null);
-        removalStream.end();
+        removalStream.destroy();
       } else {
-        Logger.error(new Error("Could not find removalStream for element with class "+el.className));
+        logger.error(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
     var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation){
-        newEls(mutation.addedNodes);
+      mutations.forEach((mutation) => {
+        Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
       });
     });
 
     // We don't want to emit the start children synchronously before all
     // stream listeners are subscribed.
-    asap(function() {
+    asap(() => {
       if (!ended) {
         observer.observe(element, ({childList: true}: any));
-        newEls(element.children);
+        // Clone child list first because it can change
+        Array.prototype.slice.call(element.children).forEach(newEl);
       }
     });
 
@@ -66,9 +57,8 @@ export default function makeElementChildStream(element: HTMLElement): Bacon.Obse
       ended = true;
       observer.disconnect();
       asap(() => {
-        removalStreams.forEach(function(removalStream, el) {
-          removalStream.push(null);
-          removalStream.end();
+        removalStreams.forEach((removalStream, el) => {
+          removalStream.destroy();
         });
       });
     };

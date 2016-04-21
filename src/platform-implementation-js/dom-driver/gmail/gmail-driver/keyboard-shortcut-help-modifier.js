@@ -4,8 +4,8 @@
 import _ from 'lodash';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import kefirMakeElementChildStream from '../../../lib/dom/kefir-make-element-child-stream';
-import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/kefir-make-mutation-observer-chunked-stream';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type GmailKeyboardShortcutHandle from '../views/gmail-keyboard-shortcut-handle';
 import type {ShortcutDescriptor} from '../../../driver-interfaces/driver';
 
@@ -56,13 +56,13 @@ export default class KeyboardShortcutHelpModifier {
 	}
 
 	_monitorKeyboardHelp() {
-		kefirMakeElementChildStream(document.body)
+		makeElementChildStream(document.body)
 			.map(event => event.el)
 			.filter(node =>
 				node && node.classList && node.classList.contains('wa')
 			)
 			.flatMap(node =>
-				kefirMakeMutationObserverChunkedStream(node, {attributes: true, attributeFilter: ['class']})
+				makeMutationObserverChunkedStream(node, {attributes: true, attributeFilter: ['class']})
 					.filter(() => !node.classList.contains('aou'))
 					.toProperty(() => null)
 					.map(() => node)

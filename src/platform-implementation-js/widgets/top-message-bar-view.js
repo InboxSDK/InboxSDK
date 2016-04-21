@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import util from 'util';
-import Bacon from 'baconjs';
 
 import EventEmitter from '../lib/safe-event-emitter';
 

@@ -1,16 +1,25 @@
+/* @flow */
+
 import _ from 'lodash';
 import assert from 'assert';
 import sinon from 'sinon';
 import co from 'co';
-import Bacon from 'baconjs';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import delay from '../src/common/delay';
 
 import ButterBar from '../src/platform-implementation-js/platform-implementation/butter-bar';
 
 class MockButterBarDriver {
+  _queue: Array<Object>;
+  _openBus: Kefir.Bus;
+  _showMessageCount: number;
+  _currentMessage: ?Object;
+  _hideGmailMessageCount: number;
+
   constructor() {
     this._queue = [];
-    this._openBus = new Bacon.Bus();
+    this._openBus = kefirBus();
     this._showMessageCount = 0;
     this._currentMessage = null;
     this._hideGmailMessageCount = 0;
@@ -25,7 +34,7 @@ class MockButterBarDriver {
       destroy: () => {
         if (num === this._showMessageCount) {
           this._currentMessage = null;
-          this._openBus.push();
+          this._openBus.emit();
         }
       }
     };
@@ -46,9 +55,9 @@ describe("ButterBar", function() {
     it("doesn't fail", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
       const options = {text: 'a'};
       const message = butterBar.showMessage(options);
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
@@ -58,23 +67,23 @@ describe("ButterBar", function() {
     });
 
     it("destroys on route change", function(done) {
-      const routeViewDriverStream = new Bacon.Bus();
+      const routeViewDriverStream = kefirBus();
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
         getRouteViewDriverStream: _.constant(routeViewDriverStream.toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
       const message = butterBar.showMessage({text: 'a'});
       // Route view changes shouldn't be listened to immediately by butterbar.
       // This first route view change shouldn't kill things.
-      routeViewDriverStream.push({});
+      routeViewDriverStream.emit({});
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
       assert(driver.getButterBarDriver()._currentMessage);
 
       setTimeout(() => {
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert(driver.getButterBarDriver()._currentMessage);
-        routeViewDriverStream.push({});
+        routeViewDriverStream.emit({});
         assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
         assert.strictEqual(driver.getButterBarDriver()._currentMessage, null);
         done();
@@ -84,9 +93,9 @@ describe("ButterBar", function() {
     it("destroys after given time passes", function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
       const message = butterBar.showMessage({text: 'a', time:1});
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 1);
@@ -102,9 +111,9 @@ describe("ButterBar", function() {
     it("low priority messages don't interrupt higher priority messages", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
       const options1 = {text: 'a', priority: 2};
       const message1 = butterBar.showMessage(options1);
       const options2 = {text: 'b', priority: 1};
@@ -122,9 +131,9 @@ describe("ButterBar", function() {
     it("low priority persistent messages queue up", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
       const options1 = {text: 'a', priority: 2};
       const message1 = butterBar.showMessage(options1);
       const options2 = {text: 'b', priority: 1, persistent: true};
@@ -158,9 +167,9 @@ describe("ButterBar", function() {
     it("messages of equal or higher priority interrupt others", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       const options1 = {text: 'a', priority: 2};
       const message1 = butterBar.showMessage(options1);
@@ -187,9 +196,9 @@ describe("ButterBar", function() {
     it("interrupted messages come back if they're persistent", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       const options1 = {text: 'a', priority: 2, persistent: true};
       const message1 = butterBar.showMessage(options1);
@@ -219,9 +228,9 @@ describe("ButterBar", function() {
     it('resolves', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
 
@@ -244,9 +253,9 @@ describe("ButterBar", function() {
     it('respects showConfirmation', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
 
@@ -268,9 +277,9 @@ describe("ButterBar", function() {
     it('rejects', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
 
@@ -292,9 +301,9 @@ describe("ButterBar", function() {
     it('has a high priority saved message', function(done) {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       assert.strictEqual(driver.getButterBarDriver()._showMessageCount, 0);
 
@@ -327,9 +336,9 @@ describe("ButterBar", function() {
     it("works", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       const options1 = {text: 'a', messageKey: {}, priority: 100};
       const message1 = butterBar.showMessage(options1);
@@ -353,9 +362,9 @@ describe("ButterBar", function() {
     it("calls driver", function() {
       const driver = {
         getButterBarDriver: _.constant(new MockButterBarDriver()),
-        getRouteViewDriverStream: _.constant(Bacon.never().toProperty())
+        getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
       };
-      const butterBar = new ButterBar('test', driver);
+      const butterBar = new ButterBar('test', (driver: any));
 
       assert.strictEqual(driver.getButterBarDriver()._hideGmailMessageCount, 0);
       butterBar.hideGmailMessage();

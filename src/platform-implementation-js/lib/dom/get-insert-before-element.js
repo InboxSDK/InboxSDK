@@ -1,9 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Bacon = require('baconjs');
-var isNumber = require('isnumber');
+import _ from 'lodash';
+import isNumber from 'isnumber';
 
 export default function getInsertBeforeElement(checkElement: HTMLElement, childElements: any, dataAttributes: string[]): ?HTMLElement {
 	var checkValues = {};

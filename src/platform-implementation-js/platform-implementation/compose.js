@@ -1,17 +1,22 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var ud = require('ud');
-var RSVP = require('rsvp');
-var Bacon = require('baconjs');
+import _ from 'lodash';
+import * as ud from 'ud';
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
 
-var ComposeView = require('../views/compose-view');
-var HandlerRegistry = require('../lib/handler-registry');
+import ComposeView from '../views/compose-view';
+import HandlerRegistry from '../lib/handler-registry';
 
-var memberMap = ud.defonce(module, ()=>new WeakMap());
+import type {Handler} from '../lib/handler-registry';
+import type {Driver} from '../driver-interfaces/driver';
+
+const memberMap = ud.defonce(module, ()=>new WeakMap());
 
 // documented in src/docs/
-var Compose = function(appId, driver){
+class Compose {
+
+  constructor(appId: string , driver: Driver){
     var members = {};
     memberMap.set(this, members);
 
@@ -29,39 +34,37 @@ var Compose = function(appId, driver){
     members.composeViewStream.onValue(view => {
       members.handlerRegistry.addTarget(view);
     });
-};
+  }
 
-_.extend(Compose.prototype, {
-
-  registerComposeViewHandler(handler){
+  registerComposeViewHandler(handler: Handler){
     return memberMap.get(this).handlerRegistry.registerHandler(handler);
-  },
+  }
 
-  openNewComposeView(){
+  openNewComposeView(): Promise<ComposeView> {
     return this.getComposeView();
-  },
+  }
 
-  openDraftByMessageID(messageID) {
+  openDraftByMessageID(messageID: string): Promise<ComposeView> {
     var members = memberMap.get(this);
     var newComposePromise = members.composeViewStream
-      .merge(Bacon.later(3000, null))
+      .merge(Kefir.later(3000, null))
       .take(1)
       .flatMap(function(view) {
-        return view ? Bacon.once(view) : new Bacon.Error(new Error("draft did not open"));
+        return view ? Kefir.constant(view) : Kefir.constantError(new Error("draft did not open"));
       })
       .toPromise(RSVP.Promise);
     members.driver.openDraftByMessageID(messageID);
     return newComposePromise;
-  },
+  }
 
-  getComposeView(){
+  getComposeView(): Promise<ComposeView> {
     var members = memberMap.get(this);
     var promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
     members.driver.openComposeWindow();
     return promise;
   }
-});
+}
 
 Compose = ud.defn(module, Compose);
 
-module.exports = Compose;
+export default Compose;
