@@ -73,6 +73,11 @@ function tweakColor(color) {
   return color;
 }
 
+type Counts = {
+  messageCount: number;
+  draftCount: number;
+};
+
 class GmailThreadRowView {
   _elements: HTMLElement[];
   _modifications: Mods;
@@ -82,13 +87,13 @@ class GmailThreadRowView {
   _pageCommunicator: ?GmailPageCommunicator;
   _userView: ?Object;
   _cachedThreadID: ?string;
-  _subscribeTextFixer: () => void;
-  _imageFixer: Kefir.Bus;
-  _imageFixerTask: Kefir.Stream;
-  _stopper: Kefir.Stream&{destroy():void};
-  _refresher: Kefir.Stream;
-  _subjectRefresher: Kefir.Stream;
-  getCounts: () => {messageCount: number, draftCount: number};
+  _didSubscribeTextFixerRun: boolean = false;
+  _imageFixer: ?Kefir.Bus;
+  _imageFixerTask: ?Kefir.Stream;
+  _stopper: Kefir.Stopper;
+  _refresher: ?Kefir.Stream;
+  _subjectRefresher: ?Kefir.Stream;
+  _counts: ?Counts;
 
   constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
@@ -133,78 +138,14 @@ class GmailThreadRowView {
 
     this._stopper = kefirStopper();
 
-    this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
-    this._imageFixerTask = this._imageFixer
-      .bufferBy(this._imageFixer.flatMap(x => delayAsap()))
-      .filter(x => x.length > 0)
-      .map(x => null)
-      .takeUntilBy(this._stopper);
 
-    this._subscribeTextFixer = _.once(() => {
-      // Work around the text-corruption issue on Chrome on retina displays that
-      // happens when images are added to the row.
-      this._imageFixerTask.onValue(() => {
-        const tr = this._elements[0];
-        const computedBgColor = window.getComputedStyle(tr).backgroundColor;
-        tr.style.backgroundColor = tweakColor(computedBgColor);
-        setTimeout(() => {
-          tr.style.backgroundColor = '';
-        }, 0);
-      });
-    });
+    this._imageFixer = null;
+    this._imageFixerTask = null;
+    this._refresher = null;
+    this._subjectRefresher = null;
+    this._counts = null;
 
-    // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
-    // nodes. One time this happens is when you have a new email in your inbox,
-    // you read the email, return to the inbox, get another email, and then the
-    // first email becomes re-rendered.
-    // Important: This stream is only listened on if some modifier method
-    // (like addLabel) is called. If none of those methods are called, then the
-    // stream is not listened on and no MutationObserver ever gets made, saving
-    // us a little bit of work.
-    const watchElement: HTMLElement = this._elements.length === 1 ?
-      this._elements[0] : (this._elements[0].children[2]: any);
-
-    this._refresher = makeMutationObserverChunkedStream(watchElement, {
-      childList: true
-    }).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
-
-    if (isVertical) {
-      this._subjectRefresher = Kefir.constant(null);
-    } else {
-      const subjectElement = watchElement.querySelector('.y6');
-      this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
-          childList: true
-        })
-        .merge(
-          makeMutationObserverChunkedStream(watchElement, {
-            attributes: true, attributeFilter: ['class']
-          })
-        )
-        .map(()=>null)
-        .takeUntilBy(this._stopper)
-        .toProperty(() => null);
-    }
-
-    this.getCounts = _.once(function() {
-      const thing = this._elements[0].querySelector('td div.yW');
-      const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
-
-      const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
-
-      const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-      const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
-
-      const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-      const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
-      return {messageCount, draftCount};
-    });
-
-    gmailDriver.getStopper()
-      .takeUntilBy(this._stopper.delay(15))
-      .delay(15)
-      .onValue(() => {
-        this._removeUnclaimedModifications();
-      });
+    this._elements[0].classList.add('inboxsdk__thread_row');
   }
 
   destroy() {
@@ -250,37 +191,7 @@ class GmailThreadRowView {
   }
 
   _removeUnclaimedModifications() {
-    for (let ii=0; ii<this._modifications.label.unclaimed.length; ii++) {
-      const mod = this._modifications.label.unclaimed[ii];
-      //console.log('removing unclaimed label mod', mod);
-      mod.remove();
-    }
-    this._modifications.label.unclaimed.length = 0;
-    for (let ii=0; ii<this._modifications.button.unclaimed.length; ii++) {
-      const mod = this._modifications.button.unclaimed[ii];
-      //console.log('removing unclaimed button mod', mod);
-      mod.remove();
-    }
-    this._modifications.button.unclaimed.length = 0;
-    for (let ii=0; ii<this._modifications.image.unclaimed.length; ii++) {
-      const mod = this._modifications.image.unclaimed[ii];
-      //console.log('removing unclaimed image mod', mod);
-      mod.remove();
-    }
-    this._modifications.image.unclaimed.length = 0;
-
-    for (let ii=0; ii<this._modifications.replacedDate.unclaimed.length; ii++) {
-      const mod = this._modifications.replacedDate.unclaimed[ii];
-      //console.log('removing unclaimed replacedDate mod', mod);
-      mod.remove();
-    }
-    this._modifications.replacedDate.unclaimed.length = 0;
-
-    for (let ii=0; ii<this._modifications.replacedDraftLabel.unclaimed.length; ii++) {
-      const mod = this._modifications.replacedDraftLabel.unclaimed[ii];
-      mod.remove();
-    }
-    this._modifications.replacedDraftLabel.unclaimed.length = 0;
+    _removeThreadRowUnclaimedModifications(this._modifications);
 
     // TODO fix column width to deal with removed buttons
   }
@@ -319,6 +230,25 @@ class GmailThreadRowView {
 
   setUserView(userView: Object) {
     this._userView = userView;
+  }
+
+  getCounts(): Counts {
+    let counts = this._counts;
+    if(!counts){
+      const thing = this._elements[0].querySelector('td div.yW');
+      const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
+
+      const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+
+      const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
+      const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+
+      const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
+      const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
+      counts = this._counts = {messageCount, draftCount};
+    }
+
+    return counts;
   }
 
   _expandColumn(colSelector: string, width: number) {
@@ -364,7 +294,7 @@ class GmailThreadRowView {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
-        this._imageFixer.emit();
+        this._getImageFixer().emit();
       }
     });
   }
@@ -376,8 +306,8 @@ class GmailThreadRowView {
     }
     const prop = kefirCast(Kefir, inIconDescriptor)
                   .toProperty()
-                  .combine(this._refresher, _.identity)
-                  .combine(this._subjectRefresher, _.identity)
+                  .combine(this._getRefresher(), _.identity)
+                  .combine(this._getSubjectRefresher(), _.identity)
                   .takeUntilBy(this._stopper);
 
     let imageMod = null;
@@ -424,11 +354,11 @@ class GmailThreadRowView {
 
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
         }
-        this._imageFixer.emit();
+        this._getImageFixer().emit();
       }
     });
 
-    this._imageFixerTask.onValue(() => {
+    this._getImageFixerTask().onValue(() => {
       const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
       if (el) {
         // Make the image reposition itself horizontally.
@@ -463,7 +393,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.combine(this._refresher, _.identity).onValue(buttonDescriptor => {
+    prop.combine(this._getRefresher(), _.identity).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (buttonMod) {
           buttonMod.remove();
@@ -553,7 +483,7 @@ class GmailThreadRowView {
           // thread row so it counts as clicking on the thread.
           (starGroup:any).onmouseover = (starGroup:any).onclick = starGroupEventInterceptor;
         }
-        this._imageFixer.emit();
+        this._getImageFixer().emit();
       }
     });
   }
@@ -572,7 +502,7 @@ class GmailThreadRowView {
     var currentIconUrl;
 
     var prop = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
+    prop.combine(this._getRefresher(), _.identity).takeUntilBy(this._stopper).onValue(opts => {
       if (!opts) {
         if (added) {
           getImgElement().remove();
@@ -632,7 +562,7 @@ class GmailThreadRowView {
     let labelMod;
     let draftElement, countElement;
     const prop = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
+    prop.combine(this._getRefresher(), _.identity).takeUntilBy(this._stopper).onValue(opts => {
       const originalLabel = this._elements[0].querySelector('td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
       if (!recipientsContainer) throw new Error("Should not happen");
@@ -817,8 +747,153 @@ class GmailThreadRowView {
             this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
             this._elements[0].querySelector('td.a4W div.xS div.xT');
   }
+
+  _getImageFixer(): Kefir.Bus {
+    let imageFixer = this._imageFixer;
+    if(!imageFixer){
+      imageFixer = this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
+    }
+
+    return imageFixer;
+  }
+
+  _getImageFixerTask(): Kefir.Stream {
+    let imageFixerTask = this._imageFixerTask;
+    if(!imageFixerTask){
+      imageFixerTask = this._imageFixerTask =
+        this._getImageFixer()
+          .bufferBy(this._getImageFixer().flatMap(x => delayAsap()))
+          .filter(x => x.length > 0)
+          .map(x => null)
+          .takeUntilBy(this._stopper);
+    }
+
+    return imageFixerTask;
+  }
+
+  _subscribeTextFixer() {
+    if(this._didSubscribeTextFixerRun) return;
+
+    // Work around the text-corruption issue on Chrome on retina displays that
+    // happens when images are added to the row.
+    this._getImageFixerTask().onValue(() => {
+      const tr = this._elements[0];
+      const computedBgColor = window.getComputedStyle(tr).backgroundColor;
+      tr.style.backgroundColor = tweakColor(computedBgColor);
+      setTimeout(() => {
+        tr.style.backgroundColor = '';
+      }, 0);
+    });
+
+    this._didSubscribeTextFixerRun = true;
+  }
+
+  _getWatchElement(): HTMLElement {
+    return this._elements.length === 1 ?
+      this._elements[0] : (this._elements[0].children[2]: any);
+  }
+
+  _getRefresher(): Kefir.Stream {
+    // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
+    // nodes. One time this happens is when you have a new email in your inbox,
+    // you read the email, return to the inbox, get another email, and then the
+    // first email becomes re-rendered.
+    // Important: This stream is only listened on if some modifier method
+    // (like addLabel) is called. If none of those methods are called, then the
+    // stream is not listened on and no MutationObserver ever gets made, saving
+    // us a little bit of work.
+    let refresher = this._refresher;
+    if(!refresher){
+      refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
+        childList: true
+      }).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+    }
+
+    return refresher;
+  }
+
+  _getSubjectRefresher(): Kefir.Stream {
+    let subjectRefresher = this._subjectRefresher;
+    if(!subjectRefresher){
+      if (false) {
+        subjectRefresher = this._subjectRefresher = Kefir.constant(null);
+      } else {
+        const watchElement = this._getWatchElement();
+        const subjectElement = watchElement.querySelector('.y6');
+        subjectRefresher = this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
+            childList: true
+          })
+          .merge(
+            makeMutationObserverChunkedStream(watchElement, {
+              attributes: true, attributeFilter: ['class']
+            })
+          )
+          .map(()=>null)
+          .takeUntilBy(this._stopper)
+          .toProperty(() => null);
+      }
+    }
+
+    return subjectRefresher;
+  }
 }
 
 assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 export default defn(module, GmailThreadRowView);
+
+export function removeAllThreadRowUnclaimedModifications(){
+    // run in a setTimeout so that the thread rows get destroyed
+    // and populate the unclaimed modifications
+    setTimeout(() => {
+
+      const modifiedRows = document.querySelectorAll('.inboxsdk__thread_row');
+      _.each(modifiedRows, row => {
+
+        const modifications = cachedModificationsByRow.get(row);
+        if(modifications){
+          _removeThreadRowUnclaimedModifications(modifications);
+        }
+
+      });
+
+    }, 15);
+
+
+}
+
+
+
+function _removeThreadRowUnclaimedModifications(modifications){
+  for (let ii=0; ii<modifications.label.unclaimed.length; ii++) {
+    const mod = modifications.label.unclaimed[ii];
+    //console.log('removing unclaimed label mod', mod);
+    mod.remove();
+  }
+  modifications.label.unclaimed.length = 0;
+  for (let ii=0; ii<modifications.button.unclaimed.length; ii++) {
+    const mod = modifications.button.unclaimed[ii];
+    //console.log('removing unclaimed button mod', mod);
+    mod.remove();
+  }
+  modifications.button.unclaimed.length = 0;
+  for (let ii=0; ii<modifications.image.unclaimed.length; ii++) {
+    const mod = modifications.image.unclaimed[ii];
+    //console.log('removing unclaimed image mod', mod);
+    mod.remove();
+  }
+  modifications.image.unclaimed.length = 0;
+
+  for (let ii=0; ii<modifications.replacedDate.unclaimed.length; ii++) {
+    const mod = modifications.replacedDate.unclaimed[ii];
+    //console.log('removing unclaimed replacedDate mod', mod);
+    mod.remove();
+  }
+  modifications.replacedDate.unclaimed.length = 0;
+
+  for (let ii=0; ii<modifications.replacedDraftLabel.unclaimed.length; ii++) {
+    const mod = modifications.replacedDraftLabel.unclaimed[ii];
+    mod.remove();
+  }
+  modifications.replacedDraftLabel.unclaimed.length = 0;
+}

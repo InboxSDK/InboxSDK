@@ -51,11 +51,11 @@ describe('HandlerRegistry', function() {
     });
 
     reg.addTarget(target2);
-    assert.strictEqual(0, calls);
+    assert.strictEqual(calls, 0);
     await delay(1);
-    assert.strictEqual(2, calls);
+    assert.strictEqual(calls, 2);
     reg.addTarget(target3);
-    assert.strictEqual(3, calls);
+    assert.strictEqual(calls, 3);
   });
 
   it('handler not called on removed targets', async function() {
@@ -77,9 +77,9 @@ describe('HandlerRegistry', function() {
     });
     reg.removeTarget(target2);
 
-    assert.strictEqual(0, calls);
+    assert.strictEqual(calls, 0);
     await delay(1);
-    assert.strictEqual(1, calls);
+    assert.strictEqual(calls, 1);
   });
 
   it('handler can unsubscribe', async function() {

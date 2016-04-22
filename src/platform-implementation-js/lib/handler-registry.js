@@ -8,35 +8,36 @@ import Logger from './logger';
 export type Handler<T> = (target: T) => void;
 
 export default class HandlerRegistry<T> {
-  _targets: Set<T>;
-  _pendingHandlers: Set<Handler<T>>;
-  _handlers: Set<Handler<T>>;
-
-  constructor() {
-    this._targets = new Set();
-    this._pendingHandlers = new Set();
-    this._handlers = new Set();
-  }
+  _targets: Array<T> = [];
+  _pendingHandlers: Array<Handler<T>> = [];
+  _handlers: Array<Handler<T>> = [];
 
   registerHandler(handler: Handler<T>): () => void {
-    this._pendingHandlers.add(handler);
+    if(this._pendingHandlers.indexOf(handler) === -1) {
+      this._pendingHandlers.push(handler);
 
-    asap(() => {
-      this._pendingHandlers.forEach(handler => {
-        this._handlers.add(handler);
-        this._informHandlerOfTargets(handler);
+      asap(() => {
+        const pendingHandlers = this._pendingHandlers.slice();
+        for(let ii=pendingHandlers.length - 1; ii>=0; ii--){
+          const handler = pendingHandlers[ii];
+          if(this._handlers.indexOf(handler) === -1){
+            this._handlers.push(handler);
+            this._informHandlerOfTargets(handler);
+          }
+        }
+
+        this._pendingHandlers = [];
       });
-      this._pendingHandlers.clear();
-    });
+    }
 
     return () => {
-      this._pendingHandlers.delete(handler);
-      this._handlers.delete(handler);
+      _.remove(this._pendingHandlers, h => h === handler);
+      _.remove(this._handlers, h => h === handler);
     };
   }
 
   addTarget(target: T) {
-    this._targets.add(target);
+    this._targets.push(target);
 
     if(target.on) {
       target.on('destroy', () => {
@@ -48,31 +49,34 @@ export default class HandlerRegistry<T> {
   }
 
   removeTarget(target: T) {
-    this._targets.delete(target);
+    _.remove(this._targets, t => t === target);
   }
 
   dumpHandlers() {
-    this._pendingHandlers.clear();
-    this._handlers.clear();
+    this._pendingHandlers = [];
+    this._handlers = [];
   }
 
   _informHandlerOfTargets(handler: Handler<T>) {
-    this._targets.forEach(function(target) {
-      try {
-        handler(target);
+    const targets = this._targets.slice();
+    for(let ii = 0; ii < targets.length; ii++){
+      try{
+        handler(targets[ii]);
       } catch(err) {
         Logger.error(err);
       }
-    });
+    }
   }
 
   _informHandlersOfTarget(target: T) {
-    this._handlers.forEach(function(handler){
-      try {
-        handler(target);
+    const handlers = this._handlers.slice();
+    for(let ii = 0; ii< handlers.length; ii++){
+      try{
+        handlers[ii](target);
       } catch(err) {
         Logger.error(err);
       }
-    });
+    }
+
   }
 }

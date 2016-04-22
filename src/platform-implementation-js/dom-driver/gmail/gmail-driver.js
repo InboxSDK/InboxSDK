@@ -20,6 +20,8 @@ import GmailThreadView from './views/gmail-thread-view';
 import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
+import {removeAllThreadRowUnclaimedModifications} from './views/gmail-thread-row-view';
+
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
@@ -89,7 +91,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	_composeViewDriverStream: Kefir.Stream<GmailComposeView>;
 	_xhrInterceptorStream: Kefir.Stream<Object>;
 	_messageViewDriverStream: Kefir.Stream<Object>;
-	_stopper: Kefir.Stream&{destroy:()=>void};
+	_stopper: Kefir.Stopper;
 	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
@@ -136,6 +138,9 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	destroy() {
 		this._keyboardShortcutHelpModifier.destroy();
 		this._stopper.destroy();
+
+
+		removeAllThreadRowUnclaimedModifications();
 	}
 
 	getAppId(): string {return this._appId;}
