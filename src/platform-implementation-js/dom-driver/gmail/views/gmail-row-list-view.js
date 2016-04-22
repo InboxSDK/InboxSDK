@@ -166,9 +166,23 @@ class GmailRowListView {
 				.filter(rowEvent => rowEvent.el.id);
 		});
 
+		const laterStream = Kefir.later(2);
+
 		this._rowViewDriverStream = elementStream
 			.takeUntilBy(this._stopper)
-			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)));
+			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)))
+			.flatMap(threadRowView => {
+				if(threadRowView.getAlreadyHadModifications()){
+					// Performance hack: If the row already has old modifications on it, wait
+			    // a moment before we re-emit the thread row and process our new
+			    // modifications.
+
+					return laterStream.flatMap(() => threadRowView.waitForReady());
+				}
+				else{
+					return threadRowView.waitForReady();
+				}
+			});
 
 		this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
 	}

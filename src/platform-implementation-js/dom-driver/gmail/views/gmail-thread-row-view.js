@@ -19,7 +19,6 @@ import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import GmailLabelView from '../widgets/gmail-label-view';
 import type GmailDriver from '../gmail-driver';
-import type GmailPageCommunicator from '../gmail-page-communicator';
 import type GmailRowListView from './gmail-row-list-view';
 
 import updateIcon from '../lib/update-icon/update-icon';
@@ -84,7 +83,6 @@ class GmailThreadRowView {
   _alreadyHadModifications: boolean;
   _rowListViewDriver: GmailRowListView;
   _driver: GmailDriver;
-  _pageCommunicator: ?GmailPageCommunicator;
   _userView: ?Object;
   _cachedThreadID: ?string;
   _didSubscribeTextFixerRun: boolean = false;
@@ -132,7 +130,6 @@ class GmailThreadRowView {
 
     this._rowListViewDriver = rowListViewDriver;
     this._driver = gmailDriver;
-    this._pageCommunicator = null; // supplied by GmailDriver later
     this._userView = null; // supplied by ThreadRowView
     this._cachedThreadID = null; // set in getter
 
@@ -185,15 +182,14 @@ class GmailThreadRowView {
     this._elements.length = 0;
   }
 
-  // Called by GmailDriver
-  setPageCommunicator(pageCommunicator: GmailPageCommunicator) {
-    this._pageCommunicator = pageCommunicator;
-  }
-
   _removeUnclaimedModifications() {
     _removeThreadRowUnclaimedModifications(this._modifications);
 
     // TODO fix column width to deal with removed buttons
+  }
+
+  getAlreadyHadModifications(): boolean {
+    return this._alreadyHadModifications;
   }
 
   // Returns a Kefir stream that emits this object once this object is ready for the
@@ -219,13 +215,7 @@ class GmailThreadRowView {
       }
     };
 
-    // Performance hack: If the row already has old modifications on it, wait
-    // a moment before we re-emit the thread row and process our new
-    // modifications.
-    const stepToUse = this._alreadyHadModifications ?
-      () => Kefir.later(2).flatMap(step) : step;
-
-    return stepToUse().takeUntilBy(this._stopper);
+    return step().takeUntilBy(this._stopper);
   }
 
   setUserView(userView: Object) {
