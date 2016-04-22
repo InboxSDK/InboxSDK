@@ -92,12 +92,13 @@ class GmailThreadRowView {
   _refresher: ?Kefir.Stream;
   _subjectRefresher: ?Kefir.Stream;
   _counts: ?Counts;
+  _isVertical: boolean;
 
   constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
 
-    const isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
-    if (isVertical) {
+    this._isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
+    if (this._isVertical) {
       const threadRow3 = element.nextElementSibling.nextElementSibling;
       const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
       this._elements = has3Rows ?
@@ -805,7 +806,7 @@ class GmailThreadRowView {
   _getSubjectRefresher(): Kefir.Stream {
     let subjectRefresher = this._subjectRefresher;
     if(!subjectRefresher){
-      if (false) {
+      if (this._isVertical) {
         subjectRefresher = this._subjectRefresher = Kefir.constant(null);
       } else {
         const watchElement = this._getWatchElement();

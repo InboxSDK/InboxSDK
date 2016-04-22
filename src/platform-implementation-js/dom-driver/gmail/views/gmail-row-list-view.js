@@ -169,7 +169,6 @@ class GmailRowListView {
 		const laterStream = Kefir.later(2);
 
 		this._rowViewDriverStream = elementStream
-			.takeUntilBy(this._stopper)
 			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)))
 			.flatMap(threadRowView => {
 				if(threadRowView.getAlreadyHadModifications()){
@@ -182,7 +181,8 @@ class GmailRowListView {
 				else{
 					return threadRowView.waitForReady();
 				}
-			});
+			})
+			.takeUntilBy(this._stopper);
 
 		this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
 	}
