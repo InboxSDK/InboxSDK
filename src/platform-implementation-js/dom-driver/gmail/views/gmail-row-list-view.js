@@ -31,11 +31,11 @@ class GmailRowListView {
 	_threadRowViewDrivers: Set<GmailThreadRowView>;
 	_eventStreamBus: Kefir.Bus;
 	_rowViewDriverStream: Kefir.Stream<GmailThreadRowView>;
-	_stopper: Kefir.Stopper;
+	_stopper: Kefir.Stream;
 
 	constructor(rootElement: HTMLElement, routeViewDriver: GmailRouteView, gmailDriver: GmailDriver){
 
-		this._eventStreamBus = kefirBus();
+		this._eventStreamBus = (kefirBus(): Kefir.Bus);
 		this._stopper = this._eventStreamBus.filter(() => false).beforeEnd(() => null);
 		this._gmailDriver = gmailDriver;
 
@@ -44,7 +44,7 @@ class GmailRowListView {
 		this._threadRowViewDrivers = new Set();
 
 		this._pendingExpansions = new Map();
-		this._pendingExpansionsSignal = kefirBus();
+		this._pendingExpansionsSignal = (kefirBus(): Kefir.Bus);
 		this._pendingExpansionsSignal
 			.bufferBy(
 				this._pendingExpansionsSignal.flatMap(delayAsap)
