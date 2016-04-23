@@ -98,7 +98,7 @@ declare module kefir {
     plug(s: Stream<T>): () => void;
   }
 
-  declare class Stopper<T> extends Stream<T> {
+  declare class Stopper extends Stream<null> {
     destroy(): void;
   }
 
