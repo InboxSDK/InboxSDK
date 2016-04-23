@@ -39,6 +39,8 @@ type Mods = {
 
 const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(module, () => new WeakMap());
 
+const identity = x => x;
+
 function focusAndNoPropagation(event) {
   this.focus();
   event.stopImmediatePropagation();
@@ -251,10 +253,10 @@ class GmailThreadRowView {
       console.warn('addLabel called on destroyed thread row');
       return;
     }
-    const prop = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Stream = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
-    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(labelDescriptor => {
+    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(labelDescriptor => {
       if(!labelDescriptor){
         if (labelMod) {
           labelMod.remove();
@@ -295,10 +297,10 @@ class GmailThreadRowView {
       console.warn('addImage called on destroyed thread row');
       return;
     }
-    const prop = kefirCast(Kefir, inIconDescriptor)
+    const prop: Kefir.Stream = kefirCast(Kefir, inIconDescriptor)
                   .toProperty()
-                  .combine(this._getRefresher(), _.identity)
-                  .combine(this._getSubjectRefresher(), _.identity)
+                  .combine(this._getRefresher(), identity)
+                  .combine(this._getSubjectRefresher(), identity)
                   .takeUntilBy(this._stopper);
 
     let imageMod = null;
@@ -370,7 +372,7 @@ class GmailThreadRowView {
     var buttonMod = null;
 
 
-    var prop = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
+    var prop: Kefir.Stream = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
     prop.beforeEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
@@ -384,7 +386,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.combine(this._getRefresher(), _.identity).onValue(buttonDescriptor => {
+    prop.combine(this._getRefresher(), identity).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (buttonMod) {
           buttonMod.remove();
@@ -492,8 +494,8 @@ class GmailThreadRowView {
     var added = false;
     var currentIconUrl;
 
-    var prop = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher(), _.identity).takeUntilBy(this._stopper).onValue(opts => {
+    var prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
       if (!opts) {
         if (added) {
           getImgElement().remove();
@@ -552,8 +554,8 @@ class GmailThreadRowView {
     }
     let labelMod;
     let draftElement, countElement;
-    const prop = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher(), _.identity).takeUntilBy(this._stopper).onValue(opts => {
+    const prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
       const originalLabel = this._elements[0].querySelector('td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
       if (!recipientsContainer) throw new Error("Should not happen");
@@ -614,8 +616,8 @@ class GmailThreadRowView {
       return;
     }
     let dateMod;
-    const prop = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._refresher, _.identity).takeUntilBy(this._stopper).onValue(opts => {
+    const prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
+    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
 
