@@ -74,7 +74,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
       .map(({el,removalStream}) =>
-        ({el: el.firstElementChild, removalStream})
+        ({el: ((el.firstElementChild: any): HTMLElement), removalStream})
       )
       .filter(({el}) => el && /\.quick_compose_focus$/.test(el.getAttribute('jsaction')))
       .flatMap(({el,removalStream}) => {
@@ -102,8 +102,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   ])
     .map(elementViewMapper((el: HTMLElement) =>
       new InboxComposeView(driver, el)
-    ))
-    .filter(Boolean);
+    ));
 }
 
 export default function getComposeViewDriverStream(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
