@@ -60,17 +60,11 @@ declare module kefir {
     merge<U>(otherObs: Stream<U>): Stream<T|U>;
     concat<U>(otherObs: Stream<U>): Stream<T|U>;
 
-    flatMap(): Stream;
     flatMap<U>(transform: (value: T) => Stream<U>): Stream<U>;
-    flatMapLatest(): Stream;
     flatMapLatest<U>(transform: (value: T) => Stream<U>): Stream<U>;
-    flatMapFirst(): Stream;
     flatMapFirst<U>(transform: (value: T) => Stream<U>): Stream<U>;
-    flatMapConcat(): Stream;
     flatMapConcat<U>(transform: (value: T) => Stream<U>): Stream<U>;
-    flatMapLimit(limit: number): Stream;
     flatMapLimit<U>(transform: (value: T) => Stream<U>, limit: number): Stream<U>;
-    flatMapErrors(): Stream;
     flatMapErrors<U>(transform: (error: any) => Stream<U>): Stream<T|U>;
 
     filterBy(otherObs: Stream): Stream<T>;
@@ -122,7 +116,7 @@ declare module kefir {
 
   declare function combine<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function combine<T,U>(obss: Stream<T>[], passiveObss?: Stream<U>[]): Stream<Array<T|U>>;
-  declare function combine(obss: Stream[], passiveObss: Stream[], combinator: Function): Stream;
+  declare function combine(obss: Stream[], passiveObss?: Stream[], combinator?: Function): Stream;
   declare function zip<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function zip<T>(obss: Stream<T>[]): Stream<Array<T>>;
   declare function zip(obss: Stream[], combinator: Function): Stream;

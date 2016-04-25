@@ -95,6 +95,7 @@ class GmailThreadRowView {
   _subjectRefresher: ?Kefir.Stream;
   _counts: ?Counts;
   _isVertical: boolean;
+  _isDestroyed: boolean = false;
 
   constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
@@ -153,6 +154,8 @@ class GmailThreadRowView {
       return;
     }
 
+    this._isDestroyed = true;
+
     this._modifications.label.unclaimed = this._modifications.label.claimed
       .concat(this._modifications.label.unclaimed);
     this._modifications.label.claimed.length = 0;
@@ -198,7 +201,18 @@ class GmailThreadRowView {
   // Returns a Kefir stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
   // a few cases such as with multiple inbox that it needs a moment.
+  // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
+  // must not be called after the gmailThreadRowView is destroyed
   waitForReady(): Kefir.Stream<GmailThreadRowView> {
+    if(!this._elements.length) {
+      //TODO: remove if never logged
+      this._driver.getLogger().error(new Error('tried to get thread id on empty array'), {
+        isDestroyed: this._isDestroyed
+      });
+
+      return Kefir.never();
+    }
+
     const time = [0,10,100];
     const step = () => {
       if (this._threadIdReady()) {
@@ -218,7 +232,7 @@ class GmailThreadRowView {
       }
     };
 
-    return step().takeUntilBy(this._stopper);
+    return step();
   }
 
   setUserView(userView: Object) {
@@ -691,12 +705,14 @@ class GmailThreadRowView {
     if (this._cachedThreadID) {
       return this._cachedThreadID;
     }
+
     const threadID = this._driver.getThreadRowIdentifier()
       .getThreadIdForThreadRow(this, this._elements);
     if (threadID) {
       this._cachedThreadID = threadID;
     }
     return threadID;
+
   }
 
   getThreadID(): string {
