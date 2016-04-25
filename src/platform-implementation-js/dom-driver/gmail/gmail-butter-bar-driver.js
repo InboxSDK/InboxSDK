@@ -15,6 +15,7 @@ const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="a
     if (!sdkNotice) {
       sdkNotice = (googleNotice.cloneNode(false): any);
       sdkNotice.classList.add('inboxsdk__butterbar');
+      sdkNotice.style.display = 'none';
       googleNotice.parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
     return {noticeContainer, googleNotice, sdkNotice};
