@@ -202,9 +202,9 @@ var ButtonView = ud.defn(module, class ButtonView {
 
 		var iconElement = this._iconElement = document.createElement('div');
 		iconElement.classList.add('inboxsdk__button_icon');
-		iconElement.innerHTML = '&nbsp;';
 
 		if(this._iconClass){
+			iconElement.innerHTML = '&nbsp;';
 			iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);
 		}
 
@@ -221,7 +221,9 @@ var ButtonView = ud.defn(module, class ButtonView {
 		}
 		var iconElement = this._iconElement;
 		if (!iconElement) throw new Error("Should not happen");
-		iconElement.innerHTML = '';
+		if(iconElement.innerHTML !== ''){
+			iconElement.innerHTML = '';
+		}
 
 		var iconImgElement = this._iconImgElement = document.createElement('img');
 		iconImgElement.classList.add('inboxsdk__button_iconImg');

@@ -45,6 +45,7 @@ import getAddressChangesStream from './gmail-compose-view/get-address-changes-st
 import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getPresendingStream from './gmail-compose-view/get-presending-stream';
+import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -578,7 +579,7 @@ class GmailComposeView {
 	}
 
 	updateInsertMoreAreaLeft(oldFormattingAreaOffsetLeft: number) {
-		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
+		updateInsertMoreAreaLeft(this, oldFormattingAreaOffsetLeft);
 	}
 
 	_getFormattingAreaOffsetLeft(): number {

@@ -25,21 +25,38 @@ function getAdditionalActionToolbar(gmailComposeView){
 }
 
 function _addActionToolbar(gmailComposeView){
-	var td = $(document.createElement('td'));
-	td[0].setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
-	$(gmailComposeView.getFormattingArea()).before(td);
+	var td = document.createElement('td');
+	td.setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
+	gmailComposeView.getFormattingArea().insertAdjacentElement('beforebegin', td);
 
 	var separator = document.createElement('td');
 	separator.setAttribute('class', 'inboxsdk__compose_separator gU');
 	separator.innerHTML = '<div class="Uz"></div>';
 
-	td.after(separator);
+	td.insertAdjacentElement('afterend', separator);
 
-	td.closest('table').find('colgroup col').first()
-		.after('<col class="inboxsdk__compose_actionToolbarColumn"></col><col class="inboxsdk__compose_separatorColumn"></col>');
+	let parent = td.parentElement;
+	while(parent){
+		if(parent.tagName === 'TABLE') break;
+		parent = parent.parentElement;
+	}
+
+	if(parent){
+		const col = parent.querySelector('colgroup col');
+		if(col){
+			const newCol1 = document.createElement('col');
+			newCol1.setAttribute('class', 'inboxsdk__compose_actionToolbarColumn');
+			const newCol2 = document.createElement('col');
+			newCol2.setAttribute('class', 'inboxsdk__compose_separatorColumn');
+
+			// want to make it <col><newCol1><newCol2> so insert in reverse order
+			col.insertAdjacentElement('afterend', newCol2);
+			col.insertAdjacentElement('afterend', newCol1);
+		}
+	}
 
 	var toolbarDiv = document.createElement('div');
-	td.append(toolbarDiv);
+	td.appendChild(toolbarDiv);
 
 	return toolbarDiv;
 }
