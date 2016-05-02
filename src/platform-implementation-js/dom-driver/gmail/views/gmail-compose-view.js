@@ -46,6 +46,7 @@ import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getPresendingStream from './gmail-compose-view/get-presending-stream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
+import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -80,6 +81,7 @@ class GmailComposeView {
 	_lastSelectionRange: ?Range;
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
+	_formattingArea: ?HTMLElement;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -583,11 +585,15 @@ class GmailComposeView {
 	}
 
 	_getFormattingAreaOffsetLeft(): number {
-		return require('./gmail-compose-view/get-formatting-area-offset-left')(this);
+		return getFormattingAreaOffsetLeft(this);
 	}
 
-	getFormattingArea(): HTMLElement {
-		return this._element.querySelector('.oc');
+	getFormattingArea(): ?HTMLElement {
+		let formattingArea = this._formattingArea;
+		if(!formattingArea){
+			formattingArea = this._formattingArea = this._element.querySelector('.oc');
+		}
+		return formattingArea;
 	}
 
 	getFormattingToolbar(): HTMLElement {
