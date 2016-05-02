@@ -21,6 +21,7 @@ let _extensionUserEmailHash: ?string;
 let _extensionUseEventTracking: boolean = false;
 
 const _sessionId = getSessionId();
+const _loggedDeprecatedMessages = new Set();
 
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
@@ -140,7 +141,12 @@ class Logger {
 
   deprecationWarning(name: string, suggestion?: ?string) {
     console.warn(`InboxSDK: ${name} is deprecated.`+(suggestion?` Please use ${suggestion} instead.`:''));
-    this.eventSdkPassive(`deprecated.${name}`);
+
+    const key = name + (suggestion ? ':' + suggestion : '');
+    if(!_loggedDeprecatedMessages.has(key)){
+      this.eventSdkPassive(`deprecated.${name}`);
+      _loggedDeprecatedMessages.add(key);
+    }
   }
 
   getAppLogger(): AppLogger {
