@@ -18,12 +18,14 @@ import kefirStopper from 'kefir-stopper';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import GmailLabelView from '../widgets/gmail-label-view';
+import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 
 import updateIcon from '../lib/update-icon/update-icon';
 
 type LabelMod = {gmailLabelView: Object, remove(): void};
+type ActionButtonMod = {gmailActionButtonView: GmailActionButtonView, remove(): void};
 type ButtonMod = {buttonSpan: HTMLElement, iconSettings: Object, remove(): void};
 type ImageMod = {iconSettings: Object, iconWrapper: HTMLElement, remove(): void};
 type ReplacedDateMod = {el: HTMLElement, remove(): void};
@@ -31,6 +33,7 @@ type ReplacedDraftLabelMod = ReplacedDateMod;
 
 type Mods = {
   label: {unclaimed: LabelMod[], claimed: LabelMod[]};
+  action: {unclaimed: ActionButtonMod[], claimed: ActionButtonMod[]};
   button: {unclaimed: ButtonMod[], claimed: ButtonMod[]};
   image: {unclaimed: ImageMod[], claimed: ImageMod[]};
   replacedDate: {unclaimed: ReplacedDateMod[], claimed: ReplacedDateMod[]};
@@ -122,6 +125,7 @@ class GmailThreadRowView {
       this._alreadyHadModifications = false;
       this._modifications = {
         label: {unclaimed: [], claimed: []},
+        action: {unclaimed: [], claimed: []},
         button: {unclaimed: [], claimed: []},
         image: {unclaimed: [], claimed: []},
         replacedDate: {unclaimed: [], claimed: []},
@@ -159,6 +163,10 @@ class GmailThreadRowView {
     this._modifications.label.unclaimed = this._modifications.label.claimed
       .concat(this._modifications.label.unclaimed);
     this._modifications.label.claimed.length = 0;
+
+    this._modifications.action.unclaimed = this._modifications.action.claimed
+      .concat(this._modifications.action.unclaimed);
+    this._modifications.action.claimed.length = 0;
 
     this._modifications.button.unclaimed = this._modifications.button.claimed
       .concat(this._modifications.button.unclaimed);
@@ -489,6 +497,49 @@ class GmailThreadRowView {
           // that aren't on the star button or our buttons should be re-emitted from the
           // thread row so it counts as clicking on the thread.
           (starGroup:any).onmouseover = (starGroup:any).onclick = starGroupEventInterceptor;
+        }
+        this._getImageFixer().emit();
+      }
+    });
+  }
+
+  addActionButton(actionButtonDescriptor: Object) {
+    if (this._elements.length !== 1) {
+      return;
+    }
+    const prop: Kefir.Stream = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
+    let actionMod = null;
+
+    prop.takeUntilBy(this._stopper).onValue(actionButtonDescriptor => {
+      if(!actionButtonDescriptor){
+        if (actionMod) {
+          actionMod.remove();
+          this._modifications.action.claimed.splice(
+            this._modifications.action.claimed.indexOf(actionMod), 1);
+          actionMod = null;
+        }
+      } else {
+        if (!actionMod) {
+          actionMod = this._modifications.action.unclaimed.shift();
+          if (!actionMod) {
+            const gmailActionButtonView = new GmailActionButtonView();
+            const el = gmailActionButtonView.getElement();
+            actionMod = {
+              gmailActionButtonView,
+              remove: el.remove.bind(el)
+            };
+          }
+          this._modifications.action.claimed.push(actionMod);
+        }
+
+        actionMod.gmailActionButtonView.updateDescriptor(actionButtonDescriptor);
+
+        const actionParentDiv = (this._getLabelParent().parentElement: any);
+        if (!_.contains(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
+          actionParentDiv.insertBefore(
+            actionMod.gmailActionButtonView.getElement(),
+            actionParentDiv.firstChild
+          );
         }
         this._getImageFixer().emit();
       }

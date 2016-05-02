@@ -110,6 +110,12 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				]));
 			}
 		});
+
+		threadRowView.addActionButton({
+			type: 'LINK',
+			title: 'Take action',
+			className: 'my-special-class'
+		});
 	});
 
 });
