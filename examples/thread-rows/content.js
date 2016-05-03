@@ -110,6 +110,27 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 				]));
 			}
 		});
+
+		threadRowView.addActionButton(Kefir.repeatedly(5000, [
+			{
+				type: inboxSDK.Lists.ActionButtonTypes.LINK,
+				title: 'Take action',
+				className: 'my-special-class',
+				url: 'https://google.com',
+				onClick(event) {
+					console.log('onClick fired: ', event);
+				}
+		  },
+			{
+				type: inboxSDK.Lists.ActionButtonTypes.LINK,
+				title: 'Actions woo!',
+				className: 'new-class',
+				url: 'https://www.streak.com',
+				onClick(event) {
+					console.log('modified onClick fired: ', event);
+				}
+		  }
+	  ]));
 	});
 
 });
