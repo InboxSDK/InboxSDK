@@ -402,9 +402,12 @@ class GmailThreadRowView {
           activeDropdown.close();
           activeDropdown = null;
         }
-        if (buttonMod && buttonMod.buttonSpan) {
-          (buttonMod.buttonSpan:any).onclick = null;
-        }
+      }
+    });
+
+    prop.onEnd(() => {
+      if (buttonMod && buttonMod.buttonSpan) {
+        (buttonMod.buttonSpan:any).onclick = null;
       }
     });
 
@@ -541,6 +544,9 @@ class GmailThreadRowView {
         actionMod.gmailActionButtonView.setOnClick((event) => {
           event.stopPropagation();
           window.open(actionButtonDescriptor.url, '_blank');
+          if (actionButtonDescriptor.onClick) {
+
+          }
         });
 
         const actionParentDiv = (this._getLabelParent().parentElement: any);
