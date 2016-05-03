@@ -511,6 +511,11 @@ class GmailThreadRowView {
     let actionMod = null;
 
     prop.takeUntilBy(this._stopper).onValue(actionButtonDescriptor => {
+      if (actionButtonDescriptor && actionButtonDescriptor.type !== 'LINK') {
+        console.error('Only type=LINK is currently supported');
+        return;
+      }
+
       if(!actionButtonDescriptor){
         if (actionMod) {
           actionMod.remove();
@@ -533,6 +538,10 @@ class GmailThreadRowView {
         }
 
         actionMod.gmailActionButtonView.updateDescriptor(actionButtonDescriptor);
+        actionMod.gmailActionButtonView.setOnClick((event) => {
+          event.stopPropagation();
+          window.open(actionButtonDescriptor.url, '_blank');
+        });
 
         const actionParentDiv = (this._getLabelParent().parentElement: any);
         if (!_.contains(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {

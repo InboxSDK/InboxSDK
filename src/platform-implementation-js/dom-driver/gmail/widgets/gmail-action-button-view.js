@@ -41,6 +41,10 @@ class GmailActionButtonView {
 		this._actionDescriptor = actionButtonDescriptor;
 	}
 
+	setOnClick(callback: (event: MouseEvent) => void) {
+		(this.getElement(): any).onclick = callback;
+	}
+
 	_updateTitle(title: string){
 		if(this._actionDescriptor && this._actionDescriptor.title === title){
 			return;
