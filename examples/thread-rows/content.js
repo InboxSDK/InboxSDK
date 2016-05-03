@@ -115,7 +115,10 @@ InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
 			type: 'LINK',
 			title: 'Take action',
 			className: 'my-special-class',
-			url: 'https://google.com'
+			url: 'https://google.com',
+			onClick(event) {
+				console.log('onClick fired: ', event);
+			}
 		});
 	});
 

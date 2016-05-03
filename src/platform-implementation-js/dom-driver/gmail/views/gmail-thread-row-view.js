@@ -513,6 +513,12 @@ class GmailThreadRowView {
     const prop: Kefir.Stream = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
     let actionMod = null;
 
+    prop.onEnd(() => {
+      if (actionMod) {
+        actionMod.gmailActionButtonView.setOnClick(null);
+      }
+    });
+
     prop.takeUntilBy(this._stopper).onValue(actionButtonDescriptor => {
       if (actionButtonDescriptor && actionButtonDescriptor.type !== 'LINK') {
         console.error('Only type=LINK is currently supported');
@@ -545,7 +551,7 @@ class GmailThreadRowView {
           event.stopPropagation();
           window.open(actionButtonDescriptor.url, '_blank');
           if (actionButtonDescriptor.onClick) {
-
+            actionButtonDescriptor.onClick.call(null, {});
           }
         });
 

@@ -41,7 +41,7 @@ class GmailActionButtonView {
 		this._actionDescriptor = actionButtonDescriptor;
 	}
 
-	setOnClick(callback: (event: MouseEvent) => void) {
+	setOnClick(callback: ?(event: MouseEvent) => void) {
 		(this.getElement(): any).onclick = callback;
 	}
 
