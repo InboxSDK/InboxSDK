@@ -1,25 +1,26 @@
 /* @flow */
 
 import {defn} from 'ud';
-import once from 'lodash/function/once';
 import isEqual from 'lodash/lang/isEqual';
 
 class GmailActionButtonView {
-	getElement: () => HTMLElement;
+	_element: HTMLElement;
 	_actionDescriptor: ?Object;
 
 	constructor() {
-		this.getElement = once(() => {
-			const element = document.createElement('div');
-			element.tabIndex = 0;
-			element.setAttribute('role', 'button');
-			element.className = 'inboxsdk__gmail_action ';
-			element.innerHTML = `
-				<div>
-				</div>`;
-			return element;
-		});
+		this._element = document.createElement('div');
+		this._element.tabIndex = 0;
+		this._element.setAttribute('role', 'button');
+		this._element.className = 'inboxsdk__gmail_action ';
+		this._element.innerHTML = `
+			<div>
+			</div>`;
+
 		this._actionDescriptor = null;
+	}
+
+	getElement(): HTMLElement {
+		return this._element;
 	}
 
 	updateDescriptor(actionButtonDescriptor: ?Object) {
@@ -32,26 +33,23 @@ class GmailActionButtonView {
 			return;
 		}
 
-		const element = this.getElement();
-
 		this._updateTitle(actionButtonDescriptor.title);
 
-		element.className = 'inboxsdk__gmail_action ' + (actionButtonDescriptor.className || '');
+		this._element.className = 'inboxsdk__gmail_action ' + (actionButtonDescriptor.className || '');
 
 		this._actionDescriptor = actionButtonDescriptor;
 	}
 
 	setOnClick(callback: ?(event: MouseEvent) => void) {
-		(this.getElement(): any).onclick = callback;
+		(this._element: any).onclick = callback;
 	}
 
 	_updateTitle(title: string){
 		if(this._actionDescriptor && this._actionDescriptor.title === title){
 			return;
 		}
-		const element = this.getElement();
 
-		element.querySelector('div').textContent = title;
+		this._element.querySelector('div').textContent = title;
 	}
 }
 export default defn(module, GmailActionButtonView);
