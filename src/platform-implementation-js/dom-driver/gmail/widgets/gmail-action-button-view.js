@@ -11,6 +11,8 @@ class GmailActionButtonView {
 	constructor() {
 		this.getElement = once(() => {
 			const element = document.createElement('div');
+			element.tabIndex = 0;
+			element.setAttribute('role', 'button');
 			element.className = 'inboxsdk__gmail_action ';
 			element.innerHTML = `
 				<div>
