@@ -20,7 +20,7 @@ var Lists = /** @lends Lists */ {
 };
 
 /**
-* The types of action buttons available to {ThreadRowView}.
+* The types of action buttons available to ThreadRowView.
 * @class
 */
 var ActionButtonTypes = /**@lends ActionButtonTypes */{

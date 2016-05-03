@@ -346,7 +346,7 @@ var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
 
 /**
 * @class
-* This type is used to modification you can do to a {ThreadRowView}.
+* This type is used to describe a modification you can do to a {ThreadRowView}.
 */
 var ThreadRowDraftLabelDescriptor = /** @lends ThreadRowDraftLabelDescriptor */{
 
