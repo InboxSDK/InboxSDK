@@ -555,7 +555,7 @@ class GmailThreadRowView {
           }
         });
 
-        const actionParentDiv = (this._getLabelParent().parentElement: any);
+        const actionParentDiv = this._elements[0].querySelector('td.a4W .a4X .aKS') || this._elements[0].querySelector('td.a4W div.xS');
         if (!_.contains(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
           actionParentDiv.insertBefore(
             actionMod.gmailActionButtonView.getElement(),
