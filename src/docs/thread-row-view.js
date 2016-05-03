@@ -28,6 +28,13 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   addButton: function(){},
 
   /**
+   * Adds an action button to the right of the subject.
+   * @param {ThreadRowActionButtonDescriptor|Stream.<ThreadRowActionButtonDescriptor>} buttonDescriptor - An options object for the button.
+   * @return {void}
+   */
+  addActionButton: function(){},
+
+  /**
    * Adds an attachment icon to the row.
    * @param {ThreadRowAttachmentIconDescriptor|Stream.<ThreadRowAttachmentIconDescriptor>} threadRowAttachmentIconDescriptor - The options for the icon to add.
    * @return {void}
@@ -242,6 +249,44 @@ var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
   hasDropdown:null
 };
 
+/**
+* @class
+* This type is used to describe an action button you add to a {ThreadRowView}.
+*/
+var ThreadRowActionButtonDescriptor = /** @lends ThreadRowActionButtonDescriptor */{
+
+  /**
+  * The type of action button to show. Only LINK is currently supported.
+  * @type {ActionButtonTypes}
+  */
+  type:null,
+
+  /**
+  * Text of the button.
+  * @type {string}
+  */
+  title:null,
+
+  /**
+  * A CSS class to apply to the action button.
+  * ^optional
+  * @type {string}
+  */
+  className:null,
+
+  /**
+  * A handler that gets called when the action button is clicked on.
+  * ^optional
+  * @type {func(event)}
+  */
+  onClick:null,
+
+  /**
+  * For LINK action buttons only. This is the URL to open when the button is clicked.
+  * @type {string}
+  */
+  url:null
+};
 
 /**
 * @class

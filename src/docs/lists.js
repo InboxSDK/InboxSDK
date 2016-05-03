@@ -18,3 +18,25 @@ var Lists = /** @lends Lists */ {
 	registerThreadRowViewHandler: function(){}
 
 };
+
+/**
+* The types of action buttons available to {ThreadRowView}.
+* @class
+*/
+var ActionButtonTypes = /**@lends ActionButtonTypes */{
+	/**
+	* Always opens an external URL. Marked with an arrow icon.
+	* @type string
+	*/
+	'LINK': 'LINK',
+	/*
+	* Always opens a dropdown. The onClick callback parameter includes a {DropdownView} as the dropdrown property. Marked with a dropdown arrow.
+	* @type string
+	*/
+	'DROPDOWN': 'DROPDOWN',
+	/*
+	* No automatic action is taken. Any behavior must be specified in the onClick callback.
+	* @type string
+	*/
+	'ACTION': 'ACTION'
+};
