@@ -246,6 +246,7 @@ class GmailComposeView {
 		this._managedViewControllers.forEach(vc => {
 			vc.destroy();
 		});
+		this._requestModifiers = {};
 		this._managedViewControllers.length = 0;
 		this._stopper.destroy();
 	}
@@ -890,11 +891,12 @@ class GmailComposeView {
 		this._driver
 			.getPageCommunicator()
 			.ajaxInterceptStream
-			.takeUntilBy(this._stopper)
 			.filter(({type, composeid, modifierId}) =>
 						type === 'inboxSDKmodifyComposeRequest' &&
 						composeid === this.getComposeID() &&
-						Boolean(this._requestModifiers[modifierId]))
+						Boolean(this._requestModifiers[modifierId])
+			)
+			.takeUntilBy(this._stopper)
 			.onValue(({composeid, modifierId, composeParams}) => {
 
 				if(this._driver.getLogger().shouldTrackEverything()){

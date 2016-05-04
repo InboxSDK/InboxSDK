@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-import {debounce} from 'lodash';
+import asap from 'asap';
 import {defn, defonce} from 'ud';
 import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
@@ -77,24 +77,34 @@ function _handleButtonAdded(gmailComposeView: GmailComposeView){
 	_fixToolbarPosition(gmailComposeView);
 }
 
-const _groupButtonsIfNeeded = debounce(function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
-	if(!_doButtonsNeedToGroup(gmailComposeView)){
-		return;
-	}
 
-	var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
-	var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+const groupButtonsIfNeededMap = new WeakMap();
+function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
+	const isGroupingPending = groupButtonsIfNeededMap.get(gmailComposeView);
+	if(isGroupingPending) return;
 
+	groupButtonsIfNeededMap.set(gmailComposeView, true);
 
-	_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
-	_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
-	_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+	window.requestAnimationFrame(() => {
+		groupButtonsIfNeededMap.delete(gmailComposeView);
 
-	gmailComposeView.getStopper().onValue(function(){
-		(groupedActionToolbarContainer:any).remove();
-		groupToggleButtonViewController.destroy();
+		if(!_doButtonsNeedToGroup(gmailComposeView)){
+			return;
+		}
+
+		var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
+		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+
+		_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
+		_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
+		_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+
+		gmailComposeView.getStopper().onValue(function(){
+			(groupedActionToolbarContainer:any).remove();
+			groupToggleButtonViewController.destroy();
+		});
 	});
-}, 10);
+};
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
@@ -214,19 +224,27 @@ function _isToggleExpanded(){
 	return localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded';
 }
 
-const _fixToolbarPosition = debounce(function _fixToolbarPosition(gmailComposeView){
-	positionFormattingToolbar(gmailComposeView);
+const fixToolbarPositionMap = new WeakMap();
+function _fixToolbarPosition(gmailComposeView){
+	const isPending = fixToolbarPositionMap.get(gmailComposeView);
+	if(isPending) return;
 
-	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
-	if(!groupedActionToolbarContainer){
-		return;
-	}
+	fixToolbarPositionMap.set(gmailComposeView, true);
+	window.requestAnimationFrame(() => {
+		fixToolbarPositionMap.delete(gmailComposeView);
+		positionFormattingToolbar(gmailComposeView);
 
-	if(groupedActionToolbarContainer.style.display === 'none'){
-		return;
-	}
-	_positionGroupToolbar(gmailComposeView);
-}, 10);
+		var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
+		if(!groupedActionToolbarContainer){
+			return;
+		}
+
+		if(groupedActionToolbarContainer.style.display === 'none'){
+			return;
+		}
+		_positionGroupToolbar(gmailComposeView);
+	});
+}
 
 function _positionGroupToolbar(gmailComposeView){
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
@@ -258,7 +276,12 @@ function _positionGroupToolbar(gmailComposeView){
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
 		try{
-			return !!gmailComposeView.getFormattingToolbar();
+			if(!gmailComposeView.getBodyElement()){
+				throw 'skip';
+			}
+			else{
+				return !!gmailComposeView.getFormattingToolbar();
+			}
 		}
 		catch(err){
 			throw 'skip';

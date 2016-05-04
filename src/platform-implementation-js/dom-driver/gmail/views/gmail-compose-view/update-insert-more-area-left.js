@@ -11,12 +11,12 @@ export default function updateInsertMoreAreaLeft(gmailComposeView: GmailComposeV
 	updateAreaMap.set(gmailComposeView, true);
 
 	window.requestAnimationFrame(() => {
+		updateAreaMap.set(gmailComposeView, false);
+		if(!gmailComposeView.getInsertMoreArea()) return;
 		var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft(true);
 		var insertMoreAreaLeft = parseInt(gmailComposeView.getInsertMoreArea().style.left, 10);
 		var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
 		gmailComposeView.getInsertMoreArea().style.left = (insertMoreAreaLeft + diff) + 'px';
-
-		updateAreaMap.set(gmailComposeView, false);
 	});
 
 }
