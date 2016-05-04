@@ -78,19 +78,16 @@ function _handleButtonAdded(gmailComposeView: GmailComposeView){
 }
 
 
-const groupButtonsIfNeededMap = new WeakMap();
+const groupButtonsIfNeededMap = new WeakSet();
 function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
-	const isGroupingPending = groupButtonsIfNeededMap.get(gmailComposeView);
-	if(isGroupingPending) return;
+	if(groupButtonsIfNeededMap.has(gmailComposeView)) return;
 
-	groupButtonsIfNeededMap.set(gmailComposeView, true);
+	groupButtonsIfNeededMap.add(gmailComposeView);
 
 	window.requestAnimationFrame(() => {
 		groupButtonsIfNeededMap.delete(gmailComposeView);
 
-		if(!_doButtonsNeedToGroup(gmailComposeView)){
-			return;
-		}
+		if(gmailComposeView.isDestroyed() || !_doButtonsNeedToGroup(gmailComposeView)) return;
 
 		var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
 		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
@@ -224,14 +221,15 @@ function _isToggleExpanded(){
 	return localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded';
 }
 
-const fixToolbarPositionMap = new WeakMap();
+const fixToolbarPositionMap = new WeakSet();
 function _fixToolbarPosition(gmailComposeView){
-	const isPending = fixToolbarPositionMap.get(gmailComposeView);
-	if(isPending) return;
+	if(fixToolbarPositionMap.has(gmailComposeView)) return;
 
-	fixToolbarPositionMap.set(gmailComposeView, true);
+	fixToolbarPositionMap.add(gmailComposeView);
 	window.requestAnimationFrame(() => {
 		fixToolbarPositionMap.delete(gmailComposeView);
+		if(gmailComposeView.isDestroyed()) return;
+
 		positionFormattingToolbar(gmailComposeView);
 
 		var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
@@ -275,21 +273,15 @@ function _positionGroupToolbar(gmailComposeView){
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
+		if(gmailComposeView.isDestroyed()) throw 'skip';
+
 		try{
-			if(!gmailComposeView.getBodyElement()){
-				throw 'skip';
-			}
-			else{
-				return !!gmailComposeView.getFormattingToolbar();
-			}
+			return !!gmailComposeView.getFormattingToolbar();
 		}
 		catch(err){
 			throw 'skip';
 		}
-
 	}).then(function(){
-
-
 		var mutationObserver = new MutationObserver(function(mutations){
 			const target = mutations[0].target;
 			if(target.style && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){

@@ -73,7 +73,7 @@ export default class HandlerRegistry<T> {
   }
 }
 
-function _tryCatch(fn: any, arg: any){
+function _tryCatch<T>(fn: (arg: T) => void, arg: T){
   try{
     fn(arg);
   }

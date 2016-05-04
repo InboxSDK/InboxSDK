@@ -82,6 +82,7 @@ class GmailComposeView {
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
 	_formattingArea: ?HTMLElement;
+	_destroyed: boolean = false;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -249,11 +250,14 @@ class GmailComposeView {
 		this._requestModifiers = {};
 		this._managedViewControllers.length = 0;
 		this._stopper.destroy();
+		this._destroyed = true;
 	}
 
 	getStopper(): Kefir.Stream {return this._stopper;}
 
 	getEventStream(): Kefir.Stream {return this._eventStream;}
+
+	isDestroyed(): boolean { return this._destroyed;}
 
 	_setupStreams() {
 		this._eventStream.plug(getBodyChangesStream(this));
