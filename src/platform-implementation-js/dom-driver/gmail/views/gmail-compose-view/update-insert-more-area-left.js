@@ -2,17 +2,16 @@
 
 import type GmailComposeView from '../gmail-compose-view';
 
-const updateAreaMap = new WeakMap();
+const updateAreaSet = new WeakSet();
 
 export default function updateInsertMoreAreaLeft(gmailComposeView: GmailComposeView, oldFormattingAreaOffsetLeft: number){
-	let willUpdate = updateAreaMap.get(gmailComposeView);
-	if(willUpdate) return;
+	if(updateAreaSet.has(gmailComposeView)) return;
 
-	updateAreaMap.set(gmailComposeView, true);
+	updateAreaSet.add(gmailComposeView);
 
 	window.requestAnimationFrame(() => {
-		updateAreaMap.set(gmailComposeView, false);
-		if(!gmailComposeView.getInsertMoreArea()) return;
+		updateAreaSet.delete(gmailComposeView);
+		if(gmailComposeView.isDestroyed()) return;
 		var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft(true);
 		var insertMoreAreaLeft = parseInt(gmailComposeView.getInsertMoreArea().style.left, 10);
 		var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
