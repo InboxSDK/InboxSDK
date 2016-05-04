@@ -33,6 +33,10 @@ export default class ThreadRowView extends EventEmitter {
     this._threadRowViewDriver.addButton(buttonDescriptor);
   }
 
+  addActionButton(actionButtonDescriptor: Object) {
+    this._threadRowViewDriver.addActionButton(actionButtonDescriptor);
+  }
+
   addAttachmentIcon(threadRowAttachmentIconDescriptor: Object) {
     this._threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
   }

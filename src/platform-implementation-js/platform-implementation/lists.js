@@ -42,4 +42,12 @@ _.extend(Lists.prototype, {
 
 });
 
+var ActionButtonTypes = Object.freeze({
+	'LINK': 'LINK',
+	'DROPDOWN': 'DROPDOWN',
+	'ACTION': 'ACTION'
+});
+
+Lists.prototype.ActionButtonTypes = ActionButtonTypes;
+
 module.exports = Lists;
