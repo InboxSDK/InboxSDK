@@ -60,23 +60,24 @@ export default class HandlerRegistry<T> {
   _informHandlerOfTargets(handler: Handler<T>) {
     const targets = this._targets.slice();
     for(let ii = 0; ii < targets.length; ii++){
-      try{
-        handler(targets[ii]);
-      } catch(err) {
-        Logger.error(err);
-      }
+      _tryCatch(handler, targets[ii]);
     }
   }
 
   _informHandlersOfTarget(target: T) {
     const handlers = this._handlers.slice();
     for(let ii = 0; ii< handlers.length; ii++){
-      try{
-        handlers[ii](target);
-      } catch(err) {
-        Logger.error(err);
-      }
+      _tryCatch(handlers[ii], target);
     }
 
+  }
+}
+
+function _tryCatch<T>(fn: (arg: T) => void, arg: T){
+  try{
+    fn(arg);
+  }
+  catch(err){
+    Logger.error(err);
   }
 }

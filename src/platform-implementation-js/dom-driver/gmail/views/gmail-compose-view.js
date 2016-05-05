@@ -45,6 +45,8 @@ import getAddressChangesStream from './gmail-compose-view/get-address-changes-st
 import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getPresendingStream from './gmail-compose-view/get-presending-stream';
+import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
+import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -79,6 +81,8 @@ class GmailComposeView {
 	_lastSelectionRange: ?Range;
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
+	_formattingArea: ?HTMLElement;
+	_destroyed: boolean = false;
 	ready: () => Kefir.Stream<GmailComposeView>;
 	getEventStream: () => Kefir.Stream;
 
@@ -243,13 +247,17 @@ class GmailComposeView {
 		this._managedViewControllers.forEach(vc => {
 			vc.destroy();
 		});
+		this._requestModifiers = {};
 		this._managedViewControllers.length = 0;
 		this._stopper.destroy();
+		this._destroyed = true;
 	}
 
 	getStopper(): Kefir.Stream {return this._stopper;}
 
 	getEventStream(): Kefir.Stream {return this._eventStream;}
+
+	isDestroyed(): boolean { return this._destroyed;}
 
 	_setupStreams() {
 		this._eventStream.plug(getBodyChangesStream(this));
@@ -578,15 +586,19 @@ class GmailComposeView {
 	}
 
 	updateInsertMoreAreaLeft(oldFormattingAreaOffsetLeft: number) {
-		require('./gmail-compose-view/update-insert-more-area-left')(this, oldFormattingAreaOffsetLeft);
+		updateInsertMoreAreaLeft(this, oldFormattingAreaOffsetLeft);
 	}
 
 	_getFormattingAreaOffsetLeft(): number {
-		return require('./gmail-compose-view/get-formatting-area-offset-left')(this);
+		return getFormattingAreaOffsetLeft(this);
 	}
 
-	getFormattingArea(): HTMLElement {
-		return this._element.querySelector('.oc');
+	getFormattingArea(): ?HTMLElement {
+		let formattingArea = this._formattingArea;
+		if(!formattingArea){
+			formattingArea = this._formattingArea = this._element.querySelector('.oc');
+		}
+		return formattingArea;
 	}
 
 	getFormattingToolbar(): HTMLElement {
@@ -883,11 +895,12 @@ class GmailComposeView {
 		this._driver
 			.getPageCommunicator()
 			.ajaxInterceptStream
-			.takeUntilBy(this._stopper)
 			.filter(({type, composeid, modifierId}) =>
 						type === 'inboxSDKmodifyComposeRequest' &&
 						composeid === this.getComposeID() &&
-						Boolean(this._requestModifiers[modifierId]))
+						Boolean(this._requestModifiers[modifierId])
+			)
+			.takeUntilBy(this._stopper)
 			.onValue(({composeid, modifierId, composeParams}) => {
 
 				if(this._driver.getLogger().shouldTrackEverything()){

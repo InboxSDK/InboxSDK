@@ -1,6 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
+import asap from 'asap';
 import {defn, defonce} from 'ud';
 import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
@@ -76,24 +77,31 @@ function _handleButtonAdded(gmailComposeView: GmailComposeView){
 	_fixToolbarPosition(gmailComposeView);
 }
 
+
+const groupButtonsIfNeededMap = new WeakSet();
 function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
-	if(!_doButtonsNeedToGroup(gmailComposeView)){
-		return;
-	}
+	if(groupButtonsIfNeededMap.has(gmailComposeView)) return;
 
-	var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
-	var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+	groupButtonsIfNeededMap.add(gmailComposeView);
 
+	window.requestAnimationFrame(() => {
+		groupButtonsIfNeededMap.delete(gmailComposeView);
 
-	_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
-	_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
-	_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+		if(gmailComposeView.isDestroyed() || !_doButtonsNeedToGroup(gmailComposeView)) return;
 
-	gmailComposeView.getStopper().onValue(function(){
-		(groupedActionToolbarContainer:any).remove();
-		groupToggleButtonViewController.destroy();
+		var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
+		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+
+		_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
+		_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
+		_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+
+		gmailComposeView.getStopper().onValue(function(){
+			(groupedActionToolbarContainer:any).remove();
+			groupToggleButtonViewController.destroy();
+		});
 	});
-}
+};
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
@@ -213,18 +221,27 @@ function _isToggleExpanded(){
 	return localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded';
 }
 
+const fixToolbarPositionMap = new WeakSet();
 function _fixToolbarPosition(gmailComposeView){
-	positionFormattingToolbar(gmailComposeView);
+	if(fixToolbarPositionMap.has(gmailComposeView)) return;
 
-	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
-	if(!groupedActionToolbarContainer){
-		return;
-	}
+	fixToolbarPositionMap.add(gmailComposeView);
+	window.requestAnimationFrame(() => {
+		fixToolbarPositionMap.delete(gmailComposeView);
+		if(gmailComposeView.isDestroyed()) return;
 
-	if(groupedActionToolbarContainer.style.display === 'none'){
-		return;
-	}
-	_positionGroupToolbar(gmailComposeView);
+		positionFormattingToolbar(gmailComposeView);
+
+		var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
+		if(!groupedActionToolbarContainer){
+			return;
+		}
+
+		if(groupedActionToolbarContainer.style.display === 'none'){
+			return;
+		}
+		_positionGroupToolbar(gmailComposeView);
+	});
 }
 
 function _positionGroupToolbar(gmailComposeView){
@@ -256,16 +273,15 @@ function _positionGroupToolbar(gmailComposeView){
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
 	waitFor(function(){
+		if(gmailComposeView.isDestroyed()) throw 'skip';
+
 		try{
 			return !!gmailComposeView.getFormattingToolbar();
 		}
 		catch(err){
 			throw 'skip';
 		}
-
 	}).then(function(){
-
-
 		var mutationObserver = new MutationObserver(function(mutations){
 			const target = mutations[0].target;
 			if(target.style && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){

@@ -1,12 +1,21 @@
-var $ = require('jquery');
+/* @flow */
 
-function updateInsertMoreAreaLeft(gmailComposeView, oldFormattingAreaOffsetLeft){
-	var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
-	var insertMoreAreaLeft = parseInt($(gmailComposeView.getInsertMoreArea()).css('left'), 10);
+import type GmailComposeView from '../gmail-compose-view';
 
-	var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
+const updateAreaSet = new WeakSet();
 
-	$(gmailComposeView.getInsertMoreArea()).css('left', (insertMoreAreaLeft + diff) + 'px');
+export default function updateInsertMoreAreaLeft(gmailComposeView: GmailComposeView, oldFormattingAreaOffsetLeft: number){
+	if(updateAreaSet.has(gmailComposeView)) return;
+
+	updateAreaSet.add(gmailComposeView);
+
+	window.requestAnimationFrame(() => {
+		updateAreaSet.delete(gmailComposeView);
+		if(gmailComposeView.isDestroyed()) return;
+		var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft(true);
+		var insertMoreAreaLeft = parseInt(gmailComposeView.getInsertMoreArea().style.left, 10);
+		var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
+		gmailComposeView.getInsertMoreArea().style.left = (insertMoreAreaLeft + diff) + 'px';
+	});
+
 }
-
-module.exports = updateInsertMoreAreaLeft;
