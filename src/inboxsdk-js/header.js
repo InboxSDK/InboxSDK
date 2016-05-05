@@ -14,5 +14,5 @@
  *
  * Like complex reverse engineering? Want to make Gmail and Inbox a hackable platform?
  *
- * Join us at: wwww.streak.com/careers?source=sdk
+ * Join us at: www.streak.com/careers?source=sdk
  */
