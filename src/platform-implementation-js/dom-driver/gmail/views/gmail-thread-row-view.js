@@ -212,7 +212,7 @@ class GmailThreadRowView {
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
   waitForReady(): Kefir.Stream<GmailThreadRowView> {
-    const time = [0,10,100,1000];
+    const time = [0,10,100,1000,10000];
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
