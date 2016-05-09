@@ -208,20 +208,11 @@ class GmailThreadRowView {
 
   // Returns a Kefir stream that emits this object once this object is ready for the
   // user. It should almost always synchronously ready immediately, but there's
-  // a few cases such as with multiple inbox that it needs a moment.
+  // a few cases such as with multiple inbox or the drafts page that it needs a moment.
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
   waitForReady(): Kefir.Stream<GmailThreadRowView> {
-    if(!this._elements.length) {
-      //TODO: remove if never logged
-      this._driver.getLogger().error(new Error('tried to get thread id on empty array'), {
-        isDestroyed: this._isDestroyed
-      });
-
-      return Kefir.never();
-    }
-
-    const time = [0,10,100];
+    const time = [0,10,100,1000];
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
