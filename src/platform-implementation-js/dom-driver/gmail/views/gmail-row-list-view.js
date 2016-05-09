@@ -168,10 +168,6 @@ class GmailRowListView {
 
 		const laterStream = Kefir.later(2);
 
-		//TODO: remove all stopperFired stuff if errors are never logged
-		let stopperFired = false;
-		this._stopper.onValue(() => {stopperFired = true;});
-
 		this._rowViewDriverStream = elementStream
 			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)))
 			.flatMap(threadRowView => {
@@ -180,14 +176,9 @@ class GmailRowListView {
 			    // a moment before we re-emit the thread row and process our new
 			    // modifications.
 
-					return laterStream.flatMap(() => {
-						if(stopperFired){ // TODO: remove if never logged
-							this._gmailDriver.getLogger().error(new Error('tried init threadRowView after destroy'));
-							return Kefir.never();
-						}
-
-						return threadRowView.waitForReady();
-					}).takeUntilBy(threadRowView.getStopper());
+					return laterStream.flatMap(() =>
+						threadRowView.waitForReady()
+					).takeUntilBy(threadRowView.getStopper());
 				}
 				else{
 					return threadRowView.waitForReady().takeUntilBy(threadRowView.getStopper());
