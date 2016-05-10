@@ -89,7 +89,6 @@ function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
   const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
-  const key = threadMetadataKey(domRowMetadata);
   const parent: HTMLElement = $(threadRow).closest('div[role="main"]').get(0);
   if (!parent) {
     throw new Error("Can't operate on disconnected thread row");
@@ -97,9 +96,6 @@ function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   const currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
   const url = clickAndGetPopupUrl(threadRow);
   const threadId = url && getThreadIdFromUrl(url);
-  if (threadId && !threadIdsByKey.has(key)) {
-    threadIdsByKey.set(key, threadId);
-  }
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
   }
