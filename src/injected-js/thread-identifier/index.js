@@ -97,9 +97,6 @@ function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   const currentRowSelection = parent.querySelector('td.PE') || parent.querySelector('tr');
   const url = clickAndGetPopupUrl(threadRow);
   const threadId = url && getThreadIdFromUrl(url);
-  if (threadId && !threadIdsByKey.has(key)) {
-    threadIdsByKey.set(key, threadId);
-  }
   if (currentRowSelection) {
     clickAndGetPopupUrl(currentRowSelection);
   }
