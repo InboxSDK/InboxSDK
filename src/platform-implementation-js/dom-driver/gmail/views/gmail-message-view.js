@@ -24,6 +24,8 @@ import type GmailToolbarView from './gmail-toolbar-view';
 
 import type {VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
 
+let hasSeenOldElement = false;
+
 class GmailMessageView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
@@ -308,6 +310,10 @@ class GmailMessageView {
 
 		let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
 		if(m){
+			if (!hasSeenOldElement) {
+				hasSeenOldElement = true;
+				this._driver.getLogger().eventSite('old messageid location');
+			}
 			return m[1];
 		}
 		else{
