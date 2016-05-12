@@ -16,6 +16,7 @@ import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
+import censorHTMLtree from '../../../../common/censor-html-tree';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
@@ -23,6 +24,7 @@ import type GmailToolbarView from './gmail-toolbar-view';
 
 import type {VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
 
+let hasSeenOldElement = false;
 
 class GmailMessageView {
 	_element: HTMLElement;
@@ -300,23 +302,35 @@ class GmailMessageView {
 		}
 		const messageEl = this._element.querySelector("div.ii.gt");
 		if (!messageEl) {
-			this._driver.getLogger().error(new Error("Could not find message id element"));
+			this._driver.getLogger().error(new Error("Could not find message id element"), {
+				elementHtml: censorHTMLtree(this._element)
+			});
 			return null;
 		}
 
 		let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
 		if(m){
+			if (!hasSeenOldElement) {
+				hasSeenOldElement = true;
+				this._driver.getLogger().eventSite('old messageid location');
+			}
 			return m[1];
 		}
 		else{
 			const messageElChild = messageEl.firstElementChild;
 			if(!messageElChild){
-				this._driver.getLogger().error(new Error("Could not find message id value"));
+				this._driver.getLogger().error(new Error("Could not find message id value"), {
+					reason: "Could not find element",
+					messageHtml: censorHTMLtree(messageEl)
+				});
 				return null;
 			}
 			const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
 			if (!m) {
-				this._driver.getLogger().error(new Error("Could not find message id value"));
+				this._driver.getLogger().error(new Error("Could not find message id value"), {
+					reason: "Element was missing message className",
+					messageHtml: censorHTMLtree(messageEl)
+				});
 				return null;
 			}
 			return m[1];
