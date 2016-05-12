@@ -325,7 +325,7 @@ class GmailMessageView {
 				});
 				return null;
 			}
-			const m = messageElChild.className.match(/\bmX([0-9a-f]+)\b/);
+			const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
 			if (!m) {
 				this._driver.getLogger().error(new Error("Could not find message id value"), {
 					reason: "Element was missing message className",
