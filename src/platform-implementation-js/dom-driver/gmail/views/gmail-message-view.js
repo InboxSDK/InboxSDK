@@ -303,7 +303,12 @@ class GmailMessageView {
 			this._driver.getLogger().error(new Error("Could not find message id element"));
 			return null;
 		}
-		const m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
+		const messageElChild = messageEl.firstElementChild;
+		if(!messageElChild){
+			this._driver.getLogger().error(new Error("Could not find message id value"));
+			return null;
+		}
+		const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
 		if (!m) {
 			this._driver.getLogger().error(new Error("Could not find message id value"));
 			return null;
