@@ -317,15 +317,18 @@ class GmailCollapsibleSectionView {
 		else if(collapsibleSectionDescriptor.hasDropdown && collapsibleSectionDescriptor.onDropdownClick){
 
 			if(!this._inboxDropdownButtonView || !this._dropdownViewController){
-				this._inboxDropdownButtonView = new InboxDropdownButtonView();
+				const inboxDropdownButtonView = this._inboxDropdownButtonView = new InboxDropdownButtonView();
 				this._dropdownViewController = new DropdownButtonViewController({
-					buttonView: this._inboxDropdownButtonView,
+					buttonView: inboxDropdownButtonView,
 					dropdownViewDriverClass: GmailDropdownView,
 					dropdownShowFunction: collapsibleSectionDescriptor.onDropdownClick
 				});
 
 				const headerElement = this._headerElement;
-				if(headerElement) headerElement.querySelector('.Cr').appendChild(this._inboxDropdownButtonView.getElement());
+				if(headerElement) {
+					const childElement = headerElement.querySelector('.Cr');
+					if(childElement) childElement.appendChild(inboxDropdownButtonView.getElement());
+				}
 			}
 			else if(collapsibleSectionDescriptor.onDropdownClick !== this._collapsibleSectionDescriptor.onDropdownClick){
 				if(this._dropdownViewController) this._dropdownViewController.setDropdownShowFunction(collapsibleSectionDescriptor.onDropdownClick);
