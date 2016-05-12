@@ -303,17 +303,24 @@ class GmailMessageView {
 			this._driver.getLogger().error(new Error("Could not find message id element"));
 			return null;
 		}
-		const messageElChild = messageEl.firstElementChild;
-		if(!messageElChild){
-			this._driver.getLogger().error(new Error("Could not find message id value"));
-			return null;
+
+		let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
+		if(m){
+			return m[1];
 		}
-		const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
-		if (!m) {
-			this._driver.getLogger().error(new Error("Could not find message id value"));
-			return null;
+		else{
+			const messageElChild = messageEl.firstElementChild;
+			if(!messageElChild){
+				this._driver.getLogger().error(new Error("Could not find message id value"));
+				return null;
+			}
+			const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
+			if (!m) {
+				this._driver.getLogger().error(new Error("Could not find message id value"));
+				return null;
+			}
+			return m[1];
 		}
-		return m[1];
 	}
 
 	addAttachmentIcon(iconDescriptor: Object) {
