@@ -187,31 +187,38 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController){
 
 function _checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController){
 	if(_isToggleExpanded()){
-		localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
-		_toggleGroupButtonToolbar(gmailComposeView, groupToggleButtonViewController);
+		_expandGroupButtonToolbar(gmailComposeView, groupToggleButtonViewController);
+	}
+}
+
+function _collapseGroupButtonToolbar(gmailComposeView, buttonViewController) {
+	get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = 'none';
+	gmailComposeView.getElement().classList.remove('inboxsdk__compose_groupedActionToolbar_visible');
+
+	buttonViewController.getView().deactivate();
+	localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
+}
+
+function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
+	get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = '';
+	gmailComposeView.getElement().classList.add('inboxsdk__compose_groupedActionToolbar_visible');
+
+	buttonViewController.getView().activate();
+	localStorage['inboxsdk__compose_groupedActionButton_state'] = 'expanded';
+
+	_positionGroupToolbar(gmailComposeView);
+
+	if(gmailComposeView.getFormattingToolbar() && gmailComposeView.getFormattingToolbar().style.display === ''){
+		simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
 	}
 }
 
 function _toggleGroupButtonToolbar(gmailComposeView, buttonViewController){
-	if(_isToggleExpanded()){ //collapse
-		get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = 'none';
-		gmailComposeView.getElement().classList.remove('inboxsdk__compose_groupedActionToolbar_visible');
-
-		buttonViewController.getView().deactivate();
-		localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
+	if(_isToggleExpanded()){
+		_collapseGroupButtonToolbar(gmailComposeView, buttonViewController);
 	}
-	else{ //expand
-		get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display = '';
-		gmailComposeView.getElement().classList.add('inboxsdk__compose_groupedActionToolbar_visible');
-
-		buttonViewController.getView().activate();
-		localStorage['inboxsdk__compose_groupedActionButton_state'] = 'expanded';
-
-		_positionGroupToolbar(gmailComposeView);
-
-		if(gmailComposeView.getFormattingToolbar() && gmailComposeView.getFormattingToolbar().style.display === ''){
-			simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
-		}
+	else{
+		_expandGroupButtonToolbar(gmailComposeView, buttonViewController);
 	}
 }
 
