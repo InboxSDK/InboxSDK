@@ -187,10 +187,8 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController){
 
 function _checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController){
 	if(_isToggleExpanded()){
-		setTimeout(function(){ //do in timeout so that we wait for all buttons to get added
-			localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
-			_toggleGroupButtonToolbar(gmailComposeView, groupToggleButtonViewController);
-		},1);
+		localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
+		_toggleGroupButtonToolbar(gmailComposeView, groupToggleButtonViewController);
 	}
 }
 
@@ -292,7 +290,7 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 
 		mutationObserver.observe(
 			gmailComposeView.getFormattingToolbar(),
-			({attributes: true, attributeFilter: ['style']}:any)
+			{attributes: true, attributeFilter: ['style']}
 		);
 
 		get(memberMap, gmailComposeView).formattingToolbarMutationObserver = mutationObserver;
