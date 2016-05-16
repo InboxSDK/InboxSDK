@@ -12,6 +12,8 @@ import kefirCast from 'kefir-cast';
 import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
+import getUpdatedContact from './gmail-message-view/get-updated-contact';
+
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -627,44 +629,7 @@ class GmailMessageView {
 	}
 
 	_getUpdatedContact(inContact: Contact): Contact{
-		const contact = _.clone(inContact);
-
-		const menuButtonElement = this._element.querySelector('.ajy[aria-haspopup=true]');
-		if(menuButtonElement){
-			let modalContactName = this._getModalContactName(contact.emailAddress);
-			if(!modalContactName){
-				//the modal that contains this email address is not visible, so we need to bring the modal up
-
-				function block(event){event.stopPropagation();};
-				(this._element: any).addEventListener('click', block);
-				simulateClick(menuButtonElement);
-				modalContactName = this._getModalContactName(contact.emailAddress);
-				simulateClick(menuButtonElement);
-				(this._element: any).removeEventListener('click', block);
-			}
-
-			contact.name = modalContactName || contact.name;
-		}
-
-		return contact;
-	}
-
-	_getModalContactName(emailAddress: string): ?string {
-		const nameSpans = document.querySelectorAll('.ajC [email]');
-		let foundNameSpan = _.find(nameSpans, span => span.getAttribute('email') === emailAddress);
-		if(foundNameSpan){
-			if(foundNameSpan.getAttribute('name')){
-				return foundNameSpan.getAttribute('name');
-			}
-			else{
-				const stringContact = extractContactFromEmailContactString(foundNameSpan.textContent);
-				if(emailAddress === stringContact.emailAddress){
-					return stringContact.name;
-				}
-			}
-		}
-
-		return null;
+		return getUpdatedContact(inContact, this._element);
 	}
 
 }
