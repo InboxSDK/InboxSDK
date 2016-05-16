@@ -7,11 +7,9 @@ import extractContactFromEmailContactString from '../../../../lib/extract-contac
 
 const cache: {[key: string]: ?Contact} =  {};
 
-export default function getUpdatedContact(inContact: Contact, element: HTMLElement){
-  let cachedContact = cache[inContact.emailAddress];
+export default function getUpdatedContact(contact: Contact, element: HTMLElement): Contact {
+  let cachedContact = cache[contact.emailAddress];
   if(cachedContact) return cachedContact;
-
-  const contact = _.clone(inContact);
 
   const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
   if(menuButtonElement){
@@ -25,14 +23,14 @@ export default function getUpdatedContact(inContact: Contact, element: HTMLEleme
 
     cachedContact = cache[contact.emailAddress];
     if(cachedContact){
-      contact.name = cachedContact.name;
+      return cachedContact;
     }
   }
 
   return contact;
 }
 
-function updateContactCacheFromModal(): ?string {
+function updateContactCacheFromModal() {
   const spans = document.querySelectorAll(`.ajC [email]`);
 
   for(let ii=0; ii<spans.length; ii++){
