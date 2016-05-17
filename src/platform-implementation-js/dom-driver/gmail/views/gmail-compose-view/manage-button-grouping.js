@@ -43,7 +43,7 @@ export default defn(module, function manageButtonGrouping(gmailComposeView: Gmai
 
 	gmailComposeView.getEventStream()
 					.filter(event =>
-						event.eventName === 'resize'
+						event.eventName === 'resize' || event.eventName === 'restored'
 					)
 					.onValue(() => {_fixToolbarPosition(gmailComposeView);});
 
