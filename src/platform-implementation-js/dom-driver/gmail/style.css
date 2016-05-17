@@ -683,6 +683,15 @@ div.inboxsdk__compose_statusbar {
   max-height: 80vh;
 }
 
+.inboxsdk__mole_view_chromeless .inboxsdk__mole_view_inner {
+  min-width: 0px;
+}
+
+.inboxsdk__mole_view_chromeless .inboxsdk__mole_view_content {
+  margin-top: 0px;
+  min-width: 0px;
+}
+
 /* end mole */
 
 
