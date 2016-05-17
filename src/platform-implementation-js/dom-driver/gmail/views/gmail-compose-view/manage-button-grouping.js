@@ -1,6 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
+import _ from 'lodash';
 import asap from 'asap';
 import {defn, defonce} from 'ud';
 import ButtonView from '../../widgets/buttons/button-view';
@@ -9,6 +10,8 @@ import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-b
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import waitFor from '../../../../lib/wait-for';
+import Logger from '../../../../lib/logger';
+import censorHTMLtree from '../../../../../common/censor-html-tree';
 import positionFormattingToolbar from './position-formatting-toolbar';
 import type GmailComposeView from '../gmail-compose-view';
 import get from '../../../../../common/get-or-fail';
@@ -250,6 +253,10 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
+	if (gmailComposeView.getMinimized()) {
+		return;
+	}
+
 	var groupedActionToolbarContainer = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar');
 
 	if(!groupedActionToolbarContainer){
@@ -273,7 +280,16 @@ function _positionGroupToolbar(gmailComposeView){
 		groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft-1) + 'px';
 	}
 
-	groupedActionToolbarContainer.style.bottom = (gmailComposeView.getBottomToolbarContainer().clientHeight + 1) + 'px';
+	const bottomToolbarHeight = gmailComposeView.getBottomToolbarContainer().clientHeight;
+	groupedActionToolbarContainer.style.bottom = `${bottomToolbarHeight + 1}px`;
+	if (bottomToolbarHeight < 1) {
+		const heElements = gmailComposeView.getElement().querySelectorAll('td.HE');
+		Logger.error(new Error('bottom toolbar had bad height'), {
+			bottomToolbarHeight,
+			heElementHeights: _.map(heElements, el => el.clientHeight),
+			heElementsHTML: _.map(heElements, censorHTMLtree)
+		});
+	}
 }
 
 function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController){
