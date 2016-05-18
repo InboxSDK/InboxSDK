@@ -48,4 +48,17 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 	};
 
 	makeMoleWidget();
+
+
+	window.makeChromelessMoleWidget = function(){
+		var div = document.createElement('div');
+		div.innerHTML = 'hello world';
+		div.style.height = '500px';
+
+		var mole = inboxSDK.Widgets.showMoleView({
+			el: div,
+			chrome: false
+		});
+	}
+
 });

@@ -48,6 +48,15 @@ var ModalOptions = /** @lends ModalOptions */{
   chrome:null,
 
   /**
+  * When chrome is set to false, this option controls whether a close (X) button should be added to the modal anyway.
+  * If chrome is set to true then this property doesn't do anything.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  showCloseButton:null,
+
+  /**
   * Text to show as the title of the modal
   * ^optional
   * ^default=''
@@ -157,7 +166,17 @@ var MoleOptions = /** @lends MoleOptions */{
   * ^default=[]
   * @type {MoleButtonDescriptor[]}
   */
-  titleButtons:null
+  titleButtons:null,
+
+  /**
+  * When chrome is set to false then the header of the mole is not rendered. This includes
+  * the title and mimize/close buttons. This means the app is totally responsible for the
+  * look and behavior of the mole, while the SDK is responsible only for the positioning.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  chrome:null
 };
 
 /**
