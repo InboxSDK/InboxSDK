@@ -48,9 +48,8 @@ var ModalOptions = /** @lends ModalOptions */{
   chrome:null,
 
   /**
-  * Whether to show the close (X) button in the top right of the Modal ONLY IF chrome is set to false.
-  * If chrome is set to true then this option doesn't do anything. If chrome is set to false and
-  * showCloseButton is set to true then the close button is shown and top padding is added to the modal.
+  * When chrome is set to false, this option controls whether a close (X) button should be added to the modal anyway.
+  * If chrome is set to true then this property doesn't do anything.
   * ^optional
   * ^default=false
   * @type {boolean}
@@ -176,7 +175,7 @@ var MoleOptions = /** @lends MoleOptions */{
   * ^optional
   * ^default=false
   * @type {boolean}
-  */  
+  */
   chrome:null
 };
 
