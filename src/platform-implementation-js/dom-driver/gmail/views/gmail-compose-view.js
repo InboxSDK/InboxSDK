@@ -47,6 +47,7 @@ import getRecipients from './gmail-compose-view/get-recipients';
 import getPresendingStream from './gmail-compose-view/get-presending-stream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
+import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -471,12 +472,20 @@ class GmailComposeView {
 		simulateClick(this.getSendButton());
 	}
 
+	discard() {
+		simulateClick(this.getDiscardButton());
+	}
+
 	popOut() {
 		if (!this.isInlineReplyForm()) {
 			throw new Error("Can only pop out inline reply compose views");
 		}
 		var popOutBtn = this._element.querySelector('.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child');
 		simulateClick(popOutBtn);
+	}
+
+	overrideEditSubject() {
+		overrideEditSubject(this._driver, this);
 	}
 
 	_hideDropzones() {
@@ -566,7 +575,11 @@ class GmailComposeView {
 	}
 
 	getSubject(): string {
-		return $(this._element).find('input[name=subjectbox]').val();
+		return this.getSubjectInput().value;
+	}
+
+	getSubjectInput(): HTMLInputElement {
+		return (this._element: any).querySelector('input[name=subjectbox]');
 	}
 
 	getToRecipients(): Contact[] {
@@ -669,6 +682,10 @@ class GmailComposeView {
 
 	getBottomToolbarContainer(): HTMLElement {
 		return this._element.querySelector('.aoP .aDj');
+	}
+
+	getDiscardButton(): HTMLElement {
+		return this._element.querySelector('.gU.az5 .oh');
 	}
 
 	getComposeID(): string {
