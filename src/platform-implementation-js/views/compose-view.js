@@ -260,6 +260,10 @@ _.extend(ComposeView.prototype, {
 
 	registerRequestModifier(modifier){
 		memberMap.get(this).composeViewImplementation.registerRequestModifier(modifier);
+	},
+
+	overrideEditSubject(){
+		memberMap.get(this).composeViewImplementation.overrideEditSubject();
 	}
 
 });
