@@ -114,15 +114,21 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
     }))
     .map(_.compact)
     // Figure out any rfc ids we don't know yet
-    .map(idPairs => RSVP.Promise.all(idPairs.map(pair =>
-      pair.rfcId ? pair :
-      driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(pair.gtid)
-        .then(rfcId => ({gtid: pair.gtid, rfcId}), findIdFailure.bind(null, pair.gtid))
-    )))
+    .map((idPairs: Array<{rfcId: string}|{gtid: string}|{rfcId: string, gtid: string}>) =>
+      RSVP.Promise.all(idPairs.map(pair => {
+        if (pair.rfcId) {
+          return pair;
+        } else if (pair.gtid) {
+          const gtid = pair.gtid;
+          return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
+            .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
+        }
+      }))
+    )
     .flatMap(Kefir.fromPromise)
     .map(_.compact)
-    .onValue(idPairs => {
-      const query = idPairs.length > 0 ?
+    .onValue((idPairs: Array<{rfcId: string, gtid?: string}>) => {
+      const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
@@ -131,7 +137,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
         Kefir.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
           pair.gtid ? pair :
           driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
-            .then(gtid => ({gtid, rfcId: pair.rfcId}), findIdFailure.bind(null, pair.rfcId))
+            .then(gtid => ({gtid, rfcId: pair.rfcId}), err => findIdFailure(pair.rfcId, err))
         ))).map(_.compact),
 
         driver.getPageCommunicator().ajaxInterceptStream
@@ -141,11 +147,11 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
           )
           .map(x => x.response)
           .take(1)
-      ]).onValue(([idPairs, response]) => {
+      ]).onValue(([idPairs, response]: [Array<{rfcId: string, gtid: string}>, string]) => {
         driver.signalCustomThreadListActivity(customRouteID);
 
         const extractedThreads = GRP.extractThreads(response);
-        const newThreads = _.chain(idPairs)
+        const newThreads: typeof extractedThreads = _.chain(idPairs)
           .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
           .compact()
           .value();
