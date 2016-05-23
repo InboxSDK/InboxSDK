@@ -37,6 +37,7 @@ class GmailMessageView {
 	_moreMenuItemDescriptors: Array<Object>;
 	_moreMenuAddedElements: Array<HTMLElement>;
 	_replyElementStream: Kefir.Stream;
+	_replyElement: ?HTMLElement;
 	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
 	_messageLoaded: boolean = false;
 	_openMoreMenu: ?HTMLElement;
@@ -50,6 +51,7 @@ class GmailMessageView {
 		this._driver = driver;
 		this._moreMenuItemDescriptors = [];
 		this._moreMenuAddedElements = [];
+		this._replyElement = null;
 
 		// Outputs the same type of stream as makeElementChildStream does.
 		this._replyElementStream = this._eventStream.filter(function(event) {
@@ -420,6 +422,10 @@ class GmailMessageView {
 		}
 	}
 
+	hasOpenReply(): boolean {
+		return Boolean(this._replyElement);
+	}
+
 	_addAttachmentCard(options: Object): GmailAttachmentCardView {
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
@@ -549,6 +555,8 @@ class GmailMessageView {
 		.onValue(mutation => {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
+					self._replyElement = replyContainer;
+
 					currentReplyElementRemovalStream = kefirBus();
 					self._eventStream.emit({
 						type: 'internal',
@@ -569,6 +577,8 @@ class GmailMessageView {
 					currentReplyElementRemovalStream = null;
 					temp.emit(null);
 					temp.end();
+
+					self._replyElement = null;
 				}
 			}
 		});

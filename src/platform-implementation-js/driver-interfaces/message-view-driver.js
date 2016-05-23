@@ -58,6 +58,7 @@ export type MessageViewDriver = {
 	getRecipients(): Array<Contact>;
 	getThreadViewDriver(): Object;
 	isLoaded(): boolean;
+	hasOpenReply(): boolean;
 };
 
 export default MessageViewDriverObj;

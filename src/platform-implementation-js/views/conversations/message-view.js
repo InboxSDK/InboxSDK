@@ -134,6 +134,10 @@ class MessageView extends EventEmitter {
 		var members = memberMap.get(this);
 		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
 	}
+
+	hasOpenReply(): boolean {
+		return memberMap.get(this).messageViewImplementation.hasOpenReply();
+	}
 }
 
 
