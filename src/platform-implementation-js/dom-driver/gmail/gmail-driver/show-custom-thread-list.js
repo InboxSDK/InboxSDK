@@ -21,7 +21,7 @@ Timeline of how a custom thread list works:
 <User eventually navigates to a custom list route>
 
 * setup-route-view-driver-stream.js receives the hashchange event, recognizes
-  that it matched a register custom list route id, and then calls this file's
+  that it matched a registered custom list route id, and then calls this file's
   showCustomThreadList function instead of creating a RouteView.
 
 * showCustomThreadList registers a bunch of listeners to respond at the right
