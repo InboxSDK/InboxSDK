@@ -1,5 +1,5 @@
 {
-  "name": "Compose Tooltip Example Extension",
+  "name": "Override Edit Subject Example Extension",
   "description": "inboxsdk example",
   "version": "0.1",
   "content_scripts": [
