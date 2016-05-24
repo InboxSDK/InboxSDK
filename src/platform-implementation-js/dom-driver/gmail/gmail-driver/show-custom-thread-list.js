@@ -8,6 +8,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
+import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
@@ -21,7 +22,7 @@ Timeline of how a custom thread list works:
 <User eventually navigates to a custom list route>
 
 * setup-route-view-driver-stream.js receives the hashchange event, recognizes
-  that it matched a register custom list route id, and then calls this file's
+  that it matched a registered custom list route id, and then calls this file's
   showCustomThreadList function instead of creating a RouteView.
 
 * showCustomThreadList registers a bunch of listeners to respond at the right
@@ -114,15 +115,21 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
     }))
     .map(_.compact)
     // Figure out any rfc ids we don't know yet
-    .map(idPairs => RSVP.Promise.all(idPairs.map(pair =>
-      pair.rfcId ? pair :
-      driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(pair.gtid)
-        .then(rfcId => ({gtid: pair.gtid, rfcId}), findIdFailure.bind(null, pair.gtid))
-    )))
+    .map((idPairs: Array<{rfcId: string}|{gtid: string}|{rfcId: string, gtid: string}>) =>
+      RSVP.Promise.all(idPairs.map(pair => {
+        if (pair.rfcId) {
+          return pair;
+        } else if (pair.gtid) {
+          const gtid = pair.gtid;
+          return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
+            .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
+        }
+      }))
+    )
     .flatMap(Kefir.fromPromise)
     .map(_.compact)
-    .onValue(idPairs => {
-      const query = idPairs.length > 0 ?
+    .onValue((idPairs: Array<{rfcId: string, gtid?: string}>) => {
+      const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
@@ -131,7 +138,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
         Kefir.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
           pair.gtid ? pair :
           driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
-            .then(gtid => ({gtid, rfcId: pair.rfcId}), findIdFailure.bind(null, pair.rfcId))
+            .then(gtid => ({gtid, rfcId: pair.rfcId}), err => findIdFailure(pair.rfcId, err))
         ))).map(_.compact),
 
         driver.getPageCommunicator().ajaxInterceptStream
@@ -141,21 +148,23 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
           )
           .map(x => x.response)
           .take(1)
-      ]).onValue(([idPairs, response]) => {
+      ]).onValue(([idPairs, response]: [Array<{rfcId: string, gtid: string}>, string]) => {
         driver.signalCustomThreadListActivity(customRouteID);
 
-        const extractedThreads = GRP.extractThreads(response);
-        const newThreads = _.chain(idPairs)
-          .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
-          .compact()
-          .value();
+        let newResponse;
         try {
-          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          const extractedThreads = GRP.extractThreads(response);
+          const newThreads: typeof extractedThreads = _.chain(idPairs)
+            .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
+            .compact()
+            .value();
+
+          newResponse = GRP.replaceThreadsInResponse(response, newThreads);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
             responseReplacementFailure: true,
-            //response: driver.getAppId() === 'streak' ? response : null,
+            //response: isStreakAppId(driver.getAppId()) ? response : null,
             idPairsLength: idPairs.length
           });
           const butterBar = driver.getButterBar()
@@ -172,7 +181,21 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
             // The original response will be used.
             driver.getPageCommunicator().setCustomListResults(newQuery, null);
           }
+          return;
         }
+
+        setTimeout(() => {
+          const errorBar = document.querySelector('.vY .vX.UC');
+          if (errorBar && errorBar.style.display !== 'none' && /#\d+/.test(errorBar.textContent)) {
+            const isStreak = true||isStreakAppId(driver.getAppId());
+            driver.getLogger().error(new Error('Gmail error with custom thread list'), {
+              message: errorBar.textContent,
+              idPairsLength: idPairs.length,
+              response: isStreak ? response : null,
+              newResponse: isStreak ? newResponse : null
+            });
+          }
+        }, 100);
       });
     });
 
