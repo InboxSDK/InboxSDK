@@ -163,10 +163,11 @@ class Logger {
       fn();
       setTimeout(() => {
         const now = Date.now();
-        this.eventSdkPassive('function performance result', (Object: any).assign({
+        this.eventSdkPassive('function performance result', {
           value: now - start,
-          timeSinceFirstLoad: now - FIRST_LOADED_TIME
-        }, details));
+          timeSinceFirstLoad: now - FIRST_LOADED_TIME,
+          ...details
+        });
       }, 10);
     }
     else{
