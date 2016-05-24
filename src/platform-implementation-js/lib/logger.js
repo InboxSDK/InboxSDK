@@ -159,19 +159,19 @@ class Logger {
 
   trackFunctionPerformance(fn: Function, sampleRate: number, options: Object) {
     if(Math.random() < sampleRate && (document: any).visibilityState === 'visible' && this._isMaster){
-			const start = Date.now();
-			fn();
-			setTimeout(() => {
+      const start = Date.now();
+      fn();
+      setTimeout(() => {
         const now = Date.now();
         _trackEvent(this._appId, 'sdkPassive', 'function performance result', Object.assign({
           value: now - start,
           timeSinceFirstLoad: now - FIRST_LOADED_TIME
         }, options));
-			}, 10);
-		}
-		else{
-			fn();
-		}
+      }, 10);
+    }
+    else{
+      fn();
+    }
   }
 }
 export default Logger;
