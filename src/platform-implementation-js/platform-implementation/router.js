@@ -40,7 +40,16 @@ class Router {
 			members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 		});
 
-		driver.getRouteViewDriverStream().onValue(routeViewDriver => _handleRouteViewChange(this, members, routeViewDriver));
+		driver.getRouteViewDriverStream().onValue(routeViewDriver => {
+			driver.getLogger().trackFunctionPerformance(
+				() => _handleRouteViewChange(this, members, routeViewDriver),
+				1,
+				{
+					type: 'handleRouteViewChange',
+					hash: routeViewDriver.getHash()
+				}
+			)
+		});
 
 		driver.getStopper().onValue(function() {
 			members.allRoutesHandlerRegistry.dumpHandlers();
@@ -155,7 +164,6 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.currentRouteViewDriver = routeViewDriver;
 	var routeView = new RouteView(routeViewDriver);
 	members.membraneMap.set(routeViewDriver, routeView);
-
 
 	_updateNavMenu(members, routeViewDriver);
 
