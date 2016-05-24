@@ -163,7 +163,7 @@ class Logger {
       fn();
       setTimeout(() => {
         const now = Date.now();
-        _trackEvent(this._appId, 'sdkPassive', 'function performance result', (Object: any).assign({
+        this.eventSdkPassive('function performance result', (Object: any).assign({
           value: now - start,
           timeSinceFirstLoad: now - FIRST_LOADED_TIME
         }, details));
