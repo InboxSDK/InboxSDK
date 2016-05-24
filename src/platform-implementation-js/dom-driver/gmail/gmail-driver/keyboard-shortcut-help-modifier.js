@@ -189,6 +189,8 @@ function _getAngledBracket(chordChar: string): string {
 			return '<Shift>';
 		case 'ctrl':
 			return '<Ctrl>';
+		case 'alt':
+			return '<Alt>';
 		case 'meta':
 		case 'command':
 			return '<⌘>';
