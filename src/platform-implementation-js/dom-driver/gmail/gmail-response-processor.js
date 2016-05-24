@@ -243,7 +243,9 @@ export function threadListSerialize(threadResponseArray: any[], options?: Messag
       response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
     } else {
       const prev = response;
-      response = response.replace(/"([0-9a-f]{16})"\]$/, "'$1']");
+      // A 16-digit hexadecimal string is usually at the end, but sometimes it
+      // has fewer digits.
+      response = response.replace(/"([0-9a-f]{8,16})"\]$/, "'$1']");
       if (response === prev) throw new Error("failed to change");
     }
   }
