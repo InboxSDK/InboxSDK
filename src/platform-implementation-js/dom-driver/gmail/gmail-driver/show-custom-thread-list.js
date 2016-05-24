@@ -8,6 +8,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
+import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
@@ -150,18 +151,20 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       ]).onValue(([idPairs, response]: [Array<{rfcId: string, gtid: string}>, string]) => {
         driver.signalCustomThreadListActivity(customRouteID);
 
-        const extractedThreads = GRP.extractThreads(response);
-        const newThreads: typeof extractedThreads = _.chain(idPairs)
-          .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
-          .compact()
-          .value();
+        let newResponse;
         try {
-          const newResponse = GRP.replaceThreadsInResponse(response, newThreads);
+          const extractedThreads = GRP.extractThreads(response);
+          const newThreads: typeof extractedThreads = _.chain(idPairs)
+            .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
+            .compact()
+            .value();
+
+          newResponse = GRP.replaceThreadsInResponse(response, newThreads);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
             responseReplacementFailure: true,
-            //response: driver.getAppId() === 'streak' ? response : null,
+            //response: isStreakAppId(driver.getAppId()) ? response : null,
             idPairsLength: idPairs.length
           });
           const butterBar = driver.getButterBar()
@@ -178,7 +181,21 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
             // The original response will be used.
             driver.getPageCommunicator().setCustomListResults(newQuery, null);
           }
+          return;
         }
+
+        setTimeout(() => {
+          const errorBar = document.querySelector('.vY .vX.UC');
+          if (errorBar && errorBar.style.display !== 'none' && /#\d+/.test(errorBar.textContent)) {
+            const isStreak = true||isStreakAppId(driver.getAppId());
+            driver.getLogger().error(new Error('Gmail error with custom thread list'), {
+              message: errorBar.textContent,
+              idPairsLength: idPairs.length,
+              response: isStreak ? response : null,
+              newResponse: isStreak ? newResponse : null
+            });
+          }
+        }, 100);
       });
     });
 
