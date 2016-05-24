@@ -157,16 +157,16 @@ class Logger {
     };
   }
 
-  trackFunctionPerformance(fn: Function, sampleRate: number, options: Object) {
+  trackFunctionPerformance(fn: Function, sampleRate: number, details: {type: string}&Object) {
     if(Math.random() < sampleRate && (document: any).visibilityState === 'visible' && this._isMaster){
       const start = Date.now();
       fn();
       setTimeout(() => {
         const now = Date.now();
-        _trackEvent(this._appId, 'sdkPassive', 'function performance result', Object.assign({
+        _trackEvent(this._appId, 'sdkPassive', 'function performance result', (Object: any).assign({
           value: now - start,
           timeSinceFirstLoad: now - FIRST_LOADED_TIME
-        }, options));
+        }, details));
       }, 10);
     }
     else{
