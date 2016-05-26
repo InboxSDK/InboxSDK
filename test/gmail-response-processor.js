@@ -110,6 +110,7 @@ describe('GmailResponseProcessor', function() {
       threads.push(threads.shift());
       const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), threads);
 
       // put them back
       threads.unshift(threads.pop());
@@ -126,6 +127,7 @@ describe('GmailResponseProcessor', function() {
       threads.push(threads.shift());
       const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), threads);
 
       // put them back
       threads.unshift(threads.pop());
@@ -143,6 +145,7 @@ describe('GmailResponseProcessor', function() {
       threads.push(threads.shift());
       const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), threads);
 
       // put them back
       threads.unshift(threads.pop());
@@ -184,6 +187,7 @@ describe('GmailResponseProcessor', function() {
       threads.push(threads.shift());
       const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), threads);
 
       // put them back
       threads.unshift(threads.pop());
@@ -211,6 +215,7 @@ describe('GmailResponseProcessor', function() {
       threads.push(threads.shift());
       const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads);
       assert.notEqual(swapped, data.input);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), threads);
 
       // put them back
       threads.unshift(threads.pop());
