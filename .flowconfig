@@ -16,7 +16,6 @@ dist/
 .*/node_modules/builtin-modules/.*
 .*/node_modules/spdx-.*/.*
 .*/node_modules/.*/\(test\|lib\|example\|samplejson\|tables\)/.*\.json
-.*/test/data/.*\.json
 
 [libs]
 flow-libs/
