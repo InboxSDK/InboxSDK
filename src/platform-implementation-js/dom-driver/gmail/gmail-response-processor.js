@@ -418,6 +418,15 @@ it all back together.
     newTbs,
     postTbGroups
   ]);
+
+  const allSections = _.flatten(parsedNew);
+  const endSection = _.last(allSections);
+
+  if (endSection[0] !== 'e') {
+    throw new Error("Failed to find end section");
+  }
+  endSection[1] = allSections.length;
+
   const fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
   return serialize(fullNew, options);
 }

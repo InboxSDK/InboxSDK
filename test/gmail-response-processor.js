@@ -160,11 +160,6 @@ describe('GmailResponseProcessor', function() {
       const emptied = GmailResponseProcessor.replaceThreadsInResponse(data.input, []);
       const emptiedThreads = GmailResponseProcessor.extractThreads(emptied);
       assert.strictEqual(emptiedThreads.length, 0);
-
-      const refilled = GmailResponseProcessor.replaceThreadsInResponse(emptied, threads);
-      const refilledThreads = GmailResponseProcessor.extractThreads(refilled);
-      assert.deepEqual(refilledThreads, threads);
-      //assert.strictEqual(refilled, data.input);
     });
 
     it('works on empty responses', function() {
@@ -220,6 +215,39 @@ describe('GmailResponseProcessor', function() {
       // put them back
       threads.unshift(threads.pop());
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads), data.input);
+    });
+
+    it("fixes the end marker's section count", function() {
+      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      {
+        const deserialized = GmailResponseProcessor.deserialize(data.input).value;
+        const endSection = _.last(_.last(deserialized));
+        assert.strictEqual(endSection[0], 'e');
+        assert.strictEqual(endSection[1], 12);
+      }
+
+      const threads = GmailResponseProcessor.extractThreads(data.input);
+      assert.strictEqual(threads.length, 2);
+
+      // Gmail responses have sections of 10 thread rows each.
+      // Replace the 2 threads with 12 threads, so that we add a new section.
+
+      const moreThreads = _.chain()
+        .range(6)
+        .map(() => threads)
+        .flatten()
+        .value();
+      assert.strictEqual(moreThreads.length, 12);
+
+      const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, moreThreads);
+      assert.deepEqual(GmailResponseProcessor.extractThreads(swapped), moreThreads);
+
+      {
+        const deserialized = GmailResponseProcessor.deserialize(swapped).value;
+        const endSection = _.last(_.last(deserialized));
+        assert.strictEqual(endSection[0], 'e');
+        assert.strictEqual(endSection[1], 13);
+      }
     });
   });
 
