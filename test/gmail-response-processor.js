@@ -11,6 +11,13 @@ import co from 'co';
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import disallowEval from './lib/disallow-eval';
 
+function readJSONnullToUndefined(filename) {
+  return JSON.parse(
+    fs.readFileSync(filename, 'utf8'),
+    (k, v) => v == null ? undefined : v
+  );
+}
+
 describe('GmailResponseProcessor', function() {
   disallowEval();
 
@@ -26,12 +33,22 @@ describe('GmailResponseProcessor', function() {
         "check double quote surrounded by single quotes (in double quote parts) isn't escaped");
       assert.strictEqual(r('"a\\\\\\\\\\"b"'), '"a\\\\\\\\\\"b"', 'escape testing 1');
       assert.strictEqual(r('\'a\\\\\\\\"b\''), '"a\\\\\\\\\\"b"', 'escape testing 2');
+      assert.strictEqual(r("'\\'a'"), '"\'a"',
+        'escaped single quote in single quotes is unescaped');
+    });
+  });
+
+  describe('deserializeArray', function() {
+    it('works', function() {
+      const input = `["a'\\"123[,,]",,,'\\'"123[,,]',456,[,\n,3],]`;
+      const decoded = GmailResponseProcessor.deserializeArray(input);
+      assert.deepEqual(decoded, ["a'\"123[,,]",,,'\'"123[,,]',456,[,,3],]);
     });
   });
 
   describe('serialization', function() {
     it('message send response', function() {
-      const data = require('./data/gmail-response-processor/send-response.json');
+      const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/send-response.json');
 
       const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
@@ -42,7 +59,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('suggestions', function() {
-      const data = require('./data/gmail-response-processor/suggestions.json');
+      const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/suggestions.json');
 
       const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
@@ -53,9 +70,10 @@ describe('GmailResponseProcessor', function() {
 
     it('can deserialize huge messages', function() {
       this.slow();
-      const message = `['${_.repeat('a', 8000000)}']`;
+      const message = `)]}'\n\n['${_.repeat('a', 8000000)}']\n`;
+      assert.strictEqual(message.length, 8000011);
+
       const decoded = GmailResponseProcessor.deserialize(message).value;
-      assert.strictEqual(message.length, 8000004);
     });
 
     it('noArrayNewLines 1', function() {
@@ -67,6 +85,13 @@ describe('GmailResponseProcessor', function() {
 
     it('noArrayNewLines 2', function() {
       const data = require('./data/gmail-response-processor/search-response-archive2.json');
+      const {value, options} = GmailResponseProcessor.deserialize(data.input);
+      const reserialized = GmailResponseProcessor.serialize(value, options);
+      assert.strictEqual(reserialized, data.input);
+    });
+
+    it('works on one-chunk message', function() {
+      const data = require('./data/gmail-response-processor/one-chunk-message.json');
       const {value, options} = GmailResponseProcessor.deserialize(data.input);
       const reserialized = GmailResponseProcessor.serialize(value, options);
       assert.strictEqual(reserialized, data.input);

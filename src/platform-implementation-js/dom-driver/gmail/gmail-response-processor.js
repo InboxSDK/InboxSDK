@@ -106,10 +106,12 @@ export function rewriteSingleQuotes(s: string): string {
       if (nextSingleQuoteIndex < 0) {
         throw new Error("Unclosed single quote");
       }
-      // Escape all double-quotes inside the part, and then write it out
-      // into the result with the ending single-quote replaced with a
-      // double-quote.
-      const part = s.slice(i,nextSingleQuoteIndex).replace(/"/g, '\\"');
+      // Escape all double-quotes inside the part, un-escape all single-quotes
+      // inside the part, and then write it out into the result with the ending
+      // single-quote replaced with a double-quote.
+      const part = s.slice(i,nextSingleQuoteIndex)
+        .replace(/"/g, '\\"')
+        .replace(/\\'/g, "'");
       resultParts.push(part);
       resultParts.push('"');
       i = nextSingleQuoteIndex + 1;
@@ -145,47 +147,55 @@ export type MessageOptions = {
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
-  let options = {
+  const options = {
     includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
     noArrayNewLines: !/^[,\]]/m.test(threadResponseString)
   };
-  let VIEW_DATA = threadResponseString.substring(
-    threadResponseString.indexOf('['), threadResponseString.lastIndexOf(']')+1);
 
-  VIEW_DATA = VIEW_DATA.replace(/[\r\n\t]/g, '');
+  const value = [];
 
-  // Change all the singly quoted parts to use double-quotes so that the
-  // data can be JSON-decoded instead of eval'd. (Also necessary for the
-  // next step.)
-  VIEW_DATA = rewriteSingleQuotes(VIEW_DATA);
-
-  // Fix some things with the data. (It's in a weird minified JSON-like
-  // format). Make sure we don't modify any data inside of strings!
-  VIEW_DATA = transformUnquotedSections(VIEW_DATA, match => {
-    const beforeNumberStrip = match;
-    match = match
-      .replace(/\]\d+\[/g, '],['); // ignore those length values
-    if (match !== beforeNumberStrip) {
-      options.includeLengths = true;
+  let pos;
+  if (options.suggestionMode) {
+    pos = threadResponseString.indexOf('\'\n');
+    if (pos === -1) {
+      throw new Error("Message was missing beginning header");
     }
-    match = match
-      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-      .replace(/\[\s*(?=,)/g, '[null'); // "
-    return match;
-  });
-
-  VIEW_DATA = '[' + VIEW_DATA + ']';
-
-  var vData;
-  try {
-    vData = (JSON.parse(VIEW_DATA): any[]);
-  }
-  catch(err){
-    throw new Error('deserialization error');
+    pos += 2;
+  } else {
+    pos = threadResponseString.indexOf('\n\n');
+    if (pos === -1) {
+      throw new Error("Message was missing beginning newlines");
+    }
+    pos += 2;
   }
 
-  return {value: vData, options};
+  while (pos < threadResponseString.length) {
+    let lineEnd = threadResponseString.indexOf('\n', pos+1);
+    if (lineEnd === -1) {
+      lineEnd = threadResponseString.length;
+    } else if (threadResponseString[lineEnd-1] === '\r') {
+      // seriously Gmail is crazy. The chunk length only sometimes includes the
+      // newline after the chunk length.
+      lineEnd += 1;
+    }
+
+    const line = threadResponseString.slice(pos, lineEnd);
+    let dataLine;
+    if (/^\d+\s*$/.test(line)) {
+      options.includeLengths = true;
+      const length = +line;
+      dataLine = threadResponseString.slice(lineEnd, lineEnd+length);
+      pos = lineEnd+length;
+    } else {
+      dataLine = threadResponseString.slice(pos);
+      pos = threadResponseString.length;
+    }
+
+    value.push(deserializeArray(dataLine));
+  }
+
+  return {value, options};
 }
 
 function transformUnquotedSections(str: string, cb: (str: string) => string): string {
@@ -207,6 +217,29 @@ function transformUnquotedSections(str: string, cb: (str: string) => string): st
   }
   parts.push(cb(str.slice(position)));
   return parts.join('');
+}
+
+export function deserializeArray(value: string): any[] {
+  value = value.replace(/[\r\n\t]/g, '');
+
+  // Change all the singly quoted parts to use double-quotes so that the
+  // data can be JSON-decoded instead of eval'd. (Also necessary for the
+  // next step.)
+  value = rewriteSingleQuotes(value);
+
+  // Fix some things with the data. (It's in a weird minified JSON-like
+  // format). Make sure we don't modify any data inside of strings!
+  value = transformUnquotedSections(value, match =>
+    match
+      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
+      .replace(/\[\s*(?=,)/g, '[null') // "
+  );
+
+  try {
+    return JSON.parse(value, (k, v) => v == null ? undefined : v);
+  } catch(err) {
+    throw new Error('deserialization error');
+  }
 }
 
 export function serialize(value: any[], options: MessageOptions): string {
@@ -432,11 +465,14 @@ it all back together.
 }
 
 export function extractThreads(response: string): Thread[] {
-  var crapFormatThreads = deserialize(response).value;
-  if (crapFormatThreads.length === 1 && crapFormatThreads[0].length === 2 && typeof crapFormatThreads[0][1] === 'string') {
-    crapFormatThreads = [crapFormatThreads[0][0]];
+  return extractThreadsFromDeserialized(deserialize(response).value);
+}
+
+export function extractThreadsFromDeserialized(value: any[]): Thread[] {
+  if (value.length === 1 && value[0].length === 2 && typeof value[0][1] === 'string') {
+    value = [value[0][0]];
   }
-  return _extractThreadArraysFromResponseArray(crapFormatThreads).map(thread =>
+  return _extractThreadArraysFromResponseArray(value).map(thread =>
     Object.freeze((Object:any).defineProperty({
       subject: htmlToText(thread[9]),
       shortDate: htmlToText(thread[14]),

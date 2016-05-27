@@ -29,9 +29,11 @@ export function setup() {
 }
 
 export function processThreadListResponse(threadListResponse: string) {
-  GmailResponseProcessor.extractThreads(threadListResponse).forEach(thread => {
-    storeThreadMetadata(thread);
-  });
+  processThreads(GmailResponseProcessor.extractThreads(threadListResponse));
+}
+
+function processThreads(threads: GmailResponseProcessor.Thread[]) {
+  threads.forEach(storeThreadMetadata);
 }
 
 var AMBIGUOUS = Marker('ABIGUOUS');
@@ -52,13 +54,20 @@ function threadMetadataKey(threadRowMetadata: threadRowParser.ThreadRowMetadata)
 }
 
 function processPreloadedThreads() {
-  var preloadScript = _.find(document.querySelectorAll('script:not([src])'), function(script) {
-    return script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1;
-  });
+  const preloadScript = _.find(document.querySelectorAll('script:not([src])'), script =>
+    script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1
+  );
   if (!preloadScript) {
     logger.error(new Error("Could not read preloaded VIEW_DATA"));
   } else {
-    processThreadListResponse(preloadScript.text);
+    const firstBracket = preloadScript.text.indexOf('[');
+    const lastBracket = preloadScript.text.lastIndexOf(']');
+    const viewDataString = preloadScript.text.slice(firstBracket, lastBracket+1);
+    processThreads(
+      GmailResponseProcessor.extractThreadsFromDeserialized(
+        [GmailResponseProcessor.deserializeArray(viewDataString)]
+      )
+    );
   }
 }
 
