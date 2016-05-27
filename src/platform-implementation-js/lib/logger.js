@@ -47,6 +47,7 @@ function getAllAppIds(): string[] {
 }
 
 var _trackedEventsQueue = new PersistentQueue('events');
+const FIRST_LOADED_TIME = Date.now();
 
 export type AppLogger = {
   error(err: Error, details?: any): void;
@@ -154,6 +155,24 @@ class Logger {
       error: (err, details) => this.errorApp(err, details),
       event: (name, details) => this.eventApp(name, details)
     };
+  }
+
+  trackFunctionPerformance(fn: Function, sampleRate: number, details: {type: string}&Object) {
+    if(Math.random() < sampleRate && (document: any).visibilityState === 'visible' && this._isMaster){
+      const start = Date.now();
+      fn();
+      setTimeout(() => {
+        const now = Date.now();
+        this.eventSdkPassive('function performance result', {
+          value: now - start,
+          timeSinceFirstLoad: now - FIRST_LOADED_TIME,
+          ...details
+        });
+      }, 10);
+    }
+    else{
+      fn();
+    }
   }
 }
 export default Logger;

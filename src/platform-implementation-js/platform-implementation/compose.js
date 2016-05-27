@@ -32,7 +32,12 @@ class Compose {
     );
 
     members.composeViewStream.onValue(view => {
-      members.handlerRegistry.addTarget(view);
+      driver.getLogger().trackFunctionPerformance(() => {
+        members.handlerRegistry.addTarget(view);
+      }, 1, {
+        type: 'composeViewHandler',
+        isInlineReplyForm: view.isInlineReplyForm()
+      })
     });
   }
 
