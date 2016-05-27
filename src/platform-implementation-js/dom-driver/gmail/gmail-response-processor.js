@@ -243,10 +243,9 @@ export function threadListSerialize(threadResponseArray: any[], options?: Messag
       response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
     } else {
       const prev = response;
-      // A 16-digit hexadecimal string is usually at the end, but sometimes it
+      // A 16-digit hexadecimal string is often at the end, but sometimes it
       // has fewer digits.
       response = response.replace(/"([0-9a-f]{8,16})"\]$/, "'$1']");
-      if (response === prev) throw new Error("failed to change");
     }
   }
 
@@ -419,6 +418,15 @@ it all back together.
     newTbs,
     postTbGroups
   ]);
+
+  const allSections = _.flatten(parsedNew);
+  const endSection = _.last(allSections);
+
+  if (endSection[0] !== 'e') {
+    throw new Error("Failed to find end section");
+  }
+  endSection[1] = allSections.length;
+
   const fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
   return serialize(fullNew, options);
 }
