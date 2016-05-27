@@ -40,9 +40,9 @@ describe('GmailResponseProcessor', function() {
 
   describe('deserializeArray', function() {
     it('works', function() {
-      const input = `["a'\\"123[,,]",,,'\\'"123[,,]',456,[,\n,3],]`;
+      const input = `["a'\\"123[,,]",,,'\\'"123[,,]',456,[,\n,3]]`;
       const decoded = GmailResponseProcessor.deserializeArray(input);
-      assert.deepEqual(decoded, ["a'\"123[,,]",,,'\'"123[,,]',456,[,,3],]);
+      assert.deepEqual(decoded, ["a'\"123[,,]",,,'\'"123[,,]',456,[,,3]]);
     });
   });
 
