@@ -1,34 +1,35 @@
-var assign = require('lodash/object/assign');
-var logError = require('../common/log-error');
+/* @flow */
 
-var PlatformImplementationLoader = require('./loading/platform-implementation-loader');
-var checkRequirements = require('./check-requirements');
-var BUILD_VERSION = require('../common/version').BUILD_VERSION;
+import assign from 'lodash/object/assign';
+import logError from '../common/log-error';
 
-var InboxSDK = {
-  LOADER_VERSION: BUILD_VERSION
+import PlatformImplementationLoader from './loading/platform-implementation-loader';
+import checkRequirements from './check-requirements';
+import {BUILD_VERSION} from '../common/version';
+import loadScript from '../common/load-script';
+
+const InboxSDK = {
+  LOADER_VERSION: BUILD_VERSION,
+  loadScript,
+  load(version: any, appId: string, opts: ?Object) {
+    opts = assign({
+      // defaults
+      globalErrorLogging: true
+    }, opts, {
+      // stuff that can't be overridden, such as extra stuff this file passes to
+      // the implementation script.
+      VERSION: InboxSDK.LOADER_VERSION,
+      REQUESTED_API_VERSION: version
+    });
+
+    checkRequirements(opts);
+
+    return PlatformImplementationLoader.load(appId, opts);
+  }
 };
-
-InboxSDK.load = function(version, appId, opts){
-  opts = assign({
-    // defaults
-    globalErrorLogging: true
-  }, opts, {
-    // stuff that can't be overridden, such as extra stuff this file passes to
-    // the implementation script.
-    VERSION: InboxSDK.LOADER_VERSION,
-    REQUESTED_API_VERSION: version
-  });
-
-  checkRequirements(opts);
-
-  return PlatformImplementationLoader.load(appId, opts);
-};
-
-InboxSDK.loadScript = require('../common/load-script');
 
 if (['https://mail.google.com', 'https://inbox.google.com'].indexOf(document.location.origin) != -1) {
   PlatformImplementationLoader.preload();
 }
 
-module.exports = InboxSDK;
+export default InboxSDK;
