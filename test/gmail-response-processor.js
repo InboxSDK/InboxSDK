@@ -39,10 +39,21 @@ describe('GmailResponseProcessor', function() {
   });
 
   describe('deserializeArray', function() {
-    it('works', function() {
-      const input = `["a'\\"123[,,]",,,'\\'"123[,,]',456,[,\n,3]]`;
+    it('handles quotes', function() {
+      const input = `["a'\\"123[,,]",'\\'"123[,,]',456,[3\n]]`;
       const decoded = GmailResponseProcessor.deserializeArray(input);
-      assert.deepEqual(decoded, ["a'\"123[,,]",,,'\'"123[,,]',456,[,,3]]);
+      assert.deepEqual(decoded, ["a'\"123[,,]",'\'"123[,,]',456,[3]]);
+    });
+
+    it('handles implied nulls', function() {
+      const input = `[5,'a',,,6]`;
+      const decoded = GmailResponseProcessor.deserializeArray(input);
+
+      const expected = [5,'a',,,6];
+      assert.strictEqual(decoded.length, expected.length);
+      for (let i=0; i < expected.length; i++) {
+        assert.strictEqual(decoded[i], expected[i], `decoded[${i}]`);
+      }
     });
   });
 
