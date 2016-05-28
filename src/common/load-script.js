@@ -8,13 +8,10 @@ import logError from './log-error';
 import ajax from './ajax';
 import delay from './delay';
 
-declare var chrome: ?Object;
-declare var safari: ?Object;
-
 const isContentScript: () => boolean = once(function() {
-  if (typeof chrome != 'undefined' && chrome && chrome.extension)
+  if (global.chrome && global.chrome.extension)
     return true;
-  if (typeof safari != 'undefined' && safari && safari.extension)
+  if (global.safari && global.safari.extension)
     return true;
   return false;
 });
@@ -45,11 +42,12 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   return promise;
 }
 
-export type loadScriptOpts = {
+export type LoadScriptOpts = {
   nowrap?: boolean;
+  disableSourceMappingURL?: boolean;
 };
 
-export default function loadScript(url: string, opts?: loadScriptOpts): Promise<void> {
+export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<void> {
   let pr;
   if (isContentScript()) {
     function attempt(retryNum: number, lastErr: ?Error): Promise<void> {
@@ -75,12 +73,20 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
         //    current scope. (Seriously, it's a javascript thing.)
         let code = response.text;
         const indirectEval = eval;
+
+        if (opts && opts.disableSourceMappingURL) {
+          code = code.replace(/\/\/# sourceMappingURL=.*\n?$/, '');
+        }
+
         if (!opts || !opts.nowrap) {
           code = "(function(){"+code+"\n});";
         }
+
+        code += "\n//# sourceURL="+url+"\n";
+
         let program;
         try {
-          program = indirectEval(code+"\n//# sourceURL="+url+"\n");
+          program = indirectEval(code);
         } catch(err) {
           if (err && err.name === 'SyntaxError') {
             logError(err, {
