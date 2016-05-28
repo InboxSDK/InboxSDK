@@ -195,7 +195,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
               newResponse: isStreak ? newResponse : null
             });
           }
-        }, 100);
+        }, 1000);
       });
     });
 

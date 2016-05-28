@@ -11,7 +11,12 @@ import co from 'co';
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import disallowEval from './lib/disallow-eval';
 
-const loadJSON = require;
+function readJSONnullToUndefined(filename) {
+  return JSON.parse(
+    fs.readFileSync(filename, 'utf8'),
+    (k, v) => v == null ? undefined : v
+  );
+}
 
 describe('GmailResponseProcessor', function() {
   disallowEval();
@@ -28,12 +33,33 @@ describe('GmailResponseProcessor', function() {
         "check double quote surrounded by single quotes (in double quote parts) isn't escaped");
       assert.strictEqual(r('"a\\\\\\\\\\"b"'), '"a\\\\\\\\\\"b"', 'escape testing 1');
       assert.strictEqual(r('\'a\\\\\\\\"b\''), '"a\\\\\\\\\\"b"', 'escape testing 2');
+      assert.strictEqual(r("'\\'a'"), '"\'a"',
+        'escaped single quote in single quotes is unescaped');
+    });
+  });
+
+  describe('deserializeArray', function() {
+    it('handles quotes', function() {
+      const input = `["a'\\"123[,,]",'\\'"123[,,]',456,[3\n]]`;
+      const decoded = GmailResponseProcessor.deserializeArray(input);
+      assert.deepEqual(decoded, ["a'\"123[,,]",'\'"123[,,]',456,[3]]);
+    });
+
+    it('handles implied nulls', function() {
+      const input = `[5,'a',,,6]`;
+      const decoded = GmailResponseProcessor.deserializeArray(input);
+
+      const expected = [5,'a',,,6];
+      assert.strictEqual(decoded.length, expected.length);
+      for (let i=0; i < expected.length; i++) {
+        assert.strictEqual(decoded[i], expected[i], `decoded[${i}]`);
+      }
     });
   });
 
   describe('serialization', function() {
     it('message send response', function() {
-      const data = loadJSON('./data/gmail-response-processor/send-response.json');
+      const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/send-response.json');
 
       const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
@@ -44,7 +70,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('suggestions', function() {
-      const data = loadJSON('./data/gmail-response-processor/suggestions.json');
+      const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/suggestions.json');
 
       const decoded = GmailResponseProcessor.deserialize(data.input).value;
       assert.deepEqual(decoded, data.output, 'deserialize test');
@@ -55,20 +81,28 @@ describe('GmailResponseProcessor', function() {
 
     it('can deserialize huge messages', function() {
       this.slow();
-      const message = `['${_.repeat('a', 8000000)}']`;
+      const message = `)]}'\n\n['${_.repeat('a', 8000000)}']\n`;
+      assert.strictEqual(message.length, 8000011);
+
       const decoded = GmailResponseProcessor.deserialize(message).value;
-      assert.strictEqual(message.length, 8000004);
     });
 
     it('noArrayNewLines 1', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-new.json');
+      const data = require('./data/gmail-response-processor/search-response-new.json');
       const {value, options} = GmailResponseProcessor.deserialize(data.input);
       const reserialized = GmailResponseProcessor.serialize(value, options);
       assert.strictEqual(reserialized, data.input);
     });
 
     it('noArrayNewLines 2', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-archive2.json');
+      const data = require('./data/gmail-response-processor/search-response-archive2.json');
+      const {value, options} = GmailResponseProcessor.deserialize(data.input);
+      const reserialized = GmailResponseProcessor.serialize(value, options);
+      assert.strictEqual(reserialized, data.input);
+    });
+
+    it('works on one-chunk message', function() {
+      const data = require('./data/gmail-response-processor/one-chunk-message.json');
       const {value, options} = GmailResponseProcessor.deserialize(data.input);
       const reserialized = GmailResponseProcessor.serialize(value, options);
       assert.strictEqual(reserialized, data.input);
@@ -77,13 +111,13 @@ describe('GmailResponseProcessor', function() {
 
   describe('readDraftId', function() {
     it("works on standalone response", function() {
-      const data = loadJSON('./data/gmail-response-processor/draft-response.json');
+      const data = require('./data/gmail-response-processor/draft-response.json');
       const draftId = GmailResponseProcessor.readDraftId(data.input, '15183c01ef55eefe');
       assert.strictEqual(draftId, '1520030853245562622');
     });
 
     it("works on reply response", function() {
-      const data = loadJSON('./data/gmail-response-processor/draft-reply-response.json');
+      const data = require('./data/gmail-response-processor/draft-reply-response.json');
       const draftId = GmailResponseProcessor.readDraftId(data.input, '1518401ace55c655');
       assert.strictEqual(draftId, '1520035358112597589');
     });
@@ -91,7 +125,7 @@ describe('GmailResponseProcessor', function() {
 
   describe('extractThreads', function() {
     it('works', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response.json');
+      const data = require('./data/gmail-response-processor/search-response.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.deepEqual(threads, data.output, 'deserialize test');
     });
@@ -101,7 +135,7 @@ describe('GmailResponseProcessor', function() {
     it('seems to work', function() {
       this.slow(100);
 
-      const data = loadJSON('./data/gmail-response-processor/search-response.json');
+      const data = require('./data/gmail-response-processor/search-response.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
@@ -118,7 +152,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('works with small number of threads', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      const data = require('./data/gmail-response-processor/search-response-small.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.strictEqual(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads), data.input);
@@ -135,7 +169,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('works on responses with empty last part', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-empty-last-part.json');
+      const data = require('./data/gmail-response-processor/search-response-empty-last-part.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.strictEqual(threads.length, 2);
 
@@ -153,7 +187,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('can empty a response', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      const data = require('./data/gmail-response-processor/search-response-small.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.strictEqual(threads.length, 2);
 
@@ -163,7 +197,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it('works on empty responses', function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-empty.json');
+      const data = require('./data/gmail-response-processor/search-response-empty.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
       assert(Array.isArray(threads));
       assert.strictEqual(threads.length, 0);
@@ -172,7 +206,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it("works on action responses", function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-archive.json');
+      const data = require('./data/gmail-response-processor/search-response-archive.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.notEqual(threads.length, 0);
@@ -190,7 +224,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it("works on newer response", function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-new.json');
+      const data = require('./data/gmail-response-processor/search-response-new.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
       assert.strictEqual(threads.length, 1);
 
@@ -200,7 +234,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it("works on newer action responses", function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-archive2.json');
+      const data = require('./data/gmail-response-processor/search-response-archive2.json');
       const threads = GmailResponseProcessor.extractThreads(data.input);
 
       assert.notEqual(threads.length, 0);
@@ -218,7 +252,7 @@ describe('GmailResponseProcessor', function() {
     });
 
     it("fixes the end marker's section count", function() {
-      const data = loadJSON('./data/gmail-response-processor/search-response-small.json');
+      const data = require('./data/gmail-response-processor/search-response-small.json');
       {
         const deserialized = GmailResponseProcessor.deserialize(data.input).value;
         const endSection = _.last(_.last(deserialized));
