@@ -75,7 +75,8 @@ export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<
         const indirectEval = eval;
 
         if (opts && opts.disableSourceMappingURL) {
-          code = code.replace(/\/\/# sourceMappingURL=.*\n?$/, '');
+          // Don't remove a data: URI sourcemap
+          code = code.replace(/\/\/# sourceMappingURL=[\n:]*\n?$/, '');
         }
 
         if (!opts || !opts.nowrap) {
