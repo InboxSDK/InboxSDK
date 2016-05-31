@@ -71,23 +71,28 @@ export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<
         // A: Using the eval value rather than the eval keyword causes the
         //    code passed to it to be run in the global scope instead of the
         //    current scope. (Seriously, it's a javascript thing.)
-        let code = response.text;
+        const originalCode = response.text;
         const indirectEval = eval;
 
+        let codeParts = [];
         if (opts && opts.disableSourceMappingURL) {
           // Don't remove a data: URI sourcemap
-          code = code.replace(/\/\/# sourceMappingURL=[\n:]*\n?$/, '');
+          codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=[\n:]*\n?$/, ''));
+        } else {
+          codeParts.push(originalCode);
         }
 
         if (!opts || !opts.nowrap) {
-          code = "(function(){"+code+"\n});";
+          codeParts.unshift("(function(){");
+          codeParts.push("\n});");
         }
 
-        code += "\n//# sourceURL="+url+"\n";
+        codeParts.push("\n//# sourceURL="+url+"\n");
 
+        const codeToRun = codeParts.join('');
         let program;
         try {
-          program = indirectEval(code);
+          program = indirectEval(codeToRun);
         } catch(err) {
           if (err && err.name === 'SyntaxError') {
             logError(err, {
