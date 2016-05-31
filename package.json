@@ -67,5 +67,5 @@
     "start": "gulp default --single --watch --reloader",
     "test": "gulp test"
   },
-  "version": "0.7.16"
+  "version": "0.7.17"
 }
