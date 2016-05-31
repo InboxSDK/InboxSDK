@@ -8,13 +8,35 @@ import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chun
 
 var fs = require('fs');
 
-var injectScript: () => Promise = _.once(function() {
+// Returns a promise that resolves once the injected script has been injected
+// and has done its initial load stuff.
+const injectScript: () => Promise = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
-    var url = 'https://www.inboxsdk.com/build/injected.js';
+    const url = 'https://www.inboxsdk.com/build/injected.js';
 
-    var script = document.createElement('script');
+    const script = document.createElement('script');
     script.type = 'text/javascript';
-    script.text = fs.readFileSync(__dirname+'/../../../dist/injected.js', 'utf8')+'\n//# sourceURL='+url+'\n';
+
+    const originalCode = fs.readFileSync(__dirname+'/../../../dist/injected.js', 'utf8');
+    let disableSourceMappingURL = true;
+    try {
+      disableSourceMappingURL = localStorage.getItem('inboxsdk__enable_sourcemap') !== 'true';
+    } catch(err) {
+      console.error(err);
+    }
+
+    let codeParts = [];
+    if (disableSourceMappingURL) {
+      // Don't remove a data: URI sourcemap (used in dev)
+      codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, ''));
+    } else {
+      codeParts.push(originalCode);
+    }
+    codeParts.push('\n//# sourceURL='+url+'\n');
+
+    const codeToRun = codeParts.join('');
+    script.text = codeToRun;
+
     document.head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', 'true');
   }

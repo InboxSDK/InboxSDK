@@ -8,13 +8,10 @@ import logError from './log-error';
 import ajax from './ajax';
 import delay from './delay';
 
-declare var chrome: ?Object;
-declare var safari: ?Object;
-
 const isContentScript: () => boolean = once(function() {
-  if (typeof chrome != 'undefined' && chrome && chrome.extension)
+  if (global.chrome && global.chrome.extension)
     return true;
-  if (typeof safari != 'undefined' && safari && safari.extension)
+  if (global.safari && global.safari.extension)
     return true;
   return false;
 });
@@ -45,11 +42,15 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   return promise;
 }
 
-export type loadScriptOpts = {
+export type LoadScriptOpts = {
+  // By default, the script is executed within a function, so that top-level
+  // variables defined in it don't become global variables. Setting nowrap to
+  // true disables this behavior.
   nowrap?: boolean;
+  disableSourceMappingURL?: boolean;
 };
 
-export default function loadScript(url: string, opts?: loadScriptOpts): Promise<void> {
+export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<void> {
   let pr;
   if (isContentScript()) {
     function attempt(retryNum: number, lastErr: ?Error): Promise<void> {
@@ -73,14 +74,28 @@ export default function loadScript(url: string, opts?: loadScriptOpts): Promise<
         // A: Using the eval value rather than the eval keyword causes the
         //    code passed to it to be run in the global scope instead of the
         //    current scope. (Seriously, it's a javascript thing.)
-        let code = response.text;
+        const originalCode = response.text;
         const indirectEval = eval;
-        if (!opts || !opts.nowrap) {
-          code = "(function(){"+code+"\n});";
+
+        let codeParts = [];
+        if (opts && opts.disableSourceMappingURL) {
+          // Don't remove a data: URI sourcemap (used in dev)
+          codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, ''));
+        } else {
+          codeParts.push(originalCode);
         }
+
+        if (!opts || !opts.nowrap) {
+          codeParts.unshift("(function(){");
+          codeParts.push("\n});");
+        }
+
+        codeParts.push("\n//# sourceURL="+url+"\n");
+
+        const codeToRun = codeParts.join('');
         let program;
         try {
-          program = indirectEval(code+"\n//# sourceURL="+url+"\n");
+          program = indirectEval(codeToRun);
         } catch(err) {
           if (err && err.name === 'SyntaxError') {
             logError(err, {

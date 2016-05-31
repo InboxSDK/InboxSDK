@@ -176,6 +176,18 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 			loadedAppIds.add(appId);
 			logger.eventSdkPassive('load');
 		}
+
+		// Enable sourcemaps on future loads by default for Streak employees.
+		try {
+			if (
+				/@streak\.com$/.test(driver.getUserEmailAddress()) &&
+				!localStorage.getItem('inboxsdk__enable_sourcemap')
+			) {
+				localStorage.setItem('inboxsdk__enable_sourcemap', 'true');
+			}
+		} catch(err) {
+			console.error(err);
+		}
 		return pi;
 	});
 }
