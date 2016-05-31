@@ -372,7 +372,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 
 	_setupThreadRowViewDriverKefirStream() {
 		this._threadRowViewDriverKefirStream = this._rowListViewDriverStream
-												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())												
+												.flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())
 												.takeUntilBy(this._stopper);
 	}
 
