@@ -33,6 +33,7 @@ var PlatformImplementationLoader = {
     }
 
     return loadScript((process.env.IMPLEMENTATION_URL:any), {
+      nowrap: true, // platform-implementation has no top-level vars so no need for function wrapping
       disableSourceMappingURL
     });
   }),
