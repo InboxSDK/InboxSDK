@@ -79,8 +79,8 @@ export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<
 
         let codeParts = [];
         if (opts && opts.disableSourceMappingURL) {
-          // Don't remove a data: URI sourcemap
-          codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=[\n:]*\n?$/, ''));
+          // Don't remove a data: URI sourcemap (used in dev)
+          codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, ''));
         } else {
           codeParts.push(originalCode);
         }

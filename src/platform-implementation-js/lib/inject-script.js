@@ -27,8 +27,8 @@ const injectScript: () => Promise = _.once(function() {
 
     let codeParts = [];
     if (disableSourceMappingURL) {
-      // Don't remove a data: URI sourcemap
-      codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=[\n:]*\n?$/, ''));
+      // Don't remove a data: URI sourcemap (used in dev)
+      codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, ''));
     } else {
       codeParts.push(originalCode);
     }
