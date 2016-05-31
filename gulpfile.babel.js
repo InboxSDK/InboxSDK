@@ -129,7 +129,7 @@ function browserifyTask(name, deps, entry, destname) {
     let bundler = browserify({
       entries: entry,
       debug: true,
-      cache: {}, packageCache: {}, fullPaths: args.watch
+      cache: {}, packageCache: {}
     }).transform(babelify).transform(envify({
       NODE_ENV: args.production ? 'production' : 'development',
       IMPLEMENTATION_URL: args.production ?
