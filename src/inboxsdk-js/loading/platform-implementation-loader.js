@@ -1,7 +1,6 @@
 /* @flow */
 //jshint ignore:start
 
-const assign = require('lodash/object/assign');
 const once = require('lodash/function/once');
 import loadScript from '../../common/load-script';
 
