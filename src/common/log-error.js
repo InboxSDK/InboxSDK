@@ -67,7 +67,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", loaderVersion]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", implVersion]);
 
-    console.error(...stuffToLog);
+    console.error.apply(console, stuffToLog);
 
     const report = {
       message: err && err.message || err,
