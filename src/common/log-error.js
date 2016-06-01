@@ -94,17 +94,36 @@ export default function logError(err: Error, details: any, context: LogErrorCont
 const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() => {
   // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
   // so we make one out of a WeakMap.
-  if (!global.__inboxsdk_extensionSeenErrors) {
+  if (!global.__inboxsdk_extensionSeenErrors && global.WeakMap) {
     Object.defineProperty(global, '__inboxsdk_extensionSeenErrors', {
       value: new global.WeakMap()
     });
   }
   return {
     has(e: Error): boolean {
-      return global.__inboxsdk_extensionSeenErrors.has(e);
+      if (global.__inboxsdk_extensionSeenErrors) {
+        return global.__inboxsdk_extensionSeenErrors.has(e);
+      } else {
+        try {
+          return !!(e: any).__inboxsdk_extensionHasSeenError;
+        } catch(err) {
+          console.error(err);
+          return false;
+        }
+      }
     },
     add(e: Error) {
-      global.__inboxsdk_extensionSeenErrors.set(e, true);
+      if (global.__inboxsdk_extensionSeenErrors) {
+        global.__inboxsdk_extensionSeenErrors.set(e, true);
+      } else {
+        try {
+          Object.defineProperty((e: any), '__inboxsdk_extensionHasSeenError', {
+            value: true
+          });
+        } catch(err) {
+          console.error(err);
+        }
+      }
     }
   };
 })();
