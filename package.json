@@ -5,6 +5,9 @@
       "brfs"
     ]
   },
+  "browser": {
+    "babel-runtime/core-js/promise": "./src/build/promise.js"
+  },
   "dependencies": {
     "add-accessors": "^2.0.0",
     "asap": "^2.0.3",
