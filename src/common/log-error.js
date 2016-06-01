@@ -113,8 +113,13 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
       }
     },
     add(e: Error) {
-      if (global.__inboxsdk_extensionSeenErrors) {
+      if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.set) {
+        // It's a WeakMap.
         global.__inboxsdk_extensionSeenErrors.set(e, true);
+      } else if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.add) {
+        // Older versions of inboxsdk.js initialized it as a WeakSet instead,
+        // so handle that too.
+        global.__inboxsdk_extensionSeenErrors.add(e);
       } else {
         try {
           Object.defineProperty((e: any), '__inboxsdk_extensionHasSeenError', {
