@@ -6,7 +6,7 @@ var asap = require('asap');
 var RSVP = require('rsvp');
 var Kefir = require('kefir');
 import Logger from './logger';
-import type {ajaxOpts} from '../../common/ajax';
+import type {AjaxOpts} from '../../common/ajax';
 
 export default class CommonPageCommunicator {
   getUserEmailAddress(): string {
@@ -21,7 +21,7 @@ export default class CommonPageCommunicator {
     return this.pageAjax({url, method: 'HEAD'}).then(result => result.responseURL);
   }
 
-  pageAjax(opts: ajaxOpts): Promise<{text: string, responseURL: string}> {
+  pageAjax(opts: AjaxOpts): Promise<{text: string, responseURL: string}> {
     var id = `${Date.now()}-${Math.random()}`;
     var promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
       .filter(event => event.detail && event.detail.id === id)

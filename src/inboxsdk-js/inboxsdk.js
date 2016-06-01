@@ -1,6 +1,5 @@
 /* @flow */
 
-import assign from 'lodash/object/assign';
 import logError from '../common/log-error';
 
 import PlatformImplementationLoader from './loading/platform-implementation-loader';
@@ -12,7 +11,7 @@ const InboxSDK = {
   LOADER_VERSION: BUILD_VERSION,
   loadScript,
   load(version: any, appId: string, opts: ?Object) {
-    opts = assign({
+    opts = Object.assign({
       // defaults
       globalErrorLogging: true
     }, opts, {
