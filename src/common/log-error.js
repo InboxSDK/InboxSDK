@@ -91,13 +91,22 @@ export default function logError(err: Error, details: any, context: LogErrorCont
   }
 }
 
-const _extensionSeenErrors: WeakSet<Error> = (() => {
+const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() => {
+  // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
+  // so we make one out of a WeakMap.
   if (!global.__inboxsdk_extensionSeenErrors) {
     Object.defineProperty(global, '__inboxsdk_extensionSeenErrors', {
-      value: new WeakSet()
+      value: new global.WeakMap()
     });
   }
-  return global.__inboxsdk_extensionSeenErrors;
+  return {
+    has(e: Error): boolean {
+      return global.__inboxsdk_extensionSeenErrors.has(e);
+    },
+    add(e: Error) {
+      global.__inboxsdk_extensionSeenErrors.set(e, true);
+    }
+  };
 })();
 
 function haveWeSeenThisErrorAlready(error: Error): boolean {
