@@ -18,7 +18,7 @@ const serversToIgnore = {};
 // * [headers] - object
 // * [xhrFields] - object
 // * [data]
-export type ajaxOpts = {
+export type AjaxOpts = {
   url: string;
   method?: ?string;
   cachebust?: ?boolean;
@@ -29,12 +29,12 @@ export type ajaxOpts = {
   retryNum?: number;
 };
 
-export type ajaxResponse = {
+export type AjaxResponse = {
   text: string;
   xhr: XMLHttpRequest;
 };
 
-export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
+export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
   if(!opts || typeof opts.url !== 'string') {
     throw new Error('URL must be given');
   }
@@ -107,7 +107,7 @@ export default function ajax(opts: ajaxOpts): Promise<ajaxResponse> {
   });
 }
 
-function _retry(opts: ajaxOpts): Promise<ajaxResponse>{
+function _retry(opts: AjaxOpts): Promise<AjaxResponse> {
   const retryNum = (opts.retryNum || 0) + 1;
 
   // 2000 4000 8000...

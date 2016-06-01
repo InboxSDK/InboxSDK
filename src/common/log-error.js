@@ -123,17 +123,19 @@ function markErrorAsSeen(error: Error) {
 }
 
 // Only let 10 errors be sent per minute.
-const sendError = rateLimit(async function(report: Object) {
+const sendError = rateLimit(function(report: Object) {
   const args = arguments;
 
   try {
-    await ajax({
+    ajax({
       url: 'https://www.inboxsdk.com/api/v2/errors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(report)
+    }).catch(err2 => {
+      tooManyErrors(err2, args);
     });
   } catch(err2) {
     tooManyErrors(err2, args);

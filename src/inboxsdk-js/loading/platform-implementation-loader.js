@@ -8,7 +8,7 @@ import type {PlatformImplementation} from '../../platform-implementation-js/plat
 
 var PlatformImplementationLoader = {
   load(appId: string, opts: Object): Promise<PlatformImplementation> {
-    return global.Promise.resolve().then(() => {
+    return Promise.resolve().then(() => {
       if (!global.__InboxSDKImpLoader) {
         return PlatformImplementationLoader._loadScript().then(() => {
           if (!global.__InboxSDKImpLoader) {
