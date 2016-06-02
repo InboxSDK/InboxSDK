@@ -73,10 +73,8 @@ export default class GmailAppToolbarButtonView {
 
     var element = this._element = this._element || _createAppButtonElement(() => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
-    var currentTitle = null;
     updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-    _updateTitle(element.querySelector('span'), currentTitle, buttonDescriptor.title);
-    currentTitle = buttonDescriptor.title;
+    _updateTitle(element.querySelector('span'), buttonDescriptor.title);
   }
 
   _handleClick() {
@@ -109,7 +107,7 @@ export default class GmailAppToolbarButtonView {
           this._element,
           {position: 'bottom', offset: {top: 8}}
         );
-      }      
+      }
     }
   }
 }
@@ -159,9 +157,6 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
   }
 }
 
-function _updateTitle(element: HTMLElement, currentTitle: ?string, newTitle: string) {
-  if(currentTitle === newTitle){
-    return;
-  }
+function _updateTitle(element: HTMLElement, newTitle: string) {
   element.textContent = newTitle;
 }
