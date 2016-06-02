@@ -19,7 +19,7 @@ export default function setupEventReemitter() {
   // https://code.google.com/p/chromium/issues/detail?id=327853
   document.addEventListener('inboxsdk_event_relay', function(event: Object) {
     const newEvent = document.createEvent('Events');
-    newEvent.initEvent(event.detail.type, event.detail.bubbles, event.detail.cancelable);
+    (newEvent: any).initEvent(event.detail.type, event.detail.bubbles, event.detail.cancelable);
     _.assign(newEvent, event.detail.props);
     if (event.detail.dataTransfer) {
       const files = event.detail.dataTransfer.files

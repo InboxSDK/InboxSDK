@@ -534,8 +534,12 @@ class GmailCollapsibleSectionView {
 		if(this._isCollapsedContainer(element.previousElementSibling) && this._isCollapsedContainer(element.nextElementSibling)){
 
 			//we are surrounded by collapse containers, let's favor our previous sibling
-			var otherCollapseContainer = element.nextElementSibling;
-			element.previousElementSibling.children[1].appendChild(element);
+			const otherCollapseContainer = element.nextElementSibling;
+			const previousSibling = element.previousElementSibling;
+			if(!previousSibling) throw new Error('previousSibling does not exist');
+			if(!otherCollapseContainer) throw new Error('otherCollapseContainer does not exist');
+
+			const anchor = previousSibling.children[1].appendChild(element);
 
 			//now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
 			//and calling our "recollapse" helper function on them

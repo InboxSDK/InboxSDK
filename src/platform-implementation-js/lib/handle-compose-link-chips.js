@@ -467,8 +467,9 @@ function _doesZSpaceZeroExist(brokenModes: string[]): boolean {
 
 function _removeZSpaceZero(chipElement, range){
     var textNode = chipElement.previousSibling;
-
-    textNode.nodeValue = textNode.nodeValue.substring(0, textNode.textContent.length - 1);
+    if(textNode){
+      textNode.nodeValue = textNode.nodeValue.substring(0, textNode.textContent.length - 1);
+    }
 }
 
 function _doesZSpaceOneExist(brokenModes: string[]): boolean {
@@ -479,5 +480,7 @@ function _doesZSpaceOneExist(brokenModes: string[]): boolean {
 
 function _removeZSpaceOne(chipElement: HTMLElement){
     var textNode = chipElement.nextSibling;
-    textNode.textContent = textNode.textContent.substring(1);
+    if(textNode){
+      textNode.textContent = textNode.textContent.substring(1);
+    }    
 }

@@ -19,22 +19,17 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 	var composeBodyElement = $(gmailComposeView.getBodyElement());
 	composeBodyElement.focus();
 
-	simulateClick(gmailComposeView.getInsertLinkButton());
+	const selection = document.getSelection();
+	if(!selection) throw new Error('selection does\'t exist, what?');
 
-	if($('#linkdialog-text').length === 0){
-		return;
-	}
+	const range = selection.getRangeAt(0);
+	const link = document.createElement('a');
+	link.href = href;
+	range.surroundContents(link);
+	link.textContent = text;
 
-	var originalText = $('#linkdialog-text').val();
-	setValueAndDispatchEvent($('#linkdialog-onweb-tab-input')[0], href, 'input');
+	selection.selectAllChildren(link);
+	selection.collapseToEnd();
 
-	simulateClick($('button[name=ok]')[0]);
-
-	var $link = composeBodyElement.find('a[href="'+href+'"]');
-
-	if(originalText.length === 0){
-		$link.text(text);
-	}
-
-	return $link[0];
+	return link;
 }
