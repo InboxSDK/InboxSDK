@@ -74,7 +74,7 @@ export default class GmailAppToolbarButtonView {
     var element = this._element = this._element || _createAppButtonElement(() => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
     updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-    _updateTitle(element.querySelector('span'), buttonDescriptor.title);
+    _updateTitle(element.querySelector('span'), buttonDescriptor);
   }
 
   _handleClick() {
@@ -157,6 +157,7 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
   }
 }
 
-function _updateTitle(element: HTMLElement, newTitle: string) {
-  element.textContent = newTitle;
+function _updateTitle(element: HTMLElement, descriptor: Object) {
+  element.textContent = descriptor.title;
+  element.className = `inboxsdk__appButton_title ${descriptor.titleClass||''}`;
 }
