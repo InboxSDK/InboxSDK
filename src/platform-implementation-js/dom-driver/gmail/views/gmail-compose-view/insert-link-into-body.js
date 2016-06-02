@@ -19,22 +19,52 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 	var composeBodyElement = $(gmailComposeView.getBodyElement());
 	composeBodyElement.focus();
 
-	simulateClick(gmailComposeView.getInsertLinkButton());
 
-	if($('#linkdialog-text').length === 0){
-		return;
+	let newLink;
+
+	const selection = document.getSelection();
+	if(selection && !selection.isCollapsed && selection.rangeCount > 0){
+		const range = selection.getRangeAt(0);
+		newLink = document.createElement('a');
+		newLink.href = href;
+		range.surroundContents(newLink);
+	}
+	else{
+		const existingLinks = composeBodyElement.find('a[href="'+href+'"]');
+		simulateClick(gmailComposeView.getInsertLinkButton());
+
+		if($('#linkdialog-text').length === 0){
+			return;
+		}
+
+		setValueAndDispatchEvent($('#linkdialog-onweb-tab-input')[0], href, 'input');
+
+		simulateClick($('button[name=ok]')[0]);
+
+		const existingAndNewLinks = composeBodyElement.find('a[href="'+href+'"]');
+		for(let ii=0; ii<existingAndNewLinks.length; ii++){
+			const potentialLink = existingAndNewLinks[ii];
+			let matchFound = false;
+			for(let jj=0; jj<existingLinks.length; jj++){
+				if(potentialLink === existingLinks[jj]){
+					matchFound = true;
+					break;
+				}
+			}
+
+			if(!matchFound){
+				newLink = potentialLink;
+				break;
+			}
+		}
+
+		if(newLink) newLink.textContent = text;
+	}
+	if(selection && newLink){
+		selection.selectAllChildren(newLink);
+		selection.collapseToEnd();
 	}
 
-	var originalText = $('#linkdialog-text').val();
-	setValueAndDispatchEvent($('#linkdialog-onweb-tab-input')[0], href, 'input');
 
-	simulateClick($('button[name=ok]')[0]);
-
-	var $link = composeBodyElement.find('a[href="'+href+'"]');
-
-	if(originalText.length === 0){
-		$link.text(text);
-	}
-
-	return $link[0];
+	return newLink;
 }
