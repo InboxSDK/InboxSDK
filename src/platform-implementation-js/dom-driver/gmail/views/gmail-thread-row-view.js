@@ -673,9 +673,9 @@ class GmailThreadRowView {
             return;
           }
           draftElement.classList.add('inboxsdk__thread_row_custom_draft_part');
-          const nextSibling = draftElement.nextSibling;
+          const nextSibling = draftElement.nextElementSibling;
           if (nextSibling) {
-            (nextSibling: any).remove();
+            nextSibling.remove();
           }
           countElement = _.assign(document.createElement('span'), {
             className: 'inboxsdk__thread_row_custom_draft_count'});

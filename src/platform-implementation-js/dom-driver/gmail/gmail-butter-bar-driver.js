@@ -17,7 +17,8 @@ const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="a
       sdkNotice.classList.add('inboxsdk__butterbar');
       sdkNotice.style.display = 'none';
       const parentNode = googleNotice.parentNode;
-      if(parentNode) parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
+      if(!parentNode) throw new Error('parentNode not found');
+      parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
     return {noticeContainer, googleNotice, sdkNotice};
   })
