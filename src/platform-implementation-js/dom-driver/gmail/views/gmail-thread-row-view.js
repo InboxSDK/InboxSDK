@@ -105,7 +105,11 @@ class GmailThreadRowView {
 
     this._isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
     if (this._isVertical) {
-      const threadRow3 = element.nextElementSibling.nextElementSibling;
+      const threadRow2 = element.nextElementSibling;
+
+      if(!threadRow2) throw new Error('threadRow2 not found');
+
+      const threadRow3 = threadRow2.nextElementSibling;
       const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
       this._elements = has3Rows ?
         [
@@ -669,8 +673,9 @@ class GmailThreadRowView {
             return;
           }
           draftElement.classList.add('inboxsdk__thread_row_custom_draft_part');
-          if (draftElement.nextSibling) {
-            draftElement.nextSibling.remove();
+          const nextSibling = draftElement.nextSibling;
+          if (nextSibling) {
+            (nextSibling: any).remove();
           }
           countElement = _.assign(document.createElement('span'), {
             className: 'inboxsdk__thread_row_custom_draft_count'});

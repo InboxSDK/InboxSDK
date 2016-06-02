@@ -37,7 +37,7 @@ const injectScript: () => Promise = _.once(function() {
     const codeToRun = codeParts.join('');
     script.text = codeToRun;
 
-    document.head.appendChild(script).parentNode.removeChild(script);
+    (document: any).head.appendChild(script).parentNode.removeChild(script);
     document.head.setAttribute('data-inboxsdk-script-injected', 'true');
   }
 

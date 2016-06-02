@@ -3,6 +3,6 @@
 
 export default function fakeWindowResize() {
   var event = document.createEvent("HTMLEvents");
-  event.initEvent("resize", true, false);
+  (event: any).initEvent("resize", true, false);
   window.dispatchEvent(event);
 }

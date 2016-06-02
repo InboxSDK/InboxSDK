@@ -630,10 +630,12 @@ class GmailMessageView {
 	}
 
 	_createAttachmentArea(): GmailAttachmentAreaView{
-		var gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
+		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
 
-		var beforeElement = this._element.querySelector('.hi');
-		beforeElement.parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);
+		const beforeElement = this._element.querySelector('.hi');
+		const parentNode = beforeElement.parentNode;
+		if(!parentNode) throw new Error('parentNode not found');
+		parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);
 
 		return gmailAttachmentAreaView;
 	}
