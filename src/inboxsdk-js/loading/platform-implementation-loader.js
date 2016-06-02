@@ -1,7 +1,6 @@
 /* @flow */
 //jshint ignore:start
 
-const assign = require('lodash/object/assign');
 const once = require('lodash/function/once');
 import loadScript from '../../common/load-script';
 
@@ -9,7 +8,7 @@ import type {PlatformImplementation} from '../../platform-implementation-js/plat
 
 var PlatformImplementationLoader = {
   load(appId: string, opts: Object): Promise<PlatformImplementation> {
-    return global.Promise.resolve().then(() => {
+    return Promise.resolve().then(() => {
       if (!global.__InboxSDKImpLoader) {
         return PlatformImplementationLoader._loadScript().then(() => {
           if (!global.__InboxSDKImpLoader) {

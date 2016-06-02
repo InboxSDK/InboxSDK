@@ -67,7 +67,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", loaderVersion]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", implVersion]);
 
-    console.error(...stuffToLog);
+    console.error.apply(console, stuffToLog);
 
     const report = {
       message: err && err.message || err,
@@ -91,13 +91,46 @@ export default function logError(err: Error, details: any, context: LogErrorCont
   }
 }
 
-const _extensionSeenErrors: WeakSet<Error> = (() => {
-  if (!global.__inboxsdk_extensionSeenErrors) {
+const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() => {
+  // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
+  // so we make one out of a WeakMap.
+  if (!global.__inboxsdk_extensionSeenErrors && global.WeakMap) {
     Object.defineProperty(global, '__inboxsdk_extensionSeenErrors', {
-      value: new WeakSet()
+      value: new global.WeakMap()
     });
   }
-  return global.__inboxsdk_extensionSeenErrors;
+  return {
+    has(e: Error): boolean {
+      if (global.__inboxsdk_extensionSeenErrors) {
+        return global.__inboxsdk_extensionSeenErrors.has(e);
+      } else {
+        try {
+          return !!(e: any).__inboxsdk_extensionHasSeenError;
+        } catch(err) {
+          console.error(err);
+          return false;
+        }
+      }
+    },
+    add(e: Error) {
+      if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.set) {
+        // It's a WeakMap.
+        global.__inboxsdk_extensionSeenErrors.set(e, true);
+      } else if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.add) {
+        // Older versions of inboxsdk.js initialized it as a WeakSet instead,
+        // so handle that too.
+        global.__inboxsdk_extensionSeenErrors.add(e);
+      } else {
+        try {
+          Object.defineProperty((e: any), '__inboxsdk_extensionHasSeenError', {
+            value: true
+          });
+        } catch(err) {
+          console.error(err);
+        }
+      }
+    }
+  };
 })();
 
 function haveWeSeenThisErrorAlready(error: Error): boolean {
@@ -114,17 +147,19 @@ function markErrorAsSeen(error: Error) {
 }
 
 // Only let 10 errors be sent per minute.
-const sendError = rateLimit(async function(report: Object) {
+const sendError = rateLimit(function(report: Object) {
   const args = arguments;
 
   try {
-    await ajax({
+    ajax({
       url: 'https://www.inboxsdk.com/api/v2/errors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(report)
+    }).catch(err2 => {
+      tooManyErrors(err2, args);
     });
   } catch(err2) {
     tooManyErrors(err2, args);

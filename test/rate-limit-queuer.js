@@ -6,7 +6,11 @@ import delay from '../src/common/delay';
 
 import rateLimitQueuer from '../src/common/rate-limit-queuer';
 
-describe("rateLimitQueuer", function() {
+// This test is disabled because it depends on timing, and the test doesn't
+// handle running on overloaded CI test instances very well. Make sure to
+// manually re-enable this (xdescribe -> describe) if you make any changed to
+// rateLimitQueuer!
+xdescribe("rateLimitQueuer", function() {
   it("single call works", async function() {
     const fn = rateLimitQueuer(async () => 5, 15, 2);
     assert.strictEqual(await fn(), 5);
