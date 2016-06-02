@@ -150,10 +150,18 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 var AppToolbarButtonDescriptor = /** @lends AppToolbarButtonDescriptor */{
 
 	/**
-	* Text to show when the user hovers the mouse over the button
+	* Text to show on the button.
 	* @type {string}
 	*/
 	title:null,
+
+	/**
+	* An optional class to apply to the title.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	titleClass: null,
 
 	/**
 	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
