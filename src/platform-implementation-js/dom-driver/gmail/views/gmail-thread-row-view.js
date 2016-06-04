@@ -90,7 +90,6 @@ class GmailThreadRowView {
   _driver: GmailDriver;
   _userView: ?Object;
   _cachedThreadID: ?string;
-  _didSubscribeTextFixerRun: boolean = false;
   _imageFixer: ?Kefir.Bus;
   _imageFixerTask: ?Kefir.Stream;
   _stopper: Kefir.Stopper;
@@ -273,7 +272,7 @@ class GmailThreadRowView {
     const prop: Kefir.Stream = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
-    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(labelDescriptor => {
+    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([labelDescriptor]) => {
       if(!labelDescriptor){
         if (labelMod) {
           labelMod.remove();
@@ -316,13 +315,12 @@ class GmailThreadRowView {
     }
     const prop: Kefir.Stream = kefirCast(Kefir, inIconDescriptor)
                   .toProperty()
-                  .combine(this._getRefresher(), identity)
-                  .combine(this._getSubjectRefresher(), identity)
+                  .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
                   .takeUntilBy(this._stopper);
 
     let imageMod = null;
 
-    prop.onValue(iconDescriptor => {
+    prop.onValue(([iconDescriptor]) => {
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -375,7 +373,6 @@ class GmailThreadRowView {
         el.style.display = (el.style && el.style.display === 'block') ? 'inline-block' : 'block';
       }
     });
-    this._subscribeTextFixer();
   }
 
   addButton(buttonDescriptor: Object) {
@@ -406,7 +403,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.combine(this._getRefresher(), identity).onValue(buttonDescriptor => {
+    prop.combine(this._getRefresher()).onValue(([buttonDescriptor]) => {
       if (!buttonDescriptor) {
         if (buttonMod) {
           buttonMod.remove();
@@ -576,7 +573,7 @@ class GmailThreadRowView {
     var currentIconUrl;
 
     var prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
+    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       if (!opts) {
         if (added) {
           getImgElement().remove();
@@ -636,7 +633,7 @@ class GmailThreadRowView {
     let labelMod;
     let draftElement, countElement;
     const prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
+    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const originalLabel = this._elements[0].querySelector('td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
       if (!recipientsContainer) throw new Error("Should not happen");
@@ -699,7 +696,7 @@ class GmailThreadRowView {
     }
     let dateMod;
     const prop: Kefir.Stream = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher(), identity).takeUntilBy(this._stopper).onValue(opts => {
+    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
 
@@ -846,23 +843,6 @@ class GmailThreadRowView {
     }
 
     return imageFixerTask;
-  }
-
-  _subscribeTextFixer() {
-    if(this._didSubscribeTextFixerRun) return;
-
-    // Work around the text-corruption issue on Chrome on retina displays that
-    // happens when images are added to the row.
-    this._getImageFixerTask().onValue(() => {
-      const tr = this._elements[0];
-      const computedBgColor = window.getComputedStyle(tr).backgroundColor;
-      tr.style.backgroundColor = tweakColor(computedBgColor);
-      setTimeout(() => {
-        tr.style.backgroundColor = '';
-      }, 0);
-    });
-
-    this._didSubscribeTextFixerRun = true;
   }
 
   _getWatchElement(): HTMLElement {
