@@ -1,1 +1,1 @@
---check-leaks --compilers js:babel/register-without-polyfill
+--check-leaks --compilers js:babel-register
