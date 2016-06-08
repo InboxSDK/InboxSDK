@@ -10,7 +10,8 @@ if (!global.__InboxSDKImpLoader) {
       oldDefine = define;
       define = null;
     }
-    require('safari-fix-map');
+    // TODO check error logs to see if we need to re-enable safari-fix-map.
+    // require('safari-fix-map');
     var RSVP = require('rsvp');
     var Kefir = require('kefir');
 
