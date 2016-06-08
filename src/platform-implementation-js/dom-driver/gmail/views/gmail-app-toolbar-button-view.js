@@ -78,7 +78,8 @@ export default class GmailAppToolbarButtonView {
   }
 
   _handleClick() {
-    if (!this._buttonDescriptor) throw new Error("Should not happen");
+    const element = this._element;
+    if (!element || !this._buttonDescriptor) throw new Error("Should not happen");
     var buttonDescriptor = this._buttonDescriptor;
 
     if (this._activeDropdown) {
@@ -93,7 +94,7 @@ export default class GmailAppToolbarButtonView {
         tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
       }
 
-      appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, this._element, {manualPosition: true});
+      appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, element, {manualPosition: true});
       appEvent.dropdown.on('destroy', () => {
         this._activeDropdown = null;
       });

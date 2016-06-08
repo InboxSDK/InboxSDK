@@ -452,7 +452,7 @@ class GmailThreadRowView {
         if(buttonDescriptor.onClick){
           (buttonSpan:any).onclick = (event) => {
             const appEvent = {
-              dropdown: null,
+              dropdown: (null: ?DropdownView),
               threadRowView: this._userView
             };
             if (buttonDescriptor.hasDropdown) {
