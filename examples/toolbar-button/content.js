@@ -44,6 +44,21 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		}
 	});
 
+	inboxSDK.Toolbars.registerToolbarButtonForList({
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		title: 'Monkeys 3',
+		section: inboxSDK.Toolbars.SectionNames.METADATA_STATE,
+		onClick: function(event){
+			event.selectedThreadRowViews.forEach(function(threadRowView){
+				threadRowView.getContacts().forEach(function(contact){
+					threadRowView.addLabel({
+						title: contact.emailAddress
+					});
+				});
+			});
+		}
+	});
+
 
 	inboxSDK.Toolbars.registerToolbarButtonForThreadView({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
