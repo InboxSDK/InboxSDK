@@ -20,18 +20,18 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return Kefir.merge([
     // Regular
     streamWaitFor(() => {
-      var els = document.querySelectorAll('body > div[id][jsan] > div[id][class]:not([role]) > div[class] > div[id]:first-child');
+      const els = document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]');
       return els.length === 1 ? els[0] : null;
     })
       .flatMap(makeElementChildStream)
-      .filter(({el}) => el.hasAttribute('jsnamespace') && el.hasAttribute('jstcache'))
+      .filter(({el}) => el.hasAttribute('jsaction') && el.hasAttribute('jstcache'))
       .flatMap(event =>
         // ignore the composes that get removed immediately
         delayAsap(event)
           .takeUntilBy(event.removalStream)
       )
       .map(({el,removalStream}) => {
-        var composeEl = el.querySelector('div[role=dialog]');
+        const composeEl = el.querySelector('div[role=dialog]');
         if (!composeEl) {
           driver.getLogger().error(new Error("compose dialog element not found"), {
             html: censorHTMLtree(el)
@@ -54,7 +54,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       // each el is a bundle now
       .flatMap(({el,removalStream}) => {
-        var expanded = makeMutationObserverChunkedStream(el, {
+        const expanded = makeMutationObserverChunkedStream(el, {
             attributes: true, attributeFilter:['aria-expanded']
           })
           .toProperty(()=>null)
@@ -62,8 +62,8 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
           .takeUntilBy(removalStream)
           .beforeEnd(()=>false)
           .skipDuplicates();
-        var opens = expanded.filter(x => x);
-        var closes = expanded.filter(x => !x);
+        const opens = expanded.filter(x => x);
+        const closes = expanded.filter(x => !x);
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       })
       // each el is an opened bundle now
@@ -74,20 +74,20 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
       .map(({el,removalStream}) =>
-        ({el: ((el.firstElementChild: any): HTMLElement), removalStream})
+        ({el: el.querySelector('div[jsaction$=".quick_compose_handle_focus"]'), removalStream})
       )
-      .filter(({el}) => el && /\.quick_compose_focus$/.test(el.getAttribute('jsaction')))
+      .filter(({el}) => el)
       .flatMap(({el,removalStream}) => {
         // We've got the compose element now, but it could be closed. Let's
         // transform the stream to only get opened inline composes.
-        var buttonEl = _.find(el.children, child => child.nodeName === 'BUTTON');
+        const buttonEl = _.find(el.children, child => child.nodeName === 'BUTTON');
         if (!buttonEl) {
           driver.getLogger().error(new Error("inline compose button not found"), {
             html: censorHTMLtree(el)
           });
           return Kefir.never();
         }
-        var expanded = makeMutationObserverChunkedStream(buttonEl, {
+        const expanded = makeMutationObserverChunkedStream(buttonEl, {
             attributes: true, attributeFilter:['style']
           })
           .toProperty(()=>null)
@@ -95,8 +95,8 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
           .takeUntilBy(removalStream)
           .beforeEnd(()=>false)
           .skipDuplicates();
-        var opens = expanded.filter(x => x);
-        var closes = expanded.filter(x => !x);
+        const opens = expanded.filter(x => x);
+        const closes = expanded.filter(x => !x);
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       })
   ])
