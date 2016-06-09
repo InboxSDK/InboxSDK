@@ -9,7 +9,7 @@ import Kefir from 'kefir';
 
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
-import containByScreen from 'contain-by-screen';
+import ScrollableContainByScreen from '../../lib/ScrollableContainByScreen';
 import type {Options as ContainByScreenOptions} from 'contain-by-screen';
 
 type Options = {
@@ -23,6 +23,7 @@ class DropdownView extends EventEmitter {
 	/*deprecated*/closed: boolean = false;
 	_options: Options;
 	_userPlacementOptions: ContainByScreenOptions = {hAlign: 'left'};
+	_scrollableContainByScreen: ?ScrollableContainByScreen = null;
 	el: HTMLElement;
 
 	constructor(dropdownViewDriver: Object, anchorElement: HTMLElement, options: ?Options){
@@ -40,6 +41,8 @@ class DropdownView extends EventEmitter {
 		}
 		this._dropdownViewDriver.getContainerElement().focus();
 
+		const onDestroy = Kefir.fromEvents(this, 'destroy');
+
 		Kefir.merge([
 				fromEventTargetCapture(document, 'focus'),
 				fromEventTargetCapture(document, 'click')
@@ -49,41 +52,56 @@ class DropdownView extends EventEmitter {
 				!anchorElement.contains(event.target) &&
 				!this._dropdownViewDriver.getContainerElement().contains(event.target)
 			)
-			.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+			.takeUntilBy(onDestroy)
 			.onValue(() => {
 				this.close();
 			});
 
 		if(!this._options.manualPosition){
-			this._dropdownViewDriver.getContainerElement().style.position = 'fixed';
+			const containerEl = dropdownViewDriver.getContainerElement();
+			containerEl.style.position = 'fixed';
 
 			asap(() => {
 				if (this.closed) return;
-				var containerEl = dropdownViewDriver.getContainerElement();
+
+				Kefir.fromEvents(this, '_placementOptionsUpdated')
+					.toProperty(() => null)
+					.takeUntilBy(onDestroy)
+					.onValue(() => {
+						if (this._scrollableContainByScreen) {
+							this._scrollableContainByScreen.destroy();
+						}
+						this._scrollableContainByScreen = new ScrollableContainByScreen(
+							containerEl, anchorElement, this._userPlacementOptions
+						);
+					});
 
 				makeMutationObserverChunkedStream(dropdownViewDriver.getContentElement(), {
 					childList: true, attributes: true,
 					characterData: true, subtree: true
 				})
-					.merge(Kefir.fromEvents(this, '_placementOptionsUpdated'))
-					.toProperty(()=>null)
 					.throttle(200)
-					.takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+					.takeUntilBy(onDestroy)
 					.onValue(event => {
-						containByScreen(containerEl, anchorElement, this._userPlacementOptions);
+						if (this._scrollableContainByScreen) {
+							this._scrollableContainByScreen.reposition();
+						}
 					});
 			});
 		}
 	}
 
 	setPlacementOptions(options: ContainByScreenOptions) {
-		Object.assign(this._userPlacementOptions, options);
+		this._userPlacementOptions = {...this._userPlacementOptions, ...options};
 		this.emit('_placementOptionsUpdated');
 	}
 
 	close() {
 		if (!this.destroyed) {
 			this.destroyed = this.closed = true;
+			if (this._scrollableContainByScreen) {
+				this._scrollableContainByScreen.destroy();
+			}
 			this.emit('destroy');
 			this._dropdownViewDriver.destroy();
 		}
