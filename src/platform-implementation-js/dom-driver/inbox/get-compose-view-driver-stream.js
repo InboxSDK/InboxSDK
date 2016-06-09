@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Kefir = require('kefir');
+import _ from 'lodash';
+import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import streamWaitFor from '../../lib/stream-wait-for';
 import delayAsap from '../../lib/delay-asap';
@@ -14,7 +14,7 @@ import InboxComposeView from './views/inbox-compose-view';
 import type InboxDriver from './inbox-driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 
-var impStream = udKefir(module, imp);
+const impStream = udKefir(module, imp);
 
 function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return Kefir.merge([
