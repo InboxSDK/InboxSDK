@@ -271,7 +271,7 @@ class GmailToolbarView {
 	}
 
 	_getArchiveSectionElement(): ?HTMLElement {
-		return this._getSectionElementForButtonSelector('.ar9, .aFh, .aFj, .lR, .nN, .nX');
+		return this._getSectionElementForButtonSelector('.ar9, .aFh, .aFj, .lR, .nN, .nX, .aFk');
 	}
 
 	_getCheckboxSectionElement(): ?HTMLElement {
