@@ -180,10 +180,11 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 		// Enable sourcemaps on future loads by default for Streak employees.
 		try {
 			if (
+				window.localStorage &&
 				/@streak\.com$/.test(driver.getUserEmailAddress()) &&
-				!localStorage.getItem('inboxsdk__enable_sourcemap')
+				!window.localStorage.getItem('inboxsdk__enable_sourcemap')
 			) {
-				localStorage.setItem('inboxsdk__enable_sourcemap', 'true');
+				window.localStorage.setItem('inboxsdk__enable_sourcemap', 'true');
 			}
 		} catch(err) {
 			console.error(err);
