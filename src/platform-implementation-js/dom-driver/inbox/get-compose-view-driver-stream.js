@@ -74,7 +74,7 @@ function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
       .map(({el,removalStream}) =>
-        ({el: el.querySelector('div[jsaction$=".quick_compose_handle_focus"]'), removalStream})
+        ({el: el.querySelector('div[jslog] > div[jsvs]'), removalStream})
       )
       .filter(({el}) => el)
       .flatMap(({el,removalStream}) => {
