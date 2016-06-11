@@ -1,19 +1,20 @@
 /* @flow */
-//jshint ignore:start
 
-var _ = require('lodash');
-var ud = require('ud');
-var RSVP = require('rsvp');
-var Kefir = require('kefir');
-var kefirStopper = require('kefir-stopper');
-var kefirBus = require('kefir-bus');
-var autoHtml = require('auto-html');
+import _ from 'lodash';
+import {defn} from 'ud';
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+import kefirBus from 'kefir-bus';
+import autoHtml from 'auto-html';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import delayAsap from '../../../lib/delay-asap';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
+import querySelectorOne from '../../../lib/dom/querySelectorOne';
+import ErrorCollector from '../../../lib/ErrorCollector';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import type InboxDriver from '../inbox-driver';
@@ -24,17 +25,17 @@ import {
   isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
-var InboxComposeView = ud.defn(module, class InboxComposeView {
+class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _eventStream: Kefir.Bus;
   _stopper: Kefir.Stream&{destroy:()=>void};
   _closeBtn: ?HTMLElement;
   _minimizeBtn: ?HTMLElement;
-  _sendBtn: HTMLElement;
-  _attachBtn: HTMLElement;
+  _sendBtn: ?HTMLElement;
+  _attachBtn: ?HTMLElement;
   _popOutBtn: ?HTMLElement;
-  _bodyEl: HTMLElement;
+  _bodyEl: ?HTMLElement;
   _bodyPlaceholder: ?HTMLElement;
   _subjectEl: ?HTMLInputElement;
   _queueDraftSave: () => void;
@@ -49,83 +50,72 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
     this._lastSelectionRange = null;
-    this._isInline = /\.quick_compose_focus$/.test(this._element.getAttribute('jsaction'));
+    this._isInline = this._element.getAttribute('role') !== 'dialog';
 
-    var hadError = false;
-    var bottomAreaElementCount = null;
-    var sendBtns = this._element.querySelectorAll(
-      'div[jstcache] > div[role=button][jsaction$=".send"], '+
-      'div[jsaction] > div[role=button][disabled]');
-    var attachBtns = this._element.querySelectorAll(
-      'div[role=button][jsaction$=".attach"]');
-    var bodyEls = this._element.querySelectorAll(
-      'div[contenteditable][g_editable][role=textbox]');
-
-    var popOutBtns = this._isInline ? this._element.querySelectorAll('button[jsaction$=".quick_compose_popout_mole"]') : [];
-
-    var topBtns = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan][jsaction] > button') : [];
-    var subjectEls = !this._isInline ? this._element.querySelectorAll('div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]') : [];
-
-    try {
-      if (bodyEls.length !== 1)
-        throw new Error("compose wrong number of body elements");
-      this._bodyEl = bodyEls[0];
-      if (sendBtns.length !== 1)
-        throw new Error("compose wrong number of send buttons");
-      this._sendBtn = sendBtns[0];
-      var bottomArea: HTMLElement = (this._sendBtn.parentElement:any);
-      bottomAreaElementCount = bottomArea.childElementCount;
-      if (attachBtns.length !== 1)
-        throw new Error("compose wrong number of attach buttons");
-      this._attachBtn = attachBtns[0];
-      if (this._isInline) {
-        this._closeBtn = null;
-        this._minimizeBtn = null;
-        this._bodyPlaceholder = null;
-        this._subjectEl = null;
-        if (popOutBtns.length !== 1)
-          throw new Error("compose wrong number pop out buttons");
-        this._popOutBtn = popOutBtns[0];
-      } else {
-        if (topBtns.length !== 2)
-          throw new Error("compose wrong number of top buttons");
-        if (!/\.close_mole$/.test(topBtns[0].getAttribute('jsaction')))
-          throw new Error("compose close button wrong jsaction")
-        this._closeBtn = topBtns[0];
-        if (!/\.minimize_mole$/.test(topBtns[1].getAttribute('jsaction')))
-          throw new Error("compose minimize button wrong jsaction")
-        this._minimizeBtn = topBtns[1];
-        var bodyPlaceholder = this._bodyEl.previousElementSibling;
-        if (!(bodyPlaceholder instanceof HTMLElement) || bodyPlaceholder.nodeName !== 'LABEL')
-          throw new Error(`compose body placeholder wrong type ${bodyPlaceholder && bodyPlaceholder.nodeName}`);
-        this._bodyPlaceholder = bodyPlaceholder;
-        if (subjectEls.length !== 1)
-          throw new Error("compose wrong number of subject elements");
-        var subjectEl = subjectEls[0];
-        if (!(subjectEl instanceof HTMLInputElement))
-          throw new Error(`compose subject wrong type ${subjectEl && subjectEl.nodeName}`);
-        this._subjectEl = subjectEl;
-        this._popOutBtn = null;
+    const ec = new ErrorCollector('compose');
+    this._sendBtn = ec.run(
+      'send button',
+      () => querySelectorOne(
+        this._element,
+        'div[jstcache] > div[role=button][jsaction$=".send"], '+
+        'div[jsaction] > div[role=button][disabled]'
+      )
+    );
+    this._attachBtn = ec.run(
+      'attach button',
+      () => querySelectorOne(this._element, 'div[role=button][jsaction$=".attach"]')
+    );
+    this._bodyEl = ec.run(
+      'body',
+      () => querySelectorOne(this._element, 'div[contenteditable][g_editable][role=textbox]')
+    );
+    this._subjectEl = this._isInline ? null : ec.run(
+      'subject',
+      () => {
+        const el = querySelectorOne(this._element, 'div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
+        if (!(el instanceof HTMLInputElement)) throw new Error("Wrong type");
+        return el;
       }
-    } catch(err) {
-      hadError = true;
-      this._driver.getLogger().error(err, {
-        isInline: this._isInline,
-        topBtnsLength: topBtns.length,
-        sendBtnsLength: sendBtns.length,
-        attachBtnsLength: attachBtns.length,
-        bodyElsLength: bodyEls.length,
-        subjectElsLength: subjectEls.length,
-        html: censorHTMLstring(this._element.innerHTML)
-      });
-    }
+    );
+    this._popOutBtn = this._isInline ? ec.run(
+      'pop-out button',
+      () => querySelectorOne(this._element, 'button[jsaction$=".quick_compose_popout_mole"]')
+    ) : null;
+    this._closeBtn = this._isInline ? null : ec.run(
+      'close button',
+      () => querySelectorOne(
+        this._element,
+        'div[jstcache][jsan][jsaction] > button[jsaction$=".close_mole"]')
+    );
+    this._minimizeBtn = this._isInline ? null : ec.run(
+      'minimize button',
+      () => querySelectorOne(
+        this._element,
+        'div[jstcache][jsan][jsaction] > button[jsaction$=".minimize_mole"]')
+    );
+    this._bodyPlaceholder = this._isInline ? null : ec.run(
+      'body placeholder',
+      () => {
+        const el = this._bodyEl && this._bodyEl.previousElementSibling;
+        if (!(el instanceof HTMLElement) || el.nodeName !== 'LABEL')
+          throw new Error(`compose body placeholder wrong type ${el && el.nodeName}`);
+        return el;
+      }
+    );
+    ec.report(() => ({
+      isInline: this._isInline,
+      html: censorHTMLstring(this._element.innerHTML)
+    }));
+
+    const bottomAreaElementCount = this._sendBtn && this._sendBtn.parentElement && this._sendBtn.parentElement.childElementCount;
 
     this._driver.getLogger().eventSite('compose open', {
-      hadError, bottomAreaElementCount,
+      errorCount: ec.errorCount(),
+      bottomAreaElementCount,
       isInline: this._isInline
     });
 
-    var draftSaveTriggerer = kefirBus();
+    const draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
     draftSaveTriggerer
       .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
@@ -152,10 +142,12 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
         }
       });
 
-    this._eventStream.plug(
-      makeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
-        .map(() => ({eventName: 'bodyChanged'}))
-    );
+    if (this._bodyEl) {
+      this._eventStream.plug(
+        makeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+          .map(() => ({eventName: 'bodyChanged'}))
+      );
+    }
 
     handleComposeLinkChips(this);
   }
@@ -171,7 +163,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   // elements.
   _informBodyChanged() {
     if (this._bodyPlaceholder) {
-      if (this._bodyEl.textContent.length > 0) {
+      if (this._bodyEl && this._bodyEl.textContent.length > 0) {
         this._bodyPlaceholder.style.display = "none";
       } else {
         // To do this properly, we have to re-add whatever the visible class is.
@@ -183,8 +175,9 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     this._queueDraftSave();
   }
   focus() {
+    if (!this._bodyEl) throw new Error("Compose View missing body element");
     this._bodyEl.focus();
-    var selection = (document:any).getSelection();
+    const selection = (document:any).getSelection();
     if (
       this._lastSelectionRange &&
       (!selection.rangeCount || isRangeEmpty(selection.getRangeAt(0)))
@@ -211,10 +204,12 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return retval;
   }
   setBodyHTML(html: string): void {
+    if (!this._bodyEl) throw new Error("Compose View missing body element");
     this._bodyEl.innerHTML = html;
     this._informBodyChanged();
   }
   setBodyText(text: string): void {
+    if (!this._bodyEl) throw new Error("Compose View missing body element");
     this._bodyEl.textContent = text;
     this._informBodyChanged();
   }
@@ -236,6 +231,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     }
   }
   send() {
+    if (!this._sendBtn) throw new Error("Compose View missing send element");
     simulateClick(this._sendBtn);
   }
   minimize() {
@@ -265,11 +261,11 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     if (this._modifierButtonContainer) {
       return this._modifierButtonContainer;
     }
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.className = 'inboxsdk__compose_actionToolbar';
 
     if (!this._isInline) {
-      var hiddenAttachBtn = this._attachBtn.nextSibling;
+      const hiddenAttachBtn = this._attachBtn && this._attachBtn.nextSibling;
       if (hiddenAttachBtn && hiddenAttachBtn.style && hiddenAttachBtn.style.position === 'absolute') {
         hiddenAttachBtn.style.display = 'none';
       } else {
@@ -277,9 +273,11 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
       }
     }
 
-    var sendParent = this._sendBtn.parentElement;
+    const sendBtn = this._sendBtn;
+    if (!sendBtn) throw new Error("Compose View missing send element");
+    const sendParent = sendBtn.parentElement;
     if (!sendParent) throw new Error("Could not find send button parent");
-    sendParent.insertBefore(div, this._sendBtn.nextSibling);
+    sendParent.insertBefore(div, sendBtn.nextSibling);
 
     this._modifierButtonContainer = div;
     return div;
@@ -317,6 +315,7 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
     return false;
   }
   getBodyElement(): HTMLElement {
+    if (!this._bodyEl) throw new Error("Compose View missing body element");
     return this._bodyEl;
   }
   getHTMLContent(): string {
@@ -380,11 +379,12 @@ var InboxComposeView = ud.defn(module, class InboxComposeView {
   closeButtonTooltip(buttonViewController: Object) {
     (buttonViewController:InboxComposeButtonView).closeTooltip();
   }
-});
-export default InboxComposeView;
+}
+
+export default defn(module, InboxComposeView);
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-  var test: ComposeViewDriver = new InboxComposeView(({}:any), document.body);
+  const test: ComposeViewDriver = new InboxComposeView(({}:any), document.body);
 }

@@ -7,8 +7,8 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(function(inboxSDK) {
 			title: 'Monkeys!',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
-			onClick: function(event){
-				event.dropdown.el.innerHTML = 'hello world!';
+			onClick(event){
+				event.dropdown.el.innerHTML = 'hello world! <br> <button type="button">Foo</button>';
 				event.dropdown.el.addEventListener('click', function() {
 					console.log('selection', composeView.getSelectedBodyText());
 				});
@@ -24,23 +24,25 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(function(inboxSDK) {
 			section: 'TRAY_LEFT'
 		});
 
-		button.showTooltip({
-			imageUrl: chrome.runtime.getURL('partycat.jpg'),
-			title: 'Monkeys Rule!',
-			subtitle: 'the jungle',
-			button: {
-				title: 'Party!',
-				onClick: function(){
-					var div = document.createElement('div');
-					div.innerHTML = 'Hello World!';
-					button2.showTooltip({
-						el: div
-					});
+		if (!composeView.isInlineReplyForm()) {
+			button.showTooltip({
+				imageUrl: chrome.runtime.getURL('partycat.jpg'),
+				title: 'Monkeys Rule!',
+				subtitle: 'the jungle',
+				button: {
+					title: 'Party!',
+					onClick: function(){
+						var div = document.createElement('div');
+						div.innerHTML = 'Hello World!';
+						button2.showTooltip({
+							el: div
+						});
 
-					setTimeout(function(){button2.closeTooltip();}, 5*1000);
+						setTimeout(function(){button2.closeTooltip();}, 5*1000);
+					}
 				}
-			}
-		});
+			});
+		}
 
 	});
 });

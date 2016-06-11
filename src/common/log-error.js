@@ -7,6 +7,7 @@ import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
 import getSessionId from './get-session-id';
 import {BUILD_VERSION} from './version';
+import isObject from 'lodash/lang/isObject';
 
 export type LogErrorContext = {
   appId?: ?string;
@@ -134,14 +135,14 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
 })();
 
 function haveWeSeenThisErrorAlready(error: Error): boolean {
-  if (error && typeof error == 'object') {
+  if (isObject(error)) {
     return _extensionSeenErrors.has(error);
   }
   return false;
 }
 
 function markErrorAsSeen(error: Error) {
-  if (error && typeof error == 'object') {
+  if (isObject(error)) {
     _extensionSeenErrors.add(error);
   }
 }
