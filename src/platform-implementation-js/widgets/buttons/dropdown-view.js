@@ -33,13 +33,13 @@ class DropdownView extends EventEmitter {
 		this._options = options || {};
 		this.el = dropdownViewDriver.getContentElement();
 
-		document.body.insertBefore(this._dropdownViewDriver.getContainerElement(), document.body.firstElementChild);
+		const containerEl = dropdownViewDriver.getContainerElement();
+		document.body.insertBefore(containerEl, document.body.firstElementChild);
 
-		if(!this._dropdownViewDriver.getContainerElement().hasAttribute('tabindex')){
+		if(!containerEl.hasAttribute('tabindex')){
 			// makes the element focusable, but not tab-focusable
-			this._dropdownViewDriver.getContainerElement().setAttribute('tabindex', '-1');
+			containerEl.setAttribute('tabindex', '-1');
 		}
-		this._dropdownViewDriver.getContainerElement().focus();
 
 		const onDestroy = Kefir.fromEvents(this, 'destroy');
 
@@ -50,7 +50,7 @@ class DropdownView extends EventEmitter {
 			.filter(event =>
 				event.isTrusted &&
 				!anchorElement.contains(event.target) &&
-				!this._dropdownViewDriver.getContainerElement().contains(event.target)
+				!containerEl.contains(event.target)
 			)
 			.takeUntilBy(onDestroy)
 			.onValue(() => {
@@ -58,7 +58,6 @@ class DropdownView extends EventEmitter {
 			});
 
 		if(!this._options.manualPosition){
-			const containerEl = dropdownViewDriver.getContainerElement();
 			containerEl.style.position = 'fixed';
 
 			asap(() => {
@@ -89,6 +88,15 @@ class DropdownView extends EventEmitter {
 					});
 			});
 		}
+
+		const startActiveElement = document.activeElement;
+		asap(() => {
+			if (this.closed) return;
+			if (document.activeElement !== startActiveElement) return;
+
+			// Needs to happen after it's been positioned.
+			containerEl.focus();
+		});
 	}
 
 	setPlacementOptions(options: ContainByScreenOptions) {
