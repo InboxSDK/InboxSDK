@@ -104,7 +104,7 @@ class InboxComposeView {
     );
     ec.report(() => ({
       isInline: this._isInline,
-      html: censorHTMLstring(this._element.innerHTML)
+      html: censorHTMLstring(this._element.outerHTML)
     }));
 
     const bottomAreaElementCount = this._sendBtn && this._sendBtn.parentElement && this._sendBtn.parentElement.childElementCount;
