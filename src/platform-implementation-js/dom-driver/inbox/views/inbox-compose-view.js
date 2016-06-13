@@ -58,7 +58,7 @@ class InboxComposeView {
       () => querySelectorOne(
         this._element,
         'div[jstcache] > div[role=button][jsaction$=".send"], '+
-        'div[jsaction] > div[role=button][disabled]'
+        'div[jstcache] > div[role=button][disabled]'
       )
     );
     this._attachBtn = ec.run(
