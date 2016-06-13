@@ -130,21 +130,22 @@ class InboxComposeView {
         }
       });
 
-    Kefir.merge([
-        Kefir.fromEvents(document.body, 'mousedown'),
-        Kefir.fromEvents(document.body, 'keydown')
-      ]).takeUntilBy(this.getStopper())
-      .onValue(event => {
-        var body = this.getBodyElement();
-        var selection = (document:any).getSelection();
-        if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
-          this._lastSelectionRange = selection.getRangeAt(0);
-        }
-      });
-
     if (this._bodyEl) {
+      const bodyEl = this._bodyEl;
+
+      Kefir.merge([
+          Kefir.fromEvents(document.body, 'mousedown'),
+          Kefir.fromEvents(document.body, 'keydown')
+        ]).takeUntilBy(this.getStopper())
+        .onValue(event => {
+          const selection = (document:any).getSelection();
+          if (selection.rangeCount > 0 && bodyEl.contains(selection.anchorNode)) {
+            this._lastSelectionRange = selection.getRangeAt(0);
+          }
+        });
+
       this._eventStream.plug(
-        makeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+        makeMutationObserverChunkedStream(bodyEl, {childList: true, subtree: true, characterData: true})
           .map(() => ({eventName: 'bodyChanged'}))
       );
     }
