@@ -67,7 +67,7 @@ class InboxComposeView {
     );
     this._bodyEl = ec.run(
       'body',
-      () => querySelectorOne(this._element, 'div[contenteditable][g_editable][role=textbox]')
+      () => querySelectorOne(this._element, 'div[contenteditable][g_editable]')
     );
     this._subjectEl = this._isInline ? null : ec.run(
       'subject',
