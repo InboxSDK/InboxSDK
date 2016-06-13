@@ -1,7 +1,6 @@
 /* @flow */
-//jshint ignore:start
 
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 
 /**
  * Returns a Kefir stream that repeatedly calls the condition callback until it
@@ -10,14 +9,23 @@ var Kefir = require('kefir');
  * thrown so that it gets logged. Well-behaving code should not let the timeout
  * get tripped.
  */
-export default function kefirWaitFor<T>(condition:() => ?T, timeout:number=60*1000, steptime:number=250): Kefir.Stream<T> {
+export default function streamWaitFor<T>(condition:() => ?T, timeout:number=60*1000, steptime:number=250): Kefir.Stream<T> {
   // make this error here so we have a sensible stack.
-  var timeoutError = new Error("waitFor timeout");
+  const timeoutError = new Error("waitFor timeout");
 
-  var timeoutStream = Kefir.later(timeout, null).flatMap(() => {
+  const timeoutButSuccessError = new Error("timed out, but condition was true!");
+
+  const timeoutStream = Kefir.later(timeout, null).flatMap(() => {
     setTimeout(() => {
       throw timeoutError;
     }, 0);
+    if (condition()) {
+      // TODO check if this is a thing that happens ever. If it is, let's
+      // return the result of condition() or restructure this function.
+      setTimeout(() => {
+        throw timeoutButSuccessError;
+      }, 0);
+    }
     return Kefir.constantError(timeoutError);
   });
 
