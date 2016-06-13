@@ -58,7 +58,7 @@ class InboxComposeView {
       () => querySelectorOne(
         this._element,
         'div[jstcache] > div[role=button][jsaction$=".send"], '+
-        'div[jsaction] > div[role=button][disabled]'
+        'div[jstcache] > div[role=button][disabled]'
       )
     );
     this._attachBtn = ec.run(
@@ -67,7 +67,7 @@ class InboxComposeView {
     );
     this._bodyEl = ec.run(
       'body',
-      () => querySelectorOne(this._element, 'div[contenteditable][g_editable][role=textbox]')
+      () => querySelectorOne(this._element, 'div[contenteditable][g_editable]')
     );
     this._subjectEl = this._isInline ? null : ec.run(
       'subject',
@@ -104,7 +104,7 @@ class InboxComposeView {
     );
     ec.report(() => ({
       isInline: this._isInline,
-      html: censorHTMLstring(this._element.innerHTML)
+      html: censorHTMLstring(this._element.outerHTML)
     }));
 
     const bottomAreaElementCount = this._sendBtn && this._sendBtn.parentElement && this._sendBtn.parentElement.childElementCount;
@@ -117,34 +117,35 @@ class InboxComposeView {
 
     const draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
-    draftSaveTriggerer
-      .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
-      .filter(x => x.length > 0)
-      .takeUntilBy(this._stopper)
-      .onValue(() => {
-        var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
-        try {
-          simulateKey(this.getBodyElement(), 13, 0);
-        } finally {
-          unsilence();
-        }
-      });
 
-    Kefir.merge([
-        Kefir.fromEvents(document.body, 'mousedown'),
-        Kefir.fromEvents(document.body, 'keydown')
-      ]).takeUntilBy(this.getStopper())
-      .onValue(event => {
-        var body = this.getBodyElement();
-        var selection = (document:any).getSelection();
-        if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
-          this._lastSelectionRange = selection.getRangeAt(0);
-        }
-      });
+    const bodyEl = this._bodyEl;
+    if (bodyEl) {
+      draftSaveTriggerer
+        .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
+        .filter(x => x.length > 0)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+          try {
+            simulateKey(bodyEl, 13, 0);
+          } finally {
+            unsilence();
+          }
+        });
 
-    if (this._bodyEl) {
+      Kefir.merge([
+          Kefir.fromEvents(document.body, 'mousedown'),
+          Kefir.fromEvents(document.body, 'keydown')
+        ]).takeUntilBy(this.getStopper())
+        .onValue(event => {
+          const selection = (document:any).getSelection();
+          if (selection.rangeCount > 0 && bodyEl.contains(selection.anchorNode)) {
+            this._lastSelectionRange = selection.getRangeAt(0);
+          }
+        });
+
       this._eventStream.plug(
-        makeMutationObserverChunkedStream(this._bodyEl, {childList: true, subtree: true, characterData: true})
+        makeMutationObserverChunkedStream(bodyEl, {childList: true, subtree: true, characterData: true})
           .map(() => ({eventName: 'bodyChanged'}))
       );
     }
