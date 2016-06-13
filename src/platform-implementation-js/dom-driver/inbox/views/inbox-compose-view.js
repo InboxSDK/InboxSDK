@@ -117,21 +117,21 @@ class InboxComposeView {
 
     const draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
-    draftSaveTriggerer
-      .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
-      .filter(x => x.length > 0)
-      .takeUntilBy(this._stopper)
-      .onValue(() => {
-        var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
-        try {
-          simulateKey(this.getBodyElement(), 13, 0);
-        } finally {
-          unsilence();
-        }
-      });
 
-    if (this._bodyEl) {
-      const bodyEl = this._bodyEl;
+    const bodyEl = this._bodyEl;
+    if (bodyEl) {
+      draftSaveTriggerer
+        .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
+        .filter(x => x.length > 0)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+          try {
+            simulateKey(bodyEl, 13, 0);
+          } finally {
+            unsilence();
+          }
+        });
 
       Kefir.merge([
           Kefir.fromEvents(document.body, 'mousedown'),
