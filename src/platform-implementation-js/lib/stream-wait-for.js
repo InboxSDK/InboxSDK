@@ -16,22 +16,21 @@ export default function streamWaitFor<T>(condition:() => ?T, timeout:number=60*1
   const timeoutButSuccessError = new Error("timed out, but condition was true!");
 
   const timeoutStream = Kefir.later(timeout, null).flatMap(() => {
+    const result = condition();
+    if (result) {
+      return Kefir.constant(result);
+    }
     setTimeout(() => {
       throw timeoutError;
     }, 0);
-    if (condition()) {
-      // TODO check if this is a thing that happens ever. If it is, let's
-      // return the result of condition() or restructure this function.
-      setTimeout(() => {
-        throw timeoutButSuccessError;
-      }, 0);
-    }
     return Kefir.constantError(timeoutError);
   });
 
-  return Kefir.later(0, null).merge(
-    Kefir.interval(steptime, null)
-  ).map(() =>
-    (condition():any)
-  ).filter(Boolean).merge(timeoutStream).take(1).takeErrors(1);
+  return Kefir.later(0, null)
+    .merge(Kefir.interval(steptime, null))
+    .map(() => (condition():any))
+    .filter(Boolean)
+    .merge(timeoutStream)
+    .take(1)
+    .takeErrors(1);
 }
