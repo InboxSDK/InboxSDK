@@ -13,8 +13,6 @@ export default function streamWaitFor<T>(condition:() => ?T, timeout:number=60*1
   // make this error here so we have a sensible stack.
   const timeoutError = new Error("waitFor timeout");
 
-  const timeoutButSuccessError = new Error("timed out, but condition was true!");
-
   const timeoutStream = Kefir.later(timeout, null).flatMap(() => {
     const result = condition();
     if (result) {
