@@ -48,6 +48,7 @@ class DropdownView extends EventEmitter {
 				fromEventTargetCapture(document, 'click')
 			])
 			.filter(event =>
+				!event.shouldIgnore &&
 				event.isTrusted &&
 				!anchorElement.contains(event.target) &&
 				!containerEl.contains(event.target)
