@@ -3,12 +3,12 @@
 
 const jsdom = require('jsdom');
 
-jsdom.defaultDocumentFeatures = {
-  FetchExternalResources: false,
-  ProcessExternalResources: false
-};
-
 export default function jsdomDoc(html: string): Document {
-  const document: Document = (jsdom.jsdom(html): any);
+  const document: Document = (jsdom.jsdom(html, {
+    features: {
+      FetchExternalResources: false,
+      ProcessExternalResources: false
+    }
+  }): any);
   return document;
 }
