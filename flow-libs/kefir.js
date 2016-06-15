@@ -7,7 +7,7 @@ declare module kefir {
     {type: 'end', value: void};
 
   // represents EventStreams and Properties. Yeah, kinda hacky that they're mixed.
-  declare class Stream<T> {
+  declare class Stream<+T> {
     toProperty(): Stream<T>;
     toProperty<U>(getCurrent: ?() => U): Stream<T|U>;
     changes(): Stream<T>;
