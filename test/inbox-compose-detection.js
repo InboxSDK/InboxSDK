@@ -36,9 +36,9 @@ describe('Inbox Compose Detection', function() {
 
       const results = finder(page20160614());
       assert.strictEqual(results.length, 3);
-      assert(results.includes(compose1));
-      assert(results.includes(compose2));
-      assert(results.includes(inlineCompose));
+      assert(_.includes(results, compose1));
+      assert(_.includes(results, compose2));
+      assert(_.includes(results, inlineCompose));
     });
 
     it('2016-06-14 with chat sidebar', function() {
@@ -47,7 +47,7 @@ describe('Inbox Compose Detection', function() {
 
       const results = finder(pageWithSidebar20160614());
       assert.strictEqual(results.length, 1);
-      assert(results.includes(compose1));
+      assert(_.includes(results, compose1));
     });
   });
 
@@ -71,9 +71,9 @@ describe('Inbox Compose Detection', function() {
         .onEnd(() => {
           const results = spy.args.map(callArgs => callArgs[0].el);
           assert.strictEqual(results.length, 3);
-          assert(results.includes(compose1));
-          assert(results.includes(compose2));
-          assert(results.includes(inlineCompose));
+          assert(_.includes(results, compose1));
+          assert(_.includes(results, compose2));
+          assert(_.includes(results, inlineCompose));
           cb();
         });
     });
@@ -89,7 +89,7 @@ describe('Inbox Compose Detection', function() {
         .onEnd(() => {
           const results = spy.args.map(callArgs => callArgs[0].el);
           assert.strictEqual(results.length, 1);
-          assert(results.includes(compose1));
+          assert(_.includes(results, compose1));
           cb();
         });
     });
