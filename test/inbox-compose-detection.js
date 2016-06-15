@@ -19,6 +19,9 @@ const pageWithSidebar20160614: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-with-chat-sidebar-2016-06-14.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
+  this.slow(5000);
+  this.timeout(10000);
+
   global.MutationObserver = undefined;
   before(function() {
     global.MutationObserver = MockMutationObserver;
@@ -29,7 +32,6 @@ describe('Inbox Compose Detection', function() {
 
   describe('finder', function() {
     it('2016-06-14', function() {
-      this.slow();
       const compose1 = page20160614().querySelector('[data-test-id=compose1]');
       const compose2 = page20160614().querySelector('[data-test-id=compose2]');
       const inlineCompose = page20160614().querySelector('[data-test-id=inlinecompose]');
@@ -42,7 +44,6 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-14 with chat sidebar', function() {
-      this.slow();
       const compose1 = pageWithSidebar20160614().querySelector('[data-test-id=compose1]');
 
       const results = finder(pageWithSidebar20160614());
@@ -53,13 +54,11 @@ describe('Inbox Compose Detection', function() {
 
   describe('parser', function() {
     it('2016-06-14', function() {
-      this.slow();
     });
   });
 
   describe('watcher', function() {
     it('2016-06-14', function(cb) {
-      this.slow();
       const compose1 = page20160614().querySelector('[data-test-id=compose1]');
       const compose2 = page20160614().querySelector('[data-test-id=compose2]');
       const inlineCompose = page20160614().querySelector('[data-test-id=inlinecompose]');
@@ -79,7 +78,6 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-14 with chat sidebar', function(cb) {
-      this.slow();
       const compose1 = pageWithSidebar20160614().querySelector('[data-test-id=compose1]');
 
       const spy = sinon.spy();
