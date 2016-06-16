@@ -20,7 +20,8 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     streamWaitFor(() => {
       const els = root.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]');
       // TODO We need to handle the case where there are multiple elements that
-      // match the above selector, but the wrong element appears first.
+      // match the above selector, but the wrong element is added to the page
+      // first, and this wait-for ends before the correct element is present.
       return els;
     })
       .flatMap(els => Kefir.merge(_.map(els, makeElementChildStream)))
