@@ -4,6 +4,7 @@ import Logger from './logger';
 
 export default class ErrorCollector {
   _name: string;
+  _runCount: number = 0;
   _errorLogs: Array<{
     name: string;
     message: string;
@@ -18,6 +19,7 @@ export default class ErrorCollector {
     if (this._hasReported) {
       throw new Error("Has already reported");
     }
+    this._runCount++;
     try {
       return cb();
     } catch(e) {
@@ -39,6 +41,14 @@ export default class ErrorCollector {
         extra: errorDataCb()
       });
     }
+  }
+
+  getErrorLogs() {
+    return this._errorLogs;
+  }
+
+  runCount(): number {
+    return this._runCount;
   }
 
   errorCount(): number {

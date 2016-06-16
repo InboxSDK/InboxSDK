@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import once from 'lodash/function/once';
 import jsdomDoc from './lib/jsdom-doc';
-import MockMutationObserver from './lib/mock-mutation-observer';
+import fakePageGlobals from './lib/fake-page-globals';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
@@ -22,13 +22,7 @@ describe('Inbox Compose Detection', function() {
   this.slow(5000);
   this.timeout(10000);
 
-  global.MutationObserver = undefined;
-  before(function() {
-    global.MutationObserver = MockMutationObserver;
-  });
-  after(function() {
-    global.MutationObserver = undefined;
-  });
+  fakePageGlobals();
 
   describe('finder', function() {
     it('2016-06-14', function() {
@@ -54,6 +48,19 @@ describe('Inbox Compose Detection', function() {
 
   describe('parser', function() {
     it('2016-06-14', function() {
+      const compose = page20160614().querySelector('[data-test-id=compose1]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.isInline);
+    });
+
+    it('2016-06-14 inline', function() {
+      const compose = page20160614().querySelector('[data-test-id=inlinecompose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
     });
   });
 
