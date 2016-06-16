@@ -17,6 +17,7 @@ describe('detectionRunner', function() {
     const e1 = {el: doc().createElement('div'), removalStream: Kefir.constant()};
 
     detectionRunner({
+      name: 'test',
       parser: () => ({
         elements: {}, score: 1, errors: [], __extra: 123
       }),

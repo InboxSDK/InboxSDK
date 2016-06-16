@@ -78,3 +78,6 @@ export default function parser(el: HTMLElement) {
     errors: ec.getErrorLogs()
   };
 }
+
+/*:: const x = parser(({}:any)); */
+export type Parsed = typeof x;

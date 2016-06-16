@@ -25,6 +25,8 @@ import {
   isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
+import type {Parsed} from '../detection/compose/parser';
+
 class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
@@ -42,83 +44,31 @@ class InboxComposeView {
   _modifierButtonContainer: ?HTMLElement;
   _lastSelectionRange: ?Range;
   _isInline: boolean;
+  _p: Parsed;
+  _els: Parsed.elements;
 
-  constructor(driver: InboxDriver, el: HTMLElement) {
+  constructor(driver: InboxDriver, el: HTMLElement, parsed: Parsed) {
     this._element = el;
     this._driver = driver;
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
     this._lastSelectionRange = null;
-    this._isInline = this._element.getAttribute('role') !== 'dialog';
+    this._p = parsed;
+    this._els = parsed.elements;
 
-    const ec = new ErrorCollector('compose');
-    this._sendBtn = ec.run(
-      'send button',
-      () => querySelectorOne(
-        this._element,
-        'div[jstcache] > div[role=button][jsaction$=".send"], '+
-        'div[jstcache] > div[role=button][disabled]'
-      )
-    );
-    this._attachBtn = ec.run(
-      'attach button',
-      () => querySelectorOne(this._element, 'div[role=button][jsaction$=".attach"]')
-    );
-    this._bodyEl = ec.run(
-      'body',
-      () => querySelectorOne(this._element, 'div[contenteditable][g_editable]')
-    );
-    this._subjectEl = this._isInline ? null : ec.run(
-      'subject',
-      () => {
-        const el = querySelectorOne(this._element, 'div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
-        if (!(el instanceof HTMLInputElement)) throw new Error("Wrong type");
-        return el;
-      }
-    );
-    this._popOutBtn = this._isInline ? ec.run(
-      'pop-out button',
-      () => querySelectorOne(this._element, 'button[jsaction$=".quick_compose_popout_mole"]')
-    ) : null;
-    this._closeBtn = this._isInline ? null : ec.run(
-      'close button',
-      () => querySelectorOne(
-        this._element,
-        'div[jstcache][jsan][jsaction] > button[jsaction$=".close_mole"]')
-    );
-    this._minimizeBtn = this._isInline ? null : ec.run(
-      'minimize button',
-      () => querySelectorOne(
-        this._element,
-        'div[jstcache][jsan][jsaction] > button[jsaction$=".minimize_mole"]')
-    );
-    this._bodyPlaceholder = this._isInline ? null : ec.run(
-      'body placeholder',
-      () => {
-        const el = this._bodyEl && this._bodyEl.previousElementSibling;
-        if (!(el instanceof HTMLElement) || el.nodeName !== 'LABEL')
-          throw new Error(`compose body placeholder wrong type ${el && el.nodeName}`);
-        return el;
-      }
-    );
-    ec.report(() => ({
-      isInline: this._isInline,
-      html: censorHTMLstring(this._element.outerHTML)
-    }));
-
-    const bottomAreaElementCount = this._sendBtn && this._sendBtn.parentElement && this._sendBtn.parentElement.childElementCount;
+    const bottomAreaElementCount = this._els.sendBtn && this._els.sendBtn.parentElement && this._els.sendBtn.parentElement.childElementCount;
 
     this._driver.getLogger().eventSite('compose open', {
-      errorCount: ec.errorCount(),
+      errorCount: this._p.errors.length,
       bottomAreaElementCount,
-      isInline: this._isInline
+      isInline: this._p.attributes.isInline
     });
 
     const draftSaveTriggerer = kefirBus();
     this._queueDraftSave = () => {draftSaveTriggerer.emit(null);};
 
-    const bodyEl = this._bodyEl;
+    const bodyEl = this._els.body;
     if (bodyEl) {
       draftSaveTriggerer
         .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
@@ -163,21 +113,21 @@ class InboxComposeView {
   // Call this whenever we change the body directly by mucking with the
   // elements.
   _informBodyChanged() {
-    if (this._bodyPlaceholder) {
-      if (this._bodyEl && this._bodyEl.textContent.length > 0) {
-        this._bodyPlaceholder.style.display = "none";
+    if (this._els.bodyPlaceholder) {
+      if (this._els.body && this._els.body.textContent.length > 0) {
+        this._els.bodyPlaceholder.style.display = "none";
       } else {
         // To do this properly, we have to re-add whatever the visible class is.
         // It's a bit of work for a pretty minor detail (making the placeholder
         // re-appear immediately when SDK methods are used to clear a compose).
-        //this._bodyPlaceholder.style.display = "";
+        //this._els.bodyPlaceholder.style.display = "";
       }
     }
     this._queueDraftSave();
   }
   focus() {
-    if (!this._bodyEl) throw new Error("Compose View missing body element");
-    this._bodyEl.focus();
+    if (!this._els.body) throw new Error("Compose View missing body element");
+    this._els.body.focus();
     const selection = (document:any).getSelection();
     if (
       this._lastSelectionRange &&
@@ -205,13 +155,13 @@ class InboxComposeView {
     return retval;
   }
   setBodyHTML(html: string): void {
-    if (!this._bodyEl) throw new Error("Compose View missing body element");
-    this._bodyEl.innerHTML = html;
+    if (!this._els.body) throw new Error("Compose View missing body element");
+    this._els.body.innerHTML = html;
     this._informBodyChanged();
   }
   setBodyText(text: string): void {
-    if (!this._bodyEl) throw new Error("Compose View missing body element");
-    this._bodyEl.textContent = text;
+    if (!this._els.body) throw new Error("Compose View missing body element");
+    this._els.body.textContent = text;
     this._informBodyChanged();
   }
   setToRecipients(emails: string[]): void {
@@ -224,25 +174,25 @@ class InboxComposeView {
     throw new Error("Not implemented");
   }
   close() {
-    if (this._isInline) {
+    if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose");
     }
-    if (this._closeBtn) {
-      simulateClick(this._closeBtn);
+    if (this._els.closeBtn) {
+      simulateClick(this._els.closeBtn);
     }
   }
   send() {
-    if (!this._sendBtn) throw new Error("Compose View missing send element");
-    simulateClick(this._sendBtn);
+    if (!this._els.sendBtn) throw new Error("Compose View missing send element");
+    simulateClick(this._els.sendBtn);
   }
   minimize() {
-    if (this._isInline) {
+    if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose views");
     }
     // TODO
   }
   restore() {
-    if (this._isInline) {
+    if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose views");
     }
     // TODO
@@ -265,8 +215,8 @@ class InboxComposeView {
     const div = document.createElement('div');
     div.className = 'inboxsdk__compose_actionToolbar';
 
-    if (!this._isInline) {
-      const hiddenAttachBtn = this._attachBtn && this._attachBtn.nextSibling;
+    if (!this._p.attributes.isInline) {
+      const hiddenAttachBtn = this._els.attachBtn && this._els.attachBtn.nextSibling;
       if (hiddenAttachBtn && hiddenAttachBtn.style && hiddenAttachBtn.style.position === 'absolute') {
         hiddenAttachBtn.style.display = 'none';
       } else {
@@ -274,7 +224,7 @@ class InboxComposeView {
       }
     }
 
-    const sendBtn = this._sendBtn;
+    const sendBtn = this._els.sendBtn;
     if (!sendBtn) throw new Error("Compose View missing send element");
     const sendParent = sendBtn.parentElement;
     if (!sendParent) throw new Error("Could not find send button parent");
@@ -296,28 +246,28 @@ class InboxComposeView {
     throw new Error("Not implemented");
   }
   isReply(): boolean {
-    if (this._isInline) return true;
+    if (this._p.attributes.isInline) return true;
     throw new Error("Not implemented");
   }
   isInlineReplyForm(): boolean {
-    return this._isInline;
+    return this._p.attributes.isInline;
   }
   popOut() {
-    if (!this._isInline) {
+    if (!this._p.attributes.isInline) {
       throw new Error("Can only pop out inline reply compose views");
     }
-    if (!this._popOutBtn) {
+    if (!this._els.popOutBtn) {
       throw new Error("Should not happen");
     }
-    simulateClick(this._popOutBtn);
+    simulateClick(this._els.popOutBtn);
   }
   getIsFullscreen(): boolean {
     // TODO
     return false;
   }
   getBodyElement(): HTMLElement {
-    if (!this._bodyEl) throw new Error("Compose View missing body element");
-    return this._bodyEl;
+    if (!this._els.body) throw new Error("Compose View missing body element");
+    return this._els.body;
   }
   getHTMLContent(): string {
     return this.getBodyElement().innerHTML;
@@ -332,19 +282,20 @@ class InboxComposeView {
     return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
   }
   getSubject(): string {
-    if (!this._subjectEl) {
+    const {subject} = this._els;
+    if (!subject) {
       throw new Error("InboxSDK: Could not locate subject field");
     }
-    return this._subjectEl.value;
+    return subject.value;
   }
   setSubject(text: string): void {
-    if (this._isInline) {
+    if (this._p.attributes.isInline) {
       throw new Error("setSubject is not supported for inline compose views");
     }
-    if (!this._subjectEl) {
+    if (!this._els.subject) {
       throw new Error("InboxSDK: Could not locate subject field");
     }
-    this._subjectEl.value = text;
+    this._els.subject.value = text;
   }
   getToRecipients(): Contact[] {
     throw new Error("Not implemented");
@@ -387,5 +338,5 @@ export default defn(module, InboxComposeView);
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-  const test: ComposeViewDriver = new InboxComposeView(({}:any), document.body);
+  const test: ComposeViewDriver = new InboxComposeView(({}:any), document.body, ({}:any));
 }
