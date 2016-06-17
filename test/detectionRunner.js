@@ -59,7 +59,7 @@ describe('detectionRunner', function() {
       }),
       watcher: () => Kefir.later(5, e1),
       finder: () => [e1.el],
-      interval: 5,
+      interval: 15,
       root: doc(),
       logError(e) { events.push(['error', e.message]); }
     })
