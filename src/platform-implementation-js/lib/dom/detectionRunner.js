@@ -76,8 +76,11 @@ export default function detectionRunner<P: GenericParserResults>(
     });
 
   const finderElements = arrayToLifetimes(
-    Kefir.interval(interval) // TODO scale based on user activity
-      .flatMap(() => delayIdle(interval))
+    // TODO scale based on user activity
+    Kefir.repeat(() =>
+      Kefir.later(interval)
+        .flatMap(() => delayIdle(interval))
+    )
       .map(() => {
         const els = finder(root);
         watcherFoundElements.forEach(el => {
