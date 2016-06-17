@@ -117,12 +117,9 @@ declare module kefir {
   declare function combine<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function combine<T,U>(obss: Stream<T>[], passiveObss?: Stream<U>[]): Stream<Array<T|U>>;
   declare function combine(obss: Stream[], passiveObss?: Stream[], combinator?: Function): Stream;
-  declare function zip<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function zip<T>(obss: Stream<T>[]): Stream<Array<T>>;
   declare function zip(obss: Stream[], combinator: Function): Stream;
-  declare function merge<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<A|B|C|D>;
   declare function merge<T>(obss: Stream<T>[]): Stream<T>;
-  declare function concat<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<A|B|C|D>;
   declare function concat<T>(obss: Stream<T>[]): Stream<T>;
 
   declare function pool(): Pool;

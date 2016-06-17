@@ -37,7 +37,7 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
           Logger.error(new Error("compose dialog element not found"), {
             html: censorHTMLtree(el)
           });
-          return null;
+          return (null: any);
         }
         return {el:composeEl,removalStream};
       })
