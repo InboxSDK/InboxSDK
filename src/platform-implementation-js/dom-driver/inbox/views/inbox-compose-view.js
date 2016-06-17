@@ -32,18 +32,9 @@ class InboxComposeView {
   _driver: InboxDriver;
   _eventStream: Kefir.Bus;
   _stopper: Kefir.Stream&{destroy:()=>void};
-  _closeBtn: ?HTMLElement;
-  _minimizeBtn: ?HTMLElement;
-  _sendBtn: ?HTMLElement;
-  _attachBtn: ?HTMLElement;
-  _popOutBtn: ?HTMLElement;
-  _bodyEl: ?HTMLElement;
-  _bodyPlaceholder: ?HTMLElement;
-  _subjectEl: ?HTMLInputElement;
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastSelectionRange: ?Range;
-  _isInline: boolean;
   _p: Parsed;
   _els: Parsed.elements;
 
