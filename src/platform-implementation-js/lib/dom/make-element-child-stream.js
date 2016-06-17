@@ -3,30 +3,32 @@
 
 import asap from 'asap';
 import logger from '../logger';
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+
+export type ElementWithLifetime = {el: HTMLElement, removalStream: Kefir.Stream};
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function makeElementChildStream(element: HTMLElement): Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
+export default function makeElementChildStream(element: HTMLElement): Kefir.Stream<ElementWithLifetime> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }
 
   return Kefir.stream((emitter) => {
-    var removalStreams: Map<HTMLElement, Object> = new Map();
-    var ended = false;
+    const removalStreams: Map<HTMLElement, Object> = new Map();
+    let ended = false;
 
     function newEl(el: HTMLElement) {
       if (el.nodeType !== 1) return;
-      var removalStream = kefirStopper();
+      const removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
       emitter.emit({el, removalStream});
     }
 
     function removedEl(el: HTMLElement) {
       if (el.nodeType !== 1) return;
-      var removalStream = removalStreams.get(el);
+      const removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
       if(removalStream){
@@ -36,7 +38,7 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Stre
       }
     }
 
-    var observer = new MutationObserver(function(mutations) {
+    const observer = new MutationObserver(function(mutations) {
       mutations.forEach((mutation) => {
         Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);

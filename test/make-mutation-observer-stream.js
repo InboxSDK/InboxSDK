@@ -6,17 +6,12 @@ import kefirBus from 'kefir-bus';
 import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
+import fakePageGlobals from './lib/fake-page-globals';
 
 import makeMutationObserverStream from '../src/platform-implementation-js/lib/dom/make-mutation-observer-stream';
 
 describe('makeMutationObserverStream', function() {
-  global.MutationObserver = null;
-  before(function() {
-    global.MutationObserver = require('./lib/mock-mutation-observer');
-  });
-  after(function() {
-    delete global.MutationObserver;
-  });
+  fakePageGlobals();
 
   it('works with MockElementParent', function(done) {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
@@ -44,7 +39,7 @@ describe('makeMutationObserverStream', function() {
     target.removeChild(child1);
   });
 
-  it("doesn't emit events while current events are processed", function(done) {    
+  it("doesn't emit events while current events are processed", function(done) {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const target = new MockElementParent([child1, child2]);

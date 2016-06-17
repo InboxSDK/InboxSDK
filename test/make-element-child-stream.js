@@ -4,17 +4,12 @@ import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
 import kefirBus from 'kefir-bus';
+import fakePageGlobals from './lib/fake-page-globals';
 
 import kefirMakeElementChildStream from '../src/platform-implementation-js/lib/dom/make-element-child-stream';
 
 describe('kefirMakeElementChildStream', function() {
-  global.MutationObserver = null;
-  before(function() {
-    global.MutationObserver = require('./lib/mock-mutation-observer');
-  });
-  after(function() {
-    delete global.MutationObserver;
-  });
+  fakePageGlobals();
 
   it('should work', function(done) {
     var child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');

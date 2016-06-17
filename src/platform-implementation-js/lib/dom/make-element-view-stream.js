@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 
 // Built for flatMapping a stream from makeElementChildStream(). This doesn't
 // call makeElementChildStream() here -- you can call that yourself so you can
@@ -9,14 +9,13 @@ var Kefir = require('kefir');
 // sure that this stream (and therefore the source makeElementChildStream) stops
 // being listened to at some point to trigger the destruction of the views!
 type View = {destroy: () => void};
-type TimedElement = {el: HTMLElement, removalStream: Kefir.Stream};
+import type {ElementWithLifetime} from './make-element-child-stream';
 
-export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: TimedElement) => Kefir.Stream<T> {
+export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: ElementWithLifetime) => Kefir.Stream<T> {
   return function(event) {
-    var mview = viewFn(event.el);
-    if (mview) {
-      var view = mview;
-      event.removalStream.onValue(function() {
+    const view = viewFn(event.el);
+    if (view) {
+      event.removalStream.take(1).onValue(() => {
         view.destroy();
       });
       return Kefir.constant(view);

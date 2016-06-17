@@ -1,7 +1,10 @@
+/* @flow */
+
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import delay from '../src/common/delay';
 
 import streamWaitFor from '../src/platform-implementation-js/lib/stream-wait-for';
 
@@ -35,20 +38,20 @@ describe('streamWaitFor', function() {
     tooEarly = false;
   });
 
-  it('should not call condition if not subscribed to', function(cb) {
-    const s = streamWaitFor(function() {
+  it('should not call condition if not subscribed to', async function() {
+    const s = streamWaitFor(() => {
       throw new Error("Should not happen");
     });
 
     // streamWaitFor calls condition after a timeout usually, so give it a
     // moment to try.
-    setTimeout(cb, 0);
+    await delay(20);
   });
 
   it('should stop calling condition when unsubscribed from inside condition', function(cb) {
     const stopper = kefirStopper();
-    var calls = 0;
-    var s = streamWaitFor(function() {
+    let calls = 0;
+    const s = streamWaitFor(() => {
       if (++calls === 1) {
         stopper.destroy();
         setTimeout(cb, 0);
@@ -56,17 +59,29 @@ describe('streamWaitFor', function() {
         throw new Error("Should not happen");
       }
     }, 10, 1);
-    s.takeUntilBy(stopper).onValue(function() {
+    s.takeUntilBy(stopper).onValue(() => {
       throw new Error("Should not happen");
     });
   });
 
-  it('will not timeout if unsubscribed from', function(cb) {
+  it('will not timeout if unsubscribed from', async function() {
     streamWaitFor(() => false, 2, 1)
       .takeUntilBy(Kefir.later(0))
       .onValue(() => {
         throw new Error("Should not happen");
       });
-    setTimeout(cb, 4);
+    await delay(20);
+  });
+
+  it('will check condition before timeout', async function() {
+    const spy = sinon.spy();
+    let x = null;
+    streamWaitFor(() => x, 50, 1000).onValue(spy);
+    await delay(20);
+    x = {};
+    await delay(40);
+
+    assert(spy.calledOnce);
+    assert.strictEqual(spy.firstCall.args[0], x);
   });
 });

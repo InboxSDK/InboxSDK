@@ -6,18 +6,13 @@ import kefirBus from 'kefir-bus';
 import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 const MockElementParent = require('./lib/mock-element-parent');
+import fakePageGlobals from './lib/fake-page-globals';
 
 import makeElementViewStream from '../src/platform-implementation-js/lib/dom/make-element-view-stream';
 import makeElementChildStream from '../src/platform-implementation-js/lib/dom/make-element-child-stream';
 
 describe('makeElementViewStream', function() {
-  global.MutationObserver = null;
-  before(function() {
-    global.MutationObserver = require('./lib/mock-mutation-observer');
-  });
-  after(function() {
-    delete global.MutationObserver;
-  });
+  fakePageGlobals();
 
   it('should work with makeElementChildStream', function(done) {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');

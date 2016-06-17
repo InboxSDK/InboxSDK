@@ -13,7 +13,14 @@ const Z_SPACE_CHAR = '\u200b';
 const X_URL = 'https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png';
 
 const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDriver) {
-  var mainElement = composeView.getElement();
+  // Abort if we're missing elements we'll need.
+  try {
+    composeView.getBodyElement();
+  } catch(err) {
+    return;
+  }
+
+  const mainElement = composeView.getElement();
   _waitToClaim(mainElement)
     .takeUntilBy(composeView.getStopper())
     .onValue(() => {
@@ -22,8 +29,8 @@ const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDri
         mainElement.classList.remove('inboxsdk__ensure_link_active');
       });
 
-      var bodyElement = composeView.getBodyElement();
-      var fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
+      const bodyElement = composeView.getBodyElement();
+      const fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
 
       composeView.getEventStream()
         .filter(event => event.eventName === 'bodyChanged')
@@ -482,5 +489,5 @@ function _removeZSpaceOne(chipElement: HTMLElement){
     var textNode = chipElement.nextSibling;
     if(textNode){
       textNode.textContent = textNode.textContent.substring(1);
-    }    
+    }
 }
