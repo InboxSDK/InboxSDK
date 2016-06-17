@@ -28,7 +28,7 @@ describe('detectionRunner', function() {
       root: doc(),
       logError(e) { events.push(['error', e.message]); }
     })
-      .takeUntilBy(Kefir.later(10))
+      .takeUntilBy(Kefir.later(50))
       .onValue(({el, removalStream, parsed}) => {
         assert.strictEqual(parsed.score, 1);
         assert.strictEqual(parsed.__extra, 123);
