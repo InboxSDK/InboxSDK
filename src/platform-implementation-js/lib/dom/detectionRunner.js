@@ -55,7 +55,7 @@ export default function detectionRunner<P: GenericParserResults>(
 
   const watcherElements = watcher(root)
     .map(addParse)
-    // .filter(({parsed}) => parsed.score < 0.5)
+    .filter(({parsed}) => parsed.score > 0.1) // TODO figure out a good scoring metric
     .filter(({el}) => {
       if (finderFoundElements.has(el)) {
         logError(new Error(`detectionRunner(${name}) watcher emitted element previously found by finder`), {
@@ -96,7 +96,7 @@ export default function detectionRunner<P: GenericParserResults>(
     // else elements ignored by watcher will be found here and then trigger an
     // error which happens whenever this stream finds an element not in
     // watcher's stream.
-    // .filter(({parsed}) => parsed.score < 0.5)
+    .filter(({parsed}) => parsed.score > 0.1)
     .filter(({el}) => {
       if (!watcherFoundElements.has(el)) {
         logError(new Error(`detectionRunner(${name}) finder found element missed by watcher`), {
