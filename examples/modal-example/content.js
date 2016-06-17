@@ -94,3 +94,12 @@ function showModal6(){
 	});
 
 }
+
+function showModal7(){
+
+	var modal = window._modal = sdk.Widgets.showModalView({
+		el: div,
+		buttons: []
+	});
+
+}
