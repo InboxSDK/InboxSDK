@@ -4,6 +4,7 @@ import assert from 'assert';
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import kefirBus from 'kefir-bus';
 import once from 'lodash/function/once';
 import jsdomDoc from './lib/jsdom-doc';
 
@@ -178,6 +179,87 @@ describe('detectionRunner', function() {
             ['add', e1.el],
             ['error', 'detectionRunner(test) watcher emitted element previously found by finder'],
             ['remove', e1.el]
+          ]);
+          cb();
+        });
+      });
+  });
+
+  it("doesn't log when watcher and finder see element re-appear", function(cb) {
+    const events = [];
+    const e1 = {el: doc().createElement('div'), removalStream: kefirBus()};
+    let finderElements = [e1.el];
+
+    detectionRunner({
+      name: 'test',
+      parser: () => ({elements: {}, score: 1, errors: []}),
+      watcher: () => Kefir.merge([
+        Kefir.later(1, e1),
+        Kefir.later(20).flatMap(() => {
+          e1.removalStream.emit();
+          finderElements = [];
+          return Kefir.later(20).flatMap(() => {
+            finderElements = [e1.el];
+            return Kefir.constant(e1);
+          });
+        })
+      ]),
+      finder: () => finderElements,
+      root: doc(),
+      interval: 5,
+      logError(e) { events.push(['error', e.message]); }
+    })
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el, removalStream, parsed}) => {
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', e1.el],
+            ['remove', e1.el],
+            ['add', e1.el]
+          ]);
+          cb();
+        });
+      });
+  });
+
+  it("doesn't log when watcher sees element re-appear quickly", function(cb) {
+    const events = [];
+    const e1 = {el: doc().createElement('div'), removalStream: kefirBus()};
+
+    detectionRunner({
+      name: 'test',
+      parser: () => ({elements: {}, score: 1, errors: []}),
+      watcher: () => Kefir.merge([
+        Kefir.later(1, e1),
+        Kefir.later(20).flatMap(() => {
+          e1.removalStream.emit();
+          return Kefir.constant(e1);
+        })
+      ]),
+      finder: () => [e1.el],
+      root: doc(),
+      interval: 5,
+      logError(e) { events.push(['error', e.message]); }
+    })
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el, removalStream, parsed}) => {
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', e1.el],
+            ['remove', e1.el],
+            ['add', e1.el]
           ]);
           cb();
         });
