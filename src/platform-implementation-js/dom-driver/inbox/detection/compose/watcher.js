@@ -101,6 +101,17 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
         return {el:composeEl,removalStream};
       })
       .filter(Boolean),
+    // Fullscreen
+    makeElementChildStream(root.body)
+      .filter(({el}) => el.id && el.hasAttribute('jsaction'))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .filter(({el}) => el.nodeName === 'DIV' && el.id && !el.hasAttribute('jsaction'))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .filter(({el}) => el.nodeName === 'DIV' && el.hasAttribute('tabindex') && _.includes(el.getAttribute('jsaction'), 'exit_full_screen'))
+      .map(({el, removalStream}) => ({
+        el: el.querySelector('div[role=dialog]'), removalStream
+      }))
+      .filter(({el}) => el),
     // Inline
     openedThreads
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
