@@ -15,6 +15,65 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 const impStream = udKefir(module, imp);
 
 function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
+  const openedBundlesAndThreads = streamWaitFor(() => root.querySelector('[role=main]'))
+    .flatMap(makeElementChildStream)
+    .filter(({el}) => el.getAttribute('role') === 'application')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'list')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.classList.contains('scroll-list-section-body'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'listitem')
+    // each el is a bundle or thread now
+    .flatMap(({el,removalStream}) => {
+      const expanded = makeMutationObserverChunkedStream(el, {
+          attributes: true, attributeFilter:['aria-expanded']
+        })
+        .toProperty(()=>null)
+        .map(() => el.getAttribute('aria-expanded') === 'true')
+        .takeUntilBy(removalStream)
+        .beforeEnd(()=>false)
+        .skipDuplicates();
+      const opens = expanded.filter(x => x);
+      const closes = expanded.filter(x => !x);
+      return opens.map(_.constant({el, removalStream:closes.changes()}));
+    });
+
+  const openedTopLevelThreads = openedBundlesAndThreads
+    .filter(({el}) => el.getAttribute('aria-multiselectable') !== 'true');
+
+  const openedThreadsInBundles = openedBundlesAndThreads
+    .filter(({el}) => el.getAttribute('aria-multiselectable') === 'true')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'list')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => !el.hasAttribute('id'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'listitem')
+    .flatMap(({el,removalStream}) => {
+      const expanded = makeMutationObserverChunkedStream(el, {
+          attributes: true, attributeFilter:['class']
+        })
+        .toProperty(()=>null)
+        .map(() => el.classList.contains('scroll-list-item-open'))
+        .takeUntilBy(removalStream)
+        .beforeEnd(()=>false)
+        .skipDuplicates();
+      const opens = expanded.filter(x => x);
+      const closes = expanded.filter(x => !x);
+      return opens.map(_.constant({el, removalStream:closes.changes()}));
+    });
+
+  const openedThreads = Kefir.merge([
+    openedTopLevelThreads,
+    openedThreadsInBundles
+  ]);
+
   return Kefir.merge([
     // Regular
     streamWaitFor(() => {
@@ -43,41 +102,17 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
       })
       .filter(Boolean),
     // Inline
-    streamWaitFor(() => root.querySelector('[role=main]'))
-      .flatMap(makeElementChildStream)
-      .filter(({el}) => el.getAttribute('role') === 'application')
-      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .filter(({el}) => el.getAttribute('role') === 'list')
-      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .filter(({el}) => el.classList.contains('scroll-list-section-body'))
-      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      // each el is a bundle now
-      .flatMap(({el,removalStream}) => {
-        const expanded = makeMutationObserverChunkedStream(el, {
-            attributes: true, attributeFilter:['aria-expanded']
-          })
-          .toProperty(()=>null)
-          .map(() => el.getAttribute('aria-expanded') === 'true')
-          .takeUntilBy(removalStream)
-          .beforeEnd(()=>false)
-          .skipDuplicates();
-        const opens = expanded.filter(x => x);
-        const closes = expanded.filter(x => !x);
-        return opens.map(_.constant({el, removalStream:closes.changes()}));
-      })
-      // each el is an opened bundle now
+    openedThreads
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.children.length>0)
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.children.length>0 && el.getAttribute('role') !== 'heading')
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
-      .map(({el,removalStream}) =>
-        ({el: el.querySelector('div[jslog] > div[jsvs]'), removalStream})
-      )
-      .filter(({el}) => el)
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .filter(({el}) => el.hasAttribute('jslog'))
+      .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+      .filter(({el}) => el.hasAttribute('jsvs'))
       .flatMap(({el,removalStream}) => {
         // We've got the compose element now, but it could be closed. Let's
         // transform the stream to only get opened inline composes.
