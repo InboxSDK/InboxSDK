@@ -28,6 +28,8 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     .filter(({el}) => el.getAttribute('role') === 'listitem')
     // each el is a bundle or thread now
     .flatMap(({el,removalStream}) => {
+      // Only emit the element when it is opened, and trigger the removalStream
+      // when it is closed.
       const expanded = makeMutationObserverChunkedStream(el, {
           attributes: true, attributeFilter:['aria-expanded']
         })
@@ -56,6 +58,8 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.getAttribute('role') === 'listitem')
     .flatMap(({el,removalStream}) => {
+      // Only emit the element when it is opened, and trigger the removalStream
+      // when it is closed.
       const expanded = makeMutationObserverChunkedStream(el, {
           attributes: true, attributeFilter:['class']
         })
