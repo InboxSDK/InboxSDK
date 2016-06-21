@@ -17,6 +17,8 @@ const page20160614: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-14.html', 'utf8')));
 const pageWithSidebar20160614: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-with-chat-sidebar-2016-06-14.html', 'utf8')));
+const pageFullscreen20160620: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-20-fullscreen compose.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -44,6 +46,16 @@ describe('Inbox Compose Detection', function() {
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, compose1));
     });
+
+    it('2016-06-20 fullscreen and bundled inline', function() {
+      const bundledInlineCompose = pageFullscreen20160620().querySelector('[data-test-id=bundledInlineCompose]');
+      const fullscreenCompose = pageFullscreen20160620().querySelector('[data-test-id=fullscreenCompose]');
+
+      const results = finder(pageFullscreen20160620());
+      assert.strictEqual(results.length, 2);
+      assert(_.includes(results, bundledInlineCompose));
+      assert(_.includes(results, fullscreenCompose));
+    });
   });
 
   describe('parser', function() {
@@ -58,6 +70,22 @@ describe('Inbox Compose Detection', function() {
     it('2016-06-14 inline', function() {
       const compose = page20160614().querySelector('[data-test-id=inlinecompose]');
       const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
+    });
+
+    it('2016-06-20 fullscreen', function() {
+      const fullscreenCompose = pageFullscreen20160620().querySelector('[data-test-id=fullscreenCompose]');
+      const results = parser(fullscreenCompose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.isInline);
+    });
+
+    it('2016-06-20 bundled inline', function() {
+      const bundledInlineCompose = pageFullscreen20160620().querySelector('[data-test-id=bundledInlineCompose]');
+      const results = parser(bundledInlineCompose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.isInline);
@@ -95,6 +123,23 @@ describe('Inbox Compose Detection', function() {
           const results = spy.args.map(callArgs => callArgs[0].el);
           assert.strictEqual(results.length, 1);
           assert(_.includes(results, compose1));
+          cb();
+        });
+    });
+
+    it('2016-06-20 fullscreen and bundled inline', function(cb) {
+      const bundledInlineCompose = pageFullscreen20160620().querySelector('[data-test-id=bundledInlineCompose]');
+      const fullscreenCompose = pageFullscreen20160620().querySelector('[data-test-id=fullscreenCompose]');
+
+      const spy = sinon.spy();
+      watcher(pageFullscreen20160620())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 2);
+          assert(_.includes(results, bundledInlineCompose));
+          assert(_.includes(results, fullscreenCompose));
           cb();
         });
     });
