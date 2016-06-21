@@ -119,9 +119,8 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     // Inline
     openedThreads
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .filter(({el}) => el.children.length>0)
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-      .filter(({el}) => el.children.length>0 && el.getAttribute('role') !== 'heading')
+      .filter(({el}) => el.getAttribute('role') !== 'heading')
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
       .filter(({el}) => el.getAttribute('role') !== 'list')
       .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
