@@ -15,6 +15,10 @@ const doc = once(() => jsdomDoc(''));
 describe('detectionRunner', function() {
   this.slow(150);
 
+  before(function() {
+    doc();
+  });
+
   it('basic test', function(cb) {
     const events = [];
     const e1 = {el: doc().createElement('div'), removalStream: Kefir.constant()};
@@ -260,6 +264,77 @@ describe('detectionRunner', function() {
             ['add', e1.el],
             ['remove', e1.el],
             ['add', e1.el]
+          ]);
+          cb();
+        });
+      });
+  });
+
+  it("logs when watcher emits an element twice", function(cb) {
+    const events = [];
+    const e1 = {el: doc().createElement('div'), removalStream: Kefir.never()};
+
+    detectionRunner({
+      name: 'test',
+      parser: () => ({elements: {}, score: 1, errors: []}),
+      watcher: () => Kefir.sequentially(10, [e1, e1]),
+      finder: () => [e1.el],
+      root: doc(),
+      interval: 20,
+      logError(e) { events.push(['error', e.message]); }
+    })
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el, removalStream, parsed}) => {
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', e1.el],
+            ['error', 'detectionRunner(test) watcher emitted element previously emitted by watcher']
+          ]);
+          cb();
+        });
+      });
+  });
+
+  it("finder can rediscover elements that watcher said were removed", function(cb) {
+    const events = [];
+    const e1 = {el: doc().createElement('div'), removalStream: kefirBus()};
+
+    detectionRunner({
+      name: 'test',
+      parser: () => ({elements: {}, score: 1, errors: []}),
+      watcher: () => Kefir.merge([
+        Kefir.later(1, e1),
+        Kefir.later(20).flatMap(() => {
+          e1.removalStream.emit();
+          return Kefir.never();
+        })
+      ]),
+      finder: () => [e1.el],
+      root: doc(),
+      interval: 5,
+      logError(e) { events.push(['error', e.message]); }
+    })
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el, removalStream, parsed}) => {
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', e1.el],
+            ['remove', e1.el],
+            ['error', 'detectionRunner(test) finder found element missed by watcher'],
+            ['add', e1.el],
+            ['remove', e1.el]
           ]);
           cb();
         });

@@ -63,6 +63,12 @@ export default function detectionRunner<P: GenericParserResults>(
         });
         return false;
       }
+      if (watcherFoundElements.has(el)) {
+        logError(new Error(`detectionRunner(${name}) watcher emitted element previously emitted by watcher`), {
+          html: censorHTMLtree(el)
+        });
+        return false;
+      }
       return true;
     })
     .map(event => {
@@ -83,6 +89,7 @@ export default function detectionRunner<P: GenericParserResults>(
     )
       .map(() => {
         const els = finder(root);
+
         watcherFoundElements.forEach(el => {
           if (!_.includes(els, el) && !watcherFoundElementsMissedByFinder.has(el)) {
             watcherFoundElementsMissedByFinder.add(el);
@@ -91,7 +98,8 @@ export default function detectionRunner<P: GenericParserResults>(
             });
           }
         });
-        return els;
+
+        return els.filter(el => !watcherFoundElements.has(el));
       })
   )
     .map(addParse)
@@ -100,17 +108,13 @@ export default function detectionRunner<P: GenericParserResults>(
     // error which happens whenever this stream finds an element not in
     // watcher's stream.
     .filter(({parsed}) => parsed.score > 0.1)
-    .filter(({el}) => {
-      if (!watcherFoundElements.has(el)) {
-        logError(new Error(`detectionRunner(${name}) finder found element missed by watcher`), {
-          html: censorHTMLtree(el)
-        });
-        return true;
-      }
-      return false;
-    })
     .map(event => {
       const {el, removalStream} = event;
+
+      logError(new Error(`detectionRunner(${name}) finder found element missed by watcher`), {
+        html: censorHTMLtree(el)
+      });
+
       finderFoundElements.add(el);
       removalStream.take(1).onValue(() => {
         finderFoundElements.delete(el);
