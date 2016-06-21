@@ -13,6 +13,8 @@ import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = ud.defonce(module, ()=>new WeakMap());
 
+
+const SAMPLE_RATE = 0.01;
 // documented in src/docs/
 class Compose {
 
@@ -34,7 +36,7 @@ class Compose {
     members.composeViewStream.onValue(view => {
       driver.getLogger().trackFunctionPerformance(() => {
         members.handlerRegistry.addTarget(view);
-      }, 1, {
+      }, SAMPLE_RATE, {
         type: 'composeViewHandler',
         isInlineReplyForm: view.isInlineReplyForm()
       })
