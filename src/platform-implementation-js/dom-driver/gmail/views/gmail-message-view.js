@@ -41,6 +41,8 @@ class GmailMessageView {
 	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
 	_messageLoaded: boolean = false;
 	_openMoreMenu: ?HTMLElement;
+	_sender: ?Contact = null;
+	_recipients: ?Contact[] = null;
 
 	constructor(element: HTMLElement, gmailThreadView: GmailThreadView, driver: GmailDriver){
 		this._element = element;
@@ -124,21 +126,30 @@ class GmailMessageView {
 	}
 
 	getSender(): Contact {
+		let sender = this._sender;
+		if(sender) return sender;
+
 		var senderSpan = this._element.querySelector('h3.iw span[email]');
-		return this._getUpdatedContact({
+		sender = this._sender = this._getUpdatedContact({
 			name: senderSpan.getAttribute('name'),
 			emailAddress: senderSpan.getAttribute('email')
 		});
+
+		return sender;
 	}
 
 	getRecipients(): Array<Contact> {
+		let recipients = this._recipients;
+		if(recipients) return recipients;
 		var receipientSpans = this._element.querySelectorAll('.hb span[email]');
-		return _.map(receipientSpans, (span) => {
+		recipients = this._recipients = _.map(receipientSpans, (span) => {
 			return this._getUpdatedContact({
 				name: span.getAttribute('name'),
 				emailAddress: span.getAttribute('email')
 			});
 		});
+
+		return recipients;
 	}
 
 	getDateString(): string {
