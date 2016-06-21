@@ -14,6 +14,8 @@ import type {Handler} from '../lib/handler-registry';
 
 const memberMap = new WeakMap();
 
+const SAMPLE_RATE = 0.01;
+
 // documented in src/docs/
 class Router {
 	static NativeRouteIDs: Object;
@@ -43,7 +45,7 @@ class Router {
 		driver.getRouteViewDriverStream().onValue(routeViewDriver => {
 			driver.getLogger().trackFunctionPerformance(
 				() => _handleRouteViewChange(this, members, routeViewDriver),
-				1,
+				SAMPLE_RATE,
 				{
 					type: 'handleRouteViewChange',
 					hash: routeViewDriver.getHash()
