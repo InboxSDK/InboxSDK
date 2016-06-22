@@ -20,7 +20,10 @@ const impStream = udKefir(module, imp);
 function imp(driver: InboxDriver): Kefir.Stream<ComposeViewDriver> {
   return detectionRunner({
     name: 'compose',
-    finder, watcher, parser
+    finder, watcher, parser,
+    logError(err: Error, details?: any) {
+      driver.getLogger().errorSite(err, details);
+    }
   })
     .map(({el, removalStream, parsed}) => {
       const view = new InboxComposeView(driver, el, parsed);

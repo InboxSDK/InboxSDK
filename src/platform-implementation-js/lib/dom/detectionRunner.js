@@ -21,17 +21,16 @@ type GenericParserResults = {
 // results by using finder.
 export default function detectionRunner<P: GenericParserResults>(
   {
-    name, parser, watcher, finder,
+    name, parser, watcher, finder, logError,
     root=document,
-    logError=(err, details) => Logger.error(err, details),
     interval=5000
   }: {
     name: string;
     parser: (el: HTMLElement) => P;
     watcher: (root: Document) => Kefir.Stream<ElementWithLifetime>;
     finder: (root: Document) => Array<HTMLElement>;
+    logError: (err: Error, details?: any) => void;
     root?: Document;
-    logError?: (err: Error, details?: any) => void;
     interval?: number;
   }
 ): Kefir.Stream<ElementWithLifetime&{parsed: P}> {
