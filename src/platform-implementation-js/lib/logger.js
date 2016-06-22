@@ -110,6 +110,14 @@ class Logger {
     _logError(err, details, this._appId, true);
   }
 
+  errorSite(err: Error, details?: any) {
+    // Only the first logger instance reports Site errors.
+    if (!this._isMaster) {
+      return;
+    }
+    this.error(err, details);
+  }
+
   // Should only be used by the InboxSDK users for their own app events.
   eventApp(name: string, details?: any) {
     _trackEvent(this._appId, 'app', name, details);
@@ -133,7 +141,7 @@ class Logger {
 
   // Track Site events.
   eventSite(name: string, details?: any) {
-    // Only the first logger instance reports Gmail events.
+    // Only the first logger instance reports Site events.
     if (!this._isMaster) {
       return;
     }
