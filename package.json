@@ -57,13 +57,17 @@
     "rimraf": "^2.4.2",
     "rsvp": "^3.0.21",
     "safari-fix-map": "^1.0.4",
+    "selenium-standalone": "^5.1.1",
     "semver": "^5.0.1",
     "sinon": "^1.17.1",
     "stdio": "^0.2.6",
     "ud": "^3.0.0",
     "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.4.0"
+    "watchify": "^3.4.0",
+    "wdio-mocha-framework": "^0.3.4",
+    "wdio-selenium-standalone-service": "0.0.5",
+    "webdriverio": "^4.1.0"
   },
   "description": "Library for browser extensions to interact with Gmail.",
   "license": "All Rights Reserved",
