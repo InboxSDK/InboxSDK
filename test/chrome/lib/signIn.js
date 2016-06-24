@@ -1,5 +1,5 @@
 /* @flow */
-/*:: declare var browser; */
+declare var browser;
 
 import googleTotp from '../../lib/googleTotp';
 import readAuthInfo from './readAuthInfo';

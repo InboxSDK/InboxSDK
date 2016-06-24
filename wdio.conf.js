@@ -60,7 +60,8 @@ exports.config = {
             args: [
                 'enable-logging',
                 'v=1',
-                'no-sandbox'
+                'no-sandbox',
+                'load-extension=./examples/browser-test/'
             ]
         }
     }],
