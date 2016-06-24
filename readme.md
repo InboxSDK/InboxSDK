@@ -11,7 +11,7 @@ any changes are made to any SDK files, so that you don't have to click reload on
 the test extension yourself on every change. (You'll still need to refresh
 Gmail!)
 
-By default, `npm start` simply runs the following command:
+By default, `npm start` runs the following command:
 
     gulp default --single --watch --reloader
 
@@ -34,6 +34,29 @@ Building separate SDK and implementation bundles represents how the production
 builds will work. When using the local test server to host the
 platform-implementation bundle, you'll need to run Chrome with the
 `--allow-running-insecure-content` flag.
+
+# Types
+
+This project uses Facebook's Flow type checker (https://flowtype.org/). On
+OS X, you can install it through brew (`brew install flow`). You can use the
+`flow` command from within the repo to do type checking.
+
+# Tests
+
+This project has different kinds of unit tests and integration tests.
+
+There are many unit tests which run under a single Javascript environment in
+`test/*.js` files. These are executed by Mocha.
+
+There are tests which each run under their own Javascript environments in
+`test/jsdom/*.js` files. These are executed by the gulp task "test-jsdom".
+Running `gulp test` will execute the jsdom tests and the above unit tests
+together.
+
+There are Selenium-based browser integration tests in `test/chrome/*.js` files.
+These are the only tests which test the InboxSDK against the live Gmail and
+Inbox sites. These tests require that the InboxSDK has been built first. These
+tests can be run with `npm run test-browser`.
 
 # Implementation Notes
 
