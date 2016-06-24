@@ -5,3 +5,5 @@
 *~
 npm-debug.log
 .atom-build.json
+/chromeTestOutput
+/.inboxsdk_test_secret
