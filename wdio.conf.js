@@ -1,3 +1,15 @@
+var fs = require('fs');
+
+var testOutputDir = `${__dirname}/chromeTestOutput`;
+
+try {
+    fs.statSync(testOutputDir);
+} catch(err) {
+    fs.mkdirSync(testOutputDir);
+}
+
+process.env.CHROME_LOG_FILE = `${testOutputDir}/chrome_debug_${new Date().toISOString().replace(/:/g, '-')}.log`;
+
 exports.config = {
 
     //
@@ -43,8 +55,14 @@ exports.config = {
         // grid with only 5 firefox instance available you can make sure that not more than
         // 5 instance gets started at a time.
         maxInstances: 1,
-        //
-        browserName: 'chrome'
+        browserName: 'chrome',
+        chromeOptions: {
+            args: [
+                'enable-logging',
+                'v=1',
+                'no-sandbox'
+            ]
+        }
     }],
     //
     // ===================
@@ -64,7 +82,7 @@ exports.config = {
     coloredLogs: true,
     //
     // Saves a screenshot to a given path if a command fails.
-    screenshotPath: './errorShots/',
+    screenshotPath: './chromeTestOutput/',
     //
     // Set a base URL in order to shorten url command calls. If your url parameter starts
     // with "/", then the base url gets prepended.
