@@ -1,10 +1,13 @@
 /* @flow */
 /*:: declare var browser; */
 
+import signIn from './lib/signIn';
+import fs from 'fs';
+
 describe('stuff', function() {
   it('works', function() {
-    browser.url('https://inbox.google.com');
-    browser.waitForVisible('input[name=email]', 5000);
-    browser.setValue('input[name=email]', 'inboxsdktest@gmail.com');
+    signIn();
+    browser.execute('console.log("blah", 123)');
+    browser.debug();
   });
 });

@@ -3586,6 +3586,11 @@
       "from": "normalize-path@>=2.0.1 <3.0.0",
       "resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-2.0.1.tgz"
     },
+    "notp": {
+      "version": "2.0.3",
+      "from": "notp@latest",
+      "resolved": "https://registry.npmjs.org/notp/-/notp-2.0.3.tgz"
+    },
     "npm-install-package": {
       "version": "1.0.2",
       "from": "npm-install-package@>=1.0.2 <2.0.0",
@@ -4133,6 +4138,11 @@
       "from": "sax@>=1.1.4 <2.0.0",
       "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.1.tgz"
     },
+    "scmp": {
+      "version": "0.0.3",
+      "from": "scmp@0.0.3",
+      "resolved": "https://registry.npmjs.org/scmp/-/scmp-0.0.3.tgz"
+    },
     "selenium-standalone": {
       "version": "5.1.1",
       "from": "selenium-standalone@>=5.1.1 <6.0.0",
@@ -4363,6 +4373,11 @@
       "version": "3.0.0",
       "from": "signal-exit@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.0.tgz"
+    },
+    "simple-encryptor": {
+      "version": "1.1.0",
+      "from": "simple-encryptor@latest",
+      "resolved": "https://registry.npmjs.org/simple-encryptor/-/simple-encryptor-1.1.0.tgz"
     },
     "sinon": {
       "version": "1.17.4",
@@ -4752,6 +4767,11 @@
       "version": "1.6.0",
       "from": "thenify-all@>=1.6.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/thenify-all/-/thenify-all-1.6.0.tgz"
+    },
+    "thirty-two": {
+      "version": "1.0.1",
+      "from": "thirty-two@latest",
+      "resolved": "https://registry.npmjs.org/thirty-two/-/thirty-two-1.0.1.tgz"
     },
     "through": {
       "version": "2.3.8",

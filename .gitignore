@@ -6,3 +6,4 @@
 npm-debug.log
 .atom-build.json
 /errorShots
+/.inboxsdk_test_secret
