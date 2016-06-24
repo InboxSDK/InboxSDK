@@ -12,7 +12,7 @@ test:
   override:
     - flow check
     - npm test
-    - if [ -n "$INBOXSDK_TEST_SECRET" ]; then gulp -s; ./node_modules/.bin/wdio; fi
+    - if [ -n "$INBOXSDK_TEST_SECRET" ]; then ./node_modules/.bin/gulp -s && ./node_modules/.bin/wdio; fi
 
 general:
   artifacts:
