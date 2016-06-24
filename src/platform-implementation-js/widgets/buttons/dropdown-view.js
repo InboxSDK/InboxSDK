@@ -44,15 +44,25 @@ class DropdownView extends EventEmitter {
 		const onDestroy = Kefir.fromEvents(this, 'destroy');
 
 		Kefir.merge([
-				 // we listen for and modify the focus event on document sometimes
-				fromEventTargetCapture(document.body, 'focus'),
-				fromEventTargetCapture(document, 'click')
+				fromEventTargetCapture(document, 'click'),
+				// We modify the focus event on document sometimes, so we listen for
+				// it on body so our modifications can happen first.
+				fromEventTargetCapture(document.body, 'focus')
 			])
 			.filter(event =>
 				!event.shouldIgnore &&
 				event.isTrusted &&
 				!anchorElement.contains(event.target) &&
 				!containerEl.contains(event.target)
+			)
+			.merge(
+				Kefir.fromEvents(containerEl, 'keydown')
+					.filter(e => e.key ? e.key === 'Escape' : e.which === 27)
+					.map(e => {
+						e.preventDefault();
+						e.stopPropagation();
+						return e;
+					})
 			)
 			.takeUntilBy(onDestroy)
 			.onValue(() => {

@@ -1,10 +1,11 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var ud = require('ud');
-var Kefir = require('kefir');
+import _ from 'lodash';
+import {defn} from 'ud';
+import Kefir from 'kefir';
 import type InboxComposeView from './inbox-compose-view';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
@@ -12,9 +13,9 @@ import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import type {ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 import InboxTooltipView from './inbox-tooltip-view';
 
-var insertionOrderHint: number = 0;
+let insertionOrderHint: number = 0;
 
-var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
+class InboxComposeButtonView {
   _composeView: InboxComposeView;
   _buttonEl: HTMLElement;
   _iconEl: HTMLImageElement;
@@ -35,7 +36,7 @@ var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
     var dropdown = null;
     Kefir.merge([
       Kefir.fromEvents(div, 'click'),
-      Kefir.fromEvents(div, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+      fromEventTargetCapture(div, 'keyup').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
     ]).onValue(event => {
       event.preventDefault();
       event.stopPropagation();
@@ -113,5 +114,6 @@ var InboxComposeButtonView = ud.defn(module, class InboxComposeButtonView {
       this._tooltip.destroy();
     }
   }
-});
-export default InboxComposeButtonView;
+}
+
+export default defn(module, InboxComposeButtonView);
