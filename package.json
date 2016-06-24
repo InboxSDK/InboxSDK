@@ -82,7 +82,8 @@
   "private": true,
   "scripts": {
     "start": "gulp default --single --watch --reloader",
-    "test": "gulp test"
+    "test": "gulp test",
+    "test-browser": "wdio"
   },
   "version": "0.7.21"
 }
