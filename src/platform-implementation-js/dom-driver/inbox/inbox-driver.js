@@ -19,7 +19,7 @@ import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
-import type ButterBar from '../../platform-implementation/butter-bar';
+import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';

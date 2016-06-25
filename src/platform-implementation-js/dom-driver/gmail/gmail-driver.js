@@ -57,7 +57,7 @@ import openComposeWindow from './gmail-driver/open-compose-window';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
-import type ButterBar from '../../platform-implementation/butter-bar';
+import type ButterBar from '../../namespaces/butter-bar';
 import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-handle';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';

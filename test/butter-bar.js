@@ -8,7 +8,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import delay from '../src/common/delay';
 
-import ButterBar from '../src/platform-implementation-js/platform-implementation/butter-bar';
+import ButterBar from '../src/platform-implementation-js/namespaces/butter-bar';
 
 class MockButterBarDriver {
   _queue: Array<Object>;

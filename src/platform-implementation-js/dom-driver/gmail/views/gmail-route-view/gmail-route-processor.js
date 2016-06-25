@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 // only used for constants
-import Router from '../../../../platform-implementation/router';
+import Router from '../../../../namespaces/router';
 
 export default function GmailRouteProcessor() {
 	this._routeNameToRouteIDMap = null;
