@@ -55,7 +55,11 @@ together.
 
 There are Selenium-based browser integration tests in `test/chrome/*.js` files.
 These are the only tests which test the InboxSDK against the live Gmail and
-Inbox sites. These tests require that the InboxSDK has been built first. These
+Inbox sites. These tests are primarily about checking whether Gmail or Inbox
+have broken support with us, and our CI system runs these for us. These tests
+require that the InboxSDK has been built first and that the
+".inboxsdk_test_secret" file or the INBOXSDK_TEST_SECRET environment variable
+contains the decryption key for the Google test account credentials. These
 tests can be run with `npm run test-browser`.
 
 # Implementation Notes
