@@ -86,7 +86,13 @@ extension.
 
 The PlatformImplementation object instantiates either a GmailDriver or
 InboxDriver object and uses it to do its DOM manipulations. The Driver object
-is not directly exposed to the application.
+is not directly exposed to the application. This pattern is used often. For
+example, each Driver object has a getComposeViewDriverStream() method which
+returns a Kefir stream of objects following the ComposeViewDriver interface.
+The PlatformImplementation's Compose object takes the ComposeViewDriver object
+and instantiates a ComposeView object wrapping it, adding some logic common to
+both Gmail and Inbox, and this ComposeView object is what is exposed to the
+extension.
 
 ## src/injected-js/
 
