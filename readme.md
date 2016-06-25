@@ -70,6 +70,20 @@ object with the load method. It triggers an AJAX request for
 platform-implementation.js which is evaluated and creates a
 PlatformImplementation object.
 
+## src/inboxsdk-js/
+
+This contains the code for the global `InboxSDK` object with the `load` and
+`loadScript` methods.
+
+## src/platform-implementation-js/
+
+This is the code that the InboxSDK loader fetches from our server.
+
+When it's executed, it defines a global object containing a function that
+instantiates a PlatformImplementation object. Calls to `InboxSDK.load` return a
+promise that resolves to this object. This object is the object given to the
+extension.
+
 The PlatformImplementation object instantiates either a GmailDriver or
 InboxDriver object and uses it to do its DOM manipulations. The Driver object
 is not directly exposed to the application.
