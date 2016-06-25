@@ -57,7 +57,7 @@ import openComposeWindow from './gmail-driver/open-compose-window';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
-import type ButterBar from '../../platform-implementation/butter-bar';
+import type ButterBar from '../../namespaces/butter-bar';
 import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-handle';
 import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -160,7 +160,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getKeyboardShortcutHelpModifier(): KeyboardShortcutHelpModifier {return this._keyboardShortcutHelpModifier;}
 	getRouteViewDriverStream(): Kefir.Stream<Object> {return this._routeViewDriverStream;}
 	getRowListViewDriverStream(): Kefir.Stream<Object> {return this._rowListViewDriverStream;}
-	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
+	getThreadRowViewDriverStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
 	getThreadViewDriverStream(): Kefir.Stream<Object> {return this._threadViewDriverStream;}
 	getToolbarViewDriverStream(): Kefir.Stream<Object> {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver> {return (this._composeViewDriverStream:any);}

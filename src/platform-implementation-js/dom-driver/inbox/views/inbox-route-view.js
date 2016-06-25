@@ -9,7 +9,7 @@ import assertInterface from '../../../lib/assert-interface';
 import addAccessors from 'add-accessors';
 
 // only used for constants
-import Router from '../../../platform-implementation/router';
+import Router from '../../../namespaces/router';
 
 function getRouteID(path) {
   if (path === '') {

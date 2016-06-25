@@ -22,7 +22,7 @@ var Lists = function(appId, driver, membraneMap){
 		members.threadRowViewRegistry.dumpHandlers();
 	});
 
-	members.driver.getThreadRowViewDriverKefirStream().onValue(function(viewDriver){
+	members.driver.getThreadRowViewDriverStream().onValue(function(viewDriver){
 		var view = membraneMap.get(viewDriver);
 		if(!view){
 			view = new ThreadRowView(viewDriver);

@@ -55,7 +55,11 @@ together.
 
 There are Selenium-based browser integration tests in `test/chrome/*.js` files.
 These are the only tests which test the InboxSDK against the live Gmail and
-Inbox sites. These tests require that the InboxSDK has been built first. These
+Inbox sites. These tests are primarily about checking whether Gmail or Inbox
+have broken support with us, and our CI system runs these for us. These tests
+require that the InboxSDK has been built first and that the
+".inboxsdk_test_secret" file or the INBOXSDK_TEST_SECRET environment variable
+contains the decryption key for the Google test account credentials. These
 tests can be run with `npm run test-browser`.
 
 # Implementation Notes
@@ -66,11 +70,50 @@ object with the load method. It triggers an AJAX request for
 platform-implementation.js which is evaluated and creates a
 PlatformImplementation object.
 
+## src/inboxsdk-js/
+
+This contains the code for the global `InboxSDK` object with the `load` and
+`loadScript` methods.
+
+## src/platform-implementation-js/
+
+This is the code that the InboxSDK loader fetches from our server.
+
+When it's executed, it defines a global object containing a function that
+instantiates a PlatformImplementation object. Calls to `InboxSDK.load` return a
+promise that resolves to this object. This object is the object given to the
+extension.
+
 The PlatformImplementation object instantiates either a GmailDriver or
 InboxDriver object and uses it to do its DOM manipulations. The Driver object
-is not directly exposed to the application.
+is not directly exposed to the application. This pattern is used often. For
+example, each Driver object has a getComposeViewDriverStream() method which
+returns a Kefir stream of objects following the ComposeViewDriver interface.
+The PlatformImplementation's Compose object takes the ComposeViewDriver object
+and instantiates a ComposeView object wrapping it, adding some logic common to
+both Gmail and Inbox, and this ComposeView object is what is exposed to the
+extension.
 
-## Gmail
+## src/injected-js/
+
+This code ultimately ends up inside of platform-implementation.js. Unlike the
+rest of the code, it's executed within Gmail's environment instead of the
+extension's environment. This allows it to access global Gmail variables, and
+to intercept Gmail's AJAX connections (see xhr-proxy-factory). It communicates
+with the InboxSDK code in the extension environment through DOM events.
+
+InboxSDK code within Gmail's environment has less coverage from our error
+tracking system, and is more vulnerable to being affected by or affecting
+Gmail's own Javascript variables, so we try to minimize what functionality
+lives in the injected script.
+
+The file "src/injected-js/main.js" is browserified into "dist/injected.js",
+which is then included by "src/platform-implementation-js/lib/inject-script.js"
+and built into "dist/platform-implementation.js".
+
+## Element Detection Notes
+
+### Gmail
 
 CSS selectors should not depend on id values as these are uniquely
 auto-generated at run-time. CSS class names are randomly strings, but they stay
@@ -80,7 +123,7 @@ elements.
 The account switcher widget in Gmail is built a bit differently, and the notes
 about Inbox should be referred to instead for it.
 
-## Inbox
+### Inbox
 
 Like Gmail, Inbox uses a lot of randomly generated class names, but the class
 names appear to be regenerated every few weeks. CSS class names, id values,

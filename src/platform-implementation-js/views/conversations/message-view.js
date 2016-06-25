@@ -5,7 +5,7 @@ import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import AttachmentCardView from './attachment-card-view';
-import {MessageViewToolbarSectionNames} from '../../platform-implementation/conversations';
+import {MessageViewToolbarSectionNames} from '../../namespaces/conversations';
 import type ThreadView from './thread-view';
 import type {
 	MessageViewDriver, VIEW_STATE, MessageViewLinkDescriptor,
