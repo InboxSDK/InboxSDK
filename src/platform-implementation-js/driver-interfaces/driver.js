@@ -24,7 +24,7 @@ export type Driver = {
 	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appIconUrl: ?string): GmailKeyboardShortcutHandle;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
-	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object>;
+	getThreadRowViewDriverStream(): Kefir.Stream<Object>;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;

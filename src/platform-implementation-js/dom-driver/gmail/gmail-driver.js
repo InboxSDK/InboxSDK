@@ -160,7 +160,7 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 	getKeyboardShortcutHelpModifier(): KeyboardShortcutHelpModifier {return this._keyboardShortcutHelpModifier;}
 	getRouteViewDriverStream(): Kefir.Stream<Object> {return this._routeViewDriverStream;}
 	getRowListViewDriverStream(): Kefir.Stream<Object> {return this._rowListViewDriverStream;}
-	getThreadRowViewDriverKefirStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
+	getThreadRowViewDriverStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
 	getThreadViewDriverStream(): Kefir.Stream<Object> {return this._threadViewDriverStream;}
 	getToolbarViewDriverStream(): Kefir.Stream<Object> {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver> {return (this._composeViewDriverStream:any);}

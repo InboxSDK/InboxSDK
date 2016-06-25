@@ -127,7 +127,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   getComposeViewDriverStream(): Kefir.Stream {return this._composeViewDriverStream;}
   getThreadViewDriverStream(): Kefir.Stream {return this._threadViewDriverStream;}
   getMessageViewDriverStream(): Kefir.Stream {return this._messageViewDriverStream;}
-  getThreadRowViewDriverKefirStream(): Kefir.Stream {return this._threadRowViewDriverKefirStream;}
+  getThreadRowViewDriverStream(): Kefir.Stream {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream(): Kefir.Stream {return this._toolbarViewDriverStream;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
