@@ -135,7 +135,7 @@ describe('detectionRunner', function() {
       interval: 2,
       logError(e) { events.push(['error', e.message]); }
     })
-      .takeUntilBy(Kefir.later(20))
+      .takeUntilBy(Kefir.later(60))
       .onValue(({el, removalStream, parsed}) => {
         events.push(['add', el]);
         removalStream.take(1).onValue(() => {
@@ -169,7 +169,7 @@ describe('detectionRunner', function() {
       interval: 5,
       logError(e) { events.push(['error', e.message]); }
     })
-      .takeUntilBy(Kefir.later(50))
+      .takeUntilBy(Kefir.later(70))
       .onValue(({el, removalStream, parsed}) => {
         events.push(['add', el]);
         removalStream.take(1).onValue(() => {
@@ -213,7 +213,7 @@ describe('detectionRunner', function() {
       interval: 5,
       logError(e) { events.push(['error', e.message]); }
     })
-      .takeUntilBy(Kefir.later(50))
+      .takeUntilBy(Kefir.later(80))
       .onValue(({el, removalStream, parsed}) => {
         events.push(['add', el]);
         removalStream.take(1).onValue(() => {
@@ -283,7 +283,7 @@ describe('detectionRunner', function() {
       interval: 20,
       logError(e) { events.push(['error', e.message]); }
     })
-      .takeUntilBy(Kefir.later(50))
+      .takeUntilBy(Kefir.later(70))
       .onValue(({el, removalStream, parsed}) => {
         events.push(['add', el]);
         removalStream.take(1).onValue(() => {
