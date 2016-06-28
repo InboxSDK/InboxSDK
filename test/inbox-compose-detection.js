@@ -162,7 +162,7 @@ describe('Inbox Compose Detection', function() {
         });
     });
 
-    it('2016-06-28', function(cb) {
+    it('2016-06-28 inline compose in search page', function(cb) {
       const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
 
       const spy = sinon.spy();

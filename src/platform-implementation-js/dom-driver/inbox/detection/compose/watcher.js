@@ -28,8 +28,30 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     }));
   } : _makeElementChildStream;
 
-  const openedBundlesAndThreads = streamWaitFor(() => root.querySelector('[role=main]'))
-    .flatMap(makeElementChildStream)
+  const mainTopAncestor = makeElementChildStream(root.body)
+    .filter(({el}) => el.id && el.hasAttribute('jsaction'));
+
+  const mainsCommonAncestors = mainTopAncestor
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) =>
+      el.nodeName === 'DIV' && el.id && el.hasAttribute('jsaction') && !el.hasAttribute('role')
+    )
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream));
+
+  const mainMain = mainsCommonAncestors
+    .filter(({el}) => el.getAttribute('role') === 'main');
+
+  const searchMain = mainsCommonAncestors
+    .filter(({el}) => !el.hasAttribute('role'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'main');
+
+  const allMains = mainMain.merge(searchMain);
+
+  const openedBundlesAndThreads = allMains
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.getAttribute('role') === 'application')
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.getAttribute('role') === 'list')
@@ -150,8 +172,7 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     })
     .filter(Boolean);
 
-  const fullscreenComposes = makeElementChildStream(root.body)
-    .filter(({el}) => el.id && el.hasAttribute('jsaction'))
+  const fullscreenComposes = mainTopAncestor
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.nodeName === 'DIV' && el.id && !el.hasAttribute('jsaction'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
