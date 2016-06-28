@@ -19,8 +19,10 @@ var PRIMARY_BUTTON_OPTION = {
 };
 
 function showModal1(){
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'green';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		chrome: true,
 		buttons: [
 			PRIMARY_BUTTON_OPTION,
@@ -46,27 +48,30 @@ function showModal1(){
 }
 
 function showModal2(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'blue';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		buttons: [PRIMARY_BUTTON_OPTION]
 	});
 
 }
 
 function showModal3(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'orange';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		chrome: false
 	});
 
 }
 
 function showModal4(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'yellow';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		chrome: false,
 		buttons: [PRIMARY_BUTTON_OPTION]
 	});
@@ -74,9 +79,10 @@ function showModal4(){
 }
 
 function showModal5(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'black';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		chrome: false,
 		showCloseButton: true
 	});
@@ -85,18 +91,24 @@ function showModal5(){
 
 
 function showModal6(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'fuscia';
 	var modal = window._modal = sdk.Widgets.showModalView({
-		el: div,
+		el: el,
 		chrome: false,
 		buttons: [PRIMARY_BUTTON_OPTION],
 		showCloseButton: true
 	});
 
+	setTimeout(function(){
+		modal.close();
+	}, 5000);
+
 }
 
 function showModal7(){
-
+	let el = div.cloneNode(true);
+	el.style.backgroundColor = 'purple';
 	var modal = window._modal = sdk.Widgets.showModalView({
 		el: div,
 		buttons: []

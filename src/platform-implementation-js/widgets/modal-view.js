@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import {defn} from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 
@@ -24,6 +25,8 @@ class ModalView extends EventEmitter {
             this._driver = null;
             this.destroyed = true;
             this.emit('destroy');
+
+            _handleModalStackOnModalDestroy(this);
         });
     }
 
@@ -32,6 +35,11 @@ class ModalView extends EventEmitter {
         if(!driver){
             throw new Error('Modal can not be shown after being hidden');
         }
+
+        const hideAndDestroyStream = Kefir.merge([
+          Kefir.fromEvents(this, 'destroy'),
+          hideStream.filter(modalView => modalView === this)
+        ]);
 
         document.body.appendChild(driver.getOverlayElement());
         document.body.appendChild(driver.getModalContainerElement());
@@ -42,7 +50,7 @@ class ModalView extends EventEmitter {
             .filter(domEvent =>
                 domEvent.keyCode === 27
             )
-            .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+            .takeUntilBy(hideAndDestroyStream)
             .onValue(domEvent => {
                 domEvent.stopImmediatePropagation();
                 domEvent.stopPropagation();
@@ -52,22 +60,24 @@ class ModalView extends EventEmitter {
 
         //don't bubble key events to gmail
         Kefir.fromEvents(document.body, 'keydown')
-            .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+            .takeUntilBy(hideAndDestroyStream)
             .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
 
         Kefir.fromEvents(document.body, 'keyup')
-            .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+            .takeUntilBy(hideAndDestroyStream)
             .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
 
         Kefir.fromEvents(document.body, 'keypress')
-            .takeUntilBy(Kefir.fromEvents(this, 'destroy'))
+            .takeUntilBy(hideAndDestroyStream)
             .onValue(domEvent => {
                 domEvent.stopPropagation();
             });
+
+        _replaceCurrentlyShowingModal(this, driver);
     }
 
     setTitle(title: string){
@@ -88,6 +98,34 @@ class ModalView extends EventEmitter {
         throw new Error("not implemented");
     }
 
+}
+
+let currentlyShowingModal: ?{modalView: ModalView, driver: GmailModalViewDriver} = null;
+const hideStream: Kefir.Bus<ModalView> = kefirBus();
+const hiddenModalStack: Array<ModalView> = [];
+
+function _handleModalStackOnModalDestroy(modalView){
+  if(currentlyShowingModal && currentlyShowingModal.modalView === modalView){
+    currentlyShowingModal = null;
+    // we have modals in the stack
+    if(hiddenModalStack.length > 0){
+      hiddenModalStack.pop().show();
+    }
+  }
+  else if(hiddenModalStack.indexOf(modalView) > -1){
+    hiddenModalStack.splice(hiddenModalStack.indexOf(modalView), 1);
+  }
+}
+
+function _replaceCurrentlyShowingModal(modalView, driver){
+  if(currentlyShowingModal){
+    hideStream.emit(currentlyShowingModal.modalView);
+    hiddenModalStack.push(currentlyShowingModal.modalView);
+    document.body.removeChild(currentlyShowingModal.driver.getOverlayElement());
+    document.body.removeChild(currentlyShowingModal.driver.getModalContainerElement());
+  }
+
+  currentlyShowingModal = {modalView, driver};
 }
 
 export default defn(module, ModalView);
