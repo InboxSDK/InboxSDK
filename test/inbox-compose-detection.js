@@ -19,6 +19,8 @@ const pageWithSidebar20160614: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-with-chat-sidebar-2016-06-14.html', 'utf8')));
 const pageFullscreen20160620: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-20-fullscreen compose.html', 'utf8')));
+const pageFullscreen20160628: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -56,6 +58,14 @@ describe('Inbox Compose Detection', function() {
       assert(_.includes(results, bundledInlineCompose));
       assert(_.includes(results, fullscreenCompose));
     });
+
+    it('2016-06-28', function() {
+      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+
+      const results = finder(pageFullscreen20160628());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, compose));
+    });
   });
 
   describe('parser', function() {
@@ -86,6 +96,14 @@ describe('Inbox Compose Detection', function() {
     it('2016-06-20 bundled inline', function() {
       const bundledInlineCompose = pageFullscreen20160620().querySelector('[data-test-id=bundledInlineCompose]');
       const results = parser(bundledInlineCompose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
+    });
+
+    it('2016-06-28', function() {
+      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.isInline);
@@ -140,6 +158,21 @@ describe('Inbox Compose Detection', function() {
           assert.strictEqual(results.length, 2);
           assert(_.includes(results, bundledInlineCompose));
           assert(_.includes(results, fullscreenCompose));
+          cb();
+        });
+    });
+
+    it('2016-06-28', function(cb) {
+      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+
+      const spy = sinon.spy();
+      watcher(pageFullscreen20160628())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, compose));
           cb();
         });
     });

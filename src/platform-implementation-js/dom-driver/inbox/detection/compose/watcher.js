@@ -8,7 +8,7 @@ import Logger from '../../../../lib/logger';
 import streamWaitFor from '../../../../lib/stream-wait-for';
 import delayAsap from '../../../../lib/delay-asap';
 import censorHTMLtree from '../../../../../common/censor-html-tree';
-import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import _makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-merger';
@@ -16,6 +16,18 @@ import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-mer
 const impStream = udKefir(module, imp);
 
 function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
+  const debugLogging = true;
+  const makeElementChildStream = debugLogging ? function(el) {
+    // Add an attribute to watched elements that we can see in reported html to
+    // help debugging the watcher.
+    return _makeElementChildStream(el).merge(Kefir.stream(() => {
+      el.setAttribute('data-compose-mecs', 'true');
+      return () => {
+        el.removeAttribute('data-compose-mecs');
+      };
+    }));
+  } : _makeElementChildStream;
+
   const openedBundlesAndThreads = streamWaitFor(() => root.querySelector('[role=main]'))
     .flatMap(makeElementChildStream)
     .filter(({el}) => el.getAttribute('role') === 'application')
