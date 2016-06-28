@@ -102,25 +102,25 @@ class ModalView extends EventEmitter {
 
 let currentlyShowingModal: ?{modalView: ModalView, driver: GmailModalViewDriver} = null;
 const hideStream: Kefir.Bus<ModalView> = kefirBus();
-const modalStack: Array<ModalView> = [];
+const hiddenModalStack: Array<ModalView> = [];
 
 function _handleModalStackOnModalDestroy(modalView){
   if(currentlyShowingModal && currentlyShowingModal.modalView === modalView){
     currentlyShowingModal = null;
     // we have modals in the stack
-    if(modalStack.length > 0){
-      modalStack.pop().show();
+    if(hiddenModalStack.length > 0){
+      hiddenModalStack.pop().show();
     }
   }
-  else if(modalStack.indexOf(modalView) > -1){
-    modalStack.splice(modalStack.indexOf(modalView), 1);
+  else if(hiddenModalStack.indexOf(modalView) > -1){
+    hiddenModalStack.splice(hiddenModalStack.indexOf(modalView), 1);
   }
 }
 
 function _replaceCurrentlyShowingModal(modalView, driver){
   if(currentlyShowingModal){
     hideStream.emit(currentlyShowingModal.modalView);
-    modalStack.push(currentlyShowingModal.modalView);
+    hiddenModalStack.push(currentlyShowingModal.modalView);
     document.body.removeChild(currentlyShowingModal.driver.getOverlayElement());
     document.body.removeChild(currentlyShowingModal.driver.getModalContainerElement());
   }
