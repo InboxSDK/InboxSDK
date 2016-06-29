@@ -22,7 +22,7 @@ export default function parser(el: HTMLElement) {
   );
   const body = ec.run(
     'body',
-    () => querySelectorOne(el, 'div[contenteditable][g_editable]')
+    () => querySelectorOne(el, 'div[contenteditable][g_editable], div[id][tabindex][aria-label][jsaction*=".quick_compose_handle_input"]')
   );
   const subject = isInline ? null : ec.run(
     'subject',
