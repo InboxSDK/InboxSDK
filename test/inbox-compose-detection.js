@@ -9,6 +9,8 @@ import once from 'lodash/function/once';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 
+import censorHTMLtree from '../src/common/censor-html-tree';
+
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
 import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/watcher';
@@ -21,6 +23,14 @@ const pageFullscreen20160620: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-20-fullscreen compose.html', 'utf8')));
 const pageFullscreen20160628: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28.html', 'utf8')));
+const pageFullscreen20160628_2: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28-2.html', 'utf8')));
+const pageFullscreen20160629: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29.html', 'utf8')));
+const pageFullscreen20160629_2: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29-2.html', 'utf8')));
+const pageFullscreen20160629_3: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29-3.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -66,6 +76,14 @@ describe('Inbox Compose Detection', function() {
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, compose));
     });
+
+    it('2016-06-28-2', function() {
+      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+
+      const results = finder(pageFullscreen20160628_2());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, compose));
+    });
   });
 
   describe('parser', function() {
@@ -103,6 +121,38 @@ describe('Inbox Compose Detection', function() {
 
     it('2016-06-28', function() {
       const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
+    });
+
+    it('2016-06-28-2', function() {
+      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.isInline);
+    });
+
+    it('2016-06-29', function() {
+      const compose = pageFullscreen20160629().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.isInline);
+    });
+
+    it('2016-06-29-2', function() {
+      const compose = pageFullscreen20160629_2().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
+    });
+
+    it('2016-06-29-3', function() {
+      const compose = pageFullscreen20160629_3().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -167,6 +217,21 @@ describe('Inbox Compose Detection', function() {
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160628())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, compose));
+          cb();
+        });
+    });
+
+    it('2016-06-28-2 regular compose', function(cb) {
+      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+
+      const spy = sinon.spy();
+      watcher(pageFullscreen20160628_2())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

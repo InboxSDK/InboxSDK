@@ -13,7 +13,7 @@ export default function parser(el: HTMLElement) {
     () => querySelectorOne(
       el,
       'div[jstcache] > div[role=button][jsaction$=".send"], '+
-      'div[jstcache] > div[role=button][disabled]'
+      'div[jstcache] > div[role=button][disabled]:not([title]):not([data-tooltip])'
     )
   );
   const attachBtn = ec.run(
@@ -22,12 +22,12 @@ export default function parser(el: HTMLElement) {
   );
   const body = ec.run(
     'body',
-    () => querySelectorOne(el, 'div[contenteditable][g_editable]')
+    () => querySelectorOne(el, 'div[contenteditable][g_editable], div[id][tabindex][aria-label][jsaction*=".quick_compose_handle_input"]')
   );
   const subject = isInline ? null : ec.run(
     'subject',
     () => {
-      const subject = querySelectorOne(el, 'div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
+      const subject = querySelectorOne(el, 'div[jstcache][jsan] > div > input[type=text][title][placeholder][jsaction*="input:"]');
       if (!(subject instanceof HTMLInputElement)) throw new Error("Wrong type");
       return subject;
     }

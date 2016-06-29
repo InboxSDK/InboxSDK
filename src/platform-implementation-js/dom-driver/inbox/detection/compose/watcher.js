@@ -154,7 +154,10 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     return els;
   })
     .flatMap(els => Kefir.merge(_.map(els, makeElementChildStream)))
-    .filter(({el}) => el.hasAttribute('jsaction') && el.hasAttribute('jstcache'))
+    .filter(({el}) =>
+      el.hasAttribute('jstcache') && el.className && el.nodeName === 'DIV' &&
+      !el.hasAttribute('aria-hidden') && !el.hasAttribute('tabindex')
+    )
     .flatMap(event =>
       // ignore the composes that get removed immediately
       delayAsap(event)
@@ -168,7 +171,12 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
         });
         return (null: any);
       }
-      return {el:composeEl,removalStream};
+      return {
+        el: composeEl,
+        // Needed so the element isn't removed before we see the element
+        // re-added as full-screen.
+        removalStream: removalStream.delay(1)
+      };
     })
     .filter(Boolean);
 
@@ -180,11 +188,13 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
       el.nodeName === 'DIV' && el.hasAttribute('tabindex') &&
       _.includes(el.getAttribute('jsaction'), 'exit_full_screen')
     )
-    .map(({el, removalStream}) => ({
-      el: el.querySelector('div[role=dialog]'),
-      removalStream: removalStream.flatMap(() => delayAsap())
-    }))
-    .filter(({el}) => el);
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'dialog');
 
   return Kefir.merge([
     inlineComposes,
