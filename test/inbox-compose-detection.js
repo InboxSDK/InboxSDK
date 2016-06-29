@@ -27,6 +27,8 @@ const pageFullscreen20160628_2: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28-2.html', 'utf8')));
 const pageFullscreen20160629: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29.html', 'utf8')));
+const pageFullscreen20160629_2: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29-2.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -137,6 +139,14 @@ describe('Inbox Compose Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(!results.attributes.isInline);
+    });
+
+    it('2016-06-29-2', function() {
+      const compose = pageFullscreen20160629_2().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
     });
   });
 

@@ -13,7 +13,7 @@ export default function parser(el: HTMLElement) {
     () => querySelectorOne(
       el,
       'div[jstcache] > div[role=button][jsaction$=".send"], '+
-      'div[jstcache] > div[role=button][disabled]'
+      'div[jstcache] > div[role=button][disabled]:not([title]):not([data-tooltip])'
     )
   );
   const attachBtn = ec.run(
