@@ -27,7 +27,7 @@ export default function parser(el: HTMLElement) {
   const subject = isInline ? null : ec.run(
     'subject',
     () => {
-      const subject = querySelectorOne(el, 'div[jstcache][jsan] > div > input[type=text][title][jsaction^="input:"]');
+      const subject = querySelectorOne(el, 'div[jstcache][jsan] > div > input[type=text][title][placeholder][jsaction*="input:"]');
       if (!(subject instanceof HTMLInputElement)) throw new Error("Wrong type");
       return subject;
     }
