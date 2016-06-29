@@ -154,7 +154,10 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     return els;
   })
     .flatMap(els => Kefir.merge(_.map(els, makeElementChildStream)))
-    .filter(({el}) => el.hasAttribute('jsaction') && el.hasAttribute('jstcache'))
+    .filter(({el}) =>
+      el.hasAttribute('jstcache') && el.className && el.nodeName === 'DIV' &&
+      !el.hasAttribute('aria-hidden') && !el.hasAttribute('tabindex')
+    )
     .flatMap(event =>
       // ignore the composes that get removed immediately
       delayAsap(event)
