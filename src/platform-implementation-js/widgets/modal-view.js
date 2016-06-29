@@ -24,9 +24,8 @@ class ModalView extends EventEmitter {
         options.modalViewDriver.getEventStream().onEnd(() => {
             this._driver = null;
             this.destroyed = true;
-            this.emit('destroy');
-
             _handleModalStackOnModalDestroy(this);
+            this.emit('destroy');
         });
     }
 
