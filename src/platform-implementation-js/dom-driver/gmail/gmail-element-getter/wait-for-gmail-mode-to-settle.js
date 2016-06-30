@@ -1,24 +1,18 @@
-var _ = require('lodash');
-var RSVP = require('rsvp');
+/* @flow */
 
-module.exports = _.once(function(){
-	return new RSVP.Promise(function(resolve, reject){
-		if(document.body.classList.length > 0){
-			resolve();
-		}
+import once from 'lodash/function/once';
+import Kefir from 'kefir';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
-		var mutationObserver = new MutationObserver(function(mutations){
-			var classList = mutations[0].target.classList;
+const waitForGmailModeToSettle = once(() =>
+	makeMutationObserverChunkedStream(
+		document.body, {attributes: true, attributeFilter: ['class']}
+	)
+		.toProperty(() => undefined)
+		.filter(() => document.body.classList.length > 0)
+		.map(() => undefined)
+		.take(1)
+		.toProperty()
+);
 
-			if(classList.length > 0){
-				mutationObserver.disconnect();
-				resolve();
-			}
-		});
-
-		mutationObserver.observe(
-			document.body,
-			{attributes: true, attributeFilter: ['class']}
-		);
-	});
-});
+export default waitForGmailModeToSettle;
