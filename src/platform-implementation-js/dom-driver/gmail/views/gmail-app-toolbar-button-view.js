@@ -11,6 +11,7 @@ import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
+import type Driver from '../gmail-driver';
 
 export default class GmailAppToolbarButtonView {
   _stopper: Kefir.Stream&{destroy:()=>void};
@@ -18,8 +19,10 @@ export default class GmailAppToolbarButtonView {
   _element: ?HTMLElement = null;
   _activeDropdown: ?DropdownView;
   _buttonDescriptor: ?Object;
+  _driver: Driver;
 
-  constructor(inButtonDescriptor: Object) {
+  constructor(driver: Driver, inButtonDescriptor: Object) {
+    this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
     var buttonDescriptorProperty = kefirCast(Kefir, inButtonDescriptor);
@@ -32,15 +35,6 @@ export default class GmailAppToolbarButtonView {
     });
   }
 
-/*
-  __memberVariables: [
-    {name: '_stopper', destroy: true},
-    {name: '_buttonDescriptor', destroy: false},
-    {name: '_element', destroy: true, get: true},
-    {name: '_activeDropdown', destroy: true, destroyFunction: 'close'},
-    {name: '_iconSettings', destroy: false, defaultValue: {}}
-  ],
-*/
   destroy() {
     this._stopper.destroy();
     if (this._element) {
@@ -71,7 +65,7 @@ export default class GmailAppToolbarButtonView {
       return;
     }
 
-    var element = this._element = this._element || _createAppButtonElement(() => {this._handleClick();});
+    var element = this._element = this._element || _createAppButtonElement(this._driver, () => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
     updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
     _updateTitle(element.querySelector('span'), buttonDescriptor);
@@ -113,7 +107,7 @@ export default class GmailAppToolbarButtonView {
   }
 }
 
-function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement {
+function _createAppButtonElement(driver: Driver, onclick: (event: Object) => void): HTMLElement {
   const element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
 
@@ -121,26 +115,31 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
                <span class="inboxsdk__appButton_title"></span>
              </a>`;
 
-  element.addEventListener('click', (event) => {
+  (element:any).addEventListener('click', (event) => {
     event.preventDefault();
     onclick(event);
   });
 
   const topAccountContainer = GmailElementGetter.getTopAccountContainer();
   if(!topAccountContainer){
-    throw new Error("Could not make button");
+    const err = new Error("Could not make button");
+    const banner = document.querySelector('[role=banner]');
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
+      gbsfwPresent: !!document.getElementById('gbsfw'),
+      bannerHtml: banner && censorHTMLtree(banner)
+    });
+    throw err;
   }
 
   const insertionElement: ?HTMLElement = (topAccountContainer.children[0]: any);
   if(!insertionElement){
-    try {
-      throw new Error("Could not make button");
-    } catch(err) {
-      Logger.error(err, {
-        topAccountContainerHTML: censorHTMLtree(topAccountContainer)
-      });
-      throw err;
-    }
+    const err = new Error("Could not make button");
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
+      topAccountContainerHTML: censorHTMLtree(topAccountContainer)
+    });
+    throw err;
   }
 
   try {
@@ -151,7 +150,8 @@ function _createAppButtonElement(onclick: (event: Object) => void): HTMLElement 
     insertionElement.insertBefore(element, insertionElement.firstElementChild);
     return element;
   } catch(err) {
-    Logger.error(err, {
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
       insertionElementHTML: censorHTMLtree(insertionElement)
     });
     throw err;

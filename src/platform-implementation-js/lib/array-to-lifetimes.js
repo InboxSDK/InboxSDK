@@ -3,16 +3,17 @@
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
+import type {ItemWithLifetime} from './dom/make-element-child-stream';
+
 // Takes in a stream of arrays of elements, and returns a stream of
-// {el, removalStream} objects (like ElementWithLifetime from
-// makeElementChildStream; only difference is that `el` doesn't have to be
-// HTMLElement). The removalStream emits an event when the input stream ends,
-// when the input stream emits a new array not containing the element, or when
-// the output stream is unsubscribed from, similar to makeElementChildStream.
+// ItemWithLifetime objects. The removalStream emits an event when the input
+// stream ends, when the input stream emits a new array not containing the
+// element, or when the output stream is unsubscribed from, similar to
+// makeElementChildStream.
 
 export default function arrayToLifetimes<T>(
   input: Kefir.Stream<Array<T>|NodeList<T>>
-): Kefir.Stream<{el: T, removalStream: Kefir.Stream}> {
+): Kefir.Stream<ItemWithLifetime<T>> {
   return Kefir.stream(emitter => {
     const removalStreams: Map<T, Object> = new Map();
 

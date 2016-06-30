@@ -5,13 +5,14 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 import waitFor from '../../lib/wait-for';
 import {defobj} from 'ud';
+import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
 
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
 
 var GmailElementGetter = {
 
 	waitForGmailModeToSettle(): Promise<void> {
-		return require('./gmail-element-getter/wait-for-gmail-mode-to-settle')();
+		return waitForGmailModeToSettle().toPromise(RSVP.Promise);
 	},
 
 	getMainContentElementChangedStream: _.once(function(){

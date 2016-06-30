@@ -12,7 +12,7 @@ export default function addToolbarButtonForApp(gmailDriver: GmailDriver, buttonD
 				//never complete
 			});
 		} else {
-			return new GmailAppToolbarButtonView(buttonDescriptor);
+			return new GmailAppToolbarButtonView(gmailDriver, buttonDescriptor);
 		}
 	});
 }
