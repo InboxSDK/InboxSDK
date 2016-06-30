@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-export var ATTRIBUTE_WHITELIST: Set<string> = new Set([
+export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
   // standard html props
   "class", "rel", "target", "type", "tabindex", "id", "style", "role",
   "contenteditable",
