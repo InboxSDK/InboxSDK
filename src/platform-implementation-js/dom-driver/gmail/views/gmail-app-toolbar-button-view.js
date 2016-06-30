@@ -32,15 +32,6 @@ export default class GmailAppToolbarButtonView {
     });
   }
 
-/*
-  __memberVariables: [
-    {name: '_stopper', destroy: true},
-    {name: '_buttonDescriptor', destroy: false},
-    {name: '_element', destroy: true, get: true},
-    {name: '_activeDropdown', destroy: true, destroyFunction: 'close'},
-    {name: '_iconSettings', destroy: false, defaultValue: {}}
-  ],
-*/
   destroy() {
     this._stopper.destroy();
     if (this._element) {
