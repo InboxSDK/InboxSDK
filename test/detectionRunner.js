@@ -2,18 +2,20 @@
 
 import assert from 'assert';
 import asap from 'asap';
+import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import once from 'lodash/function/once';
 import jsdomDoc from './lib/jsdom-doc';
+import delay from '../src/common/delay';
 
 import detectionRunner from '../src/platform-implementation-js/lib/dom/detectionRunner';
 
 const doc = once(() => jsdomDoc(''));
 
 describe('detectionRunner', function() {
-  this.slow(150);
+  this.slow(170);
 
   before(function() {
     doc();

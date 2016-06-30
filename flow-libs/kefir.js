@@ -123,5 +123,5 @@ declare module kefir {
   declare function concat<T>(obss: Stream<T>[]): Stream<T>;
 
   declare function pool(): Pool;
-  declare function repeat<T>(fn: (i: number) => Stream<T>): Stream<T>;
+  declare function repeat<T>(fn: (i: number) => ?Stream<T>): Stream<T>;
 }

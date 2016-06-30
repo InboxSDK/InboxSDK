@@ -31,9 +31,10 @@ export default function detectionRunner<P: GenericParserResults>(
     finder: (root: Document) => Array<HTMLElement>;
     logError: (err: Error, details?: any) => void;
     root?: Document;
-    interval?: number;
+    interval?: number|(liveElements: number, timeRunning: number) => number;
   }
 ): Kefir.Stream<ElementWithLifetime&{parsed: P}> {
+  const startTime = Date.now();
   const watcherFoundElements: Set<HTMLElement> = new Set();
   const finderFoundElements: Set<HTMLElement> = new Set();
   const watcherFoundElementsMissedByFinder: Set<HTMLElement> = new Set();
@@ -81,11 +82,15 @@ export default function detectionRunner<P: GenericParserResults>(
     });
 
   const finderElements = arrayToLifetimes(
-    // TODO scale based on user activity
-    Kefir.repeat(() =>
-      Kefir.later(interval)
-        .flatMap(() => delayIdle(interval))
-    )
+    Kefir.repeat(() => {
+      // TODO scale based on user activity
+      const time = typeof interval === 'function' ?
+        interval(
+          watcherFoundElements.size + finderFoundElements.size,
+          Date.now() - startTime
+        ) : interval;
+      return Kefir.later(time).flatMap(() => delayIdle(time));
+    })
       .map(() => {
         const els = finder(root);
 
