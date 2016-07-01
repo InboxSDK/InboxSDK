@@ -1,3 +1,5 @@
+/* @flow */
+
 import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';
@@ -7,19 +9,23 @@ import RSVP from 'rsvp';
 
 import ComposeButtonView from './compose-button-view';
 
+import type {Driver} from '../driver-interfaces/driver';
+import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
+
 const memberMap = ud.defonce(module, ()=>new WeakMap());
 
 // documented in src/docs/
 class ComposeView extends EventEmitter {
-	constructor(driver, composeViewImplementation, appId, composeViewStream) {
+	destroyed: boolean = false;
+
+	constructor(driver: Driver, composeViewImplementation: ComposeViewDriver, appId: string, composeViewStream: Kefir.Stream<ComposeView>) {
 		super();
 
-		this.destroyed = false;
-		var members = {
-			driver: driver,
-			composeViewImplementation: composeViewImplementation,
-			appId: appId,
-			composeViewStream: composeViewStream
+		const members = {
+			driver,
+			composeViewImplementation,
+			appId,
+			composeViewStream
 		};
 		memberMap.set(this, members);
 
@@ -174,7 +180,7 @@ class ComposeView extends EventEmitter {
 		return memberMap.get(this).composeViewImplementation.isInlineReplyForm();
 	}
 
-	popOut() {
+	popOut(): Promise<ComposeView> {
 		memberMap.get(this).composeViewImplementation.popOut();
 		return memberMap.get(this).composeViewStream.take(1).toPromise(RSVP.Promise);
 	}
@@ -195,15 +201,15 @@ class ComposeView extends EventEmitter {
 		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
 	}
 
-	getFromContact() {
+	getFromContact(): Contact {
 		return memberMap.get(this).composeViewImplementation.getFromContact();
 	}
 
-	getFromContactChoices() {
+	getFromContactChoices(): Contact[] {
 		return memberMap.get(this).composeViewImplementation.getFromContactChoices();
 	}
 
-	setFromEmail(email) {
+	setFromEmail(email: string) {
 		memberMap.get(this).composeViewImplementation.setFromEmail(email);
 	}
 
@@ -219,28 +225,28 @@ class ComposeView extends EventEmitter {
 		memberMap.get(this).composeViewImplementation.setBodyText(text);
 	}
 
-	attachFiles(files) {
+	async attachFiles(files): Promise<void> {
 		if (files.length === 0) {
 			return;
 		}
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		memberMap.get(this).composeViewImplementation.attachFiles(files);
+		return memberMap.get(this).composeViewImplementation.attachFiles(files);
 	}
 
-	attachInlineFiles(files) {
+	async attachInlineFiles(files: Blob[]): Promise<void> {
 		if (files.length === 0) {
 			return;
 		}
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		memberMap.get(this).composeViewImplementation.attachInlineFiles(files);
+		return memberMap.get(this).composeViewImplementation.attachInlineFiles(files);
 	}
 
 	// Old alias that we should keep around until we're sure no one is using it.
-	dragFilesIntoCompose(files) {
+	dragFilesIntoCompose(files: Blob[]): Promise<void> {
 		const driver = memberMap.get(this).driver;
 		driver.getLogger().deprecationWarning(
 			'ComposeView.dragFilesIntoCompose', 'ComposeView.attachInlineFiles');
@@ -257,8 +263,12 @@ class ComposeView extends EventEmitter {
 		memberMap.get(this).composeViewImplementation.registerRequestModifier(modifier);
 	}
 
+	// TODO remove
 	overrideEditSubject(){
-		memberMap.get(this).composeViewImplementation.overrideEditSubject();
+		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
+		const {composeViewImplementation} = memberMap.get(this);
+		if (composeViewImplementation.overrideEditSubject)
+			composeViewImplementation.overrideEditSubject();
 	}
 }
 

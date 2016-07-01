@@ -116,6 +116,15 @@ class InboxComposeView {
     }
     this._queueDraftSave();
   }
+  getFromContact(): Contact {
+    throw new Error("Not implemented");
+  }
+  getFromContactChoices(): Contact[] {
+    throw new Error("Not implemented");
+  }
+  setFromEmail(email: string): void {
+    throw new Error("Not implemented");
+  }
   focus() {
     if (!this._els.body) throw new Error("Compose View missing body element");
     this._els.body.focus();
@@ -251,6 +260,15 @@ class InboxComposeView {
       throw new Error("Should not happen");
     }
     simulateClick(this._els.popOutBtn);
+  }
+  registerRequestModifier(modifier: Object): void {
+    throw new Error("Not implemented");
+  }
+  attachFiles(files: Blob[]): Promise<void> {
+    throw new Error("Not implemented");
+  }
+  attachInlineFiles(files: Blob[]): Promise<void> {
+    throw new Error("Not implemented");
   }
   getIsFullscreen(): boolean {
     // TODO
