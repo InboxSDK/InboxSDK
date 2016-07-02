@@ -3,7 +3,9 @@
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
-export default function parser(el: HTMLElement) {
+import {defn} from 'ud';
+
+function parser(el: HTMLElement) {
   const ec = new ErrorCollector('compose');
 
   const isInline = el.getAttribute('role') !== 'dialog';
@@ -66,6 +68,17 @@ export default function parser(el: HTMLElement) {
     }
   );
 
+  const recipientFields = isInline ? null : ec.run(
+    'recipient fields',
+    () => {
+      const recipientFields = el.querySelectorAll('input[type=text][role=combobox]');
+      if (recipientFields.length != 3)
+        throw new Error(`Found ${recipientFields.length} recipient fields, expected 3`);
+      return recipientFields;
+    }
+  );
+  const [toInput, ccInput, bccInput] = recipientFields || [];
+
   const elements = {
     sendBtn,
     attachBtn,
@@ -76,7 +89,8 @@ export default function parser(el: HTMLElement) {
     toggleFullscreenButtonImage,
     closeBtn,
     minimizeBtn,
-    bodyPlaceholder
+    bodyPlaceholder,
+    toInput, ccInput, bccInput
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
@@ -91,3 +105,5 @@ export default function parser(el: HTMLElement) {
 
 /*:: const x = parser(({}:any)); */
 export type Parsed = typeof x;
+
+export default defn(module, parser);
