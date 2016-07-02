@@ -271,8 +271,10 @@ class InboxComposeView {
     throw new Error("Not implemented");
   }
   getIsFullscreen(): boolean {
-    // TODO
-    return false;
+    if (this._p.attributes.isInline) return false;
+    const {toggleFullscreenButtonImage} = this._els;
+    if (!toggleFullscreenButtonImage) return false;
+    return !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
   }
   getBodyElement(): HTMLElement {
     if (!this._els.body) throw new Error("Compose View missing body element");

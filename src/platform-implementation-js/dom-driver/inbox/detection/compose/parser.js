@@ -36,6 +36,14 @@ export default function parser(el: HTMLElement) {
     'pop-out button',
     () => querySelectorOne(el, 'button[jsaction$=".quick_compose_popout_mole"]')
   ) : null;
+  const toggleFullscreenButton = isInline ? null : ec.run(
+    'fullscreen button',
+    () => querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"]')
+  );
+  const toggleFullscreenButtonImage = isInline ? null : ec.run(
+    'fullscreen button image',
+    () => ((querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"] img'): any): HTMLImageElement)
+  );
   const closeBtn = isInline ? null : ec.run(
     'close button',
     () => querySelectorOne(
@@ -64,6 +72,8 @@ export default function parser(el: HTMLElement) {
     body,
     subject,
     popOutBtn,
+    toggleFullscreenButton,
+    toggleFullscreenButtonImage,
     closeBtn,
     minimizeBtn,
     bodyPlaceholder
