@@ -67,14 +67,14 @@ var MessageDescriptor = /** @lends MessageDescriptor */{
   text: null,
 
   /**
-  * String to use as the innerHTML of the ButterBar.
+  * String to use as the innerHTML of the ButterBar instead of using the given text.
   * ^optional
   * @type {string}
   */
   html: null,
 
   /**
-  * The HTML element that is displayed in the ButterBar.
+  * HTML element to insert into the ButterBar instead of using the given text.
   * ^optional
   * @type {HTMLElement}
   */
