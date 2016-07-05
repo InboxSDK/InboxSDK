@@ -94,6 +94,8 @@ export default class GmailButterBarDriver {
 
       if (rawOptions.html) {
         sdkNotice.innerHTML = rawOptions.html;
+      } else if (rawOptions.el) {
+        sdkNotice.appendChild(rawOptions.el);
       } else {
         sdkNotice.textContent = rawOptions.text;
       }
