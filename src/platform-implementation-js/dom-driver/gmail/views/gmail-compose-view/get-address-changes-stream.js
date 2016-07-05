@@ -53,6 +53,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
+				.filter(Boolean)
 				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
 
 			mainSubAddressStream
@@ -61,6 +62,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
+				.filter(Boolean)
 				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
 		]);
 	});
