@@ -164,14 +164,49 @@ class InboxComposeView {
     this._els.body.textContent = text;
     this._informBodyChanged();
   }
+  _setRecipients(inputElement: HTMLInputElement, emails: string[]) {
+    const chipContainer = inputElement.parentElement;
+    if (!chipContainer) throw new Error("Should not happen");
+
+    // Inbox re-uses the chip elements as some are removed, so finding all the
+    // button elements at once and then clicking on each of them wouldn't work.
+    const removeButtonCount = chipContainer.querySelectorAll('[role=button][jsaction*="remove_chip"]').length;
+    for (let i=0; i<removeButtonCount; i++) {
+      const removeButton = chipContainer.querySelector('[role=button][jsaction*="remove_chip"]');
+      if (!removeButton) break;
+      simulateClick(removeButton);
+    }
+
+    emails.forEach(email => {
+      inputElement.value = email;
+      inputElement.dispatchEvent(new window.FocusEvent("blur"));
+    });
+  }
   setToRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {toInput} = this._els;
+    if (!toInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(toInput, emails);
   }
   setCcRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {ccInput} = this._els;
+    if (!ccInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(ccInput, emails);
+    const {toggleCcBccButton} = this._els;
+    if (emails.length && toggleCcBccButton && toggleCcBccButton.style.display !== 'none') {
+      simulateClick(toggleCcBccButton);
+    }
   }
   setBccRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {bccInput} = this._els;
+    if (!bccInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(bccInput, emails);
+    const {toggleCcBccButton} = this._els;
+    if (emails.length && toggleCcBccButton && toggleCcBccButton.style.display !== 'none') {
+      simulateClick(toggleCcBccButton);
+    }
   }
   close() {
     if (this._p.attributes.isInline) {

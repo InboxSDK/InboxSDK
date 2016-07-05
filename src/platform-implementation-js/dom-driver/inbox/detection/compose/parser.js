@@ -71,13 +71,18 @@ function parser(el: HTMLElement) {
   const recipientFields = isInline ? null : ec.run(
     'recipient fields',
     () => {
-      const recipientFields = el.querySelectorAll('input[type=text][role=combobox]');
+      const recipientFields: HTMLInputElement[] = (el.querySelectorAll('input[type=text][role=combobox]'): any);
       if (recipientFields.length != 3)
         throw new Error(`Found ${recipientFields.length} recipient fields, expected 3`);
       return recipientFields;
     }
   );
   const [toInput, ccInput, bccInput] = recipientFields || [];
+
+  const toggleCcBccButton = isInline ? null : ec.run(
+    'toggle cc/bcc button',
+    () => querySelectorOne(el, 'button[jsaction*=".toggle_cc_bcc"]')
+  );
 
   const elements = {
     sendBtn,
@@ -90,7 +95,8 @@ function parser(el: HTMLElement) {
     closeBtn,
     minimizeBtn,
     bodyPlaceholder,
-    toInput, ccInput, bccInput
+    toInput, ccInput, bccInput,
+    toggleCcBccButton
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
