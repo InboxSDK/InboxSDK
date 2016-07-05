@@ -276,6 +276,13 @@ gulp.task('docs', function(cb) {
           .value()
       };
 
+      const outDir = './dist';
+      try {
+        fs.statSync(outDir);
+      } catch(err) {
+        fs.mkdirSync(outDir);
+      }
+
       fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
     }).catch(err => cb(err));
   });
