@@ -33,4 +33,10 @@ describe('extractContactFromString', function(){
       {name: 'George Monkey', emailAddress: 'monkeys@monkeys.com'}
     );
   });
+
+  it('throws on missing email address', function() {
+    assert.throws(() => {
+      extractContactFromEmailContactString('foo bar');
+    });
+  })
 });

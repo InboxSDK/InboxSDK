@@ -17,10 +17,6 @@ export default function getAddressInformationExtractor(addressType: string): (no
 				return extractContactFromEmailContactString(contactInfoString);
 			}
 			catch(err){
-				Logger.error(new Error('problem extracting address information'), {
-					message: err.message
-				});
-
 				return null;
 			}
 
