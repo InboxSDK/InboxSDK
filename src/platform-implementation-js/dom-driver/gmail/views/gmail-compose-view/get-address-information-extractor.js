@@ -17,6 +17,7 @@ export default function getAddressInformationExtractor(addressType: string): (no
 				return extractContactFromEmailContactString(contactInfoString);
 			}
 			catch(err){
+				// The user might have typed in a partial address. We can just ignore that.
 				return null;
 			}
 
