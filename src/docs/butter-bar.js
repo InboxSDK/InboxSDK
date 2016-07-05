@@ -67,6 +67,20 @@ var MessageDescriptor = /** @lends MessageDescriptor */{
   text: null,
 
   /**
+  * String to use as the innerHTML of the ButterBar instead of using the given text.
+  * ^optional
+  * @type {string}
+  */
+  html: null,
+
+  /**
+  * HTML element to insert into the ButterBar instead of using the given text.
+  * ^optional
+  * @type {HTMLElement}
+  */
+  el: null,
+
+  /**
   * Messages with lower priorities won't interrupt a currently displayed message.
   * ^optional
   * ^default=0
