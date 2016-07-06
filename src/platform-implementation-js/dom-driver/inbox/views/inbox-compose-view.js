@@ -352,14 +352,35 @@ class InboxComposeView {
     }
     this._els.subject.value = text;
   }
+  _getRecipients(inputElement: HTMLElement): Contact[] {
+    const chipContainer = inputElement.parentElement;
+    if (!chipContainer) throw new Error("Should not happen");
+
+    return _.chain(chipContainer.children)
+      .filter(el => el.nodeName === 'DIV' && el.hasAttribute('email'))
+      .map(chip => ({
+        emailAddress: chip.getAttribute('email'),
+        name: chip.textContent
+      }))
+      .value();
+  }
   getToRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {toInput} = this._els;
+    if (!toInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(toInput);
   }
   getCcRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {ccInput} = this._els;
+    if (!ccInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(ccInput);
   }
   getBccRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {bccInput} = this._els;
+    if (!bccInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(bccInput);
   }
   getComposeID(): string {
     throw new Error("This method was discontinued");
