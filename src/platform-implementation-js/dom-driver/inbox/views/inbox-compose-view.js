@@ -357,7 +357,9 @@ class InboxComposeView {
     if (!chipContainer) throw new Error("Should not happen");
 
     return _.chain(chipContainer.children)
-      .filter(el => el.nodeName === 'DIV' && el.hasAttribute('email'))
+      .filter(el =>
+        el.nodeName === 'DIV' && el.hasAttribute('email') && el.style.display !== 'none'
+      )
       .map(chip => ({
         emailAddress: chip.getAttribute('email'),
         name: chip.textContent
