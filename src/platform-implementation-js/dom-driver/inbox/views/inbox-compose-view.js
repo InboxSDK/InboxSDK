@@ -147,34 +147,66 @@ class InboxComposeView {
 
     const needToOpenMenu = (fromOptionEls.length === 0);
 
-    if (needToOpenMenu) {
-      simulateClick(fromPicker);
-      fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
-    }
+    try {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+        fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+      }
 
-    if (fromOptionEls.length === 0) {
-      cachedFromContacts = [this._driver.getUserContact()];
-      return cachedFromContacts;
-    }
+      if (fromOptionEls.length === 0) {
+        cachedFromContacts = [this._driver.getUserContact()];
+        return cachedFromContacts;
+      }
 
-    cachedFromContacts = _.chain(fromOptionEls)
-      .map(el => ({
-        name: el.querySelector('span[title]').title,
-        emailAddress: el.querySelector('span:not([title])').textContent
-      }))
-      .value();
-
-    if (needToOpenMenu) {
-      simulateClick(document.body);
-    }
-    if (startActiveElement) {
-      startActiveElement.focus();
+      cachedFromContacts = _.chain(fromOptionEls)
+        .map(el => ({
+          name: el.querySelector('span[title]').title,
+          emailAddress: el.querySelector('span:not([title])').textContent
+        }))
+        .value();
+    } finally {
+      if (needToOpenMenu) {
+        simulateClick(document.body);
+      }
+      if (startActiveElement) {
+        startActiveElement.focus();
+      }
     }
     return cachedFromContacts;
   }
   setFromEmail(email: string): void {
     if (this._p.attributes.isInline) throw new Error("Can't set from value of inline compose");
-    throw new Error("Not implemented");
+    if (this.getFromContact().emailAddress === email) return;
+
+    const {fromPicker} = this._els;
+    if (!fromPicker) throw new Error('from picker element not found');
+
+    const startActiveElement = document.activeElement;
+
+    const grandUncle: HTMLElement = (this._element:any).parentElement.parentElement.firstElementChild;
+    let fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+
+    const needToOpenMenu = (fromOptionEls.length === 0);
+    try {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+        fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+      }
+      const fromOptionEl = _.find(fromOptionEls, el =>
+        el.querySelector('span:not([title])').textContent === email
+      );
+      if (!fromOptionEl) {
+        throw new Error('Failed to find from contact to set');
+      }
+      simulateClick(fromOptionEl);
+    } finally {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+      }
+      if (startActiveElement) {
+        startActiveElement.focus();
+      }
+    }
   }
   focus() {
     if (!this._els.body) throw new Error("Compose View missing body element");
