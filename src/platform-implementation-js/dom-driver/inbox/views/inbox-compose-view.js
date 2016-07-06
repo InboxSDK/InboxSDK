@@ -119,11 +119,16 @@ class InboxComposeView {
     this._queueDraftSave();
   }
   getFromContact(): Contact {
-    const {fromPicker} = this._els;
-    if (!fromPicker) {
+    const {fromPickerEmailSpan} = this._els;
+    if (!fromPickerEmailSpan) {
       return this._driver.getUserContact();
     }
-    return this._driver.getUserContact();
+    const email = fromPickerEmailSpan.textContent;
+    const contact = _.find(this.getFromContactChoices(), c => c.emailAddress === email);
+    if (!contact) {
+      throw new Error('Failed to find from contact');
+    }
+    return contact;
   }
   getFromContactChoices(): Contact[] {
     if (this._p.attributes.isInline) throw new Error("Can't get from values of inline compose");

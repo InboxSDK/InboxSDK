@@ -68,7 +68,11 @@ function parser(el: HTMLElement) {
     }
   );
 
-  const fromPicker = el.querySelector('div[role=button][jsaction*=toggle_custom_from_menu]');
+  const fromPicker: ?HTMLElement = el.querySelector('div[role=button][jsaction*=toggle_custom_from_menu]');
+  const fromPickerEmailSpan = fromPicker ? ec.run(
+    'from picker email span',
+    () => querySelectorOne(fromPicker, 'span')
+  ) : null;
 
   const recipientFields = isInline ? null : ec.run(
     'recipient fields',
@@ -98,6 +102,7 @@ function parser(el: HTMLElement) {
     minimizeBtn,
     bodyPlaceholder,
     fromPicker,
+    fromPickerEmailSpan,
     toInput, ccInput, bccInput,
     toggleCcBccButton
   };
