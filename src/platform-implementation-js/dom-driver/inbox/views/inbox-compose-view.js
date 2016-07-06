@@ -22,7 +22,7 @@ import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 import {
-  isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
+  getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
 import type {Parsed} from '../detection/compose/parser';
@@ -128,13 +128,13 @@ class InboxComposeView {
   focus() {
     if (!this._els.body) throw new Error("Compose View missing body element");
     this._els.body.focus();
-    const selection = (document:any).getSelection();
+    const selection = document.getSelection();
+    const lastSelectionRange = this._lastSelectionRange;
     if (
-      this._lastSelectionRange &&
-      (!selection.rangeCount || isRangeEmpty(selection.getRangeAt(0)))
+      lastSelectionRange && selection
     ) {
       selection.removeAllRanges();
-      selection.addRange(this._lastSelectionRange);
+      selection.addRange(lastSelectionRange);
     }
   }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
@@ -181,6 +181,15 @@ class InboxComposeView {
       inputElement.value = email;
       inputElement.dispatchEvent(new window.FocusEvent("blur"));
     });
+
+    const selection = document.getSelection();
+    const lastSelectionRange = this._lastSelectionRange;
+    if (
+      lastSelectionRange && selection
+    ) {
+      selection.removeAllRanges();
+      selection.addRange(lastSelectionRange);
+    }
   }
   setToRecipients(emails: string[]): void {
     if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
