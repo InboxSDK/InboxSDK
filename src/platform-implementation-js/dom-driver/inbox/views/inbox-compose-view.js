@@ -142,10 +142,15 @@ class InboxComposeView {
     }
     const startActiveElement = document.activeElement;
 
-    simulateClick(fromPicker);
-
     const grandUncle: HTMLElement = (this._element:any).parentElement.parentElement.firstElementChild;
-    const fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+    let fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+
+    const needToOpenMenu = (fromOptionEls.length === 0);
+
+    if (needToOpenMenu) {
+      simulateClick(fromPicker);
+      fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+    }
 
     if (fromOptionEls.length === 0) {
       cachedFromContacts = [this._driver.getUserContact()];
@@ -159,7 +164,9 @@ class InboxComposeView {
       }))
       .value();
 
-    simulateClick(document.body);
+    if (needToOpenMenu) {
+      simulateClick(document.body);
+    }
     if (startActiveElement) {
       startActiveElement.focus();
     }
