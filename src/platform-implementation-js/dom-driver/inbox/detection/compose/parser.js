@@ -68,6 +68,8 @@ function parser(el: HTMLElement) {
     }
   );
 
+  const fromPicker = el.querySelector('div[role=button][jsaction*=toggle_custom_from_menu]');
+
   const recipientFields = isInline ? null : ec.run(
     'recipient fields',
     () => {
@@ -95,6 +97,7 @@ function parser(el: HTMLElement) {
     closeBtn,
     minimizeBtn,
     bodyPlaceholder,
+    fromPicker,
     toInput, ccInput, bccInput,
     toggleCcBccButton
   };

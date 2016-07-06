@@ -27,6 +27,8 @@ import {
 
 import type {Parsed} from '../detection/compose/parser';
 
+let cachedFromContacts: ?Array<Contact> = null;
+
 class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
@@ -34,7 +36,7 @@ class InboxComposeView {
   _stopper: Kefir.Stream&{destroy:()=>void};
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
-  _lastSelectionRange: ?Range;
+  _lastBodySelectionRange: ?Range;
   _p: Parsed;
   _els: Parsed.elements;
 
@@ -44,7 +46,7 @@ class InboxComposeView {
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
-    this._lastSelectionRange = null;
+    this._lastBodySelectionRange = null;
     this._p = parsed;
     this._els = parsed.elements;
 
@@ -81,7 +83,7 @@ class InboxComposeView {
         .onValue(event => {
           const selection = (document:any).getSelection();
           if (selection.rangeCount > 0 && bodyEl.contains(selection.anchorNode)) {
-            this._lastSelectionRange = selection.getRangeAt(0);
+            this._lastBodySelectionRange = selection.getRangeAt(0);
           }
         });
 
@@ -117,19 +119,56 @@ class InboxComposeView {
     this._queueDraftSave();
   }
   getFromContact(): Contact {
-    throw new Error("Not implemented");
+    const {fromPicker} = this._els;
+    if (!fromPicker) {
+      return this._driver.getUserContact();
+    }
+    return this._driver.getUserContact();
   }
   getFromContactChoices(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get from values of inline compose");
+    if (cachedFromContacts) {
+      return cachedFromContacts;
+    }
+    const {fromPicker} = this._els;
+    if (!fromPicker) {
+      cachedFromContacts = [this._driver.getUserContact()];
+      return cachedFromContacts;
+    }
+    const startActiveElement = document.activeElement;
+
+    simulateClick(fromPicker);
+
+    const grandUncle: HTMLElement = (this._element:any).parentElement.parentElement.firstElementChild;
+    const fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+
+    if (fromOptionEls.length === 0) {
+      cachedFromContacts = [this._driver.getUserContact()];
+      return cachedFromContacts;
+    }
+
+    cachedFromContacts = _.chain(fromOptionEls)
+      .map(el => ({
+        name: el.querySelector('span[title]').title,
+        emailAddress: el.querySelector('span:not([title])').textContent
+      }))
+      .value();
+
+    simulateClick(document.body);
+    if (startActiveElement) {
+      startActiveElement.focus();
+    }
+    return cachedFromContacts;
   }
   setFromEmail(email: string): void {
+    if (this._p.attributes.isInline) throw new Error("Can't set from value of inline compose");
     throw new Error("Not implemented");
   }
   focus() {
     if (!this._els.body) throw new Error("Compose View missing body element");
     this._els.body.focus();
     const selection = document.getSelection();
-    const lastSelectionRange = this._lastSelectionRange;
+    const lastSelectionRange = this._lastBodySelectionRange;
     if (
       lastSelectionRange && selection
     ) {
@@ -141,7 +180,7 @@ class InboxComposeView {
     return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
   }
   insertBodyHTMLAtCursor(html: string): ?HTMLElement {
-    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
+    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastBodySelectionRange);
     this._informBodyChanged();
     return retVal;
   }
@@ -168,6 +207,8 @@ class InboxComposeView {
     const chipContainer = inputElement.parentElement;
     if (!chipContainer) throw new Error("Should not happen");
 
+    const startActiveElement = document.activeElement;
+
     // Inbox re-uses the chip elements as some are removed, so finding all the
     // button elements at once and then clicking on each of them wouldn't work.
     const removeButtonCount = chipContainer.querySelectorAll('[role=button][jsaction*="remove_chip"]').length;
@@ -182,13 +223,8 @@ class InboxComposeView {
       inputElement.dispatchEvent(new window.FocusEvent("blur"));
     });
 
-    const selection = document.getSelection();
-    const lastSelectionRange = this._lastSelectionRange;
-    if (
-      lastSelectionRange && selection
-    ) {
-      selection.removeAllRanges();
-      selection.addRange(lastSelectionRange);
+    if (startActiveElement) {
+      startActiveElement.focus();
     }
   }
   setToRecipients(emails: string[]): void {
@@ -331,10 +367,10 @@ class InboxComposeView {
     return this.getBodyElement().textContent;
   }
   getSelectedBodyHTML(): ?string {
-    return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
+    return getSelectedHTMLInElement(this.getBodyElement(), this._lastBodySelectionRange);
   }
   getSelectedBodyText(): ?string {
-    return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
+    return getSelectedTextInElement(this.getBodyElement(), this._lastBodySelectionRange);
   }
   getSubject(): string {
     const {subject} = this._els;
