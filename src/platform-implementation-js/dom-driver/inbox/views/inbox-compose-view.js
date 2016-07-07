@@ -9,6 +9,7 @@ import kefirBus from 'kefir-bus';
 import autoHtml from 'auto-html';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import delayAsap from '../../../lib/delay-asap';
+import arrayToLifetimes from '../../../lib/array-to-lifetimes';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
@@ -22,10 +23,12 @@ import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
 import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
 import {
-  isRangeEmpty, getSelectedHTMLInElement, getSelectedTextInElement
+  getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
 
 import type {Parsed} from '../detection/compose/parser';
+
+let cachedFromContacts: ?Array<Contact> = null;
 
 class InboxComposeView {
   _element: HTMLElement;
@@ -34,7 +37,7 @@ class InboxComposeView {
   _stopper: Kefir.Stream&{destroy:()=>void};
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
-  _lastSelectionRange: ?Range;
+  _lastBodySelectionRange: ?Range;
   _p: Parsed;
   _els: Parsed.elements;
 
@@ -44,7 +47,7 @@ class InboxComposeView {
     this._stopper = kefirStopper();
     this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
-    this._lastSelectionRange = null;
+    this._lastBodySelectionRange = null;
     this._p = parsed;
     this._els = parsed.elements;
 
@@ -81,7 +84,7 @@ class InboxComposeView {
         .onValue(event => {
           const selection = (document:any).getSelection();
           if (selection.rangeCount > 0 && bodyEl.contains(selection.anchorNode)) {
-            this._lastSelectionRange = selection.getRangeAt(0);
+            this._lastBodySelectionRange = selection.getRangeAt(0);
           }
         });
 
@@ -90,6 +93,8 @@ class InboxComposeView {
           .map(() => ({eventName: 'bodyChanged'}))
       );
     }
+
+    this._eventStream.plug(this._getAddressChangesStream());
 
     handleComposeLinkChips(this);
   }
@@ -116,23 +121,141 @@ class InboxComposeView {
     }
     this._queueDraftSave();
   }
+  _getAddressChangesStream() {
+    const {toInput, ccInput, bccInput} = this._els;
+
+    function makeChangesStream(prefix, input, cb) {
+      if (!input) return Kefir.never();
+      const contactArrayStream =
+        makeMutationObserverChunkedStream(
+          (input:any).parentElement, {childList: true, attributes: true, subtree: true}
+        )
+        .merge(Kefir.later(0))
+        .map(cb);
+      return arrayToLifetimes(contactArrayStream, c => c.emailAddress)
+        .flatMap(({el, removalStream}) =>
+          Kefir.constant({eventName: prefix+'ContactAdded', data: {contact: el}})
+            .merge(
+              removalStream.map(() => ({
+                eventName: prefix+'ContactRemoved', data: {contact: el}
+              }))
+            )
+        );
+    }
+
+    return Kefir.merge([
+      makeChangesStream('to', toInput, () => this.getToRecipients()),
+      makeChangesStream('cc', ccInput, () => this.getCcRecipients()),
+      makeChangesStream('bcc', bccInput, () => this.getBccRecipients())
+    ]).takeUntilBy(this._stopper);
+  }
+  getFromContact(): Contact {
+    const {fromPickerEmailSpan} = this._els;
+    if (!fromPickerEmailSpan) {
+      return this._driver.getUserContact();
+    }
+    const email = fromPickerEmailSpan.textContent;
+    const contact = _.find(this.getFromContactChoices(), c => c.emailAddress === email);
+    if (!contact) {
+      throw new Error('Failed to find from contact');
+    }
+    return contact;
+  }
+  getFromContactChoices(): Contact[] {
+    if (this._p.attributes.isInline) throw new Error("Can't get from values of inline compose");
+    if (cachedFromContacts) {
+      return cachedFromContacts;
+    }
+    const {fromPicker} = this._els;
+    if (!fromPicker) {
+      cachedFromContacts = [this._driver.getUserContact()];
+      return cachedFromContacts;
+    }
+    const startActiveElement = document.activeElement;
+
+    const grandUncle: HTMLElement = (this._element:any).parentElement.parentElement.firstElementChild;
+    let fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+
+    const needToOpenMenu = (fromOptionEls.length === 0);
+
+    try {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+        fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+      }
+
+      if (fromOptionEls.length === 0) {
+        cachedFromContacts = [this._driver.getUserContact()];
+        return cachedFromContacts;
+      }
+
+      cachedFromContacts = _.chain(fromOptionEls)
+        .map(el => ({
+          name: el.querySelector('span[title]').title,
+          emailAddress: el.querySelector('span:not([title])').textContent
+        }))
+        .value();
+    } finally {
+      if (needToOpenMenu) {
+        simulateClick(document.body);
+      }
+      if (startActiveElement) {
+        startActiveElement.focus();
+      }
+    }
+    return cachedFromContacts;
+  }
+  setFromEmail(email: string): void {
+    if (this._p.attributes.isInline) throw new Error("Can't set from value of inline compose");
+    if (this.getFromContact().emailAddress === email) return;
+
+    const {fromPicker} = this._els;
+    if (!fromPicker) throw new Error('from picker element not found');
+
+    const startActiveElement = document.activeElement;
+
+    const grandUncle: HTMLElement = (this._element:any).parentElement.parentElement.firstElementChild;
+    let fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+
+    const needToOpenMenu = (fromOptionEls.length === 0);
+    try {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+        fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
+      }
+      const fromOptionEl = _.find(fromOptionEls, el =>
+        el.querySelector('span:not([title])').textContent === email
+      );
+      if (!fromOptionEl) {
+        throw new Error('Failed to find from contact to set');
+      }
+      simulateClick(fromOptionEl);
+    } finally {
+      if (needToOpenMenu) {
+        simulateClick(fromPicker);
+      }
+      if (startActiveElement) {
+        startActiveElement.focus();
+      }
+    }
+  }
   focus() {
     if (!this._els.body) throw new Error("Compose View missing body element");
     this._els.body.focus();
-    const selection = (document:any).getSelection();
+    const selection = document.getSelection();
+    const lastSelectionRange = this._lastBodySelectionRange;
     if (
-      this._lastSelectionRange &&
-      (!selection.rangeCount || isRangeEmpty(selection.getRangeAt(0)))
+      lastSelectionRange && selection
     ) {
       selection.removeAllRanges();
-      selection.addRange(this._lastSelectionRange);
+      selection.addRange(lastSelectionRange);
     }
   }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
     return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
   }
   insertBodyHTMLAtCursor(html: string): ?HTMLElement {
-    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
+    var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastBodySelectionRange);
     this._informBodyChanged();
     return retVal;
   }
@@ -155,14 +278,55 @@ class InboxComposeView {
     this._els.body.textContent = text;
     this._informBodyChanged();
   }
+  _setRecipients(inputElement: HTMLInputElement, emails: string[]) {
+    const chipContainer = inputElement.parentElement;
+    if (!chipContainer) throw new Error("Should not happen");
+
+    const startActiveElement = document.activeElement;
+
+    // Inbox re-uses the chip elements as some are removed, so finding all the
+    // button elements at once and then clicking on each of them wouldn't work.
+    const removeButtonCount = chipContainer.querySelectorAll('[role=button][jsaction*="remove_chip"]').length;
+    for (let i=0; i<removeButtonCount; i++) {
+      const removeButton = chipContainer.querySelector('[role=button][jsaction*="remove_chip"]');
+      if (!removeButton) break;
+      simulateClick(removeButton);
+    }
+
+    emails.forEach(email => {
+      inputElement.value = email;
+      inputElement.dispatchEvent(new window.FocusEvent("blur"));
+    });
+
+    if (startActiveElement) {
+      startActiveElement.focus();
+    }
+  }
   setToRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {toInput} = this._els;
+    if (!toInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(toInput, emails);
   }
   setCcRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {ccInput} = this._els;
+    if (!ccInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(ccInput, emails);
+    const {toggleCcBccButton} = this._els;
+    if (emails.length && toggleCcBccButton && toggleCcBccButton.style.display !== 'none') {
+      simulateClick(toggleCcBccButton);
+    }
   }
   setBccRecipients(emails: string[]): void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't set recipients of inline compose");
+    const {bccInput} = this._els;
+    if (!bccInput) throw new Error("Compose View missing recipient input");
+    this._setRecipients(bccInput, emails);
+    const {toggleCcBccButton} = this._els;
+    if (emails.length && toggleCcBccButton && toggleCcBccButton.style.display !== 'none') {
+      simulateClick(toggleCcBccButton);
+    }
   }
   close() {
     if (this._p.attributes.isInline) {
@@ -252,9 +416,20 @@ class InboxComposeView {
     }
     simulateClick(this._els.popOutBtn);
   }
+  registerRequestModifier(modifier: Object): void {
+    throw new Error("Not implemented");
+  }
+  attachFiles(files: Blob[]): Promise<void> {
+    throw new Error("Not implemented");
+  }
+  attachInlineFiles(files: Blob[]): Promise<void> {
+    throw new Error("Not implemented");
+  }
   getIsFullscreen(): boolean {
-    // TODO
-    return false;
+    if (this._p.attributes.isInline) return false;
+    const {toggleFullscreenButtonImage} = this._els;
+    if (!toggleFullscreenButtonImage) return false;
+    return !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
   }
   getBodyElement(): HTMLElement {
     if (!this._els.body) throw new Error("Compose View missing body element");
@@ -267,10 +442,10 @@ class InboxComposeView {
     return this.getBodyElement().textContent;
   }
   getSelectedBodyHTML(): ?string {
-    return getSelectedHTMLInElement(this.getBodyElement(), this._lastSelectionRange);
+    return getSelectedHTMLInElement(this.getBodyElement(), this._lastBodySelectionRange);
   }
   getSelectedBodyText(): ?string {
-    return getSelectedTextInElement(this.getBodyElement(), this._lastSelectionRange);
+    return getSelectedTextInElement(this.getBodyElement(), this._lastBodySelectionRange);
   }
   getSubject(): string {
     const {subject} = this._els;
@@ -288,14 +463,37 @@ class InboxComposeView {
     }
     this._els.subject.value = text;
   }
+  _getRecipients(inputElement: HTMLElement): Contact[] {
+    const chipContainer = inputElement.parentElement;
+    if (!chipContainer) throw new Error("Should not happen");
+
+    return _.chain(chipContainer.children)
+      .filter(el =>
+        el.nodeName === 'DIV' && el.hasAttribute('email') && el.style.display !== 'none'
+      )
+      .map(chip => ({
+        emailAddress: chip.getAttribute('email'),
+        name: chip.textContent
+      }))
+      .value();
+  }
   getToRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {toInput} = this._els;
+    if (!toInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(toInput);
   }
   getCcRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {ccInput} = this._els;
+    if (!ccInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(ccInput);
   }
   getBccRecipients(): Contact[] {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
+    const {bccInput} = this._els;
+    if (!bccInput) throw new Error("Compose View missing recipient input");
+    return this._getRecipients(bccInput);
   }
   getComposeID(): string {
     throw new Error("This method was discontinued");

@@ -17,10 +17,7 @@ export default function getAddressInformationExtractor(addressType: string): (no
 				return extractContactFromEmailContactString(contactInfoString);
 			}
 			catch(err){
-				Logger.error(new Error('problem extracting address information'), {
-					message: err.message
-				});
-
+				// The user might have typed in a partial address. We can just ignore that.
 				return null;
 			}
 

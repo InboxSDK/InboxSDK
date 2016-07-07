@@ -3,7 +3,7 @@
 
 var _ = require('lodash');
 
-export function isRangeEmpty(range: Range): boolean {
+function isRangeEmpty(range: Range): boolean {
   return range.startContainer === range.endContainer &&
     range.startOffset === range.endOffset;
 }

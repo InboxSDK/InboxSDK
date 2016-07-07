@@ -3,7 +3,9 @@
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
-export default function parser(el: HTMLElement) {
+import {defn} from 'ud';
+
+function parser(el: HTMLElement) {
   const ec = new ErrorCollector('compose');
 
   const isInline = el.getAttribute('role') !== 'dialog';
@@ -36,6 +38,14 @@ export default function parser(el: HTMLElement) {
     'pop-out button',
     () => querySelectorOne(el, 'button[jsaction$=".quick_compose_popout_mole"]')
   ) : null;
+  const toggleFullscreenButton = isInline ? null : ec.run(
+    'fullscreen button',
+    () => querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"]')
+  );
+  const toggleFullscreenButtonImage = isInline ? null : ec.run(
+    'fullscreen button image',
+    () => ((querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"] img'): any): HTMLImageElement)
+  );
   const closeBtn = isInline ? null : ec.run(
     'close button',
     () => querySelectorOne(
@@ -58,15 +68,43 @@ export default function parser(el: HTMLElement) {
     }
   );
 
+  const fromPicker: ?HTMLElement = el.querySelector('div[role=button][jsaction*=toggle_custom_from_menu]');
+  const fromPickerEmailSpan = fromPicker ? ec.run(
+    'from picker email span',
+    () => querySelectorOne(fromPicker, 'span')
+  ) : null;
+
+  const recipientFields = isInline ? null : ec.run(
+    'recipient fields',
+    () => {
+      const recipientFields: HTMLInputElement[] = (el.querySelectorAll('input[type=text][role=combobox]'): any);
+      if (recipientFields.length != 3)
+        throw new Error(`Found ${recipientFields.length} recipient fields, expected 3`);
+      return recipientFields;
+    }
+  );
+  const [toInput, ccInput, bccInput] = recipientFields || [];
+
+  const toggleCcBccButton = isInline ? null : ec.run(
+    'toggle cc/bcc button',
+    () => querySelectorOne(el, 'button[jsaction*=".toggle_cc_bcc"]')
+  );
+
   const elements = {
     sendBtn,
     attachBtn,
     body,
     subject,
     popOutBtn,
+    toggleFullscreenButton,
+    toggleFullscreenButtonImage,
     closeBtn,
     minimizeBtn,
-    bodyPlaceholder
+    bodyPlaceholder,
+    fromPicker,
+    fromPickerEmailSpan,
+    toInput, ccInput, bccInput,
+    toggleCcBccButton
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
@@ -81,3 +119,5 @@ export default function parser(el: HTMLElement) {
 
 /*:: const x = parser(({}:any)); */
 export type Parsed = typeof x;
+
+export default defn(module, parser);

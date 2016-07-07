@@ -11,30 +11,36 @@ import type {ItemWithLifetime} from './dom/make-element-child-stream';
 // element, or when the output stream is unsubscribed from, similar to
 // makeElementChildStream.
 
+type Stopper = Kefir.Stream&{destroy(): void};
+
 export default function arrayToLifetimes<T>(
-  input: Kefir.Stream<Array<T>|NodeList<T>>
+  input: Kefir.Stream<Array<T>|NodeList<T>>,
+  keyFn?: (value: T) => any
 ): Kefir.Stream<ItemWithLifetime<T>> {
   return Kefir.stream(emitter => {
-    const removalStreams: Map<T, Object> = new Map();
+    const items: Map<any, {el: T, removalStream: Stopper}> = new Map();
 
     function listener(event) {
       switch (event.type) {
       case 'value':
         const els = event.value;
+        const elKeys = keyFn ? Array.prototype.map.call(els, keyFn) : els;
 
-        removalStreams.forEach((removalStream, el) => {
-          if (Array.prototype.indexOf.call(els, el) < 0) {
-            removalStreams.delete(el);
+        items.forEach(({el, removalStream}, key) => {
+          if (Array.prototype.indexOf.call(elKeys, key) < 0) {
+            items.delete(key);
             removalStream.destroy();
           }
         });
 
         for (let i=0, len=els.length; i<len; i++) {
           const el: T = els[i];
-          if (!removalStreams.has(el)) {
+          const elKey = elKeys[i];
+          if (!items.has(elKey)) {
             const removalStream = kefirStopper();
-            removalStreams.set(el, removalStream);
-            emitter.emit({el, removalStream});
+            const itemWithLifetime = {el, removalStream};
+            items.set(elKey, itemWithLifetime);
+            emitter.emit(itemWithLifetime);
           }
         }
         break;
@@ -49,7 +55,7 @@ export default function arrayToLifetimes<T>(
     input.onAny(listener);
 
     return () => {
-      removalStreams.forEach(removalStream => {
+      items.forEach(({removalStream}) => {
         removalStream.destroy();
       });
       input.offAny(listener);

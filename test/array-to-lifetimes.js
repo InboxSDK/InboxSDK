@@ -42,6 +42,41 @@ describe('arrayToLifetimes', function() {
       });
   });
 
+  it('keyFn works', function(cb) {
+    const events = [];
+    arrayToLifetimes(
+      Kefir.sequentially(0, [
+        [{v: 'a', k: 1}, {v: 'b', k: 2}],
+        [{v: 'B', k: 2}, {v: 'd', k: 4}],
+        [{v: 'A', k: 1}, {v: 'b', k: 2}, {v: 'c', k: 3}]
+      ]),
+      el => el.k
+    )
+      .onValue(({el, removalStream}) => {
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', {v: 'a', k: 1}],
+            ['add', {v: 'b', k: 2}],
+            ['remove', {v: 'a', k: 1}],
+            ['add', {v: 'd', k: 4}],
+            ['remove', {v: 'd', k: 4}],
+            ['add', {v: 'A', k: 1}],
+            ['add', {v: 'c', k: 3}],
+            ['remove', {v: 'b', k: 2}],
+            ['remove', {v: 'A', k: 1}],
+            ['remove', {v: 'c', k: 3}]
+          ]);
+          cb();
+        });
+      });
+  });
+
   it('unsubscription triggers removal', function(cb) {
     this.slow();
 
