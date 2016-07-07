@@ -95,6 +95,9 @@ var InboxDriver = ud.defn(module, class InboxDriver {
           mainLength: document.querySelectorAll('[role=main]').length,
           regularLength: document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
           noJsActionLength: document.querySelectorAll('body > div[id] > div[id][class]:not([role]) > div[class] > div[id]').length,
+          noNotLength: document.querySelectorAll('body > div[id][jsaction] > div[id][class] > div[class] > div[id]').length,
+          noBodyDirectChildLength: document.querySelectorAll('body div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
+          noBodyLength: document.querySelectorAll('div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
           // We can use class names for logging heuristics. Don't want to use
           // them anywhere else.
           classLength: document.querySelectorAll('div.ek div.md > div').length,
