@@ -9,6 +9,7 @@ import kefirBus from 'kefir-bus';
 import autoHtml from 'auto-html';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import delayAsap from '../../../lib/delay-asap';
+import arrayToLifetimes from '../../../lib/array-to-lifetimes';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
@@ -93,6 +94,8 @@ class InboxComposeView {
       );
     }
 
+    this._eventStream.plug(this._getAddressChangesStream());
+
     handleComposeLinkChips(this);
   }
   destroy() {
@@ -117,6 +120,34 @@ class InboxComposeView {
       }
     }
     this._queueDraftSave();
+  }
+  _getAddressChangesStream() {
+    const {toInput, ccInput, bccInput} = this._els;
+
+    function makeChangesStream(prefix, input, cb) {
+      if (!input) return Kefir.never();
+      const contactArrayStream =
+        makeMutationObserverChunkedStream(
+          (input:any).parentElement, {childList: true, attributes: true, subtree: true}
+        )
+        .merge(Kefir.later(0))
+        .map(cb);
+      return arrayToLifetimes(contactArrayStream, c => c.emailAddress)
+        .flatMap(({el, removalStream}) =>
+          Kefir.constant({eventName: prefix+'ContactAdded', data: {contact: el}})
+            .merge(
+              removalStream.map(() => ({
+                eventName: prefix+'ContactRemoved', data: {contact: el}
+              }))
+            )
+        );
+    }
+
+    return Kefir.merge([
+      makeChangesStream('to', toInput, () => this.getToRecipients()),
+      makeChangesStream('cc', ccInput, () => this.getCcRecipients()),
+      makeChangesStream('bcc', bccInput, () => this.getBccRecipients())
+    ]).takeUntilBy(this._stopper);
   }
   getFromContact(): Contact {
     const {fromPickerEmailSpan} = this._els;
