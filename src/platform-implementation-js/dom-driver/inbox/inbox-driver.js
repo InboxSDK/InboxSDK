@@ -111,7 +111,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
       var waitTime = 180*1000;
       this._logger.error(err, startStatus);
       setTimeout(() => {
-        var laterStatus =  getStatus();
+        var laterStatus = getStatus();
         this._logger.eventSdkPassive('waitfor compose data', {
           startStatus, waitTime, laterStatus
         });
