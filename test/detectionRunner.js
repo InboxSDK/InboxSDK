@@ -55,6 +55,42 @@ describe('detectionRunner', function() {
       });
   });
 
+  it('works without watcher', function(cb) {
+    const events = [];
+    const el1 = doc().createElement('div');
+    let finderElements = [el1];
+
+    detectionRunner({
+      name: 'test',
+      parser: () => ({
+        elements: {}, score: 1, errors: [], __extra: 123
+      }),
+      watcher: null,
+      finder: () => finderElements,
+      interval: 15,
+      root: doc(),
+      logError(e) { events.push(['error', e.message]); }
+    })
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el, removalStream, parsed}) => {
+        assert.strictEqual(parsed.score, 1);
+        assert.strictEqual(parsed.__extra, 123);
+        events.push(['add', el]);
+        removalStream.take(1).onValue(() => {
+          events.push(['remove', el]);
+        });
+      })
+      .onEnd(() => {
+        asap(() => {
+          assert.deepEqual(events, [
+            ['add', el1],
+            ['remove', el1]
+          ]);
+          cb();
+        });
+      });
+  });
+
   it('finder and watcher together', function(cb) {
     const events = [];
     const e1 = {el: doc().createElement('div'), removalStream: kefirStopper()};
