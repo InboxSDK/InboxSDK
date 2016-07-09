@@ -27,7 +27,7 @@ export default function detectionRunner<P: GenericParserResults>(
   }: {
     name: string;
     parser: (el: HTMLElement) => P;
-    watcher: (root: Document) => Kefir.Stream<ElementWithLifetime>;
+    watcher: ?(root: Document) => Kefir.Stream<ElementWithLifetime>;
     finder: (root: Document) => Array<HTMLElement>;
     logError: (err: Error, details?: any) => void;
     root?: Document;
@@ -53,7 +53,7 @@ export default function detectionRunner<P: GenericParserResults>(
     return {el, removalStream, parsed};
   }
 
-  const watcherElements = watcher(root)
+  const watcherElements = !watcher ? Kefir.never() : watcher(root)
     .map(addParse)
     .filter(({parsed}) => parsed.score > 0.1) // TODO figure out a good scoring metric
     .filter(({el}) => {
@@ -115,9 +115,11 @@ export default function detectionRunner<P: GenericParserResults>(
     .map(event => {
       const {el, removalStream} = event;
 
-      logError(new Error(`detectionRunner(${name}) finder found element missed by watcher`), {
-        html: censorHTMLtree(el)
-      });
+      if (watcher) {
+        logError(new Error(`detectionRunner(${name}) finder found element missed by watcher`), {
+          html: censorHTMLtree(el)
+        });
+      }
 
       finderFoundElements.add(el);
       removalStream.take(1).onValue(() => {
