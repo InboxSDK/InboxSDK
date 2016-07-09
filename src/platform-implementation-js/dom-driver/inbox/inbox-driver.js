@@ -9,11 +9,15 @@ import kefirStopper from 'kefir-stopper';
 import * as ud from 'ud';
 
 import Logger from '../../lib/logger';
+import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
+import getAppToolbarLocationStream from './getAppToolbarLocationStream';
+import getAppToolbarRightMarginStream from './getAppToolbarRightMarginStream';
+import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
 import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
@@ -39,6 +43,8 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
+  _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _appToolbarRightMarginPool: ItemWithLifetimePool<ElementWithLifetime>;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -117,6 +123,24 @@ var InboxDriver = ud.defn(module, class InboxDriver {
         });
       }, waitTime);
     });
+
+    this._appToolbarLocationPool = new ItemWithLifetimePool(
+      getAppToolbarLocationStream(this).takeUntilBy(this._stopper)
+    );
+    Kefir.later(30*1000)
+      .takeUntilBy(this._appToolbarLocationPool.items())
+      .onValue(() => {
+        this._logger.errorSite(new Error('Failed to find appToolbarLocation'));
+      });
+
+    this._appToolbarRightMarginPool = new ItemWithLifetimePool(
+      getAppToolbarRightMarginStream(this).takeUntilBy(this._stopper)
+    );
+    Kefir.later(30*1000)
+      .takeUntilBy(this._appToolbarRightMarginPool.items())
+      .onValue(() => {
+        this._logger.errorSite(new Error('Failed to find appToolbarRightMargin'));
+      });
   }
 
   destroy() {
