@@ -21,15 +21,15 @@ const pageWithSidebar20160614: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-with-chat-sidebar-2016-06-14.html', 'utf8')));
 const pageFullscreen20160620: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-20-fullscreen compose.html', 'utf8')));
-const pageFullscreen20160628: () => Document = once(() =>
+const page20160628: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28.html', 'utf8')));
-const pageFullscreen20160628_2: () => Document = once(() =>
+const page20160628_2: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-28-2.html', 'utf8')));
-const pageFullscreen20160629: () => Document = once(() =>
+const page20160629: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29.html', 'utf8')));
-const pageFullscreen20160629_2: () => Document = once(() =>
+const page20160629_2: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29-2.html', 'utf8')));
-const pageFullscreen20160629_3: () => Document = once(() =>
+const page20160629_3: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/data/inbox-2016-06-29-3.html', 'utf8')));
 
 describe('Inbox Compose Detection', function() {
@@ -70,17 +70,17 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-28', function() {
-      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+      const compose = page20160628().querySelector('[data-test-id=compose]');
 
-      const results = finder(pageFullscreen20160628());
+      const results = finder(page20160628());
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, compose));
     });
 
     it('2016-06-28-2', function() {
-      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+      const compose = page20160628_2().querySelector('[data-test-id=compose]');
 
-      const results = finder(pageFullscreen20160628_2());
+      const results = finder(page20160628_2());
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, compose));
     });
@@ -120,7 +120,7 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-28', function() {
-      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+      const compose = page20160628().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -128,7 +128,7 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-28-2', function() {
-      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+      const compose = page20160628_2().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -136,7 +136,7 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-29', function() {
-      const compose = pageFullscreen20160629().querySelector('[data-test-id=compose]');
+      const compose = page20160629().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -144,7 +144,7 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-29-2', function() {
-      const compose = pageFullscreen20160629_2().querySelector('[data-test-id=compose]');
+      const compose = page20160629_2().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -152,7 +152,7 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-29-3', function() {
-      const compose = pageFullscreen20160629_3().querySelector('[data-test-id=compose]');
+      const compose = page20160629_3().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -213,10 +213,10 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-28 inline compose in search page', function(cb) {
-      const compose = pageFullscreen20160628().querySelector('[data-test-id=compose]');
+      const compose = page20160628().querySelector('[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160628())
+      watcher(page20160628())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -228,10 +228,10 @@ describe('Inbox Compose Detection', function() {
     });
 
     it('2016-06-28-2 regular compose', function(cb) {
-      const compose = pageFullscreen20160628_2().querySelector('[data-test-id=compose]');
+      const compose = page20160628_2().querySelector('[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160628_2())
+      watcher(page20160628_2())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
