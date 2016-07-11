@@ -14,6 +14,7 @@ import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
+import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 import getAppToolbarRightMarginStream from './getAppToolbarRightMarginStream';
@@ -24,7 +25,7 @@ import InboxComposeView from './views/inbox-compose-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
 import type ButterBar from '../../namespaces/butter-bar';
-import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
+import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';
 
@@ -165,10 +166,9 @@ var InboxDriver = ud.defn(module, class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string): Object {
-		// stub
-    return {};
-	}
+  activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
+    console.warn('activateShortcut not implemented');
+  }
 
   getUserEmailAddress(): string {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
