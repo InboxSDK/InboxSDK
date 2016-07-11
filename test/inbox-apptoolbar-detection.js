@@ -10,7 +10,7 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 
 import locFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/appToolbarLocation/finder';
-import rightMarginFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/appToolbarRightMargin/finder';
+import searchBarFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/searchBar/finder';
 
 import {
   page20160614,
@@ -39,17 +39,17 @@ describe('Inbox AppToolbar Support Detection', function() {
     });
   });
 
-  describe('right margin', function() {
+  describe('search bar', function() {
     describe('finder', function() {
       it('2016-06-14', function() {
         const rightMargin = page20160614().querySelector('[data-test-id="apptoolbar-rightMargin"]');
-        const results = rightMarginFinder(page20160614());
+        const results = searchBarFinder(page20160614());
         assert.deepEqual(results, [rightMargin]);
       });
 
       it('2016-06-14 with chat sidebar', function() {
         const rightMargin = pageWithSidebar20160614().querySelector('[data-test-id="apptoolbar-rightMargin"]');
-        const results = rightMarginFinder(pageWithSidebar20160614());
+        const results = searchBarFinder(pageWithSidebar20160614());
         assert.deepEqual(results, [rightMargin]);
       });
     });
