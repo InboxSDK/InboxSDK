@@ -59,6 +59,11 @@
   -webkit-user-drag: none;
 }
 
+.inboxsdk__appButton_tooltip {
+  position: fixed;
+  z-index: 22;
+}
+
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
   display: inline-block;
   position: relative;

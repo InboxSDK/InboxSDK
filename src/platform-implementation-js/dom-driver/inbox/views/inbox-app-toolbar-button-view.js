@@ -4,12 +4,15 @@ import _ from 'lodash';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import DropdownView from '../../../widgets/buttons/dropdown-view';
+import InboxAppToolbarTooltipView from './inbox-app-toolbar-tooltip-view';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 
 class InboxAppToolbarButtonView {
   _buttonDescriptor: ?Object = null;
   _buttonDescriptorStream: Kefir.Stream<Object>;
+  _buttonEl: ?HTMLElement = null;
+  _activeDropdown: ?DropdownView = null;
   _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
   _ready: Kefir.Stream&{destroy():void} = kefirStopper();
 
@@ -59,10 +62,15 @@ class InboxAppToolbarButtonView {
     .onValue(event => {
       event.preventDefault();
       event.stopPropagation();
-      console.log('foo');
+      if (this._activeDropdown) {
+        this.close();
+      } else {
+        this.open();
+      }
     });
 
     appToolbarButtonContainer.insertBefore(button, appToolbarButtonContainer.firstChild);
+    this._buttonEl = button;
 
     this._ready.destroy();
 
@@ -106,11 +114,30 @@ class InboxAppToolbarButtonView {
   }
 
   open() {
-    console.log('TODO open');
+    if (this._activeDropdown) return;
+    const button = this._buttonEl;
+    if (!button) throw new Error('should not happen');
+    button.classList.add('inboxsdk__active');
+    const dropdown = this._activeDropdown = new DropdownView(
+      new InboxAppToolbarTooltipView(), button
+    );
+    dropdown.setPlacementOptions({
+      position: 'bottom', forcePosition: true,
+      topBuffer: 20, hAlign: 'center'
+    });
+    dropdown.on('destroy', () => {
+      this._activeDropdown = null;
+      button.classList.remove('inboxsdk__active');
+    });
+    const appEvent = {dropdown};
+    if(this._buttonDescriptor && this._buttonDescriptor.onClick){
+      this._buttonDescriptor.onClick.call(null, appEvent);
+    }
   }
 
   close() {
-    console.log('TODO close');
+    if (!this._activeDropdown) return;
+    this._activeDropdown.close();
   }
 
   waitForReady(): Promise<this> {

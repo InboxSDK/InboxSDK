@@ -123,6 +123,7 @@ class DropdownView extends EventEmitter {
 				this._scrollableContainByScreen.destroy();
 			}
 			this.emit('destroy');
+			this._dropdownViewDriver.getContainerElement().remove();
 			this._dropdownViewDriver.destroy();
 		}
 	}
