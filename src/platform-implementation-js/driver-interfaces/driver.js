@@ -31,7 +31,7 @@ export type Driver = {
 	setShowNativeNavMarker(a: any): any;
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
-	addToolbarButtonForApp(buttonDescriptor: Object): Promise<Object>;
+	addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object>;
 	getToolbarViewDriverStream(): Kefir.Stream<Object>;
 	getButterBarDriver(): any;
 	setButterBar(butterBar: any): void;

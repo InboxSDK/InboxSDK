@@ -4,13 +4,18 @@ import _ from 'lodash';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 
 class InboxAppToolbarButtonView {
+  _buttonDescriptor: ?Object = null;
+  _buttonDescriptorStream: Kefir.Stream<Object>;
   _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
   _ready: Kefir.Stream&{destroy():void} = kefirStopper();
 
-  constructor(appToolbarLocationStream: Kefir.Stream<ElementWithLifetime>, searchBarStream: Kefir.Stream<ElementWithLifetime>) {
+  constructor(buttonDescriptor: Kefir.Stream<Object>, appToolbarLocationStream: Kefir.Stream<ElementWithLifetime>, searchBarStream: Kefir.Stream<ElementWithLifetime>) {
+    this._buttonDescriptorStream = buttonDescriptor.toProperty().takeUntilBy(this._stopper);
+
     searchBarStream
       .take(1)
       .takeUntilBy(this._stopper)
@@ -31,7 +36,32 @@ class InboxAppToolbarButtonView {
     }
 
     const button = document.createElement('div');
-    button.textContent = ':)';
+    button.tabIndex = 0;
+    button.setAttribute('role', 'button');
+    button.className = 'inboxsdk__appButton inboxsdk__button_icon';
+
+    const buttonImg = document.createElement('img');
+    buttonImg.className = 'inboxsdk__button_iconImg';
+    button.appendChild(buttonImg);
+
+    this._buttonDescriptorStream.onValue(buttonDescriptor => {
+      button.title = buttonDescriptor.title;
+      buttonImg.src = buttonDescriptor.iconUrl;
+      buttonImg.className = `inboxsdk__button_iconImg ${buttonDescriptor.iconClass||''}`;
+      this._buttonDescriptor = buttonDescriptor;
+    });
+
+    Kefir.merge([
+      Kefir.fromEvents(button, 'click'),
+      Kefir.fromEvents(button, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+    ])
+    .takeUntilBy(this._stopper)
+    .onValue(event => {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log('foo');
+    });
+
     appToolbarButtonContainer.insertBefore(button, appToolbarButtonContainer.firstChild);
 
     this._ready.destroy();

@@ -229,8 +229,8 @@ class InboxDriver {
     console.log('registerSearchQueryRewriter not implemented');
   }
 
-  addToolbarButtonForApp(buttonDescriptor: Object): Promise<Object> {
-    const view = new InboxAppToolbarButtonView(this._appToolbarLocationPool.items(), this._searchBarPool.items());
+  addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object> {
+    const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
     return view.waitForReady();
   }
 

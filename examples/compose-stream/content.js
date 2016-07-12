@@ -152,4 +152,19 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
 		composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
 	});
+
+	var button = inboxSDK.Toolbars.addToolbarButtonForApp({
+		iconUrl: 'https://ssl.gstatic.com/s2/oz/images/notifications/spinner_32_4152eb447e3e756250b29a0b19b2bbf9.gif',
+		title: 'App Monkey',
+		arrowColor: 'green',
+		onClick(event){
+			console.log('app toolbar click', event);
+			var div = document.createElement("div");
+			div.textContent = 'Hello World!';
+			div.style.backgroundColor = 'green';
+
+			event.dropdown.el.appendChild(div);
+		}
+	});
+	window._button = button;
 });
