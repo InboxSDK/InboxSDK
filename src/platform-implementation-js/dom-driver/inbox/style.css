@@ -6,6 +6,12 @@
   transition: none !important;
 }
 
+.inboxsdk__appButton_container {
+  position: absolute;
+  right: 200px;
+  top: 16px;
+}
+
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
 }
