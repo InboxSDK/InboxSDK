@@ -45,6 +45,15 @@
   background-color: rgba(0,0,0,0.1);
 }
 
+.inboxsdk__appButton_tooltip {
+  position: fixed;
+  z-index: 22;
+  outline: none;
+  max-width: 500px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
 }
@@ -59,12 +68,6 @@
   user-drag: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
-}
-
-.inboxsdk__appButton_tooltip {
-  position: fixed;
-  z-index: 22;
-  outline: none;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {

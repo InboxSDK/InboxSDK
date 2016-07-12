@@ -160,7 +160,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		onClick(event){
 			console.log('app toolbar click', event);
 			var div = document.createElement("div");
-			div.textContent = 'Hello World!';
+			div.textContent = 'Hello World! Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here. Foo bar 1234567 filler text is here.';
 			div.style.backgroundColor = 'green';
 
 			event.dropdown.el.appendChild(div);
