@@ -64,6 +64,7 @@
 .inboxsdk__appButton_tooltip {
   position: fixed;
   z-index: 22;
+  outline: none;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
