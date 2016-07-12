@@ -1248,6 +1248,9 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__tooltip.inboxsdk__appButton_tooltip .aRM {
   padding: 0px;
+  white-space: initial;
+  text-align: center;
+  font: normal normal normal normal 16px / normal arial, sans-serif;
 }
 
 .inboxsdk__tooltip.inboxsdk__appButton_tooltip .inboxsdk__tooltip_arrow {

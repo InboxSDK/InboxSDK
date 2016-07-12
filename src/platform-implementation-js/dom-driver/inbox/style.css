@@ -50,6 +50,9 @@
   z-index: 22;
   outline: none;
   max-width: 500px;
+  white-space: initial;
+  text-align: center;
+  font: normal normal normal normal 16px / normal arial, sans-serif;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   border: 1px solid rgba(0,0,0,0.2);
 }
