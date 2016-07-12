@@ -65,6 +65,10 @@ class InboxAppToolbarButtonView {
     appToolbarButtonContainer.insertBefore(button, appToolbarButtonContainer.firstChild);
 
     this._ready.destroy();
+
+    this._stopper.onValue(() => {
+      button.remove();
+    });
   }
 
   _adjustSearchBarMargin(searchBar: HTMLElement) {
