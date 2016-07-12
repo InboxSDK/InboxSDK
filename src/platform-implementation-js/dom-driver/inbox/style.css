@@ -10,12 +10,14 @@
   position: absolute;
   right: 192px;
   top: 16px;
+  white-space: nowrap;
 }
 
 .inboxsdk__appButton {
   position: relative;
   line-height: 0;
   margin-right: 16px;
+  display: inline-block;
 }
 
 .inboxsdk__appButton .inboxsdk__button_iconImg {
