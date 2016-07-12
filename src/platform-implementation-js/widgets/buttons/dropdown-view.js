@@ -10,6 +10,7 @@ import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import ScrollableContainByScreen from '../../lib/ScrollableContainByScreen';
+import outsideClicksAndEscape from '../../lib/dom/outsideClicksAndEscape';
 import type {Options as ContainByScreenOptions} from 'contain-by-screen';
 
 type Options = {
@@ -43,27 +44,7 @@ class DropdownView extends EventEmitter {
 
 		const onDestroy = Kefir.fromEvents(this, 'destroy');
 
-		Kefir.merge([
-				fromEventTargetCapture(document, 'click'),
-				// We modify the focus event on document sometimes, so we listen for
-				// it on body so our modifications can happen first.
-				fromEventTargetCapture(document.body, 'focus')
-			])
-			.filter(event =>
-				!event.shouldIgnore &&
-				event.isTrusted &&
-				!anchorElement.contains(event.target) &&
-				!containerEl.contains(event.target)
-			)
-			.merge(
-				Kefir.fromEvents(containerEl, 'keydown')
-					.filter(e => e.key ? e.key === 'Escape' : e.which === 27)
-					.map(e => {
-						e.preventDefault();
-						e.stopPropagation();
-						return e;
-					})
-			)
+		outsideClicksAndEscape([anchorElement, containerEl])
 			.takeUntilBy(onDestroy)
 			.onValue(() => {
 				this.close();
