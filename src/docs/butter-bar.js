@@ -81,6 +81,13 @@ var MessageDescriptor = /** @lends MessageDescriptor */{
   el: null,
 
   /**
+  * String to add as a css class to the ButterBar container element.
+  * ^optional
+  * @type {string}
+  */
+  className: null,
+
+  /**
   * Messages with lower priorities won't interrupt a currently displayed message.
   * ^optional
   * ^default=0
