@@ -120,7 +120,7 @@ class InboxAppToolbarButtonView {
     button.classList.add('inboxsdk__active');
     const {arrowColor} = (this._buttonDescriptor||{});
     const dropdown = this._activeDropdown = new DropdownView(
-      new InboxAppToolbarTooltipView(button, arrowColor), button, {manualPosition: true}
+      new InboxAppToolbarTooltipView(button, arrowColor), button
     );
     dropdown.once('destroy', () => {
       this._activeDropdown = null;

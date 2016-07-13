@@ -33,7 +33,10 @@ class DropdownView extends EventEmitter {
 		super();
 
 		this._dropdownViewDriver = dropdownViewDriver;
-		this._options = options || {};
+		this._options = {
+			...(dropdownViewDriver.getDropdownOptions && dropdownViewDriver.getDropdownOptions()),
+			...options
+		};
 		this.el = dropdownViewDriver.getContentElement();
 
 		const containerEl = dropdownViewDriver.getContainerElement();

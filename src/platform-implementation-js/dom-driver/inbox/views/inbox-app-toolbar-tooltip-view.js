@@ -44,6 +44,12 @@ class InboxAppToolbarTooltipView {
     this._containerEl.style.minWidth = `${(window.innerWidth-buttonCenter-30)*2}px`;
   }
 
+  getDropdownOptions() {
+    return {
+      manualPosition: true,
+      extraElementsToIgnore: [this._arrowEl]
+    };
+  }
   getContentElement() {
     return this._el;
   }
