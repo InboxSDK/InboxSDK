@@ -3,6 +3,12 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 
 	window._sdk = inboxSDK;
 
+	const fileInput = document.createElement('input');
+	fileInput.type = 'file';
+	fileInput.style.display = 'none';
+	document.body.appendChild(fileInput);
+	window._fileInput = fileInput;
+
 	window.openDraftByMessageID = function(messageID) {
 		return inboxSDK.Compose.openDraftByMessageID(messageID);
 	};
@@ -108,12 +114,19 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 			title: 'Attach image',
 			iconUrl: dataUri,
 			onClick(event) {
-				const file = dataURItoBlob(dataUri);
-				file.name = 'foo.png';
-				composeView.attachInlineFiles([file]);
+				fileInput.value = '';
+				fileInput.click();
 			},
 			section: 'SEND_RIGHT'
 		});
+
+		Bacon.fromEventTarget(fileInput, 'change')
+			.takeUntil(Bacon.fromEventTarget(composeView, 'destroy'))
+			.onValue(() => {
+				if (fileInput.files.length) {
+					composeView.attachInlineFiles(fileInput.files);
+				}
+			});
 
 		composeView.addButton({
 			title: 'Changer',

@@ -3,13 +3,6 @@
 
 import _ from 'lodash';
 
-type RFileInfo = {
-  data: number[];
-  type: string;
-  name: ?string;
-  lastModifiedDate: ?number;
-};
-
 export default function setupEventReemitter() {
   // Webkit has bugs that stop certain types of events from being created. We
   // can manually fake creation of those events, but we have to do it from
@@ -22,21 +15,7 @@ export default function setupEventReemitter() {
     (newEvent: any).initEvent(event.detail.type, event.detail.bubbles, event.detail.cancelable);
     _.assign(newEvent, event.detail.props);
     if (event.detail.dataTransfer) {
-      const files = event.detail.dataTransfer.files
-        .map(({data, type, name, lastModifiedDate}: RFileInfo) => {
-          const ia = new Uint8Array(data.length);
-          for (let i = 0; i < data.length; i++) {
-            ia[i] = data[i];
-          }
-          const blob = new Blob([ia], {type});
-          if (name) {
-            (blob:any).name = name;
-          }
-          if (lastModifiedDate) {
-            (blob:any).lastModifiedDate = new Date(lastModifiedDate);
-          }
-          return blob;
-        });
+      const files = event.detail.dataTransfer.files;
       (newEvent:any).dataTransfer = {
         dropEffect: "none",
         effectAllowed: "all",
