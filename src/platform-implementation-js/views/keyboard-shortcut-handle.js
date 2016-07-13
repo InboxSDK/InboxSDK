@@ -1,35 +1,22 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-
-
-var memberMap = new WeakMap();
+import {defn} from 'ud';
+import EventEmitter from '../lib/safe-event-emitter';
 
 // documented in src/docs/
-var KeyboardShortcutHandle = function(keyboardShortcutHandleDriver){
-    var members = {};
-    memberMap.set(this, members);
+class KeyboardShortcutHandle extends EventEmitter {
+  chord: string;
+  description: string;
 
-    members.keyboardShortcutHandleDriver = keyboardShortcutHandleDriver;
+  constructor(chord: string, description: string) {
+    super();
+    this.chord = chord;
+    this.description = description;
+  }
 
-    Object.defineProperties(this, {
-    	'chord': {
-    		value: keyboardShortcutHandleDriver.getChord(),
-    		writable: false
-    	}
-    });
-};
+  remove(){
+    this.emit('destroy');
+  }
+}
 
-_.extend(KeyboardShortcutHandle.prototype, {
-
-	remove(){
-		var members = memberMap.get(this);
-		if(members){
-			members.keyboardShortcutHandleDriver.destroy();
-		}
-	}
-
-});
-
-module.exports = KeyboardShortcutHandle;
+export default defn(module, KeyboardShortcutHandle);

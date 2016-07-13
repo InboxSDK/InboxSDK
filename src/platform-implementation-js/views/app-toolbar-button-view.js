@@ -3,7 +3,11 @@
 import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import type {Driver} from '../driver-interfaces/driver';
+
 import type GmailAppToolbarButtonView from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
+import type InboxAppToolbarButtonView from '../dom-driver/inbox/views/inbox-app-toolbar-button-view';
+
+type AppToolbarButtonViewDriver = GmailAppToolbarButtonView|InboxAppToolbarButtonView;
 
 const memberMap = new WeakMap();
 
@@ -11,11 +15,11 @@ const memberMap = new WeakMap();
 export default class AppToolbarButtonView extends EventEmitter {
 	destroyed: boolean;
 
-	constructor(driver: Driver, appToolbarButtonViewDriverPromise: Promise<GmailAppToolbarButtonView>) {
+	constructor(driver: Driver, appToolbarButtonViewDriverPromise: Promise<AppToolbarButtonViewDriver>) {
 		super();
 		const members = {
 			appToolbarButtonViewDriverPromise,
-			appToolbarButtonViewDriver: (null: ?GmailAppToolbarButtonView)
+			appToolbarButtonViewDriver: (null: ?AppToolbarButtonViewDriver)
 		};
 		memberMap.set(this, members);
 

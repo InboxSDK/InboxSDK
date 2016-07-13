@@ -21,12 +21,11 @@ export default class GmailAppToolbarButtonView {
   _buttonDescriptor: ?Object;
   _driver: Driver;
 
-  constructor(driver: Driver, inButtonDescriptor: Object) {
+  constructor(driver: Driver, inButtonDescriptor: Kefir.Stream<Object>) {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    var buttonDescriptorProperty = kefirCast(Kefir, inButtonDescriptor);
-    buttonDescriptorProperty.onValue((buttonDescriptor) => {
+    inButtonDescriptor.onValue((buttonDescriptor) => {
       try {
         this._handleButtonDescriptor(buttonDescriptor);
       } catch(err) {

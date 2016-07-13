@@ -10,10 +10,12 @@ import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import ScrollableContainByScreen from '../../lib/ScrollableContainByScreen';
+import outsideClicksAndEscape from '../../lib/dom/outsideClicksAndEscape';
 import type {Options as ContainByScreenOptions} from 'contain-by-screen';
 
 type Options = {
 	manualPosition?: boolean;
+	extraElementsToIgnore?: HTMLElement[];
 };
 
 // documented in src/docs/
@@ -24,17 +26,26 @@ class DropdownView extends EventEmitter {
 	_options: Options;
 	_userPlacementOptions: ContainByScreenOptions = {hAlign: 'left'};
 	_scrollableContainByScreen: ?ScrollableContainByScreen = null;
+	_didInsertContainerEl: boolean;
 	el: HTMLElement;
 
 	constructor(dropdownViewDriver: Object, anchorElement: HTMLElement, options: ?Options){
 		super();
 
 		this._dropdownViewDriver = dropdownViewDriver;
-		this._options = options || {};
+		this._options = {
+			...(dropdownViewDriver.getDropdownOptions && dropdownViewDriver.getDropdownOptions()),
+			...options
+		};
 		this.el = dropdownViewDriver.getContentElement();
 
 		const containerEl = dropdownViewDriver.getContainerElement();
-		document.body.insertBefore(containerEl, document.body.firstElementChild);
+		if (document.contains(containerEl)) {
+			this._didInsertContainerEl = false;
+		} else {
+			document.body.insertBefore(containerEl, document.body.firstElementChild);
+			this._didInsertContainerEl = true;
+		}
 
 		if(!containerEl.hasAttribute('tabindex')){
 			// makes the element focusable, but not tab-focusable
@@ -43,27 +54,12 @@ class DropdownView extends EventEmitter {
 
 		const onDestroy = Kefir.fromEvents(this, 'destroy');
 
-		Kefir.merge([
-				fromEventTargetCapture(document, 'click'),
-				// We modify the focus event on document sometimes, so we listen for
-				// it on body so our modifications can happen first.
-				fromEventTargetCapture(document.body, 'focus')
-			])
-			.filter(event =>
-				!event.shouldIgnore &&
-				event.isTrusted &&
-				!anchorElement.contains(event.target) &&
-				!containerEl.contains(event.target)
-			)
-			.merge(
-				Kefir.fromEvents(containerEl, 'keydown')
-					.filter(e => e.key ? e.key === 'Escape' : e.which === 27)
-					.map(e => {
-						e.preventDefault();
-						e.stopPropagation();
-						return e;
-					})
-			)
+		const elementsToIgnore = [anchorElement, containerEl];
+		if (this._options.extraElementsToIgnore) {
+			elementsToIgnore.push(...this._options.extraElementsToIgnore);
+		}
+
+		outsideClicksAndEscape(elementsToIgnore)
 			.takeUntilBy(onDestroy)
 			.onValue(() => {
 				this.close();
@@ -112,6 +108,10 @@ class DropdownView extends EventEmitter {
 	}
 
 	setPlacementOptions(options: ContainByScreenOptions) {
+		if (this._options.manualPosition) {
+			console.error('DropdownView.setPlacementOptions() was called on a manually-positioned DropdownView.');
+			return;
+		}
 		this._userPlacementOptions = {...this._userPlacementOptions, ...options};
 		this.emit('_placementOptionsUpdated');
 	}
@@ -123,6 +123,9 @@ class DropdownView extends EventEmitter {
 				this._scrollableContainByScreen.destroy();
 			}
 			this.emit('destroy');
+			if (this._didInsertContainerEl) {
+				this._dropdownViewDriver.getContainerElement().remove();
+			}
 			this._dropdownViewDriver.destroy();
 		}
 	}

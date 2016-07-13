@@ -14,21 +14,23 @@ import injectScript from '../../lib/inject-script';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
+import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
-import getAppToolbarRightMarginStream from './getAppToolbarRightMarginStream';
+import getSearchBarStream from './getSearchBarStream';
 import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
 import InboxRouteView from './views/inbox-route-view';
 import InboxComposeView from './views/inbox-compose-view';
+import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
 import type ButterBar from '../../namespaces/butter-bar';
-import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
+import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';
 
-var InboxDriver = ud.defn(module, class InboxDriver {
+class InboxDriver {
   _logger: Logger;
   _envData: EnvData;
   _stopper: Kefir.Stream&{destroy:()=>void};
@@ -44,7 +46,7 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
   _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
-  _appToolbarRightMarginPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -133,13 +135,13 @@ var InboxDriver = ud.defn(module, class InboxDriver {
         this._logger.errorSite(new Error('Failed to find appToolbarLocation'));
       });
 
-    this._appToolbarRightMarginPool = new ItemWithLifetimePool(
-      getAppToolbarRightMarginStream(this).takeUntilBy(this._stopper)
+    this._searchBarPool = new ItemWithLifetimePool(
+      getSearchBarStream(this).takeUntilBy(this._stopper)
     );
     Kefir.later(30*1000)
-      .takeUntilBy(this._appToolbarRightMarginPool.items())
+      .takeUntilBy(this._searchBarPool.items())
       .onValue(() => {
-        this._logger.errorSite(new Error('Failed to find appToolbarRightMargin'));
+        this._logger.errorSite(new Error('Failed to find searchBar'));
       });
   }
 
@@ -165,10 +167,9 @@ var InboxDriver = ud.defn(module, class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string): Object {
-		// stub
-    return {};
-	}
+  activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
+    console.warn('activateShortcut not implemented');
+  }
 
   getUserEmailAddress(): string {
     return document.head.getAttribute('data-inboxsdk-user-email-address');
@@ -228,9 +229,9 @@ var InboxDriver = ud.defn(module, class InboxDriver {
     console.log('registerSearchQueryRewriter not implemented');
   }
 
-  addToolbarButtonForApp(buttonDescriptor: Object): Promise {
-    console.log('addToolbarButtonForApp not implemented');
-    return new Promise((resolve, reject) => {});
+  addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object> {
+    const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
+    return view.waitForReady();
   }
 
   isRunningInPageContext(): boolean {
@@ -256,8 +257,9 @@ var InboxDriver = ud.defn(module, class InboxDriver {
   createTopMessageBarDriver(options: Object): Object {
     throw new Error("Not implemented");
   }
-});
-export default InboxDriver;
+}
+
+export default ud.defn(module, InboxDriver);
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

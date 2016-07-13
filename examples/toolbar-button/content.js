@@ -1,6 +1,6 @@
 'use strict';
 
-InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.png')}).then(function(inboxSDK) {
+InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.png'), inboxBeta: true}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
 	var shortcutHandle = inboxSDK.Keyboard.createShortcutHandle({

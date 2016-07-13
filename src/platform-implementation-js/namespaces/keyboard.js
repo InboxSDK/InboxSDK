@@ -1,33 +1,30 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
+import * as ud from 'ud';
+import KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 
-
-var KeyboardShortcutHandle = require('../views/keyboard-shortcut-handle');
-
-var memberMap = new Map();
+const memberMap = ud.defonce(module, () => new WeakMap());
 
 // documented in src/docs/
-var Keyboard = function(appId, appName, appIconUrl, driver){
-    var members = {};
+class Keyboard {
+  constructor(appId, appName, appIconUrl, driver) {
+    const members = {appId, appName, appIconUrl, driver};
     memberMap.set(this, members);
-
-    members.appId = appId;
-    members.appName = appName;
-    members.appIconUrl = appIconUrl;
-    members.driver = driver;
-};
-
-_.extend(Keyboard.prototype, {
-
-  createShortcutHandle(shortcutDescriptor){
-    var members = memberMap.get(this);
-
-    var keyboardShortcutHandleDriver = members.driver.createKeyboardShortcutHandle(shortcutDescriptor, members.appId, members.appName, members.appIconUrl);
-    return new KeyboardShortcutHandle(keyboardShortcutHandleDriver);
   }
 
-});
+  createShortcutHandle(shortcutDescriptor) {
+    const members = memberMap.get(this);
 
-module.exports = Keyboard;
+    let {chord, description} = shortcutDescriptor;
+    if (!chord) throw new Error('Keyboard.createShortcutHandle chord missing');
+    if (description == null) {
+      console.error('Keyboard.createShortcutHandle chord missing');
+      description = '';
+    }
+    const keyboardShortcutHandle = new KeyboardShortcutHandle(chord, description);
+    members.driver.activateShortcut(keyboardShortcutHandle);
+    return keyboardShortcutHandle;
+  }
+}
+
+export default ud.defn(module, Keyboard);

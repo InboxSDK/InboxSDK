@@ -34,6 +34,7 @@ import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
 import MessageIdManager from '../../lib/message-id-manager';
+import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
 import gotoView from './gmail-driver/goto-view';
@@ -41,7 +42,6 @@ import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
 import showNativeRouteView from './gmail-driver/show-native-route-view';
 import registerSearchSuggestionsProvider from './gmail-driver/register-search-suggestions-provider';
-import createKeyboardShortcutHandle from './gmail-driver/create-keyboard-shortcut-handle';
 import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driver-stream';
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
@@ -58,8 +58,7 @@ import openComposeWindow from './gmail-driver/open-compose-window';
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type ButterBar from '../../namespaces/butter-bar';
-import type GmailKeyboardShortcutHandle from './views/gmail-keyboard-shortcut-handle';
-import type {Driver, ShortcutDescriptor} from '../../driver-interfaces/driver';
+import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type {EnvData} from '../../platform-implementation';
@@ -306,8 +305,11 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		return this._userInfo.getAccountSwitcherContactList();
 	}
 
-	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string): GmailKeyboardShortcutHandle {
-		return createKeyboardShortcutHandle(this, shortcutDescriptor, appId, appName, appIconUrl);
+	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string) {
+		this.getKeyboardShortcutHelpModifier().set(keyboardShortcutHandle, this._appId, appName, appIconUrl);
+		keyboardShortcutHandle.once('destroy', () => {
+			this.getKeyboardShortcutHelpModifier().delete(keyboardShortcutHandle);
+		});
 	}
 
 	_setupEventStreams() {

@@ -6,15 +6,14 @@ import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import type GmailKeyboardShortcutHandle from '../views/gmail-keyboard-shortcut-handle';
-import type {ShortcutDescriptor} from '../../../driver-interfaces/driver';
+import type KeyboardShortcutHandle from '../../../views/keyboard-shortcut-handle';
 
 export default class KeyboardShortcutHelpModifier {
 	_appId: ?string;
 	_appName: ?string;
 	_appIconUrl: ?string;
 	_stopper: Kefir.Stream&{destroy:()=>void};
-	_shortcuts: Map<GmailKeyboardShortcutHandle, ShortcutDescriptor>;
+	_shortcuts: Set<KeyboardShortcutHandle>;
 
 	constructor() {
 		this._appId = null; // TODO have these passed to the constructor
@@ -22,7 +21,7 @@ export default class KeyboardShortcutHelpModifier {
 		this._appIconUrl = null;
 
 		this._stopper = kefirStopper();
-		this._shortcuts = new Map();
+		this._shortcuts = new Set();
 		this._monitorKeyboardHelp();
 	}
 
@@ -31,14 +30,14 @@ export default class KeyboardShortcutHelpModifier {
 		this._shortcuts.clear();
 	}
 
-	set(gmailKeyboardShortcutHandle: GmailKeyboardShortcutHandle, shortcutDescriptor: ShortcutDescriptor, appId: string, appName: ?string, appIconUrl: ?string){
+	set(keyboardShortcutHandle: KeyboardShortcutHandle, appId: string, appName: ?string, appIconUrl: ?string){
 		this._initializeAppValues(appId, appName, appIconUrl);
 
-		this._shortcuts.set(gmailKeyboardShortcutHandle, shortcutDescriptor);
+		this._shortcuts.add(keyboardShortcutHandle);
 	}
 
-	delete(gmailKeyboardShortcutHandle: GmailKeyboardShortcutHandle){
-		this._shortcuts.delete(gmailKeyboardShortcutHandle);
+	delete(keyboardShortcutHandle: KeyboardShortcutHandle){
+		this._shortcuts.delete(keyboardShortcutHandle);
 	}
 
 	_initializeAppValues(appId: string, appName: ?string, appIconUrl: ?string) {
@@ -84,8 +83,8 @@ export default class KeyboardShortcutHelpModifier {
 		var bodies = table.querySelectorAll('tbody tbody');
 
 		var index = 0;
-		this._shortcuts.forEach(shortcutDescriptor => {
-			this._renderShortcut(bodies[index % 2], shortcutDescriptor);
+		this._shortcuts.forEach(keyboardShortcutHandle => {
+			this._renderShortcut(bodies[index % 2], keyboardShortcutHandle);
 			index++;
 		});
 
@@ -150,14 +149,14 @@ export default class KeyboardShortcutHelpModifier {
 		return table;
 	}
 
-	_renderShortcut(tableBody: HTMLElement, shortcutDescriptor: ShortcutDescriptor) {
+	_renderShortcut(tableBody: HTMLElement, keyboardShortcutHandle: KeyboardShortcutHandle) {
 		var shortcutRow = document.createElement('tr');
 		shortcutRow.innerHTML = [
 			'<td class="wg Dn"> ',
-				_getShortcutHTML(shortcutDescriptor.chord),
+				_getShortcutHTML(keyboardShortcutHandle.chord),
 			'</td>',
 			'<td class="we Dn"> ',
-				_.escape(shortcutDescriptor.description || ""),
+				_.escape(keyboardShortcutHandle.description || ""),
 			'</td>'
 		].join('');
 

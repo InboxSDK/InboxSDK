@@ -1,20 +1,22 @@
 'use strict';
 
-var _ = require('lodash');
-var EventEmitter = require('../lib/safe-event-emitter');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirCast from 'kefir-cast';
+import EventEmitter from '../lib/safe-event-emitter';
 
-var HandlerRegistry = require('../lib/handler-registry');
+import HandlerRegistry from '../lib/handler-registry';
 
-var ThreadRowView = require('../views/thread-row-view');
-var ThreadView = require('../views/conversations/thread-view');
-var ToolbarView = require('../views/toolbar-view'); //only used for internal bookkeeping
+import ThreadRowView from '../views/thread-row-view';
+import ThreadView from '../views/conversations/thread-view';
+import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
 
-var AppToolbarButtonView = require('../views/app-toolbar-button-view');
+import AppToolbarButtonView from '../views/app-toolbar-button-view';
 
-var memberMap = new WeakMap();
+const memberMap = new WeakMap();
 
 // documented in src/docs/
-var Toolbars = function(appId, driver, membraneMap){
+const Toolbars = function(appId, driver, membraneMap){
 	EventEmitter.call(this);
 
 	var members = {};
@@ -57,8 +59,9 @@ _.extend(Toolbars.prototype, {
 	},
 
 	addToolbarButtonForApp(buttonDescriptor){
-		var appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptor);
-		var appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
+		const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
+		const appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptorStream);
+		const appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
 
 		return appToolbarButtonView;
 	}

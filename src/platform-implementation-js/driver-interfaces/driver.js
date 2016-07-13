@@ -2,11 +2,7 @@
 // jshint ignore:start
 
 import type Kefir from 'kefir';
-import type GmailKeyboardShortcutHandle from '../dom-driver/gmail/views/gmail-keyboard-shortcut-handle';
-export type ShortcutDescriptor = {
-	chord: string;
-	description: string;
-};
+import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 
@@ -21,7 +17,7 @@ export type Driver = {
 	openDraftByMessageID(messageID: string): void;
 	getThreadViewDriverStream(): Kefir.Stream<Object>;
 	getMessageViewDriverStream(): Kefir.Stream<Object>;
-	createKeyboardShortcutHandle(shortcutDescriptor: ShortcutDescriptor, appId: string, appIconUrl: ?string): GmailKeyboardShortcutHandle;
+	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getThreadRowViewDriverStream(): Kefir.Stream<Object>;
@@ -35,7 +31,7 @@ export type Driver = {
 	setShowNativeNavMarker(a: any): any;
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
-	addToolbarButtonForApp(buttonDescriptor: Object): Promise<Object>;
+	addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object>;
 	getToolbarViewDriverStream(): Kefir.Stream<Object>;
 	getButterBarDriver(): any;
 	setButterBar(butterBar: any): void;
