@@ -108,7 +108,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       forceHAlign: true,
       vAlign: 'center',
       forceVAlign: true,
-      buffer: 4
+      buffer: 11 // needs to overlap 1px of border
     });
     ['top','bottom','left','right'].forEach(x => {
       this._arrowEl.classList.remove('inboxsdk__'+x);

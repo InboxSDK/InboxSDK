@@ -143,55 +143,71 @@
   position: fixed;
   width: 0;
   height: 0;
+  border: none;
+  border-color: white; /* You can override this to change the tooltip's color! */
+}
+.inboxsdk__tooltip_arrow::before {
+  content: ' ';
+  position: absolute;
   border: 8px solid;
 }
-.inboxsdk__tooltip_arrow::before{
+.inboxsdk__tooltip_arrow::after {
   content: ' ';
-  border: 7px solid;
   position: absolute;
-}
-.inboxsdk__tooltip_arrow.inboxsdk__top {
-  border-bottom-width: 0;
-  border-color: rgba(0,0,0,0.2) transparent;
+  border: 7px solid;
+  border-color: transparent;
 }
 .inboxsdk__tooltip_arrow.inboxsdk__top::before {
   border-bottom-width: 0;
-  border-color: white transparent;
-  top: -8px;
-  left: -7px;
-}
-.inboxsdk__tooltip_arrow.inboxsdk__bottom {
-  border-top-width: 0;
   border-color: rgba(0,0,0,0.2) transparent;
-  margin-top: -1px;
+  left: -9px;
+}
+.inboxsdk__tooltip_arrow.inboxsdk__top::after {
+  border-bottom-width: 0;
+  border-top-color: inherit;
+  border-bottom-color: inherit;
+  left: -8px;
 }
 .inboxsdk__tooltip_arrow.inboxsdk__bottom::before {
   border-top-width: 0;
-  border-color: white transparent;
-  top: 1px;
-  left: -7px;
+  border-color: rgba(0,0,0,0.2) transparent;
+  top: -8px;
+  left: -9px;
 }
-.inboxsdk__tooltip_arrow.inboxsdk__left {
-  border-right-width: 0;
-  border-color: transparent rgba(0,0,0,0.2);
-  margin-left: 1px;
-}
-.inboxsdk__tooltip_arrow.inboxsdk__left::before {
-  border-right-width: 0;
-  border-color: transparent white;
+.inboxsdk__tooltip_arrow.inboxsdk__bottom::after {
+  border-top-width: 0;
+  border-top-color: inherit;
+  border-bottom-color: inherit;
   top: -7px;
   left: -8px;
 }
-.inboxsdk__tooltip_arrow.inboxsdk__right {
-  border-left-width: 0;
+.inboxsdk__tooltip_arrow.inboxsdk__left {
+}
+.inboxsdk__tooltip_arrow.inboxsdk__left::before {
+  border-right-width: 0;
   border-color: transparent rgba(0,0,0,0.2);
-  margin-left: -1px;
+  top: -8px;
+}
+.inboxsdk__tooltip_arrow.inboxsdk__left::after {
+  border-right-width: 0;
+  border-left-color: inherit;
+  border-right-color: inherit;
+  top: -7px;
+}
+.inboxsdk__tooltip_arrow.inboxsdk__right {
 }
 .inboxsdk__tooltip_arrow.inboxsdk__right::before {
   border-left-width: 0;
-  border-color: transparent white;
+  border-color: transparent rgba(0,0,0,0.2);
+  top: -8px;
+  left: -8px;
+}
+.inboxsdk__tooltip_arrow.inboxsdk__right::after {
+  border-left-width: 0;
+  border-left-color: inherit;
+  border-right-color: inherit;
   top: -7px;
-  left: 1px;
+  left: -7px;
 }
 
 .inboxsdk__tooltip_img {
