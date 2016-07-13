@@ -232,7 +232,7 @@ class ComposeView extends EventEmitter {
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		return memberMap.get(this).composeViewImplementation.attachFiles(files);
+		return memberMap.get(this).composeViewImplementation.attachFiles(Array.from(files));
 	}
 
 	async attachInlineFiles(files: Blob[]): Promise<void> {
@@ -242,7 +242,7 @@ class ComposeView extends EventEmitter {
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		return memberMap.get(this).composeViewImplementation.attachInlineFiles(files);
+		return memberMap.get(this).composeViewImplementation.attachInlineFiles(Array.from(files));
 	}
 
 	// Old alias that we should keep around until we're sure no one is using it.
