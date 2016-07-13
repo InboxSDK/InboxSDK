@@ -1,4 +1,17 @@
 function main() {
+	var fileInput = document.createElement('input');
+	fileInput.type = 'file';
+	fileInput.style.display = 'none';
+	document.body.appendChild(fileInput);
+
+	var currentCompose = null;
+
+	fileInput.addEventListener('change', function() {
+		if (currentCompose && fileInput.files.length) {
+			currentCompose.attachInlineFiles(fileInput.files);
+		}
+	});
+
 	InboxSDK.load('1', 'Hello World!', {inboxBeta: true}).then(function(sdk){
 		sdk.Router.handleAllRoutes(function(routeView) {
 			console.log('got a routeView', routeView);
@@ -12,12 +25,22 @@ function main() {
 
 		// the SDK has been loaded, now do something with it!
 		sdk.Compose.registerComposeViewHandler(function(composeView){
+			currentCompose = composeView;
+			composeView.on('destroy', function() {
+				if (currentCompose === composeView) {
+					currentCompose = null;
+				}
+			});
+			
 			// a compose view has come into existence, do something with it!
 			composeView.addButton({
 				title: "My Nifty Button!",
 				iconUrl: 'http://www.w3schools.com/html/html5.gif',
 				onClick: function(event) {
 					event.composeView.insertTextIntoBodyAtCursor('Hello World!');
+
+					fileInput.value = '';
+					fileInput.click();
 				},
 			});
 		});
