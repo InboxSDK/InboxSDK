@@ -15,6 +15,7 @@ import type {Options as ContainByScreenOptions} from 'contain-by-screen';
 
 type Options = {
 	manualPosition?: boolean;
+	extraElementsToIgnore?: HTMLElement[];
 };
 
 // documented in src/docs/
@@ -25,6 +26,7 @@ class DropdownView extends EventEmitter {
 	_options: Options;
 	_userPlacementOptions: ContainByScreenOptions = {hAlign: 'left'};
 	_scrollableContainByScreen: ?ScrollableContainByScreen = null;
+	_didInsertContainerEl: boolean;
 	el: HTMLElement;
 
 	constructor(dropdownViewDriver: Object, anchorElement: HTMLElement, options: ?Options){
@@ -35,7 +37,12 @@ class DropdownView extends EventEmitter {
 		this.el = dropdownViewDriver.getContentElement();
 
 		const containerEl = dropdownViewDriver.getContainerElement();
-		document.body.insertBefore(containerEl, document.body.firstElementChild);
+		if (document.contains(containerEl)) {
+			this._didInsertContainerEl = false;
+		} else {
+			document.body.insertBefore(containerEl, document.body.firstElementChild);
+			this._didInsertContainerEl = true;
+		}
 
 		if(!containerEl.hasAttribute('tabindex')){
 			// makes the element focusable, but not tab-focusable
@@ -44,7 +51,12 @@ class DropdownView extends EventEmitter {
 
 		const onDestroy = Kefir.fromEvents(this, 'destroy');
 
-		outsideClicksAndEscape([anchorElement, containerEl])
+		const elementsToIgnore = [anchorElement, containerEl];
+		if (this._options.extraElementsToIgnore) {
+			elementsToIgnore.push(...this._options.extraElementsToIgnore);
+		}
+
+		outsideClicksAndEscape(elementsToIgnore)
 			.takeUntilBy(onDestroy)
 			.onValue(() => {
 				this.close();
@@ -93,6 +105,10 @@ class DropdownView extends EventEmitter {
 	}
 
 	setPlacementOptions(options: ContainByScreenOptions) {
+		if (this._options.manualPosition) {
+			console.error('DropdownView.setPlacementOptions() was called on a manually-positioned DropdownView.');
+			return;
+		}
 		this._userPlacementOptions = {...this._userPlacementOptions, ...options};
 		this.emit('_placementOptionsUpdated');
 	}
@@ -104,7 +120,9 @@ class DropdownView extends EventEmitter {
 				this._scrollableContainByScreen.destroy();
 			}
 			this.emit('destroy');
-			this._dropdownViewDriver.getContainerElement().remove();
+			if (this._didInsertContainerEl) {
+				this._dropdownViewDriver.getContainerElement().remove();
+			}
 			this._dropdownViewDriver.destroy();
 		}
 	}

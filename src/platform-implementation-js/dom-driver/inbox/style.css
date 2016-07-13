@@ -45,10 +45,16 @@
   background-color: rgba(0,0,0,0.1);
 }
 
-.inboxsdk__appButton_tooltip {
-  position: fixed;
-  z-index: 22;
+.inboxsdk__appButton_tooltip_container {
   outline: none;
+  right: 30px;
+  position: fixed;
+  z-index: 25;
+  text-align: center;
+}
+
+.inboxsdk__appButton_tooltip {
+  display: inline-block;
   max-width: 500px;
   white-space: initial;
   text-align: center;
