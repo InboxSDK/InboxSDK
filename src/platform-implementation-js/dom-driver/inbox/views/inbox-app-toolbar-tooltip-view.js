@@ -52,7 +52,7 @@ class InboxAppToolbarTooltipView {
   }
 
   destroy() {
-    this._el.remove();
+    this._containerEl.remove();
     this._arrowEl.remove();
     this._stopper.destroy();
   }
