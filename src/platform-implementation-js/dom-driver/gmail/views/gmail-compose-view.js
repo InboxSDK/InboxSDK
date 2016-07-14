@@ -15,7 +15,7 @@ import delay from '../../../../common/delay';
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
-import {simulateDragOver, simulateDrop} from '../../../lib/dom/simulate-drag-and-drop';
+import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 import setCss from '../../../lib/dom/set-css';
@@ -524,22 +524,34 @@ class GmailComposeView {
 
 	async attachFiles(files: Blob[]): Promise<void> {
 		this._hideDropzones();
-		simulateDragOver(this._element, files);
-		await waitFor(() => this._dropzonesVisible(), 20*1000);
-		const dropzone = this._findDropzoneForThisCompose(false);
-		simulateDrop(dropzone, files);
-		await waitFor(() => !this._dropzonesVisible(), 20*1000);
-		this._reenableDropzones();
+		const endDrag = _.once(() => simulateDragEnd(this._element, files));
+		try {
+			simulateDragOver(this._element, files);
+			await waitFor(() => this._dropzonesVisible(), 20*1000);
+			const dropzone = this._findDropzoneForThisCompose(false);
+			simulateDrop(dropzone, files);
+			endDrag();
+			await waitFor(() => !this._dropzonesVisible(), 20*1000);
+		} finally {
+			endDrag();
+			this._reenableDropzones();
+		}
 	}
 
 	async attachInlineFiles(files: Blob[]): Promise<void> {
 		this._hideDropzones();
-		simulateDragOver(this._element, files);
-		await waitFor(() => this._dropzonesVisible(), 20*1000);
-		const dropzone = this._findDropzoneForThisCompose(true);
-		simulateDrop(dropzone, files);
-		await waitFor(() => !this._dropzonesVisible(), 20*1000);
-		this._reenableDropzones();
+		const endDrag = _.once(() => simulateDragEnd(this._element, files));
+		try {
+			simulateDragOver(this._element, files);
+			await waitFor(() => this._dropzonesVisible(), 20*1000);
+			const dropzone = this._findDropzoneForThisCompose(true);
+			simulateDrop(dropzone, files);
+			endDrag();
+			await waitFor(() => !this._dropzonesVisible(), 20*1000);
+		} finally {
+			endDrag();
+			this._reenableDropzones();
+		}
 	}
 
 	isReply(): boolean {
