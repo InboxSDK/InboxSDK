@@ -511,8 +511,8 @@ class GmailComposeView {
 				const bottom = top + parseInt(dropzone.style.height, 10);
 				const left = parseInt(dropzone.style.left, 10);
 				const right = left + parseInt(dropzone.style.width, 10);
-				return top > rect.top && left > rect.left &&
-					right < rect.right && bottom < rect.bottom;
+				return top >= rect.top && left >= rect.left &&
+					right <= rect.right && bottom <= rect.bottom;
 			})
 			.first()
 			.value();
