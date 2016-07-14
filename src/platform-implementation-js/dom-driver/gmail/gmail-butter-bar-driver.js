@@ -91,6 +91,7 @@ export default class GmailButterBarDriver {
       noticeContainer.style.top = '';
 
       googleNotice.style.display = 'none';
+      sdkNotice.className = googleNotice.className;
 
       if (rawOptions.html) {
         sdkNotice.innerHTML = rawOptions.html;
@@ -100,6 +101,11 @@ export default class GmailButterBarDriver {
       } else {
         sdkNotice.textContent = rawOptions.text;
       }
+
+      if (rawOptions.className) {
+        sdkNotice.classList.add(rawOptions.className);
+      }
+
       sdkNotice.style.display = '';
       sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
     });
@@ -108,6 +114,7 @@ export default class GmailButterBarDriver {
       destroy() {
         elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
           if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
+            if (rawOptions.className) sdkNotice.classList.remove(rawOptions.className);
             hideMessage(noticeContainer, googleNotice, sdkNotice);
           }
         });
