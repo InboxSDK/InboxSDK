@@ -91,6 +91,7 @@ export default class GmailButterBarDriver {
       noticeContainer.style.top = '';
 
       googleNotice.style.display = 'none';
+      sdkNotice.className = googleNotice.className;
 
       if (rawOptions.html) {
         sdkNotice.innerHTML = rawOptions.html;
