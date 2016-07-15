@@ -102,6 +102,10 @@ class InboxAppToolbarButtonView {
     const rule = `.${ruleClassName} { margin-right: ${newMarginRight}px${important}; }`;
     sheet.insertRule(rule, 0);
     searchBar.classList.add(ruleClassName);
+    const {nextElementSibling} = searchBar;
+    if (nextElementSibling) {
+      nextElementSibling.classList.add(ruleClassName);
+    }
 
     this._stopper.onValue(() => {
       const currentMarginRight = parseInt(sheet.cssRules[0].style.marginRight);
