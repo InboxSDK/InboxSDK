@@ -55,26 +55,7 @@ class ModalView extends EventEmitter {
                 domEvent.stopPropagation();
                 domEvent.preventDefault();
                 this.close();
-            });
-
-        //don't bubble key events to gmail
-        Kefir.fromEvents(document.body, 'keydown')
-            .takeUntilBy(hideAndDestroyStream)
-            .onValue(domEvent => {
-                domEvent.stopPropagation();
-            });
-
-        Kefir.fromEvents(document.body, 'keyup')
-            .takeUntilBy(hideAndDestroyStream)
-            .onValue(domEvent => {
-                domEvent.stopPropagation();
-            });
-
-        Kefir.fromEvents(document.body, 'keypress')
-            .takeUntilBy(hideAndDestroyStream)
-            .onValue(domEvent => {
-                domEvent.stopPropagation();
-            });
+            });        
 
         _replaceCurrentlyShowingModal(this, driver);
     }
