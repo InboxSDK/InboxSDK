@@ -89,7 +89,7 @@ class InboxAppToolbarButtonView {
     let style = document.getElementById('inboxsdk__dynamic_resize_searchbar');
     if (style) {
       const sheet = (style:any).sheet;
-      const currentMarginRight = parseInt(sheet.cssRules[0].style.marginRight);
+      const currentMarginRight = parseInt(style.getAttribute('data-min-margin-right'));
       newMarginRight = currentMarginRight+buttonWidth;
       sheet.deleteRule(0);
     } else {
@@ -100,9 +100,24 @@ class InboxAppToolbarButtonView {
     }
     const sheet = (style:any).sheet;
     const ruleClassName = 'inboxsdk__dynamic_resize_searchbar';
-    const important = newMarginRight > defaultMarginRight ? '!important' : '';
-    const rule = `.${ruleClassName} { margin-right: ${newMarginRight}px${important}; }`;
-    sheet.insertRule(rule, 0);
+
+    function setSheetRules(minMarginRight: number) {
+      style.setAttribute('data-min-margin-right', String(minMarginRight));
+      for (let i=sheet.rules.length-1; i>=0; i--) {
+        sheet.deleteRule(i);
+      }
+      const important = minMarginRight > defaultMarginRight ? '!important' : '';
+
+      // When the page gets wider than this number, stop applying our override
+      // so that Inbox's margin:auto takes over.
+      const applyWhenPageWidthUnder = 1394+3.575*minMarginRight;
+
+      const rule = `@media (max-width: ${applyWhenPageWidthUnder}px) { .${ruleClassName} { margin-right: ${minMarginRight}px${important}; } }`;
+      sheet.insertRule(rule, 0);
+    }
+
+    setSheetRules(newMarginRight);
+
     searchBar.classList.add(ruleClassName);
     const {nextElementSibling} = searchBar;
     if (nextElementSibling) {
@@ -110,12 +125,9 @@ class InboxAppToolbarButtonView {
     }
 
     this._stopper.onValue(() => {
-      const currentMarginRight = parseInt(sheet.cssRules[0].style.marginRight);
+      const currentMarginRight = parseInt(style.getAttribute('data-min-margin-right'));
       const newMarginRight = currentMarginRight-buttonWidth;
-      sheet.deleteRule(0);
-      const important = newMarginRight > defaultMarginRight ? '!important' : '';
-      const rule = `.${ruleClassName} { margin-right: ${newMarginRight}px${important}; }`;
-      sheet.insertRule(rule, 0);
+      setSheetRules(newMarginRight);
     });
   }
 
