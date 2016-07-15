@@ -106,6 +106,7 @@ class InboxAppToolbarButtonView {
       for (let i=sheet.rules.length-1; i>=0; i--) {
         sheet.deleteRule(i);
       }
+      if (minMarginRight <= 0) return;
       const important = minMarginRight > defaultMarginRight ? '!important' : '';
 
       // When the page gets wider than this number, stop applying our override
