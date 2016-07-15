@@ -19,8 +19,10 @@ class InboxAppToolbarButtonView {
   constructor(buttonDescriptor: Kefir.Stream<Object>, appToolbarLocationStream: Kefir.Stream<ElementWithLifetime>, searchBarStream: Kefir.Stream<ElementWithLifetime>) {
     this._buttonDescriptorStream = buttonDescriptor.toProperty().takeUntilBy(this._stopper);
 
-    searchBarStream
-      .take(1)
+    Kefir.combine([
+      searchBarStream.take(1),
+      appToolbarLocationStream.take(1)
+    ], [], searchBar => searchBar)
       .takeUntilBy(this._stopper)
       .onValue(({el}) => this._adjustSearchBarMargin(el));
 

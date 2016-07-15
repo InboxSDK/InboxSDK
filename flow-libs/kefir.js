@@ -114,7 +114,6 @@ declare module kefir {
   declare function fromESObservable(observable: {subscribe: Function}): Stream;
   declare function toESObservable(): {subscribe: Function};
 
-  declare function combine<A,B,C,D>(obss: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<[A,B,C,D]>;
   declare function combine<T,U>(obss: Stream<T>[], passiveObss?: Stream<U>[]): Stream<Array<T|U>>;
   declare function combine(obss: Stream[], passiveObss?: Stream[], combinator?: Function): Stream;
   declare function zip<T>(obss: Stream<T>[]): Stream<Array<T>>;
