@@ -257,6 +257,10 @@ class InboxDriver {
   createTopMessageBarDriver(options: Object): Object {
     throw new Error("Not implemented");
   }
+
+  createDrawerViewDriver(options) {
+    throw new Error("Not implemented");
+  }
 }
 
 export default ud.defn(module, InboxDriver);

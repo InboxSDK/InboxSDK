@@ -7,6 +7,7 @@ import {defn} from 'ud';
 
 import ModalView from '../widgets/modal-view';
 import MoleView from '../widgets/mole-view';
+import DrawerView from '../widgets/drawer-view';
 import TopMessageBarView from '../widgets/top-message-bar-view';
 import type {Driver} from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
@@ -55,6 +56,11 @@ class Widgets {
     return new TopMessageBarView({
       topMessageBarViewDriver
     });
+  }
+
+  showDrawerView(options: {el: HTMLElement}): DrawerView {
+    const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(options);
+    return new DrawerView(drawerViewDriver);
   }
 }
 

@@ -6,6 +6,9 @@ import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 
+export type DrawerViewOptions = {el: HTMLElement};
+export type DrawerViewDriver = Object; //TODO
+
 // TODO fill in some of these any types
 export type Driver = {
 	onready: Promise<void>;
@@ -40,6 +43,7 @@ export type Driver = {
 	createModalViewDriver(options: Object): Object;
 	createMoleViewDriver(options: Object): Object;
 	createTopMessageBarDriver(options: Object): Object;
+	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
 	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

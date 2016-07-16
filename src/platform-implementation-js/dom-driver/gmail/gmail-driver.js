@@ -267,6 +267,10 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		return new GmailMoleViewDriver(options);
 	}
 
+	createDrawerViewDriver(options) {
+		throw new Error("Not implemented");
+	}
+
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
 		return addNavItem(appId, navItemDescriptor);
 	}
