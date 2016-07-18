@@ -222,16 +222,6 @@
 }
 
 /* modal */
-.inboxsdk__modal_overlay {
-  opacity: .75;
-  background: white;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 500;
-}
 .inboxsdk__modal_fullscreen {
   position: fixed;
   top: 0;
@@ -246,6 +236,7 @@
   -webkit-align-items: center;
   align-items: center;
   padding: 110px 50px 50px 50px;
+  pointer-events: none;
 }
 .inboxsdk__modal_container {
   position: relative;
@@ -255,6 +246,7 @@
   border: 1px solid rgba(0,0,0,.333);
   outline: 0;
   padding: 30px 42px;
+  pointer-events: auto;
 }
 .inboxsdk__modal_toprow [role=heading] {
   font-size: 16px;

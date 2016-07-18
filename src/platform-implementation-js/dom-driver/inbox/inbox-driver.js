@@ -6,7 +6,7 @@ import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import * as ud from 'ud';
+import {defn} from 'ud';
 
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
@@ -26,6 +26,7 @@ import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
 import InboxDrawerView from './views/inbox-drawer-view';
+import InboxBackdrop from './views/inbox-backdrop';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -262,9 +263,13 @@ class InboxDriver {
   createDrawerViewDriver(options) {
     return new InboxDrawerView(options);
   }
+
+  createBackdrop() {
+    return new InboxBackdrop();
+  }
 }
 
-export default ud.defn(module, InboxDriver);
+export default defn(module, InboxDriver);
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

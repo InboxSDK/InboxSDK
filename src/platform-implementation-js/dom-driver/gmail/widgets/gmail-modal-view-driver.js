@@ -1,20 +1,18 @@
 /* @flow */
 //jshint ignore:start
 
-var _ = require('lodash');
-var Kefir = require('kefir');
-var kefirBus = require('kefir-bus');
-var ud = require('ud');
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
+import {defn} from 'ud';
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
+class GmailModalViewDriver {
   _eventStream: Kefir.Bus;
   _modalContainerElement: HTMLElement;
-  _overlayElement: HTMLElement;
 
   constructor(options: Object) {
-    this._setupOverlayElement();
     this._setupModalContainerElement(options);
 
     this._processOptions(options);
@@ -23,12 +21,10 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
   }
 
   destroy() {
-    (this._overlayElement:any).remove();
-    (this._modalContainerElement:any).remove();
+    this._modalContainerElement.remove();
     this._eventStream.end();
   }
 
-  getOverlayElement(): HTMLElement { return this._overlayElement; }
   getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
   getEventStream(): Kefir.Stream { return this._eventStream; }
 
@@ -90,11 +86,6 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
     }
   }
 
-  _setupOverlayElement() {
-    this._overlayElement = document.createElement('div');
-    this._overlayElement.className = 'Kj-JD-Jh inboxsdk__modal_overlay';
-  }
-
   _setupModalContainerElement() {
     this._modalContainerElement = document.createElement('div');
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
@@ -140,6 +131,6 @@ var GmailModalViewDriver = ud.defn(module, class GmailModalViewDriver {
       });
     });
   }
-});
+}
 
-export default GmailModalViewDriver;
+export default defn(module, GmailModalViewDriver);

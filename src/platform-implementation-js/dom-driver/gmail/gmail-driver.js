@@ -3,7 +3,7 @@
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
-import * as ud from 'ud';
+import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -17,6 +17,7 @@ import showAppIdWarning from './gmail-driver/show-app-id-warning';
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
 import GmailThreadView from './views/gmail-thread-view';
+import GmailBackdrop from './views/gmail-backdrop';
 import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
 
@@ -64,7 +65,7 @@ import type GmailComposeView from './views/gmail-compose-view';
 import type {EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
-var GmailDriver = ud.defn(module, class GmailDriver {
+class GmailDriver {
 	_appId: string;
 	_logger: Logger;
 	_envData: EnvData;
@@ -271,6 +272,10 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		throw new Error("Not implemented");
 	}
 
+	createBackdrop() {
+		return new GmailBackdrop();
+	}
+
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
 		return addNavItem(appId, navItemDescriptor);
 	}
@@ -433,8 +438,9 @@ var GmailDriver = ud.defn(module, class GmailDriver {
 		return getDraftIDForMessageID(this, messageID);
 	}
 
-});
-export default GmailDriver;
+}
+
+export default defn(module, GmailDriver);
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

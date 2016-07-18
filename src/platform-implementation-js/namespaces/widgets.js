@@ -31,10 +31,9 @@ class Widgets {
         return button;
       });
     }
-    const modalViewDriver = get(memberMap, this).driver.createModalViewDriver(options);
-    const modalView = new ModalView({
-      modalViewDriver: modalViewDriver
-    });
+    const {driver} = get(memberMap, this);
+    const modalViewDriver = driver.createModalViewDriver(options);
+    const modalView = new ModalView({driver, modalViewDriver});
     modalView.show();
 
     return modalView;
