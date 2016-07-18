@@ -25,6 +25,7 @@ import InboxComposeView from './views/inbox-compose-view';
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
+import InboxDrawerView from './views/inbox-drawer-view';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -259,7 +260,7 @@ class InboxDriver {
   }
 
   createDrawerViewDriver(options) {
-    throw new Error("Not implemented");
+    return new InboxDrawerView(options);
   }
 }
 

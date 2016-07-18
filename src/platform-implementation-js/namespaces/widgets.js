@@ -9,7 +9,7 @@ import ModalView from '../widgets/modal-view';
 import MoleView from '../widgets/mole-view';
 import DrawerView from '../widgets/drawer-view';
 import TopMessageBarView from '../widgets/top-message-bar-view';
-import type {Driver} from '../driver-interfaces/driver';
+import type {Driver, DrawerViewOptions} from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
 
 // documented in src/docs/
@@ -58,7 +58,7 @@ class Widgets {
     });
   }
 
-  showDrawerView(options: {el: HTMLElement}): DrawerView {
+  showDrawerView(options: DrawerViewOptions): DrawerView {
     const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(options);
     return new DrawerView(drawerViewDriver);
   }

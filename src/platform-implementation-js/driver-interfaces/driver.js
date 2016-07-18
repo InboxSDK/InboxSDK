@@ -6,8 +6,10 @@ import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 
+import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
+
 export type DrawerViewOptions = {el: HTMLElement};
-export type DrawerViewDriver = Object; //TODO
+export type DrawerViewDriver = InboxDrawerView;
 
 // TODO fill in some of these any types
 export type Driver = {

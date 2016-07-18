@@ -1,3 +1,5 @@
+'use strict';
+
 var div = document.createElement('div');
 div.style.width = '800px';
 div.style.height = '400px';
@@ -113,5 +115,10 @@ function showModal7(){
 		el: div,
 		buttons: []
 	});
+}
 
+function showDrawer1() {
+	const el = document.createElement('div');
+	el.textContent = 'foo';
+	const drawer = window._drawer = sdk.Widgets.showDrawerView({el});
 }

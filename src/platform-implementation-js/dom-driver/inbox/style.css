@@ -301,3 +301,20 @@
 .inboxsdk__modal_buttons input.inboxsdk__primary {
   margin-right: 7px;
 }
+
+.inboxsdk__backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: transparent;
+  -webkit-transition: background-color 150ms cubic-bezier(.4,0,1,1);
+  transition: background-color 150ms cubic-bezier(0.4, 0, 1, 1);
+}
+.inboxsdk__backdrop.inboxsdk__active {
+  background-color: rgba(10,10,10,.6);
+  -webkit-transition: background-color 150ms cubic-bezier(0,0,.2,1);
+  transition: background-color 150ms cubic-bezier(0,0,.2,1);
+}
