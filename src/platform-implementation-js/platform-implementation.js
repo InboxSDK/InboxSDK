@@ -4,6 +4,7 @@
 import _ from 'lodash';
 import SafeEventEmitter from './lib/safe-event-emitter';
 import {BUILD_VERSION} from '../common/version';
+import sharedStyle from './lib/shared-style';
 
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
@@ -142,6 +143,8 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 		// never resolve
 		return new Promise((resolve, reject) => {});
 	}
+
+	sharedStyle();
 
 	var driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, envData);
 	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
