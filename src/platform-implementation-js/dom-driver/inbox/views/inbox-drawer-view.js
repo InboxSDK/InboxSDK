@@ -13,7 +13,7 @@ class InboxDrawerView {
 
   constructor(options) {
     this._backdrop = new InboxBackdrop();
-    this._backdrop.getStopper().onValue(() => {
+    this._backdrop.getStopper().takeUntilBy(this._stopper).onValue(() => {
       this.destroy();
     });
 

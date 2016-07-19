@@ -294,6 +294,17 @@
   margin-right: 7px;
 }
 
+.inboxsdk__drawer_view {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 452px;
+  z-index: 51;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,.18), 0 8px 16px rgba(0,0,0,.36);
+}
+
 .inboxsdk__backdrop {
   position: fixed;
   top: 0;
