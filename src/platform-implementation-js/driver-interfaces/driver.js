@@ -10,7 +10,11 @@ import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
 export type Backdrop = GmailBackdrop|InboxBackdrop;
 
-export type DrawerViewOptions = {el: HTMLElement};
+export type DrawerViewOptions = {
+	el: HTMLElement;
+	title?: string;
+	chrome?: boolean;
+};
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 

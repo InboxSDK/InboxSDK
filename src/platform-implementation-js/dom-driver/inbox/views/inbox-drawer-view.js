@@ -4,8 +4,10 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import InboxBackdrop from './inbox-backdrop';
+import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
 
 class InboxDrawerView {
+  _chrome: boolean;
   _exitEl: HTMLElement;
   _el: HTMLElement;
   _backdrop: InboxBackdrop;
@@ -13,7 +15,9 @@ class InboxDrawerView {
   _closing: Kefir.Stream&{destroy():void} = kefirStopper();
   _closed: Kefir.Stream&{destroy():void} = kefirStopper();
 
-  constructor(options) {
+  constructor(options: DrawerViewOptions) {
+    this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
+
     this._backdrop = new InboxBackdrop();
     this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
       this.close();
@@ -23,6 +27,28 @@ class InboxDrawerView {
     this._el.setAttribute('role', 'dialog');
     this._el.tabIndex = 0;
     this._el.className = 'inboxsdk__drawer_view';
+
+    if (this._chrome) {
+      const titleBar = document.createElement('div');
+      titleBar.className = 'inboxsdk__drawer_title_bar';
+
+      const closeButton = document.createElement('button');
+      closeButton.type = 'button';
+      closeButton.className = 'inboxsdk__drawer_close_button';
+      closeButton.textContent = 'X';
+      closeButton.addEventListener('click', () => {
+        this.close();
+      });
+      titleBar.appendChild(closeButton);
+
+      const title = document.createElement('div');
+      title.className = 'inboxsdk__drawer_title';
+      title.textContent = options.title;
+      titleBar.appendChild(title);
+
+      this._el.appendChild(titleBar);
+    }
+
     this._el.appendChild(options.el);
 
     document.body.appendChild(this._el);

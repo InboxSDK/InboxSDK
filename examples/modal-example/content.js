@@ -119,9 +119,11 @@ function showModal7(){
 
 function showDrawer1() {
 	const el = document.createElement('div');
-	el.style.height = '100%';
+	el.style.flex = '1';
 	el.innerHTML = 'foo <div style="height:100%;background:blue"> blah </div>';
-	const drawer = window._drawer = sdk.Widgets.showDrawerView({el});
+	const drawer = window._drawer = sdk.Widgets.showDrawerView({
+		el, title: 'Drawer Test'
+	});
 	drawer.on('slideAnimationDone', () => {
 		console.log('slideAnimationDone');
 	});
