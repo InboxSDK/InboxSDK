@@ -8,7 +8,7 @@ import EventEmitter from '../lib/safe-event-emitter';
 
 import type {DrawerViewDriver} from '../driver-interfaces/driver';
 
-// TODO document in src/docs/
+// documented in src/docs/
 class DrawerView extends EventEmitter {
   destroyed: boolean = false;
   _driver: DrawerViewDriver;
