@@ -1,3 +1,5 @@
+'use strict';
+
 var div = document.createElement('div');
 div.style.width = '800px';
 div.style.height = '400px';
@@ -113,5 +115,25 @@ function showModal7(){
 		el: div,
 		buttons: []
 	});
+}
 
+function showDrawer1() {
+	const el = document.createElement('div');
+	el.style.flex = '1';
+	el.innerHTML = 'foo <div style="height:100%;background:blue"> blah </div>';
+	const drawer = window._drawer = sdk.Widgets.showDrawerView({
+		el, title: 'Drawer Test'
+	});
+	drawer.on('slideAnimationDone', () => {
+		console.log('slideAnimationDone');
+	});
+	drawer.on('closing', () => {
+		console.log('closing');
+	});
+	drawer.on('destroy', () => {
+		console.log('destroy');
+		// simulating a real application unmounting a React component.
+		// important that this happens after the drawer is already out of view.
+		el.innerHTML = '';
+	});
 }

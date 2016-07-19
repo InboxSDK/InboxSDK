@@ -41,7 +41,7 @@ assert.strictEqual(InboxSDK.LOADER_VERSION, 'beep');
 InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
   const newGlobals = _.flatten([
     _.difference(Object.keys(global), originalGlobals, ['__InboxSDKImpLoader']),
-    _.difference(Object.keys(window), originalWindowProperties, ['inboxsdk__style'])
+    _.difference(Object.keys(window), originalWindowProperties, ['inboxsdk__style', 'inboxsdk__shared_style'])
       .map(x => `window.${x}`)
   ]);
   assert.deepEqual(newGlobals, []);

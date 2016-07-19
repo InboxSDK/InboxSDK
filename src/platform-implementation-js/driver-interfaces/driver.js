@@ -6,6 +6,18 @@ import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 
+import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
+import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
+export type Backdrop = GmailBackdrop|InboxBackdrop;
+
+export type DrawerViewOptions = {
+	el: HTMLElement;
+	title?: string;
+	chrome?: boolean;
+};
+import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
+export type DrawerViewDriver = InboxDrawerView;
+
 // TODO fill in some of these any types
 export type Driver = {
 	onready: Promise<void>;
@@ -40,6 +52,8 @@ export type Driver = {
 	createModalViewDriver(options: Object): Object;
 	createMoleViewDriver(options: Object): Object;
 	createTopMessageBarDriver(options: Object): Object;
+	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
+	createBackdrop(): Backdrop;
 	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

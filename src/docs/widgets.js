@@ -23,8 +23,16 @@ var Widgets = /** @lends Widgets */{
   showMoleView: function() {},
 
   // TODO document or remove?
-  showTopMessageBarView: function(){}
+  showTopMessageBarView: function(){},
 
+  /**
+   * This creates a {DrawerView} and shows it. A drawer view is a panel that
+   * slides in from the right side of the screen, and it fades the rest of the
+   * screen out. By default, it has a title and a close button.
+   * @param {DrawerOptions} options - The options to configure the returned {DrawerView}.
+   * @return {DrawerView}
+   */
+  showDrawerView: function() {},
 };
 
 /**
@@ -211,4 +219,34 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
   * @type {function(event)}
   */
   onClick:null
+};
+
+/**
+* @class
+* The options used to configure a drawer when calling {Widgets.showDrawerView()}.
+*/
+var DrawerOptions = /** @lends ModalOptions */{
+
+  /**
+  * An HTMLElement representing the content you'd like to put inside the drawer.
+  * Use the CSS property "flex-grow: 1" on it if you want it to expand to the
+  * available space in the drawer.
+  * @type {HTMLElement}
+  */
+  el:null,
+
+  /**
+  * Whether to show the close (X) button and the title at the top of the drawer.
+  * ^optional
+  * ^default=true
+  * @type {boolean}
+  */
+  chrome:null,
+
+  /**
+  * Text to show as the title of the drawer. Not shown if chrome is set to false.
+  * ^optional
+  * @type {string}
+  */
+  title:null
 };

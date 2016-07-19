@@ -1,25 +1,21 @@
 /* @flow */
-//jshint ignore:start
 
-var _ = require('lodash');
-var Kefir = require('kefir');
-var kefirBus = require('kefir-bus');
-var ud = require('ud');
+import {defn} from 'ud';
+import _ from 'lodash';
+import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 
-var InboxModalView = ud.defn(module, class InboxModalView {
-  _eventStream: Kefir.Bus;
+class InboxModalView {
+  _eventStream: Kefir.Bus = kefirBus();
   _modalContainerElement: HTMLElement;
-  _overlayElement: HTMLElement;
 
   constructor(options: Object) {
-    this._setupOverlayElement();
     this._setupModalContainerElement(options);
 
     this._processOptions(options);
-    this._eventStream = kefirBus();
 
-    var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
+    const closeElement = this._modalContainerElement.querySelector('.inboxsdk__close_button');
 
     closeElement.addEventListener('click', event => {
       this._eventStream.emit({
@@ -30,12 +26,10 @@ var InboxModalView = ud.defn(module, class InboxModalView {
   }
 
   destroy() {
-    (this._overlayElement:any).remove();
-    (this._modalContainerElement:any).remove();
+    this._modalContainerElement.remove();
     this._eventStream.end();
   }
 
-  getOverlayElement(): HTMLElement { return this._overlayElement; }
   getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
   getEventStream(): Kefir.Stream { return this._eventStream; }
 
@@ -93,11 +87,6 @@ var InboxModalView = ud.defn(module, class InboxModalView {
     }
   }
 
-  _setupOverlayElement() {
-    this._overlayElement = document.createElement('div');
-    this._overlayElement.className = 'inboxsdk__modal_overlay';
-  }
-
   _setupModalContainerElement() {
     this._modalContainerElement = document.createElement('div');
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
@@ -106,7 +95,7 @@ var InboxModalView = ud.defn(module, class InboxModalView {
     <div class="inboxsdk__modal_container" tabindex="0" role="alertdialog">
       <div class="inboxsdk__modal_toprow">
         <span role="heading"></span>
-        <span class="inboxsdk__modal_close" tabindex="0" role="button"></span>
+        <button title="Close" class="inboxsdk__close_button"></button>
       </div>
       <div class="inboxsdk__modal_content">
       </div>
@@ -116,6 +105,6 @@ var InboxModalView = ud.defn(module, class InboxModalView {
 
     this._modalContainerElement.innerHTML = htmlString;
   }
-});
+}
 
-export default InboxModalView;
+export default defn(module, InboxModalView);
