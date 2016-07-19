@@ -26,6 +26,7 @@ import {removeAllThreadRowUnclaimedModifications} from './views/gmail-thread-row
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
+import InboxDrawerView from '../inbox/views/inbox-drawer-view';
 import GmailRouteProcessor from './views/gmail-route-view/gmail-route-processor';
 import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-modifier';
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
@@ -269,7 +270,7 @@ class GmailDriver {
 	}
 
 	createDrawerViewDriver(options) {
-		throw new Error("Not implemented");
+		return new InboxDrawerView(options);
 	}
 
 	createBackdrop() {

@@ -5,3 +5,98 @@
   -ms-transition: none !important;
   transition: none !important;
 }
+
+.inboxsdk__close_button {
+  height: 24px;
+  width: 24px;
+  opacity: .7;
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: content-box;
+  outline: none;
+}
+.inboxsdk__close_button:focus, .inboxsdk__close_button:hover {
+  opacity: 1;
+}
+.inboxsdk__close_button:focus::before {
+  background-color: rgba(0,0,0,.12);
+}
+.inboxsdk__close_button::before {
+  border-radius: 50%;
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  padding: 4px;
+  content: ' ';
+}
+.inboxsdk__close_button::after {
+  content: ' ';
+  background: url(https://www.gstatic.com/images/icons/material/system/1x/close_black_24dp.png);
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  top: 0;
+  left: 0;
+}
+
+.inboxsdk__drawer_view {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 452px;
+  z-index: 51;
+  font: normal normal normal normal 13px / normal "Helvetica Neue", Helvetica, Arial, sans-serif;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0,0,0,.18), 0 8px 16px rgba(0,0,0,.36);
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+  transition: transform 150ms cubic-bezier(.4,0,.2,1);
+}
+.inboxsdk__drawer_view.inboxsdk__active {
+  -webkit-transform: none;
+  transform: none;
+}
+.inboxsdk__drawer_title_bar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 20px;
+  white-space: nowrap;
+  display: -webkit-flex;
+  display: flex;
+}
+.inboxsdk__drawer_title_bar .inboxsdk__close_button {
+  margin-right: 20px;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+.inboxsdk__drawer_title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: normal normal normal normal 20px / 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.inboxsdk__inbox_backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: transparent;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 1, 1);
+}
+.inboxsdk__inbox_backdrop.inboxsdk__active {
+  background-color: rgba(10,10,10,.6);
+  transition: background-color 70ms cubic-bezier(0,0,.2,1);
+}

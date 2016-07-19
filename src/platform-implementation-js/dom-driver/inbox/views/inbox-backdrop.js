@@ -9,7 +9,7 @@ class InboxBackdrop {
 
   constructor() {
     const el = document.createElement('div');
-    el.className = 'inboxsdk__backdrop';
+    el.className = 'inboxsdk__inbox_backdrop';
     el.addEventListener('click', () => {
       this.destroy();
     });
