@@ -302,6 +302,7 @@
   width: 452px;
   z-index: 51;
   background-color: #fff;
+  outline: none;
   box-shadow: 0 0 8px rgba(0,0,0,.18), 0 8px 16px rgba(0,0,0,.36);
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
