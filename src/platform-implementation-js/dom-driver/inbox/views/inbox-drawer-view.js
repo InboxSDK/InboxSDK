@@ -9,12 +9,14 @@ class InboxDrawerView {
   _exitEl: HTMLElement;
   _el: HTMLElement;
   _backdrop: InboxBackdrop;
-  _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
+  _slideAnimationDone: Kefir.Stream;
+  _closing: Kefir.Stream&{destroy():void} = kefirStopper();
+  _closed: Kefir.Stream&{destroy():void} = kefirStopper();
 
   constructor(options) {
     this._backdrop = new InboxBackdrop();
-    this._backdrop.getStopper().takeUntilBy(this._stopper).onValue(() => {
-      this.destroy();
+    this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
+      this.close();
     });
 
     this._el = document.createElement('div');
@@ -25,26 +27,39 @@ class InboxDrawerView {
 
     document.body.appendChild(this._el);
 
-    this._stopper.onValue(() => {
+    this._closing.onValue(() => {
       this._backdrop.destroy();
       this._el.classList.remove('inboxsdk__active');
       Kefir.fromEvents(this._el, 'transitionend')
         .take(1)
         .onValue(() => {
+          this._closed.destroy();
           this._el.remove();
         });
     });
 
     this._el.offsetHeight; // force layout so that adding this class does a transition.
     this._el.classList.add('inboxsdk__active');
+    this._slideAnimationDone = Kefir.fromEvents(this._el, 'transitionend')
+      .take(1)
+      .takeUntilBy(this._closing)
+      .map(() => null);
   }
 
-  getStopper() {
-    return this._stopper;
+  getSlideAnimationDone() {
+    return this._slideAnimationDone;
   }
 
-  destroy() {
-    this._stopper.destroy();
+  getClosingStream() {
+    return this._closing;
+  }
+
+  getClosedStream() {
+    return this._closed;
+  }
+
+  close() {
+    this._closing.destroy();
   }
 }
 

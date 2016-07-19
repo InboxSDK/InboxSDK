@@ -15,16 +15,20 @@ class DrawerView extends EventEmitter {
   constructor(drawerViewDriver: DrawerViewDriver) {
     super();
     this._driver = drawerViewDriver;
-    this._driver.getStopper().onValue(() => {
+    this._driver.getSlideAnimationDone().onValue(() => {
+      this.emit('slideAnimationDone');
+    });
+    this._driver.getClosingStream().onValue(() => {
+      this.emit('closing');
+    });
+    this._driver.getClosedStream().onValue(() => {
       this.destroyed = true;
       this.emit('destroy');
     });
   }
 
   close(){
-    if (this._driver) {
-      this._driver.destroy();
-    }
+    this._driver.close();
   }
 }
 
