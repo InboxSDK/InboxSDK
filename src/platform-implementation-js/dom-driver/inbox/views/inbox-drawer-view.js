@@ -34,8 +34,8 @@ class InboxDrawerView {
 
       const closeButton = document.createElement('button');
       closeButton.type = 'button';
-      closeButton.className = 'inboxsdk__drawer_close_button';
-      closeButton.textContent = 'X';
+      closeButton.title = 'Close';
+      closeButton.className = 'inboxsdk__close_button';
       (closeButton:any).addEventListener('click', () => {
         this.close();
       });

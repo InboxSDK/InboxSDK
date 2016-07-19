@@ -15,7 +15,7 @@ class InboxModalView {
 
     this._processOptions(options);
 
-    const closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
+    const closeElement = this._modalContainerElement.querySelector('.inboxsdk__close_button');
 
     closeElement.addEventListener('click', event => {
       this._eventStream.emit({
@@ -95,7 +95,7 @@ class InboxModalView {
     <div class="inboxsdk__modal_container" tabindex="0" role="alertdialog">
       <div class="inboxsdk__modal_toprow">
         <span role="heading"></span>
-        <span class="inboxsdk__modal_close" tabindex="0" role="button"></span>
+        <button title="Close" class="inboxsdk__close_button"></button>
       </div>
       <div class="inboxsdk__modal_content">
       </div>

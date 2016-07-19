@@ -255,23 +255,6 @@
   font: bold 1em arial,sans-serif;
   padding-right: 20px;
 }
-.inboxsdk__modal_close {
-  height: 11px;
-  opacity: .7;
-  padding: 17px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 11px;
-}
-.inboxsdk__modal_close::after {
-  content: ' ';
-  background: url(//ssl.gstatic.com/ui/v1/dialog/close-x.png);
-  position: absolute;
-  height: 11px;
-  width: 11px;
-  right: 17px;
-}
 .inboxsdk__modal_content {
   margin: 30px 0;
   line-height: 1.4em;
@@ -315,6 +298,50 @@
 .inboxsdk__drawer_view.inboxsdk__active {
   -webkit-transform: none;
   transform: none;
+}
+.inboxsdk__modal_toprow .inboxsdk__close_button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 17px;
+}
+
+
+.inboxsdk__close_button {
+  height: 24px;
+  width: 24px;
+  opacity: .7;
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: content-box;
+  outline: none;
+}
+.inboxsdk__close_button:focus, .inboxsdk__close_button:hover {
+  opacity: 1;
+}
+.inboxsdk__close_button:focus::before {
+  background-color: rgba(0,0,0,.12);
+}
+.inboxsdk__close_button::before {
+  border-radius: 50%;
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  padding: 4px;
+  content: ' ';
+}
+.inboxsdk__close_button::after {
+  content: ' ';
+  background: url(https://www.gstatic.com/images/icons/material/system/1x/close_black_24dp.png);
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  top: 0;
+  left: 0;
 }
 
 .inboxsdk__backdrop {
