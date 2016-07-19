@@ -303,6 +303,13 @@
   z-index: 51;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(0,0,0,.18), 0 8px 16px rgba(0,0,0,.36);
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+  transition: transform 150ms cubic-bezier(.4,0,.2,1);
+}
+.inboxsdk__drawer_view.inboxsdk__active {
+  -webkit-transform: none;
+  transform: none;
 }
 
 .inboxsdk__backdrop {

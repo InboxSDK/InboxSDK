@@ -26,9 +26,17 @@ class InboxDrawerView {
     document.body.appendChild(this._el);
 
     this._stopper.onValue(() => {
-      this._el.remove();
       this._backdrop.destroy();
+      this._el.classList.remove('inboxsdk__active');
+      Kefir.fromEvents(this._el, 'transitionend')
+        .take(1)
+        .onValue(() => {
+          this._el.remove();
+        });
     });
+
+    this._el.offsetHeight; // force layout so that adding this class does a transition.
+    this._el.classList.add('inboxsdk__active');
   }
 
   getStopper() {
