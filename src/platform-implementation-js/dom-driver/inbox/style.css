@@ -290,6 +290,7 @@
   right: 0;
   width: 452px;
   z-index: 51;
+  font: normal normal normal normal 13px / normal "Helvetica Neue", Helvetica, Arial, sans-serif;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-direction: column;
