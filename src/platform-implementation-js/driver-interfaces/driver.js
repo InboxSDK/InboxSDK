@@ -53,7 +53,7 @@ export type Driver = {
 	createMoleViewDriver(options: Object): Object;
 	createTopMessageBarDriver(options: Object): Object;
 	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
-	createBackdrop(): Backdrop;
+	createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop;
 	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

@@ -7,13 +7,14 @@ import kefirStopper from 'kefir-stopper';
 class InboxBackdrop {
   _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
 
-  constructor() {
+  constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
     el.className = 'inboxsdk__inbox_backdrop';
+    el.style.zIndex = zIndex;
     el.addEventListener('click', () => {
       this.destroy();
     });
-    document.body.appendChild(el);
+    target.appendChild(el);
 
     this._stopper.onValue(() => {
       el.classList.remove('inboxsdk__active');

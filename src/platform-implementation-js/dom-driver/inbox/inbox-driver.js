@@ -264,8 +264,8 @@ class InboxDriver {
     return new InboxDrawerView(options);
   }
 
-  createBackdrop() {
-    return new InboxBackdrop();
+  createBackdrop(zIndex, target) {
+    return new InboxBackdrop(zIndex, target);
   }
 }
 

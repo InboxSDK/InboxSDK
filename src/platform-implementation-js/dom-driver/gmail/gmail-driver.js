@@ -273,8 +273,8 @@ class GmailDriver {
 		return new InboxDrawerView(options);
 	}
 
-	createBackdrop() {
-		return new GmailBackdrop();
+	createBackdrop(zIndex, target) {
+		return new GmailBackdrop(zIndex, target);
 	}
 
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
