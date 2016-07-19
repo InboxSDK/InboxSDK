@@ -43,6 +43,7 @@ class InboxDrawerView {
 
       const title = document.createElement('div');
       title.className = 'inboxsdk__drawer_title';
+      title.setAttribute('role', 'heading');
       title.textContent = options.title;
       titleBar.appendChild(title);
 

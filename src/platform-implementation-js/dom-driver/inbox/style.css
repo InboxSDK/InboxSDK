@@ -276,6 +276,12 @@
 .inboxsdk__modal_buttons input.inboxsdk__primary {
   margin-right: 7px;
 }
+.inboxsdk__modal_toprow .inboxsdk__close_button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 17px;
+}
 
 .inboxsdk__drawer_view {
   position: fixed;
@@ -299,13 +305,25 @@
   -webkit-transform: none;
   transform: none;
 }
-.inboxsdk__modal_toprow .inboxsdk__close_button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 17px;
+.inboxsdk__drawer_title_bar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 20px;
+  white-space: nowrap;
+  display: -webkit-flex;
+  display: flex;
 }
-
+.inboxsdk__drawer_title_bar .inboxsdk__close_button {
+  margin-right: 20px;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+.inboxsdk__drawer_title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: normal normal normal normal 20px / 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
 .inboxsdk__close_button {
   height: 24px;
