@@ -5,10 +5,12 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import InboxBackdrop from './inbox-backdrop';
 import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
+import findParent from '../../../lib/dom/find-parent';
 
 class InboxDrawerView {
   _chrome: boolean;
   _exitEl: HTMLElement;
+  _containerEl: HTMLElement;
   _el: HTMLElement;
   _backdrop: InboxBackdrop;
   _slideAnimationDone: Kefir.Stream;
@@ -18,15 +20,55 @@ class InboxDrawerView {
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
 
-    this._backdrop = new InboxBackdrop();
+    const zIndex = 500;
+    let target = document.body;
+
+    const {composeView} = options;
+    if (composeView) {
+      Kefir.fromEvents(composeView, 'destroy')
+        .takeUntilBy(this._closing)
+        .onValue(() => this.close());
+      const {offsetParent} = composeView.getElement();
+      if (!(offsetParent instanceof HTMLElement)) throw new Error('should not happen');
+      target = findParent(
+        offsetParent,
+        el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto'
+      ) || document.body;
+      const id = `${Date.now()}-${Math.random()}`;
+      target.setAttribute('data-drawer-owner', id);
+      target.style.zIndex = '500';
+      offsetParent.setAttribute('data-drawer-owner', id);
+      if (!offsetParent.hasAttribute('data-drawer-old-zindex')) {
+        offsetParent.setAttribute('data-drawer-old-zindex', offsetParent.style.zIndex);
+      }
+      offsetParent.style.zIndex = String(zIndex+1);
+      this._closed.onValue(() => {
+        if (target.getAttribute('data-drawer-owner') === id) {
+          target.style.zIndex = '';
+          target.removeAttribute('data-drawer-owner');
+        }
+        if (offsetParent.getAttribute('data-drawer-owner') === id) {
+          offsetParent.style.zIndex = offsetParent.getAttribute('data-drawer-old-zindex');
+          offsetParent.removeAttribute('data-drawer-owner');
+          offsetParent.removeAttribute('data-drawer-old-zindex');
+        }
+      });
+    }
+
+    this._backdrop = new InboxBackdrop(zIndex, target);
     this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
       this.close();
     });
+
+    this._containerEl = document.createElement('div');
+    this._containerEl.className = 'inboxsdk__drawer_view_container';
+    this._containerEl.style.zIndex = String(zIndex+2);
 
     this._el = document.createElement('div');
     this._el.setAttribute('role', 'dialog');
     this._el.tabIndex = 0;
     this._el.className = 'inboxsdk__drawer_view';
+    this._containerEl.appendChild(this._el);
 
     if (this._chrome) {
       const titleBar = document.createElement('div');
@@ -52,7 +94,7 @@ class InboxDrawerView {
 
     this._el.appendChild(options.el);
 
-    document.body.appendChild(this._el);
+    target.appendChild(this._containerEl);
 
     this._closing.onValue(() => {
       this._backdrop.destroy();
@@ -61,7 +103,7 @@ class InboxDrawerView {
         .take(1)
         .onValue(() => {
           this._closed.destroy();
-          this._el.remove();
+          this._containerEl.remove();
         });
     });
 

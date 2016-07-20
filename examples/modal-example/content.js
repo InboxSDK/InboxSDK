@@ -9,6 +9,27 @@ var sdk;
 
 InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 	window.sdk = sdk = inboxSDK;
+
+	sdk.Compose.registerComposeViewHandler(composeView => {
+		const imageUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
+
+		composeView.addButton({
+			title: 'Open Drawer',
+			iconUrl: imageUri,
+			onClick(event) {
+				const el = document.createElement('div');
+				el.style.flex = '1';
+				el.innerHTML = 'foo <div> blah </div>';
+				const drawer = sdk.Widgets.showDrawerView({
+					composeView, el, title: 'Drawer+Compose Test'
+				});
+				drawer.on('destroy', () => {
+					console.log('drawer destroy');
+				});
+			},
+			section: 'TRAY_LEFT'
+		});
+	});
 });
 
 var PRIMARY_BUTTON_OPTION = {

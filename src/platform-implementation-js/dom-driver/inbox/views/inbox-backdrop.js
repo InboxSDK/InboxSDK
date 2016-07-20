@@ -10,7 +10,7 @@ class InboxBackdrop {
   constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
     el.className = 'inboxsdk__inbox_backdrop';
-    el.style.zIndex = zIndex;
+    el.style.zIndex = String(zIndex);
     el.addEventListener('click', () => {
       this.destroy();
     });
