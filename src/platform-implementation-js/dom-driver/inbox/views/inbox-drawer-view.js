@@ -25,6 +25,12 @@ class InboxDrawerView {
 
     const {composeView} = options;
     if (composeView) {
+      if (composeView.isMinimized()) {
+        throw new Error("Can't attach DrawerView to minimized ComposeView");
+      }
+      if (composeView.isInlineReplyForm()) {
+        throw new Error("Can't attach DrawerView to inline ComposeView");
+      }
       Kefir.merge([
         Kefir.fromEvents(composeView, 'destroy'),
         Kefir.fromEvents(composeView, 'minimized'),
