@@ -25,7 +25,12 @@ class InboxDrawerView {
 
     const {composeView} = options;
     if (composeView) {
-      Kefir.fromEvents(composeView, 'destroy')
+      Kefir.merge([
+        Kefir.fromEvents(composeView, 'destroy'),
+        Kefir.fromEvents(composeView, 'minimized'),
+        Kefir.fromEvents(composeView, 'restored'),
+        Kefir.fromEvents(composeView, 'fullscreenChanged'),
+      ])
         .takeUntilBy(this._closing)
         .onValue(() => this.close());
       const {offsetParent} = composeView.getElement();
