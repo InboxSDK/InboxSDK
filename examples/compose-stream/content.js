@@ -164,6 +164,8 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
 		composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
 		composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
+
+		composeView.on('fullscreenChanged', console.log.bind(console, 'fullscreenChanged'));
 	});
 
 	var button = inboxSDK.Toolbars.addToolbarButtonForApp({

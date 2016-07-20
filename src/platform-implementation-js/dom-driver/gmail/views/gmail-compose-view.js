@@ -196,7 +196,8 @@ class GmailComposeView {
 					.map(() => {
 						this._updateComposeFullscreenState();
 						return {
-							eventName: 'composeFullscreenStateChanged'
+							eventName: 'fullscreenChanged',
+							data: {fullscreen: this._isFullscreen}
 						};
 					})
 			])
@@ -461,7 +462,7 @@ class GmailComposeView {
 
 		if(this._isFullscreen){
 			this._eventStream
-				.filter(({eventName}) => eventName === 'composeFullscreenStateChanged')
+				.filter(({eventName}) => eventName === 'fullscreenChanged')
 				.onValue(() => simulateClick(this.getCloseButton()));
 
 			simulateClick(this.getMoleSwitchButton());
