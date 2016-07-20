@@ -22,7 +22,7 @@ class Keyboard {
       description = '';
     }
     const keyboardShortcutHandle = new KeyboardShortcutHandle(chord, description);
-    members.driver.activateShortcut(keyboardShortcutHandle);
+    members.driver.activateShortcut(keyboardShortcutHandle, members.appName, members.appIconUrl);
     return keyboardShortcutHandle;
   }
 }
