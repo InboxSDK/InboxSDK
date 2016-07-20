@@ -6,7 +6,6 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
 import multiCompareSort from '../../../../lib/multi-compare-sort';
-import dispatchCustomEvent from '../../../../lib/dom/dispatch-custom-event';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
 import GmailTabView from './gmail-tab-view';
 
@@ -80,10 +79,14 @@ export default class GmailTabContainerView {
       this._activeGmailTabView = null;
 
       if (this._tablistElement.children.length > 1) {
-        var newIndex = Math.min(index, this._tablistElement.children.length - 2);
-        dispatchCustomEvent(((this._tablistElement.children[newIndex]:any):HTMLElement), 'tabActivate');
+        const newIndex = Math.min(index, this._tablistElement.children.length - 2);
+        this._tablistElement.children[newIndex].dispatchEvent(new CustomEvent('tabActivate', {
+          bubbles: false, cancelable: false, detail: null
+        }));
       } else if (this._tablistElement.children.length === 1) {
-        dispatchCustomEvent(((this._tablistElement.children[0]:any):HTMLElement), 'tabActivate');
+        this._tablistElement.children[0].dispatchEvent(new CustomEvent('tabActivate', {
+          bubbles: false, cancelable: false, detail: null
+        }));
       }
     }
 
@@ -185,7 +188,9 @@ export default class GmailTabContainerView {
     var activeTabElement = this._element.querySelector('.inboxsdk__tab_selected');
 
     if (activeTabElement) {
-      dispatchCustomEvent(activeTabElement, 'tabDeactivate');
+      activeTabElement.dispatchEvent(new CustomEvent('tabDeactivate', {
+        bubbles: false, cancelable: false, detail: null
+      }));
     }
 
     this._activeGmailTabView = gmailTabView;
@@ -193,8 +198,10 @@ export default class GmailTabContainerView {
   }
 
   _resetColorIndexes() {
-    Array.prototype.forEach.call(this._tablistElement.children, function(childElement, index) {
-      dispatchCustomEvent(childElement, 'newColorIndex', index);
+    Array.prototype.forEach.call(this._tablistElement.children, (childElement, index) => {
+      childElement.dispatchEvent(new CustomEvent('newColorIndex', {
+        bubbles: false, cancelable: false, detail: index
+      }));
     });
   }
 }

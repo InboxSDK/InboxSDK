@@ -22,7 +22,6 @@ import setCss from '../../../lib/dom/set-css';
 
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
-import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
@@ -438,13 +437,17 @@ class GmailComposeView {
 
 	addStatusBar(options: {height?: number, orderHint?: number}={}): StatusBar {
 		var statusBar = addStatusBar(this, options);
-		dispatchCustomEvent(this._element, 'resize');
+		this._element.dispatchEvent(new CustomEvent('resize', {
+			bubbles: false, cancelable: false, detail: null
+		}));
 		Kefir.fromEvents(statusBar, 'destroy')
 			.map(() => ({eventName:'statusBarRemoved'}))
 			.flatMap(delayAsap)
 			.takeUntilBy(this._stopper)
 			.onValue(() => {
-				dispatchCustomEvent(this._element, 'resize');
+				this._element.dispatchEvent(new CustomEvent('resize', {
+					bubbles: false, cancelable: false, detail: null
+				}));
 			});
 
 		return statusBar;

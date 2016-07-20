@@ -5,7 +5,6 @@ import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
-import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
@@ -118,9 +117,11 @@ function _waitForContainerAndMonitorChildrenStream(containerFn) {
 
 function _informElement(eventName) {
 	return function(event) {
-		var composeEl = event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]');
+		const composeEl = event && event.el && event.el.querySelector && event.el.querySelector('[role=dialog]');
 		if(composeEl){
-			dispatchCustomEvent(composeEl, eventName);
+			composeEl.dispatchEvent(new CustomEvent(eventName, {
+				bubbles: false, cancelable: false, detail: null
+			}));
 		}
 		return event;
 	};
