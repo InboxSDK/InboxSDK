@@ -100,6 +100,7 @@ class InboxDrawerView {
       this._backdrop.destroy();
       this._el.classList.remove('inboxsdk__active');
       Kefir.fromEvents(this._el, 'transitionend')
+        .merge(Kefir.later(200)) // transition might not finish if element is hidden
         .take(1)
         .onValue(() => {
           this._closed.destroy();

@@ -19,6 +19,7 @@ class InboxBackdrop {
     this._stopper.onValue(() => {
       el.classList.remove('inboxsdk__active');
       Kefir.fromEvents(el, 'transitionend')
+        .merge(Kefir.later(200)) // transition might not finish if element is hidden
         .take(1)
         .onValue(() => {
           el.remove();
