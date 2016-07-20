@@ -97,6 +97,17 @@ class InboxComposeView {
     this._eventStream.plug(this._getAddressChangesStream());
 
     handleComposeLinkChips(this);
+
+    const {fromPickerEmailSpan} = this._els;
+    if (fromPickerEmailSpan) {
+      this._eventStream.plug(
+        makeMutationObserverChunkedStream(fromPickerEmailSpan, {childList: true, subtree: true, characterData: true})
+          .map(() => ({
+            eventName: 'fromContactChanged',
+            data: {contact: this.getFromContact()}
+          }))
+      );
+    }
   }
   destroy() {
     this._eventStream.emit({eventName: 'destroy', data: {}});
