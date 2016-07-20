@@ -810,7 +810,7 @@ class GmailComposeView {
 		ensureGroupingIsOpen(this._element, type);
 	}
 
-	getMinimized(): boolean {
+	isMinimized(): boolean {
 		const element = this.getElement();
 		const bodyElement = this.getBodyElement();
 		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
@@ -818,7 +818,7 @@ class GmailComposeView {
 			if (!hasReportedMissingBody) {
 				hasReportedMissingBody = true;
 				this._driver.getLogger().error(
-					new Error("getMinimized failed to find bodyContainer"),
+					new Error("isMinimized failed to find bodyContainer"),
 					{
 						bodyElement: !!bodyElement,
 						hasMessageIDElement: !!this._messageIDElement,
@@ -836,7 +836,7 @@ class GmailComposeView {
 	}
 
 	setMinimized(minimized: boolean) {
-		if (minimized !== this.getMinimized()) {
+		if (minimized !== this.isMinimized()) {
 			const minimizeButton = this._element.querySelector('.Hm > img');
 			if (minimizeButton) {
 				simulateClick(minimizeButton);

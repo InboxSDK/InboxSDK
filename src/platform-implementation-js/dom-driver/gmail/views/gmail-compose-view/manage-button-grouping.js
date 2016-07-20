@@ -253,7 +253,7 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
-	if (gmailComposeView.getMinimized()) {
+	if (gmailComposeView.isMinimized()) {
 		return;
 	}
 

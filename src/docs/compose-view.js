@@ -192,6 +192,12 @@ var ComposeView = /** @lends ComposeView */ {
 	isFullscreen: function(){},
 
 	/**
+	 * Whether or not this compose view is minimized.
+	 * @return {boolean}
+	 */
+	isMinimized: function(){},
+
+	/**
 	 * If the compose is an inline reply form, this triggers it to be converted
 	 * to a full compose view. Note that the current ComposeView object will emit
 	 * its destroy event, and a new ComposeView object will be created. This

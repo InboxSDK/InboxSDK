@@ -166,6 +166,8 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
 
 		composeView.on('fullscreenChanged', console.log.bind(console, 'fullscreenChanged'));
+		composeView.on('minimized', console.log.bind(console, 'minimized'));
+		composeView.on('restored', console.log.bind(console, 'restored'));
 	});
 
 	var button = inboxSDK.Toolbars.addToolbarButtonForApp({
