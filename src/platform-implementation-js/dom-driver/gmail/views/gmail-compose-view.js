@@ -898,7 +898,7 @@ class GmailComposeView {
 		this._isInlineReplyForm = inline;
 	}
 
-	getIsFullscreen(): boolean {
+	isFullscreen(): boolean {
 		return this._isFullscreen;
 	}
 

@@ -467,7 +467,7 @@ class InboxComposeView {
   attachInlineFiles(files: Blob[]): Promise<void> {
     throw new Error("Not implemented");
   }
-  getIsFullscreen(): boolean {
+  isFullscreen(): boolean {
     if (this._p.attributes.isInline) return false;
     const {toggleFullscreenButtonImage} = this._els;
     if (!toggleFullscreenButtonImage) return false;

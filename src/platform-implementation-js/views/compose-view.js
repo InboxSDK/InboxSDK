@@ -181,7 +181,7 @@ class ComposeView extends EventEmitter {
 	}
 
 	isFullscreen() {
-		return memberMap.get(this).composeViewImplementation.getIsFullscreen();
+		return memberMap.get(this).composeViewImplementation.isFullscreen();
 	}
 
 	isMinimized() {

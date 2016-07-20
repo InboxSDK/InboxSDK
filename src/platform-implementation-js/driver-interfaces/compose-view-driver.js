@@ -48,7 +48,7 @@ export type ComposeViewDriver = {
 	registerRequestModifier(modifier: Object): void;
 	attachFiles(files: Blob[]): Promise<void>;
 	attachInlineFiles(files: Blob[]): Promise<void>;
-	getIsFullscreen(): boolean;
+	isFullscreen(): boolean;
 	isMinimized(): boolean;
 	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Stream): () => void;
