@@ -42,14 +42,14 @@ export type ComposeViewDriver = {
 	focus(): void;
 	close(): void;
 	send(): void;
-	minimize(): void;
-	restore(): void;
 	popOut(): void;
 	registerRequestModifier(modifier: Object): void;
 	attachFiles(files: Blob[]): Promise<void>;
 	attachInlineFiles(files: Blob[]): Promise<void>;
 	isFullscreen(): boolean;
+	setFullscreen(fullscreen: boolean): void;
 	isMinimized(): boolean;
+	setMinimized(minimized: boolean): void;
 	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Stream): () => void;
 	addOuterSidebar(options: {title: string, el: HTMLElement}): void;

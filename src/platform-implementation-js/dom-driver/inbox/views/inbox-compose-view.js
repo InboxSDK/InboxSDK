@@ -392,24 +392,22 @@ class InboxComposeView {
     if (!this._els.sendBtn) throw new Error("Compose View missing send element");
     simulateClick(this._els.sendBtn);
   }
-  minimize() {
-    if (this._p.attributes.isInline) {
-      throw new Error("Not implemented for inline compose views");
-    }
-    const {minimizeBtn} = this._els;
-    if (!minimizeBtn) throw new Error('Could not find minimize button');
-    if (!this._isMinimized) {
+  setMinimized(minimized: boolean) {
+    if (minimized !== this.isMinimized()) {
+      if (this._p.attributes.isInline)
+        throw new Error("Not implemented for inline compose views");
+      const {minimizeBtn} = this._els;
+      if (!minimizeBtn) throw new Error('Could not find minimize button');
       minimizeBtn.click();
     }
   }
-  restore() {
-    if (this._p.attributes.isInline) {
-      throw new Error("Not implemented for inline compose views");
-    }
-    const {minimizeBtn} = this._els;
-    if (!minimizeBtn) throw new Error('Could not find minimize button');
-    if (this._isMinimized) {
-      minimizeBtn.click();
+  setFullscreen(fullscreen: boolean) {
+    if (fullscreen !== this.isFullscreen()) {
+      if (this._p.attributes.isInline)
+        throw new Error("Not implemented for inline compose views");
+      const {toggleFullscreenButton} = this._els;
+      if (!toggleFullscreenButton) throw new Error('Could not find fullscreen button');
+      toggleFullscreenButton.click();
     }
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {

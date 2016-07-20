@@ -31,11 +31,18 @@ class InboxDrawerView {
       if (composeView.isInlineReplyForm()) {
         throw new Error("Can't attach DrawerView to inline ComposeView");
       }
+      const isFullscreenInboxCompose = composeView.isFullscreen() &&
+        document.location.origin === 'https://inbox.google.com';
+      if (isFullscreenInboxCompose) {
+        composeView.setFullscreen(false);
+      }
       Kefir.merge([
         Kefir.fromEvents(composeView, 'destroy'),
         Kefir.fromEvents(composeView, 'minimized'),
         Kefir.fromEvents(composeView, 'restored'),
-        Kefir.fromEvents(composeView, 'fullscreenChanged'),
+        Kefir.later(10).flatMap(() =>
+          Kefir.fromEvents(composeView, 'fullscreenChanged')
+        )
       ])
         .takeUntilBy(this._closing)
         .onValue(() => this.close());

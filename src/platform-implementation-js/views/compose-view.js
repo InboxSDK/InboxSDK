@@ -184,8 +184,16 @@ class ComposeView extends EventEmitter {
 		return memberMap.get(this).composeViewImplementation.isFullscreen();
 	}
 
+	setFullscreen(fullscreen: boolean) {
+		memberMap.get(this).composeViewImplementation.setFullscreen(fullscreen);
+	}
+
 	isMinimized() {
 		return memberMap.get(this).composeViewImplementation.isMinimized();
+	}
+
+	setMinimized(minimized: boolean) {
+		memberMap.get(this).composeViewImplementation.setMinimized(minimized);
 	}
 
 	popOut(): Promise<ComposeView> {

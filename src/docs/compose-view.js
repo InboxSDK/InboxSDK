@@ -192,10 +192,24 @@ var ComposeView = /** @lends ComposeView */ {
 	isFullscreen: function(){},
 
 	/**
+	 * This allows the fullscreen state to be changed.
+	 * @param  {boolean} minimized - If true, the compose view will be made fullscreen.
+	 * @return {void}
+	 */
+	setFullscreen: function(){},
+
+	/**
 	 * Whether or not this compose view is minimized.
 	 * @return {boolean}
 	 */
 	isMinimized: function(){},
+
+	/**
+	 * This allows the minimize state to be changed.
+	 * @param  {boolean} minimized - If true, the compose view will be minimized.
+	 * @return {void}
+	 */
+	setMinimized: function(){},
 
 	/**
 	 * If the compose is an inline reply form, this triggers it to be converted

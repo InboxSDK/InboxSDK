@@ -837,19 +837,20 @@ class GmailComposeView {
 
 	setMinimized(minimized: boolean) {
 		if (minimized !== this.isMinimized()) {
+			if (this._isInlineReplyForm)
+				throw new Error("Not implemented for inline compose views");
 			const minimizeButton = this._element.querySelector('.Hm > img');
-			if (minimizeButton) {
-				simulateClick(minimizeButton);
-			}
+			simulateClick(minimizeButton);
 		}
 	}
 
-	minimize() {
-		this.setMinimized(true);
-	}
-
-	restore() {
-		this.setMinimized(false);
+	setFullscreen(fullscreen: boolean) {
+		if (fullscreen !== this.isFullscreen()) {
+			if (this._isInlineReplyForm)
+				throw new Error("Not implemented for inline compose views");
+			const fullscreenButton = this._element.querySelector('.Hm > img:nth-of-type(2)');
+			simulateClick(fullscreenButton);
+		}
 	}
 
 	_triggerDraftSave() {
