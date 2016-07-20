@@ -7,6 +7,8 @@ import InboxBackdrop from './inbox-backdrop';
 import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
 import findParent from '../../../lib/dom/find-parent';
 
+const TAKE_OVER_EVENT = 'inboxSDKdrawerViewTakingOver';
+
 class InboxDrawerView {
   _chrome: boolean;
   _exitEl: HTMLElement;
@@ -23,7 +25,6 @@ class InboxDrawerView {
     const zIndex = 500;
     let target = document.body;
 
-    const id = `${Date.now()}-${Math.random()}`;
     const {composeView} = options;
     if (composeView) {
       if (composeView.isMinimized()) {
@@ -46,39 +47,44 @@ class InboxDrawerView {
         .takeUntilBy(this._closing)
         .onValue(() => this.close());
 
+      const composeEl = composeView.getElement();
+      composeEl.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false, cancelable: false, detail: null
+      }));
+
       // Figure out where we're going to stick our DrawerView in the DOM, and
       // set up the z-indexes of the ComposeView and the target point so
       // everything will look right.
-      const composeEl = composeView.getElement();
       const {offsetParent} = composeEl;
       if (!(offsetParent instanceof HTMLElement)) throw new Error('should not happen');
+      offsetParent.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false, cancelable: false, detail: null
+      }));
       target = findParent(
         offsetParent,
         el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto'
       ) || document.body;
-      composeEl.setAttribute('data-drawer-owner', id);
+      target.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false, cancelable: false, detail: null
+      }));
       target.classList.add('inboxsdk__drawers_in_use');
-      target.setAttribute('data-drawer-owner', id);
       target.style.zIndex = '500';
-      offsetParent.setAttribute('data-drawer-owner', id);
       if (!offsetParent.hasAttribute('data-drawer-old-zindex')) {
         offsetParent.setAttribute('data-drawer-old-zindex', offsetParent.style.zIndex);
       }
       offsetParent.style.zIndex = String(zIndex+1);
-      this._closed.onValue(() => {
-        if (composeEl.getAttribute('data-drawer-owner') === id) {
-          composeEl.removeAttribute('data-drawer-owner');
-        }
-        if (target.getAttribute('data-drawer-owner') === id) {
+
+      this._closed
+        .takeUntilBy(Kefir.fromEvents(target, TAKE_OVER_EVENT))
+        .onValue(() => {
           target.style.zIndex = '';
-          target.removeAttribute('data-drawer-owner');
-        }
-        if (offsetParent.getAttribute('data-drawer-owner') === id) {
+        });
+      this._closed
+        .takeUntilBy(Kefir.fromEvents(offsetParent, TAKE_OVER_EVENT))
+        .onValue(() => {
           offsetParent.style.zIndex = offsetParent.getAttribute('data-drawer-old-zindex');
-          offsetParent.removeAttribute('data-drawer-owner');
           offsetParent.removeAttribute('data-drawer-old-zindex');
-        }
-      });
+        });
     }
 
     this._backdrop = new InboxBackdrop(zIndex, target);
@@ -167,18 +173,18 @@ class InboxDrawerView {
       const composeEl = composeView.getElement();
       composeEl.style.left = `${-composeNeedToMoveLeft}px`;
 
-      this._closing.onValue(() => {
-        if (composeEl.getAttribute('data-drawer-owner') === id) {
+      this._closing
+        .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
+        .onValue(() => {
           composeEl.style.left = '0';
-        }
-      });
-      this._closed.onValue(() => {
-        if (!composeEl.hasAttribute('data-drawer-owner')) {
+        });
+      this._closed
+        .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
+        .onValue(() => {
           composeEl.style.position = '';
           composeEl.style.left = '';
           composeEl.style.transition = '';
-        }
-      });
+        });
     }
   }
 
