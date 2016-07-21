@@ -23,7 +23,7 @@ class InboxDrawerView {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
 
     const zIndex = 500;
-    let target = document.body;
+    let insertionTarget = document.body;
 
     let useBackdrop = true;
 
@@ -54,48 +54,62 @@ class InboxDrawerView {
       }
 
       const composeEl = composeView.getElement();
+
+      // We're going to modify a bunch of elements, and then clean up our
+      // modifications to them once the DrawerView is closed. However, if a
+      // second DrawerView is opened, that will trigger this DrawerView to
+      // close, and we need to avoid cleaning up the elements that the 2nd
+      // DrawerView modifies so we don't trample its changes.
+      // This is accomplished by us emitting TAKE_OVER_EVENT on every element
+      // we modify. Then we listen for TAKE_OVER_EVENT on these elements. If we
+      // get a TAKE_OVER_EVENT from another DrawerView, we don't do our cleanup
+      // on that element.
       composeEl.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false, cancelable: false, detail: null
       }));
 
       // Figure out where we're going to stick our DrawerView in the DOM, and
-      // set up the z-indexes of the ComposeView and the target point so
-      // everything will look right.
-      const {offsetParent} = composeEl;
-      if (!(offsetParent instanceof HTMLElement)) throw new Error('should not happen');
-      offsetParent.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
+      // set up the z-indexes of the ComposeView's offsetParent and the
+      // insertionTarget point so everything will look right.
+      const composeOffsetParent = composeEl.offsetParent;
+      if (!(composeOffsetParent instanceof HTMLElement)) throw new Error('should not happen');
+      composeOffsetParent.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false, cancelable: false, detail: null
       }));
-      target = findParent(
-        offsetParent,
+      insertionTarget = findParent(
+        composeOffsetParent,
         el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
           el.getBoundingClientRect().left === 0
       ) || document.body;
-      target.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
+      insertionTarget.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false, cancelable: false, detail: null
       }));
-      target.classList.add('inboxsdk__drawers_in_use');
-      target.style.zIndex = '500';
-      if (!offsetParent.hasAttribute('data-drawer-old-zindex')) {
-        offsetParent.setAttribute('data-drawer-old-zindex', offsetParent.style.zIndex);
+
+      // Needed to stop composeviews from coming apart visually in Gmail.
+      insertionTarget.classList.add('inboxsdk__drawers_in_use');
+      // Needed to make DrawerView show over search bar in Inbox.
+      insertionTarget.style.zIndex = '500';
+
+      if (!composeOffsetParent.hasAttribute('data-drawer-old-zindex')) {
+        composeOffsetParent.setAttribute('data-drawer-old-zindex', composeOffsetParent.style.zIndex);
       }
-      offsetParent.style.zIndex = String(zIndex+1);
+      composeOffsetParent.style.zIndex = String(zIndex+1);
 
       this._closed
-        .takeUntilBy(Kefir.fromEvents(target, TAKE_OVER_EVENT))
+        .takeUntilBy(Kefir.fromEvents(insertionTarget, TAKE_OVER_EVENT))
         .onValue(() => {
-          target.style.zIndex = '';
+          insertionTarget.style.zIndex = '';
         });
       this._closed
-        .takeUntilBy(Kefir.fromEvents(offsetParent, TAKE_OVER_EVENT))
+        .takeUntilBy(Kefir.fromEvents(composeOffsetParent, TAKE_OVER_EVENT))
         .onValue(() => {
-          offsetParent.style.zIndex = offsetParent.getAttribute('data-drawer-old-zindex');
-          offsetParent.removeAttribute('data-drawer-old-zindex');
+          composeOffsetParent.style.zIndex = composeOffsetParent.getAttribute('data-drawer-old-zindex');
+          composeOffsetParent.removeAttribute('data-drawer-old-zindex');
         });
     }
 
     if (useBackdrop) {
-      this._backdrop = new InboxBackdrop(zIndex, target);
+      this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
       this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
         this.close();
       });
@@ -135,7 +149,7 @@ class InboxDrawerView {
 
     this._el.appendChild(options.el);
 
-    target.appendChild(this._containerEl);
+    insertionTarget.appendChild(this._containerEl);
 
     this._closing.onValue(() => {
       if (this._backdrop) this._backdrop.destroy();
