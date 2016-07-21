@@ -269,6 +269,8 @@ class InboxDriver {
 
   createDrawerViewDriver(options) {
     const drawerView = new InboxDrawerView(options);
+    // TODO if a native drawer was already open, we should close the native
+    // drawer istead of the new one.
     this._nativeDrawerPool.items()
       .takeUntilBy(drawerView.getClosingStream())
       .onValue(() => {
