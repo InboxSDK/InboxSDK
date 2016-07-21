@@ -9,6 +9,7 @@ import ModalView from '../widgets/modal-view';
 import MoleView from '../widgets/mole-view';
 import DrawerView from '../widgets/drawer-view';
 import TopMessageBarView from '../widgets/top-message-bar-view';
+import ComposeView from '../views/compose-view';
 import type {Driver, DrawerViewOptions} from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
 
@@ -58,6 +59,13 @@ class Widgets {
   }
 
   showDrawerView(options: DrawerViewOptions): DrawerView {
+    console.log('Widgets.showDrawerView is experimental! This function may change! Let us know if it works well for you, but you probably should not release any extensions using it for now.');
+    get(memberMap, this).driver.getLogger().eventSdkPassive('Widgets.showDrawerView used', {
+      keys: Object.keys(options)
+    });
+
+    if (options.composeView && !(options.composeView instanceof ComposeView))
+      throw new Error('composeView option was not a ComposeView');
     const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(options);
     return new DrawerView(drawerViewDriver);
   }

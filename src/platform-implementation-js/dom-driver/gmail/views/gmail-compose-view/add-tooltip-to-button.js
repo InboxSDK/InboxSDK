@@ -29,9 +29,9 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 	_anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
 
 	gmailComposeView.getEventStream()
-					.filter(function(event){
-						return event.eventName === 'buttonAdded' || event.eventName === 'composeFullscreenStateChanged';
-					})
+					.filter(event =>
+						event.eventName === 'buttonAdded' || event.eventName === 'fullscreenChanged'
+					)
 					.merge(
 							gmailTooltipView
 								.getEventStream()

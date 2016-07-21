@@ -7,17 +7,19 @@ import kefirStopper from 'kefir-stopper';
 class InboxBackdrop {
   _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
 
-  constructor() {
+  constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
     el.className = 'inboxsdk__inbox_backdrop';
+    el.style.zIndex = String(zIndex);
     el.addEventListener('click', () => {
       this.destroy();
     });
-    document.body.appendChild(el);
+    target.appendChild(el);
 
     this._stopper.onValue(() => {
       el.classList.remove('inboxsdk__active');
       Kefir.fromEvents(el, 'transitionend')
+        .merge(Kefir.later(200)) // transition might not finish if element is hidden
         .take(1)
         .onValue(() => {
           el.remove();

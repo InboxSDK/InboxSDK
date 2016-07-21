@@ -29,9 +29,9 @@ export default defn(module, function manageButtonGrouping(gmailComposeView: Gmai
 	gmailComposeView.getElement().setAttribute('data-button-grouping-managed', 'true');
 
 	gmailComposeView.getEventStream()
-					.filter(function(event){
-						return event.eventName === 'composeFullscreenStateChanged';
-					})
+					.filter(event =>
+						event.eventName === 'fullscreenChanged'
+					)
 					.debounce(10)
 					.onValue(() => {_handleComposeFullscreenStateChanged(gmailComposeView);});
 
@@ -253,7 +253,7 @@ function _fixToolbarPosition(gmailComposeView){
 }
 
 function _positionGroupToolbar(gmailComposeView){
-	if (gmailComposeView.getMinimized()) {
+	if (gmailComposeView.isMinimized()) {
 		return;
 	}
 

@@ -202,7 +202,8 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
       regularComposes, fullscreenComposes
     ])
       .flatMap(makeElementStreamMerger())
-  ]);
+  ])
+    .filter(({el}) => !el.classList.contains('inboxsdk__drawer_view'));
 }
 
 export default function watcher(root: Document=document): Kefir.Stream<ElementWithLifetime> {

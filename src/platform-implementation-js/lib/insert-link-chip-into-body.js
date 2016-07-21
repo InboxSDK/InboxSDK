@@ -22,9 +22,9 @@ var insertLinkChipIntoBody = ud.defn(module, function(composeViewDriver: Compose
 
     composeViewDriver.insertBodyHTMLAtCursor(frag);
 
-    if(!composeViewDriver.getIsFullscreen() && !composeViewDriver.isInlineReplyForm() && document.activeElement !== composeViewDriver.getBodyElement()){
-        composeViewDriver.minimize();
-        composeViewDriver.restore();
+    if(!composeViewDriver.isFullscreen() && !composeViewDriver.isInlineReplyForm() && document.activeElement !== composeViewDriver.getBodyElement()){
+        composeViewDriver.setMinimized(true);
+        composeViewDriver.setMinimized(false);
     }
 
     composeViewDriver.focus();

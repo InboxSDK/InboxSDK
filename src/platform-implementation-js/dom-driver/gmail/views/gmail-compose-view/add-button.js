@@ -5,7 +5,6 @@ var _ = require('lodash');
 var RSVP = require('rsvp');
 var Kefir = require('kefir');
 
-import dispatchCustomEvent from '../../../../lib/dom/dispatch-custom-event';
 import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
@@ -60,7 +59,9 @@ function _addButton(gmailComposeView: GmailComposeView, buttonDescriptor: Object
 		buttonViewController = _addButtonToSendActionArea(gmailComposeView, buttonOptions);
 	}
 
-	dispatchCustomEvent(gmailComposeView.getElement(), 'buttonAdded');
+	gmailComposeView.getElement().dispatchEvent(new CustomEvent('buttonAdded', {
+		bubbles: false, cancelable: false, detail: null
+	}));
 
 	return buttonViewController;
 }

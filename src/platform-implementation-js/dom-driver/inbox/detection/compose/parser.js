@@ -58,6 +58,13 @@ function parser(el: HTMLElement) {
       el,
       'div[jstcache][jsan][jsaction] > button[jsaction$=".minimize_mole"]')
   );
+  const minimizeBtnImage = isInline ? null : ec.run(
+    'minimize button image',
+    () => ((querySelectorOne(
+      el,
+      'div[jstcache][jsan][jsaction] > button[jsaction$=".minimize_mole"] img'
+    ): any): HTMLImageElement)
+  );
   const bodyPlaceholder = isInline ? null : ec.run(
     'body placeholder',
     () => {
@@ -100,6 +107,7 @@ function parser(el: HTMLElement) {
     toggleFullscreenButtonImage,
     closeBtn,
     minimizeBtn,
+    minimizeBtnImage,
     bodyPlaceholder,
     fromPicker,
     fromPickerEmailSpan,

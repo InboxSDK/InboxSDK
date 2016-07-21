@@ -25,6 +25,14 @@ class DrawerView extends EventEmitter {
       this.destroyed = true;
       this.emit('destroy');
     });
+    document.dispatchEvent(new CustomEvent('inboxSDKcloseDrawers', {
+      bubbles: false, cancelable: false, detail: null
+    }));
+    Kefir.fromEvents(document, 'inboxSDKcloseDrawers')
+      .takeUntilBy(Kefir.fromEvents(this, 'closing'))
+      .onValue(() => {
+        this.close();
+      });
   }
 
   close(){

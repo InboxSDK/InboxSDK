@@ -7,10 +7,11 @@ import kefirStopper from 'kefir-stopper';
 class GmailBackdrop {
   _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
 
-  constructor() {
+  constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
     el.className = 'Kj-JD-Jh inboxsdk__modal_overlay';
-    document.body.appendChild(el);
+    el.style.zIndex = String(zIndex);
+    target.appendChild(el);
 
     this._stopper.onValue(() => {
       el.remove();

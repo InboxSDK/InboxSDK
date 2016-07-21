@@ -5,6 +5,7 @@ import type Kefir from 'kefir';
 import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
+import type ComposeView from '../views/compose-view';
 
 import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
@@ -14,6 +15,7 @@ export type DrawerViewOptions = {
 	el: HTMLElement;
 	title?: string;
 	chrome?: boolean;
+	composeView?: ComposeView;
 };
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
@@ -53,7 +55,7 @@ export type Driver = {
 	createMoleViewDriver(options: Object): Object;
 	createTopMessageBarDriver(options: Object): Object;
 	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
-	createBackdrop(): Backdrop;
+	createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop;
 	getStopper(): Kefir.Stream;
 	destroy(): void;
 };

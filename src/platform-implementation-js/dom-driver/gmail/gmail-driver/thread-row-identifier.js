@@ -51,7 +51,7 @@ class ThreadRowIdentifier {
       // here if we failed.
       const minimizedComposes = [];
       for (let composeView of this._composeViews) {
-        const minimized = composeView.getMinimized();
+        const minimized = composeView.isMinimized();
         if (minimized) {
           minimizedComposes.push(composeView);
         }

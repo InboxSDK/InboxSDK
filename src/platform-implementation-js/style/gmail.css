@@ -580,7 +580,9 @@ div.inboxsdk__compose_statusbar {
 
 /* mole */
 
-/* Fix issue where Compose toolbar can become disconnected when moles are in use */
+/* Fix issue where Compose toolbar can become disconnected when moles or
+ * drawers are in use */
+.inboxsdk__drawers_in_use .aDi,
 .inboxsdk__moles_in_use .aDi {
   left: auto !important;
 }

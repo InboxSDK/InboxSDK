@@ -22,7 +22,6 @@ import setCss from '../../../lib/dom/set-css';
 
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
-import dispatchCustomEvent from '../../../lib/dom/dispatch-custom-event';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
@@ -197,7 +196,8 @@ class GmailComposeView {
 					.map(() => {
 						this._updateComposeFullscreenState();
 						return {
-							eventName: 'composeFullscreenStateChanged'
+							eventName: 'fullscreenChanged',
+							data: {fullscreen: this._isFullscreen}
 						};
 					})
 			])
@@ -438,13 +438,17 @@ class GmailComposeView {
 
 	addStatusBar(options: {height?: number, orderHint?: number}={}): StatusBar {
 		var statusBar = addStatusBar(this, options);
-		dispatchCustomEvent(this._element, 'resize');
+		this._element.dispatchEvent(new CustomEvent('resize', {
+			bubbles: false, cancelable: false, detail: null
+		}));
 		Kefir.fromEvents(statusBar, 'destroy')
 			.map(() => ({eventName:'statusBarRemoved'}))
 			.flatMap(delayAsap)
 			.takeUntilBy(this._stopper)
 			.onValue(() => {
-				dispatchCustomEvent(this._element, 'resize');
+				this._element.dispatchEvent(new CustomEvent('resize', {
+					bubbles: false, cancelable: false, detail: null
+				}));
 			});
 
 		return statusBar;
@@ -458,7 +462,7 @@ class GmailComposeView {
 
 		if(this._isFullscreen){
 			this._eventStream
-				.filter(({eventName}) => eventName === 'composeFullscreenStateChanged')
+				.filter(({eventName}) => eventName === 'fullscreenChanged')
 				.onValue(() => simulateClick(this.getCloseButton()));
 
 			simulateClick(this.getMoleSwitchButton());
@@ -806,7 +810,7 @@ class GmailComposeView {
 		ensureGroupingIsOpen(this._element, type);
 	}
 
-	getMinimized(): boolean {
+	isMinimized(): boolean {
 		const element = this.getElement();
 		const bodyElement = this.getBodyElement();
 		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
@@ -814,7 +818,7 @@ class GmailComposeView {
 			if (!hasReportedMissingBody) {
 				hasReportedMissingBody = true;
 				this._driver.getLogger().error(
-					new Error("getMinimized failed to find bodyContainer"),
+					new Error("isMinimized failed to find bodyContainer"),
 					{
 						bodyElement: !!bodyElement,
 						hasMessageIDElement: !!this._messageIDElement,
@@ -832,20 +836,21 @@ class GmailComposeView {
 	}
 
 	setMinimized(minimized: boolean) {
-		if (minimized !== this.getMinimized()) {
+		if (minimized !== this.isMinimized()) {
+			if (this._isInlineReplyForm)
+				throw new Error("Not implemented for inline compose views");
 			const minimizeButton = this._element.querySelector('.Hm > img');
-			if (minimizeButton) {
-				simulateClick(minimizeButton);
-			}
+			simulateClick(minimizeButton);
 		}
 	}
 
-	minimize() {
-		this.setMinimized(true);
-	}
-
-	restore() {
-		this.setMinimized(false);
+	setFullscreen(fullscreen: boolean) {
+		if (fullscreen !== this.isFullscreen()) {
+			if (this._isInlineReplyForm)
+				throw new Error("Not implemented for inline compose views");
+			const fullscreenButton = this._element.querySelector('.Hm > img:nth-of-type(2)');
+			simulateClick(fullscreenButton);
+		}
 	}
 
 	_triggerDraftSave() {
@@ -894,7 +899,7 @@ class GmailComposeView {
 		this._isInlineReplyForm = inline;
 	}
 
-	getIsFullscreen(): boolean {
+	isFullscreen(): boolean {
 		return this._isFullscreen;
 	}
 

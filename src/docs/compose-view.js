@@ -186,6 +186,32 @@ var ComposeView = /** @lends ComposeView */ {
 	isInlineReplyForm: function(){},
 
 	/**
+	 * Whether or not this compose view is in full-screen mode.
+	 * @return {boolean}
+	 */
+	isFullscreen: function(){},
+
+	/**
+	 * This allows the fullscreen state to be changed.
+	 * @param  {boolean} minimized - If true, the compose view will be made fullscreen.
+	 * @return {void}
+	 */
+	setFullscreen: function(){},
+
+	/**
+	 * Whether or not this compose view is minimized.
+	 * @return {boolean}
+	 */
+	isMinimized: function(){},
+
+	/**
+	 * This allows the minimize state to be changed.
+	 * @param  {boolean} minimized - If true, the compose view will be minimized.
+	 * @return {void}
+	 */
+	setMinimized: function(){},
+
+	/**
 	 * If the compose is an inline reply form, this triggers it to be converted
 	 * to a full compose view. Note that the current ComposeView object will emit
 	 * its destroy event, and a new ComposeView object will be created. This
@@ -301,6 +327,12 @@ var ComposeView = /** @lends ComposeView */ {
 	 * @param {string} messageID - If the composeView was closed without being sent and the draft
 	 * was saved, then this property will have the draft's message ID after it saved. Otherwise it
 	 * will be null.
+	 */
+
+	/**
+	 * Fires when the From value is changed.
+	 * @event ComposeView#fullscreenChanged
+	 * @param {boolean} fullscreen - tells whether the compose is now fullscreen
 	 */
 
 	/**

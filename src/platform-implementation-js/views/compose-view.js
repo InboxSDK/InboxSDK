@@ -180,6 +180,22 @@ class ComposeView extends EventEmitter {
 		return memberMap.get(this).composeViewImplementation.isInlineReplyForm();
 	}
 
+	isFullscreen() {
+		return memberMap.get(this).composeViewImplementation.isFullscreen();
+	}
+
+	setFullscreen(fullscreen: boolean) {
+		memberMap.get(this).composeViewImplementation.setFullscreen(fullscreen);
+	}
+
+	isMinimized() {
+		return memberMap.get(this).composeViewImplementation.isMinimized();
+	}
+
+	setMinimized(minimized: boolean) {
+		memberMap.get(this).composeViewImplementation.setMinimized(minimized);
+	}
+
 	popOut(): Promise<ComposeView> {
 		memberMap.get(this).composeViewImplementation.popOut();
 		return memberMap.get(this).composeViewStream.take(1).toPromise(RSVP.Promise);

@@ -35,7 +35,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
-    .filter(e => _.includes(['resize', 'composeFullscreenStateChanged'], e.eventName))
+    .filter(e => _.includes(['resize', 'fullscreenChanged'], e.eventName))
     .merge(delayAsap(null));
 
   var statusAreaParent: HTMLElement = (gmailComposeView.getStatusArea().parentElement:any);

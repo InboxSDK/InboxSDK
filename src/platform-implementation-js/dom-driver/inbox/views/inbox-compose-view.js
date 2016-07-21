@@ -38,6 +38,8 @@ class InboxComposeView {
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastBodySelectionRange: ?Range;
+  _isMinimized: boolean = false;
+  _isFullscreenMode: boolean = false;
   _p: Parsed;
   _els: Parsed.elements;
 
@@ -97,6 +99,56 @@ class InboxComposeView {
     this._eventStream.plug(this._getAddressChangesStream());
 
     handleComposeLinkChips(this);
+
+    const {fromPickerEmailSpan} = this._els;
+    if (fromPickerEmailSpan) {
+      this._eventStream.plug(
+        makeMutationObserverChunkedStream(fromPickerEmailSpan, {childList: true, subtree: true, characterData: true})
+          .map(() => ({
+            eventName: 'fromContactChanged',
+            data: {contact: this.getFromContact()}
+          }))
+      );
+    }
+
+    const {minimizeBtnImage} = this._els;
+    if (minimizeBtnImage) {
+      function isMinimized() {
+        return /_maximize_/.test(minimizeBtnImage.src);
+      }
+      const minimizeButtonChanges = makeMutationObserverChunkedStream(minimizeBtnImage, {attributes: true});
+      minimizeButtonChanges
+        .toProperty(() => null)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._isMinimized = isMinimized();
+        });
+      this._eventStream.plug(
+        minimizeButtonChanges.map(() => ({
+          eventName: isMinimized() ? 'minimized' : 'restored'
+        }))
+      );
+    }
+
+    const {toggleFullscreenButtonImage} = this._els;
+    if (toggleFullscreenButtonImage) {
+      function isFullscreenMode() {
+        return !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
+      }
+      const toggleButtonChanges = makeMutationObserverChunkedStream(toggleFullscreenButtonImage, {attributes: true});
+      toggleButtonChanges
+        .toProperty(() => null)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._isFullscreenMode = isFullscreenMode();
+        });
+      this._eventStream.plug(
+        toggleButtonChanges.map(() => ({
+          eventName: 'fullscreenChanged',
+          data: {fullscreen: isFullscreenMode()}
+        }))
+      );
+    }
   }
   destroy() {
     this._eventStream.emit({eventName: 'destroy', data: {}});
@@ -340,17 +392,23 @@ class InboxComposeView {
     if (!this._els.sendBtn) throw new Error("Compose View missing send element");
     simulateClick(this._els.sendBtn);
   }
-  minimize() {
-    if (this._p.attributes.isInline) {
-      throw new Error("Not implemented for inline compose views");
+  setMinimized(minimized: boolean) {
+    if (minimized !== this.isMinimized()) {
+      if (this._p.attributes.isInline)
+        throw new Error("Not implemented for inline compose views");
+      const {minimizeBtn} = this._els;
+      if (!minimizeBtn) throw new Error('Could not find minimize button');
+      minimizeBtn.click();
     }
-    // TODO
   }
-  restore() {
-    if (this._p.attributes.isInline) {
-      throw new Error("Not implemented for inline compose views");
+  setFullscreen(fullscreen: boolean) {
+    if (fullscreen !== this.isFullscreen()) {
+      if (this._p.attributes.isInline)
+        throw new Error("Not implemented for inline compose views");
+      const {toggleFullscreenButton} = this._els;
+      if (!toggleFullscreenButton) throw new Error('Could not find fullscreen button');
+      toggleFullscreenButton.click();
     }
-    // TODO
   }
   addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
@@ -425,11 +483,11 @@ class InboxComposeView {
   attachInlineFiles(files: Blob[]): Promise<void> {
     throw new Error("Not implemented");
   }
-  getIsFullscreen(): boolean {
-    if (this._p.attributes.isInline) return false;
-    const {toggleFullscreenButtonImage} = this._els;
-    if (!toggleFullscreenButtonImage) return false;
-    return !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
+  isFullscreen(): boolean {
+    return this._isFullscreenMode;
+  }
+  isMinimized(): boolean {
+    return this._isMinimized;
   }
   getBodyElement(): HTMLElement {
     if (!this._els.body) throw new Error("Compose View missing body element");

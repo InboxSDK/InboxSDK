@@ -43,13 +43,24 @@
   left: 0;
 }
 
-.inboxsdk__drawer_view {
+.inboxsdk__drawer_view_container {
+  visibility: visible;
+  direction: initial;
   position: fixed;
+  height: 100vh;
+  width: 100vw;
+  bottom: 0;
+  left: 0;
+  z-index: 51;
+  pointer-events: none;
+}
+.inboxsdk__drawer_view {
+  position: absolute;
+  pointer-events: auto;
   top: 0;
   bottom: 0;
   right: 0;
   width: 452px;
-  z-index: 51;
   font: normal normal normal normal 13px / normal "Helvetica Neue", Helvetica, Arial, sans-serif;
   display: -webkit-flex;
   display: flex;
@@ -87,11 +98,12 @@
 }
 
 .inboxsdk__inbox_backdrop {
+  visibility: visible;
   position: fixed;
-  top: 0;
+  height: 100vh;
+  width: 100vw;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: 50;
   background-color: transparent;
   transition: background-color 150ms cubic-bezier(0.4, 0, 1, 1);
@@ -99,4 +111,8 @@
 .inboxsdk__inbox_backdrop.inboxsdk__active {
   background-color: rgba(10,10,10,.6);
   transition: background-color 70ms cubic-bezier(0,0,.2,1);
+}
+
+.inboxsdk__inbox_backdrop ~ .inboxsdk__inbox_backdrop {
+  opacity: 0.6;
 }
