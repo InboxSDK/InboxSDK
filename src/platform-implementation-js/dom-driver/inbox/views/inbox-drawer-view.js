@@ -14,7 +14,7 @@ class InboxDrawerView {
   _exitEl: HTMLElement;
   _containerEl: HTMLElement;
   _el: HTMLElement;
-  _backdrop: InboxBackdrop;
+  _backdrop: ?InboxBackdrop = null;
   _slideAnimationDone: Kefir.Stream;
   _closing: Kefir.Stream&{destroy():void} = kefirStopper();
   _closed: Kefir.Stream&{destroy():void} = kefirStopper();
@@ -24,6 +24,8 @@ class InboxDrawerView {
 
     const zIndex = 500;
     let target = document.body;
+
+    let useBackdrop = true;
 
     const {composeView} = options;
     if (composeView) {
@@ -47,6 +49,10 @@ class InboxDrawerView {
         .takeUntilBy(this._closing)
         .onValue(() => this.close());
 
+      if (document.querySelector('[jsaction="global.exit_full_screen"]')) {
+        useBackdrop = false;
+      }
+
       const composeEl = composeView.getElement();
       composeEl.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false, cancelable: false, detail: null
@@ -62,7 +68,8 @@ class InboxDrawerView {
       }));
       target = findParent(
         offsetParent,
-        el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto'
+        el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
+          el.getBoundingClientRect().left === 0
       ) || document.body;
       target.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false, cancelable: false, detail: null
@@ -87,10 +94,12 @@ class InboxDrawerView {
         });
     }
 
-    this._backdrop = new InboxBackdrop(zIndex, target);
-    this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
-      this.close();
-    });
+    if (useBackdrop) {
+      this._backdrop = new InboxBackdrop(zIndex, target);
+      this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
+        this.close();
+      });
+    }
 
     this._containerEl = document.createElement('div');
     this._containerEl.className = 'inboxsdk__drawer_view_container';
@@ -129,7 +138,7 @@ class InboxDrawerView {
     target.appendChild(this._containerEl);
 
     this._closing.onValue(() => {
-      this._backdrop.destroy();
+      if (this._backdrop) this._backdrop.destroy();
       this._el.classList.remove('inboxsdk__active');
       Kefir.fromEvents(this._el, 'transitionend')
         .merge(Kefir.later(200)) // transition might not finish if element is hidden
