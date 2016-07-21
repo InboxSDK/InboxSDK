@@ -153,6 +153,7 @@ class InboxDrawerView {
     let composeNeedToMoveLeft = 0;
     if (composeView) {
       const composeEl = composeView.getElement();
+      const parentEl: HTMLElement = (composeEl.parentElement: any);
       const composeRect = composeEl.getBoundingClientRect();
       const drawerRect = this._el.getBoundingClientRect();
 
@@ -161,10 +162,10 @@ class InboxDrawerView {
       composeNeedToMoveLeft = composeRect.right - preexistingLeftAdjustment -
         (window.innerWidth - drawerRect.width - margin);
       if (composeNeedToMoveLeft > 0) {
-        composeEl.style.position = 'relative';
-        composeEl.style.transition = 'left 150ms cubic-bezier(.4,0,.2,1)';
-        composeEl.style.left = '0';
-        composeEl.offsetHeight; // force layout of compose
+        parentEl.style.position = 'relative';
+        parentEl.style.transition = 'left 150ms cubic-bezier(.4,0,.2,1)';
+        parentEl.style.left = '0';
+        parentEl.offsetHeight; // force layout of compose
         // We only want to force a full layout once, so let's not dirty the DOM
         // again until after we've forced layout of the DrawerView _el too.
       }
@@ -180,19 +181,20 @@ class InboxDrawerView {
     // Continue ComposeView positioning after forcing a layout above.
     if (composeView && composeNeedToMoveLeft > 0) {
       const composeEl = composeView.getElement();
-      composeEl.style.left = `${-composeNeedToMoveLeft}px`;
+      const parentEl: HTMLElement = (composeEl.parentElement: any);
+      parentEl.style.left = `${-composeNeedToMoveLeft}px`;
 
       this._closing
         .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
         .onValue(() => {
-          composeEl.style.left = '0';
+          parentEl.style.left = '0';
         });
       this._closed
         .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
         .onValue(() => {
-          composeEl.style.position = '';
-          composeEl.style.left = '';
-          composeEl.style.transition = '';
+          parentEl.style.position = '';
+          parentEl.style.left = '';
+          parentEl.style.transition = '';
         });
     }
   }
