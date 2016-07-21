@@ -158,7 +158,7 @@ class InboxDrawerView {
       const drawerRect = this._el.getBoundingClientRect();
 
       const margin = 24;
-      const preexistingLeftAdjustment = parseInt(composeEl.style.left) || 0;
+      const preexistingLeftAdjustment = parseInt(parentEl.style.left) || 0;
       composeNeedToMoveLeft = composeRect.right - preexistingLeftAdjustment -
         (window.innerWidth - drawerRect.width - margin);
       if (composeNeedToMoveLeft > 0) {
