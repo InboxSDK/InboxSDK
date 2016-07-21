@@ -59,6 +59,11 @@ class Widgets {
   }
 
   showDrawerView(options: DrawerViewOptions): DrawerView {
+    console.log('Widgets.showDrawerView is experimental! This function may change! Let us know if it works well for you, but you probably should not release any extensions using it for now.');
+    get(memberMap, this).driver.getLogger().eventSdkPassive('Widgets.showDrawerView used', {
+      keys: Object.keys(options)
+    });
+
     if (options.composeView && !(options.composeView instanceof ComposeView))
       throw new Error('composeView option was not a ComposeView');
     const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(options);
