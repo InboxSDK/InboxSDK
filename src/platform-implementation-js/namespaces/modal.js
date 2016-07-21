@@ -26,9 +26,7 @@ _.assign(Modal.prototype, {
       driver.getLogger().deprecationWarning('Modal.show', 'Widgets.showModalView');
     }
     var modalViewDriver = driver.createModalViewDriver(options);
-    var modalView = new ModalView({
-      modalViewDriver: modalViewDriver
-    });
+    var modalView = new ModalView({driver, modalViewDriver});
     modalView.show();
 
     return modalView;
@@ -40,9 +38,7 @@ _.assign(Modal.prototype, {
     driver.getLogger().deprecationWarning('Modal.createModalView', 'Widgets.showModalView');
 
     var modalViewDriver = driver.createModalViewDriver(options);
-    return new ModalView({
-      modalViewDriver: modalViewDriver
-    });
+    return new ModalView({driver, modalViewDriver});
   }
 
 });
