@@ -18,6 +18,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 import getSearchBarStream from './getSearchBarStream';
+import getNativeDrawerStream from './getNativeDrawerStream';
 import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
 import InboxRouteView from './views/inbox-route-view';
@@ -49,6 +50,7 @@ class InboxDriver {
   _pageCommunicator: InboxPageCommunicator;
   _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -145,6 +147,10 @@ class InboxDriver {
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
+
+    this._nativeDrawerPool = new ItemWithLifetimePool(
+      getNativeDrawerStream(this).takeUntilBy(this._stopper)
+    );
   }
 
   destroy() {
@@ -160,6 +166,7 @@ class InboxDriver {
   getMessageViewDriverStream(): Kefir.Stream {return this._messageViewDriverStream;}
   getThreadRowViewDriverStream(): Kefir.Stream {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream(): Kefir.Stream {return this._toolbarViewDriverStream;}
+  getNativeDrawerPool() {return this._nativeDrawerPool;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
@@ -261,7 +268,13 @@ class InboxDriver {
   }
 
   createDrawerViewDriver(options) {
-    return new InboxDrawerView(options);
+    const drawerView = new InboxDrawerView(options);
+    this._nativeDrawerPool.items()
+      .takeUntilBy(drawerView.getClosingStream())
+      .onValue(() => {
+        drawerView.close();
+      });
+    return drawerView;
   }
 
   createBackdrop(zIndex, target) {
