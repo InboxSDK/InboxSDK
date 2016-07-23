@@ -407,6 +407,37 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
   document.documentElement.setAttribute('data-inboxsdk-last-event', ''+Date.now());
 }
 
+let currentAccessToken: ?{oauthToken: string, expirationDate: number} = null;
+
+function isTimestampExpired(n: number) {
+  // Let's refresh the token 10 minutes early
+  return Date.now()+10*60*1000 > n;
+}
+
+async function retrieveNewEventsAccessToken(): Promise<{oauthToken: string, expirationDate: number}> {
+  const {text} = await ajax({
+    url: 'https://www.inboxsdk.com/api/v2/events/oauth'
+  });
+  let accessToken = JSON.parse(text);
+  if (isTimestampExpired(accessToken.expirationDate)) {
+    console.warn('Got an apparently already expired token. Assuming our clock is busted...');
+    // Let's assume the token expires in 30 minutes. The server refreshes the
+    // token 30 minutes before it expires so it's probably a safe bet.
+    accessToken.expirationDate = Date.now()+30*60*1000;
+  }
+  return accessToken;
+}
+
+async function getEventsAccessToken() {
+  const t = currentAccessToken;
+  if (t && !isTimestampExpired(t.expirationDate)) {
+    return t;
+  } else {
+    currentAccessToken = await retrieveNewEventsAccessToken();
+    return currentAccessToken;
+  }
+}
+
 if (_extensionIsLoggerMaster && global.document) {
   makeMutationObserverStream(document.documentElement, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
@@ -419,17 +450,24 @@ if (_extensionIsLoggerMaster && global.document) {
       return;
     }
 
-    ajax({
-      url: 'https://www.inboxsdk.com/api/v2/events',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        data: events,
-        timestamp: Date.now()*1000
-      })
-    }).catch(function(err) {
+    (async function() {
+      const {oauthToken} = await getEventsAccessToken();
+      const apiKey = 'AIzaSyAwlvUR2x3OnCeas8hW8NDzVMswL5hZGg8';
+
+      await ajax({
+        url: `https://pubsub.googleapis.com/v1/projects/mailfoogae/topics/events:publish?key=${encodeURIComponent(apiKey)}`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${oauthToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          "messages": events.map(event => ({
+            data: new Buffer(JSON.stringify(event)).toString('base64')
+          }))
+        })
+      });
+    })().catch(err => {
       console.error("Failed to log event", err);
     });
   });
