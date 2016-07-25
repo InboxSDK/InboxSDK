@@ -2,6 +2,7 @@
 
 import {defn} from 'ud';
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import type InboxDriver from '../inbox-driver';
 import type {Parsed} from '../detection/thread/parser';
 
@@ -9,6 +10,7 @@ class InboxThreadView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _p: Parsed;
+  _eventStream: Kefir.Bus = kefirBus();
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -16,8 +18,8 @@ class InboxThreadView {
     this._p = parsed;
   }
 
-  getEventStream(): any {
-    return Kefir.never();
+  getEventStream(): Kefir.Stream {
+    return this._eventStream;
   }
 
   getMessageViewDrivers(): any {
@@ -43,7 +45,7 @@ class InboxThreadView {
   }
 
   destroy() {
-
+    this._eventStream.end();
   }
 }
 
