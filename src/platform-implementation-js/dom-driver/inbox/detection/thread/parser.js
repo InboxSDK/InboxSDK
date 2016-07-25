@@ -1,0 +1,59 @@
+/* @flow */
+
+import ErrorCollector from '../../../../lib/ErrorCollector';
+import querySelectorOne from '../../../../lib/dom/querySelectorOne';
+import BigNumber from 'bignumber.js';
+
+export default function parser(el: HTMLElement) {
+  const ec = new ErrorCollector('compose');
+
+  const inBundle = !el.hasAttribute('aria-multiselectable');
+
+  ec.run('tabindex', () => {
+    if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
+  });
+
+  const actionData = ec.run(
+    'read data-action-data',
+    () => JSON.parse(el.getAttribute('data-action-data'))
+  );
+
+  if (actionData) {
+    ec.run('actionData checks', () => {
+      if (actionData[0] !== null) throw new Error('expected null');
+      if (actionData[1][1] !== 1) throw new Error('expected type 1');
+    });
+  }
+
+  const threadId = !actionData ? null : ec.run(
+    'thread id',
+    () => new BigNumber(/#gmail:thread-f:(\d+)/.exec(actionData[1][0])[1]).toString(16)
+  );
+
+  const heading = ec.run(
+    'heading',
+    () => el.querySelector('div[role=heading]')
+  );
+  const list = ec.run(
+    'list',
+    () => el.querySelector('div[role=list]')
+  );
+
+  const elements = {
+    heading,
+    list
+  };
+  const score = 1 - (ec.errorCount() / ec.runCount());
+  return {
+    elements,
+    attributes: {
+      inBundle,
+      threadId
+    },
+    score,
+    errors: ec.getErrorLogs()
+  };
+}
+
+/*:: const x = parser(({}:any)); */
+export type Parsed = typeof x;

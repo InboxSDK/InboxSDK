@@ -17,12 +17,16 @@ import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
+
+import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
-import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+import getThreadViewStream from './getThreadViewStream';
 
-import InboxRouteView from './views/inbox-route-view';
-import InboxComposeView from './views/inbox-compose-view';
+import type InboxRouteView from './views/inbox-route-view';
+import type InboxComposeView from './views/inbox-compose-view';
+import type InboxThreadView from './views/inbox-thread-view';
+
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
@@ -30,7 +34,6 @@ import InboxDrawerView from './views/inbox-drawer-view';
 import InboxBackdrop from './views/inbox-backdrop';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
-import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type {EnvData} from '../../platform-implementation';
 
 class InboxDriver {
@@ -40,8 +43,8 @@ class InboxDriver {
   onready: Promise;
   _routeViewDriverStream: Kefir.Stream;
   _rowListViewDriverStream: Kefir.Stream;
-  _composeViewDriverStream: Kefir.Stream<ComposeViewDriver>;
-  _threadViewDriverStream: Kefir.Stream;
+  _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
+  _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
   _messageViewDriverStream: Kefir.Stream;
   _threadRowViewDriverKefirStream: Kefir.Stream;
   _toolbarViewDriverStream: Kefir.Stream;
@@ -93,7 +96,7 @@ class InboxDriver {
     this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
     this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
-    this._threadViewDriverStream = Kefir.never();
+    this._threadViewDriverStream = getThreadViewStream(this).takeUntilBy(this._stopper);
     this._messageViewDriverStream = Kefir.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
@@ -159,13 +162,13 @@ class InboxDriver {
 
   getLogger(): Logger {return this._logger;}
   getStopper(): Kefir.Stream {return this._stopper;}
-  getRouteViewDriverStream(): Kefir.Stream {return this._routeViewDriverStream;}
-  getRowListViewDriverStream(): Kefir.Stream {return this._rowListViewDriverStream;}
-  getComposeViewDriverStream(): Kefir.Stream {return this._composeViewDriverStream;}
-  getThreadViewDriverStream(): Kefir.Stream {return this._threadViewDriverStream;}
-  getMessageViewDriverStream(): Kefir.Stream {return this._messageViewDriverStream;}
-  getThreadRowViewDriverStream(): Kefir.Stream {return this._threadRowViewDriverKefirStream;}
-  getToolbarViewDriverStream(): Kefir.Stream {return this._toolbarViewDriverStream;}
+  getRouteViewDriverStream() {return this._routeViewDriverStream;}
+  getRowListViewDriverStream() {return this._rowListViewDriverStream;}
+  getComposeViewDriverStream() {return this._composeViewDriverStream;}
+  getThreadViewDriverStream() {return this._threadViewDriverStream;}
+  getMessageViewDriverStream() {return this._messageViewDriverStream;}
+  getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
+  getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}

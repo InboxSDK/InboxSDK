@@ -79,14 +79,10 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
 		var view = membraneMap.get(viewDriver);
 		if (!view) {
-			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance, driver);
+			view = new ViewClass((viewDriver:any), appId, membraneMap, ConversationsInstance, driver);
 			membraneMap.set(viewDriver, view);
 		}
-
-		return {
-			viewDriver: viewDriver,
-			view: view
-		};
+		return {viewDriver, view};
 	});
 
 	combinedStream.flatMap(function(event) {

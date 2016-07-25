@@ -731,6 +731,11 @@
       "from": "better-assert@>=1.0.0 <1.1.0",
       "resolved": "https://registry.npmjs.org/better-assert/-/better-assert-1.0.2.tgz"
     },
+    "bignumber.js": {
+      "version": "2.4.0",
+      "from": "bignumber.js@latest",
+      "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.4.0.tgz"
+    },
     "bin-version": {
       "version": "1.0.4",
       "from": "bin-version@>=1.0.0 <2.0.0",
