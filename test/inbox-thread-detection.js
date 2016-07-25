@@ -17,7 +17,7 @@ import {
   pageFullscreen20160620,
 } from './lib/pages';
 
-describe('Inbox Compose Detection', function() {
+describe('Inbox Thread Detection', function() {
   this.slow(5000);
   this.timeout(10000);
 
