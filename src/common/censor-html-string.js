@@ -7,7 +7,7 @@ export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
   "contenteditable",
   "aria-expanded", "aria-hidden", "aria-labelledby", "aria-busy", "aria-multiselectable",
   // inbox props
-  "data-action-data", "data-item-id",
+  "data-action-data", "data-item-id", "data-msg-id",
   "g_editable", "jsnamespace", "jsaction"
 ]);
 
