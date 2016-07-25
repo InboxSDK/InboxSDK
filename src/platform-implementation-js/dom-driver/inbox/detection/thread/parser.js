@@ -13,21 +13,9 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
-  const actionData = ec.run(
-    'read data-action-data',
-    () => JSON.parse(el.getAttribute('data-action-data'))
-  );
-
-  if (actionData) {
-    ec.run('actionData checks', () => {
-      if (actionData[0] !== null) throw new Error('expected null');
-      if (actionData[1][1] !== 1) throw new Error('expected type 1');
-    });
-  }
-
-  const threadId = !actionData ? null : ec.run(
+  const threadId = ec.run(
     'thread id',
-    () => new BigNumber(/#gmail:thread-f:(\d+)/.exec(actionData[1][0])[1]).toString(16)
+    () => new BigNumber(/#gmail:thread-f:(\d+)/.exec(el.getAttribute('data-item-id'))[1]).toString(16)
   );
 
   const heading = ec.run(

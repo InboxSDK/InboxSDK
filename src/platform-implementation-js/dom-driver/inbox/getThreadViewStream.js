@@ -28,7 +28,7 @@ function imp(driver: InboxDriver) {
       view.destroy();
     });
     return view;
-  })
+  });
 }
 
 export default function getThreadViewStream(driver: InboxDriver) {
