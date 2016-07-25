@@ -25,7 +25,10 @@ class InboxThreadView {
   }
 
   getSubject(): string {
-    throw new Error('not implemented');
+    if (!this._p.elements.heading) {
+      throw new Error('Failed to find subject');
+    }
+    return this._p.elements.heading.textContent;
   }
 
   getThreadID(): string {
