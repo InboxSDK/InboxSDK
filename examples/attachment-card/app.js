@@ -1,5 +1,7 @@
-InboxSDK.load("1.0", "attachment-card-exmaple").then(function(sdk){
+InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(sdk){
 	'use strict';
+
+	window._sdk = sdk;
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
