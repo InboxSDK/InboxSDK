@@ -51,10 +51,12 @@ class Conversations {
 		_setupViewDriverWatcher(
 			appId,
 			driver.getMessageViewDriverStream().flatMap(messageViewDriver =>
-				messageViewDriver.getEventStream()
-					.filter(event => event.eventName === 'messageLoad')
-					.map(event => event.view)
-					.take(1)
+				messageViewDriver.isLoaded() ?
+					Kefir.constant(messageViewDriver) :
+					messageViewDriver.getEventStream()
+						.filter(event => event.eventName === 'messageLoad')
+						.map(() => messageViewDriver)
+						.take(1)
 			),
 			MessageView,
 			members.messageViewHandlerRegistries.loaded,

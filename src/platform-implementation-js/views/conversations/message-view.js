@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
+import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import AttachmentCardView from './attachment-card-view';
@@ -163,15 +164,19 @@ function _bindToEventStream(messageView, members, stream){
 			});
 		});
 
-	stream
-		.filter(function(event){
-			return event.eventName === 'messageLoad';
-		})
-		.onValue(function(event){
-			messageView.emit('load', {
-				messageView: messageView
-			});
+	if (messageView.isLoaded()) {
+		asap(() => {
+			messageView.emit('load', {messageView});
 		});
+	} else {
+		stream
+			.filter(event => event.eventName === 'messageLoad')
+			.onValue(event => {
+				messageView.emit('load', {
+					messageView: messageView
+				});
+			});
+	}
 
 	stream
 		.filter(function(event){
