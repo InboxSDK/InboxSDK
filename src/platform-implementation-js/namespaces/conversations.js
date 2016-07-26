@@ -53,6 +53,7 @@ class Conversations {
 				messageViewDriver.getEventStream()
 					.filter(event => event.eventName === 'messageLoad')
 					.map(event => event.view)
+					.take(1)
 			),
 			MessageView,
 			members.messageViewHandlerRegistries.loaded,

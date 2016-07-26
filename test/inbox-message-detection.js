@@ -47,6 +47,7 @@ describe('Inbox Message Detection', function() {
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
+      assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.messageId, '14ff3f449377ba4e');
     });
 
@@ -55,6 +56,7 @@ describe('Inbox Message Detection', function() {
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
+      assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.messageId, '150058a7ecc2fea4');
     });
   });

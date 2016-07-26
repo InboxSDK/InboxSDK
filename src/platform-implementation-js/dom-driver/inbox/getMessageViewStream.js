@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import type InboxDriver from './inbox-driver';
 import InboxMessageView from './views/inbox-message-view';
+import censorHTMLtree from '../../../common/censor-html-tree';
 
 import finder from './detection/message/finder';
 import watcher from './detection/message/watcher';
@@ -21,12 +22,27 @@ function imp(driver: InboxDriver) {
     logError(err: Error, details?: any) {
       driver.getLogger().errorSite(err, details);
     }
-  }).map(({el, removalStream, parsed}) => {
-    const view = new InboxMessageView(el, driver, parsed);
-    removalStream.take(1).onValue(() => {
-      view.destroy();
-    });
-    return view;
+  }).flatMap(({el, removalStream, parsed}) => {
+    // If the InboxMessageView is destroyed before the removalStream fires,
+    // then make a new InboxMessageView out of the same element.
+    return Kefir.repeat(i => {
+      if (i !== 0) {
+        parsed = parser(el);
+        if (parsed.errors.length > 0) {
+          driver.getLogger().errorSite(new Error(`message reparse errors`), {
+            score: parsed.score,
+            errors: parsed.errors,
+            html: censorHTMLtree(el)
+          });
+        }
+      }
+      const view = new InboxMessageView(el, driver, parsed);
+      removalStream.take(1).takeUntilBy(view.getStopper()).onValue(() => {
+        view.destroy();
+      });
+      return Kefir.constant(view)
+        .merge(view.getStopper().filter(()=>false));
+    }).takeUntilBy(removalStream);
   });
 }
 

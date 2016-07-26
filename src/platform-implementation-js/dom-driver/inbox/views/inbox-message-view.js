@@ -1,9 +1,14 @@
 /* @flow */
 
 import {defn} from 'ud';
+import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
+import censorHTMLtree from '../../../../common/censor-html-tree';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import parser from '../detection/message/parser';
 import type {Parsed} from '../detection/message/parser';
 import type {
   MessageViewDriver, MessageViewToolbarButtonDescriptor,
@@ -14,12 +19,74 @@ class InboxMessageView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _p: Parsed;
+  _stopper: Kefir.Stream;
   _eventStream: Kefir.Bus = kefirBus();
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
     this._driver = driver;
     this._p = parsed;
+
+    this._stopper = this._eventStream.filter(()=>false).beforeEnd(()=>null);
+
+    // If our id changes, then destroy this view.
+    // getMessageViewDriverStream() will create a new view for this element.
+    makeMutationObserverChunkedStream(this._element, {
+      attributes: true, attributeFilter: ['data-msg-id']
+    })
+      .toProperty(() => null)
+      .map(() => this._element.getAttribute('data-msg-id'))
+      .skipDuplicates()
+      .changes()
+      .onValue(() => {
+        this.destroy();
+      });
+
+    delayAsap().takeUntilBy(this._stopper).onValue(() => {
+      if (this._p.attributes.loaded) {
+        this._eventStream.emit({
+          type: 'internal',
+          eventName: 'messageLoad',
+          view: this
+        });
+      }
+
+      makeMutationObserverChunkedStream(this._element, {
+        attributes: true, attributeFilter: ['aria-expanded']
+      })
+        .toProperty(() => null)
+        .map(() => this._element.getAttribute('aria-expanded'))
+        .skipDuplicates()
+        .changes()
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._reparse();
+        });
+    });
+  }
+
+  _reparse() {
+    const oldParsed = this._p;
+    this._p = parser(this._element);
+    if (this._p.errors.length > 0) {
+      this._driver.getLogger().errorSite(new Error(`message reparse errors`), {
+        score: this._p.score,
+        errors: this._p.errors,
+        html: censorHTMLtree(this._element)
+      });
+    }
+
+    if (!oldParsed.attributes.loaded && this._p.attributes.loaded) {
+      this._eventStream.emit({
+        type: 'internal',
+        eventName: 'messageLoad',
+        view: this
+      });
+    }
+  }
+
+  getStopper() {
+    return this._stopper;
   }
 
   getEventStream(): Kefir.Stream {
@@ -27,8 +94,7 @@ class InboxMessageView {
   }
 
   isLoaded() {
-    // Currently we only instantiate InboxMessageViews when they're loaded.
-    return true;
+    return this._p.attributes.loaded;
   }
 
   hasOpenReply() {
@@ -44,7 +110,8 @@ class InboxMessageView {
   }
 
   getContentsElement() {
-    throw new Error('not implemented yet');
+    if (!this._p.elements.body) throw new Error('Could not find body element');
+    return this._p.elements.body;
   }
 
   getLinks(): Array<MessageViewLinkDescriptor> {
