@@ -24,7 +24,7 @@ import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
 import type GmailToolbarView from './gmail-toolbar-view';
 
-import type {VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
+import type {MessageViewDriver, VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
 
 let hasSeenOldElement = false;
 
@@ -78,7 +78,7 @@ class GmailMessageView {
 		});
 	}
 
-	getEventStream(): Kefir.Bus {
+	getEventStream(): Kefir.Stream {
 		return this._eventStream;
 	}
 
@@ -311,7 +311,7 @@ class GmailMessageView {
 		}
 	}
 
-	getMessageID(): ?string {
+	getMessageID(): string {
 		if(!this._messageLoaded){
 			throw new Error('tried to get message id before message is loaded');
 		}
@@ -320,7 +320,7 @@ class GmailMessageView {
 			this._driver.getLogger().error(new Error("Could not find message id element"), {
 				elementHtml: censorHTMLtree(this._element)
 			});
-			return null;
+			return (null:any);
 		}
 
 		let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
@@ -338,7 +338,7 @@ class GmailMessageView {
 					reason: "Could not find element",
 					messageHtml: censorHTMLtree(messageEl)
 				});
-				return null;
+				return (null:any);
 			}
 			const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
 			if (!m) {
@@ -346,7 +346,7 @@ class GmailMessageView {
 					reason: "Element was missing message className",
 					messageHtml: censorHTMLtree(messageEl)
 				});
-				return null;
+				return (null:any);
 			}
 			return m[1];
 		}
@@ -665,3 +665,9 @@ function _extractContactInformation(span){
 }
 
 export default defn(module, GmailMessageView);
+
+// This function does not get executed. It's only checked by Flow to make sure
+// this class successfully implements the type interface.
+function __interfaceCheck() {
+	const test: MessageViewDriver = new GmailMessageView(({}:any), ({}:any), ({}:any));
+}

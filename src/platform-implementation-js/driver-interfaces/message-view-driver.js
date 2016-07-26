@@ -1,24 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
-import BasicClass from '../lib/basic-class';
 import Kefir from 'kefir';
-
-var MessageViewDriverObj = function(){
-	BasicClass.call(this);
-};
-
-MessageViewDriverObj.prototype = Object.create(BasicClass.prototype);
-
-_.extend(MessageViewDriverObj.prototype, {
-	getContentsElement: null,
-	getLinks: null,
-	isElementInQuotedArea: null,
-	getAttachmentCardViewDrivers: null,
-	addAttachmentCard: null,
-	addButtonToDownloadAllArea: null,
-	getEventStream: null
-});
 
 export type VIEW_STATE = 'HIDDEN'|'COLLAPSED'|'EXPANDED';
 
@@ -41,7 +23,6 @@ export type MessageViewToolbarButtonDescriptor = {
 
 export type MessageViewDriver = {
 	getMessageID(): string;
-	getBodyElement(): HTMLElement;
 	getContentsElement(): HTMLElement;
 	getLinks(): Array<MessageViewLinkDescriptor>;
 	isElementInQuotedArea(el: HTMLElement): boolean;
@@ -60,5 +41,3 @@ export type MessageViewDriver = {
 	isLoaded(): boolean;
 	hasOpenReply(): boolean;
 };
-
-export default MessageViewDriverObj;
