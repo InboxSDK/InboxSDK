@@ -136,6 +136,7 @@ class MessageView extends EventEmitter {
 	}
 
 	hasOpenReply(): boolean {
+		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
 		return memberMap.get(this).messageViewImplementation.hasOpenReply();
 	}
 }

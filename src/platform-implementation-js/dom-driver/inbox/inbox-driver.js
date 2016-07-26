@@ -22,10 +22,12 @@ import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream'
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
+import getMessageViewStream from './getMessageViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
+import type InboxMessageView from './views/inbox-message-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -45,7 +47,7 @@ class InboxDriver {
   _rowListViewDriverStream: Kefir.Stream;
   _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
   _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
-  _messageViewDriverStream: Kefir.Stream;
+  _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
   _threadRowViewDriverKefirStream: Kefir.Stream;
   _toolbarViewDriverStream: Kefir.Stream;
   _butterBarDriver: Object;
@@ -97,7 +99,7 @@ class InboxDriver {
     this._rowListViewDriverStream = Kefir.never();
     this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
     this._threadViewDriverStream = getThreadViewStream(this).takeUntilBy(this._stopper);
-    this._messageViewDriverStream = Kefir.never();
+    this._messageViewDriverStream = getMessageViewStream(this).takeUntilBy(this._stopper);
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
 
