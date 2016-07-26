@@ -42,27 +42,17 @@ class InboxMessageView {
         this.destroy();
       });
 
-    delayAsap().takeUntilBy(this._stopper).onValue(() => {
-      if (this._p.attributes.loaded) {
-        this._eventStream.emit({
-          type: 'internal',
-          eventName: 'messageLoad',
-          view: this
-        });
-      }
-
-      makeMutationObserverChunkedStream(this._element, {
-        attributes: true, attributeFilter: ['aria-expanded']
-      })
-        .toProperty(() => null)
-        .map(() => this._element.getAttribute('aria-expanded'))
-        .skipDuplicates()
-        .changes()
-        .takeUntilBy(this._stopper)
-        .onValue(() => {
-          this._reparse();
-        });
-    });
+    makeMutationObserverChunkedStream(this._element, {
+      attributes: true, attributeFilter: ['aria-expanded']
+    })
+      .toProperty(() => null)
+      .map(() => this._element.getAttribute('aria-expanded'))
+      .skipDuplicates()
+      .changes()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._reparse();
+      });
   }
 
   _reparse() {
@@ -79,8 +69,7 @@ class InboxMessageView {
     if (!oldParsed.attributes.loaded && this._p.attributes.loaded) {
       this._eventStream.emit({
         type: 'internal',
-        eventName: 'messageLoad',
-        view: this
+        eventName: 'messageLoad'
       });
     }
   }

@@ -18,9 +18,11 @@ InboxSDK.load(1, 'thread-example', {inboxBeta: true}).then(sdk => {
 
 	sdk.Conversations.registerMessageViewHandler(messageView => {
 		window._lastMessageView = messageView;
-		console.log('messageView', messageView.getBodyElement().textContent.slice(0,30));
-		messageView.on('destroy', () => {
-			console.log('messageView destroy', messageView.getBodyElement().textContent.slice(0,30));
+		console.log('messageView', messageView.getBodyElement().textContent.slice(0,20));
+		['viewStateChange', 'destroy'].forEach(name => {
+			messageView.on(name, event => {
+				console.log('messageView', name, messageView.getBodyElement().textContent.slice(0,20), event);
+			});
 		});
 	});
 });
