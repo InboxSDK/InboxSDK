@@ -72,6 +72,13 @@ class InboxMessageView {
         eventName: 'messageLoad'
       });
     }
+    if (oldParsed.attributes.loaded !== this._p.attributes.loaded) {
+      this._eventStream.emit({
+        eventName: 'viewStateChange',
+        oldValue: this.getViewState(oldParsed),
+        newValue: this.getViewState()
+      });
+    }
   }
 
   getStopper() {
@@ -127,8 +134,9 @@ class InboxMessageView {
   addButtonToDownloadAllArea(options: Object): void {
     throw new Error('not implemented yet');
   }
-  getViewState(): VIEW_STATE {
-    throw new Error('not implemented yet');
+  getViewState(p: ?Parsed): VIEW_STATE {
+    if (!p) p = this._p;
+    return p.attributes.loaded ? 'EXPANDED' : 'COLLAPSED';
   }
   getDateString(): string {
     throw new Error('not implemented yet');
