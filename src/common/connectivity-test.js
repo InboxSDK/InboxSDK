@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 import cachebustUrl from './cachebust-url';
-import zipObject from 'lodash/zipObject';
+import fromPairs from 'lodash/fromPairs';
 
 const URLS = [
   'https://mailfoogae.appspot.com/build/images/composeOverflowToggle.png',
@@ -27,5 +27,5 @@ export default function connectivityTest(): Promise<{[url:string]:boolean}> {
   return Promise.all(URLS.map(url =>
       imageTest(url).then(success => [url, success])
     ))
-    .then(results => zipObject(results));
+    .then(results => fromPairs(results));
 }
