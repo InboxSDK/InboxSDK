@@ -24,7 +24,6 @@ export type MessageViewToolbarButtonDescriptor = {
 export type MessageViewDriver = {
 	getMessageID(): string;
 	getContentsElement(): HTMLElement;
-	getLinks(): Array<MessageViewLinkDescriptor>;
 	isElementInQuotedArea(el: HTMLElement): boolean;
 	addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void;
 	addAttachmentIcon(options: Object): void;

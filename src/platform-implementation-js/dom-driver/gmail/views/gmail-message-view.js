@@ -105,21 +105,6 @@ class GmailMessageView {
 		return this._element.querySelector('.adP');
 	}
 
-	getLinks(): Array<{text: string, html: string, href: string, element: HTMLElement, isInQuotedArea: boolean}> {
-		var anchors = this.getContentsElement().querySelectorAll('a');
-
-		var self = this;
-		return _.map(anchors, function(anchor){
-			return {
-				text: anchor.textContent,
-				html: anchor.innerHTML,
-				href: anchor.href,
-				element: anchor,
-				isInQuotedArea: self.isElementInQuotedArea(anchor)
-			};
-		});
-	}
-
 	isElementInQuotedArea(element: HTMLElement): boolean {
 		return $(element).closest('blockquote').length > 0;
 	}

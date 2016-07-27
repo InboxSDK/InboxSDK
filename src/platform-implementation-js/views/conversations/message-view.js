@@ -107,7 +107,14 @@ class MessageView extends EventEmitter {
 	}
 
 	getLinksInBody(): Array<MessageViewLinkDescriptor> {
-		return memberMap.get(this).messageViewImplementation.getLinks();
+		const anchors = this.getBodyElement().querySelectorAll('a');
+		return _.map(anchors, anchor => ({
+			text: anchor.textContent,
+			html: anchor.innerHTML,
+			href: anchor.href,
+			element: anchor,
+			isInQuotedArea: this.isElementInQuotedArea(anchor)
+		}));
 	}
 
 	getSender(): Contact {
