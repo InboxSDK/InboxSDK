@@ -232,7 +232,7 @@ class GmailToolbarView {
 	_determineToolbarIconMode(){
 		const moveSectionElement = this._getMoveSectionElement();
 		if (!moveSectionElement) throw new Error("No move section element");
-		const isIconMode = _.any(
+		const isIconMode = _.some(
 			moveSectionElement.querySelectorAll('[role=button]'),
 			buttonElement =>
 				buttonElement.hasAttribute('title') || buttonElement.hasAttribute('data-tooltip')
@@ -386,7 +386,7 @@ class GmailToolbarView {
 		}
 
 		_.chain(this._moreMenuItems)
-			.pluck('appId')
+			.map('appId')
 			.uniq()
 			.map(function(appId){
 				return moreMenu.querySelector('[data-group-order-hint=' + appId + ']');

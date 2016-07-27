@@ -63,7 +63,7 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 }
 
 function _areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses){
-	let existingEmailAddresses = _.pluck(getRecipients(gmailComposeView, contactRowIndex, ADDRESS_TYPES[contactRowIndex]), 'emailAddress');
+	let existingEmailAddresses = getRecipients(gmailComposeView, contactRowIndex, ADDRESS_TYPES[contactRowIndex]).map(c => c.emailAddress);
 
 	if(!emailAddresses){
 		return !!existingEmailAddresses;

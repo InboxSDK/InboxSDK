@@ -299,7 +299,7 @@ class GmailThreadRowView {
         labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
 
         const labelParentDiv = this._getLabelParent();
-        if (!_.contains(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
+        if (!_.includes(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }
@@ -479,7 +479,7 @@ class GmailThreadRowView {
         }
 
         updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-        if (!_.contains(starGroup.children, buttonSpan)) {
+        if (!_.includes(starGroup.children, buttonSpan)) {
           starGroup.appendChild(buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
 
@@ -548,7 +548,7 @@ class GmailThreadRowView {
         });
 
         const actionParentDiv = this._elements[0].querySelector('td.a4W .a4X .aKS') || this._elements[0].querySelector('td.a4W div.xS');
-        if (!_.contains(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
+        if (!_.includes(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
           actionParentDiv.insertBefore(
             actionMod.gmailActionButtonView.getElement(),
             actionParentDiv.firstChild
@@ -808,7 +808,7 @@ class GmailThreadRowView {
               emailAddress: span.getAttribute('email'),
               name: span.getAttribute('name')
             }))
-            .uniq((contact) => contact.emailAddress)
+            .uniqBy((contact) => contact.emailAddress)
             .value();
   }
 

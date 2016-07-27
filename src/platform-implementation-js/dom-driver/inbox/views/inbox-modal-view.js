@@ -62,7 +62,7 @@ class InboxModalView {
     var buttonContainer = this._modalContainerElement.querySelector('.inboxsdk__modal_buttons');
 
     buttonContainer.innerHTML = '';
-    _.sortByAll(buttons, [
+    _.sortBy(buttons, [
       button => button.type === 'PRIMARY_ACTION' ? 0 : 1,
       button => button.orderHint || 0
     ])

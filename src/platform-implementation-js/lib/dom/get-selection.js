@@ -25,7 +25,7 @@ export function getSelectedTextInElement(element: HTMLElement, lastRange?: ?Rang
     ])
     .filter(range => isRangeSuitable(range, element))
     .map(range => range.toString())
-    .first()
+    .head()
     .value();
 }
 
@@ -41,6 +41,6 @@ export function getSelectedHTMLInElement(element: HTMLElement, lastRange?: ?Rang
       div.appendChild(range.cloneContents());
       return div.innerHTML;
     })
-    .first()
+    .head()
     .value();
 }

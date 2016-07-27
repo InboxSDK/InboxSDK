@@ -518,7 +518,7 @@ class GmailComposeView {
 				return top >= rect.top && left >= rect.left &&
 					right <= rect.right && bottom <= rect.bottom;
 			})
-			.first()
+			.head()
 			.value();
 		if (!el) {
 			throw new Error("Failed to find dropzone");

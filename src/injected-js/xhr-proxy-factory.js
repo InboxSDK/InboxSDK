@@ -376,11 +376,11 @@ module.exports = function(XHR, wrappers, opts) {
       this._listeners[name] = [];
       this._boundListeners[name] = [];
     }
-    if (!_.contains(this._listeners[name], listener)) {
+    if (!_.includes(this._listeners[name], listener)) {
       var boundListener = wrapEventListener(this._realxhr, this, listener);
       this._listeners[name].push(listener);
       this._boundListeners[name].push(boundListener);
-      if (!_.contains(['readystatechange', 'load', 'error', 'loadend'], name)) {
+      if (!_.includes(['readystatechange', 'load', 'error', 'loadend'], name)) {
         // certain listeners are called manually so that the final
         // call (when readyState==4) can be delayed.
         this._realxhr.addEventListener(name, boundListener, false);

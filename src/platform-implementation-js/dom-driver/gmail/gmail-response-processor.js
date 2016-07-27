@@ -350,7 +350,7 @@ export function readDraftId(response: string, messageID: string): ?string {
     .flatten()
     .filter(x => x[0] === 'ms' && x[1] === messageID)
     .map(x => x[60])
-    .first()
+    .head()
     .value();
   if (msgA) {
     return msgA.split(':')[1];
