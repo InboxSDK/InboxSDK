@@ -50,9 +50,12 @@ class Conversations {
 		_setupViewDriverWatcher(
 			appId,
 			driver.getMessageViewDriverStream().flatMap(messageViewDriver =>
-				messageViewDriver.getEventStream()
-					.filter(event => event.eventName === 'messageLoad')
-					.map(event => event.view)
+				messageViewDriver.isLoaded() ?
+					Kefir.constant(messageViewDriver) :
+					messageViewDriver.getEventStream()
+						.filter(event => event.eventName === 'messageLoad')
+						.map(() => messageViewDriver)
+						.take(1)
 			),
 			MessageView,
 			members.messageViewHandlerRegistries.loaded,
@@ -79,21 +82,18 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
 		var view = membraneMap.get(viewDriver);
 		if (!view) {
-			view = new ViewClass(viewDriver, appId, membraneMap, ConversationsInstance, driver);
+			view = new ViewClass((viewDriver:any), appId, membraneMap, ConversationsInstance, driver);
 			membraneMap.set(viewDriver, view);
 		}
-
-		return {
-			viewDriver: viewDriver,
-			view: view
-		};
+		return {viewDriver, view};
 	});
 
-	combinedStream.flatMap(function(event) {
-		return Kefir.later(0)
+	// A delay is currently necessary so that ThreadView can wait for its MessageViews.
+	combinedStream.flatMap(event =>
+		event.viewDriver.getReadyStream()
+			.map(() => event)
 			.takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
-			.map(() => event);
-	}).onValue(function(event) {
+	).onValue(function(event) {
 		handlerRegistry.addTarget(event.view);
 	});
 }

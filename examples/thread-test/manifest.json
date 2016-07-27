@@ -1,0 +1,24 @@
+{
+  "name": "Thread Example Extension",
+  "description": "Test Thread and Message views",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*"
+      ],
+      "css": [],
+      "js": ["inboxsdk.js", "content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "https://mail.google.com/",
+    "https://inbox.google.com/"
+  ],
+  "web_accessible_resources": [
+    "inboxsdk.js.map"
+  ],
+  "manifest_version": 2
+}

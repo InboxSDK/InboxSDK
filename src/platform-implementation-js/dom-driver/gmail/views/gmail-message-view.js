@@ -14,6 +14,7 @@ import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
 
+import delayAsap from '../../../lib/delay-asap';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -24,7 +25,7 @@ import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
 import type GmailToolbarView from './gmail-toolbar-view';
 
-import type {VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
+import type {MessageViewDriver, VIEW_STATE} from '../../../driver-interfaces/message-view-driver';
 
 let hasSeenOldElement = false;
 
@@ -63,9 +64,7 @@ class GmailMessageView {
 		this._setupMessageStateStream();
 		this._monitorEmailAddressHovering();
 		this._setupMoreMenuWatching();
-		asap(() => {
-			this._processInitialState();
-		});
+		this._processInitialState();
 	}
 
 	destroy() {
@@ -78,7 +77,7 @@ class GmailMessageView {
 		});
 	}
 
-	getEventStream(): Kefir.Bus {
+	getEventStream(): Kefir.Stream {
 		return this._eventStream;
 	}
 
@@ -106,23 +105,8 @@ class GmailMessageView {
 		return this._element.querySelector('.adP');
 	}
 
-	getLinks(): Array<{text: string, html: string, href: string, element: HTMLElement, isInQuotedArea: boolean}> {
-		var anchors = this.getContentsElement().querySelectorAll('a');
-
-		var self = this;
-		return _.map(anchors, function(anchor){
-			return {
-				text: anchor.textContent,
-				html: anchor.innerHTML,
-				href: anchor.href,
-				element: anchor,
-				isInQuotedArea: self.isElementInQuotedArea(anchor)
-			};
-		});
-	}
-
 	isElementInQuotedArea(element: HTMLElement): boolean {
-		return $(element).parents('blockquote').length > 0;
+		return $(element).closest('blockquote').length > 0;
 	}
 
 	getSender(): Contact {
@@ -311,16 +295,17 @@ class GmailMessageView {
 		}
 	}
 
-	getMessageID(): ?string {
-		if(!this._messageLoaded){
+	getMessageID(ignoreLoadStatus=false): string {
+		if(!ignoreLoadStatus && !this._messageLoaded){
 			throw new Error('tried to get message id before message is loaded');
 		}
 		const messageEl = this._element.querySelector("div.ii.gt");
 		if (!messageEl) {
-			this._driver.getLogger().error(new Error("Could not find message id element"), {
+			const err = new Error("Could not find message id element");
+			this._driver.getLogger().error(err, {
 				elementHtml: censorHTMLtree(this._element)
 			});
-			return null;
+			throw err;
 		}
 
 		let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
@@ -334,19 +319,21 @@ class GmailMessageView {
 		else{
 			const messageElChild = messageEl.firstElementChild;
 			if(!messageElChild){
-				this._driver.getLogger().error(new Error("Could not find message id value"), {
+				const err = new Error("Could not find message id value");
+				this._driver.getLogger().error(err, {
 					reason: "Could not find element",
 					messageHtml: censorHTMLtree(messageEl)
 				});
-				return null;
+				throw err;
 			}
 			const m = messageElChild.className.match(/\bm([0-9a-f]+)\b/);
 			if (!m) {
-				this._driver.getLogger().error(new Error("Could not find message id value"), {
+				const err = new Error("Could not find message id value");
+				this._driver.getLogger().error(err, {
 					reason: "Element was missing message className",
 					messageHtml: censorHTMLtree(messageEl)
 				});
-				return null;
+				throw err;
 			}
 			return m[1];
 		}
@@ -486,11 +473,7 @@ class GmailMessageView {
 					newValue = 'EXPANDED';
 				}
 
-				return {
-					oldValue: oldValue,
-					newValue: newValue,
-					currentClassList: currentClassList
-				};
+				return {oldValue, newValue, currentClassList};
 			})
 			.map(function(event){
 				if(event.newValue === 'EXPANDED' && event.oldValue !== 'EXPANDED'){
@@ -525,20 +508,22 @@ class GmailMessageView {
 			return;
 		}
 
-		this._messageLoaded = true;
-
-		const messageId = this.getMessageID();
-		if(messageId == null){
+		let messageId;
+		try {
+		 	messageId = this.getMessageID(true);
+		} catch(err) {
+			this._driver.getLogger().error(err);
 			return;
 		}
+
+		this._messageLoaded = true;
 
 		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), messageId);
 		this._gmailAttachmentAreaView = this._getAttachmentArea();
 
 		this._eventStream.emit({
 			type: 'internal',
-			eventName: 'messageLoad',
-			view: this
+			eventName: 'messageLoad'
 		});
 
 		this._setupReplyStream();
@@ -560,8 +545,8 @@ class GmailMessageView {
 				attributes: true, attributeFilter: ['class']
 			}
 		)
+		.merge(delayAsap())
 		.takeUntilBy(this._stopper)
-		.toProperty(() => null)
 		.beforeEnd(() => 'END')
 		.onValue(mutation => {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
@@ -655,6 +640,9 @@ class GmailMessageView {
 		return getUpdatedContact(inContact, this._element);
 	}
 
+	getReadyStream() {
+		return Kefir.constant(null);
+	}
 }
 
 function _extractContactInformation(span){
@@ -665,3 +653,9 @@ function _extractContactInformation(span){
 }
 
 export default defn(module, GmailMessageView);
+
+// This function does not get executed. It's only checked by Flow to make sure
+// this class successfully implements the type interface.
+function __interfaceCheck() {
+	const test: MessageViewDriver = new GmailMessageView(({}:any), ({}:any), ({}:any));
+}

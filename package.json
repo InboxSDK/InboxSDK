@@ -22,6 +22,7 @@
     "babel-preset-stage-1": "^6.5.0",
     "babel-register": "^6.9.0",
     "babelify": "^7.3.0",
+    "bignumber.js": "^2.4.0",
     "brfs": "^1.4.1",
     "browserify": "^13.0.0",
     "co": "^4.6.0",

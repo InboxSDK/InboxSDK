@@ -9,6 +9,7 @@ import Kefir from 'kefir';
 import {parse} from 'querystring';
 import kefirBus from 'kefir-bus';
 
+import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
@@ -223,6 +224,10 @@ class GmailThreadView {
 			eventName: 'messageCreated',
 			view: messageView
 		});
+	}
+
+	getReadyStream() {
+		return delayAsap(null);
 	}
 }
 

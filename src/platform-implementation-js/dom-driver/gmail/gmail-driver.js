@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
@@ -16,7 +15,6 @@ import showAppIdWarning from './gmail-driver/show-app-id-warning';
 
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
-import GmailThreadView from './views/gmail-thread-view';
 import GmailBackdrop from './views/gmail-backdrop';
 import type GmailThreadRowView from './views/gmail-thread-row-view';
 import type GmailAppToolbarButtonView from './views/gmail-app-toolbar-button-view';
@@ -63,6 +61,8 @@ import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
+import type GmailMessageView from './views/gmail-message-view';
+import type GmailThreadView from './views/gmail-thread-view';
 import type {EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
@@ -87,11 +87,11 @@ class GmailDriver {
 	_routeViewDriverStream: Kefir.Stream<Object>;
 	_rowListViewDriverStream: Kefir.Stream<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Stream<Object>;
-	_threadViewDriverStream: Kefir.Stream<Object>;
+	_threadViewDriverStream: Kefir.Stream<GmailThreadView>;
 	_toolbarViewDriverStream: Kefir.Stream<Object>;
 	_composeViewDriverStream: Kefir.Stream<GmailComposeView>;
 	_xhrInterceptorStream: Kefir.Stream<Object>;
-	_messageViewDriverStream: Kefir.Stream<Object>;
+	_messageViewDriverStream: Kefir.Stream<GmailMessageView>;
 	_stopper: Kefir.Stopper;
 	_navMarkerHiddenChanged: Kefir.Stream&Object;
 	_userInfo: UserInfo;
@@ -159,14 +159,14 @@ class GmailDriver {
 	getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
 	getCustomListRouteIDs(): Map<string, Function> {return this._customListRouteIDs;}
 	getKeyboardShortcutHelpModifier(): KeyboardShortcutHelpModifier {return this._keyboardShortcutHelpModifier;}
-	getRouteViewDriverStream(): Kefir.Stream<Object> {return this._routeViewDriverStream;}
-	getRowListViewDriverStream(): Kefir.Stream<Object> {return this._rowListViewDriverStream;}
-	getThreadRowViewDriverStream(): Kefir.Stream<Object> {return this._threadRowViewDriverKefirStream;}
-	getThreadViewDriverStream(): Kefir.Stream<Object> {return this._threadViewDriverStream;}
-	getToolbarViewDriverStream(): Kefir.Stream<Object> {return this._toolbarViewDriverStream;}
-	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver> {return (this._composeViewDriverStream:any);}
+	getRouteViewDriverStream() {return this._routeViewDriverStream;}
+	getRowListViewDriverStream() {return this._rowListViewDriverStream;}
+	getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
+	getThreadViewDriverStream() {return this._threadViewDriverStream;}
+	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
+	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}
-	getMessageViewDriverStream(): Kefir.Stream<Object> {return this._messageViewDriverStream;}
+	getMessageViewDriverStream() {return this._messageViewDriverStream;}
 	getStopper(): Kefir.Stream {return this._stopper;}
 	getEnvData(): EnvData {return this._envData;}
 

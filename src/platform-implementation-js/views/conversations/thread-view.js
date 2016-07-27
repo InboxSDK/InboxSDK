@@ -10,7 +10,7 @@ import Logger from '../../lib/logger';
 import ContentPanelView from '../content-panel-view';
 
 import type MessageView from './message-view';
-import type GmailThreadView from '../../dom-driver/gmail/views/gmail-thread-view';
+import type {ThreadViewDriver} from '../../driver-interfaces/driver';
 
 const memberMap = defonce(module, () => new WeakMap());
 
@@ -18,7 +18,7 @@ const memberMap = defonce(module, () => new WeakMap());
 class ThreadView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(threadViewImplementation: GmailThreadView, appId: string, membraneMap: WeakMap) {
+	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membraneMap: WeakMap) {
 		super();
 
 		const members = {threadViewImplementation, appId, membraneMap};
