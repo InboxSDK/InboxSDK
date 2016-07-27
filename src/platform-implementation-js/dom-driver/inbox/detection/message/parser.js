@@ -18,22 +18,34 @@ export default function parser(el: HTMLElement) {
 
   const heading = ec.run(
     'heading',
-    () => el.querySelector('div[role=heading]')
+    () => {
+      const heading = el.querySelector('div[role=heading]');
+      if (!heading) throw new Error('failed to find heading');
+      return heading;
+    }
   );
 
-  const body = ec.run(
-    'body',
-    () => el.querySelector('div[role=heading] ~ div:not(:empty)')
+  // Super-collapsed/HIDDEN messages don't have a body.
+  const body: ?HTMLElement = el.querySelector('div[role=heading] ~ div:not(:empty)');
+
+  const sender = (!heading || !body) ? null : ec.run(
+    'sender',
+    () => querySelectorOne(heading, '[email]:first-child')
   );
 
+  // The last message in a thread is always loaded and doesn't have the toggle
+  // collapse button.
   const toggleCollapse: ?HTMLElement = el.querySelector('div[jsaction$=".message_toggle_collapse"]');
 
   const loaded = body != null &&
     (toggleCollapse == null || toggleCollapse.getAttribute('role') === 'heading');
 
+  const viewState = loaded ? 'EXPANDED' : body != null ? 'COLLAPSED' : 'HIDDEN';
+
   const elements = {
     heading,
     body,
+    sender,
     toggleCollapse
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
@@ -41,6 +53,7 @@ export default function parser(el: HTMLElement) {
     elements,
     attributes: {
       loaded,
+      viewState,
       messageId
     },
     score,

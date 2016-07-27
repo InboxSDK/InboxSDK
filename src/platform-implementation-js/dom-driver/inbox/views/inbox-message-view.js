@@ -73,11 +73,11 @@ class InboxMessageView {
         eventName: 'messageLoad'
       });
     }
-    if (oldParsed.attributes.loaded !== this._p.attributes.loaded) {
+    if (oldParsed.attributes.viewState !== this._p.attributes.viewState) {
       this._eventStream.emit({
         eventName: 'viewStateChange',
-        oldValue: this.getViewState(oldParsed),
-        newValue: this.getViewState()
+        oldValue: oldParsed.attributes.viewState,
+        newValue: this._p.attributes.viewState
       });
     }
   }
@@ -136,9 +136,8 @@ class InboxMessageView {
   addButtonToDownloadAllArea(options: Object): void {
     throw new Error('not implemented yet');
   }
-  getViewState(p: ?Parsed): VIEW_STATE {
-    if (!p) p = this._p;
-    return p.attributes.loaded ? 'EXPANDED' : 'COLLAPSED';
+  getViewState(): VIEW_STATE {
+    return this._p.attributes.viewState;
   }
   getDateString(): string {
     throw new Error('not implemented yet');
