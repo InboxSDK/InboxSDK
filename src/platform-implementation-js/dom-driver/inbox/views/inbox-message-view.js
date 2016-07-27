@@ -6,6 +6,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
+import type InboxThreadView from './inbox-thread-view';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import findParent from '../../../lib/dom/find-parent';
@@ -22,6 +23,7 @@ class InboxMessageView {
   _p: Parsed;
   _stopper: Kefir.Stream;
   _eventStream: Kefir.Bus = kefirBus();
+  _threadViewDriver: ?InboxThreadView;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -54,6 +56,18 @@ class InboxMessageView {
       .onValue(() => {
         this._reparse();
       });
+
+    this._threadViewDriver = this._findThreadView();
+    if (this._threadViewDriver) {
+      this._threadViewDriver.addMessageViewDriver(this);
+    }
+  }
+
+  _findThreadView(): ?InboxThreadView {
+    const map = this._driver.getThreadViewElementsMap();
+    const threadViewElement = findParent(this._element, el => map.has((el:any)));
+    if (!threadViewElement) return null;
+    return map.get(threadViewElement);
   }
 
   _reparse() {
@@ -169,7 +183,8 @@ class InboxMessageView {
   }
 
   getThreadViewDriver() {
-    throw new Error('not implemented yet');
+    if (!this._threadViewDriver) throw new Error('failed to find threadView');
+    return this._threadViewDriver;
   }
 
   destroy() {

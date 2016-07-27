@@ -4,6 +4,7 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type InboxDriver from '../inbox-driver';
+import type InboxMessageView from './inbox-message-view';
 import type {Parsed} from '../detection/thread/parser';
 
 class InboxThreadView {
@@ -11,19 +12,34 @@ class InboxThreadView {
   _driver: InboxDriver;
   _p: Parsed;
   _eventStream: Kefir.Bus = kefirBus();
+  _messageViews: InboxMessageView[] = [];
+  _stopper: Kefir.Stream;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
     this._driver = driver;
     this._p = parsed;
+
+    this._stopper = this._eventStream.filter(()=>false).beforeEnd(()=>null);
+
+    this._driver.getThreadViewElementsMap().set(this._element, this);
   }
 
   getEventStream(): Kefir.Stream {
     return this._eventStream;
   }
 
-  getMessageViewDrivers(): any {
-    return [];
+  addMessageViewDriver(messageView: InboxMessageView) {
+    this._messageViews.push(messageView);
+    messageView.getStopper()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._messageViews = this._messageViews.filter(m => m !== messageView);
+      });
+  }
+
+  getMessageViewDrivers() {
+    return this._messageViews;
   }
 
   getSubject(): string {
@@ -45,6 +61,7 @@ class InboxThreadView {
   }
 
   destroy() {
+    this._driver.getThreadViewElementsMap().delete(this._element);
     this._eventStream.end();
   }
 }

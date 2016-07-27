@@ -47,6 +47,7 @@ class InboxDriver {
   _rowListViewDriverStream: Kefir.Stream;
   _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
   _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
+  _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
   _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
   _threadRowViewDriverKefirStream: Kefir.Stream;
   _toolbarViewDriverStream: Kefir.Stream;
@@ -176,6 +177,8 @@ class InboxDriver {
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
   getPageCommunicator(): InboxPageCommunicator {return this._pageCommunicator;}
+
+  getThreadViewElementsMap() {return this._threadViewElements;}
 
   openComposeWindow(): void {
     throw new Error("Not implemented");
