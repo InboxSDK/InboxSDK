@@ -8,6 +8,7 @@ import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import findParent from '../../../lib/dom/find-parent';
 import parser from '../detection/message/parser';
 import type {Parsed} from '../detection/message/parser';
 import type {
@@ -114,7 +115,8 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   isElementInQuotedArea(el: HTMLElement): boolean {
-    throw new Error('not implemented yet');
+    const quotedArea = findParent(el, el => el.classList.contains('gmail_extra'));
+    return quotedArea != null;
   }
   addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void {
     throw new Error('not implemented yet');

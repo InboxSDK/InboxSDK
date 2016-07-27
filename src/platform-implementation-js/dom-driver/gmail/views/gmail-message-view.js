@@ -121,7 +121,7 @@ class GmailMessageView {
 	}
 
 	isElementInQuotedArea(element: HTMLElement): boolean {
-		return $(element).parents('blockquote').length > 0;
+		return $(element).closest('blockquote').length > 0;
 	}
 
 	getSender(): Contact {
