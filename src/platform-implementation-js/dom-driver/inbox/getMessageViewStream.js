@@ -24,7 +24,8 @@ function imp(driver: InboxDriver) {
     }
   }).flatMap(({el, removalStream, parsed}) => {
     // If the InboxMessageView is destroyed before the removalStream fires,
-    // then make a new InboxMessageView out of the same element.
+    // then make a new InboxMessageView out of the same element. Inbox re-uses
+    // elements for different messages in some cases.
     return Kefir.repeat(i => {
       if (i !== 0) {
         parsed = parser(el);
@@ -42,6 +43,8 @@ function imp(driver: InboxDriver) {
       });
       return Kefir.constant(view)
         .merge(view.getStopper().filter(()=>false));
+        // Keep the stream open until the view is destroyed so the Kefir.repeat
+        // callback doesn't re-run until then.
     }).takeUntilBy(removalStream);
   });
 }
