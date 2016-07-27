@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 import cachebustUrl from './cachebust-url';
-import zipObject from 'lodash/array/zipObject';
+import zipObject from 'lodash/zipObject';
 
 const URLS = [
   'https://mailfoogae.appspot.com/build/images/composeOverflowToggle.png',

@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 import jsdomDoc from './lib/jsdom-doc';
 import delay from '../src/common/delay';
 

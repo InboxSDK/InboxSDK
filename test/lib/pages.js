@@ -1,7 +1,7 @@
 /* @flow */
 
 import fs from 'fs';
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 import jsdomDoc from './jsdom-doc';
 
 export const page20160614: () => Document = once(() =>

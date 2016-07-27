@@ -7,7 +7,7 @@ import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
 import getSessionId from './get-session-id';
 import {BUILD_VERSION} from './version';
-import isObject from 'lodash/lang/isObject';
+import isObject from 'lodash/isObject';
 
 export type LogErrorContext = {
   appId?: ?string;

@@ -2,7 +2,7 @@
 
 import MockMutationObserver from './mock-mutation-observer';
 import jsdomDoc from './jsdom-doc';
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 
 const docCb = once(() => jsdomDoc(''));
 

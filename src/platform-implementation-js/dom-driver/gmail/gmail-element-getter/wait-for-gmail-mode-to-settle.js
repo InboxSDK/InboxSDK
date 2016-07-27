@@ -1,6 +1,6 @@
 /* @flow */
 
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
