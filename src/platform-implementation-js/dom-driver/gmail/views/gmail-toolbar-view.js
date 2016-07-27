@@ -49,10 +49,14 @@ class GmailToolbarView {
 		this._buttonViewControllers = [];
 		this._moreMenuItems = [];
 
-		this._ready = streamWaitFor(() => !!this._getMoveSectionElement())
-			.takeUntilBy(this._stopper)
-			.map(() => this)
-			.toProperty();
+		if (this._getMoveSectionElement()) {
+			this._ready = Kefir.constant(this);
+		} else {
+			this._ready = streamWaitFor(() => !!this._getMoveSectionElement())
+				.takeUntilBy(this._stopper)
+				.map(() => this)
+				.toProperty();
+		}
 
 		this._ready.onValue(() => {
 			this._startMonitoringMoreMenu();
