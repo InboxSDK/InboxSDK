@@ -15,6 +15,7 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 import {
   page20160614,
   pageFullscreen20160620,
+  page20160727
 } from './lib/pages';
 
 describe('Inbox Thread Detection', function() {
@@ -39,6 +40,14 @@ describe('Inbox Thread Detection', function() {
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, thread));
     });
+
+    it('2016-07-27 search', function() {
+      const thread = page20160727().querySelector('[data-test-id=openthread]');
+
+      const results = finder(page20160727());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, thread));
+    });
   });
 
   describe('parser', function() {
@@ -58,6 +67,15 @@ describe('Inbox Thread Detection', function() {
       assert.strictEqual(results.score, 1);
       assert(results.attributes.inBundle);
       assert.strictEqual(results.attributes.threadId, '150058a7ecc2fea4');
+    });
+
+    it('2016-07-27 search', function() {
+      const thread = page20160727().querySelector('[data-test-id=openthread]');
+      const results = parser(thread);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.inBundle);
+      assert.strictEqual(results.attributes.threadId, '15017c99e43c97be');
     });
   });
 
@@ -82,6 +100,21 @@ describe('Inbox Thread Detection', function() {
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160620())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, thread));
+          cb();
+        });
+    });
+
+    it('2016-07-27 search', function(cb) {
+      const thread = page20160727().querySelector('[data-test-id=openthread]');
+
+      const spy = sinon.spy();
+      watcher(page20160727())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
