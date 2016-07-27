@@ -640,6 +640,9 @@ class GmailMessageView {
 		return getUpdatedContact(inContact, this._element);
 	}
 
+	getReadyStream() {
+		return Kefir.constant(null);
+	}
 }
 
 function _extractContactInformation(span){

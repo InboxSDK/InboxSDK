@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import delayAsap from '../lib/delay-asap';
 
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
@@ -91,7 +90,8 @@ function _setupViewDriverWatcher(appId, stream, ViewClass, handlerRegistry, Conv
 
 	// A delay is currently necessary so that ThreadView can wait for its MessageViews.
 	combinedStream.flatMap(event =>
-		delayAsap(event)
+		event.viewDriver.getReadyStream()
+			.map(() => event)
 			.takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
 	).onValue(function(event) {
 		handlerRegistry.addTarget(event.view);

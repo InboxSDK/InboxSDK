@@ -187,6 +187,10 @@ class InboxMessageView {
     return this._threadViewDriver;
   }
 
+  getReadyStream() {
+    return Kefir.constant(null);
+  }
+
   destroy() {
     this._eventStream.end();
   }

@@ -3,6 +3,8 @@
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
+import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type {Parsed} from '../detection/thread/parser';
@@ -13,6 +15,7 @@ class InboxThreadView {
   _p: Parsed;
   _eventStream: Kefir.Bus = kefirBus();
   _messageViews: InboxMessageView[] = [];
+  _receivedMessageView = kefirStopper();
   _stopper: Kefir.Stream;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
@@ -36,6 +39,7 @@ class InboxThreadView {
       .onValue(() => {
         this._messageViews = this._messageViews.filter(m => m !== messageView);
       });
+    this._receivedMessageView.destroy();
   }
 
   getMessageViewDrivers() {
@@ -58,6 +62,10 @@ class InboxThreadView {
 
   addSidebarContentPanel(descriptor: any, appId: string) {
     throw new Error('not implemented');
+  }
+
+  getReadyStream() {
+    return this._receivedMessageView.flatMap(() => delayAsap());
   }
 
   destroy() {

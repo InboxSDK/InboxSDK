@@ -35,6 +35,7 @@ export type MessageViewDriver = {
 	getViewState(): VIEW_STATE;
 	getDateString(): string;
 	getSender(): Contact;
+	getReadyStream(): Kefir.Stream;
 	getRecipients(): Array<Contact>;
 	getThreadViewDriver(): Object;
 	isLoaded(): boolean;
