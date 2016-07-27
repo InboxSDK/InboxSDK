@@ -33,6 +33,10 @@ export default function parser(el: HTMLElement) {
     () => querySelectorOne(heading, '[email]:first-child')
   );
 
+  const recipientElements = el.querySelectorAll(
+    '[role=heading] [email]:not(:first-child), [role=heading] + div [email]'
+  );
+
   // The last message in a thread is always loaded and doesn't have the toggle
   // collapse button.
   const toggleCollapse: ?HTMLElement = el.querySelector('div[jsaction$=".message_toggle_collapse"]');
@@ -54,7 +58,8 @@ export default function parser(el: HTMLElement) {
     attributes: {
       loaded,
       viewState,
-      messageId
+      messageId,
+      recipientElements
     },
     score,
     errors: ec.getErrorLogs()

@@ -143,10 +143,29 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   getSender(): Contact {
-    throw new Error('not implemented yet');
+    const {sender} = this._p.elements;
+    if (!sender)
+      throw new Error('could not find sender element');
+    return {
+      emailAddress: sender.getAttribute('email'),
+      name: sender.textContent
+    };
   }
   getRecipients(): Array<Contact> {
-    throw new Error('not implemented yet');
+    const userContact = this._driver.getUserContact();
+    return Array.prototype.map.call(
+      this._p.attributes.recipientElements,
+      el => {
+        const emailAddress = el.getAttribute('email');
+        if (emailAddress === userContact.emailAddress) {
+          return userContact;
+        }
+        return {
+          emailAddress,
+          name: el.textContent
+        };
+      }
+    );
   }
 
   getThreadViewDriver() {
