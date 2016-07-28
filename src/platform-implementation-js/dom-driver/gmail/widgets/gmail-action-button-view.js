@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import isEqual from 'lodash/lang/isEqual';
+import isEqual from 'lodash/isEqual';
 
 class GmailActionButtonView {
 	_element: HTMLElement;

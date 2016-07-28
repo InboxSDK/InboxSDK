@@ -11,6 +11,12 @@ import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
 export type Backdrop = GmailBackdrop|InboxBackdrop;
 
+import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
+import type InboxThreadView from '../dom-driver/inbox/views/inbox-thread-view';
+export type ThreadViewDriver = GmailThreadView|InboxThreadView;
+
+import type {MessageViewDriver} from './message-view-driver';
+
 export type DrawerViewOptions = {
 	el: HTMLElement;
 	title?: string;
@@ -29,8 +35,8 @@ export type Driver = {
 	openComposeWindow(): void;
 	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver>;
 	openDraftByMessageID(messageID: string): void;
-	getThreadViewDriverStream(): Kefir.Stream<Object>;
-	getMessageViewDriverStream(): Kefir.Stream<Object>;
+	getThreadViewDriverStream(): Kefir.Stream<ThreadViewDriver>;
+	getMessageViewDriverStream(): Kefir.Stream<MessageViewDriver>;
 	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;

@@ -13,7 +13,7 @@ export default function assertInterface(object, interface_) {
   // }
   if (process.env.NODE_ENV !== 'production') {
     var name, value;
-    for ([name, value] of _.pairs(interface_)) {
+    for ([name, value] of _.toPairs(interface_)) {
       assert.strictEqual(typeof object[name], 'function',
         `check object has ${name} method`);
       if (value) {

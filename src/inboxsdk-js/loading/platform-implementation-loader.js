@@ -1,7 +1,7 @@
 /* @flow */
 //jshint ignore:start
 
-const once = require('lodash/function/once');
+const once = require('lodash/once');
 import loadScript from '../../common/load-script';
 
 import type {PlatformImplementation} from '../../platform-implementation-js/platform-implementation';

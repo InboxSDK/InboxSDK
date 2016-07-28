@@ -27,7 +27,7 @@ export default function getURLObject(url: string): URLObject {
 	return {
 		name: decodeURIComponent(hashParts[0]),
 		params: _.chain(hashParts)
-			.rest()
+			.tail()
 			.map(part => part.replace(/\+/g, ' '))
 			.map(decodeURIComponent)
 			.value(),

@@ -2,14 +2,14 @@
 
 import MockMutationObserver from './mock-mutation-observer';
 import jsdomDoc from './jsdom-doc';
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 
 const docCb = once(() => jsdomDoc(''));
 
 function addHtmlClasses() {
   const names = [];
   const doc = docCb();
-  Object.keys(doc.defaultView).filter(x => x.startsWith('HTML')).forEach(name => {
+  Object.getOwnPropertyNames(doc.defaultView).filter(x => x.startsWith('HTML')).forEach(name => {
     global[name] = doc.defaultView[name];
     names.push(name);
   });

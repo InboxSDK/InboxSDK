@@ -1,8 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-const once = require('lodash/function/once');
-const defer = require('lodash/function/defer');
+const once = require('lodash/once');
+const defer = require('lodash/defer');
 import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';

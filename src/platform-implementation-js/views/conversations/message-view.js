@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
+import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import AttachmentCardView from './attachment-card-view';
@@ -106,7 +107,14 @@ class MessageView extends EventEmitter {
 	}
 
 	getLinksInBody(): Array<MessageViewLinkDescriptor> {
-		return memberMap.get(this).messageViewImplementation.getLinks();
+		const anchors = this.getBodyElement().querySelectorAll('a');
+		return _.map(anchors, anchor => ({
+			text: anchor.textContent,
+			html: anchor.innerHTML,
+			href: anchor.href,
+			element: anchor,
+			isInQuotedArea: this.isElementInQuotedArea(anchor)
+		}));
 	}
 
 	getSender(): Contact {
@@ -136,6 +144,7 @@ class MessageView extends EventEmitter {
 	}
 
 	hasOpenReply(): boolean {
+		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
 		return memberMap.get(this).messageViewImplementation.hasOpenReply();
 	}
 }
@@ -162,15 +171,19 @@ function _bindToEventStream(messageView, members, stream){
 			});
 		});
 
-	stream
-		.filter(function(event){
-			return event.eventName === 'messageLoad';
-		})
-		.onValue(function(event){
-			messageView.emit('load', {
-				messageView: messageView
-			});
+	if (messageView.isLoaded()) {
+		asap(() => {
+			messageView.emit('load', {messageView});
 		});
+	} else {
+		stream
+			.filter(event => event.eventName === 'messageLoad')
+			.onValue(event => {
+				messageView.emit('load', {
+					messageView: messageView
+				});
+			});
+	}
 
 	stream
 		.filter(function(event){
