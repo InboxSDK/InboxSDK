@@ -468,7 +468,9 @@ if (_extensionIsLoggerMaster && global.document) {
         })
       });
     })().catch(err => {
-      console.error("Failed to log event", err);
+      Logger.error(err, {
+        type: 'Failed to log events'
+      });
     });
   });
 }
