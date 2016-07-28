@@ -462,13 +462,20 @@ if (_extensionIsLoggerMaster && global.document) {
           'Content-Type': 'application/json'
         },
         data: JSON.stringify({
-          "messages": events.map(event => ({
-            data: new Buffer(JSON.stringify(event)).toString('base64')
-          }))
+          messages: [
+            {
+              data: new Buffer(JSON.stringify({
+                data: events,
+                timestamp: Date.now()*1000
+              })).toString('base64')
+            }
+          ]
         })
       });
     })().catch(err => {
-      console.error("Failed to log event", err);
+      Logger.error(err, {
+        type: 'Failed to log events'
+      });
     });
   });
 }
