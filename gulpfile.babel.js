@@ -260,19 +260,18 @@ gulp.task('docs', function(cb) {
     ).then(files => {
       var classes = _.chain(files)
         .filter(Boolean)
-        .pluck('classes')
-        .flatten(true)
+        .map('classes')
+        .flattenDeep()
         .filter(isNonEmptyClass)
         .map(transformClass)
-        .forEach(checkForDocIssues)
-        .value();
+        .forEach(checkForDocIssues);
 
       var docsJson = {
         classes: _.chain(classes)
           .map(function(ele) {
             return [ele.name, ele];
           })
-          .object()
+          .fromPairs()
           .value()
       };
 
