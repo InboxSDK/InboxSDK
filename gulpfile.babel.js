@@ -264,7 +264,8 @@ gulp.task('docs', function(cb) {
         .flattenDeep()
         .filter(isNonEmptyClass)
         .map(transformClass)
-        .forEach(checkForDocIssues);
+        .forEach(checkForDocIssues)
+        .value();
 
       var docsJson = {
         classes: _.chain(classes)
