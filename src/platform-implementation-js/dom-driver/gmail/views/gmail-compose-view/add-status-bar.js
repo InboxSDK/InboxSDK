@@ -28,7 +28,7 @@ export default function addStatusBar(gmailComposeView: GmailComposeView, options
 			.filter(bar => bar.orderHint > orderHint)
 			.sortBy(bar => bar.orderHint)
 			.map(bar => bar.el)
-			.first()
+			.head()
 			.value();
 		statusArea.insertBefore(el, nextEl);
 

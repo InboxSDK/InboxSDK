@@ -28,7 +28,7 @@ function checkDependenciesRecursive(packagePath, shrinkWrap) {
     assert.strictEqual(packageObj.version, shrinkWrap.version);
   }
   _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
-    if (!_.contains(optionalDeps, depname)) {
+    if (!_.includes(optionalDeps, depname)) {
       checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
     }
   });

@@ -116,7 +116,7 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 		event = event || {};
 
 		if(toolbarViewDriver.getRowListViewDriver()){
-			_.merge(event, {
+			Object.assign(event, {
 				threadRowViews: _getThreadRowViews(toolbarViewDriver, membraneMap),
 				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membraneMap)
 			});

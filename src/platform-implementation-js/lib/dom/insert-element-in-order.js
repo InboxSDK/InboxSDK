@@ -26,7 +26,7 @@ export default function insertElementInOrder(container: HTMLElement, el: HTMLEle
       }
       return false;
     })
-    .first()
+    .head()
     .value();
 
   container.insertBefore(el, (insertBeforeElement:any));

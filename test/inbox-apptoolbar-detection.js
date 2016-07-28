@@ -5,7 +5,7 @@ import fs from 'fs';
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
-import once from 'lodash/function/once';
+import once from 'lodash/once';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 

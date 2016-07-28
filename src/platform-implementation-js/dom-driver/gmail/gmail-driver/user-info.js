@@ -57,7 +57,7 @@ export default class UserInfo {
           emailAddress: match[0]
         };
       });
-    return _.chain([main, extras]).flatten().uniq(x => x.emailAddress.toLowerCase()).value();
+    return _.chain([main, extras]).flatten().uniqBy(x => x.emailAddress.toLowerCase()).value();
   }
 
   waitForAccountSwitcherReady(): Promise<void> {
