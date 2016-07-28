@@ -463,10 +463,12 @@ if (_extensionIsLoggerMaster && global.document) {
         },
         data: JSON.stringify({
           messages: [
-            new Buffer(JSON.stringify({
-              data: events,
-              timestamp: Date.now()*1000
-            })).toString('base64')
+            {
+              data: new Buffer(JSON.stringify({
+                data: events,
+                timestamp: Date.now()*1000
+              })).toString('base64')
+            }
           ]
         })
       });
