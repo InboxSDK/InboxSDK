@@ -46,6 +46,11 @@ export default function parser(el: HTMLElement) {
 
   const viewState = loaded ? 'EXPANDED' : body != null ? 'COLLAPSED' : 'HIDDEN';
 
+  const attachmentsArea = !body ? null : ec.run(
+    'attachments area',
+    () => querySelectorOne(body, 'section:last-child')
+  );
+
   const elements = {
     heading,
     body,
