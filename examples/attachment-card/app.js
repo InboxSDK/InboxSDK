@@ -28,8 +28,9 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			title: 'Test image',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
-			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
-			failoverPreviewIconUrl: chrome.runtime.getURL('zipicon.png'),
+			previewThumbnailUrl: chrome.runtime.getURL('partycat2.jpg'),
+			failoverPreviewIconUrl: chrome.runtime.getURL('partycat.jpg'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
 			buttons: [
 				{
@@ -47,6 +48,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			description: 'Test description 2',
 			previewUrl: 'https://www.google.com',
 			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com'
@@ -61,6 +63,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			description: 'Test description icon',
 			previewUrl: 'https://www.google.com',
 			iconThumbnailUrl: chrome.runtime.getURL('zipicon.png'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com'
