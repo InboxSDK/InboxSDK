@@ -7,15 +7,15 @@ import RSVP from 'rsvp';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import type MessageView from './message-view';
-import type GmailAttachmentCardView from '../../dom-driver/gmail/views/gmail-attachment-card-view'
+import type {AttachmentCardViewDriver} from '../../driver-interfaces/driver';
 
 // documented in src/docs/
 class AttachmentCardView extends EventEmitter {
 	_messageView: MessageView;
-	_attachmentCardImplementation: GmailAttachmentCardView;
+	_attachmentCardImplementation: AttachmentCardViewDriver;
 	destroyed: boolean;
 
-	constructor(attachmentCardImplementation: GmailAttachmentCardView, messageView: MessageView) {
+	constructor(attachmentCardImplementation: AttachmentCardViewDriver, messageView: MessageView) {
 		super();
 		this.destroyed = false;
 		this._messageView = messageView;
