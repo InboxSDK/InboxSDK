@@ -43,7 +43,7 @@ class GmailAttachmentCardView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Bus {
+	getEventStream(): Kefir.Stream {
 		return this._eventStream;
 	}
 
