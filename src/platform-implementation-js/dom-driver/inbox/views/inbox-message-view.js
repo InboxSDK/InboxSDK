@@ -74,7 +74,7 @@ class InboxMessageView {
     const oldParsed = this._p;
     this._p = parser(this._element);
     if (this._p.errors.length > 0) {
-      this._driver.getLogger().errorSite(new Error(`message reparse errors`), {
+      this._driver.getLogger().errorSite(new Error('message reparse errors'), {
         score: this._p.score,
         errors: this._p.errors,
         html: censorHTMLtree(this._element)

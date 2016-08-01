@@ -1,5 +1,6 @@
 /* @flow */
 
+import _ from 'lodash';
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 import BigNumber from 'bignumber.js';
@@ -46,16 +47,23 @@ export default function parser(el: HTMLElement) {
 
   const viewState = loaded ? 'EXPANDED' : body != null ? 'COLLAPSED' : 'HIDDEN';
 
-  const attachmentsArea = !body ? null : ec.run(
+  const attachmentsArea: ?HTMLElement = (!body || viewState !== 'EXPANDED') ? null : ec.run(
     'attachments area',
-    () => querySelectorOne(body, 'section:last-child')
+    () => {
+      const lastChild = _.last(body.children);
+      if (!lastChild || lastChild.nodeName !== 'SECTION') {
+        throw new Error('element not found');
+      }
+      return lastChild;
+    }
   );
 
   const elements = {
     heading,
     body,
     sender,
-    toggleCollapse
+    toggleCollapse,
+    attachmentsArea
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

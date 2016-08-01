@@ -15,7 +15,7 @@ export default function parser(el: HTMLElement) {
 
   const threadId: ?string = ec.run(
     'thread id',
-    () => new BigNumber(/#gmail:thread-f:(\d+)/.exec(el.getAttribute('data-item-id'))[1]).toString(16)
+    () => new BigNumber(/#gmail:thread-[^:]+:(\d+)/.exec(el.getAttribute('data-item-id'))[1]).toString(16)
   );
 
   const heading = ec.run(
