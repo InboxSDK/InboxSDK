@@ -5,23 +5,6 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
-		messageView.addAttachmentIcon({
-			iconClass: 'eye_icon',
-			tooltip: '1thing'
-		});
-		messageView.addAttachmentIcon(Kefir.repeat(function() {
-			return Kefir.sequentially(2000, [
-				{
-					iconClass: 'eye_icon',
-					tooltip: '2thing',
-					onClick: alert.bind(window, 'foo')
-				},
-				{
-					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-					tooltip: '2blah blah'
-				}
-			]);
-		}));
 
 		messageView.addAttachmentCardView({
 
@@ -106,6 +89,23 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			}
 		});
 
+		messageView.addAttachmentIcon({
+			iconClass: 'eye_icon',
+			tooltip: '1thing'
+		});
+		messageView.addAttachmentIcon(Kefir.repeat(function() {
+			return Kefir.sequentially(2000, [
+				{
+					iconClass: 'eye_icon',
+					tooltip: '2thing',
+					onClick: alert.bind(window, 'foo')
+				},
+				{
+					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+					tooltip: '2blah blah'
+				}
+			]);
+		}));
 	});
 
 });
