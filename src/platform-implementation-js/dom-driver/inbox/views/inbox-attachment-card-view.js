@@ -26,7 +26,7 @@ class InboxAttachmentCardView {
           <div class="tx lT">
             <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}" class="i">
             <span style="display:none"></span>
-            <span class="l0">Sheets</span>
+            <span class="l0">${options.description || ''}</span>
           </div>
         </div>
       `;
