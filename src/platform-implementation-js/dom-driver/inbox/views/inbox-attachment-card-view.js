@@ -28,16 +28,42 @@ class InboxAttachmentCardView {
       }
       this._element.title = options.title;
       this._element.className = 'u2 k9';
-      this._element.innerHTML = autoHtml `
-        <div class="ga oY">
-          <div class="lT r6 tQ">${options.title}</div>
-          <div class="tx lT">
-            <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}" class="i">
-            <span style="display:none"></span>
-            <span class="l0">${options.description || ''}</span>
-          </div>
-        </div>
-      `;
+      const setupInnerHtml = options => {
+        if (options.previewThumbnailUrl) {
+          this._element.innerHTML = autoHtml `
+            <div class="cq" style="background-size: cover">
+              <img alt="" aria-hidden="true"
+                style="width: 100%"
+                src="${options.previewThumbnailUrl}"
+                >
+            </div>
+          `;
+          if (options.failoverPreviewIconUrl) {
+            Kefir.fromEvents(this._element.querySelector('img'), 'error')
+              .take(1)
+              .takeUntilBy(this._stopper)
+              .onValue(() => {
+                setupInnerHtml({
+                  ...options,
+                  previewThumbnailUrl: null,
+                  iconThumbnailUrl: options.failoverPreviewIconUrl
+                });
+              });
+          }
+        } else {
+          this._element.innerHTML = autoHtml `
+            <div class="ga oY">
+              <div class="lT r6 tQ">${options.title}</div>
+              <div class="tx lT">
+                <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}" class="i">
+                <span style="display:none"></span>
+                <span class="l0">${options.description || ''}</span>
+              </div>
+            </div>
+          `;
+        }
+      };
+      setupInnerHtml(options);
       this._previewClicks.plug(
         Kefir.merge([
           Kefir.fromEvents(this._element, 'click'),
