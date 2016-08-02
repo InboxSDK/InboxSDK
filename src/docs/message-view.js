@@ -313,7 +313,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 
 	/**
 	* An array of buttons to support functionality in addition to the preview functionality.
-	* @type {DownloadButtonDescriptor[]|CustomButtonDescriptor[]}
+	* @type {Array.<DownloadButtonDescriptor|CustomButtonDescriptor>}
 	*/
 	buttons:null,
 
