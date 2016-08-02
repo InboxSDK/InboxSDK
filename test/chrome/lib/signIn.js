@@ -16,6 +16,20 @@ export default function signIn() {
   browser.click('input#signIn');
   browser.waitForVisible('input[name=Pin]');
   browser.setValue('input[name=Pin]', googleTotp(authInfo['inboxsdktest@gmail.com'].twofactor));
+
+  const oldTitle = browser.getTitle();
   browser.click('input#submit');
+  browser.waitUntil(() => browser.getTitle() !== oldTitle);
+
+  // Deal with an interstitial page.
+  if (!browser.getTitle().startsWith('Inbox ')) {
+    const scrolldownBtn = browser.element('div[role=button][aria-label="Scroll to agree"] img[src*="_arrow_down_"]');
+    if (scrolldownBtn) {
+      scrolldownBtn.click();
+    }
+    browser.pause(500);
+    browser.click('div[role=button]:not([aria-label]):not([title])');
+  }
+
   browser.waitUntil(() => browser.getTitle().startsWith('Inbox '));
 }
