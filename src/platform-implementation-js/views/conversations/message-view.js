@@ -30,10 +30,6 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
-		return this.addAttachmentCardViewNoPreview({...cardOptions, iconThumbnailUrl: null});
-	}
-
-	addAttachmentCardViewNoPreview(cardOptions: Object): AttachmentCardView {
 		const attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
 		const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
 
@@ -47,6 +43,10 @@ class MessageView extends EventEmitter {
 		});
 
 		return attachmentCardView;
+	}
+
+	addAttachmentCardViewNoPreview(cardOptions) {
+		return this.addAttachmentCardView(cardOptions);
 	}
 
 	addAttachmentsToolbarButton(buttonOptions: Object){
