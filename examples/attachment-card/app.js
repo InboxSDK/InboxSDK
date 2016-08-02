@@ -16,12 +16,19 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
 			previewOnClick() {
-				alert('fooooo123');
+				alert('preview button clicked');
 			},
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com',
 					openInNewTab: true
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
 				}
 			]
 
