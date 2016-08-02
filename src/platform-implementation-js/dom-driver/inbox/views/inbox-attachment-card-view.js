@@ -10,6 +10,7 @@ import type InboxDriver from '../inbox-driver';
 
 class InboxAttachmentCardView {
   _stopper = kefirStopper();
+  _previewClicks = Kefir.pool();
   _element: HTMLElement;
   _driver: InboxDriver;
 
@@ -18,8 +19,13 @@ class InboxAttachmentCardView {
     if (options.element) {
       throw new Error('not implemented yet');
     } else {
-      this._element = document.createElement('div');
-      this._element.tabIndex = '0';
+      if (options.previewUrl) {
+        this._element = document.createElement('a');
+        this._element.href = options.previewUrl;
+      } else {
+        this._element = document.createElement('div');
+        this._element.tabIndex = '0';
+      }
       this._element.title = options.title;
       this._element.className = 'u2 k9';
       this._element.innerHTML = autoHtml `
@@ -32,13 +38,12 @@ class InboxAttachmentCardView {
           </div>
         </div>
       `;
-      Kefir.merge([
-        Kefir.fromEvents(this._element, 'click'),
-        Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
-      ]).onValue(event => {
-        event.preventDefault();
-        alert('foo');
-      });
+      this._previewClicks.plug(
+        Kefir.merge([
+          Kefir.fromEvents(this._element, 'click'),
+          Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+        ])
+      );
     }
   }
 
@@ -55,8 +60,7 @@ class InboxAttachmentCardView {
   }
 
   getPreviewClicks(): Kefir.Stream {
-    //TODO
-    return Kefir.never();
+    return this._previewClicks.takeUntilBy(this._stopper);
   }
 
   getAttachmentType(): string {
