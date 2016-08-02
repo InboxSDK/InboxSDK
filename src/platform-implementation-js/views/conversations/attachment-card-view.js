@@ -3,7 +3,6 @@
 import _ from 'lodash';
 import {defn} from 'ud';
 import util from 'util';
-import RSVP from 'rsvp';
 import EventEmitter from '../../lib/safe-event-emitter';
 
 import type MessageView from './message-view';
@@ -20,7 +19,7 @@ class AttachmentCardView extends EventEmitter {
 		this.destroyed = false;
 		this._messageView = messageView;
 		this._attachmentCardImplementation = attachmentCardImplementation;
-		this._attachmentCardImplementation.getEventStream().onEnd(() => {
+		this._attachmentCardImplementation.getStopper().onValue(() => {
 			this.destroyed = true;
 			this.emit('destroy');
 		});

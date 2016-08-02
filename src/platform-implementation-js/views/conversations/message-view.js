@@ -37,6 +37,15 @@ class MessageView extends EventEmitter {
 		const attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
 		const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
 
+		attachmentCardViewDriver.getPreviewClicks().onValue(e => {
+			if (cardOptions.previewOnClick) {
+				cardOptions.previewOnClick({
+					attachmentCardView: this,
+					preventDefault: () => e.preventDefault()
+				});
+			}
+		});
+
 		return attachmentCardView;
 	}
 

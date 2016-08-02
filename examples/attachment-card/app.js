@@ -15,6 +15,9 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			failoverPreviewIconUrl: chrome.runtime.getURL('partycat.jpg'),
 			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
+			previewOnClick() {
+				alert('fooooo123');
+			},
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com',

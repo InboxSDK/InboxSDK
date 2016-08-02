@@ -1,13 +1,15 @@
 /* @flow */
 
+import _ from 'lodash';
 import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 import type InboxDriver from '../inbox-driver';
 
 class InboxAttachmentCardView {
-  _bus: Kefir.Bus = kefirBus();
+  _stopper = kefirStopper();
   _element: HTMLElement;
   _driver: InboxDriver;
 
@@ -30,19 +32,31 @@ class InboxAttachmentCardView {
           </div>
         </div>
       `;
+      Kefir.merge([
+        Kefir.fromEvents(this._element, 'click'),
+        Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+      ]).onValue(event => {
+        event.preventDefault();
+        alert('foo');
+      });
     }
   }
 
   destroy() {
-    this._bus.end();
+    this._stopper.destroy();
   }
 
   getElement() {
     return this._element;
   }
 
-  getEventStream(): Kefir.Stream {
-    return this._bus;
+  getStopper(): Kefir.Stream {
+    return this._stopper;
+  }
+
+  getPreviewClicks(): Kefir.Stream {
+    //TODO
+    return Kefir.never();
   }
 
   getAttachmentType(): string {

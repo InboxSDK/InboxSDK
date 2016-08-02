@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
@@ -21,10 +21,10 @@ class GmailAttachmentCardView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
 	_cachedType: any;
-	_eventStream: Kefir.Bus;
+	_stopper: Kefir.Stream&{destroy():void} = kefirStopper();
+	_previewClicks = Kefir.pool();
 
 	constructor(options: Object, driver: GmailDriver) {
-		this._eventStream = kefirBus();
 		this._driver = driver;
 
 		if(options.element){
@@ -36,15 +36,19 @@ class GmailAttachmentCardView {
 	}
 
 	destroy() {
-		this._eventStream.end();
+		this._stopper.destroy();
 	}
 
 	getElement(): HTMLElement {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream {
-		return this._eventStream;
+	getStopper(): Kefir.Stream {
+		return this._stopper;
+	}
+
+	getPreviewClicks(): Kefir.Stream {
+		return this._previewClicks.takeUntilBy(this._stopper);
 	}
 
 	_isStandardAttachment(): boolean {
@@ -221,16 +225,12 @@ class GmailAttachmentCardView {
 
 		var self = this;
 		// :any to work around https://github.com/facebook/flow/issues/1155
-		(this._element:any).addEventListener('click', function(e){
-			if(options.previewOnClick){
-				options.previewOnClick({
-					attachmentCardView: self,
-					preventDefault: function(){
-						e.preventDefault();
-					}
-				});
-			}
-		});
+		this._previewClicks.plug(
+			Kefir.fromEvents(this._element, 'click')
+				.map(event => ({
+					preventDefault: () => event.preventDefault()
+				}))
+		);
 
 		if(options.previewThumbnailUrl && options.failoverPreviewIconUrl){
 			var previewThumbnailUrlImage = this._element.querySelector('.inboxsdk__attachmentCard_previewThumbnailUrl');
