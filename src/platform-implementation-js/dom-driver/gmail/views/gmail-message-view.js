@@ -148,20 +148,6 @@ class GmailMessageView {
 		return this._gmailAttachmentAreaView.getAttachmentCardViews();
 	}
 
-	addAttachmentCardNoPreview(options: Object ){
-		var newOptions = _.clone(options);
-
-		return this._addAttachmentCard(newOptions);
-	}
-
-	addAttachmentCard(options: Object ){
-		var newOptions = _.clone(options);
-
-		delete newOptions.iconThumbnailUrl;
-
-		return this._addAttachmentCard(newOptions);
-	}
-
 	addButtonToDownloadAllArea(options: Object ){
 		var gmailAttachmentAreaView = this._getAttachmentArea();
 
@@ -424,7 +410,7 @@ class GmailMessageView {
 		return Boolean(this._replyElement);
 	}
 
-	_addAttachmentCard(options: Object): GmailAttachmentCardView {
+	addAttachmentCard(options: Object): GmailAttachmentCardView {
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
 		if(!this._gmailAttachmentAreaView){

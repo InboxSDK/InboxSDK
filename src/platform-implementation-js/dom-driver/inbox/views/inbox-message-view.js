@@ -155,9 +155,6 @@ class InboxMessageView {
     container.appendChild(card.getElement());
     return card;
   }
-  addAttachmentCardNoPreview(options: Object): InboxAttachmentCardView {
-    return this.addAttachmentCard({...options, iconThumbnailUrl: null});
-  }
   addButtonToDownloadAllArea(options: Object): void {
     throw new Error('not implemented yet');
   }

@@ -29,7 +29,6 @@ export type MessageViewDriver = {
 	addAttachmentIcon(options: Object): void;
 	getAttachmentCardViewDrivers(): Array<Object>;
 	addAttachmentCard(options: Object): Object;
-	addAttachmentCardNoPreview(options: Object): Object;
 	addButtonToDownloadAllArea(options: Object): void;
 	getEventStream(): Kefir.Stream;
 	getViewState(): VIEW_STATE;

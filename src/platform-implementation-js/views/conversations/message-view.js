@@ -30,15 +30,12 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
-		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
-
-		return attachmentCardView;
+		return this.addAttachmentCardViewNoPreview({...cardOptions, iconThumbnailUrl: null});
 	}
 
 	addAttachmentCardViewNoPreview(cardOptions: Object): AttachmentCardView {
-		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCardNoPreview(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
+		const attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
+		const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
 
 		return attachmentCardView;
 	}
