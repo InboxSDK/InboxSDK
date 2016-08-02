@@ -148,6 +148,8 @@ class InboxMessageView {
     let container = attachmentsArea.firstElementChild;
     if (!container) {
       attachmentsArea.style.display = '';
+      attachmentsArea.style.margin = '16px 0 0';
+      attachmentsArea.style.paddingTop = '16px';
       container = document.createElement('div');
       attachmentsArea.appendChild(container);
     }
