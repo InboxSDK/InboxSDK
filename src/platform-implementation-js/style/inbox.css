@@ -331,6 +331,25 @@
 .inboxsdk__attachment_card_with_preview:focus::after {
   background: rgba(0,0,0,.05);
 }
+.inboxsdk__attachment_card_hover_overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255,255,255,.8);
+}
+.inboxsdk__attachment_card .inboxsdk__attachment_card_buttons,
+.inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay {
+  display: none;
+}
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_description {
+  display: none;
+}
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_buttons,
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_hover_overlay {
+  display: block;
+}
 .inboxsdk__attachment_card_title {
   display: -webkit-box;
   -webkit-box-orient: vertical;

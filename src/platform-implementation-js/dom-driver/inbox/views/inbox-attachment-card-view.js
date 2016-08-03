@@ -35,6 +35,12 @@ class InboxAttachmentCardView {
               style="width: 100%"
               src="${options.previewThumbnailUrl}"
               >
+            <div class="inboxsdk__attachment_card_hover_overlay">
+              <div class="inboxsdk__attachment_card_title">${options.title}</div>
+              <div class="inboxsdk__attachment_card_buttons">
+                [button] [foo]
+              </div>
+            </div>
           `;
           if (options.failoverPreviewIconUrl) {
             Kefir.fromEvents(this._element.querySelector('img'), 'error')
@@ -55,6 +61,9 @@ class InboxAttachmentCardView {
             <div class="inboxsdk__attachment_card_description">
               <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}">
               <span>${options.description || ''}</span>
+            </div>
+            <div class="inboxsdk__attachment_card_buttons">
+              [button] [foo]
             </div>
           `;
         }
