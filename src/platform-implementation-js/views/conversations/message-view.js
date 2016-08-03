@@ -36,7 +36,7 @@ class MessageView extends EventEmitter {
 		attachmentCardViewDriver.getPreviewClicks().onValue(e => {
 			if (cardOptions.previewOnClick) {
 				cardOptions.previewOnClick({
-					attachmentCardView: this,
+					attachmentCardView,
 					preventDefault: () => e.preventDefault()
 				});
 			}

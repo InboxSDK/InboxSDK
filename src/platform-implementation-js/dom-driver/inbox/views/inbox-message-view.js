@@ -142,7 +142,7 @@ class InboxMessageView {
   getAttachmentCardViewDrivers(): Array<Object> {
     throw new Error('not implemented yet');
   }
-  addAttachmentCard(options: Object): InboxAttachmentCardView {
+  addAttachmentCard(options: Object) {
     const {attachmentsArea} = this._p.elements;
     if (!attachmentsArea) throw new Error('Could not find attachments area');
     let container = attachmentsArea.firstElementChild;

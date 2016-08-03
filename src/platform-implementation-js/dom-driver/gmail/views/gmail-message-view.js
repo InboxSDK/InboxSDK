@@ -140,7 +140,7 @@ class GmailMessageView {
 		return this._element.querySelector('.ads .gK .g3').title;
 	}
 
-	getAttachmentCardViewDrivers(): Array<GmailAttachmentCardView> {
+	getAttachmentCardViewDrivers() {
 		if(!this._gmailAttachmentAreaView){
 			return [];
 		}
@@ -410,7 +410,7 @@ class GmailMessageView {
 		return Boolean(this._replyElement);
 	}
 
-	addAttachmentCard(options: Object): GmailAttachmentCardView {
+	addAttachmentCard(options: Object) {
 		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
 
 		if(!this._gmailAttachmentAreaView){

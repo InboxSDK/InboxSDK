@@ -1,6 +1,7 @@
 /* @flow */
 
 import Kefir from 'kefir';
+import type {AttachmentCardViewDriver} from './driver';
 
 export type VIEW_STATE = 'HIDDEN'|'COLLAPSED'|'EXPANDED';
 
@@ -27,8 +28,8 @@ export type MessageViewDriver = {
 	isElementInQuotedArea(el: HTMLElement): boolean;
 	addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void;
 	addAttachmentIcon(options: Object): void;
-	getAttachmentCardViewDrivers(): Array<Object>;
-	addAttachmentCard(options: Object): Object;
+	getAttachmentCardViewDrivers(): Array<AttachmentCardViewDriver>;
+	addAttachmentCard(options: Object): AttachmentCardViewDriver;
 	addButtonToDownloadAllArea(options: Object): void;
 	getEventStream(): Kefir.Stream;
 	getViewState(): VIEW_STATE;
