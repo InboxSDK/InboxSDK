@@ -277,8 +277,7 @@
 
 .inboxsdk__attachment_card {
   cursor: pointer;
-  display: -webkit-inline-flex;
-  display: inline-flex;
+  display: inline-block;
   position: relative;
   text-decoration: none;
   vertical-align: top;
@@ -290,84 +289,89 @@
   overflow: hidden;
   height: 88px;
   width: 132px;
-  padding: 12px;
   z-index: 0;
-  flex-direction: column;
   justify-content: center;
   background: rgba(0,0,0,.03);
   border-radius: 2px;
-  transition: background-color .15s cubic-bezier(.4,0,.2,1), box-shadow .15s cubic-bezier(.4,0,.2,1);
+  transition: background-color .15s cubic-bezier(.4,0,.2,1), box-shadow .15s cubic-bezier(.4,0,.2,1), outline-color .15s cubic-bezier(.4,0,.2,1);
+  border: 1px solid transparent;
+  outline: 1px solid transparent;
 }
 .inboxsdk__attachment_card:hover {
   box-shadow: 0 0 3px rgba(0,0,0,.13), 0 3px 6px rgba(0,0,0,.26);
 }
 .inboxsdk__attachment_card:active,
 .inboxsdk__attachment_card:focus {
-  outline: none;
   box-shadow: 0 0 5px rgba(0,0,0,.15), 0 5px 10px rgba(0,0,0,.3);
-}
-.inboxsdk__attachment_card::after {
-  border: 1px solid transparent;
-  bottom: 0;
-  content: '';
-  display: block;
-  top: 0;
-  left: 0;
-  right: 0;
-  margin: 1px;
-  outline: 1px solid transparent;
-  position: absolute;
-  transition: outline-color .15s cubic-bezier(.4,0,.2,1);
-}
-.inboxsdk__attachment_card:active::after,
-.inboxsdk__attachment_card:focus::after {
   border-color: #f2f2f2;
   outline-color: #4285f4;
 }
-.inboxsdk__attachment_card_with_preview {
-  padding: 0;
-}
-.inboxsdk__attachment_card_with_preview:hover::after,
-.inboxsdk__attachment_card_with_preview:focus::after {
-  background: rgba(0,0,0,.05);
-}
+.inboxsdk__attachment_card_nohover,
 .inboxsdk__attachment_card_hover_overlay {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255,255,255,.8);
+  padding: 12px;
 }
-.inboxsdk__attachment_card .inboxsdk__attachment_card_buttons,
 .inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay {
+  background: rgba(255,255,255,.7);
+}
+.inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay,
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_nohover {
   display: none;
 }
-.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_description {
-  display: none;
-}
-.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_buttons,
 .inboxsdk__attachment_card:hover .inboxsdk__attachment_card_hover_overlay {
   display: block;
 }
+.inboxsdk__attachment_card_buttons {
+  line-height: normal;
+  position: absolute;
+  bottom: 6px;
+  left: 12px;
+  right: 6px;
+}
+.inboxsdk__attachment_card_button {
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #c6c6c6;
+  border-radius: 3px;
+  margin-right: 3px;
+  box-sizing: content-box;
+  width: 30px;
+  height: 24px;
+  padding: 0;
+  color: #333;
+  vertical-align: top;
+  text-align: center;
+}
+.inboxsdk__attachment_card_button:hover {
+  background: rgba(0,0,0,0.8);
+  border-color: rgba(0,0,0,0.8);
+}
+.inboxsdk__attachment_card_button > div {
+  height: 21px;
+  width: 21px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.inboxsdk__attachment_card_button > img {
+  max-height: 16px;
+  max-width: 16px;
+}
 .inboxsdk__attachment_card_title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  margin-top: 2px;
   line-height: 20px;
-  max-height: 3em;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: normal;
-  word-break: break-word;
-  word-wrap: normal;
+  white-space: nowrap;
   color: #212121;
-  height: 3em;
 }
 .inboxsdk__attachment_card_description {
   color: #757575;
   line-height: 16px;
-  margin-top: 4px;
+  margin-top: 23px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

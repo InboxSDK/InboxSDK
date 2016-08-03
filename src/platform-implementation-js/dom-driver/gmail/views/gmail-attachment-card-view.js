@@ -303,7 +303,6 @@ class GmailAttachmentCardView {
 				downloadLink.href = options.downloadUrl;
 
 				(downloadLink:any).addEventListener('click', function(e) {
-					e.stopImmediatePropagation();
 					e.stopPropagation();
 				}, true);
 

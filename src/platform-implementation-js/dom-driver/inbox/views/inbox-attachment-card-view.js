@@ -19,67 +19,122 @@ class InboxAttachmentCardView {
     if (options.element) {
       throw new Error('not implemented yet');
     } else {
-      if (options.previewUrl) {
-        this._element = document.createElement('a');
-        this._element.href = options.previewUrl;
-      } else {
-        this._element = document.createElement('div');
-        this._element.tabIndex = '0';
-      }
-      this._element.title = options.title;
-      const setupInnerHtml = options => {
-        if (options.previewThumbnailUrl) {
-          this._element.className = 'inboxsdk__attachment_card inboxsdk__attachment_card_with_preview';
-          this._element.innerHTML = autoHtml `
-            <img alt="" aria-hidden="true"
-              style="width: 100%"
-              src="${options.previewThumbnailUrl}"
-              >
-            <div class="inboxsdk__attachment_card_hover_overlay">
-              <div class="inboxsdk__attachment_card_title">${options.title}</div>
-              <div class="inboxsdk__attachment_card_buttons">
-                [button] [foo]
-              </div>
-            </div>
-          `;
-          if (options.failoverPreviewIconUrl) {
-            Kefir.fromEvents(this._element.querySelector('img'), 'error')
-              .take(1)
-              .takeUntilBy(this._stopper)
-              .onValue(() => {
-                setupInnerHtml({
-                  ...options,
-                  previewThumbnailUrl: null,
-                  iconThumbnailUrl: options.failoverPreviewIconUrl
-                });
-              });
-          }
-        } else {
-          this._element.className = 'inboxsdk__attachment_card';
-          this._element.innerHTML = autoHtml `
-            <div class="inboxsdk__attachment_card_title">${options.title}</div>
-            <div class="inboxsdk__attachment_card_description">
-              <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}">
-              <span>${options.description || ''}</span>
-            </div>
-            <div class="inboxsdk__attachment_card_buttons">
-              [button] [foo]
-            </div>
-          `;
-        }
-      };
-      setupInnerHtml(options);
-      this._previewClicks.plug(
-        Kefir.merge([
-          Kefir.fromEvents(this._element, 'click'),
-          Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
-        ])
-      );
+      this._createNewElement(options);
     }
   }
 
   destroy() {
     this._stopper.destroy();
+  }
+
+  _createNewElement(options) {
+    if (options.previewUrl) {
+      this._element = document.createElement('a');
+      this._element.href = options.previewUrl;
+    } else {
+      this._element = document.createElement('div');
+      this._element.tabIndex = '0';
+    }
+    this._element.title = options.title;
+
+    const setupInnerHtml = options => {
+      if (options.previewThumbnailUrl) {
+        this._element.className = 'inboxsdk__attachment_card inboxsdk__attachment_card_with_preview';
+        this._element.innerHTML = autoHtml `
+          <img alt="" aria-hidden="true"
+            style="width: 100%"
+            src="${options.previewThumbnailUrl}"
+            >
+          <div class="inboxsdk__attachment_card_hover_overlay">
+            <div class="inboxsdk__attachment_card_title">${options.title}</div>
+            <div class="inboxsdk__attachment_card_buttons"></div>
+          </div>
+        `;
+        if (options.failoverPreviewIconUrl) {
+          Kefir.fromEvents(this._element.querySelector('img'), 'error')
+            .take(1)
+            .takeUntilBy(this._stopper)
+            .onValue(() => {
+              setupInnerHtml({
+                ...options,
+                previewThumbnailUrl: null,
+                iconThumbnailUrl: options.failoverPreviewIconUrl
+              });
+            });
+        }
+      } else {
+        this._element.className = 'inboxsdk__attachment_card';
+        this._element.innerHTML = autoHtml `
+          <div class="inboxsdk__attachment_card_nohover">
+            <div class="inboxsdk__attachment_card_title">${options.title}</div>
+            <div class="inboxsdk__attachment_card_description">
+              <img alt="" aria-hidden="true" src="${options.fileIconImageUrl}">
+              <span>${options.description || ''}</span>
+            </div>
+          </div>
+          <div class="inboxsdk__attachment_card_hover_overlay">
+            <div class="inboxsdk__attachment_card_title">${options.title}</div>
+            <div class="inboxsdk__attachment_card_buttons"></div>
+          </div>
+        `;
+      }
+
+      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
+      options.buttons.forEach(button => {
+        const el = document.createElement('button');
+        el.className = 'inboxsdk__attachment_card_button';
+        if (button.downloadUrl) {
+          el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
+          (el:any).addEventListener('click', event => {
+            event.stopPropagation();
+            event.preventDefault();
+            let prevented = false;
+            if (button.onClick) {
+              button.onClick({
+                preventDefault() {
+                  prevented = true;
+                }
+              });
+            }
+            if (prevented) return;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = button.downloadUrl;
+            (downloadLink:any).addEventListener('click', function(e) {
+              e.stopPropagation();
+            }, true);
+            if (button.openInNewTab) {
+              downloadLink.setAttribute('target', '_blank');
+            }
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+          });
+          el.innerHTML = `
+            <div style="background: no-repeat url(https://ssl.gstatic.com/mail/sprites/newattachmentcards-ff2ce2bea04dec2bf32f2ebbfa0834ff.png) -219px -129px"></div>
+          `;
+        } else {
+          (el:any).addEventListener('click', event => {
+            event.stopPropagation();
+            event.preventDefault();
+            if (button.onClick) {
+              button.onClick();
+            }
+          });
+          el.innerHTML = autoHtml `
+            <img src="${button.iconUrl}">
+          `;
+          el.title = button.tooltip;
+        }
+        buttonContainer.appendChild(el);
+      });
+    };
+    setupInnerHtml(options);
+    this._previewClicks.plug(
+      Kefir.merge([
+        Kefir.fromEvents(this._element, 'click'),
+        Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+      ])
+    );
   }
 
   getElement() {

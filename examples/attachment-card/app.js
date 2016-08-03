@@ -29,6 +29,20 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 					onClick() {
 						alert('Foo bar button clicked');
 					}
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
 				}
 			]
 
