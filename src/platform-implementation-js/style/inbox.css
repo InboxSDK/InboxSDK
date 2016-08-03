@@ -274,3 +274,95 @@
   top: 0;
   margin: 17px;
 }
+
+.inboxsdk__attachment_card {
+  cursor: pointer;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  position: relative;
+  text-decoration: none;
+  vertical-align: top;
+  margin-right: 12px;
+  margin-bottom: 12px;
+
+  box-shadow: 0 0 1px rgba(0,0,0,.11), 0 1px 2px rgba(0,0,0,.22);
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 88px;
+  width: 132px;
+  padding: 12px;
+  z-index: 0;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(0,0,0,.03);
+  border-radius: 2px;
+  transition: background-color .15s cubic-bezier(.4,0,.2,1), box-shadow .15s cubic-bezier(.4,0,.2,1);
+}
+.inboxsdk__attachment_card:hover {
+  box-shadow: 0 0 3px rgba(0,0,0,.13), 0 3px 6px rgba(0,0,0,.26);
+}
+.inboxsdk__attachment_card:active,
+.inboxsdk__attachment_card:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0,0,0,.15), 0 5px 10px rgba(0,0,0,.3);
+}
+.inboxsdk__attachment_card::after {
+  border: 1px solid transparent;
+  bottom: 0;
+  content: '';
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 1px;
+  outline: 1px solid transparent;
+  position: absolute;
+  transition: outline-color .15s cubic-bezier(.4,0,.2,1);
+}
+.inboxsdk__attachment_card:active::after,
+.inboxsdk__attachment_card:focus::after {
+  border-color: #f2f2f2;
+  outline-color: #4285f4;
+}
+.inboxsdk__attachment_card_with_preview {
+  padding: 0;
+}
+.inboxsdk__attachment_card_with_preview:hover::after,
+.inboxsdk__attachment_card_with_preview:focus::after {
+  background: rgba(0,0,0,.05);
+}
+.inboxsdk__attachment_card_title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 20px;
+  max-height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  word-wrap: normal;
+  color: #212121;
+  height: 3em;
+}
+.inboxsdk__attachment_card_description {
+  color: #757575;
+  line-height: 16px;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inboxsdk__attachment_card_description > img {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+.inboxsdk__attachment_card_description > span {
+  vertical-align: middle;
+}

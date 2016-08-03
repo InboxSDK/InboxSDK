@@ -8,7 +8,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 
 		messageView.addAttachmentCardView({
 
-			title: 'Test image',
+			title: 'Test image long title testing test foobar123456',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
 			previewThumbnailUrl: chrome.runtime.getURL('partycat2.jpg'),
