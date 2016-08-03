@@ -24,15 +24,6 @@ var MessageView = /** @lends MessageView */{
 	addAttachmentCardView: function(){},
 
 	/**
-	* Adds an {AttachmentCardView} to the message. Using this method instead of {MessageView.addAttachmentCardView()}
-	* indicates to the SDK that you don't have a preview image available and instead want to show the image of a icon in the
-	* thumbnail area instead. The SDK will then render this appropriately.
-	* @param {AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
-	* @return {AttachmentCardView}
-	*/
-	addAttachmentCardViewNoPreview: function(){},
-
-	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
 	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
 	* @return {void}
