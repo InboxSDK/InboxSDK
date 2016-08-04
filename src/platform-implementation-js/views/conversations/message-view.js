@@ -30,17 +30,23 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
-		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
+		const attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
+		const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
+
+		attachmentCardViewDriver.getPreviewClicks().onValue(e => {
+			if (cardOptions.previewOnClick) {
+				cardOptions.previewOnClick({
+					attachmentCardView,
+					preventDefault: () => e.preventDefault()
+				});
+			}
+		});
 
 		return attachmentCardView;
 	}
 
-	addAttachmentCardViewNoPreview(cardOptions: Object): AttachmentCardView {
-		var attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCardNoPreview(cardOptions);
-		var attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
-
-		return attachmentCardView;
+	addAttachmentCardViewNoPreview(cardOptions) {
+		return this.addAttachmentCardView(cardOptions);
 	}
 
 	addAttachmentsToolbarButton(buttonOptions: Object){

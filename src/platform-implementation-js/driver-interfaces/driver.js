@@ -17,6 +17,10 @@ export type ThreadViewDriver = GmailThreadView|InboxThreadView;
 
 import type {MessageViewDriver} from './message-view-driver';
 
+import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
+import type InboxAttachmentCardView from '../dom-driver/inbox/views/inbox-attachment-card-view';
+export type AttachmentCardViewDriver = GmailAttachmentCardView|InboxAttachmentCardView;
+
 export type DrawerViewOptions = {
 	el: HTMLElement;
 	title?: string;

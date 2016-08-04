@@ -5,36 +5,44 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
-		messageView.addAttachmentIcon({
-			iconClass: 'eye_icon',
-			tooltip: '1thing'
-		});
-		messageView.addAttachmentIcon(Kefir.repeat(function() {
-			return Kefir.sequentially(2000, [
-				{
-					iconClass: 'eye_icon',
-					tooltip: '2thing',
-					onClick: alert.bind(window, 'foo')
-				},
-				{
-					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-					tooltip: '2blah blah'
-				}
-			]);
-		}));
 
 		messageView.addAttachmentCardView({
 
-			title: 'Test image',
+			title: 'Test image long title testing test foobar123456',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
-			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
-			failoverPreviewIconUrl: chrome.runtime.getURL('zipicon.png'),
+			previewThumbnailUrl: chrome.runtime.getURL('partycat2.jpg'),
+			failoverPreviewIconUrl: chrome.runtime.getURL('partycat.jpg'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
+			previewOnClick() {
+				alert('preview button clicked');
+			},
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com',
 					openInNewTab: true
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
+				},
+				{
+					iconUrl: chrome.runtime.getURL('zipicon.png'),
+					tooltip: 'Foo bar',
+					onClick() {
+						alert('Foo bar button clicked');
+					}
 				}
 			]
 
@@ -47,6 +55,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			description: 'Test description 2',
 			previewUrl: 'https://www.google.com',
 			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com'
@@ -61,6 +70,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			description: 'Test description icon',
 			previewUrl: 'https://www.google.com',
 			iconThumbnailUrl: chrome.runtime.getURL('zipicon.png'),
+			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			buttons: [
 				{
 					downloadUrl: 'https://www.streak.com'
@@ -103,6 +113,23 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			}
 		});
 
+		messageView.addAttachmentIcon({
+			iconClass: 'eye_icon',
+			tooltip: '1thing'
+		});
+		messageView.addAttachmentIcon(Kefir.repeat(function() {
+			return Kefir.sequentially(2000, [
+				{
+					iconClass: 'eye_icon',
+					tooltip: '2thing',
+					onClick: alert.bind(window, 'foo')
+				},
+				{
+					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+					tooltip: '2blah blah'
+				}
+			]);
+		}));
 	});
 
 });

@@ -18,19 +18,10 @@ var MessageView = /** @lends MessageView */{
 	/**
 	* Adds an {AttachmentCardView} to the message. Each message has an area where attachments of that message are shown as a set of
 	* preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
-	* @param {AttachmentCardOptions} cardOptions - The configuration of the AttachmentCardView to create.
+	* @param {AttachmentCardOptions|AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
 	* @return {AttachmentCardView}
 	*/
 	addAttachmentCardView: function(){},
-
-	/**
-	* Adds an {AttachmentCardView} to the message. Using this method instead of {MessageView.addAttachmentCardView()}
-	* indicates to the SDK that you don't have a preview image available and instead want to show the image of a icon in the
-	* thumbnail area instead. The SDK will then render this appropriately.
-	* @param {AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
-	* @return {AttachmentCardView}
-	*/
-	addAttachmentCardViewNoPreview: function(){},
 
 	/**
 	* Adds a button to the download all area of the attachments tray. <screenshot>
@@ -175,7 +166,7 @@ var MessageView = /** @lends MessageView */{
 
 /**
 * @class
-* This type is required by the {MessageView.addAttachmentCardView()} method to insert an {AttachmentCardView}
+* This type is accepted by the {MessageView.addAttachmentCardView()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
@@ -260,7 +251,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 /**
 * @class
-* This type is required by the {MessageView.addAttachmentCardViewNoPreview()} method to insert an {AttachmentCardView}
+* This type is accepted by the {MessageView.addAttachmentCardView()} method to insert an {AttachmentCardView}
 * for a message. An attachment card offers a way to display a rich preview of any 'attachment' to a message. Note that
 * 'attachments' is referenced in the generic sense and need not be a downloadable file specifically. One example would be to
 * show you YouTube attachment cards for any YouTube links present in an email.
@@ -313,7 +304,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 
 	/**
 	* An array of buttons to support functionality in addition to the preview functionality.
-	* @type {DownloadButtonDescriptor[]|CustomButtonDescriptor[]}
+	* @type {Array.<DownloadButtonDescriptor|CustomButtonDescriptor>}
 	*/
 	buttons:null,
 

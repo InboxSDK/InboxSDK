@@ -9,6 +9,7 @@ import type InboxDriver from '../inbox-driver';
 import type InboxThreadView from './inbox-thread-view';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import InboxAttachmentCardView from './inbox-attachment-card-view';
 import findParent from '../../../lib/dom/find-parent';
 import parser from '../detection/message/parser';
 import type {Parsed} from '../detection/message/parser';
@@ -74,7 +75,7 @@ class InboxMessageView {
     const oldParsed = this._p;
     this._p = parser(this._element);
     if (this._p.errors.length > 0) {
-      this._driver.getLogger().errorSite(new Error(`message reparse errors`), {
+      this._driver.getLogger().errorSite(new Error('message reparse errors'), {
         score: this._p.score,
         errors: this._p.errors,
         html: censorHTMLtree(this._element)
@@ -141,11 +142,20 @@ class InboxMessageView {
   getAttachmentCardViewDrivers(): Array<Object> {
     throw new Error('not implemented yet');
   }
-  addAttachmentCard(options: Object): Object {
-    throw new Error('not implemented yet');
-  }
-  addAttachmentCardNoPreview(options: Object): Object {
-    throw new Error('not implemented yet');
+  addAttachmentCard(options: Object) {
+    const {attachmentsArea} = this._p.elements;
+    if (!attachmentsArea) throw new Error('Could not find attachments area');
+    let container = attachmentsArea.firstElementChild;
+    if (!container) {
+      attachmentsArea.style.display = '';
+      attachmentsArea.style.margin = '16px 0 0';
+      attachmentsArea.style.paddingTop = '16px';
+      container = document.createElement('div');
+      attachmentsArea.appendChild(container);
+    }
+    const card = new InboxAttachmentCardView({...options, element:null}, this._driver);
+    container.appendChild(card.getElement());
+    return card;
   }
   addButtonToDownloadAllArea(options: Object): void {
     throw new Error('not implemented yet');

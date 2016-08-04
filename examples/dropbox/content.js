@@ -38,7 +38,7 @@ onboarding_event = new Promise(function(resolve, reject){window._start_onboard =
 close_onboarding = new Promise(function(){});//promise_message_handler("close_onboarding");
 
 Promise.all([
-  InboxSDK.load('1', SDK_APP_ID), InboxSDK.loadScript(DROPINS_URL), new Promise(function(resolve, reject) {
+  InboxSDK.load('1', SDK_APP_ID, {inboxBeta:true}), InboxSDK.loadScript(DROPINS_URL), new Promise(function(resolve, reject) {
     return chrome.storage.local.get("guid", resolve);
   }), new Promise(function(resolve, reject) {
     return chrome.storage.sync.get("is_disabled", resolve);

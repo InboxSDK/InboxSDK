@@ -34,7 +34,7 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		return this._element;
 	}
 
-	getAttachmentCardViews(): Array<GmailAttachmentCardView> {
+	getAttachmentCardViews() {
 		const attachments = this._element.querySelectorAll('.aQH > span');
 		return _.map(attachments, attachment => {
 			let cardView = this._elsToCardViews.get(attachment);

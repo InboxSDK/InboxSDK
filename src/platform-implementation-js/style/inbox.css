@@ -274,3 +274,118 @@
   top: 0;
   margin: 17px;
 }
+
+.inboxsdk__attachment_card {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  text-decoration: none;
+  vertical-align: top;
+  margin-right: 12px;
+  margin-bottom: 12px;
+
+  box-shadow: 0 0 1px rgba(0,0,0,.11), 0 1px 2px rgba(0,0,0,.22);
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 88px;
+  width: 132px;
+  z-index: 0;
+  justify-content: center;
+  background: rgba(0,0,0,.03);
+  border-radius: 2px;
+  transition: background-color .15s cubic-bezier(.4,0,.2,1), box-shadow .15s cubic-bezier(.4,0,.2,1), outline-color .15s cubic-bezier(.4,0,.2,1);
+  border: 1px solid transparent;
+  outline: 1px solid transparent;
+}
+.inboxsdk__attachment_card:hover {
+  box-shadow: 0 0 3px rgba(0,0,0,.13), 0 3px 6px rgba(0,0,0,.26);
+}
+.inboxsdk__attachment_card:active,
+.inboxsdk__attachment_card:focus {
+  box-shadow: 0 0 5px rgba(0,0,0,.15), 0 5px 10px rgba(0,0,0,.3);
+  border-color: #f2f2f2;
+  outline-color: #4285f4;
+}
+.inboxsdk__attachment_card_nohover,
+.inboxsdk__attachment_card_hover_overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+}
+.inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay {
+  background: rgba(255,255,255,.7);
+}
+.inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay,
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_nohover {
+  display: none;
+}
+.inboxsdk__attachment_card:hover .inboxsdk__attachment_card_hover_overlay {
+  display: block;
+}
+.inboxsdk__attachment_card_buttons {
+  line-height: normal;
+  position: absolute;
+  bottom: 6px;
+  left: 12px;
+  right: 6px;
+}
+.inboxsdk__attachment_card_button {
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #c6c6c6;
+  border-radius: 3px;
+  margin-right: 3px;
+  box-sizing: content-box;
+  width: 30px;
+  height: 24px;
+  padding: 0;
+  color: #333;
+  vertical-align: top;
+  text-align: center;
+}
+.inboxsdk__attachment_card_button:hover {
+  background: rgba(0,0,0,0.8);
+  border-color: rgba(0,0,0,0.8);
+}
+.inboxsdk__attachment_card_button > div {
+  height: 21px;
+  width: 21px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.inboxsdk__attachment_card_button > img {
+  max-height: 16px;
+  max-width: 16px;
+}
+.inboxsdk__attachment_card_title {
+  margin-top: 2px;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #212121;
+}
+.inboxsdk__attachment_card_description {
+  color: #757575;
+  line-height: 16px;
+  margin-top: 23px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inboxsdk__attachment_card_description > img {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  height: 16px;
+  width: 16px;
+}
+.inboxsdk__attachment_card_description > span {
+  vertical-align: middle;
+}
