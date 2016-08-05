@@ -16,7 +16,7 @@ export default class NavMenu {
 	NavItemTypes: Object;
 	SENT_MAIL: NativeNavItemView;
 
-	constructor(appId: string , driver: Driver, membraneMap: WeakMap){
+	constructor(appId: string , driver: Driver, membraneMap: WeakMap<Object, Object>){
 		var members = {};
 		memberMap.set(this, members);
 

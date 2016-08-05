@@ -13,7 +13,7 @@ export default class GmailTabContainerView {
   destroyed: boolean;
   _element: HTMLElement;
   _tablistElement: HTMLElement;
-  _eventStream: Kefir.Bus;
+  _eventStream: Kefir.Bus<any>;
   _descriptorToGmailTabViewMap: Map<Object, GmailTabView>;
   _gmailTabViews: GmailTabView[];
   _visibleGmailTabViews: GmailTabView[];
@@ -44,7 +44,7 @@ export default class GmailTabContainerView {
   }
 
   getElement(): HTMLElement {return this._element;}
-  getEventStream(): Kefir.Stream {return this._eventStream;}
+  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
 
   addTab(descriptor: Object, groupOrderHint: any) {
     var gmailTabView = new GmailTabView(descriptor, groupOrderHint);

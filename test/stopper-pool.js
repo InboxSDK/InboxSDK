@@ -3,7 +3,7 @@
 
 var assert = require('assert');
 var Kefir = require('kefir');
-var kefirBus: () => Kefir.Bus = require('kefir-bus');
+var kefirBus = require('kefir-bus');
 
 import StopperPool from '../src/platform-implementation-js/lib/stopper-pool';
 

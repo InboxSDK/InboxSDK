@@ -6,7 +6,7 @@ import kefirBus from 'kefir-bus';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 
 export default class GmailTopMessageBarDriver {
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_element: ?HTMLElement;
 
 	constructor(optionStream: Kefir.Stream<?Object>){
@@ -51,7 +51,7 @@ export default class GmailTopMessageBarDriver {
 		fakeWindowResize();
 	}
 
-	getEventStream(): Kefir.Stream {return this._eventStream;}
+	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
 
 	remove() {
 		this.destroy();

@@ -17,6 +17,7 @@ import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import delayAsap from '../../../lib/delay-asap';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
 import censorHTMLtree from '../../../../common/censor-html-tree';
@@ -32,12 +33,12 @@ let hasSeenOldElement = false;
 class GmailMessageView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
-	_eventStream: Kefir.Bus;
-	_stopper: Kefir.Stream&{destroy: () => void};
+	_eventStream: Kefir.Bus<any>;
+	_stopper: Kefir.Stream<null>&{destroy: () => void};
 	_threadViewDriver: GmailThreadView;
 	_moreMenuItemDescriptors: Array<Object>;
 	_moreMenuAddedElements: Array<HTMLElement>;
-	_replyElementStream: Kefir.Stream;
+	_replyElementStream: Kefir.Stream<ElementWithLifetime>;
 	_replyElement: ?HTMLElement;
 	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
 	_messageLoaded: boolean = false;
@@ -77,11 +78,11 @@ class GmailMessageView {
 		});
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 
-	getReplyElementStream(): Kefir.Stream {
+	getReplyElementStream(): Kefir.Stream<ElementWithLifetime> {
 		return this._replyElementStream;
 	}
 
@@ -434,18 +435,19 @@ class GmailMessageView {
 				attributes: true, attributeFilter: ['class'], attributeOldValue: true
 			}).takeUntilBy(this._stopper)
 			  .map(function(mutation) {
-				var currentClassList = (mutation.target: any).classList;
+				const currentClassList = (mutation.target: any).classList;
+				const mutationOldValue: string = (mutation.oldValue: any);
 
-				var oldValue;
-				var newValue;
+				let oldValue;
+				let newValue;
 
-				if(mutation.oldValue.indexOf('kQ') > -1){
+				if(mutationOldValue.indexOf('kQ') > -1){
 					oldValue = 'HIDDEN';
 				}
-				else if(mutation.oldValue.indexOf('kv') > -1 || mutation.oldValue.indexOf('ky') > -1){
+				else if(mutationOldValue.indexOf('kv') > -1 || mutationOldValue.indexOf('ky') > -1){
 					oldValue = 'COLLAPSED';
 				}
-				else if(mutation.oldValue.indexOf('h7') > -1){
+				else if(mutationOldValue.indexOf('h7') > -1){
 					oldValue = 'EXPANDED';
 				}
 

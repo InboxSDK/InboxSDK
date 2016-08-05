@@ -13,7 +13,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
   _el: HTMLElement;
   _contentEl: HTMLElement;
   _arrowEl: HTMLElement;
-  _stopper: Kefir.Stream&{destroy:()=>void};
+  _stopper: Kefir.Stream<null>&{destroy:()=>void};
 
   constructor(target: HTMLElement, options: TooltipDescriptor) {
     this._target = target;
@@ -86,7 +86,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
     this._stopper.destroy();
   }
 
-  getStopper(): Kefir.Stream {
+  getStopper(): Kefir.Stream<null> {
     return this._stopper;
   }
 

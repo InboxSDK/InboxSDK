@@ -5,7 +5,7 @@ import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
 
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function(gmailComposeView: GmailComposeView): Kefir.Stream {
+export default function(gmailComposeView: GmailComposeView): Kefir.Stream<Object> {
 
 	var element = gmailComposeView.getElement();
 	var sendButtonElement = gmailComposeView.getSendButton();

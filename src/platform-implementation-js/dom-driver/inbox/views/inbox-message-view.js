@@ -22,8 +22,8 @@ class InboxMessageView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _p: Parsed;
-  _stopper: Kefir.Stream;
-  _eventStream: Kefir.Bus = kefirBus();
+  _stopper: Kefir.Stream<any>;
+  _eventStream: Kefir.Bus<Object> = kefirBus();
   _threadViewDriver: ?InboxThreadView;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
@@ -101,7 +101,7 @@ class InboxMessageView {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Stream {
+  getEventStream(): Kefir.Stream<Object> {
     return this._eventStream;
   }
 

@@ -8,7 +8,7 @@ import type {ItemWithLifetime} from './dom/make-element-child-stream';
 // Class that must be given a stream of ItemWithLifetime objects. It then has a
 // method that allows the stream to be re-subscribed to multiple times in the
 // future, with all of the still-existing items emitted at the start.
-export default class ItemWithLifetimePool<T: ItemWithLifetime> {
+export default class ItemWithLifetimePool<T: ItemWithLifetime<*>> {
   _input: Kefir.Stream<T>;
   _items: Set<T> = new Set();
 

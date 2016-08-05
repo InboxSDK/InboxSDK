@@ -67,7 +67,7 @@ export default class GmailButterBarDriver {
     noticeAvailableStream.onValue(_.noop);
   }
 
-  getNoticeAvailableStream(): Kefir.Stream {
+  getNoticeAvailableStream(): Kefir.Stream<any> {
     return noticeAvailableStream;
   }
 

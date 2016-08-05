@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - if ! which flow 2>/dev/null; then (cd ~ && wget -O flow.zip https://github.com/facebook/flow/releases/download/v0.27.0/flow-linux64-v0.27.0.zip && unzip flow.zip && if [ -f flow ]; then mkdir flow_ && mv flow flow_/ && mv flow_ flow; fi; cd flow && ./flow version && echo -e "\nPATH=\"\$PATH:$(pwd)/\"" >> ~/.bashrc && source ~/.bashrc); fi
+    - if ! which flow 2>/dev/null; then (cd ~ && wget -O flow.zip https://github.com/facebook/flow/releases/download/v0.30.0/flow-linux64-v0.30.0.zip && unzip flow.zip && if [ -f flow ]; then mkdir flow_ && mv flow flow_/ && mv flow_ flow; fi; cd flow && ./flow version && echo -e "\nPATH=\"\$PATH:$(pwd)/\"" >> ~/.bashrc && source ~/.bashrc); fi
   override:
     - ./tools/install-deps.sh
 

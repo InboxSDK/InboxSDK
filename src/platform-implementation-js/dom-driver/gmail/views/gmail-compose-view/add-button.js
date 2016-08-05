@@ -13,7 +13,7 @@ import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Stream, groupOrderHint: string, extraOnClickOptions: Object){
+export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Stream<?Object>, groupOrderHint: string, extraOnClickOptions: Object){
 	return new RSVP.Promise(function(resolve, reject){
 		var buttonViewController;
 

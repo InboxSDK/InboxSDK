@@ -13,8 +13,8 @@ class InboxAppToolbarButtonView {
   _buttonDescriptorStream: Kefir.Stream<Object>;
   _buttonEl: ?HTMLElement = null;
   _activeDropdown: ?DropdownView = null;
-  _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
-  _ready: Kefir.Stream&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
+  _ready: Kefir.Stream<null>&{destroy():void} = kefirStopper();
 
   constructor(buttonDescriptor: Kefir.Stream<Object>, appToolbarLocationStream: Kefir.Stream<ElementWithLifetime>, searchBarStream: Kefir.Stream<ElementWithLifetime>) {
     this._buttonDescriptorStream = buttonDescriptor.toProperty().takeUntilBy(this._stopper);

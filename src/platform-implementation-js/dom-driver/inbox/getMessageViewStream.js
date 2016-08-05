@@ -41,8 +41,9 @@ function imp(driver: InboxDriver) {
       removalStream.take(1).takeUntilBy(view.getStopper()).onValue(() => {
         view.destroy();
       });
-      return Kefir.constant(view)
-        .merge(view.getStopper().filter(()=>false));
+      const stream: Kefir.Stream<typeof view> = (Kefir.constant(view)
+        .merge(view.getStopper().filter(()=>false)): any);
+      return stream;
         // Keep the stream open until the view is destroyed so the Kefir.repeat
         // callback doesn't re-run until then.
     }).takeUntilBy(removalStream);

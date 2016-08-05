@@ -27,7 +27,7 @@ class GmailCollapsibleSectionView {
 	_collapsedContainer: ?HTMLElement = null;
 	_messageElement: ?HTMLElement = null;
 	_footerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_isCollapsed: boolean = false;
 	_inboxDropdownButtonView: ?Object = null;
 	_dropdownViewController: ?Object = null;
@@ -61,11 +61,11 @@ class GmailCollapsibleSectionView {
 		return element;
 	}
 
-	getEventStream(): Kefir.Bus {
+	getEventStream(): Kefir.Stream<any> {
 		return this._eventStream;
 	}
 
-	setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty: Kefir.Stream){
+	setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty: Kefir.Stream<?Object>){
 		var stoppedProperty = collapsibleSectionDescriptorProperty
 								.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null));
 
@@ -125,8 +125,8 @@ class GmailCollapsibleSectionView {
 	_setupElement(collapsibleSectionDescriptor: Object){
 		const element = this._element = document.createElement('div');
 		element.setAttribute('class', 'inboxsdk__resultsSection');
-		element.setAttribute('data-group-order-hint', this._groupOrderHint);
-		element.setAttribute('data-order-hint', _.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0);
+		element.setAttribute('data-group-order-hint', String(this._groupOrderHint));
+		element.setAttribute('data-order-hint', String(_.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0));
 
 		this._setupHeader(collapsibleSectionDescriptor);
 
@@ -135,7 +135,7 @@ class GmailCollapsibleSectionView {
 		bodyContentsElement.classList.add('zE');
 		bodyElement.appendChild(bodyContentsElement);
 
-		element.appendChild(this._bodyElement);
+		element.appendChild(bodyElement);
 
 		const contentElement = this._contentElement = document.createElement('div');
 		bodyContentsElement.appendChild(contentElement);

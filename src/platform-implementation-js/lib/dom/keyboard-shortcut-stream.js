@@ -5,7 +5,7 @@ import Combokeys from 'combokeys-capture';
 
 const combokeys = global.document && new Combokeys(document.body, true);
 
-export default function keyboardShortcutStream(chord: string): Kefir.Stream {
+export default function keyboardShortcutStream(chord: string): Kefir.Stream<Object> {
 	return Kefir.stream(function(emitter) {
 		return combokeys && combokeys.bind(chord, function(domEvent){
 			emitter.emit(domEvent);

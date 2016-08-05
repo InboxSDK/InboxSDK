@@ -33,8 +33,8 @@ let cachedFromContacts: ?Array<Contact> = null;
 class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
-  _eventStream: Kefir.Bus;
-  _stopper: Kefir.Stream&{destroy:()=>void};
+  _eventStream: Kefir.Bus<any>;
+  _stopper: Kefir.Stream<null>&{destroy:()=>void};
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastBodySelectionRange: ?Range;
@@ -155,8 +155,8 @@ class InboxComposeView {
     this._eventStream.end();
     this._stopper.destroy();
   }
-  getEventStream(): Kefir.Stream {return this._eventStream;}
-  getStopper(): Kefir.Stream {return this._stopper;}
+  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+  getStopper(): Kefir.Stream<null> {return this._stopper;}
   getElement(): HTMLElement {return this._element;}
   // Call this whenever we change the body directly by mucking with the
   // elements.
@@ -446,7 +446,7 @@ class InboxComposeView {
     this._modifierButtonContainer = div;
     return div;
   }
-  addRecipientRow(options: Kefir.Stream): () => void {
+  addRecipientRow(options: Kefir.Stream<?Object>): () => void {
     throw new Error("Not implemented");
   }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {

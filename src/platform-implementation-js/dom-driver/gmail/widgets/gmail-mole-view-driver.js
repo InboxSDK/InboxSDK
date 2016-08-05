@@ -168,7 +168,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
     }
   }
 
-  getEventStream(): Kefir.Stream {
+  getEventStream(): Kefir.Stream<Object> {
     return this._eventStream;
   }
 

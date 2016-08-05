@@ -107,8 +107,10 @@ function getVersion(): Promise<string> {
 }
 
 async function getBrowserifyHmrOptions() {
-  const keyFile = `${process.env.HOME}/stunnel/key.pem`;
-  const certFile = `${process.env.HOME}/stunnel/cert.pem`;
+  const HOME = process.env.HOME;
+  if (!HOME) throw new Error('HOME env variable not set');
+  const keyFile = `${HOME}/stunnel/key.pem`;
+  const certFile = `${HOME}/stunnel/cert.pem`;
 
   let url, tlskey, tlscert;
   if ((await globp(keyFile)).length && (await globp(certFile)).length) {

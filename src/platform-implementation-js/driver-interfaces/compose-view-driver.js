@@ -23,8 +23,8 @@ export type ComposeButtonDescriptor = {
 
 export type ComposeViewDriver = {
 	destroy(): void;
-	getEventStream(): Kefir.Stream;
-	getStopper(): Kefir.Stream;
+	getEventStream(): Kefir.Stream<Object>;
+	getStopper(): Kefir.Stream<any>;
 	getElement(): HTMLElement;
 	insertBodyTextAtCursor(text: string): ?HTMLElement;
 	insertBodyHTMLAtCursor(html: string): ?HTMLElement;
@@ -51,7 +51,7 @@ export type ComposeViewDriver = {
 	isMinimized(): boolean;
 	setMinimized(minimized: boolean): void;
 	addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
-	addRecipientRow(options: Kefir.Stream): () => void;
+	addRecipientRow(options: Kefir.Stream<?Object>): () => void;
 	addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar;

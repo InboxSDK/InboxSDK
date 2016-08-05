@@ -66,6 +66,6 @@ export type Driver = {
 	createTopMessageBarDriver(options: Object): Object;
 	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
 	createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop;
-	getStopper(): Kefir.Stream;
+	getStopper(): Kefir.Stream<any>;
 	destroy(): void;
 };

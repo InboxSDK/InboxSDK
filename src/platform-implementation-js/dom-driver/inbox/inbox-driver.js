@@ -41,16 +41,16 @@ import type {EnvData} from '../../platform-implementation';
 class InboxDriver {
   _logger: Logger;
   _envData: EnvData;
-  _stopper: Kefir.Stream&{destroy:()=>void};
-  onready: Promise;
-  _routeViewDriverStream: Kefir.Stream;
-  _rowListViewDriverStream: Kefir.Stream;
+  _stopper: Kefir.Stream<any>&{destroy:()=>void};
+  onready: Promise<void>;
+  _routeViewDriverStream: Kefir.Stream<any>;
+  _rowListViewDriverStream: Kefir.Stream<any>;
   _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
   _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
   _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
-  _threadRowViewDriverKefirStream: Kefir.Stream;
-  _toolbarViewDriverStream: Kefir.Stream;
+  _threadRowViewDriverKefirStream: Kefir.Stream<any>;
+  _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
@@ -164,7 +164,7 @@ class InboxDriver {
   }
 
   getLogger(): Logger {return this._logger;}
-  getStopper(): Kefir.Stream {return this._stopper;}
+  getStopper(): Kefir.Stream<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
   getComposeViewDriverStream() {return this._composeViewDriverStream;}

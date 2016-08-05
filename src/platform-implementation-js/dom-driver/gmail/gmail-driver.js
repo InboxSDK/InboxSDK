@@ -93,7 +93,7 @@ class GmailDriver {
 	_xhrInterceptorStream: Kefir.Stream<Object>;
 	_messageViewDriverStream: Kefir.Stream<GmailMessageView>;
 	_stopper: Kefir.Stopper;
-	_navMarkerHiddenChanged: Kefir.Stream&Object;
+	_navMarkerHiddenChanged: Kefir.Stream<null>&Object;
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
@@ -167,7 +167,7 @@ class GmailDriver {
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream() {return this._messageViewDriverStream;}
-	getStopper(): Kefir.Stream {return this._stopper;}
+	getStopper(): Kefir.Stream<null> {return this._stopper;}
 	getEnvData(): EnvData {return this._envData;}
 
 	getTimings(): {[ix:string]:?number} {
@@ -423,7 +423,7 @@ class GmailDriver {
 		showAppIdWarning(this);
 	}
 
-	createTopMessageBarDriver(optionStream: Kefir.Stream): GmailTopMessageBarDriver {
+	createTopMessageBarDriver(optionStream: Kefir.Stream<?Object>): GmailTopMessageBarDriver {
 		return new GmailTopMessageBarDriver(optionStream);
 	}
 

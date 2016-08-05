@@ -12,7 +12,7 @@ import ButterBar from '../src/platform-implementation-js/namespaces/butter-bar';
 
 class MockButterBarDriver {
   _queue: Array<Object>;
-  _openBus: Kefir.Bus;
+  _openBus: Kefir.Bus<any>;
   _showMessageCount: number;
   _currentMessage: ?Object;
   _hideGmailMessageCount: number;

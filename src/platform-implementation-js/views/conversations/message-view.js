@@ -20,7 +20,7 @@ const memberMap = defonce(module, () => new WeakMap());
 class MessageView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(messageViewImplementation: MessageViewDriver, appId: string, membraneMap: WeakMap, Conversations: Object, driver: Driver){
+	constructor(messageViewImplementation: MessageViewDriver, appId: string, membraneMap: WeakMap<Object, Object>, Conversations: Object, driver: Driver){
 		super();
 
 		const members = {messageViewImplementation, membraneMap, Conversations, driver};

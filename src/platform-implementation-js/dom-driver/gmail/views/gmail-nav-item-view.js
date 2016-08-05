@@ -29,7 +29,7 @@ export default class GmailNavItemView {
 	_navItemDescriptor: Object;
 	_element: HTMLElement;
 	_activeMarkerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_iconElement: ?HTMLElement = null;
 	_iconImgElement: ?HTMLElement = null;
 	_itemContainerElement: ?HTMLElement = null;
@@ -77,7 +77,7 @@ export default class GmailNavItemView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 
@@ -93,7 +93,7 @@ export default class GmailNavItemView {
 		return this._name;
 	}
 
-	setNavItemDescriptor(navItemDescriptorPropertyStream: Kefir.Stream){
+	setNavItemDescriptor(navItemDescriptorPropertyStream: Kefir.Stream<Object>){
 		navItemDescriptorPropertyStream
 			.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
 			.onValue(x => this._updateValues(x));

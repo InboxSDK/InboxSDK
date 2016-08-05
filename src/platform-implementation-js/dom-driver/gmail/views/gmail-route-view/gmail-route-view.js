@@ -33,11 +33,11 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_name: string;
 	_paramsArray: string[];
 	_customRouteID: ?string;
-	_stopper: Kefir.Stream&{destroy():void};
+	_stopper: Kefir.Stream<null>&{destroy():void};
 	_rowListViews: GmailRowListView[];
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_driver: GmailDriver;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_customViewElement: ?HTMLElement;
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
@@ -98,8 +98,8 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	getHash(): string {return this._hash;}
-	getEventStream(): Kefir.Stream {return this._eventStream;}
-	getStopper(): Kefir.Stream {return this._stopper;}
+	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+	getStopper(): Kefir.Stream<null> {return this._stopper;}
 	getCustomViewElement(): ?HTMLElement {return this._customViewElement;}
 	getRowListViews(): GmailRowListView[] {return this._rowListViews;}
 	getThreadView(): ?GmailThreadView {return this._threadView;}

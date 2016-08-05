@@ -33,7 +33,7 @@ export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.
 	return gmailNavItemView;
 }
 
-function _waitForNavItemsHolder(): Promise {
+function _waitForNavItemsHolder(): Promise<any> {
 	if(GmailElementGetter.isStandalone()){
 		return Promise.resolve();
 	}

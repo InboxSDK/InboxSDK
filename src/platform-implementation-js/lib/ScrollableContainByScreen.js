@@ -9,8 +9,8 @@ import kefirStopper from 'kefir-stopper';
 import fromEventsWithOptions from './fromEventsWithOptions';
 
 export default class ScrollableContainByScreen {
-  _manualRepositions: Kefir.Bus = kefirBus();
-  _stopper: Kefir.Stream&{destroy(): void} = kefirStopper();
+  _manualRepositions: Kefir.Bus<null> = kefirBus();
+  _stopper: Kefir.Stream<null>&{destroy(): void} = kefirStopper();
 
   constructor(element: HTMLElement, anchorPoint: HTMLElement, options: Options) {
     Kefir.merge([

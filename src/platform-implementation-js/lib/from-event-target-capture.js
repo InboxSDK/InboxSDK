@@ -8,7 +8,7 @@ type Emitter = {
   removeEventListener: Function;
 };
 
-export default function fromEventTargetCapture(target: Emitter, eventName: string): Kefir.Stream {
+export default function fromEventTargetCapture(target: Emitter, eventName: string): Kefir.Stream<any> {
   return Kefir.stream(emitter => {
     function sink(event) {
       emitter.emit(event);
