@@ -7,7 +7,7 @@ import kefirStopper from 'kefir-stopper';
 
 export default class LabelDropdownButtonView {
 	_element: HTMLElement;
-	_eventStream: Kefir.Stream;
+	_eventStream: Kefir.Stream<Object>;
 	_stopper: Kefir.Stopper = kefirStopper();
 
 	constructor(options: Object){
@@ -24,7 +24,7 @@ export default class LabelDropdownButtonView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 

@@ -23,7 +23,7 @@ export default function detectionRunner<P: GenericParserResults>(
   {
     name, parser, watcher, finder, logError,
     root=document,
-    interval=5000
+    interval //=5000 https://github.com/facebook/flow/issues/2198
   }: {
     name: string;
     parser: (el: HTMLElement) => P;
@@ -34,6 +34,8 @@ export default function detectionRunner<P: GenericParserResults>(
     interval?: number|(liveElements: number, timeRunning: number) => number;
   }
 ): Kefir.Stream<ElementWithLifetime&{parsed: P}> {
+  if (!interval) interval = 5000;
+
   const startTime = Date.now();
   const watcherFoundElements: Set<HTMLElement> = new Set();
   const finderFoundElements: Set<HTMLElement> = new Set();
@@ -84,11 +86,17 @@ export default function detectionRunner<P: GenericParserResults>(
   const finderElements = arrayToLifetimes(
     Kefir.repeat(() => {
       // TODO scale based on user activity
-      const time = typeof interval === 'function' ?
-        interval(
+      let time;
+      if (typeof interval === 'function') {
+        time = interval(
           watcherFoundElements.size + finderFoundElements.size,
           Date.now() - startTime
-        ) : interval;
+        );
+      } else if (typeof interval === 'number') {
+        time = interval;
+      } else {
+        throw new Error(`Wrong type for interval: ${typeof interval}`);
+      }
       return Kefir.later(time).flatMap(() => delayIdle(time));
     })
       .map(() => {

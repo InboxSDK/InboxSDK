@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
 class InboxAppToolbarTooltipView {
-  _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
   _anchorElement: HTMLElement;
   _el: HTMLElement;
   _containerEl: HTMLElement;

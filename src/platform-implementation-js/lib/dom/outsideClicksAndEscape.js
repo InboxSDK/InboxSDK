@@ -3,7 +3,7 @@
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../from-event-target-capture';
 
-export default function outsideClicksAndEscape(elements: HTMLElement[]): Kefir.Stream {
+export default function outsideClicksAndEscape(elements: HTMLElement[]): Kefir.Stream<null> {
   return Kefir.merge([
     fromEventTargetCapture(document, 'click'),
     // We modify the focus event on document sometimes, so we listen for

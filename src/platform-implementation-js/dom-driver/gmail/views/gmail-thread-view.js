@@ -21,7 +21,7 @@ class GmailThreadView {
 	_routeViewDriver: any;
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_sidebarContentPanelContainerView: any;
 	_toolbarView: any;
 	_messageViewDrivers: any[];
@@ -45,7 +45,7 @@ class GmailThreadView {
 		});
 	}
 
-	getEventStream(): Kefir.Stream { return this._eventStream; }
+	getEventStream(): Kefir.Stream<Object> { return this._eventStream; }
 	getElement(): HTMLElement { return this._element; }
 	getRouteViewDriver(): any { return this._routeViewDriver; }
 	getIsPreviewedThread(): boolean { return this._isPreviewedThread; }

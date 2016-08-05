@@ -12,7 +12,7 @@ export default class KeyboardShortcutHelpModifier {
 	_appId: ?string;
 	_appName: ?string;
 	_appIconUrl: ?string;
-	_stopper: Kefir.Stream&{destroy:()=>void};
+	_stopper: Kefir.Stream<null>&{destroy:()=>void};
 	_shortcuts: Set<KeyboardShortcutHandle>;
 
 	constructor() {

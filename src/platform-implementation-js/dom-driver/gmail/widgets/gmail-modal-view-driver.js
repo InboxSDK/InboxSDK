@@ -9,7 +9,7 @@ import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 class GmailModalViewDriver {
-  _eventStream: Kefir.Bus;
+  _eventStream: Kefir.Bus<any>;
   _modalContainerElement: HTMLElement;
 
   constructor(options: Object) {
@@ -26,7 +26,7 @@ class GmailModalViewDriver {
   }
 
   getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
-  getEventStream(): Kefir.Stream { return this._eventStream; }
+  getEventStream(): Kefir.Stream<Object> { return this._eventStream; }
 
   _processOptions(options: Object) {
     this.setTitle(options.title);

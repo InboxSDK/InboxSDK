@@ -22,25 +22,19 @@ class Router {
 	static NativeListRouteIDs: Object;
 	static RouteTypes: Object;
 
-	constructor(appId: string , driver: Driver, membraneMap: WeakMap){
-		var members = {};
-		memberMap.set(this, members);
-
-		members.appId = appId;
-		members.driver = driver;
-
-		members.currentRouteViewDriver = null;
-
-		members.allRoutesHandlerRegistry = new HandlerRegistry();
-
-		members.customRoutes = [];
-
-		members.membraneMap = membraneMap;
-
-		members.listRouteHandlerRegistries = {};
+	constructor(appId: string , driver: Driver, membraneMap: WeakMap<Object, Object>){
+		const members = {
+			appId, driver,
+			currentRouteViewDriver: (null: any),
+			allRoutesHandlerRegistry: new HandlerRegistry(),
+			customRoutes: [],
+			membraneMap,
+			listRouteHandlerRegistries: {}
+		};
 		_.forOwn(NATIVE_LIST_ROUTE_IDS, value => {
 			members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 		});
+		memberMap.set(this, members);
 
 		driver.getRouteViewDriverStream().onValue(routeViewDriver => {
 			driver.getLogger().trackFunctionPerformance(
@@ -69,7 +63,7 @@ class Router {
 		memberMap.get(this).driver.goto(routeID, params);
 	}
 
-	handleCustomRoute(routeID: string, handler: Handler): () => void {
+	handleCustomRoute(routeID: string, handler: HandlerRegistry<CustomRouteView>): () => void {
 		var customRouteDescriptor = {
 			routeID: routeID,
 			onActivate: handler
@@ -88,11 +82,11 @@ class Router {
 		};
 	}
 
-	handleAllRoutes(handler: Handler): () => void {
+	handleAllRoutes(handler: Handler<any>): () => void {
 		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
 	}
 
-	handleListRoute(routeID: string, handler: Handler): () => void {
+	handleListRoute(routeID: string, handler: Handler<ListRouteView>): () => void {
 		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
 		if(!listRouteHandlerRegistries[routeID]){
 			throw new Error('Invalid routeID specified');
@@ -101,7 +95,7 @@ class Router {
 		return listRouteHandlerRegistries[routeID].registerHandler(handler);
 	}
 
-	handleCustomListRoute(routeID: string, handler: Handler): () => void {
+	handleCustomListRoute(routeID: string, handler: Function): () => void {
 		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
 	}
 

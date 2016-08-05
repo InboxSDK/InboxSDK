@@ -1,15 +1,16 @@
 /* @flow */
 //jshint ignore:start
 
-var Kefir = require('kefir');
+import Kefir from 'kefir';
 import StopperPool from '../stopper-pool';
 import delayAsap from '../delay-asap';
+import type {ItemWithLifetime} from './make-element-child-stream';
 
-export default function makeElementStreamMerger(): (event: {el: HTMLElement, removalStream: Kefir.Stream}) => Kefir.Stream<{el: HTMLElement, removalStream: Kefir.Stream}> {
-  var knownElementStopperPools: Map<HTMLElement, StopperPool> = new Map();
+export default function makeElementStreamMerger<T>(): (event: ItemWithLifetime<T>) => Kefir.Stream<ItemWithLifetime<T>> {
+  const knownElementStopperPools: Map<T, StopperPool> = new Map();
 
   return function(event) {
-    var stopperPool = knownElementStopperPools.get(event.el);
+    let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
         console.warn('element is part of multiple element streams', stopperPool.getSize(), event.el);

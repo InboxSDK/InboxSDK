@@ -18,7 +18,7 @@ const memberMap = defonce(module, () => new WeakMap());
 class ThreadView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membraneMap: WeakMap) {
+	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membraneMap: WeakMap<Object,Object>) {
 		super();
 
 		const members = {threadViewImplementation, appId, membraneMap};

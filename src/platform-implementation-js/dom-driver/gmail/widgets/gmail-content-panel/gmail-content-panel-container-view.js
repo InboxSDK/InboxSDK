@@ -10,7 +10,7 @@ import GmailContentPanelView from './gmail-content-panel-view';
 import get from '../../../../../common/get-or-fail';
 
 export default class GmailContentPanelContainerView {
-  _eventStream: Kefir.Bus;
+  _eventStream: Kefir.Bus<any>;
   _descriptorToViewMap: Map<Object, GmailContentPanelView>;
   _viewToDescriptorMap: Map<GmailContentPanelView, Object>;
   _element: HTMLElement;

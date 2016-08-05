@@ -6,7 +6,7 @@ import logger from '../logger';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Stream};
+export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Stream<any>};
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.

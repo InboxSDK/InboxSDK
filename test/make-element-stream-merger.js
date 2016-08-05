@@ -3,7 +3,7 @@
 
 var assert = require('assert');
 var Kefir = require('kefir');
-var kefirBus: ()=>Kefir.Bus = require('kefir-bus');
+var kefirBus = require('kefir-bus');
 var sinon = require('sinon');
 var Marker: any = require('../src/common/marker');
 

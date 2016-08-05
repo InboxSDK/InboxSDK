@@ -27,7 +27,7 @@ import Logger from '../../../lib/logger';
 class GmailToolbarView {
 	_element: HTMLElement;
 	_ready: Kefir.Stream<GmailToolbarView>;
-	_stopper: Kefir.Stream&{destroy:Function};
+	_stopper: Kefir.Stream<null>&{destroy:Function};
 	_routeViewDriver: RouteViewDriver;
 	_buttonViewControllers: Object[];
 	_moreMenuItems: Object[];
@@ -80,7 +80,7 @@ class GmailToolbarView {
 		}
 	}
 
-	getStopper(): Kefir.Stream {return this._stopper;}
+	getStopper(): Kefir.Stream<null> {return this._stopper;}
 	getElement(): HTMLElement {return this._element;}
 	getRouteViewDriver(): RouteViewDriver {return this._routeViewDriver;}
 

@@ -15,9 +15,9 @@ class InboxDrawerView {
   _containerEl: HTMLElement;
   _el: HTMLElement;
   _backdrop: ?InboxBackdrop = null;
-  _slideAnimationDone: Kefir.Stream;
-  _closing: Kefir.Stream&{destroy():void} = kefirStopper();
-  _closed: Kefir.Stream&{destroy():void} = kefirStopper();
+  _slideAnimationDone: Kefir.Stream<any>;
+  _closing: Kefir.Stream<any>&{destroy():void} = kefirStopper();
+  _closed: Kefir.Stream<any>&{destroy():void} = kefirStopper();
 
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
@@ -141,7 +141,7 @@ class InboxDrawerView {
       const title = document.createElement('div');
       title.className = 'inboxsdk__drawer_title';
       title.setAttribute('role', 'heading');
-      title.textContent = options.title;
+      title.textContent = options.title || '';
       titleBar.appendChild(title);
 
       this._el.appendChild(titleBar);

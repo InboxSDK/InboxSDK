@@ -11,7 +11,7 @@ import type {ItemWithLifetime} from './dom/make-element-child-stream';
 // element, or when the output stream is unsubscribed from, similar to
 // makeElementChildStream.
 
-type Stopper = Kefir.Stream&{destroy(): void};
+type Stopper = Kefir.Stream<any>&{destroy(): void};
 
 export default function arrayToLifetimes<T>(
   input: Kefir.Stream<Array<T>|NodeList<T>>,

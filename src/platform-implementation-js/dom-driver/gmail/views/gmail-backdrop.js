@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
 class GmailBackdrop {
-  _stopper: Kefir.Stream&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
 
   constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
@@ -18,7 +18,7 @@ class GmailBackdrop {
     });
   }
 
-  getStopper(): Kefir.Stream {
+  getStopper(): Kefir.Stream<null> {
     return this._stopper;
   }
 

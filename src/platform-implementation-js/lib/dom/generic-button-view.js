@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
 export default class GenericButtonView {
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_element: HTMLElement;
 
 	constructor(element: HTMLElement){
@@ -24,7 +24,7 @@ export default class GenericButtonView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 

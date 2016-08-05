@@ -10,7 +10,7 @@ var fs = require('fs');
 
 // Returns a promise that resolves once the injected script has been injected
 // and has done its initial load stuff.
-const injectScript: () => Promise = _.once(function() {
+const injectScript: () => Promise<null> = _.once(function() {
   if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
     const url = 'https://www.inboxsdk.com/build/injected.js';
 

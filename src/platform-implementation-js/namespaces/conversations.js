@@ -27,7 +27,7 @@ class Conversations {
 	MessageViewViewStates: typeof MessageViewViewStates = MessageViewViewStates;
 	MessageViewToolbarSectionNames: typeof MessageViewToolbarSectionNames = MessageViewToolbarSectionNames;
 
-	constructor(appId: string, driver: Driver, membraneMap: WeakMap) {
+	constructor(appId: string, driver: Driver, membraneMap: WeakMap<Object, Object>) {
 		const members = {
 			appId, driver, membraneMap,
 			threadViewHandlerRegistry: new HandlerRegistry(),

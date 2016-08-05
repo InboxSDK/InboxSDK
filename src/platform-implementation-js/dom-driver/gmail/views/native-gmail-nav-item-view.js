@@ -21,7 +21,7 @@ export default class NativeGmailNavItemView {
 	_element: HTMLElement;
 	_navItemName: string;
 	_activeMarkerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_itemContainerElement: ?HTMLElement = null;
 
 	constructor(nativeElement: HTMLElement, navItemName: string) {
@@ -44,7 +44,7 @@ export default class NativeGmailNavItemView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 

@@ -70,7 +70,7 @@ function parser(el: HTMLElement) {
     () => {
       const el = body && body.previousElementSibling;
       if (!(el instanceof HTMLElement) || el.nodeName !== 'LABEL')
-        throw new Error(`compose body placeholder wrong type ${el && el.nodeName}`);
+        throw new Error(`compose body placeholder wrong type ${el ? el.nodeName : 'undefined'}`);
       return el;
     }
   );

@@ -36,7 +36,7 @@ type BoundingBoxWrapper = {
 
 export default class GmailTooltipView {
 	_element: HTMLElement;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_stopper: Kefir.Stopper;
 
 	constructor(options?: Object = {}){
@@ -59,7 +59,7 @@ export default class GmailTooltipView {
 		return this._stopper;
 	}
 
-	getEventStream(): Kefir.Stream {
+	getEventStream(): Kefir.Stream<Object> {
 		return this._eventStream;
 	}
 

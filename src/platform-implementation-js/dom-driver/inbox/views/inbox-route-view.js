@@ -40,7 +40,7 @@ export default class InboxRouteView {
   _routeType: string;
   _routeID: string;
   _params: Object;
-  _eventStream: Kefir.Bus;
+  _eventStream: Kefir.Bus<any>;
   _customViewElement: ?HTMLElement = null;
 
   constructor(el: HTMLElement, type: string) {
@@ -84,7 +84,7 @@ export default class InboxRouteView {
     return this._params;
   }
 
-  getEventStream(): Kefir.Stream {
+  getEventStream(): Kefir.Stream<Object> {
     return this._eventStream;
   }
 

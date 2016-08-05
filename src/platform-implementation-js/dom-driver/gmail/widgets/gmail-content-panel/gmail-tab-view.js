@@ -14,10 +14,10 @@ const TAB_COLOR_CLASSES = [
 ];
 
 export default class GmailTabView {
-	_descriptor: Kefir.Stream<?Object>;
+	_descriptor: Kefir.Stream<Object>;
 	_groupOrderHint: any;
 	_lastDescriptorValue: ?Object;
-	_eventStream: Kefir.Bus;
+	_eventStream: Kefir.Bus<any>;
 	_element: HTMLElement;
 	_innerElement: HTMLElement;
 	_titleElement: HTMLElement;
@@ -27,7 +27,7 @@ export default class GmailTabView {
 	_iconImgElement: ?HTMLImageElement;
 	_isActive: boolean;
 
-	constructor(descriptorStream: Kefir.Stream, groupOrderHint: any) {
+	constructor(descriptorStream: Kefir.Stream<Object>, groupOrderHint: any) {
 	  this._descriptor = descriptorStream;
 	  this._groupOrderHint = groupOrderHint;
 		this._lastDescriptorValue = null;
@@ -47,10 +47,10 @@ export default class GmailTabView {
 		(this._element:any).remove();
 	}
 
-	getDescriptor(): Kefir.Stream {return this._descriptor;}
+	getDescriptor() {return this._descriptor;}
 	getGroupOrderHint(): any {return this._groupOrderHint;}
 	getElement(): HTMLElement {return this._element;}
-	getEventStream(): Kefir.Stream {return this._eventStream;}
+	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
 
   setInactive() {
     this._element.classList.remove('inboxsdk__tab_selected');

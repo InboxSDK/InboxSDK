@@ -10,10 +10,10 @@ var Kefir = require('kefir');
 export default class StopperPool {
   _streamCount: number;
   _ended: boolean;
-  _pool: Kefir.Pool;
-  stream: Kefir.Stream;
+  _pool: Kefir.Pool<any>;
+  stream: Kefir.Stream<any>;
 
-  constructor(streams: Kefir.Stream|Kefir.Stream[]) {
+  constructor(streams: Kefir.Stream<any>|Kefir.Stream<any>[]) {
     this._streamCount = 0;
     this._ended = false;
     this._pool = Kefir.pool();
@@ -34,7 +34,7 @@ export default class StopperPool {
     this.add(streams);
   }
 
-  add(newStreams: Kefir.Stream|Kefir.Stream[]) {
+  add(newStreams: Kefir.Stream<any>|Kefir.Stream<any>[]) {
     if (this._ended) {
       throw new Error("Tried to add a stream to a stopped StopperPool");
     }

@@ -6,7 +6,7 @@ var RSVP = require('rsvp');
 var cproc = require('child_process');
 
 // Spawns a process and passes stdout and stderr through.
-export default function spawn(command: string, args: string[]=[]): Promise {
+export default function spawn(command: string, args: string[]=[]): Promise<void> {
   return new RSVP.Promise(function(resolve, reject) {
     var proc = cproc.spawn(command, args, {stdio:'inherit'});
     proc.on('exit', function(code) {

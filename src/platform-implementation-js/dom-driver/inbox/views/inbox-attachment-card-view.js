@@ -33,7 +33,7 @@ class InboxAttachmentCardView {
       this._element.href = options.previewUrl;
     } else {
       this._element = document.createElement('div');
-      this._element.tabIndex = '0';
+      this._element.tabIndex = 0;
     }
     this._element.title = options.title;
 
@@ -141,11 +141,11 @@ class InboxAttachmentCardView {
     return this._element;
   }
 
-  getStopper(): Kefir.Stream {
+  getStopper(): Kefir.Stream<null> {
     return this._stopper;
   }
 
-  getPreviewClicks(): Kefir.Stream {
+  getPreviewClicks(): Kefir.Stream<Event> {
     return this._previewClicks.takeUntilBy(this._stopper);
   }
 

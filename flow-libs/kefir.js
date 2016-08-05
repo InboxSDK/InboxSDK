@@ -36,7 +36,7 @@ declare module kefir {
     diff<U>(fn: (prev: U, next: T) => T, seed: U): Stream<U>;
     scan(cb: (prev: T, next: T) => T, seed?: T): Stream<T>;
     scan<U>(cb: (prev: U, next: T) => U, seed: U): Stream<U>;
-    flatten(): Stream;
+    flatten(): Stream<any>;
     flatten<U>(transformer: (value: T) => U[]): Stream<U>;
     delay(n: number): Stream<T>;
     throttle(n: number, options?: {leading?: boolean, trailing?: boolean}): Stream<T>;
@@ -44,17 +44,17 @@ declare module kefir {
     mapErrors(fn: (error: any) => any): Stream<T>;
     filterErrors(fn: (error: any) => any): Stream<T>;
     takeErrors(n: number): Stream<T>;
-    ignoreValues(): Stream;
+    ignoreValues(): Stream<any>;
     ignoreErrors(): Stream<T>;
     ignoreEnd(): Stream<T>;
     beforeEnd<U>(fn: () => U): Stream<T|U>;
     slidingWindow(max: number, min?: number): Stream<T[]>;
     bufferWhile(predicate?: (value: T) => boolean, options?: {flushOnEnd?: boolean}): Stream<T[]>;
-    transduce(transducer: any): Stream;
+    transduce(transducer: any): Stream<any>;
     withHandler<U>(handler: (emitter: Emitter<U>, event: Event<T>) => void): Stream<U>;
 
     combine<U>(otherObs: Stream<U>): Stream<[T,U]>;
-    combine<U,Z>(otherObs: Stream, combinator: (t: T, u: U) => Z): Stream<Z>;
+    combine<U,Z>(otherObs: Stream<U>, combinator: (t: T, u: U) => Z): Stream<Z>;
     zip<U>(otherObs: Stream<U>): Stream<[T,U]>;
     zip<U,Z>(otherObs: Stream<U>, combinator: (t: T, u: U) => Z): Stream<Z>;
     merge<U>(otherObs: Stream<U>): Stream<T|U>;
@@ -67,11 +67,11 @@ declare module kefir {
     flatMapLimit<U>(transform: (value: T) => Stream<U>, limit: number): Stream<U>;
     flatMapErrors<U>(transform: (error: any) => Stream<U>): Stream<T|U>;
 
-    filterBy(otherObs: Stream): Stream<T>;
-    skipUntilBy(otherObs: Stream): Stream<T>;
-    takeUntilBy(otherObs: Stream): Stream<T>;
-    bufferBy(otherObs: Stream, options?: {flushOnEnd?: boolean}): Stream<T[]>;
-    bufferWhileBy(otherObs: Stream, options?: {flushOnEnd?: boolean, flushOnChange?: boolean}): Stream<T[]>;
+    filterBy(otherObs: Stream<any>): Stream<T>;
+    skipUntilBy(otherObs: Stream<any>): Stream<T>;
+    takeUntilBy(otherObs: Stream<any>): Stream<T>;
+    bufferBy(otherObs: Stream<any>, options?: {flushOnEnd?: boolean}): Stream<T[]>;
+    bufferWhileBy(otherObs: Stream<any>, options?: {flushOnEnd?: boolean, flushOnChange?: boolean}): Stream<T[]>;
     sampledBy<U>(otherObs: Stream<U>): Stream<T>;
     sampledBy<U, Y>(otherObs: Stream<U>, combinator: (obsValue: T, otherObsValue: U) => Y): Stream<T | Y>;
     bufferWithTimeOrCount(time: number, count: number, options?: {flushOnEnd: boolean}): Stream<T>;
@@ -96,7 +96,7 @@ declare module kefir {
     destroy(): void;
   }
 
-  declare function never(): Stream;
+  declare function never(): Stream<any>;
   declare function later<T>(delay: number, value: T): Stream<T>;
   declare function interval<T>(interval: number, value: T): Stream<T>;
   declare function sequentially<T>(interval: number, values: T[]): Stream<T>;
@@ -104,23 +104,22 @@ declare module kefir {
   declare function withInterval<T>(interval: number, f: (emitter: Emitter<T>) => void): Stream<T>;
   declare function fromCallback<T>(f: (cb: (value: T) => void) => void): Stream<T>;
   declare function fromNodeCallback<T>(f: (cb: (err: any, value: ?T) => void) => void): Stream<T>;
-  declare function fromEvents(target: Object, eventName: string, transformer?: (event: any) => any): Stream;
+  declare function fromEvents(target: Object, eventName: string, transformer?: (event: any) => any): Stream<any>;
   declare function stream<T>(subscribe: (emitter: Emitter<T>) => ?() => void): Stream<T>;
 
   declare function constant<T>(value: T): Stream<T>;
-  declare function constantError(err: any): Stream;
+  declare function constantError(err: any): Stream<any>;
   declare function fromPromise<T>(promise: Promise<T>): Stream<T>;
 
-  declare function fromESObservable(observable: {subscribe: Function}): Stream;
+  declare function fromESObservable(observable: {subscribe: Function}): Stream<any>;
   declare function toESObservable(): {subscribe: Function};
 
-  declare function combine<T,U>(obss: Stream<T>[], passiveObss?: Stream<U>[]): Stream<Array<T|U>>;
-  declare function combine(obss: Stream[], passiveObss?: Stream[], combinator?: Function): Stream;
+  declare function combine(obss: Stream<any>[], passiveObss?: Stream<any>[], combinator?: Function): Stream<any>;
   declare function zip<T>(obss: Stream<T>[]): Stream<Array<T>>;
-  declare function zip(obss: Stream[], combinator: Function): Stream;
+  declare function zip(obss: Stream<any>[], combinator: Function): Stream<any>;
   declare function merge<T>(obss: Stream<T>[]): Stream<T>;
   declare function concat<T>(obss: Stream<T>[]): Stream<T>;
 
-  declare function pool(): Pool;
+  declare function pool(): Pool<*>;
   declare function repeat<T>(fn: (i: number) => ?Stream<T>): Stream<T>;
 }

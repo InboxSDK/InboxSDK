@@ -9,7 +9,7 @@ import type GmailContentPanelContainerView from './gmail-content-panel-container
 
 export default class GmailContentPanelView {
   destroyed: boolean;
-  _eventStream: Kefir.Bus;
+  _eventStream: Kefir.Bus<any>;
   _element: HTMLElement;
   _gmailContentPanelContainerView: Object;
 
@@ -34,7 +34,7 @@ export default class GmailContentPanelView {
     }
   }
 
-  getEventStream(): Kefir.Stream {return this._eventStream;}
+  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
   getElement(): HTMLElement {return this._element;}
 
   activate() {
