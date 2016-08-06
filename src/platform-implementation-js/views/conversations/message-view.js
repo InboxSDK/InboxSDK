@@ -87,14 +87,9 @@ class MessageView extends EventEmitter {
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
 	getFileAttachmentCardViews(): Array<AttachmentCardView> {
-		var self = this;
 		return _.chain(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers())
-			.filter(function(cardDriver) {
-				return cardDriver.getAttachmentType() === 'FILE';
-			})
-			.map(function(attachmentCardViewDriver){
-				return new AttachmentCardView(attachmentCardViewDriver, self);
-			})
+			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
+			.map(attachmentCardViewDriver => new AttachmentCardView(attachmentCardViewDriver, this))
 			.value();
 	}
 

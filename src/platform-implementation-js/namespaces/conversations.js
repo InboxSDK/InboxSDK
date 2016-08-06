@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
+import AttachmentCardView from '../views/conversations/attachment-card-view';
 
 import HandlerRegistry from '../lib/handler-registry';
 
@@ -34,7 +35,8 @@ class Conversations {
 			messageViewHandlerRegistries: {
 				all: new HandlerRegistry(),
 				loaded: new HandlerRegistry()
-			}
+			},
+			attachmentCardViewHandlerRegistry: new HandlerRegistry()
 		};
 		memberMap.set(this, members);
 
@@ -43,6 +45,13 @@ class Conversations {
 			members.messageViewHandlerRegistries.all.dumpHandlers();
 			members.messageViewHandlerRegistries.loaded.dumpHandlers();
 		});
+
+		driver.getAttachmentCardViewDriverStream()
+			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
+			.onValue(attachmentCardViewDriver => {
+				const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver);
+				members.attachmentCardViewHandlerRegistry.addTarget(attachmentCardView, null);
+			});
 
 		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap, driver);
 		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap, driver);
@@ -75,6 +84,10 @@ class Conversations {
 
 	registerMessageViewHandlerAll(handler: (v: MessageView)=>void): ()=>void {
 		return memberMap.get(this).messageViewHandlerRegistries.all.registerHandler(handler);
+	}
+
+	registerFileAttachmentCardViewHandler(handler: (v: AttachmentCardView)=>void): ()=>void {
+		return memberMap.get(this).attachmentCardViewHandlerRegistry.registerHandler(handler);
 	}
 }
 

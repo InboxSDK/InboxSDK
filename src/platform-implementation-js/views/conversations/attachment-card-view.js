@@ -10,11 +10,11 @@ import type {AttachmentCardViewDriver} from '../../driver-interfaces/driver';
 
 // documented in src/docs/
 class AttachmentCardView extends EventEmitter {
-	_messageView: MessageView;
+	_messageView: ?MessageView;
 	_attachmentCardImplementation: AttachmentCardViewDriver;
 	destroyed: boolean;
 
-	constructor(attachmentCardImplementation: AttachmentCardViewDriver, messageView: MessageView) {
+	constructor(attachmentCardImplementation: AttachmentCardViewDriver, messageView: ?MessageView) {
 		super();
 		this.destroyed = false;
 		this._messageView = messageView;
@@ -41,7 +41,7 @@ class AttachmentCardView extends EventEmitter {
 		return this._attachmentCardImplementation.getDownloadURL();
 	}
 
-	getMessageView(): MessageView {
+	getMessageView(): ?MessageView {
 		return this._messageView;
 	}
 }

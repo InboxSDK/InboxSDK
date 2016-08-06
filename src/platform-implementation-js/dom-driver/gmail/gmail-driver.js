@@ -163,6 +163,11 @@ class GmailDriver {
 	getRowListViewDriverStream() {return this._rowListViewDriverStream;}
 	getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
 	getThreadViewDriverStream() {return this._threadViewDriverStream;}
+	getAttachmentCardViewDriverStream() {
+		return this._messageViewDriverStream
+			.map(messageView => messageView.getAttachmentCardViewDrivers())
+			.flatten();
+	}
 	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}
