@@ -9,6 +9,7 @@ import autoHtml from 'auto-html';
 import {defn} from 'ud';
 import type GmailDriver from '../gmail-driver';
 
+import type GmailMessageView from './gmail-message-view';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
@@ -20,12 +21,14 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 class GmailAttachmentCardView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
+	_messageViewDriver: ?GmailMessageView;
 	_cachedType: any;
 	_stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
 	_previewClicks = Kefir.pool();
 
-	constructor(options: Object, driver: GmailDriver) {
+	constructor(options: Object, driver: GmailDriver, messageViewDriver: ?GmailMessageView) {
 		this._driver = driver;
+		this._messageViewDriver = messageViewDriver;
 
 		if(options.element){
 			this._element = options.element;
@@ -41,6 +44,10 @@ class GmailAttachmentCardView {
 
 	getElement(): HTMLElement {
 		return this._element;
+	}
+
+	getMessageViewDriver() {
+		return this._messageViewDriver;
 	}
 
 	getStopper(): Kefir.Stream<null> {

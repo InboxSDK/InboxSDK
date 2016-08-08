@@ -42,7 +42,11 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		return _.map(attachments, attachment => {
 			let cardView = this._elsToCardViews.get(attachment);
 			if (!cardView) {
-				cardView = new GmailAttachmentCardView({element: attachment}, this._driver);
+				cardView = new GmailAttachmentCardView(
+					{element: attachment},
+					this._driver,
+					this._messageViewDriver
+				);
 				this._elsToCardViews.set(attachment, cardView);
 			}
 			return cardView;

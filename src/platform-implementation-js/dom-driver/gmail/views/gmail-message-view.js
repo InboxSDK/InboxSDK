@@ -412,7 +412,7 @@ class GmailMessageView {
 	}
 
 	addAttachmentCard(options: Object) {
-		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
+		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver, this);
 
 		if(!this._gmailAttachmentAreaView){
 			this._gmailAttachmentAreaView = this._getAttachmentArea();
