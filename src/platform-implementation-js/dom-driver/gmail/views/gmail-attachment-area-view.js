@@ -5,17 +5,20 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 import {defn} from 'ud';
 import type GmailDriver from '../gmail-driver';
+import type GmailMessageView from './gmail-message-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 	_element: HTMLElement;
+	_messageViewDriver: GmailMessageView;
 	_driver: GmailDriver;
 	_elsToCardViews: WeakMap<HTMLElement, GmailAttachmentCardView>;
 
-	constructor(element: ?HTMLElement, driver: GmailDriver) {
+	constructor(element: ?HTMLElement, driver: GmailDriver, messageViewDriver: GmailMessageView) {
 		this._driver = driver;
+		this._messageViewDriver = messageViewDriver;
 		this._elsToCardViews = new WeakMap();
 		if(element){
 			this._element = element;

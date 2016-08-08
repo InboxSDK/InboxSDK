@@ -607,14 +607,14 @@ class GmailMessageView {
 
 	_getAttachmentArea(): ?GmailAttachmentAreaView {
 		if(this._element.querySelector('.hq')){
-			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver);
+			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver, this);
 		}
 
 		return null;
 	}
 
 	_createAttachmentArea(): GmailAttachmentAreaView{
-		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
+		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver, this);
 
 		const beforeElement = this._element.querySelector('.hi');
 		const parentNode = beforeElement.parentNode;
