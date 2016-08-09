@@ -200,6 +200,10 @@ class InboxDriver {
     };
   }
 
+  getAccountSwitcherContactList(): Contact[] {
+    throw new Error('not implemented yet');
+  }
+
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented');
     return {

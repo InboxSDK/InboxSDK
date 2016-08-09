@@ -96,19 +96,19 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.LOADER_VERSION = LOADER_VERSION;
 		this.IMPL_VERSION = BUILD_VERSION;
 
-		this.ButterBar = new ButterBar(appId, driver, this._membraneMap);
+		this.ButterBar = new ButterBar(appId, driver);
 		driver.setButterBar(this.ButterBar);
 
-		this.Compose = new Compose(appId, driver, this._membraneMap);
+		this.Compose = new Compose(appId, driver);
 		this.Conversations = new Conversations(appId, driver, this._membrane, this._membraneMap);
-		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver, this._membraneMap);
-		this.User = new User(appId, driver, this._membraneMap);
+		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
+		this.User = new User(driver);
 		this.Lists = new Lists(appId, driver, this._membraneMap);
-		this.NavMenu = new NavMenu(appId, driver, this._membraneMap);
+		this.NavMenu = new NavMenu(appId, driver);
 		this.Router = new Router(appId, driver, this._membraneMap);
-		this.Search = new Search(appId, driver, this._membraneMap);
+		this.Search = new Search(appId, driver);
 		this.Toolbars = new Toolbars(appId, driver, this._membraneMap);
-		this.Widgets = new Widgets(appId, driver, this._membraneMap);
+		this.Widgets = new Widgets(appId, driver);
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version
 			// whenever we start that.
