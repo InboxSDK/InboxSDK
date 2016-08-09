@@ -5,6 +5,11 @@ import _ from 'lodash';
 import SafeEventEmitter from './lib/safe-event-emitter';
 import {BUILD_VERSION} from '../common/version';
 import sharedStyle from './lib/shared-style';
+import Membrane from './lib/Membrane';
+
+import AttachmentCardView from './views/conversations/attachment-card-view';
+import GmailAttachmentCardView from './dom-driver/gmail/views/gmail-attachment-card-view';
+import InboxAttachmentCardView from './dom-driver/inbox/views/inbox-attachment-card-view';
 
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
@@ -45,6 +50,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
 	_membraneMap: WeakMap<Object, Object>;
+	_membrane: Membrane;
 	destroyed: boolean;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
@@ -70,6 +76,10 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._appId = appId;
 		this._driver = driver;
 		this._membraneMap = new WeakMap();
+		this._membrane = new Membrane([
+			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
 		this.IMPL_VERSION = BUILD_VERSION;
@@ -78,7 +88,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		driver.setButterBar(this.ButterBar);
 
 		this.Compose = new Compose(appId, driver, this._membraneMap);
-		this.Conversations = new Conversations(appId, driver, this._membraneMap);
+		this.Conversations = new Conversations(appId, driver, this._membrane, this._membraneMap);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver, this._membraneMap);
 		this.User = new User(appId, driver, this._membraneMap);
 		this.Lists = new Lists(appId, driver, this._membraneMap);

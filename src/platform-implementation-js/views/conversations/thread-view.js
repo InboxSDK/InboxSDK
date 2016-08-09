@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
+import type Membrane from '../../lib/Membrane';
 import kefirCast from 'kefir-cast';
 import Kefir from 'kefir';
 import Logger from '../../lib/logger';
@@ -18,10 +19,10 @@ const memberMap = defonce(module, () => new WeakMap());
 class ThreadView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membraneMap: WeakMap<Object,Object>) {
+	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membrane: Membrane, membraneMap: WeakMap<Object,Object>) {
 		super();
 
-		const members = {threadViewImplementation, appId, membraneMap};
+		const members = {threadViewImplementation, appId, membrane, membraneMap};
 		memberMap.set(this, members);
 
 		_bindToStreamEvents(this, threadViewImplementation);
