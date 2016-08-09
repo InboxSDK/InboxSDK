@@ -43,7 +43,8 @@ class AttachmentCardView extends EventEmitter {
 	}
 
 	getMessageView(): ?MessageView {
-		return null; //TODO
+		const messageViewDriver = this._attachmentCardImplementation.getMessageViewDriver();
+		return messageViewDriver ? this._membrane.get(messageViewDriver) : null;
 	}
 }
 

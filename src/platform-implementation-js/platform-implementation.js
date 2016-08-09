@@ -11,6 +11,14 @@ import AttachmentCardView from './views/conversations/attachment-card-view';
 import GmailAttachmentCardView from './dom-driver/gmail/views/gmail-attachment-card-view';
 import InboxAttachmentCardView from './dom-driver/inbox/views/inbox-attachment-card-view';
 
+import MessageView from './views/conversations/message-view';
+import GmailMessageView from './dom-driver/gmail/views/gmail-message-view';
+import InboxMessageView from './dom-driver/inbox/views/inbox-message-view';
+
+import ThreadView from './views/conversations/thread-view';
+import GmailThreadView from './dom-driver/gmail/views/gmail-thread-view';
+import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
+
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
 import Conversations from './namespaces/conversations';
@@ -79,6 +87,10 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._membrane = new Membrane([
 			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
 			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
+			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
+			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
+			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
 		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
