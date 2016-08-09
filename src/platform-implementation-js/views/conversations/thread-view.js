@@ -19,10 +19,10 @@ const memberMap = defonce(module, () => new WeakMap());
 class ThreadView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membrane: Membrane, membraneMap: WeakMap<Object,Object>) {
+	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membrane: Membrane) {
 		super();
 
-		const members = {threadViewImplementation, appId, membrane, membraneMap};
+		const members = {threadViewImplementation, appId, membrane};
 		memberMap.set(this, members);
 
 		_bindToStreamEvents(this, threadViewImplementation);
@@ -52,7 +52,7 @@ class ThreadView extends EventEmitter {
 				return messageViewDriver.isLoaded();
 			})
 			.map(function(messageViewDriver){
-				var messageView = members.membraneMap.get(messageViewDriver);
+				var messageView = members.membrane.get(messageViewDriver);
 				if (!messageView) {
 					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
 				}
@@ -67,7 +67,7 @@ class ThreadView extends EventEmitter {
 
 		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
 			.map(function(messageViewDriver){
-				var messageView = members.membraneMap.get(messageViewDriver);
+				var messageView = members.membrane.get(messageViewDriver);
 				if (!messageView) {
 					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
 				}
@@ -119,9 +119,10 @@ function _bindToStreamEvents(threadView, threadViewImplementation){
 			return event.type !== 'internal' && event.eventName === 'contactHover';
 		})
 		.onValue(function(event){
+			const {membrane} = memberMap.get(threadView);
 			threadView.emit(event.eventName, {
 				contactType: event.contactType,
-				messageView: memberMap.get(threadView).membraneMap.get(event.messageViewDriver),
+				messageView: membrane.get(event.messageViewDriver),
 				contact: event.contact,
 				threadView: threadView
 			});

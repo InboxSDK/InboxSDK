@@ -87,10 +87,10 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._membrane = new Membrane([
 			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
 			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
-			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
-			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
-			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
-			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane, this._membraneMap, this.Conversations, driver)],
+			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
+			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
+			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
+			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
 		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;

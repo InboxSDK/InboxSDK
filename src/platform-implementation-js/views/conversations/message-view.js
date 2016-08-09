@@ -21,10 +21,10 @@ const memberMap = defonce(module, () => new WeakMap());
 class MessageView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(messageViewImplementation: MessageViewDriver, appId: string, membrane: Membrane, membraneMap: WeakMap<Object, Object>, Conversations: Object, driver: Driver){
+	constructor(messageViewImplementation: MessageViewDriver, appId: string, membrane: Membrane, Conversations: Object, driver: Driver){
 		super();
 
-		const members = {messageViewImplementation, membrane, membraneMap, Conversations, driver};
+		const members = {messageViewImplementation, membrane, Conversations, driver};
 		memberMap.set(this, members);
 
 		_bindToEventStream(this, members, messageViewImplementation.getEventStream());
@@ -130,8 +130,8 @@ class MessageView extends EventEmitter {
 	}
 
 	getThreadView(): ThreadView {
-		var members = memberMap.get(this);
-		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
+		const {messageViewImplementation, membrane} = memberMap.get(this);
+		return membrane.get(messageViewImplementation.getThreadViewDriver());
 	}
 
 	getDateString(): string {
