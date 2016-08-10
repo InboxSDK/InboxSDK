@@ -1,4 +1,4 @@
-'use strict';
+/* @flow */
 
 import _ from 'lodash';
 import Kefir from 'kefir';
@@ -7,6 +7,8 @@ import EventEmitter from '../lib/safe-event-emitter';
 
 import HandlerRegistry from '../lib/handler-registry';
 
+import type {Driver} from '../driver-interfaces/driver';
+import type Membrane from '../lib/Membrane';
 import ThreadRowView from '../views/thread-row-view';
 import ThreadView from '../views/conversations/thread-view';
 import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
@@ -16,57 +18,52 @@ import AppToolbarButtonView from '../views/app-toolbar-button-view';
 const memberMap = new WeakMap();
 
 // documented in src/docs/
-const Toolbars = function(appId, driver, membraneMap){
-	EventEmitter.call(this);
+export default class Toolbars extends EventEmitter {
+	SectionNames: Object;
 
-	var members = {};
-	memberMap.set(this, members);
+	constructor(appId: string, driver: Driver, membrane: Membrane, membraneMap: WeakMap<Object, Object>) {
+		super();
 
-	members.appId = appId;
-	members.driver = driver;
-	members.membraneMap = membraneMap;
+		const members = {
+			appId, driver, membrane, membraneMap,
+			listButtonHandlerRegistry: new HandlerRegistry(),
+			threadViewHandlerRegistry: new HandlerRegistry()
+		};
+		memberMap.set(this, members);
 
-	members.listButtonHandlerRegistry = new HandlerRegistry();
-	members.threadViewHandlerRegistry = new HandlerRegistry();
+		driver.getStopper().onValue(function() {
+			members.listButtonHandlerRegistry.dumpHandlers();
+			members.threadViewHandlerRegistry.dumpHandlers();
+		});
 
-	driver.getStopper().onValue(function() {
-		members.listButtonHandlerRegistry.dumpHandlers();
-		members.threadViewHandlerRegistry.dumpHandlers();
-	});
+		this.SectionNames = sectionNames;
 
-	this.SectionNames = sectionNames;
+		_setupToolbarViewDriverWatcher(this, members);
+	}
 
-	_setupToolbarViewDriverWatcher(this, members);
-};
-
-Toolbars.prototype = Object.create(EventEmitter.prototype);
-
-_.extend(Toolbars.prototype, {
-
-	registerToolbarButtonForList(buttonDescriptor){
+	registerToolbarButtonForList(buttonDescriptor: Object){
 		return memberMap.get(this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
-	},
+	}
 
-	registerToolbarButtonForThreadView(buttonDescriptor){
+	registerToolbarButtonForThreadView(buttonDescriptor: Object){
 		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
-	},
+	}
 
-	setAppToolbarButton(appToolbarButtonDescriptor){
+	setAppToolbarButton(appToolbarButtonDescriptor: Object){
 		const driver = memberMap.get(this).driver;
 		driver.getLogger().deprecationWarning(
 			'Toolbars.setAppToolbarButton', 'Toolbars.addToolbarButtonForApp');
 		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
-	},
+	}
 
-	addToolbarButtonForApp(buttonDescriptor){
+	addToolbarButtonForApp(buttonDescriptor: Object){
 		const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 		const appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptorStream);
 		const appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
 
 		return appToolbarButtonView;
 	}
-
-});
+}
 
 function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 	// Used to help track our duplicate toolbar button issue.
@@ -108,7 +105,7 @@ function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
 }
 
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
-	var membraneMap = members.membraneMap;
+	const {membrane, membraneMap} = members;
 	var buttonOptions = _.clone(buttonDescriptor);
 	var oldOnClick = buttonOptions.onClick || function(){};
 
@@ -122,12 +119,7 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 			});
 		}
 		else if(toolbarViewDriver.getThreadViewDriver()){
-			var threadView = membraneMap.get(toolbarViewDriver.getThreadViewDriver());
-			if(!threadView){
-				threadView = new ThreadView(toolbarViewDriver.getThreadViewDriver(), members.appId, membraneMap);
-				membraneMap.set(toolbarViewDriver.getThreadViewDriver(), threadView);
-			}
-
+			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
 			event.threadView = threadView;
 		}
 
@@ -176,5 +168,3 @@ var sectionNames = Object.freeze({
 	'METADATA_STATE': 'METADATA_STATE',
 	'OTHER': 'OTHER'
 });
-
-module.exports = Toolbars;
