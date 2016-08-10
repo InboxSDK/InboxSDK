@@ -29,9 +29,9 @@ class Conversations {
 	MessageViewViewStates: typeof MessageViewViewStates = MessageViewViewStates;
 	MessageViewToolbarSectionNames: typeof MessageViewToolbarSectionNames = MessageViewToolbarSectionNames;
 
-	constructor(appId: string, driver: Driver, membrane: Membrane, membraneMap: WeakMap<Object, Object>) {
+	constructor(appId: string, driver: Driver, membrane: Membrane) {
 		const members = {
-			appId, driver, membraneMap,
+			appId, driver,
 			threadViewHandlerRegistry: new HandlerRegistry(),
 			messageViewHandlerRegistries: {
 				all: new HandlerRegistry(),
@@ -54,8 +54,8 @@ class Conversations {
 				members.attachmentCardViewHandlerRegistry.addTarget(attachmentCardView);
 			});
 
-		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membrane, membraneMap, driver);
-		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membrane, membraneMap, driver);
+		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membrane, driver);
+		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membrane, driver);
 
 		_setupViewDriverWatcher(
 			appId,
@@ -71,7 +71,6 @@ class Conversations {
 			members.messageViewHandlerRegistries.loaded,
 			this,
 			membrane,
-			membraneMap,
 			driver
 		);
 	}
@@ -93,12 +92,9 @@ class Conversations {
 	}
 }
 
-function _setupViewDriverWatcher(appId, stream: Kefir.Stream<Object>, ViewClass, handlerRegistry, ConversationsInstance, membrane, membraneMap, driver){
+function _setupViewDriverWatcher(appId, stream: Kefir.Stream<Object>, ViewClass, handlerRegistry, ConversationsInstance, membrane, driver){
 	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
-		var view = membraneMap.get(viewDriver);
-		if (!view) {
-			view = membrane.get(viewDriver);
-		}
+		const view = membrane.get(viewDriver);
 		return {viewDriver, view};
 	});
 
