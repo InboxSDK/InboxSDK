@@ -6,7 +6,6 @@ type Mapper<T> = [Class<T>, MapperFn<T>];
 // Used to make the *View objects out of our *ViewDriver objects, and to make
 // sure we return the same *View object back if we've already made one for
 // given *ViewDriver.
-// TODO replace all uses of the `membraneMap` variable with this.
 export default class Membrane {
   _mappers: Map<Class<any>, MapperFn<any>>;
   _map: WeakMap<Object, Object> = new WeakMap();

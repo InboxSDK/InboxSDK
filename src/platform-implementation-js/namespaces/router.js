@@ -8,6 +8,7 @@ import HandlerRegistry from '../lib/handler-registry';
 import RouteView from '../views/route-view/route-view';
 import ListRouteView from '../views/route-view/list-route-view';
 import CustomRouteView from '../views/route-view/custom-route-view';
+import type Membrane from '../lib/Membrane';
 
 import type {Driver} from '../driver-interfaces/driver';
 import type {Handler} from '../lib/handler-registry';
@@ -22,13 +23,13 @@ class Router {
 	static NativeListRouteIDs: Object;
 	static RouteTypes: Object;
 
-	constructor(appId: string , driver: Driver, membraneMap: WeakMap<Object, Object>){
+	constructor(appId: string, driver: Driver, membrane: Membrane){
 		const members = {
 			appId, driver,
 			currentRouteViewDriver: (null: any),
 			allRoutesHandlerRegistry: new HandlerRegistry(),
 			customRoutes: [],
-			membraneMap,
+			membrane,
 			listRouteHandlerRegistries: {}
 		};
 		_.forOwn(NATIVE_LIST_ROUTE_IDS, value => {
@@ -101,7 +102,7 @@ class Router {
 
 	getCurrentRouteView(): RouteView {
 		var members = memberMap.get(this);
-		return members.membraneMap.get(members.currentRouteViewDriver);
+		return members.membrane.get(members.currentRouteViewDriver);
 	}
 
 }
@@ -158,8 +159,7 @@ var ROUTE_TYPES = Object.freeze({
 
 function _handleRouteViewChange(router, members, routeViewDriver){
 	members.currentRouteViewDriver = routeViewDriver;
-	var routeView = new RouteView(routeViewDriver);
-	members.membraneMap.set(routeViewDriver, routeView);
+	const routeView = members.membrane.get(routeViewDriver);
 
 	_updateNavMenu(members, routeViewDriver);
 

@@ -22,6 +22,9 @@ import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
 import ThreadRowView from './views/thread-row-view';
 import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
 
+import RouteView from './views/route-view/route-view';
+import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
+
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
 import Conversations from './namespaces/conversations';
@@ -60,7 +63,6 @@ export type PiOpts = {
 export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
-	_membraneMap: WeakMap<Object, Object>;
 	_membrane: Membrane;
 	destroyed: boolean;
 	LOADER_VERSION: string;
@@ -86,7 +88,6 @@ export class PlatformImplementation extends SafeEventEmitter {
 
 		this._appId = appId;
 		this._driver = driver;
-		this._membraneMap = new WeakMap();
 		this._membrane = new Membrane([
 			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
 			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
@@ -95,6 +96,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
 			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
 			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
+			[GmailRouteView, viewDriver => new RouteView(viewDriver)],
 		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
@@ -109,9 +111,9 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.User = new User(driver);
 		this.Lists = new Lists(appId, driver, this._membrane);
 		this.NavMenu = new NavMenu(appId, driver);
-		this.Router = new Router(appId, driver, this._membraneMap);
+		this.Router = new Router(appId, driver, this._membrane);
 		this.Search = new Search(appId, driver);
-		this.Toolbars = new Toolbars(appId, driver, this._membrane, this._membraneMap);
+		this.Toolbars = new Toolbars(appId, driver, this._membrane);
 		this.Widgets = new Widgets(appId, driver);
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version

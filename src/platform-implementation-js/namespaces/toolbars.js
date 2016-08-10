@@ -21,11 +21,11 @@ const memberMap = new WeakMap();
 export default class Toolbars extends EventEmitter {
 	SectionNames: Object;
 
-	constructor(appId: string, driver: Driver, membrane: Membrane, membraneMap: WeakMap<Object, Object>) {
+	constructor(appId: string, driver: Driver, membrane: Membrane) {
 		super();
 
 		const members = {
-			appId, driver, membrane, membraneMap,
+			appId, driver, membrane,
 			listButtonHandlerRegistry: new HandlerRegistry(),
 			threadViewHandlerRegistry: new HandlerRegistry()
 		};
@@ -75,7 +75,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 		var toolbarViewDriver = toolbarView.getToolbarViewDriver();
 
 		if(buttonDescriptor.hideFor){
-			var routeView = members.membraneMap.get(toolbarViewDriver.getRouteViewDriver());
+			const routeView = members.membrane.get(toolbarViewDriver.getRouteViewDriver());
 			if(buttonDescriptor.hideFor(routeView)){
 				return;
 			}
