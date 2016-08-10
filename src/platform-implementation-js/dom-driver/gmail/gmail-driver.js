@@ -165,6 +165,14 @@ class GmailDriver {
 	getThreadViewDriverStream() {return this._threadViewDriverStream;}
 	getAttachmentCardViewDriverStream() {
 		return this._messageViewDriverStream
+			.flatMap(messageViewDriver =>
+				messageViewDriver.isLoaded() ?
+					Kefir.constant(messageViewDriver) :
+					messageViewDriver.getEventStream()
+						.filter(event => event.eventName === 'messageLoad')
+						.map(() => messageViewDriver)
+						.take(1)
+			)
 			.map(messageView => messageView.getAttachmentCardViewDrivers())
 			.flatten();
 	}
