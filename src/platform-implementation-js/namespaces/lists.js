@@ -1,53 +1,46 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
+import _ from 'lodash';
 
-var HandlerRegistry = require('../lib/handler-registry');
-var ThreadRowView = require('../views/thread-row-view');
+import HandlerRegistry from '../lib/handler-registry';
+import ThreadRowView from '../views/thread-row-view';
+import type {Driver} from '../driver-interfaces/driver';
 
-var memberMap = new WeakMap();
+const memberMap = new WeakMap();
 
 // documented in src/docs/
-var Lists = function(appId, driver, membraneMap){
+export default class Lists {
+	ActionButtonTypes = ActionButtonTypes;
 
-	var members = {};
-	memberMap.set(this, members);
+	constructor(appId: string, driver: Driver, membraneMap: WeakMap<Object,Object>){
+		const members = {
+			appId, driver, membraneMap,
+			threadRowViewRegistry: new HandlerRegistry()
+		};
+		memberMap.set(this, members);
 
-	members.appId = appId;
-	members.driver = driver;
-	members.membraneMap = membraneMap;
+		driver.getStopper().onValue(() => {
+			members.threadRowViewRegistry.dumpHandlers();
+		});
 
-	members.threadRowViewRegistry = new HandlerRegistry();
-	driver.getStopper().onValue(function() {
-		members.threadRowViewRegistry.dumpHandlers();
-	});
+		members.driver.getThreadRowViewDriverStream().onValue(viewDriver => {
+			var view = membraneMap.get(viewDriver);
+			if(!view){
+				view = new ThreadRowView(viewDriver);
+				membraneMap.set(viewDriver, view);
+			}
 
-	members.driver.getThreadRowViewDriverStream().onValue(function(viewDriver){
-		var view = membraneMap.get(viewDriver);
-		if(!view){
-			view = new ThreadRowView(viewDriver);
-			membraneMap.set(viewDriver, view);
-		}
-
-		members.threadRowViewRegistry.addTarget(view);
-	});
-
-};
-
-_.extend(Lists.prototype, {
-
-	registerThreadRowViewHandler(handler) {
-		return memberMap.get(this).threadRowViewRegistry.registerHandler(handler);
+			members.threadRowViewRegistry.addTarget(view);
+		});
 	}
 
-});
+	registerThreadRowViewHandler(handler: Function) {
+		return memberMap.get(this).threadRowViewRegistry.registerHandler(handler);
+	}
+}
 
 var ActionButtonTypes = Object.freeze({
 	'LINK': 'LINK',
 	'DROPDOWN': 'DROPDOWN',
 	'ACTION': 'ACTION'
 });
-
-Lists.prototype.ActionButtonTypes = ActionButtonTypes;
-
-module.exports = Lists;
