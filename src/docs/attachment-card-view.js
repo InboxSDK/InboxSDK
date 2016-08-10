@@ -41,8 +41,9 @@ var AttachmentCardView = /** @lends AttachmentCardView */{
 	getDownloadURL: function() {},
 
 	/**
-	 * Get the MessageView that this attachment card belongs to.
-	 * @return {MessageView}
+	 * Get the MessageView that this attachment card belongs to if it belongs to
+	 * one. AttachmentCardViews in Gmail always belong to a MessageView.
+	 * @return {null|MessageView}
 	 */
 	getMessageView: function() {},
 

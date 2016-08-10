@@ -44,7 +44,14 @@ var Conversations = /** @lends Conversations */{
 	* @param {func(MessageView)} handler - The handler to call when a message view is displayed.
 	* @return {void}
 	*/
-	registerMessageViewHandlerAll: function(){}
+	registerMessageViewHandlerAll: function(){},
+
+	/**
+	* Registers your handler to be called when an AttachmentCardView is visible.
+	* @param {func(AttachmentCardView)} handler
+	* @return {void}
+	*/
+	registerFileAttachmentCardViewHandler: function(){}
 
 };
 

@@ -163,6 +163,19 @@ class GmailDriver {
 	getRowListViewDriverStream() {return this._rowListViewDriverStream;}
 	getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
 	getThreadViewDriverStream() {return this._threadViewDriverStream;}
+	getAttachmentCardViewDriverStream() {
+		return this._messageViewDriverStream
+			.flatMap(messageViewDriver =>
+				messageViewDriver.isLoaded() ?
+					Kefir.constant(messageViewDriver) :
+					messageViewDriver.getEventStream()
+						.filter(event => event.eventName === 'messageLoad')
+						.map(() => messageViewDriver)
+						.take(1)
+			)
+			.map(messageView => messageView.getAttachmentCardViewDrivers())
+			.flatten();
+	}
 	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}

@@ -41,9 +41,11 @@ export type Driver = {
 	openDraftByMessageID(messageID: string): void;
 	getThreadViewDriverStream(): Kefir.Stream<ThreadViewDriver>;
 	getMessageViewDriverStream(): Kefir.Stream<MessageViewDriver>;
+	getAttachmentCardViewDriverStream(): Kefir.Stream<AttachmentCardViewDriver>;
 	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
+	getAccountSwitcherContactList(): Contact[];
 	getThreadRowViewDriverStream(): Kefir.Stream<Object>;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;

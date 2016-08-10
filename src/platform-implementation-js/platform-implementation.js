@@ -5,6 +5,25 @@ import _ from 'lodash';
 import SafeEventEmitter from './lib/safe-event-emitter';
 import {BUILD_VERSION} from '../common/version';
 import sharedStyle from './lib/shared-style';
+import Membrane from './lib/Membrane';
+
+import AttachmentCardView from './views/conversations/attachment-card-view';
+import GmailAttachmentCardView from './dom-driver/gmail/views/gmail-attachment-card-view';
+import InboxAttachmentCardView from './dom-driver/inbox/views/inbox-attachment-card-view';
+
+import MessageView from './views/conversations/message-view';
+import GmailMessageView from './dom-driver/gmail/views/gmail-message-view';
+import InboxMessageView from './dom-driver/inbox/views/inbox-message-view';
+
+import ThreadView from './views/conversations/thread-view';
+import GmailThreadView from './dom-driver/gmail/views/gmail-thread-view';
+import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
+
+import ThreadRowView from './views/thread-row-view';
+import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
+
+import RouteView from './views/route-view/route-view';
+import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
 
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
@@ -44,7 +63,7 @@ export type PiOpts = {
 export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
 	_appId: string;
-	_membraneMap: WeakMap<Object, Object>;
+	_membrane: Membrane;
 	destroyed: boolean;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
@@ -69,24 +88,33 @@ export class PlatformImplementation extends SafeEventEmitter {
 
 		this._appId = appId;
 		this._driver = driver;
-		this._membraneMap = new WeakMap();
+		this._membrane = new Membrane([
+			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
+			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
+			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
+			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
+			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
+			[GmailRouteView, viewDriver => new RouteView(viewDriver)],
+		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
 		this.IMPL_VERSION = BUILD_VERSION;
 
-		this.ButterBar = new ButterBar(appId, driver, this._membraneMap);
+		this.ButterBar = new ButterBar(appId, driver);
 		driver.setButterBar(this.ButterBar);
 
-		this.Compose = new Compose(appId, driver, this._membraneMap);
-		this.Conversations = new Conversations(appId, driver, this._membraneMap);
-		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver, this._membraneMap);
-		this.User = new User(appId, driver, this._membraneMap);
-		this.Lists = new Lists(appId, driver, this._membraneMap);
-		this.NavMenu = new NavMenu(appId, driver, this._membraneMap);
-		this.Router = new Router(appId, driver, this._membraneMap);
-		this.Search = new Search(appId, driver, this._membraneMap);
-		this.Toolbars = new Toolbars(appId, driver, this._membraneMap);
-		this.Widgets = new Widgets(appId, driver, this._membraneMap);
+		this.Compose = new Compose(appId, driver);
+		this.Conversations = new Conversations(appId, driver, this._membrane);
+		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
+		this.User = new User(driver);
+		this.Lists = new Lists(appId, driver, this._membrane);
+		this.NavMenu = new NavMenu(appId, driver);
+		this.Router = new Router(appId, driver, this._membrane);
+		this.Search = new Search(appId, driver);
+		this.Toolbars = new Toolbars(appId, driver, this._membrane);
+		this.Widgets = new Widgets(appId, driver);
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version
 			// whenever we start that.

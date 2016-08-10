@@ -16,13 +16,9 @@ export default class NavMenu {
 	NavItemTypes: Object;
 	SENT_MAIL: NativeNavItemView;
 
-	constructor(appId: string , driver: Driver, membraneMap: WeakMap<Object, Object>){
-		var members = {};
+	constructor(appId: string, driver: Driver){
+		const members = {appId, driver, navItemViews: []};
 		memberMap.set(this, members);
-
-		members.appId = appId;
-		members.driver = driver;
-		members.navItemViews = [];
 
 		this.SENT_MAIL = _setupSentMail(appId, driver);
 		this.NavItemTypes = require('../../common/constants/nav-item-types');

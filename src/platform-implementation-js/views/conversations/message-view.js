@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
+import type Membrane from '../../lib/Membrane';
 
 import AttachmentCardView from './attachment-card-view';
 import {MessageViewToolbarSectionNames} from '../../namespaces/conversations';
@@ -20,18 +21,19 @@ const memberMap = defonce(module, () => new WeakMap());
 class MessageView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(messageViewImplementation: MessageViewDriver, appId: string, membraneMap: WeakMap<Object, Object>, Conversations: Object, driver: Driver){
+	constructor(messageViewImplementation: MessageViewDriver, appId: string, membrane: Membrane, Conversations: Object, driver: Driver){
 		super();
 
-		const members = {messageViewImplementation, membraneMap, Conversations, driver};
+		const members = {messageViewImplementation, membrane, Conversations, driver};
 		memberMap.set(this, members);
 
 		_bindToEventStream(this, members, messageViewImplementation.getEventStream());
 	}
 
 	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
-		const attachmentCardViewDriver = memberMap.get(this).messageViewImplementation.addAttachmentCard(cardOptions);
-		const attachmentCardView = new AttachmentCardView(attachmentCardViewDriver, this);
+		const {messageViewImplementation, membrane} = memberMap.get(this);
+		const attachmentCardViewDriver = messageViewImplementation.addAttachmentCard(cardOptions);
+		const attachmentCardView = membrane.get(attachmentCardViewDriver);
 
 		attachmentCardViewDriver.getPreviewClicks().onValue(e => {
 			if (cardOptions.previewOnClick) {
@@ -50,13 +52,13 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentsToolbarButton(buttonOptions: Object){
-		const {messageViewImplementation} = memberMap.get(this);
+		const {messageViewImplementation, membrane} = memberMap.get(this);
 		messageViewImplementation.addButtonToDownloadAllArea({
 			tooltip: buttonOptions.tooltip,
 			iconUrl: buttonOptions.iconUrl,
 			onClick: () => {
 				const attachmentCardViews = messageViewImplementation.getAttachmentCardViewDrivers().map(cardDriver =>
-					new AttachmentCardView(cardDriver, this)
+					membrane.get(cardDriver)
 				);
 				buttonOptions.onClick({attachmentCardViews});
 			}
@@ -87,14 +89,10 @@ class MessageView extends EventEmitter {
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
 	getFileAttachmentCardViews(): Array<AttachmentCardView> {
-		var self = this;
-		return _.chain(memberMap.get(this).messageViewImplementation.getAttachmentCardViewDrivers())
-			.filter(function(cardDriver) {
-				return cardDriver.getAttachmentType() === 'FILE';
-			})
-			.map(function(attachmentCardViewDriver){
-				return new AttachmentCardView(attachmentCardViewDriver, self);
-			})
+		const {messageViewImplementation, membrane} = memberMap.get(this);
+		return _.chain(messageViewImplementation.getAttachmentCardViewDrivers())
+			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
+			.map(attachmentCardViewDriver => membrane.get(attachmentCardViewDriver))
 			.value();
 	}
 
@@ -132,8 +130,8 @@ class MessageView extends EventEmitter {
 	}
 
 	getThreadView(): ThreadView {
-		var members = memberMap.get(this);
-		return members.membraneMap.get(members.messageViewImplementation.getThreadViewDriver());
+		const {messageViewImplementation, membrane} = memberMap.get(this);
+		return membrane.get(messageViewImplementation.getThreadViewDriver());
 	}
 
 	getDateString(): string {

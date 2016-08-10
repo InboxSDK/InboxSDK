@@ -412,7 +412,7 @@ class GmailMessageView {
 	}
 
 	addAttachmentCard(options: Object) {
-		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver);
+		var gmailAttachmentCardView = new GmailAttachmentCardView(options, this._driver, this);
 
 		if(!this._gmailAttachmentAreaView){
 			this._gmailAttachmentAreaView = this._getAttachmentArea();
@@ -607,14 +607,14 @@ class GmailMessageView {
 
 	_getAttachmentArea(): ?GmailAttachmentAreaView {
 		if(this._element.querySelector('.hq')){
-			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver);
+			return new GmailAttachmentAreaView(this._element.querySelector('.hq'), this._driver, this);
 		}
 
 		return null;
 	}
 
 	_createAttachmentArea(): GmailAttachmentAreaView{
-		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver);
+		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver, this);
 
 		const beforeElement = this._element.querySelector('.hi');
 		const parentNode = beforeElement.parentNode;

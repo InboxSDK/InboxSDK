@@ -5,8 +5,10 @@ import Kefir from 'kefir';
 
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
+import AttachmentCardView from '../views/conversations/attachment-card-view';
 
 import HandlerRegistry from '../lib/handler-registry';
+import type Membrane from '../lib/Membrane';
 
 import type {Driver} from '../driver-interfaces/driver';
 
@@ -27,14 +29,15 @@ class Conversations {
 	MessageViewViewStates: typeof MessageViewViewStates = MessageViewViewStates;
 	MessageViewToolbarSectionNames: typeof MessageViewToolbarSectionNames = MessageViewToolbarSectionNames;
 
-	constructor(appId: string, driver: Driver, membraneMap: WeakMap<Object, Object>) {
+	constructor(appId: string, driver: Driver, membrane: Membrane) {
 		const members = {
-			appId, driver, membraneMap,
+			appId, driver,
 			threadViewHandlerRegistry: new HandlerRegistry(),
 			messageViewHandlerRegistries: {
 				all: new HandlerRegistry(),
 				loaded: new HandlerRegistry()
-			}
+			},
+			attachmentCardViewHandlerRegistry: new HandlerRegistry()
 		};
 		memberMap.set(this, members);
 
@@ -44,8 +47,15 @@ class Conversations {
 			members.messageViewHandlerRegistries.loaded.dumpHandlers();
 		});
 
-		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membraneMap, driver);
-		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membraneMap, driver);
+		driver.getAttachmentCardViewDriverStream()
+			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
+			.onValue(attachmentCardViewDriver => {
+				const attachmentCardView = membrane.get(attachmentCardViewDriver);
+				members.attachmentCardViewHandlerRegistry.addTarget(attachmentCardView);
+			});
+
+		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membrane, driver);
+		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membrane, driver);
 
 		_setupViewDriverWatcher(
 			appId,
@@ -60,7 +70,7 @@ class Conversations {
 			MessageView,
 			members.messageViewHandlerRegistries.loaded,
 			this,
-			membraneMap,
+			membrane,
 			driver
 		);
 	}
@@ -76,15 +86,15 @@ class Conversations {
 	registerMessageViewHandlerAll(handler: (v: MessageView)=>void): ()=>void {
 		return memberMap.get(this).messageViewHandlerRegistries.all.registerHandler(handler);
 	}
+
+	registerFileAttachmentCardViewHandler(handler: (v: AttachmentCardView)=>void): ()=>void {
+		return memberMap.get(this).attachmentCardViewHandlerRegistry.registerHandler(handler);
+	}
 }
 
-function _setupViewDriverWatcher(appId, stream: Kefir.Stream<Object>, ViewClass, handlerRegistry, ConversationsInstance, membraneMap, driver){
+function _setupViewDriverWatcher(appId, stream: Kefir.Stream<Object>, ViewClass, handlerRegistry, ConversationsInstance, membrane, driver){
 	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
-		var view = membraneMap.get(viewDriver);
-		if (!view) {
-			view = new ViewClass((viewDriver:any), appId, membraneMap, ConversationsInstance, driver);
-			membraneMap.set(viewDriver, view);
-		}
+		const view = membrane.get(viewDriver);
 		return {viewDriver, view};
 	});
 

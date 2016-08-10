@@ -3,6 +3,14 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 
 	window._sdk = sdk;
 
+	sdk.Conversations.registerFileAttachmentCardViewHandler(card => {
+		card.addButton({
+			iconUrl: chrome.runtime.getURL('zipicon.png'),
+			tooltip: 'Foo1',
+			onClick: console.log.bind(console, 'click')
+		});
+	});
+
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
 		console.log('got messageView', messageView.getMessageID());
 
@@ -25,21 +33,21 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 				},
 				{
 					iconUrl: chrome.runtime.getURL('zipicon.png'),
-					tooltip: 'Foo bar',
+					tooltip: 'Foo bar1',
 					onClick() {
 						alert('Foo bar button clicked');
 					}
 				},
 				{
 					iconUrl: chrome.runtime.getURL('zipicon.png'),
-					tooltip: 'Foo bar',
+					tooltip: 'Foo bar2',
 					onClick() {
 						alert('Foo bar button clicked');
 					}
 				},
 				{
 					iconUrl: chrome.runtime.getURL('zipicon.png'),
-					tooltip: 'Foo bar',
+					tooltip: 'Foo bar3',
 					onClick() {
 						alert('Foo bar button clicked');
 					}
@@ -84,11 +92,6 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			console.log(i, 'title', card.getTitle());
 			card.getDownloadURL().then(function(url) {
 				console.log(i, 'url', url);
-			});
-			card.addButton({
-				iconUrl: chrome.runtime.getURL('zipicon.png'),
-				tooltip: 'Foo',
-				onClick: console.log.bind(console, 'click')
 			});
 			card.addButton({
 				iconUrl: chrome.runtime.getURL('zipicon.png'),

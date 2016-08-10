@@ -18,7 +18,7 @@ const SAMPLE_RATE = 0.01;
 // documented in src/docs/
 class Compose {
 
-  constructor(appId: string , driver: Driver){
+  constructor(appId: string, driver: Driver){
     var members = {};
     memberMap.set(this, members);
 

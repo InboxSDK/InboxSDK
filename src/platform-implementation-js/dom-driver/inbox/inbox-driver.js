@@ -170,6 +170,7 @@ class InboxDriver {
   getComposeViewDriverStream() {return this._composeViewDriverStream;}
   getThreadViewDriverStream() {return this._threadViewDriverStream;}
   getMessageViewDriverStream() {return this._messageViewDriverStream;}
+  getAttachmentCardViewDriverStream() {return Kefir.never();}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}
@@ -197,6 +198,10 @@ class InboxDriver {
       emailAddress: this.getUserEmailAddress(),
       name: this.getUserEmailAddress()
     };
+  }
+
+  getAccountSwitcherContactList(): Contact[] {
+    throw new Error('not implemented yet');
   }
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {

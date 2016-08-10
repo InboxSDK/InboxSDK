@@ -2,12 +2,13 @@
 
 import * as ud from 'ud';
 import KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
+import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = ud.defonce(module, () => new WeakMap());
 
 // documented in src/docs/
 class Keyboard {
-  constructor(appId, appName, appIconUrl, driver) {
+  constructor(appId: string, appName: ?string, appIconUrl: ?string, driver: Driver) {
     const members = {appId, appName, appIconUrl, driver};
     memberMap.set(this, members);
   }
