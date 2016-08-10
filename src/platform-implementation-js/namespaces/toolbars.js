@@ -105,7 +105,7 @@ function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
 }
 
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
-	const {membrane, membraneMap} = members;
+	const {membrane} = members;
 	var buttonOptions = _.clone(buttonDescriptor);
 	var oldOnClick = buttonOptions.onClick || function(){};
 
@@ -114,8 +114,8 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 
 		if(toolbarViewDriver.getRowListViewDriver()){
 			Object.assign(event, {
-				threadRowViews: _getThreadRowViews(toolbarViewDriver, membraneMap),
-				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membraneMap)
+				threadRowViews: _getThreadRowViews(toolbarViewDriver, membrane),
+				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membrane)
 			});
 		}
 		else if(toolbarViewDriver.getThreadViewDriver()){
@@ -130,16 +130,16 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
 	return buttonOptions;
 }
 
-function _getThreadRowViews(toolbarViewDriver, membraneMap){
+function _getThreadRowViews(toolbarViewDriver, membrane: Membrane){
 	return Array.from(
 			toolbarViewDriver
 				.getRowListViewDriver()
 				.getThreadRowViewDrivers()
 				.values()
-		).map(_getThreadRowView(membraneMap));
+		).map(_getThreadRowView(membrane));
 }
 
-function _getSelectedThreadRowViews(toolbarViewDriver, membraneMap){
+function _getSelectedThreadRowViews(toolbarViewDriver, membrane: Membrane){
 	return _.chain(Array.from(
 			toolbarViewDriver
 				.getRowListViewDriver()
@@ -147,18 +147,13 @@ function _getSelectedThreadRowViews(toolbarViewDriver, membraneMap){
 				.values()
 		))
 		.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
-		.map(_getThreadRowView(membraneMap))
+		.map(_getThreadRowView(membrane))
 		.value();
 }
 
-function _getThreadRowView(membraneMap){
+function _getThreadRowView(membrane: Membrane){
 	return function(threadRowViewDriver){
-		var threadRowView = membraneMap.get(threadRowViewDriver);
-		if(!threadRowView){
-			threadRowView = new ThreadRowView(threadRowViewDriver);
-			membraneMap.set(threadRowViewDriver, threadRowView);
-		}
-
+		const threadRowView = membrane.get(threadRowViewDriver);
 		return threadRowView;
 	};
 }

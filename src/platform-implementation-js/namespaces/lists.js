@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import HandlerRegistry from '../lib/handler-registry';
 import ThreadRowView from '../views/thread-row-view';
+import type Membrane from '../lib/Membrane';
 import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = new WeakMap();
@@ -12,9 +13,9 @@ const memberMap = new WeakMap();
 export default class Lists {
 	ActionButtonTypes = ActionButtonTypes;
 
-	constructor(appId: string, driver: Driver, membraneMap: WeakMap<Object,Object>){
+	constructor(appId: string, driver: Driver, membrane: Membrane){
 		const members = {
-			appId, driver, membraneMap,
+			appId, driver, membrane,
 			threadRowViewRegistry: new HandlerRegistry()
 		};
 		memberMap.set(this, members);
@@ -24,12 +25,7 @@ export default class Lists {
 		});
 
 		members.driver.getThreadRowViewDriverStream().onValue(viewDriver => {
-			var view = membraneMap.get(viewDriver);
-			if(!view){
-				view = new ThreadRowView(viewDriver);
-				membraneMap.set(viewDriver, view);
-			}
-
+			const view = membrane.get(viewDriver);
 			members.threadRowViewRegistry.addTarget(view);
 		});
 	}

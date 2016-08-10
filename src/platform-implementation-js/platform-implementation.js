@@ -19,6 +19,9 @@ import ThreadView from './views/conversations/thread-view';
 import GmailThreadView from './dom-driver/gmail/views/gmail-thread-view';
 import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
 
+import ThreadRowView from './views/thread-row-view';
+import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
+
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
 import Conversations from './namespaces/conversations';
@@ -91,6 +94,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
 			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
 			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
+			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
 		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;
@@ -103,7 +107,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.Conversations = new Conversations(appId, driver, this._membrane);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
 		this.User = new User(driver);
-		this.Lists = new Lists(appId, driver, this._membraneMap);
+		this.Lists = new Lists(appId, driver, this._membrane);
 		this.NavMenu = new NavMenu(appId, driver);
 		this.Router = new Router(appId, driver, this._membraneMap);
 		this.Search = new Search(appId, driver);
