@@ -15,6 +15,8 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 import {
   page20160614,
   pageFullscreen20160620,
+  page20160810,
+  page20160810_2,
 } from './lib/pages';
 
 describe('Inbox Message Detection', function() {
@@ -36,6 +38,22 @@ describe('Inbox Message Detection', function() {
       const message = pageFullscreen20160620().querySelector('[data-test-id=message]');
 
       const results = finder(pageFullscreen20160620());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, message));
+    });
+
+    it('2016-08-10 message', function() {
+      const message = page20160810().querySelector('[data-test-id=message]');
+
+      const results = finder(page20160810());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, message));
+    });
+
+    it('2016-08-10 message with attachments', function() {
+      const message = page20160810_2().querySelector('[data-test-id=message]');
+
+      const results = finder(page20160810_2());
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, message));
     });
@@ -61,6 +79,26 @@ describe('Inbox Message Detection', function() {
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '150058a7ecc2fea4');
     });
+
+    it('2016-08-10 message', function() {
+      const message = page20160810().querySelector('[data-test-id=message]');
+      const results = parser(message);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.viewState, 'EXPANDED');
+      assert.strictEqual(results.attributes.messageId, '156755c188c4f67c');
+    });
+
+    it('2016-08-10 message with attachments', function() {
+      const message = page20160810_2().querySelector('[data-test-id=message]');
+      const results = parser(message);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.viewState, 'EXPANDED');
+      assert.strictEqual(results.attributes.messageId, '6c908830f9c147cf');
+    });
   });
 
   describe('watcher', function() {
@@ -84,6 +122,36 @@ describe('Inbox Message Detection', function() {
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160620())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, message));
+          cb();
+        });
+    });
+
+    it('2016-08-10 message', function(cb) {
+      const message = page20160810().querySelector('[data-test-id=message]');
+
+      const spy = sinon.spy();
+      watcher(page20160810())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, message));
+          cb();
+        });
+    });
+
+    it('2016-08-10 message with attachments', function(cb) {
+      const message = page20160810_2().querySelector('[data-test-id=message]');
+
+      const spy = sinon.spy();
+      watcher(page20160810_2())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

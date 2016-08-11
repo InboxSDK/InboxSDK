@@ -22,3 +22,7 @@ export const page20160629_3: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-06-29-3.html', 'utf8')));
 export const page20160727: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-07-27 search.html', 'utf8')));
+export const page20160810: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-10 message.html', 'utf8')));
+export const page20160810_2: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-10 message with attachments.html', 'utf8')));
