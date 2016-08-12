@@ -145,7 +145,7 @@ class InboxMessageView {
   addAttachmentCard(options: Object) {
     const {attachmentsArea} = this._p.elements;
     if (!attachmentsArea) throw new Error('Could not find attachments area');
-    let container = attachmentsArea.firstElementChild;
+    let container = attachmentsArea.lastElementChild;
     if (!container) {
       attachmentsArea.style.display = '';
       attachmentsArea.style.margin = '16px 0 0';
