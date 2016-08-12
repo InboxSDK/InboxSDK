@@ -21,5 +21,13 @@ export default function watcher(
   if (!openedThreads) openedThreads = threadWatcher(root);
   if (!messages) messages = messageWatcher(root, openedThreads);
 
-  return Kefir.never();
+  return messages
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.nodeName === 'SECTION')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.style.display !== 'none')
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.hasAttribute('tabindex') && el.hasAttribute('jsaction'));
 }
