@@ -12,12 +12,15 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
+  const type = 'FILE';
+
   const elements = {
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
     elements,
     attributes: {
+      type
     },
     score,
     errors: ec.getErrorLogs()

@@ -8,17 +8,24 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type InboxDriver from '../inbox-driver';
 
+import type {Parsed} from '../detection/attachmentCard/parser';
+
 class InboxAttachmentCardView {
   _stopper = kefirStopper();
   _previewClicks = Kefir.pool();
   _element: HTMLElement;
   _driver: InboxDriver;
+  _type: string;
+  _p: ?Parsed;
 
   constructor(options, driver: InboxDriver) {
     this._driver = driver;
     if (options.element) {
-      throw new Error('not implemented yet');
+      this._element = options.element;
+      this._p = options.parsed;
+      this._type = options.parsed.attributes.type;
     } else {
+      this._type = 'FILE';
       this._createNewElement(options);
     }
   }
@@ -27,7 +34,7 @@ class InboxAttachmentCardView {
     this._stopper.destroy();
   }
 
-  _createNewElement(options) {
+  _createNewElement(options: Object) {
     if (options.previewUrl) {
       this._element = document.createElement('a');
       this._element.href = options.previewUrl;
@@ -79,53 +86,8 @@ class InboxAttachmentCardView {
         `;
       }
 
-      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
       options.buttons.forEach(button => {
-        const el = document.createElement('button');
-        el.className = 'inboxsdk__attachment_card_button';
-        if (button.downloadUrl) {
-          el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
-          (el:any).addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            let prevented = false;
-            if (button.onClick) {
-              button.onClick({
-                preventDefault() {
-                  prevented = true;
-                }
-              });
-            }
-            if (prevented) return;
-            const downloadLink = document.createElement('a');
-            downloadLink.href = button.downloadUrl;
-            (downloadLink:any).addEventListener('click', function(e) {
-              e.stopPropagation();
-            }, true);
-            if (button.openInNewTab) {
-              downloadLink.setAttribute('target', '_blank');
-            }
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-          });
-          el.innerHTML = `
-            <div style="background: no-repeat url(https://ssl.gstatic.com/mail/sprites/newattachmentcards-ff2ce2bea04dec2bf32f2ebbfa0834ff.png) -219px -129px"></div>
-          `;
-        } else {
-          (el:any).addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            if (button.onClick) {
-              button.onClick();
-            }
-          });
-          el.innerHTML = autoHtml `
-            <img src="${button.iconUrl}">
-          `;
-          el.title = button.tooltip;
-        }
-        buttonContainer.appendChild(el);
+        this.addButton(button);
       });
     };
     setupInnerHtml(options);
@@ -154,11 +116,61 @@ class InboxAttachmentCardView {
   }
 
   getAttachmentType(): string {
-    throw new Error('not implemented yet');
+    return this._type;
   }
 
-  addButton(options: Object): void {
-    throw new Error('not implemented yet');
+  addButton(button: Object): void {
+    if (this._p) {
+      //throw new Error('Not implemented yet');
+      console.log('tried to add button', this._element);
+    } else { // artificial SDK-added card
+      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
+      const el = document.createElement('button');
+      el.className = 'inboxsdk__attachment_card_button';
+      if (button.downloadUrl) {
+        el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
+        (el:any).addEventListener('click', event => {
+          event.stopPropagation();
+          event.preventDefault();
+          let prevented = false;
+          if (button.onClick) {
+            button.onClick({
+              preventDefault() {
+                prevented = true;
+              }
+            });
+          }
+          if (prevented) return;
+          const downloadLink = document.createElement('a');
+          downloadLink.href = button.downloadUrl;
+          (downloadLink:any).addEventListener('click', function(e) {
+            e.stopPropagation();
+          }, true);
+          if (button.openInNewTab) {
+            downloadLink.setAttribute('target', '_blank');
+          }
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          downloadLink.remove();
+        });
+        el.innerHTML = `
+          <div style="background: no-repeat url(https://ssl.gstatic.com/mail/sprites/newattachmentcards-ff2ce2bea04dec2bf32f2ebbfa0834ff.png) -219px -129px"></div>
+        `;
+      } else {
+        (el:any).addEventListener('click', event => {
+          event.stopPropagation();
+          event.preventDefault();
+          if (button.onClick) {
+            button.onClick();
+          }
+        });
+        el.innerHTML = autoHtml `
+          <img src="${button.iconUrl}">
+        `;
+        el.title = button.tooltip;
+      }
+      buttonContainer.appendChild(el);
+    }
   }
 
   getTitle(): string {

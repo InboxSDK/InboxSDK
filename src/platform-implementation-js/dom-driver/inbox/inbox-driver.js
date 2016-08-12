@@ -27,11 +27,13 @@ import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
+import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
+import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -53,6 +55,7 @@ class InboxDriver {
   _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
   _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
+  _attachmentCardViewDriverStream: Kefir.Stream<InboxAttachmentCardView>;
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
   _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
@@ -77,6 +80,7 @@ class InboxDriver {
 
     this._threadViewDriverStream = getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper);
     this._messageViewDriverStream = getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper);
+    this._attachmentCardViewDriverStream = getAttachmentCardViewDriverStream(this, threadElStream, messageElStream).takeUntilBy(this._stopper);
 
     this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
@@ -150,7 +154,7 @@ class InboxDriver {
   getComposeViewDriverStream() {return this._composeViewDriverStream;}
   getThreadViewDriverStream() {return this._threadViewDriverStream;}
   getMessageViewDriverStream() {return this._messageViewDriverStream;}
-  getAttachmentCardViewDriverStream() {return Kefir.never();}
+  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverStream;}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}
