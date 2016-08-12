@@ -216,7 +216,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 	/**
 	* The url of the icon of the attachment.
-	* @type {boolean}
+	* @type {string}
 	*/
 	fileIconImageUrl:null,
 
@@ -298,7 +298,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 
 	/**
 	* The url of the icon of the attachment.
-	* @type {boolean}
+	* @type {string}
 	*/
 	fileIconImageUrl:null,
 
