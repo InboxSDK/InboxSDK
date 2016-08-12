@@ -12,7 +12,7 @@ import type InboxDriver from '../../inbox-driver';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver: InboxDriver, threadElStream) {
+function imp(driver: InboxDriver, threadElStream: Kefir.Stream<*>) {
   return detectionRunner({
     name: 'message',
     finder, watcher: root => watcher(root, threadElStream), parser,
@@ -23,5 +23,5 @@ function imp(driver: InboxDriver, threadElStream) {
 }
 
 export default function stream(driver: InboxDriver, threadElStream: Kefir.Stream<*>) {
-  return impStream.flatMapLatest(_imp => _imp(driver));
+  return impStream.flatMapLatest(_imp => _imp(driver, threadElStream));
 }

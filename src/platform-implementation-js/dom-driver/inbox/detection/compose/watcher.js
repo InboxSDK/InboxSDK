@@ -14,10 +14,8 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-merger';
 import threadWatcher from '../thread/watcher';
 
-const impStream = udKefir(module, imp);
-
-function imp(
-  root: Document,
+export default function watcher(
+  root: Document=document,
   openedThreads: ?Kefir.Stream<ElementWithLifetime>=null
 ): Kefir.Stream<ElementWithLifetime> {
   const debugLogging = true;
@@ -128,8 +126,4 @@ function imp(
       .flatMap(makeElementStreamMerger())
   ])
     .filter(({el}) => !el.classList.contains('inboxsdk__drawer_view'));
-}
-
-export default function watcher(root: Document=document): Kefir.Stream<ElementWithLifetime> {
-  return impStream.flatMapLatest(_imp => _imp(root));
 }
