@@ -16,7 +16,10 @@ import threadWatcher from '../thread/watcher';
 
 const impStream = udKefir(module, imp);
 
-function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
+function imp(
+  root: Document,
+  openedThreads: ?Kefir.Stream<ElementWithLifetime>=null
+): Kefir.Stream<ElementWithLifetime> {
   const debugLogging = true;
   const makeElementChildStream = debugLogging ? function(el) {
     // Add an attribute to watched elements that we can see in reported html to
@@ -32,7 +35,7 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
   const mainTopAncestor = makeElementChildStream(root.body)
     .filter(({el}) => el.id && el.hasAttribute('jsaction'));
 
-  const openedThreads = threadWatcher(root);
+  if (!openedThreads) openedThreads = threadWatcher(root);
 
   const inlineComposes = openedThreads
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))

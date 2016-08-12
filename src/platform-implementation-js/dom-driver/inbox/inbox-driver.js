@@ -19,6 +19,10 @@ import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
 import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+
+import getThreadElStream from './detection/thread/stream';
+import getMessageElStream from './detection/message/stream';
+
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
@@ -68,39 +72,15 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    // this._customRouteIDs = new Set();
-    // this._customListRouteIDs = new Map();
-    // this._customListSearchStringsToRouteIds = new Map();
+    const threadElStream = getThreadElStream(this).takeUntilBy(this._stopper);
+    const messageElStream = getMessageElStream(this, threadElStream).takeUntilBy(this._stopper);
 
-    /*
-    var mainAdds = streamWaitFor(() => document.getElementById('mQ'))
-      .flatMap(el => makeElementChildStream(el));
-
-    // tNsA5e-nUpftc nUpftc lk
-    var mainViews = mainAdds.filter(({el}) => el.classList.contains('lk'))
-      .map(({el}) => el.querySelector('div.cz[jsan]'))
-      .flatMap(el =>
-        makeMutationObserverChunkedStream(el, {
-          attributes: true, attributeFilter: ['jsan']
-        }).toProperty(null).map(() => el)
-      )
-      .map(el => ({el, jsan: el.getAttribute('jsan')}))
-      .skipDuplicates((a, b) => a.jsan === b.jsan)
-      .map(({el, jsan}) => new InboxRouteView(el));
-
-    // tNsA5e-nUpftc nUpftc i5 xpv2f
-    var searchViews = mainAdds.filter(({el}) =>
-        !el.classList.contains('lk') &&
-        el.classList.contains('i5') && el.classList.contains('xpv2f')
-      )
-      .map(({el}) => new InboxRouteView(el));
-    */
+    this._threadViewDriverStream = getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper);
+    this._messageViewDriverStream = getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper);
 
     this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
-    this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
-    this._threadViewDriverStream = getThreadViewStream(this).takeUntilBy(this._stopper);
-    this._messageViewDriverStream = getMessageViewStream(this).takeUntilBy(this._stopper);
+    this._composeViewDriverStream = getComposeViewDriverStream(this, threadElStream).takeUntilBy(this._stopper);
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
 

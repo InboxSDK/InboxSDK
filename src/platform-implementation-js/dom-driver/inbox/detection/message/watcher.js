@@ -12,8 +12,11 @@ import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-s
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import threadWatcher from '../thread/watcher';
 
-export default function watcher(root: Document=document): Kefir.Stream<ElementWithLifetime> {
-  const openedThreads = threadWatcher(root);
+export default function watcher(
+  root: Document=document,
+  openedThreads: ?Kefir.Stream<ElementWithLifetime>=null
+): Kefir.Stream<ElementWithLifetime> {
+  if (!openedThreads) openedThreads = threadWatcher(root);
 
   const messages = openedThreads
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
