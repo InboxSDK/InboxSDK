@@ -22,6 +22,7 @@ import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream'
 
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
+import getThreadRowElStream from './detection/threadRow/watcher';
 
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
@@ -75,7 +76,8 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const threadElStream = getThreadElStream(this).takeUntilBy(this._stopper);
+    const threadRowElStream = getThreadRowElStream().takeUntilBy(this._stopper);
+    const threadElStream = getThreadElStream(this, threadRowElStream).takeUntilBy(this._stopper);
     const messageElStream = getMessageElStream(this, threadElStream).takeUntilBy(this._stopper);
 
     this._threadViewDriverStream = getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper);

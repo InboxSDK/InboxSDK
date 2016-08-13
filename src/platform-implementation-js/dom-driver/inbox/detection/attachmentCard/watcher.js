@@ -21,7 +21,7 @@ export default function watcher(
   if (!openedThreads) openedThreads = threadWatcher(root);
   if (!messages) messages = messageWatcher(root, openedThreads);
 
-  return messages
+  const messageCards = messages
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
@@ -30,4 +30,8 @@ export default function watcher(
     .filter(({el}) => el.style.display !== 'none')
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.hasAttribute('tabindex') && el.hasAttribute('jsaction'));
+
+  const listCards = Kefir.never();
+
+  return messageCards.merge(listCards);
 }
