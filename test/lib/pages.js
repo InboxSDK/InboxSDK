@@ -26,3 +26,5 @@ export const page20160810: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-10 message.html', 'utf8')));
 export const page20160810_2: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-10 message with attachments.html', 'utf8')));
+export const page20160812: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-12 list with card.html', 'utf8')));

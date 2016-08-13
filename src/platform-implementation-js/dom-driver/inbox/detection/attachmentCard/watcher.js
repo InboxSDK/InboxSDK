@@ -10,18 +10,18 @@ import censorHTMLtree from '../../../../../common/censor-html-tree';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
-import threadWatcher from '../thread/watcher';
+import threadRowWatcher from '../threadRow/watcher';
 import messageWatcher from '../message/watcher';
 
 export default function watcher(
   root: Document=document,
-  openedThreads: ?Kefir.Stream<ElementWithLifetime>=null,
-  messages: ?Kefir.Stream<ElementWithLifetime>=null
+  threadRowElStream: ?Kefir.Stream<ElementWithLifetime>=null,
+  messageElStream: ?Kefir.Stream<ElementWithLifetime>=null
 ): Kefir.Stream<ElementWithLifetime> {
-  if (!openedThreads) openedThreads = threadWatcher(root);
-  if (!messages) messages = messageWatcher(root, openedThreads);
+  if (!threadRowElStream) threadRowElStream = threadRowWatcher(root);
+  if (!messageElStream) messageElStream = messageWatcher(root);
 
-  const messageCards = messages
+  const messageCards = messageElStream
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
@@ -31,7 +31,16 @@ export default function watcher(
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.hasAttribute('tabindex') && el.hasAttribute('jsaction'));
 
-  const listCards = Kefir.never();
+  const listCards = threadRowElStream
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.hasAttribute('jsaction'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.hasAttribute('jsaction'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.getAttribute('role') === 'list' && el.hasAttribute('jsaction'))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+    .filter(({el}) => el.nodeName === 'DIV' && el.getAttribute('role') === 'listitem' && el.hasAttribute('tabindex'));
 
   return messageCards.merge(listCards);
 }

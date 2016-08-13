@@ -14,6 +14,7 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 
 import {
   page20160810_2,
+  page20160812,
 } from './lib/pages';
 
 describe('Inbox Attachment Card Detection', function() {
@@ -32,11 +33,18 @@ describe('Inbox Attachment Card Detection', function() {
 
       const results = finder(page20160810_2());
       assert.strictEqual(results.length, 5);
-      assert(_.includes(results, attachment1));
-      assert(_.includes(results, attachment2));
-      assert(_.includes(results, attachment3));
-      assert(_.includes(results, attachment4));
-      assert(_.includes(results, attachment5));
+      assert(results.includes(attachment1));
+      assert(results.includes(attachment2));
+      assert(results.includes(attachment3));
+      assert(results.includes(attachment4));
+      assert(results.includes(attachment5));
+    });
+
+    it('2016-08-12 list with card', function() {
+      const attachment1 = page20160812().querySelector('[data-test-id=attachment1]');
+      const results = finder(page20160812());
+      assert.strictEqual(results.length, 1);
+      assert(results.includes(attachment1));
     });
   });
 
@@ -68,6 +76,12 @@ describe('Inbox Attachment Card Detection', function() {
         assert.strictEqual(results.score, 1);
       }
     });
+
+    it('2016-08-12 list with card', function() {
+      const results = parser(page20160812().querySelector('[data-test-id=attachment1]'));
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+    });
   });
 
   describe('watcher', function() {
@@ -85,11 +99,26 @@ describe('Inbox Attachment Card Detection', function() {
         .onEnd(() => {
           const results = spy.args.map(callArgs => callArgs[0].el);
           assert.strictEqual(results.length, 5);
-          assert(_.includes(results, attachment1));
-          assert(_.includes(results, attachment2));
-          assert(_.includes(results, attachment3));
-          assert(_.includes(results, attachment4));
-          assert(_.includes(results, attachment5));
+          assert(results.includes(attachment1));
+          assert(results.includes(attachment2));
+          assert(results.includes(attachment3));
+          assert(results.includes(attachment4));
+          assert(results.includes(attachment5));
+          cb();
+        });
+    });
+
+    it('2016-08-12 list with card', function(cb) {
+      const attachment1 = page20160812().querySelector('[data-test-id=attachment1]');
+
+      const spy = sinon.spy();
+      watcher(page20160812())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(results.includes(attachment1));
           cb();
         });
     });

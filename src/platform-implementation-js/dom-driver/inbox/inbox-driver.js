@@ -18,7 +18,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
-import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
@@ -52,11 +52,11 @@ class InboxDriver {
   onready: Promise<void>;
   _routeViewDriverStream: Kefir.Stream<any>;
   _rowListViewDriverStream: Kefir.Stream<any>;
-  _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
-  _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
+  _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
+  _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
+  _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
+  _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
-  _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
-  _attachmentCardViewDriverStream: Kefir.Stream<InboxAttachmentCardView>;
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
   _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
@@ -80,17 +80,29 @@ class InboxDriver {
     const threadElStream = getThreadElStream(this, threadRowElStream).takeUntilBy(this._stopper);
     const messageElStream = getMessageElStream(this, threadElStream).takeUntilBy(this._stopper);
 
-    this._threadViewDriverStream = getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper);
-    this._messageViewDriverStream = getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper);
-    this._attachmentCardViewDriverStream = getAttachmentCardViewDriverStream(this, threadElStream, messageElStream).takeUntilBy(this._stopper);
+    this._threadViewDriverPool = new ItemWithLifetimePool(
+      getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._messageViewDriverPool = new ItemWithLifetimePool(
+      getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
+      getAttachmentCardViewDriverStream(this, threadRowElStream, messageElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._composeViewDriverPool = new ItemWithLifetimePool(
+      getComposeViewDriverStream(this, threadElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
 
     this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
-    this._composeViewDriverStream = getComposeViewDriverStream(this, threadElStream).takeUntilBy(this._stopper);
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
 
-    this._composeViewDriverStream.onError(err => {
+    this._composeViewDriverPool.items().onError(err => {
       // If we get here, it's probably because of a waitFor timeout caused by
       // us failing to find the compose parent. Let's log the results of a few
       // similar selectors to see if our selector was maybe slightly wrong.
@@ -153,10 +165,10 @@ class InboxDriver {
   getStopper(): Kefir.Stream<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
-  getComposeViewDriverStream() {return this._composeViewDriverStream;}
-  getThreadViewDriverStream() {return this._threadViewDriverStream;}
-  getMessageViewDriverStream() {return this._messageViewDriverStream;}
-  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverStream;}
+  getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
+  getThreadViewDriverStream() {return this._threadViewDriverPool.items().map(({el})=>el);}
+  getMessageViewDriverStream() {return this._messageViewDriverPool.items().map(({el})=>el);}
+  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}

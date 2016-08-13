@@ -32,6 +32,10 @@ class InboxThreadView {
     return this._eventStream;
   }
 
+  getStopper(): Kefir.Stream<null> {
+    return this._stopper;
+  }
+
   addMessageViewDriver(messageView: InboxMessageView) {
     this._messageViews.push(messageView);
     messageView.getStopper()
