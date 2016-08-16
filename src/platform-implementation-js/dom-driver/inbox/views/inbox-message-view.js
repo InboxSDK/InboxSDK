@@ -158,7 +158,7 @@ class InboxMessageView {
     return card;
   }
   addButtonToDownloadAllArea(options: Object): void {
-    throw new Error('not implemented yet');
+    // no-op in Inbox
   }
   getViewState(): VIEW_STATE {
     return this._p.attributes.viewState;

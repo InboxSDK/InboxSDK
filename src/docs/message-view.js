@@ -24,7 +24,8 @@ var MessageView = /** @lends MessageView */{
 	addAttachmentCardView: function(){},
 
 	/**
-	* Adds a button to the download all area of the attachments tray. <screenshot>
+	* Adds a button to the download all area of the attachments tray. This function
+	* does nothing in Google Inbox. <screenshot>
 	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
 	* @return {void}
 	*/
