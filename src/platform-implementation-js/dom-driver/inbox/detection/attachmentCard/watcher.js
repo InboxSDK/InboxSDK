@@ -40,7 +40,10 @@ export default function watcher(
     .filter(({el}) => el.getAttribute('role') === 'list' && el.hasAttribute('jsaction'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.nodeName === 'DIV' && el.getAttribute('role') === 'listitem' && el.hasAttribute('tabindex'));
+    .filter(({el}) =>
+      el.nodeName === 'DIV' && el.getAttribute('role') === 'listitem' &&
+      el.hasAttribute('tabindex') && el.style.display !== 'none'
+    );
 
   return messageCards.merge(listCards);
 }
