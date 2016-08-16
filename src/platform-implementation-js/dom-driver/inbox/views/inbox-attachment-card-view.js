@@ -6,7 +6,9 @@ import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import findParent from '../../../lib/dom/find-parent';
 import type InboxDriver from '../inbox-driver';
+import type InboxMessageView from './inbox-message-view';
 
 import type {Parsed} from '../detection/attachmentCard/parser';
 
@@ -17,6 +19,7 @@ class InboxAttachmentCardView {
   _driver: InboxDriver;
   _type: string;
   _p: ?Parsed;
+  _messageViewDriver: ?InboxMessageView;
 
   constructor(options, driver: InboxDriver) {
     this._driver = driver;
@@ -28,10 +31,22 @@ class InboxAttachmentCardView {
       this._type = 'FILE';
       this._createNewElement(options);
     }
+
+    this._messageViewDriver = this._findMessageView();
+    if (this._messageViewDriver) {
+      this._messageViewDriver.addAttachmentCardViewDriver(this);
+    }
   }
 
   destroy() {
     this._stopper.destroy();
+  }
+
+  _findMessageView(): ?InboxMessageView {
+    const map = this._driver.getMessageViewElementsMap();
+    const messageViewElement = findParent(this._element, el => map.has((el:any)));
+    if (!messageViewElement) return null;
+    return map.get(messageViewElement);
   }
 
   _createNewElement(options: Object) {

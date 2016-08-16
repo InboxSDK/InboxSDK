@@ -25,6 +25,7 @@ class InboxMessageView {
   _stopper: Kefir.Stream<any>;
   _eventStream: Kefir.Bus<Object> = kefirBus();
   _threadViewDriver: ?InboxThreadView;
+  _attachmentCardViews: InboxAttachmentCardView[] = [];
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -62,6 +63,8 @@ class InboxMessageView {
     if (this._threadViewDriver) {
       this._threadViewDriver.addMessageViewDriver(this);
     }
+
+    this._driver.getMessageViewElementsMap().set(this._element, this);
   }
 
   _findThreadView(): ?InboxThreadView {
@@ -95,6 +98,15 @@ class InboxMessageView {
         newValue: this._p.attributes.viewState
       });
     }
+  }
+
+  addAttachmentCardViewDriver(card: InboxAttachmentCardView) {
+    this._attachmentCardViews.push(card);
+    card.getStopper()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._attachmentCardViews = this._attachmentCardViews.filter(v => v !== card);
+      });
   }
 
   getStopper() {
@@ -137,10 +149,10 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   addAttachmentIcon(options: Object): void {
-    throw new Error('not implemented yet');
+    console.warn('MessageView.addAttachmentIcon is not implemented yet in Inbox');
   }
-  getAttachmentCardViewDrivers(): Array<Object> {
-    throw new Error('not implemented yet');
+  getAttachmentCardViewDrivers() {
+    return (this._attachmentCardViews: any);
   }
   addAttachmentCard(options: Object) {
     const {attachmentsArea} = this._p.elements;
@@ -198,7 +210,14 @@ class InboxMessageView {
   }
 
   getReadyStream() {
-    return Kefir.constant(null);
+    // Needs to emit after any attachment cards have been added in order for
+    // an app calling getFileAttachmentCardViews() immediately to see the cards.
+    // The cards are emitted several microtasks after the message, so we delay
+    // by about 10 microtasks here. An integration test tests this at least.
+    // TODO something else.
+    return Kefir.repeat(i =>
+      i > 10 ? null : delayAsap(null)
+    ).ignoreValues().beforeEnd(() => null);
   }
 
   destroy() {

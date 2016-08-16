@@ -57,6 +57,7 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
+  _messageViewElements: Map<HTMLElement, InboxMessageView> = new Map();
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
   _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
@@ -178,6 +179,7 @@ class InboxDriver {
   getPageCommunicator(): InboxPageCommunicator {return this._pageCommunicator;}
 
   getThreadViewElementsMap() {return this._threadViewElements;}
+  getMessageViewElementsMap() {return this._messageViewElements;}
 
   openComposeWindow(): void {
     throw new Error("Not implemented");
