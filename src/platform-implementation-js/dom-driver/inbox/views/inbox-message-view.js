@@ -51,12 +51,18 @@ class InboxMessageView {
       attributes: true, attributeFilter: ['aria-expanded']
     })
       .toProperty(() => null)
-      .map(() => this._element.getAttribute('aria-expanded'))
+      .map(() => this._element.getAttribute('aria-expanded') === 'true')
       .skipDuplicates()
       .changes()
       .takeUntilBy(this._stopper)
-      .onValue(() => {
-        this._reparse();
+      .onValue(expanded => {
+        if (expanded) {
+          this._reparse();
+        } else {
+          // Destroy on collapse so that when it's uncollapsed again, the app
+          // can re-do its modifications.
+          this.destroy();
+        }
       });
 
     this._threadViewDriver = this._findThreadView();
