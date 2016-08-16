@@ -28,8 +28,7 @@ export default function watcher(
     .filter(({el}) => el.nodeName === 'SECTION')
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.style.display !== 'none')
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.hasAttribute('tabindex') && el.hasAttribute('jsaction'));
+    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream));
 
   const listCards = threadRowElStream
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
@@ -40,10 +39,11 @@ export default function watcher(
     .filter(({el}) => el.getAttribute('role') === 'list' && el.hasAttribute('jsaction'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) =>
-      el.nodeName === 'DIV' && el.getAttribute('role') === 'listitem' &&
-      el.hasAttribute('tabindex') && el.style.display !== 'none'
-    );
+    .filter(({el}) => el.getAttribute('role') === 'listitem');
 
-  return messageCards.merge(listCards);
+  return messageCards.merge(listCards)
+    .filter(({el}) =>
+      el.nodeName === 'DIV' && el.hasAttribute('tabindex') &&
+      el.style.display !== 'none'
+    );
 }
