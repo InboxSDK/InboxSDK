@@ -21,7 +21,7 @@ describe('Inbox', function() {
 
     // Test an inline compose
     browser.click('.scroll-list-section-body div[role=listitem][jsinstance*="gmail:thread"]');
-    browser.pause(1500);
+    browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 10*1000);
     browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
     browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
     assert(browser.isVisible('div.extension-dropdown-test'));
