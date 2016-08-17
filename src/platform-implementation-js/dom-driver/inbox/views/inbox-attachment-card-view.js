@@ -27,6 +27,15 @@ class InboxAttachmentCardView {
       this._element = options.element;
       this._p = options.parsed;
       this._type = options.parsed.attributes.type;
+
+      Kefir.merge([
+        Kefir.fromEvents(this._element, 'click'),
+        Kefir.fromEvents(this._element, 'keydown')
+      ])
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._driver.setLastInteractedAttachmentCardView(this);
+        });
     } else {
       this._type = 'FILE';
       this._createNewElement(options);

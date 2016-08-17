@@ -5,6 +5,7 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import {defn} from 'ud';
 
@@ -69,6 +70,8 @@ class InboxDriver {
   _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
+  _lastInteractedAttachmentCardViewSet: Kefir.Bus<any> = kefirBus();
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -187,6 +190,20 @@ class InboxDriver {
 
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
+
+  getLastInteractedAttachmentCardView() {
+    return this._lastInteractedAttachmentCardView;
+  }
+  setLastInteractedAttachmentCardView(card: InboxAttachmentCardView) {
+    console.log('setLastInteractedAttachmentCardView', card);
+    this._lastInteractedAttachmentCardViewSet.emit();
+    this._lastInteractedAttachmentCardView = card;
+    card.getStopper()
+      .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
+      .onValue(() => {
+        this._lastInteractedAttachmentCardView = null;
+      });
+  }
 
   openComposeWindow(): void {
     throw new Error("Not implemented");
