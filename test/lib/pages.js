@@ -30,3 +30,12 @@ export const page20160812: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-12 list with card.html', 'utf8')));
 export const page20160816: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-16 message with attachment.html', 'utf8')));
+export const page20160817: () => Document = once(() => {
+  const page = jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-17 with preview overlay.html', 'utf8'));
+  const ifrContent = jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-17 with preview overlay iframe.html', 'utf8'));
+  const pageIfrBody = (page:any).querySelector('#FfJ3bf').contentDocument.body;
+  Array.from(ifrContent.body.children).forEach(el => {
+    pageIfrBody.appendChild(el);
+  });
+  return page;
+});
