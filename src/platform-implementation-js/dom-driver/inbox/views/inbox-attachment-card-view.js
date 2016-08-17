@@ -119,7 +119,7 @@ class InboxAttachmentCardView {
   }
 
   getMessageViewDriver() {
-    return null;
+    return this._messageViewDriver;
   }
 
   getStopper(): Kefir.Stream<null> {
