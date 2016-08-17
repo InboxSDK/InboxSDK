@@ -29,12 +29,14 @@ import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
 import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
+import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
 import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
+import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -56,6 +58,7 @@ class InboxDriver {
   _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
+  _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
   _messageViewElements: Map<HTMLElement, InboxMessageView> = new Map();
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
@@ -91,6 +94,10 @@ class InboxDriver {
     );
     this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
       getAttachmentCardViewDriverStream(this, threadRowElStream, messageElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
+      getAttachmentOverlayViewStream(this).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._composeViewDriverPool = new ItemWithLifetimePool(
