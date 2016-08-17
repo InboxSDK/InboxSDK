@@ -20,11 +20,12 @@ describe('Inbox', function() {
     browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
 
     // Test an inline compose
-    browser.click('.scroll-list-section-body div[role=listitem][jsinstance*="gmail:thread"]');
+    browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email]');
     browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 10*1000);
     browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
     browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
     assert(browser.isVisible('div.extension-dropdown-test'));
     browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
+    browser.pause(5000); // let discarding the draft have time to save
   });
 });
