@@ -20,6 +20,7 @@ class InboxAttachmentCardView {
   _type: string;
   _p: ?Parsed;
   _messageViewDriver: ?InboxMessageView;
+  _addedButtonDescriptors: Object[] = [];
 
   constructor(options, driver: InboxDriver) {
     this._driver = driver;
@@ -143,11 +144,15 @@ class InboxAttachmentCardView {
     return this._type;
   }
 
+  getAddedButtonDescriptors() {
+    return this._addedButtonDescriptors;
+  }
+
   addButton(button: Object): void {
-    if (this._p) {
-      //throw new Error('Not implemented yet');
-      console.log('tried to add button', this._element);
-    } else { // artificial SDK-added card
+    this._addedButtonDescriptors.push(button);
+    if (!this._p) {
+      // artificial SDK-added card. Native cards don't have their added buttons
+      // processed here. They're added in InboxAttachmentOverlayView.
       const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
       const el = document.createElement('button');
       el.className = 'inboxsdk__attachment_card_button';

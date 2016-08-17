@@ -24,8 +24,21 @@ function imp(driver: InboxDriver): Kefir.Stream<InboxAttachmentOverlayView> {
       driver.getLogger().errorSite(err, details);
     }
   })
-    .map(({el, removalStream, parsed}) => {
-      const view = new InboxAttachmentOverlayView(driver, el, parsed);
+    .flatMap(({el, removalStream, parsed}) => {
+      const cardView = driver.getLastInteractedAttachmentCardView();
+      if (cardView) {
+        return Kefir.constant({
+          el, removalStream, parsed, cardView
+        });
+      } else {
+        driver.getLogger().errorSite(new Error('got attachmentOverlay element without a lastInteractedAttachmentCardView'), {
+          attachmentOverlayHTML: censorHTMLtree(el)
+        });
+        return Kefir.never();
+      }
+    })
+    .map(({el, removalStream, parsed, cardView}) => {
+      const view = new InboxAttachmentOverlayView(driver, el, parsed, cardView);
       removalStream.take(1).onValue(() => view.destroy());
       return view;
     });
