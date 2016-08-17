@@ -7,17 +7,19 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 
 import type MessageView from './message-view';
-import type {AttachmentCardViewDriver} from '../../driver-interfaces/driver';
+import type {Driver, AttachmentCardViewDriver} from '../../driver-interfaces/driver';
 
 // documented in src/docs/
 class AttachmentCardView extends EventEmitter {
 	_attachmentCardImplementation: AttachmentCardViewDriver;
+	_driver: Driver;
 	_membrane: Membrane;
 	destroyed: boolean;
 
-	constructor(attachmentCardImplementation: AttachmentCardViewDriver, membrane: Membrane) {
+	constructor(attachmentCardImplementation: AttachmentCardViewDriver, driver: Driver, membrane: Membrane) {
 		super();
 		this.destroyed = false;
+		this._driver = driver;
 		this._membrane = membrane;
 		this._attachmentCardImplementation = attachmentCardImplementation;
 		this._attachmentCardImplementation.getStopper().onValue(() => {
@@ -39,6 +41,7 @@ class AttachmentCardView extends EventEmitter {
 	}
 
 	getDownloadURL(): Promise<?string> {
+		this._driver.getLogger().deprecationWarning('AttachmentCardView.getDownloadURL', 'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent');
 		return this._attachmentCardImplementation.getDownloadURL();
 	}
 

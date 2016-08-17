@@ -176,7 +176,11 @@ class InboxAttachmentCardView {
           event.stopPropagation();
           event.preventDefault();
           if (button.onClick) {
-            button.onClick();
+            button.onClick({
+              async getDownloadURL(): Promise<?string> {
+                throw new Error('not implemented yet');
+              }
+            });
           }
         });
         el.innerHTML = autoHtml `

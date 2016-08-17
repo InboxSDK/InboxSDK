@@ -90,13 +90,18 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			console.log(i, 'attachment card', card);
 			console.log(i, 'type', card.getAttachmentType());
 			console.log(i, 'title', card.getTitle());
-			card.getDownloadURL().then(function(url) {
-				console.log(i, 'url', url);
-			});
 			card.addButton({
 				iconUrl: chrome.runtime.getURL('zipicon.png'),
 				tooltip: 'Foo2',
-				onClick: console.log.bind(console, 'click2')
+				onClick(event) {
+					console.log('click2', event);
+					card.getDownloadURL().then(url => {
+						console.log('old, url', url);
+					});
+					event.getDownloadURL().then(url => {
+						console.log('new, url', url);
+					});
+				}
 			});
 		});
 

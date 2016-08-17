@@ -99,9 +99,11 @@ class GmailAttachmentCardView {
 		});
 
 		var basicButtonViewController = new BasicButtonViewController({
-			activateFunction: function(){
+			activateFunction: () => {
 				if(options.onClick){
-					options.onClick();
+					options.onClick({
+						getDownloadURL: () => this.getDownloadURL()
+					});
 				}
 			},
 			buttonView: buttonView
@@ -333,16 +335,9 @@ class GmailAttachmentCardView {
 			.filter(function(buttonDescriptor){
 				return !buttonDescriptor.downloadUrl;
 			})
-			.map(function(buttonDescriptor){
-				var buttonView = new ButtonView(buttonDescriptor);
-				var buttonViewController = new BasicButtonViewController({
-					buttonView: buttonView,
-					activateFunction: buttonDescriptor.onClick
-				});
-
-				return buttonView;
-			})
-			.each(this._addButton.bind(this)).value();
+			.forEach(desc => {
+				this.addButton(desc);
+			}).value();
 	}
 
 	_addButton(buttonView: ButtonView) {

@@ -89,8 +89,8 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this._appId = appId;
 		this._driver = driver;
 		this._membrane = new Membrane([
-			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
-			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, this._membrane)],
+			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, this._membrane)],
+			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, this._membrane)],
 			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
 			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
 			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
