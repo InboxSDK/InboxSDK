@@ -6,7 +6,7 @@ import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 import BigNumber from 'bignumber.js';
 
 export default function parser(el: HTMLElement) {
-  const ec = new ErrorCollector('compose');
+  const ec = new ErrorCollector('attachmentCard');
 
   ec.run('tabindex', () => {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
