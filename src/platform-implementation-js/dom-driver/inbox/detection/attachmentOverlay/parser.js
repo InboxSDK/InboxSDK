@@ -35,7 +35,7 @@ function parser(el: HTMLElement) {
     return candidates[0];
   });
 
-  const buttonContainer: ?HTMLElement = buttonContainer ? (buttonContainer:any).parentElement : null;
+  const buttonContainer: ?HTMLElement = downloadButton ? (downloadButton:any).parentElement : null;
 
   const elements = {
     downloadButton,
