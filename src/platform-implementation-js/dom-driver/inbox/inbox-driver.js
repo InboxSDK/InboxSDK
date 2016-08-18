@@ -195,7 +195,6 @@ class InboxDriver {
     return this._lastInteractedAttachmentCardView;
   }
   setLastInteractedAttachmentCardView(card: InboxAttachmentCardView) {
-    console.log('setLastInteractedAttachmentCardView', card);
     this._lastInteractedAttachmentCardViewSet.emit();
     this._lastInteractedAttachmentCardView = card;
     card.getStopper()

@@ -389,3 +389,39 @@
 .inboxsdk__attachment_card_description > span {
   vertical-align: middle;
 }
+
+/* Just for testing. TODO remove before deploy! */
+.ndfHFb-c4YZDc-Wrql6b {
+  opacity: 1!important;
+}
+
+.inboxsdk__attachment_overlay_button {
+  border: none;
+  background: rgba(0,0,0,0.6);
+  margin-right: 2px;
+  box-sizing: content-box;
+  height: 27px;
+  min-width: 50px;
+  padding: 10px 0;
+  color: #333;
+  vertical-align: middle;
+  text-align: center;
+  opacity: 0.87;
+}
+.inboxsdk__attachment_overlay_button:hover,
+.inboxsdk__attachment_overlay_button:focus {
+  outline: none;
+  opacity: 1;
+  color: rgba(255,255,255,1);
+  background-color: #232323;
+  background-image: linear-gradient(to bottom,#333,#222);
+}
+.inboxsdk__attachment_overlay_button > img {
+  display: inline-block;
+  vertical-align: middle;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 24px;
+  height: 24px;
+  width: 24px;
+}

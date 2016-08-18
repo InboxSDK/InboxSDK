@@ -9,6 +9,7 @@ import kefirStopper from 'kefir-stopper';
 import findParent from '../../../lib/dom/find-parent';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
+import type InboxAttachmentOverlayView from './inbox-attachment-overlay-view';
 
 import type {Parsed} from '../detection/attachmentCard/parser';
 
@@ -21,6 +22,7 @@ class InboxAttachmentCardView {
   _p: ?Parsed;
   _messageViewDriver: ?InboxMessageView;
   _addedButtonDescriptors: Object[] = [];
+  _overlayView: ?InboxAttachmentOverlayView = null;
 
   constructor(options, driver: InboxDriver) {
     this._driver = driver;
@@ -191,8 +193,8 @@ class InboxAttachmentCardView {
           event.preventDefault();
           if (button.onClick) {
             button.onClick({
-              async getDownloadURL(): Promise<?string> {
-                throw new Error('not implemented yet');
+              getDownloadURL() {
+                throw new Error('not implemented for artificial sdk-added cardViews!');
               }
             });
           }
@@ -211,7 +213,13 @@ class InboxAttachmentCardView {
   }
 
   async getDownloadURL(): Promise<?string> {
-    throw new Error('not implemented yet');
+    const overlayView = this._overlayView;
+    if (!overlayView) throw new Error('This method only works during a button onClick callback in Inbox');
+    return overlayView.getDownloadURL();
+  }
+
+  setOverlay(overlayView: ?InboxAttachmentOverlayView) {
+    this._overlayView = overlayView;
   }
 }
 
