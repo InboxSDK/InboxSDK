@@ -19,6 +19,8 @@ if (!global.__InboxSDKInjected) {
     const setupEventReemitter = require('./setup-event-reemitter');
     const setupErrorSilencer = require('./setup-error-silencer');
 
+    const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
+
     RSVP.on('error', function(err) {
       console.error("Possibly uncaught promise rejection", err);
     });
@@ -27,7 +29,7 @@ if (!global.__InboxSDKInjected) {
       gmailInterceptor();
       setupGmonkeyHandler();
     } else if (document.location.origin === 'https://inbox.google.com') {
-      // inbox-specific magic goes here
+      setupClickAndGetNewIframeSrc();
     } else {
       throw new Error("Should not happen");
     }

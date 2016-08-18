@@ -383,6 +383,8 @@ var AttachmentCardClickEvent = /** @lends AttachmentCardClickEvent */{
 	* be the downloadUrl property of the card's download button if it has one,
 	* otherwise null. Other attachment card types may not have a download URL,
 	* and the promise may resolve to null.
+	* To work in Inbox, your extension must have permissions to the
+	* "https://mail-attachment.googleusercontent.com/" domain.
 	* @return {Promise.<string>}
 	*/
 	getDownloadURL: function() {}

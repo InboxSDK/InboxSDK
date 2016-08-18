@@ -7,6 +7,8 @@ import autoHtml from 'auto-html';
 
 import sharedStyle from '../../../lib/shared-style';
 import customStyle from '../../../dom-driver/inbox/custom-style';
+import simulateClick from '../../../lib/dom/simulate-click';
+import ajax from '../../../../common/ajax';
 
 import type InboxDriver from '../inbox-driver';
 import type {Parsed} from '../detection/attachmentOverlay/parser';
@@ -79,7 +81,12 @@ class InboxAttachmentOverlayView {
   }
 
   async getDownloadURL(): Promise<?string> {
-    throw new Error('not implemented yet');
+    const {downloadButton} = this._p.elements;
+    if (!downloadButton) throw new Error('Could not find download button element');
+    const src = await this._driver.getPageCommunicator().clickAndGetNewIframeSrc(downloadButton);
+    const {xhr} = await ajax({url: src, method: 'HEAD'});
+    const url = (xhr:any).responseURL;
+    return url;
   }
 }
 

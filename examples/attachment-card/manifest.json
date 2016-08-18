@@ -14,7 +14,8 @@
   ],
   "permissions": [
     "https://mail.google.com/",
-    "https://inbox.google.com/"
+    "https://inbox.google.com/",
+    "https://mail-attachment.googleusercontent.com/"
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
