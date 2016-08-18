@@ -15,6 +15,7 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 import {
   page20160614,
   pageFullscreen20160620,
+  page20160818_2,
 } from './lib/pages';
 
 describe('Inbox Message Detection', function() {
@@ -36,6 +37,14 @@ describe('Inbox Message Detection', function() {
       const message = pageFullscreen20160620().querySelector('[data-test-id=message]');
 
       const results = finder(pageFullscreen20160620());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, message));
+    });
+
+    it('2016-08-18', function() {
+      const message = page20160818_2().querySelector('[data-test-id=message]');
+
+      const results = finder(page20160818_2());
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, message));
     });
@@ -61,6 +70,16 @@ describe('Inbox Message Detection', function() {
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '150058a7ecc2fea4');
     });
+
+    it('2016-08-18', function() {
+      const message = page20160818_2().querySelector('[data-test-id=message]');
+      const results = parser(message);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.viewState, 'EXPANDED');
+      assert.strictEqual(results.attributes.messageId, '1569ae485ebba663');
+    });
   });
 
   describe('watcher', function() {
@@ -84,6 +103,21 @@ describe('Inbox Message Detection', function() {
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160620())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, message));
+          cb();
+        });
+    });
+
+    it('2016-08-18', function(cb) {
+      const message = page20160818_2().querySelector('[data-test-id=message]');
+
+      const spy = sinon.spy();
+      watcher(page20160818_2())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
