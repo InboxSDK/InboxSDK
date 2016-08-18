@@ -419,9 +419,6 @@
 .inboxsdk__attachment_overlay_button > img {
   display: inline-block;
   vertical-align: middle;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 24px;
   height: 24px;
   width: 24px;
 }
