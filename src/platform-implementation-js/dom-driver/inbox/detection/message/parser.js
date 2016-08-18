@@ -50,7 +50,7 @@ export default function parser(el: HTMLElement) {
   const attachmentsArea: ?HTMLElement = (!body || viewState !== 'EXPANDED') ? null : ec.run(
     'attachments area',
     () => {
-      const lastSection = _.last(body.parentElement.querySelectorAll('section:last-child'));
+      const lastSection = _.last((body.parentElement:any).querySelectorAll('section:last-child'));
       if (!lastSection) {
         throw new Error('element not found');
       }
