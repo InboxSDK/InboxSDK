@@ -39,3 +39,7 @@ export const page20160817: () => Document = once(() => {
   });
   return page;
 });
+export const page20160818: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-18 inline compose.html', 'utf8')));
+export const page20160818_2: () => Document = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-18 message.html', 'utf8')));
