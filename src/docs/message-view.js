@@ -366,9 +366,8 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 	tooltip:null,
 
 	/**
-	* A callback that is called when the user presses the button. The function
-	* will be passed an {AttachmentCardClickEvent} object.
-	* @type {func(event)}
+	* A callback that is called when the user presses the button.
+	* @type {func(AttachmentCardClickEvent)}
 	*/
 	onClick:null
 };
