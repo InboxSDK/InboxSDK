@@ -41,7 +41,6 @@ function imp(root: Document): Kefir.Stream<ElementWithLifetime> {
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.getAttribute('role') !== 'list')
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.hasAttribute('jslog'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.hasAttribute('jsvs'))
     .flatMap(({el,removalStream}) => {
