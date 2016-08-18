@@ -7,7 +7,12 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 		card.addButton({
 			iconUrl: chrome.runtime.getURL('zipicon.png'),
 			tooltip: 'Foo1',
-			onClick: console.log.bind(console, 'click')
+			onClick(event) {
+				console.log('click', event);
+				event.getDownloadURL().then(url => {
+					console.log('download url', url);
+				});
+			}
 		});
 	});
 
