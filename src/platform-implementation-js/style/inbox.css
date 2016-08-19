@@ -390,11 +390,6 @@
   vertical-align: middle;
 }
 
-/* Just for testing. TODO remove before deploy! */
-.ndfHFb-c4YZDc-Wrql6b {
-  opacity: 1!important;
-}
-
 .inboxsdk__attachment_overlay_button {
   border: none;
   background: rgba(0,0,0,0.6);
