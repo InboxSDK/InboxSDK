@@ -41,6 +41,7 @@ describe('Inbox', function() {
         throw new Error('Did not find overlay frame');
       }
 
+      // Test an attachment card inside a message
       browser.scroll('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]', 0, -500);
       browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]');
       browser.waitForVisible('section div[title="foo.txt"]', 10*1000);
@@ -54,6 +55,7 @@ describe('Inbox', function() {
       browser.click('div[role=heading]');
       browser.pause(1000);
 
+      // Test an attachment card inside a thread row
       browser.waitForVisible('div[role=listitem][title="foo.txt"]', 10*1000);
       browser.pause(500);
       browser.click('div[role=listitem][title="foo.txt"]');
