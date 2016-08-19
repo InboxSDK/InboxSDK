@@ -40,7 +40,7 @@ class InboxAttachmentCardView {
           this._driver.setLastInteractedAttachmentCardView(this);
         });
     } else {
-      this._type = 'FILE';
+      this._type = 'CUSTOM';
       this._createNewElement(options);
     }
 
