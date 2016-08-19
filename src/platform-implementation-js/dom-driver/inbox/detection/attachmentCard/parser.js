@@ -12,6 +12,10 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
+  // Very different cards like those for youtube links aren't detected by the
+  // watcher/finder. Google drive cards aren't distinguishable from attachment
+  // cards in the html, so we just expose them as FILE cards. The only issue
+  // for applications is that cardView.addButton() is a no-op on drive cards.
   const type = 'FILE';
 
   const elements = {
