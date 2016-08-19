@@ -83,20 +83,26 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const threadRowElStream = getThreadRowElStream().takeUntilBy(this._stopper);
-    const threadElStream = getThreadElStream(this, threadRowElStream).takeUntilBy(this._stopper);
-    const messageElStream = getMessageElStream(this, threadElStream).takeUntilBy(this._stopper);
+    const threadRowElPool = new ItemWithLifetimePool(
+      getThreadRowElStream().takeUntilBy(this._stopper)
+    );
+    const threadElPool = new ItemWithLifetimePool(
+      getThreadElStream(this, threadRowElPool).takeUntilBy(this._stopper)
+    );
+    const messageElPool = new ItemWithLifetimePool(
+      getMessageElStream(this, threadElPool).takeUntilBy(this._stopper)
+    );
 
     this._threadViewDriverPool = new ItemWithLifetimePool(
-      getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper)
+      getThreadViewStream(this, threadElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._messageViewDriverPool = new ItemWithLifetimePool(
-      getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper)
+      getMessageViewStream(this, messageElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
-      getAttachmentCardViewDriverStream(this, threadRowElStream, messageElStream).takeUntilBy(this._stopper)
+      getAttachmentCardViewDriverStream(this, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
@@ -104,7 +110,7 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._composeViewDriverPool = new ItemWithLifetimePool(
-      getComposeViewDriverStream(this, threadElStream).takeUntilBy(this._stopper)
+      getComposeViewDriverStream(this, threadElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 

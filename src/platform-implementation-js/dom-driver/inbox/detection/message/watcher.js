@@ -8,15 +8,16 @@ import streamWaitFor from '../../../../lib/stream-wait-for';
 import delayAsap from '../../../../lib/delay-asap';
 import censorHTMLtree from '../../../../../common/censor-html-tree';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import threadWatcher from '../thread/watcher';
 
 export default function watcher(
   root: Document=document,
-  openedThreads: ?Kefir.Stream<ElementWithLifetime>=null
+  openedThreadPool: ?ItemWithLifetimePool<ElementWithLifetime>=null
 ): Kefir.Stream<ElementWithLifetime> {
-  if (!openedThreads) openedThreads = threadWatcher(root);
+  const openedThreads = openedThreadPool ? openedThreadPool.items() : threadWatcher(root);
 
   const messages = openedThreads
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))

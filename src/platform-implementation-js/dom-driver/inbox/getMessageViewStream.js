@@ -8,8 +8,8 @@ import censorHTMLtree from '../../../common/censor-html-tree';
 
 import parser from './detection/message/parser';
 
-export default function getThreadViewStream(driver: InboxDriver, messageElStream: *) {
-  return messageElStream.flatMap(({el, removalStream, parsed}) => {
+export default function getThreadViewStream(driver: InboxDriver, messageElPool: *) {
+  return messageElPool.items().flatMap(({el, removalStream, parsed}) => {
     // If the InboxMessageView is destroyed before the removalStream fires,
     // then make a new InboxMessageView out of the same element. Inbox re-uses
     // elements for different messages in some cases.
