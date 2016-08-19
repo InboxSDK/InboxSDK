@@ -18,6 +18,7 @@ import {
   page20160810,
   page20160810_2,
   page20160818_2,
+  page20160819,
 } from './lib/pages';
 
 describe('Inbox Message Detection', function() {
@@ -66,6 +67,14 @@ describe('Inbox Message Detection', function() {
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, message));
     });
+
+    it('2016-08-19 draft in thread', function() {
+      const message = page20160819().querySelector('[data-test-id=message]');
+
+      const results = finder(page20160819());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, message));
+    });
   });
 
   describe('parser', function() {
@@ -75,6 +84,7 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '14ff3f449377ba4e');
     });
@@ -85,6 +95,7 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '150058a7ecc2fea4');
     });
@@ -95,6 +106,7 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '156755c188c4f67c');
     });
@@ -105,6 +117,7 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '6c908830f9c147cf');
     });
@@ -115,8 +128,18 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.loaded);
+      assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
       assert.strictEqual(results.attributes.messageId, '1569ae485ebba663');
+    });
+
+    it('2016-08-19 draft in thread', function() {
+      const message = page20160819().querySelector('[data-test-id=message]');
+      const results = parser(message);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert.strictEqual(results.attributes.isDraft, true);
+      assert.strictEqual(results.attributes.messageId, '9338c46c4d05b3f');
     });
   });
 
@@ -186,6 +209,21 @@ describe('Inbox Message Detection', function() {
 
       const spy = sinon.spy();
       watcher(page20160818_2())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, message));
+          cb();
+        });
+    });
+
+    it('2016-08-19 draft in thread', function(cb) {
+      const message = page20160819().querySelector('[data-test-id=message]');
+
+      const spy = sinon.spy();
+      watcher(page20160819())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

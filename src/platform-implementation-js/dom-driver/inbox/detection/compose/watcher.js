@@ -9,6 +9,7 @@ import streamWaitFor from '../../../../lib/stream-wait-for';
 import delayAsap from '../../../../lib/delay-asap';
 import censorHTMLtree from '../../../../../common/censor-html-tree';
 import _makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-merger';
@@ -16,8 +17,10 @@ import threadWatcher from '../thread/watcher';
 
 export default function watcher(
   root: Document=document,
-  openedThreads: ?Kefir.Stream<ElementWithLifetime>=null
+  openedThreadPool: ?ItemWithLifetimePool<*>=null
 ): Kefir.Stream<ElementWithLifetime> {
+  const openedThreads: Kefir.Stream<ElementWithLifetime> = openedThreadPool ? openedThreadPool.items() : threadWatcher(root);
+
   const debugLogging = true;
   const makeElementChildStream = debugLogging ? function(el) {
     // Add an attribute to watched elements that we can see in reported html to
@@ -32,8 +35,6 @@ export default function watcher(
 
   const mainTopAncestor = makeElementChildStream(root.body)
     .filter(({el}) => el.id && el.hasAttribute('jsaction'));
-
-  if (!openedThreads) openedThreads = threadWatcher(root);
 
   const inlineComposes = openedThreads
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
