@@ -7,25 +7,65 @@ import signIn from './lib/signIn';
 
 describe('Inbox', function() {
   it('ComposeView#addButton', function() {
-    signIn();
+    try {
+      signIn();
 
-    // Test a regular compose
-    const composeButton = browser.execute(() =>
-      document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
-    );
-    composeButton.click();
-    browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
-    browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-    assert(browser.isVisible('div.extension-dropdown-test'));
-    browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
+      // Test a regular compose
+      const composeButton = browser.execute(() =>
+        document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
+      );
+      composeButton.click();
+      browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
+      browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
+      assert(browser.isVisible('div.extension-dropdown-test'));
+      browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
 
-    // Test an inline compose
-    browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email]');
-    browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 10*1000);
-    browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
-    browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-    assert(browser.isVisible('div.extension-dropdown-test'));
-    browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
-    browser.pause(5000); // let discarding the draft have time to save
+      // Test an inline compose
+      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="no-reply@accounts.google.com"]');
+      browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 10*1000);
+      browser.pause(500);
+      browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
+      browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
+      assert(browser.isVisible('div.extension-dropdown-test'));
+      browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
+      // make sure discarding the draft has time to save
+
+      function switchToOverlayFrame() {
+        const frames = browser.elements('iframe:not([src])').value;
+        for (let i=0; i<frames.length; i++) {
+          browser.frameParent();
+          browser.frame(frames[i]);
+          const el = browser.element('body > div[role=dialog][tabindex]').value;
+          if (el) return;
+        }
+        throw new Error('Did not find overlay frame');
+      }
+
+      browser.scroll('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]', 0, -500);
+      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]');
+      browser.waitForVisible('section div[title="foo.txt"]', 10*1000);
+      browser.pause(500);
+      browser.click('section div[title="foo.txt"]'); // click an attachment card
+      switchToOverlayFrame();
+      browser.waitForVisible('button[aria-label="MV"]', 10*1000);
+      browser.waitForVisible('button[aria-label="CV"]', 10*1000);
+      browser.click('div[role=button][data-tooltip="Close"]');
+      browser.frameParent();
+      browser.click('div[role=heading]');
+      browser.pause(1000);
+
+      browser.waitForVisible('div[role=listitem][title="foo.txt"]', 10*1000);
+      browser.pause(500);
+      browser.click('div[role=listitem][title="foo.txt"]');
+      switchToOverlayFrame();
+      browser.waitForVisible('button[aria-label="CV"]', 10*1000);
+      browser.click('div[role=button][data-tooltip="Close"]');
+      browser.frameParent();
+    } catch (err) {
+      console.error('error', err.message);
+      console.error(err.stack);
+      // browser.debug();
+      throw err;
+    }
   });
 });
