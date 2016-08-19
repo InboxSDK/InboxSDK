@@ -5,6 +5,7 @@ import _ from 'lodash';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import {defn} from 'ud';
 
@@ -18,16 +19,25 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
-import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+
+import getThreadElStream from './detection/thread/stream';
+import getMessageElStream from './detection/message/stream';
+import getThreadRowElStream from './detection/threadRow/watcher';
+
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
+import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
+import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
+import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
+import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -45,10 +55,13 @@ class InboxDriver {
   onready: Promise<void>;
   _routeViewDriverStream: Kefir.Stream<any>;
   _rowListViewDriverStream: Kefir.Stream<any>;
-  _composeViewDriverStream: Kefir.Stream<InboxComposeView>;
-  _threadViewDriverStream: Kefir.Stream<InboxThreadView>;
+  _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
+  _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
+  _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
+  _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
+  _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
   _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
-  _messageViewDriverStream: Kefir.Stream<InboxMessageView>;
+  _messageViewElements: Map<HTMLElement, InboxMessageView> = new Map();
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
   _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
@@ -57,6 +70,8 @@ class InboxDriver {
   _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
+  _lastInteractedAttachmentCardViewSet: Kefir.Bus<any> = kefirBus();
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -68,43 +83,37 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    // this._customRouteIDs = new Set();
-    // this._customListRouteIDs = new Map();
-    // this._customListSearchStringsToRouteIds = new Map();
+    const threadRowElStream = getThreadRowElStream().takeUntilBy(this._stopper);
+    const threadElStream = getThreadElStream(this, threadRowElStream).takeUntilBy(this._stopper);
+    const messageElStream = getMessageElStream(this, threadElStream).takeUntilBy(this._stopper);
 
-    /*
-    var mainAdds = streamWaitFor(() => document.getElementById('mQ'))
-      .flatMap(el => makeElementChildStream(el));
-
-    // tNsA5e-nUpftc nUpftc lk
-    var mainViews = mainAdds.filter(({el}) => el.classList.contains('lk'))
-      .map(({el}) => el.querySelector('div.cz[jsan]'))
-      .flatMap(el =>
-        makeMutationObserverChunkedStream(el, {
-          attributes: true, attributeFilter: ['jsan']
-        }).toProperty(null).map(() => el)
-      )
-      .map(el => ({el, jsan: el.getAttribute('jsan')}))
-      .skipDuplicates((a, b) => a.jsan === b.jsan)
-      .map(({el, jsan}) => new InboxRouteView(el));
-
-    // tNsA5e-nUpftc nUpftc i5 xpv2f
-    var searchViews = mainAdds.filter(({el}) =>
-        !el.classList.contains('lk') &&
-        el.classList.contains('i5') && el.classList.contains('xpv2f')
-      )
-      .map(({el}) => new InboxRouteView(el));
-    */
+    this._threadViewDriverPool = new ItemWithLifetimePool(
+      getThreadViewStream(this, threadElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._messageViewDriverPool = new ItemWithLifetimePool(
+      getMessageViewStream(this, messageElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
+      getAttachmentCardViewDriverStream(this, threadRowElStream, messageElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
+      getAttachmentOverlayViewStream(this).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+    this._composeViewDriverPool = new ItemWithLifetimePool(
+      getComposeViewDriverStream(this, threadElStream).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
 
     this._routeViewDriverStream = Kefir.never().toProperty();
     this._rowListViewDriverStream = Kefir.never();
-    this._composeViewDriverStream = getComposeViewDriverStream(this).takeUntilBy(this._stopper);
-    this._threadViewDriverStream = getThreadViewStream(this).takeUntilBy(this._stopper);
-    this._messageViewDriverStream = getMessageViewStream(this).takeUntilBy(this._stopper);
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
 
-    this._composeViewDriverStream.onError(err => {
+    this._composeViewDriverPool.items().onError(err => {
       // If we get here, it's probably because of a waitFor timeout caused by
       // us failing to find the compose parent. Let's log the results of a few
       // similar selectors to see if our selector was maybe slightly wrong.
@@ -167,10 +176,10 @@ class InboxDriver {
   getStopper(): Kefir.Stream<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
-  getComposeViewDriverStream() {return this._composeViewDriverStream;}
-  getThreadViewDriverStream() {return this._threadViewDriverStream;}
-  getMessageViewDriverStream() {return this._messageViewDriverStream;}
-  getAttachmentCardViewDriverStream() {return Kefir.never();}
+  getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
+  getThreadViewDriverStream() {return this._threadViewDriverPool.items().map(({el})=>el);}
+  getMessageViewDriverStream() {return this._messageViewDriverPool.items().map(({el})=>el);}
+  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}
@@ -180,6 +189,20 @@ class InboxDriver {
   getPageCommunicator(): InboxPageCommunicator {return this._pageCommunicator;}
 
   getThreadViewElementsMap() {return this._threadViewElements;}
+  getMessageViewElementsMap() {return this._messageViewElements;}
+
+  getLastInteractedAttachmentCardView() {
+    return this._lastInteractedAttachmentCardView;
+  }
+  setLastInteractedAttachmentCardView(card: InboxAttachmentCardView) {
+    this._lastInteractedAttachmentCardViewSet.emit();
+    this._lastInteractedAttachmentCardView = card;
+    card.getStopper()
+      .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
+      .onValue(() => {
+        this._lastInteractedAttachmentCardView = null;
+      });
+  }
 
   openComposeWindow(): void {
     throw new Error("Not implemented");

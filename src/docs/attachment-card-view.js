@@ -30,12 +30,8 @@ var AttachmentCardView = /** @lends AttachmentCardView */{
 	getTitle: function() {},
 
 	/**
-	* Get the URL for the attachment card's download link as a promise for a
-	* string. For FILE attachment cards, the URL will be a short-lived URL that
-	* can be accessed without cookies. For CUSTOM attachment cards, the URL will
-	* be the downloadUrl property of the card's download button if it has one,
-	* otherwise null. Other attachment card types may not have a download URL,
-	* and the promise may resolve to null.
+	* This method is deprecated. Please use the same-named method on the
+	* {AttachmentCardClickEvent} object instead.
 	* @return {Promise.<string>}
 	*/
 	getDownloadURL: function() {},

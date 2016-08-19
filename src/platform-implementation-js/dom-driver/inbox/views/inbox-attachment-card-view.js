@@ -6,20 +6,47 @@ import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import findParent from '../../../lib/dom/find-parent';
 import type InboxDriver from '../inbox-driver';
+import type InboxMessageView from './inbox-message-view';
+import type InboxAttachmentOverlayView from './inbox-attachment-overlay-view';
+
+import type {Parsed} from '../detection/attachmentCard/parser';
 
 class InboxAttachmentCardView {
   _stopper = kefirStopper();
   _previewClicks = Kefir.pool();
   _element: HTMLElement;
   _driver: InboxDriver;
+  _type: string;
+  _p: ?Parsed;
+  _messageViewDriver: ?InboxMessageView;
+  _addedButtonDescriptors: Object[] = [];
+  _overlayView: ?InboxAttachmentOverlayView = null;
 
   constructor(options, driver: InboxDriver) {
     this._driver = driver;
     if (options.element) {
-      throw new Error('not implemented yet');
+      this._element = options.element;
+      this._p = options.parsed;
+      this._type = options.parsed.attributes.type;
+
+      Kefir.merge([
+        Kefir.fromEvents(this._element, 'click'),
+        Kefir.fromEvents(this._element, 'keydown')
+      ])
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._driver.setLastInteractedAttachmentCardView(this);
+        });
     } else {
+      this._type = 'CUSTOM';
       this._createNewElement(options);
+    }
+
+    this._messageViewDriver = this._findMessageView();
+    if (this._messageViewDriver) {
+      this._messageViewDriver.addAttachmentCardViewDriver(this);
     }
   }
 
@@ -27,7 +54,14 @@ class InboxAttachmentCardView {
     this._stopper.destroy();
   }
 
-  _createNewElement(options) {
+  _findMessageView(): ?InboxMessageView {
+    const map = this._driver.getMessageViewElementsMap();
+    const messageViewElement = findParent(this._element, el => map.has((el:any)));
+    if (!messageViewElement) return null;
+    return map.get(messageViewElement);
+  }
+
+  _createNewElement(options: Object) {
     if (options.previewUrl) {
       this._element = document.createElement('a');
       this._element.href = options.previewUrl;
@@ -79,53 +113,8 @@ class InboxAttachmentCardView {
         `;
       }
 
-      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
       options.buttons.forEach(button => {
-        const el = document.createElement('button');
-        el.className = 'inboxsdk__attachment_card_button';
-        if (button.downloadUrl) {
-          el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
-          (el:any).addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            let prevented = false;
-            if (button.onClick) {
-              button.onClick({
-                preventDefault() {
-                  prevented = true;
-                }
-              });
-            }
-            if (prevented) return;
-            const downloadLink = document.createElement('a');
-            downloadLink.href = button.downloadUrl;
-            (downloadLink:any).addEventListener('click', function(e) {
-              e.stopPropagation();
-            }, true);
-            if (button.openInNewTab) {
-              downloadLink.setAttribute('target', '_blank');
-            }
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-          });
-          el.innerHTML = `
-            <div style="background: no-repeat url(https://ssl.gstatic.com/mail/sprites/newattachmentcards-ff2ce2bea04dec2bf32f2ebbfa0834ff.png) -219px -129px"></div>
-          `;
-        } else {
-          (el:any).addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            if (button.onClick) {
-              button.onClick();
-            }
-          });
-          el.innerHTML = autoHtml `
-            <img src="${button.iconUrl}">
-          `;
-          el.title = button.tooltip;
-        }
-        buttonContainer.appendChild(el);
+        this.addButton(button);
       });
     };
     setupInnerHtml(options);
@@ -142,7 +131,7 @@ class InboxAttachmentCardView {
   }
 
   getMessageViewDriver() {
-    return null;
+    return this._messageViewDriver;
   }
 
   getStopper(): Kefir.Stream<null> {
@@ -154,11 +143,69 @@ class InboxAttachmentCardView {
   }
 
   getAttachmentType(): string {
-    throw new Error('not implemented yet');
+    return this._type;
   }
 
-  addButton(options: Object): void {
-    throw new Error('not implemented yet');
+  getAddedButtonDescriptors() {
+    return this._addedButtonDescriptors;
+  }
+
+  addButton(button: Object): void {
+    this._addedButtonDescriptors.push(button);
+    if (!this._p) {
+      // artificial SDK-added card. Native cards don't have their added buttons
+      // processed here. They're added in InboxAttachmentOverlayView.
+      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
+      const el = document.createElement('button');
+      el.className = 'inboxsdk__attachment_card_button';
+      if (button.downloadUrl) {
+        el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
+        (el:any).addEventListener('click', event => {
+          event.stopPropagation();
+          event.preventDefault();
+          let prevented = false;
+          if (button.onClick) {
+            button.onClick({
+              preventDefault() {
+                prevented = true;
+              }
+            });
+          }
+          if (prevented) return;
+          const downloadLink = document.createElement('a');
+          downloadLink.href = button.downloadUrl;
+          (downloadLink:any).addEventListener('click', function(e) {
+            e.stopPropagation();
+          }, true);
+          if (button.openInNewTab) {
+            downloadLink.setAttribute('target', '_blank');
+          }
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          downloadLink.remove();
+        });
+        el.innerHTML = `
+          <div style="background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElEQVQ4y+2UMQ6AQAgEwfhQnnJP4adjc4UxB0ehhXqbULE7BRAUkLu1yQP6OXQveEab1DXTD0O9b53kIui+QReicnJ5lM2gArQA2LLcDCqAXYA2y1SgZ7BV/Lr+6TugB0K2GxxDXjEZAAAAAElFTkSuQmCC)"></div>
+        `;
+      } else {
+        (el:any).addEventListener('click', event => {
+          event.stopPropagation();
+          event.preventDefault();
+          if (button.onClick) {
+            button.onClick({
+              getDownloadURL() {
+                throw new Error('not implemented for artificial sdk-added cardViews!');
+              }
+            });
+          }
+        });
+        el.innerHTML = autoHtml `
+          <img src="${button.iconUrl}">
+        `;
+        el.title = button.tooltip;
+      }
+      buttonContainer.appendChild(el);
+    }
   }
 
   getTitle(): string {
@@ -166,7 +213,13 @@ class InboxAttachmentCardView {
   }
 
   async getDownloadURL(): Promise<?string> {
-    throw new Error('not implemented yet');
+    const overlayView = this._overlayView;
+    if (!overlayView) throw new Error('This method only works during a button onClick callback in Inbox');
+    return overlayView.getDownloadURL();
+  }
+
+  setOverlay(overlayView: ?InboxAttachmentOverlayView) {
+    this._overlayView = overlayView;
   }
 }
 

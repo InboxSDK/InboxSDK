@@ -25,6 +25,7 @@ class InboxMessageView {
   _stopper: Kefir.Stream<any>;
   _eventStream: Kefir.Bus<Object> = kefirBus();
   _threadViewDriver: ?InboxThreadView;
+  _attachmentCardViews: InboxAttachmentCardView[] = [];
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -50,18 +51,26 @@ class InboxMessageView {
       attributes: true, attributeFilter: ['aria-expanded']
     })
       .toProperty(() => null)
-      .map(() => this._element.getAttribute('aria-expanded'))
+      .map(() => this._element.getAttribute('aria-expanded') === 'true')
       .skipDuplicates()
       .changes()
       .takeUntilBy(this._stopper)
-      .onValue(() => {
-        this._reparse();
+      .onValue(expanded => {
+        if (expanded) {
+          this._reparse();
+        } else {
+          // Destroy on collapse so that when it's uncollapsed again, the app
+          // can re-do its modifications.
+          this.destroy();
+        }
       });
 
     this._threadViewDriver = this._findThreadView();
     if (this._threadViewDriver) {
       this._threadViewDriver.addMessageViewDriver(this);
     }
+
+    this._driver.getMessageViewElementsMap().set(this._element, this);
   }
 
   _findThreadView(): ?InboxThreadView {
@@ -95,6 +104,15 @@ class InboxMessageView {
         newValue: this._p.attributes.viewState
       });
     }
+  }
+
+  addAttachmentCardViewDriver(card: InboxAttachmentCardView) {
+    this._attachmentCardViews.push(card);
+    card.getStopper()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._attachmentCardViews = this._attachmentCardViews.filter(v => v !== card);
+      });
   }
 
   getStopper() {
@@ -137,15 +155,15 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   addAttachmentIcon(options: Object): void {
-    throw new Error('not implemented yet');
+    console.warn('MessageView.addAttachmentIcon is not implemented yet in Inbox');
   }
-  getAttachmentCardViewDrivers(): Array<Object> {
-    throw new Error('not implemented yet');
+  getAttachmentCardViewDrivers() {
+    return (this._attachmentCardViews: any);
   }
   addAttachmentCard(options: Object) {
     const {attachmentsArea} = this._p.elements;
     if (!attachmentsArea) throw new Error('Could not find attachments area');
-    let container = attachmentsArea.firstElementChild;
+    let container = attachmentsArea.lastElementChild;
     if (!container) {
       attachmentsArea.style.display = '';
       attachmentsArea.style.margin = '16px 0 0';
@@ -158,7 +176,7 @@ class InboxMessageView {
     return card;
   }
   addButtonToDownloadAllArea(options: Object): void {
-    throw new Error('not implemented yet');
+    // no-op in Inbox
   }
   getViewState(): VIEW_STATE {
     return this._p.attributes.viewState;
@@ -198,7 +216,14 @@ class InboxMessageView {
   }
 
   getReadyStream() {
-    return Kefir.constant(null);
+    // Needs to emit after any attachment cards have been added in order for
+    // an app calling getFileAttachmentCardViews() immediately to see the cards.
+    // The cards are emitted several microtasks after the message, so we delay
+    // by about 10 microtasks here. An integration test tests this at least.
+    // TODO something else.
+    return Kefir.repeat(i =>
+      i > 10 ? null : delayAsap(null)
+    ).ignoreValues().beforeEnd(() => null);
   }
 
   destroy() {

@@ -32,7 +32,8 @@
     "storage",
     "https://mail.google.com/",
     "https://inbox.google.com/",
-    "https://*.dropbox.com/"
+    "https://*.dropbox.com/",
+    "https://mail-attachment.googleusercontent.com/"
   ],
   "web_accessible_resources": [ "images/logo.png", "images/icon16.png", "images/icon48.png", "images/icon128.png", "images/white_icon48.png", "images/onboarding.png", "images/checkmark.png", "images/x.png", "blank.html" ]
 }

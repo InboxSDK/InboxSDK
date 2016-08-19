@@ -49,4 +49,8 @@ const injectScript: () => Promise<null> = _.once(function() {
     .toPromise(RSVP.Promise);
 });
 
+if (module.hot) {
+  module.hot.decline();
+}
+
 export default injectScript;

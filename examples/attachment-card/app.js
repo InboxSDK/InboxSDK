@@ -7,7 +7,12 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 		card.addButton({
 			iconUrl: chrome.runtime.getURL('zipicon.png'),
 			tooltip: 'Foo1',
-			onClick: console.log.bind(console, 'click')
+			onClick(event) {
+				console.log('click', event);
+				event.getDownloadURL().then(url => {
+					console.log('download url', url);
+				});
+			}
 		});
 	});
 
@@ -19,7 +24,7 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			title: 'Test image long title testing test foobar123456',
 			description: 'Test description',
 			previewUrl: 'https://www.google.com',
-			previewThumbnailUrl: chrome.runtime.getURL('partycat2.jpg'),
+			previewThumbnailUrl: chrome.runtime.getURL('partycat.jpg'),
 			failoverPreviewIconUrl: chrome.runtime.getURL('partycat.jpg'),
 			fileIconImageUrl: chrome.runtime.getURL('zipicon.png'),
 			mimeType: 'image/jpg',
@@ -90,13 +95,18 @@ InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(
 			console.log(i, 'attachment card', card);
 			console.log(i, 'type', card.getAttachmentType());
 			console.log(i, 'title', card.getTitle());
-			card.getDownloadURL().then(function(url) {
-				console.log(i, 'url', url);
-			});
 			card.addButton({
 				iconUrl: chrome.runtime.getURL('zipicon.png'),
 				tooltip: 'Foo2',
-				onClick: console.log.bind(console, 'click2')
+				onClick(event) {
+					console.log('click2', event);
+					card.getDownloadURL().then(url => {
+						console.log('old, url', url);
+					});
+					event.getDownloadURL().then(url => {
+						console.log('new, url', url);
+					});
+				}
 			});
 		});
 

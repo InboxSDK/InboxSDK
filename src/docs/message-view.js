@@ -24,7 +24,8 @@ var MessageView = /** @lends MessageView */{
 	addAttachmentCardView: function(){},
 
 	/**
-	* Adds a button to the download all area of the attachments tray. <screenshot>
+	* Adds a button to the download all area of the attachments tray. This function
+	* does nothing in Google Inbox. <screenshot>
 	* @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
 	* @return {void}
 	*/
@@ -216,7 +217,7 @@ var AttachmentCardOptions = /** @lends AttachmentCardOptions */{
 
 	/**
 	* The url of the icon of the attachment.
-	* @type {boolean}
+	* @type {string}
 	*/
 	fileIconImageUrl:null,
 
@@ -298,7 +299,7 @@ var AttachmentCardNoPreviewOptions = /** @lends AttachmentCardNoPreviewOptions *
 
 	/**
 	* The url of the icon of the attachment.
-	* @type {boolean}
+	* @type {string}
 	*/
 	fileIconImageUrl:null,
 
@@ -365,13 +366,29 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 	tooltip:null,
 
 	/**
-	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
-	* actually downloading which happens automatically.
-	* @type {func(event)}
+	* A callback that is called when the user presses the button.
+	* @type {func(AttachmentCardClickEvent)}
 	*/
 	onClick:null
 };
 
+/**
+* @class
+*/
+var AttachmentCardClickEvent = /** @lends AttachmentCardClickEvent */{
+	/**
+	* Get the URL for the attachment card's download link as a promise for a
+	* string. For FILE attachment cards, the URL will be a short-lived URL that
+	* can be accessed without cookies. For CUSTOM attachment cards, the URL will
+	* be the downloadUrl property of the card's download button if it has one,
+	* otherwise null. Other attachment card types may not have a download URL,
+	* and the promise may resolve to null.
+	* To work in Inbox, your extension must have permissions to the
+	* "https://mail-attachment.googleusercontent.com/" domain.
+	* @return {Promise.<string>}
+	*/
+	getDownloadURL: function() {}
+};
 
 
 /**
