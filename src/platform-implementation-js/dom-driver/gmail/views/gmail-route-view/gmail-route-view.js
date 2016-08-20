@@ -42,6 +42,9 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
 	_pageCommunicator: ?GmailPageCommunicator;
+	_threadContainerElement: ?HTMLElement = null;
+	_triedToGetThreadContainerElement: boolean = false;
+	_cachedParams: ?{[ix:string]: string} = null;
 
 	constructor({urlObject, type, routeID}: Object, gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver) {
 		this._type = type;
@@ -121,25 +124,34 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	getParams(): {[ix:string]: string} {
-		if (this._customRouteID) {
-			return this._getCustomParams();
-		}
-
-		var params = this._getNativeParams();
-		var routeID = this.getRouteID();
-		if(!routeID){
-			return params;
-		}
-
-		var routeIDParams = this._extractParamKeysFromRouteID(routeID);
-		var routeParams = {};
-		routeIDParams.forEach(function(param){
-			if(params[param]){
-				routeParams[param] = params[param];
+		let cachedParams = this._cachedParams;
+		if(!cachedParams){
+			if (this._customRouteID) {
+				cachedParams = this._getCustomParams();
 			}
-		});
+			else{
+				const params = this._getNativeParams();
+				const routeID = this.getRouteID();
+				if(!routeID){
+					cachedParams = params;
+				}
+				else{
+					const routeIDParams = this._extractParamKeysFromRouteID(routeID);
+					const routeParams = {};
+					routeIDParams.forEach(function(param){
+						if(params[param]){
+							routeParams[param] = params[param];
+						}
+					});
 
-		return routeParams;
+					cachedParams = routeParams;
+				}
+			}
+
+			this._cachedParams = cachedParams;
+		}
+
+		return cachedParams;
 	}
 
 	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
@@ -243,7 +255,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			return;
 		}
 
-		var threadContainerElement = GmailElementGetter.getThreadContainerElement();
+		var threadContainerElement = this._getThreadContainerElement();
 
 		if(threadContainerElement){
 			var gmailThreadView = new GmailThreadView(threadContainerElement, this, this._driver);
@@ -359,7 +371,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	_isThreadRoute(): boolean {
-		return !!GmailElementGetter.getThreadContainerElement();
+		return !!this._getThreadContainerElement();
 	}
 
 	_isListRoute(): boolean {
@@ -411,7 +423,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			}
 		}
 
-		var threadContainerElement = GmailElementGetter.getThreadContainerElement();
+		var threadContainerElement = this._getThreadContainerElement();
 
 		if (!this._pageCommunicator) throw new Error("Missing page communicator");
 		return {
@@ -465,6 +477,15 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return routeID.split('/')
 			.filter(part => part[0] === ':')
 			.map(part => part.substring(1));
+	}
+
+	_getThreadContainerElement(): ?HTMLElement{
+		if(this._triedToGetThreadContainerElement) return this._threadContainerElement;
+
+		this._threadContainerElement = GmailElementGetter.getThreadContainerElement();
+		this._triedToGetThreadContainerElement = true;
+
+		return this._threadContainerElement
 	}
 });
 export default GmailRouteView;

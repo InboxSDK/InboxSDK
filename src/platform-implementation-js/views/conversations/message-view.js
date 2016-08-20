@@ -24,7 +24,7 @@ class MessageView extends EventEmitter {
 	constructor(messageViewImplementation: MessageViewDriver, appId: string, membrane: Membrane, Conversations: Object, driver: Driver){
 		super();
 
-		const members = {messageViewImplementation, membrane, Conversations, driver};
+		const members = {messageViewImplementation, membrane, Conversations, driver, linksInBody: null};
 		memberMap.set(this, members);
 
 		_bindToEventStream(this, members, messageViewImplementation.getEventStream());
@@ -111,14 +111,19 @@ class MessageView extends EventEmitter {
 	}
 
 	getLinksInBody(): Array<MessageViewLinkDescriptor> {
-		const anchors = this.getBodyElement().querySelectorAll('a');
-		return _.map(anchors, anchor => ({
-			text: anchor.textContent,
-			html: anchor.innerHTML,
-			href: anchor.href,
-			element: anchor,
-			isInQuotedArea: this.isElementInQuotedArea(anchor)
-		}));
+		const members = memberMap.get(this);
+		if(!members.linksInBody){
+			const anchors = this.getBodyElement().querySelectorAll('a');
+			members.linksInBody = _.map(anchors, anchor => ({
+				text: anchor.textContent,
+				html: anchor.innerHTML,
+				href: anchor.href,
+				element: anchor,
+				isInQuotedArea: this.isElementInQuotedArea(anchor)
+			}));
+		}
+
+		return members.linksInBody;
 	}
 
 	getSender(): Contact {

@@ -3,6 +3,7 @@
 
 import _ from 'lodash';
 import $ from 'jquery';
+import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -34,6 +35,7 @@ class GmailToolbarView {
 	_toolbarState: ?string;
 	_threadViewDriver: ?GmailThreadView;
 	_rowListViewDriver: ?GmailRowListView;
+	_isUpdateButtonClassesScheduled: boolean = false;
 
 	constructor(element: HTMLElement, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
 		// Important: Multiple GmailToolbarViews will be created for the same
@@ -299,62 +301,69 @@ class GmailToolbarView {
 	}
 
 	_updateButtonClasses(element: HTMLElement){
-		if(this._toolbarState === 'EXPANDED'){
-			element.setAttribute('data-toolbar-expanded', 'true');
-		}
-		else if(this._toolbarState === 'COLLAPSED'){
-			element.setAttribute('data-toolbar-expanded', 'false');
-		}
+		if(this._isUpdateButtonClassesScheduled) return;
 
-		var buttons = element.querySelectorAll('.G-Ni > [role=button]');
+		this._isUpdateButtonClassesScheduled = true;
+		asap(() => {
+			if(this._toolbarState === 'EXPANDED'){
+				element.setAttribute('data-toolbar-expanded', 'true');
+			}
+			else if(this._toolbarState === 'COLLAPSED'){
+				element.setAttribute('data-toolbar-expanded', 'false');
+			}
 
-		Array.prototype.forEach.call(buttons, function(button){
-			var current = button;
-			for(var ii=0; ii<100000; ii++){
-				if(current.previousElementSibling){
-					if(current.previousElementSibling.classList.contains('inboxsdk__button')){
-						if($(current.previousElementSibling).is(':visible')){
+			var buttons = element.querySelectorAll('.G-Ni > [role=button]');
+
+			Array.prototype.forEach.call(buttons, function(button){
+				var current = button;
+				for(var ii=0; ii<100000; ii++){
+					if(current.previousElementSibling){
+						if(current.previousElementSibling.classList.contains('inboxsdk__button')){
+							if($(current.previousElementSibling).is(':visible')){
+								button.classList.add('T-I-Js-Gs');
+								break;
+							}
+							else{
+								current = current.previousElementSibling;
+							}
+						}
+						else{
 							button.classList.add('T-I-Js-Gs');
 							break;
 						}
-						else{
-							current = current.previousElementSibling;
-						}
 					}
 					else{
-						button.classList.add('T-I-Js-Gs');
+						button.classList.remove('T-I-Js-Gs');
 						break;
 					}
 				}
-				else{
-					button.classList.remove('T-I-Js-Gs');
-					break;
-				}
-			}
 
-			current = button;
-			for(ii=0; ii<100000; ii++){
-				if(current.nextElementSibling){
-					if(current.nextElementSibling.classList.contains('inboxsdk__button')){
-						if($(current.nextElementSibling).is(':visible')){
+				current = button;
+				for(ii=0; ii<100000; ii++){
+					if(current.nextElementSibling){
+						if(current.nextElementSibling.classList.contains('inboxsdk__button')){
+							if($(current.nextElementSibling).is(':visible')){
+								button.classList.add('T-I-Js-IF');
+								break;
+							}
+							else{
+								current = current.nextElementSibling;
+							}
+						}
+						else{
 							button.classList.add('T-I-Js-IF');
 							break;
 						}
-						else{
-							current = current.nextElementSibling;
-						}
 					}
 					else{
-						button.classList.add('T-I-Js-IF');
+						button.classList.remove('T-I-Js-IF');
 						break;
 					}
 				}
-				else{
-					button.classList.remove('T-I-Js-IF');
-					break;
-				}
-			}
 
+			});
+
+			this._isUpdateButtonClassesScheduled = false;
 		});
 	}
 

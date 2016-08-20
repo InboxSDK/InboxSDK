@@ -46,6 +46,7 @@ export default class GmailNavItemView {
 	_accessoryViewController: ?Object = null;
 	_level: number;
 	_navItemNumber: number;
+	_isActive: boolean = false;
 
 	constructor(orderGroup: number | string, level: number){
 
@@ -126,7 +127,7 @@ export default class GmailNavItemView {
 	}
 
 	setActive(value: boolean){
-		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE){
+		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE || this._isActive === value){
 			return;
 		}
 
@@ -144,6 +145,7 @@ export default class GmailNavItemView {
 		}
 
 		this._setHeights();
+		this._isActive = value;
 	}
 
 	toggleCollapse(){
