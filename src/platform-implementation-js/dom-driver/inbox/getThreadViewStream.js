@@ -5,8 +5,8 @@ import Kefir from 'kefir';
 import type InboxDriver from './inbox-driver';
 import InboxThreadView from './views/inbox-thread-view';
 
-export default function getThreadViewStream(driver: InboxDriver, threadElStream: *) {
-  return threadElStream.map(({el, removalStream, parsed}) => {
+export default function getThreadViewStream(driver: InboxDriver, threadElPool: *) {
+  return threadElPool.items().map(({el, removalStream, parsed}) => {
     const view = new InboxThreadView(el, driver, parsed);
     removalStream.take(1).onValue(() => {
       view.destroy();

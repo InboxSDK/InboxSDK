@@ -9,13 +9,14 @@ import streamWaitFor from '../../../../lib/stream-wait-for';
 import delayAsap from '../../../../lib/delay-asap';
 import censorHTMLtree from '../../../../../common/censor-html-tree';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 
 import threadRowWatcher from '../threadRow/watcher';
 
-export default function watcher(root: Document=document, threadRowElStream: ?Kefir.Stream<ElementWithLifetime>=null): Kefir.Stream<ElementWithLifetime> {
-  if (!threadRowElStream) threadRowElStream = threadRowWatcher(root);
+export default function watcher(root: Document=document, threadRowElPool: ?ItemWithLifetimePool<*>=null): Kefir.Stream<ElementWithLifetime> {
+  const threadRowElStream = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
 
   const openedThreads = threadRowElStream
     .flatMap(({el,removalStream}) => {

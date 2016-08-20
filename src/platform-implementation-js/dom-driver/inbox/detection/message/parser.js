@@ -29,15 +29,6 @@ export default function parser(el: HTMLElement) {
   // Super-collapsed/HIDDEN messages don't have a body.
   const body: ?HTMLElement = el.querySelector('div[role=heading] ~ div:not(:empty)');
 
-  const sender = (!heading || !body) ? null : ec.run(
-    'sender',
-    () => querySelectorOne(heading, '[email]:first-child')
-  );
-
-  const recipientElements = el.querySelectorAll(
-    '[role=heading] [email]:not(:first-child), [role=heading] + div [email]'
-  );
-
   // The last message in a thread is always loaded and doesn't have the toggle
   // collapse button.
   const toggleCollapse: ?HTMLElement = el.querySelector('div[jsaction$=".message_toggle_collapse"]');
@@ -47,7 +38,18 @@ export default function parser(el: HTMLElement) {
 
   const viewState = loaded ? 'EXPANDED' : body != null ? 'COLLAPSED' : 'HIDDEN';
 
-  const attachmentsArea: ?HTMLElement = (!body || viewState !== 'EXPANDED') ? null : ec.run(
+  const isDraft = loaded && heading && !heading.querySelector('span[email]');
+
+  const sender = (isDraft || !heading || !body) ? null : ec.run(
+    'sender',
+    () => querySelectorOne(heading, '[email]:first-child')
+  );
+
+  const recipientElements = isDraft ? null : el.querySelectorAll(
+    '[role=heading] [email]:not(:first-child), [role=heading] + div [email]'
+  );
+
+  const attachmentsArea: ?HTMLElement = (isDraft || !body || viewState !== 'EXPANDED') ? null : ec.run(
     'attachments area',
     () => {
       const lastSection = _.last((body.parentElement:any).querySelectorAll('section:last-child'));
@@ -72,7 +74,8 @@ export default function parser(el: HTMLElement) {
       loaded,
       viewState,
       messageId,
-      recipientElements
+      recipientElements,
+      isDraft
     },
     score,
     errors: ec.getErrorLogs()

@@ -6,6 +6,7 @@ import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import InboxComposeView from './views/inbox-compose-view';
+import type ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import type InboxDriver from './inbox-driver';
 
 import finder from './detection/compose/finder';
@@ -16,10 +17,10 @@ import detectionRunner from '../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver: InboxDriver, threadElStream: Kefir.Stream<*>): Kefir.Stream<InboxComposeView> {
+function imp(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Stream<InboxComposeView> {
   return detectionRunner({
     name: 'compose',
-    finder, watcher: root => watcher(root, threadElStream), parser,
+    finder, watcher: root => watcher(root, threadElPool), parser,
     logError(err: Error, details?: any) {
       driver.getLogger().errorSite(err, details);
     }
@@ -31,6 +32,6 @@ function imp(driver: InboxDriver, threadElStream: Kefir.Stream<*>): Kefir.Stream
     });
 }
 
-export default function getComposeViewDriverStream(driver: InboxDriver, threadElStream: Kefir.Stream<*>): Kefir.Stream<InboxComposeView> {
-  return impStream.flatMapLatest(_imp => _imp(driver, threadElStream));
+export default function getComposeViewDriverStream(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Stream<InboxComposeView> {
+  return impStream.flatMapLatest(_imp => _imp(driver, threadElPool));
 }

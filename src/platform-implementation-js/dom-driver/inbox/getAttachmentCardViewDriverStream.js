@@ -6,6 +6,7 @@ import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
+import type ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import type InboxDriver from './inbox-driver';
 
 import finder from './detection/attachmentCard/finder';
@@ -16,11 +17,11 @@ import detectionRunner from '../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver, threadRowElStream, messageElStream): Kefir.Stream<InboxAttachmentCardView> {
+function imp(driver, threadRowElPool, messageElPool): Kefir.Stream<InboxAttachmentCardView> {
   return detectionRunner({
     name: 'attachmentCard',
     finder,
-    watcher: root => watcher(root, threadRowElStream, messageElStream),
+    watcher: root => watcher(root, threadRowElPool, messageElPool),
     parser,
     logError(err: Error, details?: any) {
       driver.getLogger().errorSite(err, details);
@@ -33,6 +34,6 @@ function imp(driver, threadRowElStream, messageElStream): Kefir.Stream<InboxAtta
     });
 }
 
-export default function getAttachmentCardViewDriverStream(driver: InboxDriver, threadRowElStream: Kefir.Stream<*>, messageElStream: Kefir.Stream<*>): Kefir.Stream<InboxAttachmentCardView> {
-  return impStream.flatMapLatest(_imp => _imp(driver, threadRowElStream, messageElStream));
+export default function getAttachmentCardViewDriverStream(driver: InboxDriver, threadRowElPool: ItemWithLifetimePool<*>, messageElPool: ItemWithLifetimePool<*>): Kefir.Stream<InboxAttachmentCardView> {
+  return impStream.flatMapLatest(_imp => _imp(driver, threadRowElPool, messageElPool));
 }

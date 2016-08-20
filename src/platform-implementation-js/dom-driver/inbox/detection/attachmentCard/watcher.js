@@ -8,6 +8,7 @@ import streamWaitFor from '../../../../lib/stream-wait-for';
 import delayAsap from '../../../../lib/delay-asap';
 import censorHTMLtree from '../../../../../common/censor-html-tree';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import threadRowWatcher from '../threadRow/watcher';
@@ -15,11 +16,11 @@ import messageWatcher from '../message/watcher';
 
 export default function watcher(
   root: Document=document,
-  threadRowElStream: ?Kefir.Stream<ElementWithLifetime>=null,
-  messageElStream: ?Kefir.Stream<ElementWithLifetime>=null
+  threadRowElPool: ?ItemWithLifetimePool<*>=null,
+  messageElPool: ?ItemWithLifetimePool<*>=null
 ): Kefir.Stream<ElementWithLifetime> {
-  if (!threadRowElStream) threadRowElStream = threadRowWatcher(root);
-  if (!messageElStream) messageElStream = messageWatcher(root);
+  const threadRowElStream: Kefir.Stream<ElementWithLifetime> = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
+  const messageElStream: Kefir.Stream<ElementWithLifetime> = messageElPool ? messageElPool.items() : messageWatcher(root);
 
   const messageCards = messageElStream
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
@@ -32,7 +33,6 @@ export default function watcher(
 
   const listCards = threadRowElStream
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.hasAttribute('jsaction'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
     .filter(({el}) => el.hasAttribute('jsaction'))
     .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
