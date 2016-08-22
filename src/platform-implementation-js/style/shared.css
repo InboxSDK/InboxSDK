@@ -16,6 +16,7 @@
   padding: 0;
   box-sizing: content-box;
   outline: none;
+  cursor: pointer;
 }
 .inboxsdk__close_button:focus, .inboxsdk__close_button:hover {
   opacity: 1;
