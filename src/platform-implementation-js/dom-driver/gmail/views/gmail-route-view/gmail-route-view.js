@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import once from 'lodash/once';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -120,27 +121,32 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return this._type === 'CUSTOM';
 	}
 
-	getParams(): {[ix:string]: string} {
+	getParams: () => {[ix:string]: string} = once(() => {
+		let params;
 		if (this._customRouteID) {
-			return this._getCustomParams();
+			params = this._getCustomParams();
 		}
-
-		var params = this._getNativeParams();
-		var routeID = this.getRouteID();
-		if(!routeID){
-			return params;
-		}
-
-		var routeIDParams = this._extractParamKeysFromRouteID(routeID);
-		var routeParams = {};
-		routeIDParams.forEach(function(param){
-			if(params[param]){
-				routeParams[param] = params[param];
+		else{
+			params = this._getNativeParams();
+			const routeID = this.getRouteID();
+			if(!routeID){
+				params = params;
 			}
-		});
+			else{
+				const routeIDParams = this._extractParamKeysFromRouteID(routeID);
+				const routeParams = {};
+				routeIDParams.forEach(function(param){
+					if(params[param]){
+						routeParams[param] = params[param];
+					}
+				});
 
-		return routeParams;
-	}
+				params = routeParams;
+			}
+		}
+
+		return params;
+	});
 
 	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
@@ -243,7 +249,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			return;
 		}
 
-		var threadContainerElement = GmailElementGetter.getThreadContainerElement();
+		var threadContainerElement = this._getThreadContainerElement();
 
 		if(threadContainerElement){
 			var gmailThreadView = new GmailThreadView(threadContainerElement, this, this._driver);
@@ -359,7 +365,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	_isThreadRoute(): boolean {
-		return !!GmailElementGetter.getThreadContainerElement();
+		return !!this._getThreadContainerElement();
 	}
 
 	_isListRoute(): boolean {
@@ -411,7 +417,7 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			}
 		}
 
-		var threadContainerElement = GmailElementGetter.getThreadContainerElement();
+		var threadContainerElement = this._getThreadContainerElement();
 
 		if (!this._pageCommunicator) throw new Error("Missing page communicator");
 		return {
@@ -466,6 +472,10 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			.filter(part => part[0] === ':')
 			.map(part => part.substring(1));
 	}
+
+	_getThreadContainerElement: () => ?HTMLElement = once(() => {
+		return GmailElementGetter.getThreadContainerElement();
+	});
 });
 export default GmailRouteView;
 
