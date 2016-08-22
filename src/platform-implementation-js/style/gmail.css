@@ -531,13 +531,14 @@ div.inboxsdk__compose_statusbar {
     margin-top: 30px; margin-bottom: 30px;
 }
 
-  .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_content {
-    margin-bottom: 0px;
-  }
+.inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_content {
+  margin-bottom: 0px;
+}
 
-  .inboxsdk__modal_close {
-    outline: none;
-  }
+.inboxsdk__modal_close {
+  outline: none;
+  cursor: pointer;
+}
 
 
 .inboxsdk__modal_fullscreen .inboxsdk__modal_container {
