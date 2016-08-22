@@ -2,6 +2,7 @@
 //jshint ignore:start
 
 import _ from 'lodash';
+import once from 'lodash/once';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -42,9 +43,6 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
 	_pageCommunicator: ?GmailPageCommunicator;
-	_threadContainerElement: ?HTMLElement = null;
-	_triedToGetThreadContainerElement: boolean = false;
-	_cachedParams: ?{[ix:string]: string} = null;
 
 	constructor({urlObject, type, routeID}: Object, gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver) {
 		this._type = type;
@@ -123,36 +121,32 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return this._type === 'CUSTOM';
 	}
 
-	getParams(): {[ix:string]: string} {
-		let cachedParams = this._cachedParams;
-		if(!cachedParams){
-			if (this._customRouteID) {
-				cachedParams = this._getCustomParams();
+	getParams: () => {[ix:string]: string} = once(() => {
+		let params;
+		if (this._customRouteID) {
+			params = this._getCustomParams();
+		}
+		else{
+			params = this._getNativeParams();
+			const routeID = this.getRouteID();
+			if(!routeID){
+				params = params;
 			}
 			else{
-				const params = this._getNativeParams();
-				const routeID = this.getRouteID();
-				if(!routeID){
-					cachedParams = params;
-				}
-				else{
-					const routeIDParams = this._extractParamKeysFromRouteID(routeID);
-					const routeParams = {};
-					routeIDParams.forEach(function(param){
-						if(params[param]){
-							routeParams[param] = params[param];
-						}
-					});
+				const routeIDParams = this._extractParamKeysFromRouteID(routeID);
+				const routeParams = {};
+				routeIDParams.forEach(function(param){
+					if(params[param]){
+						routeParams[param] = params[param];
+					}
+				});
 
-					cachedParams = routeParams;
-				}
+				params = routeParams;
 			}
-
-			this._cachedParams = cachedParams;
 		}
 
-		return cachedParams;
-	}
+		return params;
+	});
 
 	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
@@ -479,14 +473,9 @@ var GmailRouteView = defn(module, class GmailRouteView {
 			.map(part => part.substring(1));
 	}
 
-	_getThreadContainerElement(): ?HTMLElement{
-		if(this._triedToGetThreadContainerElement) return this._threadContainerElement;
-
-		this._threadContainerElement = GmailElementGetter.getThreadContainerElement();
-		this._triedToGetThreadContainerElement = true;
-
-		return this._threadContainerElement
-	}
+	_getThreadContainerElement: () => ?HTMLElement = once(() => {
+		return GmailElementGetter.getThreadContainerElement();
+	});
 });
 export default GmailRouteView;
 
