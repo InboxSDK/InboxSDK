@@ -5,6 +5,7 @@ import _ from 'lodash';
 import ajax from '../../../../common/ajax';
 import {readDraftId} from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
+import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<?string> =
   _.memoize(async function(driver: GmailDriver, messageID: string): Promise<?string> {
@@ -23,7 +24,17 @@ const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promis
         search: 'drafts'
       }
     });
-    return readDraftId(response.text, messageID);
+    try {
+      return readDraftId(response.text, messageID);
+    } catch (err) {
+      if (isStreakAppId(driver.getAppId())) {
+        driver.getLogger().error(err, {
+          message: 'failed to read draft ID',
+          text: response.text
+        });
+      }
+      throw err;
+    }
   }, (driver, messageID) => messageID);
 
 export default getDraftIDForMessageID;
