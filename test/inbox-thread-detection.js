@@ -15,7 +15,8 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 import {
   page20160614,
   pageFullscreen20160620,
-  page20160727
+  page20160727,
+  page20160823,
 } from './lib/pages';
 
 describe('Inbox Thread Detection', function() {
@@ -48,6 +49,14 @@ describe('Inbox Thread Detection', function() {
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, thread));
     });
+
+    it('2016-08-23 thread in bundle', function() {
+      const thread = page20160823().querySelector('[data-test-id=openthread]');
+
+      const results = finder(page20160823());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, thread));
+    });
   });
 
   describe('parser', function() {
@@ -76,6 +85,15 @@ describe('Inbox Thread Detection', function() {
       assert.strictEqual(results.score, 1);
       assert(!results.attributes.inBundle);
       assert.strictEqual(results.attributes.threadId, '15017c99e43c97be');
+    });
+
+    it('2016-08-23 thread in bundle', function() {
+      const thread = page20160823().querySelector('[data-test-id=openthread]');
+      const results = parser(thread);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.inBundle);
+      assert.strictEqual(results.attributes.threadId, '156b8b59b997b470');
     });
   });
 
@@ -115,6 +133,21 @@ describe('Inbox Thread Detection', function() {
 
       const spy = sinon.spy();
       watcher(page20160727())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, thread));
+          cb();
+        });
+    });
+
+    it('2016-08-23 thread in bundle', function(cb) {
+      const thread = page20160823().querySelector('[data-test-id=openthread]');
+
+      const spy = sinon.spy();
+      watcher(page20160823())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
