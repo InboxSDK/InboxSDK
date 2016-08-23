@@ -48,10 +48,10 @@ export default function watcher(root: Document=document): Kefir.Stream<ElementWi
     .filter(({el}) => el.getAttribute('role') === 'listitem');
 
   const topLevelBundles = bundlesAndThreads
-    .filter(({el}) => el.getAttribute('aria-multiselectable') === 'true');
+    .filter(({el}) => !/#gmail:thread-/.test(el.getAttribute('data-item-id')));
 
   const topLevelThreads = bundlesAndThreads
-    .filter(({el}) => el.getAttribute('aria-multiselectable') !== 'true');
+    .filter(({el}) => /#gmail:thread-/.test(el.getAttribute('data-item-id')));
 
   const openedBundles = topLevelBundles
     .flatMap(({el,removalStream}) => {
