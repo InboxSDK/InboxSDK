@@ -31,7 +31,8 @@ export default function watcher(root: Document=document): Kefir.Stream<ElementWi
     '.scroll-list-section-body',
     {$or: [
       [
-        {$watch: '[role=listitem][aria-expanded=true]:not([data-item-id*="#gmail:thread-"])'},
+        '[role=listitem]:not([data-item-id*="#gmail:thread-"])',
+        {$watch: '[aria-expanded=true]'},
         '[role=list]',
         '*',
         ':not([id])',

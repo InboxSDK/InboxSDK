@@ -89,23 +89,19 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       const {$watch} = (item:any);
       const p = cssProcessor.process($watch).res;
       const checker = makeCssSelectorNodeChecker($watch, p);
-      return stream => stream.flatMap(({el,removalStream}) =>
-        makeElementChildStream(el)
-          .takeUntilBy(removalStream)
-          .flatMap(({el,removalStream}) => {
-            const expanded = makeMutationObserverChunkedStream(el, {
-                attributes: true
-              })
-              .toProperty(()=>null)
-              .map(() => checker(el))
-              .takeUntilBy(removalStream)
-              .beforeEnd(()=>false)
-              .skipDuplicates();
-            const opens = expanded.filter(x => x);
-            const closes = expanded.filter(x => !x);
-            return opens.map(constant({el, removalStream:closes.changes()}));
+      return stream => stream.flatMap(({el,removalStream}) => {
+        const expanded = makeMutationObserverChunkedStream(el, {
+            attributes: true
           })
-      );
+          .toProperty(()=>null)
+          .map(() => checker(el))
+          .takeUntilBy(removalStream)
+          .beforeEnd(()=>false)
+          .skipDuplicates();
+        const opens = expanded.filter(x => x);
+        const closes = expanded.filter(x => !x);
+        return opens.map(constant({el, removalStream:closes.changes()}));
+      });
     } else if (item.$log) {
       const {$log} = (item:any);
       return stream => stream.map(event => {

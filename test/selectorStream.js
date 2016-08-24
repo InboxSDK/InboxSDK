@@ -236,6 +236,7 @@ describe('selectorStream', function() {
           '[role=main]',
         ]
       ]},
+      'button',
       {$watch: 'button'}
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
@@ -265,7 +266,8 @@ describe('selectorStream', function() {
     const mainMutation = makeElementIntoEventEmitter(main);
     selectorStream([
       '.parent',
-      {$watch: '[role=main][data-foo]'},
+      '[role=main]',
+      {$watch: '[data-foo]'},
       'button'
     ])(page().body)
       .takeUntilBy(stopper)
