@@ -1,5 +1,6 @@
 /* @flow */
 
+import escapeRegExp from 'lodash/escapeRegExp';
 import Kefir from 'kefir';
 import cssParser from 'postcss-selector-parser';
 
@@ -34,8 +35,20 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
     switch (node.operator) {
     case undefined:
       return el => el.hasAttribute(node.attribute);
+    case '^=': {
+      const r = new RegExp('^'+escapeRegExp(node.raws.unquoted));
+      return el => r.test(el.getAttribute(node.attribute));
+    }
+    case '*=': {
+      const r = new RegExp(escapeRegExp(node.raws.unquoted));
+      return el => r.test(el.getAttribute(node.attribute));
+    }
+    case '$=': {
+      const r = new RegExp(escapeRegExp(node.raws.unquoted)+'$');
+      return el => r.test(el.getAttribute(node.attribute));
+    }
     case '=':
-      return el => el.getAttribute(node.attribute) === node.value;
+      return el => el.getAttribute(node.attribute) === node.raws.unquoted;
     }
     throw new Error(`Unsupported attribute operator(${node.operator}) in selector: ${selector}`);
   case 'pseudo':

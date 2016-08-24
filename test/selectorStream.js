@@ -73,11 +73,28 @@ describe('selectorStream', function() {
       });
   });
 
+  it('attribute comparisons', function(cb) {
+    const spy = sinon.spy();
+    selectorStream([
+      '[class^="paren"]',
+      '[role*="ai"]',
+      'button[class$="oo"]'
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(spy)
+      .onEnd(() => {
+        const results = spy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        cb();
+      });
+  });
+
   it('universal selector', function(cb) {
     const spy = sinon.spy();
     selectorStream([
       '.parent',
-      'div[role=main]',
+      'div[role="main"]',
       '*'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
