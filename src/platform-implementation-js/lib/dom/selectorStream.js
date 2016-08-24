@@ -1,10 +1,12 @@
 /* @flow */
 
 import escapeRegExp from 'lodash/escapeRegExp';
+import constant from 'lodash/constant';
 import Kefir from 'kefir';
 import cssParser from 'postcss-selector-parser';
 
 import makeElementChildStream from './make-element-child-stream';
+import makeMutationObserverChunkedStream from './make-mutation-observer-chunked-stream';
 import type {ElementWithLifetime} from './make-element-child-stream';
 
 export type SelectorItem = string
@@ -79,9 +81,33 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       );
     } else if (item.$or) {
       const transformers = item.$or.map(selectorStream);
-      return stream => Kefir.merge(transformers.map(fn => {
-        return stream.flatMap(({el,removalStream}) => fn(el).takeUntilBy(removalStream));
-      }));
+      return stream => Kefir.merge(transformers.map(fn =>
+        stream.flatMap(({el,removalStream}) => fn(el).takeUntilBy(removalStream))
+      ));
+    } else if (item.$watch) {
+      const {$watch} = item;
+      const p = cssProcessor.process($watch).res;
+      if (p.nodes.length === 0) {
+        throw new Error(`Expected at least 1 selector in rule: ${$watch}`);
+      }
+      const checker = makeCssSelectorNodesChecker($watch, p.nodes);
+      return stream => stream.flatMap(({el,removalStream}) =>
+        makeElementChildStream(el)
+          .takeUntilBy(removalStream)
+          .flatMap(({el,removalStream}) => {
+            const expanded = makeMutationObserverChunkedStream(el, {
+                attributes: true
+              })
+              .toProperty(()=>null)
+              .map(() => checker(el))
+              .takeUntilBy(removalStream)
+              .beforeEnd(()=>false)
+              .skipDuplicates();
+            const opens = expanded.filter(x => x);
+            const closes = expanded.filter(x => !x);
+            return opens.map(constant({el, removalStream:closes.changes()}));
+          })
+      );
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);
   });

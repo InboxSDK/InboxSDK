@@ -21,9 +21,18 @@ export default class MockMutationObserver {
         .takeUntilBy( this._stopper )
         .map(event => {
           const newEvent = {target: event.target};
-          if (options.childList) {
+          if (options.childList && event.addedNodes) {
             newEvent.addedNodes = event.addedNodes;
             newEvent.removedNodes = event.removedNodes;
+          }
+          if (
+            options.attributes && event.attributeName &&
+            (
+              !options.attributeFilter ||
+              options.attributeFilter.includes(event.attributeName)
+            )
+          ) {
+            newEvent.attributeName = event.attributeName;
           }
           return newEvent;
         })

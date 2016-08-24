@@ -4,6 +4,8 @@ import once from 'lodash/once';
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+import delay from '../src/common/delay';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import makeElementIntoEventEmitter from './lib/makeElementIntoEventEmitter';
@@ -210,7 +212,7 @@ describe('selectorStream', function() {
           '[role=main]',
         ]
       ]},
-      'button'
+      {$watch: 'button'}
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(({el,removalStream}) => {
@@ -229,5 +231,55 @@ describe('selectorStream', function() {
         assert(removalSpy.calledOnce);
         cb();
       });
+  });
+
+  it('$watch works', function(cb) {
+    const onValueSpy = sinon.spy();
+    const removalSpy = sinon.spy();
+    const stopper = kefirStopper();
+    const main = page().querySelector('[role=main]');
+    const mainMutation = makeElementIntoEventEmitter(main);
+    selectorStream([
+      '.parent',
+      {$watch: '[role=main][data-foo]'},
+      'button'
+    ])(page().body)
+      .takeUntilBy(stopper)
+      .onValue(({el,removalStream}) => {
+        removalStream.onValue(removalSpy);
+        assert(removalSpy.notCalled);
+      })
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(removalSpy.calledOnce);
+        cb();
+      });
+
+    (async () => {
+      await delay(20);
+
+      assert(onValueSpy.notCalled);
+      assert(removalSpy.notCalled);
+      main.setAttribute('data-foo', 'true');
+      mainMutation({
+        attributeName: 'data-foo'
+      });
+
+      await delay(20);
+
+      assert(onValueSpy.calledOnce);
+      assert(removalSpy.notCalled);
+      main.removeAttribute('data-foo');
+      mainMutation({
+        attributeName: 'data-foo'
+      });
+
+      await delay(20);
+
+      stopper.destroy();
+    })().catch(cb);
   });
 });
