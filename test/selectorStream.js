@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import makeElementIntoEventEmitter from './lib/makeElementIntoEventEmitter';
 
 import selectorStream from '../src/platform-implementation-js/lib/dom/selectorStream';
 
@@ -195,5 +196,38 @@ describe('selectorStream', function() {
         'button'
       ]);
     }, /:invalid/);
+  });
+
+  it('handles element removal', function(cb) {
+    const spy = sinon.spy();
+    const removalSpy = sinon.spy();
+    const body = page().querySelector('body');
+    const bodyMutation = makeElementIntoEventEmitter(body);
+    selectorStream([
+      '.parent',
+      {$or: [
+        [
+          '[role=main]',
+        ]
+      ]},
+      'button'
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(({el,removalStream}) => {
+        removalStream.onValue(removalSpy);
+        assert(removalSpy.notCalled);
+        bodyMutation({
+          addedNodes: [],
+          removedNodes: body.children
+        });
+      })
+      .onValue(spy)
+      .onEnd(() => {
+        const results = spy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(removalSpy.calledOnce);
+        cb();
+      });
   });
 });
