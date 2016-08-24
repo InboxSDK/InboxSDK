@@ -41,16 +41,16 @@ describe('selectorStream', function() {
   fakePageGlobals();
 
   it('basic case works', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       '[role=main]',
       'button'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         cb();
@@ -58,16 +58,16 @@ describe('selectorStream', function() {
   });
 
   it('attribute presence', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       '[role]',
       'button'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         cb();
@@ -75,16 +75,16 @@ describe('selectorStream', function() {
   });
 
   it('attribute comparisons', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '[class^="paren"]',
       '[role*="ai"]',
       'button[class$="oo"]'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         cb();
@@ -92,16 +92,16 @@ describe('selectorStream', function() {
   });
 
   it('universal selector', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       'div[role="main"]',
       '*'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
         assert(results.includes(page().querySelector('[role=main] div')));
         assert(results.includes(page().querySelector('[role=main] button.foo')));
@@ -110,7 +110,7 @@ describe('selectorStream', function() {
   });
 
   it(':not works', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       'div.search',
@@ -118,9 +118,9 @@ describe('selectorStream', function() {
       'button'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('.search button.foo')));
         cb();
@@ -128,7 +128,7 @@ describe('selectorStream', function() {
   });
 
   it('$or object works', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       {$or: [
@@ -144,9 +144,9 @@ describe('selectorStream', function() {
       ]}
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         assert(results.includes(page().querySelector('.search button.foo')));
@@ -155,7 +155,7 @@ describe('selectorStream', function() {
   });
 
   it('$or object at end works', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     selectorStream([
       '.parent',
       {$or: [
@@ -170,9 +170,9 @@ describe('selectorStream', function() {
       'button'
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         assert(results.includes(page().querySelector('.search button.foo')));
@@ -199,7 +199,7 @@ describe('selectorStream', function() {
   });
 
   it('handles element removal', function(cb) {
-    const spy = sinon.spy();
+    const onValueSpy = sinon.spy();
     const removalSpy = sinon.spy();
     const body = page().querySelector('body');
     const bodyMutation = makeElementIntoEventEmitter(body);
@@ -221,9 +221,9 @@ describe('selectorStream', function() {
           removedNodes: body.children
         });
       })
-      .onValue(spy)
+      .onValue(onValueSpy)
       .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
         assert(removalSpy.calledOnce);
