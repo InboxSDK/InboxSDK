@@ -18,17 +18,20 @@ export type Selector = Array<SelectorItem>;
 
 const cssProcessor = cssParser();
 
-function makeCssSelectorNodesChecker(selector: string, nodes: Array<Object>): (el: HTMLElement) => boolean {
-  const checkers = nodes
-    .filter(node => node.type !== 'universal')
-    .map(node => makeCssSelectorNodeChecker(selector, node));
-  return el => checkers.every(fn => fn(el));
-}
-
 function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLElement) => boolean {
   switch (node.type) {
-  case 'selector':
-    return makeCssSelectorNodesChecker(selector, node.nodes);
+  case 'root': {
+    const checkers = node.nodes
+      .map(node => makeCssSelectorNodeChecker(selector, node));
+    return el => checkers.some(checker => checker(el));
+  }
+  case 'selector': {
+    const checkers = node.nodes
+      .map(node => makeCssSelectorNodeChecker(selector, node));
+    return el => checkers.every(checker => checker(el));
+  }
+  case 'universal':
+    return el => true;
   case 'tag':
     return el => el.nodeName === node.value.toUpperCase();
   case 'class':
@@ -56,7 +59,7 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
   case 'pseudo':
     switch (node.value) {
     case ':not':
-      const checker = makeCssSelectorNodesChecker(selector, node.nodes);
+      const checker = makeCssSelectorNodeChecker(selector, {...node, type: 'root'});
       return el => !checker(el);
     }
     throw new Error(`Unsupported css pseudo selector(${node.value}) in selector: ${selector}`);
@@ -69,10 +72,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
   const transformers: Transformers = selector.map(item => {
     if (typeof item === 'string') {
       const p = cssProcessor.process(item).res;
-      if (p.nodes.length === 0) {
-        throw new Error(`Expected at least 1 selector in rule: ${item}`);
-      }
-      const checker = makeCssSelectorNodesChecker(item, p.nodes);
+      const checker = makeCssSelectorNodeChecker(item, p);
       const filterFn = ({el}) => checker(el);
       return stream => stream.flatMap(({el,removalStream}) =>
         makeElementChildStream(el)
@@ -87,10 +87,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
     } else if (item.$watch) {
       const {$watch} = item;
       const p = cssProcessor.process($watch).res;
-      if (p.nodes.length === 0) {
-        throw new Error(`Expected at least 1 selector in rule: ${$watch}`);
-      }
-      const checker = makeCssSelectorNodesChecker($watch, p.nodes);
+      const checker = makeCssSelectorNodeChecker($watch, p);
       return stream => stream.flatMap(({el,removalStream}) =>
         makeElementChildStream(el)
           .takeUntilBy(removalStream)

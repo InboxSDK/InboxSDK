@@ -129,6 +129,24 @@ describe('selectorStream', function() {
       });
   });
 
+  it('comma works', function(cb) {
+    const onValueSpy = sinon.spy();
+    selectorStream([
+      '.parent',
+      'div[role="main"], .search',
+      'div:not(.foo, .ignoreMe)'
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 2);
+        assert(results.includes(page().querySelector('[role=main] div')));
+        assert(results.includes(page().querySelector('.search div:not(.ignoreMe)')));
+        cb();
+      });
+  });
+
   it('$or object works', function(cb) {
     const onValueSpy = sinon.spy();
     selectorStream([
