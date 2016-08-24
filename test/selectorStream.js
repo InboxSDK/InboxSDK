@@ -25,6 +25,9 @@ const page = once(() => jsdomDoc(`
         <button class="foo">foo</button>
       </div>
     </div>
+    <div class="ignoreMe">
+      <button>ignore me</button>
+    </div>
   </div>
 </body>
 </html>
@@ -38,11 +41,28 @@ describe('selectorStream', function() {
 
   it('basic case works', function(cb) {
     const spy = sinon.spy();
-    selectorStream(page().body, [
+    selectorStream([
       '.parent',
       '[role=main]',
       'button'
-    ])
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(spy)
+      .onEnd(() => {
+        const results = spy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        cb();
+      });
+  });
+
+  it('attribute presence', function(cb) {
+    const spy = sinon.spy();
+    selectorStream([
+      '.parent',
+      '[role]',
+      'button'
+    ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(spy)
       .onEnd(() => {
@@ -55,11 +75,11 @@ describe('selectorStream', function() {
 
   it('universal selector', function(cb) {
     const spy = sinon.spy();
-    selectorStream(page().body, [
+    selectorStream([
       '.parent',
       'div[role=main]',
       '*'
-    ])
+    ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(spy)
       .onEnd(() => {
@@ -73,12 +93,12 @@ describe('selectorStream', function() {
 
   it(':not works', function(cb) {
     const spy = sinon.spy();
-    selectorStream(page().body, [
+    selectorStream([
       '.parent',
       'div.search',
       ':not(.ignoreMe)',
       'button'
-    ])
+    ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(spy)
       .onEnd(() => {
@@ -89,9 +109,9 @@ describe('selectorStream', function() {
       });
   });
 
-  xit('$or object works', function(cb) {
+  it('$or object works', function(cb) {
     const spy = sinon.spy();
-    selectorStream(page().body, [
+    selectorStream([
       '.parent',
       {$or: [
         [
@@ -104,7 +124,33 @@ describe('selectorStream', function() {
           'button'
         ]
       ]}
-    ])
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(spy)
+      .onEnd(() => {
+        const results = spy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 2);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(page().querySelector('.search button.foo')));
+        cb();
+      });
+  });
+
+  it('$or object at end works', function(cb) {
+    const spy = sinon.spy();
+    selectorStream([
+      '.parent',
+      {$or: [
+        [
+          '[role=main]'
+        ],
+        [
+          '.search',
+          'div:not(.ignoreMe)'
+        ]
+      ]},
+      'button'
+    ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(spy)
       .onEnd(() => {

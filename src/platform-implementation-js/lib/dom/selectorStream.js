@@ -32,6 +32,8 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
     return el => el.classList.contains(node.value);
   case 'attribute':
     switch (node.operator) {
+    case undefined:
+      return el => el.hasAttribute(node.attribute);
     case '=':
       return el => el.getAttribute(node.attribute) === node.value;
     }
@@ -47,8 +49,9 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
   throw new Error(`Unsupported css node type(${node.type}) in selector: ${selector}`);
 }
 
-export default function selectorStream(el: HTMLElement, selector: Selector): Kefir.Stream<ElementWithLifetime> {
-  return selector.reduce((stream, item) => {
+export default function selectorStream(selector: Selector): (el: HTMLElement) => Kefir.Stream<ElementWithLifetime> {
+  type Transformers = Array<(stream: Kefir.Stream<ElementWithLifetime>) => Kefir.Stream<ElementWithLifetime>>;
+  const transformers: Transformers = selector.map(item => {
     if (typeof item === 'string') {
       const p = cssProcessor.process(item).res;
       if (p.nodes.length === 0) {
@@ -56,12 +59,24 @@ export default function selectorStream(el: HTMLElement, selector: Selector): Kef
       }
       const checker = makeCssSelectorNodesChecker(item, p.nodes);
       const filterFn = ({el}) => checker(el);
-      return stream.flatMap(({el,removalStream}) =>
+      return stream => stream.flatMap(({el,removalStream}) =>
         makeElementChildStream(el)
           .filter(filterFn)
           .takeUntilBy(removalStream)
       );
+    } else if (item.$or) {
+      const items = item.$or;
+      return stream => Kefir.merge(items.map(item => {
+        const s = selectorStream(item);
+        return stream.flatMap(({el,removalStream}) => s(el));
+      }));
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);
-  }, Kefir.constant({el, removalStream: Kefir.never()}));
+  });
+  return el => {
+    return transformers.reduce(
+      (stream, fn) => fn(stream),
+      Kefir.constant({el, removalStream: Kefir.never()})
+    );
+  };
 }
