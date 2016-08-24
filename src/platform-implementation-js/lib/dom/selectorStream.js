@@ -79,9 +79,9 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       );
     } else if (item.$or) {
       const items = item.$or;
-      return stream => Kefir.merge(items.map(item => {
-        const s = selectorStream(item);
-        return stream.flatMap(({el,removalStream}) => s(el));
+      const transformers = items.map(selectorStream);
+      return stream => Kefir.merge(transformers.map(fn => {
+        return stream.flatMap(({el,removalStream}) => fn(el));
       }));
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);

@@ -178,4 +178,22 @@ describe('selectorStream', function() {
         cb();
       });
   });
+
+  it('reports error in merge in :not() when set up', function() {
+    assert.throws(() => {
+      selectorStream([
+        '.parent',
+        {$or: [
+          [
+            '[role=main]'
+          ],
+          [
+            '.search',
+            'div:not(.ignoreMe:invalid)'
+          ]
+        ]},
+        'button'
+      ]);
+    }, /:invalid/);
+  });
 });
