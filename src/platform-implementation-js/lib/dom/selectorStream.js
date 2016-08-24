@@ -1,7 +1,6 @@
 /* @flow */
 
-import escapeRegExp from 'lodash/escapeRegExp';
-import constant from 'lodash/constant';
+import _ from 'lodash';
 import Kefir from 'kefir';
 import cssParser from 'postcss-selector-parser';
 
@@ -42,15 +41,15 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
     case undefined:
       return el => el.hasAttribute(node.attribute);
     case '^=': {
-      const r = new RegExp('^'+escapeRegExp(node.raws.unquoted));
+      const r = new RegExp('^'+_.escapeRegExp(node.raws.unquoted));
       return el => r.test(el.getAttribute(node.attribute));
     }
     case '*=': {
-      const r = new RegExp(escapeRegExp(node.raws.unquoted));
+      const r = new RegExp(_.escapeRegExp(node.raws.unquoted));
       return el => r.test(el.getAttribute(node.attribute));
     }
     case '$=': {
-      const r = new RegExp(escapeRegExp(node.raws.unquoted)+'$');
+      const r = new RegExp(_.escapeRegExp(node.raws.unquoted)+'$');
       return el => r.test(el.getAttribute(node.attribute));
     }
     case '=':
@@ -66,6 +65,23 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
     throw new Error(`Unsupported css pseudo selector(${node.value}) in selector: ${selector}`);
   }
   throw new Error(`Unsupported css node type(${node.type}) in selector: ${selector}`);
+}
+
+function getAttributeList(selector: string, node: Object): string[] {
+  switch (node.type) {
+    case 'root':
+    case 'selector':
+      return _.flatMap(node.nodes, node => getAttributeList(selector, node));
+    case 'attribute':
+      return [node.attribute];
+    case 'pseudo':
+      switch (node.value) {
+      case ':not':
+        return getAttributeList(selector, {...node, type: 'root'});
+      }
+      throw new Error(`Unsupported css pseudo selector(${node.value}) while looking for attributes in selector: ${selector}`);
+  }
+  throw new Error(`Found css node type(${node.type}) while looking for attributes in selector: ${selector}`);
 }
 
 export default function selectorStream(selector: Selector): (el: HTMLElement) => Kefir.Stream<ElementWithLifetime> {
@@ -89,9 +105,10 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       const {$watch} = (item:any);
       const p = cssProcessor.process($watch).res;
       const checker = makeCssSelectorNodeChecker($watch, p);
+      const attributeFilter = getAttributeList($watch, p);
       return stream => stream.flatMap(({el,removalStream}) => {
         const expanded = makeMutationObserverChunkedStream(el, {
-            attributes: true
+            attributes: true, attributeFilter
           })
           .toProperty(()=>null)
           .map(() => checker(el))
@@ -100,7 +117,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
           .skipDuplicates();
         const opens = expanded.filter(x => x);
         const closes = expanded.filter(x => !x);
-        return opens.map(constant({el, removalStream:closes.changes()}));
+        return opens.map(_.constant({el, removalStream:closes.changes()}));
       });
     } else if (item.$log) {
       const {$log} = (item:any);

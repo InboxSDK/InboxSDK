@@ -237,7 +237,7 @@ describe('selectorStream', function() {
         ]
       ]},
       'button',
-      {$watch: 'button'}
+      {$watch: '[class]'}
     ])(page().body)
       .takeUntilBy(Kefir.later(50))
       .onValue(({el,removalStream}) => {
