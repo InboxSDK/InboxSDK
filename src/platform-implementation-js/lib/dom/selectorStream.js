@@ -11,6 +11,7 @@ import type {ElementWithLifetime} from './make-element-child-stream';
 
 export type SelectorItem = string
   | {$or: Array<Selector>}
+  | {$log: string}
   | {$watch: string}
 ;
 
@@ -85,7 +86,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
         stream.flatMap(({el,removalStream}) => fn(el).takeUntilBy(removalStream))
       ));
     } else if (item.$watch) {
-      const {$watch} = item;
+      const {$watch} = (item:any);
       const p = cssProcessor.process($watch).res;
       const checker = makeCssSelectorNodeChecker($watch, p);
       return stream => stream.flatMap(({el,removalStream}) =>
@@ -105,6 +106,12 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
             return opens.map(constant({el, removalStream:closes.changes()}));
           })
       );
+    } else if (item.$log) {
+      const {$log} = (item:any);
+      return stream => stream.map(event => {
+        console.log($log, event.el);
+        return event;
+      });
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);
   });

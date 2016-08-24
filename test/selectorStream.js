@@ -42,6 +42,12 @@ describe('selectorStream', function() {
 
   fakePageGlobals();
 
+  const sandbox = sinon.sandbox.create();
+
+  afterEach(function() {
+    sandbox.restore();
+  });
+
   it('basic case works', function(cb) {
     const onValueSpy = sinon.spy();
     selectorStream([
@@ -299,5 +305,34 @@ describe('selectorStream', function() {
 
       stopper.destroy();
     })().catch(cb);
+  });
+
+  it('$log works', function(cb) {
+    const onValueSpy = sinon.spy();
+    sandbox.stub(console, 'log');
+    selectorStream([
+      '.parent',
+      {$log: 'parent'},
+      'div:not(.ignoreMe)',
+      {$log: 'div'},
+      'button.foo',
+      {$log: 'button'}
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+
+        assert.deepStrictEqual(console.log.args, [
+          ['parent', page().querySelector('.parent')],
+          ['div', page().querySelector('.parent > [role=main]')],
+          ['div', page().querySelector('.parent > .search')],
+          ['button', page().querySelector('[role=main] > button.foo')]
+        ]);
+
+        cb();
+      });
   });
 });
