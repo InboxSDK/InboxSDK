@@ -337,4 +337,22 @@ describe('selectorStream', function() {
         cb();
       });
   });
+
+  it('$filter works', function(cb) {
+    const onValueSpy = sinon.spy();
+    selectorStream([
+      '.parent',
+      '*',
+      {$filter: el => el.getAttribute('role') === 'main'},
+      'button'
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        cb();
+      });
+  });
 });

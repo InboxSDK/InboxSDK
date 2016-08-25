@@ -12,6 +12,7 @@ export type SelectorItem = string
   | {$or: Array<Selector>}
   | {$log: string}
   | {$watch: string}
+  | {$filter: (el: HTMLElement) => boolean}
 ;
 
 export type Selector = Array<SelectorItem>;
@@ -125,6 +126,9 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
         console.log($log, event.el);
         return event;
       });
+    } else if (item.$filter) {
+      const {$filter} = (item:any);
+      return stream => stream.filter(({el}) => $filter(el));
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);
   });
