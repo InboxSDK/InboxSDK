@@ -159,33 +159,6 @@ describe('selectorStream', function() {
       '.parent',
       {$or: [
         [
-          '[role=main]',
-          'button'
-        ],
-        [
-          '.search',
-          'div:not(.ignoreMe)',
-          'button'
-        ]
-      ]}
-    ])(page().body)
-      .takeUntilBy(Kefir.later(50))
-      .onValue(onValueSpy)
-      .onEnd(() => {
-        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
-        assert.strictEqual(results.length, 2);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
-        assert(results.includes(page().querySelector('.search button.foo')));
-        cb();
-      });
-  });
-
-  it('$or object at end works', function(cb) {
-    const onValueSpy = sinon.spy();
-    selectorStream([
-      '.parent',
-      {$or: [
-        [
           '[role=main]'
         ],
         [
