@@ -171,9 +171,7 @@ class InboxMessageView {
       container = document.createElement('div');
       attachmentsArea.appendChild(container);
     }
-    const card = new InboxAttachmentCardView({...options, element:null}, this._driver);
-    container.appendChild(card.getElement());
-    return card;
+    return new InboxAttachmentCardView({...options, element:null, container}, this._driver);
   }
   addButtonToDownloadAllArea(options: Object): void {
     // no-op in Inbox
@@ -228,6 +226,9 @@ class InboxMessageView {
 
   destroy() {
     this._eventStream.end();
+    this._attachmentCardViews.slice().forEach(card => {
+      card.destroy();
+    });
   }
 }
 
