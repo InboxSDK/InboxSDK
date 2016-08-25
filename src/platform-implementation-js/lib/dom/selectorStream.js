@@ -11,7 +11,7 @@ import type {ElementWithLifetime} from './make-element-child-stream';
 export type SelectorItem = string
   | {$or: Array<Selector>}
   | {$log: string}
-  | {$watch: string}
+  | {$watch: string | {attributeFilter: string[], fn: (el: HTMLElement) => boolean}}
   | {$filter: (el: HTMLElement) => boolean}
   | {$map: (el: HTMLElement) => ?HTMLElement}
 ;
@@ -105,9 +105,15 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       ));
     } else if (item.$watch) {
       const {$watch} = (item:any);
-      const p = cssProcessor.process($watch).res;
-      const checker = makeCssSelectorNodeChecker($watch, p);
-      const attributeFilter = getAttributeList($watch, p);
+      let checker, attributeFilter;
+      if (typeof $watch === 'string') {
+        const p = cssProcessor.process($watch).res;
+        checker = makeCssSelectorNodeChecker($watch, p);
+        attributeFilter = getAttributeList($watch, p);
+      } else {
+        checker = $watch.fn;
+        attributeFilter = $watch.attributeFilter;
+      }
       return stream => stream.flatMap(({el,removalStream}) => {
         const expanded = makeMutationObserverChunkedStream(el, {
             attributes: true, attributeFilter
