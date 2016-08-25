@@ -355,4 +355,24 @@ describe('selectorStream', function() {
         cb();
       });
   });
+
+  it('$map works', function(cb) {
+    const onValueSpy = sinon.spy();
+    selectorStream([
+      '.parent',
+      '*',
+      {$map: el =>
+        el.getAttribute('role') === 'main' ?
+          el.querySelector('button') : null
+      }
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        cb();
+      });
+  });
 });

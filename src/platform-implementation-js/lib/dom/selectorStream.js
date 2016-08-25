@@ -13,6 +13,7 @@ export type SelectorItem = string
   | {$log: string}
   | {$watch: string}
   | {$filter: (el: HTMLElement) => boolean}
+  | {$map: (el: HTMLElement) => ?HTMLElement}
 ;
 
 export type Selector = Array<SelectorItem>;
@@ -129,6 +130,14 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
     } else if (item.$filter) {
       const {$filter} = (item:any);
       return stream => stream.filter(({el}) => $filter(el));
+    } else if (item.$map) {
+      const {$map} = (item:any);
+      return stream => stream.flatMap(({el,removalStream}) => {
+        const transformed = $map(el);
+        return transformed ?
+          Kefir.constant({el: transformed, removalStream}) :
+          Kefir.never()
+      });
     }
     throw new Error(`Invalid selector item: ${JSON.stringify(item)}`);
   });
