@@ -28,7 +28,7 @@ export default function detectionRunner<P: GenericParserResults>(
     name: string;
     parser: (el: HTMLElement) => P;
     watcher: ?(root: Document) => Kefir.Stream<ElementWithLifetime>;
-    finder: (root: Document) => Array<HTMLElement>;
+    finder: ?(root: Document) => Array<HTMLElement>;
     logError: (err: Error, details?: any) => void;
     root?: Document;
     interval?: number|(liveElements: number, timeRunning: number) => number;
@@ -83,7 +83,7 @@ export default function detectionRunner<P: GenericParserResults>(
       return event;
     });
 
-  const finderElements = arrayToLifetimes(
+  const finderElements = !finder ? Kefir.never() : arrayToLifetimes(
     Kefir.repeat(() => {
       // TODO scale based on user activity
       let time;
@@ -100,6 +100,7 @@ export default function detectionRunner<P: GenericParserResults>(
       return Kefir.later(time).flatMap(() => delayIdle(time));
     })
       .map(() => {
+        if (!finder) throw new Error('should not happen');
         const els = finder(root);
 
         watcherFoundElements.forEach(el => {
