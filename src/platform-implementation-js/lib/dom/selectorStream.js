@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import cssParser from 'postcss-selector-parser';
 
 import makeElementChildStream from './make-element-child-stream';
@@ -86,7 +87,13 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
   return el => {
     return transformers.reduce(
       (stream, fn) => fn(stream),
-      Kefir.constant({el, removalStream: Kefir.never()})
+      Kefir.stream(emitter => {
+        const removalStream = kefirStopper();
+        emitter.emit({el, removalStream});
+        return () => {
+          removalStream.destroy();
+        };
+      }).toProperty()
     );
   };
 }
