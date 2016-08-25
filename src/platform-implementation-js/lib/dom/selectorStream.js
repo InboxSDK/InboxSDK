@@ -69,11 +69,11 @@ function makeCssSelectorNodeChecker(selector: string, node: Object): (el: HTMLEl
   throw new Error(`Unsupported css node type(${node.type}) in selector: ${selector}`);
 }
 
-function getAttributeList(selector: string, node: Object): string[] {
+function getRelevantAttributeList(selector: string, node: Object): string[] {
   switch (node.type) {
     case 'root':
     case 'selector':
-      return _.flatMap(node.nodes, node => getAttributeList(selector, node));
+      return _.flatMap(node.nodes, node => getRelevantAttributeList(selector, node));
     case 'attribute':
       return [node.attribute];
     case 'class':
@@ -81,7 +81,7 @@ function getAttributeList(selector: string, node: Object): string[] {
     case 'pseudo':
       switch (node.value) {
       case ':not':
-        return getAttributeList(selector, {...node, type: 'root'});
+        return getRelevantAttributeList(selector, {...node, type: 'root'});
       }
       throw new Error(`Unsupported css pseudo selector(${node.value}) while looking for attributes in selector: ${selector}`);
   }
@@ -111,7 +111,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       if (typeof $watch === 'string') {
         const p = cssProcessor.process($watch).res;
         checker = makeCssSelectorNodeChecker($watch, p);
-        attributeFilter = getAttributeList($watch, p);
+        attributeFilter = getRelevantAttributeList($watch, p);
       } else {
         checker = $watch.fn;
         attributeFilter = $watch.attributeFilter;
