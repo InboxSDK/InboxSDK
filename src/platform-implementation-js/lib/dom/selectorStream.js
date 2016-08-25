@@ -51,7 +51,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
         attributeFilter = $watch.attributeFilter;
       }
       return stream => stream.flatMap(({el,removalStream}) => {
-        const expanded = makeMutationObserverChunkedStream(el, {
+        const passesChecker = makeMutationObserverChunkedStream(el, {
             attributes: true, attributeFilter
           })
           .toProperty(()=>null)
@@ -59,8 +59,8 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
           .takeUntilBy(removalStream)
           .beforeEnd(()=>false)
           .skipDuplicates();
-        const opens = expanded.filter(x => x);
-        const closes = expanded.filter(x => !x);
+        const opens = passesChecker.filter(x => x);
+        const closes = passesChecker.filter(x => !x);
         return opens.map(_.constant({el, removalStream:closes.changes()}));
       });
     } else if (item.$log) {
