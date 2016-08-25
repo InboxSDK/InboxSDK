@@ -6,13 +6,11 @@ import getRoot from './getRoot';
 export default function makeCssSelectorChecker(node: Object): (el: HTMLElement) => boolean {
   switch (node.type) {
   case 'root': {
-    const checkers = node.nodes
-      .map(makeCssSelectorChecker);
+    const checkers = node.nodes.map(makeCssSelectorChecker);
     return el => checkers.some(checker => checker(el));
   }
   case 'selector': {
-    const checkers = node.nodes
-      .map(makeCssSelectorChecker);
+    const checkers = node.nodes.map(makeCssSelectorChecker);
     return el => checkers.every(checker => checker(el));
   }
   case 'universal':
