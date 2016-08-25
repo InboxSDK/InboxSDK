@@ -46,6 +46,10 @@ export default function watcher(
     .flatMap(({el,removalStream}) => inlineComposeSelector(el).takeUntilBy(removalStream));
 
   const regularComposeSelector = selectorStream([
+    'div[id][jsaction]',
+    'div[id][class]:not([role])',
+    'div[class]',
+    'div[id]',
     'div[jstcache][class]:not([aria-hidden], [tabindex])',
     {$map(el) {
       const composeEl = el.querySelector('div[role=dialog]');
@@ -58,14 +62,7 @@ export default function watcher(
     }}
   ]);
 
-  const regularComposes = streamWaitFor(() => {
-    const els = root.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]');
-    // TODO We need to handle the case where there are multiple elements that
-    // match the above selector, but the wrong element is added to the page
-    // first, and this wait-for ends before the correct element is present.
-    return els;
-  })
-    .flatMap(els => Kefir.merge(_.map(els, regularComposeSelector)))
+  const regularComposes = regularComposeSelector(root.body)
     .map(({el,removalStream}) => ({
       // Needed so the element isn't removed before we see the element
       // re-added as full-screen.
