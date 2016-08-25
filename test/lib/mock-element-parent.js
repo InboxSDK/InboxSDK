@@ -15,6 +15,7 @@ class MockElementParent extends EventEmitter {
     for (let target of toRemove) {
       const ix = this.children.indexOf(target);
       if (ix >= 0) {
+        target.parentElement = null;
         presentTargets.push(target);
         this.children.splice(ix, 1);
       } else {
@@ -22,6 +23,7 @@ class MockElementParent extends EventEmitter {
       }
     }
     for (let target of toAdd) {
+      target.parentElement = this;
       this.children.push(target);
     }
     this.emit('mutation', {

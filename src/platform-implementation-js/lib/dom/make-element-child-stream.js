@@ -1,6 +1,6 @@
 /* @flow */
-//jshint ignore:start
 
+import _ from 'lodash';
 import asap from 'asap';
 import logger from '../logger';
 import Kefir from 'kefir';
@@ -39,11 +39,25 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Stre
       }
     }
 
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach((mutation) => {
-        Array.prototype.forEach.call(mutation.addedNodes, newEl);
-        Array.prototype.forEach.call(mutation.removedNodes, removedEl);
-      });
+    const observer = new MutationObserver(mutations => {
+      // Some elements might have been added and removed in the same mutations
+      // set, so we want to ignore the elements that were already re-added or
+      // removed.
+      for (let i=0, len=mutations.length; i<len; i++) {
+        const mutation = mutations[i];
+        for (let i=0, len=mutation.addedNodes.length; i<len; i++) {
+          const el: HTMLElement = (mutation.addedNodes[i]:any);
+          if (el.parentElement === element && !removalStreams.has(el)) {
+            newEl(el);
+          }
+        }
+        for (let i=0, len=mutation.removedNodes.length; i<len; i++) {
+          const el: HTMLElement = (mutation.removedNodes[i]:any);
+          if (el.parentElement !== element && removalStreams.has(el)) {
+            removedEl(el);
+          }
+        }
+      }
     });
 
     // We don't want to emit the start children synchronously before all

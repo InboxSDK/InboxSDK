@@ -216,10 +216,15 @@ describe('selectorStream', function() {
       .onValue(({el,removalStream}) => {
         removalStream.onValue(removalSpy);
         assert(removalSpy.notCalled);
+        const originalChildren = Array.from(body.children);
+        originalChildren.forEach(x => x.remove());
         bodyMutation({
           addedNodes: [],
-          removedNodes: body.children
+          removedNodes: originalChildren
         });
+        setTimeout(() => {
+          originalChildren.forEach(x => body.appendChild(x));          
+        }, 1);
       })
       .onValue(onValueSpy)
       .onEnd(() => {
