@@ -11,6 +11,7 @@ import makeElementChildStream from '../../../../lib/dom/make-element-child-strea
 import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
+import selectorStream from '../../../../lib/dom/selectorStream';
 import threadRowWatcher from '../threadRow/watcher';
 import messageWatcher from '../message/watcher';
 
@@ -22,24 +23,28 @@ export default function watcher(
   const threadRowElStream: Kefir.Stream<ElementWithLifetime> = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
   const messageElStream: Kefir.Stream<ElementWithLifetime> = messageElPool ? messageElPool.items() : messageWatcher(root);
 
+  const messageCardSelector = selectorStream([
+    '*',
+    '*',
+    'section',
+    '*',
+    {$filter: el => el.style.display !== 'none'},
+    '*'
+  ]);
+
   const messageCards = messageElStream
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.nodeName === 'SECTION')
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.style.display !== 'none')
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream));
+    .flatMap(({el,removalStream}) => messageCardSelector(el).takeUntilBy(removalStream));
+
+  const listCardSelector = selectorStream([
+    '*',
+    '[jsaction]',
+    '[role=list][jsaction]',
+    '*',
+    '[role=listitem]'
+  ]);
 
   const listCards = threadRowElStream
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.hasAttribute('jsaction'))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.getAttribute('role') === 'list' && el.hasAttribute('jsaction'))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .flatMap(({el,removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
-    .filter(({el}) => el.getAttribute('role') === 'listitem');
+    .flatMap(({el,removalStream}) => listCardSelector(el).takeUntilBy(removalStream));
 
   return messageCards.merge(listCards)
     .filter(({el}) =>

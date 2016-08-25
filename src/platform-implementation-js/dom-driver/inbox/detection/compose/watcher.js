@@ -13,7 +13,6 @@ import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-merger';
-import findParent from '../../../../lib/dom/find-parent';
 import selectorStream from '../../../../lib/dom/selectorStream';
 import threadWatcher from '../thread/watcher';
 
