@@ -76,6 +76,8 @@ function getAttributeList(selector: string, node: Object): string[] {
       return _.flatMap(node.nodes, node => getAttributeList(selector, node));
     case 'attribute':
       return [node.attribute];
+    case 'class':
+      return ['class'];
     case 'pseudo':
       switch (node.value) {
       case ':not':

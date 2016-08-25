@@ -267,7 +267,7 @@ describe('selectorStream', function() {
     selectorStream([
       '.parent',
       '[role=main]',
-      {$watch: '[data-foo]'},
+      {$watch: '[data-foo], .aaaa'},
       'button'
     ])(page().body)
       .takeUntilBy(stopper)
