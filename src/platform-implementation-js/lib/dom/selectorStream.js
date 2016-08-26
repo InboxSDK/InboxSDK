@@ -18,7 +18,7 @@ selectorStream :: Selector -> HTMLElement -> Kefir.Stream<ElementWithLifetime>
 The function takes the Selector array, and returns a function that can apply
 the Selector to an HTMLElement to return a stream of matched elements.
 
-The Selector array is made up of SelectorItems. Initially, only the input
+The Selector array is made up of SelectorOperators. Initially, only the input
 element is matched. Each SelectorOperator transforms the matched set of
 elements sequentially.
 */
