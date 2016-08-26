@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import cssParser from 'postcss-selector-parser';
@@ -89,11 +90,13 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
       (stream, fn) => fn(stream),
       Kefir.stream(emitter => {
         const removalStream = kefirStopper();
-        emitter.emit({el, removalStream});
+        asap(() => {
+          emitter.emit({el, removalStream});
+        });
         return () => {
           removalStream.destroy();
         };
-      }).toProperty()
+      })
     );
   };
 }
