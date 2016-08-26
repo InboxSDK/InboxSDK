@@ -37,8 +37,8 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
           .takeUntilBy(removalStream)
       );
     } else if (item.$or) {
-      const transformers = item.$or.map(selectorStream);
-      return stream => Kefir.merge(transformers.map(fn =>
+      const selectors = item.$or.map(selectorStream);
+      return stream => Kefir.merge(selectors.map(fn =>
         stream.flatMap(({el,removalStream}) => fn(el).takeUntilBy(removalStream))
       ));
     } else if (item.$watch) {
