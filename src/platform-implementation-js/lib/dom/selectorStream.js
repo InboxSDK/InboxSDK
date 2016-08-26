@@ -97,9 +97,9 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
           .takeUntilBy(removalStream)
           .beforeEnd(()=>false)
           .skipDuplicates();
-        const opens = passesChecker.filter(x => x);
-        const closes = passesChecker.filter(x => !x);
-        return opens.map(_.constant({el, removalStream:closes.changes()}));
+        const passes = passesChecker.filter(x => x);
+        const fails = passesChecker.filter(x => !x);
+        return passes.map(_.constant({el, removalStream:fails.changes()}));
       });
     } else if (item.$log) {
       const {$log} = (item:any);
