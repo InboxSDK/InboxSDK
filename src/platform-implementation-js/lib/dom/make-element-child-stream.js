@@ -1,8 +1,6 @@
 /* @flow */
-//jshint ignore:start
 
 import asap from 'asap';
-import logger from '../logger';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
@@ -35,7 +33,10 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Stre
       if(removalStream){
         removalStream.destroy();
       } else {
-        logger.error(new Error("Could not find removalStream for element with class "+el.className));
+        const err = new Error("Could not find removalStream for element with class "+el.className);
+        setTimeout(() => {
+          throw err;
+        }, 1);
       }
     }
 

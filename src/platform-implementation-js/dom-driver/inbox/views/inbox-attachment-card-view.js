@@ -19,7 +19,7 @@ class InboxAttachmentCardView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _type: string;
-  _p: ?Parsed;
+  _p: ?Parsed; // This is only present for native cards
   _messageViewDriver: ?InboxMessageView;
   _addedButtonDescriptors: Object[] = [];
   _overlayView: ?InboxAttachmentOverlayView = null;
@@ -51,6 +51,9 @@ class InboxAttachmentCardView {
   }
 
   destroy() {
+    if (!this._p) {
+      this._element.remove();
+    }
     this._stopper.destroy();
   }
 
@@ -124,6 +127,8 @@ class InboxAttachmentCardView {
         Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
       ])
     );
+
+    options.container.appendChild(this._element);
   }
 
   getElement() {

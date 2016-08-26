@@ -17,7 +17,7 @@ function addHtmlClasses() {
 }
 
 function CustomEvent(type, options={}) {
-  const event = document.createEvent("CustomEvent");
+  const event = (global.document || docCb()).createEvent("CustomEvent");
   (event: any).initCustomEvent(type, options.bubbles, options.cancelable, options.detail);
   return event;
 };

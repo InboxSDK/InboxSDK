@@ -60,8 +60,8 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
-  _threadViewElements: Map<HTMLElement, InboxThreadView> = new Map();
-  _messageViewElements: Map<HTMLElement, InboxMessageView> = new Map();
+  _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
+  _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Stream<any>;
   _toolbarViewDriverStream: Kefir.Stream<any>;
   _butterBarDriver: Object;
