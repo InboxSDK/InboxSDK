@@ -31,6 +31,7 @@ import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
 import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
+import getChatSidebarViewStream from './getChatSidebarViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
@@ -60,6 +61,7 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
+  _chatSidebarViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<Object>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
@@ -111,6 +113,11 @@ class InboxDriver {
     );
     this._composeViewDriverPool = new ItemWithLifetimePool(
       getComposeViewDriverStream(this, threadElPool).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+
+    this._chatSidebarViewDriverPool = new ItemWithLifetimePool(
+      getChatSidebarViewStream(this).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
