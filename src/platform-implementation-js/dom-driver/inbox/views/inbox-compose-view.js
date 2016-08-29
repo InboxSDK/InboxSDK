@@ -41,7 +41,7 @@ class InboxComposeView {
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
   _p: Parsed;
-  _els: Parsed.elements;
+  _els: *;
 
   constructor(driver: InboxDriver, el: HTMLElement, parsed: Parsed) {
     this._element = el;
