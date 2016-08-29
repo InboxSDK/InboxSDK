@@ -4241,9 +4241,9 @@
       "resolved": "https://registry.npmjs.org/scmp/-/scmp-0.0.3.tgz"
     },
     "selenium-standalone": {
-      "version": "5.6.2",
-      "from": "selenium-standalone@>=5.6.0 <6.0.0",
-      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.6.2.tgz",
+      "version": "5.5.0",
+      "from": "selenium-standalone@>=5.5.0 <5.6.0",
+      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.5.0.tgz",
       "dependencies": {
         "asn1": {
           "version": "0.1.11",
@@ -5321,9 +5321,9 @@
       }
     },
     "wdio-selenium-standalone-service": {
-      "version": "0.0.6",
-      "from": "wdio-selenium-standalone-service@0.0.6",
-      "resolved": "https://registry.npmjs.org/wdio-selenium-standalone-service/-/wdio-selenium-standalone-service-0.0.6.tgz",
+      "version": "0.0.5",
+      "from": "wdio-selenium-standalone-service@0.0.5",
+      "resolved": "https://registry.npmjs.org/wdio-selenium-standalone-service/-/wdio-selenium-standalone-service-0.0.5.tgz",
       "dependencies": {
         "fs-extra": {
           "version": "0.30.0",
