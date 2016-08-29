@@ -3,9 +3,10 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 export default class GenericButtonView {
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_element: HTMLElement;
 
 	constructor(element: HTMLElement){
@@ -24,7 +25,7 @@ export default class GenericButtonView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream<Object> {
+	getEventStream(): Kefir.Observable<Object> {
 		return this._eventStream;
 	}
 

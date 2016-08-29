@@ -1,5 +1,3 @@
-// jshint ignore:start
-
 declare function describe(name: string, fn: (done: (err: any) => void) => ?Promise<any>): void;
 declare function xdescribe(name: string, fn: (done: (err: any) => void) => ?Promise<any>): void;
 declare function before(fn: (done: (err: any) => void) => ?Promise<any>): void;

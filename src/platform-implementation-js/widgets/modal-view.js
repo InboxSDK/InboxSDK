@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import {defn} from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 
@@ -86,7 +87,7 @@ class ModalView extends EventEmitter {
 
 let activeBackdrop: ?Backdrop = null;
 let currentlyShowingModal: ?{modalView: ModalView, modalViewDriver: ModalViewDriver} = null;
-const hideStream: Kefir.Bus<ModalView> = kefirBus();
+const hideStream: Bus<ModalView> = kefirBus();
 const hiddenModalStack: Array<ModalView> = [];
 
 function _handleModalStackOnModalDestroy(modalView){

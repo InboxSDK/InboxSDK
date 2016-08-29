@@ -6,13 +6,14 @@ import sinon from 'sinon';
 import co from 'co';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import delay from '../src/common/delay';
 
 import ButterBar from '../src/platform-implementation-js/namespaces/butter-bar';
 
 class MockButterBarDriver {
   _queue: Array<Object>;
-  _openBus: Kefir.Bus<any>;
+  _openBus: Bus<any>;
   _showMessageCount: number;
   _currentMessage: ?Object;
   _hideGmailMessageCount: number;

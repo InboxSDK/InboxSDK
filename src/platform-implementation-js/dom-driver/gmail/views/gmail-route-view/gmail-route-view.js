@@ -7,6 +7,7 @@ import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import asap from 'asap';
 import {defn} from 'ud';
@@ -34,11 +35,11 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_name: string;
 	_paramsArray: string[];
 	_customRouteID: ?string;
-	_stopper: Kefir.Stream<null>&{destroy():void};
+	_stopper = kefirStopper();
 	_rowListViews: GmailRowListView[];
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_driver: GmailDriver;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_customViewElement: ?HTMLElement;
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
@@ -99,8 +100,8 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	}
 
 	getHash(): string {return this._hash;}
-	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
-	getStopper(): Kefir.Stream<null> {return this._stopper;}
+	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
+	getStopper(): Kefir.Observable<null> {return this._stopper;}
 	getCustomViewElement(): ?HTMLElement {return this._customViewElement;}
 	getRowListViews(): GmailRowListView[] {return this._rowListViews;}
 	getThreadView(): ?GmailThreadView {return this._threadView;}
@@ -148,11 +149,11 @@ var GmailRouteView = defn(module, class GmailRouteView {
 		return params;
 	});
 
-	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
+	addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, true);
 	}
 
-	addSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
+	addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
 		return this._addCollapsibleSection(sectionDescriptorProperty, groupOrderHint, false);
 	}
 

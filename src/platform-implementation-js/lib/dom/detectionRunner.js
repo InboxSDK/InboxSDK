@@ -27,13 +27,13 @@ export default function detectionRunner<P: GenericParserResults>(
   }: {
     name: string;
     parser: (el: HTMLElement) => P;
-    watcher: ?(root: Document) => Kefir.Stream<ElementWithLifetime>;
+    watcher: ?(root: Document) => Kefir.Observable<ElementWithLifetime>;
     finder: ?(root: Document) => Array<HTMLElement>;
     logError: (err: Error, details?: any) => void;
     root?: Document;
     interval?: number|(liveElements: number, timeRunning: number) => number;
   }
-): Kefir.Stream<ElementWithLifetime&{parsed: P}> {
+): Kefir.Observable<ElementWithLifetime&{parsed: P}> {
   if (!interval) interval = 5000;
 
   const startTime = Date.now();

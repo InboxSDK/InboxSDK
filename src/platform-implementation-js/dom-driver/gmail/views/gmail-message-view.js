@@ -6,6 +6,7 @@ import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import kefirCast from 'kefir-cast';
 
@@ -33,12 +34,12 @@ let hasSeenOldElement = false;
 class GmailMessageView {
 	_element: HTMLElement;
 	_driver: GmailDriver;
-	_eventStream: Kefir.Bus<any>;
-	_stopper: Kefir.Stream<null>&{destroy: () => void};
+	_eventStream: Bus<any> = kefirBus();
+	_stopper = kefirStopper();
 	_threadViewDriver: GmailThreadView;
 	_moreMenuItemDescriptors: Array<Object>;
 	_moreMenuAddedElements: Array<HTMLElement>;
-	_replyElementStream: Kefir.Stream<ElementWithLifetime>;
+	_replyElementStream: Kefir.Observable<ElementWithLifetime>;
 	_replyElement: ?HTMLElement;
 	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
 	_messageLoaded: boolean = false;
@@ -48,8 +49,6 @@ class GmailMessageView {
 
 	constructor(element: HTMLElement, gmailThreadView: GmailThreadView, driver: GmailDriver){
 		this._element = element;
-		this._eventStream = kefirBus();
-		this._stopper = kefirStopper();
 
 		this._threadViewDriver = gmailThreadView;
 		this._driver = driver;
@@ -78,11 +77,11 @@ class GmailMessageView {
 		});
 	}
 
-	getEventStream(): Kefir.Stream<Object> {
+	getEventStream(): Kefir.Observable<Object> {
 		return this._eventStream;
 	}
 
-	getReplyElementStream(): Kefir.Stream<ElementWithLifetime> {
+	getReplyElementStream(): Kefir.Observable<ElementWithLifetime> {
 		return this._replyElementStream;
 	}
 

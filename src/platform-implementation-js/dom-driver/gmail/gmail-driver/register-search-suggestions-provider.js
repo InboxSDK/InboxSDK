@@ -70,7 +70,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
-  var searchBoxStream: Kefir.Stream<HTMLInputElement> =
+  var searchBoxStream: Kefir.Observable<HTMLInputElement> =
     driver.getRouteViewDriverStream()
       .toProperty(() => null)
       .map(() => gmailElementGetter.getSearchInput())
@@ -78,7 +78,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
       .take(1);
 
   // Wait for the search box to be focused before looking for the suggestions box.
-  var suggestionsBoxTbodyStream: Kefir.Stream<HTMLElement> = searchBoxStream
+  var suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement> = searchBoxStream
     .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
     .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
     .filter(Boolean)
@@ -102,7 +102,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     );
 
   // Stream of arrays of row elements belonging to this provider.
-  var providedRows: Kefir.Stream<HTMLElement[]> = suggestionsBoxTbodyStream
+  var providedRows: Kefir.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
     .map(suggestionsBoxTbody =>
       _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
@@ -121,7 +121,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     }
   });
 
-  var rowSelectionEvents: Kefir.Stream<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
+  var rowSelectionEvents: Kefir.Observable<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
     Kefir.merge(rows.map(row =>
       Kefir.merge([
         fromEventTargetCapture(row, 'click'),

@@ -20,7 +20,7 @@ export default class ContentPanelView extends EventEmitter {
   }
 
   _bindToStreamEvents(){
-    const stream: Kefir.Stream<any> = this._contentPanelViewImplementation.getEventStream();
+    const stream: Kefir.Observable<any> = this._contentPanelViewImplementation.getEventStream();
     stream.onValue(({eventName}) => {this.emit(eventName);});
     stream.onEnd(() => {
         this.destroyed = true;

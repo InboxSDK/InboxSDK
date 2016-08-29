@@ -9,6 +9,7 @@ import * as Kefir from 'kefir';
 import * as ud from 'ud';
 import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from '../../../../common/delay';
 
@@ -65,7 +66,7 @@ class GmailComposeView {
 	_emailWasSent: boolean;
 	_driver: GmailDriver;
 	_managedViewControllers: Array<{destroy: () => void}>;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
 	_composeID: string;
@@ -77,16 +78,16 @@ class GmailComposeView {
 	_draftSaving: boolean;
 	_draftIDpromise: ?Promise<?string>;
 	_threadID: ?string;
-	_stopper: Kefir.Stream<null>&{destroy:()=>void};
+	_stopper: Kefir.Observable<null>&{destroy:()=>void};
 	_lastSelectionRange: ?Range;
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
 	_formattingArea: ?HTMLElement;
 	_destroyed: boolean = false;
-	ready: () => Kefir.Stream<GmailComposeView>;
-	getEventStream: () => Kefir.Stream<any>;
+	ready: () => Kefir.Observable<GmailComposeView>;
+	getEventStream: () => Kefir.Observable<any>;
 
-	constructor(element: HTMLElement, xhrInterceptorStream: Kefir.Stream<*>, driver: GmailDriver) {
+	constructor(element: HTMLElement, xhrInterceptorStream: Kefir.Observable<*>, driver: GmailDriver) {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
@@ -254,9 +255,9 @@ class GmailComposeView {
 		this._destroyed = true;
 	}
 
-	getStopper(): Kefir.Stream<null> {return this._stopper;}
+	getStopper(): Kefir.Observable<null> {return this._stopper;}
 
-	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
 	isDestroyed(): boolean { return this._destroyed;}
 
@@ -381,7 +382,7 @@ class GmailComposeView {
 		this._triggerDraftSave();
 	}
 
-	addRecipientRow(options: Kefir.Stream<?Object>): () => void {
+	addRecipientRow(options: Kefir.Observable<?Object>): () => void {
 		return addRecipientRow(this, options);
 	}
 
@@ -397,7 +398,7 @@ class GmailComposeView {
 		fromManager.setFromEmail(this._driver, this, email);
 	}
 
-	addButton(buttonDescriptor: Kefir.Stream<?Object>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
+	addButton(buttonDescriptor: Kefir.Observable<?Object>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
 		return addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
 	}
 

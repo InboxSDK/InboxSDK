@@ -14,14 +14,14 @@ import DropdownView from '../../../widgets/buttons/dropdown-view';
 import type Driver from '../gmail-driver';
 
 export default class GmailAppToolbarButtonView {
-  _stopper: Kefir.Stream<null>&{destroy:()=>void};
+  _stopper: Kefir.Observable<null>&{destroy:()=>void};
   _iconSettings: Object;
   _element: ?HTMLElement = null;
   _activeDropdown: ?DropdownView;
   _buttonDescriptor: ?Object;
   _driver: Driver;
 
-  constructor(driver: Driver, inButtonDescriptor: Kefir.Stream<Object>) {
+  constructor(driver: Driver, inButtonDescriptor: Kefir.Observable<Object>) {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
@@ -44,7 +44,7 @@ export default class GmailAppToolbarButtonView {
     }
   }
 
-  getStopper(): Kefir.Stream<null> {return this._stopper;}
+  getStopper(): Kefir.Observable<null> {return this._stopper;}
   getElement(): ?HTMLElement {return this._element;}
 
   open() {

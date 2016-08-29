@@ -1,15 +1,15 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import {defn} from 'ud';
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 class GmailModalViewDriver {
-  _eventStream: Kefir.Bus<any>;
+  _eventStream: Bus<any>;
   _modalContainerElement: HTMLElement;
 
   constructor(options: Object) {
@@ -26,7 +26,7 @@ class GmailModalViewDriver {
   }
 
   getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
-  getEventStream(): Kefir.Stream<Object> { return this._eventStream; }
+  getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
 
   _processOptions(options: Object) {
     this.setTitle(options.title);

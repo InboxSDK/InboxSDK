@@ -4,6 +4,7 @@ import {defn} from 'ud';
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
 import type InboxThreadView from './inbox-thread-view';
@@ -22,8 +23,8 @@ class InboxMessageView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _p: Parsed;
-  _stopper: Kefir.Stream<any>;
-  _eventStream: Kefir.Bus<Object> = kefirBus();
+  _stopper: Kefir.Observable<any>;
+  _eventStream: Bus<Object> = kefirBus();
   _threadViewDriver: ?InboxThreadView;
   _attachmentCardViews: InboxAttachmentCardView[] = [];
 
@@ -32,7 +33,7 @@ class InboxMessageView {
     this._driver = driver;
     this._p = parsed;
 
-    this._stopper = this._eventStream.filter(()=>false).beforeEnd(()=>null);
+    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null);
 
     // If our id changes, then destroy this view.
     // getMessageViewDriverStream() will create a new view for this element.
@@ -119,7 +120,7 @@ class InboxMessageView {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Stream<Object> {
+  getEventStream(): Kefir.Observable<Object> {
     return this._eventStream;
   }
 

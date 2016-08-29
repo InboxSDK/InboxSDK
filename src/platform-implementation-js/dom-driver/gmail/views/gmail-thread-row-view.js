@@ -7,6 +7,7 @@ import assert from 'assert';
 import Kefir from 'kefir';
 import asap from 'asap';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import assertInterface from '../../../lib/assert-interface';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -90,11 +91,11 @@ class GmailThreadRowView {
   _driver: GmailDriver;
   _userView: ?Object;
   _cachedThreadID: ?string;
-  _imageFixer: ?Kefir.Bus<any>;
-  _imageFixerTask: ?Kefir.Stream<any>;
-  _stopper: Kefir.Stopper;
-  _refresher: ?Kefir.Stream<any>;
-  _subjectRefresher: ?Kefir.Stream<any>;
+  _imageFixer: ?Bus<any>;
+  _imageFixerTask: ?Kefir.Observable<any>;
+  _stopper = kefirStopper();
+  _refresher: ?Kefir.Observable<any>;
+  _subjectRefresher: ?Kefir.Observable<any>;
   _counts: ?Counts;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
@@ -143,9 +144,6 @@ class GmailThreadRowView {
     this._driver = gmailDriver;
     this._userView = null; // supplied by ThreadRowView
     this._cachedThreadID = null; // set in getter
-
-    this._stopper = kefirStopper();
-
 
     this._imageFixer = null;
     this._imageFixerTask = null;
@@ -214,7 +212,7 @@ class GmailThreadRowView {
   // a few cases such as with multiple inbox or the drafts page that it needs a moment.
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
-  waitForReady(): Kefir.Stream<GmailThreadRowView> {
+  waitForReady(): Kefir.Observable<GmailThreadRowView> {
     const time = [0,10,100,1000,10000];
     const step = () => {
       if (this._threadIdReady()) {
@@ -269,7 +267,7 @@ class GmailThreadRowView {
       console.warn('addLabel called on destroyed thread row');
       return;
     }
-    const prop: Kefir.Stream<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([labelDescriptor]) => {
@@ -313,7 +311,7 @@ class GmailThreadRowView {
       console.warn('addImage called on destroyed thread row');
       return;
     }
-    const prop: Kefir.Stream<[?Object]> = kefirCast(Kefir, inIconDescriptor)
+    const prop: Kefir.Observable<[?Object]> = kefirCast(Kefir, inIconDescriptor)
       .toProperty()
       .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
       .takeUntilBy(this._stopper);
@@ -386,7 +384,7 @@ class GmailThreadRowView {
     var buttonMod = null;
 
 
-    var prop: Kefir.Stream<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
+    var prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
     prop.beforeEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
@@ -503,7 +501,7 @@ class GmailThreadRowView {
     if (this._elements.length !== 1) {
       return;
     }
-    const prop: Kefir.Stream<?Object> = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
     let actionMod = null;
 
     prop.onEnd(() => {
@@ -574,7 +572,7 @@ class GmailThreadRowView {
     var added = false;
     var currentIconUrl;
 
-    var prop: Kefir.Stream<?Object> = kefirCast(Kefir, opts).toProperty();
+    var prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       if (!opts) {
         if (added) {
@@ -634,7 +632,7 @@ class GmailThreadRowView {
     }
     let labelMod;
     let draftElement, countElement;
-    const prop: Kefir.Stream<?Object> = kefirCast(Kefir, opts).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const originalLabel = this._elements[0].querySelector('td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
@@ -697,7 +695,7 @@ class GmailThreadRowView {
       return;
     }
     let dateMod;
-    const prop: Kefir.Stream<?Object> = kefirCast(Kefir, opts).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
@@ -742,11 +740,11 @@ class GmailThreadRowView {
     });
   }
 
-  getEventStream(): Kefir.Stream<any> {
+  getEventStream(): Kefir.Observable<any> {
     return this._stopper;
   }
 
-  getStopper(): Kefir.Stream<any> {
+  getStopper(): Kefir.Observable<any> {
     return this._stopper;
   }
 
@@ -824,7 +822,7 @@ class GmailThreadRowView {
             this._elements[0].querySelector('td.a4W div.xS div.xT');
   }
 
-  _getImageFixer(): Kefir.Bus<any> {
+  _getImageFixer(): Bus<any> {
     let imageFixer = this._imageFixer;
     if(!imageFixer){
       imageFixer = this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
@@ -833,7 +831,7 @@ class GmailThreadRowView {
     return imageFixer;
   }
 
-  _getImageFixerTask(): Kefir.Stream<any> {
+  _getImageFixerTask(): Kefir.Observable<any> {
     let imageFixerTask = this._imageFixerTask;
     if(!imageFixerTask){
       imageFixerTask = this._imageFixerTask =
@@ -852,7 +850,7 @@ class GmailThreadRowView {
       this._elements[0] : (this._elements[0].children[2]: any);
   }
 
-  _getRefresher(): Kefir.Stream<any> {
+  _getRefresher(): Kefir.Observable<any> {
     // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
     // nodes. One time this happens is when you have a new email in your inbox,
     // you read the email, return to the inbox, get another email, and then the
@@ -871,7 +869,7 @@ class GmailThreadRowView {
     return refresher;
   }
 
-  _getSubjectRefresher(): Kefir.Stream<any> {
+  _getSubjectRefresher(): Kefir.Observable<any> {
     let subjectRefresher = this._subjectRefresher;
     if(!subjectRefresher){
       if (this._isVertical) {

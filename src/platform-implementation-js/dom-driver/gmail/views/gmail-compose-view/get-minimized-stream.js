@@ -9,11 +9,11 @@ import type GmailComposeView from '../gmail-compose-view';
 
 const fnStream = udKefir(module, getMinimizedStream_);
 
-export default function getMinimizedStream(gmailComposeView: GmailComposeView): Kefir.Stream<boolean> {
+export default function getMinimizedStream(gmailComposeView: GmailComposeView): Kefir.Observable<boolean> {
 	return fnStream.flatMapLatest(fn => fn(gmailComposeView));
 }
 
-function getMinimizedStream_(gmailComposeView: GmailComposeView): Kefir.Stream<boolean> {
+function getMinimizedStream_(gmailComposeView: GmailComposeView): Kefir.Observable<boolean> {
 	const element = gmailComposeView.getElement();
 	const bodyElement = gmailComposeView.getBodyElement();
 	const bodyContainer = _.find(element.children, child => child.contains(bodyElement));

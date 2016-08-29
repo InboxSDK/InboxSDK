@@ -19,7 +19,7 @@ class InboxAttachmentOverlayView {
   _el: HTMLElement;
   _p: Parsed;
   _cardView: InboxAttachmentCardView;
-  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
 
   constructor(driver: InboxDriver, el: HTMLElement, parsed: Parsed, cardView: InboxAttachmentCardView) {
     this._driver = driver;
@@ -43,7 +43,7 @@ class InboxAttachmentOverlayView {
     this._stopper.destroy();
   }
 
-  getStopper(): Kefir.Stream<null> {
+  getStopper(): Kefir.Observable<null> {
     return this._stopper;
   }
 

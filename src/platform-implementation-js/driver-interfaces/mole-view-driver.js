@@ -8,6 +8,6 @@ export type MoleViewDriver = {
   setTitle(title: string): void;
   setMinimized(minimized: boolean): void;
   getMinimized(): boolean;
-  getEventStream(): Kefir.Stream<Object>;
+  getEventStream(): Kefir.Observable<Object>;
   destroy(): void;
 };

@@ -1,10 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 var _ = require('lodash');
 var ud = require('ud');
 var Kefir = require('kefir');
-var kefirStopper = require('kefir-stopper');
+import kefirStopper from 'kefir-stopper';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import containByScreen from 'contain-by-screen';
 
@@ -13,11 +12,10 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
   _el: HTMLElement;
   _contentEl: HTMLElement;
   _arrowEl: HTMLElement;
-  _stopper: Kefir.Stream<null>&{destroy:()=>void};
+  _stopper = kefirStopper();
 
   constructor(target: HTMLElement, options: TooltipDescriptor) {
     this._target = target;
-    this._stopper = kefirStopper();
     this._arrowEl = document.createElement('div');
     this._arrowEl.className = 'inboxsdk__tooltip_arrow';
     this._contentEl = document.createElement('div');
@@ -86,7 +84,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
     this._stopper.destroy();
   }
 
-  getStopper(): Kefir.Stream<null> {
+  getStopper(): Kefir.Observable<null> {
     return this._stopper;
   }
 

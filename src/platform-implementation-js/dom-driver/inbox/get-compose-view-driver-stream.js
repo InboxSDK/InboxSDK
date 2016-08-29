@@ -17,7 +17,7 @@ import detectionRunner from '../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Stream<InboxComposeView> {
+function imp(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxComposeView> {
   return detectionRunner({
     name: 'compose',
     finder, watcher: root => watcher(root, threadElPool), parser,
@@ -32,6 +32,6 @@ function imp(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.
     });
 }
 
-export default function getComposeViewDriverStream(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Stream<InboxComposeView> {
+export default function getComposeViewDriverStream(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxComposeView> {
   return impStream.flatMapLatest(_imp => _imp(driver, threadElPool));
 }

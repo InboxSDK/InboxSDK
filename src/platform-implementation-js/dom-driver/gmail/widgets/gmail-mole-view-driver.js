@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -30,13 +29,11 @@ export type Options = {
 };
 
 const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
-  _eventStream: kefirBus;
-  _stopper: kefirStopper;
+  _eventStream = kefirBus();
+  _stopper = kefirStopper();
   _element: HTMLElement;
 
   constructor(options: Options) {
-    this._eventStream = kefirBus();
-    this._stopper = kefirStopper();
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view '+(options.className||''),
       innerHTML: getHTMLString(options)
@@ -168,7 +165,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
     }
   }
 
-  getEventStream(): Kefir.Stream<Object> {
+  getEventStream(): Kefir.Observable<Object> {
     return this._eventStream;
   }
 

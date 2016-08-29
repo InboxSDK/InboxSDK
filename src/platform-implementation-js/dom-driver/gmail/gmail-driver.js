@@ -6,6 +6,7 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
@@ -84,16 +85,16 @@ class GmailDriver {
 	_pageCommunicatorPromise: Promise<PageCommunicator>;
 	_butterBar: ?ButterBar;
 	_butterBarDriver: GmailButterBarDriver;
-	_routeViewDriverStream: Kefir.Stream<Object>;
-	_rowListViewDriverStream: Kefir.Stream<Object>;
-	_threadRowViewDriverKefirStream: Kefir.Stream<Object>;
-	_threadViewDriverStream: Kefir.Stream<GmailThreadView>;
-	_toolbarViewDriverStream: Kefir.Stream<Object>;
-	_composeViewDriverStream: Kefir.Stream<GmailComposeView>;
-	_xhrInterceptorStream: Kefir.Stream<Object>;
-	_messageViewDriverStream: Kefir.Stream<GmailMessageView>;
-	_stopper: Kefir.Stopper;
-	_navMarkerHiddenChanged: Kefir.Stream<null>&Object;
+	_routeViewDriverStream: Kefir.Observable<Object>;
+	_rowListViewDriverStream: Kefir.Observable<Object>;
+	_threadRowViewDriverKefirStream: Kefir.Observable<Object>;
+	_threadViewDriverStream: Kefir.Observable<GmailThreadView>;
+	_toolbarViewDriverStream: Kefir.Observable<Object>;
+	_composeViewDriverStream: Kefir.Observable<GmailComposeView>;
+	_xhrInterceptorStream: Kefir.Observable<Object>;
+	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
+	_stopper = kefirStopper();
+	_navMarkerHiddenChanged: Bus<null>;
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
@@ -111,7 +112,6 @@ class GmailDriver {
 		this._customListSearchStringsToRouteIds = new Map();
 
 		this._messageIDsToThreadIDs = new Map();
-		this._stopper = kefirStopper();
 		this._navMarkerHiddenChanged = kefirBus();
 
 		this._messageIdManager = new MessageIdManager({
@@ -178,9 +178,9 @@ class GmailDriver {
 	}
 	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
-	getXhrInterceptorStream(): Kefir.Stream<Object> {return this._xhrInterceptorStream;}
+	getXhrInterceptorStream(): Kefir.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream() {return this._messageViewDriverStream;}
-	getStopper(): Kefir.Stream<null> {return this._stopper;}
+	getStopper(): Kefir.Observable<null> {return this._stopper;}
 	getEnvData(): EnvData {return this._envData;}
 
 	getTimings(): {[ix:string]:?number} {
@@ -387,7 +387,7 @@ class GmailDriver {
 			.takeUntilBy(this._stopper);
 	}
 
-	_setupRouteSubViewDriver(viewName: string): Kefir.Stream<Object> {
+	_setupRouteSubViewDriver(viewName: string): Kefir.Observable<Object> {
 		return this._routeViewDriverStream.flatMap((gmailRouteView) => {
 			return gmailRouteView.getEventStream()
 				.filter(event => event.eventName === viewName)
@@ -436,7 +436,7 @@ class GmailDriver {
 		showAppIdWarning(this);
 	}
 
-	createTopMessageBarDriver(optionStream: Kefir.Stream<?Object>): GmailTopMessageBarDriver {
+	createTopMessageBarDriver(optionStream: Kefir.Observable<?Object>): GmailTopMessageBarDriver {
 		return new GmailTopMessageBarDriver(optionStream);
 	}
 

@@ -15,7 +15,7 @@ import Logger from '../../lib/logger';
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
-  ajaxInterceptStream: Kefir.Stream<Object>;
+  ajaxInterceptStream: Kefir.Observable<Object>;
 
   constructor() {
     super();

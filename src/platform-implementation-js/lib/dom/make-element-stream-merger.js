@@ -6,7 +6,7 @@ import StopperPool from '../stopper-pool';
 import delayAsap from '../delay-asap';
 import type {ItemWithLifetime} from './make-element-child-stream';
 
-export default function makeElementStreamMerger<T>(): (event: ItemWithLifetime<T>) => Kefir.Stream<ItemWithLifetime<T>> {
+export default function makeElementStreamMerger<T>(): (event: ItemWithLifetime<T>) => Kefir.Observable<ItemWithLifetime<T>> {
   const knownElementStopperPools: Map<T, StopperPool> = new Map();
 
   return function(event) {

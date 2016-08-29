@@ -12,7 +12,7 @@ import type {TooltipDescriptor} from '../../../../views/compose-button-view';
 export default function addTooltipToButton(gmailComposeView: GmailComposeView, buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): GmailTooltipView {
 
 	var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
-	var tooltipStopperStream: Kefir.Stream<any> =
+	var tooltipStopperStream: Kefir.Observable<any> =
 		gmailTooltipView
 			.getStopper()
 			.merge(

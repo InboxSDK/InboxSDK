@@ -4,7 +4,7 @@
 import Kefir from 'kefir';
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function addRecipientRow(gmailComposeView: GmailComposeView, recipientRowOptionStream: Kefir.Stream<?Object>): ()=>void {
+export default function addRecipientRow(gmailComposeView: GmailComposeView, recipientRowOptionStream: Kefir.Observable<?Object>): ()=>void {
 	var row;
 
 	recipientRowOptionStream

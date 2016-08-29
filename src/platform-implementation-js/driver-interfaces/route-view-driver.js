@@ -9,12 +9,12 @@ export type RouteViewDriver = {
 	getRouteType(): string;
 	getRouteID(): string;
 	getParams(): {[ix:string]:string};
-	getEventStream(): Kefir.Stream<Object>;
-	getStopper(): Kefir.Stream<any>;
+	getEventStream(): Kefir.Observable<Object>;
+	getStopper(): Kefir.Observable<any>;
 	getCustomViewElement(): ?HTMLElement;
 	refresh(): void;
-	addCollapsibleSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
-	addSection(sectionDescriptorProperty: Kefir.Stream<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
+	addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
+	addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
 };
 
 export default {

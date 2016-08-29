@@ -92,8 +92,8 @@ class Conversations {
 	}
 }
 
-function _setupViewDriverWatcher(appId, stream: Kefir.Stream<Object>, ViewClass, handlerRegistry, ConversationsInstance, membrane, driver){
-	var combinedStream: Kefir.Stream<Object> = stream.map(function(viewDriver){
+function _setupViewDriverWatcher(appId, stream: Kefir.Observable<Object>, ViewClass, handlerRegistry, ConversationsInstance, membrane, driver){
+	var combinedStream: Kefir.Observable<Object> = stream.map(function(viewDriver){
 		const view = membrane.get(viewDriver);
 		return {viewDriver, view};
 	});

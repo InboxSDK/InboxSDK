@@ -16,7 +16,7 @@ import detectionRunner from '../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver: InboxDriver): Kefir.Stream<InboxAttachmentOverlayView> {
+function imp(driver: InboxDriver): Kefir.Observable<InboxAttachmentOverlayView> {
   return detectionRunner({
     name: 'attachmentOverlay',
     finder, watcher, parser,
@@ -44,6 +44,6 @@ function imp(driver: InboxDriver): Kefir.Stream<InboxAttachmentOverlayView> {
     });
 }
 
-export default function getAttachmentOverlayViewStream(driver: InboxDriver): Kefir.Stream<InboxAttachmentOverlayView> {
+export default function getAttachmentOverlayViewStream(driver: InboxDriver): Kefir.Observable<InboxAttachmentOverlayView> {
   return impStream.flatMapLatest(_imp => _imp(driver));
 }

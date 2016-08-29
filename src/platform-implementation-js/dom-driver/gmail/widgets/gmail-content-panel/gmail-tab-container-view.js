@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import multiCompareSort from '../../../../lib/multi-compare-sort';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
@@ -13,7 +13,7 @@ export default class GmailTabContainerView {
   destroyed: boolean;
   _element: HTMLElement;
   _tablistElement: HTMLElement;
-  _eventStream: Kefir.Bus<any>;
+  _eventStream: Bus<any>;
   _descriptorToGmailTabViewMap: Map<Object, GmailTabView>;
   _gmailTabViews: GmailTabView[];
   _visibleGmailTabViews: GmailTabView[];
@@ -44,7 +44,7 @@ export default class GmailTabContainerView {
   }
 
   getElement(): HTMLElement {return this._element;}
-  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+  getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
   addTab(descriptor: Object, groupOrderHint: any) {
     var gmailTabView = new GmailTabView(descriptor, groupOrderHint);

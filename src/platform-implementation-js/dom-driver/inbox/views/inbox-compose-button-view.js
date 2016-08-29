@@ -21,7 +21,7 @@ class InboxComposeButtonView {
   _iconEl: HTMLImageElement;
   _tooltip: ?InboxTooltipView;
 
-  constructor(composeView: InboxComposeView, buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object) {
+  constructor(composeView: InboxComposeView, buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object) {
     this._tooltip = null;
     this._composeView = composeView;
     var div = this._buttonEl = document.createElement('div');

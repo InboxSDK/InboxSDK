@@ -8,6 +8,7 @@ import util from 'util';
 import Kefir from 'kefir';
 import {parse} from 'querystring';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
@@ -21,7 +22,7 @@ class GmailThreadView {
 	_routeViewDriver: any;
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_sidebarContentPanelContainerView: any;
 	_toolbarView: any;
 	_messageViewDrivers: any[];
@@ -45,7 +46,7 @@ class GmailThreadView {
 		});
 	}
 
-	getEventStream(): Kefir.Stream<Object> { return this._eventStream; }
+	getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
 	getElement(): HTMLElement { return this._element; }
 	getRouteViewDriver(): any { return this._routeViewDriver; }
 	getIsPreviewedThread(): boolean { return this._isPreviewedThread; }

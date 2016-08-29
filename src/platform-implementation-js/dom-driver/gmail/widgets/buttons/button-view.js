@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import Logger from '../../../../lib/logger';
 import * as ud from 'ud';
 import simulateHover from '../../../../lib/dom/simulate-hover';
@@ -39,7 +39,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	_buttonColor: string;
 	_isEnabled: boolean;
 	_keyboardShortcutHandle: ?KeyboardShortcutHandle;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 
 	constructor(options: ButtonViewOptions){
 		this._hasDropdown = false;
@@ -71,7 +71,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	}
 
 	getElement(): HTMLElement {return this._element;}
-	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
 	activate(){
 		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);

@@ -19,12 +19,12 @@ import type GmailDriver from '../gmail-driver';
 
 var impStream = udKefir(module, imp);
 
-export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream<GmailMessageView>, xhrInterceptorStream: Kefir.Stream<Object>): Kefir.Stream<GmailComposeView> {
+export default function setupComposeViewDriverStream(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Observable<GmailMessageView>, xhrInterceptorStream: Kefir.Observable<Object>): Kefir.Observable<GmailComposeView> {
 	return impStream.flatMapLatest(imp =>
 		imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream));
 }
 
-function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Stream<GmailMessageView>, xhrInterceptorStream: Kefir.Stream<Object>): Kefir.Stream<GmailComposeView> {
+function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Observable<GmailMessageView>, xhrInterceptorStream: Kefir.Observable<Object>): Kefir.Observable<GmailComposeView> {
 	return Kefir.fromPromise(
 		GmailElementGetter.waitForGmailModeToSettle()
 	).flatMap(() => {

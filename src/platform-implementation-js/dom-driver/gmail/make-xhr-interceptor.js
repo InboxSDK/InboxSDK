@@ -8,7 +8,7 @@ import PageCommunicator from './gmail-page-communicator';
 
 import injectScript from '../../lib/inject-script';
 
-export default function makeXhrInterceptor(): {xhrInterceptStream: Kefir.Stream<Object>, pageCommunicatorPromise: Promise<PageCommunicator>} {
+export default function makeXhrInterceptor(): {xhrInterceptStream: Kefir.Observable<Object>, pageCommunicatorPromise: Promise<PageCommunicator>} {
   var pageCommunicator = new PageCommunicator();
   var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
 

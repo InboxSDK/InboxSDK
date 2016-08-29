@@ -8,7 +8,7 @@ const cancelIdleCallback = global.cancelIdleCallback || clearTimeout;
 
 // Returns a stream that emits a value using requestIdleCallback. Works well
 // with flatmap.
-export default function delayIdle<T>(timeout: ?number, value: T): Kefir.Stream<T> {
+export default function delayIdle<T>(timeout: ?number, value: T): Kefir.Observable<T> {
   return Kefir.stream(emitter => {
     const t = requestIdleCallback(() => {
       emitter.emit(value);

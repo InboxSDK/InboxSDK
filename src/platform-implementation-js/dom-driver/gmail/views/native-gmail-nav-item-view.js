@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import eventNameFilter from '../../../lib/event-name-filter';
@@ -21,7 +22,7 @@ export default class NativeGmailNavItemView {
 	_element: HTMLElement;
 	_navItemName: string;
 	_activeMarkerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_itemContainerElement: ?HTMLElement = null;
 
 	constructor(nativeElement: HTMLElement, navItemName: string) {
@@ -44,7 +45,7 @@ export default class NativeGmailNavItemView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream<Object> {
+	getEventStream(): Kefir.Observable<Object> {
 		return this._eventStream;
 	}
 
