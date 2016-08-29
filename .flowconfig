@@ -7,7 +7,7 @@ dist/
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*
 .*/flow-libs/.*
-.*/node_modules/kefir/.*
+.*/node_modules/\(ud-\)?kefir.*/.*
 .*/node_modules/fbjs/.*
 .*/node_modules/jstimezonedetect/.*
 .*/Server.*/.*\.json

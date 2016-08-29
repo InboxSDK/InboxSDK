@@ -1,5 +1,21 @@
 // jshint ignore:start
 
+declare module "kefir-cast" {
+  declare var exports: any;
+}
+
+declare module "kefir-stopper" {
+  declare var exports: any;
+}
+
+declare module "kefir-bus" {
+  declare var exports: any;
+}
+
+declare module "ud-kefir" {
+  declare var exports: any;
+}
+
 declare module kefir {
   declare type Event<T> =
     {type: 'value', value: T} |
