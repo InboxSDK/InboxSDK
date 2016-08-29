@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 const TAB_COLOR_CLASSES = [
   "aIf-aLe",
@@ -14,10 +14,10 @@ const TAB_COLOR_CLASSES = [
 ];
 
 export default class GmailTabView {
-	_descriptor: Kefir.Stream<Object>;
+	_descriptor: Kefir.Observable<Object>;
 	_groupOrderHint: any;
 	_lastDescriptorValue: ?Object;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_element: HTMLElement;
 	_innerElement: HTMLElement;
 	_titleElement: HTMLElement;
@@ -27,7 +27,7 @@ export default class GmailTabView {
 	_iconImgElement: ?HTMLImageElement;
 	_isActive: boolean;
 
-	constructor(descriptorStream: Kefir.Stream<Object>, groupOrderHint: any) {
+	constructor(descriptorStream: Kefir.Observable<Object>, groupOrderHint: any) {
 	  this._descriptor = descriptorStream;
 	  this._groupOrderHint = groupOrderHint;
 		this._lastDescriptorValue = null;
@@ -50,7 +50,7 @@ export default class GmailTabView {
 	getDescriptor() {return this._descriptor;}
 	getGroupOrderHint(): any {return this._groupOrderHint;}
 	getElement(): HTMLElement {return this._element;}
-	getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
   setInactive() {
     this._element.classList.remove('inboxsdk__tab_selected');

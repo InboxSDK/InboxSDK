@@ -38,7 +38,7 @@ const getIframeSrcDescriptor = once(() =>
   Object.getOwnPropertyDescriptor(getIframeProto(), 'src')
 );
 
-const iframeSrcSets: Kefir.Stream<string> = Kefir.stream(emitter => {
+const iframeSrcSets: Kefir.Observable<string> = Kefir.stream(emitter => {
   const iframeProto = getIframeProto();
   const originalDescriptor = getIframeSrcDescriptor();
   (Object:any).defineProperty(iframeProto, 'src', {

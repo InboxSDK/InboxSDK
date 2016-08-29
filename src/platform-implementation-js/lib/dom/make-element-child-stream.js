@@ -4,12 +4,12 @@ import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Stream<any>};
+export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<any>};
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function makeElementChildStream(element: HTMLElement): Kefir.Stream<ElementWithLifetime> {
+export default function makeElementChildStream(element: HTMLElement): Kefir.Observable<ElementWithLifetime> {
   if (!element || !element.nodeType) {
     throw new Error("Expected element, got "+String(element));
   }

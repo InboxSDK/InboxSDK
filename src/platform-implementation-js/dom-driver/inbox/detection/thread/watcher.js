@@ -8,7 +8,7 @@ import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-s
 import selectorStream from '../../../../lib/dom/selectorStream';
 import threadRowWatcher from '../threadRow/watcher';
 
-export default function watcher(root: Document=document, threadRowElPool: ?ItemWithLifetimePool<*>=null): Kefir.Stream<ElementWithLifetime> {
+export default function watcher(root: Document=document, threadRowElPool: ?ItemWithLifetimePool<*>=null): Kefir.Observable<ElementWithLifetime> {
   const threadRowElStream = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
 
   const selector = selectorStream([

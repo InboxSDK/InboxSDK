@@ -139,11 +139,11 @@ class InboxAttachmentCardView {
     return this._messageViewDriver;
   }
 
-  getStopper(): Kefir.Stream<null> {
+  getStopper(): Kefir.Observable<null> {
     return this._stopper;
   }
 
-  getPreviewClicks(): Kefir.Stream<Event> {
+  getPreviewClicks(): Kefir.Observable<Event> {
     return this._previewClicks.takeUntilBy(this._stopper);
   }
 

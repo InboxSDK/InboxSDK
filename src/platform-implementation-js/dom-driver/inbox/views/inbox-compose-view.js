@@ -6,6 +6,7 @@ import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import autoHtml from 'auto-html';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import delayAsap from '../../../lib/delay-asap';
@@ -33,21 +34,19 @@ let cachedFromContacts: ?Array<Contact> = null;
 class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
-  _eventStream: Kefir.Bus<any>;
-  _stopper: Kefir.Stream<null>&{destroy:()=>void};
+  _eventStream: Bus<any> = kefirBus();
+  _stopper = kefirStopper();
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastBodySelectionRange: ?Range;
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
   _p: Parsed;
-  _els: Parsed.elements;
+  _els: *;
 
   constructor(driver: InboxDriver, el: HTMLElement, parsed: Parsed) {
     this._element = el;
     this._driver = driver;
-    this._stopper = kefirStopper();
-    this._eventStream = kefirBus();
     this._modifierButtonContainer = null;
     this._lastBodySelectionRange = null;
     this._p = parsed;
@@ -155,8 +154,8 @@ class InboxComposeView {
     this._eventStream.end();
     this._stopper.destroy();
   }
-  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
-  getStopper(): Kefir.Stream<null> {return this._stopper;}
+  getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
+  getStopper(): Kefir.Observable<null> {return this._stopper;}
   getElement(): HTMLElement {return this._element;}
   // Call this whenever we change the body directly by mucking with the
   // elements.
@@ -410,7 +409,7 @@ class InboxComposeView {
       toggleFullscreenButton.click();
     }
   }
-  addButton(buttonDescriptor: Kefir.Stream<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
+  addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
     return RSVP.Promise.resolve({
       buttonViewController,
@@ -446,7 +445,7 @@ class InboxComposeView {
     this._modifierButtonContainer = div;
     return div;
   }
-  addRecipientRow(options: Kefir.Stream<?Object>): () => void {
+  addRecipientRow(options: Kefir.Observable<?Object>): () => void {
     throw new Error("Not implemented");
   }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {

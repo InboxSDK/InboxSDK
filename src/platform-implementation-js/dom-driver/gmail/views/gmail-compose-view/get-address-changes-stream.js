@@ -9,7 +9,7 @@ import getAddressInformationExtractor from './get-address-information-extractor'
 
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function(gmailComposeView: GmailComposeView): Kefir.Stream<Object> {
+export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
 	var recipientRowElements = gmailComposeView.getRecipientRowElements();
 
 	if(!recipientRowElements || recipientRowElements.length === 0){

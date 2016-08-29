@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
@@ -13,10 +14,10 @@ class InboxThreadView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _p: Parsed;
-  _eventStream: Kefir.Bus<any> = kefirBus();
+  _eventStream: Bus<any> = kefirBus();
   _messageViews: InboxMessageView[] = [];
   _receivedMessageView = kefirStopper();
-  _stopper: Kefir.Stream<null>;
+  _stopper: Kefir.Observable<null>;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -28,11 +29,11 @@ class InboxThreadView {
     this._driver.getThreadViewElementsMap().set(this._element, this);
   }
 
-  getEventStream(): Kefir.Stream<any> {
+  getEventStream(): Kefir.Observable<any> {
     return this._eventStream;
   }
 
-  getStopper(): Kefir.Stream<null> {
+  getStopper(): Kefir.Observable<null> {
     return this._stopper;
   }
 

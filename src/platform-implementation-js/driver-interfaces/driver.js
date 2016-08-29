@@ -34,19 +34,19 @@ export type DrawerViewDriver = InboxDrawerView;
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
-	getRouteViewDriverStream(): Kefir.Stream<Object>; // should be a property
-	getRowListViewDriverStream(): Kefir.Stream<Object>;
+	getRouteViewDriverStream(): Kefir.Observable<Object>; // should be a property
+	getRowListViewDriverStream(): Kefir.Observable<Object>;
 	openComposeWindow(): void;
-	getComposeViewDriverStream(): Kefir.Stream<ComposeViewDriver>;
+	getComposeViewDriverStream(): Kefir.Observable<ComposeViewDriver>;
 	openDraftByMessageID(messageID: string): void;
-	getThreadViewDriverStream(): Kefir.Stream<ThreadViewDriver>;
-	getMessageViewDriverStream(): Kefir.Stream<MessageViewDriver>;
-	getAttachmentCardViewDriverStream(): Kefir.Stream<AttachmentCardViewDriver>;
+	getThreadViewDriverStream(): Kefir.Observable<ThreadViewDriver>;
+	getMessageViewDriverStream(): Kefir.Observable<MessageViewDriver>;
+	getAttachmentCardViewDriverStream(): Kefir.Observable<AttachmentCardViewDriver>;
 	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
-	getThreadRowViewDriverStream(): Kefir.Stream<Object>;
+	getThreadRowViewDriverStream(): Kefir.Observable<Object>;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;
@@ -57,8 +57,8 @@ export type Driver = {
 	setShowNativeNavMarker(a: any): any;
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
-	addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object>;
-	getToolbarViewDriverStream(): Kefir.Stream<Object>;
+	addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<Object>;
+	getToolbarViewDriverStream(): Kefir.Observable<Object>;
 	getButterBarDriver(): any;
 	setButterBar(butterBar: any): void;
 	isRunningInPageContext(): boolean;
@@ -68,6 +68,6 @@ export type Driver = {
 	createTopMessageBarDriver(options: Object): Object;
 	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
 	createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop;
-	getStopper(): Kefir.Stream<any>;
+	getStopper(): Kefir.Observable<any>;
 	destroy(): void;
 };

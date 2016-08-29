@@ -1,16 +1,16 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import GmailTabContainerView from './gmail-tab-container-view';
 import GmailContentPanelView from './gmail-content-panel-view';
 import get from '../../../../../common/get-or-fail';
 
 export default class GmailContentPanelContainerView {
-  _eventStream: Kefir.Bus<any>;
+  _eventStream: Bus<any>;
   _descriptorToViewMap: Map<Object, GmailContentPanelView>;
   _viewToDescriptorMap: Map<GmailContentPanelView, Object>;
   _element: HTMLElement;
@@ -105,7 +105,7 @@ export default class GmailContentPanelContainerView {
       .getEventStream()
       .filter(_isEventName.bind(null, 'tabActivate'))
       .map(x => x.descriptor)
-      .map(x => get(this._descriptorToViewMap, x))      
+      .map(x => get(this._descriptorToViewMap, x))
       .map(x => {
         x.activate();
         return x.getElement();

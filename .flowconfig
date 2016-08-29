@@ -1,17 +1,11 @@
 [include]
 
 [ignore]
-dist/
 .*/examples/.*/inboxsdk\.js.*
 .*/dist/inboxsdk\.js.*
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*
-.*/flow-libs/.*
-.*/node_modules/kefir/.*
-.*/node_modules/fbjs/.*
 .*/node_modules/jstimezonedetect/.*
-.*/Server.*/.*\.json
-.*/node_modules/babel-.*
 .*/node_modules/binary-extensions/.*
 .*/node_modules/builtin-modules/.*
 .*/node_modules/spdx-.*/.*

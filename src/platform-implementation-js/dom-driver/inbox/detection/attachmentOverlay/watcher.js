@@ -9,7 +9,7 @@ import selectorStream from '../../../../lib/dom/selectorStream';
 
 export default function watcher(
   root: Document=document
-): Kefir.Stream<ElementWithLifetime> {
+): Kefir.Observable<ElementWithLifetime> {
   const selector = selectorStream([
     'iframe[id][frameborder]:not([src])',
     {$map: el => (el:any).contentDocument.body},

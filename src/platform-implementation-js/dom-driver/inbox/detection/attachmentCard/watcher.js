@@ -13,9 +13,9 @@ export default function watcher(
   root: Document=document,
   threadRowElPool: ?ItemWithLifetimePool<*>=null,
   messageElPool: ?ItemWithLifetimePool<*>=null
-): Kefir.Stream<ElementWithLifetime> {
-  const threadRowElStream: Kefir.Stream<ElementWithLifetime> = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
-  const messageElStream: Kefir.Stream<ElementWithLifetime> = messageElPool ? messageElPool.items() : messageWatcher(root);
+): Kefir.Observable<ElementWithLifetime> {
+  const threadRowElStream: Kefir.Observable<ElementWithLifetime> = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
+  const messageElStream: Kefir.Observable<ElementWithLifetime> = messageElPool ? messageElPool.items() : messageWatcher(root);
 
   const messageCardSelector = selectorStream([
     '*',

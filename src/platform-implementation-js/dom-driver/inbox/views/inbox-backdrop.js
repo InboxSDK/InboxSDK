@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
 class InboxBackdrop {
-  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
 
   constructor(zIndex=500, target=document.body) {
     const el = document.createElement('div');
@@ -30,7 +30,7 @@ class InboxBackdrop {
     el.classList.add('inboxsdk__active');
   }
 
-  getStopper(): Kefir.Stream<null> {
+  getStopper(): Kefir.Observable<null> {
     return this._stopper;
   }
 

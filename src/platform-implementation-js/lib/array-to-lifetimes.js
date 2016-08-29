@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 
 import type {ItemWithLifetime} from './dom/make-element-child-stream';
 
@@ -11,12 +12,10 @@ import type {ItemWithLifetime} from './dom/make-element-child-stream';
 // element, or when the output stream is unsubscribed from, similar to
 // makeElementChildStream.
 
-type Stopper = Kefir.Stream<any>&{destroy(): void};
-
 export default function arrayToLifetimes<T>(
-  input: Kefir.Stream<Array<T>|NodeList<T>>,
+  input: Kefir.Observable<Array<T>|NodeList<T>>,
   keyFn?: (value: T) => any
-): Kefir.Stream<ItemWithLifetime<T>> {
+): Kefir.Observable<ItemWithLifetime<T>> {
   return Kefir.stream(emitter => {
     const items: Map<any, {el: T, removalStream: Stopper}> = new Map();
 
@@ -40,7 +39,7 @@ export default function arrayToLifetimes<T>(
             const removalStream = kefirStopper();
             const itemWithLifetime = {el, removalStream};
             items.set(elKey, itemWithLifetime);
-            emitter.emit(itemWithLifetime);
+            emitter.emit((itemWithLifetime:any));
           }
         }
         break;

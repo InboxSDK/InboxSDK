@@ -23,7 +23,7 @@ class GmailAttachmentCardView {
 	_driver: GmailDriver;
 	_messageViewDriver: ?GmailMessageView;
 	_cachedType: any;
-	_stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
+	_stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
 	_previewClicks = Kefir.pool();
 
 	constructor(options: Object, driver: GmailDriver, messageViewDriver: ?GmailMessageView) {
@@ -50,11 +50,11 @@ class GmailAttachmentCardView {
 		return this._messageViewDriver;
 	}
 
-	getStopper(): Kefir.Stream<null> {
+	getStopper(): Kefir.Observable<null> {
 		return this._stopper;
 	}
 
-	getPreviewClicks(): Kefir.Stream<Event> {
+	getPreviewClicks(): Kefir.Observable<Event> {
 		return this._previewClicks.takeUntilBy(this._stopper);
 	}
 

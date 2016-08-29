@@ -9,7 +9,7 @@ import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
 import typeof GmailElementGetter from '../gmail-element-getter';
 
-export default function getMainContentElementChangedStream(GmailElementGetter: GmailElementGetter): Kefir.Stream<HTMLElement> {
+export default function getMainContentElementChangedStream(GmailElementGetter: GmailElementGetter): Kefir.Observable<HTMLElement> {
 	return waitForMainContentContainer(GmailElementGetter)
 				.flatMap(mainContentContainer =>
 					makeElementChildStream(mainContentContainer)

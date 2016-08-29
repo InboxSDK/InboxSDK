@@ -4,10 +4,11 @@ import {defn} from 'ud';
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 
 class InboxModalView {
-  _eventStream: Kefir.Bus<Object> = kefirBus();
+  _eventStream: Bus<Object> = kefirBus();
   _modalContainerElement: HTMLElement;
 
   constructor(options: Object) {
@@ -31,7 +32,7 @@ class InboxModalView {
   }
 
   getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
-  getEventStream(): Kefir.Stream<Object> { return this._eventStream; }
+  getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
 
   _processOptions(options: Object) {
     this.setTitle(options.title);

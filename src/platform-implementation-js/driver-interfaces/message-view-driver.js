@@ -31,11 +31,11 @@ export type MessageViewDriver = {
 	getAttachmentCardViewDrivers(): Array<AttachmentCardViewDriver>;
 	addAttachmentCard(options: Object): AttachmentCardViewDriver;
 	addButtonToDownloadAllArea(options: Object): void;
-	getEventStream(): Kefir.Stream<Object>;
+	getEventStream(): Kefir.Observable<Object>;
 	getViewState(): VIEW_STATE;
 	getDateString(): string;
 	getSender(): Contact;
-	getReadyStream(): Kefir.Stream<any>;
+	getReadyStream(): Kefir.Observable<any>;
 	getRecipients(): Array<Contact>;
 	getThreadViewDriver(): Object;
 	isLoaded(): boolean;

@@ -13,7 +13,7 @@ import makeCssSelectorChecker from './css/makeCssSelectorChecker';
 import getRelevantAttributeList from './css/getRelevantAttributeList';
 
 /*
-selectorStream :: Selector -> HTMLElement -> Kefir.Stream<ElementWithLifetime>
+selectorStream :: Selector -> HTMLElement -> Kefir.Observable<ElementWithLifetime>
 
 The function takes the Selector array, and returns a function that can apply
 the Selector to an HTMLElement to return a stream of matched elements.
@@ -60,8 +60,8 @@ export type Selector = Array<SelectorOperator>;
 
 const cssProcessor = cssParser();
 
-export default function selectorStream(selector: Selector): (el: HTMLElement) => Kefir.Stream<ElementWithLifetime> {
-  type Transformers = Array<(stream: Kefir.Stream<ElementWithLifetime>) => Kefir.Stream<ElementWithLifetime>>;
+export default function selectorStream(selector: Selector): (el: HTMLElement) => Kefir.Observable<ElementWithLifetime> {
+  type Transformers = Array<(stream: Kefir.Observable<ElementWithLifetime>) => Kefir.Observable<ElementWithLifetime>>;
   const transformers: Transformers = selector.map(item => {
     if (typeof item === 'string') {
       const p = cssProcessor.process(item).res;

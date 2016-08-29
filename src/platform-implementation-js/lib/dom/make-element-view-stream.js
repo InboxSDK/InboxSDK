@@ -11,7 +11,7 @@ import Kefir from 'kefir';
 type View = {destroy: () => void};
 import type {ElementWithLifetime} from './make-element-child-stream';
 
-export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: ElementWithLifetime) => Kefir.Stream<T> {
+export default function makeElementViewStream<T: View>(viewFn: (el: HTMLElement) => ?T): (event: ElementWithLifetime) => Kefir.Observable<T> {
   return function(event) {
     const view = viewFn(event.el);
     if (view) {

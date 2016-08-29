@@ -3,7 +3,7 @@
 import type Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 var fs = require('fs');
-var cssContent: Kefir.Stream<string> = udKefir(module, fs.readFileSync(__dirname + '/../style/shared.css', 'utf8'));
+var cssContent: Kefir.Observable<string> = udKefir(module, fs.readFileSync(__dirname + '/../style/shared.css', 'utf8'));
 
 export default function sharedStyle(root: Document=document) {
 	if (!root.getElementById('inboxsdk__shared_style')){

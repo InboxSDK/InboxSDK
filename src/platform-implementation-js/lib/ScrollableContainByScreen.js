@@ -5,12 +5,13 @@ import type {Options} from 'contain-by-screen';
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import fromEventsWithOptions from './fromEventsWithOptions';
 
 export default class ScrollableContainByScreen {
-  _manualRepositions: Kefir.Bus<null> = kefirBus();
-  _stopper: Kefir.Stream<null>&{destroy(): void} = kefirStopper();
+  _manualRepositions: Bus<null> = kefirBus();
+  _stopper: Kefir.Observable<null>&{destroy(): void} = kefirStopper();
 
   constructor(element: HTMLElement, anchorPoint: HTMLElement, options: Options) {
     Kefir.merge([

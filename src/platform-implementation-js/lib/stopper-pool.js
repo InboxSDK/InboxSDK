@@ -11,9 +11,9 @@ export default class StopperPool {
   _streamCount: number;
   _ended: boolean;
   _pool: Kefir.Pool<any>;
-  stream: Kefir.Stream<any>;
+  stream: Kefir.Observable<any>;
 
-  constructor(streams: Kefir.Stream<any>|Kefir.Stream<any>[]) {
+  constructor(streams: Kefir.Observable<any>|Kefir.Observable<any>[]) {
     this._streamCount = 0;
     this._ended = false;
     this._pool = Kefir.pool();
@@ -34,7 +34,7 @@ export default class StopperPool {
     this.add(streams);
   }
 
-  add(newStreams: Kefir.Stream<any>|Kefir.Stream<any>[]) {
+  add(newStreams: Kefir.Observable<any>|Kefir.Observable<any>[]) {
     if (this._ended) {
       throw new Error("Tried to add a stream to a stopped StopperPool");
     }

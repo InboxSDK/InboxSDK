@@ -88,7 +88,7 @@ function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   return _.map(chipInnerEls, x => x.parentElement);
 }
 
-function _waitToClaim(el: HTMLElement): Kefir.Stream<boolean> {
+function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
   return Kefir.later(0).merge(
       makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['class']})
     )

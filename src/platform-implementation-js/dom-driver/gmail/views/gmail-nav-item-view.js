@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import $ from 'jquery';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
@@ -29,7 +30,7 @@ export default class GmailNavItemView {
 	_navItemDescriptor: Object;
 	_element: HTMLElement;
 	_activeMarkerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_iconElement: ?HTMLElement = null;
 	_iconImgElement: ?HTMLElement = null;
 	_itemContainerElement: ?HTMLElement = null;
@@ -78,7 +79,7 @@ export default class GmailNavItemView {
 		return this._element;
 	}
 
-	getEventStream(): Kefir.Stream<Object> {
+	getEventStream(): Kefir.Observable<Object> {
 		return this._eventStream;
 	}
 
@@ -94,7 +95,7 @@ export default class GmailNavItemView {
 		return this._name;
 	}
 
-	setNavItemDescriptor(navItemDescriptorPropertyStream: Kefir.Stream<Object>){
+	setNavItemDescriptor(navItemDescriptorPropertyStream: Kefir.Observable<Object>){
 		navItemDescriptorPropertyStream
 			.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
 			.onValue(x => this._updateValues(x));

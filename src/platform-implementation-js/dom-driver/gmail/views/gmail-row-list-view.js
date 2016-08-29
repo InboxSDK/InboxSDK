@@ -7,6 +7,7 @@ import asap from 'asap';
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import delayAsap from '../../../lib/delay-asap';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 
@@ -27,17 +28,17 @@ class GmailRowListView {
 	_gmailDriver: GmailDriver;
 	_routeViewDriver: GmailRouteView;
 	_pendingExpansions: Map<string, number>;
-	_pendingExpansionsSignal: Kefir.Bus<any>;
+	_pendingExpansionsSignal: Bus<any>;
 	_toolbarView: ?GmailToolbarView;
 	_threadRowViewDrivers: Set<GmailThreadRowView>;
-	_eventStreamBus: Kefir.Bus<any>;
-	_rowViewDriverStream: Kefir.Stream<GmailThreadRowView>;
-	_stopper: Kefir.Stream<any>;
+	_eventStreamBus: Bus<any>;
+	_rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
+	_stopper: Kefir.Observable<any>;
 
 	constructor(rootElement: HTMLElement, routeViewDriver: GmailRouteView, gmailDriver: GmailDriver){
 
 		this._eventStreamBus = kefirBus();
-		this._stopper = this._eventStreamBus.filter(() => false).beforeEnd(() => null);
+		this._stopper = this._eventStreamBus.ignoreValues().beforeEnd(() => null);
 		this._gmailDriver = gmailDriver;
 
 		this._element = rootElement;
@@ -45,7 +46,7 @@ class GmailRowListView {
 		this._threadRowViewDrivers = new Set();
 
 		this._pendingExpansions = new Map();
-		this._pendingExpansionsSignal = (kefirBus(): Kefir.Bus<any>);
+		this._pendingExpansionsSignal = kefirBus();
 		this._pendingExpansionsSignal
 			.bufferBy(
 				this._pendingExpansionsSignal.flatMap(delayAsap)
@@ -80,11 +81,11 @@ class GmailRowListView {
 		return this._threadRowViewDrivers;
 	}
 
-	getRowViewDriverStream(): Kefir.Stream<GmailThreadRowView> {
+	getRowViewDriverStream(): Kefir.Observable<GmailThreadRowView> {
 		return this._rowViewDriverStream;
 	}
 
-	getEventStream(): Kefir.Stream<any> {
+	getEventStream(): Kefir.Observable<any> {
 		return this._eventStreamBus;
 	}
 
@@ -155,7 +156,7 @@ class GmailRowListView {
 	_startWatchingForRowViews() {
 		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
 
-		const elementStream: Kefir.Stream<ElementWithLifetime> = Kefir.merge(tableDivParents.map(makeElementChildStream)).flatMap(event => {
+		const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(tableDivParents.map(makeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
 			const tbody = event.el.querySelector('table > tbody');
 

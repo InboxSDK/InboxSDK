@@ -18,7 +18,7 @@ const memberMap = ud.defonce(module, ()=>new WeakMap());
 class ComposeView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(driver: Driver, composeViewImplementation: ComposeViewDriver, appId: string, composeViewStream: Kefir.Stream<ComposeView>) {
+	constructor(driver: Driver, composeViewImplementation: ComposeViewDriver, appId: string, composeViewStream: Kefir.Observable<ComposeView>) {
 		super();
 
 		const members = {

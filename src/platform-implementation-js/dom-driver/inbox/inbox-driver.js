@@ -1,11 +1,11 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import {defn} from 'ud';
 
@@ -51,10 +51,10 @@ import type {EnvData} from '../../platform-implementation';
 class InboxDriver {
   _logger: Logger;
   _envData: EnvData;
-  _stopper: Kefir.Stream<any>&{destroy:()=>void};
+  _stopper: Kefir.Observable<any>&{destroy:()=>void};
   onready: Promise<void>;
-  _routeViewDriverStream: Kefir.Stream<any>;
-  _rowListViewDriverStream: Kefir.Stream<any>;
+  _routeViewDriverStream: Kefir.Observable<any>;
+  _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
   _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
@@ -62,8 +62,8 @@ class InboxDriver {
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
-  _threadRowViewDriverKefirStream: Kefir.Stream<any>;
-  _toolbarViewDriverStream: Kefir.Stream<any>;
+  _threadRowViewDriverKefirStream: Kefir.Observable<any>;
+  _toolbarViewDriverStream: Kefir.Observable<any>;
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
@@ -71,7 +71,7 @@ class InboxDriver {
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
-  _lastInteractedAttachmentCardViewSet: Kefir.Bus<any> = kefirBus();
+  _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -179,7 +179,7 @@ class InboxDriver {
   }
 
   getLogger(): Logger {return this._logger;}
-  getStopper(): Kefir.Stream<null> {return this._stopper;}
+  getStopper(): Kefir.Observable<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
   getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
@@ -280,7 +280,7 @@ class InboxDriver {
     console.log('registerSearchQueryRewriter not implemented');
   }
 
-  addToolbarButtonForApp(buttonDescriptor: Kefir.Stream<Object>): Promise<Object> {
+  addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<Object> {
     const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
     return view.waitForReady();
   }

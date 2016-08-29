@@ -4,6 +4,7 @@ import _ from 'lodash';
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 
 import ButtonView from './buttons/button-view';
@@ -36,12 +37,10 @@ type BoundingBoxWrapper = {
 
 export default class GmailTooltipView {
 	_element: HTMLElement;
-	_eventStream: Kefir.Bus<any>;
-	_stopper: Kefir.Stopper;
+	_eventStream: Bus<any> = kefirBus();
+	_stopper = kefirStopper();
 
 	constructor(options?: Object = {}){
-		this._eventStream = kefirBus();
-		this._stopper = kefirStopper();
 		this._setupElement(options);
 	}
 
@@ -55,11 +54,11 @@ export default class GmailTooltipView {
 		return this._element;
 	}
 
-	getStopper(): Kefir.Stopper {
+	getStopper(): Kefir.Observable<null> {
 		return this._stopper;
 	}
 
-	getEventStream(): Kefir.Stream<Object> {
+	getEventStream(): Kefir.Observable<Object> {
 		return this._eventStream;
 	}
 

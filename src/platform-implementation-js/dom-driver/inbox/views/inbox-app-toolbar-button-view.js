@@ -10,13 +10,13 @@ import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stre
 
 class InboxAppToolbarButtonView {
   _buttonDescriptor: ?Object = null;
-  _buttonDescriptorStream: Kefir.Stream<Object>;
+  _buttonDescriptorStream: Kefir.Observable<Object>;
   _buttonEl: ?HTMLElement = null;
   _activeDropdown: ?DropdownView = null;
-  _stopper: Kefir.Stream<null>&{destroy():void} = kefirStopper();
-  _ready: Kefir.Stream<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
+  _ready: Kefir.Observable<null>&{destroy():void} = kefirStopper();
 
-  constructor(buttonDescriptor: Kefir.Stream<Object>, appToolbarLocationStream: Kefir.Stream<ElementWithLifetime>, searchBarStream: Kefir.Stream<ElementWithLifetime>) {
+  constructor(buttonDescriptor: Kefir.Observable<Object>, appToolbarLocationStream: Kefir.Observable<ElementWithLifetime>, searchBarStream: Kefir.Observable<ElementWithLifetime>) {
     this._buttonDescriptorStream = buttonDescriptor.toProperty().takeUntilBy(this._stopper);
 
     Kefir.combine([

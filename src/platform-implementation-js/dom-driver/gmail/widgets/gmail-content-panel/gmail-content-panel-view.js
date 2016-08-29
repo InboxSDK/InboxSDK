@@ -1,15 +1,15 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 
 import type GmailContentPanelContainerView from './gmail-content-panel-container-view';
 
 export default class GmailContentPanelView {
   destroyed: boolean;
-  _eventStream: Kefir.Bus<any>;
+  _eventStream: Bus<any>;
   _element: HTMLElement;
   _gmailContentPanelContainerView: Object;
 
@@ -34,7 +34,7 @@ export default class GmailContentPanelView {
     }
   }
 
-  getEventStream(): Kefir.Stream<Object> {return this._eventStream;}
+  getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
   getElement(): HTMLElement {return this._element;}
 
   activate() {

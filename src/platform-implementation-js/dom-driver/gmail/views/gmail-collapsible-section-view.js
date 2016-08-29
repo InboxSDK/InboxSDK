@@ -4,6 +4,7 @@ import {defn} from 'ud';
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import RSVP from 'rsvp';
 import autoHtml from 'auto-html';
 
@@ -27,7 +28,7 @@ class GmailCollapsibleSectionView {
 	_collapsedContainer: ?HTMLElement = null;
 	_messageElement: ?HTMLElement = null;
 	_footerElement: ?HTMLElement = null;
-	_eventStream: Kefir.Bus<any>;
+	_eventStream: Bus<any>;
 	_isCollapsed: boolean = false;
 	_inboxDropdownButtonView: ?Object = null;
 	_dropdownViewController: ?Object = null;
@@ -61,11 +62,11 @@ class GmailCollapsibleSectionView {
 		return element;
 	}
 
-	getEventStream(): Kefir.Stream<any> {
+	getEventStream(): Kefir.Observable<any> {
 		return this._eventStream;
 	}
 
-	setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty: Kefir.Stream<?Object>){
+	setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty: Kefir.Observable<?Object>){
 		var stoppedProperty = collapsibleSectionDescriptorProperty
 								.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null));
 

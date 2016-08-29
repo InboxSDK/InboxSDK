@@ -7,7 +7,7 @@ import {defn} from 'ud';
 
 const pageMouseUps = fromEventTargetCapture(document.body, 'mouseup');
 
-const onMouseDownAndUp = defn(module, function onMouseDownAndUp(el: HTMLElement): Kefir.Stream<Event> {
+const onMouseDownAndUp = defn(module, function onMouseDownAndUp(el: HTMLElement): Kefir.Observable<Event> {
   const elMouseDowns = fromEventTargetCapture(el, 'mousedown');
   return elMouseDowns.flatMapLatest(() =>
     pageMouseUps.take(1).filter(event => el.contains(event.target))
