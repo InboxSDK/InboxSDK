@@ -10,7 +10,11 @@ function parser(el: HTMLElement) {
   const ec = new ErrorCollector('chatSidebar');
 
   ec.run('position:fixed', () => {
-    if (getComputedStyle(el).position !== 'fixed') throw new Error('expected position:fixed');
+    if (getComputedStyle((el:any).parentElement).position !== 'fixed') throw new Error('expected position:fixed in parent');
+  });
+
+  ec.run('id', () => {
+    if (!el.id) throw new Error('expected id');
   });
 
   const elements = {

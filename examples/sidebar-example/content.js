@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
+InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
 	inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
@@ -48,6 +48,8 @@ InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
 				console.log('destroy');
 			});
 		};
+
+		window.activate();
 	});
 
 });

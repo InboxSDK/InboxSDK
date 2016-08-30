@@ -10,8 +10,7 @@ export default function watcher(root: Document=document): Kefir.Observable<Eleme
     '[id][jsaction]',
     'div[id][class]',
     'div[class]',
-    'div.in#in',
-    {$map: el => (el:any).parentElement}
+    'div.in#in'
   ];
 
   return selectorStream(selector)(root.body);
