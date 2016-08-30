@@ -18,6 +18,7 @@ function imp(driver: InboxDriver): Kefir.Observable<any> {
   return detectionRunner({
     name: 'chatSidebar',
     finder, watcher, parser,
+    interval: count => count === 0 ? 5*1000 : 120*1000,
     logError(err: Error, details?: any) {
       driver.getLogger().errorSite(err, details);
     }
