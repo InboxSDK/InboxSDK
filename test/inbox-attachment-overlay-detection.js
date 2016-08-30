@@ -15,9 +15,10 @@ import watcher from '../src/platform-implementation-js/dom-driver/inbox/detectio
 import {
   page20160816,
   page20160817,
+  page20160830,
 } from './lib/pages';
 
-describe('Inbox Attachment Card Detection', function() {
+describe('Inbox Attachment Overlay Detection', function() {
   this.slow(5000);
   this.timeout(10000);
 
@@ -43,6 +44,14 @@ describe('Inbox Attachment Card Detection', function() {
       const results = parser(overlay);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
+    });
+
+    it('2016-08-30', function() {
+      const overlay = page20160830().querySelector('[data-test-id=overlay]');
+      const results = parser(overlay);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert.strictEqual(results.elements.downloadButton, page20160830().querySelector('[data-test-id="downloadButton"]'));
     });
   });
 
