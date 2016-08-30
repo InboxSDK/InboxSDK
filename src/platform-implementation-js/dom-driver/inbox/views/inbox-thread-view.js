@@ -24,7 +24,7 @@ class InboxThreadView {
     this._driver = driver;
     this._p = parsed;
 
-    this._stopper = this._eventStream.filter(()=>false).beforeEnd(()=>null);
+    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null);
 
     this._driver.getThreadViewElementsMap().set(this._element, this);
   }
@@ -65,8 +65,14 @@ class InboxThreadView {
     return this._p.attributes.threadId;
   }
 
-  addSidebarContentPanel(descriptor: any, appId: string) {
-    throw new Error('not implemented');
+  addSidebarContentPanel(descriptor: any) {
+    const panel = this._driver.getCurrentChatSidebarView().addSidebarContentPanel(descriptor);
+    this._stopper
+      .takeUntilBy(panel.getStopper())
+      .onValue(() => {
+        panel.remove();
+      });
+    return panel;
   }
 
   getReadyStream() {

@@ -62,7 +62,7 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
-  _chatSidebarViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
+  _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
@@ -117,7 +117,7 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
-    this._chatSidebarViewDriverPool = new ItemWithLifetimePool(
+    this._chatSidebarViewPool = new ItemWithLifetimePool(
       getChatSidebarViewStream(this).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
@@ -204,6 +204,12 @@ class InboxDriver {
 
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
+
+  getCurrentChatSidebarView(): InboxChatSidebarView {
+    const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
+    if (!view) throw new Error('No chat sidebar found');
+    return view;
+  }
 
   getLastInteractedAttachmentCardView() {
     return this._lastInteractedAttachmentCardView;

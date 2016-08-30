@@ -27,6 +27,7 @@ describe('ItemWithLifetimePool', function() {
 
     assert.equal(spy.callCount, 3);
     assert.deepEqual(spy.args.map(args => args[0].el), ['a', 'c', 'd']);
+    assert.deepEqual(p.currentItemWithLifetimes().map(({el}) => el), ['a', 'c', 'd']);
   });
 
   it('handles items removed from pool immediately after subscribe', async function() {

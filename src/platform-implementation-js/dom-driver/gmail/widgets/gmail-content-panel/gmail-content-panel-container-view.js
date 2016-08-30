@@ -11,8 +11,8 @@ import get from '../../../../../common/get-or-fail';
 
 export default class GmailContentPanelContainerView {
   _eventStream: Bus<any>;
-  _descriptorToViewMap: Map<Object, GmailContentPanelView>;
-  _viewToDescriptorMap: Map<GmailContentPanelView, Object>;
+  _descriptorToViewMap: Map<Kefir.Observable<Object>, GmailContentPanelView>;
+  _viewToDescriptorMap: Map<GmailContentPanelView, Kefir.Observable<Object>>;
   _element: HTMLElement;
   _gmailTabContainerView: GmailTabContainerView;
   _gmailContentPanelViews: any[];
@@ -43,7 +43,7 @@ export default class GmailContentPanelContainerView {
 
   getElement(): HTMLElement {return this._element;}
 
-  addContentPanel(descriptor: Object, appId: string): GmailContentPanelView {
+  addContentPanel(descriptor: Kefir.Observable<Object>, appId: string): GmailContentPanelView {
     var gmailContentPanelView = new GmailContentPanelView(descriptor, this, appId);
     this._gmailContentPanelViews.push(gmailContentPanelView);
     this._descriptorToViewMap.set(descriptor, gmailContentPanelView);

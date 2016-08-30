@@ -5,6 +5,8 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Parsed} from '../detection/chatSidebar/parser';
 
+import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
+
 class InboxChatSidebarView {
   _el: HTMLElement;
   _p: Parsed;
@@ -21,6 +23,17 @@ class InboxChatSidebarView {
 
   destroy() {
     this._stopper.destroy();
+  }
+
+  addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
+    const view = new InboxSidebarContentPanelView(descriptor);
+    this._el.insertBefore(view.getElement(), this._el.firstChild);
+    this._stopper
+      .takeUntilBy(view.getStopper())
+      .onValue(() => {
+        view.remove();
+      });
+    return view;
   }
 }
 
