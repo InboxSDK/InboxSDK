@@ -39,6 +39,7 @@ import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
 import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
+import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -61,7 +62,7 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
-  _chatSidebarViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<Object>>;
+  _chatSidebarViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
