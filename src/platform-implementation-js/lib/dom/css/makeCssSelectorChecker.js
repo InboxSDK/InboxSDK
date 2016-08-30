@@ -17,6 +17,8 @@ export default function makeCssSelectorChecker(node: Object): (el: HTMLElement) 
     return el => true;
   case 'tag':
     return el => el.nodeName === node.value.toUpperCase();
+  case 'id':
+    return el => el.id === node.value;
   case 'class':
     return el => el.classList.contains(node.value);
   case 'attribute':
