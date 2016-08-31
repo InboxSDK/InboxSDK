@@ -14,25 +14,27 @@ function parser(el: HTMLElement) {
   });
 
   const downloadButton: ?HTMLElement = ec.run('downloadButton', () => {
-    const candidates = _.chain(el.querySelectorAll('div[role=button][tabindex]:not([aria-disabled]):not([aria-pressed])'))
+    const candidate = _.chain(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'))
       .filter(el =>
         el.childElementCount === 1 && el.firstElementChild.childElementCount === 0
       )
-      .filter((el, i) => {
+      .filter(el => {
         if (global.document) {
           const rect = el.getBoundingClientRect();
           if (rect.top > 100) return false;
-          if (window.innerWidth - rect.right < 100) return false;
+          if (window.innerWidth - rect.right > 200) return false;
+          return true;
         } else {
-          // Can't use screen position logic in unit tests. Just grab the first
-          // element there.
-          if (i > 0) return false;
+          // Can't use screen position logic in unit tests so we're cheating a
+          // little and depending on an exact class name.
+          return el.childElementCount === 1 &&
+            el.firstElementChild.classList.contains('ndfHFb-c4YZDc-nupQLb-N');
         }
-        return true;
       })
+      .first()
       .value();
-    if (candidates.length !== 1) throw new Error(`wrong number: ${candidates.length}`);
-    return candidates[0];
+    if (!candidate) throw new Error('Failed to find element');
+    return candidate;
   });
 
   const buttonContainer: ?HTMLElement = downloadButton ? (downloadButton:any).parentElement : null;
