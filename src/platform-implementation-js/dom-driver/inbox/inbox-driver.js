@@ -180,6 +180,18 @@ class InboxDriver {
     this._nativeDrawerPool = new ItemWithLifetimePool(
       getNativeDrawerStream(this).takeUntilBy(this._stopper)
     );
+
+    // When a user goes from one thread to another, a new thread view is made
+    // but the old thread view doesn't get destroyed until it finishes
+    // animating out. We need to clear the old thread view's sidebar
+    // immediately when a new thread view comes in.
+    let _currentThreadView = null;
+    this._threadViewDriverPool.items().onValue(({el: threadView}) => {
+      if (_currentThreadView) {
+        _currentThreadView.removePanels();
+      }
+      _currentThreadView = threadView;
+    });
   }
 
   destroy() {
