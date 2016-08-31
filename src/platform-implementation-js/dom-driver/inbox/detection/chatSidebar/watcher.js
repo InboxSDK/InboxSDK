@@ -8,7 +8,7 @@ import selectorStream from '../../../../lib/dom/selectorStream';
 export default function watcher(root: Document=document): Kefir.Observable<ElementWithLifetime> {
   const selector = [
     '[id][jsaction]',
-    'div[id][class]',
+    'div[id]',
     'div[class]',
     'div.in#in'
   ];
