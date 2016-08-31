@@ -24,7 +24,7 @@ InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
 			var monkeyIndex = 1;
 
 			var el2 = document.createElement('div');
-			el2.innerHTML = 'Hellow back!';
+			el2.innerHTML = 'Hello back!';
 
 			var options = {
 				title: 'Monkey 2',
