@@ -34,7 +34,8 @@ export default function watcher(
     '[jsaction]',
     '[role=list][jsaction]',
     '*',
-    '[role=listitem]'
+    '[role=listitem]',
+    {$watch: '[tabindex]'}
   ]);
 
   const listCards = threadRowElStream
