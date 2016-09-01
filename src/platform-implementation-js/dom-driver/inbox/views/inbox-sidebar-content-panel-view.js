@@ -6,12 +6,13 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 
 class InboxSidebarContentPanelView {
-  _stopper = kefirStopper();
+  _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
   _el: HTMLElement;
 
   constructor(descriptor: Kefir.Observable<Object>) {
     this._el = document.createElement('div');
+    this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
     descriptor
       .takeUntilBy(this._stopper)
@@ -36,7 +37,6 @@ class InboxSidebarContentPanelView {
   }
 
   remove() {
-    this._stopper.destroy();
     this._eventStream.end();
     this._el.remove();
   }

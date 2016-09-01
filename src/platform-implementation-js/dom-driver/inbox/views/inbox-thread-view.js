@@ -68,7 +68,7 @@ class InboxThreadView {
   }
 
   addSidebarContentPanel(descriptor: any) {
-    const panel = this._driver.getCurrentChatSidebarView().addSidebarContentPanel(descriptor);
+    const panel = this._driver.getAppSidebarView().addSidebarContentPanel(descriptor);
     this._sidebarPanels.add(panel);
     panel.getStopper()
       .onValue(() => {

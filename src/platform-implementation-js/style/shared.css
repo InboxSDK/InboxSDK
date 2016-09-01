@@ -6,10 +6,6 @@
   transition: none !important;
 }
 
-.inboxsdk__hide_everything_after ~ * {
-  display: none;
-}
-
 .inboxsdk__close_button {
   height: 24px;
   width: 24px;

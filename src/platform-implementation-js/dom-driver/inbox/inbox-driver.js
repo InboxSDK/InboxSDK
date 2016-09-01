@@ -41,6 +41,8 @@ import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
+import InboxAppSidebarView from './views/inbox-app-sidebar-view';
+
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
 import InboxModalView from './views/inbox-modal-view';
@@ -75,6 +77,7 @@ class InboxDriver {
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
+  _appSidebarView: ?InboxAppSidebarView = null;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -221,6 +224,13 @@ class InboxDriver {
     const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
     if (!view) throw new Error('No chat sidebar found');
     return view;
+  }
+
+  getAppSidebarView(): InboxAppSidebarView {
+    if (!this._appSidebarView) {
+      this._appSidebarView = new InboxAppSidebarView();
+    }
+    return this._appSidebarView;
   }
 
   getLastInteractedAttachmentCardView() {
