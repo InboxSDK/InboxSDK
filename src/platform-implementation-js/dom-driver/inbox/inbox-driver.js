@@ -228,7 +228,7 @@ class InboxDriver {
 
   getAppSidebarView(): InboxAppSidebarView {
     if (!this._appSidebarView) {
-      this._appSidebarView = new InboxAppSidebarView();
+      this._appSidebarView = new InboxAppSidebarView(this);
     }
     return this._appSidebarView;
   }

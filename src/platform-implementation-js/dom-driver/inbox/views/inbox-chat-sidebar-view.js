@@ -25,6 +25,17 @@ class InboxChatSidebarView {
   destroy() {
     this._stopper.destroy();
   }
+
+  getMode(): 'HIDDEN'|'DROPDOWN'|'SIDEBAR' {
+    if (this._el.style.display === 'none') {
+      return 'HIDDEN';
+    }
+    const parent: HTMLElement = (this._el.parentElement: any);
+    if (parseInt(window.getComputedStyle(parent).bottom) === 0) {
+      return 'SIDEBAR'
+    }
+    return 'DROPDOWN';
+  }
 }
 
 export default defn(module, InboxChatSidebarView);
