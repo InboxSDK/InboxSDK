@@ -62,6 +62,11 @@ class InboxAppSidebarView {
     this._positionSidebar();
   }
 
+  destroy() {
+    this._stopper.destroy();
+    this._el.remove();
+  }
+
   _createElement() {
     const el = document.createElement('div');
     el.className = 'inboxsdk__app_sidebar';
@@ -74,24 +79,28 @@ class InboxAppSidebarView {
   }
 
   _positionSidebar() {
-    if (this._buttonContainer.childElementCount === 0) {
-      this._el.style.display = 'none';
+    Kefir.later(250)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        if (this._buttonContainer.childElementCount === 0) {
+          this._el.style.display = 'none';
 
-      if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
-        this._mainParent.classList.remove(getChatSidebarClassname());
-        fakeWindowResize();
-      }
-    } else {
-      this._el.style.display = '';
-      this._el.style.position = 'fixed';
-      this._el.style.right = '0';
-      this._el.style.top = '60px';
+          if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+            this._mainParent.classList.remove(getChatSidebarClassname());
+            this._driver.getPageCommunicator().fakeWindowResize();
+          }
+        } else {
+          this._el.style.display = '';
+          this._el.style.position = 'fixed';
+          this._el.style.right = '0';
+          this._el.style.top = '60px';
 
-      if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
-        this._mainParent.classList.add(getChatSidebarClassname());
-        fakeWindowResize();
-      }
-    }
+          if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+            this._mainParent.classList.add(getChatSidebarClassname());
+            this._driver.getPageCommunicator().fakeWindowResize();
+          }
+        }
+      });
   }
 
   _hideAllPanels() {
