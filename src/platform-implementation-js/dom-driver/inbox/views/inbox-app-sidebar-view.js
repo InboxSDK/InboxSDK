@@ -67,9 +67,6 @@ class InboxAppSidebarView {
           }
         } else {
           this._el.style.display = '';
-          this._el.style.position = 'fixed';
-          this._el.style.right = '0';
-          this._el.style.top = '60px';
 
           if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
             this._mainParent.classList.add(getChatSidebarClassname());
