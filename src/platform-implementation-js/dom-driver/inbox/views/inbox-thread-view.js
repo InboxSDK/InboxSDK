@@ -26,7 +26,7 @@ class InboxThreadView {
     this._driver = driver;
     this._p = parsed;
 
-    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null);
+    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null).toProperty();
 
     this._driver.getThreadViewElementsMap().set(this._element, this);
   }
