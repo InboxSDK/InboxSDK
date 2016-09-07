@@ -6,36 +6,10 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
+import getChatSidebarClassname from '../getChatSidebarClassname';
 
 import type InboxDriver from '../inbox-driver';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
-
-const getChatSidebarClassname: () => string = _.once(() => {
-  const classRegexes: RegExp[] = Array.from((document.querySelector('[role=application]').classList: any))
-    .map(x => new RegExp('\\.'+x+'\\b'));
-  if (classRegexes.length === 0) throw new Error('no class names on element');
-
-  function rulesToStyleRules(rule: CSSRule): Object[] {
-    if (rule instanceof window.CSSMediaRule) {
-      if (_.some(rule.media, m => window.matchMedia(m).matches)) {
-        return _.flatMap(rule.cssRules, rulesToStyleRules);
-      }
-    } else if (rule instanceof window.CSSStyleRule) {
-      return [rule];
-    }
-    return [];
-  }
-
-  const rules = _.chain(document.styleSheets)
-    .map(sheet => sheet.cssRules)
-    .flatMap(rulesToStyleRules)
-    .filter(rule => classRegexes.some(r => r.test(rule.selectorText)))
-    .value();
-  console.log('rules', rules);
-
-  //TODO
-  return 'm';
-});
 
 class InboxAppSidebarView {
   _stopper = kefirStopper();
