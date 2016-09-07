@@ -7,6 +7,7 @@ import kefirStopper from 'kefir-stopper';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
+import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 
 import type InboxDriver from '../inbox-driver';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
@@ -53,7 +54,8 @@ class InboxAppSidebarView {
   }
 
   _positionSidebar() {
-    Kefir.later(250)
+    Kefir.later(0)
+      .flatMap(waitForAnimationClickBlockerGone)
       .takeUntilBy(this._stopper)
       .onValue(() => {
         if (this._buttonContainer.childElementCount === 0) {
