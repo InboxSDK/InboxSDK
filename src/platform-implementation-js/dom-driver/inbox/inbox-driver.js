@@ -18,7 +18,6 @@ import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
-import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
@@ -26,8 +25,9 @@ import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
+import getSearchBarStream from './detection/searchBar/stream';
+import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
-import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
