@@ -3,31 +3,17 @@
 import _ from 'lodash';
 import Kefir from 'kefir';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
+import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import selectorStream from '../../../../lib/dom/selectorStream';
+import topRowWatcher from '../topRow/watcher';
 
-export default function watcher(root: Document=document): Kefir.Observable<ElementWithLifetime> {
-  const selector = [
-    '[id][jsaction]',
-    'div[jsaction]:not([role])',
-    '*',
+export default function watcher(root: Document=document, topRowElPool: ?ItemWithLifetimePool<*>=null): Kefir.Observable<ElementWithLifetime> {
+  const topRowElStream: Kefir.Observable<ElementWithLifetime> = topRowElPool ? topRowElPool.items() : topRowWatcher(root);
+
+  const selector = selectorStream([
     {$or: [
       [
-        '[role=main]',
-      ],
-      [
-        ':not([role])',
-        '*',
-        '[role=main]'
-      ]
-    ]},
-    '[role=application]',
-    '[role=list]',
-    '*',
-    '*',
-    '.scroll-list-section-body',
-    {$or: [
-      [
-        '[role=listitem]:not([data-item-id*="#gmail:thread-"])',
+        {$filter: el => !/#gmail:thread-/.test(el.getAttribute('data-item-id'))},
         {$watch: '[aria-expanded=true]'},
         '[role=list]',
         '*',
@@ -37,10 +23,11 @@ export default function watcher(root: Document=document): Kefir.Observable<Eleme
         '[role=listitem]'
       ],
       [
-        '[role=listitem][data-item-id*="#gmail:thread-"]'
+        {$filter: el => /#gmail:thread-/.test(el.getAttribute('data-item-id'))}
       ]
     ]}
-  ];
+  ]);
 
-  return selectorStream(selector)(root.body);
+  return topRowElStream
+    .flatMap(({el,removalStream}) => selector(el).takeUntilBy(removalStream));
 }

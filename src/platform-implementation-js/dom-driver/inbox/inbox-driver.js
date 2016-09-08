@@ -12,6 +12,7 @@ import {defn} from 'ud';
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
+import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -21,9 +22,10 @@ import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
+import getTopRowElStream from './detection/topRow/watcher';
+import getThreadRowElStream from './detection/threadRow/watcher';
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
-import getThreadRowElStream from './detection/threadRow/watcher';
 
 import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
@@ -89,8 +91,11 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
+    const topRowElPool = new ItemWithLifetimePool(
+      getTopRowElStream().takeUntilBy(this._stopper)
+    );
     const threadRowElPool = new ItemWithLifetimePool(
-      getThreadRowElStream().takeUntilBy(this._stopper)
+      getThreadRowElStream(document, topRowElPool).takeUntilBy(this._stopper)
     );
     const threadElPool = new ItemWithLifetimePool(
       getThreadElStream(this, threadRowElPool).takeUntilBy(this._stopper)
@@ -108,7 +113,7 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
-      getAttachmentCardViewDriverStream(this, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
+      getAttachmentCardViewDriverStream(this, topRowElPool, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
     this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
@@ -239,11 +244,16 @@ class InboxDriver {
   setLastInteractedAttachmentCardView(card: InboxAttachmentCardView) {
     this._lastInteractedAttachmentCardViewSet.emit();
     this._lastInteractedAttachmentCardView = card;
-    card.getStopper()
-      .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
-      .onValue(() => {
-        this._lastInteractedAttachmentCardView = null;
-      });
+    if (card) {
+      card.getStopper()
+        .merge(fromEventTargetCapture(document.body, 'click'))
+        .take(1)
+        .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._lastInteractedAttachmentCardView = null;
+        });
+    }
   }
 
   openComposeWindow(): void {
