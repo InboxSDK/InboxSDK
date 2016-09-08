@@ -6,14 +6,17 @@ import Logger from '../../../../lib/logger';
 import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import selectorStream from '../../../../lib/dom/selectorStream';
+import topRowWatcher from '../topRow/watcher';
 import threadRowWatcher from '../threadRow/watcher';
 import messageWatcher from '../message/watcher';
 
 export default function watcher(
   root: Document=document,
+  topRowElPool: ?ItemWithLifetimePool<*>=null,
   threadRowElPool: ?ItemWithLifetimePool<*>=null,
   messageElPool: ?ItemWithLifetimePool<*>=null
 ): Kefir.Observable<ElementWithLifetime> {
+  const topRowElStream: Kefir.Observable<ElementWithLifetime> = topRowElPool ? topRowElPool.items() : topRowWatcher(root);
   const threadRowElStream: Kefir.Observable<ElementWithLifetime> = threadRowElPool ? threadRowElPool.items() : threadRowWatcher(root);
   const messageElStream: Kefir.Observable<ElementWithLifetime> = messageElPool ? messageElPool.items() : messageWatcher(root);
 
@@ -38,7 +41,10 @@ export default function watcher(
     {$watch: '[tabindex]'}
   ]);
 
-  const listCards = threadRowElStream
+  const listCards = Kefir.merge([
+    topRowElStream.filter(({el}) => !/#gmail:thread-/.test(el.getAttribute('data-item-id'))),
+    threadRowElStream
+  ])
     .flatMap(({el,removalStream}) => listCardSelector(el).takeUntilBy(removalStream));
 
   return messageCards.merge(listCards)
