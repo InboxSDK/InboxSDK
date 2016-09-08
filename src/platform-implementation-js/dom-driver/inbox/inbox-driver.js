@@ -12,6 +12,7 @@ import {defn} from 'ud';
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
+import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -207,11 +208,16 @@ class InboxDriver {
   setLastInteractedAttachmentCardView(card: InboxAttachmentCardView) {
     this._lastInteractedAttachmentCardViewSet.emit();
     this._lastInteractedAttachmentCardView = card;
-    card.getStopper()
-      .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
-      .onValue(() => {
-        this._lastInteractedAttachmentCardView = null;
-      });
+    if (card) {
+      card.getStopper()
+        .merge(fromEventTargetCapture(document.body, 'click'))
+        .take(1)
+        .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._lastInteractedAttachmentCardView = null;
+        });
+    }
   }
 
   openComposeWindow(): void {
