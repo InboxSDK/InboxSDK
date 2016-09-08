@@ -34,7 +34,7 @@ class InboxAppSidebarView {
     }
     this._mainParent = mainParent;
 
-    this._positionSidebar();
+    this._positionSidebarAfterAnimation();
   }
 
   destroy() {
@@ -44,35 +44,48 @@ class InboxAppSidebarView {
 
   _createElement() {
     const el = document.createElement('div');
+    el.style.display = 'none';
     el.className = 'inboxsdk__app_sidebar';
     el.innerHTML = `
       <div class="inboxsdk__sidebar_panel_buttons"></div>
       <div class="inboxsdk__sidebar_panel_content_area"></div>
     `;
     document.body.appendChild(el);
+
+    this._driver.getCurrentChatSidebarView().getModeStream()
+      .changes()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._positionSidebarNow();
+      });
+
     return el;
   }
 
-  _positionSidebar() {
+  _positionSidebarNow() {
+    if (this._buttonContainer.childElementCount === 0) {
+      this._el.style.display = 'none';
+
+      if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+        this._mainParent.classList.remove(getChatSidebarClassname());
+        this._driver.getPageCommunicator().fakeWindowResize();
+      }
+    } else {
+      this._el.style.display = '';
+
+      if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+        this._mainParent.classList.add(getChatSidebarClassname());
+        this._driver.getPageCommunicator().fakeWindowResize();
+      }
+    }
+  }
+
+  _positionSidebarAfterAnimation() {
     Kefir.later(0)
       .flatMap(waitForAnimationClickBlockerGone)
       .takeUntilBy(this._stopper)
       .onValue(() => {
-        if (this._buttonContainer.childElementCount === 0) {
-          this._el.style.display = 'none';
-
-          if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
-            this._mainParent.classList.remove(getChatSidebarClassname());
-            this._driver.getPageCommunicator().fakeWindowResize();
-          }
-        } else {
-          this._el.style.display = '';
-
-          if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
-            this._mainParent.classList.add(getChatSidebarClassname());
-            this._driver.getPageCommunicator().fakeWindowResize();
-          }
-        }
+        this._positionSidebarNow();
       });
   }
 
@@ -97,7 +110,7 @@ class InboxAppSidebarView {
 
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
-    this._positionSidebar();
+    this._positionSidebarAfterAnimation();
 
     this._stopper
       .takeUntilBy(view.getStopper())
@@ -109,7 +122,7 @@ class InboxAppSidebarView {
       .onValue(() => {
         button.remove();
         this._hideAllPanels();
-        this._positionSidebar();
+        this._positionSidebarAfterAnimation();
       });
     return view;
   }
