@@ -16,6 +16,7 @@ import {
   page20160810_2,
   page20160812,
   page20160816,
+  page20160908,
 } from './lib/pages';
 
 describe('Inbox Attachment Card Detection', function() {
@@ -51,6 +52,13 @@ describe('Inbox Attachment Card Detection', function() {
     it('2016-08-16 message with attachment', function() {
       const attachment1 = page20160816().querySelector('[data-test-id=attachment1]');
       const results = finder(page20160816());
+      assert.strictEqual(results.length, 1);
+      assert(results.includes(attachment1));
+    });
+
+    it('2016-09-08 card in bundle', function() {
+      const attachment1 = page20160908().querySelector('[data-test-id=attachment1]');
+      const results = finder(page20160908());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
@@ -93,6 +101,12 @@ describe('Inbox Attachment Card Detection', function() {
 
     it('2016-08-16 message with attachment', function() {
       const results = parser(page20160816().querySelector('[data-test-id=attachment1]'));
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+    });
+
+    it('2016-09-08 card in bundle', function() {
+      const results = parser(page20160908().querySelector('[data-test-id=attachment1]'));
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
     });
@@ -142,6 +156,21 @@ describe('Inbox Attachment Card Detection', function() {
 
       const spy = sinon.spy();
       watcher(page20160816())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(results.includes(attachment1));
+          cb();
+        });
+    });
+
+    it('2016-09-08 card in bundle', function(cb) {
+      const attachment1 = page20160908().querySelector('[data-test-id=attachment1]');
+
+      const spy = sinon.spy();
+      watcher(page20160908())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

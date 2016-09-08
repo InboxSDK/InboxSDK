@@ -31,9 +31,6 @@ function imp(driver: InboxDriver): Kefir.Observable<InboxAttachmentOverlayView> 
           el, removalStream, parsed, cardView
         });
       } else {
-        driver.getLogger().errorSite(new Error('got attachmentOverlay element without a lastInteractedAttachmentCardView'), {
-          attachmentOverlayHTML: censorHTMLtree(el)
-        });
         return Kefir.never();
       }
     })
