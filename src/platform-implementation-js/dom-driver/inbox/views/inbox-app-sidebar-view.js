@@ -8,6 +8,7 @@ import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 
 import type InboxDriver from '../inbox-driver';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
@@ -88,6 +89,30 @@ class InboxAppSidebarView {
         }
       });
     }
+
+    fromEventTargetCapture(this._driver.getChatSidebarButton(), 'click')
+      .filter(() =>
+        this._el.style.display !== 'none' &&
+        this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
+      )
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        event.stopImmediatePropagation();
+        this._el.style.display = 'none';
+      });
+    Kefir.fromEvents(this._driver.getChatSidebarButton(), 'click')
+      .delay(0)
+      .filter(() =>
+        console.log('display', this._el.style.display, 'mode', this._driver.getCurrentChatSidebarView().getMode())||true
+      )
+      .filter(() =>
+        this._el.style.display !== 'none' &&
+        this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
+      )
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._el.style.display = 'none';
+      });
 
     return el;
   }

@@ -74,7 +74,7 @@ class InboxDriver {
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
-  _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _appToolbarLocationPool: ItemWithLifetimePool<*>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
@@ -236,6 +236,13 @@ class InboxDriver {
       this._appSidebarView = new InboxAppSidebarView(this);
     }
     return this._appSidebarView;
+  }
+
+  getChatSidebarButton(): HTMLElement {
+    const parsed = this._appToolbarLocationPool.currentItemWithLifetimes().map(({parsed}) => parsed)[0];
+    const el = parsed ? parsed.elements.chatSidebarButton : null;
+    if (!el) throw new Error('No chat sidebar button found');
+    return el;
   }
 
   getLastInteractedAttachmentCardView() {
