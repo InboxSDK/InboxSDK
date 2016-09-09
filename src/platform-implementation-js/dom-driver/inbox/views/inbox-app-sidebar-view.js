@@ -153,8 +153,7 @@ class InboxAppSidebarView {
   }
 
   _positionSidebarAfterAnimation() {
-    Kefir.later(0)
-      .flatMap(waitForAnimationClickBlockerGone)
+    waitForAnimationClickBlockerGone()
       .takeUntilBy(this._stopper)
       .onValue(() => {
         this._positionSidebarNow();
