@@ -87,8 +87,11 @@ class InboxAppSidebarView {
               if (this._el.style.display === 'none') {
                 this._positionSidebarNow();
               } else {
-                // TODO set some flag and call _positionSidebarNow
                 this._el.style.display = 'none';
+                if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+                  this._mainParent.classList.remove(getChatSidebarClassname());
+                  this._driver.getPageCommunicator().fakeWindowResize();
+                }
               }
             }
           }));
