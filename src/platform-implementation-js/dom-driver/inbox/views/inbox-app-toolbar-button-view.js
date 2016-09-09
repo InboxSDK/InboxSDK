@@ -91,7 +91,9 @@ class InboxAppToolbarButtonView {
       const sheet = (style:any).sheet;
       const currentMarginRight = parseInt(style.getAttribute('data-min-margin-right'));
       newMarginRight = currentMarginRight+buttonWidth;
-      sheet.deleteRule(0);
+      for (let i=sheet.rules.length-1; i>=0; i--) {
+        sheet.deleteRule(i);
+      }
     } else {
       style = document.createElement('style');
       style.id = 'inboxsdk__dynamic_resize_searchbar';
