@@ -67,7 +67,13 @@ class InboxAppToolbarButtonView {
       if (this._activeDropdown) {
         this.close();
       } else {
-        this.open();
+        if (!this._buttonDescriptor || this._buttonDescriptor.hasDropdown !== false) {
+          this.open();
+        } else {
+          if (this._buttonDescriptor && this._buttonDescriptor.onClick) {
+            this._buttonDescriptor.onClick();
+          }
+        }
       }
     });
 
