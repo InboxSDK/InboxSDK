@@ -75,6 +75,7 @@
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  cursor: pointer;
 }
 
 .inboxsdk__button_iconImg {
