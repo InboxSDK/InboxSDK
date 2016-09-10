@@ -25,6 +25,14 @@ class InboxAppSidebarView {
 
   constructor(driver: InboxDriver) {
     this._driver = driver;
+
+    // We need to be able to cooperate with other apps/extensions that are
+    // sharing the app sidebar. We do this by using the shared DOM as the
+    // source of truth about the state of the sidebar and as a signalling
+    // mechanism. When InboxAppSidebarView is instantiated, we check to see if
+    // the element already exists. If it doesn't, then we create the element,
+    // and set up some mutation observers to watch for changes to the sidebar
+    // and reposition it and modify the page as needed.
     this._el = document.querySelector('.inboxsdk__app_sidebar') || this._createElement();
     this._buttonContainer = this._el.querySelector('.inboxsdk__sidebar_panel_buttons');
     this._contentArea = this._el.querySelector('.inboxsdk__sidebar_panel_content_area');
@@ -88,12 +96,17 @@ class InboxAppSidebarView {
       }
     };
 
+    // Whenever the app sidebar's data-open property is changed, then we show
+    // or hide the sidebar as necessary.
     makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['data-open']})
       .map(() => el.getAttribute('data-open'))
       .skipDuplicates()
       .onValue(positionSidebarNow);
 
     {
+      // When the sidebar switches between having no contents and having at
+      // least one item, we toggle whether the app sidebar button is visible,
+      // and we close the sidebar if it's empty now.
       let appToolbarButtonPromise = null;
       makeMutationObserverChunkedStream(contentArea, {childList: true})
         .map(() => contentArea.childElementCount > 0)
@@ -120,6 +133,9 @@ class InboxAppSidebarView {
         });
     }
 
+    // If the user clicks the chat button while the chat sidebar and app
+    // sidebar are both open, then we want the chat sidebar to become visible.
+    // We block Inbox from closing the chat sidebar, and we close the app sidebar.
     fromEventTargetCapture(this._driver.getChatSidebarButton(), 'click')
       .filter(() =>
         el.getAttribute('data-open') === 'true' &&
@@ -130,6 +146,10 @@ class InboxAppSidebarView {
         event.stopImmediatePropagation();
         el.setAttribute('data-open', 'false');
       });
+    // If the user clicks the chat button while the chat sidebar is closed and
+    // the app sidebar is open, and Inbox opens the chat sidebar, then we want
+    // the chat sidebar to become visible. We just hide the app sidebar after
+    // Inbox brings up the chat sidebar.
     Kefir.fromEvents(this._driver.getChatSidebarButton(), 'click')
       .delay(0)
       .filter(() =>
