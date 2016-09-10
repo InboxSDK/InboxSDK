@@ -18,6 +18,7 @@ if (!global.__InboxSDKInjected) {
     const setupDataExposer = require('./setup-data-exposer');
     const setupEventReemitter = require('./setup-event-reemitter');
     const setupErrorSilencer = require('./setup-error-silencer');
+    const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
 
     const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
 
@@ -30,6 +31,7 @@ if (!global.__InboxSDKInjected) {
       setupGmonkeyHandler();
     } else if (document.location.origin === 'https://inbox.google.com') {
       setupClickAndGetNewIframeSrc();
+      setupInboxFakeWindowResizeListener();
     } else {
       throw new Error("Should not happen");
     }

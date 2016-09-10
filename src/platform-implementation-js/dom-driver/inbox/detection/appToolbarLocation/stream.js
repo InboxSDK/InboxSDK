@@ -1,15 +1,14 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
-import type InboxDriver from './inbox-driver';
+import type InboxDriver from '../../inbox-driver';
 
-import finder from './detection/appToolbarLocation/finder';
-import parser from './detection/appToolbarLocation/parser';
+import finder from './finder';
+import parser from './parser';
 
-import detectionRunner from '../../lib/dom/detectionRunner';
+import detectionRunner from '../../../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 

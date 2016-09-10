@@ -21,4 +21,12 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
     }));
     return pr;
   }
+
+  fakeWindowResize() {
+    document.dispatchEvent(new CustomEvent('inboxSDKinboxFakeWindowResize', {
+      bubbles: false,
+      cancelable: false,
+      detail: null
+    }));
+  }
 }

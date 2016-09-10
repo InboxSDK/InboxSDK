@@ -55,6 +55,18 @@
   border: 1px solid rgba(0,0,0,0.2);
 }
 
+.inboxsdk__app_sidebar {
+  background: #f2f2f2;
+  position: fixed;
+  top: 56px;
+  bottom: 0;
+  right: 0;
+  width: 232px;
+  z-index: 5;
+  padding: 16px 8px 0;
+  box-sizing: border-box;
+}
+
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
 }
@@ -63,6 +75,7 @@
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  cursor: pointer;
 }
 
 .inboxsdk__button_iconImg {

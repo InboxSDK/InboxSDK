@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default function fakeWindowResize() {
   var event = document.createEvent("HTMLEvents");

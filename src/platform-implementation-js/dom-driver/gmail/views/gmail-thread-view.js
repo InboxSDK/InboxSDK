@@ -73,7 +73,7 @@ class GmailThreadView {
 		this._pageCommunicator = pc;
 	}
 
-	addSidebarContentPanel(descriptor: any, appId: string){
+	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
 		if(!this._sidebarContentPanelContainerView){
 			var sidebarElement = GmailElementGetter.getSidebarContainerElement();
 

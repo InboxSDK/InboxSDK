@@ -13,7 +13,7 @@ export default class GmailContentPanelView {
   _element: HTMLElement;
   _gmailContentPanelContainerView: Object;
 
-  constructor(contentPanelDescriptor: Object, gmailContentPanelContainerView: GmailContentPanelContainerView) {
+  constructor(contentPanelDescriptor: Kefir.Observable<Object>, gmailContentPanelContainerView: GmailContentPanelContainerView) {
     this.destroyed = false;
     this._eventStream = kefirBus();
     this._element = document.createElement('div');

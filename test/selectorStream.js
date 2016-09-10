@@ -20,7 +20,7 @@ const page = once(() => jsdomDoc(`
       <div>bar</div>
       <button class="foo">foo</button>
     </div>
-    <div class="search">
+    <div class="search" id="search">
       <div class="ignoreMe">
         <button>ignore me</button>
       </div>
@@ -95,6 +95,24 @@ describe('selectorStream', function() {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
         assert(results.includes(page().querySelector('[role=main] button.foo')));
+        cb();
+      });
+  });
+
+  it('id', function(cb) {
+    const onValueSpy = sinon.spy();
+    selectorStream([
+      '[class^="paren"]',
+      'div#search',
+      'div',
+      'button.foo'
+    ])(page().body)
+      .takeUntilBy(Kefir.later(50))
+      .onValue(onValueSpy)
+      .onEnd(() => {
+        const results = onValueSpy.args.map(callArgs => callArgs[0].el);
+        assert.strictEqual(results.length, 1);
+        assert(results.includes(page().querySelector('#search button.foo')));
         cb();
       });
   });
@@ -223,7 +241,7 @@ describe('selectorStream', function() {
           removedNodes: originalChildren
         });
         setTimeout(() => {
-          originalChildren.forEach(x => body.appendChild(x));          
+          originalChildren.forEach(x => body.appendChild(x));
         }, 1);
       })
       .onValue(onValueSpy)

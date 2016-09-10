@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
+InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 
 	inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
@@ -24,7 +24,7 @@ InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
 			var monkeyIndex = 1;
 
 			var el2 = document.createElement('div');
-			el2.innerHTML = 'Hellow back!';
+			el2.textContent = `Hello world ${Math.random()}`;
 
 			var options = {
 				title: 'Monkey 2',
@@ -48,6 +48,8 @@ InboxSDK.load(1, 'sidebar-example').then(function(inboxSDK) {
 				console.log('destroy');
 			});
 		};
+
+		window.activate();
 	});
 
 });

@@ -15,6 +15,8 @@ export default function getRelevantAttributeList(node: Object): string[] {
       return _.flatMap(node.nodes, getRelevantAttributeList);
     case 'attribute':
       return [node.attribute];
+    case 'id':
+      return ['id'];
     case 'class':
       return ['class'];
     case 'pseudo':

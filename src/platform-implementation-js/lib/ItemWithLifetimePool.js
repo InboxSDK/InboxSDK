@@ -27,4 +27,8 @@ export default class ItemWithLifetimePool<T: ItemWithLifetime<*>> {
       Kefir.constant(Array.from(this._items)).flatten()
     ));
   }
+
+  currentItemWithLifetimes(): T[] {
+    return Array.from(this._items);
+  }
 }

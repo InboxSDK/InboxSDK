@@ -18,7 +18,6 @@ import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
-import getAppToolbarLocationStream from './getAppToolbarLocationStream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 
@@ -26,13 +25,15 @@ import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
+import getSearchBarStream from './detection/searchBar/stream';
+import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
-import getSearchBarStream from './getSearchBarStream';
 import getNativeDrawerStream from './getNativeDrawerStream';
 import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
 import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
+import getChatSidebarViewStream from './getChatSidebarViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
@@ -40,6 +41,9 @@ import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
 import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
+import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
+
+import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -62,6 +66,7 @@ class InboxDriver {
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
+  _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
@@ -69,11 +74,12 @@ class InboxDriver {
   _butterBarDriver: Object;
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
-  _appToolbarLocationPool: ItemWithLifetimePool<ElementWithLifetime>;
+  _appToolbarLocationPool: ItemWithLifetimePool<*>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
+  _appSidebarView: ?InboxAppSidebarView = null;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
     customStyle();
@@ -116,6 +122,11 @@ class InboxDriver {
     );
     this._composeViewDriverPool = new ItemWithLifetimePool(
       getComposeViewDriverStream(this, threadElPool).takeUntilBy(this._stopper)
+        .map(el => ({el, removalStream: el.getStopper()}))
+    );
+
+    this._chatSidebarViewPool = new ItemWithLifetimePool(
+      getChatSidebarViewStream(this).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
@@ -177,6 +188,18 @@ class InboxDriver {
     this._nativeDrawerPool = new ItemWithLifetimePool(
       getNativeDrawerStream(this).takeUntilBy(this._stopper)
     );
+
+    // When a user goes from one thread to another, a new thread view is made
+    // but the old thread view doesn't get destroyed until it finishes
+    // animating out. We need to clear the old thread view's sidebar
+    // immediately when a new thread view comes in.
+    let _currentThreadView = null;
+    this._threadViewDriverPool.items().onValue(({el: threadView}) => {
+      if (_currentThreadView) {
+        _currentThreadView.removePanels();
+      }
+      _currentThreadView = threadView;
+    });
   }
 
   destroy() {
@@ -201,6 +224,26 @@ class InboxDriver {
 
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
+
+  getCurrentChatSidebarView(): InboxChatSidebarView {
+    const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
+    if (!view) throw new Error('No chat sidebar found');
+    return view;
+  }
+
+  getAppSidebarView(): InboxAppSidebarView {
+    if (!this._appSidebarView) {
+      this._appSidebarView = new InboxAppSidebarView(this);
+    }
+    return this._appSidebarView;
+  }
+
+  getChatSidebarButton(): HTMLElement {
+    const parsed = this._appToolbarLocationPool.currentItemWithLifetimes().map(({parsed}) => parsed)[0];
+    const el = parsed ? parsed.elements.chatSidebarButton : null;
+    if (!el) throw new Error('No chat sidebar button found');
+    return el;
+  }
 
   getLastInteractedAttachmentCardView() {
     return this._lastInteractedAttachmentCardView;
@@ -290,7 +333,7 @@ class InboxDriver {
     console.log('registerSearchQueryRewriter not implemented');
   }
 
-  addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<Object> {
+  addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<InboxAppToolbarButtonView> {
     const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
     return view.waitForReady();
   }
