@@ -6,7 +6,28 @@ import Logger from '../../lib/logger';
 
 const cssProcessor = cssParser();
 
+// There's a specific classname when put on an element which switches the page
+// into the chat sidebar layout. We need to be able to activate that chat
+// sidebar layout ourselves, and we don't want to hardcode this classname
+// because Inbox is prone to changing their classnames.
+
 const getChatSidebarClassname: () => string = _.once(() => {
+  // We know that the page has a CSS rule which looks like
+  //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
+  // where .chat is the chat sidebar classname that we want to know, and .foo
+  // is one of the classnames that's on the [role=application] element.
+
+  // We could search the rules for this rule, but then we don't know which part
+  // of the selector string is the chat sidebar classname!
+
+  // There's also another similar rule for when only the nav sidebar is open:
+  //   .blah.nav .foo { margin-right: smaller number; margin-left: bigger number; }
+  // If we find both of thse rules, then we can find the classname which is
+  // mentioned in the chat sidebar rule which is not mentioned in the nav
+  // sidebar rule.
+
+  // So first we find all the classnames on the [role=application] and make a
+  // regex for each one.
   const classRegexes: RegExp[] = Array.from((document.querySelector('[role=application]').classList: any))
     .map(x => new RegExp('\\.'+x+'\\b'));
   if (classRegexes.length === 0) throw new Error('no class names on element');
@@ -22,10 +43,14 @@ const getChatSidebarClassname: () => string = _.once(() => {
     return [];
   }
 
+  // rules will contain both the chat and nav sidebar rules.
   const rules = _.chain(document.styleSheets)
     .flatMap(sheet => Array.from(sheet.cssRules))
     .flatMap(rulesToStyleRules)
+    // We have all page rules. Filter it down to just rules mentioning one of
+    // [role=application]'s classnames.
     .filter(rule => classRegexes.some(r => r.test(rule.selectorText)))
+    // Now just the rules that contain both margin-left and -right rules.
     .filter(rule => rule.style.marginLeft && rule.style.marginRight)
     .value();
 
@@ -59,14 +84,14 @@ const getChatSidebarClassname: () => string = _.once(() => {
     }
   }
 
-  const onlyNavSidebarClassNames = getMentionedClassNames(
+  const onlyNavSidebarClassNames: string[] = getMentionedClassNames(
     cssProcessor.process(onlyNavSidebarRule.selectorText).res
   );
-  const onlyChatSidebarClassNames = getMentionedClassNames(
+  const onlyChatSidebarClassNames: string[] = getMentionedClassNames(
     cssProcessor.process(onlyChatSidebarRule.selectorText).res
   );
 
-  const chatSidebarClassNames = _.difference(
+  const chatSidebarClassNames: string[] = _.difference(
     onlyChatSidebarClassNames,
     onlyNavSidebarClassNames
   );
