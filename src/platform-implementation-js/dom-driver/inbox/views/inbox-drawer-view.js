@@ -126,25 +126,7 @@ class InboxDrawerView {
     this._containerEl.appendChild(this._el);
 
     if (this._chrome) {
-      const titleBar = document.createElement('div');
-      titleBar.className = 'inboxsdk__drawer_title_bar';
-
-      const closeButton = document.createElement('button');
-      closeButton.type = 'button';
-      closeButton.title = 'Close';
-      closeButton.className = 'inboxsdk__close_button';
-      (closeButton:any).addEventListener('click', () => {
-        this.close();
-      });
-      titleBar.appendChild(closeButton);
-
-      const title = document.createElement('div');
-      title.className = 'inboxsdk__drawer_title';
-      title.setAttribute('role', 'heading');
-      title.textContent = options.title || '';
-      titleBar.appendChild(title);
-
-      this._el.appendChild(titleBar);
+      this._setupChrome(options);
     }
 
     this._el.appendChild(options.el);
@@ -211,6 +193,28 @@ class InboxDrawerView {
           parentEl.style.transition = '';
         });
     }
+  }
+
+  _setupChrome(options: DrawerViewOptions) {
+    const titleBar = document.createElement('div');
+    titleBar.className = 'inboxsdk__drawer_title_bar';
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.title = 'Close';
+    closeButton.className = 'inboxsdk__close_button';
+    (closeButton:any).addEventListener('click', () => {
+      this.close();
+    });
+    titleBar.appendChild(closeButton);
+
+    const title = document.createElement('div');
+    title.className = 'inboxsdk__drawer_title';
+    title.setAttribute('role', 'heading');
+    title.textContent = options.title || '';
+    titleBar.appendChild(title);
+
+    this._el.appendChild(titleBar);
   }
 
   getSlideAnimationDone() {
