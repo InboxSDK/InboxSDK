@@ -15,9 +15,9 @@ class InboxDrawerView {
   _containerEl: HTMLElement;
   _el: HTMLElement;
   _backdrop: ?InboxBackdrop = null;
-  _slideAnimationDone: Kefir.Observable<any>;
-  _closing: Kefir.Observable<any>&{destroy():void} = kefirStopper();
-  _closed: Kefir.Observable<any>&{destroy():void} = kefirStopper();
+  _slideAnimationDone: Kefir.Observable<null>;
+  _closing = kefirStopper();
+  _closed = kefirStopper();
 
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
