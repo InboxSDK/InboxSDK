@@ -715,7 +715,7 @@ class GmailComposeView {
 
 	_getMessageIDfromForm(): ?string {
 		const value = this._messageIDElement && this._messageIDElement.value || null;
-		if (value && value !== 'undefined' && value !== 'null') {
+		if (typeof value === 'string' && value !== 'undefined' && value !== 'null') {
 			if (/^[0-9a-f]+$/i.test(value)) {
 				return value;
 			} else {
@@ -879,7 +879,7 @@ class GmailComposeView {
 	// we're replying to.
 	_getTargetMessageID(): ?string {
 		const input = this._element.querySelector('input[name="rm"]');
-		return input && input.value && input.value != 'undefined' ? input.value : null;
+		return input && typeof input.value === 'string' && input.value != 'undefined' ? input.value : null;
 	}
 
 	_getThreadID(): ?string {

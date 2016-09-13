@@ -106,9 +106,9 @@ function _isNotEnhanced(chipElement: HTMLElement): boolean {
 }
 
 function _addEnhancements(chipElement: HTMLElement) {
-    var anchor = chipElement.querySelector('a');
+    const anchor = chipElement.querySelector('a');
     if (anchor) {
-      anchor.addEventListener('mousedown', function(e) {
+      anchor.addEventListener('mousedown', function(e: MouseEvent) {
         e.stopImmediatePropagation();
       }, true);
       anchor.addEventListener('click', function(e) {
@@ -120,8 +120,8 @@ function _addEnhancements(chipElement: HTMLElement) {
     xElement.src = X_URL;
     xElement.setAttribute('style', 'opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;');
 
-    xElement.addEventListener('mousedown', function(e){
-        (chipElement:any).remove();
+    xElement.addEventListener('mousedown', function(e: MouseEvent){
+        chipElement.remove();
     }, true);
 
     xElement.addEventListener('click', function(e){
@@ -148,7 +148,7 @@ function _addEnhancements(chipElement: HTMLElement) {
 
     chipElement.addEventListener(
         'mousedown',
-        function(e){
+        function(e: MouseEvent){
             e.preventDefault();
         }
     );

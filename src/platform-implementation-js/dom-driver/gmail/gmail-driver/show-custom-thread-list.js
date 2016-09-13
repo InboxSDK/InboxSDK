@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
@@ -119,7 +118,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       RSVP.Promise.all(idPairs.map(pair => {
         if (pair.rfcId) {
           return pair;
-        } else if (pair.gtid) {
+        } else if (typeof pair.gtid === 'string') {
           const gtid = pair.gtid;
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));

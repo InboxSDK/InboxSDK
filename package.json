@@ -31,7 +31,7 @@
     "entities": "1.1.1",
     "envify": "^3.4.0",
     "event-listener-with-options": "^1.0.2",
-    "flow-bin": "^0.31.1",
+    "flow-bin": "^0.32.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",

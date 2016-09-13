@@ -22,24 +22,27 @@ The Selector array is made up of SelectorOperators. Initially, only the input
 element is matched. Each SelectorOperator transforms the matched set of
 elements sequentially.
 */
+
+/*:: // comment needed until Babel supports {| ... |} syntax
+
 export type SelectorOperator =
   string
   // The children operator: this will change the matched set to contain only
   // the direct children of the current matched set, and then filters them
   // based on a css selector string.
 
-  | {$filter: (el: HTMLElement) => boolean}
+  | {| $filter: (el: HTMLElement) => boolean |}
   // The $filter operator allows you to specify a function which will be called
   // on every matched element. If the function returns false, then the element
   // will be removed from the matched set.
 
-  | {$map: (el: HTMLElement) => ?HTMLElement}
+  | {| $map: (el: HTMLElement) => ?HTMLElement |}
   // The $map operator allows you to specify a function which will be called
   // on every matched element, and each element in the matched set will be
   // replaced with the element returned by your function. If your function
   // returns null, then the element will just be removed from the matched set.
 
-  | {$watch: string | {attributeFilter: string[], fn: (el: HTMLElement) => boolean}}
+  | {| $watch: string | {attributeFilter: string[], fn: (el: HTMLElement) => boolean} |}
   // The $watch operator allows you to specify either a css selector string, or
   // an attributeFilter list and a function. The currently matched elements
   // will be removed from the matched set if they don't match the css selector
@@ -47,14 +50,16 @@ export type SelectorOperator =
   // changed, then it will be re-considered and may be added or removed from
   // the matched set.
 
-  | {$or: Array<Selector>}
+  | {| $or: Array<Selector> |}
   // The $or operator forks the operator list into multiple lists, and then
   // re-combines the resulting matched sets.
 
-  | {$log: string}
+  | {| $log: string |}
   // The $log operator uses `console.log` to log every element in the matched
   // set to the console with a given string prefix.
 ;
+
+*/
 
 export type Selector = Array<SelectorOperator>;
 
@@ -78,7 +83,7 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
         stream.flatMap(({el,removalStream}) => fn(el).takeUntilBy(removalStream))
       ));
     } else if (item.$watch) {
-      const {$watch} = (item:any);
+      const {$watch} = item;
       let checker, attributeFilter;
       if (typeof $watch === 'string') {
         const p = cssProcessor.process($watch).res;
@@ -102,16 +107,16 @@ export default function selectorStream(selector: Selector): (el: HTMLElement) =>
         return passes.map(_.constant({el, removalStream:fails.changes()}));
       });
     } else if (item.$log) {
-      const {$log} = (item:any);
+      const {$log} = item;
       return stream => stream.map(event => {
         console.log($log, event.el);
         return event;
       });
     } else if (item.$filter) {
-      const {$filter} = (item:any);
+      const {$filter} = item;
       return stream => stream.filter(({el}) => $filter(el));
     } else if (item.$map) {
-      const {$map} = (item:any);
+      const {$map} = item;
       return stream => stream.flatMap(({el,removalStream}) => {
         const transformed = $map(el);
         return transformed ?

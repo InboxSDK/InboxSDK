@@ -428,8 +428,8 @@ class InboxComposeView {
     div.className = 'inboxsdk__compose_actionToolbar';
 
     if (!this._p.attributes.isInline) {
-      const hiddenAttachBtn = this._els.attachBtn && this._els.attachBtn.nextSibling;
-      if (hiddenAttachBtn && hiddenAttachBtn.style && hiddenAttachBtn.style.position === 'absolute') {
+      const hiddenAttachBtn = this._els.attachBtn ? this._els.attachBtn.nextSibling : null;
+      if (hiddenAttachBtn instanceof HTMLElement && hiddenAttachBtn.style.position === 'absolute') {
         hiddenAttachBtn.style.display = 'none';
       } else {
         this._driver.getLogger().error(new Error("Didn't find hiddenAttachBtn"));
