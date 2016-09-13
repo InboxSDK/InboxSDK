@@ -2,7 +2,7 @@
 //jshint ignore:start
 
 import type Kefir from 'kefir';
-import type {EventEmitter} from 'events';
+import type EventEmitter from 'events';
 import type {TooltipDescriptor} from '../views/compose-button-view';
 
 export type StatusBar = EventEmitter & {

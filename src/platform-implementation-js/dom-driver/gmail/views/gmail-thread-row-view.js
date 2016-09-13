@@ -366,7 +366,7 @@ class GmailThreadRowView {
 
     this._getImageFixerTask().onValue(() => {
       const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
-      if (el) {
+      if (el instanceof HTMLElement) {
         // Make the image reposition itself horizontally.
         el.style.display = (el.style && el.style.display === 'block') ? 'inline-block' : 'block';
       }

@@ -1,7 +1,6 @@
 /* @flow */
-//jshint ignore:start
 
-import type {EventEmitter} from 'events';
+import type EventEmitter from 'events';
 import RSVP from 'rsvp';
 
 // for nodejs streams

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import htmlToText from '../common/html-to-text';
@@ -69,7 +68,7 @@ export default function modifySuggestions(responseText: string, modifications: A
         nameHTML
       ];
     }
-    if (modification.iconURL) {
+    if (typeof modification.iconURL === 'string') {
       var iconURL = modification.iconURL;
       console.warn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
       if (!modification.iconUrl) {

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -251,7 +250,7 @@ class GmailToolbarView {
 			)
 			.takeUntilBy(this._stopper)
 			.onValue(mutation => {
-				if(mutation.target.style && mutation.target.style.display === 'none'){
+				if(mutation.target instanceof HTMLElement && mutation.target.style.display === 'none'){
 					this._toolbarState = 'COLLAPSED';
 				}
 				else{
