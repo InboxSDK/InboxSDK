@@ -88,7 +88,7 @@ class InboxDrawerView {
       // Needed to stop composeviews from coming apart visually in Gmail.
       insertionTarget.classList.add('inboxsdk__drawers_in_use');
       // Needed to make DrawerView show over search bar in Inbox.
-      insertionTarget.style.zIndex = '500';
+      insertionTarget.style.zIndex = String(zIndex);
 
       if (!composeOffsetParent.hasAttribute('data-drawer-old-zindex')) {
         composeOffsetParent.setAttribute('data-drawer-old-zindex', composeOffsetParent.style.zIndex);
