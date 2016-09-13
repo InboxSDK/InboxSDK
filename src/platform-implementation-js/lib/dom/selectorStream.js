@@ -42,7 +42,7 @@ export type SelectorOperator =
   // replaced with the element returned by your function. If your function
   // returns null, then the element will just be removed from the matched set.
 
-  | {| $watch: string | {attributeFilter: string[], fn: (el: HTMLElement) => boolean} |}
+  | {| $watch: string | {| attributeFilter: string[], fn: (el: HTMLElement) => boolean |} |}
   // The $watch operator allows you to specify either a css selector string, or
   // an attributeFilter list and a function. The currently matched elements
   // will be removed from the matched set if they don't match the css selector
