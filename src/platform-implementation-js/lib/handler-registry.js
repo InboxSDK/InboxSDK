@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import asap from 'asap';
@@ -39,7 +38,7 @@ export default class HandlerRegistry<T> {
   addTarget(target: T) {
     this._targets.push(target);
 
-    if(target.on) {
+    if(typeof target.on === 'function') {
       target.on('destroy', () => {
         this.removeTarget(target);
       });

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import asap from 'asap';
@@ -305,7 +304,7 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 	}).then(function(){
 		var mutationObserver = new MutationObserver(function(mutations){
 			const target = mutations[0].target;
-			if(target.style && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
+			if(target instanceof HTMLElement && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
 				groupToggleButtonViewController.activate();
 			}
 

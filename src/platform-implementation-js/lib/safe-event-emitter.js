@@ -1,7 +1,6 @@
 /* @flow */
-//jshint ignore:start
 
-import {EventEmitter} from 'events';
+const {EventEmitter} = require('events');
 import Logger from './logger';
 
 // Version of EventEmitter where any exceptions thrown by event handlers are

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
@@ -50,7 +49,7 @@ const injectScript: () => Promise<null> = _.once(function() {
 });
 
 if (module.hot) {
-  module.hot.decline();
+  (module.hot:any).decline();
 }
 
 export default injectScript;

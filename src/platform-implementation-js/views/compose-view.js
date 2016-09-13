@@ -283,7 +283,7 @@ class ComposeView extends EventEmitter {
 	overrideEditSubject(){
 		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
 		const {composeViewImplementation} = memberMap.get(this);
-		if (composeViewImplementation.overrideEditSubject)
+		if (typeof composeViewImplementation.overrideEditSubject === 'function')
 			composeViewImplementation.overrideEditSubject();
 	}
 }
