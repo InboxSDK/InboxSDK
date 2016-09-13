@@ -184,8 +184,12 @@ class InboxDrawerView {
         .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
         .onValue(() => {
           parentEl.style.left = '0';
-        });
-      this._closed
+        })
+        .flatMap(() =>
+          Kefir.fromEvents(parentEl, 'transitionend')
+            .merge(Kefir.later(200)) // transition might not finish if element is hidden
+        )
+        .take(1)
         .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
         .onValue(() => {
           parentEl.style.position = '';
