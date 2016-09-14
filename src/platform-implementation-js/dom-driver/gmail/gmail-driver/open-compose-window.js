@@ -7,21 +7,17 @@ import waitFor from '../../../lib/wait-for';
 
 import type GmailDriver from '../gmail-driver';
 
-export default function openComposeWindow(gmailDriver: GmailDriver){
+export default async function openComposeWindow(gmailDriver: GmailDriver){
+	await GmailElementGetter.waitForGmailModeToSettle();
 
-	GmailElementGetter.waitForGmailModeToSettle().then(function(){
+	if(GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow()){
+		//do nothing
+		return;
+	}
 
-		if(GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow()){
-			//do nothing
-			return;
-		}
+	if (!GmailElementGetter.getComposeButton()) {
+		await waitFor(() => !!GmailElementGetter.getComposeButton());
+	}
 
-		waitFor(function(){
-			return !!GmailElementGetter.getComposeButton();
-		}).then(function(){
-			simulateClick(GmailElementGetter.getComposeButton());
-		});
-
-	});
-
+	simulateClick(GmailElementGetter.getComposeButton());
 };
