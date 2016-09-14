@@ -10,6 +10,15 @@ var DrawerView = /** @lends DrawerView */{
   close: function(){},
 
   /**
+   * This method allows a compose view to be associated with a pre-existing
+   * drawer. The compose view will be usable and shown next to the drawer
+   * instead of being hidden behind it.
+   * @param  {ComposeView} composeView
+   * @return {void}
+   */
+  associateComposeView: function(composeView) {},
+
+  /**
    * This property is set to true once the view is destroyed.
    * @type {boolean}
    */

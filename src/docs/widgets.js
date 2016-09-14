@@ -251,7 +251,7 @@ var DrawerOptions = /** @lends ModalOptions */{
   title:null,
 
   /**
-  * You can optionally specify a ComposeView to associate the DrawerView with.
+  * You can optionally specify a ComposeView to associate with the DrawerView.
   * The ComposeView will be interactable next to the DrawerView instead of
   * being blocked.
   * ^optional

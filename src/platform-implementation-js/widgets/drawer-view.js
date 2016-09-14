@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import {defn} from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
+import ComposeView from '../views/compose-view';
 
 import type {DrawerViewDriver} from '../driver-interfaces/driver';
 
@@ -37,6 +38,12 @@ class DrawerView extends EventEmitter {
 
   close(){
     this._driver.close();
+  }
+
+  associateComposeView(composeView: ComposeView) {
+    if (!(composeView instanceof ComposeView))
+      throw new Error('argument was not a ComposeView');
+    this._driver.associateComposeView(composeView);
   }
 }
 
