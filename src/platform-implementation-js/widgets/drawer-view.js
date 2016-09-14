@@ -40,10 +40,10 @@ class DrawerView extends EventEmitter {
     this._driver.close();
   }
 
-  associateComposeView(composeView: ComposeView) {
+  associateComposeView(composeView: ComposeView, closeWithCompose: boolean) {
     if (!(composeView instanceof ComposeView))
       throw new Error('argument was not a ComposeView');
-    this._driver.associateComposeView(composeView);
+    this._driver.associateComposeView(composeView, closeWithCompose);
   }
 }
 

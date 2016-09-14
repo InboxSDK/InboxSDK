@@ -26,6 +26,7 @@ export type DrawerViewOptions = {
 	title?: string;
 	chrome?: boolean;
 	composeView?: ComposeView;
+	closeWithCompose?: boolean;
 };
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;

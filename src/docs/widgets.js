@@ -253,9 +253,20 @@ var DrawerOptions = /** @lends ModalOptions */{
   /**
   * You can optionally specify a ComposeView to associate with the DrawerView.
   * The ComposeView will be interactable next to the DrawerView instead of
-  * being blocked.
+  * being blocked. Using this option will animate the ComposeView into position
+  * along with the opening DrawerView unlike the
+  * {DrawerView.associateComposeView()} method.
   * ^optional
   * @type {ComposeView}
   */
-  composeView:null
+  composeView:null,
+
+  /**
+  * If this is true, then if any associated ComposeView is closed or otherwise
+  * becomes inaccessible, then the DrawerView will close too.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  closeWithCompose:null
 };

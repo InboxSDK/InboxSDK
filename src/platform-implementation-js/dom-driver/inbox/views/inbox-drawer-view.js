@@ -29,9 +29,9 @@ class InboxDrawerView {
     let insertionTarget = document.body;
     let composeRect = null;
 
-    const {composeView} = options;
+    const {composeView, closeWithCompose} = options;
     if (composeView) {
-      const ret = this._setupComposeInsertionTarget(composeView);
+      const ret = this._setupComposeInsertionTarget(composeView, closeWithCompose);
       insertionTarget = ret.insertionTarget;
       composeRect = ret.composeRect;
     }
@@ -57,7 +57,7 @@ class InboxDrawerView {
     }
   }
 
-  _setupComposeInsertionTarget(composeView: ComposeView): {composeRect: ClientRect, insertionTarget: HTMLElement} {
+  _setupComposeInsertionTarget(composeView: ComposeView, closeWithCompose: ?boolean): {composeRect: ClientRect, insertionTarget: HTMLElement} {
     if (composeView.isMinimized()) {
       throw new Error("Can't attach DrawerView to minimized ComposeView");
     }
@@ -67,14 +67,19 @@ class InboxDrawerView {
     if (composeView.isFullscreen()) {
       composeView.setFullscreen(false);
     }
-    Kefir.merge([
-      Kefir.fromEvents(composeView, 'destroy'),
-      Kefir.fromEvents(composeView, 'minimized'),
+    const closeEvents = [
       Kefir.fromEvents(composeView, 'restored'),
       Kefir.later(10).flatMap(() =>
         Kefir.fromEvents(composeView, 'fullscreenChanged')
       )
-    ])
+    ];
+    if (closeWithCompose) {
+      closeEvents.push(
+        Kefir.fromEvents(composeView, 'destroy'),
+        Kefir.fromEvents(composeView, 'minimized')
+      );
+    }
+    Kefir.merge(closeEvents)
       .takeUntilBy(this._closing)
       .onValue(() => this.close());
 
@@ -252,10 +257,10 @@ class InboxDrawerView {
     }
   }
 
-  associateComposeView(composeView: ComposeView) {
+  associateComposeView(composeView: ComposeView, closeWithCompose: boolean) {
     this._composeChanges.emit(null);
 
-    const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView);
+    const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView, closeWithCompose);
 
     if (this._backdrop) {
       insertionTarget.appendChild(this._backdrop.getElement());

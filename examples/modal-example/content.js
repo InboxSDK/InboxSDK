@@ -23,7 +23,7 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 				el.style.flex = '1';
 				el.innerHTML = 'foo <div> blah </div>';
 				const drawer = sdk.Widgets.showDrawerView({
-					composeView, el, title: 'Drawer+Compose Test'
+					composeView, closeWithCompose: true, el, title: 'Drawer+Compose Test'
 				});
 				drawer.on('destroy', () => {
 					console.log('drawer destroy');
@@ -152,10 +152,10 @@ function showDrawer1() {
 
 	el.querySelector('button').addEventListener('click', () => {
 		sdk.Compose.openNewComposeView().then(cv => {
-			drawer.associateComposeView(cv);
+			drawer.associateComposeView(cv, false);
 		});
 	});
-	
+
 	drawer.on('slideAnimationDone', () => {
 		console.log('slideAnimationDone');
 	});
