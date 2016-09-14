@@ -20,6 +20,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverStream from './get-compose-view-driver-stream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
+import querySelectorOne from '../../lib/dom/querySelectorOne';
 
 import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
@@ -264,7 +265,8 @@ class InboxDriver {
   }
 
   openComposeWindow(): void {
-    throw new Error("Not implemented");
+    const fabButton = querySelectorOne(document.body, 'nav[role=banner] ~ div[aria-expanded] button:not([tabindex="-1"])');
+    fabButton.click();
   }
 
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
