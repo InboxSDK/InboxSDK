@@ -25,8 +25,6 @@ class InboxDrawerView {
     const zIndex = 500;
     let insertionTarget = document.body;
 
-    let useBackdrop = true;
-
     const {composeView} = options;
     if (composeView) {
       if (composeView.isMinimized()) {
@@ -48,10 +46,6 @@ class InboxDrawerView {
       ])
         .takeUntilBy(this._closing)
         .onValue(() => this.close());
-
-      if (document.querySelector('[jsaction="global.exit_full_screen"]')) {
-        useBackdrop = false;
-      }
 
       const composeEl = composeView.getElement();
 
@@ -108,12 +102,10 @@ class InboxDrawerView {
         });
     }
 
-    if (useBackdrop) {
-      this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
-      this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
-        this.close();
-      });
-    }
+    this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
+    this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
+      this.close();
+    });
 
     this._containerEl = document.createElement('div');
     this._containerEl.className = 'inboxsdk__drawer_view_container';
