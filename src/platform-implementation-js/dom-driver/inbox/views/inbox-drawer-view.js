@@ -126,11 +126,13 @@ class InboxDrawerView {
     composeOffsetParent.style.zIndex = String(zIndex+1);
 
     this._closed
+      .merge(this._composeChanges)
       .takeUntilBy(Kefir.fromEvents(insertionTarget, TAKE_OVER_EVENT))
       .onValue(() => {
         insertionTarget.style.zIndex = '';
       });
     this._closed
+      .merge(this._composeChanges)
       .takeUntilBy(Kefir.fromEvents(composeOffsetParent, TAKE_OVER_EVENT))
       .onValue(() => {
         composeOffsetParent.style.zIndex = composeOffsetParent.getAttribute('data-drawer-old-zindex');
@@ -225,6 +227,10 @@ class InboxDrawerView {
       const parentEl: HTMLElement = (composeEl.parentElement: any);
       parentEl.style.left = `${-composeNeedToMoveLeft}px`;
 
+      // When the drawer closes, animate the compose back to its original
+      // location, and then unset our extra CSS.
+      // If the drawer has a different compose associated with it, then just
+      // immediately remove this compose view's extra CSS.
       this._closing
         .takeUntilBy(this._composeChanges)
         .takeUntilBy(Kefir.fromEvents(composeEl, TAKE_OVER_EVENT))
