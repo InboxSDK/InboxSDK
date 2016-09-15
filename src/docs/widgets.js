@@ -25,7 +25,7 @@ var Widgets = /** @lends Widgets */{
   // TODO document or remove?
   showTopMessageBarView: function(){},
 
-  /* TODO document when we start using it
+  /**
    * This creates a {DrawerView} and shows it. A drawer view is a panel that
    * slides in from the right side of the screen, and it fades the rest of the
    * screen out. By default, it has a title and a close button.
