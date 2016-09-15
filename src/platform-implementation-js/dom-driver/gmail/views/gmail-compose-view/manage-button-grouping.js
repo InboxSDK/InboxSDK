@@ -62,16 +62,20 @@ function _handleComposeFullscreenStateChanged(gmailComposeView){
 }
 
 function _ungroupButtons(gmailComposeView){
-	var members = get(memberMap, gmailComposeView);
-	members.groupedToolbarButtonViewController.destroy();
-	members.formattingToolbarMutationObserver.disconnect();
+	const members = get(memberMap, gmailComposeView);
+	if (members.groupedToolbarButtonViewController)
+		members.groupedToolbarButtonViewController.destroy();
+	if (members.formattingToolbarMutationObserver)
+		members.formattingToolbarMutationObserver.disconnect();
 
-	var buttonToolbar: HTMLElement = (members.groupedActionToolbarContainer.firstElementChild:any);
-	(buttonToolbar:any).remove();
+	const buttonToolbar = members.groupedActionToolbarContainer.firstElementChild;
+	if (buttonToolbar) {
+		buttonToolbar.remove();
 
-	var composeActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar');
-	composeActionToolbar.innerHTML = '';
-	composeActionToolbar.appendChild(buttonToolbar);
+		const composeActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_actionToolbar');
+		composeActionToolbar.innerHTML = '';
+		composeActionToolbar.appendChild(buttonToolbar);
+	}
 }
 
 function _handleButtonAdded(gmailComposeView: GmailComposeView){
