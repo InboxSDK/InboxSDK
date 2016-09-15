@@ -206,10 +206,15 @@ class GmailComposeView {
 
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
+		const initialBodyElement = this.getBodyElement();
 		this.ready = _.constant(
-			streamWaitFor(
-				() => this.getBodyElement(),
-				3*60 * 1000 //timeout
+			(
+				initialBodyElement ?
+					Kefir.constant(initialBodyElement) :
+					streamWaitFor(
+						() => this.getBodyElement(),
+						3*60 * 1000 //timeout
+					)
 			)
 			.takeUntilBy(this._stopper)
 			.map(bodyElement => {

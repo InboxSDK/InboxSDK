@@ -6,9 +6,10 @@ import kefirStopper from 'kefir-stopper';
 
 class InboxBackdrop {
   _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
+  _el: HTMLElement;
 
   constructor(zIndex=500, target=document.body) {
-    const el = document.createElement('div');
+    const el = this._el = document.createElement('div');
     el.className = 'inboxsdk__inbox_backdrop';
     el.style.zIndex = String(zIndex);
     el.addEventListener('click', () => {
@@ -28,6 +29,10 @@ class InboxBackdrop {
 
     el.offsetHeight; // force layout so that adding this class does a transition.
     el.classList.add('inboxsdk__active');
+  }
+
+  getElement(): HTMLElement {
+    return this._el;
   }
 
   getStopper(): Kefir.Observable<null> {

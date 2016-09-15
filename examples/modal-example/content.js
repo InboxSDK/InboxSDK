@@ -11,6 +11,8 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 	window.sdk = sdk = inboxSDK;
 
 	sdk.Compose.registerComposeViewHandler(composeView => {
+		window._cv = composeView;
+
 		const imageUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
 
 		composeView.addButton({
@@ -21,7 +23,7 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 				el.style.flex = '1';
 				el.innerHTML = 'foo <div> blah </div>';
 				const drawer = sdk.Widgets.showDrawerView({
-					composeView, el, title: 'Drawer+Compose Test'
+					composeView, closeWithCompose: true, el, title: 'Drawer+Compose Test'
 				});
 				drawer.on('destroy', () => {
 					console.log('drawer destroy');
@@ -142,10 +144,18 @@ function showDrawer1() {
 	const el = document.createElement('div');
 	el.style.height = '100%';
 	el.style.background = 'blue';
-	el.innerHTML = 'foo';
+	el.innerHTML = 'foo <button type="button">open compose</button>';
+
 	const drawer = window._drawer = sdk.Widgets.showDrawerView({
 		el, title: 'Drawer Test'
 	});
+
+	el.querySelector('button').addEventListener('click', () => {
+		sdk.Compose.openNewComposeView().then(cv => {
+			drawer.associateComposeView(cv, false);
+		});
+	});
+
 	drawer.on('slideAnimationDone', () => {
 		console.log('slideAnimationDone');
 	});
