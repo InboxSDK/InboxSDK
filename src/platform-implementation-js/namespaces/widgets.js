@@ -59,8 +59,7 @@ class Widgets {
   }
 
   showDrawerView(options: DrawerViewOptions): DrawerView {
-    console.log('Widgets.showDrawerView is experimental! This function may change! Let us know if it works well for you, but you probably should not release any extensions using it for now.');
-    get(memberMap, this).driver.getLogger().eventSdkPassive('Widgets.showDrawerView used', {
+    get(memberMap, this).driver.getLogger().eventSdkActive('Widgets.showDrawerView used', {
       keys: Object.keys(options)
     });
 
