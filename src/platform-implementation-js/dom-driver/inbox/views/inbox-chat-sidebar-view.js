@@ -31,13 +31,14 @@ class InboxChatSidebarView {
 
   getMode(): Mode {
     const parent: HTMLElement = (this._el.parentElement: any);
-    if (parseInt(window.getComputedStyle(parent).bottom) === 0) {
+    const parentComputedStyle = window.getComputedStyle(parent);
+    if (parseInt(parentComputedStyle.bottom) === 0) {
       return 'SIDEBAR'
     }
-    if (this._el.style.display === 'none') {
-      return 'HIDDEN';
+    if (parseInt(parentComputedStyle.top) > 0) {
+      return 'DROPDOWN';
     }
-    return 'DROPDOWN';
+    return 'HIDDEN';
   }
 
   getModeStream: () => Kefir.Observable<Mode> = _.once(() => {
