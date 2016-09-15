@@ -53,7 +53,7 @@ class InboxDrawerView {
       .map(() => null);
 
     if (composeView) {
-      this._startComposeAnimation(composeView, composeNeedToMoveLeft);
+      this._positionCompose(composeView, composeNeedToMoveLeft);
     }
   }
 
@@ -226,7 +226,7 @@ class InboxDrawerView {
     return composeNeedToMoveLeft;
   }
 
-  _startComposeAnimation(composeView: ComposeView, composeNeedToMoveLeft: number) {
+  _positionCompose(composeView: ComposeView, composeNeedToMoveLeft: number) {
     if (composeNeedToMoveLeft > 0) {
       const composeEl = composeView.getElement();
       const parentEl: HTMLElement = (composeEl.parentElement: any);
@@ -268,7 +268,7 @@ class InboxDrawerView {
     insertionTarget.appendChild(this._containerEl);
 
     const composeNeedToMoveLeft = this._setupComposeAnimation(composeView, composeRect, false);
-    this._startComposeAnimation(composeView, composeNeedToMoveLeft);
+    this._positionCompose(composeView, composeNeedToMoveLeft);
   }
 
   getSlideAnimationDone() {
