@@ -87,13 +87,13 @@ class GmailComposeView {
 	ready: () => Kefir.Observable<GmailComposeView>;
 	getEventStream: () => Kefir.Observable<any>;
 
-	constructor(element: HTMLElement, xhrInterceptorStream: Kefir.Observable<*>, driver: GmailDriver) {
+	constructor(element: HTMLElement, xhrInterceptorStream: Kefir.Observable<*>, driver: GmailDriver, options: {isInlineReplyForm: boolean, isStandalone: boolean}) {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
-		this._isInlineReplyForm = false;
+		this._isInlineReplyForm = options.isInlineReplyForm;
+		this._isStandalone = options.isStandalone;
 		this._isFullscreen = false;
-		this._isStandalone = false;
 		this._emailWasSent = false;
 		this._messageId = null;
 		this._finalMessageId = null;
@@ -972,5 +972,5 @@ export default ud.defn(module, GmailComposeView);
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.
 function __interfaceCheck() {
-	var test: ComposeViewDriver = new GmailComposeView(document.body, ({}:any), ({}:any));
+	var test: ComposeViewDriver = new GmailComposeView(document.body, ({}:any), ({}:any), ({}:any));
 }
