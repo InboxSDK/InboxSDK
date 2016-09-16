@@ -828,16 +828,9 @@
       "resolved": "https://registry.npmjs.org/browserify-des/-/browserify-des-1.0.0.tgz"
     },
     "browserify-hmr": {
-      "version": "0.3.1",
+      "version": "0.3.5",
       "from": "browserify-hmr@>=0.3.1 <0.4.0",
-      "resolved": "https://registry.npmjs.org/browserify-hmr/-/browserify-hmr-0.3.1.tgz",
-      "dependencies": {
-        "lodash": {
-          "version": "3.10.1",
-          "from": "lodash@>=3.10.1 <4.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
-        }
-      }
+      "resolved": "https://registry.npmjs.org/browserify-hmr/-/browserify-hmr-0.3.5.tgz"
     },
     "browserify-rsa": {
       "version": "4.0.1",
@@ -1374,9 +1367,9 @@
       "resolved": "https://registry.npmjs.org/ejs/-/ejs-2.5.2.tgz"
     },
     "elliptic": {
-      "version": "6.3.1",
+      "version": "6.3.2",
       "from": "elliptic@>=6.0.0 <7.0.0",
-      "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.1.tgz"
+      "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.2.tgz"
     },
     "encodeurl": {
       "version": "1.0.1",
@@ -1702,9 +1695,9 @@
       "resolved": "https://registry.npmjs.org/flow-bin/-/flow-bin-0.32.0.tgz"
     },
     "for-in": {
-      "version": "0.1.5",
+      "version": "0.1.6",
       "from": "for-in@>=0.1.5 <0.2.0",
-      "resolved": "https://registry.npmjs.org/for-in/-/for-in-0.1.5.tgz"
+      "resolved": "https://registry.npmjs.org/for-in/-/for-in-0.1.6.tgz"
     },
     "for-own": {
       "version": "0.1.4",
@@ -2759,9 +2752,9 @@
       }
     },
     "http-proxy": {
-      "version": "1.14.0",
+      "version": "1.15.1",
       "from": "http-proxy@>=1.8.1 <2.0.0",
-      "resolved": "https://registry.npmjs.org/http-proxy/-/http-proxy-1.14.0.tgz"
+      "resolved": "https://registry.npmjs.org/http-proxy/-/http-proxy-1.15.1.tgz"
     },
     "http-server": {
       "version": "0.9.0",
@@ -3151,9 +3144,9 @@
       "resolved": "https://registry.npmjs.org/json5/-/json5-0.4.0.tgz"
     },
     "jsonfile": {
-      "version": "2.3.1",
+      "version": "2.4.0",
       "from": "jsonfile@>=2.1.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/jsonfile/-/jsonfile-2.3.1.tgz"
+      "resolved": "https://registry.npmjs.org/jsonfile/-/jsonfile-2.4.0.tgz"
     },
     "jsonify": {
       "version": "0.0.0",
@@ -3208,9 +3201,9 @@
       "resolved": "https://registry.npmjs.org/kefir/-/kefir-3.5.1.tgz"
     },
     "kefir-bus": {
-      "version": "2.2.0",
+      "version": "2.2.1",
       "from": "kefir-bus@>=2.2.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/kefir-bus/-/kefir-bus-2.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/kefir-bus/-/kefir-bus-2.2.1.tgz"
     },
     "kefir-cast": {
       "version": "3.1.0",
@@ -3929,9 +3922,14 @@
       "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
     },
     "pbkdf2": {
-      "version": "3.0.5",
+      "version": "3.0.7",
       "from": "pbkdf2@>=3.0.3 <4.0.0",
-      "resolved": "https://registry.npmjs.org/pbkdf2/-/pbkdf2-3.0.5.tgz"
+      "resolved": "https://registry.npmjs.org/pbkdf2/-/pbkdf2-3.0.7.tgz"
+    },
+    "pdelay": {
+      "version": "1.0.0",
+      "from": "pdelay@latest",
+      "resolved": "https://registry.npmjs.org/pdelay/-/pdelay-1.0.0.tgz"
     },
     "pend": {
       "version": "1.2.0",
@@ -4506,9 +4504,9 @@
       "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.1.tgz"
     },
     "signal-exit": {
-      "version": "3.0.0",
+      "version": "3.0.1",
       "from": "signal-exit@>=3.0.0 <4.0.0",
-      "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.0.tgz"
+      "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.1.tgz"
     },
     "simple-encryptor": {
       "version": "1.1.0",
@@ -4854,6 +4852,11 @@
       "version": "3.1.4",
       "from": "symbol-tree@>=3.1.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/symbol-tree/-/symbol-tree-3.1.4.tgz"
+    },
+    "synchd": {
+      "version": "1.0.1",
+      "from": "synchd@latest",
+      "resolved": "https://registry.npmjs.org/synchd/-/synchd-1.0.1.tgz"
     },
     "syntax-error": {
       "version": "1.1.6",
@@ -5369,9 +5372,9 @@
       "resolved": "https://registry.npmjs.org/wdio-sync/-/wdio-sync-0.5.13.tgz"
     },
     "webdriverio": {
-      "version": "4.2.15",
+      "version": "4.2.16",
       "from": "webdriverio@>=4.1.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/webdriverio/-/webdriverio-4.2.15.tgz",
+      "resolved": "https://registry.npmjs.org/webdriverio/-/webdriverio-4.2.16.tgz",
       "dependencies": {
         "supports-color": {
           "version": "3.1.2",
