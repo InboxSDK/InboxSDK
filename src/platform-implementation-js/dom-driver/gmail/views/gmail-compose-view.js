@@ -649,9 +649,12 @@ class GmailComposeView {
 		return $(innerElement).closest('[role=button]')[0];
 	}
 
-	getScrollBody(): ?HTMLElement {
-		// This element may not be available immediately for inline composes.
-		return this._element.querySelector('table .GP');
+	getScrollBody(): HTMLElement {
+		var scrollBody = this._element.querySelector('table .GP');
+		if (!scrollBody) {
+			throw new Error("Failed to find scroll body");
+		}
+		return scrollBody;
 	}
 
 	getStatusArea(): HTMLElement {
