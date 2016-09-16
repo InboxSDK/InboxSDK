@@ -40,20 +40,21 @@ function imp(gmailDriver: GmailDriver, messageViewDriverStream: Kefir.Observable
 			elementStream = _setupStandardComposeElementStream();
 		}
 
-		return elementStream.map(elementViewMapper(el => {
-			var composeView = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
-			composeView.setIsStandalone(isStandalone);
-
-			return composeView;
-		}));
+		return elementStream.map(elementViewMapper(el =>
+			new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
+				isStandalone,
+				isInlineReplyForm: false
+			})
+		));
 	}).merge(
 		messageViewDriverStream.flatMap(gmailMessageView =>
 			gmailMessageView.getReplyElementStream()
-				.map(elementViewMapper(el => {
-					var view = new GmailComposeView(el, xhrInterceptorStream, gmailDriver);
-					view.setIsInlineReplyForm(true);
-					return view;
-				}))
+				.map(elementViewMapper(el =>
+					new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
+						isStandalone: false,
+						isInlineReplyForm: true
+					})
+				))
 		)
 	).flatMap((composeViewDriver:any) =>
 		composeViewDriver.ready()
