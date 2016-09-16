@@ -901,16 +901,8 @@ class GmailComposeView {
 		return this._element;
 	}
 
-	setIsInlineReplyForm(inline: boolean) {
-		this._isInlineReplyForm = inline;
-	}
-
 	isFullscreen(): boolean {
 		return this._isFullscreen;
-	}
-
-	setIsStandalone(isStandalone: boolean) {
-		this._isStandalone = isStandalone;
 	}
 
 	getLastSelectionRange(): ?Range {
