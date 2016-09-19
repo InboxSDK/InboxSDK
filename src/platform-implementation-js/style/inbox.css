@@ -53,6 +53,7 @@
   font: normal normal normal normal 16px / normal arial, sans-serif;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   border: 1px solid rgba(0,0,0,0.2);
+  background: white;
 }
 
 .inboxsdk__app_sidebar {
