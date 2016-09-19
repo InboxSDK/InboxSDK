@@ -82,14 +82,20 @@ class InboxAppSidebarView {
       if (el.getAttribute('data-open') !== 'true') {
         this._el.style.display = 'none';
 
-        if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+        if (
+          this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
+          this._mainParent.classList.contains(getChatSidebarClassname())
+        ) {
           this._mainParent.classList.remove(getChatSidebarClassname());
           this._driver.getPageCommunicator().fakeWindowResize();
         }
       } else {
         this._el.style.display = '';
 
-        if (this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR') {
+        if (
+          this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
+          !this._mainParent.classList.contains(getChatSidebarClassname())
+        ) {
           this._mainParent.classList.add(getChatSidebarClassname());
           this._driver.getPageCommunicator().fakeWindowResize();
         }
@@ -146,19 +152,26 @@ class InboxAppSidebarView {
         event.stopImmediatePropagation();
         el.setAttribute('data-open', 'false');
       });
-    // If the user clicks the chat button while the chat sidebar is closed and
-    // the app sidebar is open, and Inbox opens the chat sidebar, then we want
-    // the chat sidebar to become visible. We just hide the app sidebar after
-    // Inbox brings up the chat sidebar.
-    Kefir.fromEvents(this._driver.getChatSidebarButton(), 'click')
-      .delay(0)
-      .filter(() =>
-        el.getAttribute('data-open') === 'true' &&
-        this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
-      )
+
+    this._driver.getCurrentChatSidebarView().getModeStream()
+      .changes()
       .takeUntilBy(this._stopper)
-      .onValue(() => {
-        el.setAttribute('data-open', 'false');
+      .onValue(mode => {
+        if (mode === 'SIDEBAR') {
+          // If the user clicks the chat button while the chat sidebar is
+          // closed and the app sidebar is open, and Inbox opens the chat
+          // sidebar, then we want the chat sidebar to become visible. We just
+          // hide the app sidebar after Inbox brings up the chat sidebar.
+          el.setAttribute('data-open', 'false');
+        } else {
+          // If the chat sidebar changes in any other way
+          // (ie. HIDDEN<->DROPDOWN) while the app sidebar is open, then we
+          // might need to fix up some class changes that Inbox might have
+          // made.
+          if (el.getAttribute('data-open') === 'true') {
+            positionSidebarNow();
+          }
+        }
       });
 
     positionSidebarAfterAnimation();
