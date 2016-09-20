@@ -66,6 +66,7 @@
   z-index: 5;
   padding: 16px 8px 0;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .inboxsdk__sidebar_panel_buttons > :first-child:last-child {
