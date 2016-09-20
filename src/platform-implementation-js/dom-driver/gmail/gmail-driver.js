@@ -7,7 +7,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
-import kefirCast from 'kefir-cast';
 import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
@@ -64,6 +63,7 @@ import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-drive
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
+import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type {EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
@@ -85,7 +85,7 @@ class GmailDriver {
 	_pageCommunicatorPromise: Promise<PageCommunicator>;
 	_butterBar: ?ButterBar;
 	_butterBarDriver: GmailButterBarDriver;
-	_routeViewDriverStream: Kefir.Observable<Object>;
+	_routeViewDriverStream: Kefir.Observable<GmailRouteView>;
 	_rowListViewDriverStream: Kefir.Observable<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Observable<Object>;
 	_threadViewDriverStream: Kefir.Observable<GmailThreadView>;

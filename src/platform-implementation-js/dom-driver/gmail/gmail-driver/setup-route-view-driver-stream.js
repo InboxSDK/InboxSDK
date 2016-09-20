@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
 
 import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
@@ -85,7 +84,7 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		revertNativeHashChanges,
 
 		//when native gmail changes main view there's a div that takes on role=main
-		kefirCast(Kefir, GmailElementGetter.getMainContentElementChangedStream())
+		GmailElementGetter.getMainContentElementChangedStream()
 			.map(event => ({
 				urlObject: getURLObject(document.location.href),
 				type: 'NATIVE'

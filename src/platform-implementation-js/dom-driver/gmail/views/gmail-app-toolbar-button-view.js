@@ -5,7 +5,6 @@ import Logger from '../../../lib/logger';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
