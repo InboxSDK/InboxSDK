@@ -144,10 +144,23 @@
   background: white;
   min-width: 1em;
   min-height: 1em;
-  padding: 0;
+  padding: 29px 36px 32px;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   border: 1px solid rgba(0,0,0,0.2);
+}
+
+.inboxsdk__tooltip h1 {
+  color: #333;
+  font-size: 18px;
+  font-weight: normal;
+  margin: 13px 0 0;
+}
+
+.inboxsdk__tooltip .inboxsdk__subtitle {
+  color: #777;
+  font-size: 13px;
+  margin: 3px 0 14px 0;
 }
 
 .inboxsdk__tooltip_arrow {

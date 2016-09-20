@@ -38,8 +38,9 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       this._contentEl.appendChild(titleEl);
     }
     if (options.subtitle) {
-      var subtitle = options.subtitle;
-      var sEl = document.createElement('div');
+      const subtitle = options.subtitle;
+      const sEl = document.createElement('div');
+      sEl.className = 'inboxsdk__subtitle';
       sEl.textContent = subtitle;
       this._contentEl.appendChild(sEl);
     }
@@ -79,8 +80,8 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
   }
 
   destroy() {
-    (this._el:any).remove();
-    (this._arrowEl:any).remove();
+    this._el.remove();
+    this._arrowEl.remove();
     this._stopper.destroy();
   }
 
