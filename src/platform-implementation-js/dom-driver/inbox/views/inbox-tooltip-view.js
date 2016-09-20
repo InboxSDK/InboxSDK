@@ -24,6 +24,16 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
     this._el.style.position = 'fixed';
     this._el.className = 'inboxsdk__tooltip';
     this._el.appendChild(this._contentEl);
+    {
+      const closeButton = document.createElement('button');
+      closeButton.type = 'button';
+      closeButton.title = 'Close';
+      closeButton.className = 'inboxsdk__close_button';
+      (closeButton:any).addEventListener('click', () => {
+        this.destroy();
+      });
+      this._el.appendChild(closeButton);
+    }
     if (options.imageUrl) {
       var src = options.imageUrl;
       var img = document.createElement('img');
