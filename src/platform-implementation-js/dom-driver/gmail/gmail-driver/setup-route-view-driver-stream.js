@@ -1,23 +1,25 @@
-'use strict';
+/* @flow */
 
 import _ from 'lodash';
 import Kefir from 'kefir';
+import get from '../../../../common/get-or-fail';
 
+import type GmailDriver from '../gmail-driver';
+import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 
-const routeIDtoRegExp = _.memoize(routeID =>
+const routeIDtoRegExp: (routeID: string) => RegExp = _.memoize(routeID =>
 	new RegExp('^'+_.escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
 );
 
-function routeIDmatchesHash(routeID, hash) {
+function routeIDmatchesHash(routeID: string|Array<string>, hash: string): ?string {
 	const routeIDs = Array.isArray(routeID) ? routeID : [routeID];
 	return _.find(routeIDs, routeID => hash.match(routeIDtoRegExp(routeID)));
 }
 
-// returns a Kefir stream
-export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) {
+export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver): Kefir.Observable<GmailRouteView> {
 	const customRouteIDs = driver.getCustomRouteIDs();
 	const customListRouteIDs = driver.getCustomListRouteIDs();
 	const customListSearchStringsToRouteIds = driver.getCustomListSearchStringsToRouteIds();
@@ -42,20 +44,19 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		.map(event => event.new)
 		.map(urlObject => {
 			const hash = urlObject.hash;
-			var routeIDs;
-			for (routeIDs of customRouteIDs) {
+			for (let routeIDs of customRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
 				if (routeID) {
 					return {urlObject, type: 'CUSTOM', routeID};
 				}
 			}
-			for ([routeIDs] of customListRouteIDs) {
+			for (let [routeIDs] of customListRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
 				if (routeID) {
 					return {urlObject, type: 'CUSTOM_LIST_TRIGGER', routeID};
 				}
 			}
-			if (GmailRouteProcessor.isNativeRoute(urlObject.name)) {
+			if (gmailRouteProcessor.isNativeRoute(urlObject.name)) {
 				return {urlObject, type: 'NATIVE'};
 			}
 			return {urlObject, type: 'OTHER_APP_CUSTOM'};
@@ -112,10 +113,10 @@ export default function setupRouteViewDriverStream(GmailRouteProcessor, driver) 
 		if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
 			driver.showNativeRouteView();
 		} else if (options.type === 'CUSTOM_LIST_TRIGGER') {
-			driver.showCustomThreadList(options.routeID, customListRouteIDs.get(options.routeID));
+			driver.showCustomThreadList(options.routeID, get(customListRouteIDs, options.routeID));
 			return;
 		}
-		return new GmailRouteView(options, GmailRouteProcessor, driver);
+		return new GmailRouteView(options, gmailRouteProcessor, driver);
 	})
 	.filter(Boolean)
 	.map((gmailRouteView) => {
