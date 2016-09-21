@@ -3,7 +3,6 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
 import delayAsap from '../../../../lib/delay-asap';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import cssSelectorEscape from '../../../../lib/css-selector-escape';

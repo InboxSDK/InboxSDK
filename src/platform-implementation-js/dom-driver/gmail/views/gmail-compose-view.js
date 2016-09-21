@@ -7,7 +7,6 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
 import * as ud from 'ud';
-import kefirCast from 'kefir-cast';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';

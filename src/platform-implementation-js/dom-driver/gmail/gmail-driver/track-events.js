@@ -3,7 +3,6 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirCast from 'kefir-cast';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 

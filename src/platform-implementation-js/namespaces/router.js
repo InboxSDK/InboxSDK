@@ -8,6 +8,7 @@ import HandlerRegistry from '../lib/handler-registry';
 import RouteView from '../views/route-view/route-view';
 import ListRouteView from '../views/route-view/list-route-view';
 import CustomRouteView from '../views/route-view/custom-route-view';
+import DummyRouteViewDriver from '../views/route-view/dummy-route-view-driver';
 import type Membrane from '../lib/Membrane';
 
 import type {Driver} from '../driver-interfaces/driver';
@@ -26,7 +27,7 @@ class Router {
 	constructor(appId: string, driver: Driver, membrane: Membrane){
 		const members = {
 			appId, driver,
-			currentRouteViewDriver: (null: any),
+			currentRouteViewDriver: new DummyRouteViewDriver(),
 			allRoutesHandlerRegistry: new HandlerRegistry(),
 			customRoutes: [],
 			membrane,
@@ -158,6 +159,10 @@ var ROUTE_TYPES = Object.freeze({
 
 
 function _handleRouteViewChange(router, members, routeViewDriver){
+	if (members.currentRouteViewDriver instanceof DummyRouteViewDriver) {
+		members.currentRouteViewDriver.destroy();
+	}
+
 	members.currentRouteViewDriver = routeViewDriver;
 	const routeView = members.membrane.get(routeViewDriver);
 

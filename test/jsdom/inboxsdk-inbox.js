@@ -34,6 +34,8 @@ InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(function(inboxsdk) {
   assert.strictEqual(inboxsdk.LOADER_VERSION, 'beep');
   assert.strictEqual(inboxsdk.IMPL_VERSION, 'beep');
 
+  assert.strictEqual(inboxsdk.Router.getCurrentRouteView().getRouteType(), 'UNKNOWN');
+
   RSVP.all([
     InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
     InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts)

@@ -5,7 +5,7 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import RSVP from 'rsvp';
 import {defn} from 'ud';
 import get from '../../../common/get-or-fail';
-import type {RouteViewDriver} from '../../driver-interfaces/route-view-driver';
+import type {MinRouteViewDriver} from '../../driver-interfaces/route-view-driver';
 
 const membersMap = new WeakMap();
 
@@ -13,7 +13,7 @@ const membersMap = new WeakMap();
 class RouteView extends EventEmitter {
 	destroyed: boolean;
 
-	constructor(routeViewDriver: RouteViewDriver) {
+	constructor(routeViewDriver: MinRouteViewDriver) {
 		super();
 
 		const members = {

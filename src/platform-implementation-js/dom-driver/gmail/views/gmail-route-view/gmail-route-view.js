@@ -29,7 +29,7 @@ import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
 import type GmailPageCommunicator from '../../gmail-page-communicator';
 
-var GmailRouteView = defn(module, class GmailRouteView {
+class GmailRouteView {
 	_type: string;
 	_hash: string;
 	_name: string;
@@ -46,6 +46,9 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_pageCommunicator: ?GmailPageCommunicator;
 
 	constructor({urlObject, type, routeID}: Object, gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver) {
+		// Check we implement interface
+		(this: RouteViewDriver);
+
 		this._type = type;
 		this._hash = urlObject.hash;
 		this._name = urlObject.name;
@@ -477,11 +480,6 @@ var GmailRouteView = defn(module, class GmailRouteView {
 	_getThreadContainerElement: () => ?HTMLElement = once(() => {
 		return GmailElementGetter.getThreadContainerElement();
 	});
-});
-export default GmailRouteView;
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	var x: RouteViewDriver = new GmailRouteView(({}:any), ({}:any), ({}:any));
 }
+
+export default defn(module, GmailRouteView);

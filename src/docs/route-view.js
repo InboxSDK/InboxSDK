@@ -11,20 +11,23 @@
 var RouteView = /** @lends RouteView */{
 
 	/**
-	 * Get the ID of the RouteView. This is the same routeID that you give {Router.goto()} or {Router.createLink()}.
+	 * Get the ID of the RouteView. This is the same routeID that you give
+	 * {Router.goto()} or {Router.createLink()}. This will be a value from
+	 * {NativeRouteIDs}.
 	 * @return {string}
 	 */
 	getRouteID: function(){},
 
 	/**
-	* Get the type of the route, either custom or native
+	* Get the type of the route. This will be one of the values in {RouteTypes}.
 	* @return {string}
 	*/
 	getRouteType: function(){},
 
 	/**
-	 * Get the URL parameters of this RouteView instance
-	 * @return {string[]}
+	 * Get the URL parameters of this RouteView instance. This will be an object
+	 * where the properties are strings.
+	 * @return {Object}
 	 */
 	getParams: function(){},
 
