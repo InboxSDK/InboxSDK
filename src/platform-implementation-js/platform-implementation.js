@@ -22,6 +22,7 @@ import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
 import ThreadRowView from './views/thread-row-view';
 import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
 
+import DummyRouteViewDriver from './views/route-view/dummy-route-view-driver';
 import RouteView from './views/route-view/route-view';
 import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
 
@@ -97,6 +98,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, this._membrane)],
 			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
 			[GmailRouteView, viewDriver => new RouteView(viewDriver)],
+			[DummyRouteViewDriver, viewDriver => new RouteView(viewDriver)]
 		]);
 		this.destroyed = false;
 		this.LOADER_VERSION = LOADER_VERSION;

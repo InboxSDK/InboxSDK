@@ -9,6 +9,7 @@ function delay(time, value) {
 }
 
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
+	console.log('current routeview', sdk.Router.getCurrentRouteView());
 });
 
 InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
