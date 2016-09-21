@@ -6,6 +6,7 @@ import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 import type ComposeView from '../views/compose-view';
+import type {RouteViewDriver} from './route-view-driver';
 
 import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
@@ -35,7 +36,7 @@ export type DrawerViewDriver = InboxDrawerView;
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
-	getRouteViewDriverStream(): Kefir.Observable<Object>; // should be a property
+	getRouteViewDriverStream(): Kefir.Observable<RouteViewDriver>; // should be a property
 	getRowListViewDriverStream(): Kefir.Observable<Object>;
 	openComposeWindow(): void;
 	getComposeViewDriverStream(): Kefir.Observable<ComposeViewDriver>;

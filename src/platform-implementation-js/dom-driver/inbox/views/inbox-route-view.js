@@ -2,12 +2,10 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
 
-import RouteViewDriver from '../../../driver-interfaces/route-view-driver';
-import assertInterface from '../../../lib/assert-interface';
-import addAccessors from 'add-accessors';
+import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
 // only used for constants
 import Router from '../../../namespaces/router';
@@ -41,10 +39,14 @@ export default class InboxRouteView {
   _routeType: string;
   _routeID: string;
   _params: Object;
-  _eventStream: Bus<any>;
+  _eventStream = kefirBus();
+  _stopper = kefirStopper();
   _customViewElement: ?HTMLElement = null;
 
   constructor(el: HTMLElement, type: string) {
+    // Check we implement interface
+    (this: RouteViewDriver);
+
     this._element = el;
 
     this._type = type;
@@ -52,7 +54,6 @@ export default class InboxRouteView {
     this._routeID = getRouteID(path);
     this._params = getParams(path);
     this._routeType = this._routeID === 'UNKNOWN' ? 'UNKNOWN' : 'LIST';
-    this._eventStream = kefirBus();
     this._customViewElement = null;
 
     console.log('el jsan', el.getAttribute('jsan'));
@@ -60,8 +61,13 @@ export default class InboxRouteView {
     }
   }
 
+  getStopper() {
+    return this._stopper;
+  }
+
   destroy(){
     this._eventStream.end();
+    this._stopper.destroy();
     if(this._customViewElement) this._customViewElement.remove();
   }
 
@@ -96,7 +102,20 @@ export default class InboxRouteView {
   refresh() {
     // stub
   }
+
+  getHash(): string {
+    throw new Error('should not happen');
+  }
+
+  getCustomViewElement(): ?HTMLElement {
+    throw new Error('should not happen');
+  }
+
+  addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+    throw new Error('not implemented yet');
+  }
+
+  addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+    throw new Error('not implemented yet');
+  }
 }
-
-
-assertInterface(InboxRouteView.prototype, RouteViewDriver);
