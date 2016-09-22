@@ -13,6 +13,7 @@ function main() {
 	});
 
 	InboxSDK.load('1', 'Hello World!', {inboxBeta: true}).then(function(sdk){
+
 		sdk.Router.handleAllRoutes(function(routeView) {
 			console.log('got a routeView', routeView);
 			console.log('routeType', routeView.getRouteType());
@@ -31,7 +32,7 @@ function main() {
 					currentCompose = null;
 				}
 			});
-			
+
 			// a compose view has come into existence, do something with it!
 			composeView.addButton({
 				title: "My Nifty Button!",
@@ -71,6 +72,15 @@ function main() {
 		};
 
 		makeMoleWidget();
+
+
+		sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
+			threadRowView.addImage(Kefir.constant({
+				imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+				tooltip: 'Monkeys'
+			}));
+		});
+
 	});
 }
 

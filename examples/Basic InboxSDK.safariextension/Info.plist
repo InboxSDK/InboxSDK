@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Builder Version</key>
-	<string>11601.5.17.1</string>
+	<string>12602.1.50.0.10</string>
 	<key>CFBundleDisplayName</key>
 	<string>Basic Safari InboxSDK example</string>
 	<key>CFBundleIdentifier</key>
@@ -23,6 +23,7 @@
 			<key>End</key>
 			<array>
 				<string>inboxsdk.js</string>
+				<string>kefir.js</string>
 				<string>content.js</string>
 			</array>
 		</dict>
