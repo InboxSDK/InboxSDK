@@ -884,6 +884,8 @@ class GmailThreadRowView {
             makeMutationObserverChunkedStream(watchElement, {
               attributes: true, attributeFilter: ['class']
             })
+            .map(() => _.filter(watchElement.classList, className => className.indexOf('inboxsdk') !== 0).sort().join(' '))
+            .skipDuplicates()
           )
           .map(()=>null)
           .takeUntilBy(this._stopper)
