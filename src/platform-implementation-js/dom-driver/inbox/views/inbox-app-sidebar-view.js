@@ -51,14 +51,6 @@ class InboxAppSidebarView {
     this._el.remove();
   }
 
-  _hasAppToolbarButton(): boolean {
-    return this._el.getAttribute('data-sdk-has-app-toolbar-button') === 'true';
-  }
-
-  _setHasAppToolbarButton(x: boolean) {
-    this._el.setAttribute('data-sdk-has-app-toolbar-button', String(x));
-  }
-
   _createElement() {
     const el = document.createElement('div');
     el.style.display = 'none';
