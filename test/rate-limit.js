@@ -1,8 +1,7 @@
 /* @flow */
-//jshint ignore:start
 
 import assert from 'assert';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import rateLimit from '../src/common/rate-limit';
 
@@ -27,12 +26,12 @@ describe("rateLimit", function() {
   });
   it("multiple calls over longer period works", async function() {
     let x = 5;
-    const fn = rateLimit(() => x++, 15, 2);
+    const fn = rateLimit(() => x++, 25, 2);
     assert.strictEqual(fn(), 5);
     assert.strictEqual(fn(), 6);
     assert.throws(fn, /^Error: Function rate limit exceeded$/);
     assert.throws(fn, /^Error: Function rate limit exceeded$/);
-    await delay(16);
+    await delay(30);
     assert.strictEqual(fn(), 7);
     assert.strictEqual(fn(), 8);
     assert.throws(fn, /^Error: Function rate limit exceeded$/);
