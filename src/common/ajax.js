@@ -1,9 +1,8 @@
 /* @flow */
-//jshint ignore:start
 
 const forOwn = require('lodash/forOwn');
 import querystring from 'querystring';
-import delay from './delay';
+import delay from 'pdelay';
 import cachebustUrl from './cachebust-url';
 
 const MAX_TIMEOUT = 64*1000; //64 seconds

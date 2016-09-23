@@ -8,7 +8,7 @@ import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import once from 'lodash/once';
 import jsdomDoc from './lib/jsdom-doc';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import detectionRunner from '../src/platform-implementation-js/lib/dom/detectionRunner';
 

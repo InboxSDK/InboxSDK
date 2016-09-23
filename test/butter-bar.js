@@ -7,7 +7,7 @@ import co from 'co';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import ButterBar from '../src/platform-implementation-js/namespaces/butter-bar';
 

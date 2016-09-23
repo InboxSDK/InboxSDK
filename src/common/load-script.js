@@ -1,12 +1,11 @@
 /* @flow */
-//jshint ignore:start
 
 const once = require('lodash/once');
 const defer = require('lodash/defer');
 import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';
-import delay from './delay';
+import delay from 'pdelay';
 
 const isContentScript: () => boolean = once(function() {
   if (global.chrome && global.chrome.extension)

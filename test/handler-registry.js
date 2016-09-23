@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 import Marker from '../src/common/marker';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import HandlerRegistry from '../src/platform-implementation-js/lib/handler-registry';
 

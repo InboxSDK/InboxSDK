@@ -2,7 +2,7 @@
 
 import assert from 'assert';
 import sinon from 'sinon';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import arrayToLifetimes from '../src/platform-implementation-js/lib/array-to-lifetimes';

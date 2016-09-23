@@ -5,7 +5,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import makeElementIntoEventEmitter from './lib/makeElementIntoEventEmitter';
