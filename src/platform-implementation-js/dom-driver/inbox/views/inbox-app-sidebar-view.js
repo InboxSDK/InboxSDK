@@ -51,12 +51,19 @@ class InboxAppSidebarView {
     this._el.remove();
   }
 
-  _hasAppToolbarButton(): boolean {
-    return this._el.getAttribute('data-sdk-has-app-toolbar-button') === 'true';
+  // This value controls whether the app sidebar should automatically open
+  // itself when available when the chat sidebar isn't present. It's only set
+  // if the user interacts with the app sidebar button.
+  _getShouldAppSidebarOpen(): boolean {
+    return localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
   }
 
-  _setHasAppToolbarButton(x: boolean) {
-    this._el.setAttribute('data-sdk-has-app-toolbar-button', String(x));
+  _setShouldAppSidebarOpen(open: boolean) {
+    try {
+      localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
+    } catch(err) {
+      console.error('error saving', err);
+    }
   }
 
   _createElement() {
@@ -71,43 +78,6 @@ class InboxAppSidebarView {
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
-
-    const positionSidebarAfterAnimation = () => {
-      waitForAnimationClickBlockerGone()
-        .takeUntilBy(this._stopper)
-        .onValue(positionSidebarNow);
-    };
-
-    const positionSidebarNow = () => {
-      if (el.getAttribute('data-open') !== 'true') {
-        this._el.style.display = 'none';
-
-        if (
-          this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-          this._mainParent.classList.contains(getChatSidebarClassname())
-        ) {
-          this._mainParent.classList.remove(getChatSidebarClassname());
-          this._driver.getPageCommunicator().fakeWindowResize();
-        }
-      } else {
-        this._el.style.display = '';
-
-        if (
-          this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-          !this._mainParent.classList.contains(getChatSidebarClassname())
-        ) {
-          this._mainParent.classList.add(getChatSidebarClassname());
-          this._driver.getPageCommunicator().fakeWindowResize();
-        }
-      }
-    };
-
-    // Whenever the app sidebar's data-open property is changed, then we show
-    // or hide the sidebar as necessary.
-    makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['data-open']})
-      .map(() => el.getAttribute('data-open'))
-      .skipDuplicates()
-      .onValue(positionSidebarNow);
 
     {
       // When the sidebar switches between having no contents and having at
@@ -125,16 +95,18 @@ class InboxAppSidebarView {
                 iconUrl: appSidebarIcon,
                 hasDropdown: false,
                 onClick: () => {
-                  el.setAttribute('data-open', String(el.getAttribute('data-open') !== 'true'));
+                  const newState = el.getAttribute('data-open') !== 'true';
+                  this._setShouldAppSidebarOpen(newState);
+                  this._setOpenedNow(newState);
                 }
               }));
             }
           } else {
-            el.setAttribute('data-open', 'false');
             if (appToolbarButtonPromise) {
               appToolbarButtonPromise.then(x => { x.destroy(); });
               appToolbarButtonPromise = null;
             }
+            this._setOpenedNow(false);
           }
         });
     }
@@ -150,7 +122,8 @@ class InboxAppSidebarView {
       .takeUntilBy(this._stopper)
       .onValue(event => {
         event.stopImmediatePropagation();
-        el.setAttribute('data-open', 'false');
+        this._setShouldAppSidebarOpen(false);
+        this._setOpenedNow(false);
       });
 
     this._driver.getCurrentChatSidebarView().getModeStream()
@@ -162,21 +135,52 @@ class InboxAppSidebarView {
           // closed and the app sidebar is open, and Inbox opens the chat
           // sidebar, then we want the chat sidebar to become visible. We just
           // hide the app sidebar after Inbox brings up the chat sidebar.
-          el.setAttribute('data-open', 'false');
+          this._setShouldAppSidebarOpen(false);
+          this._setOpenedNow(false);
         } else {
           // If the chat sidebar changes in any other way
           // (ie. HIDDEN<->DROPDOWN) while the app sidebar is open, then we
           // might need to fix up some class changes that Inbox might have
           // made.
           if (el.getAttribute('data-open') === 'true') {
-            positionSidebarNow();
+            this._setOpenedNow(true);
           }
         }
       });
 
-    positionSidebarAfterAnimation();
-
     return el;
+  }
+
+  _setOpenedNow(open: boolean) {
+    this._el.setAttribute('data-open', String(open));
+    if (!open) {
+      this._el.style.display = 'none';
+
+      if (
+        this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
+        this._mainParent.classList.contains(getChatSidebarClassname())
+      ) {
+        this._mainParent.classList.remove(getChatSidebarClassname());
+        this._driver.getPageCommunicator().fakeWindowResize();
+      }
+    } else {
+      this._el.style.display = '';
+
+      if (
+        this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
+        !this._mainParent.classList.contains(getChatSidebarClassname())
+      ) {
+        this._mainParent.classList.add(getChatSidebarClassname());
+        this._driver.getPageCommunicator().fakeWindowResize();
+      }
+    }
+  }
+
+  _setOpenedAfterAnimation(open: boolean) {
+    waitForAnimationClickBlockerGone()
+      .takeUntilBy(this._stopper)
+      .takeUntilBy(makeMutationObserverChunkedStream(this._el, {attributes: true, attributeFilter: ['data-open']}))
+      .onValue(() => this._setOpenedNow(open));
   }
 
   _hideAllPanels() {
@@ -200,14 +204,20 @@ class InboxAppSidebarView {
 
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
-    if (this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR') {
-      this._el.setAttribute('data-open', 'true');
+
+    if (
+      this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
+      this._getShouldAppSidebarOpen()
+    ) {
+      this._setOpenedAfterAnimation(true);
     }
 
     this._stopper
       .takeUntilBy(view.getStopper())
       .onValue(() => {
         view.remove();
+        // _createElement sets up a MutationObserver which will close the
+        // sidebar at this point if it should be closed.
       });
 
     view.getStopper()

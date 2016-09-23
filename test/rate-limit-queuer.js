@@ -1,8 +1,7 @@
 /* @flow */
-//jshint ignore:start
 
 import assert from 'assert';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import rateLimitQueuer from '../src/common/rate-limit-queuer';
 

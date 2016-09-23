@@ -4,7 +4,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import delay from '../src/common/delay';
+import delay from 'pdelay';
 
 import streamWaitFor from '../src/platform-implementation-js/lib/stream-wait-for';
 
