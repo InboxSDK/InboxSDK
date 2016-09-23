@@ -51,6 +51,21 @@ class InboxAppSidebarView {
     this._el.remove();
   }
 
+  // This value controls whether the app sidebar should automatically open
+  // itself when available when the chat sidebar isn't present. It's only set
+  // if the user interacts with the app sidebar button.
+  _getShouldAppSidebarOpen(): boolean {
+    return localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
+  }
+
+  _setShouldAppSidebarOpen(open: boolean) {
+    try {
+      localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
+    } catch(err) {
+      console.error('error saving', err);
+    }
+  }
+
   _createElement() {
     const el = document.createElement('div');
     el.style.display = 'none';
@@ -60,7 +75,6 @@ class InboxAppSidebarView {
       <div class="inboxsdk__sidebar_panel_content_area"></div>
     `;
     el.setAttribute('data-open', 'false');
-    el.setAttribute('data-wants-open', 'false');
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
@@ -82,7 +96,7 @@ class InboxAppSidebarView {
                 hasDropdown: false,
                 onClick: () => {
                   const newState = el.getAttribute('data-open') !== 'true';
-                  el.setAttribute('data-wants-open', String(newState));
+                  this._setShouldAppSidebarOpen(newState);
                   this._setOpenedNow(newState);
                 }
               }));
@@ -108,7 +122,7 @@ class InboxAppSidebarView {
       .takeUntilBy(this._stopper)
       .onValue(event => {
         event.stopImmediatePropagation();
-        el.setAttribute('data-wants-open', 'false');
+        this._setShouldAppSidebarOpen(false);
         this._setOpenedNow(false);
       });
 
@@ -121,7 +135,7 @@ class InboxAppSidebarView {
           // closed and the app sidebar is open, and Inbox opens the chat
           // sidebar, then we want the chat sidebar to become visible. We just
           // hide the app sidebar after Inbox brings up the chat sidebar.
-          el.setAttribute('data-wants-open', 'false');
+          this._setShouldAppSidebarOpen(false);
           this._setOpenedNow(false);
         } else {
           // If the chat sidebar changes in any other way
@@ -193,7 +207,7 @@ class InboxAppSidebarView {
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
-      this._el.getAttribute('data-wants-open') === 'true'
+      this._getShouldAppSidebarOpen()
     ) {
       this._setOpenedAfterAnimation(true);
     }
