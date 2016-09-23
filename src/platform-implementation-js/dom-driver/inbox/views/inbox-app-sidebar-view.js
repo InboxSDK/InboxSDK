@@ -179,7 +179,7 @@ class InboxAppSidebarView {
   _setOpenedAfterAnimation(open: boolean) {
     waitForAnimationClickBlockerGone()
       .takeUntilBy(this._stopper)
-      .takeUntilBy(makeMutationObserverChunkedStream(this._el, {attributes: true, attributeFilter: ['class']}))
+      .takeUntilBy(makeMutationObserverChunkedStream(this._el, {attributes: true, attributeFilter: ['data-open']}))
       .onValue(() => this._setOpenedNow(open));
   }
 
