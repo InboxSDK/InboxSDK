@@ -749,11 +749,13 @@ class GmailComposeView {
 		}
 	}
 
-	async getDraftID(): Promise<?string> {
-		if (!this._draftIDpromise) {
-			this._draftIDpromise = this._getDraftIDimplementation();
+	getDraftID(): Promise<?string> {
+		let draftIDpromise = this._draftIDpromise;
+		if (!draftIDpromise) {
+			draftIDpromise = this._draftIDpromise = this._getDraftIDimplementation();
 		}
-		return this._draftIDpromise;
+		draftIDpromise.catch(err => this._driver.getLogger().error(err));
+		return draftIDpromise;
 	}
 
 	async _getDraftIDimplementation(): Promise<?string> {
