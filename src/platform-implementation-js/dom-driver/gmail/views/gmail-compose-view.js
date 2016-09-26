@@ -796,7 +796,7 @@ class GmailComposeView {
 			}
 			lastMessageId = messageId;
 
-			const draftID = this._driver.getDraftIDForMessageID(messageId);
+			const draftID = await this._driver.getDraftIDForMessageID(messageId);
 			if (draftID) {
 				return draftID;
 			}
