@@ -346,7 +346,7 @@ export function readDraftId(response: string, messageID: string): ?string {
   const decoded = deserialize(response).value;
   const msgA = _.chain(decoded)
     .flatten()
-    .filter(x => Array.isArray(x))
+    .filter(Array.isArray)
     .flatten()
     .filter(x => x[0] === 'ms' && x[1] === messageID)
     .map(x => x[60])

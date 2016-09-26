@@ -749,55 +749,73 @@ class GmailComposeView {
 		}
 	}
 
-	async getDraftID(): Promise<?string> {
-		if (!this._draftIDpromise) {
-			this._draftIDpromise = this._getDraftIDimplementation();
+	getDraftID(): Promise<?string> {
+		let draftIDpromise = this._draftIDpromise;
+		if (!draftIDpromise) {
+			draftIDpromise = this._draftIDpromise = this._getDraftIDimplementation();
 		}
-		return this._draftIDpromise;
+		return draftIDpromise;
 	}
 
 	async _getDraftIDimplementation(): Promise<?string> {
-		// If this compose view doesn't have a message id yet, wait until it gets
-		// one or it's closed.
-		if (!this._messageId) {
-			await this._eventStream
-				.filter(event => event.eventName === 'messageIDChange')
-				.beforeEnd(() => null)
-				.take(1)
-				.toPromise(RSVP.Promise);
-		}
+		let i = -1;
 
-		// We make an AJAX request against gmail to find the draft ID for our
-		// current message ID. However, our message ID can change before that
-		// request finishes. If we fail to get our draft ID and we see that our
-		// message ID has changed since we made the request, then we try again.
-		let lastMessageId = null;
-		while (true) {
-			const messageId = this._messageId;
-			if (!messageId) {
-				return null;
-			}
-			if (lastMessageId === messageId) {
-				// It's possible that the server received a draft save request from us
-				// already, causing the draft id lookup to fail, but we haven't gotten
-				// the draft save response yet. Wait for that response to finish and
-				// keep trying if it looks like that might be the case.
-				if (this._draftSaving) {
-					await this._eventStream
-						.filter(event => event.eventName === 'messageIDChange')
-						.beforeEnd(() => null)
-						.take(1)
-						.toPromise(RSVP.Promise);
-					continue;
+		try {
+			// If this compose view doesn't have a message id yet, wait until it gets
+			// one or it's closed.
+			if (!this._messageId) {
+				await this._eventStream
+					.filter(event => event.eventName === 'messageIDChange')
+					.beforeEnd(() => null)
+					.take(1)
+					.toPromise();
+
+				if (!this._messageId) {
+					// The compose was closed before it got an id.
+					return null;
 				}
-				throw new Error("Failed to read draft ID");
 			}
-			lastMessageId = messageId;
 
-			const draftID = this._driver.getDraftIDForMessageID(messageId);
-			if (draftID) {
-				return draftID;
+			// We make an AJAX request against gmail to find the draft ID for our
+			// current message ID. However, our message ID can change before that
+			// request finishes. If we fail to get our draft ID and we see that our
+			// message ID has changed since we made the request, then we try again.
+			let lastMessageId = null;
+			while (true) {
+				i++;
+
+				const messageId = this._messageId;
+				if (!messageId) {
+					throw new Error('Should not happen');
+				}
+				if (lastMessageId === messageId) {
+					// It's possible that the server received a draft save request from us
+					// already, causing the draft id lookup to fail, but we haven't gotten
+					// the draft save response yet. Wait for that response to finish and
+					// keep trying if it looks like that might be the case.
+					if (this._draftSaving) {
+						await this._eventStream
+							.filter(event => event.eventName === 'messageIDChange')
+							.beforeEnd(() => null)
+							.take(1)
+							.toPromise();
+						continue;
+					}
+					throw new Error("Failed to read draft ID");
+				}
+				lastMessageId = messageId;
+
+				const draftID = await this._driver.getDraftIDForMessageID(messageId);
+				if (draftID) {
+					return draftID;
+				}
 			}
+		} catch(err) {
+			this._driver.getLogger().error(err, {
+				message: 'getDraftID error',
+				i
+			});
+			throw err;
 		}
 	}
 
