@@ -754,7 +754,9 @@ class GmailComposeView {
 		if (!draftIDpromise) {
 			draftIDpromise = this._draftIDpromise = this._getDraftIDimplementation();
 		}
-		draftIDpromise.catch(err => this._driver.getLogger().error(err));
+		draftIDpromise.catch(err => this._driver.getLogger().error(err, {
+			message: 'getDraftID error'
+		}));
 		return draftIDpromise;
 	}
 
