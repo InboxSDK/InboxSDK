@@ -2,15 +2,13 @@
 //jshint ignore:start
 
 import _ from 'lodash';
-import {defn} from 'ud';
 import ajax from '../../../../common/ajax';
 import {readDraftId} from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
-import rateLimitQueuer from '../../../../common/rate-limit-queuer';
 
 const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<?string> =
-  _.memoize(rateLimitQueuer(async function(driver: GmailDriver, messageID: string): Promise<?string> {
+  _.memoize(async function(driver: GmailDriver, messageID: string): Promise<?string> {
     const response = await ajax({
       method: 'GET',
       url: (document.location:any).origin+document.location.pathname,
@@ -38,6 +36,6 @@ const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promis
       }
       throw err;
     }
-  }, 1000, 5), (driver, messageID) => messageID);
+  }, (driver, messageID) => messageID);
 
-export default defn(module, getDraftIDForMessageID);
+export default getDraftIDForMessageID;
