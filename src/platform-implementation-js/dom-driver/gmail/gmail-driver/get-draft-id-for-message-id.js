@@ -30,6 +30,7 @@ const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promis
       if (isStreakAppId(driver.getAppId())) {
         driver.getLogger().error(err, {
           message: 'failed to read draft ID',
+          messageID,
           text: response.text
         });
       }
