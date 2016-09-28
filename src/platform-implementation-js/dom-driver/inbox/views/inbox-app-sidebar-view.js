@@ -191,7 +191,7 @@ class InboxAppSidebarView {
       .onValue(() => {
         button.remove();
       })
-      .flatMap(delayAsap)
+      .delay(0)
       .onValue(() => {
         if (this._contentArea.childElementCount === 0) {
           this._setOpenedNow(false);
