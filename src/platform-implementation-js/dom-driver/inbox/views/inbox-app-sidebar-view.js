@@ -7,6 +7,7 @@ import kefirStopper from 'kefir-stopper';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
+import delayAsap from '../../../lib/delay-asap';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
@@ -78,38 +79,6 @@ class InboxAppSidebarView {
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
-
-    {
-      // When the sidebar switches between having no contents and having at
-      // least one item, we toggle whether the app sidebar button is visible,
-      // and we close the sidebar if it's empty now.
-      let appToolbarButtonPromise = null;
-      makeMutationObserverChunkedStream(contentArea, {childList: true})
-        .map(() => contentArea.childElementCount > 0)
-        .skipDuplicates()
-        .onValue(hasChildren => {
-          if (hasChildren) {
-            if (!appToolbarButtonPromise) {
-              appToolbarButtonPromise = this._driver.addToolbarButtonForApp(Kefir.constant({
-                title: 'Extension Sidebar',
-                iconUrl: appSidebarIcon,
-                hasDropdown: false,
-                onClick: () => {
-                  const newState = el.getAttribute('data-open') !== 'true';
-                  this._setShouldAppSidebarOpen(newState);
-                  this._setOpenedNow(newState);
-                }
-              }));
-            }
-          } else {
-            if (appToolbarButtonPromise) {
-              appToolbarButtonPromise.then(x => { x.destroy(); });
-              appToolbarButtonPromise = null;
-            }
-            this._setOpenedNow(false);
-          }
-        });
-    }
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
@@ -216,13 +185,17 @@ class InboxAppSidebarView {
       .takeUntilBy(view.getStopper())
       .onValue(() => {
         view.remove();
-        // _createElement sets up a MutationObserver which will close the
-        // sidebar at this point if it should be closed.
       });
 
     view.getStopper()
       .onValue(() => {
         button.remove();
+      })
+      .flatMap(delayAsap)
+      .onValue(() => {
+        if (this._contentArea.childElementCount === 0) {
+          this._setOpenedNow(false);
+        }
       });
     return view;
   }
