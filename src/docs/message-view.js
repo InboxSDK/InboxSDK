@@ -480,6 +480,7 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
 
 	/**
 	* Function to call when the user clicks the icon.
+	* ^optional
 	* @type {function()}
 	*/
 	onClick: null
