@@ -75,6 +75,9 @@ class InboxAppSidebarView {
       <div class="inboxsdk__sidebar_panel_buttons"></div>
       <div class="inboxsdk__sidebar_panel_content_area"></div>
     `;
+    // Store the open state in the DOM rather than a class property because
+    // multiple instances of InboxAppSidebarView from different apps need to
+    // share the value.
     el.setAttribute('data-open', 'false');
     document.body.appendChild(el);
 
