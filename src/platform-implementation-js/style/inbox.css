@@ -98,7 +98,7 @@
   left: -24px;
 }
 
-.inboxsdk__app_sidebar[data-panel-count="1"] .inboxsdk__sidebar_panel_buttons {
+.inboxsdk__sidebar_panel_buttons > :first-child:last-child {
   display: none;
 }
 
