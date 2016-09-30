@@ -92,6 +92,16 @@
   display: none;
 }
 
+.inboxsdk__app_sidebar_tab_preview_icon {
+  text-align: right;
+  margin: 4px;
+}
+
+.inboxsdk__app_sidebar_tab_preview_icon > img {
+  width: 16px;
+  height: 16px;
+}
+
 .inboxsdk__app_sidebar_closer {
   position: absolute;
   top: 10px;

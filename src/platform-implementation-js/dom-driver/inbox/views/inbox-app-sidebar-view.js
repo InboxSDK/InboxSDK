@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import {defn} from 'ud';
+import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import fakeWindowResize from '../../../lib/fake-window-resize';
@@ -196,6 +197,28 @@ class InboxAppSidebarView {
       this._hideAllPanels();
       view.getElement().style.display = '';
     });
+
+    {
+      const tabPreviewIcon = document.createElement('div');
+      tabPreviewIcon.className = 'inboxsdk__app_sidebar_tab_preview_icon';
+
+      descriptor
+        .takeUntilBy(view.getStopper())
+        .onValue(descriptor => {
+          tabPreviewIcon.className = `inboxsdk__app_sidebar_tab_preview_icon ${descriptor.iconClass||''}`;
+          if (descriptor.iconUrl) {
+            tabPreviewIcon.innerHTML = autoHtml `<img src="${descriptor.iconUrl}">`;
+          } else {
+            tabPreviewIcon.innerHTML = '';
+          }
+        });
+
+      view.getStopper().onValue(() => {
+        tabPreviewIcon.remove();
+      });
+
+      this._openerEl.appendChild(tabPreviewIcon);
+    }
 
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
