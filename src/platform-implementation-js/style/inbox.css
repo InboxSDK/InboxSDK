@@ -85,6 +85,8 @@
   position: fixed;
   top: 66px;
   right: 0;
+  pointer-events: none;
+  text-align: right;
 }
 
 .inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
@@ -92,9 +94,14 @@
   display: none;
 }
 
+.inboxsdk__app_sidebar_opener button,
 .inboxsdk__app_sidebar_tab_preview_icon {
-  text-align: right;
-  margin: 4px;
+  pointer-events: all;
+}
+
+.inboxsdk__app_sidebar_tab_preview_icon {
+  display: inline-block;
+  margin: 4px 4px 4px 0;
 }
 
 .inboxsdk__app_sidebar_tab_preview_icon > img {

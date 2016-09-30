@@ -217,7 +217,10 @@ class InboxAppSidebarView {
         tabPreviewIcon.remove();
       });
 
-      this._openerEl.appendChild(tabPreviewIcon);
+      const container = document.createElement('div');
+      container.className = 'inboxsdk__app_sidebar_tab_preview_icon_container';
+      container.appendChild(tabPreviewIcon);
+      this._openerEl.appendChild(container);
     }
 
     this._hideAllPanels();
