@@ -90,7 +90,7 @@ class InboxAppSidebarView {
     // multiple instances of InboxAppSidebarView from different apps need to
     // share the value.
     el.setAttribute('data-open', 'false');
-    el.setAttribute('data-panel-count', '0');
+    el.setAttribute('data-can-open', 'false');
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
@@ -151,6 +151,7 @@ class InboxAppSidebarView {
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
+    this._el.setAttribute('data-can-open', String(this._contentArea.childElementCount>0));
     if (!open) {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
@@ -198,13 +199,14 @@ class InboxAppSidebarView {
 
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
-    this._el.setAttribute('data-panel-count', String(this._contentArea.childElementCount));
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
       this._getShouldAppSidebarOpen()
     ) {
       this._setOpenedAfterAnimation(true);
+    } else {
+      this._el.setAttribute('data-can-open', 'true');
     }
 
     this._stopper
@@ -219,9 +221,9 @@ class InboxAppSidebarView {
       })
       .delay(0)
       .onValue(() => {
-        const count = this._contentArea.childElementCount;
-        this._el.setAttribute('data-panel-count', String(count));
-        if (count === 0) {
+        const hasChildren = this._contentArea.childElementCount > 0;
+        this._el.setAttribute('data-can-open', String(hasChildren));
+        if (!hasChildren) {
           this._setOpenedNow(false);
         }
       });

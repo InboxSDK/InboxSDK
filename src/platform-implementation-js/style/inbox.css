@@ -88,7 +88,7 @@
 }
 
 .inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
-.inboxsdk__app_sidebar[data-panel-count="0"] + .inboxsdk__app_sidebar_opener {
+.inboxsdk__app_sidebar[data-can-open="false"] + .inboxsdk__app_sidebar_opener {
   display: none;
 }
 
