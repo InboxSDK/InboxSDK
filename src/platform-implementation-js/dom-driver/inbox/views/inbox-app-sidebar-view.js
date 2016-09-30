@@ -19,6 +19,7 @@ import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
 class InboxAppSidebarView {
   _stopper = kefirStopper();
   _driver: InboxDriver;
+  _openerEl: HTMLElement;
   _el: HTMLElement;
   _buttonContainer: HTMLElement;
   _contentArea: HTMLElement;
@@ -34,7 +35,13 @@ class InboxAppSidebarView {
     // the element already exists. If it doesn't, then we create the element,
     // and set up some mutation observers to watch for changes to the sidebar
     // and reposition it and modify the page as needed.
-    this._el = document.querySelector('.inboxsdk__app_sidebar') || this._createElement();
+    const el = document.querySelector('.inboxsdk__app_sidebar');
+    if (el) {
+      this._el = el;
+      this._openerEl = document.querySelector('.inboxsdk__app_sidebar_opener');
+    } else {
+      this._createElement();
+    }
     this._buttonContainer = this._el.querySelector('.inboxsdk__sidebar_panel_buttons');
     this._contentArea = this._el.querySelector('.inboxsdk__sidebar_panel_content_area');
 
@@ -68,17 +75,22 @@ class InboxAppSidebarView {
   }
 
   _createElement() {
-    const el = document.createElement('div');
-    el.style.display = 'none';
+    const el = this._el = document.createElement('div');
     el.className = 'inboxsdk__app_sidebar';
     el.innerHTML = `
-      <div class="inboxsdk__sidebar_panel_buttons"></div>
-      <div class="inboxsdk__sidebar_panel_content_area"></div>
+      <div class="inboxsdk__app_sidebar_main">
+        <div class="inboxsdk__sidebar_panel_buttons"></div>
+        <div class="inboxsdk__sidebar_panel_content_area"></div>
+      </div>
+      <div class="inboxsdk__app_sidebar_closer">
+        <button type="button" title="Close">⇨</button>
+      </div>
     `;
     // Store the open state in the DOM rather than a class property because
     // multiple instances of InboxAppSidebarView from different apps need to
     // share the value.
     el.setAttribute('data-open', 'false');
+    el.setAttribute('data-panel-count', '0');
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
@@ -120,14 +132,26 @@ class InboxAppSidebarView {
         }
       });
 
-    return el;
+    el.querySelector('.inboxsdk__app_sidebar_closer button').addEventListener('click', () => {
+      this._setShouldAppSidebarOpen(false);
+      this._setOpenedNow(false);
+    });
+
+    this._openerEl = document.createElement('div');
+    this._openerEl.className = 'inboxsdk__app_sidebar_opener';
+    this._openerEl.innerHTML = `
+      <button type="button" title="Open Extension Sidebar">⇦</button>
+    `;
+    this._openerEl.querySelector('button').addEventListener('click', () => {
+      this._setShouldAppSidebarOpen(true);
+      this._setOpenedNow(true);
+    });
+    document.body.appendChild(this._openerEl);
   }
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
     if (!open) {
-      this._el.style.display = 'none';
-
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
         this._mainParent.classList.contains(getChatSidebarClassname())
@@ -136,8 +160,6 @@ class InboxAppSidebarView {
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     } else {
-      this._el.style.display = '';
-
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
         !this._mainParent.classList.contains(getChatSidebarClassname())
@@ -176,6 +198,7 @@ class InboxAppSidebarView {
 
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
+    this._el.setAttribute('data-panel-count', String(this._contentArea.childElementCount));
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
@@ -196,7 +219,9 @@ class InboxAppSidebarView {
       })
       .delay(0)
       .onValue(() => {
-        if (this._contentArea.childElementCount === 0) {
+        const count = this._contentArea.childElementCount;
+        this._el.setAttribute('data-panel-count', String(count));
+        if (count === 0) {
           this._setOpenedNow(false);
         }
       });

@@ -64,12 +64,41 @@
   right: 0;
   width: 232px;
   z-index: 5;
+}
+
+.inboxsdk__app_sidebar[data-open="false"] {
+  display: none;
+}
+
+.inboxsdk__app_sidebar_main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 16px 8px 0;
-  box-sizing: border-box;
   overflow-y: auto;
 }
 
-.inboxsdk__sidebar_panel_buttons > :first-child:last-child {
+.inboxsdk__app_sidebar_opener {
+  z-index: 5;
+  position: fixed;
+  top: 66px;
+  right: 0;
+}
+
+.inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
+.inboxsdk__app_sidebar[data-panel-count="0"] + .inboxsdk__app_sidebar_opener {
+  display: none;
+}
+
+.inboxsdk__app_sidebar_closer {
+  position: absolute;
+  top: 10px;
+  left: -24px;
+}
+
+.inboxsdk__app_sidebar[data-panel-count="1"] .inboxsdk__sidebar_panel_buttons {
   display: none;
 }
 
