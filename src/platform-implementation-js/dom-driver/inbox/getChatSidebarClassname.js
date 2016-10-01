@@ -34,9 +34,7 @@ const getChatSidebarClassname: () => string = _.once(() => {
 
   function rulesToStyleRules(rule: CSSRule): Object[] {
     if (rule instanceof window.CSSMediaRule) {
-      if (_.some(rule.media, m => window.matchMedia(m).matches)) {
-        return _.flatMap(rule.cssRules, rulesToStyleRules);
-      }
+      return _.flatMap(rule.cssRules, rulesToStyleRules);
     } else if (rule instanceof window.CSSStyleRule) {
       return [rule];
     }
