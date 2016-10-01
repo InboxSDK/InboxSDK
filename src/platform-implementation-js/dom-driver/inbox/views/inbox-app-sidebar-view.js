@@ -247,6 +247,9 @@ class InboxAppSidebarView {
       })
       .delay(0)
       .onValue(() => {
+        // The delay(0) is necessary because the view's element isn't removed
+        // already at the time the stopper fires, and because we don't really
+        // need to close the sidebar synchronously.
         const hasChildren = this._contentArea.childElementCount > 0;
         this._el.setAttribute('data-can-open', String(hasChildren));
         if (!hasChildren) {
