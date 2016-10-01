@@ -213,14 +213,14 @@ class InboxAppSidebarView {
           }
         });
 
-      view.getStopper().onValue(() => {
-        tabPreviewIcon.remove();
-      });
-
       const container = document.createElement('div');
       container.className = 'inboxsdk__app_sidebar_tab_preview_icon_container';
       container.appendChild(tabPreviewIcon);
       this._openerEl.appendChild(container);
+
+      view.getStopper().onValue(() => {
+        container.remove();
+      });
     }
 
     this._hideAllPanels();
