@@ -2,11 +2,13 @@
 
 import _ from 'lodash';
 import {defn} from 'ud';
+import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
+import delayAsap from '../../../lib/delay-asap';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
@@ -18,6 +20,7 @@ import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
 class InboxAppSidebarView {
   _stopper = kefirStopper();
   _driver: InboxDriver;
+  _openerEl: HTMLElement;
   _el: HTMLElement;
   _buttonContainer: HTMLElement;
   _contentArea: HTMLElement;
@@ -33,7 +36,13 @@ class InboxAppSidebarView {
     // the element already exists. If it doesn't, then we create the element,
     // and set up some mutation observers to watch for changes to the sidebar
     // and reposition it and modify the page as needed.
-    this._el = document.querySelector('.inboxsdk__app_sidebar') || this._createElement();
+    const el = document.querySelector('.inboxsdk__app_sidebar');
+    if (el) {
+      this._el = el;
+      this._openerEl = document.querySelector('.inboxsdk__app_sidebar_opener');
+    } else {
+      this._createElement();
+    }
     this._buttonContainer = this._el.querySelector('.inboxsdk__sidebar_panel_buttons');
     this._contentArea = this._el.querySelector('.inboxsdk__sidebar_panel_content_area');
 
@@ -67,49 +76,25 @@ class InboxAppSidebarView {
   }
 
   _createElement() {
-    const el = document.createElement('div');
-    el.style.display = 'none';
+    const el = this._el = document.createElement('div');
     el.className = 'inboxsdk__app_sidebar';
     el.innerHTML = `
-      <div class="inboxsdk__sidebar_panel_buttons"></div>
-      <div class="inboxsdk__sidebar_panel_content_area"></div>
+      <div class="inboxsdk__app_sidebar_main">
+        <div class="inboxsdk__sidebar_panel_buttons"></div>
+        <div class="inboxsdk__sidebar_panel_content_area"></div>
+      </div>
+      <div class="inboxsdk__app_sidebar_closer">
+        <button type="button" title="Close">⇨</button>
+      </div>
     `;
+    // Store the open state in the DOM rather than a class property because
+    // multiple instances of InboxAppSidebarView from different apps need to
+    // share the value.
     el.setAttribute('data-open', 'false');
+    el.setAttribute('data-can-open', 'false');
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
-
-    {
-      // When the sidebar switches between having no contents and having at
-      // least one item, we toggle whether the app sidebar button is visible,
-      // and we close the sidebar if it's empty now.
-      let appToolbarButtonPromise = null;
-      makeMutationObserverChunkedStream(contentArea, {childList: true})
-        .map(() => contentArea.childElementCount > 0)
-        .skipDuplicates()
-        .onValue(hasChildren => {
-          if (hasChildren) {
-            if (!appToolbarButtonPromise) {
-              appToolbarButtonPromise = this._driver.addToolbarButtonForApp(Kefir.constant({
-                title: 'Extension Sidebar',
-                iconUrl: appSidebarIcon,
-                hasDropdown: false,
-                onClick: () => {
-                  const newState = el.getAttribute('data-open') !== 'true';
-                  this._setShouldAppSidebarOpen(newState);
-                  this._setOpenedNow(newState);
-                }
-              }));
-            }
-          } else {
-            if (appToolbarButtonPromise) {
-              appToolbarButtonPromise.then(x => { x.destroy(); });
-              appToolbarButtonPromise = null;
-            }
-            this._setOpenedNow(false);
-          }
-        });
-    }
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
@@ -148,14 +133,27 @@ class InboxAppSidebarView {
         }
       });
 
-    return el;
+    el.querySelector('.inboxsdk__app_sidebar_closer button').addEventListener('click', () => {
+      this._setShouldAppSidebarOpen(false);
+      this._setOpenedNow(false);
+    });
+
+    this._openerEl = document.createElement('div');
+    this._openerEl.className = 'inboxsdk__app_sidebar_opener';
+    this._openerEl.innerHTML = `
+      <button type="button" title="Open Extension Sidebar">⇦</button>
+    `;
+    this._openerEl.querySelector('button').addEventListener('click', () => {
+      this._setShouldAppSidebarOpen(true);
+      this._setOpenedNow(true);
+    });
+    document.body.appendChild(this._openerEl);
   }
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
+    this._el.setAttribute('data-can-open', String(this._contentArea.childElementCount>0));
     if (!open) {
-      this._el.style.display = 'none';
-
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
         this._mainParent.classList.contains(getChatSidebarClassname())
@@ -164,8 +162,6 @@ class InboxAppSidebarView {
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     } else {
-      this._el.style.display = '';
-
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
         !this._mainParent.classList.contains(getChatSidebarClassname())
@@ -202,6 +198,31 @@ class InboxAppSidebarView {
       view.getElement().style.display = '';
     });
 
+    {
+      const tabPreviewIcon = document.createElement('div');
+      tabPreviewIcon.className = 'inboxsdk__app_sidebar_tab_preview_icon';
+
+      descriptor
+        .takeUntilBy(view.getStopper())
+        .onValue(descriptor => {
+          tabPreviewIcon.className = `inboxsdk__app_sidebar_tab_preview_icon ${descriptor.iconClass||''}`;
+          if (descriptor.iconUrl) {
+            tabPreviewIcon.innerHTML = autoHtml `<img src="${descriptor.iconUrl}">`;
+          } else {
+            tabPreviewIcon.innerHTML = '';
+          }
+        });
+
+      const container = document.createElement('div');
+      container.className = 'inboxsdk__app_sidebar_tab_preview_icon_container';
+      container.appendChild(tabPreviewIcon);
+      this._openerEl.appendChild(container);
+
+      view.getStopper().onValue(() => {
+        container.remove();
+      });
+    }
+
     this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
 
@@ -210,19 +231,30 @@ class InboxAppSidebarView {
       this._getShouldAppSidebarOpen()
     ) {
       this._setOpenedAfterAnimation(true);
+    } else {
+      this._el.setAttribute('data-can-open', 'true');
     }
 
     this._stopper
       .takeUntilBy(view.getStopper())
       .onValue(() => {
         view.remove();
-        // _createElement sets up a MutationObserver which will close the
-        // sidebar at this point if it should be closed.
       });
 
     view.getStopper()
       .onValue(() => {
         button.remove();
+      })
+      .delay(0)
+      .onValue(() => {
+        // The delay(0) is necessary because the view's element isn't removed
+        // already at the time the stopper fires, and because we don't really
+        // need to close the sidebar synchronously.
+        const hasChildren = this._contentArea.childElementCount > 0;
+        this._el.setAttribute('data-can-open', String(hasChildren));
+        if (!hasChildren) {
+          this._setOpenedNow(false);
+        }
       });
     return view;
   }

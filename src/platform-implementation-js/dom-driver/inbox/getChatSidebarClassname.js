@@ -34,9 +34,7 @@ const getChatSidebarClassname: () => string = _.once(() => {
 
   function rulesToStyleRules(rule: CSSRule): Object[] {
     if (rule instanceof window.CSSMediaRule) {
-      if (_.some(rule.media, m => window.matchMedia(m).matches)) {
-        return _.flatMap(rule.cssRules, rulesToStyleRules);
-      }
+      return _.flatMap(rule.cssRules, rulesToStyleRules);
     } else if (rule instanceof window.CSSStyleRule) {
       return [rule];
     }
@@ -66,8 +64,8 @@ const getChatSidebarClassname: () => string = _.once(() => {
     const err = new Error('Failed to parse element CSS rules');
     Logger.error(err, {
       rulesCount: rules.length,
-      onlyNavSidebarRuleCount: onlyNavSidebarRule.length,
-      onlyChatSidebarRuleCount: onlyChatSidebarRule.length
+      hasOnlyNavSidebarRule: !!onlyNavSidebarRule,
+      hasOnlyChatSidebarRule: !!onlyChatSidebarRule
     });
     throw err;
   }

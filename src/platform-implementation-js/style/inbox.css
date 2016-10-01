@@ -64,9 +64,55 @@
   right: 0;
   width: 232px;
   z-index: 5;
+}
+
+.inboxsdk__app_sidebar[data-open="false"] {
+  display: none;
+}
+
+.inboxsdk__app_sidebar_main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 16px 8px 0;
-  box-sizing: border-box;
   overflow-y: auto;
+}
+
+.inboxsdk__app_sidebar_opener {
+  z-index: 5;
+  position: fixed;
+  top: 66px;
+  right: 0;
+  pointer-events: none;
+  text-align: right;
+}
+
+.inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
+.inboxsdk__app_sidebar[data-can-open="false"] + .inboxsdk__app_sidebar_opener {
+  display: none;
+}
+
+.inboxsdk__app_sidebar_opener button,
+.inboxsdk__app_sidebar_tab_preview_icon {
+  pointer-events: all;
+}
+
+.inboxsdk__app_sidebar_tab_preview_icon {
+  display: inline-block;
+  margin: 4px 4px 4px 0;
+}
+
+.inboxsdk__app_sidebar_tab_preview_icon > img {
+  width: 16px;
+  height: 16px;
+}
+
+.inboxsdk__app_sidebar_closer {
+  position: absolute;
+  top: 10px;
+  left: -24px;
 }
 
 .inboxsdk__sidebar_panel_buttons > :first-child:last-child {
