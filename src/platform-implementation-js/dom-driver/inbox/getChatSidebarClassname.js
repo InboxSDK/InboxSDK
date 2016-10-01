@@ -66,8 +66,8 @@ const getChatSidebarClassname: () => string = _.once(() => {
     const err = new Error('Failed to parse element CSS rules');
     Logger.error(err, {
       rulesCount: rules.length,
-      onlyNavSidebarRuleCount: onlyNavSidebarRule.length,
-      onlyChatSidebarRuleCount: onlyChatSidebarRule.length
+      hasOnlyNavSidebarRule: !!onlyNavSidebarRule,
+      hasOnlyChatSidebarRule: !!onlyChatSidebarRule
     });
     throw err;
   }
