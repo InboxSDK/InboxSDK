@@ -130,3 +130,16 @@ names appear to be regenerated every few weeks. CSS class names, id values,
 jstcache properties, and jsl properties are not dependable for using to find
 elements. The presence of the id and usually the class properties can be used.
 CSS child and sibling selectors are useful to use.
+
+## Gmail Response Processor Utilities
+
+You can use the `./tools/serialize.js` and `./tools/deserialize.js` executables
+to (de)serialize Gmail messages from the command line. You need to have
+babel-cli installed globally (`npm i -g babel-cli`) for them to work. Each one
+reads from stdin and writes to stdout.
+
+If you have a file of JSON containing the Gmail response, you can use `jq`
+(`brew install jq`) to read the string out of the JSON and pipe it into
+deserialize:
+
+    jq -j '.input' ./test/data/gmail-response-processor/suggestions.json | ./tools/deserialize.js
