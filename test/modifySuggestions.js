@@ -10,4 +10,10 @@ describe('modifySuggestions', function() {
     const modified = modifySuggestions(responseText, modifications);
     assert.strictEqual(modified, expected);
   });
+
+  it('works on new suggestion response', function() {
+    const {responseText, modifications, expected} = require('./data/modify-suggestions-2016-10-04.json');
+    const modified = modifySuggestions(responseText, modifications);
+    assert.strictEqual(modified, expected);
+  });
 });
