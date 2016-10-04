@@ -244,13 +244,13 @@ export function deserializeArray(value: string): any[] {
 
 export function serialize(value: any[], options: MessageOptions): string {
   if (options.suggestionMode) {
-    assert(!options.includeLengths);
+    assert(options.includeLengths);
     return suggestionSerialize(value);
   }
   return threadListSerialize(value, options);
 }
 
-export function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
+function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
   const includeLengths = options ? options.includeLengths : true;
   const noArrayNewLines = options ? options.noArrayNewLines : false;
 
@@ -285,7 +285,7 @@ export function threadListSerialize(threadResponseArray: any[], options?: Messag
   return response + (noArrayNewLines && includeLengths ? '\n' : '');
 }
 
-export function suggestionSerialize(suggestionsArray: any[]): string {
+function suggestionSerialize(suggestionsArray: any[]): string {
   var response = "5\n)]}'\n";
   for(var ii=0; ii<suggestionsArray.length; ii++){
     var arraySection = suggestionsArray[ii];

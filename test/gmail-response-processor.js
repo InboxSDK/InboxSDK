@@ -61,10 +61,10 @@ describe('GmailResponseProcessor', function() {
     it('message send response', function() {
       const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/send-response.json');
 
-      const decoded = GmailResponseProcessor.deserialize(data.input).value;
+      const {value: decoded, options} = GmailResponseProcessor.deserialize(data.input);
       assert.deepEqual(decoded, data.output, 'deserialize test');
 
-      const reencoded = GmailResponseProcessor.threadListSerialize(decoded);
+      const reencoded = GmailResponseProcessor.serialize(decoded, options);
       const redecoded = GmailResponseProcessor.deserialize(reencoded).value;
       assert.deepEqual(redecoded, data.output, 're-deserialize test');
     });
@@ -72,10 +72,10 @@ describe('GmailResponseProcessor', function() {
     it('suggestions', function() {
       const data = readJSONnullToUndefined(__dirname+'/data/gmail-response-processor/suggestions.json');
 
-      const decoded = GmailResponseProcessor.deserialize(data.input).value;
-      assert.deepEqual(decoded, data.output, 'deserialize test');
+      const {value, options} = GmailResponseProcessor.deserialize(data.input);
+      assert.deepEqual(value, data.output, 'deserialize test');
 
-      const reencoded = GmailResponseProcessor.suggestionSerialize(decoded);
+      const reencoded = GmailResponseProcessor.serialize(value, options);
       assert.strictEqual(reencoded, data.input, 'serialize test');
     });
 

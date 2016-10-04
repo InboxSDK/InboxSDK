@@ -16,10 +16,10 @@ export type AutoCompleteSuggestion = {
 };
 
 export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
-  var parsed = GRP.deserialize(responseText).value;
-  var query = parsed[0][1];
+  const {value: parsed, options} = GRP.deserialize(responseText);
+  const query = parsed[0][1];
   for (var modification of modifications) {
-    var name, nameHTML;
+    let name, nameHTML;
     if (typeof modification.name === 'string') {
       name = modification.name;
       nameHTML = (_.escape(name): string);
@@ -30,7 +30,7 @@ export default function modifySuggestions(responseText: string, modifications: A
     if (name == null || nameHTML == null) {
       throw new Error("name or nameHTML must be provided");
     }
-    var description, descriptionHTML;
+    let description, descriptionHTML;
     if (typeof modification.description === 'string') {
       description = modification.description;
       descriptionHTML = (_.escape(description): string);
@@ -39,7 +39,7 @@ export default function modifySuggestions(responseText: string, modifications: A
       description = htmlToText(descriptionHTML);
     }
     if (modification.routeName || modification.externalURL) {
-      var data = {
+      const data = {
         routeName: modification.routeName,
         routeParams: modification.routeParams,
         externalURL: modification.externalURL
@@ -48,7 +48,7 @@ export default function modifySuggestions(responseText: string, modifications: A
         ' <span style="display:none" data-inboxsdk-suggestion="' +
         _.escape(JSON.stringify(data)) + '"></span>';
     }
-    var newItem = [
+    const newItem = [
       "aso.sug",
       modification.searchTerm || query,
       nameHTML,
@@ -69,7 +69,7 @@ export default function modifySuggestions(responseText: string, modifications: A
       ];
     }
     if (typeof modification.iconURL === 'string') {
-      var iconURL = modification.iconURL;
+      const iconURL = modification.iconURL;
       console.warn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
       if (!modification.iconUrl) {
         modification.iconUrl = iconURL;
@@ -83,5 +83,5 @@ export default function modifySuggestions(responseText: string, modifications: A
     }
     parsed[0][3].push(newItem);
   }
-  return GRP.suggestionSerialize(parsed);
+  return GRP.serialize(parsed, options);
 }
