@@ -231,15 +231,12 @@ export default function setupGmailInterceptor() {
           query: currentQuery
         });
       },
-      responseTextChanger: function(connection, responseText) {
-        if (connection._defer) {
-          return connection._defer.promise.then((modifications) => {
-            if (!modifications) {
-              return responseText;
-            } else {
-              return modifySuggestions(responseText, modifications);
-            }
-          });
+      async responseTextChanger(connection, responseText) {
+        if (connection._defer && connection.status === 200) {
+          const modifications = await connection._defer.promise;
+          if (modifications) {
+            return modifySuggestions(responseText, modifications);
+          }
         }
         return responseText;
       }

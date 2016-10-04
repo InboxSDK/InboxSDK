@@ -7,6 +7,8 @@ import assert from 'assert';
 import jsdomDoc from './lib/jsdom-doc';
 import UserInfo from '../src/platform-implementation-js/dom-driver/gmail/gmail-driver/user-info';
 
+global.document = undefined;
+
 describe('UserInfo', function() {
   var document = jsdomDoc(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
   var slot = document.getElementById('slot');

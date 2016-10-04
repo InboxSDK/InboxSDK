@@ -27,6 +27,7 @@
     "browserify": "^13.0.0",
     "co": "^4.6.0",
     "combokeys-capture": "^2.4.2",
+    "concat-stream": "^1.5.2",
     "contain-by-screen": "^1.0.3",
     "entities": "1.1.1",
     "envify": "^3.4.0",
