@@ -1,13 +1,17 @@
-function log() {
-	console.log.apply(console, ['search-suggestions'].concat(Array.prototype.slice.call(arguments)));
+'use strict';
+
+function log(...args) {
+	console.log('search-suggestions', ...args);
 }
 
-InboxSDK.load(1, 'search-suggestions').then(function(inboxSDK) {
-	inboxSDK.Search.registerSearchSuggestionsProvider(function(query) {
+InboxSDK.load(1, 'search-suggestions').then(inboxSDK => {
+	window._sdk = inboxSDK;
+
+	inboxSDK.Search.registerSearchSuggestionsProvider(query => {
 		log('search autocompleter', query);
 		return [
 			{
-				name: 'aaaaaaa also bacon',
+				name: `bacon api ${query}`,
 				iconUrl: 'https://www.streak.com/build/images/boxIconOnNewCompose.png',
 				externalURL: 'https://baconjs.github.io/api.html'
 			},
