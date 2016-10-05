@@ -513,11 +513,6 @@ function _threadsToTbGroups(threads: any[]): Array<Array<any>> {
     .value();
 }
 
-function _doesResponseUseFormatWithSectionNumbers(responseString: string): boolean {
-  var lines = responseString.split(/\n|\r/);
-  return !!lines[2].match(/^\d/);
-}
-
 function _searchArray(responseArray: any, marker: string, markerArrayValidator: (markerArray: any[]) => boolean): any {
   var pathArray = _searchObject(responseArray, marker, 100);
 
