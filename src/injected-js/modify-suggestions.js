@@ -39,7 +39,7 @@ app-provided suggestions into the search term/contact suggestions array.
 export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
   const {value: parsed, options} = GRP.deserialize(responseText);
   const query = parsed[0][1];
-  for (let modification of modifications.slice(0,15)) {
+  for (let modification of modifications) {
     let name, nameHTML;
     if (typeof modification.name === 'string') {
       name = modification.name;
