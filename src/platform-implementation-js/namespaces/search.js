@@ -16,8 +16,11 @@ export default class Search {
 		if (typeof handler != 'function') {
 			throw new Error("Incorrect arguments");
 		}
-		const members = memberMap.get(this);
-		members.driver.registerSearchSuggestionsProvider(handler);
+
+		console.warn("InboxSDK has temporarily removed support for Search.registerSearchSuggestionsProvider because of Gmail changes. Support will return soon.");
+
+		// const members = memberMap.get(this);
+		// members.driver.registerSearchSuggestionsProvider(handler);
 	}
 
 	registerSearchQueryRewriter(rewriter: Object) {
