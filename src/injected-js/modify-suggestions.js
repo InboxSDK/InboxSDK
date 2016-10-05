@@ -15,6 +15,27 @@ export type AutoCompleteSuggestion = {
   owner: string;
 };
 
+/*
+Notes about the Gmail suggestions response:
+The response may be made up of multiple sections. Each section can specify
+results. There are three types of results: search terms/contacts, drive files,
+and emails. I believe that each section could specify multiple types of
+results, but by convention Gmail uses multiple sections with one only
+containing a single type of results.
+
+Some fields of a section:
+0: The constant "aso.srp"
+1: The user's search query
+3: Array of search term/contact suggestions.
+4: Array of email suggestions.
+5: Array of drive suggestions.
+11: Timestamp in microseconds. Each section should have the same timestamp.
+13: The length of the user's search query times 4 then cast to a string.
+
+Currently modifySuggestions modifies the first section and adds the
+app-provided suggestions into the search term/contact suggestions array.
+*/
+
 export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
   const {value: parsed, options} = GRP.deserialize(responseText);
   const query = parsed[0][1];
