@@ -32,7 +32,7 @@
     "entities": "1.1.1",
     "envify": "^3.4.0",
     "event-listener-with-options": "^1.0.2",
-    "flow-bin": "^0.32.0",
+    "flow-bin": "^0.33.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",
@@ -46,6 +46,7 @@
     "gulp-util": "^3.0.3",
     "http-server": "^0.9.0",
     "isnumber": "^1.0.0",
+    "jest": "^16.0.1",
     "jquery": "2.1.4",
     "jsdoc": "3.4.0",
     "jsdom": "^9.2.1",
@@ -89,6 +90,7 @@
   "scripts": {
     "start": "gulp default --single --watch --reloader",
     "flow_check": "flow check",
+    "jest": "jest",
     "test": "gulp test",
     "test-browser": "wdio"
   },
