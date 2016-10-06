@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import {defn} from 'ud';
 import htmlToText from '../common/html-to-text';
 import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
@@ -36,7 +37,7 @@ Currently modifySuggestions modifies the first section and adds the
 app-provided suggestions into the search term/contact suggestions array.
 */
 
-export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
+function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]): string {
   const {value: parsed, options} = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (let modification of modifications) {
@@ -106,3 +107,5 @@ export default function modifySuggestions(responseText: string, modifications: A
   }
   return GRP.serialize(parsed, options);
 }
+
+export default defn(module, modifySuggestions);

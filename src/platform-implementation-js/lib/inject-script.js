@@ -49,7 +49,7 @@ const injectScript: () => Promise<null> = _.once(function() {
 });
 
 if (module.hot) {
-  (module.hot:any).decline();
+  (module.hot:any).accept();
 }
 
 export default injectScript;
