@@ -106,7 +106,7 @@ function getVersion(): Promise<string> {
   });
 }
 
-async function getBrowserifyHmrOptions() {
+async function getBrowserifyHmrOptions(port: number) {
   const HOME = process.env.HOME;
   if (!HOME) throw new Error('HOME env variable not set');
   const keyFile = `${HOME}/stunnel/key.pem`;
@@ -114,19 +114,19 @@ async function getBrowserifyHmrOptions() {
 
   let url, tlskey, tlscert;
   if ((await globp(keyFile)).length && (await globp(certFile)).length) {
-    url = 'https://dev.mailfoogae.appspot.com:3123';
+    url = `https://dev.mailfoogae.appspot.com:${port}`;
     tlskey = keyFile;
     tlscert = certFile;
   }
-  return {url, tlskey, tlscert};
+  return {url, tlskey, tlscert, port};
 }
 
-function browserifyTask(name, deps, entry, destname) {
+function browserifyTask(name, deps, entry, destname, port: ?number) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
   gulp.task(name, deps, async function() {
     const VERSION = await getVersion();
-    const browserifyHmrOptions = await getBrowserifyHmrOptions();
+    const browserifyHmrOptions = port && await getBrowserifyHmrOptions(port);
 
     let bundler = browserify({
       entries: entry,
@@ -140,7 +140,7 @@ function browserifyTask(name, deps, entry, destname) {
       VERSION
     }));
 
-    if (args.hot && name === (args.single ? 'sdk' : 'imp')) {
+    if (args.hot && port) {
       bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
     }
 
@@ -203,7 +203,7 @@ function browserifyTask(name, deps, entry, destname) {
 
 if (args.single) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename);
+  browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename, 3140);
   gulp.task('imp', function() {
     throw new Error("No separate imp bundle in single bundle mode");
   });
@@ -211,10 +211,10 @@ if (args.single) {
   gulp.task('default', ['sdk', 'imp', 'examples']);
   browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
   browserifyTask('imp', ['injected'],
-    './src/platform-implementation-js/main.js', 'platform-implementation.js');
+    './src/platform-implementation-js/main.js', 'platform-implementation.js', 3141);
 }
 
-browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js');
+browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js', 3142);
 
 gulp.task('examples', ['sdk'], setupExamples);
 

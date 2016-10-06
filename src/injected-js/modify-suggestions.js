@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import {defn} from 'ud';
 import htmlToText from '../common/html-to-text';
 import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
@@ -15,10 +16,36 @@ export type AutoCompleteSuggestion = {
   owner: string;
 };
 
-export default function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]) {
+/*
+Notes about the Gmail suggestions response:
+The response may be made up of multiple sections. Each section can specify
+results. There are three types of results: search terms/contacts, drive files,
+and emails. Each section may only contain one type of result. The sections can
+be in any order, though Gmail appears to always put the search terms/contacts
+section first.
+
+Some fields of a section:
+0: The constant "aso.srp"
+1: The user's search query
+3: Array of search term/contact suggestions.
+4: Array of email suggestions.
+5: Array of drive suggestions.
+6-9: Constants signifying type of section(?)
+  search terms/contacts: 1,0,0,1
+  drive:                 0,0,1,3
+  email:                 0,1,0,2
+11: Timestamp in microseconds. Each section should have the same timestamp.
+12: Typing autocomplete value or empty array.
+13: The length of the user's search query times 4 then cast to a string.
+
+Currently modifySuggestions modifies the first section and adds the
+app-provided suggestions into the search term/contact suggestions array.
+*/
+
+function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]): string {
   const {value: parsed, options} = GRP.deserialize(responseText);
   const query = parsed[0][1];
-  for (let modification of modifications.slice(0,15)) {
+  for (let modification of modifications) {
     let name, nameHTML;
     if (typeof modification.name === 'string') {
       name = modification.name;
@@ -54,7 +81,12 @@ export default function modifySuggestions(responseText: string, modifications: A
       nameHTML,
       (null: ?[string, ?string, string, ?string, string]),
       [],
-      34,
+
+      // screen height estimate. Currently Gmail bugs out if the screen height
+      // estimates add up to above the screen height, so let's avoid making the
+      // issue more likely by telling it our entries are zero-height.
+      0,
+
       (null: ?[string, string]),
       "asor inboxsdk__custom_suggestion "+modification.owner,
       0
@@ -85,3 +117,5 @@ export default function modifySuggestions(responseText: string, modifications: A
   }
   return GRP.serialize(parsed, options);
 }
+
+export default defn(module, modifySuggestions);
