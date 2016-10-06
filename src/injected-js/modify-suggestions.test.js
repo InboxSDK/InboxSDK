@@ -1,7 +1,5 @@
 /* @flow */
 
-import assert from 'assert';
-
 import modifySuggestions from './modify-suggestions';
 
 test('works on old suggestion response', () => {
