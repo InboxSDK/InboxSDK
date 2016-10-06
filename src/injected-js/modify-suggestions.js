@@ -20,9 +20,9 @@ export type AutoCompleteSuggestion = {
 Notes about the Gmail suggestions response:
 The response may be made up of multiple sections. Each section can specify
 results. There are three types of results: search terms/contacts, drive files,
-and emails. I believe that each section could specify multiple types of
-results, but by convention Gmail uses multiple sections with one only
-containing a single type of results.
+and emails. Each section may only contain one type of result. The sections can
+be in any order, though Gmail appears to always put the search terms/contacts
+section first.
 
 Some fields of a section:
 0: The constant "aso.srp"
@@ -30,7 +30,12 @@ Some fields of a section:
 3: Array of search term/contact suggestions.
 4: Array of email suggestions.
 5: Array of drive suggestions.
+6-9: Constants signifying type of section(?)
+  search terms/contacts: 1,0,0,1
+  drive:                 0,0,1,3
+  email:                 0,1,0,2
 11: Timestamp in microseconds. Each section should have the same timestamp.
+12: Typing autocomplete value or empty array.
 13: The length of the user's search query times 4 then cast to a string.
 
 Currently modifySuggestions modifies the first section and adds the
