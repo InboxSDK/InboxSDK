@@ -14,6 +14,7 @@
     "auto-html": "^1.0.4",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",
+    "babel-jest": "^16.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
