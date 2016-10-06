@@ -91,7 +91,7 @@
     "start": "gulp default --single --watch --reloader",
     "flow_check": "flow check",
     "jest": "jest",
-    "test": "gulp test",
+    "test": "gulp test && jest",
     "test-browser": "wdio"
   },
   "version": "0.7.21"
