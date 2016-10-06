@@ -81,7 +81,12 @@ function modifySuggestions(responseText: string, modifications: AutoCompleteSugg
       nameHTML,
       (null: ?[string, ?string, string, ?string, string]),
       [],
-      34,
+
+      // screen height estimate. Currently Gmail bugs out if the screen height
+      // estimates add up to above the screen height, so let's avoid making the
+      // issue more likely by telling it our entries are zero-height.
+      0,
+
       (null: ?[string, string]),
       "asor inboxsdk__custom_suggestion "+modification.owner,
       0
