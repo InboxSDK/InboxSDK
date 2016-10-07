@@ -111,7 +111,18 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		}
 
 		composeView.addButton({
-			title: 'Attach image',
+			title: 'Attach image from blob',
+			iconUrl: dataUri,
+			onClick(event) {
+				const file = dataURItoBlob(dataUri);
+				file.name = 'icon.png';
+				composeView.attachFiles([file]);
+			},
+			section: 'SEND_RIGHT'
+		});
+
+		composeView.addButton({
+			title: 'Attach image from file',
 			iconUrl: dataUri,
 			onClick(event) {
 				fileInput.value = '';

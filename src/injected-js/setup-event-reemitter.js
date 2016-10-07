@@ -16,6 +16,13 @@ export default function setupEventReemitter() {
     _.assign(newEvent, event.detail.props);
     if (event.detail.dataTransfer) {
       const files = event.detail.dataTransfer.files;
+      if (event.detail.dataTransfer.fileNames) {
+        _.forEach(files, (file, i) => {
+          if (typeof file.name !== 'string') {
+            file.name = event.detail.dataTransfer.fileNames[i];
+          }
+        });
+      }
       (newEvent:any).dataTransfer = {
         dropEffect: "none",
         effectAllowed: "all",
