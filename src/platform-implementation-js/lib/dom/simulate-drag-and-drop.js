@@ -1,10 +1,16 @@
 /* @flow */
 //jshint ignore:start
 
+import _ from 'lodash';
 import triggerRelayEvent from './trigger-relay-event';
 
+function makeDataTransferObj(files: Blob[]) {
+	const fileNames: string[] = _.map(files, file => file.name);
+	return {files, fileNames};
+}
+
 export function simulateDragOver(element: HTMLElement, files: Blob[]) {
-	const dataTransfer = {files};
+	const dataTransfer = makeDataTransferObj(files);
 	const props = {
 		screenX: 0, screenY: 0, clientX: 0, clientY: 0, buttons: 1,
 		ctrlKey: false, shiftKey: false, altKey: false, metaKey: false,
@@ -25,7 +31,7 @@ export function simulateDragOver(element: HTMLElement, files: Blob[]) {
 }
 
 export function simulateDrop(element: HTMLElement, files: Blob[]) {
-	const dataTransfer = {files};
+	const dataTransfer = makeDataTransferObj(files);
 	const props = {
 		screenX: 0, screenY: 0, clientX: 0, clientY: 0, buttons: 1,
 		ctrlKey: false, shiftKey: false, altKey: false, metaKey: false,
@@ -40,7 +46,7 @@ export function simulateDrop(element: HTMLElement, files: Blob[]) {
 }
 
 export function simulateDragEnd(element: HTMLElement, files: Blob[]) {
-	const dataTransfer = {files};
+	const dataTransfer = makeDataTransferObj(files);
 	const props = {
 		screenX: 0, screenY: 0, clientX: 0, clientY: 0, buttons: 1,
 		ctrlKey: false, shiftKey: false, altKey: false, metaKey: false,
