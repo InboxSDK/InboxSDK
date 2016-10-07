@@ -41,8 +41,7 @@ function _getChipElement(options: Object): HTMLElement {
 ` : '';
     var chipHTML: string = autoHtml `
 <div contenteditable="false" class="inboxsdk__compose_linkChip"
-style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);">
-  <span hspace="inboxsdk__chip"></span>
+style="width: 396px; height: 18px; max-height: 18px; padding: 5px; color: rgb(34, 34, 34); font-family: arial; font-style: normal; font-weight: bold; font-size: 13px; cursor: default; border: 1px solid rgb(221, 221, 221); line-height: 1; background-color: rgb(245, 245, 245);" hspace="inboxsdk__chip_main">
   <a href="${options.url}" target="_blank" style=" display:inline-block; max-width: 366px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-height: 1.2em; text-decoration: none; cursor: pointer; padding: 1px 0; border: none; ">
     ${{__html:iconHtml}}
     <span dir="ltr" style="color: rgb(17, 85, 204); text-decoration: none; vertical-align: bottom;">${options.text}</span>
