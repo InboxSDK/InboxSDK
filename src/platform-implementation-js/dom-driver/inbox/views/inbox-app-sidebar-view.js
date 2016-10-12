@@ -30,12 +30,11 @@ class InboxAppSidebarView {
     this._driver = driver;
 
     // We need to be able to cooperate with other apps/extensions that are
-    // sharing the app sidebar. We do this by using the shared DOM as the
-    // source of truth about the state of the sidebar and as a signalling
-    // mechanism. When InboxAppSidebarView is instantiated, we check to see if
-    // the element already exists. If it doesn't, then we create the element,
-    // and set up some mutation observers to watch for changes to the sidebar
-    // and reposition it and modify the page as needed.
+    // sharing the app sidebar. We store some properties as attributes in the
+    // shared DOM instead of as class properties; class properties are mostly
+    // restricted to being used for references to DOM nodes. When
+    // InboxAppSidebarView is instantiated, we check to see if the element
+    // already exists and create it if it doesn't.
     const el = document.querySelector('.inboxsdk__app_sidebar');
     if (el) {
       this._el = el;
