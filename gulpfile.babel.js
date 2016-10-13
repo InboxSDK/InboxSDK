@@ -256,24 +256,21 @@ gulp.task('docs', function(cb) {
 
     Promise.all(_.chain(paths.files)
       .filter(isFileEligbleForDocs)
-      .map(logFiles)
       .map(parseCommentsInFile)
       .value()
     ).then(files => {
       var classes = _.chain(files)
         .filter(Boolean)
-        .map('classes')
+        .map(x => x.classes)
         .flattenDeep()
-        .filter(isNonEmptyClass)
+        .filter(Boolean)
         .map(transformClass)
         .forEach(checkForDocIssues)
         .value();
 
       var docsJson = {
         classes: _.chain(classes)
-          .map(function(ele) {
-            return [ele.name, ele];
-          })
+          .map(ele => [ele.name, ele])
           .fromPairs()
           .value()
       };
@@ -299,7 +296,6 @@ function checkForDocIssues(c) {
       }
     });
   }
-
 }
 
 function parseCommentsInFile(file) {
@@ -350,22 +346,9 @@ function transformClass(c) {
   return c;
 }
 
-function isNonEmptyClass(c) {
-  // its going to have one property with the filename at minimum because we added it
-  return c != null;
-}
-
-function logFiles(filename) {
-  return filename;
-}
-
 function isFileEligbleForDocs(filename) {
   return filename.endsWith(".js") && (
-    filename.indexOf("src/docs/") > -1 ||
-    filename.indexOf("src/common/constants/") > -1
+    filename.includes("src/docs/") ||
+    filename.includes("src/platform-implementation-js/constants/")
   );
-}
-
-function endsWith(str, suffix) {
-  return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }

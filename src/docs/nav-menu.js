@@ -87,8 +87,15 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	* ^default=null
 	* @type {string}
 	*/
-	iconClass: null
+	iconClass: null,
 
+	/**
+	* The nav item type affects how the item is displayed.
+	* ^optional
+	* ^default=NAVIGATION
+	* @type {NavItemTypes}
+	*/
+	type: null
 };
 
 /**
