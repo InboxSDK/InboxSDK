@@ -22,7 +22,6 @@ class InboxAppSidebarView {
   _driver: InboxDriver;
   _openerEl: HTMLElement;
   _el: HTMLElement;
-  _buttonContainer: HTMLElement;
   _contentArea: HTMLElement;
   _mainParent: HTMLElement;
 
@@ -42,7 +41,6 @@ class InboxAppSidebarView {
     } else {
       this._createElement();
     }
-    this._buttonContainer = this._el.querySelector('.inboxsdk__sidebar_panel_buttons');
     this._contentArea = this._el.querySelector('.inboxsdk__sidebar_panel_content_area');
 
     const mainParent = findParent(document.querySelector('[role=application]'), el => el.parentElement === document.body);
@@ -79,7 +77,6 @@ class InboxAppSidebarView {
     el.className = 'inboxsdk__app_sidebar';
     el.innerHTML = `
       <div class="inboxsdk__app_sidebar_main">
-        <div class="inboxsdk__sidebar_panel_buttons"></div>
         <div class="inboxsdk__sidebar_panel_content_area"></div>
       </div>
       <div class="inboxsdk__app_sidebar_closer">
@@ -178,24 +175,8 @@ class InboxAppSidebarView {
       .onValue(() => this._setOpenedNow(open));
   }
 
-  _hideAllPanels() {
-    _.forEach(this._contentArea.children, el => {
-      el.style.display = 'none';
-    });
-  }
-
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const view = new InboxSidebarContentPanelView(descriptor);
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = String(this._buttonContainer.childElementCount);
-    this._buttonContainer.appendChild(button);
-
-    button.addEventListener('click', () => {
-      this._hideAllPanels();
-      view.getElement().style.display = '';
-    });
 
     {
       const tabPreviewIcon = document.createElement('div');
@@ -204,6 +185,7 @@ class InboxAppSidebarView {
       descriptor
         .takeUntilBy(view.getStopper())
         .onValue(descriptor => {
+          tabPreviewIcon.title = descriptor.title;
           tabPreviewIcon.className = `inboxsdk__app_sidebar_tab_preview_icon ${descriptor.iconClass||''}`;
           if (descriptor.iconUrl) {
             tabPreviewIcon.innerHTML = autoHtml `<img src="${descriptor.iconUrl}">`;
@@ -222,7 +204,6 @@ class InboxAppSidebarView {
       });
     }
 
-    this._hideAllPanels();
     this._contentArea.appendChild(view.getElement());
 
     if (
@@ -241,9 +222,6 @@ class InboxAppSidebarView {
       });
 
     view.getStopper()
-      .onValue(() => {
-        button.remove();
-      })
       .delay(0)
       .onValue(() => {
         // The delay(0) is necessary because the view's element isn't removed

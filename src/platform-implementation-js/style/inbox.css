@@ -115,12 +115,37 @@
   left: -24px;
 }
 
-.inboxsdk__sidebar_panel_buttons > :first-child:last-child {
-  display: none;
-}
-
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
+}
+
+.inboxsdk__app_sidebar_content_panel {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  overflow-x: hidden;
+  font: 12px Arial, sans-serif
+}
+
+.inboxsdk__app_sidebar_content_panel_title_icon {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  vertical-align: top;
+  padding-left: 5px;
+  box-sizing: border-box;
+}
+
+.inboxsdk__app_sidebar_content_panel_title_icon > img {
+  width: 16px;
+  height: 16px;
+}
+
+.inboxsdk__app_sidebar_content_panel_title {
+  font: 13px / 15px arial, sans-serif;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .inboxsdk__button_icon {
