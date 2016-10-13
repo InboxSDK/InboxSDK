@@ -20,7 +20,7 @@ import BasicButtonViewController from '../../../widgets/buttons/basic-button-vie
 
 import updateIcon from '../lib/update-icon/update-icon';
 
-import NAV_ITEM_TYPES from '../../../../common/constants/nav-item-types';
+import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 const LEFT_INDENTATION_PADDING = 14;
