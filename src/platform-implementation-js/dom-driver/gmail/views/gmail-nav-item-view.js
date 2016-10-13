@@ -115,7 +115,7 @@ export default class GmailNavItemView {
 	}
 
 	setHighlight(value: boolean){
-		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE){
+		if(!this._element || this._type === NAV_ITEM_TYPES.LINK || this._type === NAV_ITEM_TYPES.MANAGE){
 			return;
 		}
 
@@ -128,7 +128,7 @@ export default class GmailNavItemView {
 	}
 
 	setActive(value: boolean){
-		if(!this._element || this._type === NAV_ITEM_TYPES.MANAGE || this._isActive === value){
+		if(!this._element || this._type === NAV_ITEM_TYPES.LINK || this._type === NAV_ITEM_TYPES.MANAGE || this._isActive === value){
 			return;
 		}
 
@@ -246,6 +246,7 @@ export default class GmailNavItemView {
 					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<span class="nU n1 inboxsdk__navItem_name" role="link">${_.escape(this._name)}</span>`;
 				}
 			break;
+			case NAV_ITEM_TYPES.LINK:
 			case NAV_ITEM_TYPES.MANAGE:
 				if(!nameElement || nameElement.tagName !== 'A'){
 					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<a href="#" class="inboxsdk__navItem_name CK">${_.escape(this._name)}</a>`;

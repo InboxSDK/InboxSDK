@@ -56,7 +56,7 @@ InboxSDK.load(1.0, 'custom-view').then(function(sdk) {
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     routeID: 'example/:monkeyName',
     routeParams: 'george {} {} {}',
-    type: sdk.NavMenu.NavItemTypes.MANAGE,
+    type: sdk.NavMenu.NavItemTypes.LINK,
     accessory: {
       type: 'CREATE',
       onClick: function() {
