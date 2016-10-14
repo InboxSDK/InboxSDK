@@ -22,9 +22,9 @@ const _ = require('lodash');
 document.head.setAttribute('data-inboxsdk-script-injected', 'true');
 document.head.setAttribute('data-inboxsdk-user-email-address', 'cowan@streak.com');
 
-test('loads in gmail mock', () => {
-  const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
+const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
 
+test('loads in gmail mock', () => {
   const appOpts = {globalErrorLogging: false};
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');

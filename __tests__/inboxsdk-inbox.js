@@ -17,9 +17,9 @@ document.head.setAttribute('data-inboxsdk-script-injected', 'true');
 document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
 document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 
-test('loads in inbox mock', () => {
-  const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
+const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
 
+test('loads in inbox mock', () => {
   const appOpts = {globalErrorLogging: false, inboxBeta: true};
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
