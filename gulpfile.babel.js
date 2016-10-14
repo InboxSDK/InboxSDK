@@ -234,8 +234,7 @@ gulp.task('test-unit', function() {
 
 gulp.task('test-jsdom', [
   'test-jsdom-inboxsdk-gmail',
-  'test-jsdom-inboxsdk-inbox',
-  'test-jsdom-iti'
+  'test-jsdom-inboxsdk-inbox'
 ]);
 
 gulp.task('test-jsdom-inboxsdk-gmail', function() {
@@ -244,10 +243,6 @@ gulp.task('test-jsdom-inboxsdk-gmail', function() {
 
 gulp.task('test-jsdom-inboxsdk-inbox', function() {
   return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/inboxsdk-inbox.js");']);
-});
-
-gulp.task('test-jsdom-iti', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/injected-thread-identifier.js");']);
 });
 
 gulp.task('docs', function(cb) {
