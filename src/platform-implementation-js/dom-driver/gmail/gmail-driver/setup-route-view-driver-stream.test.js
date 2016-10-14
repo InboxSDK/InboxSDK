@@ -183,3 +183,49 @@ test('revertNativeHashChanges works', async () => {
   expect(items.length).toBe(5);
   expect(driver.showNativeRouteView).toHaveBeenCalledTimes(3);
 });
+
+test('revertNativeHashChanges and ?compose parameter play nicely together', async () => {
+  // If you make a draft while at a native route view, Gmail adds ?compose=ID
+  // to the hash. If you edit the draft, Gmail updates the ID in the hash. If
+  // you go to a custom route view, then we drop ?compose=ID from the hash and
+  // Gmail doesn't try to update it because it doesn't understand the hash. If
+  // you edit the draft, and then hit the back button, the hash will first
+  // change to the hash in your browser history, and then Gmail will
+  // immediately update it to the draft's current ID. We need to not pay
+  // attention to the extra hash change, but our revertNativeHashChanges still
+  // needs to work.
+
+  const items = [];
+  const driver = makeMockDriver();
+  driver.getCustomRouteIDs().add('foo');
+  window.location.hash = '#inbox';
+
+  setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
+    .takeUntilBy(stopper)
+    .onValue(item => {
+      items.push(item);
+    });
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#inbox?compose=A';
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#foo';
+
+  await delay(1);
+  expect(items.length).toBe(2);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#inbox?compose=A';
+  window.location.hash = '#inbox?compose=B';
+
+  await delay(1);
+  expect(items.length).toBe(3);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
+});
