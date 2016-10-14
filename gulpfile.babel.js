@@ -226,54 +226,27 @@ gulp.task('clean', function(cb) {
   rimraf('./dist/', cb);
 });
 
-gulp.task('test', ['test-unit', 'test-jsdom']);
-
-gulp.task('test-unit', function() {
-  return spawn('node_modules/.bin/mocha');
-});
-
-gulp.task('test-jsdom', [
-  'test-jsdom-inboxsdk-gmail',
-  'test-jsdom-inboxsdk-inbox',
-  'test-jsdom-iti'
-]);
-
-gulp.task('test-jsdom-inboxsdk-gmail', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/inboxsdk-gmail.js");']);
-});
-
-gulp.task('test-jsdom-inboxsdk-inbox', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/inboxsdk-inbox.js");']);
-});
-
-gulp.task('test-jsdom-iti', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/injected-thread-identifier.js");']);
-});
-
 gulp.task('docs', function(cb) {
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
 
     Promise.all(_.chain(paths.files)
       .filter(isFileEligbleForDocs)
-      .map(logFiles)
       .map(parseCommentsInFile)
       .value()
     ).then(files => {
       var classes = _.chain(files)
         .filter(Boolean)
-        .map('classes')
+        .map(x => x.classes)
         .flattenDeep()
-        .filter(isNonEmptyClass)
+        .filter(Boolean)
         .map(transformClass)
         .forEach(checkForDocIssues)
         .value();
 
       var docsJson = {
         classes: _.chain(classes)
-          .map(function(ele) {
-            return [ele.name, ele];
-          })
+          .map(ele => [ele.name, ele])
           .fromPairs()
           .value()
       };
@@ -299,7 +272,6 @@ function checkForDocIssues(c) {
       }
     });
   }
-
 }
 
 function parseCommentsInFile(file) {
@@ -350,22 +322,9 @@ function transformClass(c) {
   return c;
 }
 
-function isNonEmptyClass(c) {
-  // its going to have one property with the filename at minimum because we added it
-  return c != null;
-}
-
-function logFiles(filename) {
-  return filename;
-}
-
 function isFileEligbleForDocs(filename) {
   return filename.endsWith(".js") && (
-    filename.indexOf("src/docs/") > -1 ||
-    filename.indexOf("src/common/constants/") > -1
+    filename.includes("src/docs/") ||
+    filename.includes("src/platform-implementation-js/constants/")
   );
-}
-
-function endsWith(str, suffix) {
-  return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }

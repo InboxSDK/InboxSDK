@@ -10,7 +10,7 @@ import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import typeof GmailElementGetter from '../gmail-element-getter';
 
 export default function getMainContentElementChangedStream(GmailElementGetter: GmailElementGetter): Kefir.Observable<HTMLElement> {
-	return waitForMainContentContainer(GmailElementGetter)
+	const s = waitForMainContentContainer(GmailElementGetter)
 				.flatMap(mainContentContainer =>
 					makeElementChildStream(mainContentContainer)
 						.map(({el}) => el)
@@ -28,6 +28,12 @@ export default function getMainContentElementChangedStream(GmailElementGetter: G
 							.map(e => e.target)
 						)
 				).toProperty();
+
+	// Make sure we always have a subscriber. The function breaks if it loses all
+	// subscribers and then re-gains some.
+	s.onValue(()=>{});
+
+	return s;
 }
 
 function waitForMainContentContainer(GmailElementGetter){

@@ -297,7 +297,7 @@ class InboxDriver {
 
   getSentMailNativeNavItem(): Promise<Object> {
     // stub, never resolve
-    console.log('getSentMailNativeNavItem not implemented');
+    // console.log('getSentMailNativeNavItem not implemented');
     return new Promise((resolve, reject) => {});
   }
 

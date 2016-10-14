@@ -21,7 +21,7 @@ export default class NavMenu {
 		memberMap.set(this, members);
 
 		this.SENT_MAIL = _setupSentMail(appId, driver);
-		this.NavItemTypes = require('../../common/constants/nav-item-types');
+		this.NavItemTypes = require('../constants/nav-item-types');
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
