@@ -3,7 +3,6 @@
 import RSVP from '../test/lib/rsvp';
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 30*1000;
 process.env.VERSION = 'beep';
 
 global.MutationObserver = MockMutationObserver;
@@ -19,6 +18,8 @@ document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com'
 document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 
 const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
+//preload implementation
+require('../src/platform-implementation-js/platform-implementation');
 
 test('loads in inbox mock', () => {
   const appOpts = {globalErrorLogging: false, inboxBeta: true};
