@@ -1,6 +1,5 @@
 /* @flow */
 
-import assert from 'assert';
 import RSVP from '../test/lib/rsvp';
 import fs from 'fs';
 
@@ -15,17 +14,17 @@ test('threadIdentifier works', () => {
   threadIdentifier.setup();
 
   // Identify a regular email
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':3r')), '14a3481b07c29fcf');
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':3r'))).toBe('14a3481b07c29fcf');
 
   // Fail to identify an ambiguous email that has no click handler
   const amb = document.getElementById(':3g');
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(amb), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(amb), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(amb)).toBe(null);
 
   // Fail to identify another ambiguous email that has no click handler
   const amb2 = document.getElementById(':35');
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(amb2), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(amb2), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb2)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(amb2)).toBe(null);
 
   // Identify an email using its click handler
   let clickedCount = 0;
@@ -37,52 +36,53 @@ test('threadIdentifier works', () => {
     setTimeout(function() {
       const requiredProps = {ctrlKey: true, altKey: false, shiftKey: false, metaKey: true};
       Object.keys(requiredProps).forEach(key => {
-        assert.strictEqual((event:any)[key], requiredProps[key]);
+        expect((event:any)[key]).toBe(requiredProps[key]);
       });
-      assert(!win.closed && win.focus);
+      expect(win.closed).toBe(false);
+      expect(typeof win.focus).toBe('function');
     }, 0);
   });
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(amb), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(amb), '14a5f1c5ad340727');
-  assert.equal(clickedCount, 1);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(amb)).toBe('14a5f1c5ad340727');
+  expect(clickedCount).toBe(1);
 
   // Identify it again by using the cached value. No clicking allowed.
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(amb), '14a5f1c5ad340727');
-  assert.equal(clickedCount, 1);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe('14a5f1c5ad340727');
+  expect(clickedCount).toBe(1);
 
   // Continue to fail to identify the other ambiguous email
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(amb2), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(amb2), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb2)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(amb2)).toBe(null);
 
   // Fail to identify two emails that were edited out of the original VIEW_DATA
   const twi1 = document.getElementById(':42');
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(twi1), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(twi1), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi1)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(twi1)).toBe(null);
   const twi2 = document.getElementById(':42-dup');
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(twi2), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(twi2)).toBe(null);
 
   // Give the first one a click handler and identify it.
   twi1.addEventListener('click', function(event) {
     window.open('?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a0c5f5571b501c&cvid=1', '_blank');
   });
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(twi1), '14a0c5f5571b501c');
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(twi1)).toBe('14a0c5f5571b501c');
   // Make sure that the other one is *not* identifiable by the database. A
   // successful click should not populate the database because it does not handle
   // ambiguous thread rows.
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2)).toBe(null);
 
   // Fail to identify an email that was edited out of the original VIEW_DATA
   const missing = document.getElementById(':74');
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(missing), null);
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByClick(missing), null);
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe(null);
+  expect(pageCommunicator.getThreadIdForThreadRowByClick(missing)).toBe(null);
 
   // Intercept some AJAX data
   threadIdentifier.processThreadListResponse(fs.readFileSync(__dirname+'/injected-thread-identifier-ajax.txt', 'utf8'));
 
   // Can still identify regular email
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':4d')), '149bf3ae4702f5a7');
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':4d'))).toBe('149bf3ae4702f5a7');
 
   // Can now identify that missing email
-  assert.strictEqual(pageCommunicator.getThreadIdForThreadRowByDatabase(missing), '1477fe06f5924590');
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe('1477fe06f5924590');
 });
