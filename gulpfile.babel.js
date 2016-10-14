@@ -226,25 +226,6 @@ gulp.task('clean', function(cb) {
   rimraf('./dist/', cb);
 });
 
-gulp.task('test', ['test-unit', 'test-jsdom']);
-
-gulp.task('test-unit', function() {
-  return spawn('node_modules/.bin/mocha');
-});
-
-gulp.task('test-jsdom', [
-  'test-jsdom-inboxsdk-gmail',
-  'test-jsdom-inboxsdk-inbox'
-]);
-
-gulp.task('test-jsdom-inboxsdk-gmail', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/inboxsdk-gmail.js");']);
-});
-
-gulp.task('test-jsdom-inboxsdk-inbox', function() {
-  return spawn('node', ['-e', 'require("babel-register"); require("./test/jsdom/inboxsdk-inbox.js");']);
-});
-
 gulp.task('docs', function(cb) {
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
