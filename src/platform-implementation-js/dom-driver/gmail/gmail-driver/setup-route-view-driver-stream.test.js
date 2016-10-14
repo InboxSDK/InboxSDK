@@ -16,24 +16,18 @@ import MockMutationObserver from '../../../../../test/lib/mock-mutation-observer
 
 global.MutationObserver = MockMutationObserver;
 
-let main: HTMLElement;
-let mainEmitter;
-let main2: HTMLElement;
-let main2Emitter;
-beforeEach(() => {
-  document.body.innerHTML = `
-    <div class="aeF">
-      <div class="nH">
-        <div id="main" class="nH"></div>
-        <div id="main2" class="nH" style="display:none"></div>
-      </div>
+document.body.innerHTML = `
+  <div class="aeF">
+    <div class="nH">
+      <div id="main" class="nH"></div>
+      <div id="main2" class="nH" style="display:none"></div>
     </div>
-  `;
-  main = document.getElementById('main');
-  mainEmitter = makeMutationEventInjector(main);
-  main2 = document.getElementById('main2');
-  main2Emitter = makeMutationEventInjector(main2);
-});
+  </div>
+`;
+const main = document.getElementById('main');
+const mainEmitter = makeMutationEventInjector(main);
+const main2 = document.getElementById('main2');
+const main2Emitter = makeMutationEventInjector(main2);
 
 const stopper = kefirBus();
 afterEach(() => {
@@ -46,12 +40,16 @@ function makeMockDriver(): Object {
     getCustomRouteIDs: _.constant(new Set()),
     getCustomListRouteIDs: _.constant(new Map()),
     getCustomListSearchStringsToRouteIds: _.constant(new Map()),
-    showNativeRouteView: jest.fn()
+    hashChangeNoViewChange: jest.fn(),
+    showNativeRouteView: jest.fn(),
+    showCustomThreadList: jest.fn()
   };
 }
 
 test('role=main changes are seen', async () => {
   const items = [];
+  window.location.hash = '#inbox';
+
   setupRouteViewDriverStream(new GmailRouteProcessor(), makeMockDriver())
     .takeUntilBy(stopper)
     .onValue(item => {
@@ -59,7 +57,6 @@ test('role=main changes are seen', async () => {
     });
 
   await delay(1);
-
   expect(items.length).toBe(1);
 
   main.style.display = 'none';
@@ -68,6 +65,97 @@ test('role=main changes are seen', async () => {
   main2Emitter({attributeName: 'style'});
 
   await delay(1);
-
   expect(items.length).toBe(2);
+
+  main.style.display = '';
+  main2.style.display = 'none';
+  mainEmitter({attributeName: 'style'});
+  main2Emitter({attributeName: 'style'});
+
+  await delay(1);
+  expect(items.length).toBe(3);
+});
+
+test('custom view hashchanges are seen', async () => {
+  const items = [];
+  const driver = makeMockDriver();
+  driver.getCustomRouteIDs().add('foo');
+  driver.getCustomRouteIDs().add('bar');
+  window.location.hash = '#inbox';
+
+  setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
+    .takeUntilBy(stopper)
+    .onValue(item => {
+      items.push(item);
+    });
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#foo';
+
+  await delay(1);
+  expect(items.length).toBe(2);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#foo/123';
+
+  await delay(1);
+  expect(items.length).toBe(3);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  // Setting to the same hash should NOT make a new routeview.
+  window.location.hash = '#foo/123?compose=123';
+
+  await delay(1);
+  expect(items.length).toBe(3);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#bar';
+
+  await delay(1);
+  expect(items.length).toBe(4);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+});
+
+test('revertNativeHashChanges works', async () => {
+  const items = [];
+  const driver = makeMockDriver();
+  driver.getCustomRouteIDs().add('foo');
+  window.location.hash = '#inbox';
+
+  setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
+    .takeUntilBy(stopper)
+    .onValue(item => {
+      items.push(item);
+    });
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#foo';
+
+  await delay(1);
+  expect(items.length).toBe(2);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#inbox';
+
+  await delay(1);
+  expect(items.length).toBe(3);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
+
+  window.location.hash = '#foo';
+
+  await delay(1);
+  expect(items.length).toBe(4);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
+
+  window.location.hash = '#inbox';
+
+  await delay(1);
+  expect(items.length).toBe(5);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(3);
 });
