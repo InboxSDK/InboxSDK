@@ -119,6 +119,30 @@ test('custom view hashchanges are seen', async () => {
   expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
 });
 
+test('native hash changes are ignored', async () => {
+  // We don't pay attention to native hash changes usually. We settle for
+  // watching a new [role=main] element become displayed.
+  const items = [];
+  const driver = makeMockDriver();
+  window.location.hash = '#inbox';
+
+  setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
+    .takeUntilBy(stopper)
+    .onValue(item => {
+      items.push(item);
+    });
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+
+  window.location.hash = '#starred';
+
+  await delay(1);
+  expect(items.length).toBe(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(1);
+});
+
 test('revertNativeHashChanges works', async () => {
   const items = [];
   const driver = makeMockDriver();
