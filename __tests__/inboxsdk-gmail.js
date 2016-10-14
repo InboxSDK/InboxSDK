@@ -3,6 +3,7 @@
 import RSVP from '../test/lib/rsvp';
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 30*1000;
 process.env.VERSION = 'beep';
 
 global.MutationObserver = MockMutationObserver;
