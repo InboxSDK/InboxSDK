@@ -438,7 +438,7 @@ async function getEventsAccessToken() {
   }
 }
 
-if (_extensionIsLoggerMaster && global.document) {
+if (_extensionIsLoggerMaster && global.document && global.MutationObserver) {
   makeMutationObserverStream(document.documentElement, {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(()=>null).throttle(120*1000).onValue(function() {

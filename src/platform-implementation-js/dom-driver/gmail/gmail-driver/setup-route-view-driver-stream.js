@@ -38,7 +38,6 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 
 	const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
 		.filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-		.filter(event => event.newURL === document.location.href) // ignore outdated events
 		.map(event => ({new: getURLObject(event.newURL), old: getURLObject(event.oldURL)}))
 		.filter(event => event.new.hash !== event.old.hash)
 		.map(event => event.new)
