@@ -43,5 +43,4 @@ export default function parser(el: HTMLElement) {
   };
 }
 
-/*:: const x = parser(({}:any)); */
-export type Parsed = typeof x;
+export type Parsed = $ReturnType<typeof parser>;
