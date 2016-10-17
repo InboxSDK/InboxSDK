@@ -1,7 +1,5 @@
 /* @flow */
-// jshint ignore:start
 
-import _ from 'lodash';
 import SafeEventEmitter from './lib/safe-event-emitter';
 import {BUILD_VERSION} from '../common/version';
 import sharedStyle from './lib/shared-style';
@@ -49,7 +47,7 @@ import isValidAppId from './lib/is-valid-app-id';
 import type {Driver} from './driver-interfaces/driver';
 import type {AppLogger} from './lib/logger';
 
-var loadedAppIds: Set<string> = new Set();
+const loadedAppIds: Set<string> = new Set();
 
 export type PiOpts = {
 	appName: ?string;
@@ -85,7 +83,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 
 	constructor(driver: Driver, appId: string, piOpts: PiOpts) {
 		super();
-		var {appName, appIconUrl, VERSION:LOADER_VERSION} = piOpts;
+		const {appName, appIconUrl, VERSION:LOADER_VERSION} = piOpts;
 
 		this._appId = appId;
 		this._driver = driver;
@@ -146,28 +144,29 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 		throw new Error("appId must be a string");
 	}
 
-	var opts: PiOpts = _.extend({
+	const opts: PiOpts = {
 		// defaults
 		globalErrorLogging: true, eventTracking: true,
-		inboxBeta: false
-	}, _opts);
+		inboxBeta: false,
+		..._opts
+	};
 
 	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
 	if (opts.REQUESTED_API_VERSION !== 1) {
 		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
-	var DRIVERS_BY_ORIGIN = {
+	const DRIVERS_BY_ORIGIN = {
 		'https://mail.google.com': GmailDriver,
 		'https://inbox.google.com': InboxDriver
 	};
 
-	var LOADER_VERSION: string = opts.VERSION;
-	var IMPL_VERSION: string = BUILD_VERSION;
-	var logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
+	const LOADER_VERSION: string = opts.VERSION;
+	const IMPL_VERSION: string = BUILD_VERSION;
+	const logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 
-	var origin: string = (document.location: any).origin;
-	var DriverClass = DRIVERS_BY_ORIGIN[origin];
+	const origin: string = (document.location: any).origin;
+	const DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", origin);
 		// never resolve
@@ -176,8 +175,8 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 
 	sharedStyle();
 
-	var driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, envData);
-	return (driver.onready: any /* work around https://github.com/facebook/flow/issues/683 */).then(() => {
+	const driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, envData);
+	return driver.onready.then(() => {
 		if (!isValidAppId(appId)) {
 			console.error(`
 ===========================================================
@@ -195,7 +194,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 		}
 
 		logger.eventSdkPassive('instantiate');
-		var pi = new PlatformImplementation(driver, appId, opts);
+		const pi = new PlatformImplementation(driver, appId, opts);
 		if (origin === 'https://inbox.google.com' && !opts.inboxBeta) {
 			console.log("InboxSDK: Unsupported origin", origin);
 			if (!loadedAppIds.has(appId)) {
