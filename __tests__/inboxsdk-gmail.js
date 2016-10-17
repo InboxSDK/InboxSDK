@@ -34,7 +34,10 @@ test('loads in gmail mock', () => {
   return InboxSDK.load(1, "sdk_testfoo_2a9c68f994", appOpts).then(inboxsdk => {
     const newGlobals = _.difference(
       Object.keys(window), originalWindowProperties,
-      ['__InboxSDKImpLoader', 'inboxsdk__style', 'inboxsdk__shared_style', '__inboxsdk_extensionSeenErrors']
+      [
+        '__InboxSDKImpLoader', 'inboxsdk__style', 'inboxsdk__shared_style',
+        '__inboxsdk_extensionSeenErrors', '__coverage__'
+      ]
     ).map(x => `window.${x}`);
     expect(newGlobals).toEqual([]);
 
