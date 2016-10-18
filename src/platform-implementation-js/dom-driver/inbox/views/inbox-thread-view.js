@@ -1,6 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
+import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -76,11 +77,13 @@ class InboxThreadView {
     return this._p.attributes.threadId;
   }
 
-  addSidebarContentPanel(descriptor: any) {
+  addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
+    let icon = null;
     const panel = this._driver.getAppSidebarView().addSidebarContentPanel(descriptor);
     this._sidebarPanels.add(panel);
     panel.getStopper()
       .onValue(() => {
+        if (icon) icon.remove();
         this._sidebarPanels.delete(panel);
       });
     this._stopper
@@ -88,6 +91,51 @@ class InboxThreadView {
       .onValue(() => {
         panel.remove();
       });
+
+    descriptor
+      .takeUntilBy(this._stopper)
+      .takeUntilBy(panel.getStopper())
+      .take(1)
+      .onValue(descriptor => {
+        const {stickyHeading} = this._p.elements;
+        if (!stickyHeading) return;
+
+        let iconArea = stickyHeading.querySelector('.inboxsdk__sidebar_iconArea');
+        if (!iconArea) {
+          iconArea = document.createElement('div');
+          iconArea.className = 'inboxsdk__sidebar_iconArea';
+
+          this._driver.getAppSidebarView().getOpenStream()
+            .takeUntilBy(this._stopper)
+            .onValue(open => {
+              iconArea.style.display = open ? 'none' : '';
+            });
+
+          stickyHeading.appendChild(iconArea);
+        }
+
+        let {appName, appIconUrl} = this._driver.getOpts();
+        if (!appName) {
+          appName = descriptor.title;
+        }
+        if (!appIconUrl) {
+          appIconUrl = descriptor.iconUrl;
+        }
+
+        icon = document.createElement('div');
+        icon.innerHTML = autoHtml `
+          <button class="inboxsdk__button_icon" type="button" title="${appName}">
+            <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
+          </button>
+        `;
+        icon.querySelector('button').addEventListener('click', event => {
+          event.stopPropagation();
+          this._driver.getAppSidebarView().open();
+          panel.scrollIntoView();
+        }, true);
+        iconArea.appendChild(icon);
+      });
+
     return panel;
   }
 

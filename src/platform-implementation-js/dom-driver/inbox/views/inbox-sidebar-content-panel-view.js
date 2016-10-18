@@ -55,6 +55,10 @@ class InboxSidebarContentPanelView {
     return this._eventStream;
   }
 
+  scrollIntoView() {
+    this._contentEl.scrollIntoView();
+  }
+
   remove() {
     this._eventStream.end();
     this._el.remove();

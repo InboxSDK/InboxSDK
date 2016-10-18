@@ -148,6 +148,40 @@
   white-space: nowrap;
 }
 
+.inboxsdk__sidebar_iconArea {
+  position: absolute;
+  right: -16px;
+  z-index: 100;
+
+  /* needed to prevent rendering bug in chrome where the element is
+  visibly duplicated when the parent becomes position:fixed. */
+  will-change: top;
+}
+
+.inboxsdk__sidebar_iconArea .inboxsdk__button_icon {
+  transition: box-shadow .2s cubic-bezier(.4,0,.2,1);
+  transition-delay: 0.01s;
+  box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  height: 26px;
+  width: 26px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.inboxsdk__sidebar_iconArea .inboxsdk__button_icon:focus,
+.inboxsdk__sidebar_iconArea .inboxsdk__button_icon:hover {
+  outline: none;
+  box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
+}
+
+.inboxsdk__sidebar_iconArea .inboxsdk__button_iconImg {
+  width: 26px;
+  height: 26px;
+}
+
 .inboxsdk__button_icon {
   -moz-user-select: none;
   -webkit-user-select: none;

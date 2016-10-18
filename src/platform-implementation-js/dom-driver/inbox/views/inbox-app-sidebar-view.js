@@ -24,6 +24,7 @@ class InboxAppSidebarView {
   _el: HTMLElement;
   _contentArea: HTMLElement;
   _mainParent: HTMLElement;
+  _openProp: Kefir.Observable<boolean>;
 
   constructor(driver: InboxDriver) {
     this._driver = driver;
@@ -50,11 +51,32 @@ class InboxAppSidebarView {
       throw err;
     }
     this._mainParent = mainParent;
+
+    this._openProp = makeMutationObserverChunkedStream(
+      this._el, {attributes: true, attributeFilter: ['data-open']}
+    )
+      .toProperty(() => null)
+      .map(() => this._el.getAttribute('data-open') === 'true')
+      .skipDuplicates();
   }
 
   destroy() {
     this._stopper.destroy();
     this._el.remove();
+  }
+
+  open() {
+    this._setShouldAppSidebarOpen(true);
+    this._setOpenedNow(true);
+  }
+
+  close() {
+    this._setShouldAppSidebarOpen(false);
+    this._setOpenedNow(false);
+  }
+
+  getOpenStream(): Kefir.Observable<boolean> {
+    return this._openProp;
   }
 
   // This value controls whether the app sidebar should automatically open
@@ -171,7 +193,7 @@ class InboxAppSidebarView {
   _setOpenedAfterAnimation(open: boolean) {
     waitForAnimationClickBlockerGone()
       .takeUntilBy(this._stopper)
-      .takeUntilBy(makeMutationObserverChunkedStream(this._el, {attributes: true, attributeFilter: ['data-open']}))
+      .takeUntilBy(this._openProp.changes())
       .onValue(() => this._setOpenedNow(open));
   }
 

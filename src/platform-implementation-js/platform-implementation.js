@@ -156,7 +156,7 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
-	const DRIVERS_BY_ORIGIN = {
+	const DRIVERS_BY_ORIGIN: {[name:string]: *} = {
 		'https://mail.google.com': GmailDriver,
 		'https://inbox.google.com': InboxDriver
 	};
@@ -175,7 +175,7 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 
 	sharedStyle();
 
-	const driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, envData);
+	const driver: Driver = new DriverClass(appId, LOADER_VERSION, IMPL_VERSION, logger, opts, envData);
 	return driver.onready.then(() => {
 		if (!isValidAppId(appId)) {
 			console.error(`
