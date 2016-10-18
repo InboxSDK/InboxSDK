@@ -105,7 +105,7 @@ class InboxThreadView {
           iconArea = document.createElement('div');
           iconArea.className = 'inboxsdk__sidebar_iconArea';
 
-          this._driver.getAppSidebarView().getOpenStream()
+          this._driver.getAppSidebarView().getOpenOrOpeningStream()
             .takeUntilBy(this._stopper)
             .onValue(open => {
               iconArea.style.display = open ? 'none' : '';

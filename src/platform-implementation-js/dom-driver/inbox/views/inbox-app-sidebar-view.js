@@ -23,7 +23,7 @@ class InboxAppSidebarView {
   _el: HTMLElement;
   _contentArea: HTMLElement;
   _mainParent: HTMLElement;
-  _openProp: Kefir.Observable<boolean>;
+  _openOrOpeningProp: Kefir.Observable<boolean>;
 
   constructor(driver: InboxDriver) {
     this._driver = driver;
@@ -50,11 +50,14 @@ class InboxAppSidebarView {
     }
     this._mainParent = mainParent;
 
-    this._openProp = makeMutationObserverChunkedStream(
-      this._el, {attributes: true, attributeFilter: ['data-open']}
+    this._openOrOpeningProp = makeMutationObserverChunkedStream(
+      this._el, {attributes: true, attributeFilter: ['data-open', 'data-is-opening']}
     )
       .toProperty(() => null)
-      .map(() => this._el.getAttribute('data-open') === 'true')
+      .map(() =>
+        this._el.getAttribute('data-open') === 'true' ||
+        this._el.getAttribute('data-is-opening') === 'true'
+      )
       .skipDuplicates();
   }
 
@@ -73,8 +76,8 @@ class InboxAppSidebarView {
     this._setOpenedNow(false);
   }
 
-  getOpenStream(): Kefir.Observable<boolean> {
-    return this._openProp;
+  getOpenOrOpeningStream(): Kefir.Observable<boolean> {
+    return this._openOrOpeningProp;
   }
 
   // This value controls whether the app sidebar should automatically open
@@ -108,6 +111,7 @@ class InboxAppSidebarView {
     // share the value.
     el.setAttribute('data-open', 'false');
     el.setAttribute('data-can-open', 'false');
+    el.setAttribute('data-is-opening', 'false');
     document.body.appendChild(el);
 
     const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
@@ -178,10 +182,18 @@ class InboxAppSidebarView {
   }
 
   _setOpenedAfterAnimation(open: boolean) {
+    this._el.setAttribute('data-is-opening', 'true');
     waitForAnimationClickBlockerGone()
       .takeUntilBy(this._stopper)
-      .takeUntilBy(this._openProp.changes())
-      .onValue(() => this._setOpenedNow(open));
+      .takeUntilBy(makeMutationObserverChunkedStream(
+        this._el, {attributes: true, attributeFilter: ['data-open']}
+      ))
+      .onValue(() => {
+        this._setOpenedNow(open);
+      })
+      .onEnd(() => {
+        this._el.setAttribute('data-is-opening', 'false');
+      });
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
