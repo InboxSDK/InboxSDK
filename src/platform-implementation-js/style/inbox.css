@@ -80,35 +80,6 @@
   overflow-y: auto;
 }
 
-.inboxsdk__app_sidebar_opener {
-  z-index: 5;
-  position: fixed;
-  top: 66px;
-  right: 0;
-  pointer-events: none;
-  text-align: right;
-}
-
-.inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
-.inboxsdk__app_sidebar[data-can-open="false"] + .inboxsdk__app_sidebar_opener {
-  display: none;
-}
-
-.inboxsdk__app_sidebar_opener button,
-.inboxsdk__app_sidebar_tab_preview_icon {
-  pointer-events: all;
-}
-
-.inboxsdk__app_sidebar_tab_preview_icon {
-  display: inline-block;
-  margin: 4px 4px 4px 0;
-}
-
-.inboxsdk__app_sidebar_tab_preview_icon > img {
-  width: 16px;
-  height: 16px;
-}
-
 .inboxsdk__app_sidebar_closer {
   position: absolute;
   top: 10px;

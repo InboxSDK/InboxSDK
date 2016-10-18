@@ -20,7 +20,6 @@ import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
 class InboxAppSidebarView {
   _stopper = kefirStopper();
   _driver: InboxDriver;
-  _openerEl: HTMLElement;
   _el: HTMLElement;
   _contentArea: HTMLElement;
   _mainParent: HTMLElement;
@@ -38,7 +37,6 @@ class InboxAppSidebarView {
     const el = document.querySelector('.inboxsdk__app_sidebar');
     if (el) {
       this._el = el;
-      this._openerEl = document.querySelector('.inboxsdk__app_sidebar_opener');
     } else {
       this._createElement();
     }
@@ -155,17 +153,6 @@ class InboxAppSidebarView {
       this._setShouldAppSidebarOpen(false);
       this._setOpenedNow(false);
     });
-
-    this._openerEl = document.createElement('div');
-    this._openerEl.className = 'inboxsdk__app_sidebar_opener';
-    this._openerEl.innerHTML = `
-      <button type="button" title="Open Extension Sidebar">⇦</button>
-    `;
-    this._openerEl.querySelector('button').addEventListener('click', () => {
-      this._setShouldAppSidebarOpen(true);
-      this._setOpenedNow(true);
-    });
-    document.body.appendChild(this._openerEl);
   }
 
   _setOpenedNow(open: boolean) {
@@ -199,32 +186,6 @@ class InboxAppSidebarView {
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const view = new InboxSidebarContentPanelView(descriptor);
-
-    {
-      const tabPreviewIcon = document.createElement('div');
-      tabPreviewIcon.className = 'inboxsdk__app_sidebar_tab_preview_icon';
-
-      descriptor
-        .takeUntilBy(view.getStopper())
-        .onValue(descriptor => {
-          tabPreviewIcon.title = descriptor.title;
-          tabPreviewIcon.className = `inboxsdk__app_sidebar_tab_preview_icon ${descriptor.iconClass||''}`;
-          if (descriptor.iconUrl) {
-            tabPreviewIcon.innerHTML = autoHtml `<img src="${descriptor.iconUrl}">`;
-          } else {
-            tabPreviewIcon.innerHTML = '';
-          }
-        });
-
-      const container = document.createElement('div');
-      container.className = 'inboxsdk__app_sidebar_tab_preview_icon_container';
-      container.appendChild(tabPreviewIcon);
-      this._openerEl.appendChild(container);
-
-      view.getStopper().onValue(() => {
-        container.remove();
-      });
-    }
 
     this._contentArea.appendChild(view.getElement());
 
