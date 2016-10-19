@@ -5,7 +5,7 @@ import {createHash} from 'crypto';
 const cache: Map<string,string> = new Map();
 let seed: ?string = null;
 
-export function getId(name: string): string {
+export default function idMap(name: string): string {
   const id = cache.get(name);
   if (id != null) return id;
 

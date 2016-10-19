@@ -2,7 +2,7 @@
 
 import rewriteCssWithIdMap from './rewriteCssWithIdMap';
 
-import {getId} from './idMap';
+import idMap from './idMap';
 
 test('rewrites single classname', () => {
   expect(rewriteCssWithIdMap(`
@@ -10,7 +10,7 @@ test('rewrites single classname', () => {
       color: red;
     }
   `)).toBe(`
-    .${getId('foo')} {
+    .${idMap('foo')} {
       color: red;
     }
   `);
@@ -29,10 +29,10 @@ test('only rewrites IDMAP_ classnames', () => {
     .blaaah {
       color: blue;
     }
-    .foo .x.${getId('foo')}.y .blah .${getId('xyz-_def3')}, .x {
+    .foo .x.${idMap('foo')}.y .blah .${idMap('xyz-_def3')}, .x {
       color: red;
     }
-    .xyz .${getId('foo')}::after {}
+    .xyz .${idMap('foo')}::after {}
   `);
 });
 
