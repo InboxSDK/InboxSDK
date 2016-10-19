@@ -23,7 +23,7 @@ export function getId(name: string): string {
   } else {
     const hasher = createHash('sha1');
     hasher.update('4iYi29W'+name+':'+seed+'jn2mPvTG');
-    newId = hasher.digest('hex').replace(
+    newId = hasher.digest('hex').slice(0,16).replace(
       /[0-9]/g,
       match => String.fromCharCode('A'.charCodeAt(0) + Number(match))
     );
