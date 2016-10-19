@@ -130,20 +130,13 @@ class InboxThreadView {
           }
         );
 
+        let container;
         if (existingButtonContainer) {
           const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
           existingButtonContainer.setAttribute('data-count', currentCount+1);
-
-          panel.getStopper().onValue(() => {
-            const currentCount = Number(existingButtonContainer.getAttribute('data-count'));
-            if (currentCount === 2) {
-              existingButtonContainer.removeAttribute('data-count');
-            } else {
-              existingButtonContainer.setAttribute('data-count', currentCount-1);
-            }
-          });
+          container = existingButtonContainer;
         } else {
-          const container = document.createElement('div');
+          container = document.createElement('div');
           container.className = idMap('sidebar_button_container');
           container.innerHTML = autoHtml `
             <button class="inboxsdk__button_icon" type="button" title="${appName}">
@@ -156,11 +149,18 @@ class InboxThreadView {
             panel.scrollIntoView();
           }, true);
           iconArea.appendChild(container);
-
-          panel.getStopper().onValue(() => {
-            container.remove();
-          });
         }
+
+        panel.getStopper().onValue(() => {
+          const currentCount = Number(container.getAttribute('data-count'));
+          if (currentCount <= 1) {
+            container.remove();
+          } else if (currentCount === 2) {
+            container.removeAttribute('data-count');
+          } else {
+            container.setAttribute('data-count', String(currentCount-1));
+          }
+        });
       });
 
     return panel;
