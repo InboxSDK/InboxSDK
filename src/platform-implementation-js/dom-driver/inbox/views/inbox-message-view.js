@@ -29,6 +29,7 @@ class InboxMessageView {
   _attachmentCardViews: InboxAttachmentCardView[] = [];
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
+    (this: MessageViewDriver); // interface check
     this._element = element;
     this._driver = driver;
     this._p = parsed;
@@ -234,9 +235,3 @@ class InboxMessageView {
 }
 
 export default defn(module, InboxMessageView);
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	const test: MessageViewDriver = new InboxMessageView(({}:any), ({}:any), ({}:any));
-}
