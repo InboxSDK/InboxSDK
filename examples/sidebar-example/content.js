@@ -53,9 +53,11 @@ InboxSDK.load(1, 'sidebar-example', {
 			contentPanel.on('destroy', function(){
 				console.log('destroy');
 			});
+
+			return contentPanel;
 		};
 
-		window.activate();
+		window._firstPanel = window.activate();
 	});
 
 });

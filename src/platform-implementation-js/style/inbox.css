@@ -149,6 +149,7 @@
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  margin-top: 10px;
   transition: box-shadow .2s cubic-bezier(.4,0,.2,1);
   transition-delay: 0.01s;
   box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
