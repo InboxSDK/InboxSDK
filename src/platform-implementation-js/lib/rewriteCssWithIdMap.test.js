@@ -10,7 +10,7 @@ test('rewrites single classname', () => {
       color: red;
     }
   `)).toBe(`
-    .${getId('IDMAP_foo')} {
+    .${getId('foo')} {
       color: red;
     }
   `);
@@ -29,10 +29,10 @@ test('only rewrites IDMAP_ classnames', () => {
     .blaaah {
       color: blue;
     }
-    .foo .x.${getId('IDMAP_foo')}.y .blah .${getId('IDMAP_xyz-_def3')}, .x {
+    .foo .x.${getId('foo')}.y .blah .${getId('xyz-_def3')}, .x {
       color: red;
     }
-    .xyz .${getId('IDMAP_foo')}::after {}
+    .xyz .${getId('foo')}::after {}
   `);
 });
 
