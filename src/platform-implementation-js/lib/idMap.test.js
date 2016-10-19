@@ -16,54 +16,76 @@ afterEach(() => {
   _reset();
 });
 
-test('createId, getId works', () => {
-  const a = createId('aleph');
-  const b = createId('bet');
-  expect(a).not.toBe(b);
-  expect(typeof a).toBe('string');
-  expect(typeof b).toBe('string');
+for (let env of ['test', 'development']) {
+  describe(`NODE_ENV: ${env}`, () => {
+    let original_NODE_ENV;
+    beforeAll(() => {
+      original_NODE_ENV = process.env.NODE_ENV;
+      process.env.NODE_ENV = env;
+    });
+    afterAll(() => {
+      process.env.NODE_ENV = original_NODE_ENV;
+    });
 
-  expect(getId('aleph')).toBe(a);
-  expect(getId('bet')).toBe(b);
-  expect(getId('aleph')).toBe(a);
-});
+    test('createId, getId works', () => {
+      const a = createId('aleph');
+      const b = createId('bet');
+      expect(a).not.toBe(b);
+      expect(typeof a).toBe('string');
+      expect(typeof b).toBe('string');
 
-test('createId can run with existing name', () => {
-  const a1 = createId('aleph');
-  const a2 = createId('aleph');
-  expect(a1).toBe(a2);
-});
+      expect(getId('aleph')).toBe(a);
+      expect(getId('bet')).toBe(b);
+      expect(getId('aleph')).toBe(a);
+    });
 
-test('getId throws if given non-existing name', () => {
-  expect(() => {
-    getId('aleph');
-  }).toThrowError('Name not found in idMap: aleph');
-});
+    test('createId can run with existing name', () => {
+      const a1 = createId('aleph');
+      const a2 = createId('aleph');
+      expect(a1).toBe(a2);
+    });
 
-test('ids do not contain digits and are at least 6 characters', () => {
-  for (let i=0; i<10; i++) {
-    const id = createId(`foo${i}`);
-    expect(/[0-9]/.test(id)).toBe(false);
-    expect(id.length).toBeGreaterThanOrEqual(6);
-  }
+    test('getId throws if given non-existing name', () => {
+      expect(() => {
+        getId('aleph');
+      }).toThrowError('Name not found in idMap: aleph');
+    });
 
-  randomOverride = 0x100000;
+    if (env === 'development') {
+      test('ids have the IDMAP_ prefix', () => {
+        for (let i=0; i<10; i++) {
+          const id = createId(`foo${i}`);
+          expect(id).toBe(`IDMAP_foo${i}`);
+        }
+      });
+    } else {
+      test('ids do not contain digits and are at least 6 characters', () => {
+        for (let i=0; i<10; i++) {
+          const id = createId(`foo${i}`);
+          expect(/[0-9]/.test(id)).toBe(false);
+          expect(id.length).toBeGreaterThanOrEqual(6);
+        }
 
-  for (let i=0; i<30; i++) {
-    const id = createId(`bar${i}`);
-    expect(/[0-9]/.test(id)).toBe(false);
-    expect(id.length).toBeGreaterThanOrEqual(6);
-    randomOverride++;
-  }
-});
+        randomOverride = 0x100000;
 
-test('still gives unique ids if it get a repeated random number', () => {
-  randomOverride = 0x100000;
+        for (let i=0; i<30; i++) {
+          const id = createId(`bar${i}`);
+          expect(/[0-9]/.test(id)).toBe(false);
+          expect(id.length).toBeGreaterThanOrEqual(6);
+          randomOverride++;
+        }
+      });
+    }
 
-  const ids = new Set();
-  for (let i=0; i<10; i++) {
-    const id = createId(`foo${i}`);
-    expect(ids.has(id)).toBe(false);
-    ids.add(id);
-  }
-});
+    test('still gives unique ids if it get a repeated random number', () => {
+      randomOverride = 0x100000;
+
+      const ids = new Set();
+      for (let i=0; i<10; i++) {
+        const id = createId(`foo${i}`);
+        expect(ids.has(id)).toBe(false);
+        ids.add(id);
+      }
+    });
+  });
+}

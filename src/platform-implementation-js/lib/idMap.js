@@ -14,11 +14,17 @@ export function getId(name: string): string {
 export function createId(name: string): string {
   const id = m.get(name);
   if (id != null) return id;
-  let n = random(0x100000, 0xffffff);
-  while (takenNumbers.has(n)) n++;
-  takenNumbers.add(n);
-  const newId = n.toString(16)
-    .replace(/[0-9]/g, match => String.fromCharCode('A'.charCodeAt(0) + Number(match)));
+
+  let newId;
+  if (process.env.NODE_ENV === 'development') {
+    newId = `IDMAP_${name}`;
+  } else {
+    let n = random(0x100000, 0xffffff);
+    while (takenNumbers.has(n)) n++;
+    takenNumbers.add(n);
+    newId = n.toString(16)
+      .replace(/[0-9]/g, match => String.fromCharCode('A'.charCodeAt(0) + Number(match)));
+  }
   m.set(name, newId);
   return newId;
 }
