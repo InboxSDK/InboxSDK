@@ -1,5 +1,6 @@
 /* @flow */
 
+import _ from 'lodash';
 import {defn} from 'ud';
 import asap from 'asap';
 import Kefir from 'kefir';
@@ -29,6 +30,7 @@ class InboxMessageView {
   _attachmentCardViews: InboxAttachmentCardView[] = [];
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
+    (this: MessageViewDriver); // interface check
     this._element = element;
     this._driver = driver;
     this._p = parsed;
@@ -72,6 +74,8 @@ class InboxMessageView {
     }
 
     this._driver.getMessageViewElementsMap().set(this._element, this);
+
+    this._monitorEmailAddressHovering();
   }
 
   _findThreadView(): ?InboxThreadView {
@@ -106,6 +110,39 @@ class InboxMessageView {
       });
     }
   }
+
+  _monitorEmailAddressHovering() {
+    this._eventStream.plug(Kefir.fromEvents(this._element, 'mouseover')
+      .map(e => e.target)
+      .filter(element => element && element.getAttribute('email'))
+      .map(element => {
+        const contact = {
+          name: element.textContent,
+          emailAddress: element.getAttribute('email')
+        };
+
+        let contactType;
+        if (this._p.elements.sender && this._p.elements.sender.contains(element)) {
+          contactType = 'sender';
+        } else if (
+          this._p.attributes.recipientElements &&
+          _.some(this._p.attributes.recipientElements, el => el.contains(element))
+        ) {
+          contactType = 'recipient';
+        } else {
+          return null;
+        }
+
+        return {
+          eventName: 'contactHover',
+          messageViewDriver: this,
+          contact, contactType
+        };
+      })
+      .filter()
+    );
+  }
+
 
   addAttachmentCardViewDriver(card: InboxAttachmentCardView) {
     this._attachmentCardViews.push(card);
@@ -234,9 +271,3 @@ class InboxMessageView {
 }
 
 export default defn(module, InboxMessageView);
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	const test: MessageViewDriver = new InboxMessageView(({}:any), ({}:any), ({}:any));
-}
