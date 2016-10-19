@@ -19,7 +19,8 @@ export default function idMap(name: string): string {
 
   let newId;
   if (process.env.NODE_ENV === 'development') {
-    newId = name;
+    const n = String(Math.floor(Number(seed)*10)).charAt(0);
+    newId = `idm${n}_${name}`;
   } else {
     const hasher = createHash('sha1');
     hasher.update('4iYi29W'+name+':'+seed+'jn2mPvTG');

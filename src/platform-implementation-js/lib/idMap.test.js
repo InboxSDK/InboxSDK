@@ -40,10 +40,10 @@ for (let env of ['test', 'development']) {
 
     describe('env-specific', () => {
       if (env === 'development') {
-        test('ids are equal to the name', () => {
+        test('ids are similar to the name', () => {
           for (let i=0; i<10; i++) {
             const id = idMap(`foo${i}`);
-            expect(id).toBe(`foo${i}`);
+            expect(id).toMatch(new RegExp(`^idm\\d_foo${i}$`));
           }
         });
       } else {
