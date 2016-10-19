@@ -1,5 +1,6 @@
 /* @flow */
 
+import _ from 'lodash';
 import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
@@ -79,12 +80,10 @@ class InboxThreadView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    let icon = null;
     const panel = this._driver.getAppSidebarView().addSidebarContentPanel(descriptor);
     this._sidebarPanels.add(panel);
     panel.getStopper()
       .onValue(() => {
-        if (icon) icon.remove();
         this._sidebarPanels.delete(panel);
       });
     this._stopper
@@ -123,18 +122,50 @@ class InboxThreadView {
           appIconUrl = descriptor.iconUrl;
         }
 
-        icon = document.createElement('div');
-        icon.innerHTML = autoHtml `
-          <button class="inboxsdk__button_icon" type="button" title="${appName}">
-            <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
-          </button>
-        `;
-        icon.querySelector('button').addEventListener('click', event => {
-          event.stopPropagation();
-          this._driver.getAppSidebarView().open();
-          panel.scrollIntoView();
-        }, true);
-        iconArea.appendChild(icon);
+        // If there's an existing button for the app, then just increment its
+        // data-count attribute instead of adding a new button.
+        const existingButtonContainer = _.find(
+          iconArea.querySelectorAll('.'+idMap('sidebar_button_container')),
+          el => {
+            const button = el.querySelector('button');
+            if (!button || button.title !== appName) return false;
+            const img = button.querySelector('img');
+            if (!img || img.src !== appIconUrl) return false;
+            return true;
+          }
+        );
+
+        if (existingButtonContainer) {
+          const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
+          existingButtonContainer.setAttribute('data-count', currentCount+1);
+
+          panel.getStopper().onValue(() => {
+            const currentCount = Number(existingButtonContainer.getAttribute('data-count'));
+            if (currentCount === 2) {
+              existingButtonContainer.removeAttribute('data-count');
+            } else {
+              existingButtonContainer.setAttribute('data-count', currentCount-1);
+            }
+          });
+        } else {
+          const container = document.createElement('div');
+          container.className = idMap('sidebar_button_container');
+          container.innerHTML = autoHtml `
+            <button class="inboxsdk__button_icon" type="button" title="${appName}">
+              <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
+            </button>
+          `;
+          container.querySelector('button').addEventListener('click', event => {
+            event.stopPropagation();
+            this._driver.getAppSidebarView().open();
+            panel.scrollIntoView();
+          }, true);
+          iconArea.appendChild(container);
+
+          panel.getStopper().onValue(() => {
+            container.remove();
+          });
+        }
       });
 
     return panel;
