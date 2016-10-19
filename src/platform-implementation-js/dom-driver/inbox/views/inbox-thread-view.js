@@ -7,6 +7,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
+import idMap from '../../../lib/idMap';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
@@ -100,10 +101,10 @@ class InboxThreadView {
         const {stickyHeading} = this._p.elements;
         if (!stickyHeading) return;
 
-        let iconArea = stickyHeading.querySelector('.inboxsdk__sidebar_iconArea');
+        let iconArea = stickyHeading.querySelector('.'+idMap('sidebar_iconArea'));
         if (!iconArea) {
           iconArea = document.createElement('div');
-          iconArea.className = 'inboxsdk__sidebar_iconArea';
+          iconArea.className = idMap('sidebar_iconArea');
 
           this._driver.getAppSidebarView().getOpenOrOpeningStream()
             .takeUntilBy(this._stopper)

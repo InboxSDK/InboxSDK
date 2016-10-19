@@ -13,6 +13,7 @@ import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGon
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import appSidebarIcon from '../../../lib/appSidebarIcon';
+import idMap from '../../../lib/idMap';
 
 import type InboxDriver from '../inbox-driver';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
@@ -34,13 +35,13 @@ class InboxAppSidebarView {
     // restricted to being used for references to DOM nodes. When
     // InboxAppSidebarView is instantiated, we check to see if the element
     // already exists and create it if it doesn't.
-    const el = document.querySelector('.inboxsdk__app_sidebar');
+    const el = document.querySelector('.'+idMap('app_sidebar'));
     if (el) {
       this._el = el;
     } else {
       this._createElement();
     }
-    this._contentArea = this._el.querySelector('.inboxsdk__sidebar_panel_content_area');
+    this._contentArea = this._el.querySelector('.'+idMap('sidebar_panel_content_area'));
 
     const mainParent = findParent(document.querySelector('[role=application]'), el => el.parentElement === document.body);
     if (!mainParent) {
@@ -97,12 +98,12 @@ class InboxAppSidebarView {
 
   _createElement() {
     const el = this._el = document.createElement('div');
-    el.className = 'inboxsdk__app_sidebar';
+    el.className = idMap('app_sidebar');
     el.innerHTML = `
-      <div class="inboxsdk__app_sidebar_main">
-        <div class="inboxsdk__sidebar_panel_content_area"></div>
+      <div class="${idMap('app_sidebar_main')}">
+        <div class="${idMap('sidebar_panel_content_area')}"></div>
       </div>
-      <div class="inboxsdk__app_sidebar_closer">
+      <div class="${idMap('app_sidebar_closer')}">
         <button type="button" title="Close">⇨</button>
       </div>
     `;
@@ -114,7 +115,7 @@ class InboxAppSidebarView {
     el.setAttribute('data-is-opening', 'false');
     document.body.appendChild(el);
 
-    const contentArea = el.querySelector('.inboxsdk__sidebar_panel_content_area');
+    const contentArea = el.querySelector('.'+idMap('sidebar_panel_content_area'));
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
@@ -153,7 +154,7 @@ class InboxAppSidebarView {
         }
       });
 
-    el.querySelector('.inboxsdk__app_sidebar_closer button').addEventListener('click', () => {
+    el.querySelector(`.${idMap('app_sidebar_closer')} button`).addEventListener('click', () => {
       this._setShouldAppSidebarOpen(false);
       this._setOpenedNow(false);
     });
