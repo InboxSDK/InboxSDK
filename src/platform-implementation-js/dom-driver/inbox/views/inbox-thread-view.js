@@ -114,13 +114,8 @@ class InboxThreadView {
           stickyHeading.appendChild(iconArea);
         }
 
-        let {appName, appIconUrl} = this._driver.getOpts();
-        if (!appName) {
-          appName = descriptor.title;
-        }
-        if (!appIconUrl) {
-          appIconUrl = descriptor.iconUrl;
-        }
+        const appName = descriptor.appName || this._driver.getOpts().appName || descriptor.title;
+        const appIconUrl = descriptor.appIconUrl || this._driver.getOpts().appIconUrl || descriptor.iconUrl;
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
