@@ -13,6 +13,7 @@ for (let env of ['test', 'development']) {
     });
     afterAll(() => {
       process.env.NODE_ENV = original_NODE_ENV;
+      document.documentElement.removeAttribute('data-map-id');
     });
 
     describe('common', () => {

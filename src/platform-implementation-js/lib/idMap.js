@@ -4,22 +4,24 @@ import {createHash} from 'crypto';
 
 const cache: Map<string,string> = new Map();
 let seed: ?string = null;
+let useDevMode: boolean = false;
 
 export default function idMap(name: string): string {
   const id = cache.get(name);
   if (id != null) return id;
 
-  if (!seed) {
+  if (seed == null) {
     seed = document.documentElement.getAttribute('data-map-id');
-    if (!seed) {
-      seed = String(Math.random());
+    if (seed == null) {
+      seed = String(Math.random()) + ((process.env.NODE_ENV === 'development') ? 'd' : '');
       document.documentElement.setAttribute('data-map-id', seed);
     }
+    useDevMode = /d$/.test(seed);
   }
 
   let newId;
-  if (process.env.NODE_ENV === 'development') {
-    const n = String(Math.floor(Number(seed)*10)).charAt(0);
+  if (useDevMode) {
+    const n = String(Math.floor(parseFloat(seed)*10)).charAt(0);
     newId = `idm${n}_${name}`;
   } else {
     const hasher = createHash('sha1');
