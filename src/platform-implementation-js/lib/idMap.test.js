@@ -1,20 +1,8 @@
 /* @flow */
 
-let randomOverride: ?number = null;
-jest.mock('lodash/random', () => {
-  const actualRandom = require.requireActual('lodash/random');
-  return function(...args) {
-    if (randomOverride != null) return randomOverride;
-    return actualRandom(...args);
-  };
-});
+import {getId, _reset} from './idMap';
 
-import {getId, createId, _reset} from './idMap';
-
-afterEach(() => {
-  randomOverride = null;
-  _reset();
-});
+afterEach(_reset);
 
 for (let env of ['test', 'development']) {
   describe(`NODE_ENV: ${env}`, () => {
@@ -27,64 +15,60 @@ for (let env of ['test', 'development']) {
       process.env.NODE_ENV = original_NODE_ENV;
     });
 
-    test('createId, getId works', () => {
-      const a = createId('aleph');
-      const b = createId('bet');
-      expect(a).not.toBe(b);
-      expect(typeof a).toBe('string');
-      expect(typeof b).toBe('string');
+    describe('common', () => {
+      test('getId works', () => {
+        const a = getId('aleph');
+        const b = getId('bet');
+        expect(a).not.toBe(b);
+        expect(typeof a).toBe('string');
+        expect(typeof b).toBe('string');
 
-      expect(getId('aleph')).toBe(a);
-      expect(getId('bet')).toBe(b);
-      expect(getId('aleph')).toBe(a);
-    });
+        expect(getId('aleph')).toBe(a);
+        expect(getId('bet')).toBe(b);
+        expect(getId('aleph')).toBe(a);
+      });
 
-    test('createId can run with existing name', () => {
-      const a1 = createId('aleph');
-      const a2 = createId('aleph');
-      expect(a1).toBe(a2);
-    });
-
-    test('getId throws if given non-existing name', () => {
-      expect(() => {
-        getId('aleph');
-      }).toThrowError('Name not found in idMap: aleph');
-    });
-
-    if (env === 'development') {
-      test('ids have the IDMAP_ prefix', () => {
-        for (let i=0; i<10; i++) {
-          const id = createId(`foo${i}`);
-          expect(id).toBe(`IDMAP_foo${i}`);
+      test('ids are unique', () => {
+        const ids = new Set();
+        for (let i=0; i<20; i++) {
+          const id = getId(`foo${i}`);
+          expect(ids.has(id)).toBe(false);
+          ids.add(id);
         }
       });
-    } else {
-      test('ids do not contain digits and are at least 6 characters', () => {
-        for (let i=0; i<10; i++) {
-          const id = createId(`foo${i}`);
-          expect(/[0-9]/.test(id)).toBe(false);
-          expect(id.length).toBeGreaterThanOrEqual(6);
-        }
+    });
 
-        randomOverride = 0x100000;
+    describe('env-specific', () => {
+      if (env === 'development') {
+        test('ids are equal to the name', () => {
+          for (let i=0; i<10; i++) {
+            const id = getId(`foo${i}`);
+            expect(id).toBe(`foo${i}`);
+          }
+        });
+      } else {
+        test('ids do not contain digits and are at least 6 characters', () => {
+          for (let i=0; i<10; i++) {
+            const id = getId(`foo${i}`);
+            expect(/[0-9]/.test(id)).toBe(false);
+            expect(id.length).toBeGreaterThanOrEqual(6);
+          }
+        });
 
-        for (let i=0; i<30; i++) {
-          const id = createId(`bar${i}`);
-          expect(/[0-9]/.test(id)).toBe(false);
-          expect(id.length).toBeGreaterThanOrEqual(6);
-          randomOverride++;
-        }
-      });
-    }
+        test('ids depend on seed', () => {
+          const a1 = getId('foo');
+          const a2 = getId('foo');
+          expect(a2).toBe(a1);
 
-    test('still gives unique ids if it get a repeated random number', () => {
-      randomOverride = 0x100000;
+          document.documentElement.removeAttribute('data-map-id');
+          _reset();
 
-      const ids = new Set();
-      for (let i=0; i<10; i++) {
-        const id = createId(`foo${i}`);
-        expect(ids.has(id)).toBe(false);
-        ids.add(id);
+          const b1 = getId('foo');
+          const b2 = getId('foo');
+          expect(b2).toBe(b1);
+
+          expect(b1).not.toBe(a1);
+        });
       }
     });
   });

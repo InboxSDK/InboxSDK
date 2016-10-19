@@ -1,36 +1,39 @@
 /* @flow */
 
-import random from 'lodash/random';
+import {createHash} from 'crypto';
 
-const m: Map<string,string> = new Map();
-const takenNumbers: Set<number> = new Set();
+const cache: Map<string,string> = new Map();
+let seed: ?string = null;
 
 export function getId(name: string): string {
-  const id = m.get(name);
+  const id = cache.get(name);
   if (id != null) return id;
-  throw new Error(`Name not found in idMap: ${name}`);
-}
 
-export function createId(name: string): string {
-  const id = m.get(name);
-  if (id != null) return id;
+  if (!seed) {
+    seed = document.documentElement.getAttribute('data-map-id');
+    if (!seed) {
+      seed = String(Math.random());
+      document.documentElement.setAttribute('data-map-id', seed);
+    }
+  }
 
   let newId;
   if (process.env.NODE_ENV === 'development') {
-    newId = `IDMAP_${name}`;
+    newId = name;
   } else {
-    let n = random(0x100000, 0xffffff);
-    while (takenNumbers.has(n)) n++;
-    takenNumbers.add(n);
-    newId = n.toString(16)
-      .replace(/[0-9]/g, match => String.fromCharCode('A'.charCodeAt(0) + Number(match)));
+    const hasher = createHash('sha1');
+    hasher.update('4iYi29W'+name+':'+seed+'jn2mPvTG');
+    newId = hasher.digest('hex').replace(
+      /[0-9]/g,
+      match => String.fromCharCode('A'.charCodeAt(0) + Number(match))
+    );
   }
-  m.set(name, newId);
+  cache.set(name, newId);
   return newId;
 }
 
 // Only exposed for tests!
 export function _reset() {
-  m.clear();
-  takenNumbers.clear();
+  cache.clear();
+  seed = null;
 }

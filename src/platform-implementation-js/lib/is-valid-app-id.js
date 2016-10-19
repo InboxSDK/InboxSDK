@@ -1,7 +1,9 @@
-import crypto from 'crypto';
+/* @flow */
+
+import {createHash} from 'crypto';
 
 function grandfatherHash(x) {
-  var hasher = crypto.createHash('sha1');
+  const hasher = createHash('sha1');
   hasher.update('YlEHtGl72+c'+x);
   return hasher.digest('hex');
 }
@@ -19,7 +21,7 @@ const whitelist = new Set([
 
 const appIdRegex = /^sdk_(.{5,15})_([0-9a-f]{10})$/;
 
-export default function isValidAppId(appId) {
+export default function isValidAppId(appId: string): boolean {
   if (whitelist.has(grandfatherHash(appId))) return true;
 
   const m = appIdRegex.exec(appId);
@@ -27,7 +29,7 @@ export default function isValidAppId(appId) {
 
   const name = m[1], hash = m[2];
 
-  const shasum = crypto.createHash('sha1');
+  const shasum = createHash('sha1');
   shasum.update(name);
   return shasum.digest('hex').slice(0, 10) === hash;
 }
