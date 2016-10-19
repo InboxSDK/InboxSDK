@@ -6,6 +6,8 @@ const cache: Map<string,string> = new Map();
 let seed: ?string = null;
 let useDevMode: boolean = false;
 
+// Pass a name and you'll get a unique identifier associated with that name.
+// The returned identifier will only contain alphabetic characters.
 export default function idMap(name: string): string {
   const id = cache.get(name);
   if (id != null) return id;

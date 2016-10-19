@@ -48,10 +48,10 @@ for (let env of ['test', 'development']) {
           }
         });
       } else {
-        test('ids do not contain digits and are at least 6 characters', () => {
+        test('ids are only alphabetic and are at least 6 characters', () => {
           for (let i=0; i<10; i++) {
             const id = idMap(`foo${i}`);
-            expect(/[0-9]/.test(id)).toBe(false);
+            expect(/^[a-zA-Z]+$/.test(id)).toBe(true);
             expect(id.length).toBeGreaterThanOrEqual(6);
           }
         });
