@@ -103,9 +103,7 @@ class InboxAppSidebarView {
       <div class="${idMap('app_sidebar_main')}">
         <div class="${idMap('sidebar_panel_content_area')}"></div>
       </div>
-      <div class="${idMap('app_sidebar_closer')}">
-        <button type="button" title="Close">⇨</button>
-      </div>
+      <button class="inboxsdk__close_button" type="button" title="Close"></button>
     `;
     // Store the open state in the DOM rather than a class property because
     // multiple instances of InboxAppSidebarView from different apps need to
@@ -154,7 +152,7 @@ class InboxAppSidebarView {
         }
       });
 
-    el.querySelector(`.${idMap('app_sidebar_closer')} button`).addEventListener('click', () => {
+    el.querySelector(`.inboxsdk__close_button`).addEventListener('click', () => {
       this._setShouldAppSidebarOpen(false);
       this._setOpenedNow(false);
     });
