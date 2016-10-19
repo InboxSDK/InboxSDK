@@ -2,7 +2,11 @@
 
 import idMap, {_reset} from './idMap';
 
-afterEach(_reset);
+const original_Date_now = Date.now;
+afterEach(() => {
+  _reset();
+  (Date:any).now = original_Date_now;
+});
 
 for (let env of ['test', 'development']) {
   describe(`NODE_ENV: ${env}`, () => {
@@ -61,6 +65,7 @@ for (let env of ['test', 'development']) {
           const a2 = idMap('foo');
           expect(a2).toBe(a1);
 
+          (Date:any).now = () => original_Date_now() + 1000*60*60;
           document.documentElement.removeAttribute('data-map-id');
           _reset();
 

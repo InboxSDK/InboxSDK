@@ -15,15 +15,19 @@ export default function idMap(name: string): string {
   if (seed == null) {
     seed = document.documentElement.getAttribute('data-map-id');
     if (seed == null) {
-      seed = String(Math.random()) + ((process.env.NODE_ENV === 'development') ? 'd' : '');
+      // Make the seed change every hour: the seed is based on a hash of the
+      // current timestamp in hour resolution.
+      const hasher = createHash('sha1');
+      hasher.update('PWVe'+Math.floor(Date.now()/(1000*60*60))+'PYiE0');
+      seed = hasher.digest('hex').slice(0,16) + ((process.env.NODE_ENV === 'development') ? 'x' : '');
       document.documentElement.setAttribute('data-map-id', seed);
     }
-    useDevMode = /d$/.test(seed);
+    useDevMode = /x$/.test(seed);
   }
 
   let newId;
   if (useDevMode) {
-    const n = String(Math.floor(parseFloat(seed)*10)).charAt(0);
+    const n = String(seed.charCodeAt(0)%10);
     newId = `idm${n}_${name}`;
   } else {
     const hasher = createHash('sha1');
