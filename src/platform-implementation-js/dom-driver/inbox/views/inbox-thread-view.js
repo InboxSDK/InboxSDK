@@ -53,6 +53,9 @@ class InboxThreadView {
 
   addMessageViewDriver(messageView: InboxMessageView) {
     this._messageViews.push(messageView);
+    this._eventStream.plug(messageView.getEventStream()
+      .filter(event => event.eventName === 'contactHover')
+    );
     messageView.getStopper()
       .takeUntilBy(this._stopper)
       .onValue(() => {
