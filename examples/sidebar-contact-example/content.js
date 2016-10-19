@@ -1,4 +1,4 @@
-InboxSDK.load('1', 'sidebar-contact-example').then(function(sdk){
+InboxSDK.load('1', 'sidebar-contact-example', {inboxBeta:true}).then(function(sdk){
 	window._sdk = sdk;
 
 	sdk.Conversations.registerMessageViewHandlerAll(function(messageView) {

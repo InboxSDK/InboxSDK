@@ -53,10 +53,11 @@ import InboxDrawerView from './views/inbox-drawer-view';
 import InboxBackdrop from './views/inbox-backdrop';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
-import type {EnvData} from '../../platform-implementation';
+import type {PiOpts, EnvData} from '../../platform-implementation';
 
 class InboxDriver {
   _logger: Logger;
+  _opts: PiOpts;
   _envData: EnvData;
   _stopper: Kefir.Observable<any>&{destroy:()=>void};
   onready: Promise<void>;
@@ -82,9 +83,11 @@ class InboxDriver {
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
 
-  constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
+  constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
+    (this: Driver); // interface check
     customStyle();
     this._logger = logger;
+    this._opts = opts;
     this._envData = envData;
     this._stopper = kefirStopper();
     this._pageCommunicator = new InboxPageCommunicator();
@@ -207,6 +210,7 @@ class InboxDriver {
     this._stopper.destroy();
   }
 
+  getOpts(): PiOpts {return this._opts;}
   getLogger(): Logger {return this._logger;}
   getStopper(): Kefir.Observable<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
@@ -382,9 +386,3 @@ class InboxDriver {
 }
 
 export default defn(module, InboxDriver);
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	var driver: Driver = new InboxDriver('', '', '', ({}:any), ({}:any));
-}

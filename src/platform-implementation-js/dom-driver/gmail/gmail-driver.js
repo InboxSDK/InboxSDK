@@ -64,12 +64,13 @@ import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
-import type {EnvData} from '../../platform-implementation';
+import type {PiOpts, EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
 class GmailDriver {
 	_appId: string;
 	_logger: Logger;
+	_opts: PiOpts;
 	_envData: EnvData;
 	_customRouteIDs: Set<string>;
 	_customListRouteIDs: Map<string, Function>;
@@ -101,11 +102,13 @@ class GmailDriver {
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 
-	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, envData: EnvData) {
+	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
+		(this: Driver); // interface check
 		customStyle();
 
 		this._appId = appId;
 		this._logger = logger;
+		this._opts = opts;
 		this._envData = envData;
 		this._customRouteIDs = new Set();
 		this._customListRouteIDs = new Map();
@@ -145,6 +148,7 @@ class GmailDriver {
 	}
 
 	getAppId(): string {return this._appId;}
+	getOpts(): PiOpts {return this._opts;}
 	getPageCommunicator(): PageCommunicator {return this._pageCommunicator;}
 	getPageCommunicatorPromise(): Promise<PageCommunicator> {return this._pageCommunicatorPromise;}
 	getLogger(): Logger {return this._logger;}
@@ -455,9 +459,3 @@ class GmailDriver {
 }
 
 export default defn(module, GmailDriver);
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	var driver: Driver = new GmailDriver('', '', '', ({}:any), ({}:any));
-}

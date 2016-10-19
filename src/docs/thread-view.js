@@ -89,6 +89,24 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 	iconUrl: null,
 
 	/**
+	 * (Currently Inbox-only) In Inbox, when a thread is open but the sidebar isn't, then
+	 * buttons to open the sidebar will be shown next to the thread. Each button may be
+	 * associated with multiple sidebars. The sidebars are grouped into buttons based on
+	 * this appName property, their app's appName passed to `InboxSDK.load`, or the title
+	 * property.
+	 * ^optional
+	 * @type {string}
+	 */
+	appName: null,
+
+	/**
+	 * (Currently Inbox-only) Overrides the icon for the sidebar-opener button.
+	 * ^optional
+	 * @type {string}
+	 */
+	appIconUrl: null,
+
+	/**
 	 * If multiple content panels for your app are added then they will be ordered by this value.
 	 * ^optional
 	 * ^default=0

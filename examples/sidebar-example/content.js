@@ -1,4 +1,10 @@
-InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
+'use strict';
+
+InboxSDK.load(1, 'sidebar-example', {
+	inboxBeta: true,
+	appName: 'Streak',
+  appIconUrl: 'https://www.streak.com/images/orangeIcon.png'
+}).then(inboxSDK => {
 	window._sdk = inboxSDK;
 
 	inboxSDK.Conversations.registerThreadViewHandler(function(threadView){
@@ -7,7 +13,7 @@ InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
 		el.innerHTML = 'Hello world!';
 
 		/*
-		var cp =  threadView.addSidebarContentPanel({
+		var cp = threadView.addSidebarContentPanel({
 			title: 'Monkey',
 			iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 			el: el,
@@ -47,9 +53,11 @@ InboxSDK.load(1, 'sidebar-example', {inboxBeta:true}).then(function(inboxSDK) {
 			contentPanel.on('destroy', function(){
 				console.log('destroy');
 			});
+
+			return contentPanel;
 		};
 
-		window.activate();
+		window._firstPanel = window.activate();
 	});
 
 });

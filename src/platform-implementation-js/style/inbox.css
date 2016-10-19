@@ -56,7 +56,7 @@
   background: white;
 }
 
-.inboxsdk__app_sidebar {
+.IDMAP_app_sidebar {
   background: #f2f2f2;
   position: fixed;
   top: 56px;
@@ -66,11 +66,11 @@
   z-index: 5;
 }
 
-.inboxsdk__app_sidebar[data-open="false"] {
+.IDMAP_app_sidebar[data-open="false"] {
   display: none;
 }
 
-.inboxsdk__app_sidebar_main {
+.IDMAP_app_sidebar_main {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -80,47 +80,97 @@
   overflow-y: auto;
 }
 
-.inboxsdk__app_sidebar_opener {
-  z-index: 5;
-  position: fixed;
-  top: 66px;
-  right: 0;
-  pointer-events: none;
-  text-align: right;
-}
-
-.inboxsdk__app_sidebar[data-open="true"] + .inboxsdk__app_sidebar_opener,
-.inboxsdk__app_sidebar[data-can-open="false"] + .inboxsdk__app_sidebar_opener {
-  display: none;
-}
-
-.inboxsdk__app_sidebar_opener button,
-.inboxsdk__app_sidebar_tab_preview_icon {
-  pointer-events: all;
-}
-
-.inboxsdk__app_sidebar_tab_preview_icon {
-  display: inline-block;
-  margin: 4px 4px 4px 0;
-}
-
-.inboxsdk__app_sidebar_tab_preview_icon > img {
-  width: 16px;
-  height: 16px;
-}
-
-.inboxsdk__app_sidebar_closer {
+.IDMAP_app_sidebar > .inboxsdk__close_button {
   position: absolute;
-  top: 10px;
-  left: -24px;
-}
-
-.inboxsdk__sidebar_panel_buttons > :first-child:last-child {
-  display: none;
+  bottom: 10px;
+  right: 10px;
 }
 
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
+}
+
+.IDMAP_app_sidebar_content_panel {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  overflow-x: hidden;
+  font: 12px Arial, sans-serif
+}
+
+.IDMAP_app_sidebar_content_panel_title_icon {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  vertical-align: top;
+  padding-left: 5px;
+  box-sizing: border-box;
+}
+
+.IDMAP_app_sidebar_content_panel_title_icon > img {
+  width: 16px;
+  height: 16px;
+}
+
+.IDMAP_app_sidebar_content_panel_title {
+  font: 13px / 15px arial, sans-serif;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.IDMAP_sidebar_iconArea {
+  position: absolute;
+  right: -16px;
+  z-index: 100;
+
+  /* needed to prevent rendering bug in chrome where the element is
+  visibly duplicated when the parent becomes position:fixed. */
+  will-change: top;
+}
+
+.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container {
+  position: relative;
+}
+
+.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container[data-count]::after {
+  position: absolute;
+  display: block;
+  bottom: 0;
+  right: -4px;
+  width: 13px;
+  height: 13px;
+  text-align: center;
+  font: 9pt sans-serif;
+  border-radius: 50%;
+  color: #fff;
+  background: #adadad;
+  content: attr(data-count);
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  margin-top: 10px;
+  transition: box-shadow .2s cubic-bezier(.4,0,.2,1);
+  transition-delay: 0.01s;
+  box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  height: 26px;
+  width: 26px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon:focus,
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover {
+  outline: none;
+  box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
+  width: 26px;
+  height: 26px;
 }
 
 .inboxsdk__button_icon {
