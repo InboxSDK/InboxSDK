@@ -109,7 +109,6 @@ class InboxAppSidebarView {
     // multiple instances of InboxAppSidebarView from different apps need to
     // share the value.
     el.setAttribute('data-open', 'false');
-    el.setAttribute('data-can-open', 'false');
     el.setAttribute('data-is-opening', 'false');
     document.body.appendChild(el);
 
@@ -160,7 +159,6 @@ class InboxAppSidebarView {
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
-    this._el.setAttribute('data-can-open', String(this._contentArea.childElementCount>0));
     if (!open) {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
@@ -205,8 +203,6 @@ class InboxAppSidebarView {
       this._getShouldAppSidebarOpen()
     ) {
       this._setOpenedAfterAnimation(true);
-    } else {
-      this._el.setAttribute('data-can-open', 'true');
     }
 
     this._stopper
@@ -222,7 +218,6 @@ class InboxAppSidebarView {
         // already at the time the stopper fires, and because we don't really
         // need to close the sidebar synchronously.
         const hasChildren = this._contentArea.childElementCount > 0;
-        this._el.setAttribute('data-can-open', String(hasChildren));
         if (!hasChildren) {
           this._setOpenedNow(false);
         }
