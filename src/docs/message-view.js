@@ -72,8 +72,7 @@ var MessageView = /** @lends MessageView */{
 
 	/**
 	* Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on
-	* this object may return empty results. There is no way to set the load state to true directly. If you require this message
-	* to be loaded, you should set the view state to {MessageViewViewStates.EXPANDED}.
+	* this object may return empty results. The message may be loaded once the user clicks on the message stub.
 	* @return {boolean}
 	*/
 	isLoaded: function(){},
