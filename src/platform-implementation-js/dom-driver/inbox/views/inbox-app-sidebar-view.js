@@ -5,6 +5,9 @@ import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import InboxAppSidebar from './InboxAppSidebar';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../lib/dom/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
@@ -22,7 +25,6 @@ class InboxAppSidebarView {
   _stopper = kefirStopper();
   _driver: InboxDriver;
   _el: HTMLElement;
-  _contentArea: HTMLElement;
   _mainParent: HTMLElement;
   _openOrOpeningProp: Kefir.Observable<boolean>;
 
@@ -35,13 +37,12 @@ class InboxAppSidebarView {
     // restricted to being used for references to DOM nodes. When
     // InboxAppSidebarView is instantiated, we check to see if the element
     // already exists and create it if it doesn't.
-    const el = document.querySelector('.'+idMap('app_sidebar'));
+    const el = document.querySelector('.'+idMap('app_sidebar_container'));
     if (el) {
       this._el = el;
     } else {
       this._createElement();
     }
-    this._contentArea = this._el.querySelector('.'+idMap('sidebar_panel_content_area'));
 
     const mainParent = findParent(document.querySelector('[role=application]'), el => el.parentElement === document.body);
     if (!mainParent) {
@@ -98,13 +99,7 @@ class InboxAppSidebarView {
 
   _createElement() {
     const el = this._el = document.createElement('div');
-    el.className = idMap('app_sidebar');
-    el.innerHTML = `
-      <div class="${idMap('app_sidebar_main')}">
-        <div class="${idMap('sidebar_panel_content_area')}"></div>
-      </div>
-      <button class="inboxsdk__close_button" type="button" title="Close"></button>
-    `;
+    el.className = idMap('app_sidebar_container');
     // Store the open state in the DOM rather than a class property because
     // multiple instances of InboxAppSidebarView from different apps need to
     // share the value.
@@ -112,7 +107,9 @@ class InboxAppSidebarView {
     el.setAttribute('data-is-opening', 'false');
     document.body.appendChild(el);
 
-    const contentArea = el.querySelector('.'+idMap('sidebar_panel_content_area'));
+    const waitingPlatform = document.createElement('div');
+    waitingPlatform.className = idMap('app_sidebar_waiting_platform');
+    document.body.appendChild(waitingPlatform);
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
@@ -151,10 +148,72 @@ class InboxAppSidebarView {
         }
       });
 
-    el.querySelector(`.inboxsdk__close_button`).addEventListener('click', () => {
-      this._setShouldAppSidebarOpen(false);
-      this._setOpenedNow(false);
+    let panels = [];
+    let component: InboxAppSidebar;
+
+    const render = () => {
+      component = (ReactDOM.render(
+        <InboxAppSidebar
+          content={Math.random()}
+          panels={panels}
+          onClose={() => {
+            this._setShouldAppSidebarOpen(false);
+            this._setOpenedNow(false);
+          }}
+        />,
+        el
+      ): any);
+    };
+    render();
+
+    this._stopper.onValue(() => {
+      ReactDOM.unmountComponentAtNode(el);
     });
+
+    Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        panels = panels.concat([{
+          id: event.detail.id,
+          title: event.detail.title,
+          iconClass: event.detail.iconClass,
+          iconUrl: event.detail.iconUrl,
+          el: event.target
+        }]);
+        render();
+      });
+    Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        panels = panels.map(panel => {
+          if (panel.id === event.detail.id) {
+            return {
+              id: event.detail.id,
+              title: event.detail.title,
+              iconClass: event.detail.iconClass,
+              iconUrl: event.detail.iconUrl,
+              el: event.target
+            }
+          } else {
+            return panel;
+          }
+        });
+        render();
+      });
+    Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        panels = panels.filter(({id}) => event.detail.id !== id);
+        if (panels.length === 0) {
+          this._setOpenedNow(false);
+        }
+        render();
+      });
+    Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        component.scrollPanelIntoView(event.detail.id);
+      });
   }
 
   _setOpenedNow(open: boolean) {
@@ -196,8 +255,6 @@ class InboxAppSidebarView {
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const view = new InboxSidebarContentPanelView(descriptor);
 
-    this._contentArea.appendChild(view.getElement());
-
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
       this._getShouldAppSidebarOpen()
@@ -211,17 +268,6 @@ class InboxAppSidebarView {
         view.remove();
       });
 
-    view.getStopper()
-      .delay(0)
-      .onValue(() => {
-        // The delay(0) is necessary because the view's element isn't removed
-        // already at the time the stopper fires, and because we don't really
-        // need to close the sidebar synchronously.
-        const hasChildren = this._contentArea.childElementCount > 0;
-        if (!hasChildren) {
-          this._setOpenedNow(false);
-        }
-      });
     return view;
   }
 }

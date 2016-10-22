@@ -66,7 +66,11 @@
   z-index: 5;
 }
 
-.IDMAP_app_sidebar[data-open="false"] {
+.IDMAP_app_sidebar_waiting_platform {
+  display: none;
+}
+
+.IDMAP_app_sidebar_container[data-open="false"] {
   display: none;
 }
 
