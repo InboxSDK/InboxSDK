@@ -727,9 +727,9 @@
       "resolved": "https://registry.npmjs.org/babelify/-/babelify-7.3.0.tgz"
     },
     "babylon": {
-      "version": "6.12.0",
+      "version": "6.13.0",
       "from": "babylon@>=6.11.0 <7.0.0",
-      "resolved": "https://registry.npmjs.org/babylon/-/babylon-6.12.0.tgz"
+      "resolved": "https://registry.npmjs.org/babylon/-/babylon-6.13.0.tgz"
     },
     "backo2": {
       "version": "1.0.2",
@@ -5094,9 +5094,9 @@
       "resolved": "https://registry.npmjs.org/scmp/-/scmp-0.0.3.tgz"
     },
     "selenium-standalone": {
-      "version": "5.5.0",
-      "from": "selenium-standalone@>=5.5.0 <5.6.0",
-      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.5.0.tgz",
+      "version": "5.7.2",
+      "from": "selenium-standalone@>=5.7.2 <5.8.0",
+      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.7.2.tgz",
       "dependencies": {
         "asn1": {
           "version": "0.1.11",
@@ -5749,7 +5749,7 @@
     },
     "tar-stream": {
       "version": "1.5.2",
-      "from": "tar-stream@>=1.5.0 <2.0.0",
+      "from": "tar-stream@1.5.2",
       "resolved": "https://registry.npmjs.org/tar-stream/-/tar-stream-1.5.2.tgz",
       "dependencies": {
         "end-of-stream": {
@@ -6267,9 +6267,9 @@
       }
     },
     "wdio-selenium-standalone-service": {
-      "version": "0.0.5",
-      "from": "wdio-selenium-standalone-service@0.0.5",
-      "resolved": "https://registry.npmjs.org/wdio-selenium-standalone-service/-/wdio-selenium-standalone-service-0.0.5.tgz",
+      "version": "0.0.7",
+      "from": "wdio-selenium-standalone-service@0.0.7",
+      "resolved": "https://registry.npmjs.org/wdio-selenium-standalone-service/-/wdio-selenium-standalone-service-0.0.7.tgz",
       "dependencies": {
         "fs-extra": {
           "version": "0.30.0",
