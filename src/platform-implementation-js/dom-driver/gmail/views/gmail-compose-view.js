@@ -1,7 +1,6 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
@@ -14,6 +13,7 @@ import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import findParent from '../../../../common/find-parent';
+import isElementVisible from '../../../../common/isElementVisible';
 import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
@@ -505,15 +505,16 @@ class GmailComposeView {
 	}
 
 	_dropzonesVisible(): boolean {
-		return $('body > .aC7:not(.aWP)').filter(':visible').length > 0;
+		return _.filter(document.querySelectorAll('body > .aC7:not(.aWP)'), isElementVisible).length > 0;
 	}
 
 	_findDropzoneForThisCompose(inline: boolean): HTMLElement {
 		// Iterate through all the dropzones and find the one visually contained by
 		// this compose.
 		const rect = this._element.getBoundingClientRect();
-		const dropzoneClass = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
-		const el = _.chain($(dropzoneClass).filter(':visible'))
+		const dropzoneSelector = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
+		const el = _.chain(document.querySelectorAll(dropzoneSelector))
+			.filter(isElementVisible)
 			.filter(dropzone => {
 				const top = parseInt(dropzone.style.top, 10);
 				const bottom = top + parseInt(dropzone.style.height, 10);
