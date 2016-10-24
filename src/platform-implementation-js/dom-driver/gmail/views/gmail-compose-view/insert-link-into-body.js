@@ -1,7 +1,6 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import RSVP from 'rsvp';
 
 import simulateClick from '../../../../lib/dom/simulate-click';
@@ -16,8 +15,7 @@ export default function insertLinkIntoBody(gmailComposeView: GmailComposeView, t
 function _insertLinkIntoBody(gmailComposeView, text, href){
 	gmailComposeView.focus();
 
-	var composeBodyElement = $(gmailComposeView.getBodyElement());
-	composeBodyElement.focus();
+	gmailComposeView.getBodyElement().focus();
 
 	const selection = document.getSelection();
 	if(!selection) throw new Error('selection does\'t exist, what?');

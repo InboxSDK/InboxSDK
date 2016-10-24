@@ -1,14 +1,13 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
-import $ from 'jquery';
 import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
 import * as logger from '../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
 import Marker from '../../common/marker';
+import findParent from '../../common/find-parent';
 
 export function setup() {
   processPreloadedThreads();
@@ -98,7 +97,7 @@ function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
   const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(threadRow);
-  const parent: HTMLElement = $(threadRow).closest('div[role="main"]').get(0);
+  const parent = findParent(threadRow, el => el.nodeName === 'DIV' && el.getAttribute('role') === 'main');
   if (!parent) {
     throw new Error("Can't operate on disconnected thread row");
   }

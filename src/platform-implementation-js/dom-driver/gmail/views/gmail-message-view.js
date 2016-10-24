@@ -1,7 +1,6 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
@@ -22,6 +21,7 @@ import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stre
 import simulateClick from '../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
 import censorHTMLtree from '../../../../common/censor-html-tree';
+import findParent from '../../../../common/find-parent';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
@@ -106,7 +106,7 @@ class GmailMessageView {
 	}
 
 	isElementInQuotedArea(element: HTMLElement): boolean {
-		return $(element).closest('blockquote').length > 0;
+		return findParent(element, el => el.nodeName === 'BLOCKQUOTE') != null;
 	}
 
 	getSender(): Contact {

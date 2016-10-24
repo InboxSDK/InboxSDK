@@ -13,6 +13,7 @@ import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import findParent from '../../../../common/find-parent';
 import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
@@ -346,22 +347,22 @@ class GmailComposeView {
 	}
 
 	setSubject(text: string) {
-		$(this._element).find('input[name=subjectbox]').val(text);
-		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
+		(this._element.querySelector('input[name=subjectbox]'): any).value = text;
+		(this._element.querySelector('input[type=hidden][name=subjectbox]'): any).value = text;
 
 		this._triggerDraftSave();
 	}
 
 	setBodyHTML(html: string) {
 		this.getBodyElement().innerHTML = html;
-		$(this._element).find('input[type=hidden][name=body]').val(html);
+		(this._element.querySelector('input[type=hidden][name=body]'): any).value = html;
 
 		this._triggerDraftSave();
 	}
 
 	setBodyText(text: string) {
 		this.getBodyElement().textContent = text;
-		$(this._element).find('input[type=hidden][name=body]').val(text);
+		(this._element.querySelector('input[type=hidden][name=body]'): any).value = this.getBodyElement().innerHTML;
 
 		this._triggerDraftSave();
 	}
@@ -642,8 +643,10 @@ class GmailComposeView {
 	}
 
 	getFormattingToolbarToggleButton(): HTMLElement {
-		var innerElement = this._element.querySelector('[role=button] .dv');
-		return $(innerElement).closest('[role=button]')[0];
+		const innerElement = this._element.querySelector('[role=button] .dv');
+		const btn = findParent(innerElement, el => el.getAttribute('role') === 'button');
+		if (!btn) throw new Error('failed to find button');
+		return btn;
 	}
 
 	getScrollBody(): HTMLElement {
@@ -679,12 +682,16 @@ class GmailComposeView {
 			return null;
 		}
 
-		var siblings = $(this.getSendButton()).siblings();
-		if(siblings.length === 0){
+		const sendButton = this.getSendButton();
+		const parent = sendButton.parentElement;
+		if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
+		if(parent.childElementCount <= 1){
 			return null;
 		}
 
-		return siblings.first().find('[role=button]')[0];
+		const firstNotSendElement =
+			parent.children[0] !== sendButton ? parent.children[0] : parent.children[1];
+		return !firstNotSendElement ? null : firstNotSendElement.querySelector('[role=button]');
 	}
 
 	getCloseButton(): HTMLElement {

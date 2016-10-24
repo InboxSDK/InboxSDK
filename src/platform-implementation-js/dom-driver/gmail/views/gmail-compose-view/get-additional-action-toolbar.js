@@ -1,8 +1,10 @@
-import $ from 'jquery';
+/* @flow */
+
+import type GmailComposeView from '../gmail-compose-view';
 
 const composeViewActionToolbars = new WeakMap();
 
-function getAdditionalActionToolbar(gmailComposeView){
+function getAdditionalActionToolbar(gmailComposeView: GmailComposeView){
 	var groupedActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar > div');
 	if(groupedActionToolbar){
 		return groupedActionToolbar;
@@ -24,12 +26,14 @@ function getAdditionalActionToolbar(gmailComposeView){
 	return actionToolbar;
 }
 
-function _addActionToolbar(gmailComposeView){
-	var td = document.createElement('td');
+function _addActionToolbar(gmailComposeView: GmailComposeView){
+	const td = document.createElement('td');
 	td.setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
-	gmailComposeView.getFormattingArea().insertAdjacentElement('beforebegin', td);
+	const formattingArea = gmailComposeView.getFormattingArea();
+	if (!formattingArea) throw new Error('formatting area missing');
+	formattingArea.insertAdjacentElement('beforebegin', td);
 
-	var separator = document.createElement('td');
+	const separator = document.createElement('td');
 	separator.setAttribute('class', 'inboxsdk__compose_separator gU');
 	separator.innerHTML = '<div class="Uz"></div>';
 
