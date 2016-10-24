@@ -1,7 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
-import findParent from '../../../../lib/dom/find-parent';
+import findParent from '../../../../../common/find-parent';
 
 export default function finder(root: Document=document): Array<HTMLElement> {
   return _.chain(Array.from(root.querySelectorAll('iframe[frameborder]:not([src])')))

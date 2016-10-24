@@ -7,7 +7,7 @@ import kefirBus from 'kefir-bus';
 import InboxBackdrop from './inbox-backdrop';
 import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
 import type ComposeView from '../../../views/compose-view';
-import findParent from '../../../lib/dom/find-parent';
+import findParent from '../../../../common/find-parent';
 
 const TAKE_OVER_EVENT = 'inboxSDKdrawerViewTakingOver';
 const zIndex = 500;

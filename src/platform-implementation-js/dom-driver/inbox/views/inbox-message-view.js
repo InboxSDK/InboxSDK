@@ -12,7 +12,7 @@ import type InboxThreadView from './inbox-thread-view';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import InboxAttachmentCardView from './inbox-attachment-card-view';
-import findParent from '../../../lib/dom/find-parent';
+import findParent from '../../../../common/find-parent';
 import parser from '../detection/message/parser';
 import type {Parsed} from '../detection/message/parser';
 import type {

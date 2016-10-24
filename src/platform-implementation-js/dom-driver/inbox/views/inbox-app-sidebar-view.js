@@ -9,7 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import InboxAppSidebar from './InboxAppSidebar';
 import fakeWindowResize from '../../../lib/fake-window-resize';
-import findParent from '../../../lib/dom/find-parent';
+import findParent from '../../../../common/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
 import delayAsap from '../../../lib/delay-asap';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
