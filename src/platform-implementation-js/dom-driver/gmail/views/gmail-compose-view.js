@@ -173,7 +173,7 @@ class GmailComposeView {
 					.flatten()
 					.map(event => {
 						if(this._driver.getLogger().shouldTrackEverything()){
-							driver.getLogger().eventSite(event.eventName);
+							driver.getLogger().eventSite('compose.debug.xhr', {eventName: event.eventName});
 						}
 
 						return event;
