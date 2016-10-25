@@ -348,21 +348,18 @@ class GmailComposeView {
 
 	setSubject(text: string) {
 		(this._element.querySelector('input[name=subjectbox]'): any).value = text;
-		(this._element.querySelector('input[type=hidden][name=subjectbox]'): any).value = text;
 
 		this._triggerDraftSave();
 	}
 
 	setBodyHTML(html: string) {
 		this.getBodyElement().innerHTML = html;
-		(this._element.querySelector('input[type=hidden][name=body]'): any).value = html;
 
 		this._triggerDraftSave();
 	}
 
 	setBodyText(text: string) {
 		this.getBodyElement().textContent = text;
-		(this._element.querySelector('input[type=hidden][name=body]'): any).value = this.getBodyElement().innerHTML;
 
 		this._triggerDraftSave();
 	}
