@@ -6,12 +6,11 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import kefirCast from 'kefir-cast';
 import Kefir from 'kefir';
-import Logger from '../../lib/logger';
 
 import ContentPanelView from '../content-panel-view';
 
 import type MessageView from './message-view';
-import type {ThreadViewDriver} from '../../driver-interfaces/driver';
+import type {Driver, ThreadViewDriver} from '../../driver-interfaces/driver';
 
 const memberMap = defonce(module, () => new WeakMap());
 
@@ -19,24 +18,22 @@ const memberMap = defonce(module, () => new WeakMap());
 class ThreadView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(threadViewImplementation: ThreadViewDriver, appId: string, membrane: Membrane) {
+	constructor(threadViewImplementation: ThreadViewDriver, appId: string, driver: Driver, membrane: Membrane) {
 		super();
 
-		const members = {threadViewImplementation, appId, membrane};
+		const members = {threadViewImplementation, appId, driver, membrane};
 		memberMap.set(this, members);
 
 		_bindToStreamEvents(this, threadViewImplementation);
 	}
 
 	addSidebarContentPanel(descriptor: Object): ?ContentPanelView {
-		var descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
-		var members = memberMap.get(this);
+		const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+		const members = memberMap.get(this);
 
-		if(!members){
-			return null;
-		}
+		members.driver.getLogger().eventSdkPassive('threadView.addSidebarContentPanel');
 
-		var contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
+		const contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}
