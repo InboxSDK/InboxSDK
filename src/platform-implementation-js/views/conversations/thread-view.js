@@ -45,35 +45,19 @@ class ThreadView extends EventEmitter {
 	}
 
 	getMessageViews(): Array<MessageView> {
-		var members = memberMap.get(this);
+		const {threadViewImplementation, membrane} = memberMap.get(this);
 
-		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
-			.filter(function(messageViewDriver){
-				return messageViewDriver.isLoaded();
-			})
-			.map(function(messageViewDriver){
-				var messageView = members.membrane.get(messageViewDriver);
-				if (!messageView) {
-					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
-				}
-				return messageView;
-			})
-			.filter(Boolean)
+		return _.chain(threadViewImplementation.getMessageViewDrivers())
+			.filter(messageViewDriver => messageViewDriver.isLoaded())
+			.map(messageViewDriver => membrane.get(messageViewDriver))
 			.value();
 	}
 
 	getMessageViewsAll(): Array<MessageView> {
-		var members = memberMap.get(this);
+		const {threadViewImplementation, membrane} = memberMap.get(this);
 
-		return _.chain(members.threadViewImplementation.getMessageViewDrivers())
-			.map(function(messageViewDriver){
-				var messageView = members.membrane.get(messageViewDriver);
-				if (!messageView) {
-					logAboutMissingMV(members.threadViewImplementation, messageViewDriver);
-				}
-				return messageView;
-			})
-			.filter(Boolean)
+		return _.chain(threadViewImplementation.getMessageViewDrivers())
+			.map(messageViewDriver => membrane.get(messageViewDriver))
 			.value();
 	}
 
@@ -87,23 +71,6 @@ class ThreadView extends EventEmitter {
 }
 
 export default defn(module, ThreadView);
-
-function logAboutMissingMV(threadViewDriver, messageViewDriver) {
-	try {
-		Logger.error(new Error("missing messageview"), {
-			messageViewDriver: {
-				hasElement: !!messageViewDriver.getElement(),
-				isLoaded: messageViewDriver.isLoaded()
-			},
-			threadViewDriver: {
-				eventStreamEnded: (threadViewDriver.getEventStream():any).ended,
-				messagesCount: threadViewDriver.getMessageViewDrivers().length
-			}
-		});
-	} catch(err) {
-		Logger.error(err);
-	}
-}
 
 function _bindToStreamEvents(threadView, threadViewImplementation){
 	threadViewImplementation.getEventStream().onEnd(function(){
