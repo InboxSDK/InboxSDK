@@ -1,7 +1,6 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
@@ -10,6 +9,7 @@ import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
+import isElementVisible from '../../../../common/isElementVisible';
 
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -318,7 +318,7 @@ class GmailToolbarView {
 				for(var ii=0; ii<100000; ii++){
 					if(current.previousElementSibling){
 						if(current.previousElementSibling.classList.contains('inboxsdk__button')){
-							if($(current.previousElementSibling).is(':visible')){
+							if(isElementVisible(current.previousElementSibling)){
 								button.classList.add('T-I-Js-Gs');
 								break;
 							}
@@ -341,7 +341,7 @@ class GmailToolbarView {
 				for(ii=0; ii<100000; ii++){
 					if(current.nextElementSibling){
 						if(current.nextElementSibling.classList.contains('inboxsdk__button')){
-							if($(current.nextElementSibling).is(':visible')){
+							if(isElementVisible(current.nextElementSibling)){
 								button.classList.add('T-I-Js-IF');
 								break;
 							}

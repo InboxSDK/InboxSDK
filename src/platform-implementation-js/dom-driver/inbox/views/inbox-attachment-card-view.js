@@ -6,7 +6,7 @@ import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-import findParent from '../../../lib/dom/find-parent';
+import findParent from '../../../../common/find-parent';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type InboxAttachmentOverlayView from './inbox-attachment-overlay-view';

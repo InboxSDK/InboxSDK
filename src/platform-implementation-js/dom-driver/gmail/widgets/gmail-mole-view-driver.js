@@ -1,13 +1,13 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import {defn} from 'ud';
 import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
+import findParent from '../../../../common/find-parent';
 import type {MoleViewDriver} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -106,7 +106,10 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   show() {
     var doShow = (moleParent) => {
       moleParent.insertBefore(this._element, _.last(moleParent.children));
-      $(moleParent).parents('div.dw').get(0).classList.add('inboxsdk__moles_in_use');
+      const dw = findParent(moleParent, el => el.nodeName === 'DIV' && el.classList.contains('dw'));
+      if (dw) {
+        dw.classList.add('inboxsdk__moles_in_use');
+      }
     };
 
     var moleParent = GmailElementGetter.getMoleParent();

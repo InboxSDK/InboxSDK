@@ -10,42 +10,35 @@ import idMap from '../../../lib/idMap';
 class InboxSidebarContentPanelView {
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
-  _el: HTMLElement;
-  _titleEl: HTMLElement;
-  _contentEl: HTMLElement;
+  _id: string = `${Date.now()}-${Math.random()}`;
 
   constructor(descriptor: Kefir.Observable<Object>) {
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
-    this._el = document.createElement('div');
-    this._el.className = idMap('app_sidebar_content_panel');
-    this._el.innerHTML = `
-      <div class="${idMap('app_sidebar_content_panel_title')}"></div>
-      <div class="${idMap('app_sidebar_content_panel_content')}"></div>
-    `;
-    this._titleEl = this._el.querySelector('.'+idMap('app_sidebar_content_panel_title'));
-    this._contentEl = this._el.querySelector('.'+idMap('app_sidebar_content_panel_content'));
 
+    let hasPlacedAlready = false;
+    const waitingPlatform = document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'));
     descriptor
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const imgHtml = descriptor.iconUrl ? autoHtml `<img src="${descriptor.iconUrl}">` : '';
-        this._titleEl.innerHTML = autoHtml `
-          <span class="${idMap('app_sidebar_content_panel_title_icon')} ${descriptor.iconClass||''}">
-            ${{__html: imgHtml}}
-          </span>
-          <span class="${idMap('app_sidebar_content_panel_title_text')}">
-            ${descriptor.title}
-          </span>
-        `;
-        if (this._contentEl.firstChild !== descriptor.el) {
-          this._contentEl.innerHTML = '';
-          this._contentEl.appendChild(descriptor.el);
+        const {el, iconUrl, iconClass, title} = descriptor;
+        if (!document.body.contains(el)) {
+          waitingPlatform.appendChild(el);
         }
+        el.dispatchEvent(new CustomEvent(
+          hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel',
+          {
+            bubbles: true, cancelable: false,
+            detail: {id: this._id, title, iconUrl, iconClass}
+          }
+        ));
+        hasPlacedAlready = true;
       });
-  }
-
-  getElement() {
-    return this._el;
+    this._stopper.onValue(() => {
+      document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
+        bubbles: true, cancelable: false,
+        detail: {id: this._id}
+      }));
+    });
   }
 
   getStopper(): Kefir.Observable<null> {
@@ -57,12 +50,14 @@ class InboxSidebarContentPanelView {
   }
 
   scrollIntoView() {
-    this._contentEl.scrollIntoView();
+    document.body.dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
+      bubbles: true, cancelable: false,
+      detail: {id: this._id}
+    }));
   }
 
   remove() {
     this._eventStream.end();
-    this._el.remove();
   }
 }
 

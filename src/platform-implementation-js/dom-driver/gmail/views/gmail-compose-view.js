@@ -1,7 +1,6 @@
 /* @flow */
 
 import _ from 'lodash';
-import $ from 'jquery';
 import asap from 'asap';
 import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
@@ -13,6 +12,8 @@ import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
+import findParent from '../../../../common/find-parent';
+import isElementVisible from '../../../../common/isElementVisible';
 import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
@@ -172,7 +173,7 @@ class GmailComposeView {
 					.flatten()
 					.map(event => {
 						if(this._driver.getLogger().shouldTrackEverything()){
-							driver.getLogger().eventSite(event.eventName);
+							driver.getLogger().eventSite('compose.debug.xhr', {eventName: event.eventName});
 						}
 
 						return event;
@@ -346,22 +347,19 @@ class GmailComposeView {
 	}
 
 	setSubject(text: string) {
-		$(this._element).find('input[name=subjectbox]').val(text);
-		$(this._element).find('input[type=hidden][name=subjectbox]').val(text);
+		(this._element.querySelector('input[name=subjectbox]'): any).value = text;
 
 		this._triggerDraftSave();
 	}
 
 	setBodyHTML(html: string) {
 		this.getBodyElement().innerHTML = html;
-		$(this._element).find('input[type=hidden][name=body]').val(html);
 
 		this._triggerDraftSave();
 	}
 
 	setBodyText(text: string) {
 		this.getBodyElement().textContent = text;
-		$(this._element).find('input[type=hidden][name=body]').val(text);
 
 		this._triggerDraftSave();
 	}
@@ -504,15 +502,16 @@ class GmailComposeView {
 	}
 
 	_dropzonesVisible(): boolean {
-		return $('body > .aC7:not(.aWP)').filter(':visible').length > 0;
+		return _.filter(document.querySelectorAll('body > .aC7:not(.aWP)'), isElementVisible).length > 0;
 	}
 
 	_findDropzoneForThisCompose(inline: boolean): HTMLElement {
 		// Iterate through all the dropzones and find the one visually contained by
 		// this compose.
 		const rect = this._element.getBoundingClientRect();
-		const dropzoneClass = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
-		const el = _.chain($(dropzoneClass).filter(':visible'))
+		const dropzoneSelector = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
+		const el = _.chain(document.querySelectorAll(dropzoneSelector))
+			.filter(isElementVisible)
 			.filter(dropzone => {
 				const top = parseInt(dropzone.style.top, 10);
 				const bottom = top + parseInt(dropzone.style.height, 10);
@@ -642,8 +641,10 @@ class GmailComposeView {
 	}
 
 	getFormattingToolbarToggleButton(): HTMLElement {
-		var innerElement = this._element.querySelector('[role=button] .dv');
-		return $(innerElement).closest('[role=button]')[0];
+		const innerElement = this._element.querySelector('[role=button] .dv');
+		const btn = findParent(innerElement, el => el.getAttribute('role') === 'button');
+		if (!btn) throw new Error('failed to find button');
+		return btn;
 	}
 
 	getScrollBody(): HTMLElement {
@@ -679,12 +680,16 @@ class GmailComposeView {
 			return null;
 		}
 
-		var siblings = $(this.getSendButton()).siblings();
-		if(siblings.length === 0){
+		const sendButton = this.getSendButton();
+		const parent = sendButton.parentElement;
+		if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
+		if(parent.childElementCount <= 1){
 			return null;
 		}
 
-		return siblings.first().find('[role=button]')[0];
+		const firstNotSendElement =
+			parent.children[0] !== sendButton ? parent.children[0] : parent.children[1];
+		return !firstNotSendElement ? null : firstNotSendElement.querySelector('[role=button]');
 	}
 
 	getCloseButton(): HTMLElement {

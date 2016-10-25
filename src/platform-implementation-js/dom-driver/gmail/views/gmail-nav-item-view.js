@@ -4,7 +4,6 @@ import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
-import $ from 'jquery';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import eventNameFilter from '../../../lib/event-name-filter';
@@ -528,10 +527,6 @@ export default class GmailNavItemView {
 			this._element.style.height = '';
 			this._element.style.overflow = '';
 			this._element.style.marginBottom = '';
-		}
-
-		if($(this._element).closest('.inboxsdk__navMenu').length === 0){
-			return;
 		}
 	}
 

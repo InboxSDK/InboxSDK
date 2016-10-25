@@ -1,8 +1,7 @@
 {
-  "presets": ["es2015", "stage-1"],
+  "presets": ["es2015", "stage-1", "react"],
   "plugins": [
     "transform-runtime",
-    "transform-flow-strip-types",
     "add-module-exports"
   ]
 }

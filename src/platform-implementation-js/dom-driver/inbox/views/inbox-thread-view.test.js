@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
+import idMap from '../../../lib/idMap';
 import InboxThreadView from './inbox-thread-view';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
 
@@ -21,6 +22,11 @@ function makeDriver(): Object {
       _openOrOpeningStreamBus,
       _addedPanels,
       addSidebarContentPanel(descriptor) {
+        if (!document.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+          const waitingPlatform = document.createElement('div');
+          waitingPlatform.className = idMap('app_sidebar_waiting_platform');
+          document.body.appendChild(waitingPlatform);
+        }
         const panel = new InboxSidebarContentPanelView(descriptor);
         _addedPanels.push(panel);
         return panel;

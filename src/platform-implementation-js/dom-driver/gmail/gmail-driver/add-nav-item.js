@@ -1,7 +1,5 @@
 /* @flow */
-//jshint ignore:start
 
-import $ from 'jquery';
 import Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView from '../views/gmail-nav-item-view';

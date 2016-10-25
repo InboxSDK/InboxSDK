@@ -1,29 +1,28 @@
 /* @flow */
 
 import NativeGmailNavItemView from '../views/native-gmail-nav-item-view';
-import $ from 'jquery';
 import GmailElementGetter from '../gmail-element-getter';
-
+import findParent from '../../../../common/find-parent';
 import waitFor from '../../../lib/wait-for';
 
 export default function getNativeNavItem(label: string): Promise<NativeGmailNavItemView> {
-	return waitFor(function(){
-		return $(GmailElementGetter.getLeftNavContainerElement()).find('.aim a[href*=#' + label + ']').length > 0;
-	}, 300*1000).then(function(){
-		var labelLinkElement = $(GmailElementGetter.getLeftNavContainerElement()).find('.aim a[href*=#' + label + ']');
-
-		var labelElement = labelLinkElement.closest('.aim')[0];
+	return waitFor(() => {
+		const navContainer = GmailElementGetter.getLeftNavContainerElement();
+		if (!navContainer) return null;
+		return navContainer.querySelector(`.aim a[href*="#${label}"]`);
+	}, 300*1000).then(labelLinkElement => {
+		const labelElement = findParent(labelLinkElement, el => el.classList.contains('aim'));
 
 		if(!labelElement){
 			throw new Error('native nav item structured weird');
 		}
 
-		if(!labelElement.__nativeGmailNavItemView){
-			labelElement.__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement, label);
+		if(!(labelElement:any).__nativeGmailNavItemView){
+			(labelElement:any).__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement, label);
 		}
 
-		return labelElement.__nativeGmailNavItemView;
-	}).catch(function(err){
+		return (labelElement:any).__nativeGmailNavItemView;
+	}).catch(err => {
 		if(GmailElementGetter.isStandalone()){
 			// never resolve
 			return new Promise((resolve, reject) => {});
