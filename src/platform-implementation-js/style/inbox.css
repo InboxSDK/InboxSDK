@@ -98,8 +98,10 @@
   margin-bottom: 5px;
   padding-bottom: 5px;
   border-bottom: 1px solid #ddd;
-  overflow-x: hidden;
-  font: 12px Arial, sans-serif
+  overflow: hidden;
+  font: 12px Arial, sans-serif;
+  max-height: 100%;
+  background: #f2f2f2;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon {
@@ -121,6 +123,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  cursor: move;
 }
 
 .IDMAP_sidebar_iconArea {

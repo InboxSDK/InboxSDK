@@ -160,6 +160,10 @@ class InboxAppSidebarView {
             this._setShouldAppSidebarOpen(false);
             this._setOpenedNow(false);
           }}
+          onMoveEnd={newList => {
+            panels = newList;
+            render();
+          }}
         />,
         el
       ): any);
