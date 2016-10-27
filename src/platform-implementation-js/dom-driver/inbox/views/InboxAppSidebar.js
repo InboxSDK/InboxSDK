@@ -51,7 +51,7 @@ export default class InboxAppSidebar extends React.Component {
               onMoveEnd={onMoveEnd}
               springConfig={springConfig}
               container={()=>this._main}
-          />
+            />
           </div>
           <div
             className={idMap('app_sidebar_content_area_padding')}
