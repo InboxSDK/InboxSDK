@@ -26,7 +26,6 @@ var Kefir = require('kefir');
 var RSVP = require('rsvp');
 var globp = RSVP.denodeify(require('glob'));
 import streamToPromise from './src/common/stream-to-promise';
-var envify = require('envify/custom');
 import exec from './src/build/exec';
 import spawn from './src/build/spawn';
 import escapeShellArg from './src/build/escape-shell-arg';
@@ -62,6 +61,9 @@ if (args.production && (args.watch || args.single)) {
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
+process.env.IMPLEMENTATION_URL = args.production ?
+  'https://www.inboxsdk.com/build/platform-implementation.js' :
+  'http://localhost:4567/platform-implementation.js';
 
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
@@ -125,19 +127,16 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
   var willMinify = args.minify && (args.single || name !== "sdk");
 
   gulp.task(name, deps, async function() {
-    const VERSION = await getVersion();
+    process.env.VERSION = await getVersion();
     const browserifyHmrOptions = port && await getBrowserifyHmrOptions(port);
 
     let bundler = browserify({
       entries: entry,
       debug: true,
       cache: {}, packageCache: {}
-    }).transform(babelify).transform(envify({
-      NODE_ENV: args.production ? 'production' : 'development',
-      IMPLEMENTATION_URL: args.production ?
-        'https://www.inboxsdk.com/build/platform-implementation.js' :
-        'http://localhost:4567/platform-implementation.js',
-      VERSION
+    }).transform(babelify.configure({
+      presets: args.hot && port ? ["react-hmre"] : [],
+      plugins: "transform-inline-environment-variables"
     }));
 
     if (args.hot && port) {
