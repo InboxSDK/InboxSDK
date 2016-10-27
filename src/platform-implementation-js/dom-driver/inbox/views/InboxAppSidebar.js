@@ -41,12 +41,6 @@ export default class InboxAppSidebar extends React.Component {
         <div
           className={idMap('app_sidebar_main')}
           ref={el => this._main = el}
-          onClick={event => {
-            if (event.target === this._main) {
-              event.preventDefault();
-              onOutsideClick();
-            }
-          }}
         >
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
@@ -57,8 +51,15 @@ export default class InboxAppSidebar extends React.Component {
               onMoveEnd={onMoveEnd}
               springConfig={springConfig}
               container={()=>this._main}
-            />
+          />
           </div>
+          <div
+            className={idMap('app_sidebar_content_area_padding')}
+            onClick={event => {
+              event.preventDefault();
+              onOutsideClick();
+            }}
+          />
         </div>
         <button
           className="inboxsdk__close_button"

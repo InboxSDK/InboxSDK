@@ -81,6 +81,10 @@
   left: 0;
   right: 0;
   overflow-y: auto;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
 }
 
 .IDMAP_app_sidebar > .inboxsdk__close_button {
@@ -94,7 +98,12 @@
 }
 
 .IDMAP_app_sidebar_content_area {
-  padding: 16px 8px 0;
+  padding: 16px 8px;
+}
+
+.IDMAP_app_sidebar_content_area_padding {
+  -webkit-flex: 1;
+  flex: 1;
 }
 
 .IDMAP_app_sidebar_content_panel {
