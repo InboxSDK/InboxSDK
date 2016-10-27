@@ -154,7 +154,6 @@ class InboxAppSidebarView {
     const render = () => {
       component = (ReactDOM.render(
         <InboxAppSidebar
-          content={Math.random()}
           panels={panels}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);

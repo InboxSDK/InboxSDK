@@ -18,13 +18,12 @@ type PanelDescriptor = {
   el: HTMLElement;
 };
 type Props = {
-  content: any;
   panels: PanelDescriptor[];
   onClose(): void;
   onOutsideClick(): void;
   onMoveEnd(newList: PanelDescriptor[]): void;
 };
-export default class InboxAppSidebar extends React.PureComponent {
+export default class InboxAppSidebar extends React.Component {
   props: Props;
   _list: DraggableList;
   _main: HTMLElement;
@@ -32,8 +31,11 @@ export default class InboxAppSidebar extends React.PureComponent {
     const panel: Panel = this._list.getItemInstance(id);
     panel.scrollIntoView();
   }
+  shouldComponentUpdate(nextProps: Props) {
+    return this.props.panels !== nextProps.panels;
+  }
   render() {
-    const {content, panels, onClose, onOutsideClick, onMoveEnd} = this.props;
+    const {panels, onClose, onOutsideClick, onMoveEnd} = this.props;
     return (
       <div className={idMap('app_sidebar')}>
         <div
@@ -76,7 +78,7 @@ type PanelProps = {
 type PanelState = {
   expanded: boolean;
 };
-class Panel extends React.PureComponent {
+class Panel extends React.Component {
   props: PanelProps;
   _el: HTMLElement;
   _content: HTMLElement;
@@ -93,6 +95,10 @@ class Panel extends React.PureComponent {
       }
       this._content.appendChild(this.props.item.el);
     }
+  }
+  shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
+    return this.props.item !== nextProps.item ||
+      this.state.expanded !== nextState.expanded;
   }
   scrollIntoView() {
     this._el.scrollIntoView();
