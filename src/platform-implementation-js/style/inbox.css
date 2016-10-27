@@ -132,13 +132,38 @@
 
 .IDMAP_app_sidebar_content_panel_title_text {
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  -webkit-flex: 1;
+  flex: 1;
 }
 
 .IDMAP_app_sidebar_content_panel_title {
   font: 13px / 15px arial, sans-serif;
-  text-overflow: ellipsis;
-  overflow: hidden;
   white-space: nowrap;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.IDMAP_app_sidebar_content_panel_toggle {
+  background: url(https://www.streak.com/build/images/chevron.png) center / contain no-repeat;
+  border: none;
+  width: 16px;
+  height: 16px;
+  -webkit-transform: rotate(0);
+  transform: rotate(0);
+  transition: -webkit-transform .15s, transform .15s;
+  outline: none;
+}
+
+.IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle {
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.IDMAP_app_sidebar_content_panel_toggle {
+  cursor: pointer;
 }
 
 .IDMAP_sidebar_iconArea {

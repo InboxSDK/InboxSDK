@@ -109,10 +109,14 @@ class Panel extends React.Component {
   }
   render() {
     const {dragHandle, item: {title, iconClass, iconUrl}} = this.props;
+    const toggleExpansion = event => {
+      event.preventDefault();
+      this.setState({expanded: !this.state.expanded});
+    };
     return (
       <div
         ref={el => this._el = el}
-        className={idMap('app_sidebar_content_panel')}
+        className={cx(idMap('app_sidebar_content_panel'), {[idMap('expanded')]: this.state.expanded})}
       >
         <div className={idMap('app_sidebar_content_panel_title')}>
           {dragHandle(
@@ -120,15 +124,19 @@ class Panel extends React.Component {
               {iconUrl && <img src={iconUrl} />}
             </span>
           )}
-          <span
-            className={idMap('app_sidebar_content_panel_title_text')}
-            onClick={event => {
-              event.preventDefault();
-              this.setState({expanded: !this.state.expanded});
-            }}
-          >
-            {title}
-          </span>
+          {dragHandle(
+            <span
+              className={idMap('app_sidebar_content_panel_title_text')}
+              onClick={toggleExpansion}
+            >
+              {title}
+            </span>
+          )}
+          <button
+            type="button"
+            className={idMap('app_sidebar_content_panel_toggle')}
+            onClick={toggleExpansion}
+          />
         </div>
         <SmoothCollapse
           expanded={this.state.expanded}
