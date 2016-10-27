@@ -80,22 +80,24 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 8px 0;
   overflow-y: auto;
 }
 
 .IDMAP_app_sidebar > .inboxsdk__close_button {
   position: absolute;
   bottom: 10px;
-  right: 10px;
+  right: 20px;
 }
 
 .inboxsdk__compose_actionToolbar {
   display: inline-block;
 }
 
+.IDMAP_app_sidebar_content_area {
+  padding: 16px 8px 0;
+}
+
 .IDMAP_app_sidebar_content_panel {
-  margin-bottom: 5px;
   padding-bottom: 5px;
   border-bottom: 1px solid #ddd;
   overflow: hidden;

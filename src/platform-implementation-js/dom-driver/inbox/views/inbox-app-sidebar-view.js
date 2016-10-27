@@ -160,6 +160,9 @@ class InboxAppSidebarView {
             this._setShouldAppSidebarOpen(false);
             this._setOpenedNow(false);
           }}
+          onOutsideClick={() => {
+            this._driver.closeOpenThread();
+          }}
           onMoveEnd={newList => {
             panels = newList;
             render();

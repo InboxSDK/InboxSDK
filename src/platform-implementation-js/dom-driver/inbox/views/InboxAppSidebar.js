@@ -7,6 +7,8 @@ import DraggableList from 'react-draggable-list';
 import get from '../../../../common/get-or-fail';
 import idMap from '../../../lib/idMap';
 
+const springConfig = {stiffness: 400, damping: 50};
+
 type PanelDescriptor = {
   id: string;
   title: string;
@@ -18,6 +20,7 @@ type Props = {
   content: any;
   panels: PanelDescriptor[];
   onClose(): void;
+  onOutsideClick(): void;
   onMoveEnd(newList: PanelDescriptor[]): void;
 };
 export default class InboxAppSidebar extends React.PureComponent {
@@ -29,17 +32,27 @@ export default class InboxAppSidebar extends React.PureComponent {
     panel.scrollIntoView();
   }
   render() {
-    const {content, panels, onClose, onMoveEnd} = this.props;
+    const {content, panels, onClose, onOutsideClick, onMoveEnd} = this.props;
     return (
       <div className={idMap('app_sidebar')}>
-        <div className={idMap('app_sidebar_main')} ref={el => this._main = el}>
-          <div className={idMap('sidebar_panel_content_area')}>
+        <div
+          className={idMap('app_sidebar_main')}
+          ref={el => this._main = el}
+          onClick={event => {
+            if (event.target === this._main) {
+              event.preventDefault();
+              onOutsideClick();
+            }
+          }}
+        >
+          <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
               ref={el => this._list = el}
               itemKey="id"
               template={Panel}
               list={panels}
               onMoveEnd={onMoveEnd}
+              springConfig={springConfig}
               container={()=>this._main}
             />
           </div>

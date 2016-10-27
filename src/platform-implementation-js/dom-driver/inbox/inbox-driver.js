@@ -13,6 +13,7 @@ import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import simulateKey from '../../lib/dom/simulate-key';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -382,6 +383,10 @@ class InboxDriver {
 
   createBackdrop(zIndex, target) {
     return new InboxBackdrop(zIndex, target);
+  }
+
+  closeOpenThread() {
+    simulateKey(document.body, 27, 27);
   }
 }
 
