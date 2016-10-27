@@ -4,6 +4,7 @@ import cx from 'classnames';
 import React from 'react';
 import saveRefs from 'react-save-refs';
 import DraggableList from 'react-draggable-list';
+import SmoothCollapse from 'react-smooth-collapse';
 import get from '../../../../common/get-or-fail';
 import idMap from '../../../lib/idMap';
 
@@ -72,10 +73,16 @@ type PanelProps = {
   item: PanelDescriptor;
   dragHandle: Function;
 };
+type PanelState = {
+  expanded: boolean;
+};
 class Panel extends React.PureComponent {
   props: PanelProps;
   _el: HTMLElement;
   _content: HTMLElement;
+  state: PanelState = {
+    expanded: true
+  };
   componentDidMount() {
     this._content.appendChild(this.props.item.el);
   }
@@ -100,20 +107,31 @@ class Panel extends React.PureComponent {
         ref={el => this._el = el}
         className={idMap('app_sidebar_content_panel')}
       >
-        {dragHandle(
-          <div className={idMap('app_sidebar_content_panel_title')}>
+        <div className={idMap('app_sidebar_content_panel_title')}>
+          {dragHandle(
             <span className={cx(idMap('app_sidebar_content_panel_title_icon'), iconClass)}>
               {iconUrl && <img src={iconUrl} />}
             </span>
-            <span className={idMap('app_sidebar_content_panel_title_text')}>
-              {title}
-            </span>
-          </div>
-        )}
-        <div
-          className={idMap('app_sidebar_content_panel_content')}
-          ref={el => this._content = el}
-        />
+          )}
+          <span
+            className={idMap('app_sidebar_content_panel_title_text')}
+            onClick={event => {
+              event.preventDefault();
+              this.setState({expanded: !this.state.expanded});
+            }}
+          >
+            {title}
+          </span>
+        </div>
+        <SmoothCollapse
+          expanded={this.state.expanded}
+          heightTransition=".15s ease"
+        >
+          <div
+            className={idMap('app_sidebar_content_panel_content')}
+            ref={el => this._content = el}
+          />
+        </SmoothCollapse>
       </div>
     );
   }

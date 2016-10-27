@@ -113,6 +113,7 @@
   vertical-align: top;
   padding-left: 5px;
   box-sizing: border-box;
+  cursor: move;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon > img {
@@ -120,12 +121,15 @@
   height: 16px;
 }
 
+.IDMAP_app_sidebar_content_panel_title_text {
+  cursor: pointer;
+}
+
 .IDMAP_app_sidebar_content_panel_title {
   font: 13px / 15px arial, sans-serif;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  cursor: move;
 }
 
 .IDMAP_sidebar_iconArea {
