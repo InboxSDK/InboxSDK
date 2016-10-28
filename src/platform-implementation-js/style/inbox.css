@@ -154,6 +154,8 @@
 }
 
 .IDMAP_app_sidebar_content_panel_toggle_button {
+  margin-top: 2px;
+  margin-right: 1px;
   background: url(https://www.streak.com/build/images/chevron.png) center / contain no-repeat;
   border: none;
   width: 16px;

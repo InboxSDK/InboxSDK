@@ -75,6 +75,7 @@ export default class InboxAppSidebar extends React.Component {
 type PanelProps = {
   item: PanelDescriptor;
   dragHandle: Function;
+  itemSelected: number;
 };
 type PanelState = {
   expanded: boolean;
@@ -98,7 +99,8 @@ class Panel extends React.Component {
     }
   }
   shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
-    return this.props.item !== nextProps.item ||
+    return this.props.itemSelected !== nextProps.itemSelected ||
+      this.props.item !== nextProps.item ||
       this.state.expanded !== nextState.expanded;
   }
   scrollIntoView() {
@@ -108,14 +110,21 @@ class Panel extends React.Component {
     return 16;
   }
   render() {
-    const {dragHandle, item: {title, iconClass, iconUrl}} = this.props;
+    const {dragHandle, itemSelected, item: {title, iconClass, iconUrl}} = this.props;
     const toggleExpansion = event => {
       this.setState({expanded: !this.state.expanded});
     };
+    const scale = itemSelected * 0.01 + 1;
+    const shadow = itemSelected * 4;
+
     return (
       <div
         ref={el => this._el = el}
         className={cx(idMap('app_sidebar_content_panel'), {[idMap('expanded')]: this.state.expanded})}
+        style={{
+          transform: `scale(${scale})`,
+          boxShadow: shadow === 0 ? 'none' : `0px 0px ${shadow}px 0px rgba(0, 0, 0, 0.3)`
+        }}
       >
         <div className={idMap('app_sidebar_content_panel_top_line')}>
           {dragHandle(
