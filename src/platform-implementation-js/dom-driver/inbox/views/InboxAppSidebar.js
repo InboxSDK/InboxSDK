@@ -83,26 +83,9 @@ type PanelState = {
 class Panel extends React.Component {
   props: PanelProps;
   _el: HTMLElement;
-  _content: HTMLElement;
   state: PanelState = {
     expanded: true
   };
-  componentDidMount() {
-    this._content.appendChild(this.props.item.el);
-  }
-  componentDidUpdate(prevProps: PanelProps) {
-    if (prevProps.item.el !== this.props.item.el) {
-      while (this._content.lastElementChild) {
-        this._content.lastElementChild.remove();
-      }
-      this._content.appendChild(this.props.item.el);
-    }
-  }
-  shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
-    return this.props.itemSelected !== nextProps.itemSelected ||
-      this.props.item !== nextProps.item ||
-      this.state.expanded !== nextState.expanded;
-  }
   scrollIntoView() {
     this._el.scrollIntoView();
   }
@@ -110,7 +93,7 @@ class Panel extends React.Component {
     return 16;
   }
   render() {
-    const {dragHandle, itemSelected, item: {title, iconClass, iconUrl}} = this.props;
+    const {dragHandle, itemSelected, item: {title, iconClass, iconUrl, el}} = this.props;
     const toggleExpansion = event => {
       this.setState({expanded: !this.state.expanded});
     };
@@ -151,12 +134,38 @@ class Panel extends React.Component {
           expanded={this.state.expanded}
           heightTransition=".15s ease"
         >
-          <div
-            className={idMap('app_sidebar_content_panel_content')}
-            ref={el => this._content = el}
-          />
+          <PanelElement el={el} />
         </SmoothCollapse>
       </div>
+    );
+  }
+}
+
+type PanelElementProps = {
+  el: HTMLElement;
+};
+class PanelElement extends React.Component {
+  _content: HTMLElement;
+  componentDidMount() {
+    this._content.appendChild(this.props.el);
+  }
+  componentDidUpdate(prevProps: PanelElementProps) {
+    if (prevProps.el !== this.props.el) {
+      while (this._content.lastElementChild) {
+        this._content.lastElementChild.remove();
+      }
+      this._content.appendChild(this.props.el);
+    }
+  }
+  shouldComponentUpdate(nextProps: PanelElementProps) {
+    return this.props.el !== nextProps.el;
+  }
+  render() {
+    return (
+      <div
+        className={idMap('app_sidebar_content_panel_content')}
+        ref={el => this._content = el}
+      />
     );
   }
 }
