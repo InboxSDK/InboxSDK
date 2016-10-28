@@ -4,13 +4,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import RSVP from './lib/rsvp';
 import delay from 'pdelay';
-import MockStorage from './lib/mock-storage';
+import MockStorage from 'mock-webstorage';
 
 import MessageIdManager from '../src/platform-implementation-js/lib/message-id-manager';
 
 describe("MessageIdManager", function() {
   it("return value from getGmailThreadIdForRfcMessageId is cached", async function() {
-    const storage = new MockStorage();
+    const storage: Object = new MockStorage();
     const getGmailThreadIdForRfcMessageId = sinon.stub().returns(RSVP.Promise.resolve("123"));
     const mim = new MessageIdManager({
       getGmailThreadIdForRfcMessageId,
@@ -40,7 +40,7 @@ describe("MessageIdManager", function() {
   });
 
   it("return value from getRfcMessageIdForGmailMessageId is cached", async function() {
-    const storage = new MockStorage();
+    const storage: Object = new MockStorage();
     const getRfcMessageIdForGmailMessageId = sinon.stub().returns(RSVP.Promise.resolve("<456>"));
     const mim = new MessageIdManager({
       getGmailThreadIdForRfcMessageId(rfcId) {
@@ -70,7 +70,7 @@ describe("MessageIdManager", function() {
   });
 
   it("can load from storage", async function() {
-    const storage = new MockStorage();
+    const storage: Object = new MockStorage();
     storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify([["<789>", "789", Date.now()]]));
     const mim = new MessageIdManager({
       getGmailThreadIdForRfcMessageId(rfcId) {

@@ -59,6 +59,7 @@
     "lazypipe": "^1.0.1",
     "lodash": "^4.14.0",
     "mocha": "^3.0.2",
+    "mock-webstorage": "^1.0.3",
     "node-dir": "^0.1.6",
     "notp": "^2.0.3",
     "pdelay": "^1.0.0",
