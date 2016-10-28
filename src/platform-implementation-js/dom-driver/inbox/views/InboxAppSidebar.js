@@ -92,6 +92,11 @@ class Panel extends React.Component {
   getDragHeight() {
     return 16;
   }
+  shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
+    return this.props.itemSelected !== nextProps.itemSelected ||
+      this.props.item !== nextProps.item ||
+      this.state.expanded !== nextState.expanded;
+  }
   render() {
     const {dragHandle, itemSelected, item: {title, iconClass, iconUrl, el}} = this.props;
     const toggleExpansion = event => {
