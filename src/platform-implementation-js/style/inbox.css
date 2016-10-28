@@ -123,13 +123,17 @@
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  cursor: default;
 }
 
 .IDMAP_app_sidebar_content_panel_title {
-  cursor: move;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.IDMAP_showControls .IDMAP_app_sidebar_content_panel_title {
+  cursor: move;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon {
@@ -147,10 +151,15 @@
 }
 
 .IDMAP_app_sidebar_content_panel_toggle {
-  cursor: pointer;
   -webkit-flex: 1;
   flex: 1;
   text-align: right;
+  visibility: hidden;
+}
+
+.IDMAP_showControls .IDMAP_app_sidebar_content_panel_toggle {
+  visibility: visible;
+  cursor: pointer;
 }
 
 .IDMAP_app_sidebar_content_panel_toggle_button {
@@ -164,8 +173,8 @@
   transform: rotate(0);
   transition: -webkit-transform .15s, transform .15s;
   outline: none;
-  cursor: pointer;
   opacity: .8;
+  cursor: pointer;
 }
 
 .IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {

@@ -36,6 +36,7 @@ export default class InboxAppSidebar extends React.Component {
   }
   render() {
     const {panels, onClose, onOutsideClick, onMoveEnd} = this.props;
+    const showControls = panels.length > 1;
     return (
       <div className={idMap('app_sidebar')}>
         <div
@@ -45,10 +46,12 @@ export default class InboxAppSidebar extends React.Component {
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
               ref={el => this._list = el}
-              itemKey="id"
+              itemKey={x => x.panelDescriptor.id}
               template={Panel}
-              list={panels}
-              onMoveEnd={onMoveEnd}
+              list={panels.map(panelDescriptor => ({panelDescriptor, showControls}))}
+              onMoveEnd={newList => {
+                onMoveEnd(newList.map(x => x.panelDescriptor));
+              }}
               springConfig={springConfig}
               container={()=>this._main}
             />
@@ -73,7 +76,10 @@ export default class InboxAppSidebar extends React.Component {
 }
 
 type PanelProps = {
-  item: PanelDescriptor;
+  item: {
+    panelDescriptor: PanelDescriptor;
+    showControls: boolean;
+  };
   dragHandle: Function;
   itemSelected: number;
 };
@@ -94,11 +100,16 @@ class Panel extends React.Component {
   }
   shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
     return this.props.itemSelected !== nextProps.itemSelected ||
-      this.props.item !== nextProps.item ||
+      this.props.item.panelDescriptor !== nextProps.item.panelDescriptor ||
+      this.props.item.showControls !== nextProps.item.showControls ||
       this.state.expanded !== nextState.expanded;
   }
   render() {
-    const {dragHandle, itemSelected, item: {title, iconClass, iconUrl, el}} = this.props;
+    const {
+      dragHandle, itemSelected, item: {
+        showControls, panelDescriptor: {title, iconClass, iconUrl, el}
+      }
+    } = this.props;
     const toggleExpansion = event => {
       this.setState({expanded: !this.state.expanded});
     };
@@ -108,14 +119,17 @@ class Panel extends React.Component {
     return (
       <div
         ref={el => this._el = el}
-        className={cx(idMap('app_sidebar_content_panel'), {[idMap('expanded')]: this.state.expanded})}
+        className={cx(idMap('app_sidebar_content_panel'), {
+          [idMap('expanded')]: this.state.expanded,
+          [idMap('showControls')]: showControls
+        })}
         style={{
           transform: `scale(${scale})`,
           boxShadow: shadow === 0 ? 'none' : `0px 0px ${shadow}px 0px rgba(0, 0, 0, 0.3)`
         }}
       >
         <div className={idMap('app_sidebar_content_panel_top_line')}>
-          {dragHandle(
+          {(showControls ? dragHandle : (x=>x))(
             <span className={idMap('app_sidebar_content_panel_title')}>
               <span className={cx(idMap('app_sidebar_content_panel_title_icon'), iconClass)}>
                 {iconUrl && <img src={iconUrl} />}
@@ -136,7 +150,7 @@ class Panel extends React.Component {
           </span>
         </div>
         <SmoothCollapse
-          expanded={this.state.expanded}
+          expanded={!showControls || this.state.expanded}
           heightTransition=".15s ease"
         >
           <PanelElement el={el} />
