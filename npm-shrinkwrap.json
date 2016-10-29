@@ -5100,6 +5100,11 @@
       "from": "scmp@0.0.3",
       "resolved": "https://registry.npmjs.org/scmp/-/scmp-0.0.3.tgz"
     },
+    "seed-random": {
+      "version": "2.2.0",
+      "from": "seed-random@latest",
+      "resolved": "https://registry.npmjs.org/seed-random/-/seed-random-2.2.0.tgz"
+    },
     "selenium-standalone": {
       "version": "5.8.0",
       "from": "selenium-standalone@>=5.8.0 <6.0.0",

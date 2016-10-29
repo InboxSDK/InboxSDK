@@ -79,6 +79,7 @@
     "rimraf": "^2.4.2",
     "rsvp": "^3.0.21",
     "safari-fix-map": "^1.0.4",
+    "seed-random": "^2.2.0",
     "selenium-standalone": "^5.8.0",
     "semver": "^5.0.1",
     "simple-encryptor": "^1.1.0",

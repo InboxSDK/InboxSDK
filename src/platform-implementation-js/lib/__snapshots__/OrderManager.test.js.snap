@@ -1,0 +1,109 @@
+exports[`test orderHint is not respected across groups 1`] = `
+Array [
+  Array [
+    "mercury",
+    "a",
+  ],
+  Array [
+    "mercury",
+    "a",
+  ],
+  Array [
+    "a",
+    "mercury",
+  ],
+  Array [
+    "mercury",
+    "a",
+  ],
+  Array [
+    "a",
+    "mercury",
+  ],
+  Array [
+    "a",
+    "mercury",
+  ],
+  Array [
+    "a",
+    "mercury",
+  ],
+  Array [
+    "a",
+    "mercury",
+  ],
+  Array [
+    "mercury",
+    "a",
+  ],
+  Array [
+    "mercury",
+    "a",
+  ],
+]
+`;
+
+exports[`test orderHint is respected within groups but not across groups 1`] = `
+Array [
+  Array [
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+  ],
+  Array [
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+  ],
+  Array [
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+]
+`;
