@@ -240,11 +240,11 @@ test('orderHint is respected within groups but not across groups', () => {
 });
 
 test('handles orderHint being changed from remembered value', () => {
-  const orderedItemPairsOverMultipleRuns = times(10).map(i => {
+  times(10).forEach(i => {
     seed(`seed ${i}`, {global: true});
 
     const storage: Object = new MockStorage();
-    return times(2).map(ii => {
+    const [orderedItems, orderedItems2] = times(2).map(ii => {
       const plutoBeforeNeptune = ii === 0;
 
       const o = new OrderManager('k', storage);
@@ -285,6 +285,14 @@ test('handles orderHint being changed from remembered value', () => {
       }
       return orderedItems;
     });
+
+    expect(orderedItems.findIndex(x => x.id === 'a'))
+      .toBe(orderedItems2.findIndex(x => x.id === 'a'));
+    expect(orderedItems.findIndex(x => x.id === 'b'))
+      .toBe(orderedItems2.findIndex(x => x.id === 'b'));
+    expect(orderedItems.findIndex(x => x.id === 'neptune'))
+      .toBe(orderedItems2.findIndex(x => x.id === 'pluto'));
+    expect(orderedItems.findIndex(x => x.id === 'pluto'))
+      .toBe(orderedItems2.findIndex(x => x.id === 'neptune'));
   });
-  expect(orderedItemPairsOverMultipleRuns).toMatchSnapshot();
 });
