@@ -1,3 +1,708 @@
+exports[`test handles orderHint being changed from remembered value 1`] = `
+Array [
+  Array [
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+    ],
+  ],
+  Array [
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 7.9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+    ],
+    Array [
+      Object {
+        "groupId": "letters",
+        "id": "a",
+        "orderHint": 0,
+        "value": Object {
+          "v": "A",
+        },
+      },
+      Object {
+        "groupId": "letters",
+        "id": "b",
+        "orderHint": 1,
+        "value": Object {
+          "v": "B",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "neptune",
+        "orderHint": 8,
+        "value": Object {
+          "v": "Neptune",
+        },
+      },
+      Object {
+        "groupId": "planets",
+        "id": "pluto",
+        "orderHint": 9,
+        "value": Object {
+          "v": "Pluto",
+        },
+      },
+    ],
+  ],
+]
+`;
+
 exports[`test orderHint is not respected across groups, and picked order persists 1`] = `
 Array [
   Array [

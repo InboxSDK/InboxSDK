@@ -5,7 +5,9 @@ import seed from 'seed-random';
 import times from 'lodash/times';
 import MockStorage from 'mock-webstorage';
 
+const _originalConsoleError = console.error;
 afterEach(() => {
+  console.error = _originalConsoleError;
   seed.resetGlobal();
 });
 
@@ -73,6 +75,63 @@ test('orderHint within group is respected', () => {
     .toEqual(['mercury', 'venus', 'earth', 'mars']);
 });
 
+test('handles write fails of localStorage', () => {
+  console.error = jest.fn();
+  const storage: Object = new MockStorage();
+  storage.setItem = () => {
+    throw new Error('setItem test failure');
+  };
+  const o = new OrderManager('k', storage);
+  o.addItem({
+    groupId: 'planets',
+    id: 'mercury',
+    orderHint: -1,
+    value: {v: 'Mercury'}
+  });
+  o.addItem({
+    groupId: 'planets',
+    id: 'earth',
+    orderHint: 1,
+    value: {v: 'Earth'}
+  });
+  expect(o.getOrderedItems().length).toBe(2);
+  expect(console.error).toHaveBeenCalledTimes(2);
+});
+
+test('handles read fails of localStorage', () => {
+  console.error = jest.fn();
+  const storage: Object = new MockStorage();
+  storage.setItem('k', 'not valid json here');
+  const o = new OrderManager('k', storage);
+  o.addItem({
+    groupId: 'planets',
+    id: 'mercury',
+    orderHint: -1,
+    value: {v: 'Mercury'}
+  });
+  o.addItem({
+    groupId: 'planets',
+    id: 'earth',
+    orderHint: 1,
+    value: {v: 'Earth'}
+  });
+  o.addItem({
+    groupId: 'planets',
+    id: 'venus',
+    orderHint: 0,
+    value: {v: 'Venus'}
+  });
+  o.addItem({
+    groupId: 'planets',
+    id: 'mars',
+    orderHint: 1.1,
+    value: {v: 'Mars'}
+  });
+  expect(o.getOrderedItems().map(x => x.id))
+    .toEqual(['mercury', 'venus', 'earth', 'mars']);
+  expect(console.error).toHaveBeenCalledTimes(1);
+});
+
 test('orderHint is not respected across groups, and picked order persists', () => {
   const orderedIdsOverMultipleRuns = times(10).map(i => {
     seed(`seed ${i}`, {global: true});
@@ -117,7 +176,7 @@ test('orderHint is respected within groups but not across groups', () => {
     seed(`seed ${i}`, {global: true});
 
     const storage: Object = new MockStorage();
-    const [o, o2] = times(2).map(() => {
+    const [orderedItems, orderedItems2] = times(2).map(() => {
       const o = new OrderManager('k', storage);
       o.addItem({
         groupId: 'numbers',
@@ -161,12 +220,11 @@ test('orderHint is respected within groups but not across groups', () => {
         orderHint: 11,
         value: {v: 'One'}
       });
-      return o;
+      return o.getOrderedItems();
     });
 
-    expect(o2.getOrderedItems()).toEqual(o.getOrderedItems());
+    expect(orderedItems2).toEqual(orderedItems);
 
-    const orderedItems = o.getOrderedItems();
     expect(orderedItems.findIndex(x => x.id === 'mercury'))
       .toBe(orderedItems.findIndex(x => x.id === 'venus') - 1);
     expect(orderedItems.findIndex(x => x.id === 'a'))
@@ -179,4 +237,54 @@ test('orderHint is respected within groups but not across groups', () => {
     return orderedItems.map(x => x.id);
   });
   expect(orderedIdsOverMultipleRuns).toMatchSnapshot();
+});
+
+test('handles orderHint being changed from remembered value', () => {
+  const orderedItemPairsOverMultipleRuns = times(10).map(i => {
+    seed(`seed ${i}`, {global: true});
+
+    const storage: Object = new MockStorage();
+    return times(2).map(ii => {
+      const plutoBeforeNeptune = ii === 0;
+
+      const o = new OrderManager('k', storage);
+      o.addItem({
+        groupId: 'letters',
+        id: 'b',
+        orderHint: 1,
+        value: {v: 'B'}
+      });
+      o.addItem({
+        groupId: 'planets',
+        id: 'neptune',
+        orderHint: 8,
+        value: {v: 'Neptune'}
+      });
+      o.addItem({
+        groupId: 'planets',
+        id: 'pluto',
+        orderHint: plutoBeforeNeptune ? 7.9 : 9,
+        value: {v: 'Pluto'}
+      });
+      o.addItem({
+        groupId: 'letters',
+        id: 'a',
+        orderHint: 0,
+        value: {v: 'A'}
+      });
+
+      const orderedItems = o.getOrderedItems();
+      expect(orderedItems.findIndex(x => x.id === 'a'))
+        .toBe(orderedItems.findIndex(x => x.id === 'b') - 1);
+      if (plutoBeforeNeptune) {
+        expect(orderedItems.findIndex(x => x.id === 'pluto'))
+          .toBe(orderedItems.findIndex(x => x.id === 'neptune') - 1);
+      } else {
+        expect(orderedItems.findIndex(x => x.id === 'neptune'))
+          .toBe(orderedItems.findIndex(x => x.id === 'pluto') - 1);
+      }
+      return orderedItems;
+    });
+  });
+  expect(orderedItemPairsOverMultipleRuns).toMatchSnapshot();
 });
