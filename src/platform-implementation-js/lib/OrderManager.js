@@ -1,6 +1,10 @@
 /* @flow */
 
-import sortedIndexBy from 'lodash/sortedIndexBy';
+import update from 'react-addons-update';
+import findIndex from 'lodash/findIndex';
+import findLastIndex from 'lodash/findLastIndex';
+import invertBy from 'lodash/invertBy';
+import sortBy from 'lodash/sortBy';
 
 export type Item<T> = {
   groupId: string;
@@ -8,35 +12,128 @@ export type Item<T> = {
   orderHint: number;
   value: T;
 };
+
+type PersistedData = {
+  order: Array<{
+    groupId: string;
+    id: string;
+    orderHint: number;
+    lastUse: number;
+  }>;
+};
+
 export default class OrderManager<T> {
+  _key: string;
   _items: Array<Item<T>> = [];
   _storage: Storage;
-  constructor(storage: Storage=window.localStorage) {
+  constructor(key: string, storage: Storage=window.localStorage) {
+    this._key = key;
     this._storage = storage;
   }
-  addItem(item: Item<T>) {
-    const itemsInSameGroup = this._items.filter(x => x.groupId === item.groupId);
-    if (itemsInSameGroup.length === 0) {
-      if (Math.random() < 0.5) {
-        this._items = [item].concat(this._items);
-      } else {
-        this._items = this._items.concat([item]);
+  _read(): PersistedData {
+    const str = this._storage.getItem(this._key);
+    if (str != null) {
+      try {
+        return JSON.parse(str);
+      } catch(err) {
+        console.error('OrderManager failed to parse storage', err);
       }
-    } else {
-      const ixInGroup = sortedIndexBy(itemsInSameGroup, item, x => x.orderHint);
-      let ix;
-      if (ixInGroup === 0) {
-        const afterItem = itemsInSameGroup[0];
-        ix = this._items.indexOf(afterItem);
-      } else {
-        const beforeItem = itemsInSameGroup[ixInGroup-1];
-        ix = this._items.indexOf(beforeItem)+1;
-      }
-      this._items = this._items.slice(0, ix).concat([item], this._items.slice(ix));
+    }
+    return {order: []};
+  }
+  _save(pdata: PersistedData) {
+    const str = JSON.stringify(pdata);
+    try {
+      this._storage.setItem(this._key, str);
+    } catch(err) {
+      console.error('OrderManager failed to save storage', err);
     }
   }
-  removeItem(id: string) {
-    this._items = this._items.filter(item => item.id !== id);
+  _updatePersistedDataWithItem(item: Item<T>): PersistedData {
+    let pdata = this._read();
+
+    let ixOfId = findIndex(
+      pdata.order,
+      x => x.groupId === item.groupId && x.id === item.id
+    );
+
+    // If we have persisted pdata for the item id but the orderHint has changed
+    // since then, then drop our persisted pdata for the id.
+    if (ixOfId !== -1 && pdata.order[ixOfId].orderHint !== item.orderHint) {
+      pdata = update(pdata, {order: {$splice: [[ixOfId, 1]]}});
+      ixOfId = -1;
+    }
+
+    if (ixOfId !== -1) {
+      pdata = update(pdata, {order: {$splice: [[ixOfId, 1, {
+        groupId: item.groupId,
+        id: item.id,
+        orderHint: item.orderHint,
+        lastUse: Date.now()
+      }]]}});
+    } else {
+      let ixToInsertAt;
+      // Try to find an item in the same group with a lower/equal orderHint for
+      // us to put the new item after.
+      const ixOfLesserOrEqualGroupItem = findLastIndex(
+        pdata.order,
+        x => x.groupId === item.groupId && x.orderHint <= item.orderHint
+      );
+      if (ixOfLesserOrEqualGroupItem !== -1) {
+        ixToInsertAt = ixOfLesserOrEqualGroupItem+1;
+      } else {
+        // We didn't find any group items with a lower/equal orderHint. Try to
+        // find a group item (which would have a higher orderHint) to put the new
+        // item before.
+        const ixOfGreaterGroupItem = findIndex(pdata.order, x => x.groupId === item.groupId);
+        if (ixOfGreaterGroupItem !== -1) {
+          ixToInsertAt = ixOfGreaterGroupItem;
+        } else {
+          // There weren't any items in the same group to put our new item next
+          // to. What we need to do now is put the new item into a random spot in
+          // the list, preferably not within an existing continuous group. We do
+          // this by finding the first index of each group, and then randomly
+          // choose to put the new item before one of them or at the end of the
+          // list.
+
+          const groupIdsToIndexes: {[groupId:string]: Array<number>} = invertBy(pdata.order, x => x.groupId);
+          const groupIds = Object.keys(groupIdsToIndexes);
+          const roll = Math.floor(Math.random()*(groupIds.length+1));
+          if (roll === groupIds.length) {
+            ixToInsertAt = pdata.order.length;
+          } else {
+            ixToInsertAt = groupIdsToIndexes[groupIds[roll]][0];
+          }
+        }
+      }
+
+      // Use Flow to check that every path above sets ixToInsertAt.
+      (ixToInsertAt: number);
+
+      pdata = update(pdata, {order: {$splice: [[ixToInsertAt, 0, {
+        groupId: item.groupId,
+        id: item.id,
+        orderHint: item.orderHint,
+        lastUse: Date.now()
+      }]]}});
+    }
+
+    this._save(pdata);
+    return pdata;
+  }
+  addItem(item: Item<T>) {
+    const pdata = this._updatePersistedDataWithItem(item);
+    const itemToCombinedId = (x: Item<T>) => `${JSON.stringify(x.groupId)}:${JSON.stringify(x.id)}`;
+    const idsToIndexes: {[id:string]: Array<number>} = invertBy(pdata.order, itemToCombinedId);
+
+    this._items = sortBy(this._items.concat([item]), item => {
+      const id = itemToCombinedId(item);
+      return Object.prototype.hasOwnProperty.call(idsToIndexes, id) ?
+        idsToIndexes[id][0] : 0;
+    });
+  }
+  removeItem(groupId: string, id: string) {
+    this._items = this._items.filter(item => item.groupId !== groupId || item.id !== id);
   }
   getOrderedItems(): Array<Item<T>> {
     return this._items;

@@ -1,4 +1,4 @@
-exports[`test orderHint is not respected across groups 1`] = `
+exports[`test orderHint is not respected across groups, and picked order persists 1`] = `
 Array [
   Array [
     "mercury",
@@ -46,30 +46,9 @@ Array [
 exports[`test orderHint is respected within groups but not across groups 1`] = `
 Array [
   Array [
-    "a",
-    "b",
-    "mercury",
-    "venus",
-  ],
-  Array [
-    "a",
-    "b",
-    "mercury",
-    "venus",
-  ],
-  Array [
-    "mercury",
-    "venus",
-    "a",
-    "b",
-  ],
-  Array [
-    "a",
-    "b",
-    "mercury",
-    "venus",
-  ],
-  Array [
+    "zero",
+    "one",
+    "two",
     "mercury",
     "venus",
     "a",
@@ -78,6 +57,9 @@ Array [
   Array [
     "mercury",
     "venus",
+    "zero",
+    "one",
+    "two",
     "a",
     "b",
   ],
@@ -86,16 +68,25 @@ Array [
     "venus",
     "a",
     "b",
+    "zero",
+    "one",
+    "two",
   ],
   Array [
     "mercury",
     "venus",
+    "zero",
+    "one",
+    "two",
     "a",
     "b",
   ],
   Array [
     "a",
     "b",
+    "zero",
+    "one",
+    "two",
     "mercury",
     "venus",
   ],
@@ -104,6 +95,45 @@ Array [
     "b",
     "mercury",
     "venus",
+    "zero",
+    "one",
+    "two",
+  ],
+  Array [
+    "a",
+    "b",
+    "zero",
+    "one",
+    "two",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "mercury",
+    "venus",
+    "a",
+    "b",
+    "zero",
+    "one",
+    "two",
+  ],
+  Array [
+    "zero",
+    "one",
+    "two",
+    "a",
+    "b",
+    "mercury",
+    "venus",
+  ],
+  Array [
+    "zero",
+    "one",
+    "two",
+    "mercury",
+    "venus",
+    "a",
+    "b",
   ],
 ]
 `;
