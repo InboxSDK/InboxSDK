@@ -319,3 +319,63 @@ test('handles orderHint being changed from remembered value', () => {
       .toBe(orderedItems2.findIndex(x => x.id === 'neptune'));
   });
 });
+
+test('moveItem works', () => {
+  const storage: Object = new MockStorage();
+  function addItems(o) {
+    o.addItem({
+      groupId: 'numbers',
+      id: 'one',
+      orderHint: 1,
+      value: {v: 'one'}
+    });
+    o.addItem({
+      groupId: 'numbers',
+      id: 'two',
+      orderHint: 2,
+      value: {v: 'two'}
+    });
+    o.addItem({
+      groupId: 'numbers',
+      id: 'three',
+      orderHint: 3,
+      value: {v: 'three'}
+    });
+  }
+
+  {
+    const o = new OrderManager('k', storage);
+    addItems(o);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['one', 'two', 'three']);
+    o.moveItem(1, 0);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'one', 'three']);
+  }
+  {
+    const o = new OrderManager('k', storage);
+    addItems(o);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'one', 'three']);
+    o.moveItem(1, 0);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['one', 'two', 'three']);
+  }
+  {
+    const o = new OrderManager('k', storage);
+    addItems(o);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['one', 'two', 'three']);
+    o.moveItem(0, 1);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'one', 'three']);
+  }
+  {
+    const o = new OrderManager('k', storage);
+    addItems(o);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'one', 'three']);
+    o.moveItem(2, 1);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'three', 'one']);
+  }
+  {
+    const o = new OrderManager('k', storage);
+    addItems(o);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['two', 'three', 'one']);
+    o.moveItem(0, 2);
+    expect(o.getOrderedItems().map(i => i.id)).toEqual(['three', 'one', 'two']);
+  }
+});

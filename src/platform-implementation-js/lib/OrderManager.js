@@ -22,6 +22,10 @@ type PersistedData = {
   }>;
 };
 
+function itemToCombinedId(x: Item<any>) {
+  return `${JSON.stringify(x.groupId)}:${JSON.stringify(x.id)}`;
+}
+
 export default class OrderManager<T> {
   _key: string;
   _items: Array<Item<T>> = [];
@@ -131,19 +135,33 @@ export default class OrderManager<T> {
     this._save(pdata);
     return pdata;
   }
-  addItem(item: Item<T>) {
-    const pdata = this._updatePersistedDataWithItem(item);
-    const itemToCombinedId = (x: Item<T>) => `${JSON.stringify(x.groupId)}:${JSON.stringify(x.id)}`;
+  _sortItems(pdata: PersistedData, items: Array<Item<T>>): Array<Item<T>> {
     const idsToIndexes: {[id:string]: Array<number>} = invertBy(pdata.order, itemToCombinedId);
-
-    this._items = sortBy(this._items.concat([item]), item => {
+    return sortBy(items, item => {
       const id = itemToCombinedId(item);
       return Object.prototype.hasOwnProperty.call(idsToIndexes, id) ?
         idsToIndexes[id][0] : 0;
     });
   }
+  addItem(item: Item<T>) {
+    const pdata = this._updatePersistedDataWithItem(item);
+    this._items = this._sortItems(pdata, this._items.concat([item]));
+  }
   removeItem(groupId: string, id: string) {
     this._items = this._items.filter(item => item.groupId !== groupId || item.id !== id);
+  }
+  moveItem(sourceIndex: number, destinationIndex: number) {
+    let pdata = this._read();
+    const source = this._items[sourceIndex];
+    const destination = this._items[destinationIndex];
+    const sourcePIx = findIndex(pdata.order, item => item.groupId === source.groupId && item.id === source.id);
+    const destinationPIx = findIndex(pdata.order, item => item.groupId === destination.groupId && item.id === destination.id);
+    pdata = update(pdata, {order: {$splice: [
+      [sourcePIx, 1],
+      [destinationPIx, 0, source]
+    ]}});
+    this._save(pdata);
+    this._items = this._sortItems(pdata, this._items);
   }
   getOrderedItems(): Array<Item<T>> {
     return this._items;
