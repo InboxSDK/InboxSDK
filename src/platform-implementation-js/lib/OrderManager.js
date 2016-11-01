@@ -30,6 +30,7 @@ export default class OrderManager<T> {
   _key: string;
   _items: Array<Item<T>> = [];
   _storage: Storage;
+  _needsSort = false;
   _MAX_ORDER_LENGTH = 200;
   constructor(key: string, storage: Storage=window.localStorage) {
     this._key = key;
@@ -145,7 +146,8 @@ export default class OrderManager<T> {
   }
   addItem(item: Item<T>) {
     const pdata = this._updatePersistedDataWithItem(item);
-    this._items = this._sortItems(pdata, this._items.concat([item]));
+    this._needsSort = true;
+    this._items = this._items.concat([item]);
   }
   removeItem(groupId: string, id: string) {
     this._items = this._items.filter(item => item.groupId !== groupId || item.id !== id);
@@ -161,9 +163,13 @@ export default class OrderManager<T> {
       [destinationPIx, 0, pdata.order[sourcePIx]]
     ]}});
     this._save(pdata);
-    this._items = this._sortItems(pdata, this._items);
+    this._needsSort = true;
   }
   getOrderedItems(): Array<Item<T>> {
+    if (this._needsSort) {
+      this._items = this._sortItems(this._read(), this._items);
+      this._needsSort = false;
+    }
     return this._items;
   }
 }
