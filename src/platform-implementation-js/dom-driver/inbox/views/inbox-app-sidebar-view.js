@@ -194,13 +194,6 @@ class InboxAppSidebarView {
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
-      .merge(
-        Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
-          .takeUntilBy(this._stopper)
-          .onValue(event => {
-            orderManager.removeItem(event.detail.groupId, event.detail.orderId);
-          })
-      )
       .onValue(event => {
         orderManager.addItem({
           groupId: event.detail.groupId,
@@ -216,12 +209,26 @@ class InboxAppSidebarView {
         });
         render();
       });
+    Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
+        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        orderManager.updateItemValueByIndex(index, {
+          id: event.detail.id,
+          title: event.detail.title,
+          iconClass: event.detail.iconClass,
+          iconUrl: event.detail.iconUrl,
+          el: event.target
+        });
+        render();
+      });
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        const orderItem = _.find(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
-        if (!orderItem) throw new Error('should not happen: failed to find orderItem');
-        orderManager.removeItem(orderItem.groupId, orderItem.id);
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
+        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
           this._setOpenedNow(false);
         }
