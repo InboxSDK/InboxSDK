@@ -158,7 +158,7 @@ export default class OrderManager<T> {
     const destinationPIx = findIndex(pdata.order, item => item.groupId === destination.groupId && item.id === destination.id);
     pdata = update(pdata, {order: {$splice: [
       [sourcePIx, 1],
-      [destinationPIx, 0, source]
+      [destinationPIx, 0, pdata.order[sourcePIx]]
     ]}});
     this._save(pdata);
     this._items = this._sortItems(pdata, this._items);
