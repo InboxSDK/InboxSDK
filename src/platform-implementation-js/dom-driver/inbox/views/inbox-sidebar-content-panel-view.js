@@ -35,7 +35,8 @@ class InboxSidebarContentPanelView {
           {
             bubbles: true, cancelable: false,
             detail: {
-              instanceId: this._instanceId, groupId: this._driver.getAppId(),
+              instanceId: this._instanceId,
+              appId: this._driver.getAppId(),
               id: String(id || title),
               title, iconUrl, iconClass,
               orderHint: typeof orderHint === 'number' ? orderHint : 0

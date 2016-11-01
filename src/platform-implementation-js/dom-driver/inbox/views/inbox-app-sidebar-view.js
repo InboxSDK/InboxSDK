@@ -196,11 +196,12 @@ class InboxAppSidebarView {
       .takeUntilBy(this._stopper)
       .onValue(event => {
         orderManager.addItem({
-          groupId: event.detail.groupId,
+          groupId: event.detail.appId,
           id: event.detail.id,
           orderHint: event.detail.orderHint,
           value: {
             id: event.detail.id,
+            appId: event.detail.appId,
             instanceId: event.detail.instanceId,
             title: event.detail.title,
             iconClass: event.detail.iconClass,
@@ -217,6 +218,7 @@ class InboxAppSidebarView {
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
           id: event.detail.id,
+          appId: event.detail.appId,
           instanceId: event.detail.instanceId,
           title: event.detail.title,
           iconClass: event.detail.iconClass,

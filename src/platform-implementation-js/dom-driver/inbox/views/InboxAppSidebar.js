@@ -1,5 +1,6 @@
 /* @flow */
 
+import _ from 'lodash';
 import cx from 'classnames';
 import React from 'react';
 import saveRefs from 'react-save-refs';
@@ -10,8 +11,20 @@ import idMap from '../../../lib/idMap';
 
 const springConfig = {stiffness: 400, damping: 50};
 
+type ExpansionSettings = {
+  apps: {[appId:string]: {
+    ids: {[id: string]: {
+      lastUse: number;
+      expanded: boolean;
+    }};
+  }};
+};
+
+const MAX_SIDEBAR_SETTINGS = 200;
+
 type PanelDescriptor = {
   instanceId: string;
+  appId: string;
   id: string;
   title: string;
   iconClass: ?string;
@@ -24,20 +37,96 @@ type Props = {
   onOutsideClick(): void;
   onMoveEnd(newList: PanelDescriptor[], item: PanelDescriptor, oldIndex: number, newIndex: number): void;
 };
+type State = {
+  expansionSettings: ExpansionSettings;
+};
 export default class InboxAppSidebar extends React.Component {
   props: Props;
+  state: State;
   _list: DraggableList;
   _main: HTMLElement;
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      expansionSettings: this._readExpansionSettings()
+    };
+  }
   scrollPanelIntoView(instanceId: string) {
     const panel: Panel = this._list.getItemInstance(instanceId);
     panel.scrollIntoView();
   }
-  shouldComponentUpdate(nextProps: Props) {
-    return this.props.panels !== nextProps.panels;
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return this.props.panels !== nextProps.panels ||
+      this.state.expansionSettings !== nextState.expansionSettings;
+  }
+  _readExpansionSettings(): ExpansionSettings {
+    let data;
+    try {
+      data = JSON.parse(localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
+    } catch (err) {
+      console.error('Failed to read sidebar settings', err);
+    }
+    if (data) return data;
+    return {apps: {}};
+  }
+  _saveExpansionSettings(data: ExpansionSettings) {
+    const allSidebarIds: [string,string] = _.flatMap(
+      Object.keys(data.apps),
+      appId => Object.keys(data.apps[appId].ids).map(id => [appId, id])
+    );
+    if (allSidebarIds.length > MAX_SIDEBAR_SETTINGS) {
+      const idsToRemove: [string,string] = _.chain(allSidebarIds)
+        .sortBy(([appId, id]) => data.apps[appId].ids[id].lastUse)
+        .take(allSidebarIds.length - MAX_SIDEBAR_SETTINGS)
+        .value();
+      idsToRemove.forEach(([appId, id]) => {
+        delete data.apps[appId].ids[id];
+        if (Object.keys(data.apps[appId].ids).length === 0) {
+          delete data.apps[appId];
+        }
+      });
+    }
+    try {
+      localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
+    } catch (err) {
+      console.error('Failed to save sidebar settings', err);
+    }
+  }
+  _expandedToggle(appId: string, id: string, expanded: boolean) {
+    // Operate on the latest value from localStorage
+    let expansionSettings = this._readExpansionSettings();
+    if (!Object.prototype.hasOwnProperty.call(expansionSettings.apps, appId)) {
+      expansionSettings.apps[appId] = {
+        ids: {}
+      };
+    }
+    const appSettings = expansionSettings.apps[appId];
+    appSettings.ids[id] = {
+      lastUse: Date.now(),
+      expanded
+    };
+    this.setState({expansionSettings});
+    this._saveExpansionSettings(expansionSettings);
   }
   render() {
+    const {expansionSettings} = this.state;
     const {panels, onClose, onOutsideClick, onMoveEnd} = this.props;
     const showControls = panels.length > 1;
+
+    const panelList = panels.map(panelDescriptor => {
+      const appExpansionSettings = Object.prototype.hasOwnProperty.call(expansionSettings.apps, panelDescriptor.appId) ?
+        expansionSettings.apps[panelDescriptor.appId] : null;
+      const panelExpansionSettings = appExpansionSettings ?
+        appExpansionSettings.ids[panelDescriptor.id] : null;
+      const expanded = panelExpansionSettings ? panelExpansionSettings.expanded : true;
+      return {
+        panelDescriptor, showControls, expanded,
+        onExpandedToggle: (expanded) => {
+          this._expandedToggle(panelDescriptor.appId, panelDescriptor.id, expanded);
+        }
+      };
+    });
+
     return (
       <div className={idMap('app_sidebar')}>
         <div
@@ -49,7 +138,7 @@ export default class InboxAppSidebar extends React.Component {
               ref={el => this._list = el}
               itemKey={x => x.panelDescriptor.instanceId}
               template={Panel}
-              list={panels.map(panelDescriptor => ({panelDescriptor, showControls}))}
+              list={panelList}
               onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
                 onMoveEnd(newList.map(x => x.panelDescriptor), movedItem.panelDescriptor, oldIndex, newIndex);
               }}
@@ -80,40 +169,34 @@ type PanelProps = {
   item: {
     panelDescriptor: PanelDescriptor;
     showControls: boolean;
+    expanded: boolean;
+    onExpandedToggle(expanded: boolean): void;
   };
   dragHandle: Function;
   itemSelected: number;
 };
-type PanelState = {
-  expanded: boolean;
-};
 class Panel extends React.Component {
   props: PanelProps;
   _el: HTMLElement;
-  state: PanelState = {
-    expanded: true
-  };
   scrollIntoView() {
     this._el.scrollIntoView();
   }
   getDragHeight() {
     return 16;
   }
-  shouldComponentUpdate(nextProps: PanelProps, nextState: PanelState) {
+  shouldComponentUpdate(nextProps: PanelProps) {
     return this.props.itemSelected !== nextProps.itemSelected ||
       this.props.item.panelDescriptor !== nextProps.item.panelDescriptor ||
       this.props.item.showControls !== nextProps.item.showControls ||
-      this.state.expanded !== nextState.expanded;
+      this.props.item.expanded !== nextProps.item.expanded;
   }
   render() {
     const {
       dragHandle, itemSelected, item: {
-        showControls, panelDescriptor: {title, iconClass, iconUrl, el}
+        panelDescriptor: {title, iconClass, iconUrl, el},
+        showControls, expanded, onExpandedToggle
       }
     } = this.props;
-    const toggleExpansion = event => {
-      this.setState({expanded: !this.state.expanded});
-    };
     const scale = itemSelected * 0.01 + 1;
     const shadow = itemSelected * 4;
 
@@ -121,7 +204,7 @@ class Panel extends React.Component {
       <div
         ref={el => this._el = el}
         className={cx(idMap('app_sidebar_content_panel'), {
-          [idMap('expanded')]: this.state.expanded,
+          [idMap('expanded')]: expanded,
           [idMap('showControls')]: showControls
         })}
         style={{
@@ -142,7 +225,7 @@ class Panel extends React.Component {
           )}
           <span
             className={idMap('app_sidebar_content_panel_toggle')}
-            onClick={toggleExpansion}
+            onClick={() => onExpandedToggle(!expanded)}
           >
             <button
               type="button"
@@ -151,7 +234,7 @@ class Panel extends React.Component {
           </span>
         </div>
         <SmoothCollapse
-          expanded={!showControls || this.state.expanded}
+          expanded={!showControls || expanded}
           heightTransition=".15s ease"
         >
           <PanelElement el={el} />
