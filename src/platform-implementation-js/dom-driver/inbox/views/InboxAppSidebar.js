@@ -11,6 +11,7 @@ import idMap from '../../../lib/idMap';
 const springConfig = {stiffness: 400, damping: 50};
 
 type PanelDescriptor = {
+  instanceId: string;
   id: string;
   title: string;
   iconClass: ?string;
@@ -27,8 +28,8 @@ export default class InboxAppSidebar extends React.Component {
   props: Props;
   _list: DraggableList;
   _main: HTMLElement;
-  scrollPanelIntoView(id: string) {
-    const panel: Panel = this._list.getItemInstance(id);
+  scrollPanelIntoView(instanceId: string) {
+    const panel: Panel = this._list.getItemInstance(instanceId);
     panel.scrollIntoView();
   }
   shouldComponentUpdate(nextProps: Props) {
@@ -46,7 +47,7 @@ export default class InboxAppSidebar extends React.Component {
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
               ref={el => this._list = el}
-              itemKey={x => x.panelDescriptor.id}
+              itemKey={x => x.panelDescriptor.instanceId}
               template={Panel}
               list={panels.map(panelDescriptor => ({panelDescriptor, showControls}))}
               onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {

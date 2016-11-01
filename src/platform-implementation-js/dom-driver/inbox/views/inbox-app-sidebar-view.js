@@ -197,10 +197,11 @@ class InboxAppSidebarView {
       .onValue(event => {
         orderManager.addItem({
           groupId: event.detail.groupId,
-          id: event.detail.orderId,
+          id: event.detail.id,
           orderHint: event.detail.orderHint,
           value: {
             id: event.detail.id,
+            instanceId: event.detail.instanceId,
             title: event.detail.title,
             iconClass: event.detail.iconClass,
             iconUrl: event.detail.iconUrl,
@@ -212,10 +213,11 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
           id: event.detail.id,
+          instanceId: event.detail.instanceId,
           title: event.detail.title,
           iconClass: event.detail.iconClass,
           iconUrl: event.detail.iconUrl,
@@ -226,7 +228,7 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
@@ -237,7 +239,7 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        component.scrollPanelIntoView(event.detail.id);
+        component.scrollPanelIntoView(event.detail.instanceId);
       });
   }
 

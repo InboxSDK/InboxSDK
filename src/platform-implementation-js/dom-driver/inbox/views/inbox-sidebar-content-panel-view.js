@@ -12,7 +12,10 @@ class InboxSidebarContentPanelView {
   _driver: Driver;
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
-  _id: string = `${Date.now()}-${Math.random()}`;
+
+  // This is not the `id` property passed by the application, but a random
+  // unique identifier used to manage a specific instance.
+  _instanceId: string = `${Date.now()}-${Math.random()}`;
 
   constructor(driver: Driver, descriptor: Kefir.Observable<Object>) {
     this._driver = driver;
@@ -23,7 +26,7 @@ class InboxSidebarContentPanelView {
     descriptor
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id: orderId} = descriptor;
+        const {el, iconUrl, iconClass, title, orderHint, id} = descriptor;
         if (!document.body.contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -32,8 +35,8 @@ class InboxSidebarContentPanelView {
           {
             bubbles: true, cancelable: false,
             detail: {
-              id: this._id, groupId: this._driver.getAppId(),
-              orderId: String(orderId || title),
+              instanceId: this._instanceId, groupId: this._driver.getAppId(),
+              id: String(id || title),
               title, iconUrl, iconClass,
               orderHint: typeof orderHint === 'number' ? orderHint : 0
             }
@@ -44,7 +47,7 @@ class InboxSidebarContentPanelView {
     this._stopper.onValue(() => {
       document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
-        detail: {id: this._id}
+        detail: {instanceId: this._instanceId}
       }));
     });
   }
@@ -60,7 +63,7 @@ class InboxSidebarContentPanelView {
   scrollIntoView() {
     document.body.dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
       bubbles: true, cancelable: false,
-      detail: {id: this._id}
+      detail: {instanceId: this._instanceId}
     }));
   }
 
