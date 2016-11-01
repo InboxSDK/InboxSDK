@@ -16,6 +16,7 @@ import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGon
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import appSidebarIcon from '../../../lib/appSidebarIcon';
+import OrderManager from '../../../lib/OrderManager';
 import idMap from '../../../lib/idMap';
 
 import type InboxDriver from '../inbox-driver';
@@ -148,13 +149,13 @@ class InboxAppSidebarView {
         }
       });
 
-    let panels = [];
+    const orderManager = new OrderManager('inboxsdk__sidebar_ordering');
     let component: InboxAppSidebar;
 
     const render = () => {
       component = (ReactDOM.render(
         <InboxAppSidebar
-          panels={panels}
+          panels={orderManager.getOrderedItems().map(x => x.value)}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);
             this._setOpenedNow(false);
@@ -162,8 +163,8 @@ class InboxAppSidebarView {
           onOutsideClick={() => {
             this._driver.closeOpenThread();
           }}
-          onMoveEnd={newList => {
-            panels = newList;
+          onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
+            orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
         />,
@@ -178,30 +179,24 @@ class InboxAppSidebarView {
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
+      .merge(
+        Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+          .takeUntilBy(this._stopper)
+          .onValue(event => {
+            orderManager.removeItem(event.detail.groupId, event.detail.orderId);
+          })
+      )
       .onValue(event => {
-        panels = panels.concat([{
-          id: event.detail.id,
-          title: event.detail.title,
-          iconClass: event.detail.iconClass,
-          iconUrl: event.detail.iconUrl,
-          el: event.target
-        }]);
-        render();
-      });
-    Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        panels = panels.map(panel => {
-          if (panel.id === event.detail.id) {
-            return {
-              id: event.detail.id,
-              title: event.detail.title,
-              iconClass: event.detail.iconClass,
-              iconUrl: event.detail.iconUrl,
-              el: event.target
-            }
-          } else {
-            return panel;
+        orderManager.addItem({
+          groupId: event.detail.groupId,
+          id: event.detail.orderId,
+          orderHint: event.detail.orderHint,
+          value: {
+            id: event.detail.id,
+            title: event.detail.title,
+            iconClass: event.detail.iconClass,
+            iconUrl: event.detail.iconUrl,
+            el: event.target
           }
         });
         render();
@@ -209,8 +204,10 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        panels = panels.filter(({id}) => event.detail.id !== id);
-        if (panels.length === 0) {
+        const orderItem = _.find(orderManager.getOrderedItems(), x => x.value.id === event.detail.id);
+        if (!orderItem) throw new Error('should not happen: failed to find orderItem');
+        orderManager.removeItem(orderItem.groupId, orderItem.id);
+        if (orderManager.getOrderedItems().length === 0) {
           this._setOpenedNow(false);
         }
         render();
@@ -259,7 +256,7 @@ class InboxAppSidebarView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const view = new InboxSidebarContentPanelView(descriptor);
+    const view = new InboxSidebarContentPanelView(this._driver, descriptor);
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||

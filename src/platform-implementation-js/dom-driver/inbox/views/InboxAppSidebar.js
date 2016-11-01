@@ -21,7 +21,7 @@ type Props = {
   panels: PanelDescriptor[];
   onClose(): void;
   onOutsideClick(): void;
-  onMoveEnd(newList: PanelDescriptor[]): void;
+  onMoveEnd(newList: PanelDescriptor[], item: PanelDescriptor, oldIndex: number, newIndex: number): void;
 };
 export default class InboxAppSidebar extends React.Component {
   props: Props;
@@ -49,8 +49,8 @@ export default class InboxAppSidebar extends React.Component {
               itemKey={x => x.panelDescriptor.id}
               template={Panel}
               list={panels.map(panelDescriptor => ({panelDescriptor, showControls}))}
-              onMoveEnd={newList => {
-                onMoveEnd(newList.map(x => x.panelDescriptor));
+              onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
+                onMoveEnd(newList.map(x => x.panelDescriptor), movedItem.panelDescriptor, oldIndex, newIndex);
               }}
               springConfig={springConfig}
               container={()=>this._main}

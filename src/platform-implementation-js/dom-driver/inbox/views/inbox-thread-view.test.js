@@ -12,7 +12,8 @@ import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
 function makeDriver(): Object {
   const _openOrOpeningStreamBus = kefirBus();
   const _addedPanels = [];
-  return {
+  const driver: Object = {
+    getAppId: ()=>'foo',
     getOpts: _.constant({
       appName: 'driver appName',
       appIconUrl: '/driver/appIconUrl.png'
@@ -27,7 +28,7 @@ function makeDriver(): Object {
           waitingPlatform.className = idMap('app_sidebar_waiting_platform');
           document.body.appendChild(waitingPlatform);
         }
-        const panel = new InboxSidebarContentPanelView(descriptor);
+        const panel = new InboxSidebarContentPanelView(driver, descriptor);
         _addedPanels.push(panel);
         return panel;
       },
@@ -37,6 +38,7 @@ function makeDriver(): Object {
       open: jest.fn()
     })
   };
+  return driver;
 }
 
 function makeElement(): {el: HTMLElement, parsed: Object} {
