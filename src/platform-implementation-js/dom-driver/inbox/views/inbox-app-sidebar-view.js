@@ -16,7 +16,7 @@ import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGon
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import appSidebarIcon from '../../../lib/appSidebarIcon';
-import OrderManager from '../../../lib/OrderManager';
+import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
 
 import type InboxDriver from '../inbox-driver';
@@ -149,7 +149,22 @@ class InboxAppSidebarView {
         }
       });
 
-    const orderManager = new OrderManager('inboxsdk__sidebar_ordering');
+    const orderManager = new OrderManager({
+      get() {
+        try {
+          return JSON.parse(localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+        } catch (err) {
+          console.error('failed to read sidebar order data', err);
+        }
+      },
+      set(data) {
+        try {
+          localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+        } catch (err) {
+          console.error('failed to set sidebar order data', err);
+        }
+      }
+    });
     let component: InboxAppSidebar;
 
     const render = () => {
