@@ -136,13 +136,17 @@ export default class OrderManager<T> {
     this._save(pdata);
     return pdata;
   }
-  _sortItems(pdata: PersistedData, items: Array<Item<T>>): Array<Item<T>> {
-    const idsToIndexes: {[id:string]: Array<number>} = invertBy(pdata.order, itemToCombinedId);
-    return sortBy(items, item => {
-      const id = itemToCombinedId(item);
-      return Object.prototype.hasOwnProperty.call(idsToIndexes, id) ?
-        idsToIndexes[id][0] : 0;
-    });
+  _sortItemsIfNecessary(pdata: ?PersistedData) {
+    if (this._needsSort) {
+      if (!pdata) pdata = this._read();
+      const idsToIndexes: {[id:string]: Array<number>} = invertBy(pdata.order, itemToCombinedId);
+      this._items = sortBy(this._items, item => {
+        const id = itemToCombinedId(item);
+        return Object.prototype.hasOwnProperty.call(idsToIndexes, id) ?
+          idsToIndexes[id][0] : 0;
+      });
+      this._needsSort = false;
+    }
   }
   addItem(item: Item<T>) {
     const pdata = this._updatePersistedDataWithItem(item);
@@ -154,6 +158,7 @@ export default class OrderManager<T> {
   }
   moveItem(sourceIndex: number, destinationIndex: number) {
     let pdata = this._read();
+    this._sortItemsIfNecessary(pdata);
     const source = this._items[sourceIndex];
     const destination = this._items[destinationIndex];
     const sourcePIx = findIndex(pdata.order, item => item.groupId === source.groupId && item.id === source.id);
@@ -166,10 +171,7 @@ export default class OrderManager<T> {
     this._needsSort = true;
   }
   getOrderedItems(): Array<Item<T>> {
-    if (this._needsSort) {
-      this._items = this._sortItems(this._read(), this._items);
-      this._needsSort = false;
-    }
+    this._sortItemsIfNecessary();
     return this._items;
   }
 }
