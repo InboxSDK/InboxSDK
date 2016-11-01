@@ -132,6 +132,29 @@ test('handles read fails of localStorage', () => {
   expect(console.error).toHaveBeenCalledTimes(1);
 });
 
+test('culls old entries from persisted data as it grows large', () => {
+  class LimitedMockStorage extends MockStorage {
+    setItem(k, v) {
+      expect(v.length).toBeLessThan(20000);
+      super.setItem(k, v);
+    }
+  }
+  const storage: Object = new LimitedMockStorage();
+  const o = new OrderManager('k', storage);
+  for (let i=4600; i<5000; i++) {
+    o.addItem({
+      groupId: 'blah',
+      id: `foo ${i}`,
+      orderHint: -i,
+      value: {v: `Foo ${i}`}
+    });
+    if (i >= 2) {
+      o.removeItem('blah', `foo ${i-2}`);
+    }
+  }
+  expect(o.getOrderedItems().map(x => x.id)).toEqual(['foo 4999', 'foo 4998']);
+});
+
 test('orderHint is not respected across groups, and picked order persists', () => {
   const orderedIdsOverMultipleRuns = times(10).map(i => {
     seed(`seed ${i}`, {global: true});

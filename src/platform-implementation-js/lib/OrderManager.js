@@ -26,6 +26,7 @@ export default class OrderManager<T> {
   _key: string;
   _items: Array<Item<T>> = [];
   _storage: Storage;
+  _MAX_ORDER_LENGTH = 200;
   constructor(key: string, storage: Storage=window.localStorage) {
     this._key = key;
     this._storage = storage;
@@ -42,6 +43,15 @@ export default class OrderManager<T> {
     return {order: []};
   }
   _save(pdata: PersistedData) {
+    if (pdata.order.length > this._MAX_ORDER_LENGTH) {
+      const itemsAndIndexes = pdata.order.map((item,index) => ({item, index}));
+      const indexesToRemove = sortBy(itemsAndIndexes, x => x.item.lastUse)
+        .slice(0, pdata.order.length - this._MAX_ORDER_LENGTH)
+        .map(x => x.index);
+      const sortedIndexesToRemove = sortBy(indexesToRemove, x => -x);
+      pdata = update(pdata, {order: {$splice: sortedIndexesToRemove.map(i => [i, 1])}});
+    }
+
     const str = JSON.stringify(pdata);
     try {
       this._storage.setItem(this._key, str);
