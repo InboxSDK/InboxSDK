@@ -751,10 +751,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   max-width: 220px;
 }
 
-.inboxsdk__contentPanelContainer_tabContainer > table {
-
-}
-
 .inboxsdk__contentPanelContainer_contentContainer {
   margin-bottom: 10px;
   border-bottom: 1px solid #D8D8D8;
