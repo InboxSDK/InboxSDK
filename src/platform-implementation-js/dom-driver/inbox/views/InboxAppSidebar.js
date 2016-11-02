@@ -31,6 +31,7 @@ type PanelDescriptor = {
   title: string;
   iconClass: ?string;
   iconUrl: ?string;
+  hideTitleBar: boolean;
   el: HTMLElement;
 };
 type Props = {
@@ -129,6 +130,8 @@ export default class InboxAppSidebar extends React.Component {
     const {panels, onClose, onOutsideClick, onMoveEnd} = this.props;
     const showControls = panels.length > 1;
 
+    const hideTitleBar = panels.length === 1 && panels[0].hideTitleBar;
+
     const panelList = panels.map(panelDescriptor => {
       const appExpansionSettings = Object.prototype.hasOwnProperty.call(expansionSettings.apps, panelDescriptor.appId) ?
         expansionSettings.apps[panelDescriptor.appId] : null;
@@ -144,7 +147,9 @@ export default class InboxAppSidebar extends React.Component {
     });
 
     return (
-      <div className={idMap('app_sidebar')}>
+      <div className={cx(idMap('app_sidebar'), {
+        [idMap('hideTitleBar')]: hideTitleBar
+      })}>
         <div
           className={idMap('app_sidebar_main')}
           ref={el => this._main = el}

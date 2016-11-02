@@ -214,6 +214,7 @@ class InboxAppSidebarView {
             title: event.detail.title,
             iconClass: event.detail.iconClass,
             iconUrl: event.detail.iconUrl,
+            hideTitleBar: event.detail.hideTitleBar,
             el: event.target
           }
         });
@@ -231,6 +232,7 @@ class InboxAppSidebarView {
           title: event.detail.title,
           iconClass: event.detail.iconClass,
           iconUrl: event.detail.iconUrl,
+          hideTitleBar: event.detail.hideTitleBar,
           el: event.target
         });
         render();

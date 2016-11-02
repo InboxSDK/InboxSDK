@@ -136,6 +136,10 @@
   cursor: move;
 }
 
+.IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_panel_top_line {
+  display: none;
+}
+
 .IDMAP_app_sidebar_content_panel_title_icon {
   display: inline-block;
   width: 25px;

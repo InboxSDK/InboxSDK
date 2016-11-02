@@ -116,6 +116,17 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 	id: null,
 
 	/**
+	 * Hide the title bar if this is the only sidebar panel attached to the thread.
+	 * If multiple panels are added (including panels from other extensions) then
+	 * the title bar will appear so that the user can adjust the panels with the
+	 * title bar controls.
+	 * ^optional
+	 * ^default=false
+	 * @type {boolean}
+	 */
+	hideTitleBar: null,
+
+	/**
 	 * If multiple content panels for your app are added then they will be ordered by this value.
 	 * ^optional
 	 * ^default=0
