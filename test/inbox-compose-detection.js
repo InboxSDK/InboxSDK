@@ -22,6 +22,7 @@ import {
   page20160629_2,
   page20160629_3,
   page20160818,
+  page20161102,
 } from './lib/pages';
 
 describe('Inbox Compose Detection', function() {
@@ -81,6 +82,14 @@ describe('Inbox Compose Detection', function() {
       const compose = page20160818().querySelector('[data-test-id=compose]');
 
       const results = finder(page20160818());
+      assert.strictEqual(results.length, 1);
+      assert(results.includes(compose));
+    });
+
+    it('2016-11-02 inline compose', function() {
+      const compose = page20161102().querySelector('[data-test-id=compose]');
+
+      const results = finder(page20161102());
       assert.strictEqual(results.length, 1);
       assert(results.includes(compose));
     });
@@ -161,6 +170,14 @@ describe('Inbox Compose Detection', function() {
 
     it('2016-08-18', function() {
       const compose = page20160818().querySelector('[data-test-id=compose]');
+      const results = parser(compose);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(results.attributes.isInline);
+    });
+
+    it('2016-11-02 inline compose', function() {
+      const compose = page20161102().querySelector('[data-test-id=compose]');
       const results = parser(compose);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -255,6 +272,21 @@ describe('Inbox Compose Detection', function() {
 
       const spy = sinon.spy();
       watcher(page20160818())
+        .takeUntilBy(Kefir.later(50))
+        .onValue(spy)
+        .onEnd(() => {
+          const results = spy.args.map(callArgs => callArgs[0].el);
+          assert.strictEqual(results.length, 1);
+          assert(_.includes(results, compose));
+          cb();
+        });
+    });
+
+    it('2016-11-02 inline compose', function(cb) {
+      const compose = page20161102().querySelector('[data-test-id=compose]');
+
+      const spy = sinon.spy();
+      watcher(page20161102())
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
