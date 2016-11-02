@@ -700,6 +700,10 @@ div.inboxsdk__compose_statusbar {
   width: 30px;
 }
 
+.inboxsdk__tab.IDMAP_hideTitleBar:first-child:last-child {
+  display: none;
+}
+
 .inboxsdk__tab.inboxsdk__tab_selected {
   width: auto;
 }
