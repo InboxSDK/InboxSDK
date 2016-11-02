@@ -2,6 +2,8 @@
 
 import _ from 'lodash';
 import cx from 'classnames';
+import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import saveRefs from 'react-save-refs';
 import DraggableList from 'react-draggable-list';
@@ -45,11 +47,25 @@ export default class InboxAppSidebar extends React.Component {
   state: State;
   _list: DraggableList;
   _main: HTMLElement;
+  _stopper = kefirStopper();
   constructor(props: Props) {
     super(props);
     this.state = {
       expansionSettings: this._readExpansionSettings()
     };
+  }
+  componentDidMount() {
+    Kefir.fromEvents(window, 'storage')
+      .filter(e => e.key === 'inboxsdk__sidebar_expansion_settings')
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this.setState({
+          expansionSettings: this._readExpansionSettings()
+        });
+      });
+  }
+  componentWillUnmount() {
+    this._stopper.destroy();
   }
   scrollPanelIntoView(instanceId: string) {
     const panel: Panel = this._list.getItemInstance(instanceId);
