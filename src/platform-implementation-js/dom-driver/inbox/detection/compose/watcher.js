@@ -23,13 +23,16 @@ export default function watcher(
     '*',
     '[jsvs]',
     {$map(el) {
-      const buttonEl = _.find(el.children, child => child.nodeName === 'BUTTON');
-      if (!buttonEl) {
-        Logger.error(new Error("inline compose button not found"), {
-          html: censorHTMLtree(el)
-        });
-      }
-      return buttonEl;
+      // <2016-11-02 support
+      const oldButton = _.find(el.children, child => child.nodeName === 'BUTTON');
+      if (oldButton) return oldButton;
+
+      const buttonEl = el.querySelector('div[jsaction="global.none"] > div[role=button]');
+      if (buttonEl) return (buttonEl.parentElement:any);
+
+      Logger.error(new Error("inline compose button not found"), {
+        html: censorHTMLtree(el)
+      });
     }},
     {$watch: {attributeFilter: ['style'], fn: el => el.style.display !== 'none'}},
     {$map: el => (el.parentElement:any)}

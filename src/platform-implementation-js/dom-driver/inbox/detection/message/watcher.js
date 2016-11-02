@@ -17,7 +17,8 @@ export default function watcher(
     '*',
     ':not([role=heading])',
     '[role=list]',
-    '[role=listitem][data-msg-id]'
+    'div',
+    {$watch: '[role=listitem][data-msg-id]'}
   ]);
 
   return openedThreads
