@@ -22,7 +22,11 @@ export default class GmailContentPanelView {
     contentPanelDescriptor
       .takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
       .map(x => x.el)
-      .onValue(el => {this._element.appendChild(el);});
+      .skipDuplicates()
+      .onValue(el => {
+        this._element.innerHTML = '';
+        this._element.appendChild(el);
+      });
   }
 
   destroy() {
