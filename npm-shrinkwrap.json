@@ -4444,9 +4444,9 @@
       "resolved": "https://registry.npmjs.org/orchestrator/-/orchestrator-0.3.7.tgz"
     },
     "order-manager": {
-      "version": "0.2.0",
-      "from": "order-manager@>=0.2.0 <0.3.0",
-      "resolved": "https://registry.npmjs.org/order-manager/-/order-manager-0.2.0.tgz"
+      "version": "1.0.0",
+      "from": "order-manager@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/order-manager/-/order-manager-1.0.0.tgz"
     },
     "ordered-read-streams": {
       "version": "0.1.0",

@@ -188,6 +188,14 @@ class InboxAppSidebarView {
     };
     render();
 
+    Kefir.fromEvents(window, 'storage')
+      .filter(e => e.key === 'inboxsdk__sidebar_ordering')
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        orderManager.reload();
+        render();
+      });
+
     this._stopper.onValue(() => {
       ReactDOM.unmountComponentAtNode(el);
     });
