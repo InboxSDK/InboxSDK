@@ -44,6 +44,10 @@ InboxSDK.load(1, 'sidebar-example', {
 
 			stream.push(options);
 
+			// just for testing at the dev console
+			contentPanel.__options = options;
+			contentPanel.__bus = stream;
+
 			contentPanel.on('activate', function(){
 				monkeyIndex = (monkeyIndex + 1)%2;
 				options.iconUrl = monkeyImages[monkeyIndex];

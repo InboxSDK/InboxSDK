@@ -16,6 +16,7 @@ import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGon
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import appSidebarIcon from '../../../lib/appSidebarIcon';
+import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
 
 import type InboxDriver from '../inbox-driver';
@@ -148,23 +149,52 @@ class InboxAppSidebarView {
         }
       });
 
-    let panels = [];
+    const orderManager = new OrderManager({
+      get() {
+        try {
+          return JSON.parse(localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+        } catch (err) {
+          console.error('failed to read sidebar order data', err);
+        }
+      },
+      set(data) {
+        try {
+          localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+        } catch (err) {
+          console.error('failed to set sidebar order data', err);
+        }
+      }
+    });
     let component: InboxAppSidebar;
 
     const render = () => {
       component = (ReactDOM.render(
         <InboxAppSidebar
-          content={Math.random()}
-          panels={panels}
+          panels={orderManager.getOrderedItems().map(x => x.value)}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);
             this._setOpenedNow(false);
+          }}
+          onOutsideClick={() => {
+            this._driver.closeOpenThread();
+          }}
+          onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
+            orderManager.moveItem(oldIndex, newIndex);
+            render();
           }}
         />,
         el
       ): any);
     };
     render();
+
+    Kefir.fromEvents(window, 'storage')
+      .filter(e => e.key === 'inboxsdk__sidebar_ordering')
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        orderManager.reload();
+        render();
+      });
 
     this._stopper.onValue(() => {
       ReactDOM.unmountComponentAtNode(el);
@@ -173,38 +203,45 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        panels = panels.concat([{
+        orderManager.addItem({
+          groupId: event.detail.appId,
           id: event.detail.id,
-          title: event.detail.title,
-          iconClass: event.detail.iconClass,
-          iconUrl: event.detail.iconUrl,
-          el: event.target
-        }]);
+          orderHint: event.detail.orderHint,
+          value: {
+            id: event.detail.id,
+            appId: event.detail.appId,
+            instanceId: event.detail.instanceId,
+            title: event.detail.title,
+            iconClass: event.detail.iconClass,
+            iconUrl: event.detail.iconUrl,
+            el: event.target
+          }
+        });
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        panels = panels.map(panel => {
-          if (panel.id === event.detail.id) {
-            return {
-              id: event.detail.id,
-              title: event.detail.title,
-              iconClass: event.detail.iconClass,
-              iconUrl: event.detail.iconUrl,
-              el: event.target
-            }
-          } else {
-            return panel;
-          }
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
+        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        orderManager.updateItemValueByIndex(index, {
+          id: event.detail.id,
+          appId: event.detail.appId,
+          instanceId: event.detail.instanceId,
+          title: event.detail.title,
+          iconClass: event.detail.iconClass,
+          iconUrl: event.detail.iconUrl,
+          el: event.target
         });
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        panels = panels.filter(({id}) => event.detail.id !== id);
-        if (panels.length === 0) {
+        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
+        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        orderManager.removeItemByIndex(index);
+        if (orderManager.getOrderedItems().length === 0) {
           this._setOpenedNow(false);
         }
         render();
@@ -212,7 +249,7 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        component.scrollPanelIntoView(event.detail.id);
+        component.scrollPanelIntoView(event.detail.instanceId);
       });
   }
 
@@ -253,7 +290,7 @@ class InboxAppSidebarView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const view = new InboxSidebarContentPanelView(descriptor);
+    const view = new InboxSidebarContentPanelView(this._driver, descriptor);
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||

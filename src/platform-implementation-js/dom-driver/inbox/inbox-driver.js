@@ -13,6 +13,7 @@ import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import simulateKey from '../../lib/dom/simulate-key';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -56,6 +57,7 @@ import type {Driver} from '../../driver-interfaces/driver';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 
 class InboxDriver {
+  _appId: string;
   _logger: Logger;
   _opts: PiOpts;
   _envData: EnvData;
@@ -86,6 +88,7 @@ class InboxDriver {
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
     (this: Driver); // interface check
     customStyle();
+    this._appId = appId;
     this._logger = logger;
     this._opts = opts;
     this._envData = envData;
@@ -210,6 +213,9 @@ class InboxDriver {
     this._stopper.destroy();
   }
 
+  getAppId() {
+    return this._appId;
+  }
   getOpts(): PiOpts {return this._opts;}
   getLogger(): Logger {return this._logger;}
   getStopper(): Kefir.Observable<null> {return this._stopper;}
@@ -382,6 +388,10 @@ class InboxDriver {
 
   createBackdrop(zIndex, target) {
     return new InboxBackdrop(zIndex, target);
+  }
+
+  closeOpenThread() {
+    simulateKey(document.body, 27, 27);
   }
 }
 

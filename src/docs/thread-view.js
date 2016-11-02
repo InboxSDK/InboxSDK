@@ -107,6 +107,15 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 	appIconUrl: null,
 
 	/**
+	 * A string can be passed to identify this panel so that user preferences
+	 * specific to this panel may be saved. If this property is not present, then
+	 * the title will be used as the id.
+	 * ^optional
+	 * @type {string}
+	 */
+	id: null,
+
+	/**
 	 * If multiple content panels for your app are added then they will be ordered by this value.
 	 * ^optional
 	 * ^default=0

@@ -36,6 +36,7 @@ export type DrawerViewDriver = InboxDrawerView;
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
+	getAppId(): string;
 	getRouteViewDriverStream(): Kefir.Observable<RouteViewDriver>; // should be a property
 	getRowListViewDriverStream(): Kefir.Observable<Object>;
 	openComposeWindow(): void;
