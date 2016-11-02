@@ -107,9 +107,9 @@ var ContentPanelDescriptor = /** @lends ContentPanelDescriptor */ {
 	appIconUrl: null,
 
 	/**
-	 * (Currently Inbox-only) A string can be passed to identify this panel so that
-	 * user preferences specific to this panel may be saved. If this property is not
-	 * present, then the title will be used as the id.
+	 * A string can be passed to identify this panel so that user preferences
+	 * specific to this panel may be saved. If this property is not present, then
+	 * the title will be used as the id.
 	 * ^optional
 	 * @type {string}
 	 */
