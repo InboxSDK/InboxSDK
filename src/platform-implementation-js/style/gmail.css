@@ -756,6 +756,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 .inboxsdk__contentPanelContainer_contentContainer {
+  overflow: hidden;
   margin-bottom: 10px;
   border-bottom: 1px solid #D8D8D8;
 }
