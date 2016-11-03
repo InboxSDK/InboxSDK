@@ -23,8 +23,6 @@ element is matched. Each SelectorOperator transforms the matched set of
 elements sequentially.
 */
 
-/*:: // comment needed until Babel supports {| ... |} syntax
-
 export type SelectorOperator =
   string
   // The children operator: this will change the matched set to contain only
@@ -58,8 +56,6 @@ export type SelectorOperator =
   // The $log operator uses `console.log` to log every element in the matched
   // set to the console with a given string prefix.
 ;
-
-*/
 
 export type Selector = Array<SelectorOperator>;
 
