@@ -205,6 +205,36 @@ class Panel extends React.Component {
   getDragHeight() {
     return 16;
   }
+  componentDidMount() {
+    const expanded = !this.props.item.showControls || this.props.item.expanded;
+    if (expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelActivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    }
+  }
+  componentDidUpdate(prevProps: PanelProps) {
+    const prevExpanded = !prevProps.item.showControls || prevProps.item.expanded;
+    const expanded = !this.props.item.showControls || this.props.item.expanded;
+    if (!prevExpanded && expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelActivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    } else if (prevExpanded && !expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelDeactivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    }
+  }
   shouldComponentUpdate(nextProps: PanelProps) {
     return this.props.itemSelected !== nextProps.itemSelected ||
       this.props.item.panelDescriptor !== nextProps.item.panelDescriptor ||

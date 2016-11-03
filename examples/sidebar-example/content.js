@@ -54,6 +54,10 @@ InboxSDK.load(1, 'sidebar-example', {
 				stream.push(options);
 			});
 
+			contentPanel.on('deactivate', function(){
+				console.log('contentPanel deactivate');
+			});
+
 			contentPanel.on('destroy', function(){
 				console.log('destroy');
 			});

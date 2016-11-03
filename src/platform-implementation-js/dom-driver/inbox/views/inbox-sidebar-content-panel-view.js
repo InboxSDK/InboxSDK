@@ -21,6 +21,17 @@ class InboxSidebarContentPanelView {
     this._driver = driver;
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
+    this._eventStream.plug(
+      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
+        .filter(e => e.detail.instanceId === this._instanceId)
+        .map(() => ({eventName: 'activate'}))
+    );
+    this._eventStream.plug(
+      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelDeactivated')
+        .filter(e => e.detail.instanceId === this._instanceId)
+        .map(() => ({eventName: 'deactivate'}))
+    );
+
     let hasPlacedAlready = false;
     const waitingPlatform = document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'));
     descriptor
