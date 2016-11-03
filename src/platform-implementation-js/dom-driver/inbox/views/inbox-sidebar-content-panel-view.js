@@ -26,7 +26,7 @@ class InboxSidebarContentPanelView {
     descriptor
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id} = descriptor;
+        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar} = descriptor;
         if (!document.body.contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -39,6 +39,7 @@ class InboxSidebarContentPanelView {
               appId: this._driver.getAppId(),
               id: String(id || title),
               title, iconUrl, iconClass,
+              hideTitleBar: Boolean(hideTitleBar),
               orderHint: typeof orderHint === 'number' ? orderHint : 0
             }
           }

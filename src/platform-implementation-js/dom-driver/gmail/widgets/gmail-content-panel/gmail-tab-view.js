@@ -4,6 +4,7 @@ import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
+import idMap from '../../../../lib/idMap';
 
 const TAB_COLOR_CLASSES = [
   "aIf-aLe",
@@ -98,6 +99,12 @@ export default class GmailTabView {
     this._updateOrderHint(descriptor.orderHint);
     this._updateIconClass(descriptor.iconClass);
     this._updateIconUrl(descriptor.iconUrl);
+
+    if (descriptor.hideTitleBar) {
+      this._element.classList.add(idMap('hideTitleBar'));
+    } else {
+      this._element.classList.remove(idMap('hideTitleBar'));
+    }
 
     this._lastDescriptorValue = descriptor;
   }
