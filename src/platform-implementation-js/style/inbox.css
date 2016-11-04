@@ -98,7 +98,7 @@
 }
 
 .IDMAP_app_sidebar_content_area {
-  padding: 16px 8px;
+  padding: 12px 8px;
 }
 
 .IDMAP_app_sidebar_content_area_padding {
@@ -107,16 +107,14 @@
 }
 
 .IDMAP_app_sidebar_content_panel {
-  padding-bottom: 5px;
-  border-bottom: 1px solid #ddd;
   overflow: hidden;
   font: 12px Arial, sans-serif;
   max-height: 100%;
+  box-sizing: border-box;
   background: #f2f2f2;
 }
 
 .IDMAP_app_sidebar_content_panel_top_line {
-  font: 13px / 15px arial, sans-serif;
   white-space: nowrap;
   display: -webkit-flex;
   display: flex;
@@ -124,6 +122,10 @@
   -webkit-user-select: none;
   user-select: none;
   cursor: default;
+}
+
+.IDMAP_app_sidebar_content_panel_top_line:hover {
+  background: rgba(0,0,0,.03);
 }
 
 .IDMAP_app_sidebar_content_panel_title {
@@ -136,22 +138,27 @@
   cursor: move;
 }
 
+.IDMAP_app_sidebar_content_panel_title_text {
+  padding-left: 20px;
+  vertical-align: middle;
+  font: 13px / 40px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #303030;
+}
+
 .IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_panel_top_line {
   display: none;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon {
   display: inline-block;
-  width: 25px;
-  height: 25px;
-  vertical-align: top;
-  padding-left: 5px;
+  vertical-align: middle;
+  padding-left: 10px;
   box-sizing: border-box;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon > img {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 
 .IDMAP_app_sidebar_content_panel_toggle {
@@ -167,12 +174,12 @@
 }
 
 .IDMAP_app_sidebar_content_panel_toggle_button {
-  margin-top: 2px;
-  margin-right: 1px;
+  margin-top: 12px;
+  margin-right: 4px;
   background: url(https://www.streak.com/build/images/chevron.png) center / contain no-repeat;
   border: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   -webkit-transform: rotate(0);
   transform: rotate(0);
   transition: -webkit-transform .15s, transform .15s;
@@ -184,6 +191,10 @@
 .IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
+}
+
+.IDMAP_app_sidebar_content_panel_content {
+  border-bottom: 1px solid #ddd;
 }
 
 .IDMAP_sidebar_iconArea {

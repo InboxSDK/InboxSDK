@@ -156,6 +156,7 @@ export default class AppSidebar extends React.Component {
         >
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
+              padding={0}
               ref={el => this._list = el}
               itemKey={x => x.panelDescriptor.instanceId}
               template={Panel}
@@ -203,7 +204,7 @@ class Panel extends React.Component {
     this._el.scrollIntoView();
   }
   getDragHeight() {
-    return 16;
+    return 40;
   }
   componentDidMount() {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
