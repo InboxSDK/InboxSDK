@@ -18,6 +18,7 @@ import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import appSidebarIcon from '../../../lib/appSidebarIcon';
 import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
+import incrementName from '../../../lib/incrementName';
 
 import type InboxDriver from '../inbox-driver';
 import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
@@ -149,6 +150,7 @@ class InboxAppSidebarView {
         }
       });
 
+    const currentIds = new Set();
     const orderManager = new OrderManager({
       get() {
         try {
@@ -203,12 +205,17 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
+        let id = event.detail.id;
+        while (currentIds.has(id)) {
+          id = incrementName(id);
+        }
+        currentIds.add(id);
         orderManager.addItem({
           groupId: event.detail.appId,
-          id: event.detail.id,
+          id,
           orderHint: event.detail.orderHint,
           value: {
-            id: event.detail.id,
+            id,
             appId: event.detail.appId,
             instanceId: event.detail.instanceId,
             title: event.detail.title,
@@ -223,10 +230,11 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
+        const orderedItems = orderManager.getOrderedItems();
+        const index = _.findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
-          id: event.detail.id,
+          id: orderedItems[index].value.id,
           appId: event.detail.appId,
           instanceId: event.detail.instanceId,
           title: event.detail.title,
@@ -240,8 +248,10 @@ class InboxAppSidebarView {
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        const index = _.findIndex(orderManager.getOrderedItems(), x => x.value.instanceId === event.detail.instanceId);
+        const orderedItems = orderManager.getOrderedItems();
+        const index = _.findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        currentIds.delete(orderedItems[index].id);
         orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
           this._setOpenedNow(false);
