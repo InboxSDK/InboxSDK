@@ -5,6 +5,7 @@ import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import delayAsap from '../../../lib/delay-asap';
 import type {Driver} from '../../../driver-interfaces/driver';
 import idMap from '../../../lib/idMap';
 
@@ -25,24 +26,33 @@ class InboxSidebarContentPanelView {
       Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => ({eventName: 'activate'}))
+        .flatMap(delayAsap)
     );
     this._eventStream.plug(
       Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelDeactivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => ({eventName: 'deactivate'}))
+        .flatMap(delayAsap)
     );
+
+    // Attach a value-listener so that it immediately subscribes and the
+    // property retains its value.
+    const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
     const waitingPlatform = document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'));
     descriptor
+      .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar} = descriptor;
         if (!document.body.contains(el)) {
           waitingPlatform.appendChild(el);
         }
+        const eventName = hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel';
+        hasPlacedAlready = true;
         el.dispatchEvent(new CustomEvent(
-          hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel',
+          eventName,
           {
             bubbles: true, cancelable: false,
             detail: {
@@ -55,7 +65,6 @@ class InboxSidebarContentPanelView {
             }
           }
         ));
-        hasPlacedAlready = true;
       });
     this._stopper.onValue(() => {
       document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
