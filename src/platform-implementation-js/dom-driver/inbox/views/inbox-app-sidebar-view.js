@@ -7,7 +7,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import InboxAppSidebar from './InboxAppSidebar';
+import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../../common/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
@@ -167,11 +167,11 @@ class InboxAppSidebarView {
         }
       }
     });
-    let component: InboxAppSidebar;
+    let component: AppSidebar;
 
     const render = () => {
       component = (ReactDOM.render(
-        <InboxAppSidebar
+        <AppSidebar
           panels={orderManager.getOrderedItems().map(x => x.value)}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);

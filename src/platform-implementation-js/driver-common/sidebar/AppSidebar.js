@@ -8,8 +8,8 @@ import React from 'react';
 import saveRefs from 'react-save-refs';
 import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
-import get from '../../../../common/get-or-fail';
-import idMap from '../../../lib/idMap';
+import get from '../../../common/get-or-fail';
+import idMap from '../../lib/idMap';
 
 const springConfig = {stiffness: 400, damping: 50};
 
@@ -43,7 +43,7 @@ type Props = {
 type State = {
   expansionSettings: ExpansionSettings;
 };
-export default class InboxAppSidebar extends React.Component {
+export default class AppSidebar extends React.Component {
   props: Props;
   state: State;
   _list: DraggableList;
