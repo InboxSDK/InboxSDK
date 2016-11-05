@@ -124,7 +124,7 @@
   cursor: default;
 }
 
-.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover {
   background: rgba(0,0,0,.03);
 }
 
@@ -134,7 +134,7 @@
   text-overflow: ellipsis;
 }
 
-.IDMAP_showControls .IDMAP_app_sidebar_content_panel_title {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_title {
   cursor: move;
 }
 
@@ -168,7 +168,7 @@
   visibility: hidden;
 }
 
-.IDMAP_showControls .IDMAP_app_sidebar_content_panel_toggle {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_toggle {
   visibility: visible;
   cursor: pointer;
 }
