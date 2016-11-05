@@ -256,6 +256,7 @@ class Panel extends React.Component {
       <div
         ref={el => this._el = el}
         className={cx(idMap('app_sidebar_content_panel'), {
+          [idMap('dragged')]: itemSelected > 0.2,
           [idMap('expanded')]: expanded,
           [idMap('showControls')]: showControls
         })}
