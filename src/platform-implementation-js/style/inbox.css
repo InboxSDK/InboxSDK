@@ -124,7 +124,7 @@
   cursor: default;
 }
 
-.IDMAP_app_sidebar_content_panel_top_line:hover {
+.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover {
   background: rgba(0,0,0,.03);
 }
 
