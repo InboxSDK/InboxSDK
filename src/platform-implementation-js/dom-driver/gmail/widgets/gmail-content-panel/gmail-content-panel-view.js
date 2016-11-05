@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -42,16 +43,20 @@ export default class GmailContentPanelView {
   getElement(): HTMLElement {return this._element;}
 
   activate() {
-    this._eventStream.emit({
-      eventName: 'activate'
+    asap(() => {
+      this._eventStream.emit({
+        eventName: 'activate'
+      });
     });
   }
 
   deactivate() {
-    this._eventStream.emit({
-      eventName: 'deactivate'
+    asap(() => {
+      this._eventStream.emit({
+        eventName: 'deactivate'
+      });
+      (this._element:any).remove();
     });
-    (this._element:any).remove();
   }
 
   remove() {

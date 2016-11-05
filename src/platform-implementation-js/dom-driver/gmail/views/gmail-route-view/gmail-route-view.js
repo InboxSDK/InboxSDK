@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import once from 'lodash/once';
@@ -43,7 +42,6 @@ class GmailRouteView {
 	_customViewElement: ?HTMLElement;
 	_threadView: ?GmailThreadView;
 	_sectionsContainer: ?HTMLElement;
-	_pageCommunicator: ?GmailPageCommunicator;
 
 	constructor({urlObject, type, routeID}: Object, gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver) {
 		// Check we implement interface
@@ -108,10 +106,6 @@ class GmailRouteView {
 	getCustomViewElement(): ?HTMLElement {return this._customViewElement;}
 	getRowListViews(): GmailRowListView[] {return this._rowListViews;}
 	getThreadView(): ?GmailThreadView {return this._threadView;}
-
-	setPageCommunicator(pc: GmailPageCommunicator) {
-		this._pageCommunicator = pc;
-	}
 
 	getType(): string {
 		if (this._type === 'OTHER_APP_CUSTOM') {
@@ -412,7 +406,7 @@ class GmailRouteView {
 
 	_getThreadRouteParams(): Object {
 		if(this._paramsArray && this._paramsArray.length > 0){
-			var threadID = _.last(this._paramsArray);
+			const threadID = _.last(this._paramsArray);
 
 			if(threadID && threadID.length === 16){
 				return {
@@ -421,11 +415,10 @@ class GmailRouteView {
 			}
 		}
 
-		var threadContainerElement = this._getThreadContainerElement();
+		const threadContainerElement = this._getThreadContainerElement();
 
-		if (!this._pageCommunicator) throw new Error("Missing page communicator");
 		return {
-			threadID: threadContainerElement ? this._pageCommunicator.getCurrentThreadID(threadContainerElement) : ''
+			threadID: threadContainerElement ? this._driver.getPageCommunicator().getCurrentThreadID(threadContainerElement) : ''
 		};
 	}
 

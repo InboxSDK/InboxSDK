@@ -1,5 +1,4 @@
 /* @flow */
-// jshint ignore:start
 
 import asap from 'asap';
 import _ from 'lodash';
@@ -26,7 +25,6 @@ class GmailThreadView {
 	_sidebarContentPanelContainerView: any;
 	_toolbarView: any;
 	_messageViewDrivers: any[];
-	_pageCommunicator: any;
 	_newMessageMutationObserver: ?MutationObserver;
 	_threadID: ?string;
 
@@ -69,10 +67,6 @@ class GmailThreadView {
 		}
 	}
 
-	setPageCommunicator(pc: any) {
-		this._pageCommunicator = pc;
-	}
-
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
 		if(!this._sidebarContentPanelContainerView){
 			var sidebarElement = GmailElementGetter.getSidebarContainerElement();
@@ -105,7 +99,7 @@ class GmailThreadView {
 		}
 
 		if(this._isPreviewedThread){
-			this._threadID = this._pageCommunicator.getCurrentThreadID(this._element, true);
+			this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
 		}
 		else{
 			var params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
@@ -114,7 +108,7 @@ class GmailThreadView {
 				this._threadID = params.threadID;
 			}
 			else{
-				this._threadID = this._pageCommunicator.getCurrentThreadID(this._element);
+				this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element);
 			}
 		}
 

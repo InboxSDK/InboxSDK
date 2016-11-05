@@ -8,8 +8,8 @@ import React from 'react';
 import saveRefs from 'react-save-refs';
 import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
-import get from '../../../../common/get-or-fail';
-import idMap from '../../../lib/idMap';
+import get from '../../../common/get-or-fail';
+import idMap from '../../lib/idMap';
 
 const springConfig = {stiffness: 400, damping: 50};
 
@@ -43,7 +43,7 @@ type Props = {
 type State = {
   expansionSettings: ExpansionSettings;
 };
-export default class InboxAppSidebar extends React.Component {
+export default class AppSidebar extends React.Component {
   props: Props;
   state: State;
   _list: DraggableList;
@@ -156,6 +156,7 @@ export default class InboxAppSidebar extends React.Component {
         >
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
+              padding={0}
               ref={el => this._list = el}
               itemKey={x => x.panelDescriptor.instanceId}
               template={Panel}
@@ -203,7 +204,37 @@ class Panel extends React.Component {
     this._el.scrollIntoView();
   }
   getDragHeight() {
-    return 16;
+    return 40;
+  }
+  componentDidMount() {
+    const expanded = !this.props.item.showControls || this.props.item.expanded;
+    if (expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelActivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    }
+  }
+  componentDidUpdate(prevProps: PanelProps) {
+    const prevExpanded = !prevProps.item.showControls || prevProps.item.expanded;
+    const expanded = !this.props.item.showControls || this.props.item.expanded;
+    if (!prevExpanded && expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelActivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    } else if (prevExpanded && !expanded) {
+      document.body.dispatchEvent(
+        new CustomEvent('inboxsdkSidebarPanelDeactivated', {
+          bubbles: true, cancelable: false,
+          detail: {instanceId: this.props.item.panelDescriptor.instanceId}
+        })
+      );
+    }
   }
   shouldComponentUpdate(nextProps: PanelProps) {
     return this.props.itemSelected !== nextProps.itemSelected ||
@@ -225,6 +256,7 @@ class Panel extends React.Component {
       <div
         ref={el => this._el = el}
         className={cx(idMap('app_sidebar_content_panel'), {
+          [idMap('dragged')]: itemSelected > 0.2,
           [idMap('expanded')]: expanded,
           [idMap('showControls')]: showControls
         })}

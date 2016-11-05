@@ -357,21 +357,12 @@ class GmailDriver {
 			this._timestampAccountSwitcherReady = Date.now();
 			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
-			).map(routeViewDriver => {
-				routeViewDriver.setPageCommunicator(this._pageCommunicator);
-				return routeViewDriver;
-			}).takeUntilBy(this._stopper).toProperty();
+			).takeUntilBy(this._stopper).toProperty();
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntilBy(this._stopper);
 
 			this._setupThreadRowViewDriverKefirStream();
-			this._threadViewDriverStream =
-				this._setupRouteSubViewDriver('newGmailThreadView')
-						.map(gmailThreadView => {
-							gmailThreadView.setPageCommunicator(this._pageCommunicator);
-							return gmailThreadView;
-						})
-						.takeUntilBy(this._stopper);
+			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView').takeUntilBy(this._stopper);
 
 			this._setupToolbarViewDriverStream();
 			this._setupMessageViewDriverStream();
