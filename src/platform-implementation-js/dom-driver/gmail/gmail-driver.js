@@ -137,6 +137,10 @@ class GmailDriver {
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
 			trackGmailStyles();
 		});
+
+		if (opts.sidebarBeta && !document.body.hasAttribute('data-inboxsdk-sidebar-beta')) {
+			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'true');
+		}
 	}
 
 	destroy() {

@@ -56,6 +56,7 @@ export type PiOpts = {
 	globalErrorLogging: boolean;
 	eventTracking: boolean;
 	inboxBeta: boolean;
+	sidebarBeta: boolean;
 	REQUESTED_API_VERSION: number;
 };
 
@@ -148,6 +149,7 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 		// defaults
 		globalErrorLogging: true, eventTracking: true,
 		inboxBeta: false,
+		sidebarBeta: false,
 		..._opts
 	};
 

@@ -68,19 +68,24 @@ class GmailThreadView {
 	}
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
-		if(!this._sidebarContentPanelContainerView){
-			var sidebarElement = GmailElementGetter.getSidebarContainerElement();
+		if (document.body.getAttribute('data-inboxsdk-sidebar-beta') === 'true') {
+			throw new Error('sidebar beta not implemented yet');
+		} else {
+			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'false');
+			if(!this._sidebarContentPanelContainerView){
+				const sidebarElement = GmailElementGetter.getSidebarContainerElement();
 
-			if(!sidebarElement){
-				console.warn('This view does not have a sidebar');
-				return;
+				if(!sidebarElement){
+					this._driver.getLogger().error(new Error('This view does not have a sidebar'));
+					return;
+				}
+				else{
+					this._setupSidebarView(sidebarElement);
+				}
 			}
-			else{
-				this._setupSidebarView(sidebarElement);
-			}
+
+			return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
 		}
-
-		return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
 	}
 
 	getSubject(): string {
