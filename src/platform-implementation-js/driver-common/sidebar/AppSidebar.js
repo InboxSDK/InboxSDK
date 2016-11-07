@@ -36,8 +36,8 @@ type PanelDescriptor = {
 };
 type Props = {
   panels: PanelDescriptor[];
-  onClose(): void;
-  onOutsideClick(): void;
+  onClose?: () => void;
+  onOutsideClick?: () => void;
   onMoveEnd(newList: PanelDescriptor[], item: PanelDescriptor, oldIndex: number, newIndex: number): void;
 };
 type State = {
@@ -168,20 +168,24 @@ export default class AppSidebar extends React.Component {
               container={()=>this._main}
             />
           </div>
-          <div
-            className={idMap('app_sidebar_content_area_padding')}
-            onClick={event => {
-              event.preventDefault();
-              onOutsideClick();
-            }}
-          />
+          {onOutsideClick &&
+            <div
+              className={idMap('app_sidebar_content_area_padding')}
+              onClick={event => {
+                event.preventDefault();
+                onOutsideClick();
+              }}
+            />
+          }
         </div>
-        <button
-          className="inboxsdk__close_button"
-          type="button"
-          title="Close"
-          onClick={onClose}
-        />
+        {onClose &&
+          <button
+            className="inboxsdk__close_button"
+            type="button"
+            title="Close"
+            onClick={onClose}
+          />
+        }
       </div>
     );
   }
