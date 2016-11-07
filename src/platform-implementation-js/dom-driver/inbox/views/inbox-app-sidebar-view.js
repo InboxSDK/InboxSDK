@@ -7,7 +7,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../../common/find-parent';
 import getChatSidebarClassname from '../getChatSidebarClassname';
@@ -15,13 +14,13 @@ import delayAsap from '../../../lib/delay-asap';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
-import appSidebarIcon from '../../../lib/appSidebarIcon';
 import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
 import incrementName from '../../../lib/incrementName';
-
 import type InboxDriver from '../inbox-driver';
-import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
+
+import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
+import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 
 class InboxAppSidebarView {
   _stopper = kefirStopper();
@@ -302,7 +301,7 @@ class InboxAppSidebarView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const view = new InboxSidebarContentPanelView(this._driver, descriptor);
+    const view = new ContentPanelViewDriver(this._driver, descriptor);
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||

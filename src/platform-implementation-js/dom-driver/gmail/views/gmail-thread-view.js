@@ -22,7 +22,7 @@ class GmailThreadView {
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
 	_eventStream: Bus<any>;
-	_sidebarContentPanelContainerView: any;
+	_sidebarContentPanelContainerView: GmailContentPanelContainerView;
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_newMessageMutationObserver: ?MutationObserver;

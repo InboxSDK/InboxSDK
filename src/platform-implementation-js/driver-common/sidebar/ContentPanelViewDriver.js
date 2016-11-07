@@ -5,11 +5,11 @@ import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-import delayAsap from '../../../lib/delay-asap';
-import type {Driver} from '../../../driver-interfaces/driver';
-import idMap from '../../../lib/idMap';
+import delayAsap from '../../lib/delay-asap';
+import type {Driver} from '../../driver-interfaces/driver';
+import idMap from '../../lib/idMap';
 
-class InboxSidebarContentPanelView {
+class ContentPanelViewDriver {
   _driver: Driver;
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
@@ -94,4 +94,4 @@ class InboxSidebarContentPanelView {
   }
 }
 
-export default defn(module, InboxSidebarContentPanelView);
+export default defn(module, ContentPanelViewDriver);
