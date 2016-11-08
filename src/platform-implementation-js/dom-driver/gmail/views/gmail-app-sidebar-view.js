@@ -79,6 +79,9 @@ class GmailAppSidebarView {
       document.body.appendChild(waitingPlatform);
     }
 
+    const containerEl = findParent(this._sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
+    const container = containerEl ? (() => containerEl) : undefined;
+
     const currentIds = new Set();
     const orderManager = new OrderManager({
       get() {
@@ -106,6 +109,7 @@ class GmailAppSidebarView {
             orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
+          container={container}
         />,
         el
       ): any);

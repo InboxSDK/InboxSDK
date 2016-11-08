@@ -39,6 +39,7 @@ type Props = {
   onClose?: () => void;
   onOutsideClick?: () => void;
   onMoveEnd(newList: PanelDescriptor[], item: PanelDescriptor, oldIndex: number, newIndex: number): void;
+  container?: () => HTMLElement;
 };
 type State = {
   expansionSettings: ExpansionSettings;
@@ -127,7 +128,7 @@ export default class AppSidebar extends React.Component {
   }
   render() {
     const {expansionSettings} = this.state;
-    const {panels, onClose, onOutsideClick, onMoveEnd} = this.props;
+    const {panels, onClose, onOutsideClick, onMoveEnd, container} = this.props;
     const showControls = panels.length > 1;
 
     const hideTitleBar = panels.length === 1 && panels[0].hideTitleBar;
@@ -165,7 +166,7 @@ export default class AppSidebar extends React.Component {
                 onMoveEnd(newList.map(x => x.panelDescriptor), movedItem.panelDescriptor, oldIndex, newIndex);
               }}
               springConfig={springConfig}
-              container={()=>this._main}
+              container={container || (()=>this._main)}
             />
           </div>
           {onOutsideClick &&
