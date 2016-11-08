@@ -3506,23 +3506,6 @@
       "from": "istanbul-reports@>=1.0.0-alpha <2.0.0",
       "resolved": "https://registry.npmjs.org/istanbul-reports/-/istanbul-reports-1.0.0.tgz"
     },
-    "jade": {
-      "version": "0.26.3",
-      "from": "jade@0.26.3",
-      "resolved": "https://registry.npmjs.org/jade/-/jade-0.26.3.tgz",
-      "dependencies": {
-        "commander": {
-          "version": "0.6.1",
-          "from": "commander@0.6.1",
-          "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
-        },
-        "mkdirp": {
-          "version": "0.3.0",
-          "from": "mkdirp@0.3.0",
-          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.0.tgz"
-        }
-      }
-    },
     "jasmine-check": {
       "version": "0.1.5",
       "from": "jasmine-check@>=0.1.4 <0.2.0",
@@ -5984,11 +5967,6 @@
       "from": "to-fast-properties@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/to-fast-properties/-/to-fast-properties-1.0.2.tgz"
     },
-    "to-iso-string": {
-      "version": "0.0.2",
-      "from": "to-iso-string@0.0.2",
-      "resolved": "https://registry.npmjs.org/to-iso-string/-/to-iso-string-0.0.2.tgz"
-    },
     "tough-cookie": {
       "version": "2.3.2",
       "from": "tough-cookie@>=2.3.1 <3.0.0",
@@ -6329,64 +6307,19 @@
       }
     },
     "wdio-mocha-framework": {
-      "version": "0.4.6",
-      "from": "wdio-mocha-framework@>=0.4.6 <0.5.0",
-      "resolved": "https://registry.npmjs.org/wdio-mocha-framework/-/wdio-mocha-framework-0.4.6.tgz",
+      "version": "0.5.3",
+      "from": "wdio-mocha-framework@>=0.5.3 <0.6.0",
+      "resolved": "https://registry.npmjs.org/wdio-mocha-framework/-/wdio-mocha-framework-0.5.3.tgz",
       "dependencies": {
         "babel-runtime": {
           "version": "5.8.38",
           "from": "babel-runtime@>=5.8.25 <6.0.0",
           "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.38.tgz"
         },
-        "commander": {
-          "version": "2.3.0",
-          "from": "commander@2.3.0",
-          "resolved": "https://registry.npmjs.org/commander/-/commander-2.3.0.tgz"
-        },
         "core-js": {
           "version": "1.2.7",
           "from": "core-js@>=1.0.0 <2.0.0",
           "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.7.tgz"
-        },
-        "debug": {
-          "version": "2.2.0",
-          "from": "debug@2.2.0",
-          "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz"
-        },
-        "diff": {
-          "version": "1.4.0",
-          "from": "diff@1.4.0",
-          "resolved": "https://registry.npmjs.org/diff/-/diff-1.4.0.tgz"
-        },
-        "escape-string-regexp": {
-          "version": "1.0.2",
-          "from": "escape-string-regexp@1.0.2",
-          "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.2.tgz"
-        },
-        "glob": {
-          "version": "3.2.11",
-          "from": "glob@3.2.11",
-          "resolved": "https://registry.npmjs.org/glob/-/glob-3.2.11.tgz"
-        },
-        "minimatch": {
-          "version": "0.3.0",
-          "from": "minimatch@>=0.3.0 <0.4.0",
-          "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-0.3.0.tgz"
-        },
-        "mocha": {
-          "version": "2.5.3",
-          "from": "mocha@>=2.3.3 <3.0.0",
-          "resolved": "https://registry.npmjs.org/mocha/-/mocha-2.5.3.tgz"
-        },
-        "ms": {
-          "version": "0.7.1",
-          "from": "ms@0.7.1",
-          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
-        },
-        "supports-color": {
-          "version": "1.2.0",
-          "from": "supports-color@1.2.0",
-          "resolved": "https://registry.npmjs.org/supports-color/-/supports-color-1.2.0.tgz"
         }
       }
     },
@@ -6403,9 +6336,9 @@
       }
     },
     "wdio-sync": {
-      "version": "0.5.16",
-      "from": "wdio-sync@0.5.16",
-      "resolved": "https://registry.npmjs.org/wdio-sync/-/wdio-sync-0.5.16.tgz"
+      "version": "0.6.6",
+      "from": "wdio-sync@0.6.6",
+      "resolved": "https://registry.npmjs.org/wdio-sync/-/wdio-sync-0.6.6.tgz"
     },
     "webdriverio": {
       "version": "4.4.0",
