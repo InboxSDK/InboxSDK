@@ -108,9 +108,11 @@ class InboxAppSidebarView {
     el.setAttribute('data-is-opening', 'false');
     document.body.appendChild(el);
 
-    const waitingPlatform = document.createElement('div');
-    waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-    document.body.appendChild(waitingPlatform);
+    if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+      const waitingPlatform = document.createElement('div');
+      waitingPlatform.className = idMap('app_sidebar_waiting_platform');
+      document.body.appendChild(waitingPlatform);
+    }
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
@@ -200,7 +202,6 @@ class InboxAppSidebarView {
     this._stopper.onValue(() => {
       ReactDOM.unmountComponentAtNode(el);
       el.remove();
-      waitingPlatform.remove();
     });
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
