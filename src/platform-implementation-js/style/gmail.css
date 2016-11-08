@@ -733,12 +733,14 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   top: 4px;
 }
 
-.inboxsdk__sidebar div[role=complementary] {
+.inboxsdk__sidebar div[role=complementary],
+.IDMAP_app_sidebar_in_use div[role=complementary] {
   position: static !important;
 }
 
 /* Fix issue where sidebar causes threadview to be taller than it should */
-.inboxsdk__sidebar > div.y4 {
+.inboxsdk__sidebar > div.y4,
+.IDMAP_app_sidebar_in_use > div.y4 {
   display: none;
 }
 

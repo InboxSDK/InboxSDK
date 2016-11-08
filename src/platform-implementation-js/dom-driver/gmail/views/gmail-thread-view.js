@@ -15,6 +15,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailContentPanelContainerView from '../widgets/gmail-content-panel/gmail-content-panel-container-view';
+import GmailAppSidebarView from './gmail-app-sidebar-view';
 
 class GmailThreadView {
 	_element: HTMLElement;
@@ -22,7 +23,11 @@ class GmailThreadView {
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
 	_eventStream: Bus<any>;
-	_sidebarContentPanelContainerView: GmailContentPanelContainerView;
+	_sidebar: ?GmailAppSidebarView = null;
+
+	// OLD sidebar
+	_sidebarContentPanelContainerView: ?GmailContentPanelContainerView = null;
+
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_newMessageMutationObserver: ?MutationObserver;
@@ -69,19 +74,31 @@ class GmailThreadView {
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
 		if (document.body.getAttribute('data-inboxsdk-sidebar-beta') === 'true') {
-			throw new Error('sidebar beta not implemented yet');
+			const sidebarElement = GmailElementGetter.getSidebarContainerElement();
+			if (!sidebarElement) {
+				console.warn('This view does not have a sidebar');
+				return;
+			}
+			if (!this._sidebar) {
+				this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
+			}
+			return this._sidebar.addSidebarContentPanel(descriptor);
 		} else {
 			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'false');
 			if(!this._sidebarContentPanelContainerView){
 				const sidebarElement = GmailElementGetter.getSidebarContainerElement();
 
 				if(!sidebarElement){
-					this._driver.getLogger().error(new Error('This view does not have a sidebar'));
+					console.warn('This view does not have a sidebar');
 					return;
 				}
 				else{
 					this._setupSidebarView(sidebarElement);
 				}
+			}
+
+			if (!this._sidebarContentPanelContainerView) {
+				throw new Error('should not happen');
 			}
 
 			return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
@@ -134,11 +151,11 @@ class GmailThreadView {
 
 	_setupSidebarView(sidebarElement: HTMLElement) {
 		var existingContentPanelContainer = sidebarElement.querySelector('.inboxsdk__contentPanelContainer');
-		this._sidebarContentPanelContainerView = new GmailContentPanelContainerView(existingContentPanelContainer);
+		const sidebar = this._sidebarContentPanelContainerView = new GmailContentPanelContainerView(existingContentPanelContainer);
 
 		if(!existingContentPanelContainer){
 			sidebarElement.classList.add('inboxsdk__sidebar');
-			sidebarElement.insertBefore(this._sidebarContentPanelContainerView.getElement(), sidebarElement.firstElementChild);
+			sidebarElement.insertBefore(sidebar.getElement(), sidebarElement.firstElementChild);
 		}
 	}
 
