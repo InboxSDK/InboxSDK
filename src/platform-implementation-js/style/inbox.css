@@ -81,6 +81,10 @@
   overflow-y: auto;
 }
 
+.IDMAP_app_sidebar_content_area {
+  padding: 12px 8px;
+}
+
 .IDMAP_app_sidebar_container[data-open="false"] {
   display: none;
 }

@@ -733,8 +733,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   top: 4px;
 }
 
-.inboxsdk__sidebar div[role=complementary],
-.IDMAP_app_sidebar_in_use div[role=complementary] {
+.inboxsdk__sidebar div[role=complementary] {
   position: static !important;
 }
 
@@ -769,6 +768,15 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* sidebar */
 
+.IDMAP_app_sidebar_in_use div[role=complementary] {
+  position: static !important;
+  width: 216px !important;
+}
+
+.IDMAP_app_sidebar_in_use {
+  transform: scale(1);
+}
+
 .IDMAP_app_sidebar {
   position: relative;
   width: 232px;
@@ -776,6 +784,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .IDMAP_app_sidebar_content_panel {
   background: #ffffff;
+}
+
+.IDMAP_app_sidebar_content_area {
+  padding: 0 0 12px;
 }
 
 /* end sidebar */
