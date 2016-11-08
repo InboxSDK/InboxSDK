@@ -119,6 +119,7 @@ class GmailAppSidebarView {
     this._stopper.onValue(() => {
       ReactDOM.unmountComponentAtNode(el);
       el.remove();
+      this._sidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
     });
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
