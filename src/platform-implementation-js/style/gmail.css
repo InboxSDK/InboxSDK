@@ -750,7 +750,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* end tabs */
 
-/* sidebar */
+/* old sidebar */
 
 .inboxsdk__sidebar .inboxsdk__contentPanelContainer {
   font: 12px Arial, sans-serif;
@@ -764,8 +764,17 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 
-/* end sidebar */
+/* end old sidebar */
 
+
+/* sidebar */
+
+.IDMAP_app_sidebar {
+  position: relative;
+  width: 232px;
+}
+
+/* end sidebar */
 
 /* custom content */
 
