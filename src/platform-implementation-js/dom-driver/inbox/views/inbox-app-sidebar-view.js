@@ -28,7 +28,6 @@ class InboxAppSidebarView {
   _el: HTMLElement;
   _mainParent: HTMLElement;
   _openOrOpeningProp: Kefir.Observable<boolean>;
-  _instanceId: string = `${Date.now()}-${Math.random()}`;
 
   constructor(driver: InboxDriver) {
     this._driver = driver;
@@ -205,7 +204,6 @@ class InboxAppSidebarView {
     });
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         let id = event.detail.id;
@@ -231,7 +229,6 @@ class InboxAppSidebarView {
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -250,7 +247,6 @@ class InboxAppSidebarView {
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -264,7 +260,6 @@ class InboxAppSidebarView {
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
-      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.scrollPanelIntoView(event.detail.instanceId);
@@ -308,7 +303,8 @@ class InboxAppSidebarView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const view = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId);
+    // There's only up to one sidebar in Inbox, so the ID doesn't really matter.
+    const view = new ContentPanelViewDriver(this._driver, descriptor, 'inbox');
 
     if (
       this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||

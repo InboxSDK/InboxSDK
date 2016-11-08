@@ -24,7 +24,7 @@ class GmailAppSidebarView {
   _driver: GmailDriver;
   _sidebarContainerEl: HTMLElement;
   _el: HTMLElement;
-  _instanceId: string = `${Date.now()}-${Math.random()}`;
+  _instanceId: string;
 
   constructor(driver: GmailDriver, sidebarContainerEl: HTMLElement) {
     this._driver = driver;
@@ -39,6 +39,7 @@ class GmailAppSidebarView {
     const el = sidebarContainerEl.querySelector('.'+idMap('app_sidebar_container'));
     if (el) {
       this._el = el;
+      this._instanceId = el.getAttribute('data-instance-id');
     } else {
       this._createElement();
     }
@@ -66,8 +67,11 @@ class GmailAppSidebarView {
   _createElement() {
     const el = this._el = document.createElement('div');
     el.className = idMap('app_sidebar_container');
+    el.setAttribute('data-instance-id', `${Date.now()}-${Math.random()}`);
     this._sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
     this._sidebarContainerEl.insertBefore(el, this._sidebarContainerEl.firstElementChild);
+
+    this._instanceId = el.getAttribute('data-instance-id');
 
     if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
       const waitingPlatform = document.createElement('div');
