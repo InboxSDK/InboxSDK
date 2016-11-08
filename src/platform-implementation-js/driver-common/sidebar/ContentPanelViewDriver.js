@@ -17,9 +17,11 @@ class ContentPanelViewDriver {
   // This is not the `id` property passed by the application, but a random
   // unique identifier used to manage a specific instance.
   _instanceId: string = `${Date.now()}-${Math.random()}`;
+  _sidebarId: string;
 
-  constructor(driver: Driver, descriptor: Kefir.Observable<Object>) {
+  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string) {
     this._driver = driver;
+    this._sidebarId = sidebarId;
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
     this._eventStream.plug(
@@ -56,6 +58,7 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
+              sidebarId: this._sidebarId,
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
               id: String(id || title),
@@ -69,7 +72,7 @@ class ContentPanelViewDriver {
     this._stopper.onValue(() => {
       document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
-        detail: {instanceId: this._instanceId}
+        detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
       }));
     });
   }
@@ -85,7 +88,7 @@ class ContentPanelViewDriver {
   scrollIntoView() {
     document.body.dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
       bubbles: true, cancelable: false,
-      detail: {instanceId: this._instanceId}
+      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
     }));
   }
 

@@ -28,7 +28,7 @@ function makeDriver(): Object {
           waitingPlatform.className = idMap('app_sidebar_waiting_platform');
           document.body.appendChild(waitingPlatform);
         }
-        const panel = new ContentPanelViewDriver(driver, descriptor);
+        const panel = new ContentPanelViewDriver(driver, descriptor, 'foobar');
         _addedPanels.push(panel);
         return panel;
       },
