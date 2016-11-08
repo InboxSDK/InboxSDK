@@ -194,10 +194,11 @@
 .IDMAP_app_sidebar_content_panel_title_icon {
   display: inline-block;
   vertical-align: middle;
-  padding-left: 10px;
+  margin-left: 10px;
   box-sizing: border-box;
 }
 
+.IDMAP_app_sidebar_content_panel_title_icon,
 .IDMAP_app_sidebar_content_panel_title_icon > img {
   width: 20px;
   height: 20px;
