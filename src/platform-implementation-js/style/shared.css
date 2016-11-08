@@ -196,6 +196,7 @@
   vertical-align: middle;
   margin-left: 10px;
   box-sizing: border-box;
+  background-size: contain;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon,
