@@ -774,6 +774,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 232px;
 }
 
+.IDMAP_app_sidebar_content_panel {
+  background: #ffffff;
+}
+
 /* end sidebar */
 
 /* custom content */

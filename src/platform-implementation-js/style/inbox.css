@@ -90,6 +90,11 @@
   flex: 1;
 }
 
+.IDMAP_app_sidebar_content_panel {
+  background: #f2f2f2;
+}
+
+
 /* thread sidebar icon */
 
 .IDMAP_sidebar_iconArea {
