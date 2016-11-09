@@ -712,22 +712,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   height: 28px;
 }
 
-  .aKp.inboxsdk__tab_icon {
-    background-image: none;
-    width: 30px;
-    height: 25px;
-    background-position-x: 5px;
-    background-position-y: 3px;
-    background-size: 16px;
-    bacgkround-repeat: no-repeat;
-  }
+.inboxsdk__tab_icon {
+  width: 30px;
+  height: 25px;
+  background-position-x: 5px;
+  background-position-y: 3px;
+  background-size: 16px;
+  bacgkround-repeat: no-repeat;
+}
 
-    .inboxsdk__tab_icon img {
-      height: 16px;
-      width: 16px;
-      margin-left: 5px;
-      margin-top: 3px;
-    }
+.inboxsdk__tab_icon img {
+  height: 16px;
+  width: 16px;
+  margin-left: 5px;
+  margin-top: 3px;
+}
 
 .inboxsdk__tab .aKx {
   top: 4px;
