@@ -22,7 +22,8 @@ describe('Inbox', function() {
 
       // Test an inline compose
       browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="no-reply@accounts.google.com"]');
-      browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 10*1000);
+      // The thread might take some time to load
+      browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 30*1000);
       browser.pause(500);
       browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
