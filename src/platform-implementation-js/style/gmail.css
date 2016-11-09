@@ -790,6 +790,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   padding: 4px 0 12px;
 }
 
+.IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_area {
+  padding-top: 0;
+}
+
 /* end sidebar */
 
 /* custom content */
