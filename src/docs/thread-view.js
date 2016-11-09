@@ -5,9 +5,13 @@
 var ThreadView = /** @lends ThreadView */ {
 
 	/**
-	 * Inserts a content panel into the sidebar of a thread view. A content panel simply displays your content to the user, typically
-	 * in the form of a sidebar. ThreadViewss can have multiple content panels added to them and the SDK will handle creating a tabbed
-	 * interface if needed.
+	 * Inserts a content panel into the sidebar of a thread view. A content panel
+	 * simply displays your content to the user, typically in the form of a
+	 * sidebar. ThreadViewss can have multiple content panels added to them and
+	 * the SDK will handle creating a tabbed interface if needed.
+	 * This feature is being re-designed; you can opt-in to the new design early
+	 * by using the `sidebarBeta` flag of {LoadOptions} when you set up your app
+	 * with `InboxSDK.load`.
 	 * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the thread's sidebar.
 	 * @return {ContentPanelView}
 	 */

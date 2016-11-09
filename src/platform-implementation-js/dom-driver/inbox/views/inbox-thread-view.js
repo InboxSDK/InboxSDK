@@ -11,7 +11,7 @@ import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
-import type InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
+import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import parser from '../detection/thread/parser';
 import type {Parsed} from '../detection/thread/parser';
 
@@ -24,7 +24,7 @@ class InboxThreadView {
   _receivedMessageView = kefirStopper();
   _stopper: Kefir.Observable<null>;
   _ready: Kefir.Observable<void>;
-  _sidebarPanels: Set<InboxSidebarContentPanelView> = new Set();
+  _sidebarPanels: Set<ContentPanelViewDriver> = new Set();
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;

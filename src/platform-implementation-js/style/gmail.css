@@ -712,22 +712,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   height: 28px;
 }
 
-  .aKp.inboxsdk__tab_icon {
-    background-image: none;
-    width: 30px;
-    height: 25px;
-    background-position-x: 5px;
-    background-position-y: 3px;
-    background-size: 16px;
-    bacgkround-repeat: no-repeat;
-  }
+.inboxsdk__tab_icon {
+  width: 30px;
+  height: 25px;
+  background-position-x: 5px;
+  background-position-y: 3px;
+  background-size: 16px;
+  bacgkround-repeat: no-repeat;
+}
 
-    .inboxsdk__tab_icon img {
-      height: 16px;
-      width: 16px;
-      margin-left: 5px;
-      margin-top: 3px;
-    }
+.inboxsdk__tab_icon img {
+  height: 16px;
+  width: 16px;
+  margin-left: 5px;
+  margin-top: 3px;
+}
 
 .inboxsdk__tab .aKx {
   top: 4px;
@@ -738,7 +737,8 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
 }
 
 /* Fix issue where sidebar causes threadview to be taller than it should */
-.inboxsdk__sidebar > div.y4 {
+.inboxsdk__sidebar > div.y4,
+.IDMAP_app_sidebar_in_use > div.y4 {
   display: none;
 }
 
@@ -748,7 +748,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* end tabs */
 
-/* sidebar */
+/* old sidebar */
 
 .inboxsdk__sidebar .inboxsdk__contentPanelContainer {
   font: 12px Arial, sans-serif;
@@ -762,8 +762,39 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 
-/* end sidebar */
+/* end old sidebar */
 
+
+/* sidebar */
+
+.IDMAP_app_sidebar_in_use div[role=complementary] {
+  position: static !important;
+  width: 216px !important;
+}
+
+.IDMAP_app_sidebar_in_use {
+  /* Necessary to prevent z-indexes on sidebar items from causing them to show
+  above stuff outside of the sidebar. */
+  transform: scale(1);
+}
+
+.IDMAP_app_sidebar {
+  position: relative;
+}
+
+.IDMAP_app_sidebar_content_panel {
+  background: #ffffff;
+}
+
+.IDMAP_app_sidebar_content_area {
+  padding: 4px 0 12px;
+}
+
+.IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_area {
+  padding-top: 0;
+}
+
+/* end sidebar */
 
 /* custom content */
 

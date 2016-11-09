@@ -7,8 +7,6 @@ import kefirStopper from 'kefir-stopper';
 import type {Parsed} from '../detection/chatSidebar/parser';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
-import InboxSidebarContentPanelView from './inbox-sidebar-content-panel-view';
-
 export type Mode = 'HIDDEN'|'DROPDOWN'|'SIDEBAR';
 
 class InboxChatSidebarView {

@@ -56,6 +56,12 @@
   background: white;
 }
 
+.inboxsdk__compose_actionToolbar {
+  display: inline-block;
+}
+
+/* sidebar */
+
 .IDMAP_app_sidebar {
   background: #f2f2f2;
   position: fixed;
@@ -66,14 +72,6 @@
   z-index: 5;
 }
 
-.IDMAP_app_sidebar_waiting_platform {
-  display: none;
-}
-
-.IDMAP_app_sidebar_container[data-open="false"] {
-  display: none;
-}
-
 .IDMAP_app_sidebar_main {
   position: absolute;
   top: 0;
@@ -81,24 +79,14 @@
   left: 0;
   right: 0;
   overflow-y: auto;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: column;
-  flex-direction: column;
-}
-
-.IDMAP_app_sidebar > .inboxsdk__close_button {
-  position: absolute;
-  bottom: 10px;
-  right: 20px;
-}
-
-.inboxsdk__compose_actionToolbar {
-  display: inline-block;
 }
 
 .IDMAP_app_sidebar_content_area {
   padding: 12px 8px;
+}
+
+.IDMAP_app_sidebar_container[data-open="false"] {
+  display: none;
 }
 
 .IDMAP_app_sidebar_content_area_padding {
@@ -107,96 +95,11 @@
 }
 
 .IDMAP_app_sidebar_content_panel {
-  overflow: hidden;
-  font: 12px Arial, sans-serif;
-  max-height: 100%;
-  box-sizing: border-box;
   background: #f2f2f2;
 }
 
-.IDMAP_app_sidebar_content_panel_top_line {
-  white-space: nowrap;
-  display: -webkit-flex;
-  display: flex;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: default;
-}
 
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover,
-.IDMAP_app_sidebar_content_panel.IDMAP_dragged .IDMAP_app_sidebar_content_panel_top_line {
-  background: rgba(0,0,0,.03);
-}
-
-.IDMAP_app_sidebar_content_panel_title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_title {
-  cursor: move;
-}
-
-.IDMAP_app_sidebar_content_panel_title_text {
-  padding-left: 20px;
-  vertical-align: middle;
-  font: 13px / 40px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #303030;
-}
-
-.IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_panel_top_line {
-  display: none;
-}
-
-.IDMAP_app_sidebar_content_panel_title_icon {
-  display: inline-block;
-  vertical-align: middle;
-  padding-left: 10px;
-  box-sizing: border-box;
-}
-
-.IDMAP_app_sidebar_content_panel_title_icon > img {
-  width: 20px;
-  height: 20px;
-}
-
-.IDMAP_app_sidebar_content_panel_toggle {
-  -webkit-flex: 1;
-  flex: 1;
-  text-align: right;
-  visibility: hidden;
-}
-
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_toggle {
-  visibility: visible;
-  cursor: pointer;
-}
-
-.IDMAP_app_sidebar_content_panel_toggle_button {
-  margin-top: 12px;
-  margin-right: 4px;
-  background: url(https://www.streak.com/build/images/chevron.png) center / contain no-repeat;
-  border: none;
-  width: 14px;
-  height: 14px;
-  -webkit-transform: rotate(0);
-  transform: rotate(0);
-  transition: -webkit-transform .15s, transform .15s;
-  outline: none;
-  opacity: .8;
-  cursor: pointer;
-}
-
-.IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {
-  -webkit-transform: rotate(90deg);
-  transform: rotate(90deg);
-}
-
-.IDMAP_app_sidebar_content_panel_content {
-  border-bottom: 1px solid #ddd;
-}
+/* thread sidebar icon */
 
 .IDMAP_sidebar_iconArea {
   position: absolute;

@@ -3,7 +3,7 @@
 * The functions in this class are only used for load related functionality like loading the SDK itself or other external scripts.
 */
 var InboxSDK = {
-  LOADER_VERSION: BUILD_VERSION
+	LOADER_VERSION: BUILD_VERSION
 };
 
 /**
@@ -30,10 +30,10 @@ InboxSDK.loadScript = function(){};
  */
 var LoadOptions = /** @lends LoadOptions */{
 	/**
-  * The name of your app. This is used by several methods in the SDK.
-  * ^optional
-  * ^default=null
-  * @type {string}
+	 * The name of your app. This is used by several methods in the SDK.
+	 * ^optional
+	 * ^default=null
+	 * @type {string}
 	 */
 	appName: null,
 
@@ -43,5 +43,14 @@ var LoadOptions = /** @lends LoadOptions */{
 	 * ^default=null
 	 * @type {string}
 	 */
-	appIconUrl:null
+	appIconUrl:null,
+
+	/**
+	 * Opt-in to the new thread sidebar early. The new design allows users to see
+	 * multiple sidebars at once, collapse sidebars, re-order sidebars by
+	 * drag-and-drop, and have their changes be persisted.
+	 * ^optional
+	 * ^default=false
+	 */
+	sidebarBeta:null
 };

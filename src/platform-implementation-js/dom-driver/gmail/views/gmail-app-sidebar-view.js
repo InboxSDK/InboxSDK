@@ -7,79 +7,50 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../../common/find-parent';
-import getChatSidebarClassname from '../getChatSidebarClassname';
 import delayAsap from '../../../lib/delay-asap';
-import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
 import incrementName from '../../../lib/incrementName';
-import type InboxDriver from '../inbox-driver';
+import type GmailDriver from '../gmail-driver';
 
 import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
 import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 
-class InboxAppSidebarView {
+class GmailAppSidebarView {
   _stopper = kefirStopper();
-  _driver: InboxDriver;
+  _driver: GmailDriver;
+  _sidebarContainerEl: HTMLElement;
   _el: HTMLElement;
-  _mainParent: HTMLElement;
-  _openOrOpeningProp: Kefir.Observable<boolean>;
+  _instanceId: string;
 
-  constructor(driver: InboxDriver) {
+  constructor(driver: GmailDriver, sidebarContainerEl: HTMLElement) {
     this._driver = driver;
+    this._sidebarContainerEl = sidebarContainerEl;
 
     // We need to be able to cooperate with other apps/extensions that are
     // sharing the app sidebar. We store some properties as attributes in the
     // shared DOM instead of as class properties; class properties are mostly
     // restricted to being used for references to DOM nodes. When
-    // InboxAppSidebarView is instantiated, we check to see if the element
+    // GmailAppSidebarView is instantiated, we check to see if the element
     // already exists and create it if it doesn't.
-    const el = document.querySelector('.'+idMap('app_sidebar_container'));
+    const el = sidebarContainerEl.querySelector('.'+idMap('app_sidebar_container'));
     if (el) {
       this._el = el;
+      this._instanceId = el.getAttribute('data-instance-id');
     } else {
       this._createElement();
     }
-
-    const mainParent = findParent(document.querySelector('[role=application]'), el => el.parentElement === document.body);
-    if (!mainParent) {
-      const err = new Error('Failed to find main parent');
-      this._driver.getLogger().errorSite(err);
-      throw err;
-    }
-    this._mainParent = mainParent;
-
-    this._openOrOpeningProp = makeMutationObserverChunkedStream(
-      this._el, {attributes: true, attributeFilter: ['data-open', 'data-is-opening']}
-    )
-      .toProperty(() => null)
-      .map(() =>
-        this._el.getAttribute('data-open') === 'true' ||
-        this._el.getAttribute('data-is-opening') === 'true'
-      )
-      .skipDuplicates();
   }
 
   destroy() {
     this._stopper.destroy();
   }
 
-  open() {
-    this._setShouldAppSidebarOpen(true);
-    this._setOpenedNow(true);
-  }
-
-  close() {
-    this._setShouldAppSidebarOpen(false);
-    this._setOpenedNow(false);
-  }
-
-  getOpenOrOpeningStream(): Kefir.Observable<boolean> {
-    return this._openOrOpeningProp;
+  getStopper(): Kefir.Observable<*> {
+    return this._stopper;
   }
 
   // This value controls whether the app sidebar should automatically open
@@ -100,12 +71,11 @@ class InboxAppSidebarView {
   _createElement() {
     const el = this._el = document.createElement('div');
     el.className = idMap('app_sidebar_container');
-    // Store the open state in the DOM rather than a class property because
-    // multiple instances of InboxAppSidebarView from different apps need to
-    // share the value.
-    el.setAttribute('data-open', 'false');
-    el.setAttribute('data-is-opening', 'false');
-    document.body.appendChild(el);
+    el.setAttribute('data-instance-id', `${Date.now()}-${Math.random()}`);
+    this._sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
+    this._sidebarContainerEl.insertBefore(el, this._sidebarContainerEl.firstElementChild);
+
+    this._instanceId = el.getAttribute('data-instance-id');
 
     if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
       const waitingPlatform = document.createElement('div');
@@ -113,42 +83,8 @@ class InboxAppSidebarView {
       document.body.appendChild(waitingPlatform);
     }
 
-    // If the user clicks the chat button while the chat sidebar and app
-    // sidebar are both open, then we want the chat sidebar to become visible.
-    // We block Inbox from closing the chat sidebar, and we close the app sidebar.
-    fromEventTargetCapture(this._driver.getChatSidebarButton(), 'click')
-      .filter(() =>
-        el.getAttribute('data-open') === 'true' &&
-        this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
-      )
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        event.stopImmediatePropagation();
-        this._setShouldAppSidebarOpen(false);
-        this._setOpenedNow(false);
-      });
-
-    this._driver.getCurrentChatSidebarView().getModeStream()
-      .changes()
-      .takeUntilBy(this._stopper)
-      .onValue(mode => {
-        if (mode === 'SIDEBAR') {
-          // If the user clicks the chat button while the chat sidebar is
-          // closed and the app sidebar is open, and Inbox opens the chat
-          // sidebar, then we want the chat sidebar to become visible. We just
-          // hide the app sidebar after Inbox brings up the chat sidebar.
-          this._setShouldAppSidebarOpen(false);
-          this._setOpenedNow(false);
-        } else {
-          // If the chat sidebar changes in any other way
-          // (ie. HIDDEN<->DROPDOWN) while the app sidebar is open, then we
-          // might need to fix up some class changes that Inbox might have
-          // made.
-          if (el.getAttribute('data-open') === 'true') {
-            this._setOpenedNow(true);
-          }
-        }
-      });
+    const containerEl = findParent(this._sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
+    const container = containerEl ? (() => containerEl) : undefined;
 
     const currentIds = new Set();
     const orderManager = new OrderManager({
@@ -173,17 +109,11 @@ class InboxAppSidebarView {
       component = (ReactDOM.render(
         <AppSidebar
           panels={orderManager.getOrderedItems().map(x => x.value)}
-          onClose={() => {
-            this._setShouldAppSidebarOpen(false);
-            this._setOpenedNow(false);
-          }}
-          onOutsideClick={() => {
-            this._driver.closeOpenThread();
-          }}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
             orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
+          container={container}
         />,
         el
       ): any);
@@ -201,9 +131,11 @@ class InboxAppSidebarView {
     this._stopper.onValue(() => {
       ReactDOM.unmountComponentAtNode(el);
       el.remove();
+      this._sidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
     });
 
     Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
+      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         let id = event.detail.id;
@@ -229,6 +161,7 @@ class InboxAppSidebarView {
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -247,6 +180,7 @@ class InboxAppSidebarView {
         render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
+      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -255,63 +189,21 @@ class InboxAppSidebarView {
         currentIds.delete(orderedItems[index].id);
         orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
-          this._setOpenedNow(false);
+          this.destroy();
+        } else {
+          render();
         }
-        render();
       });
     Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
+      .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.scrollPanelIntoView(event.detail.instanceId);
       });
   }
 
-  _setOpenedNow(open: boolean) {
-    this._el.setAttribute('data-open', String(open));
-    if (!open) {
-      if (
-        this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        this._mainParent.classList.contains(getChatSidebarClassname())
-      ) {
-        this._mainParent.classList.remove(getChatSidebarClassname());
-        this._driver.getPageCommunicator().fakeWindowResize();
-      }
-    } else {
-      if (
-        this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        !this._mainParent.classList.contains(getChatSidebarClassname())
-      ) {
-        this._mainParent.classList.add(getChatSidebarClassname());
-        this._driver.getPageCommunicator().fakeWindowResize();
-      }
-    }
-  }
-
-  _setOpenedAfterAnimation(open: boolean) {
-    this._el.setAttribute('data-is-opening', 'true');
-    waitForAnimationClickBlockerGone()
-      .takeUntilBy(this._stopper)
-      .takeUntilBy(makeMutationObserverChunkedStream(
-        this._el, {attributes: true, attributeFilter: ['data-open']}
-      ))
-      .onValue(() => {
-        this._setOpenedNow(open);
-      })
-      .onEnd(() => {
-        this._el.setAttribute('data-is-opening', 'false');
-      });
-  }
-
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    // There's only up to one sidebar in Inbox, so the ID doesn't really matter.
-    const view = new ContentPanelViewDriver(this._driver, descriptor, 'inbox');
-
-    if (
-      this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR' ||
-      this._getShouldAppSidebarOpen()
-    ) {
-      this._setOpenedAfterAnimation(true);
-    }
+    const view = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId);
 
     this._stopper
       .takeUntilBy(view.getStopper())
@@ -323,4 +215,4 @@ class InboxAppSidebarView {
   }
 }
 
-export default defn(module, InboxAppSidebarView);
+export default defn(module, GmailAppSidebarView);

@@ -92,7 +92,7 @@
     "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0",
-    "wdio-mocha-framework": "^0.4.6",
+    "wdio-mocha-framework": "^0.5.3",
     "wdio-selenium-standalone-service": "0.0.7",
     "webdriverio": "^4.1.0"
   },

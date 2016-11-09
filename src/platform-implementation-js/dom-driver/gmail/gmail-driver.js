@@ -137,6 +137,11 @@ class GmailDriver {
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
 			trackGmailStyles();
 		});
+
+		// Only turn on the flag if we haven't locked it in already.
+		if (opts.sidebarBeta && !document.body.hasAttribute('data-inboxsdk-sidebar-beta')) {
+			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'true');
+		}
 	}
 
 	destroy() {
