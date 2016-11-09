@@ -51,6 +51,7 @@ var LoadOptions = /** @lends LoadOptions */{
 	 * drag-and-drop, and have their changes be persisted.
 	 * ^optional
 	 * ^default=false
+	 * @type {boolean}
 	 */
 	sidebarBeta:null
 };
