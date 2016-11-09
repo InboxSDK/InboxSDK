@@ -49,6 +49,10 @@ class GmailAppSidebarView {
     this._stopper.destroy();
   }
 
+  getStopper(): Kefir.Observable<*> {
+    return this._stopper;
+  }
+
   // This value controls whether the app sidebar should automatically open
   // itself when available when the chat sidebar isn't present. It's only set
   // if the user interacts with the app sidebar button.

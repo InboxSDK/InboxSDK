@@ -60,6 +60,7 @@ class GmailThreadView {
 	destroy() {
 		this._eventStream.end();
 		this._toolbarView.destroy();
+		if (this._sidebar) this._sidebar.destroy();
 		this._messageViewDrivers.forEach(messageView => {
 			messageView.destroy();
 		});
@@ -79,10 +80,16 @@ class GmailThreadView {
 				console.warn('This view does not have a sidebar');
 				return;
 			}
-			if (!this._sidebar) {
-				this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
+			let sidebar = this._sidebar;
+			if (!sidebar) {
+				sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
+				sidebar.getStopper().onValue(() => {
+					if (this._sidebar === sidebar) {
+						this._sidebar = null;
+					}
+				});
 			}
-			return this._sidebar.addSidebarContentPanel(descriptor);
+			return sidebar.addSidebarContentPanel(descriptor);
 		} else {
 			// Once an old-style sidebar is shown, lock in the setting so that future
 			// app loads within this session don't change it.
