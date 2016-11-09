@@ -220,25 +220,31 @@
 .IDMAP_app_sidebar_content_panel_toggle_button {
   margin-top: 12px;
   margin-right: 4px;
-  background: url(https://www.streak.com/build/images/chevron.png) center / contain no-repeat;
+  background: url(https://www.streak.com/build/images/arrowDown.png) center / 20px no-repeat;
   border: none;
   width: 14px;
   height: 14px;
-  -webkit-transform: rotate(0);
-  transform: rotate(0);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
   transition: -webkit-transform .15s, transform .15s;
   outline: none;
-  opacity: .8;
+  opacity: .6;
   cursor: pointer;
 }
 
-.IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {
-  -webkit-transform: rotate(90deg);
-  transform: rotate(90deg);
+.IDMAP_app_sidebar_content_panel_top_line:hover .IDMAP_app_sidebar_content_panel_toggle_button,
+.IDMAP_app_sidebar_content_panel.IDMAP_dragged .IDMAP_app_sidebar_content_panel_top_line .IDMAP_app_sidebar_content_panel_toggle_button {
+  opacity: .9;
+}
+
+.IDMAP_app_sidebar_content_panel.IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {
+  -webkit-transform: rotate(0);
+  transform: rotate(0);
 }
 
 .IDMAP_app_sidebar_content_panel_content {
   border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
 }
 
 /* end sidebar */
