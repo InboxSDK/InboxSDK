@@ -84,6 +84,8 @@ class GmailThreadView {
 			}
 			return this._sidebar.addSidebarContentPanel(descriptor);
 		} else {
+			// Once an old-style sidebar is shown, lock in the setting so that future
+			// app loads within this session don't change it.
 			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'false');
 			if(!this._sidebarContentPanelContainerView){
 				const sidebarElement = GmailElementGetter.getSidebarContainerElement();
