@@ -119,7 +119,7 @@ class InboxAppToolbarButtonView {
     margin-right: ${minMarginRight}px${important};
   }
 }
-.inboxsdk__appButton_container ~ :nth-child(3) ~ *:not(.inboxsdk_escape_mod) {
+.inboxsdk__appButton_container + * + * ~ *:not(.inboxsdk_escape_mod) {
   margin-right: ${minMarginRight}px${important};
 }
 `;
