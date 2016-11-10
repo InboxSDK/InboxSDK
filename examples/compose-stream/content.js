@@ -5,6 +5,7 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 
 	const fileInput = document.createElement('input');
 	fileInput.type = 'file';
+	fileInput.multiple = true;
 	fileInput.style.display = 'none';
 	document.body.appendChild(fileInput);
 	window._fileInput = fileInput;

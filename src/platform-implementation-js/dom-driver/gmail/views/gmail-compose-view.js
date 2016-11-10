@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import asap from 'asap';
+import delay from 'pdelay';
 import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
 import * as ud from 'ud';
@@ -528,36 +529,37 @@ class GmailComposeView {
 		return el;
 	}
 
-	async attachFiles(files: Blob[]): Promise<void> {
+	async _attachFiles(files: Blob[], inline: boolean): Promise<void> {
 		this._hideDropzones();
 		const endDrag = _.once(() => simulateDragEnd(this._element, files));
 		try {
-			simulateDragOver(this._element, files);
-			await waitFor(() => this._dropzonesVisible(), 20*1000);
-			const dropzone = this._findDropzoneForThisCompose(false);
-			simulateDrop(dropzone, files);
-			endDrag();
-			await waitFor(() => !this._dropzonesVisible(), 20*1000);
+			let firstLoop = true;
+			for (let files of _.chunk(files, 5)) {
+				if (firstLoop) {
+					firstLoop = false;
+				} else {
+					await delay(500);
+				}
+
+				simulateDragOver(this._element, files);
+				await waitFor(() => this._dropzonesVisible(), 20*1000);
+				const dropzone = this._findDropzoneForThisCompose(inline);
+				simulateDrop(dropzone, files);
+				endDrag();
+				await waitFor(() => !this._dropzonesVisible(), 20*1000);
+			}
 		} finally {
 			endDrag();
 			this._reenableDropzones();
 		}
 	}
 
-	async attachInlineFiles(files: Blob[]): Promise<void> {
-		this._hideDropzones();
-		const endDrag = _.once(() => simulateDragEnd(this._element, files));
-		try {
-			simulateDragOver(this._element, files);
-			await waitFor(() => this._dropzonesVisible(), 20*1000);
-			const dropzone = this._findDropzoneForThisCompose(true);
-			simulateDrop(dropzone, files);
-			endDrag();
-			await waitFor(() => !this._dropzonesVisible(), 20*1000);
-		} finally {
-			endDrag();
-			this._reenableDropzones();
-		}
+	attachFiles(files: Blob[]): Promise<void> {
+		return this._attachFiles(files, false);
+	}
+
+	attachInlineFiles(files: Blob[]): Promise<void> {
+		return this._attachFiles(files, true);
 	}
 
 	isReply(): boolean {
