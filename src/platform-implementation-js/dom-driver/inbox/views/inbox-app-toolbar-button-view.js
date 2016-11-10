@@ -111,7 +111,18 @@ class InboxAppToolbarButtonView {
       // so that Inbox's margin:auto takes over.
       const applyWhenPageWidthUnder = 1394+3.575*minMarginRight;
 
-      const rule = `@media (max-width: ${applyWhenPageWidthUnder}px) { .${ruleClassName} { margin-right: ${minMarginRight}px${important}; } }`;
+      // @media-scoped rule is for adjusting gmail stuff. Last rule is for
+      // adjusting icons from non-SDK extensions including Mixmax.
+      const rule = `
+@media (max-width: ${applyWhenPageWidthUnder}px) {
+  .${ruleClassName} {
+    margin-right: ${minMarginRight}px${important};
+  }
+}
+.inboxsdk__appButton_container ~ :nth-child(3) ~ *:not(.inboxsdk_escape_mod) {
+  margin-right: ${minMarginRight}px${important};
+}
+`;
       setCss('dynamic_resize_searchbar', rule);
     }
 
