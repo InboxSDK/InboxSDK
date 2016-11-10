@@ -528,13 +528,13 @@ class GmailComposeView {
 		return el;
 	}
 
-	async attachFiles(files: Blob[]): Promise<void> {
+	async _attachFiles(files: Blob[], inline: boolean): Promise<void> {
 		this._hideDropzones();
 		const endDrag = _.once(() => simulateDragEnd(this._element, files));
 		try {
 			simulateDragOver(this._element, files);
 			await waitFor(() => this._dropzonesVisible(), 20*1000);
-			const dropzone = this._findDropzoneForThisCompose(false);
+			const dropzone = this._findDropzoneForThisCompose(inline);
 			simulateDrop(dropzone, files);
 			endDrag();
 			await waitFor(() => !this._dropzonesVisible(), 20*1000);
@@ -544,20 +544,12 @@ class GmailComposeView {
 		}
 	}
 
-	async attachInlineFiles(files: Blob[]): Promise<void> {
-		this._hideDropzones();
-		const endDrag = _.once(() => simulateDragEnd(this._element, files));
-		try {
-			simulateDragOver(this._element, files);
-			await waitFor(() => this._dropzonesVisible(), 20*1000);
-			const dropzone = this._findDropzoneForThisCompose(true);
-			simulateDrop(dropzone, files);
-			endDrag();
-			await waitFor(() => !this._dropzonesVisible(), 20*1000);
-		} finally {
-			endDrag();
-			this._reenableDropzones();
-		}
+	attachFiles(files: Blob[]): Promise<void> {
+		return this._attachFiles(files, false);
+	}
+
+	attachInlineFiles(files: Blob[]): Promise<void> {
+		return this._attachFiles(files, true);
 	}
 
 	isReply(): boolean {
