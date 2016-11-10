@@ -7,6 +7,7 @@ import kefirStopper from 'kefir-stopper';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxAppToolbarTooltipView from './inbox-app-toolbar-tooltip-view';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
+import setCss from '../../../lib/dom/set-css';
 
 class InboxAppToolbarButtonView {
   _buttonDescriptor: ?Object = null;
@@ -91,38 +92,38 @@ class InboxAppToolbarButtonView {
     const buttonWidth = 40;
     const defaultMarginRight = 70;
 
-    let newMarginRight;
-    let style = document.getElementById('inboxsdk__dynamic_resize_searchbar');
-    if (style) {
-      const sheet = (style:any).sheet;
-      const currentMarginRight = parseInt(style.getAttribute('data-min-margin-right'));
-      newMarginRight = currentMarginRight+buttonWidth;
-      for (let i=sheet.rules.length-1; i>=0; i--) {
-        sheet.deleteRule(i);
-      }
-    } else {
-      style = document.createElement('style');
-      style.id = 'inboxsdk__dynamic_resize_searchbar';
-      document.head.appendChild(style);
-      newMarginRight = buttonWidth;
-    }
-    const sheet = (style:any).sheet;
+    const ATTR_NAME = 'data-inboxsdk-searchbar-min-margin-right';
+
+    const newMarginRight = buttonWidth +
+      parseInt(document.documentElement.getAttribute(ATTR_NAME) || '0');
+
     const ruleClassName = 'inboxsdk__dynamic_resize_searchbar';
 
     function setSheetRules(minMarginRight: number) {
-      style.setAttribute('data-min-margin-right', String(minMarginRight));
-      for (let i=sheet.rules.length-1; i>=0; i--) {
-        sheet.deleteRule(i);
+      document.documentElement.setAttribute(ATTR_NAME, String(minMarginRight));
+      if (minMarginRight <= 0) {
+        setCss('dynamic_resize_searchbar', '');
+        return;
       }
-      if (minMarginRight <= 0) return;
       const important = minMarginRight > defaultMarginRight ? '!important' : '';
 
       // When the page gets wider than this number, stop applying our override
       // so that Inbox's margin:auto takes over.
       const applyWhenPageWidthUnder = 1394+3.575*minMarginRight;
 
-      const rule = `@media (max-width: ${applyWhenPageWidthUnder}px) { .${ruleClassName} { margin-right: ${minMarginRight}px${important}; } }`;
-      sheet.insertRule(rule, 0);
+      // @media-scoped rule is for adjusting gmail stuff. Last rule is for
+      // adjusting icons from non-SDK extensions including Mixmax.
+      const rule = `
+@media (max-width: ${applyWhenPageWidthUnder}px) {
+  .${ruleClassName} {
+    margin-right: ${minMarginRight}px${important};
+  }
+}
+.inboxsdk__appButton_container + * + * ~ *:not(.inboxsdk_escape_mod) {
+  margin-right: ${minMarginRight}px${important};
+}
+`;
+      setCss('dynamic_resize_searchbar', rule);
     }
 
     setSheetRules(newMarginRight);
@@ -134,8 +135,7 @@ class InboxAppToolbarButtonView {
     }
 
     this._stopper.onValue(() => {
-      const currentMarginRight = parseInt(style.getAttribute('data-min-margin-right'));
-      const newMarginRight = currentMarginRight-buttonWidth;
+      const newMarginRight = parseInt(document.documentElement.getAttribute(ATTR_NAME) || '0') - buttonWidth;
       setSheetRules(newMarginRight);
     });
   }

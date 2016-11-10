@@ -1,5 +1,5 @@
-// flow-typed signature: 7b3bc6a5025d594dae4c16105008248d
-// flow-typed version: dd49a9fb04/jest_v16.x.x/flow_>=v0.33.x
+// flow-typed signature: 961fb5c57518d93746c1ba2d3bd9263b
+// flow-typed version: 9bf4a10c26/jest_v17.x.x/flow_>=v0.33.x
 
 type JestMockFn = {
   (...args: Array<any>): any;
@@ -35,6 +35,13 @@ type JestClockType = {
   tick(): void;
   uninstall(): void;
 }
+
+type JestMatcherResult = {
+  message?: string | ()=>string;
+  pass: boolean;
+};
+
+type JestMatcher = (actual: any, expected: any) => JestMatcherResult;
 
 type JestExpectType = {
   not: JestExpectType;
@@ -87,7 +94,10 @@ declare var fdescribe: typeof describe;
 declare var xit: typeof it;
 declare var xtest: typeof it;
 
-declare function expect(value: any): JestExpectType;
+declare var expect: {
+  (value: any): JestExpectType;
+  extend(matchers: {[name:string]: JestMatcher}): void;
+};
 
 // TODO handle return type
 // http://jasmine.github.io/2.4/introduction.html#section-Spies
@@ -96,7 +106,7 @@ declare function spyOn(value: mixed, method: string): Object;
 declare var jest: {
   autoMockOff(): void;
   autoMockOn(): void;
-  clearAllMocks(): void;
+  resetAllMocks(): void;
   clearAllTimers(): void;
   currentTestPath(): void;
   disableAutomock(): void;
