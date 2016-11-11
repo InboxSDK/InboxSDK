@@ -534,7 +534,7 @@ class GmailComposeView {
 		const endDrag = _.once(() => simulateDragEnd(this._element, files));
 		try {
 			let firstLoop = true;
-			for (let files of _.chunk(files, 5)) {
+			for (let files of _.chunk(files, 3)) {
 				if (firstLoop) {
 					firstLoop = false;
 				} else {
