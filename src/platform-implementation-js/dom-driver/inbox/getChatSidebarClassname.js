@@ -49,16 +49,16 @@ const getChatSidebarClassname: () => string = _.once(() => {
     // [role=application]'s classnames.
     .filter(rule => classRegexes.some(r => r.test(rule.selectorText)))
     // Now just the rules that contain both margin-left and -right rules.
-    .filter(rule => rule.style.marginLeft && rule.style.marginRight)
+    .filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
     .value();
 
   const onlyNavSidebarRule = _.chain(rules)
     .filter(rule =>
-      parseFloat(rule.style.marginLeft) > parseFloat(rule.style.marginRight)
+      parseFloat(rule.style['margin-left']) > parseFloat(rule.style['margin-right'])
     ).head().value();
   const onlyChatSidebarRule = _.chain(rules)
     .filter(rule =>
-      parseFloat(rule.style.marginLeft) < parseFloat(rule.style.marginRight)
+      parseFloat(rule.style['margin-left']) < parseFloat(rule.style['margin-right'])
     ).head().value();
   if (!onlyNavSidebarRule || !onlyChatSidebarRule) {
     const err = new Error('Failed to parse element CSS rules');
