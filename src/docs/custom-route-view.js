@@ -6,7 +6,8 @@
 var CustomRouteView = /** @lends CustomRouteView */{
 
 	/**
-	* Gets the element representing the content area of this CustomRouteView
+	* Gets the element representing the content area of this CustomRouteView. You
+	* should inject your content into this element.
 	* @return {HTMLElement} the main element of your custom route
 	*/
 	getElement: function(){}
