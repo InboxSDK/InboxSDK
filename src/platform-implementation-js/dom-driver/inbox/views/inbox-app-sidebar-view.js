@@ -9,7 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import findParent from '../../../../common/find-parent';
-import getChatSidebarClassname from '../getChatSidebarClassname';
+import getSidebarClassnames from '../getSidebarClassnames';
 import delayAsap from '../../../lib/delay-asap';
 import waitForAnimationClickBlockerGone from '../waitForAnimationClickBlockerGone';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -271,17 +271,17 @@ class InboxAppSidebarView {
     if (!open) {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        this._mainParent.classList.contains(getChatSidebarClassname())
+        this._mainParent.classList.contains(getSidebarClassnames().chat)
       ) {
-        this._mainParent.classList.remove(getChatSidebarClassname());
+        this._mainParent.classList.remove(getSidebarClassnames().chat);
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     } else {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        !this._mainParent.classList.contains(getChatSidebarClassname())
+        !this._mainParent.classList.contains(getSidebarClassnames().chat)
       ) {
-        this._mainParent.classList.add(getChatSidebarClassname());
+        this._mainParent.classList.add(getSidebarClassnames().chat);
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     }

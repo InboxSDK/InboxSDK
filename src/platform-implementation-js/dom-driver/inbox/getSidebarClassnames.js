@@ -11,7 +11,7 @@ const cssProcessor = cssParser();
 // sidebar layout ourselves, and we don't want to hardcode this classname
 // because Inbox is prone to changing their classnames.
 
-const getChatSidebarClassname: () => string = _.once(() => {
+const getSidebarClassnames: () => {chat: string, nav: string} = _.once(() => {
   // We know that the page has a CSS rule which looks like
   //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
   // where .chat is the chat sidebar classname that we want to know, and .foo
@@ -94,17 +94,23 @@ const getChatSidebarClassname: () => string = _.once(() => {
     onlyNavSidebarClassNames
   );
 
-  if (chatSidebarClassNames.length !== 1) {
-    const err = new Error('Failed to find single chat sidebar classname');
+  const navSidebarClassNames: string[] = _.difference(
+    onlyNavSidebarClassNames,
+    onlyChatSidebarClassNames
+  );
+
+  if (chatSidebarClassNames.length !== 1 || navSidebarClassNames.length !== 1) {
+    const err = new Error('Failed to find single sidebar classnames');
     Logger.error(err, {
       onlyNavSidebarClassNames,
       onlyChatSidebarClassNames,
-      chatSidebarClassNames
+      chatSidebarClassNames,
+      navSidebarClassNames
     });
     throw err;
   }
 
-  return chatSidebarClassNames[0];
+  return {chat: chatSidebarClassNames[0], nav: navSidebarClassNames[0]};
 });
 
-export default getChatSidebarClassname;
+export default getSidebarClassnames;

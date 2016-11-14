@@ -1,6 +1,6 @@
 /* @flow */
 
-import getChatSidebarClassname from './getChatSidebarClassname';
+import getSidebarClassnames from './getSidebarClassnames';
 
 document.documentElement.innerHTML = `
 <head>
@@ -66,5 +66,5 @@ document.documentElement.innerHTML = `
 `;
 
 test('works', () => {
-  expect(getChatSidebarClassname()).toBe('m');
+  expect(getSidebarClassnames()).toEqual({chat: 'm', nav: 'M'});
 });
