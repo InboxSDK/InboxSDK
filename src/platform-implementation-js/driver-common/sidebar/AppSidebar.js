@@ -266,7 +266,7 @@ class Panel extends React.Component {
           [idMap('showControls')]: showControls
         })}
         style={{
-          transform: `scale(${scale})`,
+          transform: scale === 1 ? 'none' : `scale(${scale})`,
           boxShadow: shadow === 0 ? 'none' : `0px 0px ${shadow}px 0px rgba(0, 0, 0, 0.3)`
         }}
       >

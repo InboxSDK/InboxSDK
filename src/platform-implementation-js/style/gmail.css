@@ -775,7 +775,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .IDMAP_app_sidebar_in_use {
   /* Necessary to prevent z-indexes on sidebar items from causing them to show
   above stuff outside of the sidebar. */
-  transform: scale(1);
+  will-change: position;
 }
 
 .IDMAP_app_sidebar {
