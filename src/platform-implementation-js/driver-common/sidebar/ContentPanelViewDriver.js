@@ -70,6 +70,7 @@ class ContentPanelViewDriver {
         ));
       });
     this._stopper.onValue(() => {
+      if (!hasPlacedAlready) return;
       document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
         detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
