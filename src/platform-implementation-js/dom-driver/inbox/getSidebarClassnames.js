@@ -6,12 +6,18 @@ import Logger from '../../lib/logger';
 
 const cssProcessor = cssParser();
 
-// There's a specific classname when put on an element which switches the page
-// into the chat sidebar layout. We need to be able to activate that chat
-// sidebar layout ourselves, and we don't want to hardcode this classname
-// because Inbox is prone to changing their classnames.
+// There are specific classnames which are added when the chat or nav sidebars
+// are open which affect the layout of the page. We need to be able to activate
+// that chat sidebar layout ourselves, and we don't want to hardcode this
+// classname because Inbox is prone to changing their classnames.
 
-const getSidebarClassnames: () => {chat: string, nav: string} = _.once(() => {
+// We also get the classname for the center list element which has margins
+// applied to it depending on the current page width and sidebar settings to
+// keep it lined up with the search bar.
+
+const getSidebarClassnames: () => {
+  chat: ?string, nav: ?string, centerList: ?string
+} = _.once(() => {
   // We know that the page has a CSS rule which looks like
   //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
   // where .chat is the chat sidebar classname that we want to know, and .foo
@@ -82,35 +88,41 @@ const getSidebarClassnames: () => {chat: string, nav: string} = _.once(() => {
     }
   }
 
-  const onlyNavSidebarClassNames: string[] = getMentionedClassNames(
+  const onlyNavSidebarRuleClassNames: string[] = getMentionedClassNames(
     cssProcessor.process(onlyNavSidebarRule.selectorText).res
   );
-  const onlyChatSidebarClassNames: string[] = getMentionedClassNames(
+  const onlyChatSidebarRuleClassNames: string[] = getMentionedClassNames(
     cssProcessor.process(onlyChatSidebarRule.selectorText).res
   );
 
   const chatSidebarClassNames: string[] = _.difference(
-    onlyChatSidebarClassNames,
-    onlyNavSidebarClassNames
+    onlyChatSidebarRuleClassNames,
+    onlyNavSidebarRuleClassNames
   );
 
   const navSidebarClassNames: string[] = _.difference(
-    onlyNavSidebarClassNames,
-    onlyChatSidebarClassNames
+    onlyNavSidebarRuleClassNames,
+    onlyChatSidebarRuleClassNames
   );
 
-  if (chatSidebarClassNames.length !== 1 || navSidebarClassNames.length !== 1) {
-    const err = new Error('Failed to find single sidebar classnames');
-    Logger.error(err, {
-      onlyNavSidebarClassNames,
-      onlyChatSidebarClassNames,
+  const centerListClassName: ?string = _.last(onlyNavSidebarRuleClassNames) === _.last(onlyChatSidebarRuleClassNames) ?
+    _.last(onlyNavSidebarRuleClassNames) : null;
+
+  if (chatSidebarClassNames.length !== 1 || navSidebarClassNames.length !== 1 || !centerListClassName) {
+    Logger.error(new Error('Failed to find sidebar classnames'), {
+      onlyNavSidebarRuleClassNames,
+      onlyChatSidebarRuleClassNames,
       chatSidebarClassNames,
-      navSidebarClassNames
+      navSidebarClassNames,
+      centerListClassName
     });
-    throw err;
   }
 
-  return {chat: chatSidebarClassNames[0], nav: navSidebarClassNames[0]};
+  return {
+    chat: chatSidebarClassNames[0],
+    nav: navSidebarClassNames[0],
+    centerList: centerListClassName
+  };
 });
 
 export default getSidebarClassnames;

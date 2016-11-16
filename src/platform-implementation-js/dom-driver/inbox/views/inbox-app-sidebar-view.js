@@ -268,20 +268,22 @@ class InboxAppSidebarView {
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
+    const {chat} = getSidebarClassnames();
+    if (!chat) return;
     if (!open) {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        this._mainParent.classList.contains(getSidebarClassnames().chat)
+        this._mainParent.classList.contains(chat)
       ) {
-        this._mainParent.classList.remove(getSidebarClassnames().chat);
+        this._mainParent.classList.remove(chat);
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     } else {
       if (
         this._driver.getCurrentChatSidebarView().getMode() !== 'SIDEBAR' &&
-        !this._mainParent.classList.contains(getSidebarClassnames().chat)
+        !this._mainParent.classList.contains(chat)
       ) {
-        this._mainParent.classList.add(getSidebarClassnames().chat);
+        this._mainParent.classList.add(chat);
         this._driver.getPageCommunicator().fakeWindowResize();
       }
     }
