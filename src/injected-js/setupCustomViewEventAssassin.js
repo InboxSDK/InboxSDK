@@ -13,14 +13,14 @@ function md<T>(value: T): {value: T, configurable: boolean} {
 // view is open. Key combos which affect things still visible on the screen or
 // navigate to a new view are still allowed.
 
-const blockedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', 'Enter'];
+const blockedAnyModKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', 'Enter'];
 
 // These are only necessary for Safari
 const blockedKeyIdentifiers = ['Left', 'Right', 'Up', 'Down'];
 
-const blockedAnyModKeys = '!#[]{}_+=-;:\r\n1234567890`~';
-const blockedNoModKeys = ',xsyemrafz.ujkpnl';
-const blockedShiftKeys = 'parfniut';
+const blockedAnyModCharacters = '!#[]{}_+=-;:\r\n1234567890`~';
+const blockedNoModCharacters = ',xsyemrafz.ujkpnl';
+const blockedShiftCharacters = 'parfniut';
 
 const handler = defn(module, function(event: KeyboardEvent) {
   // If the key is in a blacklist and it originated while a custom view is
@@ -29,16 +29,16 @@ const handler = defn(module, function(event: KeyboardEvent) {
 
   const key = event.key || /* safari*/String.fromCharCode(event.which || event.keyCode);
   if (
-    includes(blockedKeys, key) ||
-    /* safari */ includes(blockedKeyIdentifiers, (event:any).keyIdentifier) ||
     includes(blockedAnyModKeys, key) ||
+    /* safari */ includes(blockedKeyIdentifiers, (event:any).keyIdentifier) ||
+    includes(blockedAnyModCharacters, key) ||
     (
       (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
-      includes(blockedNoModKeys, key)
+      includes(blockedNoModCharacters, key)
     ) ||
     (
       (event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
-      includes(blockedShiftKeys, key.toLowerCase())
+      includes(blockedShiftCharacters, key.toLowerCase())
     )
   ) {
     if (closest((event.target: any), 'input, [contenteditable]')) return;
