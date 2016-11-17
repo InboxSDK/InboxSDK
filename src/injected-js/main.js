@@ -21,6 +21,7 @@ if (!global.__InboxSDKInjected) {
     const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
 
     const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
+    const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin');
 
     RSVP.on('error', function(err) {
       console.error("Possibly uncaught promise rejection", err);
@@ -40,6 +41,7 @@ if (!global.__InboxSDKInjected) {
     setupDataExposer();
     setupEventReemitter();
     setupErrorSilencer();
+    setupCustomViewEventAssassin();
   } catch(err) {
     logger.error(err);
   } finally {

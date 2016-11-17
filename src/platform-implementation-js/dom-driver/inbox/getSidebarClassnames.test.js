@@ -66,5 +66,9 @@ document.documentElement.innerHTML = `
 `;
 
 test('works', () => {
-  expect(getSidebarClassnames()).toEqual({chat: 'm', nav: 'M'});
+  expect(getSidebarClassnames()).toEqual({
+    chat: 'm',
+    nav: 'M',
+    centerList: 'bz'
+  });
 });

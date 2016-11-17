@@ -1091,6 +1091,11 @@
       "from": "clone-stats@>=0.0.1 <0.0.2",
       "resolved": "https://registry.npmjs.org/clone-stats/-/clone-stats-0.0.1.tgz"
     },
+    "closest-ng": {
+      "version": "1.0.0",
+      "from": "closest-ng@latest",
+      "resolved": "https://registry.npmjs.org/closest-ng/-/closest-ng-1.0.0.tgz"
+    },
     "co": {
       "version": "4.6.0",
       "from": "co@>=4.6.0 <5.0.0",
@@ -4145,6 +4150,11 @@
       "version": "1.7.0",
       "from": "marked-terminal@>=1.6.2 <2.0.0",
       "resolved": "https://registry.npmjs.org/marked-terminal/-/marked-terminal-1.7.0.tgz"
+    },
+    "matches-selector-ng": {
+      "version": "1.0.0",
+      "from": "matches-selector-ng@latest",
+      "resolved": "https://registry.npmjs.org/matches-selector-ng/-/matches-selector-ng-1.0.0.tgz"
     },
     "md5": {
       "version": "2.2.1",
