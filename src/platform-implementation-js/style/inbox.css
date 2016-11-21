@@ -69,7 +69,7 @@
   right: 0;
   /* needs to take up the whole screen so that it blocks clicks to elements behind it. */
   min-height: 100%;
-  background: rgba(0,0,255,0.2);
+  background: rgb(242, 242, 242);
 }
 
 .IDMAP_custom_view_container {
