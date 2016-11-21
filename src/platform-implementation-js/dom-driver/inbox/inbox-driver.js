@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
@@ -14,6 +15,7 @@ import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import simulateKey from '../../lib/dom/simulate-key';
+import setCss from '../../lib/dom/set-css';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -22,6 +24,9 @@ import getComposeViewDriverStream from './get-compose-view-driver-stream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
+import idMap from '../../lib/idMap';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import getSidebarClassnames from './getSidebarClassnames';
 
 import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
@@ -330,7 +335,68 @@ class InboxDriver {
   }
 
   showCustomRouteView(element: HTMLElement): void {
-    throw new Error("Not implemented");
+    let customViewBase = document.querySelector(`body > .${idMap('custom_view_base')}`);
+    if (!customViewBase) {
+      customViewBase = document.createElement('div');
+      customViewBase.className = idMap('custom_view_base');
+      customViewBase.innerHTML = autoHtml `
+        <div class="${idMap('custom_view_container')}"></div>
+      `;
+
+      const {chat, nav} = getSidebarClassnames();
+
+      setCss('custom_view_base_margins', `
+        .${idMap('custom_view_base')}.${nav||'nav_sidebar'} >
+        .${idMap('custom_view_container')} {
+          margin-left: 232px;
+        }
+        .${idMap('custom_view_base')}.${chat||'chat_sidebar'} >
+        .${idMap('custom_view_container')} {
+          margin-right: 232px;
+        }
+      `);
+
+      const main = document.querySelector('body > div[class][id][jsaction][jslog]');
+      makeMutationObserverChunkedStream(main, {attributes: true, attributeFilter: ['class']})
+        .toProperty(() => null)
+        .onValue(() => {
+          [chat, nav].filter(Boolean).forEach(className => {
+            if (main.classList.contains(className)) {
+              customViewBase.classList.add(className);
+            } else {
+              customViewBase.classList.remove(className);
+            }
+          });
+        });
+
+      document.body.appendChild(customViewBase);
+    }
+
+    const container = customViewBase.querySelector('.'+idMap('custom_view_container'));
+    container.innerHTML = '';
+    container.appendChild(element);
+    customViewBase.style.display = '';
+
+    document.body.classList.add('inboxsdk__custom_view_active');
+
+    const main = document.querySelector('[id][jsaction] > div[token][class]');
+    if (main) {
+      main.style.display = 'none';
+    }
+  }
+
+  showNativeRouteView(): void {
+    document.body.classList.remove('inboxsdk__custom_view_active');
+    const customViewBase = document.querySelector(`body > .${idMap('custom_view_base')}`);
+    if (customViewBase) {
+      customViewBase.style.display = 'none';
+      const container = customViewBase.querySelector('.'+idMap('custom_view_container'));
+      container.innerHTML = '';
+    }
+    const main = document.querySelector('[id][jsaction] > div[token][class]');
+    if (main) {
+      main.style.display = '';
+    }
   }
 
   setShowNativeNavMarker(value: boolean) {
