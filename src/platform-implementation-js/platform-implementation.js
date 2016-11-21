@@ -62,8 +62,6 @@ export type PiOpts = {
 
 export class PlatformImplementation extends SafeEventEmitter {
 	_driver: Driver;
-	_appId: string;
-	_membrane: Membrane;
 	destroyed: boolean;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
@@ -86,15 +84,14 @@ export class PlatformImplementation extends SafeEventEmitter {
 		super();
 		const {appName, appIconUrl, VERSION:LOADER_VERSION} = piOpts;
 
-		this._appId = appId;
 		this._driver = driver;
-		this._membrane = new Membrane([
-			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, this._membrane)],
-			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, this._membrane)],
-			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
-			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, this._membrane, this.Conversations, driver)],
-			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, driver, this._membrane)],
-			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, driver, this._membrane)],
+		const membrane = new Membrane([
+			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
+			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
+			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, membrane, this.Conversations, driver)],
+			[InboxMessageView, viewDriver => new MessageView(viewDriver, appId, membrane, this.Conversations, driver)],
+			[GmailThreadView, viewDriver => new ThreadView(viewDriver, appId, driver, membrane)],
+			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, driver, membrane)],
 			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
 			[GmailRouteView, viewDriver => new RouteView(viewDriver)],
 			[DummyRouteViewDriver, viewDriver => new RouteView(viewDriver)]
@@ -107,14 +104,14 @@ export class PlatformImplementation extends SafeEventEmitter {
 		driver.setButterBar(this.ButterBar);
 
 		this.Compose = new Compose(appId, driver);
-		this.Conversations = new Conversations(appId, driver, this._membrane);
+		this.Conversations = new Conversations(appId, driver, membrane);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
 		this.User = new User(driver);
-		this.Lists = new Lists(appId, driver, this._membrane);
+		this.Lists = new Lists(appId, driver, membrane);
 		this.NavMenu = new NavMenu(appId, driver);
-		this.Router = new Router(appId, driver, this._membrane);
+		this.Router = new Router(appId, driver, membrane);
 		this.Search = new Search(appId, driver);
-		this.Toolbars = new Toolbars(appId, driver, this._membrane);
+		this.Toolbars = new Toolbars(appId, driver, membrane);
 		this.Widgets = new Widgets(appId, driver);
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version
