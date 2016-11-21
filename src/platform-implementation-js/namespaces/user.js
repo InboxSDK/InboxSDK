@@ -1,27 +1,28 @@
 /* @flow */
 
 import _ from 'lodash';
+import * as ud from 'ud';
 import type {Driver} from '../driver-interfaces/driver';
 
-// documented in src/docs/
-export default class User {
-	_driver: Driver;
+const memberMap = ud.defonce(module, ()=>new WeakMap());
 
+// documented in src/docs/
+class User {
 	constructor(driver: Driver){
-		this._driver = driver;
+		memberMap.set(this, {driver});
 	}
 
 	getEmailAddress() {
-		return this._driver.getUserEmailAddress();
+		return memberMap.get(this).driver.getUserEmailAddress();
 	}
 
 	getUserContact() {
-		this._driver.getLogger().deprecationWarning('User.getUserContact', 'User.getEmailAddress');
-		return this._driver.getUserContact();
+		memberMap.get(this).driver.getLogger().deprecationWarning('User.getUserContact', 'User.getEmailAddress');
+		return memberMap.get(this).driver.getUserContact();
 	}
 
 	getAccountSwitcherContactList() {
-		let list = this._driver.getAccountSwitcherContactList();
+		let list = memberMap.get(this).driver.getAccountSwitcherContactList();
 		const userEmail = this.getEmailAddress();
 		const listHasUser = !!_.find(list, item => item.emailAddress === userEmail);
 		if (!listHasUser) {
@@ -31,3 +32,5 @@ export default class User {
 		return list;
 	}
 }
+
+export default ud.defn(module, User);

@@ -48,6 +48,7 @@ import type {Driver} from './driver-interfaces/driver';
 import type {AppLogger} from './lib/logger';
 
 const loadedAppIds: Set<string> = new Set();
+const memberMap = new WeakMap();
 
 export type PiOpts = {
 	appName: ?string;
@@ -61,7 +62,6 @@ export type PiOpts = {
 };
 
 export class PlatformImplementation extends SafeEventEmitter {
-	_driver: Driver;
 	destroyed: boolean;
 	LOADER_VERSION: string;
 	IMPL_VERSION: string;
@@ -84,7 +84,13 @@ export class PlatformImplementation extends SafeEventEmitter {
 		super();
 		const {appName, appIconUrl, VERSION:LOADER_VERSION} = piOpts;
 
-		this._driver = driver;
+		const members = {driver};
+		memberMap.set(this, members);
+
+		if (process.env.NODE_ENV !== 'production') {
+			(this:any)._members = members;
+		}
+
 		const membrane = new Membrane([
 			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
 			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
@@ -124,7 +130,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 	destroy() {
 		if (!this.destroyed) {
 			this.destroyed = true;
-			this._driver.destroy();
+			memberMap.get(this).driver.destroy();
 			this.emit('destroy');
 		}
 	}
