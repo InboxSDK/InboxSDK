@@ -305,9 +305,11 @@ class InboxDriver {
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented');
-    return {
-      getEventStream: _.constant(Kefir.never())
+    const obj = {
+      getEventStream: _.constant(Kefir.never()),
+      addNavItem: () => obj
     };
+    return obj;
   }
 
   getSentMailNativeNavItem(): Promise<Object> {
