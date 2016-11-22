@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 import includes from 'lodash/includes';
 import closest from 'closest-ng';
+import * as logger from './injected-logger';
 
 function md<T>(value: T): {value: T, configurable: boolean} {
   return {value, configurable: true};
@@ -23,38 +24,56 @@ const blockedNoModCharacters = ',xsyemrafz.ujkpnl';
 const blockedShiftCharacters = 'parfniut';
 
 const handler = defn(module, function(event: KeyboardEvent) {
-  // If the key is in a blacklist and it originated while a custom view is
-  // present, then maim the event object before Gmail or Inbox sees it.
-  if (!document.body.classList.contains('inboxsdk__custom_view_active')) return;
+  try {
+    // If the key is in a blacklist and it originated while a custom view is
+    // present, then maim the event object before Gmail or Inbox sees it.
+    if (!document.body.classList.contains('inboxsdk__custom_view_active')) return;
 
-  const key = event.key || /* safari*/String.fromCharCode(event.which || event.keyCode);
-  if (
-    includes(blockedAnyModKeys, key) ||
-    /* safari */ includes(blockedKeyIdentifiers, (event:any).keyIdentifier) ||
-    includes(blockedAnyModCharacters, key) ||
-    (
-      (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
-      includes(blockedNoModCharacters, key)
-    ) ||
-    (
-      (event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
-      includes(blockedShiftCharacters, key.toLowerCase())
-    )
-  ) {
-    if (closest((event.target: any), 'input, [contenteditable]')) return;
+    const target: HTMLElement = (event.target: any);
 
-    Object.defineProperties(event, {
-      altKey: md(false),
-      ctrlKey: md(false),
-      shiftKey: md(false),
-      metaKey: md(false),
+    const key = event.key || /* safari*/String.fromCharCode(event.which || event.keyCode);
+    if (
+      includes(blockedAnyModKeys, key) ||
+      /* safari */ includes(blockedKeyIdentifiers, (event:any).keyIdentifier) ||
+      includes(blockedAnyModCharacters, key) ||
+      (
+        (!event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
+        includes(blockedNoModCharacters, key)
+      ) ||
+      (
+        (event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) &&
+        includes(blockedShiftCharacters, key.toLowerCase())
+      )
+    ) {
+      if (
+        // Gmail already ignores events originating in these elements even if
+        // they were made by an extension.
+        closest(target, 'input, textarea, [contenteditable]') ||
+        (
+          // Gmail ignores events originating in its own interactive elements
+          // which tend to have certain role attributes.
+          !closest(target, '.inboxsdk__custom_view') &&
+          closest(target, '[role=button], [role=link]')
+        )
+      ) {
+        return;
+      }
 
-      charCode: md(92),
-      code: md('Backslash'),
-      key: md('\\'),
-      keyCode: md(92),
-      which: md(92)
-    });
+      Object.defineProperties(event, {
+        altKey: md(false),
+        ctrlKey: md(false),
+        shiftKey: md(false),
+        metaKey: md(false),
+
+        charCode: md(92),
+        code: md('Backslash'),
+        key: md('\\'),
+        keyCode: md(92),
+        which: md(92)
+      });
+    }
+  } catch (err) {
+    logger.error(err);
   }
 });
 
