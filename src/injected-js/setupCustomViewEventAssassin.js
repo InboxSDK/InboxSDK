@@ -27,6 +27,8 @@ const handler = defn(module, function(event: KeyboardEvent) {
   // present, then maim the event object before Gmail or Inbox sees it.
   if (!document.body.classList.contains('inboxsdk__custom_view_active')) return;
 
+  const target: HTMLElement = (event.target: any);
+
   const key = event.key || /* safari*/String.fromCharCode(event.which || event.keyCode);
   if (
     includes(blockedAnyModKeys, key) ||
@@ -41,7 +43,19 @@ const handler = defn(module, function(event: KeyboardEvent) {
       includes(blockedShiftCharacters, key.toLowerCase())
     )
   ) {
-    if (closest((event.target: any), 'input, [contenteditable]')) return;
+    if (
+      // Gmail already ignores events originating in these elements even if
+      // they were made by an extension.
+      closest(target, 'input, textarea, [contenteditable]') ||
+      (
+        // Gmail ignores events originating in its own interactive elements
+        // which tend to have certain role attributes.
+        !closest(target, '.inboxsdk__custom_view') &&
+        closest(target, '[role=button], [role=link]')
+      )
+    ) {
+      return;
+    }
 
     Object.defineProperties(event, {
       altKey: md(false),
