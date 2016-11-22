@@ -48,7 +48,7 @@ const handler = defn(module, function(event: KeyboardEvent) {
       if (
         // Gmail already ignores events originating in these elements even if
         // they were made by an extension.
-        closest(target, 'input, textarea, [contenteditable]') ||
+        closest(target, 'input, textarea, button, [contenteditable]') ||
         (
           // Gmail ignores events originating in its own interactive elements
           // which tend to have certain role attributes.
