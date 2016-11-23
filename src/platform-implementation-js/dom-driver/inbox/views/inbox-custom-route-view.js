@@ -20,7 +20,7 @@ export default class InboxCustomRouteView {
   constructor(routeID: string, params: Object) {
     // Check we implement interface
     (this: RouteViewDriver);
-    this._routeID === routeID;
+    this._routeID = routeID;
     this._params = params;
     this._customViewElement = document.createElement('div');
     this.setFullWidth(true);
@@ -68,7 +68,7 @@ export default class InboxCustomRouteView {
     return this._eventStream;
   }
 
-  getCustomViewElement(): HTMLElement{
+  getCustomViewElement(): ?HTMLElement{
     return this._customViewElement;
   }
 
@@ -77,10 +77,6 @@ export default class InboxCustomRouteView {
   }
 
   getHash(): string {
-    throw new Error('should not happen');
-  }
-
-  getCustomViewElement(): ?HTMLElement {
     throw new Error('should not happen');
   }
 
