@@ -337,23 +337,20 @@ class InboxDriver {
   }
 
   showCustomRouteView(element: HTMLElement): void {
-    let customViewBase = document.querySelector(`body > .${idMap('custom_view_base')}`);
+    let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (!customViewBase) {
       customViewBase = document.createElement('div');
-      customViewBase.className = idMap('custom_view_base');
-      customViewBase.innerHTML = autoHtml `
-        <div class="${idMap('custom_view_container')}"></div>
-      `;
+      customViewBase.className = 'inboxsdk__custom_view';
 
       const {chat, nav} = getSidebarClassnames();
 
       setCss('custom_view_base_margins', `
-        .${idMap('custom_view_base')}.${nav||'nav_sidebar'} >
-        .${idMap('custom_view_container')} {
+        .inboxsdk__custom_view.${nav||'nav_sidebar'} >
+        .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
           margin-left: 232px;
         }
-        .${idMap('custom_view_base')}.${chat||'chat_sidebar'} >
-        .${idMap('custom_view_container')} {
+        .inboxsdk__custom_view.${chat||'chat_sidebar'} >
+        .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
           margin-right: 232px;
         }
       `);
@@ -374,9 +371,8 @@ class InboxDriver {
       document.body.appendChild(customViewBase);
     }
 
-    const container = customViewBase.querySelector('.'+idMap('custom_view_container'));
-    container.innerHTML = '';
-    container.appendChild(element);
+    customViewBase.innerHTML = '';
+    customViewBase.appendChild(element);
     customViewBase.style.display = '';
 
     document.body.classList.add('inboxsdk__custom_view_active');
@@ -389,11 +385,10 @@ class InboxDriver {
 
   showNativeRouteView(): void {
     document.body.classList.remove('inboxsdk__custom_view_active');
-    const customViewBase = document.querySelector(`body > .${idMap('custom_view_base')}`);
+    const customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (customViewBase) {
       customViewBase.style.display = 'none';
-      const container = customViewBase.querySelector('.'+idMap('custom_view_container'));
-      container.innerHTML = '';
+      customViewBase.innerHTML = '';
     }
     const main = document.querySelector('[id][jsaction] > div[token][class]');
     if (main) {

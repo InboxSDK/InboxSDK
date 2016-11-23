@@ -62,7 +62,7 @@
 
 /* custom view */
 
-.IDMAP_custom_view_base {
+.inboxsdk__custom_view {
   position: absolute;
   top: 0;
   left: 0;

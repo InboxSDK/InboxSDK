@@ -41,7 +41,6 @@ export default class InboxRouteView {
   _params: Object;
   _eventStream = kefirBus();
   _stopper = kefirStopper();
-  _customViewElement: ?HTMLElement = null;
 
   constructor(el: HTMLElement, type: string) {
     // Check we implement interface
@@ -54,7 +53,6 @@ export default class InboxRouteView {
     this._routeID = getRouteID(path);
     this._params = getParams(path);
     this._routeType = this._routeID === 'UNKNOWN' ? 'UNKNOWN' : 'LIST';
-    this._customViewElement = null;
 
     console.log('el jsan', el.getAttribute('jsan'));
     if (this._type === 'CUSTOM') {
@@ -68,7 +66,6 @@ export default class InboxRouteView {
   destroy(){
     this._eventStream.end();
     this._stopper.destroy();
-    if(this._customViewElement) this._customViewElement.remove();
   }
 
   getElement(): HTMLElement {
@@ -96,7 +93,7 @@ export default class InboxRouteView {
   }
 
   getCustomViewElement(): ?HTMLElement{
-    return this._customViewElement;
+    return null;
   }
 
   refresh() {
@@ -117,5 +114,9 @@ export default class InboxRouteView {
 
   addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
     throw new Error('not implemented yet');
+  }
+
+  setFullWidth(fullWidth: boolean) {
+    throw new Error('should not happen');
   }
 }
