@@ -355,6 +355,9 @@ class InboxDriver {
         }
       `);
 
+      // Mirror the nav and chat sidebar classnames onto the inboxsdk__custom_view
+      // element so that if the custom_view_container element also has the centerList
+      // classname, then Inbox's margin rules for centerList will apply to it.
       const main = document.querySelector('body > div[class][id][jsaction][jslog]');
       makeMutationObserverChunkedStream(main, {attributes: true, attributeFilter: ['class']})
         .toProperty(() => null)
