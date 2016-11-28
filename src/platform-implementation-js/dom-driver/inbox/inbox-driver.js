@@ -43,6 +43,7 @@ import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
+import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
@@ -336,7 +337,7 @@ class InboxDriver {
     return _.noop;
   }
 
-  showCustomRouteView(element: HTMLElement): void {
+  showCustomRouteView(view: InboxCustomRouteView): void {
     let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (!customViewBase) {
       customViewBase = document.createElement('div');
@@ -374,8 +375,11 @@ class InboxDriver {
       document.body.appendChild(customViewBase);
     }
 
+    const el = view.getCustomViewElement();
+    if (!el) throw new Error('should not happen');
+
     customViewBase.innerHTML = '';
-    customViewBase.appendChild(element);
+    customViewBase.appendChild(el);
     customViewBase.style.display = '';
 
     document.body.classList.add('inboxsdk__custom_view_active');
