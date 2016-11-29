@@ -347,7 +347,7 @@ class GmailMessageView {
 			}
 		});
 
-		kefirCast(Kefir, iconDescriptor)
+		kefirCast((Kefir: any), iconDescriptor)
 			.takeUntilBy(this._stopper)
 			.onValue(opts => {
 				if (!opts) {

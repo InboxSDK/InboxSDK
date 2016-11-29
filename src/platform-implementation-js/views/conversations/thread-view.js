@@ -28,7 +28,7 @@ class ThreadView extends EventEmitter {
 	}
 
 	addSidebarContentPanel(descriptor: Object): ?ContentPanelView {
-		const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+		const descriptorPropertyStream = kefirCast((Kefir: any), descriptor).toProperty();
 		const members = memberMap.get(this);
 
 		members.driver.getLogger().eventSdkPassive('threadView.addSidebarContentPanel');

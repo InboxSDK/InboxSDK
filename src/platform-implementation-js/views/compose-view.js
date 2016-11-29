@@ -49,7 +49,7 @@ class ComposeView extends EventEmitter {
 
 	addButton(buttonDescriptor){
 		var members = memberMap.get(this);
-		var buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
+		var buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 
 		var optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
 		return new ComposeButtonView(optionsPromise, members.composeViewImplementation);
@@ -73,7 +73,7 @@ class ComposeView extends EventEmitter {
 
 	addRecipientRow(options){
 		return {
-			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(kefirCast(Kefir, options))
+			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(kefirCast((Kefir: any), options))
 		};
 	}
 

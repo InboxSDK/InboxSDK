@@ -37,7 +37,7 @@ export default class NavItemView extends EventEmitter {
 		const appId = members.appId;
 		const navItemViews = members.navItemViews;
 
-		var navItemDescriptorPropertyStream = kefirCast(Kefir, navItemDescriptor).toProperty();
+		var navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
 		var navItemView = new NavItemView(appId, driver, navItemDescriptorPropertyStream);
 
 		members.deferred.promise.then(function(navItemViewDriver){

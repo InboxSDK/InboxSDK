@@ -51,7 +51,7 @@ class Widgets {
   }
 
   showTopMessageBarView(options: Object): TopMessageBarView {
-    const topMessageBarViewDriver = get(memberMap, this).driver.createTopMessageBarDriver(kefirCast(Kefir, options));
+    const topMessageBarViewDriver = get(memberMap, this).driver.createTopMessageBarDriver(kefirCast((Kefir: any), options));
 
     return new TopMessageBarView({
       topMessageBarViewDriver
