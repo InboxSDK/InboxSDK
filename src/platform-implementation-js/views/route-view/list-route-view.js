@@ -28,7 +28,7 @@ class ListRouteView extends RouteView {
 	addCollapsibleSection(collapsibleSectionDescriptor: ?Object): CollapsibleSectionView {
 		const members = get(membersMap, this);
 
-		const collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(kefirCast(Kefir, collapsibleSectionDescriptor).toProperty(), members.appId);
+		const collapsibleSectionViewDriver = members.routeViewDriver.addCollapsibleSection(kefirCast((Kefir: any), collapsibleSectionDescriptor).toProperty(), members.appId);
 		const collapsibleSectionView = new CollapsibleSectionView(collapsibleSectionViewDriver, members.driver);
 
 		members.sectionViews.push(collapsibleSectionView);
@@ -38,7 +38,7 @@ class ListRouteView extends RouteView {
 	addSection(sectionDescriptor: ?Object): SectionView {
 		const members = get(membersMap, this);
 
-		const sectionViewDriver = members.routeViewDriver.addSection(kefirCast(Kefir, sectionDescriptor).toProperty(), members.appId);
+		const sectionViewDriver = members.routeViewDriver.addSection(kefirCast((Kefir: any), sectionDescriptor).toProperty(), members.appId);
 		const sectionView = new SectionView(sectionViewDriver, members.driver);
 
 		members.sectionViews.push(sectionView);

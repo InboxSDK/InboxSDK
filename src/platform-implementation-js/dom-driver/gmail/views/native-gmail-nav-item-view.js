@@ -177,7 +177,7 @@ export default class NativeGmailNavItemView {
 		expandoElement.setAttribute('role', 'link');
 		expandoElement.title = `Expand ${link ? link.title || link.textContent : ''}`;
 
-		expandoElement.addEventListener('click', e => {
+		expandoElement.addEventListener('click', (e: MouseEvent) => {
 			this._toggleCollapse();
 			e.stopPropagation();
 			e.preventDefault();

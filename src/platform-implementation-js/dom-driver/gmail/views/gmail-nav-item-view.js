@@ -321,7 +321,7 @@ export default class GmailNavItemView {
 
 		anchor.href = '#';
 
-		anchor.addEventListener('click', function(e){
+		anchor.addEventListener('click', function(e: MouseEvent){
 			e.stopPropagation();
 			e.preventDefault();
 
@@ -442,7 +442,7 @@ export default class GmailNavItemView {
 		expandoElement.title = `Expand ${this._name || ''}`;
 
 		var self = this;
-		expandoElement.addEventListener('click', function(e){
+		expandoElement.addEventListener('click', function(e: MouseEvent){
 			self._toggleCollapse();
 			e.stopPropagation();
 		});

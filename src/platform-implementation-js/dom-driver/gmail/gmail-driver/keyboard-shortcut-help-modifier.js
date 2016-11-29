@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type KeyboardShortcutHandle from '../../../views/keyboard-shortcut-handle';
@@ -12,7 +12,7 @@ export default class KeyboardShortcutHelpModifier {
 	_appId: ?string;
 	_appName: ?string;
 	_appIconUrl: ?string;
-	_stopper: Kefir.Observable<null>&{destroy:()=>void};
+	_stopper: Stopper;
 	_shortcuts: Set<KeyboardShortcutHandle>;
 
 	constructor() {

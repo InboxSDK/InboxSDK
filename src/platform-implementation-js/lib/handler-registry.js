@@ -38,7 +38,7 @@ export default class HandlerRegistry<T> {
   addTarget(target: T) {
     this._targets.push(target);
 
-    if(typeof target.on === 'function') {
+    if(target && typeof target === 'object' && typeof target.on === 'function') {
       target.on('destroy', () => {
         this.removeTarget(target);
       });

@@ -57,7 +57,7 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	addToolbarButtonForApp(buttonDescriptor: Object){
-		const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
+		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 		const appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptorStream);
 		const appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
 

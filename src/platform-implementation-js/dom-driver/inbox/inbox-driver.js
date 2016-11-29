@@ -8,6 +8,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
 import Logger from '../../lib/logger';
@@ -67,7 +68,7 @@ class InboxDriver {
   _logger: Logger;
   _opts: PiOpts;
   _envData: EnvData;
-  _stopper: Kefir.Observable<any>&{destroy:()=>void};
+  _stopper: Stopper;
   onready: Promise<void>;
   _routeViewDriverStream: Kefir.Observable<any>;
   _rowListViewDriverStream: Kefir.Observable<any>;

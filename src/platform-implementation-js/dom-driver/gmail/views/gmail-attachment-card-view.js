@@ -311,7 +311,7 @@ class GmailAttachmentCardView {
 				var downloadLink = document.createElement('a');
 				downloadLink.href = options.downloadUrl;
 
-				(downloadLink:any).addEventListener('click', function(e) {
+				downloadLink.addEventListener('click', function(e: MouseEvent) {
 					e.stopPropagation();
 				}, true);
 

@@ -171,7 +171,7 @@ class InboxDrawerView {
       closeButton.type = 'button';
       closeButton.title = 'Close';
       closeButton.className = 'inboxsdk__close_button';
-      (closeButton:any).addEventListener('click', () => {
+      closeButton.addEventListener('click', (e: MouseEvent) => {
         this.close();
       });
       titleBar.appendChild(closeButton);

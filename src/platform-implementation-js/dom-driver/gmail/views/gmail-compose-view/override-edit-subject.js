@@ -27,11 +27,11 @@ export default function overrideEditSubject(gmailDriver: GmailDriver, gmailCompo
     }
   }
 
-  (menuItem: any).addEventListener('click', e => {
+  menuItem.addEventListener('click', (e: MouseEvent) => {
     e.stopPropagation();
   }, true);
 
-  (menuItem: any).addEventListener('mouseup', e => {
+  menuItem.addEventListener('mouseup', (e: MouseEvent) => {
     e.stopPropagation();
     _cloneContentToNewCompose(gmailDriver, gmailComposeView);
   }, true);

@@ -165,7 +165,7 @@ class InboxAttachmentCardView {
       el.className = 'inboxsdk__attachment_card_button';
       if (button.downloadUrl) {
         el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
-        (el:any).addEventListener('click', event => {
+        (el:any).addEventListener('click', (event: MouseEvent) => {
           event.stopPropagation();
           event.preventDefault();
           let prevented = false;
@@ -179,7 +179,7 @@ class InboxAttachmentCardView {
           if (prevented) return;
           const downloadLink = document.createElement('a');
           downloadLink.href = button.downloadUrl;
-          (downloadLink:any).addEventListener('click', function(e) {
+          downloadLink.addEventListener('click', function(e: MouseEvent) {
             e.stopPropagation();
           }, true);
           if (button.openInNewTab) {
@@ -193,7 +193,7 @@ class InboxAttachmentCardView {
           <div style="background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElEQVQ4y+2UMQ6AQAgEwfhQnnJP4adjc4UxB0ehhXqbULE7BRAUkLu1yQP6OXQveEab1DXTD0O9b53kIui+QReicnJ5lM2gArQA2LLcDCqAXYA2y1SgZ7BV/Lr+6TugB0K2GxxDXjEZAAAAAElFTkSuQmCC)"></div>
         `;
       } else {
-        (el:any).addEventListener('click', event => {
+        el.addEventListener('click', (event: MouseEvent) => {
           event.stopPropagation();
           event.preventDefault();
           if (button.onClick) {

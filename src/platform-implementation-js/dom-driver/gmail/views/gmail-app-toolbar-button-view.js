@@ -6,6 +6,7 @@ import censorHTMLtree from '../../../../common/censor-html-tree';
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 import updateIcon from '../lib/update-icon/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
@@ -13,7 +14,7 @@ import DropdownView from '../../../widgets/buttons/dropdown-view';
 import type Driver from '../gmail-driver';
 
 export default class GmailAppToolbarButtonView {
-  _stopper: Kefir.Observable<null>&{destroy:()=>void};
+  _stopper: Stopper;
   _iconSettings: Object;
   _element: ?HTMLElement = null;
   _activeDropdown: ?DropdownView;
@@ -113,7 +114,7 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
                <span class="inboxsdk__appButton_title"></span>
              </a>`;
 
-  (element:any).addEventListener('click', (event) => {
+  element.addEventListener('click', (event: MouseEvent) => {
     event.preventDefault();
     onclick(event);
   });
