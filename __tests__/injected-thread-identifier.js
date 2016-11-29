@@ -28,7 +28,7 @@ test('threadIdentifier works', () => {
 
   // Identify an email using its click handler
   let clickedCount = 0;
-  amb.addEventListener('click', function(event) {
+  amb.addEventListener('click', function(event: MouseEvent) {
     clickedCount++;
     const win = window.open('?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a5f1c5ad340727&cvid=1', '_blank');
 
@@ -63,7 +63,7 @@ test('threadIdentifier works', () => {
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi2)).toBe(null);
 
   // Give the first one a click handler and identify it.
-  twi1.addEventListener('click', function(event) {
+  twi1.addEventListener('click', function(event: MouseEvent) {
     window.open('?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a0c5f5571b501c&cvid=1', '_blank');
   });
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi1)).toBe('14a0c5f5571b501c');

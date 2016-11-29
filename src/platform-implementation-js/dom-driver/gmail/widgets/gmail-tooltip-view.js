@@ -165,7 +165,7 @@ export default class GmailTooltipView {
 
 			let closeElement = this._element.querySelector('.inboxsdk__tooltip_close');
 			if(closeElement){
-				closeElement.addEventListener('click', () => {
+				closeElement.addEventListener('click', (e: MouseEvent) => {
 					this.destroy();
 				});
 			}

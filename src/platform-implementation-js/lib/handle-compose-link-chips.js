@@ -112,7 +112,7 @@ function _addEnhancements(chipElement: HTMLElement) {
       anchor.addEventListener('mousedown', function(e: MouseEvent) {
         e.stopImmediatePropagation();
       }, true);
-      anchor.addEventListener('click', function(e) {
+      anchor.addEventListener('click', function(e: MouseEvent) {
         e.stopImmediatePropagation();
       }, true);
     }
@@ -125,7 +125,7 @@ function _addEnhancements(chipElement: HTMLElement) {
         chipElement.remove();
     }, true);
 
-    xElement.addEventListener('click', function(e){
+    xElement.addEventListener('click', function(e: MouseEvent){
         e.stopImmediatePropagation();
         e.preventDefault();
     }, true);

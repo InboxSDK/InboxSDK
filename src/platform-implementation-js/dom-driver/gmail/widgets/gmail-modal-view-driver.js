@@ -124,7 +124,7 @@ class GmailModalViewDriver {
   _setupEventStream() {
     var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
 
-    closeElement.addEventListener('click', event => {
+    closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({
         eventName: 'closeClick',
         domEvent: event

@@ -1,11 +1,10 @@
 /* @flow */
-//jshint ignore:start
 
 var Kefir = require('kefir');
 
 type Emitter = {
-  addEventListener: Function;
-  removeEventListener: Function;
+  +addEventListener: Function;
+  +removeEventListener: Function;
 };
 
 export default function fromEventTargetCapture(target: Emitter, eventName: string): Kefir.Observable<any> {

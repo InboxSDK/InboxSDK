@@ -24,16 +24,16 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
   const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
   if(menuButtonElement){
     //the modal that contains this email address is not visible, so we need to bring the modal up
-    function block(event){event.stopPropagation();};
+    function block(event: MouseEvent){event.stopPropagation();};
     function modifyFocusEvent(event){
       event.shouldIgnore = true;
     };
-    (element: any).addEventListener('click', block);
+    element.addEventListener('click', block);
     (document: any).addEventListener('focus', modifyFocusEvent, true);
     simulateClick(menuButtonElement);
     updateContactCacheFromModal(headerContact);
     simulateClick(menuButtonElement);
-    (element: any).removeEventListener('click', block);
+    element.removeEventListener('click', block);
     (document: any).removeEventListener('focus', modifyFocusEvent, true);
 
     cacheEntry = cache[headerContact.emailAddress];

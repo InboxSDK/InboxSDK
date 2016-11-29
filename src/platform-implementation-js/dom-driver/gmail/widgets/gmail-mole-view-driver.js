@@ -43,28 +43,28 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
       this._element.classList.add('inboxsdk__mole_view_chromeless');
     }
     else{
-      this._element.querySelector('.inboxsdk__mole_view_titlebar').addEventListener('click', e => {
+      this._element.querySelector('.inboxsdk__mole_view_titlebar').addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(!this.getMinimized());
         e.preventDefault();
         e.stopPropagation();
       });
 
       var minimizeBtn = this._element.querySelector('.Hl');
-      minimizeBtn.addEventListener('click', e => {
+      minimizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(true);
         e.preventDefault();
         e.stopPropagation();
       });
 
       var maximizeBtn = this._element.querySelector('.Hk');
-      maximizeBtn.addEventListener('click', e => {
+      maximizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(false);
         e.preventDefault();
         e.stopPropagation();
       });
 
       var closeBtn = this._element.querySelector('.Ha');
-      closeBtn.addEventListener('click', e => {
+      closeBtn.addEventListener('click', (e: MouseEvent) => {
         this.destroy();
         e.preventDefault();
         e.stopPropagation();
@@ -89,7 +89,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
             img.className = titleButton.iconClass;
           }
           img.setAttribute('data-tooltip', titleButton.title);
-          img.addEventListener('click', event => {
+          img.addEventListener('click', (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
             titleButton.onClick.call(null);

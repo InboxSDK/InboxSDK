@@ -5,6 +5,7 @@ import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
@@ -27,7 +28,7 @@ import Logger from '../../../lib/logger';
 class GmailToolbarView {
 	_element: HTMLElement;
 	_ready: Kefir.Observable<GmailToolbarView>;
-	_stopper: Kefir.Observable<null>&{destroy:Function};
+	_stopper: Stopper;
 	_routeViewDriver: RouteViewDriver;
 	_buttonViewControllers: Object[];
 	_moreMenuItems: Object[];
@@ -451,7 +452,7 @@ class GmailToolbarView {
 		var itemElement = document.createElement('div');
 		itemElement.setAttribute('class', 'J-N inboxsdk__menuItem');
 		itemElement.setAttribute('role', 'menuitem');
-		itemElement.setAttribute('orderHint', buttonDescriptor.orderHint || 0);
+		itemElement.setAttribute('orderHint', String(buttonDescriptor.orderHint || 0));
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
@@ -461,21 +462,18 @@ class GmailToolbarView {
 			'</div>'
 		].join('');
 
-		// :any cast to work around https://github.com/facebook/flow/issues/1155
-		(itemElement:any).addEventListener('mouseenter', function(){
+		itemElement.addEventListener('mouseenter', function(e: MouseEvent){
 			itemElement.classList.add('J-N-JT');
 		});
 
-		(itemElement:any).addEventListener('mouseleave', function(){
+		itemElement.addEventListener('mouseleave', function(e: MouseEvent){
 			itemElement.classList.remove('J-N-JT');
 		});
 
-		(itemElement:any).addEventListener('click', function(){
-
+		itemElement.addEventListener('click', function(e: MouseEvent){
 			if(buttonDescriptor.onClick){
 				buttonDescriptor.onClick();
 			}
-
 		});
 
 		return itemElement;

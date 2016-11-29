@@ -18,7 +18,7 @@ class InboxModalView {
 
     const closeElement = this._modalContainerElement.querySelector('.inboxsdk__close_button');
 
-    closeElement.addEventListener('click', event => {
+    closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({
         eventName: 'closeClick',
         domEvent: event
@@ -72,7 +72,7 @@ class InboxModalView {
         buttonEl.className = buttonDescriptor.type === 'PRIMARY_ACTION' ? 'inboxsdk__primary' : '';
         buttonEl.type = 'button';
         buttonEl.value = buttonDescriptor.text;
-        buttonEl.addEventListener('click', event => {
+        buttonEl.addEventListener('click', (event: MouseEvent) => {
           event.preventDefault();
           buttonDescriptor.onClick.call(null);
         });

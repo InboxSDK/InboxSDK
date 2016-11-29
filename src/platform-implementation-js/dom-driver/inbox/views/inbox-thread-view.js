@@ -146,7 +146,7 @@ class InboxThreadView {
               <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
             </button>
           `;
-          container.querySelector('button').addEventListener('click', event => {
+          container.querySelector('button').addEventListener('click', (event: MouseEvent) => {
             event.stopPropagation();
             this._driver.getAppSidebarView().open();
             panel.scrollIntoView();

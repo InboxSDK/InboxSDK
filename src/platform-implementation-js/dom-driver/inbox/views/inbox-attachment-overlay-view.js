@@ -53,7 +53,7 @@ class InboxAttachmentOverlayView {
 
     const el = document.createElement('button');
     el.className = 'inboxsdk__attachment_overlay_button';
-    (el:any).addEventListener('click', event => {
+    el.addEventListener('click', (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
       if (button.onClick) {

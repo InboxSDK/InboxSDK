@@ -29,7 +29,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       closeButton.type = 'button';
       closeButton.title = 'Close';
       closeButton.className = 'inboxsdk__close_button';
-      (closeButton:any).addEventListener('click', () => {
+      closeButton.addEventListener('click', (e: MouseEvent) => {
         this.destroy();
       });
       this._el.appendChild(closeButton);
@@ -59,7 +59,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       var buttonEl = document.createElement('input');
       buttonEl.type = 'button';
       buttonEl.value = button.title;
-      buttonEl.addEventListener('click', event => {
+      buttonEl.addEventListener('click', (event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
         button.onClick.call(null);

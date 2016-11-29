@@ -9,6 +9,7 @@ import * as ud from 'ud';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -64,7 +65,7 @@ class GmailComposeView {
 	_isStandalone: boolean;
 	_emailWasSent: boolean;
 	_driver: GmailDriver;
-	_managedViewControllers: Array<{destroy: () => void}>;
+	_managedViewControllers: Array<{destroy(): void}>;
 	_eventStream: Bus<any>;
 	_isTriggeringADraftSavePending: boolean;
 	_buttonViewControllerTooltipMap: WeakMap<Object, Object>;
@@ -77,7 +78,7 @@ class GmailComposeView {
 	_draftSaving: boolean;
 	_draftIDpromise: ?Promise<?string>;
 	_threadID: ?string;
-	_stopper: Kefir.Observable<null>&{destroy:()=>void};
+	_stopper: Stopper;
 	_lastSelectionRange: ?Range;
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
@@ -830,7 +831,7 @@ class GmailComposeView {
 		return _.filter(this._element.querySelectorAll('.GS tr'), (tr) => !tr.classList.contains('inboxsdk__recipient_row'));
 	}
 
-	addManagedViewController(viewController: {destroy: () => void}) {
+	addManagedViewController(viewController: {destroy(): void}) {
 		this._managedViewControllers.push(viewController);
 	}
 

@@ -236,13 +236,13 @@ class GmailMessageView {
 				itemEl.className = 'J-N';
 				itemEl.setAttribute('role', 'menuitem');
 				itemEl.textContent = options.title;
-				(itemEl: any).addEventListener('mouseenter', () => {
+				itemEl.addEventListener('mouseenter', (event: MouseEvent) => {
 					itemEl.classList.add('J-N-JT');
 				});
-				(itemEl: any).addEventListener('mouseleave', () => {
+				itemEl.addEventListener('mouseleave', (event: MouseEvent) => {
 					itemEl.classList.remove('J-N-JT');
 				});
-				(itemEl: any).addEventListener('click', () => {
+				itemEl.addEventListener('click', (event: MouseEvent) => {
 					this._closeActiveEmailMenu();
 					options.onClick();
 				});
