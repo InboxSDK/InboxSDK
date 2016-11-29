@@ -2,31 +2,33 @@ function log() {
   console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.load(1.0, 'custom-view').then(function(sdk) {
-  window.sdk = sdk;
-	var threadIds = new Set();
+InboxSDK.load(1.0, 'custom-view', {inboxBeta:true}).then(function(sdk) {
+  window._sdk = sdk;
+  var threadIds = new Set();
 
-	sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
-		threadIds.add(threadRowView.getThreadID());
-	});
+  sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
+    threadIds.add(threadRowView.getThreadID());
+  });
 
   sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView) {
+    customRouteView.setFullWidth(false);
+
     customRouteView.getElement().innerHTML = 'hello world!';
-		var list = document.createElement('ul');
-		threadIds.forEach(function(threadId) {
-			var link = document.createElement('a');
-			link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-			link.onclick = function(event) {
-				event.preventDefault();
-				event.stopPropagation();
-				sdk.Router.goto(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-			};
-			link.textContent = threadId;
-			var item = document.createElement('li');
-			item.appendChild(link);
-			list.appendChild(item);
-		});
-		customRouteView.getElement().appendChild(list);
+    var list = document.createElement('ul');
+    threadIds.forEach(function(threadId) {
+      var link = document.createElement('a');
+      link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+      link.onclick = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        sdk.Router.goto(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+      };
+      link.textContent = threadId;
+      var item = document.createElement('li');
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    customRouteView.getElement().appendChild(list);
   });
 
   sdk.Router.handleAllRoutes(function(routeView) {

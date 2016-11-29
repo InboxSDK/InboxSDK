@@ -16,9 +16,11 @@ export type MinRouteViewDriver = {
 // The necessary interface that ListRouteView and CustomRouteView expect.
 export type RouteViewDriver = MinRouteViewDriver&{
 	refresh(): void;
-	getCustomViewElement(): ?HTMLElement;
 	getType(): string;
 	getHash(): string;
 	addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
 	addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView;
+
+	getCustomViewElement(): ?HTMLElement;
+	setFullWidth(fullWidth: boolean): void;
 };

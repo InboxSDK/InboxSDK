@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
@@ -14,6 +15,7 @@ import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import simulateKey from '../../lib/dom/simulate-key';
+import setCss from '../../lib/dom/set-css';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -22,6 +24,9 @@ import getComposeViewDriverStream from './get-compose-view-driver-stream';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
+import idMap from '../../lib/idMap';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import getSidebarClassnames from './getSidebarClassnames';
 
 import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
@@ -38,6 +43,7 @@ import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
 import type InboxRouteView from './views/inbox-route-view';
+import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import type InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
@@ -300,9 +306,11 @@ class InboxDriver {
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented');
-    return {
-      getEventStream: _.constant(Kefir.never())
+    const obj = {
+      getEventStream: _.constant(Kefir.never()),
+      addNavItem: () => obj
     };
+    return obj;
   }
 
   getSentMailNativeNavItem(): Promise<Object> {
@@ -329,8 +337,70 @@ class InboxDriver {
     return _.noop;
   }
 
-  showCustomRouteView(element: HTMLElement): void {
-    throw new Error("Not implemented");
+  showCustomRouteView(view: InboxCustomRouteView): void {
+    let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
+    if (!customViewBase) {
+      customViewBase = document.createElement('div');
+      customViewBase.className = 'inboxsdk__custom_view';
+
+      const {chat, nav} = getSidebarClassnames();
+
+      setCss('custom_view_base_margins', `
+        .inboxsdk__custom_view.${nav||'nav_sidebar'} >
+        .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
+          margin-left: 232px;
+        }
+        .inboxsdk__custom_view.${chat||'chat_sidebar'} >
+        .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
+          margin-right: 232px;
+        }
+      `);
+
+      // Mirror the nav and chat sidebar classnames onto the inboxsdk__custom_view
+      // element so that if the custom_view_container element also has the centerList
+      // classname, then Inbox's margin rules for centerList will apply to it.
+      const main = document.querySelector('body > div[class][id][jsaction][jslog]');
+      makeMutationObserverChunkedStream(main, {attributes: true, attributeFilter: ['class']})
+        .toProperty(() => null)
+        .onValue(() => {
+          [chat, nav].filter(Boolean).forEach(className => {
+            if (main.classList.contains(className)) {
+              customViewBase.classList.add(className);
+            } else {
+              customViewBase.classList.remove(className);
+            }
+          });
+        });
+
+      document.body.appendChild(customViewBase);
+    }
+
+    const el = view.getCustomViewElement();
+    if (!el) throw new Error('should not happen');
+
+    customViewBase.innerHTML = '';
+    customViewBase.appendChild(el);
+    customViewBase.style.display = '';
+
+    document.body.classList.add('inboxsdk__custom_view_active');
+
+    const main = document.querySelector('[id][jsaction] > div[token][class]');
+    if (main) {
+      main.style.display = 'none';
+    }
+  }
+
+  showNativeRouteView(): void {
+    document.body.classList.remove('inboxsdk__custom_view_active');
+    const customViewBase = document.querySelector('body > .inboxsdk__custom_view');
+    if (customViewBase) {
+      customViewBase.style.display = 'none';
+      customViewBase.innerHTML = '';
+    }
+    const main = document.querySelector('[id][jsaction] > div[token][class]');
+    if (main) {
+      main.style.display = '';
+    }
   }
 
   setShowNativeNavMarker(value: boolean) {

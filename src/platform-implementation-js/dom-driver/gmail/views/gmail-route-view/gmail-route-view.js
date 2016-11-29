@@ -464,6 +464,10 @@ class GmailRouteView {
 		}
 	}
 
+	setFullWidth(fullWidth: boolean) {
+		// The setFullWidth method does not do anything in Gmail
+	}
+
 	_extractParamKeysFromRouteID(routeID: string): string[] {
 		return routeID.split('/')
 			.filter(part => part[0] === ':')

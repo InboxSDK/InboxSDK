@@ -1,7 +1,4 @@
 /* @flow */
-//jshint ignore:start
-
-import _ from 'lodash';
 
 // For quick temporary CSS changes
 export default function setCss(key: string, css: ?string) {
