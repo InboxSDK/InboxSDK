@@ -19,6 +19,7 @@ var CustomRouteView = /** @lends CustomRouteView */{
 	* mode be true.
 	* @param {boolean} fullWidth - If true, then the custom view will be as wide
 	* as possible without leaving margins.
+	* @return {void}
 	*/
 	setFullWidth: function(fullWidth) {}
 
