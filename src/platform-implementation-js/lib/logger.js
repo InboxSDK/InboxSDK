@@ -464,7 +464,7 @@ if (_extensionIsLoggerMaster && global.document && global.MutationObserver) {
         data: JSON.stringify({
           messages: [
             {
-              data: new Buffer(JSON.stringify({
+              data: Buffer.from(JSON.stringify({
                 data: events,
                 timestamp: Date.now()*1000
               })).toString('base64')
