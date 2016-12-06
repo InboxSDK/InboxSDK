@@ -1,9 +1,8 @@
 /* @flow */
-//jshint ignore:start
 
 const _ = require('lodash');
 import * as ud from 'ud';
-import Router from '../../../../platform-implementation-js/namespaces/router';
+import {NATIVE_ROUTE_IDS} from '../../../constants/router';
 import simulateClick from '../../../lib/dom/simulate-click';
 import getURLObject from './get-url-object';
 import type GmailDriver from '../gmail-driver';
@@ -11,7 +10,7 @@ import type GmailDriver from '../gmail-driver';
 const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, viewName: string, params: ?{[ix: string]: string}) {
 	const newHash = gmailDriver.createLink(viewName, params);
 
-	if (_.includes(Router.NativeRouteIDs, viewName)) {
+	if (_.includes(NATIVE_ROUTE_IDS, viewName)) {
 		// Create a fake link and simulate a click event on it to let Gmail handle
 		// the view change. If we just set window.location.hash ourselves to the
 		// newHash, it's a Gmail hash, and any composes are open, then Gmail will

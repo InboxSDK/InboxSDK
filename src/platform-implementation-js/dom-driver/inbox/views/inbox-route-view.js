@@ -7,18 +7,17 @@ import kefirBus from 'kefir-bus';
 
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
-// only used for constants
-import Router from '../../../namespaces/router';
+import {NATIVE_ROUTE_IDS} from '../../../constants/router';
 
 function getRouteID(path) {
   if (path === '') {
-    return Router.NativeRouteIDs.INBOX;
+    return NATIVE_ROUTE_IDS.INBOX;
   }
   if (_.includes(['snoozed', 'reminders', 'done', 'spam', 'trash'], path)) {
-    return Router.NativeRouteIDs[path.toUpperCase()];
+    return NATIVE_ROUTE_IDS[path.toUpperCase()];
   }
   if (/search\//.test(path)) {
-    return Router.NativeRouteIDs.SEARCH;
+    return NATIVE_ROUTE_IDS.SEARCH;
   }
   return 'UNKNOWN';
 }

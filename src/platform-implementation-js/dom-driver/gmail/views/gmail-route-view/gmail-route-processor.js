@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 // only used for constants
-import Router from '../../../../namespaces/router';
+import {NATIVE_ROUTE_IDS, NATIVE_LIST_ROUTE_IDS, ROUTE_TYPES} from '../../../../constants/router';
 
 export default function GmailRouteProcessor() {
 	this._routeNameToRouteIDMap = null;
@@ -13,9 +13,9 @@ export default function GmailRouteProcessor() {
 
 _.extend(GmailRouteProcessor.prototype, {
 
-	NativeRouteIDs: Router.NativeRouteIDs,
-	NativeListRouteIDs: Router.NativeListRouteIDs,
-	RouteTypes: Router.RouteTypes,
+	NativeRouteIDs: NATIVE_ROUTE_IDS,
+	NativeListRouteIDs: NATIVE_LIST_ROUTE_IDS,
+	RouteTypes: ROUTE_TYPES,
 
 	isListRouteName: function(routeName){
 		var routeID = this.getRouteID(routeName);
@@ -23,15 +23,7 @@ _.extend(GmailRouteProcessor.prototype, {
 			return false;
 		}
 
-		var keys = Object.getOwnPropertyNames(Router.NativeListRouteIDs);
-
-		for(var ii=0; ii<keys.length; ii++){
-			if(Router.NativeListRouteIDs[keys[ii]] === routeID){
-				return true;
-			}
-		}
-
-		return false;
+		return _.includes(Object.getOwnPropertyNames(NATIVE_LIST_ROUTE_IDS), routeID);
 	},
 
 	isSettingsRouteName: function(routeName){
