@@ -72,10 +72,10 @@ class GmailDriver {
 	_logger: Logger;
 	_opts: PiOpts;
 	_envData: EnvData;
-	_customRouteIDs: Set<string>;
-	_customListRouteIDs: Map<string, Function>;
-	_customListSearchStringsToRouteIds: Map<string, string>;
-	_messageIDsToThreadIDs: Map<string, string>;
+	_customRouteIDs: Set<string> = new Set();
+	_customListRouteIDs: Map<string, Function> = new Map();
+	_customListSearchStringsToRouteIds: Map<string, string> = new Map();
+	_messageIDsToThreadIDs: Map<string, string> = new Map();
 	_messageIdManager: MessageIdManager;
 	_threadRowIdentifier: ThreadRowIdentifier;
 	_gmailRouteProcessor: GmailRouteProcessor;
@@ -95,7 +95,7 @@ class GmailDriver {
 	_xhrInterceptorStream: Kefir.Observable<Object>;
 	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
 	_stopper = kefirStopper();
-	_navMarkerHiddenChanged: Bus<null>;
+	_navMarkerHiddenChanged: Bus<null> = kefirBus();
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
@@ -110,12 +110,6 @@ class GmailDriver {
 		this._logger = logger;
 		this._opts = opts;
 		this._envData = envData;
-		this._customRouteIDs = new Set();
-		this._customListRouteIDs = new Map();
-		this._customListSearchStringsToRouteIds = new Map();
-
-		this._messageIDsToThreadIDs = new Map();
-		this._navMarkerHiddenChanged = kefirBus();
 
 		this._messageIdManager = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
