@@ -91,6 +91,7 @@ class InboxDriver {
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
+  _customRouteIDs: Set<string> = new Set();
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
     (this: Driver); // interface check
@@ -243,6 +244,8 @@ class InboxDriver {
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
 
+  getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
+
   getCurrentChatSidebarView(): InboxChatSidebarView {
     const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
     if (!view) throw new Error('No chat sidebar found');
@@ -329,8 +332,10 @@ class InboxDriver {
   }
 
   addCustomRouteID(routeID: string): () => void {
-    console.log('addCustomRouteID not implemented');
-    return _.noop;
+    this._customRouteIDs.add(routeID);
+    return () => {
+      this._customRouteIDs.delete(routeID);
+    };
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
