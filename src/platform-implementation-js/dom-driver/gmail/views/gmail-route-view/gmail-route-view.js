@@ -143,7 +143,7 @@ class GmailRouteView {
 			}
 		}
 
-		return params;
+		return Object.freeze(params);
 	});
 
 	addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any): GmailCollapsibleSectionView {
@@ -305,7 +305,7 @@ class GmailRouteView {
 	}
 
 	_getCustomParams(): Object {
-		var params: Object = {};
+		var params: Object = Object.create(null);
 
 		if (!this._customRouteID) throw new Error("Should not happen, can't get custom params for non-custom view");
 		this._customRouteID
