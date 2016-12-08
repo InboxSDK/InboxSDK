@@ -56,7 +56,7 @@ export type Driver = {
 	goto(routeID: string, params: any): void;
 	addCustomRouteID(routeID: string): () => void;
 	addCustomListRouteID(routeID: string, handler: Function): () => void;
-	showCustomRouteView(a: any): any;
+	showCustomRouteView(el: HTMLElement): void;
 	setShowNativeNavMarker(a: any): any;
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;

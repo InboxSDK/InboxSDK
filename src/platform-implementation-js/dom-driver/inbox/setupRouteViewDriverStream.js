@@ -43,6 +43,7 @@ export default function setupRouteViewDriverStream(driver: InboxDriver): Kefir.O
       if (detail.type === 'CUSTOM') {
         return new InboxCustomRouteView(detail.routeID, detail.hash);
       } else if (detail.type === 'NATIVE') {
+        driver.showNativeRouteView();
         return new InboxDummyRouteView('NATIVE');
       } else if (detail.type === 'OTHER_APP_CUSTOM') {
         return new InboxDummyRouteView('OTHER_APP_CUSTOM');

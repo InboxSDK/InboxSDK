@@ -43,6 +43,8 @@ import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStre
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
+import setupRouteViewDriverStream from './setupRouteViewDriverStream';
+
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
@@ -70,7 +72,7 @@ class InboxDriver {
   _envData: EnvData;
   _stopper: Stopper;
   onready: Promise<void>;
-  _routeViewDriverStream: Kefir.Observable<any>;
+  _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
   _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
@@ -145,7 +147,8 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
-    this._routeViewDriverStream = Kefir.never().toProperty();
+    this._routeViewDriverStream = setupRouteViewDriverStream(this);
+
     this._rowListViewDriverStream = Kefir.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
@@ -333,6 +336,7 @@ class InboxDriver {
 
   addCustomRouteID(routeID: string): () => void {
     this._customRouteIDs.add(routeID);
+    this._pageCommunicator.registerAllowedHashLinkStartTerm(routeID.split('/')[0]);
     return () => {
       this._customRouteIDs.delete(routeID);
     };
@@ -343,7 +347,7 @@ class InboxDriver {
     return _.noop;
   }
 
-  showCustomRouteView(view: InboxCustomRouteView): void {
+  showCustomRouteView(el: HTMLElement): void {
     let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (!customViewBase) {
       customViewBase = document.createElement('div');
@@ -380,9 +384,6 @@ class InboxDriver {
 
       document.body.appendChild(customViewBase);
     }
-
-    const el = view.getCustomViewElement();
-    if (!el) throw new Error('should not happen');
 
     customViewBase.innerHTML = '';
     customViewBase.appendChild(el);

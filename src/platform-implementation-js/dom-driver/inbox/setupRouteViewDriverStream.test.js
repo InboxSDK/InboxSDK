@@ -54,6 +54,7 @@ test('test', async () => {
   expect(items.length).toBe(2);
   expect(items[1]).toBeInstanceOf(InboxDummyRouteView);
   expect(firstStopper).toHaveBeenCalledTimes(1);
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
 
   document.location.hash = '#bar/123/blah';
   await delay(1);
@@ -61,6 +62,7 @@ test('test', async () => {
   expect(items[2]).toBeInstanceOf(InboxCustomRouteView);
   expect(items[2].getRouteID()).toBe('bar/:id/blah');
   expect(items[2].getParams()).toEqual({id: '123'});
+  expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
 
   document.dispatchEvent(new CustomEvent('inboxSDKpushState', {
     bubbles: false, cancelable: false,

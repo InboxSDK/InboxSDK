@@ -4,6 +4,14 @@ import Kefir from 'kefir';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 export default class InboxPageCommunicator extends CommonPageCommunicator {
+  registerAllowedHashLinkStartTerm(term: string) {
+    document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
+      bubbles: false,
+      cancelable: false,
+      detail: {term}
+    }));
+  }
+
   clickAndGetNewIframeSrc(el: HTMLElement): Promise<string> {
     const pr = Kefir.fromEvents(el, 'inboxSDKclickAndGetNewIframeSrcResult')
       .take(1)

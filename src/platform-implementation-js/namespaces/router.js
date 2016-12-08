@@ -45,7 +45,7 @@ class Router {
 				SAMPLE_RATE,
 				{
 					type: 'handleRouteViewChange',
-					hash: routeViewDriver.getHash()
+					routeID: routeViewDriver.getRouteID()
 				}
 			)
 		});
@@ -148,8 +148,9 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 
 	if (relevantCustomRoute) {
 		const customRouteView = new CustomRouteView(routeViewDriver);
-
-		members.driver.showCustomRouteView(routeViewDriver.getCustomViewElement());
+		const customViewElement = routeViewDriver.getCustomViewElement();
+		if (!customViewElement) throw new Error('should not happen');
+		members.driver.showCustomRouteView(customViewElement);
 		try {
 			relevantCustomRoute.onActivate(customRouteView);
 		} catch(err) {

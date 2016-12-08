@@ -18,11 +18,12 @@ if (!global.__InboxSDKInjected) {
     const setupDataExposer = require('./setup-data-exposer');
     const setupEventReemitter = require('./setup-event-reemitter');
     const setupErrorSilencer = require('./setup-error-silencer');
-    const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
-
-    const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
     const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin');
     const setupPushStateListener = require('./setupPushStateListener');
+
+    const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
+    const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
+    const setupInboxCustomViewLinkSmuggler = require('./setupInboxCustomViewLinkSmuggler');
 
     RSVP.on('error', function(err) {
       console.error("Possibly uncaught promise rejection", err);
@@ -34,6 +35,7 @@ if (!global.__InboxSDKInjected) {
     } else if (document.location.origin === 'https://inbox.google.com') {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
+      setupInboxCustomViewLinkSmuggler();
     } else {
       throw new Error("Should not happen");
     }
