@@ -15,6 +15,7 @@ import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import customStyle from './custom-style';
@@ -331,7 +332,10 @@ class InboxDriver {
   }
 
   goto(routeID: string, params: ?{[ix: string]: string}): void {
-    throw new Error("Not implemented");
+    if (!this._customRouteIDs.has(routeID)) {
+      throw new Error(`Invalid routeID: ${routeID}`);
+    }
+    document.location.hash = populateRouteID(routeID, params);
   }
 
   addCustomRouteID(routeID: string): () => void {
