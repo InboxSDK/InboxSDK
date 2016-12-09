@@ -7,6 +7,7 @@ import kefirBus from 'kefir-bus';
 import cx from 'classnames';
 
 import idMap from '../../../lib/idMap';
+import parseParamsFromRouteID from '../../../lib/parseParamsFromRouteID';
 import getSidebarClassnames from '../getSidebarClassnames';
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
@@ -17,11 +18,11 @@ export default class InboxCustomRouteView {
   _stopper = kefirStopper();
   _customViewElement: HTMLElement;
 
-  constructor(routeID: string, params: Object) {
+  constructor(routeID: string, hash: string) {
     // Check we implement interface
     (this: RouteViewDriver);
     this._routeID = routeID;
-    this._params = params;
+    this._params = parseParamsFromRouteID(routeID, hash);
     this._customViewElement = document.createElement('div');
     this.setFullWidth(true);
   }

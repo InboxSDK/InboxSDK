@@ -159,8 +159,8 @@ export default function setupGmailInterceptor() {
     },
     originalResponseTextLogger: function(connection) {
       if (connection.status === 200) {
-        var search = connection.params.search;
-        var responseText = connection.originalResponseText;
+        const search = connection.params.search;
+        const responseText = connection.originalResponseText;
 
         threadIdentifier.processThreadListResponse(responseText);
       }
@@ -268,7 +268,7 @@ export default function setupGmailInterceptor() {
 
     js_frame_wrappers.push({
       isRelevantTo: function(connection) {
-        var customSearchTerm;
+        let customSearchTerm;
         const params = connection.params;
         if (
           connection.method === 'POST' &&
@@ -312,7 +312,7 @@ export default function setupGmailInterceptor() {
       },
       requestChanger: function(connection, request) {
         return connection._queryReplacement.newQuery.promise.then(function(newQuery) {
-          var newParams = _.clone(connection.params);
+          let newParams = _.clone(connection.params);
           newParams.q = newQuery;
           return {
             method: request.method,

@@ -1,9 +1,11 @@
+/* @flow */
+
 /**
  * The different nav item types that exist
  * @class
  * @name  NavItemTypes
  */
-var navItemTypes = Object.freeze(/** @lends NavItemTypes */ {
+const navItemTypes = Object.freeze(/** @lends NavItemTypes */ {
 	/**
 	 * standard nav item for navigating
 	 * @type {string}

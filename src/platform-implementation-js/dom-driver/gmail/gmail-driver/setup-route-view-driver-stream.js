@@ -10,14 +10,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 
-const routeIDtoRegExp: (routeID: string) => RegExp = _.memoize(routeID =>
-	new RegExp('^'+_.escapeRegExp(routeID).replace(/\/:[^/]+/g, '/([^/]+)')+'/?$')
-);
-
-function routeIDmatchesHash(routeID: string|Array<string>, hash: string): ?string {
-	const routeIDs = Array.isArray(routeID) ? routeID : [routeID];
-	return _.find(routeIDs, routeID => hash.match(routeIDtoRegExp(routeID)));
-}
+import routeIDmatchesHash from '../../../lib/routeIDmatchesHash';
 
 export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRouteProcessor, driver: GmailDriver): Kefir.Observable<GmailRouteView> {
 	const customRouteIDs = driver.getCustomRouteIDs();

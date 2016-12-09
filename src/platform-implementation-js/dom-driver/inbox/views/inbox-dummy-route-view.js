@@ -7,55 +7,15 @@ import kefirBus from 'kefir-bus';
 
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
-import {NATIVE_ROUTE_IDS} from '../../../constants/router';
-
-function getRouteID(path) {
-  if (path === '') {
-    return NATIVE_ROUTE_IDS.INBOX;
-  }
-  if (_.includes(['snoozed', 'reminders', 'done', 'spam', 'trash'], path)) {
-    return NATIVE_ROUTE_IDS[path.toUpperCase()];
-  }
-  if (/search\//.test(path)) {
-    return NATIVE_ROUTE_IDS.SEARCH;
-  }
-  return 'UNKNOWN';
-}
-
-function getParams(path) {
-  const parts = path.split('/');
-  if (parts.length < 2) {
-    return {};
-  }
-  return {
-    query: decodeURIComponent(parts[1])
-  };
-}
-
-export default class InboxRouteView {
-  _element: HTMLElement;
+export default class InboxDummyRouteView {
   _type: string;
-  _routeType: string;
-  _routeID: string;
-  _params: Object;
   _eventStream = kefirBus();
   _stopper = kefirStopper();
 
-  constructor(el: HTMLElement, type: string) {
+  constructor(type: string) {
     // Check we implement interface
     (this: RouteViewDriver);
-
-    this._element = el;
-
     this._type = type;
-    const path = document.location.pathname.slice(1);
-    this._routeID = getRouteID(path);
-    this._params = getParams(path);
-    this._routeType = this._routeID === 'UNKNOWN' ? 'UNKNOWN' : 'LIST';
-
-    console.log('el jsan', el.getAttribute('jsan'));
-    if (this._type === 'CUSTOM') {
-    }
   }
 
   getStopper() {
@@ -68,7 +28,7 @@ export default class InboxRouteView {
   }
 
   getElement(): HTMLElement {
-    return this._element;
+    throw new Error('Should not happen');
   }
 
   getType(): string {
@@ -76,15 +36,15 @@ export default class InboxRouteView {
   }
 
   getRouteType(): string {
-    return this._routeType;
+    return 'UNKNOWN';
   }
 
   getRouteID(): string {
-    return this._routeID;
+    return 'UNKNOWN';
   }
 
   getParams(): Object {
-    return this._params;
+    return {};
   }
 
   getEventStream(): Kefir.Observable<Object> {
@@ -108,11 +68,11 @@ export default class InboxRouteView {
   }
 
   addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
-    throw new Error('not implemented yet');
+    throw new Error('should not happen');
   }
 
   addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
-    throw new Error('not implemented yet');
+    throw new Error('should not happen');
   }
 
   setFullWidth(fullWidth: boolean) {

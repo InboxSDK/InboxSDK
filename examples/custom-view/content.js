@@ -13,7 +13,7 @@ InboxSDK.load(1.0, 'custom-view', {inboxBeta:true}).then(function(sdk) {
   sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView) {
     customRouteView.setFullWidth(false);
 
-    customRouteView.getElement().innerHTML = 'hello world!';
+    customRouteView.getElement().textContent = 'hello world! ' + customRouteView.getParams().monkeyName;
     var list = document.createElement('ul');
     threadIds.forEach(function(threadId) {
       var link = document.createElement('a');

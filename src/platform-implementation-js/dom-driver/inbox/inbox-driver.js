@@ -15,6 +15,7 @@ import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import customStyle from './custom-style';
@@ -43,6 +44,8 @@ import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStre
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
+import setupRouteViewDriverStream from './setupRouteViewDriverStream';
+
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
@@ -70,7 +73,7 @@ class InboxDriver {
   _envData: EnvData;
   _stopper: Stopper;
   onready: Promise<void>;
-  _routeViewDriverStream: Kefir.Observable<any>;
+  _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
   _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
@@ -91,6 +94,7 @@ class InboxDriver {
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
+  _customRouteIDs: Set<string> = new Set();
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
     (this: Driver); // interface check
@@ -144,7 +148,8 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
-    this._routeViewDriverStream = Kefir.never().toProperty();
+    this._routeViewDriverStream = setupRouteViewDriverStream(this);
+
     this._rowListViewDriverStream = Kefir.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
@@ -243,6 +248,8 @@ class InboxDriver {
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
 
+  getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
+
   getCurrentChatSidebarView(): InboxChatSidebarView {
     const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
     if (!view) throw new Error('No chat sidebar found');
@@ -325,12 +332,18 @@ class InboxDriver {
   }
 
   goto(routeID: string, params: ?{[ix: string]: string}): void {
-    throw new Error("Not implemented");
+    if (!this._customRouteIDs.has(routeID)) {
+      throw new Error(`Invalid routeID: ${routeID}`);
+    }
+    document.location.hash = populateRouteID(routeID, params);
   }
 
   addCustomRouteID(routeID: string): () => void {
-    console.log('addCustomRouteID not implemented');
-    return _.noop;
+    this._customRouteIDs.add(routeID);
+    this._pageCommunicator.registerAllowedHashLinkStartTerm(routeID.split('/')[0]);
+    return () => {
+      this._customRouteIDs.delete(routeID);
+    };
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
@@ -338,7 +351,7 @@ class InboxDriver {
     return _.noop;
   }
 
-  showCustomRouteView(view: InboxCustomRouteView): void {
+  showCustomRouteView(el: HTMLElement): void {
     let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (!customViewBase) {
       customViewBase = document.createElement('div');
@@ -375,9 +388,6 @@ class InboxDriver {
 
       document.body.appendChild(customViewBase);
     }
-
-    const el = view.getCustomViewElement();
-    if (!el) throw new Error('should not happen');
 
     customViewBase.innerHTML = '';
     customViewBase.appendChild(el);

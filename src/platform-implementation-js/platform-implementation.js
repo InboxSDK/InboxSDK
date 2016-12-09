@@ -23,6 +23,9 @@ import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
 import DummyRouteViewDriver from './views/route-view/dummy-route-view-driver';
 import RouteView from './views/route-view/route-view';
 import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
+import InboxRouteView from './dom-driver/inbox/views/inbox-route-view';
+import InboxDummyRouteView from './dom-driver/inbox/views/inbox-dummy-route-view';
+import InboxCustomRouteView from './dom-driver/inbox/views/inbox-custom-route-view';
 
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
@@ -100,6 +103,9 @@ export class PlatformImplementation extends SafeEventEmitter {
 			[InboxThreadView, viewDriver => new ThreadView(viewDriver, appId, driver, membrane)],
 			[GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
 			[GmailRouteView, viewDriver => new RouteView(viewDriver)],
+			[InboxRouteView, viewDriver => new RouteView(viewDriver)],
+			[InboxDummyRouteView, viewDriver => new RouteView(viewDriver)],
+			[InboxCustomRouteView, viewDriver => new RouteView(viewDriver)],
 			[DummyRouteViewDriver, viewDriver => new RouteView(viewDriver)]
 		]);
 		this.destroyed = false;
