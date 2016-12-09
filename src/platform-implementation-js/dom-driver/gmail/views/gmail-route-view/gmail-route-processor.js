@@ -23,7 +23,7 @@ _.extend(GmailRouteProcessor.prototype, {
 			return false;
 		}
 
-		return _.includes(Object.getOwnPropertyNames(NATIVE_LIST_ROUTE_IDS), routeID);
+		return _.includes(Object.values(NATIVE_LIST_ROUTE_IDS), routeID);
 	},
 
 	isSettingsRouteName: function(routeName){
