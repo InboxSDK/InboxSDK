@@ -1,4 +1,0 @@
-- links in descriptions, links in types
-- add return descriptions to methods
-- handle callbacks either inline or as links (see @callback)
-- Compose.js - remove getComposeView
