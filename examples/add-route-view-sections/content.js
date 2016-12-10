@@ -1,4 +1,7 @@
+'use strict';
+
 InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
+	window._sdk = inboxSDK;
 
 	inboxSDK.Router.handleListRoute(inboxSDK.Router.NativeRouteIDs.ANY_LIST, function(listRouteView){
 		var view1 = listRouteView.addCollapsibleSection({
