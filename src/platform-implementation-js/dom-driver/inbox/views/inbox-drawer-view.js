@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import InboxBackdrop from './inbox-backdrop';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
 import type ComposeView from '../../../views/compose-view';
 import findParent from '../../../../common/find-parent';
@@ -55,6 +56,27 @@ class InboxDrawerView {
     if (composeView) {
       this._positionCompose(composeView, composeNeedToMoveLeft);
     }
+
+    // Gmail calls preventDefault on escape keypresses. We want to close the
+    // drawer for any escape keypresses which weren't preventDefaulted by the
+    // current extension.
+    fromEventTargetCapture(document, 'keydown')
+      .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
+      .takeUntilBy(this._closing)
+      .onValue(e => {
+        const origPreventDefault = e.preventDefault;
+        e.preventDefault = function() {
+          this._defaultPreventedInContext = true;
+          return origPreventDefault.call(this);
+        };
+      });
+    Kefir.fromEvents(document, 'keydown')
+      .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
+      .filter(e => !e._defaultPreventedInContext)
+      .takeUntilBy(this._closing)
+      .onValue(() => {
+        this.close();
+      });
   }
 
   _setupComposeInsertionTarget(composeView: ComposeView, closeWithCompose: ?boolean): {composeRect: ClientRect, insertionTarget: HTMLElement} {
