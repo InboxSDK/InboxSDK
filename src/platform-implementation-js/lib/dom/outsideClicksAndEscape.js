@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../from-event-target-capture';
+import parentNodes from './parentNodes';
 
 export default function outsideClicksAndEscape(elements: HTMLElement[]): Kefir.Observable<null> {
   return Kefir.merge([
@@ -12,8 +13,13 @@ export default function outsideClicksAndEscape(elements: HTMLElement[]): Kefir.O
   ])
     .filter(event =>
       !event.shouldIgnore &&
-      event.isTrusted &&
-      elements.every(el => !el.contains(event.target))
+      (event.isTrusted || (process.env.NODE_ENV === 'test' && event.__testAllow)) &&
+      elements.every(el => {
+        for (let node of parentNodes(event.target)) {
+          if (node === el) return false;
+        }
+        return true;
+      })
     )
     .merge(
       Kefir.fromEvents(document, 'keydown')
