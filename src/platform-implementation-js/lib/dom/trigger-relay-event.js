@@ -1,7 +1,4 @@
 /* @flow */
-//jshint ignore:start
-
-import _ from 'lodash';
 
 type RelayProps = {
   type: string;

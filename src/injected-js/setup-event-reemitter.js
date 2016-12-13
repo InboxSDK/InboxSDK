@@ -1,7 +1,4 @@
 /* @flow */
-//jshint ignore:start
-
-import _ from 'lodash';
 
 export default function setupEventReemitter() {
   // Webkit has bugs that stop certain types of events from being created. We
@@ -13,13 +10,14 @@ export default function setupEventReemitter() {
   document.addEventListener('inboxsdk_event_relay', function(event: Object) {
     const newEvent = document.createEvent('Events');
     (newEvent: any).initEvent(event.detail.type, event.detail.bubbles, event.detail.cancelable);
-    _.assign(newEvent, event.detail.props);
+    Object.assign(newEvent, event.detail.props);
     if (event.detail.dataTransfer) {
-      const files = event.detail.dataTransfer.files;
-      if (event.detail.dataTransfer.fileNames) {
-        _.forEach(files, (file, i) => {
+      const {files, fileNames} = event.detail.dataTransfer;
+      if (fileNames) {
+        fileNames.forEach((fileName, i) => {
+          const file = files[i];
           if (typeof file.name !== 'string') {
-            file.name = event.detail.dataTransfer.fileNames[i];
+            file.name = fileName;
           }
         });
       }
@@ -27,7 +25,7 @@ export default function setupEventReemitter() {
         dropEffect: "none",
         effectAllowed: "all",
         files,
-        items: event.detail.dataTransfer.files.map(({type}, i) => ({
+        items: files.map(({type}, i) => ({
           kind: "file", type,
           getAsFile() {return files[i];},
           getAsString() {throw new Error('getAsString not supported');}
