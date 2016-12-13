@@ -892,9 +892,9 @@ class GmailComposeView {
 				this._isTriggeringADraftSavePending = false;
 
 				if(this.getBodyElement()){
-					var unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+					const unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
 					try {
-						simulateKey(this.getBodyElement(), 13, 0);
+						simulateKey(this.getBodyElement(), 190, 0);
 					} finally {
 						unsilence();
 					}
