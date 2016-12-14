@@ -7,6 +7,7 @@ import type {Bus} from 'kefir-bus';
 
 import multiCompareSort from '../../../../lib/multi-compare-sort';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import GmailTabView from './gmail-tab-view';
 
 export default class GmailTabContainerView {
@@ -103,12 +104,12 @@ export default class GmailTabContainerView {
       '</tbody>'
     ].join('');
 
-    this._tablistElement = this._element.querySelector('[role=tablist]');
+    this._tablistElement = querySelector(this._element, '[role=tablist]');
   }
 
   _setupExistingElement(element: HTMLElement) {
     this._element = element;
-    this._tablistElement = this._element.querySelector('[role=tablist]');
+    this._tablistElement = querySelector(this._element, '[role=tablist]');
   }
 
   _addTab(gmailTabView: GmailTabView) {

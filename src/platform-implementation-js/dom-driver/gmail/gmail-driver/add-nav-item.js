@@ -7,6 +7,7 @@ import waitFor from '../../../lib/wait-for';
 import eventNameFilter from '../../../lib/event-name-filter';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.Observable<Object>): GmailNavItemView {
 	var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
@@ -54,16 +55,17 @@ function _getNavItemsHolder(): HTMLElement {
 		return _createNavItemsHolder();
 	}
 	else{
-		return holder.querySelector('.TK');
+		return querySelector(holder, '.TK');
 	}
 }
 
 function _createNavItemsHolder(): HTMLElement {
-	var holder = document.createElement('div');
+	const holder = document.createElement('div');
 	holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
 	holder.innerHTML = '<div class="TK"></div>';
 
-	var navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
+	const navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
+	if (!navMenuInjectionContainer) throw new Error('should not happen');
 	navMenuInjectionContainer.insertBefore(holder, navMenuInjectionContainer.children[2]);
 
 	makeMutationObserverStream(holder, {attributes: true, attributeFilter: ['class']}).onValue(function(){
@@ -72,5 +74,5 @@ function _createNavItemsHolder(): HTMLElement {
 		}
 	});
 
-	return holder.querySelector('.TK');
+	return querySelector(holder, '.TK');
 }

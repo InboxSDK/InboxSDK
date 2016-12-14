@@ -9,6 +9,7 @@ import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import eventNameFilter from '../../../lib/event-name-filter';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -63,15 +64,16 @@ export default class NativeGmailNavItemView {
 	}
 
 	setActive(value: boolean){
+		const toElement = querySelector(this._element, '.TO');
 		if(value){
 			this._element.classList.add('ain');
-			this._element.querySelector('.TO').classList.add('nZ');
-			this._element.querySelector('.TO').classList.add('aiq');
+			toElement.classList.add('nZ');
+			toElement.classList.add('aiq');
 		}
 		else{
 			this._element.classList.remove('ain');
-			this._element.querySelector('.TO').classList.remove('nZ');
-			this._element.querySelector('.TO').classList.remove('aiq');
+			toElement.classList.remove('nZ');
+			toElement.classList.remove('aiq');
 		}
 
 		this._setHeights();
@@ -143,7 +145,7 @@ export default class NativeGmailNavItemView {
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
 		var element = gmailNavItemView.getElement();
-		element.querySelector('.TO').style.paddingLeft = LEFT_INDENTATION_PADDING + 'px';
+		querySelector(element, '.TO').style.paddingLeft = LEFT_INDENTATION_PADDING + 'px';
 
 		this._setHeights();
 	}
@@ -215,13 +217,13 @@ export default class NativeGmailNavItemView {
 	}
 
 	_collapse(){
-		var expandoElement = this._element.querySelector('.inboxsdk__expando');
+		const expandoElement = querySelector(this._element, '.inboxsdk__expando');
 		expandoElement.classList.remove('aih');
 		expandoElement.classList.add('aii');
 
 		if(this._itemContainerElement) this._itemContainerElement.style.display = 'none';
 
-		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'collapsed';
+		localStorage.setItem('inboxsdk__nativeNavItem__state_' + this._navItemName, 'collapsed');
 
 		this._eventStream.emit({
 			eventName: 'collapsed'
@@ -231,13 +233,13 @@ export default class NativeGmailNavItemView {
 	}
 
 	_expand(){
-		var expandoElement = this._element.querySelector('.inboxsdk__expando');
+		const expandoElement = querySelector(this._element, '.inboxsdk__expando');
 		expandoElement.classList.add('aih');
 		expandoElement.classList.remove('aii');
 
 		if(this._itemContainerElement) this._itemContainerElement.style.display = '';
 
-		localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] = 'expanded';
+		localStorage.setItem('inboxsdk__nativeNavItem__state_' + this._navItemName, 'expanded');
 
 		this._eventStream.emit({
 			eventName: 'expanded'
@@ -251,13 +253,13 @@ export default class NativeGmailNavItemView {
 	}
 
 	_setHeights(){
-		var toElement = this._element.querySelector('.TO');
+		const toElement = querySelector(this._element, '.TO');
 
 		if(this._element.classList.contains('ain') && this._itemContainerElement){
 			this._element.style.height = '';
 
-			var totalHeight = this._element.clientHeight;
-			var itemHeight = toElement.clientHeight;
+			const totalHeight = this._element.clientHeight;
+			const itemHeight = toElement.clientHeight;
 
 			this._element.style.height = itemHeight + 'px';
 			this._element.style.overflow = 'visible';

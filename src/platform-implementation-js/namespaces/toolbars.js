@@ -4,11 +4,10 @@ import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import EventEmitter from '../lib/safe-event-emitter';
-
 import HandlerRegistry from '../lib/handler-registry';
-
 import type {Driver} from '../driver-interfaces/driver';
 import type Membrane from '../lib/Membrane';
+import get from '../../common/get-or-fail';
 import ThreadRowView from '../views/thread-row-view';
 import ThreadView from '../views/conversations/thread-view';
 import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
@@ -42,15 +41,15 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
-		return memberMap.get(this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		return get(memberMap, this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	registerToolbarButtonForThreadView(buttonDescriptor: Object){
-		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		return get(memberMap, this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	setAppToolbarButton(appToolbarButtonDescriptor: Object){
-		const driver = memberMap.get(this).driver;
+		const driver = get(memberMap, this).driver;
 		driver.getLogger().deprecationWarning(
 			'Toolbars.setAppToolbarButton', 'Toolbars.addToolbarButtonForApp');
 		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
@@ -58,8 +57,8 @@ export default class Toolbars extends EventEmitter {
 
 	addToolbarButtonForApp(buttonDescriptor: Object){
 		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
-		const appToolbarButtonViewDriverPromise = memberMap.get(this).driver.addToolbarButtonForApp(buttonDescriptorStream);
-		const appToolbarButtonView = new AppToolbarButtonView(memberMap.get(this).driver, appToolbarButtonViewDriverPromise);
+		const appToolbarButtonViewDriverPromise = get(memberMap, this).driver.addToolbarButtonForApp(buttonDescriptorStream);
+		const appToolbarButtonView = new AppToolbarButtonView(get(memberMap, this).driver, appToolbarButtonViewDriverPromise);
 
 		return appToolbarButtonView;
 	}
@@ -69,10 +68,10 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 	// Used to help track our duplicate toolbar button issue.
 	const id = `${Date.now()}-${Math.random()}-${buttonDescriptor.title}`;
 
-	return function(toolbarView){
-		var members = memberMap.get(toolbarsInstance);
+	return toolbarView => {
+		const members = get(memberMap, toolbarsInstance);
 
-		var toolbarViewDriver = toolbarView.getToolbarViewDriver();
+		const toolbarViewDriver = toolbarView.getToolbarViewDriver();
 
 		if(buttonDescriptor.hideFor){
 			const routeView = members.membrane.get(toolbarViewDriver.getRouteViewDriver());

@@ -16,6 +16,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import incrementName from '../../../lib/incrementName';
 import type InboxDriver from '../inbox-driver';
 
@@ -45,7 +46,7 @@ class InboxAppSidebarView {
       this._createElement();
     }
 
-    const mainParent = findParent(document.querySelector('[role=application]'), el => el.parentElement === document.body);
+    const mainParent = findParent(querySelector(document, '[role=application]'), el => el.parentElement === document.body);
     if (!mainParent) {
       const err = new Error('Failed to find main parent');
       this._driver.getLogger().errorSite(err);

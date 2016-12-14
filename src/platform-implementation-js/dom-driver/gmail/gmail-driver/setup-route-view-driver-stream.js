@@ -89,6 +89,7 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 			const customListRouteId = customListSearchStringsToRouteIds.get(urlObject.params[0]);
 			if (customListRouteId) {
 				const searchInput = GmailElementGetter.getSearchInput();
+				if (!searchInput) throw new Error('Should not happen');
 				searchInput.value = '';
 
 				if (urlObject.params.length === 1) {

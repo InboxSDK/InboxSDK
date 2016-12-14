@@ -1,8 +1,8 @@
 /* @flow */
-//jshint ignore:start
 
-var _ = require('lodash');
+import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
+import get from '../../common/get-or-fail';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
 export type TooltipDescriptor = {
@@ -19,7 +19,7 @@ export default class ComposeButtonView extends EventEmitter {
 	constructor(optionsPromise: Promise<?Object>, composeViewDriver: ComposeViewDriver) {
 		super();
 		this.destroyed = false;
-		var members = {optionsPromise, composeViewDriver};
+		const members = {optionsPromise, composeViewDriver};
 		memberMap.set(this, members);
 
 		members.optionsPromise.then(options => {
@@ -35,7 +35,7 @@ export default class ComposeButtonView extends EventEmitter {
 	}
 
 	showTooltip(tooltipDescriptor: TooltipDescriptor) {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.optionsPromise.then(options => {
 			if (!options) return;
 			members.composeViewDriver.addTooltipToButton(options.buttonViewController, options.buttonDescriptor, tooltipDescriptor);
@@ -43,7 +43,7 @@ export default class ComposeButtonView extends EventEmitter {
 	}
 
 	closeTooltip() {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.optionsPromise.then(options => {
 			if (!options) return;
 			members.composeViewDriver.closeButtonTooltip(options.buttonViewController);

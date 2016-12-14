@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
 import EventEmitter from '../lib/safe-event-emitter';
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
 
@@ -27,7 +28,7 @@ class SectionView extends EventEmitter {
 	}
 
 	destroy(){
-		const members = membersMap.get(this);
+		const members = get(membersMap, this);
 		members.sectionViewDriver.destroy();
 		this.removeAllListeners();
 	}

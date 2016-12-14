@@ -224,9 +224,11 @@ class InboxMessageView {
     const {sender} = this._p.elements;
     if (!sender)
       throw new Error('could not find sender element');
+    const emailAddress = sender.getAttribute('email');
+    if (!emailAddress)
+      throw new Error('could not find email address');
     return {
-      emailAddress: sender.getAttribute('email'),
-      name: sender.textContent
+      emailAddress, name: sender.textContent
     };
   }
   getRecipients(): Array<Contact> {

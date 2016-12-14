@@ -5,6 +5,7 @@ import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type KeyboardShortcutHandle from '../../../views/keyboard-shortcut-handle';
 
@@ -88,15 +89,15 @@ export default class KeyboardShortcutHelpModifier {
 			index++;
 		});
 
-		var firstHeader = node.querySelector('.aov');
-		var parent = firstHeader.parentElement;
+		const firstHeader = querySelector(node, '.aov');
+		const parent = firstHeader.parentElement;
 		if (!parent) throw new Error("Could not find parent");
 		parent.insertBefore(header, firstHeader);
 		parent.insertBefore(table, firstHeader);
 	}
 
 	_renderHeader(): HTMLElement {
-		var header = document.createElement('div');
+		const header = document.createElement('div');
 		header.setAttribute('class', 'aov  aox');
 		header.innerHTML = [
 			'<div class="aow">',
@@ -107,13 +108,13 @@ export default class KeyboardShortcutHelpModifier {
 		].join('');
 
 		if(this._appIconUrl){
-			var img = document.createElement('img');
+			const img = document.createElement('img');
 			if (this._appIconUrl) {
 				img.src = this._appIconUrl;
 			}
 			img.setAttribute('class', 'inboxsdk__icon');
 
-			var title = header.querySelector('.inboxsdk__shortcutHelp_title');
+			const title = querySelector(header, '.inboxsdk__shortcutHelp_title');
 			title.insertBefore(img, title.firstChild);
 		}
 

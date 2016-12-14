@@ -212,6 +212,7 @@ export default function showCustomThreadList(driver: GmailDriver, customRouteID:
   const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
   const searchInput = GmailElementGetter.getSearchInput();
+  if (!searchInput) throw new Error('could not find search input');
   searchInput.value = '';
   searchInput.style.visibility = 'hidden';
   nextMainContentElementChange.onValue(() => {

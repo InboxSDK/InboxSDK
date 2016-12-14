@@ -39,7 +39,9 @@ class GmailAppSidebarView {
     const el = sidebarContainerEl.querySelector('.'+idMap('app_sidebar_container'));
     if (el) {
       this._el = el;
-      this._instanceId = el.getAttribute('data-instance-id');
+      const instanceId = el.getAttribute('data-instance-id');
+      if (instanceId == null) throw new Error('Failed to find instance id');
+      this._instanceId = instanceId;
     } else {
       this._createElement();
     }
@@ -69,13 +71,13 @@ class GmailAppSidebarView {
   }
 
   _createElement() {
+    this._instanceId = `${Date.now()}-${Math.random()}`;
+
     const el = this._el = document.createElement('div');
     el.className = idMap('app_sidebar_container');
-    el.setAttribute('data-instance-id', `${Date.now()}-${Math.random()}`);
+    el.setAttribute('data-instance-id', this._instanceId);
     this._sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
     this._sidebarContainerEl.insertBefore(el, this._sidebarContainerEl.firstElementChild);
-
-    this._instanceId = el.getAttribute('data-instance-id');
 
     if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
       const waitingPlatform = document.createElement('div');

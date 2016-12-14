@@ -5,7 +5,7 @@ import {defn, defonce} from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
-
+import get from '../../../common/get-or-fail';
 import AttachmentCardView from './attachment-card-view';
 import {MessageViewToolbarSectionNames} from '../../namespaces/conversations';
 import type ThreadView from './thread-view';
@@ -31,7 +31,7 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentCardView(cardOptions: Object): AttachmentCardView {
-		const {messageViewImplementation, membrane} = memberMap.get(this);
+		const {messageViewImplementation, membrane} = get(memberMap, this);
 		const attachmentCardViewDriver = messageViewImplementation.addAttachmentCard(cardOptions);
 		const attachmentCardView = membrane.get(attachmentCardViewDriver);
 
@@ -52,7 +52,7 @@ class MessageView extends EventEmitter {
 	}
 
 	addAttachmentsToolbarButton(buttonOptions: Object){
-		const {messageViewImplementation, membrane} = memberMap.get(this);
+		const {messageViewImplementation, membrane} = get(memberMap, this);
 		messageViewImplementation.addButtonToDownloadAllArea({
 			tooltip: buttonOptions.tooltip,
 			iconUrl: buttonOptions.iconUrl,
@@ -73,23 +73,23 @@ class MessageView extends EventEmitter {
 		) {
 			throw new Error("Missing required properties on MessageViewToolbarButtonDescriptor object");
 		}
-		const {messageViewImplementation} = memberMap.get(this);
+		const {messageViewImplementation} = get(memberMap, this);
 		messageViewImplementation.addMoreMenuItem(buttonOptions);
 	}
 
 	getBodyElement(): HTMLElement {
-		return memberMap.get(this).messageViewImplementation.getContentsElement();
+		return get(memberMap, this).messageViewImplementation.getContentsElement();
 	}
 
 	getMessageID(): string {
-		return memberMap.get(this).messageViewImplementation.getMessageID();
+		return get(memberMap, this).messageViewImplementation.getMessageID();
 	}
 
 	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
 	// registerAttachmentCardViewHandler function to listen for other types of
 	// attachment cards.
 	getFileAttachmentCardViews(): Array<AttachmentCardView> {
-		const {messageViewImplementation, membrane} = memberMap.get(this);
+		const {messageViewImplementation, membrane} = get(memberMap, this);
 		return _.chain(messageViewImplementation.getAttachmentCardViewDrivers())
 			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
 			.map(attachmentCardViewDriver => membrane.get(attachmentCardViewDriver))
@@ -98,20 +98,20 @@ class MessageView extends EventEmitter {
 
 	// Deprecated name
 	getAttachmentCardViews(): Array<AttachmentCardView> {
-		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
+		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
 		return this.getFileAttachmentCardViews();
 	}
 
 	isElementInQuotedArea(element: HTMLElement): boolean {
-		return memberMap.get(this).messageViewImplementation.isElementInQuotedArea(element);
+		return get(memberMap, this).messageViewImplementation.isElementInQuotedArea(element);
 	}
 
 	isLoaded(): boolean {
-		return memberMap.get(this).messageViewImplementation.isLoaded();
+		return get(memberMap, this).messageViewImplementation.isLoaded();
 	}
 
 	getLinksInBody(): Array<MessageViewLinkDescriptor> {
-		const members = memberMap.get(this);
+		const members = get(memberMap, this);
 		if(!members.linksInBody){
 			const anchors = this.getBodyElement().querySelectorAll('a');
 			members.linksInBody = _.map(anchors, anchor => ({
@@ -127,34 +127,34 @@ class MessageView extends EventEmitter {
 	}
 
 	getSender(): Contact {
-		return memberMap.get(this).messageViewImplementation.getSender();
+		return get(memberMap, this).messageViewImplementation.getSender();
 	}
 
 	getRecipients(): Array<Contact> {
-		return memberMap.get(this).messageViewImplementation.getRecipients();
+		return get(memberMap, this).messageViewImplementation.getRecipients();
 	}
 
 	getThreadView(): ThreadView {
-		const {messageViewImplementation, membrane} = memberMap.get(this);
+		const {messageViewImplementation, membrane} = get(memberMap, this);
 		return membrane.get(messageViewImplementation.getThreadViewDriver());
 	}
 
 	getDateString(): string {
-		return memberMap.get(this).messageViewImplementation.getDateString();
+		return get(memberMap, this).messageViewImplementation.getDateString();
 	}
 
 	addAttachmentIcon(iconDescriptor: Object) {
-		memberMap.get(this).messageViewImplementation.addAttachmentIcon(iconDescriptor);
+		get(memberMap, this).messageViewImplementation.addAttachmentIcon(iconDescriptor);
 	}
 
 	getViewState(): VIEW_STATE {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		return members.Conversations.MessageViewViewStates[members.messageViewImplementation.getViewState()];
 	}
 
 	hasOpenReply(): boolean {
-		memberMap.get(this).driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
-		return memberMap.get(this).messageViewImplementation.hasOpenReply();
+		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
+		return get(memberMap, this).messageViewImplementation.hasOpenReply();
 	}
 }
 

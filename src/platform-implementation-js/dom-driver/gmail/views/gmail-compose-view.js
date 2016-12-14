@@ -6,6 +6,7 @@ import delay from 'pdelay';
 import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
 import * as ud from 'ud';
+import closest from 'closest-ng';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -14,7 +15,7 @@ import type {Stopper} from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
-import findParent from '../../../../common/find-parent';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
 import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
@@ -206,13 +207,13 @@ class GmailComposeView {
 
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
-		const initialBodyElement = this.getBodyElement();
+		const initialBodyElement = this.getMaybeBodyElement();
 		this.ready = _.constant(
 			(
 				initialBodyElement ?
 					Kefir.constant(initialBodyElement) :
 					streamWaitFor(
-						() => this.getBodyElement(),
+						() => this.getMaybeBodyElement(),
 						3*60 * 1000 //timeout
 					)
 			)
@@ -221,7 +222,7 @@ class GmailComposeView {
 				this._seenBodyElement = bodyElement;
 
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
-				this._messageIDElement = this._element.querySelector('input[name="draft"]');
+				this._messageIDElement = (this._element.querySelector('input[name="draft"]'): any);
 				if (!this._messageIDElement) {
 					driver.getLogger().error(new Error("Could not find compose message id field"));
 					// stub so other things don't fail
@@ -318,7 +319,7 @@ class GmailComposeView {
 	_updateComposeFullscreenState() {
 		this._isFullscreen = !this._isInlineReplyForm &&
 			(this._isStandalone ||
-				GmailElementGetter.getFullscreenComposeWindowContainer().contains(this._element));
+				(GmailElementGetter.getFullscreenComposeWindowContainer():any).contains(this._element));
 	}
 
 	focus() {
@@ -487,7 +488,7 @@ class GmailComposeView {
 		if (!this.isInlineReplyForm()) {
 			throw new Error("Can only pop out inline reply compose views");
 		}
-		var popOutBtn = this._element.querySelector('.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child');
+		const popOutBtn = querySelector(this._element, '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child');
 		simulateClick(popOutBtn);
 	}
 
@@ -572,11 +573,17 @@ class GmailComposeView {
 	}
 
 	getBodyElement(): HTMLElement {
+		const el = this.getMaybeBodyElement();
+		if (!el) throw new Error('Could not find body element');
+		return el;
+	}
+
+	getMaybeBodyElement(): ?HTMLElement {
 		return this._element.querySelector('.Ap [g_editable=true]');
 	}
 
 	getTopFormElement(): HTMLElement {
-		return this._element.querySelector('td > form');
+		return querySelector(this._element, 'td > form');
 	}
 
 	getHTMLContent(): string {
@@ -636,16 +643,16 @@ class GmailComposeView {
 	}
 
 	getFormattingToolbar(): HTMLElement {
-		return this._element.querySelector('.aX');
+		return querySelector(this._element, '.aX');
 	}
 
 	getFormattingToolbarArrow(): HTMLElement {
-		return this.getFormattingToolbar().querySelector('.aA4');
+		return querySelector(this.getFormattingToolbar(), '.aA4');
 	}
 
 	getFormattingToolbarToggleButton(): HTMLElement {
-		const innerElement = this._element.querySelector('[role=button] .dv');
-		const btn = findParent(innerElement, el => el.getAttribute('role') === 'button');
+		const innerElement = querySelector(this._element, '[role=button] .dv');
+		const btn = closest(innerElement, '[role=button]');
 		if (!btn) throw new Error('failed to find button');
 		return btn;
 	}
@@ -667,15 +674,15 @@ class GmailComposeView {
 	}
 
 	getInsertMoreArea(): HTMLElement {
-		return this._element.querySelector('.eq');
+		return querySelector(this._element, '.eq');
 	}
 
 	getInsertLinkButton(): HTMLElement {
-		return this._element.querySelector('.e5.aaA.aMZ');
+		return querySelector(this._element, '.e5.aaA.aMZ');
 	}
 
 	getSendButton(): HTMLElement {
-		return this._element.querySelector('.IZ .Up > div > [role=button]');
+		return querySelector(this._element, '.IZ .Up > div > [role=button]');
 	}
 
 	getSendAndArchiveButton(): ?HTMLElement {
@@ -704,15 +711,15 @@ class GmailComposeView {
 	}
 
 	getBottomBarTable(): HTMLElement {
-		return this._element.querySelector('.aoP .aDh > table');
+		return querySelector(this._element, '.aoP .aDh > table');
 	}
 
 	getBottomToolbarContainer(): HTMLElement {
-		return this._element.querySelector('.aoP .aDj');
+		return querySelector(this._element, '.aoP .aDj');
 	}
 
 	getDiscardButton(): HTMLElement {
-		return this._element.querySelector('.gU.az5 .oh');
+		return querySelector(this._element, '.gU.az5 .oh');
 	}
 
 	getComposeID(): string {
@@ -841,7 +848,7 @@ class GmailComposeView {
 
 	isMinimized(): boolean {
 		const element = this.getElement();
-		const bodyElement = this.getBodyElement();
+		const bodyElement = this.getMaybeBodyElement();
 		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
 		if (!bodyContainer) {
 			if (!hasReportedMissingBody) {
@@ -868,7 +875,7 @@ class GmailComposeView {
 		if (minimized !== this.isMinimized()) {
 			if (this._isInlineReplyForm)
 				throw new Error("Not implemented for inline compose views");
-			const minimizeButton = this._element.querySelector('.Hm > img');
+			const minimizeButton = querySelector(this._element, '.Hm > img');
 			simulateClick(minimizeButton);
 		}
 	}
@@ -877,7 +884,7 @@ class GmailComposeView {
 		if (fullscreen !== this.isFullscreen()) {
 			if (this._isInlineReplyForm)
 				throw new Error("Not implemented for inline compose views");
-			const fullscreenButton = this._element.querySelector('.Hm > img:nth-of-type(2)');
+			const fullscreenButton = querySelector(this._element, '.Hm > img:nth-of-type(2)');
 			simulateClick(fullscreenButton);
 		}
 	}
@@ -891,10 +898,11 @@ class GmailComposeView {
 			asap(() => {
 				this._isTriggeringADraftSavePending = false;
 
-				if(this.getBodyElement()){
+				const body = this.getMaybeBodyElement();
+				if(body){
 					const unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
 					try {
-						simulateKey(this.getBodyElement(), 190, 0);
+						simulateKey(body, 190, 0);
 					} finally {
 						unsilence();
 					}

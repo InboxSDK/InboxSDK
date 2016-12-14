@@ -7,6 +7,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import findParent from '../../../../common/find-parent';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type InboxAttachmentOverlayView from './inbox-attachment-overlay-view';
@@ -88,7 +89,7 @@ class InboxAttachmentCardView {
           </div>
         `;
         if (options.failoverPreviewIconUrl) {
-          Kefir.fromEvents(this._element.querySelector('img'), 'error')
+          Kefir.fromEvents(querySelector(this._element, 'img'), 'error')
             .take(1)
             .takeUntilBy(this._stopper)
             .onValue(() => {
@@ -160,7 +161,7 @@ class InboxAttachmentCardView {
     if (!this._p) {
       // artificial SDK-added card. Native cards don't have their added buttons
       // processed here. They're added in InboxAttachmentOverlayView.
-      const buttonContainer = this._element.querySelector('.inboxsdk__attachment_card_buttons');
+      const buttonContainer = querySelector(this._element, '.inboxsdk__attachment_card_buttons');
       const el = document.createElement('button');
       el.className = 'inboxsdk__attachment_card_button';
       if (button.downloadUrl) {

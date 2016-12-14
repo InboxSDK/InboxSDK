@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
@@ -8,6 +7,7 @@ import type GmailDriver from '../gmail-driver';
 import type GmailMessageView from './gmail-message-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 import ButtonView from '../widgets/buttons/button-view';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
@@ -84,7 +84,7 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		const cardCount = this.getAttachmentCardViews().length;
 		if (cardCount > 1) {
 			const toolbar = this._createAreaToolbarIfNeeded();
-			const counter = toolbar.querySelector('.aVW > span');
+			const counter = querySelector(toolbar, '.aVW > span');
 			counter.textContent = String(cardCount);
 		}
 	}
@@ -120,7 +120,7 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 		});
 
 		const toolbar = this._createAreaToolbarIfNeeded();
-		toolbar.querySelector('.aZi').appendChild(buttonView.getElement());
+		querySelector(toolbar, '.aZi').appendChild(buttonView.getElement());
 	}
 
 });

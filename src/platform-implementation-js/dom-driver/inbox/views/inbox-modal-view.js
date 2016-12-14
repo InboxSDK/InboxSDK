@@ -6,6 +6,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 class InboxModalView {
   _eventStream: Bus<Object> = kefirBus();
@@ -16,7 +17,7 @@ class InboxModalView {
 
     this._processOptions(options);
 
-    const closeElement = this._modalContainerElement.querySelector('.inboxsdk__close_button');
+    const closeElement = querySelector(this._modalContainerElement, '.inboxsdk__close_button');
 
     closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({
@@ -42,25 +43,27 @@ class InboxModalView {
   }
 
   setTitle(title: string) {
+    const heading = querySelector(this._modalContainerElement, '[role=heading]');
     if (!title) {
-      this._modalContainerElement.querySelector('[role=heading]').style.display = 'none';
+      heading.style.display = 'none';
     } else {
-      this._modalContainerElement.querySelector('[role=heading]').style.display = '';
-      this._modalContainerElement.querySelector('[role=heading]').textContent = title;
+      heading.style.display = '';
+      heading.textContent = title;
     }
   }
 
   setContentElement(element: HTMLElement) {
-    this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = '';
+    const content = querySelector(this._modalContainerElement, '.inboxsdk__modal_content');
+    content.innerHTML = '';
     if (typeof element === 'string') {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = element;
+      content.innerHTML = element;
     } else if(element instanceof Element) {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').appendChild(element);
+      content.appendChild(element);
     }
   }
 
   setButtons(buttons: Object[]) {
-    var buttonContainer = this._modalContainerElement.querySelector('.inboxsdk__modal_buttons');
+    const buttonContainer = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
 
     buttonContainer.innerHTML = '';
     _.sortBy(buttons, [

@@ -18,6 +18,7 @@ import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
+import querySelector from '../../lib/dom/querySelectorOrFail';
 import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
@@ -298,7 +299,9 @@ class InboxDriver {
   }
 
   getUserEmailAddress(): string {
-    return document.head.getAttribute('data-inboxsdk-user-email-address');
+    const s = document.head.getAttribute('data-inboxsdk-user-email-address');
+    if (s == null) throw new Error('should not happen');
+    return s;
   }
 
   getUserContact(): Contact {
@@ -354,7 +357,7 @@ class InboxDriver {
   showCustomRouteView(el: HTMLElement): void {
     let customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (!customViewBase) {
-      customViewBase = document.createElement('div');
+      const _customViewBase = customViewBase = document.createElement('div');
       customViewBase.className = 'inboxsdk__custom_view';
 
       const {chat, nav} = getSidebarClassnames();
@@ -373,15 +376,15 @@ class InboxDriver {
       // Mirror the nav and chat sidebar classnames onto the inboxsdk__custom_view
       // element so that if the custom_view_container element also has the centerList
       // classname, then Inbox's margin rules for centerList will apply to it.
-      const main = document.querySelector('body > div[class][id][jsaction][jslog]');
+      const main = querySelector(document, 'body > div[class][id][jsaction][jslog]');
       makeMutationObserverChunkedStream(main, {attributes: true, attributeFilter: ['class']})
         .toProperty(() => null)
         .onValue(() => {
           [chat, nav].filter(Boolean).forEach(className => {
             if (main.classList.contains(className)) {
-              customViewBase.classList.add(className);
+              _customViewBase.classList.add(className);
             } else {
-              customViewBase.classList.remove(className);
+              _customViewBase.classList.remove(className);
             }
           });
         });

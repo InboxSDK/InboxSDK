@@ -16,12 +16,12 @@ class CustomRouteView extends RouteView {
 	}
 
 	setFullWidth(fullWidth: boolean) {
-		const {routeViewDriver} = membersMap.get(this);
+		const {routeViewDriver} = get(membersMap, this);
 		routeViewDriver.setFullWidth(fullWidth);
 	}
 
 	getElement(): HTMLElement {
-		const {routeViewDriver} = membersMap.get(this);
+		const {routeViewDriver} = get(membersMap, this);
 		const el = routeViewDriver.getCustomViewElement();
 		if (!el) throw new Error("Should not happen");
 		return el;

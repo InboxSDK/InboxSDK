@@ -9,6 +9,7 @@ import delay from 'pdelay';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import makeElementIntoEventEmitter from './lib/makeElementIntoEventEmitter';
+import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import selectorStream from '../src/platform-implementation-js/lib/dom/selectorStream';
 
@@ -60,7 +61,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });
@@ -77,7 +78,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });
@@ -94,7 +95,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });
@@ -112,7 +113,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('#search button.foo')));
+        assert(results.includes(querySelector(page(), '#search button.foo')));
         cb();
       });
   });
@@ -129,8 +130,8 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
-        assert(results.includes(page().querySelector('[role=main] div')));
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] div')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });
@@ -148,7 +149,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('.search button.foo')));
+        assert(results.includes(querySelector(page(), '.search button.foo')));
         cb();
       });
   });
@@ -165,8 +166,8 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
-        assert(results.includes(page().querySelector('[role=main] div')));
-        assert(results.includes(page().querySelector('.search div:not(.ignoreMe)')));
+        assert(results.includes(querySelector(page(), '[role=main] div')));
+        assert(results.includes(querySelector(page(), '.search div:not(.ignoreMe)')));
         cb();
       });
   });
@@ -191,8 +192,8 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 2);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
-        assert(results.includes(page().querySelector('.search button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '.search button.foo')));
         cb();
       });
   });
@@ -218,7 +219,7 @@ describe('selectorStream', function() {
   it('handles element removal', function(cb) {
     const onValueSpy = sinon.spy();
     const removalSpy = sinon.spy();
-    const body = page().querySelector('body');
+    const body = querySelector(page(), 'body');
     const bodyMutation = makeElementIntoEventEmitter(body);
     selectorStream([
       '.parent',
@@ -248,7 +249,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         assert(removalSpy.calledOnce);
         cb();
       });
@@ -258,7 +259,7 @@ describe('selectorStream', function() {
     const onValueSpy = sinon.spy();
     const removalSpy = sinon.spy();
     const stopper = kefirStopper();
-    const main = page().querySelector('[role=main]');
+    const main = querySelector(page(), '[role=main]');
     const mainMutation = makeElementIntoEventEmitter(main);
     selectorStream([
       '.parent',
@@ -275,7 +276,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         assert(removalSpy.calledOnce);
         cb();
       });
@@ -309,7 +310,7 @@ describe('selectorStream', function() {
     const onValueSpy = sinon.spy();
     const removalSpy = sinon.spy();
     const stopper = kefirStopper();
-    const main = page().querySelector('[role=main]');
+    const main = querySelector(page(), '[role=main]');
     const mainMutation = makeElementIntoEventEmitter(main);
     selectorStream([
       '.parent',
@@ -326,7 +327,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         assert(removalSpy.calledOnce);
         cb();
       });
@@ -372,13 +373,13 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
 
         assert.deepStrictEqual(console.log.args, [
-          ['parent', page().querySelector('.parent')],
-          ['div', page().querySelector('.parent > [role=main]')],
-          ['div', page().querySelector('.parent > .search')],
-          ['button', page().querySelector('[role=main] > button.foo')]
+          ['parent', querySelector(page(), '.parent')],
+          ['div', querySelector(page(), '.parent > [role=main]')],
+          ['div', querySelector(page(), '.parent > .search')],
+          ['button', querySelector(page(), '[role=main] > button.foo')]
         ]);
 
         cb();
@@ -398,7 +399,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });
@@ -418,7 +419,7 @@ describe('selectorStream', function() {
       .onEnd(() => {
         const results = onValueSpy.args.map(callArgs => callArgs[0].el);
         assert.strictEqual(results.length, 1);
-        assert(results.includes(page().querySelector('[role=main] button.foo')));
+        assert(results.includes(querySelector(page(), '[role=main] button.foo')));
         cb();
       });
   });

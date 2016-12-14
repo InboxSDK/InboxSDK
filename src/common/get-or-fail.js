@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default function get<K,V>(map: Map<K,V>|WeakMap<K,V>, key: K): V {
   const value = map.get(key);

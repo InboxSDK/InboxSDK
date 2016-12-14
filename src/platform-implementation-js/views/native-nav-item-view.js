@@ -2,12 +2,10 @@
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
-
 import EventEmitter from '../lib/safe-event-emitter';
-
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
-
+import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
 
 import type {Driver} from '../driver-interfaces/driver';
@@ -31,13 +29,13 @@ export default class NativeNavItemView extends EventEmitter {
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 
-		var navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
-		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
+		const navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
+		const navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
-		members.deferred.promise.then(function(navItemViewDriver){
-			var childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
+		members.deferred.promise.then(navItemViewDriver => {
+			const childNavItemViewDriver = navItemViewDriver.addNavItem(members.appId, navItemDescriptorPropertyStream);
 			navItemView.setNavItemViewDriver(childNavItemViewDriver);
 		});
 
@@ -50,7 +48,7 @@ export default class NativeNavItemView extends EventEmitter {
 			return;
 		}
 
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 
 		members.navItemViewDriver = navItemViewDriver;
 		navItemViewDriver.getEventStream().onValue((event) => _handleStreamEvent(this, event));
@@ -59,17 +57,17 @@ export default class NativeNavItemView extends EventEmitter {
 	}
 
 	isCollapsed(): boolean {
-		return localStorage['inboxsdk__nativeNavItem__state_' + memberMap.get(this).labelName] === 'collapsed';
+		return localStorage.getItem('inboxsdk__nativeNavItem__state_' + get(memberMap, this).labelName) === 'collapsed';
 	}
 
 	setCollapsed(collapseValue: boolean ){
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 
 		if(members.navItemViewDriver){
 			members.navItemViewDriver.setCollapsed(collapseValue);
 		}
 		else{
-			localStorage['inboxsdk__nativeNavItem__state_' + members.labelName] = collapseValue ? 'collapsed' : 'expanded';
+			localStorage.setItem('inboxsdk__nativeNavItem__state_' + members.labelName, collapseValue ? 'collapsed' : 'expanded');
 		}
 	}
 

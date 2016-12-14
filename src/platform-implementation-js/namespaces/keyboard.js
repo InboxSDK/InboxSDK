@@ -1,6 +1,7 @@
 /* @flow */
 
 import * as ud from 'ud';
+import get from '../../common/get-or-fail';
 import KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type {Driver} from '../driver-interfaces/driver';
 
@@ -14,7 +15,7 @@ class Keyboard {
   }
 
   createShortcutHandle(shortcutDescriptor) {
-    const members = memberMap.get(this);
+    const members = get(memberMap, this);
 
     let {chord, description} = shortcutDescriptor;
     if (!chord) throw new Error('Keyboard.createShortcutHandle chord missing');

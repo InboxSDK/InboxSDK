@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
 import {defn} from 'ud';
+import querySelector from './dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
@@ -135,7 +135,7 @@ function _addEnhancements(chipElement: HTMLElement) {
         'mouseenter',
         function(){
             chipElement.appendChild(xElement);
-            chipElement.querySelector('a > span').style.textDecoration = 'underline';
+            querySelector(chipElement, 'a > span').style.textDecoration = 'underline';
         }
     );
 
@@ -143,7 +143,7 @@ function _addEnhancements(chipElement: HTMLElement) {
         'mouseleave',
         function(){
             (xElement:any).remove();
-            chipElement.querySelector('a > span').style.textDecoration = 'none';
+            querySelector(chipElement, 'a > span').style.textDecoration = 'none';
         }
     );
 

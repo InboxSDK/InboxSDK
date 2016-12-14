@@ -19,5 +19,7 @@ export default async function openComposeWindow(gmailDriver: GmailDriver){
 		await waitFor(() => !!GmailElementGetter.getComposeButton());
 	}
 
-	simulateClick(GmailElementGetter.getComposeButton());
+	const composeButton = GmailElementGetter.getComposeButton();
+	if (!composeButton) throw new Error('Could not find compose button');
+	simulateClick(composeButton);
 };

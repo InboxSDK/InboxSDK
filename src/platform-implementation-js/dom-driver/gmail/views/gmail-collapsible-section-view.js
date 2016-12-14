@@ -8,6 +8,7 @@ import type {Bus} from 'kefir-bus';
 import RSVP from 'rsvp';
 import autoHtml from 'auto-html';
 
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
@@ -232,7 +233,7 @@ class GmailCollapsibleSectionView {
 
 	_updateTitle(collapsibleSectionDescriptor: Object){
 		if(this._collapsibleSectionDescriptor.title !== collapsibleSectionDescriptor.title){
-			if(this._titleElement) this._titleElement.querySelector('h3').textContent = collapsibleSectionDescriptor.title;
+			if(this._titleElement) querySelector(this._titleElement, 'h3').textContent = collapsibleSectionDescriptor.title;
 		}
 	}
 
@@ -294,19 +295,20 @@ class GmailCollapsibleSectionView {
 					})
 				);
 
+				const _summaryTextElement = summaryTextElement;
 				summaryTextElement.addEventListener('mouseenter', function(){
-					summaryTextElement.classList.add('aqi');
+					_summaryTextElement.classList.add('aqi');
 				});
 
 				summaryTextElement.addEventListener('mouseleave', function(){
-					summaryTextElement.classList.remove('aqi');
+					_summaryTextElement.classList.remove('aqi');
 				});
 
 				const insertionPoint = headerElement.querySelector('.Cr');
 				if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', summaryTextElement);
 			}
 
-			summaryTextElement.querySelector('b').textContent = collapsibleSectionDescriptor.titleLinkText;
+			querySelector(summaryTextElement, 'b').textContent = collapsibleSectionDescriptor.titleLinkText;
 		}
 	}
 
@@ -390,6 +392,7 @@ class GmailCollapsibleSectionView {
 
 			rowElement.innerHTML = _getRowHTML(result);
 
+			if (!tbody) throw new Error('should not happen');
 			tbody.appendChild(rowElement);
 
 			eventStream.plug(

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
 import EventEmitter from '../lib/safe-event-emitter';
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
 
@@ -23,7 +24,7 @@ class CollapsibleSectionView extends EventEmitter {
 	}
 
 	setCollapsed(value: boolean) {
-		membersMap.get(this).collapsibleSectionViewDriver.setCollapsed(value);
+		get(membersMap, this).collapsibleSectionViewDriver.setCollapsed(value);
 	}
 
 	remove(){
@@ -31,7 +32,7 @@ class CollapsibleSectionView extends EventEmitter {
 	}
 
 	destroy(){
-		const members = membersMap.get(this);
+		const members = get(membersMap, this);
 		members.collapsibleSectionViewDriver.destroy();
 		this.removeAllListeners();
 	}

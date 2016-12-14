@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 
 import type GmailAppToolbarButtonView from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
@@ -38,21 +39,21 @@ export default class AppToolbarButtonView extends EventEmitter {
 	}
 
 	open() {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.open();
 		});
 	}
 
 	close() {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.close();
 		});
 	}
 
 	remove() {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.appToolbarButtonViewDriverPromise.then(function(appToolbarButtonViewDriver){
 			appToolbarButtonViewDriver.destroy();
 		});

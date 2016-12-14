@@ -27,15 +27,24 @@ export default function makeCssSelectorChecker(node: Object): (el: HTMLElement) 
       return el => el.hasAttribute(node.attribute);
     case '^=': {
       const r = new RegExp('^'+_.escapeRegExp(node.raws.unquoted));
-      return el => r.test(el.getAttribute(node.attribute));
+      return el => {
+        const attrVal = el.getAttribute(node.attribute);
+        return typeof attrVal === 'string' && r.test(attrVal);
+      };
     }
     case '*=': {
       const r = new RegExp(_.escapeRegExp(node.raws.unquoted));
-      return el => r.test(el.getAttribute(node.attribute));
+      return el => {
+        const attrVal = el.getAttribute(node.attribute);
+        return typeof attrVal === 'string' && r.test(attrVal);
+      };
     }
     case '$=': {
       const r = new RegExp(_.escapeRegExp(node.raws.unquoted)+'$');
-      return el => r.test(el.getAttribute(node.attribute));
+      return el => {
+        const attrVal = el.getAttribute(node.attribute);
+        return typeof attrVal === 'string' && r.test(attrVal);
+      };
     }
     case '=':
       return el => el.getAttribute(node.attribute) === node.raws.unquoted;

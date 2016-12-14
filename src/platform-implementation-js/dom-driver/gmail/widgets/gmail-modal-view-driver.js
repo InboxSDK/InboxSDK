@@ -7,6 +7,7 @@ import type {Bus} from 'kefir-bus';
 import {defn} from 'ud';
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 class GmailModalViewDriver {
   _eventStream: Bus<any>;
@@ -36,36 +37,39 @@ class GmailModalViewDriver {
   }
 
   setTitle(title: string) {
+    const heading = querySelector(this._modalContainerElement, '[role=heading]');
     if (!title) {
-      this._modalContainerElement.querySelector('[role=heading]').style.display = 'none';
+      heading.style.display = 'none';
     } else {
-      this._modalContainerElement.querySelector('[role=heading]').style.display = '';
-      this._modalContainerElement.querySelector('[role=heading]').textContent = title;
+      heading.style.display = '';
+      heading.textContent = title;
     }
   }
 
   setContentElement(element: HTMLElement) {
-    this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = '';
+    const content = querySelector(this._modalContainerElement, '.inboxsdk__modal_content');
+    content.innerHTML = '';
     if (typeof element === 'string') {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').innerHTML = element;
+      content.innerHTML = element;
     } else if(element instanceof Element) {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_content').appendChild(element);
+      content.appendChild(element);
     }
   }
 
   setButtons(buttons: Object[]) {
-    this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').innerHTML = '';
+    const buttonsEl = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
+    buttonsEl.innerHTML = '';
 
     if (buttons.length === 0) {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = 'none';
+      buttonsEl.style.display = 'none';
       this._modalContainerElement.classList.add('inboxsdk__modal_content_no_buttons');
     } else {
-      this._modalContainerElement.querySelector('.inboxsdk__modal_buttons').style.display = '';
+      buttonsEl.style.display = '';
       this._modalContainerElement.classList.remove('inboxsdk__modal_content_no_buttons');
     }
 
     _.sortBy(buttons, button => button.orderHint || 0)
-      .forEach(this._addButton.bind(this, this._modalContainerElement.querySelector('.inboxsdk__modal_buttons')));
+      .forEach(this._addButton.bind(this, buttonsEl));
   }
 
   setChromeClass(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
@@ -122,7 +126,7 @@ class GmailModalViewDriver {
   }
 
   _setupEventStream() {
-    var closeElement = this._modalContainerElement.querySelector('.inboxsdk__modal_close');
+    const closeElement = querySelector(this._modalContainerElement, '.inboxsdk__modal_close');
 
     closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({

@@ -2,6 +2,7 @@
 
 import SafeEventEmitter from './lib/safe-event-emitter';
 import {BUILD_VERSION} from '../common/version';
+import get from '../common/get-or-fail';
 import sharedStyle from './lib/shared-style';
 import Membrane from './lib/Membrane';
 
@@ -136,7 +137,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 	destroy() {
 		if (!this.destroyed) {
 			this.destroyed = true;
-			memberMap.get(this).driver.destroy();
+			get(memberMap, this).driver.destroy();
 			this.emit('destroy');
 		}
 	}

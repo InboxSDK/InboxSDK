@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import querySelector from './querySelectorOrFail';
 
 import outsideClicksAndEscape from './outsideClicksAndEscape';
 
@@ -31,7 +32,7 @@ test('outside click works', () => {
 
   expect(onValue).toHaveBeenCalledTimes(0);
   const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  div2.querySelector('p').dispatchEvent(evt);
+  querySelector(div2, 'p').dispatchEvent(evt);
   expect(onValue).toHaveBeenCalledTimes(1);
 });
 
@@ -43,7 +44,7 @@ test('inside click ignored', () => {
 
   expect(onValue).toHaveBeenCalledTimes(0);
   const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  div2.querySelector('p').dispatchEvent(evt);
+  querySelector(div2, 'p').dispatchEvent(evt);
   expect(onValue).toHaveBeenCalledTimes(0);
 });
 
@@ -55,6 +56,6 @@ test('float anchor click ignored', () => {
 
   expect(onValue).toHaveBeenCalledTimes(0);
   const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  float.querySelector('p').dispatchEvent(evt);
+  querySelector(float, 'p').dispatchEvent(evt);
   expect(onValue).toHaveBeenCalledTimes(0);
 });

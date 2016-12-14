@@ -2,6 +2,7 @@
 
 import {defn} from 'ud';
 import isEqual from 'lodash/isEqual';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 class GmailActionButtonView {
 	_element: HTMLElement;
@@ -49,7 +50,7 @@ class GmailActionButtonView {
 			return;
 		}
 
-		this._element.querySelector('div').textContent = title;
+		querySelector(this._element, 'div').textContent = title;
 	}
 }
 export default defn(module, GmailActionButtonView);

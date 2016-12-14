@@ -1,10 +1,9 @@
 /* @flow */
 
 import _ from 'lodash';
-
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
-
+import get from '../../common/get-or-fail';
 import NavItemView from '../views/nav-item-view';
 import NativeNavItemView from '../views/native-nav-item-view';
 
@@ -25,12 +24,12 @@ export default class NavMenu {
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
-		var members = memberMap.get(this);
-		var navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
+		const members = get(memberMap, this);
+		const navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
 
-		var navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
+		const navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 
-		var navItemViewDriver = members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream);
+		const navItemViewDriver = members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream);
 		navItemView.setNavItemViewDriver(navItemViewDriver);
 
 		members.navItemViews.push(navItemView);
@@ -41,7 +40,7 @@ export default class NavMenu {
 }
 
 function _setupSentMail(appId, driver){
-	var nativeNavItemView = new NativeNavItemView(appId, driver, 'sent');
+	const nativeNavItemView = new NativeNavItemView(appId, driver, 'sent');
 
 	driver.getSentMailNativeNavItem().then(function(sentMailNavItemViewDriver){
 		nativeNavItemView.setNavItemViewDriver(sentMailNavItemViewDriver);

@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/parser';
@@ -31,7 +32,7 @@ describe('Inbox Attachment Overlay Detection', function() {
     });
 
     it('2016-08-17 with preview overlay', function() {
-      const overlay = (page20160817().querySelector('iframe#FfJ3bf'):any).contentDocument.querySelector('[data-test-id=overlay]');
+      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
       const results = finder(page20160817());
       assert.strictEqual(results.length, 1);
       assert(results.includes(overlay));
@@ -40,18 +41,18 @@ describe('Inbox Attachment Overlay Detection', function() {
 
   describe('parser', function() {
     it('2016-08-17 with preview overlay', function() {
-      const overlay = (page20160817().querySelector('iframe#FfJ3bf'):any).contentDocument.querySelector('[data-test-id=overlay]');
+      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
       const results = parser(overlay);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
     });
 
     it('2016-08-30', function() {
-      const overlay = page20160830().querySelector('[data-test-id=overlay]');
+      const overlay = querySelector(page20160830(), '[data-test-id=overlay]');
       const results = parser(overlay);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
-      assert.strictEqual(results.elements.downloadButton, page20160830().querySelector('[data-test-id="downloadButton"]'));
+      assert.strictEqual(results.elements.downloadButton, querySelector(page20160830(), '[data-test-id="downloadButton"]'));
     });
   });
 
@@ -69,7 +70,7 @@ describe('Inbox Attachment Overlay Detection', function() {
     });
 
     it('2016-08-17 with preview overlay', function(cb) {
-      const overlay = (page20160817().querySelector('iframe#FfJ3bf'):any).contentDocument.querySelector('[data-test-id=overlay]');
+      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
 
       const spy = sinon.spy();
       watcher(page20160817())

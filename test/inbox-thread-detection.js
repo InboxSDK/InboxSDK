@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/parser';
@@ -27,7 +28,7 @@ describe('Inbox Thread Detection', function() {
 
   describe('finder', function() {
     it('2016-06-14', function() {
-      const thread = page20160614().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160614(), '[data-test-id=openthread]');
 
       const results = finder(page20160614());
       assert.strictEqual(results.length, 1);
@@ -35,7 +36,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-06-20 fullscreen and bundled inline', function() {
-      const thread = pageFullscreen20160620().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
 
       const results = finder(pageFullscreen20160620());
       assert.strictEqual(results.length, 1);
@@ -43,7 +44,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-07-27 search', function() {
-      const thread = page20160727().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160727(), '[data-test-id=openthread]');
 
       const results = finder(page20160727());
       assert.strictEqual(results.length, 1);
@@ -51,7 +52,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-08-23 thread in bundle', function() {
-      const thread = page20160823().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
       const results = finder(page20160823());
       assert.strictEqual(results.length, 1);
@@ -61,7 +62,7 @@ describe('Inbox Thread Detection', function() {
 
   describe('parser', function() {
     it('2016-06-14 inline', function() {
-      const thread = page20160614().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160614(), '[data-test-id=openthread]');
       const results = parser(thread);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -70,7 +71,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-06-20 bundled inline', function() {
-      const thread = pageFullscreen20160620().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
       const results = parser(thread);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -79,7 +80,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-07-27 search', function() {
-      const thread = page20160727().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160727(), '[data-test-id=openthread]');
       const results = parser(thread);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -88,7 +89,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-08-23 thread in bundle', function() {
-      const thread = page20160823().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160823(), '[data-test-id=openthread]');
       const results = parser(thread);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -99,7 +100,7 @@ describe('Inbox Thread Detection', function() {
 
   describe('watcher', function() {
     it('2016-06-14', function(cb) {
-      const thread = page20160614().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160614(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
       watcher(page20160614())
@@ -114,7 +115,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-06-20 fullscreen and bundled inline', function(cb) {
-      const thread = pageFullscreen20160620().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160620())
@@ -129,7 +130,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-07-27 search', function(cb) {
-      const thread = page20160727().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160727(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
       watcher(page20160727())
@@ -144,7 +145,7 @@ describe('Inbox Thread Detection', function() {
     });
 
     it('2016-08-23 thread in bundle', function(cb) {
-      const thread = page20160823().querySelector('[data-test-id=openthread]');
+      const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
       watcher(page20160823())

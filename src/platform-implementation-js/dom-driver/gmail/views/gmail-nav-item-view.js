@@ -6,6 +6,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import eventNameFilter from '../../../lib/event-name-filter';
 
 import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
@@ -119,10 +120,10 @@ export default class GmailNavItemView {
 		}
 
 		if(value){
-			this._element.querySelector('.TO').classList.add('NQ');
+			querySelector(this._element, '.TO').classList.add('NQ');
 		}
 		else{
-			this._element.querySelector('.TO').classList.remove('NQ');
+			querySelector(this._element, '.TO').classList.remove('NQ');
 		}
 	}
 
@@ -131,7 +132,7 @@ export default class GmailNavItemView {
 			return;
 		}
 
-		var toElement = this._element.querySelector('.TO');
+		const toElement = querySelector(this._element, '.TO');
 
 		if(value){
 			this._element.classList.add('ain');
@@ -189,7 +190,7 @@ export default class GmailNavItemView {
 			'</div>'
 		].join('');
 
-		var innerElement = this._element.querySelector('.TO');
+		const innerElement = querySelector(this._element, '.TO');
 
 		this._eventStream.plug(Kefir.fromEvents(innerElement, 'mouseenter').map(this._makeEventMapper('mouseenter')));
 		this._eventStream.plug(Kefir.fromEvents(innerElement, 'mouseleave').map(this._makeEventMapper('mouseleave')));
@@ -216,7 +217,7 @@ export default class GmailNavItemView {
 
 		updateIcon(
 			this,
-			this._element.querySelector('.aio'),
+			querySelector(this._element, '.aio'),
 			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
 			navItemDescriptor.iconClass,
 			navItemDescriptor.iconUrl
@@ -242,13 +243,13 @@ export default class GmailNavItemView {
 		switch(type){
 			case NAV_ITEM_TYPES.NAVIGATION:
 				if(!nameElement || nameElement.tagName !== 'SPAN'){
-					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<span class="nU n1 inboxsdk__navItem_name" role="link">${_.escape(this._name)}</span>`;
+					querySelector(this._element, '.aip').innerHTML += `<span class="nU n1 inboxsdk__navItem_name" role="link">${_.escape(this._name)}</span>`;
 				}
 			break;
 			case NAV_ITEM_TYPES.LINK:
 			case NAV_ITEM_TYPES.MANAGE:
 				if(!nameElement || nameElement.tagName !== 'A'){
-					this._element.querySelector('.aip').innerHTML = this._element.querySelector('.aip').innerHTML + `<a href="#" class="inboxsdk__navItem_name CK">${_.escape(this._name)}</a>`;
+					querySelector(this._element, '.aip').innerHTML += `<a href="#" class="inboxsdk__navItem_name CK">${_.escape(this._name)}</a>`;
 				}
 			break;
 		}
@@ -261,7 +262,7 @@ export default class GmailNavItemView {
 			return;
 		}
 
-		var navItemNameElement = this._element.querySelector('.inboxsdk__navItem_name');
+		const navItemNameElement = querySelector(this._element, '.inboxsdk__navItem_name');
 		navItemNameElement.textContent = name;
 		navItemNameElement.setAttribute('title', name);
 		if (this._expandoElement) {
@@ -328,7 +329,7 @@ export default class GmailNavItemView {
 			accessoryDescriptor.onClick();
 		});
 
-		this._element.querySelector('.aio').appendChild(linkDiv);
+		querySelector(this._element, '.aio').appendChild(linkDiv);
 	}
 
 	_createIconButtonAccessory(accessoryDescriptor: Object){
@@ -339,11 +340,11 @@ export default class GmailNavItemView {
 
 		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
 
-		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
+		querySelector(this._element, '.aio').appendChild(buttonOptions.buttonView.getElement());
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
-		var buttonOptions = _.clone(accessoryDescriptor);
+		const buttonOptions = _.clone(accessoryDescriptor);
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
@@ -351,10 +352,10 @@ export default class GmailNavItemView {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
 		};
 
-		var accessoryViewController = new DropdownButtonViewController(buttonOptions);
+		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
 		this._accessoryViewController = accessoryViewController;
 
-		var innerElement = this._element.querySelector('.TO');
+		const innerElement = querySelector(this._element, '.TO');
 		innerElement.addEventListener('mouseenter', function(){
 			innerElement.classList.add('inboxsdk__navItem_hover');
 		});
@@ -363,9 +364,9 @@ export default class GmailNavItemView {
 			innerElement.classList.remove('inboxsdk__navItem_hover');
 		});
 
-		this._element.querySelector('.aio').appendChild(buttonOptions.buttonView.getElement());
+		querySelector(this._element, '.aio').appendChild(buttonOptions.buttonView.getElement());
 
-		var self = this;
+		const self = this;
 
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
@@ -411,7 +412,7 @@ export default class GmailNavItemView {
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
 		var element = gmailNavItemView.getElement();
-		element.querySelector('.TO').style.paddingLeft = (LEFT_INDENTATION_PADDING * this._level) + 'px';
+		querySelector(element, '.TO').style.paddingLeft = (LEFT_INDENTATION_PADDING * this._level) + 'px';
 
 		this._setHeights();
 	}
@@ -511,13 +512,13 @@ export default class GmailNavItemView {
 	}
 
 	_setHeights(){
-		var toElement = this._element.querySelector('.TO');
+		const toElement = querySelector(this._element, '.TO');
 
 		if(this._element.classList.contains('ain') && this._itemContainerElement){
 			this._element.style.height = '';
 
-			var totalHeight = this._element.clientHeight;
-			var itemHeight = toElement.clientHeight;
+			const totalHeight = this._element.clientHeight;
+			const itemHeight = toElement.clientHeight;
 
 			this._element.style.height = itemHeight + 'px';
 			this._element.style.overflow = 'visible';

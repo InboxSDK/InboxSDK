@@ -9,6 +9,7 @@ import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
@@ -105,13 +106,13 @@ class InboxThreadView {
 
         let iconArea = stickyHeading.querySelector('.'+idMap('sidebar_iconArea'));
         if (!iconArea) {
-          iconArea = document.createElement('div');
+          const _iconArea = iconArea = document.createElement('div');
           iconArea.className = idMap('sidebar_iconArea');
 
           this._driver.getAppSidebarView().getOpenOrOpeningStream()
             .takeUntilBy(this._stopper)
             .onValue(open => {
-              iconArea.style.display = open ? 'none' : '';
+              _iconArea.style.display = open ? 'none' : '';
             });
 
           stickyHeading.appendChild(iconArea);
@@ -146,7 +147,7 @@ class InboxThreadView {
               <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
             </button>
           `;
-          container.querySelector('button').addEventListener('click', (event: MouseEvent) => {
+          querySelector(container, 'button').addEventListener('click', (event: MouseEvent) => {
             event.stopPropagation();
             this._driver.getAppSidebarView().open();
             panel.scrollIntoView();

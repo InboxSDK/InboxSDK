@@ -57,11 +57,15 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       detail: {isPreviewedThread}
     }));
 
-    return threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
+    const s = threadContainerElement.getAttribute('data-inboxsdk-currentthreadid');
+    if (s == null) throw new Error('Failed to read value');
+    return s;
   }
 
   getUserOriginalPreviewPaneMode(): string {
-    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
+    const s = document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
+    if (s == null) throw new Error('Failed to read value');
+    return s;
   }
 
   getIkValue(): string {
@@ -77,7 +81,9 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   getActionTokenValue(): string {
-    return document.head.getAttribute('data-inboxsdk-action-token-value');
+    const s = document.head.getAttribute('data-inboxsdk-action-token-value');
+    if (s == null) throw new Error('Failed to read value');
+    return s;
   }
 
   isConversationViewDisabled(): Promise<boolean> {

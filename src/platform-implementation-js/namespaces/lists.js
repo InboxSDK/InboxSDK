@@ -1,7 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
-
+import get from '../../common/get-or-fail';
 import HandlerRegistry from '../lib/handler-registry';
 import ThreadRowView from '../views/thread-row-view';
 import type Membrane from '../lib/Membrane';
@@ -31,11 +31,11 @@ export default class Lists {
 	}
 
 	registerThreadRowViewHandler(handler: Function) {
-		return memberMap.get(this).threadRowViewRegistry.registerHandler(handler);
+		return get(memberMap, this).threadRowViewRegistry.registerHandler(handler);
 	}
 }
 
-var ActionButtonTypes = Object.freeze({
+const ActionButtonTypes = Object.freeze({
 	'LINK': 'LINK',
 	'DROPDOWN': 'DROPDOWN',
 	'ACTION': 'ACTION'

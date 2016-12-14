@@ -25,6 +25,7 @@ export default function overrideEditSubject(gmailDriver: GmailDriver, gmailCompo
       });
       hasLoggedError = true;
     }
+    return;
   }
 
   menuItem.addEventListener('click', (e: MouseEvent) => {
