@@ -8,6 +8,7 @@ import type {Bus} from 'kefir-bus';
 import GmailTabContainerView from './gmail-tab-container-view';
 import GmailContentPanelView from './gmail-content-panel-view';
 import get from '../../../../../common/get-or-fail';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
 export default class GmailContentPanelContainerView {
   _eventStream: Bus<any>;
@@ -89,8 +90,8 @@ export default class GmailContentPanelContainerView {
 
   _setupExistingElement(element: HTMLElement) {
     this._element = element;
-    this._tabContainer = element.querySelector('.inboxsdk__contentPanelContainer_tabContainer');
-    this._contentContainer = element.querySelector('.inboxsdk__contentPanelContainer_contentContainer');
+    this._tabContainer = querySelector(element, '.inboxsdk__contentPanelContainer_tabContainer');
+    this._contentContainer = querySelector(element, '.inboxsdk__contentPanelContainer_contentContainer');
   }
 
   _setupGmailTabContainerView() {

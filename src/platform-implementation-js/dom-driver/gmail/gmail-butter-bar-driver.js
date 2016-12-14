@@ -6,12 +6,13 @@ import RSVP from 'rsvp';
 
 import streamWaitFor from '../../lib/stream-wait-for';
 import makeRevocableFunction from '../../lib/make-revocable-function';
+import querySelector from '../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
   .map((noticeContainer: HTMLElement) => {
-    const googleNotice: HTMLElement = noticeContainer.querySelector('.vh:not(.inboxsdk__butterbar)');
-    let sdkNotice: HTMLElement = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
+    const googleNotice = querySelector(noticeContainer, '.vh:not(.inboxsdk__butterbar)');
+    let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
     if (!sdkNotice) {
       sdkNotice = (googleNotice.cloneNode(false): any);
       sdkNotice.classList.add('inboxsdk__butterbar');

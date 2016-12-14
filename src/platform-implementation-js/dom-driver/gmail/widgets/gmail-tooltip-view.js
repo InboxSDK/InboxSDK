@@ -6,7 +6,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import ButtonView from './buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
@@ -104,7 +104,7 @@ export default class GmailTooltipView {
 	}
 
 	getContentElement(): HTMLElement {
-		return this._element.querySelector('.aRM');
+		return querySelector(this._element, '.aRM');
 	}
 
 	close(){
@@ -132,7 +132,7 @@ export default class GmailTooltipView {
 			this._element.innerHTML = html;
 
 			this._element.classList.add('inboxdk__tooltip_content');
-			this._element.querySelector('.aRM').appendChild(options.el);
+			querySelector(this._element, '.aRM').appendChild(options.el);
 		}
 		else{
 			let html = [
@@ -172,9 +172,9 @@ export default class GmailTooltipView {
 
 
 			if(options.imageUrl){
-				var image = document.createElement('img');
+				const image = document.createElement('img');
 				image.src = options.imageUrl;
-				this._element.querySelector('.inboxsdk__tooltip_image').appendChild(image);
+				querySelector(this._element, '.inboxsdk__tooltip_image').appendChild(image);
 
 				image.addEventListener('load', (domEvent) => {
 					asap(() => {
@@ -187,11 +187,11 @@ export default class GmailTooltipView {
 			}
 
 			if(options.button){
-				var buttonOptions = _.clone(options.button);
+				const buttonOptions = _.clone(options.button);
 
 				buttonOptions.buttonColor = 'blue';
 
-				var oldOnClick = buttonOptions.onClick;
+				const oldOnClick = buttonOptions.onClick;
 				buttonOptions.onClick = () => {
 					this.destroy();
 					if(oldOnClick){
@@ -200,8 +200,8 @@ export default class GmailTooltipView {
 				};
 
 				buttonOptions.buttonView = new ButtonView(buttonOptions);
-				var buttonViewController = new BasicButtonViewController(buttonOptions);
-				this._element.querySelector('.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
+				const buttonViewController = new BasicButtonViewController(buttonOptions);
+				querySelector(this._element, '.inboxsdk__tooltip_button').appendChild(buttonOptions.buttonView.getElement());
 			}
 		}
 	}
@@ -382,7 +382,7 @@ export default class GmailTooltipView {
 		}
 
 
-		var arrow = this._element.querySelector('.inboxsdk__tooltip_arrow');
+		const arrow = querySelector(this._element, '.inboxsdk__tooltip_arrow');
 		arrow.style.left = position.left + 'px';
 		arrow.style.top = position.top + 'px';
 	}

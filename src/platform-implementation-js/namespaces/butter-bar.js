@@ -5,7 +5,7 @@ import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import getStackTrace from '../../common/get-stack-trace';
-
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 
 const ancientComplainTime = 2 * 60 * 1000;
@@ -40,7 +40,7 @@ export default class ButterBar {
     });
     this.hideMessage(options.messageKey);
 
-    const members = memberMap.get(this);
+    const members = get(memberMap, this);
     const butterBarDriver = members.driver.getButterBarDriver();
     const messageId = Date.now()+'-'+Math.random();
 
@@ -168,7 +168,7 @@ export default class ButterBar {
 
   hideMessage(messageKey: Object | string) {
     if (messageKey) {
-      const members = memberMap.get(this);
+      const members = get(memberMap, this);
       const message = members.messagesByKey.get(messageKey);
       if (message) {
         message.destroy();
@@ -177,7 +177,7 @@ export default class ButterBar {
   }
 
   hideGmailMessage() {
-    const members = memberMap.get(this);
+    const members = get(memberMap, this);
     const butterBarDriver = members.driver.getButterBarDriver();
 
     butterBarDriver.hideGmailMessage();

@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-
+import get from '../../common/get-or-fail';
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
 import AttachmentCardView from '../views/conversations/attachment-card-view';
@@ -76,19 +76,19 @@ class Conversations {
 	}
 
 	registerThreadViewHandler(handler: (v: ThreadView)=>void): ()=>void {
-		return memberMap.get(this).threadViewHandlerRegistry.registerHandler(handler);
+		return get(memberMap, this).threadViewHandlerRegistry.registerHandler(handler);
 	}
 
 	registerMessageViewHandler(handler: (v: MessageView)=>void): ()=>void {
-		return memberMap.get(this).messageViewHandlerRegistries.loaded.registerHandler(handler);
+		return get(memberMap, this).messageViewHandlerRegistries.loaded.registerHandler(handler);
 	}
 
 	registerMessageViewHandlerAll(handler: (v: MessageView)=>void): ()=>void {
-		return memberMap.get(this).messageViewHandlerRegistries.all.registerHandler(handler);
+		return get(memberMap, this).messageViewHandlerRegistries.all.registerHandler(handler);
 	}
 
 	registerFileAttachmentCardViewHandler(handler: (v: AttachmentCardView)=>void): ()=>void {
-		return memberMap.get(this).attachmentCardViewHandlerRegistry.registerHandler(handler);
+		return get(memberMap, this).attachmentCardViewHandlerRegistry.registerHandler(handler);
 	}
 }
 

@@ -14,7 +14,10 @@ export default function parser(el: HTMLElement) {
 
   const messageId: ?string = ec.run(
     'message id',
-    () => new BigNumber(/msg-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-msg-id'))[1]).toString(16)
+    () =>
+      new BigNumber(/msg-[^:]+:[^:\d]*(\d+)/.exec(
+        el.getAttribute('data-msg-id') || ''
+      )[1]).toString(16)
   );
 
   const heading = ec.run(

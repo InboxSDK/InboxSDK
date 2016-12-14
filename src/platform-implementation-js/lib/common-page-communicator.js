@@ -10,11 +10,15 @@ import type {AjaxOpts} from '../../common/ajax';
 
 export default class CommonPageCommunicator {
   getUserEmailAddress(): string {
-    return document.head.getAttribute('data-inboxsdk-user-email-address');
+    const s = document.head.getAttribute('data-inboxsdk-user-email-address');
+    if (typeof s !== 'string') throw new Error('should not happen');
+    return s;
   }
 
   getUserLanguage(): string {
-    return document.head.getAttribute('data-inboxsdk-user-language');
+    const s = document.head.getAttribute('data-inboxsdk-user-language');
+    if (typeof s !== 'string') throw new Error('should not happen');
+    return s;
   }
 
   resolveUrlRedirects(url: string): Promise<string> {

@@ -16,6 +16,7 @@ import getUpdatedContact from './gmail-message-view/get-updated-contact';
 
 import delayAsap from '../../../lib/delay-asap';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -102,7 +103,7 @@ class GmailMessageView {
 			throw new Error('tried to get message contents before message is loaded');
 		}
 
-		return this._element.querySelector('.adP');
+		return querySelector(this._element, '.adP');
 	}
 
 	isElementInQuotedArea(element: HTMLElement): boolean {
@@ -113,10 +114,14 @@ class GmailMessageView {
 		let sender = this._sender;
 		if(sender) return sender;
 
-		var senderSpan = this._element.querySelector('h3.iw span[email]');
+		const senderSpan = querySelector(this._element, 'h3.iw span[email]');
+
+		const emailAddress = senderSpan.getAttribute('email');
+		if (!emailAddress) throw new Error('Could not find email address');
+
 		sender = this._sender = this._getUpdatedContact({
 			name: senderSpan.getAttribute('name'),
-			emailAddress: senderSpan.getAttribute('email')
+			emailAddress
 		});
 
 		return sender;
@@ -137,7 +142,7 @@ class GmailMessageView {
 	}
 
 	getDateString(): string {
-		return this._element.querySelector('.ads .gK .g3').title;
+		return querySelector(this._element, '.ads .gK .g3').title;
 	}
 
 	getAttachmentCardViewDrivers() {
@@ -202,7 +207,7 @@ class GmailMessageView {
 		return this._element.querySelector('tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]');
 	}
 
-	_getOpenMoreMenu(): HTMLElement {
+	_getOpenMoreMenu(): ?HTMLElement {
 		// This will find any message's open more menu! The caller needs to make
 		// sure it belongs to this message!
 		return document.body.querySelector('td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]');
@@ -385,7 +390,7 @@ class GmailMessageView {
 						currentIconUrl = opts.iconUrl;
 					}
 
-					const attachmentDiv = this._element.querySelector('td.gH div.gK span');
+					const attachmentDiv = querySelector(this._element, 'td.gH div.gK span');
 					if (!attachmentDiv.contains(img)) {
 						attachmentDiv.appendChild(img);
 						added = true;
@@ -517,7 +522,7 @@ class GmailMessageView {
 	}
 
 	_setupReplyStream(){
-		var replyContainer = this._element.querySelector('.ip');
+		const replyContainer = this._element.querySelector('.ip');
 
 		if(!replyContainer){
 			return;
@@ -615,7 +620,7 @@ class GmailMessageView {
 	_createAttachmentArea(): GmailAttachmentAreaView{
 		const gmailAttachmentAreaView = new GmailAttachmentAreaView(null, this._driver, this);
 
-		const beforeElement = this._element.querySelector('.hi');
+		const beforeElement = querySelector(this._element, '.hi');
 		const parentNode = beforeElement.parentNode;
 		if(!parentNode) throw new Error('parentNode not found');
 		parentNode.insertBefore(gmailAttachmentAreaView.getElement(), beforeElement);

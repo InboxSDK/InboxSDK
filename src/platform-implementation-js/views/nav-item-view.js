@@ -4,6 +4,7 @@ import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import RSVP from 'rsvp';
+import get from '../../common/get-or-fail';
 import EventEmitter from '../lib/safe-event-emitter';
 
 import type {Driver} from '../driver-interfaces/driver';
@@ -31,7 +32,7 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
-		var members = memberMap.get(this);
+		const members = memberMap.get(this);
 		if(!members || !members.driver || !members.appId || !members.navItemViews) throw new Error('this nav item view does not exist');
 		const driver = members.driver;
 		const appId = members.appId;
@@ -51,9 +52,9 @@ export default class NavItemView extends EventEmitter {
 
 	// TODO make this not a public method
 	setNavItemViewDriver(navItemViewDriver: Object){
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 
-		if(!members || !members.driver){
+		if(!members.driver){
 			members.deferred.resolve(navItemViewDriver);
 			return; //we have been removed already
 		}
@@ -78,7 +79,7 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	remove(){
-		var members = memberMap.get(this);
+		const members = memberMap.get(this);
 		if(!members || !members.navItemViews || !members.driver || !members.navItemViews){
 			return;
 		}
@@ -96,7 +97,7 @@ export default class NavItemView extends EventEmitter {
 		members.appId = null;
 		members.driver = null;
 
-		members.deferred.promise.then(function(navItemViewDriver){
+		members.deferred.promise.then(navItemViewDriver => {
 			navItemViewDriver.destroy();
 			members.navItemViewDriver = null;
 		});
@@ -118,7 +119,7 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	setCollapsed(collapseValue: boolean){
-		memberMap.get(this).deferred.promise.then(function(navItemViewDriver){
+		get(memberMap, this).deferred.promise.then(navItemViewDriver => {
 			navItemViewDriver.setCollapsed(collapseValue);
 		});
 	}

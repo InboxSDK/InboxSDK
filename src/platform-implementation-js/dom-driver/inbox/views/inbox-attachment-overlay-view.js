@@ -68,8 +68,8 @@ class InboxAttachmentOverlayView {
     el.setAttribute('data-tooltip-delay', '500');
     el.setAttribute('data-tooltip-unhoverable', 'true');
     if (downloadButton) {
-      el.setAttribute('data-tooltip-class', downloadButton.getAttribute('data-tooltip-class'));
-      el.setAttribute('data-tooltip-align', downloadButton.getAttribute('data-tooltip-align'));
+      el.setAttribute('data-tooltip-class', downloadButton.getAttribute('data-tooltip-class') || '');
+      el.setAttribute('data-tooltip-align', downloadButton.getAttribute('data-tooltip-align') || '');
     }
     el.setAttribute('aria-label', button.tooltip);
     el.setAttribute('data-tooltip', button.tooltip);

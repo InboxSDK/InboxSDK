@@ -11,6 +11,7 @@ import type GmailDriver from '../gmail-driver';
 
 import type GmailMessageView from './gmail-message-view';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
@@ -147,7 +148,7 @@ class GmailAttachmentCardView {
 	}
 
 	_extractFileNameFromElement(): string {
-		return this._element.querySelector('.aQA > span').textContent;
+		return querySelector(this._element, '.aQA > span').textContent;
 	}
 
 	_createNewElement(options: Object) {
@@ -213,9 +214,9 @@ class GmailAttachmentCardView {
 		}
 
 
-		this._element.querySelector('span .aV3').textContent = options.title;
-		this._element.querySelector('div.aYp > span').textContent = options.description || '';
-		this._element.querySelector('div.aSJ').style.borderColor = options.foldColor;
+		querySelector(this._element, 'span .aV3').textContent = options.title;
+		querySelector(this._element, 'div.aYp > span').textContent = options.description || '';
+		querySelector(this._element, 'div.aSJ').style.borderColor = options.foldColor;
 
 		this._addHoverEvents();
 
@@ -242,7 +243,7 @@ class GmailAttachmentCardView {
 		);
 
 		if(options.previewThumbnailUrl && options.failoverPreviewIconUrl){
-			var previewThumbnailUrlImage = this._element.querySelector('.inboxsdk__attachmentCard_previewThumbnailUrl');
+			const previewThumbnailUrlImage = querySelector(this._element, '.inboxsdk__attachmentCard_previewThumbnailUrl');
 			previewThumbnailUrlImage.onerror = (e) => {
 				var iconDiv = document.createElement('div');
 				iconDiv.classList.add('aYv');
@@ -273,7 +274,7 @@ class GmailAttachmentCardView {
 				this._element.classList.remove('aZp');
 			});
 
-		const anchor = this._element.querySelector('a');
+		const anchor = querySelector(this._element, 'a');
 		Kefir.fromEvents(anchor, 'focus')
 			.onValue(() => {
 				anchor.classList.add('a1U');
@@ -360,7 +361,7 @@ class GmailAttachmentCardView {
 	}
 
 	_getButtonContainerElement(): HTMLElement {
-		return this._element.querySelector('.aQw');
+		return querySelector(this._element, '.aQw');
 	}
 }
 

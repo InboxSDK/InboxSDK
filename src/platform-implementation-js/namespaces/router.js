@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {defn, defonce} from 'ud';
 
 import HandlerRegistry from '../lib/handler-registry';
-
+import get from '../../common/get-or-fail';
 import RouteView from '../views/route-view/route-view';
 import ListRouteView from '../views/route-view/list-route-view';
 import CustomRouteView from '../views/route-view/custom-route-view';
@@ -59,11 +59,11 @@ class Router {
 	}
 
 	createLink(routeID: string, params?: ?Object): string {
-		return memberMap.get(this).driver.createLink(routeID, params);
+		return get(memberMap, this).driver.createLink(routeID, params);
 	}
 
 	goto(routeID: string, params?: ?Object){
-		memberMap.get(this).driver.goto(routeID, params);
+		get(memberMap, this).driver.goto(routeID, params);
 	}
 
 	handleCustomRoute(routeID: string, handler: HandlerRegistry<CustomRouteView>): () => void {
@@ -72,8 +72,8 @@ class Router {
 			onActivate: handler
 		};
 
-		var removeCustomRouteFromDriver = memberMap.get(this).driver.addCustomRouteID(routeID);
-		var customRoutes = memberMap.get(this).customRoutes;
+		var removeCustomRouteFromDriver = get(memberMap, this).driver.addCustomRouteID(routeID);
+		var customRoutes = get(memberMap, this).customRoutes;
 		customRoutes.push(customRouteDescriptor);
 
 		return function(){
@@ -86,11 +86,11 @@ class Router {
 	}
 
 	handleAllRoutes(handler: Handler<any>): () => void {
-		return memberMap.get(this).allRoutesHandlerRegistry.registerHandler(handler);
+		return get(memberMap, this).allRoutesHandlerRegistry.registerHandler(handler);
 	}
 
 	handleListRoute(routeID: string, handler: Handler<ListRouteView>): () => void {
-		var listRouteHandlerRegistries = memberMap.get(this).listRouteHandlerRegistries;
+		var listRouteHandlerRegistries = get(memberMap, this).listRouteHandlerRegistries;
 		if(!listRouteHandlerRegistries[routeID]){
 			throw new Error('Invalid routeID specified');
 		}
@@ -99,11 +99,11 @@ class Router {
 	}
 
 	handleCustomListRoute(routeID: string, handler: Function): () => void {
-		return memberMap.get(this).driver.addCustomListRouteID(routeID, handler);
+		return get(memberMap, this).driver.addCustomListRouteID(routeID, handler);
 	}
 
 	getCurrentRouteView(): RouteView {
-		var members = memberMap.get(this);
+		const members = get(memberMap, this);
 		return members.membrane.get(members.currentRouteViewDriver);
 	}
 

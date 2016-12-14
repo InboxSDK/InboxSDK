@@ -15,7 +15,7 @@ export default function setupInboxCustomViewLinkSmuggler() {
     if (!(target instanceof HTMLElement)) return;
     const anchor = closest(target, 'a[href^="#"]');
     if (!anchor || !(anchor instanceof HTMLAnchorElement)) return;
-    const m = /^#([^/]+)/.exec(anchor.getAttribute('href'));
+    const m = /^#([^/]+)/.exec(anchor.getAttribute('href') || '');
     if (!m) return;
     const startTerm = m[1];
     if (!allowedStartTerms.has(startTerm)) return;

@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/parser';
@@ -27,11 +28,11 @@ describe('Inbox Attachment Card Detection', function() {
 
   describe('finder', function() {
     it('2016-08-10 message with attachments', function() {
-      const attachment1 = page20160810_2().querySelector('[data-test-id=attachment1]');
-      const attachment2 = page20160810_2().querySelector('[data-test-id=attachment2]');
-      const attachment3 = page20160810_2().querySelector('[data-test-id=attachment3]');
-      const attachment4 = page20160810_2().querySelector('[data-test-id=attachment4]');
-      const attachment5 = page20160810_2().querySelector('[data-test-id=attachment5]');
+      const attachment1 = querySelector(page20160810_2(), '[data-test-id=attachment1]');
+      const attachment2 = querySelector(page20160810_2(), '[data-test-id=attachment2]');
+      const attachment3 = querySelector(page20160810_2(), '[data-test-id=attachment3]');
+      const attachment4 = querySelector(page20160810_2(), '[data-test-id=attachment4]');
+      const attachment5 = querySelector(page20160810_2(), '[data-test-id=attachment5]');
 
       const results = finder(page20160810_2());
       assert.strictEqual(results.length, 5);
@@ -43,21 +44,21 @@ describe('Inbox Attachment Card Detection', function() {
     });
 
     it('2016-08-12 list with card', function() {
-      const attachment1 = page20160812().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160812(), '[data-test-id=attachment1]');
       const results = finder(page20160812());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
 
     it('2016-08-16 message with attachment', function() {
-      const attachment1 = page20160816().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160816(), '[data-test-id=attachment1]');
       const results = finder(page20160816());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
 
     it('2016-09-08 card in bundle', function() {
-      const attachment1 = page20160908().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160908(), '[data-test-id=attachment1]');
       const results = finder(page20160908());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
@@ -67,46 +68,46 @@ describe('Inbox Attachment Card Detection', function() {
   describe('parser', function() {
     it('2016-08-10 message with attachments', function() {
       {
-        const results = parser(page20160810_2().querySelector('[data-test-id=attachment1]'));
+        const results = parser(querySelector(page20160810_2(), '[data-test-id=attachment1]'));
         assert.deepEqual(results.errors, []);
         assert.strictEqual(results.score, 1);
       }
       {
-        const results = parser(page20160810_2().querySelector('[data-test-id=attachment2]'));
+        const results = parser(querySelector(page20160810_2(), '[data-test-id=attachment2]'));
         assert.deepEqual(results.errors, []);
         assert.strictEqual(results.score, 1);
       }
       {
-        const results = parser(page20160810_2().querySelector('[data-test-id=attachment3]'));
+        const results = parser(querySelector(page20160810_2(), '[data-test-id=attachment3]'));
         assert.deepEqual(results.errors, []);
         assert.strictEqual(results.score, 1);
       }
       {
-        const results = parser(page20160810_2().querySelector('[data-test-id=attachment4]'));
+        const results = parser(querySelector(page20160810_2(), '[data-test-id=attachment4]'));
         assert.deepEqual(results.errors, []);
         assert.strictEqual(results.score, 1);
       }
       {
-        const results = parser(page20160810_2().querySelector('[data-test-id=attachment5]'));
+        const results = parser(querySelector(page20160810_2(), '[data-test-id=attachment5]'));
         assert.deepEqual(results.errors, []);
         assert.strictEqual(results.score, 1);
       }
     });
 
     it('2016-08-12 list with card', function() {
-      const results = parser(page20160812().querySelector('[data-test-id=attachment1]'));
+      const results = parser(querySelector(page20160812(), '[data-test-id=attachment1]'));
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
     });
 
     it('2016-08-16 message with attachment', function() {
-      const results = parser(page20160816().querySelector('[data-test-id=attachment1]'));
+      const results = parser(querySelector(page20160816(), '[data-test-id=attachment1]'));
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
     });
 
     it('2016-09-08 card in bundle', function() {
-      const results = parser(page20160908().querySelector('[data-test-id=attachment1]'));
+      const results = parser(querySelector(page20160908(), '[data-test-id=attachment1]'));
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
     });
@@ -114,11 +115,11 @@ describe('Inbox Attachment Card Detection', function() {
 
   describe('watcher', function() {
     it('2016-08-10 message with attachments', function(cb) {
-      const attachment1 = page20160810_2().querySelector('[data-test-id=attachment1]');
-      const attachment2 = page20160810_2().querySelector('[data-test-id=attachment2]');
-      const attachment3 = page20160810_2().querySelector('[data-test-id=attachment3]');
-      const attachment4 = page20160810_2().querySelector('[data-test-id=attachment4]');
-      const attachment5 = page20160810_2().querySelector('[data-test-id=attachment5]');
+      const attachment1 = querySelector(page20160810_2(), '[data-test-id=attachment1]');
+      const attachment2 = querySelector(page20160810_2(), '[data-test-id=attachment2]');
+      const attachment3 = querySelector(page20160810_2(), '[data-test-id=attachment3]');
+      const attachment4 = querySelector(page20160810_2(), '[data-test-id=attachment4]');
+      const attachment5 = querySelector(page20160810_2(), '[data-test-id=attachment5]');
 
       const spy = sinon.spy();
       watcher(page20160810_2())
@@ -137,7 +138,7 @@ describe('Inbox Attachment Card Detection', function() {
     });
 
     it('2016-08-12 list with card', function(cb) {
-      const attachment1 = page20160812().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160812(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
       watcher(page20160812())
@@ -152,7 +153,7 @@ describe('Inbox Attachment Card Detection', function() {
     });
 
     it('2016-08-16 message with attachment', function(cb) {
-      const attachment1 = page20160816().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160816(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
       watcher(page20160816())
@@ -167,7 +168,7 @@ describe('Inbox Attachment Card Detection', function() {
     });
 
     it('2016-09-08 card in bundle', function(cb) {
-      const attachment1 = page20160908().querySelector('[data-test-id=attachment1]');
+      const attachment1 = querySelector(page20160908(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
       watcher(page20160908())

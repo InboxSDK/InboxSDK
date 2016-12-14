@@ -23,6 +23,7 @@ import GmailElementGetter from '../../gmail-element-getter';
 
 import assertInterface from '../../../../lib/assert-interface';
 import simulateClick from '../../../../lib/dom/simulate-click';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
@@ -202,10 +203,10 @@ class GmailRouteView {
 	}
 
 	_setCustomViewElementHeight(){
-		var leftNav = GmailElementGetter.getLeftNavContainerElement();
-		var gtalkButtons = GmailElementGetter.getGtalkButtons();
-		var customViewEl = this._customViewElement;
-		if (!customViewEl) throw new Error("Should not happen");
+		const leftNav = GmailElementGetter.getLeftNavContainerElement();
+		const gtalkButtons = GmailElementGetter.getGtalkButtons();
+		const customViewEl = this._customViewElement;
+		if (!leftNav || !customViewEl) throw new Error("Should not happen");
 		customViewEl.style.height = `${parseInt(leftNav.style.height,10) + (gtalkButtons ? gtalkButtons.offsetHeight : 0)}px`;
 	}
 
@@ -262,17 +263,15 @@ class GmailRouteView {
 	}
 
 	_startMonitoringPreviewPaneRowListForThread(rowListElement: HTMLElement){
-		var threadContainerTableElement = rowListElement.querySelector('table.Bs > tr');
+		const threadContainerTableElement = querySelector(rowListElement, 'table.Bs > tr');
 
-		var elementStream = makeElementChildStream(threadContainerTableElement)
-			.filter(function(event) {
-				return !!event.el.querySelector('.if');
-			});
+		const elementStream = makeElementChildStream(threadContainerTableElement)
+			.filter(event => !!event.el.querySelector('.if'));
 
 		this._eventStream.plug(
-			elementStream.flatMap(makeElementViewStream((element) => {
-				return new (GmailThreadView:any)(element, this, this._driver, true);
-			})).map((view) => {
+			elementStream.flatMap(makeElementViewStream(element =>
+				new (GmailThreadView:any)(element, this, this._driver, true)
+			)).map((view) => {
 				this._threadView = view;
 				return {
 					eventName: 'newGmailThreadView',
@@ -283,7 +282,9 @@ class GmailRouteView {
 	}
 
 	_getSectionsContainer(): HTMLElement {
-		var sectionsContainer = GmailElementGetter.getMainContentContainer().querySelector('.inboxsdk__custom_sections');
+		const main = GmailElementGetter.getMainContentContainer();
+		if (!main) throw new Error('should not happen');
+		let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
 		if(!sectionsContainer){
 			sectionsContainer = this._sectionsContainer = document.createElement('div');
 			sectionsContainer.classList.add('inboxsdk__custom_sections');
@@ -292,7 +293,7 @@ class GmailRouteView {
 				sectionsContainer.classList.add('Wc');
 			}
 
-			GmailElementGetter.getMainContentContainer().insertBefore(sectionsContainer, GmailElementGetter.getMainContentContainer().firstChild);
+			main.insertBefore(sectionsContainer, main.firstChild);
 		}
 		else if(!sectionsContainer.classList.contains('Wc') && this._isSearchRoute()){
 			sectionsContainer.classList.add('Wc');

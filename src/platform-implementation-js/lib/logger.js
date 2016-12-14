@@ -39,11 +39,8 @@ const _extensionIsLoggerMaster = (function() {
 })();
 
 function getAllAppIds(): string[] {
-  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-active-app-ids')) {
-    return JSON.parse(document.documentElement.getAttribute('data-inboxsdk-active-app-ids'));
-  } else {
-    return [];
-  }
+  const str = global.document && document.documentElement.getAttribute('data-inboxsdk-active-app-ids') || '[]';
+  return JSON.parse(str);
 }
 
 var _trackedEventsQueue = new PersistentQueue('events');

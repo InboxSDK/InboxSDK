@@ -1,9 +1,9 @@
 /* @flow */
-//jshint ignore:start
 
 export default function getSessionId(): string {
-  if (global.document && document.documentElement.hasAttribute('data-inboxsdk-session-id')) {
-    return document.documentElement.getAttribute('data-inboxsdk-session-id');
+  const attrValue = global.document && document.documentElement.getAttribute('data-inboxsdk-session-id');
+  if (typeof attrValue === 'string') {
+    return attrValue;
   } else {
     const sessionId = Date.now()+'-'+Math.random();
     if (global.document) {

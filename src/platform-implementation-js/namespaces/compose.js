@@ -4,7 +4,7 @@ import _ from 'lodash';
 import * as ud from 'ud';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
-
+import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
 
@@ -19,7 +19,7 @@ const SAMPLE_RATE = 0.01;
 class Compose {
 
   constructor(appId: string, driver: Driver){
-    var members = {};
+    const members = {};
     memberMap.set(this, members);
 
     members.appId = appId;
@@ -44,7 +44,7 @@ class Compose {
   }
 
   registerComposeViewHandler(handler){
-    return memberMap.get(this).handlerRegistry.registerHandler(handler);
+    return get(memberMap, this).handlerRegistry.registerHandler(handler);
   }
 
   openNewComposeView(): Promise<ComposeView> {
@@ -52,8 +52,8 @@ class Compose {
   }
 
   openDraftByMessageID(messageID: string): Promise<ComposeView> {
-    var members = memberMap.get(this);
-    var newComposePromise = members.composeViewStream
+    const members = get(memberMap, this);
+    const newComposePromise = members.composeViewStream
       .merge(Kefir.later(3000, null))
       .take(1)
       .flatMap(function(view) {
@@ -65,13 +65,11 @@ class Compose {
   }
 
   getComposeView(): Promise<ComposeView> {
-    var members = memberMap.get(this);
-    var promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
+    const members = get(memberMap, this);
+    const promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
     members.driver.openComposeWindow();
     return promise;
   }
 }
 
-Compose = ud.defn(module, Compose);
-
-export default Compose;
+export default ud.defn(module, Compose);

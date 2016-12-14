@@ -13,7 +13,7 @@ export default function watcher(root: Document=document, topRowElPool: ?ItemWith
   const selector = selectorStream([
     {$or: [
       [
-        {$filter: el => !/#gmail:thread-/.test(el.getAttribute('data-item-id'))},
+        {$filter: el => !/#gmail:thread-/.test(el.getAttribute('data-item-id') || '')},
         {$watch: '[aria-expanded=true]'},
         '[role=list]',
         '*',
@@ -23,7 +23,7 @@ export default function watcher(root: Document=document, topRowElPool: ?ItemWith
         '[role=listitem]'
       ],
       [
-        {$filter: el => /#gmail:thread-/.test(el.getAttribute('data-item-id'))}
+        {$filter: el => /#gmail:thread-/.test(el.getAttribute('data-item-id') || '')}
       ]
     ]}
   ]);

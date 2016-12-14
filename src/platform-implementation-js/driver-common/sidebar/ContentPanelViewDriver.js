@@ -8,6 +8,7 @@ import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../lib/delay-asap';
 import type {Driver} from '../../driver-interfaces/driver';
 import idMap from '../../lib/idMap';
+import querySelector from '../../lib/dom/querySelectorOrFail';
 
 class ContentPanelViewDriver {
   _driver: Driver;
@@ -42,7 +43,7 @@ class ContentPanelViewDriver {
     const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
-    const waitingPlatform = document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'));
+    const waitingPlatform = querySelector(document.body, '.'+idMap('app_sidebar_waiting_platform'));
     descriptor
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)

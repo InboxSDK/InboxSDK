@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = new WeakMap();
@@ -16,7 +17,7 @@ export default class Search {
 		if (typeof handler != 'function') {
 			throw new Error("Incorrect arguments");
 		}
-		const members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.driver.registerSearchSuggestionsProvider(handler);
 	}
 
@@ -27,7 +28,7 @@ export default class Search {
 		if (!rewriter.term.match(/^(app|has):/)) {
 			throw new Error("Custom search term must begin with 'app:'");
 		}
-		const members = memberMap.get(this);
+		const members = get(memberMap, this);
 		members.driver.registerSearchQueryRewriter(rewriter);
 	}
 }

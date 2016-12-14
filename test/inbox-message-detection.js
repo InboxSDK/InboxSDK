@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import Kefir from 'kefir';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/message/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
@@ -29,7 +30,7 @@ describe('Inbox Message Detection', function() {
 
   describe('finder', function() {
     it('2016-06-14', function() {
-      const message = page20160614().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160614(), '[data-test-id=message]');
 
       const results = finder(page20160614());
       assert.strictEqual(results.length, 1);
@@ -37,7 +38,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-06-20 fullscreen and bundled inline', function() {
-      const message = pageFullscreen20160620().querySelector('[data-test-id=message]');
+      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
 
       const results = finder(pageFullscreen20160620());
       assert.strictEqual(results.length, 1);
@@ -45,7 +46,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message', function() {
-      const message = page20160810().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810(), '[data-test-id=message]');
 
       const results = finder(page20160810());
       assert.strictEqual(results.length, 1);
@@ -53,7 +54,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message with attachments', function() {
-      const message = page20160810_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810_2(), '[data-test-id=message]');
 
       const results = finder(page20160810_2());
       assert.strictEqual(results.length, 1);
@@ -61,7 +62,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-18', function() {
-      const message = page20160818_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160818_2(), '[data-test-id=message]');
 
       const results = finder(page20160818_2());
       assert.strictEqual(results.length, 1);
@@ -69,7 +70,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-19 draft in thread', function() {
-      const message = page20160819().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160819(), '[data-test-id=message]');
 
       const results = finder(page20160819());
       assert.strictEqual(results.length, 1);
@@ -79,7 +80,7 @@ describe('Inbox Message Detection', function() {
 
   describe('parser', function() {
     it('2016-06-14 inline', function() {
-      const message = page20160614().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160614(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -90,7 +91,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-06-20 bundled inline', function() {
-      const message = pageFullscreen20160620().querySelector('[data-test-id=message]');
+      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -101,7 +102,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message', function() {
-      const message = page20160810().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -112,7 +113,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message with attachments', function() {
-      const message = page20160810_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810_2(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -123,7 +124,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-18', function() {
-      const message = page20160818_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160818_2(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -134,7 +135,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-19 draft in thread', function() {
-      const message = page20160819().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160819(), '[data-test-id=message]');
       const results = parser(message);
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
@@ -145,7 +146,7 @@ describe('Inbox Message Detection', function() {
 
   describe('watcher', function() {
     it('2016-06-14', function(cb) {
-      const message = page20160614().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160614(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(page20160614())
@@ -160,7 +161,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-06-20 fullscreen and bundled inline', function(cb) {
-      const message = pageFullscreen20160620().querySelector('[data-test-id=message]');
+      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(pageFullscreen20160620())
@@ -175,7 +176,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message', function(cb) {
-      const message = page20160810().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(page20160810())
@@ -190,7 +191,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-10 message with attachments', function(cb) {
-      const message = page20160810_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160810_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(page20160810_2())
@@ -205,7 +206,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-18', function(cb) {
-      const message = page20160818_2().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160818_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(page20160818_2())
@@ -220,7 +221,7 @@ describe('Inbox Message Detection', function() {
     });
 
     it('2016-08-19 draft in thread', function(cb) {
-      const message = page20160819().querySelector('[data-test-id=message]');
+      const message = querySelector(page20160819(), '[data-test-id=message]');
 
       const spy = sinon.spy();
       watcher(page20160819())

@@ -1,7 +1,7 @@
 /* @flow */
-//jshint ignore:start
 
 import Logger from '../../../lib/logger';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import _ from 'lodash';
 import Kefir from 'kefir';
@@ -66,8 +66,8 @@ export default class GmailAppToolbarButtonView {
 
     var element = this._element = this._element || _createAppButtonElement(this._driver, () => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
-    updateIcon(this._iconSettings, element.querySelector('a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-    _updateTitle(element.querySelector('span'), buttonDescriptor);
+    updateIcon(this._iconSettings, querySelector(element, 'a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+    _updateTitle(querySelector(element, 'span'), buttonDescriptor);
   }
 
   _handleClick() {
@@ -84,7 +84,7 @@ export default class GmailAppToolbarButtonView {
       tooltipView.getContentElement().innerHTML = '';
 
       if(buttonDescriptor.arrowColor){
-        tooltipView.getContainerElement().querySelector('.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
+        querySelector(tooltipView.getContainerElement(), '.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
       }
 
       appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, element, {manualPosition: true});

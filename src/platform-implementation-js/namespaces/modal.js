@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import ModalView from '../widgets/modal-view';
+import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
 import type {PiOpts} from '../platform-implementation';
 
@@ -17,8 +18,8 @@ class Modal {
 
   // Deprecated, use Widgets.showModalView
   show(options: Object): ModalView {
-    const driver = memberMap.get(this).driver;
-    if (memberMap.get(this).piOpts.inboxBeta) {
+    const driver = get(memberMap, this).driver;
+    if (get(memberMap, this).piOpts.inboxBeta) {
       driver.getLogger().deprecationWarning('Modal.show', 'Widgets.showModalView');
     }
     const modalViewDriver = driver.createModalViewDriver(options);
@@ -30,7 +31,7 @@ class Modal {
 
   // Deprecated, does not have an exact replacement. Use Widgets.showModalView.
   createModalView(options: Object): ModalView {
-    const driver = memberMap.get(this).driver;
+    const driver = get(memberMap, this).driver;
     driver.getLogger().deprecationWarning('Modal.createModalView', 'Widgets.showModalView');
 
     const modalViewDriver = driver.createModalViewDriver(options);

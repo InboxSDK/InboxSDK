@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import idMap from '../../../../lib/idMap';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
 const TAB_COLOR_CLASSES = [
   "aIf-aLe",
@@ -85,9 +86,9 @@ export default class GmailTabView {
       '</div>'
     ].join('');
 
-    this._innerElement = this._element.querySelector('[role=tab]');
-    this._titleElement = this._element.querySelector('.inboxsdk__tab_title');
-    this._iconElement = this._element.querySelector('.inboxsdk__tab_icon');
+    this._innerElement = querySelector(this._element, '[role=tab]');
+    this._titleElement = querySelector(this._element, '.inboxsdk__tab_title');
+    this._iconElement = querySelector(this._element, '.inboxsdk__tab_icon');
 
     this._element.setAttribute('data-group-order-hint', this._groupOrderHint);
 

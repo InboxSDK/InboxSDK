@@ -6,7 +6,7 @@ import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import * as ud from 'ud';
 import RSVP from 'rsvp';
-
+import get from '../../common/get-or-fail';
 import ComposeButtonView from './compose-button-view';
 
 import type {Driver} from '../driver-interfaces/driver';
@@ -48,7 +48,7 @@ class ComposeView extends EventEmitter {
 	}
 
 	addButton(buttonDescriptor){
-		var members = memberMap.get(this);
+		var members = get(memberMap, this);
 		var buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 
 		var optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
@@ -58,105 +58,105 @@ class ComposeView extends EventEmitter {
 	/*
 	// Incomplete
 	addInnerSidebar(options){
-		memberMap.get(this).composeViewImplementation.addInnerSidebar(options);
+		get(memberMap, this).composeViewImplementation.addInnerSidebar(options);
 	}
 
 	// Incomplete
 	addOuterSidebar(options){
-		memberMap.get(this).composeViewImplementation.addOuterSidebar(options);
+		get(memberMap, this).composeViewImplementation.addOuterSidebar(options);
 	}
 	*/
 
 	addStatusBar(statusBarDescriptor) {
-		return memberMap.get(this).composeViewImplementation.addStatusBar(statusBarDescriptor);
+		return get(memberMap, this).composeViewImplementation.addStatusBar(statusBarDescriptor);
 	}
 
 	addRecipientRow(options){
 		return {
-			destroy: memberMap.get(this).composeViewImplementation.addRecipientRow(kefirCast((Kefir: any), options))
+			destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(kefirCast((Kefir: any), options))
 		};
 	}
 
 	close(){
-		memberMap.get(this).composeViewImplementation.close();
+		get(memberMap, this).composeViewImplementation.close();
 	}
 
 	send() {
-		memberMap.get(this).composeViewImplementation.send();
+		get(memberMap, this).composeViewImplementation.send();
 	}
 
 	getBodyElement(){
-		return memberMap.get(this).composeViewImplementation.getBodyElement();
+		return get(memberMap, this).composeViewImplementation.getBodyElement();
 	}
 
 	// NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS
 	// TODO remove?
 	getComposeID(){
-		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.getComposeID');
-		return memberMap.get(this).composeViewImplementation.getComposeID();
+		get(memberMap, this).driver.getLogger().deprecationWarning('composeView.getComposeID');
+		return get(memberMap, this).composeViewImplementation.getComposeID();
 	}
 
 	getInitialMessageID(){
-		return memberMap.get(this).composeViewImplementation.getInitialMessageID();
+		return get(memberMap, this).composeViewImplementation.getInitialMessageID();
 	}
 
 	/* deprecated */
 	getMessageID() {
-		memberMap.get(this).driver.getLogger().deprecationWarning(
+		get(memberMap, this).driver.getLogger().deprecationWarning(
 			'composeView.getMessageID', 'composeView.getDraftID');
-		return memberMap.get(this).composeViewImplementation.getMessageID();
+		return get(memberMap, this).composeViewImplementation.getMessageID();
 	}
 
 	getThreadID() {
-		return memberMap.get(this).composeViewImplementation.getThreadID();
+		return get(memberMap, this).composeViewImplementation.getThreadID();
 	}
 
 	getDraftID() {
-		return memberMap.get(this).composeViewImplementation.getDraftID();
+		return get(memberMap, this).composeViewImplementation.getDraftID();
 	}
 
 	getCurrentDraftID() {
-		return memberMap.get(this).composeViewImplementation.getCurrentDraftID();
+		return get(memberMap, this).composeViewImplementation.getCurrentDraftID();
 	}
 
 	getHTMLContent(){
-		return memberMap.get(this).composeViewImplementation.getHTMLContent();
+		return get(memberMap, this).composeViewImplementation.getHTMLContent();
 	}
 
 	getSelectedBodyHTML(){
-		return memberMap.get(this).composeViewImplementation.getSelectedBodyHTML() || '';
+		return get(memberMap, this).composeViewImplementation.getSelectedBodyHTML() || '';
 	}
 
 	getSelectedBodyText(){
-		return memberMap.get(this).composeViewImplementation.getSelectedBodyText() || '';
+		return get(memberMap, this).composeViewImplementation.getSelectedBodyText() || '';
 	}
 
 	getSubject(){
-		return memberMap.get(this).composeViewImplementation.getSubject();
+		return get(memberMap, this).composeViewImplementation.getSubject();
 	}
 
 	getTextContent(){
-		return memberMap.get(this).composeViewImplementation.getTextContent();
+		return get(memberMap, this).composeViewImplementation.getTextContent();
 	}
 
 	getToRecipients(){
-		return memberMap.get(this).composeViewImplementation.getToRecipients();
+		return get(memberMap, this).composeViewImplementation.getToRecipients();
 	}
 
 	getCcRecipients(){
-		return memberMap.get(this).composeViewImplementation.getCcRecipients();
+		return get(memberMap, this).composeViewImplementation.getCcRecipients();
 	}
 
 	getBccRecipients(){
-		return memberMap.get(this).composeViewImplementation.getBccRecipients();
+		return get(memberMap, this).composeViewImplementation.getBccRecipients();
 	}
 
 	insertTextIntoBodyAtCursor(text){
-		return memberMap.get(this).composeViewImplementation.insertBodyTextAtCursor(text);
+		return get(memberMap, this).composeViewImplementation.insertBodyTextAtCursor(text);
 	}
 
 	insertHTMLIntoBodyAtCursor(html){
-		return memberMap.get(this).composeViewImplementation.insertBodyHTMLAtCursor(html);
+		return get(memberMap, this).composeViewImplementation.insertBodyHTMLAtCursor(html);
 	}
 
 	insertLinkChipIntoBodyAtCursor(text, url, iconUrl){
@@ -165,7 +165,7 @@ class ComposeView extends EventEmitter {
 			return;
 		}
 
-		return memberMap.get(this).composeViewImplementation.insertLinkChipIntoBody({
+		return get(memberMap, this).composeViewImplementation.insertLinkChipIntoBody({
 			text: text,
 			url: url,
 			iconUrl: iconUrl
@@ -173,72 +173,72 @@ class ComposeView extends EventEmitter {
 	}
 
 	insertLinkIntoBodyAtCursor(text, url){
-		return memberMap.get(this).composeViewImplementation.insertLinkIntoBody(text, url);
+		return get(memberMap, this).composeViewImplementation.insertLinkIntoBody(text, url);
 	}
 
 	isInlineReplyForm(){
-		return memberMap.get(this).composeViewImplementation.isInlineReplyForm();
+		return get(memberMap, this).composeViewImplementation.isInlineReplyForm();
 	}
 
 	isFullscreen() {
-		return memberMap.get(this).composeViewImplementation.isFullscreen();
+		return get(memberMap, this).composeViewImplementation.isFullscreen();
 	}
 
 	setFullscreen(fullscreen: boolean) {
-		memberMap.get(this).composeViewImplementation.setFullscreen(fullscreen);
+		get(memberMap, this).composeViewImplementation.setFullscreen(fullscreen);
 	}
 
 	isMinimized() {
-		return memberMap.get(this).composeViewImplementation.isMinimized();
+		return get(memberMap, this).composeViewImplementation.isMinimized();
 	}
 
 	setMinimized(minimized: boolean) {
-		memberMap.get(this).composeViewImplementation.setMinimized(minimized);
+		get(memberMap, this).composeViewImplementation.setMinimized(minimized);
 	}
 
 	popOut(): Promise<ComposeView> {
-		memberMap.get(this).composeViewImplementation.popOut();
-		return memberMap.get(this).composeViewStream.take(1).toPromise(RSVP.Promise);
+		get(memberMap, this).composeViewImplementation.popOut();
+		return get(memberMap, this).composeViewStream.take(1).toPromise(RSVP.Promise);
 	}
 
 	isReply(){
-		return memberMap.get(this).composeViewImplementation.isReply();
+		return get(memberMap, this).composeViewImplementation.isReply();
 	}
 
 	setToRecipients(emails){
-		memberMap.get(this).composeViewImplementation.setToRecipients(emails);
+		get(memberMap, this).composeViewImplementation.setToRecipients(emails);
 	}
 
 	setCcRecipients(emails){
-		memberMap.get(this).composeViewImplementation.setCcRecipients(emails);
+		get(memberMap, this).composeViewImplementation.setCcRecipients(emails);
 	}
 
 	setBccRecipients(emails){
-		memberMap.get(this).composeViewImplementation.setBccRecipients(emails);
+		get(memberMap, this).composeViewImplementation.setBccRecipients(emails);
 	}
 
 	getFromContact(): Contact {
-		return memberMap.get(this).composeViewImplementation.getFromContact();
+		return get(memberMap, this).composeViewImplementation.getFromContact();
 	}
 
 	getFromContactChoices(): Contact[] {
-		return memberMap.get(this).composeViewImplementation.getFromContactChoices();
+		return get(memberMap, this).composeViewImplementation.getFromContactChoices();
 	}
 
 	setFromEmail(email: string) {
-		memberMap.get(this).composeViewImplementation.setFromEmail(email);
+		get(memberMap, this).composeViewImplementation.setFromEmail(email);
 	}
 
 	setSubject(text){
-		memberMap.get(this).composeViewImplementation.setSubject(text);
+		get(memberMap, this).composeViewImplementation.setSubject(text);
 	}
 
 	setBodyHTML(html){
-		memberMap.get(this).composeViewImplementation.setBodyHTML(html);
+		get(memberMap, this).composeViewImplementation.setBodyHTML(html);
 	}
 
 	setBodyText(text){
-		memberMap.get(this).composeViewImplementation.setBodyText(text);
+		get(memberMap, this).composeViewImplementation.setBodyText(text);
 	}
 
 	async attachFiles(files): Promise<void> {
@@ -248,7 +248,7 @@ class ComposeView extends EventEmitter {
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		return memberMap.get(this).composeViewImplementation.attachFiles(Array.from(files));
+		return get(memberMap, this).composeViewImplementation.attachFiles(Array.from(files));
 	}
 
 	async attachInlineFiles(files: Blob[]): Promise<void> {
@@ -258,12 +258,12 @@ class ComposeView extends EventEmitter {
 		if (!(files[0] instanceof global.Blob)) {
 			throw new Error("parameter must be an array of Blob objects");
 		}
-		return memberMap.get(this).composeViewImplementation.attachInlineFiles(Array.from(files));
+		return get(memberMap, this).composeViewImplementation.attachInlineFiles(Array.from(files));
 	}
 
 	// Old alias that we should keep around until we're sure no one is using it.
 	dragFilesIntoCompose(files: Blob[]): Promise<void> {
-		const driver = memberMap.get(this).driver;
+		const driver = get(memberMap, this).driver;
 		driver.getLogger().deprecationWarning(
 			'ComposeView.dragFilesIntoCompose', 'ComposeView.attachInlineFiles');
 
@@ -272,17 +272,17 @@ class ComposeView extends EventEmitter {
 
 	//NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
 	getElement(){
-		return memberMap.get(this).composeViewImplementation.getElement();
+		return get(memberMap, this).composeViewImplementation.getElement();
 	}
 
 	registerRequestModifier(modifier){
-		memberMap.get(this).composeViewImplementation.registerRequestModifier(modifier);
+		get(memberMap, this).composeViewImplementation.registerRequestModifier(modifier);
 	}
 
 	// TODO remove
 	overrideEditSubject(){
-		memberMap.get(this).driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
-		const {composeViewImplementation} = memberMap.get(this);
+		get(memberMap, this).driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
+		const {composeViewImplementation} = get(memberMap, this);
 		if (typeof composeViewImplementation.overrideEditSubject === 'function')
 			composeViewImplementation.overrideEditSubject();
 	}

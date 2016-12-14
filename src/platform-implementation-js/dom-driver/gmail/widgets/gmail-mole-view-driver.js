@@ -7,6 +7,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import type {MoleViewDriver} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
@@ -43,27 +44,27 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
       this._element.classList.add('inboxsdk__mole_view_chromeless');
     }
     else{
-      this._element.querySelector('.inboxsdk__mole_view_titlebar').addEventListener('click', (e: MouseEvent) => {
+      querySelector(this._element, '.inboxsdk__mole_view_titlebar').addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(!this.getMinimized());
         e.preventDefault();
         e.stopPropagation();
       });
 
-      var minimizeBtn = this._element.querySelector('.Hl');
+      const minimizeBtn = querySelector(this._element, '.Hl');
       minimizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(true);
         e.preventDefault();
         e.stopPropagation();
       });
 
-      var maximizeBtn = this._element.querySelector('.Hk');
+      const maximizeBtn = querySelector(this._element, '.Hk');
       maximizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(false);
         e.preventDefault();
         e.stopPropagation();
       });
 
-      var closeBtn = this._element.querySelector('.Ha');
+      const closeBtn = querySelector(this._element, '.Ha');
       closeBtn.addEventListener('click', (e: MouseEvent) => {
         this.destroy();
         e.preventDefault();
@@ -79,12 +80,12 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
         this._setMinimizedTitleEl(options.minimizedTitleEl);
       }
 
-      var titleButtons = options.titleButtons;
+      const titleButtons = options.titleButtons;
       if (titleButtons) {
-        var titleButtonContainer: HTMLElement = this._element.querySelector('.inboxsdk__mole_title_buttons');
-        var lastChild: HTMLElement = (titleButtonContainer.lastElementChild:any);
+        const titleButtonContainer = querySelector(this._element, '.inboxsdk__mole_title_buttons');
+        const lastChild: HTMLElement = (titleButtonContainer.lastElementChild:any);
         titleButtons.forEach(titleButton => {
-          var img: HTMLImageElement = (document.createElement('img'):any);
+          const img: HTMLImageElement = (document.createElement('img'):any);
           if (titleButton.iconClass) {
             img.className = titleButton.iconClass;
           }
@@ -100,7 +101,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
       }
     }
 
-    this._element.querySelector('.inboxsdk__mole_view_content').appendChild(options.el);
+    querySelector(this._element, '.inboxsdk__mole_view_content').appendChild(options.el);
   }
 
   show() {

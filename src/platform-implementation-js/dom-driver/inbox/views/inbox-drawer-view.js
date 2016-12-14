@@ -162,7 +162,7 @@ class InboxDrawerView {
       .merge(this._composeChanges)
       .takeUntilBy(Kefir.fromEvents(composeOffsetParent, TAKE_OVER_EVENT))
       .onValue(() => {
-        composeOffsetParent.style.zIndex = composeOffsetParent.getAttribute('data-drawer-old-zindex');
+        composeOffsetParent.style.zIndex = composeOffsetParent.getAttribute('data-drawer-old-zindex') || '';
         composeOffsetParent.removeAttribute('data-drawer-old-zindex');
       });
 

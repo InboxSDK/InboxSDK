@@ -42,7 +42,7 @@ export default function watcher(
   ]);
 
   const listCards = Kefir.merge([
-    topRowElStream.filter(({el}) => !/#gmail:thread-/.test(el.getAttribute('data-item-id'))),
+    topRowElStream.filter(({el}) => !/#gmail:thread-/.test(el.getAttribute('data-item-id')||'')),
     threadRowElStream
   ])
     .flatMap(({el,removalStream}) => listCardSelector(el).takeUntilBy(removalStream));

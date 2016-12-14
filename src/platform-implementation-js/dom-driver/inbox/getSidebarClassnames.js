@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import cssParser from 'postcss-selector-parser';
 import Logger from '../../lib/logger';
+import querySelector from '../../lib/dom/querySelectorOrFail';
 
 const cssProcessor = cssParser();
 
@@ -34,7 +35,7 @@ const getSidebarClassnames: () => {
 
   // So first we find all the classnames on the [role=application] and make a
   // regex for each one.
-  const classRegexes: RegExp[] = Array.from((document.querySelector('[role=application]').classList: any))
+  const classRegexes: RegExp[] = Array.from((querySelector(document, '[role=application]').classList: any))
     .map(x => new RegExp('\\.'+x+'\\b'));
   if (classRegexes.length === 0) throw new Error('no class names on element');
 

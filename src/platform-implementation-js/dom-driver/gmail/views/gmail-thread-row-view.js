@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import _ from 'lodash';
 import {defn, defonce} from 'ud';
@@ -10,6 +9,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 
 import assertInterface from '../../../lib/assert-interface';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import kefirCast from 'kefir-cast';
 import ThreadRowViewDriver from '../../../driver-interfaces/thread-row-view-driver';
@@ -124,8 +124,8 @@ class GmailThreadRowView {
       this._elements = [element];
     }
 
-    this._modifications = cachedModificationsByRow.get(this._elements[0]);
-    if (!this._modifications) {
+    const modifications = cachedModificationsByRow.get(this._elements[0]);
+    if (!modifications) {
       this._alreadyHadModifications = false;
       this._modifications = {
         label: {unclaimed: [], claimed: []},
@@ -137,6 +137,7 @@ class GmailThreadRowView {
       };
       cachedModificationsByRow.set(this._elements[0], this._modifications);
     } else {
+      this._modifications = modifications;
       this._alreadyHadModifications = true;
     }
 
@@ -242,7 +243,7 @@ class GmailThreadRowView {
   getCounts(): Counts {
     let counts = this._counts;
     if(!counts){
-      const thing = this._elements[0].querySelector('td div.yW');
+      const thing = querySelector(this._elements[0], 'td div.yW');
       const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
 
       const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
@@ -356,7 +357,7 @@ class GmailThreadRowView {
         if(!this._elements[0].contains(iconWrapper)) {
           const insertionPoint = this._elements.length > 1 ?
                                 this._getLabelParent() :
-                                this._getLabelParent().querySelector('.y6');
+                                querySelector(this._getLabelParent(), '.y6');
 
           insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
         }
@@ -418,7 +419,7 @@ class GmailThreadRowView {
         }
 
         // could also be trash icon
-        const starGroup = this._elements[0].querySelector('td.apU.xY, td.aqM.xY');
+        const starGroup = querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
 
         let buttonSpan, iconSettings;
         if (!buttonMod) {
@@ -548,6 +549,7 @@ class GmailThreadRowView {
         });
 
         const actionParentDiv = this._elements[0].querySelector('td.a4W .a4X .aKS') || this._elements[0].querySelector('td.a4W div.xS');
+        if (!actionParentDiv) throw new Error('Failed to find actionParentDiv');
         if (!_.includes(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
           actionParentDiv.insertBefore(
             actionMod.gmailActionButtonView.getElement(),
@@ -596,7 +598,7 @@ class GmailThreadRowView {
           currentIconUrl = opts.iconUrl;
         }
 
-        var attachmentDiv = this._elements[0].querySelector('td.yf.xY');
+        const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
           added = true;
@@ -617,6 +619,7 @@ class GmailThreadRowView {
       if (!dateContainer) return;
       const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
         dateContainer.firstElementChild;
+      if (!visibleDateSpan || !(visibleDateSpan instanceof HTMLElement)) return;
 
       // Attachment icons are only in the date column in vertical preivew pane.
       const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
@@ -634,7 +637,7 @@ class GmailThreadRowView {
     let draftElement, countElement;
     const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
-      const originalLabel = this._elements[0].querySelector('td > div.yW');
+      const originalLabel = querySelector(this._elements[0], 'td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
       if (!recipientsContainer) throw new Error("Should not happen");
 
@@ -697,7 +700,7 @@ class GmailThreadRowView {
     let dateMod;
     const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
-      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      const dateContainer = querySelector(this._elements[0], 'td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
 
       if (!opts) {
@@ -750,14 +753,14 @@ class GmailThreadRowView {
 
   getSubject(): string {
     if (this._elements.length > 1) {
-      return this._elements[1].querySelector('div.xS div.xT div.y6 > span[id]').textContent;
+      return querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]').textContent;
     } else {
-      return this._elements[0].querySelector('td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+      return querySelector(this._elements[0], 'td.a4W div.xS div.xT div.y6 > span[id]').textContent;
     }
   }
 
   getDateString(): string {
-    return this._elements[0].querySelector(
+    return querySelector(this._elements[0],
       'td.xW > span[title]:not(.inboxsdk__thread_row_custom_date), td.yf.apt > div.apm > span[title]:not(.inboxsdk__thread_row_custom_date)'
     ).title;
   }
@@ -818,8 +821,8 @@ class GmailThreadRowView {
 
   _getLabelParent(): HTMLElement {
     return this._elements.length > 1 ?
-            this._elements[ this._elements.length === 2 ? 0 : 2 ].querySelector('div.apu') :
-            this._elements[0].querySelector('td.a4W div.xS div.xT');
+      querySelector(this._elements[ this._elements.length === 2 ? 0 : 2 ], 'div.apu') :
+      querySelector(this._elements[0], 'td.a4W div.xS div.xT');
   }
 
   _getImageFixer(): Bus<any> {
@@ -876,7 +879,7 @@ class GmailThreadRowView {
         subjectRefresher = this._subjectRefresher = Kefir.constant(null);
       } else {
         const watchElement = this._getWatchElement();
-        const subjectElement = watchElement.querySelector('.y6');
+        const subjectElement = querySelector(watchElement, '.y6');
         subjectRefresher = this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
             childList: true
           })

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
@@ -83,7 +82,7 @@ function _setupStandardComposeElementStream() {
 			// If you close a fullscreen compose while it's still saving, Gmail never
 			// removes it from the DOM, and instead only removes a specific child
 			// element. Ugh. Watch for its removal too.
-			var targetEl = el.querySelector('[role=dialog] div.aaZ');
+			const targetEl = el.querySelector('[role=dialog] div.aaZ');
 			if (!targetEl) return null;
 			var hiddenStream = kefirMakeMutationObserverChunkedStream(
 					targetEl, {childList: true}
@@ -95,15 +94,16 @@ function _setupStandardComposeElementStream() {
 			};
 		})
 		.filter(Boolean)
-	).map(event => {
+	).flatMap(event => {
 		if (!event) throw new Error("Should not happen");
-		return {
-			removalStream: event.removalStream,
-			el: event.el.querySelector('[role=dialog]')
-		};
-	}).filter(event =>
-		event && event.el && event.el.querySelector('form')
-	).flatMap(makeElementStreamMerger());
+		const el = event.el.querySelector('[role=dialog]');
+		if (!el || !el.querySelector('form')) {
+			return Kefir.never();
+		}
+		return Kefir.constant({
+			el, removalStream: event.removalStream
+		});
+	}).flatMap(makeElementStreamMerger());
 }
 
 function _setupStandaloneComposeElementStream() {

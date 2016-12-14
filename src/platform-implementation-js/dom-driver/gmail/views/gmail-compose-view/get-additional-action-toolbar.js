@@ -17,9 +17,9 @@ function getAdditionalActionToolbar(gmailComposeView: GmailComposeView){
 
 	actionToolbar = composeViewActionToolbars.get(gmailComposeView);
 	if (!actionToolbar) {
-		actionToolbar = _addActionToolbar(gmailComposeView);
+		const _actionToolbar = actionToolbar = _addActionToolbar(gmailComposeView);
 		gmailComposeView.getStopper().onValue(() => {
-			actionToolbar.remove();
+			_actionToolbar.remove();
 		});
 		composeViewActionToolbars.set(gmailComposeView, actionToolbar);
 	}
