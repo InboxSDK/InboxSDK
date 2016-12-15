@@ -1,18 +1,29 @@
 /* @flow */
 
 import _ from 'lodash';
+import autoHtml from 'auto-html';
 import {defn} from 'ud';
 import htmlToText from '../common/html-to-text';
 import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
-export type AutoCompleteSuggestion = {
+// This is the type that the user provides.
+export type AutocompleteSearchResult = {
   name?: ?string;
   nameHTML?: ?string;
+  description?: ?string;
+  descriptionHTML?: ?string;
   routeName?: ?string;
-  routeParams?: {[ix: string]: string};
+  routeParams?: ?{[ix: string]: string};
   externalURL?: ?string;
   searchTerm?: ?string;
   iconUrl?: ?string;
+  onClick?: ?()=>void;
+};
+
+// These ids are part of the object constructed by the SDK used to refer to a
+// suggestion to the injected script.
+export type AutocompleteSearchResultWithId = AutocompleteSearchResult&{
+  id: string;
   owner: string;
 };
 
@@ -42,7 +53,7 @@ Currently modifySuggestions modifies the first section and adds the
 app-provided suggestions into the search term/contact suggestions array.
 */
 
-function modifySuggestions(responseText: string, modifications: AutoCompleteSuggestion[]): string {
+function modifySuggestions(responseText: string, modifications: AutocompleteSearchResultWithId[]): string {
   const {value: parsed, options} = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (let modification of modifications) {
@@ -65,16 +76,14 @@ function modifySuggestions(responseText: string, modifications: AutoCompleteSugg
       descriptionHTML = modification.descriptionHTML;
       description = htmlToText(descriptionHTML);
     }
-    if (modification.routeName || modification.externalURL) {
-      const data = {
-        routeName: modification.routeName,
-        routeParams: modification.routeParams,
-        externalURL: modification.externalURL
-      };
-      nameHTML +=
-        ' <span style="display:none" data-inboxsdk-suggestion="' +
-        _.escape(JSON.stringify(data)) + '"></span>';
-    }
+    const data = {
+      id: modification.id,
+      routeName: modification.routeName,
+      routeParams: modification.routeParams,
+      externalURL: modification.externalURL
+    };
+    nameHTML +=
+      autoHtml ` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(data)}"></span>`;
     const newItem = [
       "aso.sug",
       modification.searchTerm || query,
@@ -99,13 +108,6 @@ function modifySuggestions(responseText: string, modifications: AutoCompleteSugg
         descriptionHTML,
         nameHTML
       ];
-    }
-    if (typeof modification.iconURL === 'string') {
-      const iconURL = modification.iconURL;
-      console.warn('AutocompleteSearchResult "iconURL" property is deprecated. It should be "iconUrl".');
-      if (!modification.iconUrl) {
-        modification.iconUrl = iconURL;
-      }
     }
     if (modification.iconUrl) {
       newItem[6] = ['aso.thn', modification.iconUrl];

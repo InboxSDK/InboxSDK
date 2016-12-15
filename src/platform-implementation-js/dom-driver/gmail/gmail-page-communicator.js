@@ -1,7 +1,6 @@
 /* @flow */
-// jshint ignore:start
 
-import type {AutoCompleteSuggestion} from '../../../injected-js/modify-suggestions';
+import type {AutocompleteSearchResultWithId} from '../../../injected-js/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 import _ from 'lodash';
@@ -102,7 +101,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     });
   }
 
-  announceSearchAutocompleter(providerID: string) {
+  registerSuggestionsModifier(providerID: string) {
     document.dispatchEvent(new CustomEvent('inboxSDKregisterSuggestionsModifier', {
       bubbles: false,
       cancelable: false,
@@ -110,11 +109,15 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     }));
   }
 
-  provideAutocompleteSuggestions(providerID: string, query: string, suggestions: AutoCompleteSuggestion[]) {
+  provideAutocompleteSuggestions(providerID: string, query: string, suggestions: AutocompleteSearchResultWithId[]) {
     document.dispatchEvent(new CustomEvent('inboxSDKprovideSuggestions', {
       bubbles: false,
       cancelable: false,
-      detail: {providerID, query, suggestions}
+      detail: {
+        providerID, query,
+        // Filter out non-JSONifiable things
+        suggestions: JSON.parse(JSON.stringify(suggestions))
+      }
     }));
   }
 
