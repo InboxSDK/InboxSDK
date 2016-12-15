@@ -1,5 +1,4 @@
 /* @flow */
-// jshint ignore:start
 
 import _ from 'lodash';
 import Kefir from 'kefir';
@@ -17,8 +16,8 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
   // watch the DOM for our injected suggestions to show up and attach click and
   // enter handlers to them to let them do custom actions.
 
-  var id = 'inboxsdk__suggestions_'+(''+Date.now()+Math.random()).replace(/\D+/g,'');
-  var pageCommunicator = driver.getPageCommunicator();
+  const id = 'inboxsdk__suggestions_'+(''+Date.now()+Math.random()).replace(/\D+/g,'');
+  const pageCommunicator = driver.getPageCommunicator();
   pageCommunicator.announceSearchAutocompleter(id);
 
   // Listen for the AJAX requests, call the application's handler function, and
@@ -36,7 +35,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
             if (!Array.isArray(suggestions)) {
               throw new Error("suggestions must be an array");
             }
-            for (var suggestion of suggestions) {
+            for (const suggestion of suggestions) {
               if (
                 typeof suggestion.name !== 'string' &&
                 typeof suggestion.nameHTML !== 'string'
@@ -70,7 +69,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     });
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
-  var searchBoxStream: Kefir.Observable<HTMLInputElement> =
+  const searchBoxStream: Kefir.Observable<HTMLInputElement> =
     driver.getRouteViewDriverStream()
       .toProperty(() => null)
       .map(() => gmailElementGetter.getSearchInput())
@@ -78,7 +77,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
       .take(1);
 
   // Wait for the search box to be focused before looking for the suggestions box.
-  var suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement> = searchBoxStream
+  const suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement> = searchBoxStream
     .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
     .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
     .filter(Boolean)
@@ -88,21 +87,21 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
 
   // This stream emits an event after every time Gmail changes the suggestions
   // list.
-  var suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
+  const suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
     .flatMap((suggestionsBoxTbody) =>
       makeMutationObserverChunkedStream(suggestionsBoxTbody, {childList:true}).toProperty(() => null)
     ).map(() => null);
 
   // We listen to the event on the document node so that the event can be
   // canceled before Gmail receives it.
-  var suggestionsBoxEnterPresses = searchBoxStream
+  const suggestionsBoxEnterPresses = searchBoxStream
     .flatMap((searchBox) =>
       fromEventTargetCapture(document, 'keydown')
         .filter((event) => event.keyCode == 13 && event.target === searchBox)
     );
 
   // Stream of arrays of row elements belonging to this provider.
-  var providedRows: Kefir.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
+  const providedRows: Kefir.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
     .map(suggestionsBoxTbody =>
       _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(id).length > 0)
@@ -110,18 +109,18 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
 
   providedRows.onValue(rows => {
     if (rows[0] && rows[0].previousElementSibling) {
-      var prevFirstChild = rows[0].previousElementSibling.firstElementChild;
+      const prevFirstChild = rows[0].previousElementSibling.firstElementChild;
       if (prevFirstChild) {
         prevFirstChild.classList.add('inboxsdk__suggestions_separator_before');
       }
-      var firstChild = rows[0].firstElementChild;
+      const firstChild = rows[0].firstElementChild;
       if (firstChild) {
         firstChild.classList.add('inboxsdk__suggestions_separator_after');
       }
     }
   });
 
-  var rowSelectionEvents: Kefir.Observable<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
+  const rowSelectionEvents: Kefir.Observable<{event: Object, row: HTMLElement}> = providedRows.flatMapLatest(rows =>
     Kefir.merge(rows.map(row =>
       Kefir.merge([
         fromEventTargetCapture(row, 'click'),
@@ -133,8 +132,8 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
 
   Kefir.combine([rowSelectionEvents, searchBoxStream])
     .onValue(([{event, row}, searchBox]) => {
-      var itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
-      var itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;
+      const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
+      const itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;
       if (itemData) {
         event.stopImmediatePropagation();
         event.preventDefault();
