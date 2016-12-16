@@ -34,7 +34,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
             }
             suggestions = suggestions.map(suggestion => {
               suggestion = Object.assign({}, suggestion, {
-                owner: providerId,
+                providerId,
                 id: `${Date.now()}-${Math.random()}`
               });
               if (

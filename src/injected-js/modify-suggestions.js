@@ -24,7 +24,7 @@ export type AutocompleteSearchResult = {
 // suggestion to the injected script.
 export type AutocompleteSearchResultWithId = AutocompleteSearchResult&{
   id: string;
-  owner: string;
+  providerId: string;
 };
 
 /*
@@ -97,7 +97,7 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
       0,
 
       (null: ?[string, string]),
-      "asor inboxsdk__custom_suggestion "+modification.owner,
+      "asor inboxsdk__custom_suggestion "+modification.providerId,
       0
     ];
     if (descriptionHTML != null) {
