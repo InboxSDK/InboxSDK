@@ -105,7 +105,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	* ^default=null
 	* @type {string}
 	*/
-	externalURL: null
+	externalURL: null,
 
 	/**
 	* A function to call when the autocomplete search result is selected.
