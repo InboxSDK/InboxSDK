@@ -174,7 +174,7 @@ export default function setupGmailInterceptor() {
   // scripts, wait for the same number of responses as the number of registered
   // suggestion modifiers, and then meld them into the query response.
   {
-    const providers = {};
+    const providers = Object.create(null);
     let currentQuery;
     let suggestionModifications;
     let currentQueryDefer;

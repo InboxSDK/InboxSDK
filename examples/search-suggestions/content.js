@@ -11,23 +11,28 @@ InboxSDK.load(1, 'search-suggestions').then(inboxSDK => {
     log('search autocompleter', query);
     return [
       {
-        "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Last Week&#39;s Finis<b>he</b>d Work\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/saved-views-icon.png",
-        "descriptionHTML": "Filter: Assigned To Is Any Of Me and Date Last Updated After 1432450800000 and Stage Is Any Of Launched, Duplicate, Testing / Deploy Ready, Unreproducible, Not Fixing Ever, Sort: Priority, Group By: Stage",
-        "routeName": "pipeline/:key/:viewKey",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
-          "viewKey": "1433179291754.0.8816199006978422"
+        name: 'new window',
+        description: 'opens in new window',
+        externalURL: 'https://www.xkcd.com'
+      },
+      {
+        name: 'search term',
+        description: 'sets a search term',
+        searchTerm: 'foobar'
+      },
+      {
+        name: 'alert box',
+        description: 'opens an alert box',
+        onClick() {
+          alert('foo of bar');
         }
       },
       {
-        "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t My Sc<b>he</b>duled Bugs\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/saved-views-icon.png",
-        "descriptionHTML": "Filter: Assigned To Is Any Of Me and Stage Is Any Of Scheduled, Group By: Stage",
-        "routeName": "pipeline/:key/:viewKey",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
-          "viewKey": "bf94266f-27eb-4c5f-a7b6-1c406579444e"
+        name: 'alert box+link',
+        description: 'opens an alert box and goes somewhere',
+        externalURL: 'https://www.xkcd.com',
+        onClick() {
+          alert('foo of bar');
         }
       },
       {

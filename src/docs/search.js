@@ -45,6 +45,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* The name of the result to display. This property or {nameHTML} must be set.
 	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	name: null,
@@ -52,6 +53,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* HTML to display in the name area of the result. This property or {name} must be set.
 	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	nameHTML: null,
@@ -59,7 +61,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* The name of the result to display. This property or {descriptionHTML} must be set.
 	* ^optional
-	* ^default=empty
+	* ^default=null
 	* @type {string}
 	*/
 	description: null,
@@ -67,7 +69,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* HTML to display in the name area of the result. This property or {description} must be set.
 	* ^optional
-	* ^default=empty
+	* ^default=null
 	* @type {string}
 	*/
 	descriptionHTML: null,
@@ -76,7 +78,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* URL for the icon to show in the result. Should be a local extension file URL or a HTTPS url.
 	* ^optional
-	* ^default=empty
+	* ^default=null
 	* @type {string}
 	*/
 	iconUrl: null,
@@ -84,7 +86,7 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* The name of the route to navigate to when the autocomplete search result is selected.
 	* ^optional
-	* ^default=empty
+	* ^default=null
 	* @type {string}
 	*/
 	routeName: null,
@@ -100,10 +102,18 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
 	/**
 	* An external URL to navigate to when the autocomplete search result is selected.
 	* ^optional
-	* ^default=empty
+	* ^default=null
 	* @type {string}
 	*/
-	externalURL: null
+	externalURL: null,
+
+	/**
+	* A function to call when the autocomplete search result is selected.
+	* ^optional
+	* ^default=null
+	* @type {func()}
+	*/
+	onClick: null
 };
 
 
