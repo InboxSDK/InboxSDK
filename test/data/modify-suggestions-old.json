@@ -10,7 +10,7 @@
         "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
         "viewKey": "1433179291754.0.8816199006978422"
       },
-      "owner": "inboxsdk__suggestions_147561474898009832949044869919"
+      "providerId": "inboxsdk__suggestions_147561474898009832949044869919"
     },
     {
       "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t My Sc<b>he</b>duled Bugs\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
@@ -21,7 +21,7 @@
         "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
         "viewKey": "bf94266f-27eb-4c5f-a7b6-1c406579444e"
       },
-      "owner": "inboxsdk__suggestions_147561474898009832949044869919"
+      "providerId": "inboxsdk__suggestions_147561474898009832949044869919"
     },
     {
       "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Launc<b>he</b>d Today*\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
@@ -32,7 +32,7 @@
         "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
         "viewKey": "35e6ba3a-de30-40e5-9bc3-b51ddc8a7031"
       },
-      "owner": "inboxsdk__suggestions_147561474898009832949044869919"
+      "providerId": "inboxsdk__suggestions_147561474898009832949044869919"
     },
     {
       "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Launc<b>he</b>d Today\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
@@ -43,7 +43,7 @@
         "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
         "viewKey": "5d47c367-860c-4af8-b8ab-77d808c18fd1"
       },
-      "owner": "inboxsdk__suggestions_147561474898009832949044869919"
+      "providerId": "inboxsdk__suggestions_147561474898009832949044869919"
     },
     {
       "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Needs to be Pus<b>he</b>d by Me\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Hiring\n\t\t</div>",
@@ -54,7 +54,7 @@
         "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICgnvaXCgw",
         "viewKey": "93e92925-e36b-4a0e-a994-222ecee8d185"
       },
-      "owner": "inboxsdk__suggestions_147561474898009832949044869919"
+      "providerId": "inboxsdk__suggestions_147561474898009832949044869919"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/pipeline-icon.png",
@@ -64,7 +64,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
       },
-      "owner": "inboxsdk__suggestions_1475614748981019506033441583126"
+      "providerId": "inboxsdk__suggestions_1475614748981019506033441583126"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -74,7 +74,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGMvsiLMFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -84,7 +84,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGImtsrMFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -94,7 +94,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGLq656wFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -104,7 +104,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGP38p7MFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -114,7 +114,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGMn9x6oFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -124,7 +124,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGLm_hrAFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -134,7 +134,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGKnU07UFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -144,7 +144,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGNnS_rMFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -154,7 +154,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGNmO67MFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     },
     {
       "iconUrl": "https://mailfoogae.appspot.com/images/extension/box-icon.png",
@@ -164,7 +164,7 @@
       "routeParams": {
         "key": "agxzfm1haWxmb29nYWVyKgsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRDYXNlGOyIirMFDA"
       },
-      "owner": "inboxsdk__suggestions_1475614748982001929769894028066"
+      "providerId": "inboxsdk__suggestions_1475614748982001929769894028066"
     }
   ]
 }
