@@ -145,7 +145,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     Kefir.merge([
       suggestionsStream,
       searchBoxStream
-        .flatMapLatest(searchBox => Kefir.fromEvents(searchBox, 'focus'))
+        .flatMapLatest(searchBox => Kefir.fromEvents(searchBox, 'blur'))
         .map(() => [])
     ]).toProperty();
 
