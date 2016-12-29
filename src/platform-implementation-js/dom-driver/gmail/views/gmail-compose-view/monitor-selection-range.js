@@ -10,7 +10,7 @@ export default function(gmailComposeView: GmailComposeView) {
     Kefir.fromEvents(document.body, 'keydown')
   ]).takeUntilBy(gmailComposeView.getStopper())
   .onValue(event => {
-    var body = gmailComposeView.getBodyElement();
+    var body = gmailComposeView.getMaybeBodyElement();
     var selection = (document:any).getSelection();
     if (body && selection.rangeCount > 0 && body.contains(selection.anchorNode)) {
       gmailComposeView.setLastSelectionRange(selection.getRangeAt(0));
