@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import asap from 'asap';
 var Kefir = require('kefir');

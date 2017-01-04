@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import assert from "assert";
 import jsdomDoc from "./lib/jsdom-doc";

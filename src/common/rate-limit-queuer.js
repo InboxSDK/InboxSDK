@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 // Returns a wrapped version of the function which queues up callTimestamps to the
 // function if it is called more than count times within period amount of time.

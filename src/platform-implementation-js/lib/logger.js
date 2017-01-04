@@ -1,5 +1,4 @@
 /* @flow */
-// jshint ignore:start
 
 import _ from 'lodash';
 import crypto from 'crypto';

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const once = require('lodash/once');
 import loadScript from '../../common/load-script';

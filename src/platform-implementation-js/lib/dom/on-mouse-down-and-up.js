@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const Kefir = require('kefir');
 import fromEventTargetCapture from '../from-event-target-capture';

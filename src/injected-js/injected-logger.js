@@ -1,5 +1,4 @@
 /* @flow */
-// jshint ignore:start
 
 export function error(err: Error, details?: any) {
   if (!err) {

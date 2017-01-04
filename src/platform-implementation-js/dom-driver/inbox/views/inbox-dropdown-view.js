@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default class InboxDropdownView {
   _containerEl: HTMLElement;

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 // Splits a string on spaces, but ignores spaces inside quotes.
 

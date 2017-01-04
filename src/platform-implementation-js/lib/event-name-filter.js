@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 type Event = {
 	eventName: string;

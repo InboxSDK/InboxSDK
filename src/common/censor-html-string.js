@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
   // standard html props

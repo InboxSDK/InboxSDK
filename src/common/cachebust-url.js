@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const r = /([?&])_=[^&]*/;
 let nonce = Date.now() + Math.floor(Math.random() * Math.pow(2, 32));

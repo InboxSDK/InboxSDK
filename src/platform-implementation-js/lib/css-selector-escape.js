@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default function cssSelectorEscape(text: string): string {
   if (text.length === 0 || /^-?[0-9]/.test(text)) {

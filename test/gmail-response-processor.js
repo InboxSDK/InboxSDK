@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import assert from "assert";
 import _ from "lodash";

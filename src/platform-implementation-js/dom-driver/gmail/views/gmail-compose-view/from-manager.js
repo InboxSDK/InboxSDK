@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const _ = require('lodash');
 import simulateClick from '../../../../lib/dom/simulate-click';

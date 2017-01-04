@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import ajax from '../common/ajax';
 

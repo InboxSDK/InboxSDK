@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const _ = require('lodash');
 const Kefir = require('kefir');

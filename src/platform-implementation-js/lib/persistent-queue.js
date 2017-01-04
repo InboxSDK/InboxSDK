@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 // Queue which tries to persist its data into localStorage so its contents
 // aren't wiped when the page is closed. It handles localStorage not being

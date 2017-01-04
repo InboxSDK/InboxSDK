@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import cachebustUrl from './cachebust-url';
 import fromPairs from 'lodash/fromPairs';

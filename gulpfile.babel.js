@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 var fs = require('fs');
 var checkDependencies = require('./src/build/check-dependencies');

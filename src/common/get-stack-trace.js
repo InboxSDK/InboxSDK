@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default function getStackTrace(): string {
   var err = new Error("Stack saver");

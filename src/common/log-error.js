@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import ajax from './ajax';
 import rateLimit from './rate-limit';

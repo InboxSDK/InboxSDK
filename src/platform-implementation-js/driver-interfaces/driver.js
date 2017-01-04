@@ -1,5 +1,4 @@
 /* @flow */
-// jshint ignore:start
 
 import type Kefir from 'kefir';
 import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';

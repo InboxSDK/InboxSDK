@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 var hs = require('http-server');
 var path = require('path');
