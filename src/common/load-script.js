@@ -41,7 +41,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   return promise;
 }
 
-export type LoadScriptOpts = {
+export type LoadScriptOptions = {
   // By default, the script is executed within a function, so that top-level
   // variables defined in it don't become global variables. Setting nowrap to
   // true disables this behavior.
@@ -49,7 +49,7 @@ export type LoadScriptOpts = {
   disableSourceMappingURL?: boolean;
 };
 
-export default function loadScript(url: string, opts?: LoadScriptOpts): Promise<void> {
+export default function loadScript(url: string, opts?: LoadScriptOptions): Promise<void> {
   let pr;
   if (isContentScript()) {
     function attempt(retryNum: number, lastErr: ?Error): Promise<void> {
