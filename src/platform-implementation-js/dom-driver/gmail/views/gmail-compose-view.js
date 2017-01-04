@@ -895,19 +895,25 @@ class GmailComposeView {
 		}
 		else{
 			this._isTriggeringADraftSavePending = true;
-			asap(() => {
-				this._isTriggeringADraftSavePending = false;
 
-				const body = this.getMaybeBodyElement();
-				if(body){
-					const unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
-					try {
-						simulateKey(body, 190, 0);
-					} finally {
-						unsilence();
+			// Done asynchronously with setTimeout because if it's done synchronously
+			// or after an asap step after an inline compose view's creation, Gmail
+			// interprets the fake keypress and decides to add a '¾' character.
+			Kefir.later(0)
+				.takeUntilBy(this._stopper)
+				.onValue(() => {
+					this._isTriggeringADraftSavePending = false;
+
+					const body = this.getMaybeBodyElement();
+					if(body){
+						const unsilence = this._driver.getPageCommunicator().silenceGmailErrorsForAMoment();
+						try {
+							simulateKey(body, 190, 0);
+						} finally {
+							unsilence();
+						}
 					}
-				}
-			});
+				});
 		}
 	}
 
