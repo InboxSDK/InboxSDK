@@ -11,7 +11,7 @@ var InboxSDK = {
 * @function
 * @param {string} version - The version of the SDK to load, the only acceptable value currently is "1.0".
 * @param {string} appId - The AppId that you registered for on the <a href="/register">AppId Registration page</a>.
-* @param {LoadOptions} opts - Options for the loading of the SDK
+* @param {LoadOptions} [options] - Optional options object.
 * @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
 */
 InboxSDK.load = function(){};
@@ -20,13 +20,14 @@ InboxSDK.load = function(){};
 * Loads a remote script into this extension's content script space and evals it
 * @function
 * @param {string} url - The URL of the remote script to load.
+* @param {LoadScriptOptions} [options] - Optional options object.
 * @return {Promise} a promise which resolves when this script is finished downloading and eval'ing
 */
 InboxSDK.loadScript = function(){};
 
 /**
  * @class
- * This type is passed into {load} method.
+ * This type may be passed into the {InboxSDK.load} method.
  */
 var LoadOptions = /** @lends LoadOptions */{
 	/**
@@ -54,4 +55,20 @@ var LoadOptions = /** @lends LoadOptions */{
 	 * @type {boolean}
 	 */
 	sidebarBeta:null
+};
+
+/**
+ * @class
+ * This type may be passed into the {InboxSDK.loadScript} method.
+ */
+var LoadScriptOptions = /** @lends LoadScriptOptions */{
+	/**
+	 * By default, the loaded script is wrapped in a closure which happens to
+	 * prevent top-level variable declarations from becoming global variables.
+	 * Setting this property to true disables this behavior.
+	 * ^optional
+	 * ^default=false
+	 * @type {boolean}
+	 */
+	nowrap: false
 };
