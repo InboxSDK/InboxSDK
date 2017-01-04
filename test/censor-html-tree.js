@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 var assert = require('assert');
 import jsdomDoc from "./lib/jsdom-doc";

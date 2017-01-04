@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import simulateClick from '../../../../lib/dom/simulate-click';
 

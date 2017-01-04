@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 // Returns a wrapped version of the function which throws an exception if it's
 // called more than count times within period amount of time.

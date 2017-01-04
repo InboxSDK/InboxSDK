@@ -3,7 +3,6 @@ import RSVP from './lib/rsvp';
 import {EventEmitter} from 'events';
 import Marker from '../src/common/marker';
 
-// jshint -W079
 import MutationObserver from './lib/mock-mutation-observer';
 
 describe('MockMutationObserver', function() {

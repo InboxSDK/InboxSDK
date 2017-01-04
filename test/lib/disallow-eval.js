@@ -1,5 +1,4 @@
 function disallowEval() {
-  // jshint evil:true
   var _eval = eval, _Function = Function;
   before(function() {
     global.eval = global.Function = function() {

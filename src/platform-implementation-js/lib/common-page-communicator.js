@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 var _ = require('lodash');
 var asap = require('asap');

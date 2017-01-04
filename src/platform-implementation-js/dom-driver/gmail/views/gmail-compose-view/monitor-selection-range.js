@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 var Kefir = require('kefir');
 import type GmailComposeView from '../gmail-compose-view';

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 function createIconElement(iconSettings: Object, containerElement: HTMLElement, append: boolean){
 	iconSettings.iconElement = document.createElement('div');

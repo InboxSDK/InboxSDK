@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 export default function simulateHover(element: HTMLElement) {
 	var event: Object = document.createEvent("MouseEvents");

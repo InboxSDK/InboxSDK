@@ -60,8 +60,6 @@ export default function loadScript(url: string, opts?: LoadScriptOptions): Promi
       return ajax({
         url, cachebust: retryNum > 0
       }).then(response => {
-        // jshint evil:true
-
         // Q: Why put the code into a function before executing it instead of
         //    evaling it immediately?
         // A: Chrome would execute it before applying any remembered

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import gmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';

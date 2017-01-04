@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import GmailElementGetter from '../gmail-element-getter';
 import GmailAppToolbarButtonView from '../views/gmail-app-toolbar-button-view';

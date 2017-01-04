@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import gmailLimitedAjax from '../gmail-limited-ajax';
 import type GmailDriver from '../gmail-driver';

@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import assert from 'assert';
 import get from "../src/common/get-or-fail";

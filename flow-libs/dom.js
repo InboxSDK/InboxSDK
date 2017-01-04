@@ -1,5 +1,3 @@
-// jshint ignore:start
-
 declare class HTMLIFrameElement extends HTMLElement {
   src: string;
   contentWindow: {

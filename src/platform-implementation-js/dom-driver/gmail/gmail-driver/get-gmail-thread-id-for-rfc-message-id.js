@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import RSVP from 'rsvp';
 import {extractThreads} from '../gmail-response-processor';

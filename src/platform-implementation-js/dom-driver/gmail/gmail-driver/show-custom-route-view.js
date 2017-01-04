@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 import {defn} from 'ud';
 import GmailElementGetter from '../gmail-element-getter';
