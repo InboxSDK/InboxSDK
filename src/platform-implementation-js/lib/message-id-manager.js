@@ -40,10 +40,10 @@ export default class MessageIdManager {
       // everything from localStorage first before overwriting it.
       this._loadCache();
 
-      const item = [];
+      const item = {version: 2, ids: []};
       this._rfcIdsToThreadIds.forEach((gmailThreadId, rfcId) => {
         const timestamp = this._rfcIdsTimestamps.get(rfcId);
-        item.push([rfcId, gmailThreadId, timestamp]);
+        item.ids.push([rfcId, gmailThreadId, timestamp]);
       });
       storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
     }, saveThrottle, {leading:false});
@@ -55,14 +55,24 @@ export default class MessageIdManager {
     const storage = this._storage;
     if (!storage) return;
     try {
-      const item = JSON.parse(storage.getItem('inboxsdk__cached_thread_ids')||'null');
-      if (item) {
-        for (let x of item) {
-          const [rfcId, gmailThreadId, timestamp] = x;
-          this._rfcIdsTimestamps.set(rfcId, timestamp);
-          this._rfcIdsToThreadIds.set(rfcId, gmailThreadId);
-          this._threadIdsToRfcIds.set(gmailThreadId, rfcId);
-        }
+      let item = JSON.parse(storage.getItem('inboxsdk__cached_thread_ids')||'null');
+      if (!item) return;
+      if (Array.isArray(item)) { // old version
+        // There used to be a glitch which could cause the rfcIds to be encoded
+        // as HTML, so we fix that up here.
+        item = {
+          version: 2,
+          ids: item.map(([rfcId, gmailThreadId, timestamp]) =>
+            [_.unescape(rfcId), gmailThreadId, timestamp]
+          )
+        };
+      }
+      if (item.version !== 2) return;
+      for (let x of item.ids) {
+        const [rfcId, gmailThreadId, timestamp] = x;
+        this._rfcIdsTimestamps.set(rfcId, timestamp);
+        this._rfcIdsToThreadIds.set(rfcId, gmailThreadId);
+        this._threadIdsToRfcIds.set(gmailThreadId, rfcId);
       }
     } catch(e) {
       console.error('failed to read cached ids', e);

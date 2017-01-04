@@ -26,7 +26,7 @@ test("return value from getGmailThreadIdForRfcMessageId is cached", async functi
   const endTime = Date.now();
 
   expect(storage.length).toBe(1);
-  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids"));
+  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids")).ids;
   expect(cachedThreadIds.length).toBe(1);
   expect(cachedThreadIds[0].length).toBe(3);
   expect(cachedThreadIds[0][0]).toBe("<123>");
@@ -57,7 +57,7 @@ test("return value from getRfcMessageIdForGmailMessageId is cached", async funct
   const endTime = Date.now();
 
   expect(storage.length).toBe(1);
-  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids"));
+  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids")).ids;
   expect(cachedThreadIds.length).toBe(1);
   expect(cachedThreadIds[0].length).toBe(3);
   expect(cachedThreadIds[0][0]).toBe("<456>");
@@ -69,7 +69,23 @@ test("return value from getRfcMessageIdForGmailMessageId is cached", async funct
 
 test("can load from storage", async function() {
   const storage: Object = new MockStorage();
-  storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify([["<789>", "789", Date.now()]]));
+  storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify({version: 2, ids: [["<789>", "789", Date.now()]]}));
+  const mim = new MessageIdManager({
+    getGmailThreadIdForRfcMessageId(rfcId) {
+      throw new Error("should not happen");
+    },
+    getRfcMessageIdForGmailMessageId(mid) {
+      throw new Error("should not happen");
+    },
+    storage, saveThrottle: 2
+  });
+  expect(await mim.getRfcMessageIdForGmailThreadId("789")).toBe("<789>");
+  expect(await mim.getGmailThreadIdForRfcMessageId("<789>")).toBe("789");
+});
+
+test("can load old v1 data containing HTML from storage", async function() {
+  const storage: Object = new MockStorage();
+  storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify([["&lt;789&gt;", "789", Date.now()]]));
   const mim = new MessageIdManager({
     getGmailThreadIdForRfcMessageId(rfcId) {
       throw new Error("should not happen");
