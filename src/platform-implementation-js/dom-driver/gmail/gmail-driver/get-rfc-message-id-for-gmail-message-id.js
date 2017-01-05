@@ -2,6 +2,7 @@
 
 import gmailLimitedAjax from '../gmail-limited-ajax';
 import type GmailDriver from '../gmail-driver';
+import htmlToText from '../../../../common/html-to-text';
 
 export default function getRfcMessageIdForGmailMessageId(driver: GmailDriver, gmailMessageId: string): Promise<string> {
   return gmailLimitedAjax({
@@ -14,10 +15,10 @@ export default function getRfcMessageIdForGmailMessageId(driver: GmailDriver, gm
       th: gmailMessageId
     }
   }).then(response => {
-    var match = response.text.match(/^Message-ID:\s+(\S+)\s*$/im);
+    const match = response.text.match(/^Message-ID:\s+(\S+)\s*$/im);
     if (!match) {
       throw new Error("Failed to find rfc id for gmail message id. Message may not exist in user's account.");
     }
-    return match[1];
+    return htmlToText(match[1]);
   });
 }
