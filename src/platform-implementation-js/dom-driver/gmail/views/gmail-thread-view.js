@@ -74,44 +74,21 @@ class GmailThreadView {
 	}
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
-		if (document.body.getAttribute('data-inboxsdk-sidebar-beta') === 'true') {
-			const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-			if (!sidebarElement) {
-				console.warn('This view does not have a sidebar');
-				return;
-			}
-			let sidebar = this._sidebar;
-			if (!sidebar) {
-				sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
-				sidebar.getStopper().onValue(() => {
-					if (this._sidebar === sidebar) {
-						this._sidebar = null;
-					}
-				});
-			}
-			return sidebar.addSidebarContentPanel(descriptor);
-		} else {
-			// Once an old-style sidebar is shown, lock in the setting so that future
-			// app loads within this session don't change it.
-			document.body.setAttribute('data-inboxsdk-sidebar-beta', 'false');
-			if(!this._sidebarContentPanelContainerView){
-				const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-
-				if(!sidebarElement){
-					console.warn('This view does not have a sidebar');
-					return;
-				}
-				else{
-					this._setupSidebarView(sidebarElement);
-				}
-			}
-
-			if (!this._sidebarContentPanelContainerView) {
-				throw new Error('should not happen');
-			}
-
-			return this._sidebarContentPanelContainerView.addContentPanel(descriptor, appId);
+		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
+		if (!sidebarElement) {
+			console.warn('This view does not have a sidebar');
+			return;
 		}
+		let sidebar = this._sidebar;
+		if (!sidebar) {
+			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
+			sidebar.getStopper().onValue(() => {
+				if (this._sidebar === sidebar) {
+					this._sidebar = null;
+				}
+			});
+		}
+		return sidebar.addSidebarContentPanel(descriptor);
 	}
 
 	getSubject(): string {
