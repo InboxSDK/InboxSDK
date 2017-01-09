@@ -165,6 +165,10 @@
   cursor: default;
 }
 
+   .IDMAP_app_sidebar_content_panel:not(.IDMAP_expanded) .IDMAP_app_sidebar_content_panel_top_line {
+     border-bottom: 1px solid #ddd;
+   }
+
 .IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover,
 .IDMAP_app_sidebar_content_panel.IDMAP_dragged .IDMAP_app_sidebar_content_panel_top_line {
   background: rgba(0,0,0,.03);
@@ -243,7 +247,6 @@
 }
 
 .IDMAP_app_sidebar_content_panel_content {
-  border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
 }
 
