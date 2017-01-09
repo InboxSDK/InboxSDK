@@ -14,7 +14,6 @@ import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
-import GmailContentPanelContainerView from '../widgets/gmail-content-panel/gmail-content-panel-container-view';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
 
 class GmailThreadView {
@@ -24,9 +23,6 @@ class GmailThreadView {
 	_isPreviewedThread: boolean;
 	_eventStream: Bus<any>;
 	_sidebar: ?GmailAppSidebarView = null;
-
-	// OLD sidebar
-	_sidebarContentPanelContainerView: ?GmailContentPanelContainerView = null;
 
 	_toolbarView: any;
 	_messageViewDrivers: any[];
@@ -53,7 +49,6 @@ class GmailThreadView {
 	getElement(): HTMLElement { return this._element; }
 	getRouteViewDriver(): any { return this._routeViewDriver; }
 	getIsPreviewedThread(): boolean { return this._isPreviewedThread; }
-	getSidebarContentPanelContainerView(): any { return this._sidebarContentPanelContainerView; }
 	getToolbarView(): any { return this._toolbarView; }
 	getMessageViewDrivers(): any[] { return this._messageViewDrivers; }
 
@@ -67,9 +62,6 @@ class GmailThreadView {
 		this._messageViewDrivers.length = 0;
 		if (this._newMessageMutationObserver) {
 			this._newMessageMutationObserver.disconnect();
-		}
-		if (this._sidebarContentPanelContainerView) {
-			this._sidebarContentPanelContainerView.destroy();
 		}
 	}
 
@@ -133,16 +125,6 @@ class GmailThreadView {
 		if (!toolbarElement) throw new Error("No toolbar element found");
 
 		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
-	}
-
-	_setupSidebarView(sidebarElement: HTMLElement) {
-		var existingContentPanelContainer = sidebarElement.querySelector('.inboxsdk__contentPanelContainer');
-		const sidebar = this._sidebarContentPanelContainerView = new GmailContentPanelContainerView(existingContentPanelContainer);
-
-		if(!existingContentPanelContainer){
-			sidebarElement.classList.add('inboxsdk__sidebar');
-			sidebarElement.insertBefore(sidebar.getElement(), sidebarElement.firstElementChild);
-		}
 	}
 
 	_findToolbarElement(): ?HTMLElement {
