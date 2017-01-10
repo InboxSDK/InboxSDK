@@ -273,8 +273,11 @@ class Panel extends React.Component {
         <div className={idMap('app_sidebar_content_panel_top_line')}>
           {(showControls ? dragHandle : (x=>x))(
             <span className={idMap('app_sidebar_content_panel_title')}>
-              <span className={cx(idMap('app_sidebar_content_panel_title_icon'), iconClass)}>
-                {iconUrl && <img src={iconUrl} />}
+              <div className={idMap('app_sidebar_content_panel_grip')} />
+              <span className={idMap('app_sidebar_content_panel_title_icon_container')}>
+                <span className={cx(idMap('app_sidebar_content_panel_title_icon'), iconClass)}>
+                  {iconUrl && <img src={iconUrl} />}
+                </span>
               </span>
               <span className={idMap('app_sidebar_content_panel_title_text')}>
                 {title}
