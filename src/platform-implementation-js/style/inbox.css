@@ -386,13 +386,24 @@
   font: normal 0.8em arial,sans-serif;
 }
 .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_container {
-  padding: 0px;
-}
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_close {
-  display: none;
+  padding-left: 0;
+  padding-right: 0;
 }
 .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_content {
-  margin: 0px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_container {
+  padding-top: 0;
+}
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_content {
+  margin-top: 0;
+}
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_container {
+  padding-bottom: 0;
+}
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_content {
+  margin-bottom: 0;
 }
 .inboxsdk__modal_buttons input {
   margin-right: 5px;
@@ -405,6 +416,9 @@
   right: 0;
   top: 0;
   margin: 17px;
+}
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_toprow .inboxsdk__close_button {
+  display: none;
 }
 
 .inboxsdk__attachment_card {
