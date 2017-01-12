@@ -30,6 +30,7 @@ import querySelectorOne from '../../lib/dom/querySelectorOne';
 import idMap from '../../lib/idMap';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import getSidebarClassnames from './getSidebarClassnames';
+import InboxButterBarDriver from './inbox-butter-bar-driver';
 
 import getTopRowElStream from './detection/topRow/watcher';
 import getThreadRowElStream from './detection/threadRow/watcher';
@@ -86,7 +87,7 @@ class InboxDriver {
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
   _toolbarViewDriverStream: Kefir.Observable<any>;
-  _butterBarDriver: Object;
+  _butterBarDriver = new InboxButterBarDriver();
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
   _appToolbarLocationPool: ItemWithLifetimePool<*>;

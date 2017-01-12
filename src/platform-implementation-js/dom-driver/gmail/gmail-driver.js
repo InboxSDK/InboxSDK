@@ -80,7 +80,6 @@ class GmailDriver {
 	_threadRowIdentifier: ThreadRowIdentifier;
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
-	_butterBarDriver: GmailButterBarDriver;
 	onready: Promise<void>;
 	_pageCommunicator: PageCommunicator;
 	_pageCommunicatorPromise: Promise<PageCommunicator>;
