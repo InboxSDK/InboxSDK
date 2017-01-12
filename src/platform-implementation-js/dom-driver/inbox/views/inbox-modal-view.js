@@ -39,7 +39,7 @@ class InboxModalView {
     this.setTitle(options.title);
     this.setContentElement(options.el);
     this.setButtons(options.buttons || []);
-    this.setChrome(options.chrome);
+    this.setChromeClasses(options.chrome, options.showCloseButton, (options.buttons||[]).length > 0);
   }
 
   setTitle(title: string) {
@@ -83,11 +83,21 @@ class InboxModalView {
       });
   }
 
-  setChrome(chrome: boolean) {
+  setChromeClasses(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
     if (chrome === false) {
       this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
     } else {
       this._modalContainerElement.classList.remove('inboxsdk__modal_chromeless');
+    }
+    if (showCloseButton) {
+      this._modalContainerElement.classList.add('inboxsdk__modal_showCloseButton');
+    } else {
+      this._modalContainerElement.classList.remove('inboxsdk__modal_showCloseButton');
+    }
+    if (hasButtons) {
+      this._modalContainerElement.classList.add('inboxsdk__modal_hasButtons');
+    } else {
+      this._modalContainerElement.classList.remove('inboxsdk__modal_hasButtons');
     }
   }
 
