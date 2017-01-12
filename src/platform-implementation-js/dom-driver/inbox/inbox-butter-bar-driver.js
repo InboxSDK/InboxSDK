@@ -101,8 +101,12 @@ export default class InboxButterBarDriver {
       Object.assign(sdkNotice.style, {
         opacity: '0',
         transform: '',
-        transition: '',
+        transition: 'none',
         display: 'block'
+      });
+      sdkNotice.offsetHeight; // force relayout
+      Object.assign(sdkNotice.style, {
+        transition: ''
       });
       sdkNotice.offsetHeight; // force relayout
       Object.assign(sdkNotice.style, {
