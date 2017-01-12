@@ -7,60 +7,56 @@ import streamWaitFor from '../../lib/stream-wait-for';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
-  .map((noticeContainer: HTMLElement) => {
-    const googleNotice = querySelector(noticeContainer, '.vh:not(.inboxsdk__butterbar)');
-    let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
+const elements = streamWaitFor(() => document.querySelector('body > div[id][jsaction] > div[id] > div[class][jsaction][aria-hidden]'))
+  .map((googleNotice: HTMLElement) => {
+    const noticeContainer = googleNotice.parentElement;
+    if (!noticeContainer) throw new Error('Should not happen');
+    let sdkNotice = noticeContainer.querySelector('.inboxsdk__butterbar');
     if (!sdkNotice) {
-      sdkNotice = (googleNotice.cloneNode(false): any);
-      sdkNotice.classList.add('inboxsdk__butterbar');
+      sdkNotice = document.createElement('div');
+      sdkNotice.className = googleNotice.className+' inboxsdk__butterbar';
       sdkNotice.style.display = 'none';
-      const parentNode = googleNotice.parentNode;
-      if(!parentNode) throw new Error('parentNode not found');
-      parentNode.insertBefore(sdkNotice, googleNotice.nextSibling);
+      noticeContainer.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
     return {noticeContainer, googleNotice, sdkNotice};
   })
   .toProperty();
 
-const googleNoticeMutationChunks = elements
-  .flatMapLatest(({googleNotice}) =>
-    makeMutationObserverChunkedStream(googleNotice, {childList: true})
-  );
-const googleAddedNotice = googleNoticeMutationChunks
-  .filter(mutations => mutations.some(m => m.addedNodes.length > 0));
-const googleRemovedNotice = googleNoticeMutationChunks
-  .filter(mutations => !mutations.some(m => m.addedNodes.length > 0));
+// We queue our notices separately from the native ones in Inbox.
 
-const sdkRemovedNotice = elements
+const sdkNoticeIdChanges = elements
   .flatMapLatest(({sdkNotice}) =>
     makeMutationObserverChunkedStream(
       sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']}
     ).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
-  )
+  );
+
+const sdkRemovedNotice = sdkNoticeIdChanges
   .filter(id => id == null);
 
-const noticeAvailableStream = Kefir.merge([googleRemovedNotice, sdkRemovedNotice]);
+const noticeAvailableStream = sdkRemovedNotice;
 
 function hideMessage(noticeContainer, googleNotice, sdkNotice) {
-  googleNotice.style.display = '';
-  noticeContainer.style.top = '-10000px';
-  noticeContainer.style.position = 'relative';
-  sdkNotice.style.display = 'none';
+  Object.assign(sdkNotice.style, {
+    opacity: '0',
+    transform: '',
+    transition: 'opacity 100ms'
+  });
   sdkNotice.removeAttribute('data-inboxsdk-id');
+  Kefir.fromEvents(sdkNotice, 'transitionend')
+    .merge(Kefir.later(200)) // transition might not finish if element is hidden
+    .takeUntilBy(sdkNoticeIdChanges.filter(id => id != null))
+    .onValue(() => {
+      Object.assign(sdkNotice.style, {
+        display: 'none',
+        opacity: '',
+        transition: ''
+      });
+    });
 }
 
-export default class GmailButterBarDriver {
+export default class InboxButterBarDriver {
   constructor() {
-    Kefir.combine([elements, googleAddedNotice])
-      .onValue(({googleNotice, sdkNotice}) => {
-        if(googleNotice) googleNotice.style.display = '';
-        if(sdkNotice){
-          sdkNotice.style.display = 'none';
-          sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
-        }
-      });
-
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
     // events if it only becomes active once a message has started.
     noticeAvailableStream.onValue(_.noop);
@@ -86,10 +82,6 @@ export default class GmailButterBarDriver {
     const instanceId = Date.now()+'-'+Math.random();
 
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-      noticeContainer.style.visibility = 'visible';
-      noticeContainer.style.top = '';
-
-      googleNotice.style.display = 'none';
       sdkNotice.className = googleNotice.className;
       sdkNotice.classList.add('inboxsdk__butterbar');
 
@@ -106,7 +98,36 @@ export default class GmailButterBarDriver {
         sdkNotice.classList.add(rawOptions.className);
       }
 
-      sdkNotice.style.display = '';
+      // If the sdkNotice is already up, just flash it out and in instead of
+      // animating it up into position.
+      if (
+        sdkNotice.style.display === 'block' &&
+        getComputedStyle(sdkNotice).opacity === '1'
+      ) {
+        Object.assign(sdkNotice.style, {
+          opacity: '0',
+          transform: 'none',
+          transition: 'none'
+        });
+        sdkNotice.offsetHeight; // force relayout
+        Object.assign(sdkNotice.style, {
+          opacity: '1',
+          transition: ''
+        });
+      } else {
+        Object.assign(sdkNotice.style, {
+          opacity: '0',
+          transform: '',
+          transition: '',
+          display: 'block'
+        });
+        sdkNotice.offsetHeight; // force relayout
+        Object.assign(sdkNotice.style, {
+          opacity: '1',
+          transform: 'none'
+        });
+      }
+
       sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
     });
 
@@ -123,10 +144,6 @@ export default class GmailButterBarDriver {
   }
 
   hideGmailMessage() {
-    elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-      if (sdkNotice.getAttribute('data-inboxsdk-id') === 'gmail') {
-        hideMessage(noticeContainer, googleNotice, sdkNotice);
-      }
-    });
+    // No-op in Inbox because we don't touch the native messages
   }
 }
