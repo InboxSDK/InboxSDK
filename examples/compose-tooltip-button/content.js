@@ -34,6 +34,7 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(function(inboxSDK) {
 					onClick: function(){
 						var div = document.createElement('div');
 						div.innerHTML = 'Hello World!';
+						div.style.background = 'green';
 						button2.showTooltip({
 							el: div
 						});

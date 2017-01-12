@@ -249,6 +249,10 @@
   border: 1px solid rgba(0,0,0,0.2);
 }
 
+.inboxsdk__tooltip.inboxsdk__tooltip_chromeless {
+  padding: 0;
+}
+
 .inboxsdk__tooltip > .inboxsdk__close_button {
   position: absolute;
   top: 4px;
