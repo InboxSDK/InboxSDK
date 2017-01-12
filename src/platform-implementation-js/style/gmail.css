@@ -1059,6 +1059,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   outline: none;
   padding: 13px 10px 16px;
   text-align: center;
+  font: normal normal normal normal 16px / normal arial, sans-serif;
 }
 
   .inboxdk__tooltip_content.inboxsdk__tooltip .aRM {
