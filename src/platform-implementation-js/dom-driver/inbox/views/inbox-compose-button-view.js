@@ -95,7 +95,11 @@ class InboxComposeButtonView {
 
   showTooltip(tooltipDescriptor: TooltipDescriptor) {
     if (this._composeView.isInlineReplyForm()) {
-      throw new Error("Tooltips not supported in Inbox inline compose");
+      // In Inbox, if you haven't interacted with an inline compose yet, then
+      // it will auto-close as soon as anything else including the tooltip is
+      // interacted with. Focusing the inline compose is enough to make Inbox
+      // think it's been interacted with and to avoid that behavior.
+      this._composeView.getElement().focus();
     }
     if (this._tooltip) {
       this.closeTooltip();
