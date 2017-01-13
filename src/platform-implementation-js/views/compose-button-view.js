@@ -1,9 +1,9 @@
 /* @flow */
 
-import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
+import type {Driver} from '../driver-interfaces/driver';
 
 export type TooltipDescriptor = {
 	el?: ?HTMLElement,
@@ -13,13 +13,19 @@ export type TooltipDescriptor = {
 	button?: ?{onClick?: Function, title: string}&Object
 };
 
+type Options = {
+	buttonDescriptor: Object,
+	buttonViewController: Object
+};
+const memberMap = new WeakMap();
+
 export default class ComposeButtonView extends EventEmitter {
 	destroyed: boolean;
 
-	constructor(optionsPromise: Promise<?Object>, composeViewDriver: ComposeViewDriver) {
+	constructor(optionsPromise: Promise<?Options>, composeViewDriver: ComposeViewDriver, driver: Driver) {
 		super();
 		this.destroyed = false;
-		const members = {optionsPromise, composeViewDriver};
+		const members = {optionsPromise, composeViewDriver, driver};
 		memberMap.set(this, members);
 
 		members.optionsPromise.then(options => {
@@ -36,6 +42,9 @@ export default class ComposeButtonView extends EventEmitter {
 
 	showTooltip(tooltipDescriptor: TooltipDescriptor) {
 		const members = get(memberMap, this);
+		members.driver.getLogger().eventSdkPassive('ComposeButtonView.showTooltip', {
+			keys: Object.keys(tooltipDescriptor)
+		});
 		members.optionsPromise.then(options => {
 			if (!options) return;
 			members.composeViewDriver.addTooltipToButton(options.buttonViewController, options.buttonDescriptor, tooltipDescriptor);
@@ -50,15 +59,6 @@ export default class ComposeButtonView extends EventEmitter {
 		});
 	}
 }
-
-type Options = {
-	buttonDescriptor: Object,
-	buttonViewController: Object
-};
-var memberMap: WeakMap<ComposeButtonView, {
-	composeViewDriver: ComposeViewDriver,
-	optionsPromise: Promise<?Options>
-}> = new WeakMap();
 
 function _destroy(composeButtonViewInstance: ComposeButtonView) {
 	composeButtonViewInstance.destroyed = true;

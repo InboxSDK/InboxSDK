@@ -48,11 +48,11 @@ class ComposeView extends EventEmitter {
 	}
 
 	addButton(buttonDescriptor){
-		var members = get(memberMap, this);
-		var buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
+		const members = get(memberMap, this);
+		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 
-		var optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
-		return new ComposeButtonView(optionsPromise, members.composeViewImplementation);
+		const optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
+		return new ComposeButtonView(optionsPromise, members.composeViewImplementation, members.driver);
 	}
 
 	/*
