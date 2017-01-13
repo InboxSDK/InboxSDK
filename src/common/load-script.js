@@ -1,7 +1,6 @@
 /* @flow */
 
 const once = require('lodash/once');
-const defer = require('lodash/defer');
 import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';
@@ -32,7 +31,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
     script.addEventListener('load', function() {
       // Make sure the script has a moment to execute before this promise
       // resolves.
-      defer(resolve);
+      setTimeout(resolve, 1);
     }, false);
   });
 
