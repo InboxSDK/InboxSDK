@@ -136,7 +136,7 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
     }).transform(babelify.configure({
       presets: args.hot && port ? ["react-hmre"] : [],
       plugins: "transform-inline-environment-variables"
-    }));
+    })).transform('redirectify', {global: true});
 
     if (args.hot && port) {
       bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);

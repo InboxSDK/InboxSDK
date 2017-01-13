@@ -1,12 +1,13 @@
 {
   "author": "Streak",
-  "browser": {
-    "babel-runtime/core-js/promise": "./src/build/promise.js"
-  },
   "browserify": {
     "transform": [
       "brfs"
     ]
+  },
+  "redirectify": {
+    "base": ".",
+    "dir": "overrides"
   },
   "dependencies": {
     "add-accessors": "^2.0.0",
@@ -79,6 +80,7 @@
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
     "redbox-react": "^1.3.2",
+    "redirectify": "^1.4.0",
     "rimraf": "^2.4.2",
     "rsvp": "^3.0.21",
     "safari-fix-map": "^1.0.4",
