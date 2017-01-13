@@ -24,26 +24,23 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(function(inboxSDK) {
 			section: 'TRAY_LEFT'
 		});
 
-		if (!composeView.isInlineReplyForm()) {
-			button.showTooltip({
-				imageUrl: chrome.runtime.getURL('partycat.jpg'),
-				title: 'Monkeys Rule!',
-				subtitle: 'the jungle',
-				button: {
-					title: 'Party!',
-					onClick: function(){
-						var div = document.createElement('div');
-						div.innerHTML = 'Hello World!';
-						div.style.background = 'green';
-						button2.showTooltip({
-							el: div
-						});
+		button.showTooltip({
+			imageUrl: chrome.runtime.getURL('partycat.jpg'),
+			title: 'Monkeys Rule!',
+			subtitle: 'the jungle',
+			button: {
+				title: 'Party!',
+				onClick: function(){
+					var div = document.createElement('div');
+					div.innerHTML = 'Hello World!';
+					div.style.background = 'green';
+					button2.showTooltip({
+						el: div
+					});
 
-						setTimeout(function(){button2.closeTooltip();}, 5*1000);
-					}
+					setTimeout(function(){button2.closeTooltip();}, 5*1000);
 				}
-			});
-		}
-
+			}
+		});
 	});
 });
