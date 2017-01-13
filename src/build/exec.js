@@ -1,14 +1,12 @@
 /* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var cproc = require('child_process');
+const cproc = require('child_process');
 
 // Executes a process and captures stdout.
 export default function exec(cmd: string, options:Object={}): Promise<any> {
-  var {passStdErr} = options;
-  return new RSVP.Promise(function(resolve, reject) {
-    cproc.exec(cmd, function(err, stdout, stderr) {
+  const {passStdErr} = options;
+  return new Promise((resolve, reject) => {
+    cproc.exec(cmd, (err, stdout, stderr) => {
       if (err) {
         if (stderr) {
           process.stderr.write(stderr);

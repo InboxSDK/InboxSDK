@@ -324,8 +324,9 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 
 		gmailComposeView.getStopper().onValue(() => mutationObserver.disconnect());
 
-	}).catch(function(err){
+	}).catch(err => {
 		if(err !== 'skip'){
+			Logger.error(err);
 			throw err;
 		}
 	});

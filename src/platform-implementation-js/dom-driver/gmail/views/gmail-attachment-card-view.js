@@ -135,10 +135,14 @@ class GmailAttachmentCardView {
 	getDownloadURL(): Promise<?string> {
 		return RSVP.Promise.resolve().then(() => {
 			if (this._isStandardAttachment()) {
-				return waitFor(() => this._getDownloadLink()).then(downloadUrl => {
+				const p = waitFor(() => this._getDownloadLink()).then(downloadUrl => {
 					if (!downloadUrl) return null;
 					return this._driver.resolveUrlRedirects(downloadUrl);
 				});
+				p.catch(err => {
+					this._driver.getLogger().error(err);
+				});
+				return p;
 			} else {
 				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
 				return downloadButton ?

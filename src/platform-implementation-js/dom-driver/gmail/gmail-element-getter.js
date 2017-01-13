@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import RSVP from 'rsvp';
-import waitFor from '../../lib/wait-for';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import {defobj} from 'ud';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';

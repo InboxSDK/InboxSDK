@@ -550,6 +550,8 @@ class GmailComposeView {
 				endDrag();
 				await waitFor(() => !this._dropzonesVisible(), 20*1000);
 			}
+		} catch (err) {
+			this._driver.getLogger().error(err);
 		} finally {
 			endDrag();
 			this._reenableDropzones();

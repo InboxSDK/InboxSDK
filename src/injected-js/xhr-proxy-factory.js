@@ -1,8 +1,6 @@
-/*jslint node: true */
 'use strict';
 var _ = require('lodash');
 var assert = require('assert');
-var RSVP = require('rsvp');
 var EventEmitter = require('events').EventEmitter;
 var deparam = require('querystring').parse;
 
@@ -254,7 +252,7 @@ module.exports = function(XHR, wrappers, opts) {
                   return modifiedResponseText;
                 }
               });
-            }, RSVP.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
+            }, Promise.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
               if (startConnection === self._connection) {
                 self.responseText = self._connection.modifiedResponseText = modifiedResponseText;
                 finish();
@@ -488,7 +486,7 @@ module.exports = function(XHR, wrappers, opts) {
             return nextRequestChanger(self._connection, Object.freeze(modifiedRequest));
           }
         });
-      }, RSVP.Promise.resolve(request)).then(function(modifiedRequest) {
+      }, Promise.resolve(request)).then(function(modifiedRequest) {
         if (startConnection === self._connection && !self._realStartedSend) {
           assert(_.has(modifiedRequest, 'method'), 'modifiedRequest has method');
           assert(_.has(modifiedRequest, 'url'), 'modifiedRequest has url');

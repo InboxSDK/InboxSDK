@@ -88,5 +88,8 @@ export default function trackGmailStyles() {
         }
       });
       checkStyles();
+    })
+    .catch(err => {
+      Logger.error(err);
     });
 }
