@@ -1,13 +1,12 @@
 /* @flow */
 
-var _ = require('lodash');
-var ud = require('ud');
-var Kefir = require('kefir');
+import {defn} from 'ud';
+import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import containByScreen from 'contain-by-screen';
 
-var InboxTooltipView = ud.defn(module, class InboxTooltipView {
+class InboxTooltipView {
   _target: HTMLElement;
   _el: HTMLElement;
   _contentEl: HTMLElement;
@@ -24,50 +23,52 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
     this._el.style.position = 'fixed';
     this._el.className = 'inboxsdk__tooltip';
     this._el.appendChild(this._contentEl);
-    {
-      const closeButton = document.createElement('button');
-      closeButton.type = 'button';
-      closeButton.title = 'Close';
-      closeButton.className = 'inboxsdk__close_button';
-      closeButton.addEventListener('click', (e: MouseEvent) => {
-        this.destroy();
-      });
-      this._el.appendChild(closeButton);
-    }
-    if (options.imageUrl) {
-      var src = options.imageUrl;
-      var img = document.createElement('img');
-      img.className = 'inboxsdk__tooltip_img';
-      img.src = src;
-      this._contentEl.appendChild(img);
-    }
-    if (options.title) {
-      var title = options.title;
-      var titleEl = document.createElement('h1');
-      titleEl.textContent = title;
-      this._contentEl.appendChild(titleEl);
-    }
-    if (options.subtitle) {
-      const subtitle = options.subtitle;
-      const sEl = document.createElement('div');
-      sEl.className = 'inboxsdk__subtitle';
-      sEl.textContent = subtitle;
-      this._contentEl.appendChild(sEl);
-    }
-    if (options.button) {
-      var button = options.button;
-      var buttonEl = document.createElement('input');
-      buttonEl.type = 'button';
-      buttonEl.value = button.title;
-      buttonEl.addEventListener('click', (event: MouseEvent) => {
-        event.preventDefault();
-        event.stopPropagation();
-        button.onClick.call(null);
-      });
-      this._contentEl.appendChild(buttonEl);
-    }
     if (options.el) {
       this._contentEl.appendChild(options.el);
+      this._el.classList.add('inboxsdk__tooltip_chromeless');
+    } else {
+      {
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.title = 'Close';
+        closeButton.className = 'inboxsdk__close_button';
+        closeButton.addEventListener('click', (e: MouseEvent) => {
+          this.destroy();
+        });
+        this._el.appendChild(closeButton);
+      }
+      if (options.imageUrl) {
+        const src = options.imageUrl;
+        const img = document.createElement('img');
+        img.className = 'inboxsdk__tooltip_img';
+        img.src = src;
+        this._contentEl.appendChild(img);
+      }
+      if (options.title) {
+        const title = options.title;
+        const titleEl = document.createElement('h1');
+        titleEl.textContent = title;
+        this._contentEl.appendChild(titleEl);
+      }
+      if (options.subtitle) {
+        const subtitle = options.subtitle;
+        const sEl = document.createElement('div');
+        sEl.className = 'inboxsdk__subtitle';
+        sEl.textContent = subtitle;
+        this._contentEl.appendChild(sEl);
+      }
+      if (options.button) {
+        const button = options.button;
+        const buttonEl = document.createElement('input');
+        buttonEl.type = 'button';
+        buttonEl.value = button.title;
+        buttonEl.addEventListener('click', (event: MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          button.onClick.call(null);
+        });
+        this._contentEl.appendChild(buttonEl);
+      }
     }
 
     document.body.appendChild(this._el);
@@ -104,7 +105,7 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       this._el.classList.add('inboxsdk__notransition');
       this._arrowEl.classList.add('inboxsdk__notransition');
     }
-    var {position} = containByScreen(this._el, this._target, {
+    const {position} = containByScreen(this._el, this._target, {
       position: 'top',
       hAlign: 'center',
       vAlign: 'center',
@@ -131,5 +132,5 @@ var InboxTooltipView = ud.defn(module, class InboxTooltipView {
       this._arrowEl.classList.remove('inboxsdk__notransition');
     }
   }
-});
-export default InboxTooltipView;
+}
+export default defn(module, InboxTooltipView);
