@@ -1,7 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
-import crypto from 'crypto';
+import Sha256 from 'sha.js/sha256';
 import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
 import getStackTrace from '../../common/get-stack-trace';
@@ -355,13 +355,13 @@ function makeLoggedFunction(func: Function, name: ?string): Function {
 }
 
 function replaceFunction(parent: any, name: string, newFnMaker: (original: Function) => Function) {
-  var newFn = newFnMaker(parent[name]);
+  const newFn = newFnMaker(parent[name]);
   newFn.__original = parent[name];
   parent[name] = newFn;
 }
 
 export function hashEmail(str: string): string {
-  var hasher = crypto.createHash('sha256');
+  const hasher = new Sha256();
   hasher.update('inboxsdk:'+str);
   return hasher.digest('hex');
 }

@@ -87,6 +87,7 @@
     "seed-random": "^2.2.0",
     "selenium-standalone": "^5.8.0",
     "semver": "^5.0.1",
+    "sha.js": "^2.4.8",
     "simple-encryptor": "^1.1.0",
     "sinon": "^1.17.1",
     "stdio": "^0.2.6",
