@@ -1,9 +1,9 @@
 /* @flow */
 
-import {createHash} from 'crypto';
+import Sha1 from 'sha.js/sha1';
 
 function grandfatherHash(x) {
-  const hasher = createHash('sha1');
+  const hasher = new Sha1();
   hasher.update('YlEHtGl72+c'+x);
   return hasher.digest('hex');
 }
@@ -29,7 +29,7 @@ export default function isValidAppId(appId: string): boolean {
 
   const name = m[1], hash = m[2];
 
-  const shasum = createHash('sha1');
+  const shasum = new Sha1();
   shasum.update(name);
   return shasum.digest('hex').slice(0, 10) === hash;
 }

@@ -1,13 +1,13 @@
 /* @flow */
 
 import _ from 'lodash';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import * as logger from './injected-logger';
 import XHRProxyFactory from './xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
 import quotedSplit from '../common/quoted-split';
+import defer from '../common/defer';
 import modifySuggestions from './modify-suggestions';
 
 function logErrorExceptEventListeners(err, details) {
@@ -224,7 +224,7 @@ export default function setupGmailInterceptor() {
         currentQuery = query;
         if (currentQueryDefer)
           currentQueryDefer.resolve();
-        currentQueryDefer = connection._defer = RSVP.defer();
+        currentQueryDefer = connection._defer = defer();
         suggestionModifications = [];
         triggerEvent({
           type: 'suggestionsRequest',
@@ -297,7 +297,7 @@ export default function setupGmailInterceptor() {
               term: customSearchTerm,
               query: params.q,
               start: params.start,
-              newQuery: RSVP.defer()
+              newQuery: defer()
             };
 
             triggerEvent({
@@ -369,8 +369,8 @@ export default function setupGmailInterceptor() {
           customListJob = connection._customListJob = {
             query: params.q,
             start: +params.start,
-            newQuery: RSVP.defer(),
-            newResults: RSVP.defer()
+            newQuery: defer(),
+            newResults: defer()
           };
           triggerEvent({
             type: 'searchForReplacement',

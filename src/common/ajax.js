@@ -1,6 +1,5 @@
 /* @flow */
 
-const forOwn = require('lodash/forOwn');
 import querystring from 'querystring';
 import delay from 'pdelay';
 import cachebustUrl from './cachebust-url';
@@ -99,9 +98,13 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       }
     };
     xhr.open(method, url, true);
-    forOwn(opts.headers, (value, name) => {
-      xhr.setRequestHeader(name, value);
-    });
+    if (opts.headers) {
+      const {headers} = opts;
+      Object.keys(headers).forEach(name => {
+        const value = headers[name];
+        xhr.setRequestHeader(name, value);
+      });
+    }
     xhr.send(stringData);
   });
 }

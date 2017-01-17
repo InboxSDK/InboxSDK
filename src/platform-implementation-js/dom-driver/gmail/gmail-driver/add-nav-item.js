@@ -3,6 +3,7 @@
 import Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView from '../views/gmail-nav-item-view';
+import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import eventNameFilter from '../../../lib/event-name-filter';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
@@ -17,7 +18,8 @@ export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.
 	GmailElementGetter
 		.waitForGmailModeToSettle()
 		.then(_waitForNavItemsHolder)
-		.then(attacher);
+		.then(attacher)
+		.catch(err => Logger.error(err));
 
 	gmailNavItemView
 		.getEventStream()

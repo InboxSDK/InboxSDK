@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 
 import isValidAppId from "../src/platform-implementation-js/lib/is-valid-app-id";

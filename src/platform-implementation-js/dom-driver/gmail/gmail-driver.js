@@ -7,7 +7,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
-import waitFor from '../../lib/wait-for';
 import asap from 'asap';
 
 import get from '../../../common/get-or-fail';
@@ -129,6 +128,8 @@ class GmailDriver {
 			gmailLoadEvent(this);
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
 			trackGmailStyles();
+		}).catch(err => {
+			this._logger.error(err);
 		});
 	}
 
@@ -264,7 +265,7 @@ class GmailDriver {
 	}
 
 	openComposeWindow() {
-		openComposeWindow(this);
+		openComposeWindow(this).catch(err => this._logger.error(err));
 	}
 
 	openDraftByMessageID(messageID: string) {
@@ -292,7 +293,9 @@ class GmailDriver {
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
-		return getNativeNavItem('sent');
+		const p = getNativeNavItem('sent')
+		p.catch(err => this._logger.error(err));
+		return p;
 	}
 
 	setShowNativeNavMarker(value: boolean) {

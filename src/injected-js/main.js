@@ -11,7 +11,6 @@ if (!global.__InboxSDKInjected) {
       define = null;
     }
     const _ = require('lodash');
-    const RSVP = require('rsvp');
     const xhrHelper = require('./xhr-helper');
     const gmailInterceptor = require('./setup-gmail-interceptor');
     const setupGmonkeyHandler = require('./setup-gmonkey-handler');
@@ -24,10 +23,6 @@ if (!global.__InboxSDKInjected) {
     const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
     const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
     const setupInboxCustomViewLinkSmuggler = require('./setupInboxCustomViewLinkSmuggler');
-
-    RSVP.on('error', function(err) {
-      console.error("Possibly uncaught promise rejection", err);
-    });
 
     if (document.location.origin === 'https://mail.google.com') {
       gmailInterceptor();
