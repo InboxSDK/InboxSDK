@@ -5,10 +5,6 @@
       "brfs"
     ]
   },
-  "redirectify": {
-    "base": ".",
-    "dir": "overrides"
-  },
   "dependencies": {
     "add-accessors": "^2.0.0",
     "asap": "^2.0.3",
@@ -109,12 +105,16 @@
     "browserify-hmr": "^0.3.1"
   },
   "private": true,
+  "redirectify": {
+    "base": ".",
+    "dir": "overrides"
+  },
   "scripts": {
-    "start": "gulp default --single --watch --reloader",
     "flow_check": "flow check",
     "jest": "jest",
+    "start": "gulp default --single --watch --reloader",
     "test": "mocha && jest",
     "test-browser": "wdio"
   },
-  "version": "0.7.21"
+  "version": "0.7.22"
 }
