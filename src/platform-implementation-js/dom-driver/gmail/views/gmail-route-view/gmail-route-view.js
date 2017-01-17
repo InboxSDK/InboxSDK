@@ -7,6 +7,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
+import {parse} from 'querystring';
 
 import asap from 'asap';
 import {defn} from 'ud';
@@ -417,10 +418,20 @@ class GmailRouteView {
 		}
 
 		const threadContainerElement = this._getThreadContainerElement();
+		let threadID;
+		if (threadContainerElement) {
+			try {
+				threadID = this._driver.getPageCommunicator().getCurrentThreadID(threadContainerElement);
+			} catch(err) {
+				// leave threadID null to be set below
+			}
+		}
+		if (!threadID) {
+			// Happens if gmonkey isn't available, like on a standalone thread page.
+			threadID = parse(document.location.search, null, null).th || '';
+		}
 
-		return {
-			threadID: threadContainerElement ? this._driver.getPageCommunicator().getCurrentThreadID(threadContainerElement) : ''
-		};
+		return {threadID};
 	}
 
 	_getSettingsRouteParams(): Object {
