@@ -20,7 +20,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
-import extractContactFromEmailContactString from '../../../lib/extract-contact-from-email-contact-string';
+
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import findParent from '../../../../common/find-parent';
 

@@ -46,7 +46,7 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
 }
 
 function updateContactCacheFromModal(headerContact) {
-  const spans = document.querySelectorAll(`.ajC [email]`);
+  const spans = document.querySelectorAll('.ajC [email]');
 
   for(let ii=0; ii<spans.length; ii++){
     const span = spans[ii];
