@@ -69,6 +69,12 @@ describe('Inbox', function() {
       console.error(err.stack);
       // browser.debug();
       throw err;
+    } finally {
+      const errors = browser.execute(() => window._errors).value;
+      if (errors.length) {
+        console.log('Logged errors:');
+        console.log(errors);
+      }
     }
   });
 });

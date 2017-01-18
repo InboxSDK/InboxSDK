@@ -42,7 +42,7 @@ function getAllAppIds(): string[] {
   return JSON.parse(str);
 }
 
-var _trackedEventsQueue = new PersistentQueue('events');
+const _trackedEventsQueue = new PersistentQueue('events');
 const FIRST_LOADED_TIME = Date.now();
 
 export type AppLogger = {

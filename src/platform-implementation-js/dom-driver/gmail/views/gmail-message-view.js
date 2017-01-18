@@ -510,7 +510,11 @@ class GmailMessageView {
 
 		this._messageLoaded = true;
 
-		this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), messageId);
+		try {
+			this._driver.associateThreadAndMessageIDs(this._threadViewDriver.getThreadID(), messageId);
+		} catch (err) {
+			this._driver.getLogger().error(err);
+		}
 		this._gmailAttachmentAreaView = this._getAttachmentArea();
 
 		this._eventStream.emit({
