@@ -1,9 +1,7 @@
 /* @flow */
 
-import Logger from '../../../lib/logger';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import censorHTMLtree from '../../../../common/censor-html-tree';
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
@@ -31,7 +29,7 @@ export default class GmailAppToolbarButtonView {
         try {
           this._handleButtonDescriptor(buttonDescriptor);
         } catch(err) {
-          Logger.error(err);
+          this._driver.getLogger().error(err);
         }
       });
   }
@@ -39,7 +37,7 @@ export default class GmailAppToolbarButtonView {
   destroy() {
     this._stopper.destroy();
     if (this._element) {
-      (this._element:any).remove();
+      this._element.remove();
     }
     if (this._activeDropdown) {
       this._activeDropdown.close();
