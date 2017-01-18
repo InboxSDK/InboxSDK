@@ -1,5 +1,15 @@
 'use strict';
 
+const script = document.createElement('script');
+script.textContent = `
+window._errors = [];
+document.documentElement.addEventListener('inboxSDKerror', event => {
+	window._errors.push(event.detail);
+});
+`;
+document.documentElement.appendChild(script).remove();
+document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
+
 InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		var button = composeView.addButton({

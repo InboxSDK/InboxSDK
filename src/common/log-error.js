@@ -86,6 +86,20 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     };
 
     sendError(report);
+
+    if (document.documentElement.getAttribute('inboxsdk-emit-error-event') === 'true') {
+      document.documentElement.dispatchEvent(new CustomEvent('inboxSDKerror', {
+        bubbles: false,
+        cancelable: false,
+        detail: {
+          message: err && err.message || err,
+          stack: err && err.stack,
+          loggedFrom: nowStack,
+          details,
+          sentByApp
+        }
+      }));
+    }
   } catch(err2) {
     tooManyErrors(err2, args);
   }
