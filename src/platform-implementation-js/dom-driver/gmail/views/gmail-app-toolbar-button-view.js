@@ -25,13 +25,15 @@ export default class GmailAppToolbarButtonView {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    inButtonDescriptor.onValue((buttonDescriptor) => {
-      try {
-        this._handleButtonDescriptor(buttonDescriptor);
-      } catch(err) {
-        Logger.error(err);
-      }
-    });
+    inButtonDescriptor
+      .takeUntilBy(this._stopper)
+      .onValue((buttonDescriptor) => {
+        try {
+          this._handleButtonDescriptor(buttonDescriptor);
+        } catch(err) {
+          Logger.error(err);
+        }
+      });
   }
 
   destroy() {
