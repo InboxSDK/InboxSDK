@@ -48,23 +48,30 @@ export default class GmailAppToolbarButtonView {
   getElement(): ?HTMLElement {return this._element;}
 
   open() {
-    if(!this._activeDropdown){
-      this._handleClick();
+    try {
+      if(!this._activeDropdown){
+        this._handleClick();
+      }
+    } catch(err) {
+      this._driver.getLogger().error(err);
     }
   }
 
   close() {
-    if(this._activeDropdown){
-      this._handleClick();
+    try {
+      if(this._activeDropdown){
+        this._handleClick();
+      }
+    } catch(err) {
+      this._driver.getLogger().error(err);
     }
   }
 
   _handleButtonDescriptor(buttonDescriptor: Object) {
     if(!buttonDescriptor){
-      return;
+      throw new Error('The application passed an invalid value for buttonDescriptor');
     }
-
-    var element = this._element = this._element || _createAppButtonElement(this._driver, () => {this._handleClick();});
+    const element = this._element = this._element || _createAppButtonElement(this._driver, () => {this._handleClick();});
     this._buttonDescriptor = buttonDescriptor;
     updateIcon(this._iconSettings, querySelector(element, 'a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
     _updateTitle(querySelector(element, 'span'), buttonDescriptor);
@@ -72,8 +79,15 @@ export default class GmailAppToolbarButtonView {
 
   _handleClick() {
     const element = this._element;
-    if (!element || !this._buttonDescriptor) throw new Error("Should not happen");
-    var buttonDescriptor = this._buttonDescriptor;
+    if (!element) {
+      // We must have failed to create the element. An error would have already
+      // been logged.
+      return;
+    }
+    const buttonDescriptor = this._buttonDescriptor;
+    if (!buttonDescriptor) {
+      throw new Error("app toolbar button clicked before receiving button descriptor");
+    }
 
     if (this._activeDropdown) {
       this._activeDropdown.close();
