@@ -102,19 +102,15 @@ class GmailThreadView {
 			this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
 		}
 		else{
-			var params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
+			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
 			if(params && params.threadID){
 				this._threadID = params.threadID;
+			} else {
+				const err = new Error('Failed to get id for thread');
+				this._driver.getLogger().error(err);
+				throw err;
 			}
-			else{
-				this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element);
-			}
-		}
-
-		if (!this._threadID) {
-			// Happens if gmonkey isn't available, like on a standalone thread page.
-			this._threadID = parse(document.location.search, null, null).th;
 		}
 
 		return this._threadID;

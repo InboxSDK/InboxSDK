@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
+import GmailElementGetter from '../gmail-element-getter';
 
 const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
 
@@ -46,7 +47,12 @@ function isDarkTheme(): boolean {
 }
 
 export default function trackGmailStyles() {
-  if (document.head.hasAttribute('data-inboxsdk-gmail-style-tracker')) return;
+  if (
+    document.head.hasAttribute('data-inboxsdk-gmail-style-tracker') ||
+    GmailElementGetter.isStandalone()
+  ) {
+    return;
+  }
   document.head.setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
 
   let currentDensity = null;

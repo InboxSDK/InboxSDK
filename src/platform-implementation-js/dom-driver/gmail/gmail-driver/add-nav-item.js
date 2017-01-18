@@ -11,23 +11,25 @@ import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.Observable<Object>): GmailNavItemView {
-	var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
+	const gmailNavItemView = new GmailNavItemView(orderGroup, 1);
 
-	var attacher = _attachNavItemView(gmailNavItemView);
+	const attacher = _attachNavItemView(gmailNavItemView);
 
-	GmailElementGetter
-		.waitForGmailModeToSettle()
-		.then(_waitForNavItemsHolder)
-		.then(attacher)
-		.catch(err => Logger.error(err));
+	if (!GmailElementGetter.isStandalone()) {
+		GmailElementGetter
+			.waitForGmailModeToSettle()
+			.then(_waitForNavItemsHolder)
+			.then(() => {
+				attacher();
 
-	gmailNavItemView
-		.getEventStream()
-		.filter(eventNameFilter('orderChanged'))
-		.takeWhile(function(){
-			return !!GmailElementGetter.getNavItemMenuInjectionContainer();
-		})
-		.onValue(attacher);
+				gmailNavItemView
+					.getEventStream()
+					.filter(eventNameFilter('orderChanged'))
+					.takeWhile(() => !!GmailElementGetter.getNavItemMenuInjectionContainer())
+					.onValue(attacher);
+			})
+			.catch(err => Logger.error(err));
+	}
 
 	gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
@@ -35,13 +37,7 @@ export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.
 }
 
 function _waitForNavItemsHolder(): Promise<any> {
-	if(GmailElementGetter.isStandalone()){
-		return Promise.resolve();
-	}
-
-	return waitFor(function(){
-		return !!GmailElementGetter.getNavItemMenuInjectionContainer();
-	});
+	return waitFor(() => !!GmailElementGetter.getNavItemMenuInjectionContainer());
 }
 
 function _attachNavItemView(gmailNavItemView){
@@ -52,7 +48,7 @@ function _attachNavItemView(gmailNavItemView){
 
 
 function _getNavItemsHolder(): HTMLElement {
-	var holder = document.querySelector('.inboxsdk__navMenu');
+	const holder = document.querySelector('.inboxsdk__navMenu');
 	if(!holder){
 		return _createNavItemsHolder();
 	}

@@ -644,12 +644,14 @@ class GmailComposeView {
 		return formattingArea;
 	}
 
-	getFormattingToolbar(): HTMLElement {
-		return querySelector(this._element, '.aX');
+	getFormattingToolbar(): ?HTMLElement {
+		return this._element.querySelector('.aX');
 	}
 
 	getFormattingToolbarArrow(): HTMLElement {
-		return querySelector(this.getFormattingToolbar(), '.aA4');
+		const el = this.getFormattingToolbar();
+		if (!el) throw new Error('Failed to find formatting toolbar');
+		return querySelector(el, '.aA4');
 	}
 
 	getFormattingToolbarToggleButton(): HTMLElement {

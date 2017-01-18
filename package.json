@@ -116,5 +116,5 @@
     "test": "mocha && jest",
     "test-browser": "wdio"
   },
-  "version": "0.7.22"
+  "version": "0.7.23"
 }

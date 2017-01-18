@@ -215,7 +215,8 @@ function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
 
 	_positionGroupToolbar(gmailComposeView);
 
-	if(gmailComposeView.getFormattingToolbar() && gmailComposeView.getFormattingToolbar().style.display === ''){
+	const formattingToolbar = gmailComposeView.getFormattingToolbar();
+	if(formattingToolbar && formattingToolbar.style.display === ''){
 		simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
 	}
 }
@@ -300,14 +301,9 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 	waitFor(function(){
 		if(gmailComposeView.isDestroyed()) throw 'skip';
 
-		try{
-			return !!gmailComposeView.getFormattingToolbar();
-		}
-		catch(err){
-			throw 'skip';
-		}
-	}).then(function(){
-		var mutationObserver = new MutationObserver(function(mutations){
+		return gmailComposeView.getFormattingToolbar();
+	}).then(formattingToolbar => {
+		const mutationObserver = new MutationObserver(function(mutations){
 			const target = mutations[0].target;
 			if(target instanceof HTMLElement && target.style.display === '' && localStorage['inboxsdk__compose_groupedActionButton_state'] === 'expanded'){
 				groupToggleButtonViewController.activate();
@@ -316,7 +312,7 @@ function _startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonVi
 		});
 
 		mutationObserver.observe(
-			gmailComposeView.getFormattingToolbar(),
+			formattingToolbar,
 			{attributes: true, attributeFilter: ['style']}
 		);
 

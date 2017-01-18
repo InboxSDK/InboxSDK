@@ -61,10 +61,8 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s;
   }
 
-  getUserOriginalPreviewPaneMode(): string {
-    const s = document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
-    if (s == null) throw new Error('Failed to read value');
-    return s;
+  getUserOriginalPreviewPaneMode(): ?string {
+    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
   getIkValue(): string {
