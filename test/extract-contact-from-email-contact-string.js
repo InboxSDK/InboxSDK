@@ -38,5 +38,12 @@ describe('extractContactFromString', function(){
     assert.throws(() => {
       extractContactFromEmailContactString('foo bar');
     });
-  })
+  });
+
+  it('filters out U+202C', function() {
+    assert.deepEqual(
+      extractContactFromEmailContactString('Foo Bar <s@gmail.com\u202c>'),
+      {name: 'Foo Bar', emailAddress: 's@gmail.com'}
+    );
+  });
 });

@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 
+import Logger from '../../../../lib/logger';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
@@ -31,10 +32,15 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
     element.addEventListener('click', block);
     (document: any).addEventListener('focus', modifyFocusEvent, true);
     simulateClick(menuButtonElement);
-    updateContactCacheFromModal(headerContact);
-    simulateClick(menuButtonElement);
-    element.removeEventListener('click', block);
-    (document: any).removeEventListener('focus', modifyFocusEvent, true);
+    try {
+      updateContactCacheFromModal(headerContact);
+    } catch (err) {
+      Logger.error(err);
+    } finally {
+      simulateClick(menuButtonElement);
+      element.removeEventListener('click', block);
+      (document: any).removeEventListener('focus', modifyFocusEvent, true);
+    }
 
     cacheEntry = cache[headerContact.emailAddress];
     if(cacheEntry){
@@ -46,7 +52,7 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
 }
 
 function updateContactCacheFromModal(headerContact) {
-  const spans = document.querySelectorAll(`.ajC [email]`);
+  const spans = document.querySelectorAll('.ajC [email]');
 
   for(let ii=0; ii<spans.length; ii++){
     const span = spans[ii];

@@ -48,6 +48,22 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
+    const errorProperties: Object = {};
+    for (let name in err) {
+      if (Object.prototype.hasOwnProperty.call(err, name)) {
+        try {
+          const value = (err:any)[name];
+          JSON.stringify(value);
+          errorProperties[name] = value;
+        } catch (err) {
+          // ignore
+        }
+      }
+    }
+    if (Object.keys(errorProperties).length > 0) {
+      details = {errorProperties, details};
+    }
+
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
     const nowStack = getStackTrace();
