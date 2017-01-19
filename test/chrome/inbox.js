@@ -65,10 +65,15 @@ describe('Inbox', function() {
       browser.click('div[role=button][data-tooltip="Close"]');
       browser.frameParent();
 
-      const threadsSeen = browser.execute(() =>
-        Number(document.head.getAttribute('data-test-threadViews-seen'))
+      const threadViewsSeen = browser.execute(() =>
+        Number(document.head.getAttribute('data-test-threadViewsSeen'))
       ).value;
-      assert.strictEqual(threadsSeen, 2);
+      assert.strictEqual(threadViewsSeen, 2);
+
+      const messageViewsWithNativeCardsSeen = browser.execute(() =>
+        Number(document.head.getAttribute('data-test-messageViewsWithNativeCardsSeen'))
+      ).value;
+      assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
     } catch (err) {
       console.error('error', err.message);
       console.error(err.stack);
