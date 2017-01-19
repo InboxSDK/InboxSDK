@@ -38,6 +38,27 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 	sdk.Conversations.registerThreadViewHandler(threadView => {
 		incrementStat('data-test-threadViewsSeen');
 
+		{
+			const sidebarEl = document.createElement('div');
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'test__sidebarCounterButton';
+			let i = 0;
+			const update = () => {
+				button.textContent = `Counter: ${i++}`;
+			};
+			update();
+			button.addEventListener('click', update);
+			sidebarEl.appendChild(button);
+
+			threadView.addSidebarContentPanel({
+				title: 'Test Sidebar',
+				iconUrl: chrome.runtime.getURL('monkey.png'),
+				el: sidebarEl,
+				orderHint: 1
+			});
+		}
+
 		const id = threadView.getThreadID();
 		if (!/[0-9a-f]{12,16}/i.test(id)) {
 			throw Object.assign(new Error('Bad thread id'), {id});

@@ -29,7 +29,22 @@ describe('Inbox', function() {
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
       assert(browser.isVisible('div.extension-dropdown-test'));
       browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
-      // make sure discarding the draft has time to save
+      // make sure discarding the draft has time to save before test ends
+
+      // Test thread sidebar
+      assert(browser.isVisible('button[title="Test Sidebar"]'));
+      browser.click('button[title="Test Sidebar"]');
+      browser.pause(500);
+      assert(!browser.isVisible('button[title="Test Sidebar"]'));
+      assert(browser.isVisible('.test__sidebarCounterButton'));
+      assert.strictEqual(browser.getText('.test__sidebarCounterButton'), 'Counter: 0');
+      browser.click('.test__sidebarCounterButton');
+      assert.strictEqual(browser.getText('.test__sidebarCounterButton'), 'Counter: 1');
+      assert(!browser.isVisible('button[title="Test Sidebar"]'));
+      browser.click('button.inboxsdk__close_button');
+      browser.pause(500);
+      assert(!browser.isVisible('.test__sidebarCounterButton'));
+      assert(browser.isVisible('button[title="Test Sidebar"]'));
 
       function switchToOverlayFrame() {
         const frames = browser.elements('iframe:not([src])').value;
