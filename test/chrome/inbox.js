@@ -6,7 +6,7 @@ import assert from 'assert';
 import signIn from './lib/signIn';
 
 describe('Inbox', function() {
-  it('ComposeView#addButton', function() {
+  it('works', function() {
     try {
       signIn();
 
@@ -16,8 +16,12 @@ describe('Inbox', function() {
       );
       composeButton.click();
       browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 0');
+      browser.click('.test__tooltipButton');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 1');
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-      assert(browser.isVisible('div.extension-dropdown-test'));
+      assert(!browser.isVisible('.test__tooltipButton'));
+      assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
 
       // Test an inline compose
@@ -26,10 +30,40 @@ describe('Inbox', function() {
       browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 30*1000);
       browser.pause(500);
       browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 0');
+      browser.click('.test__tooltipButton');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 1');
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-      assert(browser.isVisible('div.extension-dropdown-test'));
+      assert(!browser.isVisible('.test__tooltipButton'));
+      assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
-      // make sure discarding the draft has time to save
+      // make sure discarding the draft has time to save before test ends
+
+      // Test thread sidebar
+      browser.click('button[title="Test Sidebar"]');
+      browser.pause(500);
+      assert(!browser.isVisible('button[title="Test Sidebar"]'));
+      assert(browser.isVisible('.test__sidebarCounterButton'));
+      assert.strictEqual(browser.getText('.test__sidebarCounterButton'), 'Counter: 0');
+      browser.click('.test__sidebarCounterButton');
+      assert.strictEqual(browser.getText('.test__sidebarCounterButton'), 'Counter: 1');
+      assert(!browser.isVisible('button[title="Test Sidebar"]'));
+      browser.click('button.inboxsdk__close_button');
+      browser.pause(500);
+      assert(!browser.isVisible('.test__sidebarCounterButton'));
+      assert(browser.isVisible('button[title="Test Sidebar"]'));
+
+      // Test app toolbar button
+      browser.click('div[role=button][title="Test App Toolbar Button"]');
+      assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 0');
+      browser.click('.test__appToolbarCounterButton');
+      assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 1');
+      // second click opens a modal
+      browser.click('.test__appToolbarCounterButton');
+      assert(browser.isVisible('.test__modalContent'));
+      assert.strictEqual(browser.getText('.test__modalContent'), 'modal test');
+      browser.click('[role=alertdialog] button[title="Close"]');
+      assert(!browser.isVisible('.test__modalContent'));
 
       function switchToOverlayFrame() {
         const frames = browser.elements('iframe:not([src])').value;
@@ -64,16 +98,26 @@ describe('Inbox', function() {
       browser.waitForVisible('button[aria-label="CV"]', 10*1000);
       browser.click('div[role=button][data-tooltip="Close"]');
       browser.frameParent();
+
+      const threadViewsSeen = browser.execute(() =>
+        Number(document.head.getAttribute('data-test-threadViewsSeen'))
+      ).value;
+      assert.strictEqual(threadViewsSeen, 2);
+
+      const messageViewsWithNativeCardsSeen = browser.execute(() =>
+        Number(document.head.getAttribute('data-test-messageViewsWithNativeCardsSeen'))
+      ).value;
+      assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
     } catch (err) {
-      console.error('error', err.message);
-      console.error(err.stack);
+      console.error(err.stack || ('Error: '+err.message));
       // browser.debug();
       throw err;
     } finally {
       const errors = browser.execute(() => window._errors).value;
       if (errors.length) {
         console.log('Logged errors:');
-        console.log(errors);
+        console.log(JSON.stringify(errors, null, 2));
+        throw new Error('One or more javascript errors were logged');
       }
     }
   });
