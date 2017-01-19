@@ -17,7 +17,7 @@ export default function extractContactFromEmailContactString(contactInfoString: 
       emailAddress = firstPartTrimmed;
     }
     else{
-      throw new Error(firstPartTrimmed + ' is not a valid email address');
+      throw Object.assign((new Error('Invalid email address'):any), {firstPartTrimmed});
     }
   }
 
