@@ -95,8 +95,7 @@ describe('Inbox', function() {
       ).value;
       assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
     } catch (err) {
-      console.error('error', err.message);
-      console.error(err.stack);
+      console.error(err.stack || ('Error: '+err.message));
       // browser.debug();
       throw err;
     } finally {
