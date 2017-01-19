@@ -58,6 +58,12 @@ describe('Inbox', function() {
       assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 0');
       browser.click('.test__appToolbarCounterButton');
       assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 1');
+      // second click opens a modal
+      browser.click('.test__appToolbarCounterButton');
+      assert(browser.isVisible('.test__modalContent'));
+      assert.strictEqual(browser.getText('.test__modalContent'), 'modal test');
+      browser.click('[role=alertdialog] button[title="Close"]');
+      assert(!browser.isVisible('.test__modalContent'));
 
       function switchToOverlayFrame() {
         const frames = browser.elements('iframe:not([src])').value;

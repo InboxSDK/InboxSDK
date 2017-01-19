@@ -55,7 +55,15 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 			button.className = 'test__appToolbarCounterButton';
 			let i = 0;
 			const update = () => {
-				button.textContent = `Counter: ${i++}`;
+				if (i === 2) {
+					const modalEl = document.createElement('div');
+					modalEl.className = 'test__modalContent';
+					modalEl.textContent = 'modal test';
+					sdk.Widgets.showModalView({el: modalEl});
+					event.dropdown.close();
+				} else {
+					button.textContent = `Counter: ${i++}`;
+				}
 			};
 			update();
 			button.addEventListener('click', update);
