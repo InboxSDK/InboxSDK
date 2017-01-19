@@ -16,8 +16,12 @@ describe('Inbox', function() {
       );
       composeButton.click();
       browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 0');
+      browser.click('.test__tooltipButton');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 1');
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-      assert(browser.isVisible('div.extension-dropdown-test'));
+      assert(!browser.isVisible('.test__tooltipButton'));
+      assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
 
       // Test an inline compose
@@ -26,8 +30,12 @@ describe('Inbox', function() {
       browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 30*1000);
       browser.pause(500);
       browser.click('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 0');
+      browser.click('.test__tooltipButton');
+      assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 1');
       browser.click('div.inboxsdk__button_icon[title="Monkeys!"]');
-      assert(browser.isVisible('div.extension-dropdown-test'));
+      assert(!browser.isVisible('.test__tooltipButton'));
+      assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
       // make sure discarding the draft has time to save before test ends
 

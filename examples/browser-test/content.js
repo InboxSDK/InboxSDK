@@ -24,10 +24,23 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
 			onClick(event) {
-				event.dropdown.el.innerHTML = '<div class="extension-dropdown-test">foo</div>';
+				event.dropdown.el.innerHTML = '<div class="test__dropdownContent">foo</div>';
 			},
 			section: 'TRAY_LEFT'
 		});
+
+		const tooltipButton = document.createElement('button');
+		tooltipButton.className = 'test__tooltipButton';
+		let i = 0;
+		const update = () => {
+			tooltipButton.textContent = `Counter: ${i++}`;
+		};
+		update();
+		tooltipButton.addEventListener('click', update);
+
+		const tooltipEl = document.createElement('div');
+		tooltipEl.appendChild(tooltipButton);
+		button.showTooltip({el: tooltipEl});
 	});
 
 	sdk.Toolbars.addToolbarButtonForApp({
