@@ -6,7 +6,7 @@ import assert from 'assert';
 import signIn from './lib/signIn';
 
 describe('Inbox', function() {
-  it('ComposeView#addButton', function() {
+  it('works', function() {
     try {
       signIn();
 
