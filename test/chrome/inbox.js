@@ -32,7 +32,6 @@ describe('Inbox', function() {
       // make sure discarding the draft has time to save before test ends
 
       // Test thread sidebar
-      assert(browser.isVisible('button[title="Test Sidebar"]'));
       browser.click('button[title="Test Sidebar"]');
       browser.pause(500);
       assert(!browser.isVisible('button[title="Test Sidebar"]'));
@@ -45,6 +44,12 @@ describe('Inbox', function() {
       browser.pause(500);
       assert(!browser.isVisible('.test__sidebarCounterButton'));
       assert(browser.isVisible('button[title="Test Sidebar"]'));
+
+      // Test app toolbar button
+      browser.click('div[role=button][title="Test App Toolbar Button"]');
+      assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 0');
+      browser.click('.test__appToolbarCounterButton');
+      assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 1');
 
       function switchToOverlayFrame() {
         const frames = browser.elements('iframe:not([src])').value;

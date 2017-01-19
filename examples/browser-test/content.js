@@ -19,7 +19,7 @@ function incrementStat(name) {
 
 InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 	sdk.Compose.registerComposeViewHandler(composeView => {
-		var button = composeView.addButton({
+		const button = composeView.addButton({
 			title: 'Monkeys!',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
 			hasDropdown: true,
@@ -28,6 +28,28 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 			},
 			section: 'TRAY_LEFT'
 		});
+	});
+
+	sdk.Toolbars.addToolbarButtonForApp({
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		title: 'Test App Toolbar Button',
+		arrowColor: 'white',
+		onClick(event) {
+			console.log('app toolbar click', event);
+			const div = document.createElement("div");
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'test__appToolbarCounterButton';
+			let i = 0;
+			const update = () => {
+				button.textContent = `Counter: ${i++}`;
+			};
+			update();
+			button.addEventListener('click', update);
+			div.appendChild(button);
+
+			event.dropdown.el.appendChild(div);
+		}
 	});
 
 	const arrowIconUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElEQVQ4y+2UMQ6AQAgEwfhQnnJP4adjc4UxB0ehhXqbULE7BRAUkLu1yQP6OXQveEab1DXTD0O9b53kIui+QReicnJ5lM2gArQA2LLcDCqAXYA2y1SgZ7BV/Lr+6TugB0K2GxxDXjEZAAAAAElFTkSuQmCC';
