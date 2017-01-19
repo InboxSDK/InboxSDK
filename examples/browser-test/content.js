@@ -25,6 +25,17 @@ InboxSDK.load(1, 'simple-example', {inboxBeta:true}).then(sdk => {
 
 	const arrowIconUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElEQVQ4y+2UMQ6AQAgEwfhQnnJP4adjc4UxB0ehhXqbULE7BRAUkLu1yQP6OXQveEab1DXTD0O9b53kIui+QReicnJ5lM2gArQA2LLcDCqAXYA2y1SgZ7BV/Lr+6TugB0K2GxxDXjEZAAAAAElFTkSuQmCC';
 
+	sdk.Conversations.registerThreadViewHandler(threadView => {
+		const id = threadView.getThreadID();
+		if (!/[0-9a-f]{12,16}/i.test(id)) {
+			throw Object.assign(new Error('Bad thread id'), {id});
+		}
+		document.head.setAttribute(
+			'data-test-threadViews-seen',
+			Number(document.head.getAttribute('data-test-threadViews-seen'))+1
+		);
+	});
+
 	sdk.Conversations.registerMessageViewHandler(messageView => {
 		messageView.getFileAttachmentCardViews().forEach(cardView => {
 			cardView.addButton({

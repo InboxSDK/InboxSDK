@@ -64,6 +64,11 @@ describe('Inbox', function() {
       browser.waitForVisible('button[aria-label="CV"]', 10*1000);
       browser.click('div[role=button][data-tooltip="Close"]');
       browser.frameParent();
+
+      const threadsSeen = browser.execute(() =>
+        Number(document.head.getAttribute('data-test-threadViews-seen'))
+      ).value;
+      assert.strictEqual(threadsSeen, 2);
     } catch (err) {
       console.error('error', err.message);
       console.error(err.stack);
@@ -73,7 +78,8 @@ describe('Inbox', function() {
       const errors = browser.execute(() => window._errors).value;
       if (errors.length) {
         console.log('Logged errors:');
-        console.log(errors);
+        console.log(JSON.stringify(errors, null, 2));
+        throw new Error('One or more javascript errors were logged');
       }
     }
   });
