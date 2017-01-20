@@ -2,6 +2,8 @@
 * @class
 * This namespace contains functions for creating various widgets that are
 * styled to look and feel native to Gmail and Inbox.
+* ^gmail
+* ^inbox
 */
 var Widgets = /** @lends Widgets */{
 

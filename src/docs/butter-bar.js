@@ -3,6 +3,8 @@
  * This namespace contains methods for showing informative messages to the user. In Gmail this is
  * a small yellow "butter bar" overlay near the top. In Inbox, the UI is different but the purpose
  * is the same.
+ * ^gmail
+ * ^inbox
  */
 var ButterBar = /** @lends ButterBar */ {
 

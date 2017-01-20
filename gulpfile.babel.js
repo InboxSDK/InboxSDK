@@ -298,24 +298,29 @@ function parseCommentsInFile(file) {
 }
 
 function transformClass(c) {
-  if (!c.properties) {
-    return c;
-  }
+  c.description = c.description.replace(/\n\^(\S+)/g, (m, rule) => {
+    if (rule === 'gmail' || rule === 'inbox') {
+      if (!c.environments) c.environments = [];
+      c.environments.push(rule);
+      return '';
+    }
+    throw new Error(`Unknown rule ${rule}`);
+  });
 
-  c.properties.forEach(prop => {
+  (c.properties || []).forEach(prop => {
     prop.optional = false;
 
-    prop.description = prop.description.replace(/\n\^(\S+)/g, (m, c) => {
-      if (c === 'optional') {
+    prop.description = prop.description.replace(/\n\^(\S+)/g, (m, rule) => {
+      if (rule === 'optional') {
         prop.optional = true;
         return '';
       }
-      const defaultM = /^default=(.*)$/.exec(c);
+      const defaultM = /^default=(.*)$/.exec(rule);
       if (defaultM) {
         prop.default = defaultM[1];
         return '';
       }
-      throw new Error(`Unknown rule ${c}`);
+      throw new Error(`Unknown rule ${rule}`);
     });
   });
 
