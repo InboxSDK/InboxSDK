@@ -115,7 +115,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.ButterBar = new ButterBar(appId, driver);
 		driver.setButterBar(this.ButterBar);
 
-		this.Compose = new Compose(appId, driver);
+		this.Compose = new Compose(appId, driver, piOpts);
 		this.Conversations = new Conversations(appId, driver, membrane);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
 		this.User = new User(driver);

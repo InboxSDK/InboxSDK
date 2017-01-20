@@ -8,6 +8,7 @@ import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
 
+import type {PiOpts} from '../platform-implementation';
 import type {Handler} from '../lib/handler-registry';
 import type {Driver} from '../driver-interfaces/driver';
 
@@ -18,12 +19,13 @@ const SAMPLE_RATE = 0.01;
 // documented in src/docs/
 class Compose {
 
-  constructor(appId: string, driver: Driver){
+  constructor(appId: string, driver: Driver, piOpts: PiOpts) {
     const members = {};
     memberMap.set(this, members);
 
     members.appId = appId;
     members.driver = driver;
+    members.piOpts = piOpts;
 
     members.handlerRegistry = new HandlerRegistry();
     driver.getStopper().onValue(() => {
@@ -48,7 +50,10 @@ class Compose {
   }
 
   openNewComposeView(): Promise<ComposeView> {
-    return this.getComposeView();
+    const members = get(memberMap, this);
+    const promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
+    members.driver.openComposeWindow();
+    return promise;
   }
 
   openDraftByMessageID(messageID: string): Promise<ComposeView> {
@@ -65,10 +70,12 @@ class Compose {
   }
 
   getComposeView(): Promise<ComposeView> {
-    const members = get(memberMap, this);
-    const promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
-    members.driver.openComposeWindow();
-    return promise;
+    const {driver, piOpts} = get(memberMap, this);
+    driver.getLogger().deprecationWarning('Compose.getComposeView', 'Compose.openNewComposeView');
+    if (piOpts.REQUESTED_API_VERSION !== 1) {
+      throw new Error('This method was discontinued');
+    }
+    return this.openNewComposeView();
   }
 }
 
