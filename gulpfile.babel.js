@@ -230,6 +230,7 @@ gulp.task('docs', function(cb) {
 
     Promise.all(_.chain(paths.files)
       .filter(isFileEligbleForDocs)
+      .sort()
       .map(parseCommentsInFile)
       .value()
     ).then(files => {
