@@ -44,17 +44,7 @@ var LoadOptions = /** @lends LoadOptions */{
 	 * ^default=null
 	 * @type {string}
 	 */
-	appIconUrl:null,
-
-	/**
-	 * Opt-in to the new thread sidebar early. The new design allows users to see
-	 * multiple sidebar panels at once, collapse panels, re-order panels by
-	 * drag-and-drop, and have their changes be persisted.
-	 * ^optional
-	 * ^default=false
-	 * @type {boolean}
-	 */
-	sidebarBeta:null
+	appIconUrl:null
 };
 
 /**
