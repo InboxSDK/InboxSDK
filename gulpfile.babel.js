@@ -298,13 +298,15 @@ function parseCommentsInFile(file) {
 }
 
 function transformClass(c) {
-  c.description = c.description.replace(/\n\^(\S+)/g, (m, rule) => {
-    if (rule === 'gmail' || rule === 'inbox') {
-      if (!c.environments) c.environments = [];
-      c.environments.push(rule);
-      return '';
-    }
-    throw new Error(`Unknown rule ${rule}`);
+  (c.functions || []).forEach(func => {
+    func.description = func.description.replace(/\n\^(\S+)/g, (m, rule) => {
+      if (rule === 'gmail' || rule === 'inbox') {
+        if (!func.environments) func.environments = [];
+        func.environments.push(rule);
+        return '';
+      }
+      throw new Error(`Unknown rule ${rule}`);
+    });
   });
 
   (c.properties || []).forEach(prop => {
