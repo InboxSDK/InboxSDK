@@ -8,6 +8,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * Adds a label to the thread row view. This label will appear like a normal
    * Gmail label, but it is purely a temporary visual modification. This method
    * does not cause any change to persist to the user's thread in Gmail.
+   * ^gmail
    * @param {LabelDescriptor|Stream.<LabelDescriptor>} labelDescriptor - An options object for the label.
    * @return {void}
    */
@@ -15,6 +16,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
    * Adds an image to the thread row view.
+   * ^gmail
    * @param {ImageDescriptor|Stream.<ImageDescriptor>} imageDescriptor - An options object for the image.
    * @return {void}
    */
@@ -22,6 +24,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
    * Adds an icon style button to this row, placed right next to the star button.
+   * ^gmail
    * @param {ThreadRowButtonDescriptor|Stream.<ThreadRowButtonDescriptor>} buttonDescriptor - An options object for the button.
    * @return {void}
    */
@@ -36,6 +39,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
    * Adds an attachment icon to the row.
+   * ^gmail
    * @param {ThreadRowAttachmentIconDescriptor|Stream.<ThreadRowAttachmentIconDescriptor>} threadRowAttachmentIconDescriptor - The options for the icon to add.
    * @return {void}
    */
@@ -43,6 +47,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
    * Replaces the text inside the date column.
+   * ^gmail
    * @param {ThreadRowDateDescriptor|Stream.<ThreadRowDateDescriptor>} threadRowDateDescriptor - The options for the date replacement.
    * @return {void}
    */
@@ -51,6 +56,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   /**
    * If this row represents a draft, then this allows the word "Draft" and the number next to it
    * to be replaced.
+   * ^gmail
    * @param {ThreadRowDraftLabelDescriptor|Stream.<ThreadRowDraftLabelDescriptor>} draftLabelDescriptor - The options for the replacement.
     * @return {void}
    */
@@ -58,6 +64,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
 
   /**
   * Gets the subject of this thread.
+  * ^gmail
   * @return {string} The subject.
   */
   getSubject: function(){},
@@ -66,12 +73,14 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   * Gets string representation of the timestamp of the most recent message on the thread.
   * Note: this is the string representation because timezone information is not available,
   * the accuracy is limited to minutes, and it is formatted to the user's language.
+  * ^gmail
   * @return {string} The date as a string.
   */
   getDateString: function(){},
 
   /**
    * Gets the Gmail Thread ID of the thread.
+   * ^gmail
    * @return {string} The gmail threadID.
    */
   getThreadID: function(){},
@@ -82,6 +91,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
   * if you're not careful about this fact. This method provides you with an easy way to tell if
   * the thread has a stable ID. It will only return a thread ID if it is expected to stay the same.
+  * ^gmail
   * @return {string} The gmail threadID or null if its not stable.
   */
   getThreadIDIfStable: function(){},
@@ -89,6 +99,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   /**
    * Returns a Promise for the thread row's draft ID, if the thread row
    * represents a single draft. Otherwise the promise may resolve to null.
+   * ^gmail
    * @return {Promise.<string>}
    */
   getDraftID: function() {},
@@ -96,19 +107,22 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   /**
   * Gets the number of visible draft messages in the row. This is purely an estimate based on
   * what is visible in the row.
+  * ^gmail
   * @return {number}
   */
   getVisibleDraftCount: function(){},
 
   /**
   * Gets the number of visible messages in the thread based on the visible numeric marker.
+  * ^gmail
   * @return {number}
   */
   getVisibleMessageCount: function(){},
 
   /**
-  * Gets the <b>visible</b> contacts listed on the row. Note: this may noit include all
+  * Gets the <b>visible</b> contacts listed on the row. Note: this may not include all
   * participants on the thread as this information is not visible.
+  * ^gmail
   * @return {Contact[]} the visible contact objects
   */
   getContacts: function(){},

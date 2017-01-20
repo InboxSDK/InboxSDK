@@ -7,6 +7,7 @@ var Keyboard = /** @lends Keyboard */ {
   /**
    * This method creates a shortcut handle. A shortcut handle can be used in various APIs in
    * the SDK to keyboard enable them.
+   * ^gmail
    * @param  {KeyboardShortcutDescriptor} keyboardShortcutDescriptor - details of the shortcut.
    * @return {KeyboardShortcutHandle}
    */

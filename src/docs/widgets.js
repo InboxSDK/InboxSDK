@@ -2,14 +2,14 @@
 * @class
 * This namespace contains functions for creating various widgets that are
 * styled to look and feel native to Gmail and Inbox.
-* ^gmail
-* ^inbox
 */
 var Widgets = /** @lends Widgets */{
 
   /**
    * This creates a {ModalView} and shows it. You can insert an arbitrary HTMLElement
    * for content of the modal.
+   * ^gmail
+   * ^inbox
    * @param {ModalOptions} options - The options to configure the returned {ModalView}.
    * @return {ModalView}
    */
@@ -19,6 +19,7 @@ var Widgets = /** @lends Widgets */{
    * This creates a {MoleView} and shows it. A mole view is a modal that is
    * attached to the bottom of the viewport and has minimize and close buttons
    * just like a compose view.
+   * ^gmail
    * @param {MoleOptions} options - The options to configure the returned {MoleView}.
    * @return {MoleView}
    */
@@ -31,6 +32,8 @@ var Widgets = /** @lends Widgets */{
    * This creates a {DrawerView} and shows it. A drawer view is a panel that
    * slides in from the right side of the screen, and it fades the rest of the
    * screen out. By default, it has a title and a close button.
+   * ^gmail
+   * ^inbox
    * @param {DrawerOptions} options - The options to configure the returned {DrawerView}.
    * @return {DrawerView}
    */

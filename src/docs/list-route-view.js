@@ -8,6 +8,7 @@ var ListRouteView = /** @lends ListRouteView */ {
 
 	/**
 	 * Adds a collapsible section to the top of the page.
+	 * ^gmail
 	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the CollapsibleSectionView
 	 * @returns {CollapsibleSectionView} the CollapsibleSectionView that was added
 	 */
@@ -15,6 +16,7 @@ var ListRouteView = /** @lends ListRouteView */ {
 
 	/**
 	 * Adds a non-collapsible section to the top of the page.
+	 * ^gmail
 	 * @param {SectionDescriptor|Stream.<SectionDescriptor>} options - configuration options of the SectionView
 	 * @returns {SectionView} the SectionView that was added
 	 */
@@ -22,6 +24,7 @@ var ListRouteView = /** @lends ListRouteView */ {
 
 	/**
 	 * Simulates a click on the Gmail thread list refresh button.
+	 * ^gmail
 	 * @returns {void}
 	 */
 	refresh: function(){}
