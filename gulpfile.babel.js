@@ -305,7 +305,7 @@ function transformClass(c) {
         func.environments.push(rule);
         return '';
       }
-      throw new Error(`Unknown rule ${rule}`);
+      throw new Error(`Unknown rule ^${rule}`);
     });
   });
 
@@ -322,7 +322,7 @@ function transformClass(c) {
         prop.default = defaultM[1];
         return '';
       }
-      throw new Error(`Unknown rule ${rule}`);
+      throw new Error(`Unknown rule ^${rule}`);
     });
   });
 
