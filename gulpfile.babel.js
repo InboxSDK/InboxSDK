@@ -302,19 +302,20 @@ function transformClass(c) {
     return c;
   }
 
-  c.properties.forEach(function(prop){
-    var optionalMarker = '\n^optional';
-    var defaultRegex = /\n\^default=(.*)/;
-
+  c.properties.forEach(prop => {
     prop.optional = false;
-    if (prop.description.indexOf(optionalMarker) > -1) {
-      prop.optional = true;
-      prop.description = prop.description.replace(optionalMarker, '');
-    }
 
-    prop.description = prop.description.replace(defaultRegex, function(m, c) {
-      prop.default = c;
-      return '';
+    prop.description = prop.description.replace(/\n\^(\S+)/g, (m, c) => {
+      if (c === 'optional') {
+        prop.optional = true;
+        return '';
+      }
+      const defaultM = /^default=(.*)$/.exec(c);
+      if (defaultM) {
+        prop.default = defaultM[1];
+        return '';
+      }
+      throw new Error(`Unknown rule ${c}`);
     });
   });
 
