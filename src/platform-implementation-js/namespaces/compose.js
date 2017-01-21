@@ -73,7 +73,7 @@ class Compose {
     const {driver, piOpts} = get(memberMap, this);
     driver.getLogger().deprecationWarning('Compose.getComposeView', 'Compose.openNewComposeView');
     if (piOpts.REQUESTED_API_VERSION !== 1) {
-      throw new Error('This method was discontinued');
+      throw new Error('This method was discontinued after API version 1');
     }
     return this.openNewComposeView();
   }

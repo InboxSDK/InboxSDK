@@ -31,11 +31,14 @@ export type DrawerViewOptions = {
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 
+import type {PiOpts} from '../platform-implementation';
+
 // TODO fill in some of these any types
 export type Driver = {
 	onready: Promise<void>;
 	getLogger(): Logger;
 	getAppId(): string;
+	getOpts(): PiOpts;
 	getRouteViewDriverStream(): Kefir.Observable<RouteViewDriver>; // should be a property
 	getRowListViewDriverStream(): Kefir.Observable<Object>;
 	openComposeWindow(): void;

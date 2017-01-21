@@ -98,7 +98,11 @@ class MessageView extends EventEmitter {
 
 	// Deprecated name
 	getAttachmentCardViews(): Array<AttachmentCardView> {
-		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
+		const {driver} = get(memberMap, this);
+		driver.getLogger().deprecationWarning('MessageView.getAttachmentCardViews', 'MessageView.getFileAttachmentCardViews');
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		return this.getFileAttachmentCardViews();
 	}
 
@@ -153,7 +157,11 @@ class MessageView extends EventEmitter {
 	}
 
 	hasOpenReply(): boolean {
-		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
+		const {driver, messageViewImplementation} = get(memberMap, this);
+		driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		return get(memberMap, this).messageViewImplementation.hasOpenReply();
 	}
 }

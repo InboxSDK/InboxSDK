@@ -6,6 +6,7 @@ import kefirCast from 'kefir-cast';
 import EventEmitter from '../lib/safe-event-emitter';
 import HandlerRegistry from '../lib/handler-registry';
 import type {Driver} from '../driver-interfaces/driver';
+import type {PiOpts} from '../platform-implementation';
 import type Membrane from '../lib/Membrane';
 import get from '../../common/get-or-fail';
 import ThreadRowView from '../views/thread-row-view';
@@ -20,11 +21,11 @@ const memberMap = new WeakMap();
 export default class Toolbars extends EventEmitter {
 	SectionNames: Object;
 
-	constructor(appId: string, driver: Driver, membrane: Membrane) {
+	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
 
 		const members = {
-			appId, driver, membrane,
+			appId, driver, membrane, piOpts,
 			listButtonHandlerRegistry: new HandlerRegistry(),
 			threadViewHandlerRegistry: new HandlerRegistry()
 		};
@@ -49,9 +50,12 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	setAppToolbarButton(appToolbarButtonDescriptor: Object){
-		const driver = get(memberMap, this).driver;
+		const {driver, piOpts} = get(memberMap, this);
 		driver.getLogger().deprecationWarning(
 			'Toolbars.setAppToolbarButton', 'Toolbars.addToolbarButtonForApp');
+		if (piOpts.REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
 	}
 

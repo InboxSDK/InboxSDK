@@ -32,16 +32,28 @@ class ComposeView extends EventEmitter {
 		this.on('newListener', function(eventName) {
 			if (eventName === 'close') {
 				driver.getLogger().deprecationWarning('composeView close event', 'composeView destroy event');
+				if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+					console.error('The composeView close event was removed after API version 1');
+				}
 			} else if (eventName === 'messageIDChange') {
 				driver.getLogger().deprecationWarning(
 					'composeView messageIDChange event', 'composeView.getDraftID');
+				if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+					console.error('The composeView messageIDChange event was removed after API version 1');
+				}
 			}
 		});
 
 		members.composeViewImplementation.getEventStream().onValue(event => {
 			if (event.eventName === 'destroy') {
 				this.destroyed = true;
-				this.emit('close'); /* TODO: deprecated */
+				if (driver.getOpts().REQUESTED_API_VERSION === 1) {
+					this.emit('close'); /* deprecated */
+				}
+			} else if (event.eventName === 'messageIDChange') {
+				if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+					return;
+				}
 			}
 			this.emit(event.eventName, event.data);
 		});
@@ -92,8 +104,12 @@ class ComposeView extends EventEmitter {
 	// NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS
 	// TODO remove?
 	getComposeID(){
-		get(memberMap, this).driver.getLogger().deprecationWarning('composeView.getComposeID');
-		return get(memberMap, this).composeViewImplementation.getComposeID();
+		const {driver, composeViewImplementation} = get(memberMap, this);
+		driver.getLogger().deprecationWarning('composeView.getComposeID');
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
+		return composeViewImplementation.getComposeID();
 	}
 
 	getInitialMessageID(){
@@ -102,9 +118,13 @@ class ComposeView extends EventEmitter {
 
 	/* deprecated */
 	getMessageID() {
-		get(memberMap, this).driver.getLogger().deprecationWarning(
+		const {driver, composeViewImplementation} = get(memberMap, this);
+		driver.getLogger().deprecationWarning(
 			'composeView.getMessageID', 'composeView.getDraftID');
-		return get(memberMap, this).composeViewImplementation.getMessageID();
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
+		return composeViewImplementation.getMessageID();
 	}
 
 	getThreadID() {
@@ -263,10 +283,12 @@ class ComposeView extends EventEmitter {
 
 	// Old alias that we should keep around until we're sure no one is using it.
 	dragFilesIntoCompose(files: Blob[]): Promise<void> {
-		const driver = get(memberMap, this).driver;
+		const {driver} = get(memberMap, this);
 		driver.getLogger().deprecationWarning(
 			'ComposeView.dragFilesIntoCompose', 'ComposeView.attachInlineFiles');
-
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		return this.attachInlineFiles(files);
 	}
 
@@ -281,8 +303,11 @@ class ComposeView extends EventEmitter {
 
 	// TODO remove
 	overrideEditSubject(){
-		get(memberMap, this).driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
-		const {composeViewImplementation} = get(memberMap, this);
+		const {driver, composeViewImplementation} = get(memberMap, this);
+		driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
+		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		if (typeof composeViewImplementation.overrideEditSubject === 'function')
 			composeViewImplementation.overrideEditSubject();
 	}
