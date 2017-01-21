@@ -162,8 +162,14 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 	};
 
 	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
-	if (opts.REQUESTED_API_VERSION !== 1) {
-		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
+	switch (opts.REQUESTED_API_VERSION) {
+		case 2:
+			opts.inboxBeta = true;
+			break;
+		case 1:
+			break;
+		default:
+			throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
 	const DRIVERS_BY_ORIGIN: {[name:string]: *} = {
