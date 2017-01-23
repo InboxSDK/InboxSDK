@@ -440,7 +440,24 @@ class InboxDriver {
   }
 
   showAppIdWarning() {
-    // stub
+    const topDiv = document.createElement('div');
+    topDiv.className = 'inboxsdk__appid_warning';
+    topDiv.innerHTML = `
+  <button type="button" value="" title="Close" class="inboxsdk__close_button"></button>
+  <div class="inboxsdk__appid_warning_main">
+    <div class="topline">InboxSDK Developer Warning: Invalid AppId</div>
+    <div>You've loaded the InboxSDK with an unregistered appId. Registration is free but necessary to load the SDK.</div>
+  </div>
+  <a class="inboxsdk__appid_register" target="_blank" href="https://www.inboxsdk.com/register">Register Your App</a>
+  `;
+
+    document.body.insertBefore(topDiv, document.body.firstChild);
+
+    const closeBtn = topDiv.querySelector('.inboxsdk__close_button');
+    if (!closeBtn) throw new Error('Should not happen');
+    closeBtn.addEventListener('click', function(e: MouseEvent) {
+      topDiv.remove();
+    });
   }
 
   openDraftByMessageID(messageID: string): void {
