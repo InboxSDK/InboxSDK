@@ -10,6 +10,8 @@ describe('Inbox', function() {
     try {
       signIn();
 
+      browser.click('.inboxsdk__appid_warning button.inboxsdk__close_button');
+
       // Test a regular compose
       const composeButton = browser.execute(() =>
         document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
