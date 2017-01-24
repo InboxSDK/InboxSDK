@@ -9,42 +9,50 @@ var ThreadView = /** @lends ThreadView */ {
 	 * simply displays your content to the user, typically in the form of a
 	 * sidebar. ThreadViewss can have multiple content panels added to them and
 	 * the SDK will handle creating a tabbed interface if needed.
-	 * This feature is being re-designed; you can opt-in to the new design early
-	 * by using the `sidebarBeta` flag of {LoadOptions} when you set up your app
-	 * with `InboxSDK.load`.
+	 * ^gmail
+	 * ^inbox
 	 * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the thread's sidebar.
 	 * @return {ContentPanelView}
 	 */
 	addSidebarContentPanel: function(){},
 
 	/**
-	* Gets all the loaded MessageView objects currently in the thread. See MessageView for more information on what "loaded" means. Note that Gmail may load more messages into the thread later!
+	* Gets all the loaded MessageView objects currently in the thread. See MessageView for more information on what "loaded" means. Note that load more messages may load into the thread later!
 	* If it's important to get future messages, use {Conversations.registerMessageViewHandler} instead.
+	* ^gmail
+	* ^inbox
 	* @return {MessageView[]} an array of message view objects
 	*/
 	getMessageViews: function(){},
 
 	/**
-	* Gets all the {MessageView} objects in the thread regardless of their load state. See {MessageView} for more information on what "loaded" means. Note that Gmail may load more messages into the thread later!
-	* If it's important to get future messages, use {Conversations.registerMessageViewHandlerAll} instead.
+	* Gets all the {MessageView} objects in the thread regardless of their load state. See {MessageView} for more information on what "loaded" means.
+	* ^gmail
+	* ^inbox
 	* @return {MessageView[]} an array of message view objects
 	*/
 	getMessageViewsAll: function(){},
 
 	/**
 	 * Gets the subject of this thread.
+	 * ^gmail
+	 * ^inbox
 	 * @return {string} The subject.
 	 */
 	getSubject: function(){},
 
 	/**
 	 * Gets the Gmail Thread ID of the thread.
+	 * ^gmail
+	 * ^inbox
 	 * @return {string} The gmail threadID.
 	 */
 	getThreadID: function(){},
 
 	/**
 	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}.
+	 * ^gmail
+	 * ^inbox
 	 * @event ThreadView#contactHover
 	 * @param {Contact} contact - the contact that was hovered over
 	 * @param {string} contactType - whether the hovered contact was a 'sender' or 'recipient'

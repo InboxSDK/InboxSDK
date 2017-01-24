@@ -42,6 +42,9 @@ class AttachmentCardView extends EventEmitter {
 
 	getDownloadURL(): Promise<?string> {
 		this._driver.getLogger().deprecationWarning('AttachmentCardView.getDownloadURL', 'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent');
+		if (this._driver.getOpts().REQUESTED_API_VERSION !== 1) {
+			throw new Error('This method was discontinued after API version 1');
+		}
 		return this._attachmentCardImplementation.getDownloadURL();
 	}
 

@@ -10,6 +10,7 @@ var Search = /** @lends Search */{
 	* Registers a search autocomplete suggestion provider. This allows you to add results to Gmails
 	* autocomplete results when a user types into a search box. Each providers results are visually
 	* seperated from each other in the UI.
+	* ^gmail
 	* @param {function(query)} handler - A handler that takes in a string {query} and
 	* returns an {Array} (or {Promise} for one) of {AutocompleteSearchResult}s.
 	* @return {void}
@@ -25,6 +26,7 @@ var Search = /** @lends Search */{
 	* navigate the user to a specific search results view (using {Router}) programtically with a
 	* search term of your choosing (so its displayed to the user), and then use {registerSearchQueryRewriter}
 	* to make sure the results you want are shown.
+	* ^gmail
 	* @param {SearchQueryRewriter} rewriter - A rewriter object that specifies the term to rewrite and a function to
 	* get the new query.
 	* @return {void}

@@ -14,6 +14,7 @@ var Toolbars = /** @lends Toolbars */ {
 
 	/**
 	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
+	* ^gmail
 	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
 	* @return {void}
 	*/
@@ -21,15 +22,18 @@ var Toolbars = /** @lends Toolbars */ {
 
 	/**
 	* Registers a toolbar button to appear in a conversation view.
+	* ^gmail
 	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
 	* @return {void}
 	*/
 	registerToolbarButtonForThreadView: function(){},
 
 	/**
-	* Adds a button *and* dropdown to the "Global Toolbar". This is typically used to show a dropdown with general information
+	* Adds a button and dropdown to the "Global Toolbar". This is typically used to show a dropdown with general information
 	* about your application. In Gmail this refers to the navigation area at the top right of the window and in
-	*  Inbox it refers to the top level toolbar. Your application can only set one app toolbar button.
+	*  Inbox it refers to the top level toolbar.
+	* ^gmail
+	* ^inbox
 	* @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
 	* @return {AppToolbarButtonView}
 	*/

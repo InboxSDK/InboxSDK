@@ -2,7 +2,7 @@ function log() {
   console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.load(1.0, 'custom-view', {inboxBeta:true}).then(function(sdk) {
+InboxSDK.load(2, 'custom-view').then(function(sdk) {
   window._sdk = sdk;
   var threadIds = new Set();
 

@@ -570,3 +570,11 @@
   height: 24px;
   width: 24px;
 }
+
+/* appid warning inbox specific parts */
+.inboxsdk__appid_warning {
+  margin: 68px 240px -68px;
+}
+.inboxsdk__appid_warning .inboxsdk__close_button {
+  float: right;
+}

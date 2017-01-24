@@ -55,7 +55,11 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
                 const iconURL = suggestion.iconURL;
                 driver.getLogger().deprecationWarning('AutocompleteSearchResult "iconURL" property', 'AutocompleteSearchResult.iconUrl');
                 if (!suggestion.iconUrl) {
-                  suggestion.iconUrl = iconURL;
+                  if (driver.getOpts().REQUESTED_API_VERSION === 1) {
+                    suggestion.iconUrl = iconURL;
+                  } else {
+                    console.error('Support for iconURL property was dropped after API version 1');
+                  }
                 }
                 delete suggestion.iconURL;
               }

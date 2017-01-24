@@ -12,7 +12,7 @@ function main() {
 		}
 	});
 
-	InboxSDK.load('1', 'Hello World!', {inboxBeta: true}).then(function(sdk){
+	InboxSDK.load(2, 'Hello World!').then(function(sdk){
 
 		sdk.Router.handleAllRoutes(function(routeView) {
 			console.log('got a routeView', routeView);

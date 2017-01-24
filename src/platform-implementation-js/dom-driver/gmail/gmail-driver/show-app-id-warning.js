@@ -1,12 +1,12 @@
-'use strict';
+/* @flow */
 
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 
+import type GmailDriver from '../gmail-driver';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 
-export default function showAppIdWarning(driver) {
-
+export default function showAppIdWarning(driver: GmailDriver) {
   const topDiv = document.createElement('div');
   topDiv.className = 'inboxsdk__appid_warning';
   topDiv.innerHTML = `
@@ -18,11 +18,11 @@ export default function showAppIdWarning(driver) {
 <input type="button" value="" title="Close" class="inboxsdk__x_close_button" />
 `;
 
- const topMessageBarDriver = driver.createTopMessageBarDriver(kefirCast(Kefir, {el: topDiv}));
+  const topMessageBarDriver = driver.createTopMessageBarDriver(kefirCast(Kefir, {el: topDiv}));
 
-  topDiv.querySelector('.inboxsdk__x_close_button')
-    .addEventListener('click', function(e) {
-      topMessageBarDriver.remove();
-    });
-
+  const closeBtn = topDiv.querySelector('.inboxsdk__x_close_button');
+  if (!closeBtn) throw new Error('Should not happen');
+  closeBtn.addEventListener('click', function(e: MouseEvent) {
+    topMessageBarDriver.remove();
+  });
 }

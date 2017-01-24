@@ -9,7 +9,7 @@ var InboxSDK = {
 /**
 * Loads the InboxSDK remotely and prepares it to be used.
 * @function
-* @param {string} version - The version of the SDK to load, the only acceptable value currently is "1.0".
+* @param {number} version - The API version of the SDK to use. The recommended value right now is <code>1</code>. The value <code>2</code> may be used to opt in early to use the Inbox support which is still under development. See the <a href="#InboxSupport">Inbox Support</a> section for more information.
 * @param {string} appId - The AppId that you registered for on the <a href="/register">AppId Registration page</a>.
 * @param {LoadOptions} [options] - Optional options object.
 * @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
@@ -44,17 +44,7 @@ var LoadOptions = /** @lends LoadOptions */{
 	 * ^default=null
 	 * @type {string}
 	 */
-	appIconUrl:null,
-
-	/**
-	 * Opt-in to the new thread sidebar early. The new design allows users to see
-	 * multiple sidebar panels at once, collapse panels, re-order panels by
-	 * drag-and-drop, and have their changes be persisted.
-	 * ^optional
-	 * ^default=false
-	 * @type {boolean}
-	 */
-	sidebarBeta:null
+	appIconUrl:null
 };
 
 /**

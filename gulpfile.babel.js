@@ -230,6 +230,7 @@ gulp.task('docs', function(cb) {
 
     Promise.all(_.chain(paths.files)
       .filter(isFileEligbleForDocs)
+      .sort()
       .map(parseCommentsInFile)
       .value()
     ).then(files => {
@@ -297,23 +298,31 @@ function parseCommentsInFile(file) {
 }
 
 function transformClass(c) {
-  if (!c.properties) {
-    return c;
-  }
+  (c.functions || []).forEach(func => {
+    func.description = func.description.replace(/\n\^(\S+)/g, (m, rule) => {
+      if (rule === 'gmail' || rule === 'inbox') {
+        if (!func.environments) func.environments = [];
+        func.environments.push(rule);
+        return '';
+      }
+      throw new Error(`Unknown rule ^${rule}`);
+    });
+  });
 
-  c.properties.forEach(function(prop){
-    var optionalMarker = '\n^optional';
-    var defaultRegex = /\n\^default=(.*)/;
-
+  (c.properties || []).forEach(prop => {
     prop.optional = false;
-    if (prop.description.indexOf(optionalMarker) > -1) {
-      prop.optional = true;
-      prop.description = prop.description.replace(optionalMarker, '');
-    }
 
-    prop.description = prop.description.replace(defaultRegex, function(m, c) {
-      prop.default = c;
-      return '';
+    prop.description = prop.description.replace(/\n\^(\S+)/g, (m, rule) => {
+      if (rule === 'optional') {
+        prop.optional = true;
+        return '';
+      }
+      const defaultM = /^default=(.*)$/.exec(rule);
+      if (defaultM) {
+        prop.default = defaultM[1];
+        return '';
+      }
+      throw new Error(`Unknown rule ^${rule}`);
     });
   });
 

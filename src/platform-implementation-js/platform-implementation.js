@@ -61,7 +61,6 @@ export type PiOpts = {
 	globalErrorLogging: boolean;
 	eventTracking: boolean;
 	inboxBeta: boolean;
-	sidebarBeta: boolean;
 	REQUESTED_API_VERSION: number;
 };
 
@@ -116,15 +115,15 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.ButterBar = new ButterBar(appId, driver);
 		driver.setButterBar(this.ButterBar);
 
-		this.Compose = new Compose(appId, driver);
+		this.Compose = new Compose(appId, driver, piOpts);
 		this.Conversations = new Conversations(appId, driver, membrane);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
-		this.User = new User(driver);
+		this.User = new User(driver, piOpts);
 		this.Lists = new Lists(appId, driver, membrane);
 		this.NavMenu = new NavMenu(appId, driver);
 		this.Router = new Router(appId, driver, membrane);
 		this.Search = new Search(appId, driver);
-		this.Toolbars = new Toolbars(appId, driver, membrane);
+		this.Toolbars = new Toolbars(appId, driver, membrane, piOpts);
 		this.Widgets = new Widgets(appId, driver);
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version
@@ -159,13 +158,18 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 		// defaults
 		globalErrorLogging: true, eventTracking: true,
 		inboxBeta: false,
-		sidebarBeta: false,
 		..._opts
 	};
 
 	opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
-	if (opts.REQUESTED_API_VERSION !== 1) {
-		throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
+	switch (opts.REQUESTED_API_VERSION) {
+		case 2:
+			opts.inboxBeta = true;
+			break;
+		case 1:
+			break;
+		default:
+			throw new Error("InboxSDK: Unsupported API version "+opts.REQUESTED_API_VERSION);
 	}
 
 	const DRIVERS_BY_ORIGIN: {[name:string]: *} = {
