@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'thread-example', {inboxBeta: true}).then(sdk => {
+InboxSDK.load(2, 'thread-example').then(sdk => {
 	'use strict';
 
 	window._sdk = sdk;

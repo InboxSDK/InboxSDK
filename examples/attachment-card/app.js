@@ -1,4 +1,4 @@
-InboxSDK.load("1.0", "attachment-card-exmaple", {inboxBeta:true}).then(function(sdk){
+InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 	'use strict';
 
 	window._sdk = sdk;

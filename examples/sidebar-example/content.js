@@ -1,7 +1,6 @@
 'use strict';
 
-InboxSDK.load(1, 'sidebar-example', {
-	inboxBeta: true,
+InboxSDK.load(2, 'sidebar-example', {
 	appName: 'Streak',
   appIconUrl: 'https://www.streak.com/images/orangeIcon.png'
 }).then(inboxSDK => {
