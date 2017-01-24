@@ -405,6 +405,7 @@ var CustomButtonDescriptor = /** @lends CustomButtonDescriptor */{
 
 /**
 * @class
+* This object is given to the onClick function defined in a {CustomButtonDescriptor} added to an {AttachmentCardView}.
 */
 var AttachmentCardClickEvent = /** @lends AttachmentCardClickEvent */{
 	/**
