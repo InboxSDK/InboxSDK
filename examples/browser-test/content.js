@@ -11,9 +11,9 @@ document.documentElement.appendChild(script).remove();
 document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
 
 function incrementStat(name) {
-	(document.head:any).setAttribute(
+	document.head.setAttribute(
 		name,
-		Number((document.head:any).getAttribute(name))+1
+		Number(document.head.getAttribute(name))+1
 	);
 }
 
