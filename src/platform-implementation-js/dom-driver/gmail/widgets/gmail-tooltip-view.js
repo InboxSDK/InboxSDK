@@ -176,7 +176,7 @@ export default class GmailTooltipView {
 				image.src = options.imageUrl;
 				querySelector(this._element, '.inboxsdk__tooltip_image').appendChild(image);
 
-				image.addEventListener('load', (domEvent) => {
+				image.addEventListener('load', (domEvent:any) => {
 					asap(() => {
 						this._eventStream.emit({
 							eventName: 'imageLoaded'
@@ -308,8 +308,8 @@ export default class GmailTooltipView {
 		var distances = [
 			boundingBoxWrapper.value[0].y, //top
 			boundingBoxWrapper.value[0].x, //left
-			document.body.clientWidth - boundingBoxWrapper.value[1].x, //right
-			document.body.clientHeight - boundingBoxWrapper.value[1].y //bottom
+			((document.body:any):HTMLElement).clientWidth - boundingBoxWrapper.value[1].x, //right
+			((document.body:any):HTMLElement).clientHeight - boundingBoxWrapper.value[1].y //bottom
 		];
 
 		return _.sortBy(distances, function(distance){
@@ -325,8 +325,8 @@ export default class GmailTooltipView {
 			boundingBox[0].y = 0;
 			boundingBox[1].y = boundingBox[0].y + boundingBoxHeight;
 		}
-		else if(boundingBox[1].y > document.body.clientHeight){
-			boundingBox[0].y = document.body.clientHeight - boundingBoxHeight;
+		else if(boundingBox[1].y > ((document.body:any):HTMLElement).clientHeight){
+			boundingBox[0].y = ((document.body:any):HTMLElement).clientHeight - boundingBoxHeight;
 			boundingBox[1].y = boundingBox[0].y + boundingBoxHeight;
 		}
 
@@ -334,8 +334,8 @@ export default class GmailTooltipView {
 			boundingBox[0].x = 0;
 			boundingBox[1].x = boundingBox[0].x + boundingBoxWidth;
 		}
-		else if(boundingBox[1].x > document.body.clientWidth){
-			boundingBox[0].x = document.body.clientWidth - boundingBoxWidth - 20;
+		else if(boundingBox[1].x > ((document.body:any):HTMLElement).clientWidth){
+			boundingBox[0].x = ((document.body:any):HTMLElement).clientWidth - boundingBoxWidth - 20;
 			boundingBox[1].x = boundingBox[0].x + boundingBoxWidth;
 		}
 

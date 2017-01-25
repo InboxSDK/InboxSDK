@@ -26,7 +26,7 @@ function makeDriver(): Object {
         if (!document.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
           const waitingPlatform = document.createElement('div');
           waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-          document.body.appendChild(waitingPlatform);
+          ((document.body:any):HTMLElement).appendChild(waitingPlatform);
         }
         const panel = new ContentPanelViewDriver(driver, descriptor, 'foobar');
         _addedPanels.push(panel);

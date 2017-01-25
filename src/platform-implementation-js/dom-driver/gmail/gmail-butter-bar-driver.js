@@ -7,7 +7,7 @@ import streamWaitFor from '../../lib/stream-wait-for';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-const elements = streamWaitFor(() => document.body.querySelector('div.b8[role="alert"]'))
+const elements = streamWaitFor(() => ((document.body:any):HTMLElement).querySelector('div.b8[role="alert"]'))
   .map((noticeContainer: HTMLElement) => {
     const googleNotice = querySelector(noticeContainer, '.vh:not(.inboxsdk__butterbar)');
     let sdkNotice = noticeContainer.querySelector('.vh.inboxsdk__butterbar');
@@ -71,13 +71,13 @@ export default class GmailButterBarDriver {
   }
 
   getSharedMessageQueue(): Array<Object> {
-    const attr = document.head.getAttribute('data-inboxsdk-butterbar-queue');
+    const attr = (document.head:any).getAttribute('data-inboxsdk-butterbar-queue');
     return attr ? JSON.parse(attr) : [];
   }
 
   setSharedMessageQueue(queue: Object) {
     const attr = JSON.stringify(queue);
-    document.head.setAttribute('data-inboxsdk-butterbar-queue', attr);
+    (document.head:any).setAttribute('data-inboxsdk-butterbar-queue', attr);
   }
 
   // Immediately displays the message, overriding anything else on the screen.

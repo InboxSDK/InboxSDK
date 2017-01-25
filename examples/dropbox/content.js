@@ -4,7 +4,7 @@ var EXTENSION_VERSION, close_onboarding, log_error, onboarding_event, promise_me
 
 EXTENSION_VERSION = chrome.runtime.getManifest().version;
 
-document.head.setAttribute("data-dropbox-version", EXTENSION_VERSION);
+(document.head:any).setAttribute("data-dropbox-version", EXTENSION_VERSION);
 
 promise_message_handler = function(message) {
   return new Promise(function(resolve, reject) {

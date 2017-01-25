@@ -8,10 +8,10 @@ import cssSelectorEscape from '../../../../lib/css-selector-escape';
 import type GmailComposeView from '../gmail-compose-view';
 
 var getSizeFixerSheet: () => CSSStyleSheet = _.once(() => {
-  var style: HTMLStyleElement = (document.createElement('style'):any);
+  const style: HTMLStyleElement = (document.createElement('style'):any);
   style.type = 'text/css';
   style.className = 'inboxsdk__compose_size_fixer';
-  document.head.appendChild(style);
+  (document.head:any).appendChild(style);
   var sheet = style.sheet;
   if (!(sheet instanceof CSSStyleSheet)) {
     throw new Error("Could not add stylesheet");

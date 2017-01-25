@@ -6,7 +6,7 @@ import fs from 'fs';
 import PageCommunicator from '../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator';
 import * as threadIdentifier from '../src/injected-js/thread-identifier';
 
-document.documentElement.innerHTML = fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8');
+(document.documentElement:any).innerHTML = fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8');
 
 // Work around https://github.com/tmpvar/jsdom/issues/1703
 window.open = window.open;
@@ -17,15 +17,15 @@ test('threadIdentifier works', () => {
   threadIdentifier.setup();
 
   // Identify a regular email
-  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':3r'))).toBe('14a3481b07c29fcf');
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase((document:any).getElementById(':3r'))).toBe('14a3481b07c29fcf');
 
   // Fail to identify an ambiguous email that has no click handler
-  const amb = document.getElementById(':3g');
+  const amb: HTMLElement = (document:any).getElementById(':3g');
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe(null);
   expect(pageCommunicator.getThreadIdForThreadRowByClick(amb)).toBe(null);
 
   // Fail to identify another ambiguous email that has no click handler
-  const amb2 = document.getElementById(':35');
+  const amb2: HTMLElement = (document:any).getElementById(':35');
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb2)).toBe(null);
   expect(pageCommunicator.getThreadIdForThreadRowByClick(amb2)).toBe(null);
 
@@ -58,10 +58,10 @@ test('threadIdentifier works', () => {
   expect(pageCommunicator.getThreadIdForThreadRowByClick(amb2)).toBe(null);
 
   // Fail to identify two emails that were edited out of the original VIEW_DATA
-  const twi1 = document.getElementById(':42');
+  const twi1: HTMLElement = (document:any).getElementById(':42');
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi1)).toBe(null);
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi1)).toBe(null);
-  const twi2 = document.getElementById(':42-dup');
+  const twi2: HTMLElement = (document:any).getElementById(':42-dup');
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2)).toBe(null);
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi2)).toBe(null);
 
@@ -76,7 +76,7 @@ test('threadIdentifier works', () => {
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(twi2)).toBe(null);
 
   // Fail to identify an email that was edited out of the original VIEW_DATA
-  const missing = document.getElementById(':74');
+  const missing: HTMLElement = (document:any).getElementById(':74');
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe(null);
   expect(pageCommunicator.getThreadIdForThreadRowByClick(missing)).toBe(null);
 
@@ -84,7 +84,7 @@ test('threadIdentifier works', () => {
   threadIdentifier.processThreadListResponse(fs.readFileSync(__dirname+'/injected-thread-identifier-ajax.txt', 'utf8'));
 
   // Can still identify regular email
-  expect(pageCommunicator.getThreadIdForThreadRowByDatabase(document.getElementById(':4d'))).toBe('149bf3ae4702f5a7');
+  expect(pageCommunicator.getThreadIdForThreadRowByDatabase((document:any).getElementById(':4d'))).toBe('149bf3ae4702f5a7');
 
   // Can now identify that missing email
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe('1477fe06f5924590');

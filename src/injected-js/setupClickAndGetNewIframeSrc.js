@@ -6,7 +6,7 @@ import simulateClick from '../platform-implementation-js/lib/dom/simulate-click'
 import makeElementChildStream from '../platform-implementation-js/lib/dom/make-element-child-stream';
 
 export default function setupClickAndGetNewIframeSrc() {
-  makeElementChildStream(document.body)
+  makeElementChildStream(((document.body:any):HTMLElement))
     .filter(({el}) => el.nodeName === 'IFRAME' && !el.hasAttribute('src'))
     .onValue(({el}) => {
       const document = (el:any).contentDocument;

@@ -24,11 +24,11 @@ const GmailElementGetter = {
 	},
 
 	isStandaloneComposeWindow(): boolean {
-		return document.body.classList.contains('xE') && document.body.classList.contains('xp');
+		return ((document.body:any):HTMLElement).classList.contains('xE') && ((document.body:any):HTMLElement).classList.contains('xp');
 	},
 
 	isStandaloneThreadWindow(): boolean {
-		return document.body.classList.contains('aAU') && document.body.classList.contains('xE') && document.body.classList.contains('Su');
+		return ((document.body:any):HTMLElement).classList.contains('aAU') && ((document.body:any):HTMLElement).classList.contains('xE') && ((document.body:any):HTMLElement).classList.contains('Su');
 	},
 
 	getComposeWindowContainer(): ?HTMLElement {
@@ -57,7 +57,7 @@ const GmailElementGetter = {
 	},
 
 	getMoleParent(): ?HTMLElement {
-		return document.body.querySelector('.dw .nH > .nH > .no');
+		return ((document.body:any):HTMLElement).querySelector('.dw .nH > .nH > .no');
 	},
 
 	isPreviewPane(): boolean {

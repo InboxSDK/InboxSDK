@@ -186,7 +186,7 @@ class InboxAttachmentCardView {
           if (button.openInNewTab) {
             downloadLink.setAttribute('target', '_blank');
           }
-          document.body.appendChild(downloadLink);
+          ((document.body:any):HTMLElement).appendChild(downloadLink);
           downloadLink.click();
           downloadLink.remove();
         });

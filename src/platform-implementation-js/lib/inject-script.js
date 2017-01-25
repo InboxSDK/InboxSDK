@@ -10,7 +10,7 @@ var fs = require('fs');
 // Returns a promise that resolves once the injected script has been injected
 // and has done its initial load stuff.
 const injectScript: () => Promise<null> = _.once(function() {
-  if (!document.head.hasAttribute('data-inboxsdk-script-injected')) {
+  if (!(document.head:any).hasAttribute('data-inboxsdk-script-injected')) {
     const url = 'https://www.inboxsdk.com/build/injected.js';
 
     const script = document.createElement('script');
@@ -36,13 +36,13 @@ const injectScript: () => Promise<null> = _.once(function() {
     const codeToRun = codeParts.join('');
     script.text = codeToRun;
 
-    (document: any).head.appendChild(script).parentNode.removeChild(script);
-    document.head.setAttribute('data-inboxsdk-script-injected', 'true');
+    (document.head:any).appendChild(script).parentNode.removeChild(script);
+    (document.head:any).setAttribute('data-inboxsdk-script-injected', 'true');
   }
 
   return Kefir.later(0, null)
-    .merge( makeMutationObserverChunkedStream(document.head, {attributes: true}) )
-    .filter(() => document.head.hasAttribute('data-inboxsdk-user-email-address'))
+    .merge( makeMutationObserverChunkedStream((document.head:any), {attributes: true}) )
+    .filter(() => (document.head:any).hasAttribute('data-inboxsdk-user-email-address'))
     .take(1)
     .map(() => null)
     .toPromise(RSVP.Promise);

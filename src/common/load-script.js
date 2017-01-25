@@ -36,6 +36,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   });
 
   script.src = url;
+  if (!document.head) throw new Error('missing head');
   document.head.appendChild(script);
   return promise;
 }

@@ -11,6 +11,7 @@ class GmailBackdrop {
     const el = document.createElement('div');
     el.className = 'Kj-JD-Jh inboxsdk__modal_overlay';
     el.style.zIndex = String(zIndex);
+    if (!target) throw new Error('no target');
     target.appendChild(el);
 
     this._stopper.onValue(() => {

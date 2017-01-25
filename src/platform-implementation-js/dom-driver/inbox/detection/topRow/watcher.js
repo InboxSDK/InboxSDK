@@ -28,5 +28,5 @@ export default function watcher(root: Document=document): Kefir.Observable<Eleme
     '[role=listitem]'
   ];
 
-  return selectorStream(selector)(root.body);
+  return selectorStream(selector)((root.body:any));
 }

@@ -106,12 +106,12 @@ class InboxAppSidebarView {
     // share the value.
     el.setAttribute('data-open', 'false');
     el.setAttribute('data-is-opening', 'false');
-    document.body.appendChild(el);
+    ((document.body:any):HTMLElement).appendChild(el);
 
-    if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+    if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-      document.body.appendChild(waitingPlatform);
+      ((document.body:any):HTMLElement).appendChild(waitingPlatform);
     }
 
     // If the user clicks the chat button while the chat sidebar and app
@@ -204,7 +204,7 @@ class InboxAppSidebarView {
       el.remove();
     });
 
-    Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         let id = event.detail.id;
@@ -229,7 +229,7 @@ class InboxAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -247,7 +247,7 @@ class InboxAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
@@ -260,7 +260,7 @@ class InboxAppSidebarView {
         }
         render();
       });
-    Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
+    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.scrollPanelIntoView(event.detail.instanceId);

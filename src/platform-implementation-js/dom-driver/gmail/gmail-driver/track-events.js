@@ -57,7 +57,7 @@ function _monitorAttachmentButton(composeViewDriver, logFunction){
 }
 
 function _monitorAttachmentAdded(composeViewDriver, logFunction) {
-	makeElementChildStream(document.body)
+	makeElementChildStream(((document.body:any):HTMLElement))
 		.map(event => event.el)
 		.filter(node => node && (node:any).type === 'file')
 		.take(1)
@@ -93,7 +93,7 @@ function _monitorDriveButton(composeViewDriver, logFunction){
 function _monitorDriveFileAdded(composeViewDriver, logFunction){
 	var numberCurrentDriveChips = composeViewDriver.getBodyElement().querySelectorAll('.gmail_drive_chip').length;
 
-	makeElementChildStream(document.body)
+	makeElementChildStream(((document.body:any):HTMLElement))
 		.map(event => event.el)
 		.filter(node => node && node.classList.contains('picker-dialog'))
 		.take(1)
@@ -118,7 +118,7 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction){
 
 function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver){
 
-	makeElementChildStream(document.body)
+	makeElementChildStream(((document.body:any):HTMLElement))
 		.map(event => event.el)
 		.filter(node => node.getAttribute && node.getAttribute('role') === 'alertdialog')
 		.takeUntilBy(gmailDriver.getStopper())
@@ -146,7 +146,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Kefir.fromEvents(document.body, 'dragenter')
+					return Kefir.fromEvents((document.body:any), 'dragenter')
 								.filter((event) => event.toElement) // ignore events caused by dragFilesIntoCompose
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);
@@ -159,7 +159,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver){
 	gmailDriver.getComposeViewDriverStream()
 				.flatMapLatest(() => {
 
-					return Kefir.fromEvents(document.body, 'drop')
+					return Kefir.fromEvents((document.body:any), 'drop')
 								.filter((event) => event.toElement)
 								.filter((event) => event.toElement.classList.contains('aC7') || event.toElement.classList.contains('aC9'))
 								.take(1);

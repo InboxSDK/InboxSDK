@@ -103,8 +103,8 @@ export default function logError(err: Error, details: any, context: LogErrorCont
 
     sendError(report);
 
-    if (document.documentElement.getAttribute('inboxsdk-emit-error-event') === 'true') {
-      document.documentElement.dispatchEvent(new CustomEvent('inboxSDKerror', {
+    if (((document.documentElement:any):HTMLElement).getAttribute('inboxsdk-emit-error-event') === 'true') {
+      ((document.documentElement:any):HTMLElement).dispatchEvent(new CustomEvent('inboxSDKerror', {
         bubbles: false,
         cancelable: false,
         detail: {

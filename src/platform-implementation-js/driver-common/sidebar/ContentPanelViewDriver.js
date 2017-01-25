@@ -26,13 +26,13 @@ class ContentPanelViewDriver {
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
     this._eventStream.plug(
-      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => ({eventName: 'activate'}))
         .flatMap(delayAsap)
     );
     this._eventStream.plug(
-      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelDeactivated')
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelDeactivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => ({eventName: 'deactivate'}))
         .flatMap(delayAsap)
@@ -43,13 +43,13 @@ class ContentPanelViewDriver {
     const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
-    const waitingPlatform = querySelector(document.body, '.'+idMap('app_sidebar_waiting_platform'));
+    const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
     descriptor
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar} = descriptor;
-        if (!document.body.contains(el)) {
+        if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
         const eventName = hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel';
@@ -72,7 +72,7 @@ class ContentPanelViewDriver {
       });
     this._stopper.onValue(() => {
       if (!hasPlacedAlready) return;
-      document.body.dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
+      ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
         detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
       }));
@@ -88,7 +88,7 @@ class ContentPanelViewDriver {
   }
 
   scrollIntoView() {
-    document.body.dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
+    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
       bubbles: true, cancelable: false,
       detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
     }));

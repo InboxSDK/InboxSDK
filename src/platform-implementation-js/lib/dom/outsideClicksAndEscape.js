@@ -9,7 +9,7 @@ export default function outsideClicksAndEscape(elements: HTMLElement[]): Kefir.O
     fromEventTargetCapture(document, 'click'),
     // We modify the focus event on document sometimes, so we listen for
     // it on body so our modifications can happen first.
-    fromEventTargetCapture(document.body, 'focus')
+    fromEventTargetCapture((document.body:any), 'focus')
   ])
     .filter(event =>
       !event.shouldIgnore &&

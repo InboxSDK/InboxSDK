@@ -280,7 +280,7 @@ class InboxDriver {
     this._lastInteractedAttachmentCardView = card;
     if (card) {
       card.getStopper()
-        .merge(fromEventTargetCapture(document.body, 'click'))
+        .merge(fromEventTargetCapture((document.body:any), 'click'))
         .take(1)
         .takeUntilBy(this._lastInteractedAttachmentCardViewSet)
         .takeUntilBy(this._stopper)
@@ -291,7 +291,7 @@ class InboxDriver {
   }
 
   openComposeWindow(): void {
-    const fabButton = querySelectorOne(document.body, 'nav[role=banner] ~ div[aria-expanded] button:not([tabindex="-1"])');
+    const fabButton = querySelectorOne((document.body:any), 'nav[role=banner] ~ div[aria-expanded] button:not([tabindex="-1"])');
     fabButton.click();
   }
 
@@ -300,7 +300,7 @@ class InboxDriver {
   }
 
   getUserEmailAddress(): string {
-    const s = document.head.getAttribute('data-inboxsdk-user-email-address');
+    const s = (document.head:any).getAttribute('data-inboxsdk-user-email-address');
     if (s == null) throw new Error('should not happen');
     return s;
   }
@@ -390,14 +390,14 @@ class InboxDriver {
           });
         });
 
-      document.body.appendChild(customViewBase);
+      ((document.body:any):HTMLElement).appendChild(customViewBase);
     }
 
     customViewBase.innerHTML = '';
     customViewBase.appendChild(el);
     customViewBase.style.display = '';
 
-    document.body.classList.add('inboxsdk__custom_view_active');
+    ((document.body:any):HTMLElement).classList.add('inboxsdk__custom_view_active');
 
     const main = document.querySelector('[id][jsaction] > div[token][class]');
     if (main) {
@@ -406,7 +406,7 @@ class InboxDriver {
   }
 
   showNativeRouteView(): void {
-    document.body.classList.remove('inboxsdk__custom_view_active');
+    ((document.body:any):HTMLElement).classList.remove('inboxsdk__custom_view_active');
     const customViewBase = document.querySelector('body > .inboxsdk__custom_view');
     if (customViewBase) {
       customViewBase.style.display = 'none';
@@ -451,7 +451,7 @@ class InboxDriver {
   <a class="inboxsdk__appid_register" target="_blank" href="https://www.inboxsdk.com/register">Register Your App</a>
   `;
 
-    document.body.insertBefore(topDiv, document.body.firstChild);
+    ((document.body:any):HTMLElement).insertBefore(topDiv, ((document.body:any):HTMLElement).firstChild);
 
     const closeBtn = topDiv.querySelector('.inboxsdk__close_button');
     if (!closeBtn) throw new Error('Should not happen');
@@ -493,7 +493,7 @@ class InboxDriver {
   }
 
   closeOpenThread() {
-    simulateKey(document.body, 27, 27);
+    simulateKey((document.body:any), 27, 27);
   }
 }
 

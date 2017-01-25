@@ -45,6 +45,7 @@ class InboxComposeView {
   _els: *;
 
   constructor(driver: InboxDriver, el: HTMLElement, parsed: Parsed) {
+    (this: ComposeViewDriver);
     this._element = el;
     this._driver = driver;
     this._modifierButtonContainer = null;
@@ -79,8 +80,8 @@ class InboxComposeView {
         });
 
       Kefir.merge([
-          Kefir.fromEvents(document.body, 'mousedown'),
-          Kefir.fromEvents(document.body, 'keydown')
+          Kefir.fromEvents((document.body:any), 'mousedown'),
+          Kefir.fromEvents((document.body:any), 'keydown')
         ]).takeUntilBy(this.getStopper())
         .onValue(event => {
           const selection = (document:any).getSelection();
@@ -248,7 +249,7 @@ class InboxComposeView {
         .value();
     } finally {
       if (needToOpenMenu) {
-        simulateClick(document.body);
+        simulateClick((document.body:any));
       }
       if (startActiveElement) {
         startActiveElement.focus();
@@ -580,9 +581,3 @@ class InboxComposeView {
 }
 
 export default defn(module, InboxComposeView);
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-  const test: ComposeViewDriver = new InboxComposeView(({}:any), document.body, ({}:any));
-}

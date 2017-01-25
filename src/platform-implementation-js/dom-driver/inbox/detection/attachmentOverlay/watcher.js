@@ -16,5 +16,5 @@ export default function watcher(
     {$watch: ':not([aria-hidden=true])'}
   ]);
 
-  return selector(root.body);
+  return selector((root.body:any));
 }

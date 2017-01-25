@@ -17,7 +17,7 @@ for (let env of ['test', 'development']) {
     });
     afterAll(() => {
       process.env.NODE_ENV = original_NODE_ENV;
-      document.documentElement.removeAttribute('data-map-id');
+      ((document.documentElement:any):HTMLElement).removeAttribute('data-map-id');
     });
 
     describe('common', () => {
@@ -66,7 +66,7 @@ for (let env of ['test', 'development']) {
           expect(a2).toBe(a1);
 
           (Date:any).now = () => original_Date_now() + 1000*60*60;
-          document.documentElement.removeAttribute('data-map-id');
+          ((document.documentElement:any):HTMLElement).removeAttribute('data-map-id');
           _reset();
 
           const b1 = idMap('foo');

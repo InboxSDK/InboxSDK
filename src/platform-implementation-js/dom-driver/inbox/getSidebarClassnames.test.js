@@ -2,7 +2,7 @@
 
 import getSidebarClassnames from './getSidebarClassnames';
 
-document.documentElement.innerHTML = `
+(document.documentElement:any).innerHTML = `
 <head>
 <style type="text/css">
 .blah {

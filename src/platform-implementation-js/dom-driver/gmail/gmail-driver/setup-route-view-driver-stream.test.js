@@ -16,7 +16,8 @@ import MockMutationObserver from '../../../../../test/lib/mock-mutation-observer
 
 global.MutationObserver = MockMutationObserver;
 
-document.body.innerHTML = `
+if (!document.body) throw new Error('should not happen');
+((document.body:any):HTMLElement).innerHTML = `
   <div class="aeF">
     <div class="nH">
       <div id="main" class="nH"></div>
@@ -25,8 +26,9 @@ document.body.innerHTML = `
   </div>
 `;
 const main = document.getElementById('main');
-const mainEmitter = makeMutationEventInjector(main);
 const main2 = document.getElementById('main2');
+if (!main || !main2) throw new Error();
+const mainEmitter = makeMutationEventInjector(main);
 const main2Emitter = makeMutationEventInjector(main2);
 
 const stopper = kefirBus();

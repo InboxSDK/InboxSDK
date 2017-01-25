@@ -30,7 +30,7 @@ const showCustomRouteView = defn(module, function showCustomRouteView(gmailDrive
 		child.style.display = 'none';
 	});
 
-	document.body.classList.add('inboxsdk__custom_view_active');
+	((document.body:any):HTMLElement).classList.add('inboxsdk__custom_view_active');
 });
 export default showCustomRouteView;
 

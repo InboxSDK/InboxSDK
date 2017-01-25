@@ -14,8 +14,8 @@ export default function showNativeRouteView(gmailDriver: any) {
 		child.style.display = '';
 	});
 
-	if (document.body.classList.contains('inboxsdk__custom_view_active')) {
-		document.body.classList.remove('inboxsdk__custom_view_active');
+	if (((document.body:any):HTMLElement).classList.contains('inboxsdk__custom_view_active')) {
+		((document.body:any):HTMLElement).classList.remove('inboxsdk__custom_view_active');
 		// Work around issue where Gmail sometimes screws up its formatting until
 		// the user resizes their screen. Reproduction steps that sometimes work:
 		// use multiple inboxes lab, with multiple inboxes set below the inbox, go

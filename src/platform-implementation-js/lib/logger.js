@@ -29,16 +29,16 @@ const _extensionIsLoggerMaster = (function() {
     return true; // for unit tests
   }
 
-  if (document.documentElement.hasAttribute('data-inboxsdk-master-claimed')) {
+  if (((document.documentElement:any):HTMLElement).hasAttribute('data-inboxsdk-master-claimed')) {
     return false;
   } else {
-    document.documentElement.setAttribute('data-inboxsdk-master-claimed', 'true');
+    ((document.documentElement:any):HTMLElement).setAttribute('data-inboxsdk-master-claimed', 'true');
     return true;
   }
 })();
 
 function getAllAppIds(): string[] {
-  const str = global.document && document.documentElement.getAttribute('data-inboxsdk-active-app-ids') || '[]';
+  const str = global.document && ((document.documentElement:any):HTMLElement).getAttribute('data-inboxsdk-active-app-ids') || '[]';
   return JSON.parse(str);
 }
 
@@ -61,11 +61,11 @@ class Logger {
       if (
         !_extensionUseEventTracking || (
           global.document &&
-          document.documentElement.hasAttribute('data-inboxsdk-app-logger-master-chosen')
+          ((document.documentElement:any):HTMLElement).hasAttribute('data-inboxsdk-app-logger-master-chosen')
       )) {
         return false;
       } else {
-        document.documentElement.setAttribute('data-inboxsdk-app-logger-master-chosen', 'true');
+        ((document.documentElement:any):HTMLElement).setAttribute('data-inboxsdk-app-logger-master-chosen', 'true');
         return true;
       }
     })();
@@ -186,7 +186,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     appId: appId,
     version: opts.appVersion || undefined
   }));
-  document.documentElement.setAttribute(
+  ((document.documentElement:any):HTMLElement).setAttribute(
     'data-inboxsdk-active-app-ids', JSON.stringify(getAllAppIds().concat([
       {
         appId: appId,
@@ -400,7 +400,7 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
   _trackedEventsQueue.add(event);
 
   // Signal to the logger master that a new event is ready to be sent.
-  document.documentElement.setAttribute('data-inboxsdk-last-event', ''+Date.now());
+  ((document.documentElement:any):HTMLElement).setAttribute('data-inboxsdk-last-event', ''+Date.now());
 }
 
 let currentAccessToken: ?{oauthToken: string, expirationDate: number} = null;
@@ -435,7 +435,7 @@ async function getEventsAccessToken() {
 }
 
 if (_extensionIsLoggerMaster && global.document && global.MutationObserver) {
-  makeMutationObserverStream(document.documentElement, {
+  makeMutationObserverStream((document.documentElement:any), {
     attributes: true, attributeFilter: ['data-inboxsdk-last-event']
   }).map(()=>null).throttle(120*1000).onValue(function() {
     var events: any[] = _trackedEventsQueue.removeAll();
