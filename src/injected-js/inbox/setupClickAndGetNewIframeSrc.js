@@ -2,8 +2,8 @@
 
 import once from 'lodash/once';
 import Kefir from 'kefir';
-import simulateClick from '../platform-implementation-js/lib/dom/simulate-click';
-import makeElementChildStream from '../platform-implementation-js/lib/dom/make-element-child-stream';
+import simulateClick from '../../platform-implementation-js/lib/dom/simulate-click';
+import makeElementChildStream from '../../platform-implementation-js/lib/dom/make-element-child-stream';
 
 export default function setupClickAndGetNewIframeSrc() {
   makeElementChildStream(((document.body:any):HTMLElement))

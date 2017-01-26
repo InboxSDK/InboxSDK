@@ -2,8 +2,8 @@
 
 import _ from 'lodash';
 import assert from 'assert';
-import * as logger from '../injected-logger';
-import {cleanupPeopleLine} from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import * as logger from '../../injected-logger';
+import {cleanupPeopleLine} from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 export type ThreadRowMetadata = {
   timeString: string;

@@ -1,6 +1,6 @@
 /* @flow */
 
-import type {AutocompleteSearchResultWithId} from '../../../injected-js/modify-suggestions';
+import type {AutocompleteSearchResultWithId} from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 import _ from 'lodash';

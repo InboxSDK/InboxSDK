@@ -2,12 +2,12 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import * as logger from './injected-logger';
-import XHRProxyFactory from './xhr-proxy-factory';
+import * as logger from '../injected-logger';
+import XHRProxyFactory from '../xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
-import quotedSplit from '../common/quoted-split';
-import defer from '../common/defer';
+import quotedSplit from '../../common/quoted-split';
+import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
 
 function logErrorExceptEventListeners(err, details) {

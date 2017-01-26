@@ -1,13 +1,13 @@
 /* @flow */
 
 import _ from 'lodash';
-import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import * as GmailResponseProcessor from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
-import * as logger from '../injected-logger';
+import * as logger from '../../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
-import Marker from '../../common/marker';
-import findParent from '../../common/find-parent';
+import Marker from '../../../common/marker';
+import findParent from '../../../common/find-parent';
 
 export function setup() {
   processPreloadedThreads();

@@ -3,8 +3,8 @@
 import _ from 'lodash';
 import autoHtml from 'auto-html';
 import {defn} from 'ud';
-import htmlToText from '../common/html-to-text';
-import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import htmlToText from '../../common/html-to-text';
+import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 // This is the type that the user provides.
 export type AutocompleteSearchResult = {

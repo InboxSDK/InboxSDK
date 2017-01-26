@@ -1,7 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
-import * as logger from '../injected-logger';
+import * as logger from '../../injected-logger';
 
 const ignoreErrors = _.constant(true);
 
