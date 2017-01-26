@@ -849,9 +849,9 @@
       "resolved": "https://registry.npmjs.org/browser-stdout/-/browser-stdout-1.3.0.tgz"
     },
     "browserify": {
-      "version": "13.3.0",
-      "from": "browserify@>=13.0.0 <14.0.0",
-      "resolved": "https://registry.npmjs.org/browserify/-/browserify-13.3.0.tgz",
+      "version": "14.0.0",
+      "from": "browserify@>=14.0.0 <15.0.0",
+      "resolved": "https://registry.npmjs.org/browserify/-/browserify-14.0.0.tgz",
       "dependencies": {
         "concat-stream": {
           "version": "1.5.2",
@@ -941,9 +941,9 @@
       "resolved": "https://registry.npmjs.org/bser/-/bser-1.0.2.tgz"
     },
     "buffer": {
-      "version": "4.9.1",
-      "from": "buffer@>=4.1.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/buffer/-/buffer-4.9.1.tgz"
+      "version": "5.0.2",
+      "from": "buffer@>=5.0.2 <6.0.0",
+      "resolved": "https://registry.npmjs.org/buffer/-/buffer-5.0.2.tgz"
     },
     "buffer-crc32": {
       "version": "0.2.13",
@@ -5076,9 +5076,9 @@
       "resolved": "https://registry.npmjs.org/seed-random/-/seed-random-2.2.0.tgz"
     },
     "selenium-standalone": {
-      "version": "5.11.1",
+      "version": "5.11.2",
       "from": "selenium-standalone@>=5.8.0 <6.0.0",
-      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.11.1.tgz",
+      "resolved": "https://registry.npmjs.org/selenium-standalone/-/selenium-standalone-5.11.2.tgz",
       "dependencies": {
         "async": {
           "version": "1.2.1",
@@ -6057,9 +6057,9 @@
       "resolved": "https://registry.npmjs.org/watch/-/watch-0.10.0.tgz"
     },
     "watchify": {
-      "version": "3.8.0",
+      "version": "3.9.0",
       "from": "watchify@>=3.4.0 <4.0.0",
-      "resolved": "https://registry.npmjs.org/watchify/-/watchify-3.8.0.tgz"
+      "resolved": "https://registry.npmjs.org/watchify/-/watchify-3.9.0.tgz"
     },
     "wdio-dot-reporter": {
       "version": "0.0.6",
