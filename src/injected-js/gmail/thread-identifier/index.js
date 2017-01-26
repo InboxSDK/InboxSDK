@@ -35,7 +35,7 @@ function processThreads(threads: GmailResponseProcessor.Thread[]) {
   threads.forEach(storeThreadMetadata);
 }
 
-var AMBIGUOUS = Marker('ABIGUOUS');
+var AMBIGUOUS = Marker('AMBIGUOUS');
 var threadIdsByKey: Map<string, string|Marker> = new Map();
 function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
