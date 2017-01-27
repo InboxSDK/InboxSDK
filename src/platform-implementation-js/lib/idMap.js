@@ -13,14 +13,14 @@ export default function idMap(name: string): string {
   if (id != null) return id;
 
   if (seed == null) {
-    seed = document.documentElement.getAttribute('data-map-id');
+    seed = ((document.documentElement:any):HTMLElement).getAttribute('data-map-id');
     if (seed == null) {
       // Make the seed change every hour: the seed is based on a hash of the
       // current timestamp in hour resolution.
       const hasher = new Sha256();
       hasher.update('PWVe'+Math.floor(Date.now()/(1000*60*60))+'PYiE0');
       seed = hasher.digest('hex').slice(0,16) + ((process.env.NODE_ENV === 'development') ? 'x' : '');
-      document.documentElement.setAttribute('data-map-id', seed);
+      ((document.documentElement:any):HTMLElement).setAttribute('data-map-id', seed);
     }
     useDevMode = /x$/.test(seed);
   }

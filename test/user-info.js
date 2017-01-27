@@ -9,9 +9,10 @@ import UserInfo from '../src/platform-implementation-js/dom-driver/gmail/gmail-d
 global.document = undefined;
 
 describe('UserInfo', function() {
-  var document = jsdomDoc(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
-  var slot = document.getElementById('slot');
-  var driver = {getUserEmailAddress: _.constant('cowan@streak.com')};
+  const document = jsdomDoc(`<!doctype html><html><body><div role="banner"><div id="slot"></div></div></body></html>`);
+  const slot = document.getElementById('slot');
+  if (!slot) throw new Error();
+  const driver = {getUserEmailAddress: _.constant('cowan@streak.com')};
 
   before(function() {
     global.document = document;

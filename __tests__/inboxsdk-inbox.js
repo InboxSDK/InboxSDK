@@ -6,16 +6,16 @@ import MockMutationObserver from '../test/lib/mock-mutation-observer';
 process.env.VERSION = 'beep';
 
 global.MutationObserver = MockMutationObserver;
-document.documentElement.innerHTML = `
+(document.documentElement:any).innerHTML = `
 <body>
 <div id="canvas"></div>
 </body>`;
 Object.defineProperty(document.location, 'origin', {value:'https://inbox.google.com'});
 
 // don't try to inject ajax interceptor
-document.head.setAttribute('data-inboxsdk-script-injected', 'true');
-document.head.setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
-document.head.setAttribute('data-inboxsdk-user-name', 'Foo Bar');
+(document.head:any).setAttribute('data-inboxsdk-script-injected', 'true');
+(document.head:any).setAttribute('data-inboxsdk-user-email-address', 'foo@example.com');
+(document.head:any).setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 
 const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
 //preload implementation

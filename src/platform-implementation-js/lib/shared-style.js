@@ -13,6 +13,7 @@ export default function sharedStyle(root: Document=document) {
 		cssContent.onValue(css => {
 			style.textContent = rewriteCssWithIdMap(css);
 		});
+		if (!root.head) throw new Error('missing head');
 		root.head.appendChild(style);
 	}
 }

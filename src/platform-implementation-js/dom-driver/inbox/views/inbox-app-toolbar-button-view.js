@@ -95,12 +95,12 @@ class InboxAppToolbarButtonView {
     const ATTR_NAME = 'data-inboxsdk-searchbar-min-margin-right';
 
     const newMarginRight = buttonWidth +
-      parseInt(document.documentElement.getAttribute(ATTR_NAME) || '0');
+      parseInt(((document.documentElement:any):HTMLElement).getAttribute(ATTR_NAME) || '0');
 
     const ruleClassName = 'inboxsdk__dynamic_resize_searchbar';
 
     function setSheetRules(minMarginRight: number) {
-      document.documentElement.setAttribute(ATTR_NAME, String(minMarginRight));
+      ((document.documentElement:any):HTMLElement).setAttribute(ATTR_NAME, String(minMarginRight));
       if (minMarginRight <= 0) {
         setCss('dynamic_resize_searchbar', '');
         return;
@@ -135,7 +135,7 @@ class InboxAppToolbarButtonView {
     }
 
     this._stopper.onValue(() => {
-      const newMarginRight = parseInt(document.documentElement.getAttribute(ATTR_NAME) || '0') - buttonWidth;
+      const newMarginRight = parseInt(((document.documentElement:any):HTMLElement).getAttribute(ATTR_NAME) || '0') - buttonWidth;
       setSheetRules(newMarginRight);
     });
   }

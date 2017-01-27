@@ -79,10 +79,10 @@ class GmailAppSidebarView {
     this._sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
     this._sidebarContainerEl.insertBefore(el, this._sidebarContainerEl.firstElementChild);
 
-    if (!document.body.querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+    if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-      document.body.appendChild(waitingPlatform);
+      ((document.body:any):HTMLElement).appendChild(waitingPlatform);
     }
 
     const containerEl = findParent(this._sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
@@ -136,7 +136,7 @@ class GmailAppSidebarView {
       this._sidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
     });
 
-    Kefir.fromEvents(document.body, 'inboxsdkNewSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
@@ -162,7 +162,7 @@ class GmailAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents(document.body, 'inboxsdkUpdateSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
@@ -181,7 +181,7 @@ class GmailAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents(document.body, 'inboxsdkRemoveSidebarPanel')
+    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
@@ -196,7 +196,7 @@ class GmailAppSidebarView {
           render();
         }
       });
-    Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelScrollIntoView')
+    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {

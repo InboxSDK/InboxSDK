@@ -14,6 +14,7 @@ export default function setCss(key: string, css: ?string) {
     style = document.createElement('style');
     style.className = 'inboxsdk__custom';
     style.id = id;
+    if (!document.head) throw new Error('missing head');
     document.head.appendChild(style);
   }
   style.textContent = css;

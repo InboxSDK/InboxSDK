@@ -71,10 +71,10 @@ class InboxTooltipView {
       }
     }
 
-    document.body.appendChild(this._el);
-    document.body.appendChild(this._arrowEl);
+    ((document.body:any):HTMLElement).appendChild(this._el);
+    ((document.body:any):HTMLElement).appendChild(this._arrowEl);
     this._updatePosition(true);
-    this._el.addEventListener('load', event => {
+    this._el.addEventListener('load', (event:any) => {
       this._updatePosition(true);
     }, true);
 

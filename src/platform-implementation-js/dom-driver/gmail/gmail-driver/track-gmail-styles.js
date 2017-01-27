@@ -48,12 +48,12 @@ function isDarkTheme(): boolean {
 
 export default function trackGmailStyles() {
   if (
-    document.head.hasAttribute('data-inboxsdk-gmail-style-tracker') ||
+    (document.head:any).hasAttribute('data-inboxsdk-gmail-style-tracker') ||
     GmailElementGetter.isStandalone()
   ) {
     return;
   }
-  document.head.setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
+  (document.head:any).setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
 
   let currentDensity = null;
   let currentDarkTheme = null;
@@ -62,19 +62,19 @@ export default function trackGmailStyles() {
     const newDensity = getDensity();
     if (currentDensity !== newDensity) {
       if (currentDensity) {
-        document.body.classList.remove('inboxsdk__gmail_density_' + currentDensity);
+        ((document.body:any):HTMLElement).classList.remove('inboxsdk__gmail_density_' + currentDensity);
       }
       currentDensity = newDensity;
-      document.body.classList.add('inboxsdk__gmail_density_' + currentDensity);
+      ((document.body:any):HTMLElement).classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
     const newDarkTheme = isDarkTheme();
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
       if (currentDarkTheme) {
-        document.body.classList.add('inboxsdk__gmail_dark_theme');
+        ((document.body:any):HTMLElement).classList.add('inboxsdk__gmail_dark_theme');
       } else {
-        document.body.classList.remove('inboxsdk__gmail_dark_theme');
+        ((document.body:any):HTMLElement).classList.remove('inboxsdk__gmail_dark_theme');
       }
     }
   }

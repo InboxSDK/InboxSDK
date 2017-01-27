@@ -324,7 +324,7 @@ class GmailAttachmentCardView {
 					downloadLink.setAttribute('target', '_blank');
 				}
 
-				document.body.appendChild(downloadLink);
+				((document.body:any):HTMLElement).appendChild(downloadLink);
 
 				simulateClick(downloadLink);
 				downloadLink.remove();

@@ -29,6 +29,6 @@ function _createOuterSidebar(gmailComposeView){
 	gmailComposeView.getElement().appendChild(outerSidebar);
 	gmailComposeView.getAdditionalAreas().outerSidebar = outerSidebar;
 
-	document.body.classList.add('inboxsdk__outerSidebarActive');
+	((document.body:any):HTMLElement).classList.add('inboxsdk__outerSidebarActive');
 	gmailComposeView.getElement().addClass('inboxsdk__compose_outerSidebarActive');
 }

@@ -23,7 +23,7 @@ export default function addTooltipToButton(gmailComposeView: GmailComposeView, b
 		.takeUntilBy(gmailTooltipView.getStopper())
 		.onValue(() => gmailTooltipView.destroy());
 
-	document.body.appendChild(gmailTooltipView.getElement());
+	((document.body:any):HTMLElement).appendChild(gmailTooltipView.getElement());
 
 	_anchorTooltip(gmailTooltipView, gmailComposeView, buttonViewController, buttonDescriptor);
 

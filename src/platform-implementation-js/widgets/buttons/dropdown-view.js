@@ -43,7 +43,7 @@ class DropdownView extends EventEmitter {
 		if (document.contains(containerEl)) {
 			this._didInsertContainerEl = false;
 		} else {
-			document.body.insertBefore(containerEl, document.body.firstElementChild);
+			((document.body:any):HTMLElement).insertBefore(containerEl, ((document.body:any):HTMLElement).firstElementChild);
 			this._didInsertContainerEl = true;
 		}
 

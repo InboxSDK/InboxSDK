@@ -102,12 +102,12 @@ describe('Inbox', function() {
       browser.frameParent();
 
       const threadViewsSeen = browser.execute(() =>
-        Number(document.head.getAttribute('data-test-threadViewsSeen'))
+        Number((document.head:any).getAttribute('data-test-threadViewsSeen'))
       ).value;
       assert.strictEqual(threadViewsSeen, 2);
 
       const messageViewsWithNativeCardsSeen = browser.execute(() =>
-        Number(document.head.getAttribute('data-test-messageViewsWithNativeCardsSeen'))
+        Number((document.head:any).getAttribute('data-test-messageViewsWithNativeCardsSeen'))
       ).value;
       assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
     } catch (err) {

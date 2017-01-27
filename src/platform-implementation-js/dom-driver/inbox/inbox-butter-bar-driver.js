@@ -67,13 +67,13 @@ export default class InboxButterBarDriver {
   }
 
   getSharedMessageQueue(): Array<Object> {
-    const attr = document.head.getAttribute('data-inboxsdk-butterbar-queue');
+    const attr = (document.head:any).getAttribute('data-inboxsdk-butterbar-queue');
     return attr ? JSON.parse(attr) : [];
   }
 
   setSharedMessageQueue(queue: Object) {
     const attr = JSON.stringify(queue);
-    document.head.setAttribute('data-inboxsdk-butterbar-queue', attr);
+    (document.head:any).setAttribute('data-inboxsdk-butterbar-queue', attr);
   }
 
   // Immediately displays the message, overriding anything else on the screen.

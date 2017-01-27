@@ -19,7 +19,8 @@ describe("censorHTMLtree", function() {
 </html>`);
 
   it("works", function() {
-    var divB = document.getElementById('b');
+    const divB = document.getElementById('b');
+    if (!divB) throw new Error();
     assert.strictEqual(
       censorHTMLtree(divB),
       '<html>[1]<body><div id="canvas" role="foo&amp;" data-blah="...">[1]<div id="b">...<b class="blah" data-foo="...">...</b>...</div></div>[2]</body></html>'

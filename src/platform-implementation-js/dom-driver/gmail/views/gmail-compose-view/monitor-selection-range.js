@@ -5,8 +5,8 @@ import type GmailComposeView from '../gmail-compose-view';
 
 export default function(gmailComposeView: GmailComposeView) {
   Kefir.merge([
-    Kefir.fromEvents(document.body, 'mousedown'),
-    Kefir.fromEvents(document.body, 'keydown')
+    Kefir.fromEvents((document.body:any), 'mousedown'),
+    Kefir.fromEvents((document.body:any), 'keydown')
   ]).takeUntilBy(gmailComposeView.getStopper())
   .onValue(event => {
     var body = gmailComposeView.getMaybeBodyElement();

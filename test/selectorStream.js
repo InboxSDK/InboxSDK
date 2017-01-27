@@ -55,7 +55,7 @@ describe('selectorStream', function() {
       '.parent',
       '[role=main]',
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -72,7 +72,7 @@ describe('selectorStream', function() {
       '.parent',
       '[role]',
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -89,7 +89,7 @@ describe('selectorStream', function() {
       '[class^="paren"]',
       '[role*="ai"]',
       'button[class$="oo"]'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -107,7 +107,7 @@ describe('selectorStream', function() {
       'div#search',
       'div',
       'button.foo'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -124,7 +124,7 @@ describe('selectorStream', function() {
       '.parent',
       'div[role="main"]',
       '*'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -143,7 +143,7 @@ describe('selectorStream', function() {
       'div.search',
       ':not(.ignoreMe)',
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -160,7 +160,7 @@ describe('selectorStream', function() {
       '.parent',
       'div[role="main"], .search',
       'div:not(.foo, .ignoreMe)'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -186,7 +186,7 @@ describe('selectorStream', function() {
         ]
       ]},
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -230,7 +230,7 @@ describe('selectorStream', function() {
       ]},
       'button',
       {$watch: '[class]'}
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(({el,removalStream}) => {
         removalStream.onValue(removalSpy);
@@ -266,7 +266,7 @@ describe('selectorStream', function() {
       '[role=main]',
       {$watch: '[data-foo], .aaaa'},
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(stopper)
       .onValue(({el,removalStream}) => {
         removalStream.onValue(removalSpy);
@@ -317,7 +317,7 @@ describe('selectorStream', function() {
       '[role=main]',
       {$watch: {attributeFilter: ['data-foo'], fn: el => el.hasAttribute('data-foo')}},
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(stopper)
       .onValue(({el,removalStream}) => {
         removalStream.onValue(removalSpy);
@@ -367,7 +367,7 @@ describe('selectorStream', function() {
       {$log: 'div'},
       'button.foo',
       {$log: 'button'}
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -393,7 +393,7 @@ describe('selectorStream', function() {
       '*',
       {$filter: el => el.getAttribute('role') === 'main'},
       'button'
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {
@@ -413,7 +413,7 @@ describe('selectorStream', function() {
         el.getAttribute('role') === 'main' ?
           el.querySelector('button') : null
       }
-    ])(page().body)
+    ])((page().body:any))
       .takeUntilBy(Kefir.later(50))
       .onValue(onValueSpy)
       .onEnd(() => {

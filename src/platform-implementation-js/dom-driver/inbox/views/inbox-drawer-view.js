@@ -27,7 +27,7 @@ class InboxDrawerView {
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
 
-    let insertionTarget = document.body;
+    let insertionTarget = ((document.body:any):HTMLElement);
     let composeRect = null;
 
     const {composeView, closeWithCompose} = options;
@@ -130,7 +130,7 @@ class InboxDrawerView {
       composeOffsetParent,
       el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
         el.getBoundingClientRect().left === 0
-    ) || document.body;
+    ) || ((document.body:any):HTMLElement);
 
     composeEl.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
       bubbles: false, cancelable: false, detail: null

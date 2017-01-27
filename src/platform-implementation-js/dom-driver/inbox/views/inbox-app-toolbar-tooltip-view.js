@@ -16,7 +16,7 @@ class InboxAppToolbarTooltipView {
 
     this._arrowEl = document.createElement('div');
     this._arrowEl.className = 'inboxsdk__tooltip_arrow inboxsdk__bottom';
-    document.body.appendChild(this._arrowEl);
+    ((document.body:any):HTMLElement).appendChild(this._arrowEl);
     if (arrowColor) {
       this._arrowEl.style.borderColor = arrowColor;
     }
@@ -29,7 +29,7 @@ class InboxAppToolbarTooltipView {
     this._el.setAttribute('role', 'region');
 
     this._containerEl.appendChild(this._el);
-    document.body.appendChild(this._containerEl);
+    ((document.body:any):HTMLElement).appendChild(this._containerEl);
 
     this._reposition();
   }

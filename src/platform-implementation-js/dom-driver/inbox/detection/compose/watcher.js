@@ -58,7 +58,7 @@ export default function watcher(
     }}
   ]);
 
-  const regularComposes = regularComposeSelector(root.body)
+  const regularComposes = regularComposeSelector((root.body:any))
     .map(({el,removalStream}) => ({
       // Needed so the element isn't removed before we see the element
       // re-added as full-screen.
@@ -77,7 +77,7 @@ export default function watcher(
     '[role=dialog]'
   ]);
 
-  const fullscreenComposes = fullscreenComposeSelector(root.body);
+  const fullscreenComposes = fullscreenComposeSelector((root.body:any));
 
   return Kefir.merge([
     inlineComposes,

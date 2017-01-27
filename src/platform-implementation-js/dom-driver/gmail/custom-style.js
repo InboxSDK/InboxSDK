@@ -13,6 +13,7 @@ export default function customStyle() {
 		cssContent.onValue(css => {
 			style.textContent = rewriteCssWithIdMap(css);
 		});
+		if (!document.head) throw new Error('missing head');
 		document.head.appendChild(style);
 	}
 }

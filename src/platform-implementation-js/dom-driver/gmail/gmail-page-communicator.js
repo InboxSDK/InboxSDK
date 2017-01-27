@@ -62,11 +62,11 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   getUserOriginalPreviewPaneMode(): ?string {
-    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
+    return (document.head:any).getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
   getIkValue(): string {
-    const ownIk = document.head.getAttribute('data-inboxsdk-ik-value');
+    const ownIk = (document.head:any).getAttribute('data-inboxsdk-ik-value');
     if (ownIk) {
       return ownIk;
     }
@@ -78,7 +78,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   getActionTokenValue(): string {
-    const s = document.head.getAttribute('data-inboxsdk-action-token-value');
+    const s = (document.head:any).getAttribute('data-inboxsdk-action-token-value');
     if (s == null) throw new Error('Failed to read value');
     return s;
   }

@@ -56,7 +56,7 @@ export default class KeyboardShortcutHelpModifier {
 	}
 
 	_monitorKeyboardHelp() {
-		makeElementChildStream(document.body)
+		makeElementChildStream(((document.body:any):HTMLElement))
 			.map(event => event.el)
 			.filter(node =>
 				node && node.classList && node.classList.contains('wa')

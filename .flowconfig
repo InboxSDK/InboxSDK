@@ -5,6 +5,7 @@
 .*/dist/inboxsdk\.js.*
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*
+.*/node_modules/fbjs/.*
 .*/node_modules/jstimezonedetect/.*
 .*/node_modules/binary-extensions/.*
 .*/node_modules/builtin-modules/.*

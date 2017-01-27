@@ -13,5 +13,5 @@ export default function watcher(root: Document=document): Kefir.Observable<Eleme
     'div.in#in'
   ];
 
-  return selectorStream(selector)(root.body);
+  return selectorStream(selector)((root.body:any));
 }

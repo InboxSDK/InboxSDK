@@ -34,7 +34,7 @@ export const page20160817: () => Document = once(() => {
   const page = jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-17 with preview overlay.html', 'utf8'));
   const ifrContent = jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-08-17 with preview overlay iframe.html', 'utf8'));
   const pageIfrBody = (page:any).querySelector('#FfJ3bf').contentDocument.body;
-  Array.from(ifrContent.body.children).forEach(el => {
+  Array.from((ifrContent.body:any).children).forEach(el => {
     pageIfrBody.appendChild(el);
   });
   return page;

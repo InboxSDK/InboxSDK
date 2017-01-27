@@ -22,7 +22,7 @@ const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, vie
 		const link = document.createElement('a');
 		link.style.display = 'none';
 		link.href = newHash;
-		document.body.appendChild(link);
+		((document.body:any):HTMLElement).appendChild(link);
 		simulateClick(link);
 		link.remove();
 	} else {

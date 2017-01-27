@@ -312,7 +312,7 @@ class GmailThreadRowView {
       console.warn('addImage called on destroyed thread row');
       return;
     }
-    const prop: Kefir.Observable<[?Object]> = kefirCast((Kefir: any), inIconDescriptor)
+    const prop = kefirCast((Kefir: any), inIconDescriptor)
       .toProperty()
       .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
       .takeUntilBy(this._stopper);

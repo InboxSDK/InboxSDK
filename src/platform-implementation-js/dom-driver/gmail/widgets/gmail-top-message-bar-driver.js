@@ -26,7 +26,7 @@ export default class GmailTopMessageBarDriver {
 						element = this._element = document.createElement('div');
 						element.classList.add('inboxsdk__topMessageBar');
 
-						document.body.insertBefore(element, document.body.firstChild);
+						((document.body:any):HTMLElement).insertBefore(element, ((document.body:any):HTMLElement).firstChild);
 						fakeWindowResize();
 					}
 

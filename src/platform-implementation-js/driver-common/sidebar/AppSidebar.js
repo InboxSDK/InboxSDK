@@ -214,7 +214,7 @@ class Panel extends React.Component {
   componentDidMount() {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
     if (expanded) {
-      document.body.dispatchEvent(
+      ((document.body:any):HTMLElement).dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true, cancelable: false,
           detail: {instanceId: this.props.item.panelDescriptor.instanceId}
@@ -226,14 +226,14 @@ class Panel extends React.Component {
     const prevExpanded = !prevProps.item.showControls || prevProps.item.expanded;
     const expanded = !this.props.item.showControls || this.props.item.expanded;
     if (!prevExpanded && expanded) {
-      document.body.dispatchEvent(
+      ((document.body:any):HTMLElement).dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true, cancelable: false,
           detail: {instanceId: this.props.item.panelDescriptor.instanceId}
         })
       );
     } else if (prevExpanded && !expanded) {
-      document.body.dispatchEvent(
+      ((document.body:any):HTMLElement).dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelDeactivated', {
           bubbles: true, cancelable: false,
           detail: {instanceId: this.props.item.panelDescriptor.instanceId}

@@ -15,6 +15,7 @@ class InboxBackdrop {
     el.addEventListener('click', (e: MouseEvent) => {
       this.destroy();
     });
+    if (!target) throw new Error('no target');
     target.appendChild(el);
 
     this._stopper.onValue(() => {
