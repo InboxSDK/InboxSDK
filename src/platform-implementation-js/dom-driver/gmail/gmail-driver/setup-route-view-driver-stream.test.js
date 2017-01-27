@@ -17,7 +17,7 @@ import MockMutationObserver from '../../../../../test/lib/mock-mutation-observer
 global.MutationObserver = MockMutationObserver;
 
 if (!document.body) throw new Error('should not happen');
-((document.body:any):HTMLElement).innerHTML = `
+document.body.innerHTML = `
   <div class="aeF">
     <div class="nH">
       <div id="main" class="nH"></div>
