@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import * as GmailResponseProcessor from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
 import * as logger from '../../injected-logger';
@@ -53,7 +53,7 @@ function threadMetadataKey(threadRowMetadata: threadRowParser.ThreadRowMetadata)
 }
 
 function processPreloadedThreads() {
-  const preloadScript = _.find(document.querySelectorAll('script:not([src])'), script =>
+  const preloadScript = find(document.querySelectorAll('script:not([src])'), script =>
     script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {

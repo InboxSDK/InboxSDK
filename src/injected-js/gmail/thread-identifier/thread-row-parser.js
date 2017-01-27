@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import intersection from 'lodash/intersection';
 import assert from 'assert';
 import * as logger from '../../injected-logger';
 import {cleanupPeopleLine} from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
@@ -17,7 +17,7 @@ export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowM
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
 
   var errors = [];
-  var threadRowIsVertical = _.intersection(_.toArray(threadRow.classList), ['zA','apv']).length === 2;
+  var threadRowIsVertical = intersection(Array.from(threadRow.classList), ['zA','apv']).length === 2;
   if (threadRowIsVertical) {
     var threadRow2 = threadRow.nextElementSibling;
     if(!threadRow2){

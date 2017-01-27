@@ -1,6 +1,5 @@
 /* @flow */
 
-// import {clone, flatten, find, intersection} from 'lodash';
 import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';

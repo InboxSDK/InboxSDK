@@ -1,9 +1,10 @@
 /* @flow */
 
-import _ from 'lodash';
+import constant from 'lodash/constant';
+import noop from 'lodash/noop';
 import * as logger from '../../injected-logger';
 
-const ignoreErrors = _.constant(true);
+const ignoreErrors = constant(true);
 
 function getIfOwn(object: Object, prop: string): any {
   if (Object.prototype.hasOwnProperty.call(object, prop)) {
@@ -31,14 +32,14 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
     oldFocus = getIfOwn(window.HTMLElement.prototype, 'focus'),
     oldBlur = getIfOwn(window.HTMLElement.prototype, 'blur');
   try {
-    window.HTMLElement.prototype.focus = _.noop;
-    window.HTMLElement.prototype.blur = _.noop;
+    window.HTMLElement.prototype.focus = noop;
+    window.HTMLElement.prototype.blur = noop;
     window.onerror = ignoreErrors;
     const newOpen = function(_url, _title, _options) {
       url = _url;
       // Gmail checks the returned object for these two values specifically.
       const newWin = {
-        closed: false, focus: _.noop
+        closed: false, focus: noop
       };
       setTimeout(function() {
         newWin.closed = true;
