@@ -1,8 +1,102 @@
-'use strict';
-var _ = require('lodash');
-var assert = require('assert');
-var EventEmitter = require('events').EventEmitter;
-var deparam = require('querystring').parse;
+/* @flow */
+
+import has from 'lodash/has';
+import noop from 'lodash/noop';
+import each from 'lodash/each';
+import filter from 'lodash/filter';
+import includes from 'lodash/includes';
+import once from 'lodash/once';
+import assert from 'assert';
+import EventEmitter from 'events';
+import {parse as deparam} from 'querystring';
+
+export type Opts = {
+  logError: (error: Error, details: any) => void;
+};
+
+/**
+ * Object with information about the connection in progress. Its fields are
+ * populated as the connection goes on. The object is passed as the first
+ * argument to all of the wrappers. The object is mutable so the wrappers can
+ * add properties to it.
+ *
+ * @typedef {Object} XHRProxyConnectionDetails
+ * @property {string} method
+ * @property {string} url
+ * @property {Object} params - parameters decoded from the URL
+ * @property {string} responseType
+ * @property {string} originalSendBody - data passed to send method
+ * @property {number} status - HTTP response status
+ * @property {string} [originalResponseText] - Is not set if responseType is set
+ *  to a value besides 'text'.
+ * @property {string} [modifiedResponseText]
+ */
+
+export type XHRProxyConnectionDetails = {
+  method: string;
+  url: string;
+  params: {[key:string]: string};
+  responseType: string;
+  originalSendBody: ?string;
+};
+
+export type XHRProxyConnectionDetailsWithResponse = XHRProxyConnectionDetails&{
+  status: number;
+  originalResponseText: string;
+  modifiedResponseText: string;
+};
+
+export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails&{
+  status: number;
+  originalResponseText: ?string;
+  modifiedResponseText: ?string;
+};
+
+/**
+ * Thing
+ *
+ * @callback XHRProxyWrapperCallback
+ * @param {XHRProxyConnectionDetails} connection
+ */
+
+/**
+ * Wrapper object contains optional callbacks that get run for completed
+ * requests, and a required isRelevantTo method that filters what types of
+ * requests the methods should be called for. All methods are passed an object
+ * with details about the connection as the first argument. Some methods are
+ * called with a relevant second argument (which is also present within the
+ * connection argument).
+ *
+ * @typedef {Object} XHRProxyWrapper
+ * @property {XHRProxyWrapperCallback} isRelevantTo - returns true if wrapper should be used
+ *  for request.
+ * @property {XHRProxyWrapperCallback} [originalSendBodyLogger] - called with value passed to
+ *  send.
+ * @property {XHRProxyWrapperCallback} [requestChanger] - Allows the protocol, URL, and body
+ *  to be changed together before the connection is opened and sent.
+ * @property {XHRProxyWrapperCallback} [originalResponseTextLogger] - called with the responseText as
+ *  given by the server. Is not called if responseType is set to a value besides 'text'.
+ * @property {XHRProxyWrapperCallback} [responseTextChanger] - called with the responseText as given
+ *  by the server and returns new responseText value. Is not called if responseType
+ * is set to a value besides 'text'.
+ * @property {XHRProxyWrapperCallback} [finalResponseTextLogger] - called with the responseText as
+ *  delivered to application code. Is not called if responseType is set to a value besides 'text'.
+ * @property {XHRProxyWrapperCallback} [afterListeners] - called after all event listeners
+ *  for readystatechange have run
+ */
+export type Wrapper = {|
+  isRelevantTo: (connection: XHRProxyConnectionDetails) => boolean;
+  originalSendBodyLogger?: (connection: XHRProxyConnectionDetails, body: string) => void;
+  requestChanger?: (connection: XHRProxyConnectionDetails, request: Object) => Promise<{|
+    method: string;
+    url: string;
+    body: string;
+  |}>;
+  originalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => void;
+  responseTextChanger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => Promise<string>;
+  finalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, finalResponseText: string) => void;
+  afterListeners?: (connection: XHRProxyConnectionDetailsAfterListeners) => void;
+|};
 
 /**
  * Creates a drop-in replacement for the XMLHttpRequest constructor that can
@@ -14,8 +108,7 @@ var deparam = require('querystring').parse;
  * @param {Object} [opts] - Can specify a logError function
  * @returns {function} wrapped XMLHttpRequest-like constructor
  */
-module.exports = function(XHR, wrappers, opts) {
-
+export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wrapper[], opts: Opts): typeof XMLHttpRequest {
   var logError = opts && opts.logError || function(error, label) {
     setTimeout(function() {
       // let window.onerror log this
@@ -38,7 +131,7 @@ module.exports = function(XHR, wrappers, opts) {
       'NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',
       'eventPhase'
     ]).filter(name => name in event).forEach(name => {
-      const value = event[name];
+      const value = (event:any)[name];
       if (value === oldTarget) {
         newEvent[name] = newTarget;
       } else if (typeof value === 'function') {
@@ -57,62 +150,12 @@ module.exports = function(XHR, wrappers, opts) {
   }
 
   function findApplicableWrappers(wrappers, connection) {
-    return _.filter(wrappers, function(wrapper) {
+    return filter(wrappers, function(wrapper) {
       try {
         return wrapper.isRelevantTo(connection);
       } catch(e) { logError(e); }
     });
   }
-
-  /**
-   * Object with information about the connection in progress. Its fields are
-   * populated as the connection goes on. The object is passed as the first
-   * argument to all of the wrappers. The object is mutable so the wrappers can
-   * add properties to it.
-   *
-   * @typedef {Object} XHRProxyConnectionDetails
-   * @property {string} method
-   * @property {string} url
-   * @property {Object} params - parameters decoded from the URL
-   * @property {string} originalSendBody - data passed to send method
-   * @property {number} status - HTTP response status
-   * @property {string} [originalResponseText] - Is not set if responseType is set
-   *  to a value besides 'text'.
-   * @property {string} [modifiedResponseText]
-   */
-
-  /**
-   * Thing
-   *
-   * @callback XHRProxyWrapperCallback
-   * @param {XHRProxyConnectionDetails} connection
-   */
-
-  /**
-   * Wrapper object contains optional callbacks that get run for completed
-   * requests, and a required isRelevantTo method that filters what types of
-   * requests the methods should be called for. All methods are passed an object
-   * with details about the connection as the first argument. Some methods are
-   * called with a relevant second argument (which is also present within the
-   * connection argument).
-   *
-   * @typedef {Object} XHRProxyWrapper
-   * @property {XHRProxyWrapperCallback} isRelevantTo - returns true if wrapper should be used
-   *  for request.
-   * @property {XHRProxyWrapperCallback} [originalSendBodyLogger] - called with value passed to
-   *  send.
-   * @property {XHRProxyWrapperCallback} [requestChanger] - Allows the protocol, URL, and body
-   *  to be changed together before the connection is opened and sent.
-   * @property {XHRProxyWrapperCallback} [originalResponseTextLogger] - called with the responseText as
-   *  given by the server. Is not called if responseType is set to a value besides 'text'.
-   * @property {XHRProxyWrapperCallback} [responseTextChanger] - called with the responseText as given
-   *  by the server and returns new responseText value. Is not called if responseType
-   * is set to a value besides 'text'.
-   * @property {XHRProxyWrapperCallback} [finalResponseTextLogger] - called with the responseText as
-   *  delivered to application code. Is not called if responseType is set to a value besides 'text'.
-   * @property {XHRProxyWrapperCallback} [afterListeners] - called after all event listeners
-   *  for readystatechange have run
-   */
 
   function XHRProxy() {
     this._wrappers = wrappers;
@@ -123,7 +166,7 @@ module.exports = function(XHR, wrappers, opts) {
 
     if (XHR.bind && XHR.bind.apply) {
       // call constructor with variable number of arguments
-      this._realxhr = new (XHR.bind.apply(XHR, [null].concat(arguments)))();
+      this._realxhr = new ((XHR:any).bind.apply(XHR, [null].concat(arguments)))();
     } else {
       // Safari's XMLHttpRequest lacks a bind method, but its constructor
       // doesn't support extra arguments anyway, so don't bother logging an
@@ -139,7 +182,7 @@ module.exports = function(XHR, wrappers, opts) {
         } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
       }
 
-      _.each(self._boundListeners[name], function(boundListener) {
+      each(self._boundListeners[name], function(boundListener) {
         try {
           boundListener(event);
         } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
@@ -154,9 +197,9 @@ module.exports = function(XHR, wrappers, opts) {
       runRscListeners(Object.freeze({
         bubbles: false, cancelBubble: false, cancelable: false,
         defaultPrevented: false,
-        preventDefault: _.noop,
-        stopPropagation: _.noop,
-        stopImmediatePropagation: _.noop,
+        preventDefault: noop,
+        stopPropagation: noop,
+        stopImmediatePropagation: noop,
         type: 'readystatechange',
         currentTarget: this, target: this,
         srcElement: this,
@@ -170,14 +213,14 @@ module.exports = function(XHR, wrappers, opts) {
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
       var wasSuccess = self.status == 200;
-      var progressEvent = _.extend({}, transformEvent(self._realxhr, self, event), {
+      var progressEvent = Object.assign({}, transformEvent(self._realxhr, self, event), {
         lengthComputable: false, loaded: 0, total: 0
       });
 
       var supportsResponseText = !self._realxhr.responseType || self._realxhr.responseType == 'text';
 
       if (supportsResponseText) {
-        _.each(self._activeWrappers, function(wrapper) {
+        each(self._activeWrappers, function(wrapper) {
           if (wrapper.finalResponseTextLogger) {
             try {
               wrapper.finalResponseTextLogger(
@@ -195,7 +238,7 @@ module.exports = function(XHR, wrappers, opts) {
       }
       triggerEventListeners('loadend', progressEvent);
 
-      _.each(self._activeWrappers, function(wrapper) {
+      each(self._activeWrappers, function(wrapper) {
         if (wrapper.afterListeners) {
           try {
             wrapper.afterListeners(self._connection);
@@ -222,7 +265,7 @@ module.exports = function(XHR, wrappers, opts) {
             value: self._realxhr.responseText
           });
 
-          _.each(self._activeWrappers, function(wrapper) {
+          each(self._activeWrappers, function(wrapper) {
             if (wrapper.originalResponseTextLogger) {
               try {
                 wrapper.originalResponseTextLogger(
@@ -231,7 +274,7 @@ module.exports = function(XHR, wrappers, opts) {
             }
           });
 
-          var finish = _.once(deliverFinalRsc.bind(null, event));
+          var finish = once(deliverFinalRsc.bind(null, event));
           if (self._connection.async) {
             // If the XHR object is re-used for another connection, then we need
             // to make sure that our upcoming async calls here do nothing.
@@ -324,7 +367,7 @@ module.exports = function(XHR, wrappers, opts) {
       });
     });
 
-    Object.defineProperty(self, 'response', {
+    (Object:any).defineProperty(self, 'response', {
       enumerable: true, configurable: false,
       get: function() {
         if (!this._realxhr.responseType || this._realxhr.responseType == 'text') {
@@ -374,11 +417,11 @@ module.exports = function(XHR, wrappers, opts) {
       this._listeners[name] = [];
       this._boundListeners[name] = [];
     }
-    if (!_.includes(this._listeners[name], listener)) {
+    if (!includes(this._listeners[name], listener)) {
       var boundListener = wrapEventListener(this._realxhr, this, listener);
       this._listeners[name].push(listener);
       this._boundListeners[name].push(boundListener);
-      if (!_.includes(['readystatechange', 'load', 'error', 'loadend'], name)) {
+      if (!includes(['readystatechange', 'load', 'error', 'loadend'], name)) {
         // certain listeners are called manually so that the final
         // call (when readyState==4) can be delayed.
         this._realxhr.addEventListener(name, boundListener, false);
@@ -451,7 +494,7 @@ module.exports = function(XHR, wrappers, opts) {
     });
     this._connection.responseType = this._realxhr.responseType || 'text';
 
-    _.each(self._activeWrappers, function(wrapper) {
+    each(self._activeWrappers, function(wrapper) {
       if (wrapper.originalSendBodyLogger) {
         try {
           wrapper.originalSendBodyLogger(
@@ -480,17 +523,17 @@ module.exports = function(XHR, wrappers, opts) {
       this._requestChangers.reduce(function(promise, nextRequestChanger) {
         return promise.then(function(modifiedRequest) {
           if (startConnection === self._connection && !self._realStartedSend) {
-            assert(_.has(modifiedRequest, 'method'), 'modifiedRequest has method');
-            assert(_.has(modifiedRequest, 'url'), 'modifiedRequest has url');
-            assert(_.has(modifiedRequest, 'body'), 'modifiedRequest has body');
+            assert(has(modifiedRequest, 'method'), 'modifiedRequest has method');
+            assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
+            assert(has(modifiedRequest, 'body'), 'modifiedRequest has body');
             return nextRequestChanger(self._connection, Object.freeze(modifiedRequest));
           }
         });
       }, Promise.resolve(request)).then(function(modifiedRequest) {
         if (startConnection === self._connection && !self._realStartedSend) {
-          assert(_.has(modifiedRequest, 'method'), 'modifiedRequest has method');
-          assert(_.has(modifiedRequest, 'url'), 'modifiedRequest has url');
-          assert(_.has(modifiedRequest, 'body'), 'modifiedRequest has body');
+          assert(has(modifiedRequest, 'method'), 'modifiedRequest has method');
+          assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
+          assert(has(modifiedRequest, 'body'), 'modifiedRequest has body');
           return modifiedRequest;
         }
       }).catch(function(err) {
@@ -509,7 +552,7 @@ module.exports = function(XHR, wrappers, opts) {
   };
 
   [XHRProxy, XHRProxy.prototype].forEach(function(obj) {
-    _.extend(obj, {
+    Object.assign(obj, {
       UNSENT: 0,
       OPENED: 1,
       HEADERS_RECEIVED: 2,
@@ -518,5 +561,5 @@ module.exports = function(XHR, wrappers, opts) {
     });
   });
 
-  return XHRProxy;
-};
+  return (XHRProxy: any);
+}
