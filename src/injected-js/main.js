@@ -2,7 +2,7 @@ if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
 
   const logger = require('./injected-logger');
-  var oldDefine;
+  let oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
       // work around amd compatibility issue
@@ -23,6 +23,7 @@ if (!global.__InboxSDKInjected) {
     const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
     const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener');
     const setupInboxCustomViewLinkSmuggler = require('./inbox/setupInboxCustomViewLinkSmuggler');
+    const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
     if (document.location.origin === 'https://mail.google.com') {
       gmailInterceptor();
@@ -31,6 +32,7 @@ if (!global.__InboxSDKInjected) {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
       setupInboxCustomViewLinkSmuggler();
+      setupInboxAjaxInterceptor();
     } else {
       throw new Error("Should not happen");
     }
