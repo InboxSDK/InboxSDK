@@ -1,13 +1,17 @@
 /* @flow */
 
-import _ from 'lodash';
+import clone from 'lodash/clone';
+import flatten from 'lodash/flatten';
+import find from 'lodash/find';
+import intersection from 'lodash/intersection';
+
 import Kefir from 'kefir';
-import * as logger from './injected-logger';
-import XHRProxyFactory from './xhr-proxy-factory';
+import * as logger from '../injected-logger';
+import XHRProxyFactory from '../xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
-import quotedSplit from '../common/quoted-split';
-import defer from '../common/defer';
+import quotedSplit from '../../common/quoted-split';
+import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
 
 function logErrorExceptEventListeners(err, details) {
@@ -113,8 +117,10 @@ export default function setupGmailInterceptor() {
             originalSendBody: connection.originalSendBody
           });
 
-          const composeParams = querystring.parse(connection.originalSendBody);
-          delete modifiers[composeParams.composeid];
+          if (connection.originalSendBody) {
+            const composeParams = querystring.parse(connection.originalSendBody);
+            delete modifiers[composeParams.composeid];
+          }
         }
       }
     });
@@ -148,16 +154,16 @@ export default function setupGmailInterceptor() {
   });
 
   js_frame_wrappers.push({
-    isRelevantTo: function(connection) {
-      return connection.params.search && connection.params.view === 'tl';
+    isRelevantTo(connection) {
+      return !!connection.params.search && connection.params.view === 'tl';
     },
-    responseTextChanger: function(connection, responseText) {
+    async responseTextChanger(connection, responseText) {
       // Presence of a responseTextChanger blocks Gmail from getting the partial
       // values as this loads. We want our originalResponseTextLogger to run
       // before Gmail has seen any of the response.
       return responseText;
     },
-    originalResponseTextLogger: function(connection) {
+    originalResponseTextLogger(connection) {
       if (connection.status === 200) {
         const search = connection.params.search;
         const responseText = connection.originalResponseText;
@@ -199,20 +205,20 @@ export default function setupGmailInterceptor() {
           if(currentQueryDefer == null){
             throw new Error('tried to resolve a null currentQueryDefer');
           }
-          currentQueryDefer.resolve(_.flatten(suggestionModifications));
+          currentQueryDefer.resolve(flatten(suggestionModifications));
           currentQueryDefer = currentQuery = suggestionModifications = null;
         }
       }
     });
 
     main_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo(connection) {
         return Object.keys(providers).length > 0 &&
-          connection.url.match(/^\/cloudsearch\/request\?/) &&
+          !!connection.url.match(/^\/cloudsearch\/request\?/) &&
           connection.params.client == 'gmail' &&
           connection.params.gs_ri == 'gmail';
       },
-      originalSendBodyLogger: function(connection, body) {
+      originalSendBodyLogger(connection, body) {
         const parsedBody = querystring.parse(body);
         if (!parsedBody.request) {
           return;
@@ -224,7 +230,7 @@ export default function setupGmailInterceptor() {
         currentQuery = query;
         if (currentQueryDefer)
           currentQueryDefer.resolve();
-        currentQueryDefer = connection._defer = defer();
+        currentQueryDefer = (connection:any)._defer = defer();
         suggestionModifications = [];
         triggerEvent({
           type: 'suggestionsRequest',
@@ -232,8 +238,8 @@ export default function setupGmailInterceptor() {
         });
       },
       async responseTextChanger(connection, responseText) {
-        if (connection._defer && connection.status === 200) {
-          const modifications = await connection._defer.promise;
+        if ((connection:any)._defer && connection.status === 200) {
+          const modifications = await (connection:any)._defer.promise;
           if (modifications) {
             return modifySuggestions(responseText, modifications);
           }
@@ -275,14 +281,14 @@ export default function setupGmailInterceptor() {
           params.search && params.view === 'tl' &&
           connection.url.match(/^\?/) &&
           params.q &&
-          (customSearchTerm = _.intersection(customSearchTerms, quotedSplit(params.q))[0])
+          (customSearchTerm = intersection(customSearchTerms, quotedSplit(params.q))[0])
         ) {
           if (queryReplacement && queryReplacement.query === params.q && queryReplacement.start != params.start) {
             // If this is the same query that was made last, but just for a
             // different page, then re-use the replacement query we got last time.
             // Don't wait on the extension to come up with it again (and risk it
             // giving an inconsistent answer between pages).
-            connection._queryReplacement = queryReplacement;
+            (connection:any)._queryReplacement = queryReplacement;
             // Mark the old queryReplacement with this page now so we can tell on
             // a later request whether the page was changed or the list refresh
             // button was hit.
@@ -293,7 +299,7 @@ export default function setupGmailInterceptor() {
               // to after it's replaced in a moment.
               queryReplacement.newQuery.resolve(queryReplacement.query);
             }
-            queryReplacement = connection._queryReplacement = {
+            queryReplacement = (connection:any)._queryReplacement = {
               term: customSearchTerm,
               query: params.q,
               start: params.start,
@@ -311,8 +317,8 @@ export default function setupGmailInterceptor() {
         return false;
       },
       requestChanger: function(connection, request) {
-        return connection._queryReplacement.newQuery.promise.then(function(newQuery) {
-          let newParams = _.clone(connection.params);
+        return (connection:any)._queryReplacement.newQuery.promise.then(function(newQuery) {
+          let newParams = clone(connection.params);
           newParams.q = newQuery;
           return {
             method: request.method,
@@ -358,7 +364,7 @@ export default function setupGmailInterceptor() {
           params.search && params.view === 'tl' &&
           connection.url.match(/^\?/) &&
           params.q &&
-          (customSearchQuery = _.find(customSearchQueries, x => x === params.q))
+          (customSearchQuery = find(customSearchQueries, x => x === params.q))
         ) {
           if (customListJob) {
             // Resolve the old one with something because no one else is going
@@ -366,7 +372,7 @@ export default function setupGmailInterceptor() {
             customListJob.newQuery.resolve(customListJob.query);
             customListJob.newResults.resolve(null);
           }
-          customListJob = connection._customListJob = {
+          customListJob = (connection:any)._customListJob = {
             query: params.q,
             start: +params.start,
             newQuery: defer(),
@@ -382,8 +388,8 @@ export default function setupGmailInterceptor() {
         return false;
       },
       requestChanger: function(connection, request) {
-        return connection._customListJob.newQuery.promise.then(newQuery => {
-          const newParams = _.clone(connection.params);
+        return (connection:any)._customListJob.newQuery.promise.then(newQuery => {
+          const newParams = clone(connection.params);
           newParams.q = newQuery;
           return {
             method: request.method,
@@ -395,11 +401,11 @@ export default function setupGmailInterceptor() {
       responseTextChanger: function(connection, response) {
         triggerEvent({
           type: 'searchResultsResponse',
-          query: connection._customListJob.query,
-          start: connection._customListJob.start,
+          query: (connection:any)._customListJob.query,
+          start: (connection:any)._customListJob.start,
           response
         });
-        return connection._customListJob.newResults.promise.then(newResults =>
+        return (connection:any)._customListJob.newResults.promise.then(newResults =>
           newResults === null ? response : newResults
         );
       }
@@ -415,8 +421,8 @@ function triggerEvent(detail) {
 }
 
 function stringifyComposeParams(inComposeParams){
-  let composeParams = _.cloneDeep(inComposeParams);
-  let string = `=${stringifyComposeRecipientParam(composeParams.to, 'to')}&=${stringifyComposeRecipientParam(composeParams.cc, 'cc')}&=${stringifyComposeRecipientParam(composeParams.bcc, 'bcc')}`;
+  const composeParams = clone(inComposeParams);
+  const string = `=${stringifyComposeRecipientParam(composeParams.to, 'to')}&=${stringifyComposeRecipientParam(composeParams.cc, 'cc')}&=${stringifyComposeRecipientParam(composeParams.bcc, 'bcc')}`;
 
   delete composeParams.to;
   delete composeParams.bcc;

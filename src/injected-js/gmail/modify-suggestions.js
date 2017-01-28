@@ -1,10 +1,10 @@
 /* @flow */
 
-import _ from 'lodash';
+import escape from 'lodash/escape';
 import autoHtml from 'auto-html';
 import {defn} from 'ud';
-import htmlToText from '../common/html-to-text';
-import * as GRP from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import htmlToText from '../../common/html-to-text';
+import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 // This is the type that the user provides.
 export type AutocompleteSearchResult = {
@@ -60,7 +60,7 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
     let name, nameHTML;
     if (typeof modification.name === 'string') {
       name = modification.name;
-      nameHTML = (_.escape(name): string);
+      nameHTML = (escape(name): string);
     } else if (typeof modification.nameHTML === 'string') {
       nameHTML = modification.nameHTML;
       name = htmlToText(nameHTML);
@@ -71,7 +71,7 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
     let description, descriptionHTML;
     if (typeof modification.description === 'string') {
       description = modification.description;
-      descriptionHTML = (_.escape(description): string);
+      descriptionHTML = (escape(description): string);
     } else if (typeof modification.descriptionHTML === 'string') {
       descriptionHTML = modification.descriptionHTML;
       description = htmlToText(descriptionHTML);

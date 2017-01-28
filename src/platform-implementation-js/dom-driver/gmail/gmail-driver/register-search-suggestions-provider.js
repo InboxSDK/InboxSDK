@@ -9,7 +9,7 @@ import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import gmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
-import type {AutocompleteSearchResult, AutocompleteSearchResultWithId} from '../../../../injected-js/modify-suggestions';
+import type {AutocompleteSearchResult, AutocompleteSearchResultWithId} from '../../../../injected-js/gmail/modify-suggestions';
 
 export default function registerSearchSuggestionsProvider(driver: GmailDriver, handler: Function) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we

@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import * as logger from './injected-logger';
 import waitFor from '../platform-implementation-js/lib/wait-for';
 
@@ -19,7 +19,7 @@ function stupidToBool(stupid: any): boolean {
 }
 
 function getSettingValue(settings: any[], name: string): boolean {
-  var entry = _.find(settings, (setting) => setting[0] === name);
+  var entry = find(settings, (setting) => setting[0] === name);
   return entry ? stupidToBool(entry[1]) : false;
 }
 
@@ -37,7 +37,7 @@ module.exports = function() {
       (document.head:any).setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
       (document.head:any).setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
 
-      var globalSettingsHolder = _.find(GLOBALS[17], (item) => item[0] === 'p');
+      var globalSettingsHolder = find(GLOBALS[17], (item) => item[0] === 'p');
 
       if(!globalSettingsHolder){
         logger.error(new Error('failed to find globalSettings'), {

@@ -2,7 +2,7 @@ if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
 
   const logger = require('./injected-logger');
-  var oldDefine;
+  let oldDefine;
   try {
     if (typeof define !== "undefined" && define && define.amd) {
       // work around amd compatibility issue
@@ -10,19 +10,20 @@ if (!global.__InboxSDKInjected) {
       oldDefine = define;
       define = null;
     }
-    const _ = require('lodash');
     const xhrHelper = require('./xhr-helper');
-    const gmailInterceptor = require('./setup-gmail-interceptor');
-    const setupGmonkeyHandler = require('./setup-gmonkey-handler');
     const setupDataExposer = require('./setup-data-exposer');
     const setupEventReemitter = require('./setup-event-reemitter');
     const setupErrorSilencer = require('./setup-error-silencer');
     const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin');
     const setupPushStateListener = require('./setupPushStateListener');
 
-    const setupClickAndGetNewIframeSrc = require('./setupClickAndGetNewIframeSrc');
-    const setupInboxFakeWindowResizeListener = require('./setupInboxFakeWindowResizeListener');
-    const setupInboxCustomViewLinkSmuggler = require('./setupInboxCustomViewLinkSmuggler');
+    const gmailInterceptor = require('./gmail/setup-gmail-interceptor');
+    const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler');
+
+    const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
+    const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener');
+    const setupInboxCustomViewLinkSmuggler = require('./inbox/setupInboxCustomViewLinkSmuggler');
+    const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
     if (document.location.origin === 'https://mail.google.com') {
       gmailInterceptor();
@@ -31,6 +32,7 @@ if (!global.__InboxSDKInjected) {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
       setupInboxCustomViewLinkSmuggler();
+      setupInboxAjaxInterceptor();
     } else {
       throw new Error("Should not happen");
     }

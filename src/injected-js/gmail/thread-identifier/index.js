@@ -1,13 +1,13 @@
 /* @flow */
 
-import _ from 'lodash';
-import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import find from 'lodash/find';
+import * as GmailResponseProcessor from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {parse} from 'querystring';
-import * as logger from '../injected-logger';
+import * as logger from '../../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
-import Marker from '../../common/marker';
-import findParent from '../../common/find-parent';
+import Marker from '../../../common/marker';
+import findParent from '../../../common/find-parent';
 
 export function setup() {
   processPreloadedThreads();
@@ -35,7 +35,7 @@ function processThreads(threads: GmailResponseProcessor.Thread[]) {
   threads.forEach(storeThreadMetadata);
 }
 
-var AMBIGUOUS = Marker('ABIGUOUS');
+var AMBIGUOUS = Marker('AMBIGUOUS');
 var threadIdsByKey: Map<string, string|Marker> = new Map();
 function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
@@ -53,7 +53,7 @@ function threadMetadataKey(threadRowMetadata: threadRowParser.ThreadRowMetadata)
 }
 
 function processPreloadedThreads() {
-  const preloadScript = _.find(document.querySelectorAll('script:not([src])'), script =>
+  const preloadScript = find(document.querySelectorAll('script:not([src])'), script =>
     script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {
