@@ -30,7 +30,7 @@ export default function setupAjaxInterceptor() {
   // Only set up the interception for a fraction of sessions right now.
   // This has the benefit that if something goes wrong, then the user can
   // refresh and most likely not have interception present.
-  const useXHRInterceptor = Math.random() < 0.1 || true;
+  const useXHRInterceptor = Math.random() < 0.1;
 
   if (useXHRInterceptor) {
     global.XMLHttpRequest = XHRProxyFactory(
