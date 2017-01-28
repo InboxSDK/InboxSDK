@@ -5,10 +5,10 @@ import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
 
 export function interpretSentEmailResponse(responseString: string): {threadID: string, messageID: string} {
-  var emailSentArray = deserialize(responseString).value;
+  const emailSentArray = deserialize(responseString).value;
 
-  var gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
-  var gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
+  const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
+  const gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
   if (!gmailMessageId || !gmailThreadId) {
     throw new Error("Failed to read email response");
   }
@@ -21,10 +21,10 @@ export function interpretSentEmailResponse(responseString: string): {threadID: s
 }
 
 export function extractGmailMessageIdFromSentEmail(emailSentArray: any): ?string {
-  var messageIdArrayMarker = "a";
-  var messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, function(markerArray) {
-    return markerArray.length > 3 && _.isArray(markerArray[3]) && markerArray[3].length > 0;
-  });
+  const messageIdArrayMarker = "a";
+  const messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, markerArray =>
+    markerArray.length > 3 && Array.isArray(markerArray[3]) && markerArray[3].length > 0
+  );
 
   if(!messageIdArray){
     return null;
@@ -34,9 +34,9 @@ export function extractGmailMessageIdFromSentEmail(emailSentArray: any): ?string
 }
 
 export function extractGmailThreadIdFromSentEmail(emailSentArray: any): ?string {
-  var threadIdArrayMarker = "csd";
-  var threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
-    return markerArray.length == 3 && _.isArray(markerArray[2]) && markerArray[2].length > 5;
+  const threadIdArrayMarker = "csd";
+  const threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
+    return markerArray.length == 3 && Array.isArray(markerArray[2]) && markerArray[2].length > 5;
   });
 
   if(!threadIdArray){
@@ -52,11 +52,11 @@ function extractHexGmailThreadIdFromMessageIdSearch(responseString: string): any
     return null;
   }
 
-  var threadResponseArray = deserialize(responseString).value;
-  var threadIdArrayMarker = "cs";
-  var threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, function(markerArray){
-    return markerArray.length > 20;
-  });
+  const threadResponseArray = deserialize(responseString).value;
+  const threadIdArrayMarker = "cs";
+  const threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, markerArray =>
+    markerArray.length > 20
+  );
 
   if(!threadIdArray){
     return;
@@ -269,8 +269,8 @@ function threadListSerialize(threadResponseArray: any[], options?: MessageOption
   if(!includeLengths){
     if (!noArrayNewLines) {
       const lines = response.split(/\r|\n/);
-      const firstLines = _.dropRight(lines, 3);
-      const lastLines = _.takeRight(lines, 3);
+      const firstLines = lines.slice(0, -3);
+      const lastLines = lines.slice(-3);
       response = firstLines.join('\n');
       response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
     } else {
@@ -285,12 +285,12 @@ function threadListSerialize(threadResponseArray: any[], options?: MessageOption
 }
 
 function suggestionSerialize(suggestionsArray: any[]): string {
-  var response = "5\n)]}'\n";
-  for(var ii=0; ii<suggestionsArray.length; ii++){
-    var arraySection = suggestionsArray[ii];
-    var arraySectionString = serializeArray(arraySection);
+  let response = "5\n)]}'\n";
+  for(let ii=0; ii<suggestionsArray.length; ii++){
+    const arraySection = suggestionsArray[ii];
+    const arraySectionString = serializeArray(arraySection);
 
-    var length = arraySectionString.length;
+    const length = arraySectionString.length;
     response += length + '\r\n' + arraySectionString;
   }
 
@@ -298,12 +298,12 @@ function suggestionSerialize(suggestionsArray: any[]): string {
 }
 
 export function serializeArray(array: any[], noArrayNewLines: boolean = false): string {
-  var response = '[';
-  for(var ii=0; ii<array.length; ii++){
-    var item = array[ii];
+  let response = '[';
+  for(let ii=0; ii<array.length; ii++){
+    const item = array[ii];
 
-    var addition;
-    if(_.isArray(item)){
+    let addition;
+    if(Array.isArray(item)){
       addition = serializeArray(item, noArrayNewLines);
     }
     else if(item == null) {
@@ -513,11 +513,11 @@ function _threadsToTbGroups(threads: any[]): Array<Array<any>> {
 }
 
 function _searchArray(responseArray: any, marker: string, markerArrayValidator: (markerArray: any[]) => boolean): any {
-  var pathArray = _searchObject(responseArray, marker, 100);
+  const pathArray = _searchObject(responseArray, marker, 100);
 
-  for(var ii=0; ii<pathArray.length; ii++){
-    var pathToMarkerArray = _.initial(pathArray[ii].path);
-    var markerArray = _getArrayValueFromPath(responseArray, pathToMarkerArray);
+  for(let ii=0; ii<pathArray.length; ii++){
+    const pathToMarkerArray = pathArray[ii].path.slice(0, -1);
+    const markerArray = _getArrayValueFromPath(responseArray, pathToMarkerArray);
 
     if(markerArrayValidator(markerArray)){
       return markerArray;
@@ -526,21 +526,21 @@ function _searchArray(responseArray: any, marker: string, markerArrayValidator: 
 }
 
 function _searchObject(element: Object, query: string, maxDepth: number): any {
-  var retVal = [];
-  var initialNode = {
+  const retVal = [];
+  const initialNode = {
     el: element,
     path: []
   };
-  var nodeList = [initialNode];
+  const nodeList = [initialNode];
 
   while (nodeList.length > 0) {
-    var node = nodeList.pop();
+    const node = nodeList.pop();
     if (node.path.length <= maxDepth) {
       if(node.el !== null && typeof node.el === 'object'){
-        var keys = Object.keys(node.el);
-        for (var i = 0; i < keys.length; i++) {
-          var key = keys[i];
-          var newNode = {
+        const keys = Object.keys(node.el);
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i];
+          const newNode = {
             el: node.el[key],
             path: node.path.concat([key])
           };
@@ -557,8 +557,8 @@ function _searchObject(element: Object, query: string, maxDepth: number): any {
 }
 
 function _getArrayValueFromPath(responseArray: any, path: string[]): any {
-  var currentArray = responseArray;
-  for(var ii=0; ii<path.length; ii++){
+  let currentArray = responseArray;
+  for(let ii=0; ii<path.length; ii++){
     currentArray = currentArray[ path[ii] ];
   }
   return currentArray;
