@@ -1,13 +1,13 @@
 /* @flow */
 
-import _ from 'lodash';
+import constant from 'lodash/constant';
 
 export default function Marker(description?: string): {name: ?string} {
   if (this instanceof Marker) {
     throw new TypeError("Can't use new with Marker function");
   }
   const strFnOpts = {
-    value: Object.freeze(_.constant('[Marker'+(description?' '+description:'')+']'))
+    value: Object.freeze(constant('[Marker'+(description?' '+description:'')+']'))
   };
   return (Object:any).defineProperties({
     name: description
