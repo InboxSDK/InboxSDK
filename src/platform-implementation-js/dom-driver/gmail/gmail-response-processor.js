@@ -1,6 +1,9 @@
 /* @flow */
 
-import _ from 'lodash';
+import flatten from 'lodash/flatten';
+import last from 'lodash/last';
+import t from 'transducers.js';
+import mapIndexed from 'map-indexed-xf';
 import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
 
@@ -343,14 +346,15 @@ export type Thread = {
 
 export function readDraftId(response: string, messageID: string): ?string {
   const decoded = deserialize(response).value;
-  const msgA = _.chain(decoded)
-    .flatten()
-    .filter(Array.isArray)
-    .flatten()
-    .filter(x => x[0] === 'ms' && x[1] === messageID)
-    .map(x => x[60])
-    .head()
-    .value();
+
+  const msgA = t.toArray(decoded, t.compose(
+    t.cat,
+    t.filter(Array.isArray),
+    t.cat,
+    t.filter(x => x[0] === 'ms' && x[1] === messageID),
+    t.take(1),
+    t.map(x => x[60])
+  ))[0];
   if (msgA) {
     return msgA.split(':')[1];
   }
@@ -445,21 +449,21 @@ it all back together.
       newTbs.push(postTbItems);
     }
   }
-  const parsedNew = _.flatten([
+  const parsedNew = flatten([
     preTbGroups,
     newTbs,
     postTbGroups
   ]);
 
-  const allSections = _.flatten(parsedNew);
-  const endSection = _.last(allSections);
+  const allSections = flatten(parsedNew);
+  const endSection = last(allSections);
 
   if (endSection[0] !== 'e') {
     throw new Error("Failed to find end section");
   }
   endSection[1] = allSections.length;
 
-  const fullNew = actionResponseMode ? [[_.flatten(parsedNew), value[0][1]]] : parsedNew;
+  const fullNew = actionResponseMode ? [[flatten(parsedNew), value[0][1]]] : parsedNew;
   return serialize(fullNew, options);
 }
 
@@ -495,21 +499,23 @@ export function cleanupPeopleLine(peopleHtml: string): string {
     .replace(/(<span[^>]*) class="[^"]*"/g, '$1');
 }
 
+const _extractThreadArraysFromResponseArrayXf = t.compose(
+  t.cat,
+  t.filter(item => item[0] === 'tb'),
+  t.map(item => item[2]),
+  t.cat
+);
 function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[] {
-  return _.chain(threadResponseArray)
-    .flatten()
-    .filter(item => item[0] === 'tb')
-    .map(item => item[2])
-    .flatten()
-    .value();
+  return t.toArray(threadResponseArray, _extractThreadArraysFromResponseArrayXf);
 }
 
+const _threadsToTbGroupsXf = t.compose(
+  t.map(thread => thread._originalGmailFormat),
+  t.partition(10),
+  mapIndexed((threadsChunk, i) => [['tb', i*10, threadsChunk]])
+);
 function _threadsToTbGroups(threads: any[]): Array<Array<any>> {
-  return _.chain(threads)
-    .map(thread => thread._originalGmailFormat)
-    .chunk(10)
-    .map((threadsChunk, i) => [['tb', i*10, threadsChunk]])
-    .value();
+  return t.toArray(threads, _threadsToTbGroupsXf);
 }
 
 function _searchArray(responseArray: any, marker: string, markerArrayValidator: (markerArray: any[]) => boolean): any {
