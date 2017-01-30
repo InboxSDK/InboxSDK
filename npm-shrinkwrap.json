@@ -4052,6 +4052,11 @@
       "from": "map-cache@>=0.2.0 <0.3.0",
       "resolved": "https://registry.npmjs.org/map-cache/-/map-cache-0.2.2.tgz"
     },
+    "map-indexed-xf": {
+      "version": "1.0.0",
+      "from": "map-indexed-xf@latest",
+      "resolved": "https://registry.npmjs.org/map-indexed-xf/-/map-indexed-xf-1.0.0.tgz"
+    },
     "map-stream": {
       "version": "0.1.0",
       "from": "map-stream@>=0.1.0 <0.2.0",
@@ -5748,6 +5753,11 @@
       "version": "0.0.3",
       "from": "tr46@>=0.0.3 <0.1.0",
       "resolved": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz"
+    },
+    "transducers.js": {
+      "version": "0.3.2",
+      "from": "transducers.js@latest",
+      "resolved": "https://registry.npmjs.org/transducers.js/-/transducers.js-0.3.2.tgz"
     },
     "tty-browserify": {
       "version": "0.0.0",
