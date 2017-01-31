@@ -11,6 +11,22 @@ export function error(err: Error, details?: any) {
     details = "<failed to jsonify>";
   }
 
+  const errorProperties: Object = {};
+  for (let name in err) {
+    if (Object.prototype.hasOwnProperty.call(err, name)) {
+      try {
+        const value = (err:any)[name];
+        JSON.stringify(value);
+        errorProperties[name] = value;
+      } catch (err) {
+        // ignore
+      }
+    }
+  }
+  if (Object.keys(errorProperties).length > 0) {
+    details = {errorProperties, details};
+  }
+
   document.dispatchEvent(new CustomEvent('inboxSDKinjectedError', {
     bubbles: false,
     cancelable: false,
