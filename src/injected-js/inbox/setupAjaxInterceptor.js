@@ -113,7 +113,7 @@ export default function setupAjaxInterceptor() {
                   listPart.forEach(contactPart => {
                     const contactKeys = Object.keys(contactPart);
                     if (
-                      !contactPart['1'] || difference(contactKeys, ['1','2','3','4']).length
+                      !contactPart['1'] || difference(contactKeys, ['1','2','3','4','6']).length
                     ) {
                       weirdness.push({unexpectedContactKeys: contactKeys});
                     }
