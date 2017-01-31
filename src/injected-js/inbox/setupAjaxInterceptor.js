@@ -132,14 +132,20 @@ export default function setupAjaxInterceptor() {
         if (weirdness.length) {
           logger.error(new Error('Suggestion Response Parse Failure'), {
             type: 'interceptSuggestResponse',
-            responseLength: responseText && responseText.length,
-            weirdness
+            weirdness,
+            response: JSON.stringify(parsed, (k,v) => {
+              const t = typeof v;
+              return (t === 'string' || t === 'number') ? t : v;
+            })
           });
         } else {
           logger.eventSdkPassive('inboxSuggestResponseParseSuccess');
         }
       } catch (err) {
-        logger.error(err, {type: 'interceptSuggestResponse'});
+        logger.error(err, {
+          type: 'interceptSuggestResponse',
+          responseLength: responseText && responseText.length
+        });
       }
     }
   });
