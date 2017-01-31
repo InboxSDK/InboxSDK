@@ -75,6 +75,9 @@ export default function setupAjaxInterceptor() {
       }
     },
     originalResponseTextLogger(connection, responseText) {
+      if (connection.status !== 200) {
+        return;
+      }
       try {
         const parsed = JSON.parse(responseText);
 
