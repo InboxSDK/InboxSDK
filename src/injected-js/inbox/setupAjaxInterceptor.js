@@ -132,6 +132,7 @@ export default function setupAjaxInterceptor() {
         if (weirdness.length) {
           logger.error(new Error('Suggestion Response Parse Failure'), {
             type: 'interceptSuggestResponse',
+            responseLength: responseText && responseText.length,
             weirdness
           });
         } else {
