@@ -187,8 +187,8 @@
 .IDMAP_app_sidebar_content_panel_title_text {
   padding-left: 6px;
   vertical-align: middle;
-  font: 13px / 40px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #303030;
+  font: bold 13px / 40px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(0,0,0, 0.87);
 }
 
 .IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_panel_top_line {
@@ -259,7 +259,7 @@
 }
 
 .IDMAP_app_sidebar_content_panel_content {
-  margin-bottom: 10px;
+  margin-bottom: 25px;
 }
 
 /* end sidebar */
