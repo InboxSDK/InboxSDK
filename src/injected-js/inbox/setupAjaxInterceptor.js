@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual';
 import difference from 'lodash/difference';
 import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
+import SuggestionsResponseModifier from './SuggestionsResponseModifier';
 
 function logErrorExceptEventListeners(err, details) {
   // Don't log the page's own errors
@@ -78,74 +79,12 @@ export default function setupAjaxInterceptor() {
       if (connection.status !== 200) {
         return;
       }
-      try {
-        const parsed = JSON.parse(responseText);
-
-        const weirdness = [];
-        if (!Array.isArray(parsed)) {
-          weirdness.push('response was not array');
-        } else {
-          if (parsed.length !== 2) {
-            weirdness.push({unexpectedLength: parsed.length});
-          }
-
-          const firstPart = parsed[0];
-          if (!firstPart) {
-            weirdness.push('missing first part');
-          } else {
-            const firstKeys = Object.keys(firstPart);
-            if (!isEqual(firstKeys, ['55684698'])) {
-              weirdness.push({unexpectedFirstKeys: firstKeys});
-            }
-            const mainPart = firstPart['55684698'];
-            if (!mainPart) {
-              weirdness.push('missing main part');
-            } else {
-              const mainKeys = Object.keys(mainPart);
-              if (!isEqual(mainKeys, ['2']) && !isEqual(mainKeys, ['1', '2'])) {
-                weirdness.push({unexpectedMainKeys: mainKeys});
-              }
-              const listPart = mainPart[1];
-              if (listPart) {
-                if (!Array.isArray(listPart)) {
-                  weirdness.push('list part is not array');
-                } else {
-                  listPart.forEach(contactPart => {
-                    const contactKeys = Object.keys(contactPart);
-                    if (
-                      !contactPart['1'] || difference(contactKeys, ['1','2','3','4','6']).length
-                    ) {
-                      weirdness.push({unexpectedContactKeys: contactKeys});
-                    }
-                    contactKeys.forEach(key => {
-                      if (typeof contactPart[key] !== (key === '4' ? 'number' : 'string')) {
-                        weirdness.push({wrongType: typeof contactPart[key], key});
-                      }
-                    })
-                  });
-                }
-              }
-            }
-          }
-        }
-
-        if (weirdness.length) {
-          logger.error(new Error('Suggestion Response Parse Failure'), {
-            type: 'interceptSuggestResponse',
-            weirdness,
-            response: JSON.stringify(parsed, (k,v) => {
-              const t = typeof v;
-              return (t === 'string' || t === 'number') ? t : v;
-            })
-          });
-        } else {
-          logger.eventSdkPassive('inboxSuggestResponseParseSuccess');
-        }
-      } catch (err) {
-        logger.error(err, {
-          type: 'interceptSuggestResponse',
-          responseLength: responseText && responseText.length
-        });
+      const response = new SuggestionsResponseModifier(responseText);
+      const warning = response.getWarningError();
+      if (warning) {
+        logger.error(warning);
+      } else {
+        logger.eventSdkPassive('inboxSuggestResponseParseNoWarnings');
       }
     }
   });
