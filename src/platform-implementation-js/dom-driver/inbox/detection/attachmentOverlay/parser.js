@@ -16,7 +16,8 @@ function parser(el: HTMLElement) {
   const downloadButton: ?HTMLElement = ec.run('downloadButton', () => {
     const candidate = _.chain(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'))
       .filter(el =>
-        el.childElementCount === 1 && el.firstElementChild.childElementCount === 0
+        el.childElementCount === 1 && el.firstElementChild.childElementCount === 0 &&
+        !el.hasAttribute('aria-disabled')
       )
       .filter(el => {
         if (global.document) {
@@ -34,6 +35,7 @@ function parser(el: HTMLElement) {
       .first()
       .value();
     if (!candidate) throw new Error('Failed to find element');
+    if (candidate.getAttribute('aria-label') === 'Print') throw new Error('Found print button instead');
     return candidate;
   });
 
