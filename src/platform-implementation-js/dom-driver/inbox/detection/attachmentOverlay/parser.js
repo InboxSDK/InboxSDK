@@ -22,7 +22,6 @@ function parser(el: HTMLElement) {
         if (global.document) {
           const rect = el.getBoundingClientRect();
           if (rect.top > 100) return false;
-          if (window.innerWidth - rect.right > 200) return false;
           return true;
         } else {
           // Can't use screen position logic in unit tests so we're cheating a
