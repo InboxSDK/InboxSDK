@@ -16,8 +16,7 @@ function parser(el: HTMLElement) {
   const downloadButton: ?HTMLElement = ec.run('downloadButton', () => {
     const candidate = _.chain(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'))
       .filter(el =>
-        el.childElementCount === 1 && el.firstElementChild.childElementCount === 0 &&
-        !el.hasAttribute('aria-disabled')
+        el.childElementCount === 1 && el.firstElementChild.childElementCount === 0
       )
       .filter(el => {
         if (global.document) {
@@ -28,9 +27,16 @@ function parser(el: HTMLElement) {
         } else {
           // Can't use screen position logic in unit tests so we're cheating a
           // little and depending on an exact class name.
-          return el.childElementCount === 1 &&
-            el.firstElementChild.classList.contains('ndfHFb-c4YZDc-nupQLb-N');
+          return el.parentElement.classList.contains('ndfHFb-c4YZDc-Wrql6b-C7uZwb-b0t70b');
         }
+      })
+      .filter(el => {
+        const elIx = Array.prototype.indexOf.call(el.parentElement.children, el);
+        const nextDivSibling = Array.prototype.filter.call(
+          el.parentElement.children,
+          (el, i) => i > elIx && el.nodeName === 'DIV'
+        )[0];
+        return nextDivSibling && nextDivSibling.getAttribute('aria-haspopup') === 'true';
       })
       .first()
       .value();
