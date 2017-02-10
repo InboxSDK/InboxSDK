@@ -1,9 +1,11 @@
-module.exports = {
-  addLabel: 1,
-  addButton: 1,
-  addAttachmentIcon: 1,
-  replaceDate: 1,
-  getSubject: 0,
-  getDateString: 0,
-  getThreadID: 0
+/* @flow */
+
+export type ThreadRowViewDriver = {
+  addLabel(label: Object): void;
+  addButton(buttonDescriptor: Object): void;
+  addAttachmentIcon(opts: Object): void;
+  replaceDate(opts: Object): void;
+  getSubject(): string;
+  getDateString(): string;
+  getThreadID(): string;
 };
