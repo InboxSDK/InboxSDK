@@ -124,6 +124,9 @@ export default class ButterBar {
       persistent: true,
       hideOnViewChanged: true
     });
+
+    options.time = Infinity; // Loading messages should exist until destroyed.
+
     return this.showMessage(options);
   }
 
