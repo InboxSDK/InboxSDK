@@ -158,6 +158,27 @@ var SavingMessageDescriptor = /** @lends SavingMessageDescriptor */{
   text: null,
 
   /**
+  * String to use as the innerHTML of the ButterBar instead of using the given text.
+  * ^optional
+  * @type {string}
+  */
+  html: null,
+
+  /**
+  * HTML element to insert into the ButterBar instead of using the given text.
+  * ^optional
+  * @type {HTMLElement}
+  */
+  el: null,
+
+  /**
+  * String to add as a css class to the ButterBar container element.
+  * ^optional
+  * @type {string}
+  */
+  className: null,
+
+  /**
   * Text shown when the save is complete.
   * ^optional
   * ^default='Saved'
@@ -240,6 +261,27 @@ var LoadingMessageDescriptor = /** @lends LoadingMessageDescriptor */{
   * @type {string}
   */
   text: null,
+
+  /**
+  * String to use as the innerHTML of the ButterBar instead of using the given text.
+  * ^optional
+  * @type {string}
+  */
+  html: null,
+
+  /**
+  * HTML element to insert into the ButterBar instead of using the given text.
+  * ^optional
+  * @type {HTMLElement}
+  */
+  el: null,
+
+  /**
+  * String to add as a css class to the ButterBar container element.
+  * ^optional
+  * @type {string}
+  */
+  className: null,
 
   /**
   * Messages with lower priorities won't interrupt a currently displayed message.
