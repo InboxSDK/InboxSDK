@@ -20,15 +20,16 @@ var Compose = /** @lends Compose */ {
   * ^gmail
   * ^inbox
   * @param {func(ComposeView)} handler - The function to be called.
-  * @return {function} a function to call when you want to unregister this handler
+  * @return {function}
   */
   registerComposeViewHandler: function(){},
 
   /**
-   * Opens a new compose view. Any handlers you've registered for ComposeViews will be called as well.
+   * Opens a new compose view. Any handlers you've registered for ComposeViews will be called as well. Returns
+   * a promise which will resolve with the new ComposeView once it has opened.
    * ^gmail
    * ^inbox
-   * @return {Promise.<ComposeView>} a promise that will resolve to a ComposeView once the ComposeView has opened
+   * @return {Promise.<ComposeView>}
    */
   openNewComposeView: function(){},
 

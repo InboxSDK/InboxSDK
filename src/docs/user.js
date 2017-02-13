@@ -8,7 +8,7 @@ var User = /** @lends User */ {
 	 * Get the email address of the currently logged in user.
 	 * ^gmail
 	 * ^inbox
-	 * @return {string} an email address
+	 * @return {string}
 	 */
 	getEmailAddress: function(){},
 
