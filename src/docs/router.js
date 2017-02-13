@@ -47,7 +47,7 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
 	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
-	* {CustomRouteView} which you can modify the content.
+	* {CustomRouteView} whose contents you may modify. Returns a function which can be called to unregister the route handler.
 	* ^gmail
 	* ^inbox
 	* @param {string} routeID - which route this handler is registering for
@@ -60,7 +60,8 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to any route (both customs and built in routes).
 	* Because this can apply to any route, your callback will be given only a generic {RouteView}. This is typically used
-	* when you want to monitor for page changes but don't necessarily need to modify the page.
+	* when you want to monitor for page changes but don't necessarily need to modify the page. Returns a function
+	* which can be called to unregister the route handler.
 	* ^gmail
 	* @param {func(RouteView)} handler - The callback to call when the route changes
 	* @return {function} a function which can be called to to stop handling these routes
@@ -70,13 +71,15 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a list route which matches the routeID you provide.
 	* Gmail and Inbox have several built in routes which are "Lists". These include routes like Inbox, All Mail, Sent, Drafts, etc.
-	* You'll typically use this modify Gmail's and Inbox's built in List routes.
+	* You'll typically use this to modify Gmail's and Inbox's built in List routes.  Returns a function which can be called
+	* to unregister the route handler.
 	* ^gmail
 	* @example
 InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
-	sdk.Router.handleListRoute(Router.NativeListRouteIDs.SEARCH, function(inboxView) {
+	var unregister = sdk.Router.handleListRoute(Router.NativeListRouteIDs.SEARCH, function(inboxView) {
 		console.log(inboxView);
-	})
+	});
+  unregister(); // Stop handling list route
 });
 	* @param {NativeListRouteIDs} routeID - which list route this handler is registering for.
 	* @param {func(ListRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
@@ -93,7 +96,8 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	* The thread IDs should each be a string that is a Gmail Thread ID or the value of
 	* a message's Message-ID header (which must start with "<" and end with ">"), or for more
 	* efficiency both of them can be supplied together in an object with "gmailThreadId" and
-	* "rfcMessageId" properties.
+	* "rfcMessageId" properties.  Returns a function which can be called to unregister
+	* the route handler.
 	* ^gmail
 	* @param {string} routeID - which route this handler is registering for
 	* @param {function(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
