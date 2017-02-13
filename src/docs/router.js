@@ -22,13 +22,14 @@ var Router = /** @lends Router */ {
 
 	/**
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
+	* Returns the encoded URL string.
 	* ^gmail
 	* ^inbox
 	* @param {string} routeID - A route specifying where the link should navigate the user to.
 	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
-	* @return {string} the encoded URL
+	* @return {string}
 	*/
 	createLink: function(){},
 
@@ -53,7 +54,7 @@ var Router = /** @lends Router */ {
 	* @param {string} routeID - which route this handler is registering for
 	* @param {func(CustomRouteView)} handler - The callback to call when the route changes to a custom route matching
 	* the provided routeID
-	* @return {function} a function which can be called to to stop handling these routes
+	* @return {function}
 	*/
 	handleCustomRoute: function(){},
 
@@ -64,7 +65,7 @@ var Router = /** @lends Router */ {
 	* which can be called to unregister the route handler.
 	* ^gmail
 	* @param {func(RouteView)} handler - The callback to call when the route changes
-	* @return {function} a function which can be called to to stop handling these routes
+	* @return {function}
 	*/
 	handleAllRoutes: function(){},
 
@@ -83,7 +84,7 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 });
 	* @param {NativeListRouteIDs} routeID - which list route this handler is registering for.
 	* @param {func(ListRouteView)} handler - The callback to call when the route changes to a list route matching the routeId.
-	* @return {function} a function which can be called to stop handling these routes
+	* @return {function}
 	*/
 	handleListRoute: function(){},
 
@@ -101,7 +102,7 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	* ^gmail
 	* @param {string} routeID - which route this handler is registering for
 	* @param {function(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
-	* @return {function} a function which can be called to stop handling these routes
+	* @return {function}
 	*/
 	handleCustomListRoute: function() {},
 

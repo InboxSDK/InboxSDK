@@ -17,19 +17,23 @@ var ThreadView = /** @lends ThreadView */ {
 	addSidebarContentPanel: function(){},
 
 	/**
-	* Gets all the loaded MessageView objects currently in the thread. See MessageView for more information on what "loaded" means. Note that load more messages may load into the thread later!
-	* If it's important to get future messages, use {Conversations.registerMessageViewHandler} instead.
+	* Gets an Array of all the loaded MessageView objects currently in the thread.
+	* See MessageView for more information on what "loaded" means.
+	* Note that more messages may load into the thread later! If it's important
+	* to get future messages, use {Conversations.registerMessageViewHandler} instead.
 	* ^gmail
 	* ^inbox
-	* @return {MessageView[]} an array of message view objects
+	* @return {MessageView[]}
 	*/
 	getMessageViews: function(){},
 
 	/**
-	* Gets all the {MessageView} objects in the thread regardless of their load state. See {MessageView} for more information on what "loaded" means.
+	* Gets an Array of all the {MessageView} objects in the thread
+	* regardless of their load state. See {MessageView} for more information
+	* on what "loaded" means.
 	* ^gmail
 	* ^inbox
-	* @return {MessageView[]} an array of message view objects
+	* @return {MessageView[]}
 	*/
 	getMessageViewsAll: function(){},
 
@@ -37,7 +41,7 @@ var ThreadView = /** @lends ThreadView */ {
 	 * Gets the subject of this thread.
 	 * ^gmail
 	 * ^inbox
-	 * @return {string} The subject.
+	 * @return {string}
 	 */
 	getSubject: function(){},
 
@@ -45,7 +49,7 @@ var ThreadView = /** @lends ThreadView */ {
 	 * Gets the Gmail Thread ID of the thread.
 	 * ^gmail
 	 * ^inbox
-	 * @return {string} The gmail threadID.
+	 * @return {string}
 	 */
 	getThreadID: function(){},
 

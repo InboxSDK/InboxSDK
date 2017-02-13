@@ -7,21 +7,24 @@ var InboxSDK = {
 };
 
 /**
-* Loads the InboxSDK remotely and prepares it to be used.
+* Loads InboxSDK remotely and prepares it to be used. Returns a promise
+* which resolves with the SDK interface (see usage examples under "Structuring
+* Your App") when the SDK is loaded and ready to be used.
 * @function
 * @param {number} version - The API version of the SDK to use. The recommended value right now is <code>1</code>. The value <code>2</code> may be used to opt in early to use the Inbox support which is still under development. See the <a href="#InboxSupport">Inbox Support</a> section for more information.
 * @param {string} appId - The AppId that you registered for on the <a href="/register">AppId Registration page</a>.
 * @param {LoadOptions} [options] - Optional options object.
-* @return {Promise} A promise which resolves when the SDK is loaded and ready to be used.
+* @return {Promise}
 */
 InboxSDK.load = function(){};
 
 /**
-* Loads a remote script into this extension's content script space and evals it
+* Loads a remote script into the extension's content script space and evals it.
+* Returns a promise which resolves when the script is finished downloading and eval'ing.
 * @function
 * @param {string} url - The URL of the remote script to load.
 * @param {LoadScriptOptions} [options] - Optional options object.
-* @return {Promise} a promise which resolves when this script is finished downloading and eval'ing
+* @return {Promise}
 */
 InboxSDK.loadScript = function(){};
 

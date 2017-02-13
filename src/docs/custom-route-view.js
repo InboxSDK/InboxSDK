@@ -10,7 +10,7 @@ var CustomRouteView = /** @lends CustomRouteView */{
 	* should inject your content into this element.
 	* ^gmail
   * ^inbox
-	* @return {HTMLElement} the main element of your custom route
+	* @return {HTMLElement}
 	*/
 	getElement: function(){},
 
