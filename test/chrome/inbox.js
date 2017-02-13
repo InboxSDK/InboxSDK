@@ -16,8 +16,15 @@ describe('Inbox', function() {
       const composeButton = browser.execute(() =>
         document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
       );
+      const composeButtonHtml = browser.execute((el) => el.innerHTML, composeButton.value).value;
       composeButton.click();
-      browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
+      try {
+        browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
+      } catch (e) {
+        console.log('composeButton initial HTML: ', composeButtonHtml);
+        throw e;
+      }
+
       assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 0');
       browser.click('.test__tooltipButton');
       assert.strictEqual(browser.getText('.test__tooltipButton'), 'Counter: 1');
