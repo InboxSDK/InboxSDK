@@ -62,6 +62,7 @@ describe('Inbox', function() {
       assert(!browser.isVisible('.test__sidebarCounterButton'));
       assert(browser.isVisible('button[title="Test Sidebar"]'));
 
+      console.log('test app toolbar button');
       // Test app toolbar button
       browser.click('div[role=button][title="Test App Toolbar Button"]');
       assert.strictEqual(browser.getText('.test__appToolbarCounterButton'), 'Counter: 0');
@@ -73,18 +74,25 @@ describe('Inbox', function() {
       assert.strictEqual(browser.getText('.test__modalContent'), 'modal test');
       browser.click('[role=alertdialog] button[title="Close"]');
       assert(!browser.isVisible('.test__modalContent'));
+      browser.waitForVisible('.inboxsdk__inbox_backdrop', undefined, true);
 
       function switchToOverlayFrame() {
+        console.log('switching to overlay frame');
         const frames = browser.elements('iframe:not([src])').value;
         for (let i=0; i<frames.length; i++) {
           browser.frameParent();
           browser.frame(frames[i]);
-          const el = browser.element('body > div[role=dialog][tabindex]').value;
+          console.log('switching to frame: ', i);
+          browser.pause(1000);
+          // Do .execute() rather than .element() because there seemns to be
+          // an issue with querying elements directly after switching frame contexts.
+          const el = browser.execute(() => Boolean(document.querySelector('body > div[role=dialog][tabindex]'))).value;
           if (el) return;
         }
         throw new Error('Did not find overlay frame');
       }
 
+      console.log('Test an attachment card inside a message');
       // Test an attachment card inside a message
       browser.scroll('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]', 0, -500);
       browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]');
@@ -92,13 +100,21 @@ describe('Inbox', function() {
       browser.pause(500);
       browser.click('section div[title="foo.txt"]'); // click an attachment card
       switchToOverlayFrame();
+      console.log('waiting for attachment overlay buttons');
       browser.waitForVisible('button[aria-label="MV"]', 10*1000);
+      console.log('found MV, looking for CV');
       browser.waitForVisible('button[aria-label="CV"]', 10*1000);
+      console.log('found CV, clicking "Close"');
       browser.click('div[role=button][data-tooltip="Close"]');
+      console.log('clicked "Close", switching back to frame parent')
       browser.frameParent();
-      browser.click('div[role=heading]');
       browser.pause(1000);
+      console.log('switched to frame parent, clicking heading');
+      browser.click('div[role=heading]');
+      console.log('clicked heading');
+      browser.pause(2000);
 
+      console.log('Test an attachment card inside a thread row');
       // Test an attachment card inside a thread row
       browser.waitForVisible('div[role=listitem][title="foo.txt"]', 10*1000);
       browser.pause(500);
@@ -107,6 +123,11 @@ describe('Inbox', function() {
       browser.waitForVisible('button[aria-label="CV"]', 10*1000);
       browser.click('div[role=button][data-tooltip="Close"]');
       browser.frameParent();
+      browser.pause(1000);
+      console.log('switched to frame parent, clicking heading');
+      browser.click('div[role=heading]');
+      console.log('clicked heading');
+      browser.pause(2000);
 
       const threadViewsSeen = browser.execute(() =>
         Number((document.head:any).getAttribute('data-test-threadViewsSeen'))
@@ -119,9 +140,12 @@ describe('Inbox', function() {
       assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
     } catch (err) {
       console.error(err.stack || ('Error: '+err.message));
-      // browser.debug();
+      if (process.env.CI !== 'true') {
+        browser.debug();
+      }
       throw err;
     } finally {
+      browser.frameParent();
       const errors = browser.execute(() => window._errors).value;
       if (errors.length) {
         console.log('Logged errors:');
