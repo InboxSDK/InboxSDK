@@ -16,7 +16,8 @@ describe('Inbox', function() {
       const composeButton = browser.execute(() =>
         document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
       );
-      const composeButtonHtml = browser.execute((el) => el.innerHTML, composeButton.value).value;
+      const composeButtonHtml = browser.execute((el) => el.outerHTML, composeButton.value).value;
+      console.log('composeButton initial HTML (before click): ', composeButtonHtml);
       composeButton.click();
       try {
         browser.waitForVisible('div[role=dialog] div[jsaction^=compose]');
