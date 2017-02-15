@@ -335,7 +335,7 @@ class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  goto(routeID: string, params: ?{[ix: string]: string}): void {
+  goto(routeID: string, params: ?{[ix: string]: string|number}): void {
     if (!this._customRouteIDs.has(routeID)) {
       throw new Error(`Invalid routeID: ${routeID}`);
     }

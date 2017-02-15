@@ -63,7 +63,14 @@ class Router {
 	}
 
 	goto(routeID: string, params?: ?Object){
-		get(memberMap, this).driver.goto(routeID, params);
+		const {driver} = get(memberMap, this);
+		if (_.isString(params)) {
+			driver.getLogger().deprecationWarning(
+				'Router.goto param string',
+				'param object (e.g. {param: value})'
+			)
+		}
+		driver.goto(routeID, params);
 	}
 
 	handleCustomRoute(routeID: string, handler: HandlerRegistry<CustomRouteView>): () => void {
