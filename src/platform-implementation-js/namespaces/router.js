@@ -62,7 +62,10 @@ class Router {
 		return get(memberMap, this).driver.createLink(routeID, params);
 	}
 
-	goto(routeID: string, params?: ?Object){
+	goto(routeID: string, params?: ?Object) {
+		if (typeof routeID !== 'string') {
+			throw new Error('routeID must be a string');
+		}
 		const {driver} = get(memberMap, this);
 		if (_.isString(params)) {
 			driver.getLogger().deprecationWarning(
