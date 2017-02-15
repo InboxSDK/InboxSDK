@@ -73,8 +73,11 @@ class Router {
 		};
 
 		const removeCustomRouteFromDriver = get(memberMap, this).driver.addCustomRouteID(routeID);
-		const {customRoutes} = get(memberMap, this);
+		const {customRoutes, driver} = get(memberMap, this);
+
 		customRoutes.push(customRouteDescriptor);
+
+		driver.getLogger().eventSdkPassive('Router.handleCustomRoute');
 
 		return function(){
 			removeCustomRouteFromDriver();
