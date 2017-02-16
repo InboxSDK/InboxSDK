@@ -5,9 +5,11 @@ import * as ud from 'ud';
 import {NATIVE_ROUTE_IDS} from '../../../constants/router';
 import simulateClick from '../../../lib/dom/simulate-click';
 import getURLObject from './get-url-object';
-import type GmailDriver from '../gmail-driver';
 
-const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, viewName: string, params: ?{[ix: string]: string}) {
+import type GmailDriver from '../gmail-driver';
+import type {RouteParams} from '../../../namespaces/router';
+
+const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, viewName: string, params: ?RouteParams|string) {
 	const newHash = gmailDriver.createLink(viewName, params);
 
 	if (_.includes(NATIVE_ROUTE_IDS, viewName)) {
