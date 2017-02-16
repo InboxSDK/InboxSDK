@@ -65,6 +65,7 @@ import InboxModalView from './views/inbox-modal-view';
 import InboxDrawerView from './views/inbox-drawer-view';
 import InboxBackdrop from './views/inbox-backdrop';
 import type ButterBar from '../../namespaces/butter-bar';
+import type {RouteParams} from '../../namespaces/router';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 
@@ -331,11 +332,11 @@ class InboxDriver {
     return new Promise((resolve, reject) => {});
   }
 
-  createLink(routeID: string, params: ?{[ix: string]: string}): any {
+  createLink(routeID: string, params: ?RouteParams): any {
     throw new Error("Not implemented");
   }
 
-  goto(routeID: string, params: ?{[ix: string]: string|number}): void {
+  goto(routeID: string, params: ?RouteParams): void {
     if (!this._customRouteIDs.has(routeID)) {
       throw new Error(`Invalid routeID: ${routeID}`);
     }

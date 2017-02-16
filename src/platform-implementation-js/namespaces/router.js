@@ -15,6 +15,8 @@ import {NATIVE_ROUTE_IDS, NATIVE_LIST_ROUTE_IDS, ROUTE_TYPES} from '../constants
 import type {Driver} from '../driver-interfaces/driver';
 import type {Handler} from '../lib/handler-registry';
 
+export type RouteParams = {[ix:string]: string|number};
+
 const memberMap = defonce(module, () => new WeakMap());
 
 const SAMPLE_RATE = 0.01;
@@ -58,16 +60,16 @@ class Router {
 		});
 	}
 
-	createLink(routeID: string, params?: ?Object): string {
+	createLink(routeID: string, params?: ?RouteParams|string): string {
 		return get(memberMap, this).driver.createLink(routeID, params);
 	}
 
-	goto(routeID: string, params?: ?Object) {
+	goto(routeID: string, params?: ?RouteParams|string) {
 		if (typeof routeID !== 'string') {
 			throw new Error('routeID must be a string');
 		}
 		const {driver} = get(memberMap, this);
-		if (_.isString(params)) {
+		if (typeof params === 'string') {
 			driver.getLogger().deprecationWarning(
 				'Router.goto param string',
 				'param object (e.g. {param: value})'

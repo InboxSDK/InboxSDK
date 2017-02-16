@@ -1,6 +1,8 @@
 /* @flow */
 
-export default function populateRouteID(routeID: string, params: ?{[ix:string]: string|number}): string {
+import type {RouteParams} from '../namespaces/router';
+
+export default function populateRouteID(routeID: string, params: ?RouteParams): string {
   const paramsObject = params || {};
   const usedParams = new Set();
   const result = routeID.replace(/:([^/]+)/g, (whole: string, term: string) => {
