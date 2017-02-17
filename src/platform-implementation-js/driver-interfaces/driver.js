@@ -15,6 +15,8 @@ import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
 import type InboxThreadView from '../dom-driver/inbox/views/inbox-thread-view';
 export type ThreadViewDriver = GmailThreadView|InboxThreadView;
 
+import type {ThreadRowViewDriver} from './thread-row-view-driver';
+
 import type {MessageViewDriver} from './message-view-driver';
 
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
@@ -51,7 +53,7 @@ export type Driver = {
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
-	getThreadRowViewDriverStream(): Kefir.Observable<Object>;
+	getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;

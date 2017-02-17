@@ -56,6 +56,7 @@ import openComposeWindow from './gmail-driver/open-compose-window';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
+import type {RouteParams} from '../../namespaces/router';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
@@ -239,11 +240,11 @@ class GmailDriver {
 		showNativeRouteView(this);
 	}
 
-	createLink(routeID: string, params: ?{[ix: string]: string}) {
+	createLink(routeID: string, params: ?RouteParams|string) {
 		return createLink(this._gmailRouteProcessor, routeID, params);
 	}
 
-	goto(routeID: string, params: ?{[ix: string]: string}) {
+	goto(routeID: string, params: ?RouteParams|string) {
 		return gotoView(this, routeID, params);
 	}
 

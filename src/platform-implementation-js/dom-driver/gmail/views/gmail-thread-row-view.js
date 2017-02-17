@@ -8,11 +8,10 @@ import asap from 'asap';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 
-import assertInterface from '../../../lib/assert-interface';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import kefirCast from 'kefir-cast';
-import ThreadRowViewDriver from '../../../driver-interfaces/thread-row-view-driver';
+import type {ThreadRowViewDriver} from '../../../driver-interfaces/thread-row-view-driver';
 import delayAsap from '../../../lib/delay-asap';
 import kefirStopper from 'kefir-stopper';
 
@@ -101,6 +100,7 @@ class GmailThreadRowView {
   _isDestroyed: boolean = false;
 
   constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
+    (this: ThreadRowViewDriver);
     assert(element.hasAttribute('id'), 'check element is main thread row');
 
     this._isVertical = _.intersection(_.toArray(element.classList), ['zA','apv']).length === 2;
@@ -899,8 +899,6 @@ class GmailThreadRowView {
     return subjectRefresher;
   }
 }
-
-assertInterface(GmailThreadRowView.prototype, ThreadRowViewDriver);
 
 export default defn(module, GmailThreadRowView);
 

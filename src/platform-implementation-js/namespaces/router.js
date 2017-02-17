@@ -15,6 +15,8 @@ import {NATIVE_ROUTE_IDS, NATIVE_LIST_ROUTE_IDS, ROUTE_TYPES} from '../constants
 import type {Driver} from '../driver-interfaces/driver';
 import type {Handler} from '../lib/handler-registry';
 
+export type RouteParams = {[ix:string]: string|number};
+
 const memberMap = defonce(module, () => new WeakMap());
 
 const SAMPLE_RATE = 0.01;
@@ -58,27 +60,40 @@ class Router {
 		});
 	}
 
-	createLink(routeID: string, params?: ?Object): string {
+	createLink(routeID: string, params?: ?RouteParams|string): string {
 		return get(memberMap, this).driver.createLink(routeID, params);
 	}
 
-	goto(routeID: string, params?: ?Object){
-		get(memberMap, this).driver.goto(routeID, params);
+	goto(routeID: string, params?: ?RouteParams|string) {
+		if (typeof routeID !== 'string') {
+			throw new Error('routeID must be a string');
+		}
+		const {driver} = get(memberMap, this);
+		if (typeof params === 'string') {
+			driver.getLogger().deprecationWarning(
+				'Router.goto param string',
+				'param object (e.g. {param: value})'
+			)
+		}
+		driver.goto(routeID, params);
 	}
 
 	handleCustomRoute(routeID: string, handler: HandlerRegistry<CustomRouteView>): () => void {
-		var customRouteDescriptor = {
+		const customRouteDescriptor = {
 			routeID: routeID,
 			onActivate: handler
 		};
 
-		var removeCustomRouteFromDriver = get(memberMap, this).driver.addCustomRouteID(routeID);
-		var customRoutes = get(memberMap, this).customRoutes;
+		const removeCustomRouteFromDriver = get(memberMap, this).driver.addCustomRouteID(routeID);
+		const {customRoutes, driver} = get(memberMap, this);
+
 		customRoutes.push(customRouteDescriptor);
+
+		driver.getLogger().eventSdkPassive('Router.handleCustomRoute');
 
 		return function(){
 			removeCustomRouteFromDriver();
-			var index = customRoutes.indexOf(customRouteDescriptor);
+			const index = customRoutes.indexOf(customRouteDescriptor);
 			if(index > -1){
 				customRoutes.splice(index, 1);
 			}
@@ -90,7 +105,7 @@ class Router {
 	}
 
 	handleListRoute(routeID: string, handler: Handler<ListRouteView>): () => void {
-		var listRouteHandlerRegistries = get(memberMap, this).listRouteHandlerRegistries;
+		const {listRouteHandlerRegistries} = get(memberMap, this);
 		if(!listRouteHandlerRegistries[routeID]){
 			throw new Error('Invalid routeID specified');
 		}
@@ -126,9 +141,9 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 	members.allRoutesHandlerRegistry.addTarget(routeView);
 
 	if(routeView.getRouteType() === ROUTE_TYPES.LIST){
-		var listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
+		const listRouteView = new ListRouteView(routeViewDriver, members.driver, members.appId);
 
-		var listRouteHandlerRegistry = members.listRouteHandlerRegistries[routeView.getRouteID()];
+		const listRouteHandlerRegistry = members.listRouteHandlerRegistries[routeView.getRouteID()];
 		if (listRouteHandlerRegistry) {
 			listRouteHandlerRegistry.addTarget(listRouteView);
 		}

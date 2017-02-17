@@ -419,6 +419,15 @@ var ComposeView = /** @lends ComposeView */ {
 	 * will prevent the message from being sent.
 	 */
 
+	 /**
+ 	 * Fires after an extension cancels the send during presending (see the 'presending' event).
+	 * Because multiple extensions may choose to cancel the send, your extension
+	 * may receive a 'sendCanceled' event even if it did not initiate the cancellation.
+	 * This event may be emitted multiple times for one message.
+ 	 * ^gmail
+ 	 * @event ComposeView#sendCanceled
+ 	 */
+
 	/**
 	 * Fires when an AJAX request to Gmail/Inbox has been initiated but the response has not yet been
 	 * received. Any modifications you make to the {ComposeView} at this point will not have an effect

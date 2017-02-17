@@ -128,10 +128,10 @@ var MessageView = /** @lends MessageView */{
 
 	/**
 	 * Gets Gmail's representation of the timestamp of the message.
-	 * Note: this is the string representation because timezone information is not available,
+	 * Note: this returns a string representation because timezone information is not available,
 	 * the accuracy is limited to minutes, and it is formatted to the user's language.
 	 * ^gmail
-	 * @return {string} The date as a string.
+	 * @return {string}
 	 */
 	getDateString: function(){},
 

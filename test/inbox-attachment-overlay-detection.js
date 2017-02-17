@@ -17,6 +17,7 @@ import {
   page20160816,
   page20160817,
   page20160830,
+  page20170209,
 } from './lib/pages';
 
 describe('Inbox Attachment Overlay Detection', function() {
@@ -53,6 +54,14 @@ describe('Inbox Attachment Overlay Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert.strictEqual(results.elements.downloadButton, querySelector(page20160830(), '[data-test-id="downloadButton"]'));
+    });
+
+    it('2017-02-09', function() {
+      const overlay = querySelector(page20170209(), '[data-test-id=overlay]');
+      const results = parser(overlay);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert.strictEqual(results.elements.downloadButton, querySelector(page20170209(), '[data-test-id="downloadButton"]'));
     });
   });
 
