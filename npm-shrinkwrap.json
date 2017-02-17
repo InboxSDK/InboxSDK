@@ -3842,6 +3842,11 @@
       "from": "liftoff@>=2.1.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/liftoff/-/liftoff-2.3.0.tgz"
     },
+    "live-set": {
+      "version": "0.3.6",
+      "from": "live-set@latest",
+      "resolved": "https://registry.npmjs.org/live-set/-/live-set-0.3.6.tgz"
+    },
     "load-json-file": {
       "version": "1.1.0",
       "from": "load-json-file@>=1.0.0 <2.0.0",
@@ -4460,6 +4465,11 @@
       "version": "1.1.2",
       "from": "output-file-sync@>=1.1.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/output-file-sync/-/output-file-sync-1.1.2.tgz"
+    },
+    "page-parser-tree": {
+      "version": "0.2.2",
+      "from": "page-parser-tree@latest",
+      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.2.2.tgz"
     },
     "pako": {
       "version": "0.2.9",
@@ -5586,6 +5596,11 @@
       "from": "taffydb@2.6.2",
       "resolved": "https://registry.npmjs.org/taffydb/-/taffydb-2.6.2.tgz"
     },
+    "tag-tree": {
+      "version": "0.3.3",
+      "from": "tag-tree@latest",
+      "resolved": "https://registry.npmjs.org/tag-tree/-/tag-tree-0.3.3.tgz"
+    },
     "tar-stream": {
       "version": "1.5.2",
       "from": "tar-stream@1.5.2",
@@ -6230,6 +6245,11 @@
       "version": "0.1.2",
       "from": "yeast@0.1.2",
       "resolved": "https://registry.npmjs.org/yeast/-/yeast-0.1.2.tgz"
+    },
+    "zen-observable": {
+      "version": "0.4.0",
+      "from": "zen-observable@>=0.4.0 <0.5.0",
+      "resolved": "https://registry.npmjs.org/zen-observable/-/zen-observable-0.4.0.tgz"
     },
     "zip-object": {
       "version": "0.1.0",
