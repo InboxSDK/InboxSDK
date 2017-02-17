@@ -42,6 +42,7 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
 										domEvent.preventDefault();
 										domEvent.stopPropagation();
 										domEvent.stopImmediatePropagation();
+										gmailComposeView.sendCanceled();
 									}
 								}
 							};

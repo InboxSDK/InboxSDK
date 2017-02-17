@@ -268,6 +268,8 @@ class GmailComposeView {
 
 	isDestroyed(): boolean { return this._destroyed;}
 
+  sendCanceled(): void { this._eventStream.emit({eventName: 'sendCanceled'}) }
+
 	_setupStreams() {
 		this._eventStream.plug(getBodyChangesStream(this));
 		this._eventStream.plug(getAddressChangesStream(this));
