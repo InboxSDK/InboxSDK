@@ -1,9 +1,20 @@
 /* @flow */
 
+import asap from 'asap';
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
 
 import type GmailComposeView from '../gmail-compose-view';
+
+const dispatchCancel = (element, composeId) => (
+	asap(() => (
+		element.dispatchEvent(new CustomEvent('inboxSDKsendCanceled', {
+		  bubbles: false,
+		  cancelable: false,
+		  detail: {composeId}
+	  }))
+	))
+);
 
 export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
 
@@ -42,7 +53,7 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
 										domEvent.preventDefault();
 										domEvent.stopPropagation();
 										domEvent.stopImmediatePropagation();
-										gmailComposeView.sendCanceled();
+										dispatchCancel(element, gmailComposeView.getComposeID())
 									}
 								}
 							};
