@@ -286,7 +286,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
         }
         if (Original.bind && Original.bind.apply) {
           // call constructor with variable number of arguments
-          return new (Original.bind.apply(Original, [null].concat(args)))();
+          return new ((Original.bind:any).apply(Original, [null].concat(args)))();
         } else {
           // Safari's MutationObserver lacks a bind method, but its constructor
           // doesn't support extra arguments anyway, so don't bother logging an
