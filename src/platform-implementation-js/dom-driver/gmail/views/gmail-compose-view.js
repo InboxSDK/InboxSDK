@@ -275,6 +275,12 @@ class GmailComposeView {
 
 		this._eventStream.plug(
 			Kefir
+				.fromEvents(this.getElement(), 'inboxSDKsendCanceled')
+				.map(() => ({eventName: 'sendCanceled'}))
+		);
+
+		this._eventStream.plug(
+			Kefir
 				.later(10)
 				.flatMap(()=>getMinimizedStream(this))
 				.changes()
