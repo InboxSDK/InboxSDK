@@ -38,7 +38,10 @@ export default function createLink(GmailRouteProcessor: GmailRouteProcessor, rou
 	try {
 		processedRoute = populateRouteID(routeID, params);
 	} catch (error) {
-		Logger.error(error);
+		Logger.error(error, {
+			routeID,
+			paramsKey: Object.keys(params)
+		});
 
 		processedRoute = parts
 							.map(function(part){
