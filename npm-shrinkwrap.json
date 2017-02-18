@@ -4467,9 +4467,9 @@
       "resolved": "https://registry.npmjs.org/output-file-sync/-/output-file-sync-1.1.2.tgz"
     },
     "page-parser-tree": {
-      "version": "0.2.2",
-      "from": "page-parser-tree@latest",
-      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.2.2.tgz"
+      "version": "0.2.6",
+      "from": "page-parser-tree@>=0.2.6 <0.3.0",
+      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.2.6.tgz"
     },
     "pako": {
       "version": "0.2.9",
