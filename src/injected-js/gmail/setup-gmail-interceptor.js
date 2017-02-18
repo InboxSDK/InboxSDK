@@ -364,6 +364,7 @@ export default function setupGmailInterceptor() {
           params.search && params.view === 'tl' &&
           connection.url.match(/^\?/) &&
           params.q &&
+          !params.act &&
           (customSearchQuery = find(customSearchQueries, x => x === params.q))
         ) {
           if (customListJob) {
