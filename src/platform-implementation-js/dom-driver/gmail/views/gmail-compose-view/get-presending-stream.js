@@ -18,34 +18,33 @@ const dispatchCancel = (element) => (
 
 export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
 
-  var element = gmailComposeView.getElement();
-  var sendButtonElement = gmailComposeView.getSendButton();
-  var sendAndArchiveButtonElement = gmailComposeView.getSendAndArchiveButton();
+  const element = gmailComposeView.getElement();
+  const sendButtonElement = gmailComposeView.getSendButton();
+  const sendAndArchiveButtonElement = gmailComposeView.getSendAndArchiveButton();
 
-  var domEventStream = Kefir.merge([
+  const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
-      .filter(function(domEvent){
-        return domEvent.ctrlKey || domEvent.metaKey;
-      })
-      .filter(function(domEvent){
-        return domEvent.which === 13 || domEvent.keyCode === 13;
-      }),
+      .filter(domEvent => domEvent.ctrlKey || domEvent.metaKey)
+      .filter(domEvent => domEvent.which === 13 || domEvent.keyCode === 13),
 
     fromEventTargetCapture(element, 'keydown')
-      .filter(function(domEvent){
-        return [13, 32].indexOf(domEvent.which) > -1 ||  [13, 32].indexOf(domEvent.keyCode) > -1;
-      })
-      .filter(function(domEvent){
-        return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
-      }),
+      .filter(domEvent => (
+        [13, 32].indexOf(domEvent.which) > -1 ||
+        [13, 32].indexOf(domEvent.keyCode) > -1
+      ))
+      .filter(domEvent => (
+        (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) ||
+        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement))
+      )),
 
     fromEventTargetCapture(element, 'click')
-      .filter(function(domEvent){
-        return (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) || (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement));
-      })
+      .filter(domEvent => (
+        (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) ||
+        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement))
+      ))
   ]);
 
-  return domEventStream.map((domEvent) => ({
+  return domEventStream.map(domEvent => ({
     eventName: 'presending',
     data: {
       cancel() {
