@@ -33,14 +33,14 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
         [13, 32].indexOf(domEvent.keyCode) > -1
       ))
       .filter(domEvent => (
-        (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) ||
-        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement))
+        (sendButtonElement && sendButtonElement.contains(domEvent.target)) ||
+        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.target))
       )),
 
     fromEventTargetCapture(element, 'click')
       .filter(domEvent => (
-        (sendButtonElement && sendButtonElement.contains(domEvent.srcElement)) ||
-        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.srcElement))
+        (sendButtonElement && sendButtonElement.contains(domEvent.target)) ||
+        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.target))
       ))
   ]);
 

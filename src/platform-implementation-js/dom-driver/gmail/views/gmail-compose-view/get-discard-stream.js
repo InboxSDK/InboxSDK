@@ -17,11 +17,11 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
         [13, 32].indexOf(domEvent.keyCode) > -1
       ))
       .filter(domEvent => (
-        discardButton && discardButton.contains(domEvent.srcElement)
+        discardButton && discardButton.contains(domEvent.target)
       )),
 
     fromEventTargetCapture(element, 'click').filter(domEvent => (
-      discardButton && discardButton.contains(domEvent.srcElement)
+      discardButton && discardButton.contains(domEvent.target)
     ))
   ]);
 
