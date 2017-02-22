@@ -400,6 +400,12 @@ var ComposeView = /** @lends ComposeView */ {
 	 * will be null. This property is only present in Gmail.
 	 */
 
+	 /**
+		* Fires when the compose view is discarded (deleted). If the user chooses
+		* ^gmail
+		* @event ComposeView#discard
+		*/
+
 	/**
 	 * Fires when the From value is changed.
 	 * ^gmail
