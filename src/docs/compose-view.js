@@ -401,7 +401,8 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 
 	 /**
-		* Fires when the compose view is discarded (deleted).
+		* Fires when the compose view is discarded (deleted). 'discard' event
+		* handlers will always be called before 'destroy' handlers.
 		* ^gmail
 		* @event ComposeView#discard
 		*/
