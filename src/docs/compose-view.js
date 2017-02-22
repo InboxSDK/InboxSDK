@@ -401,7 +401,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 
 	 /**
-		* Fires when the compose view is discarded (deleted). If the user chooses
+		* Fires when the compose view is discarded (deleted).
 		* ^gmail
 		* @event ComposeView#discard
 		*/
