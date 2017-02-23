@@ -3,8 +3,6 @@
 import type {PageParserTreeOptions} from 'page-parser-tree';
 
 const pageParserOptions: PageParserTreeOptions = {
-  // logError(err, el) {
-	// },
   tags: {
   },
   watchers: [

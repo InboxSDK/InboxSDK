@@ -5,15 +5,26 @@ import PageParserTree from 'page-parser-tree';
 import type Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import pageParserOptions from './pageParserOptions';
-import once from 'lodash/once';
+import censorHTMLtree from '../../../common/censor-html-tree';
 
 const pageParserOptionsStream: Kefir.Observable<*> = udKefir(module, pageParserOptions);
 
 export default function makePageParserTree(driver: ?Driver, root: Document|HTMLElement): PageParserTree {
-	const page = new PageParserTree(root, pageParserOptions);
+	const _driver = driver;
+
+	function transformOptions(pageParserOptions) {
+		return !_driver ? pageParserOptions : {...pageParserOptions, logError(err, el) {
+			const details = {
+				html: el ? censorHTMLtree(el) : null
+			};
+			_driver.getLogger().errorSite(err, details);
+		}};
+	}
+
+	const page = new PageParserTree(root, transformOptions(pageParserOptions));
 	pageParserOptionsStream.changes().onValue(pageParserOptions => {
 		console.log('replacing PageParserTree options');
-		page.replaceOptions(pageParserOptions);
+		page.replaceOptions(transformOptions(pageParserOptions));
 	});
 	return page;
 }
