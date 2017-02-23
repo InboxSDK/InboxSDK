@@ -127,11 +127,11 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     }));
   }
 
-  setCustomListNewQuery(query: string, newQuery: string) {
+  setCustomListNewQuery(query: string, newQuery: string, newStart: number) {
     document.dispatchEvent(new CustomEvent('inboxSDKcustomListNewQuery', {
       bubbles: false,
       cancelable: false,
-      detail: {query, newQuery}
+      detail: {query, newQuery, newStart}
     }));
   }
 

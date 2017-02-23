@@ -11,7 +11,7 @@ import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
-const COUNT = 50;
+const MAX_THREADS_PER_PAGE = 50;
 
 /*
 Timeline of how a custom thread list works:
@@ -83,17 +83,17 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       start = e.start;
       driver.signalCustomThreadListActivity(customRouteID);
       try {
-        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start, COUNT)));
+        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start, MAX_THREADS_PER_PAGE)));
       } catch(e) {
         return Kefir.constantError(e);
       }
     })
     .flatMap(ids => {
       if (Array.isArray(ids)) {
-        if (ids.length > COUNT) {
+        if (ids.length > MAX_THREADS_PER_PAGE) {
           // upgrade to deprecationWarning later
-          console.warn('Received more than COUNT threads, ignoring them');
-          ids = ids.slice(0, COUNT);
+          console.warn('Received more than MAX_THREADS_PER_PAGE threads, ignoring them');
+          ids = ids.slice(0, MAX_THREADS_PER_PAGE);
         }
         return Kefir.constant(ids);
       } else {
@@ -140,7 +140,12 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
-      driver.getPageCommunicator().setCustomListNewQuery(newQuery, query);
+
+      // Outgoing requests for list queries always need to have a `start` of 0,
+      // because we only ever ask for 1 page-worth of threads per query.
+      // When the response comes back, we modify it to have a `start` consistent
+      // with whatever page was being loaded so Gmail's UI makes sense.
+      driver.getPageCommunicator().setCustomListNewQuery(newQuery, query, 0);
       Kefir.combine([
         // Figure out any gmail thread ids we don't know yet
         Kefir.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
