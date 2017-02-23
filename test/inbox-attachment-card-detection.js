@@ -9,6 +9,12 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
+import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
+import ItemWithLifetimePool from '../src/platform-implementation-js/lib/ItemWithLifetimePool';
+import threadWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/watcher';
+import messageWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/message/watcher';
+
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/parser';
 import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/watcher';
@@ -19,6 +25,15 @@ import {
   page20160816,
   page20160908,
 } from './lib/pages';
+
+function makePools(root) {
+  const {tree} = makePageParserTree(null, root);
+  const topRowPool = toItemWithLifetimePool(tree.getAllByTag('topRow'));
+  const threadRowPool = toItemWithLifetimePool(tree.getAllByTag('threadRow'));
+  const threadPool = new ItemWithLifetimePool(threadWatcher(root, threadRowPool));
+  const messagePool = new ItemWithLifetimePool(messageWatcher(root, threadPool));
+  return [topRowPool, threadRowPool, messagePool];
+}
 
 describe('Inbox Attachment Card Detection', function() {
   this.slow(5000);
@@ -122,7 +137,7 @@ describe('Inbox Attachment Card Detection', function() {
       const attachment5 = querySelector(page20160810_2(), '[data-test-id=attachment5]');
 
       const spy = sinon.spy();
-      watcher(page20160810_2())
+      watcher(page20160810_2(), ...makePools(page20160810_2()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -141,7 +156,7 @@ describe('Inbox Attachment Card Detection', function() {
       const attachment1 = querySelector(page20160812(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
-      watcher(page20160812())
+      watcher(page20160812(), ...makePools(page20160812()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -156,7 +171,7 @@ describe('Inbox Attachment Card Detection', function() {
       const attachment1 = querySelector(page20160816(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
-      watcher(page20160816())
+      watcher(page20160816(), ...makePools(page20160816()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -171,7 +186,7 @@ describe('Inbox Attachment Card Detection', function() {
       const attachment1 = querySelector(page20160908(), '[data-test-id=attachment1]');
 
       const spy = sinon.spy();
-      watcher(page20160908())
+      watcher(page20160908(), ...makePools(page20160908()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

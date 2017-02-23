@@ -11,8 +11,12 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
+import type PageParserTree from 'page-parser-tree';
+import makePageParserTree from './makePageParserTree';
+
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
+import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import populateRouteID from '../../lib/populateRouteID';
@@ -32,8 +36,6 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getTopRowElStream from './detection/topRow/watcher';
-import getThreadRowElStream from './detection/threadRow/watcher';
 import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
 import getSearchBarStream from './detection/searchBar/stream';
@@ -76,6 +78,7 @@ class InboxDriver {
   _envData: EnvData;
   _stopper: Stopper;
   onready: Promise<void>;
+  _page: PageParserTree;
   _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
@@ -108,16 +111,16 @@ class InboxDriver {
     this._envData = envData;
     this._stopper = kefirStopper();
     this._pageCommunicator = new InboxPageCommunicator();
+
+    this._page = makePageParserTree(this, document);
+    this._stopper.onValue(() => this._page.dump());
+
     this.onready = injectScript().then(() => {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const topRowElPool = new ItemWithLifetimePool(
-      getTopRowElStream().takeUntilBy(this._stopper)
-    );
-    const threadRowElPool = new ItemWithLifetimePool(
-      getThreadRowElStream(document, topRowElPool).takeUntilBy(this._stopper)
-    );
+    const topRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('topRow'));
+    const threadRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('threadRow'));
     const threadElPool = new ItemWithLifetimePool(
       getThreadElStream(this, threadRowElPool).takeUntilBy(this._stopper)
     );

@@ -9,9 +9,9 @@ import threadWatcher from '../thread/watcher';
 
 export default function watcher(
   root: Document=document,
-  openedThreadPool: ?ItemWithLifetimePool<ElementWithLifetime>=null
+  openedThreadPool: ItemWithLifetimePool<ElementWithLifetime>
 ): Kefir.Observable<ElementWithLifetime> {
-  const openedThreads = openedThreadPool ? openedThreadPool.items() : threadWatcher(root);
+  const openedThreads = openedThreadPool.items();
 
   const selector = selectorStream([
     '*',

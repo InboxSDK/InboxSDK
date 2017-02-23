@@ -9,6 +9,9 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
+import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
+
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
 import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/watcher';
@@ -25,6 +28,12 @@ import {
   page20160818,
   page20161102,
 } from './lib/pages';
+
+function makeThreadRowElPool(root) {
+  return toItemWithLifetimePool(
+    makePageParserTree(null, root).tree.getAllByTag('threadRow')
+  );
+}
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -193,7 +202,7 @@ describe('Inbox Compose Detection', function() {
       const inlineCompose = querySelector(page20160614(), '[data-test-id=inlinecompose]');
 
       const spy = sinon.spy();
-      watcher(page20160614())
+      watcher(page20160614(), makeThreadRowElPool(page20160614()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -210,7 +219,7 @@ describe('Inbox Compose Detection', function() {
       const compose1 = querySelector(pageWithSidebar20160614(), '[data-test-id=compose1]');
 
       const spy = sinon.spy();
-      watcher(pageWithSidebar20160614())
+      watcher(pageWithSidebar20160614(), makeThreadRowElPool(pageWithSidebar20160614()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -226,7 +235,7 @@ describe('Inbox Compose Detection', function() {
       const fullscreenCompose = querySelector(pageFullscreen20160620(), '[data-test-id=fullscreenCompose]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160620())
+      watcher(pageFullscreen20160620(), makeThreadRowElPool(pageFullscreen20160620()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -242,7 +251,7 @@ describe('Inbox Compose Detection', function() {
       const compose = querySelector(page20160628(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160628())
+      watcher(page20160628(), makeThreadRowElPool(page20160628()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -257,7 +266,7 @@ describe('Inbox Compose Detection', function() {
       const compose = querySelector(page20160628_2(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160628_2())
+      watcher(page20160628_2(), makeThreadRowElPool(page20160628_2()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -272,7 +281,7 @@ describe('Inbox Compose Detection', function() {
       const compose = querySelector(page20160818(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160818())
+      watcher(page20160818(), makeThreadRowElPool(page20160818()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -287,7 +296,7 @@ describe('Inbox Compose Detection', function() {
       const compose = querySelector(page20161102(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20161102())
+      watcher(page20161102(), makeThreadRowElPool(page20161102()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

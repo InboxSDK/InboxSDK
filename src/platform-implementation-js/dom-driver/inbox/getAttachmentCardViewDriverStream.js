@@ -16,11 +16,11 @@ import detectionRunner from '../../lib/dom/detectionRunner';
 
 const impStream = udKefir(module, imp);
 
-function imp(driver, threadRowElPool, messageElPool): Kefir.Observable<InboxAttachmentCardView> {
+function imp(driver, topRowElPool, threadRowElPool, messageElPool): Kefir.Observable<InboxAttachmentCardView> {
   return detectionRunner({
     name: 'attachmentCard',
     finder,
-    watcher: root => watcher(root, threadRowElPool, messageElPool),
+    watcher: root => watcher(root, topRowElPool, threadRowElPool, messageElPool),
     parser,
     logError(err: Error, details?: any) {
       driver.getLogger().errorSite(err, details);
@@ -33,6 +33,6 @@ function imp(driver, threadRowElPool, messageElPool): Kefir.Observable<InboxAtta
     });
 }
 
-export default function getAttachmentCardViewDriverStream(driver: InboxDriver, threadRowElPool: ItemWithLifetimePool<*>, messageElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxAttachmentCardView> {
-  return impStream.flatMapLatest(_imp => _imp(driver, threadRowElPool, messageElPool));
+export default function getAttachmentCardViewDriverStream(driver: InboxDriver, topRowElPool: ItemWithLifetimePool<*>, threadRowElPool: ItemWithLifetimePool<*>, messageElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxAttachmentCardView> {
+  return impStream.flatMapLatest(_imp => _imp(driver, topRowElPool, threadRowElPool, messageElPool));
 }

@@ -26,7 +26,7 @@ export default function fakePageGlobals() {
   if (global.before) { // We're in mocha
     // First we set all of the globals to undefined so that mocha doesn't think
     // they're accidental globals introduced later.
-    let names = ['MutationObserver', 'CustomEvent'];
+    let names = ['MutationObserver', 'CustomEvent', 'Node'];
     names = names.concat(addHtmlClasses());
 
     names.forEach(name => {
@@ -38,6 +38,7 @@ export default function fakePageGlobals() {
       addHtmlClasses();
       global.MutationObserver = MockMutationObserver;
       global.CustomEvent = CustomEvent;
+      global.Node = (global.document || docCb()).defaultView.Node;
     });
 
     // Unset them so that we don't affect the rest of the tests.
@@ -50,5 +51,6 @@ export default function fakePageGlobals() {
     addHtmlClasses();
     global.MutationObserver = MockMutationObserver;
     global.CustomEvent = CustomEvent;
+    global.Node = (global.document || docCb()).defaultView.Node;
   }
 }

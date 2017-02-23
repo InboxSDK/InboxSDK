@@ -9,6 +9,11 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
+import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
+import ItemWithLifetimePool from '../src/platform-implementation-js/lib/ItemWithLifetimePool';
+import threadWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/watcher';
+
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/message/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
 import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/message/watcher';
@@ -21,6 +26,13 @@ import {
   page20160818_2,
   page20160819,
 } from './lib/pages';
+
+function makeThreadPool(root) {
+  const threadRowPool = toItemWithLifetimePool(
+    makePageParserTree(null, root).tree.getAllByTag('threadRow')
+  );
+  return new ItemWithLifetimePool(threadWatcher(root, threadRowPool));
+}
 
 describe('Inbox Message Detection', function() {
   this.slow(5000);
@@ -149,7 +161,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(page20160614(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160614())
+      watcher(page20160614(), makeThreadPool(page20160614()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -164,7 +176,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160620())
+      watcher(pageFullscreen20160620(), makeThreadPool(pageFullscreen20160620()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -179,7 +191,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(page20160810(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160810())
+      watcher(page20160810(), makeThreadPool(page20160810()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -194,7 +206,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(page20160810_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160810_2())
+      watcher(page20160810_2(), makeThreadPool(page20160810_2()))
       .takeUntilBy(Kefir.later(50))
       .onValue(spy)
       .onEnd(() => {
@@ -209,7 +221,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(page20160818_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160818_2())
+      watcher(page20160818_2(), makeThreadPool(page20160818_2()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -224,7 +236,7 @@ describe('Inbox Message Detection', function() {
       const message = querySelector(page20160819(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160819())
+      watcher(page20160819(), makeThreadPool(page20160819()))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
