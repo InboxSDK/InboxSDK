@@ -132,7 +132,8 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 	switch(event.eventName){
 		case 'mouseenter':
 
-			if(navItemDescriptor.routeID){
+			if (navItemDescriptor.routeID ||
+				  typeof navItemDescriptor.onClick === 'function') {
 				navItemViewDriver.setHighlight(true);
 			}
 
@@ -144,8 +145,17 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 			break;
 		case 'click':
 
-			if(navItemDescriptor.onClick){
-				navItemDescriptor.onClick();
+			if (typeof navItemDescriptor.onClick === 'function') {
+				let defaultPrevented = false;
+				const syntheticEvent = {
+					preventDefault() { defaultPrevented = true }
+				};
+
+				navItemDescriptor.onClick(syntheticEvent);
+
+				if (defaultPrevented) {
+					break;
+				}
 			}
 
 			if(navItemDescriptor.routeID){

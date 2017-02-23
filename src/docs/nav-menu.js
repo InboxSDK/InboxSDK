@@ -57,6 +57,16 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	*/
 	routeParams: null,
 
+	/**
+	* A function that will be called when the NavItemView is clicked.
+	* Passed a single event object parameter which includes a preventDefault()
+	* function. If the NavItemView has a routeID, calling preventDefault() will
+	* prevent navigation to the given route.
+	* ^optional
+	* ^default=null
+	* @type {function(event)}
+	*/
+	onClick: null,
 
 	/**
 	* Used to specify the order in which your NavItemViews should be relative to each other
