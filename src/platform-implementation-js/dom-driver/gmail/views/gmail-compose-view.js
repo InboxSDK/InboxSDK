@@ -46,6 +46,7 @@ import getAddressChangesStream from './gmail-compose-view/get-address-changes-st
 import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getPresendingStream from './gmail-compose-view/get-presending-stream';
+import getDiscardStream from './gmail-compose-view/get-discard-stream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
@@ -272,6 +273,7 @@ class GmailComposeView {
 		this._eventStream.plug(getBodyChangesStream(this));
 		this._eventStream.plug(getAddressChangesStream(this));
 		this._eventStream.plug(getPresendingStream(this));
+		this._eventStream.plug(getDiscardStream(this));
 
 		this._eventStream.plug(
 			Kefir
