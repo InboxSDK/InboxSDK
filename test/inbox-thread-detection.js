@@ -9,6 +9,9 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
+import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
+
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/parser';
 import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/watcher';
@@ -19,6 +22,12 @@ import {
   page20160727,
   page20160823,
 } from './lib/pages';
+
+function makeThreadRowElPool(root) {
+  return toItemWithLifetimePool(
+    makePageParserTree(null, root).tree.getAllByTag('threadRow')
+  );
+}
 
 describe('Inbox Thread Detection', function() {
   this.slow(5000);
@@ -103,7 +112,8 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(page20160614(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
-      watcher(page20160614())
+      const root = page20160614();
+      watcher(root, makeThreadRowElPool(root))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -118,7 +128,8 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160620())
+      const root = pageFullscreen20160620();
+      watcher(root, makeThreadRowElPool(root))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -133,7 +144,8 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(page20160727(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
-      watcher(page20160727())
+      const root = page20160727();
+      watcher(root, makeThreadRowElPool(root))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {
@@ -148,7 +160,8 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
       const spy = sinon.spy();
-      watcher(page20160823())
+      const root = page20160823();
+      watcher(root, makeThreadRowElPool(root))
         .takeUntilBy(Kefir.later(50))
         .onValue(spy)
         .onEnd(() => {

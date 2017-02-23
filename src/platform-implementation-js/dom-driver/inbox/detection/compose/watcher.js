@@ -12,9 +12,9 @@ import threadWatcher from '../thread/watcher';
 
 export default function watcher(
   root: Document=document,
-  openedThreadPool: ?ItemWithLifetimePool<*>=null
+  openedThreadPool: ItemWithLifetimePool<*>
 ): Kefir.Observable<ElementWithLifetime> {
-  const openedThreads: Kefir.Observable<ElementWithLifetime> = openedThreadPool ? openedThreadPool.items() : threadWatcher(root);
+  const openedThreads: Kefir.Observable<ElementWithLifetime> = openedThreadPool.items();
 
   const inlineComposeSelector = selectorStream([
     '*',

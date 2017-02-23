@@ -4,6 +4,7 @@ machine:
 
 dependencies:
   override:
+    - npm i -g npm
     - ./tools/install-deps.sh
 
 test:
