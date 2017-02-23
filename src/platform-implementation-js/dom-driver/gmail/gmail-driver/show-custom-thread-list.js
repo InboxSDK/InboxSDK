@@ -11,6 +11,8 @@ import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
+const COUNT = 50;
+
 /*
 Timeline of how a custom thread list works:
 
@@ -81,16 +83,23 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
       start = e.start;
       driver.signalCustomThreadListActivity(customRouteID);
       try {
-        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start)));
+        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start, COUNT)));
       } catch(e) {
         return Kefir.constantError(e);
       }
     })
-    .flatMap(ids =>
-      Array.isArray(ids) ?
-        Kefir.constant(ids) :
-        Kefir.constantError(new Error("handleCustomListRoute result must be an array"))
-    )
+    .flatMap(ids => {
+      if (Array.isArray(ids)) {
+        if (ids.length > COUNT) {
+          // upgrade to deprecationWarning later
+          console.warn('Received more than COUNT threads, ignoring them');
+          ids = ids.slice(0, COUNT);
+        }
+        return Kefir.constant(ids);
+      } else {
+        return Kefir.constantError(new Error("handleCustomListRoute result must be an array"));
+      }
+    })
     .mapErrors(e => {
       driver.getLogger().error(e);
       return [];
