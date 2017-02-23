@@ -9,6 +9,19 @@ import * as GRP from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
 
+type ThreadDescriptor = string|{[id: 'gmailThreadId'|'rfcMessageId']: string};
+
+type InitialIDPairs = Array<
+  {rfcId: string}|
+  {gtid: string}|
+  {rfcId: string, gtid: string}
+>;
+type IDPairsWithRFC = Array<{rfcId: string, gtid?: string}>;
+type CompletedIDPairs = Array<{rfcId: string, gtid: string}>;
+
+type HandlerResult = {total: number, threads: Array<ThreadDescriptor>};
+
+
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
 const MAX_THREADS_PER_PAGE = 50;
@@ -60,13 +73,21 @@ for the search>
 
 */
 
-function findIdFailure(id, err) {
+const copyAndOmitExcessThreads = (ids: Array<ThreadDescriptor>): Array<ThreadDescriptor> => {
+  if (ids.length > MAX_THREADS_PER_PAGE) {
+    // upgrade to deprecationWarning later
+    console.warn('Received more than MAX_THREADS_PER_PAGE threads, ignoring them');
+  }
+  return ids.slice(0, MAX_THREADS_PER_PAGE);
+};
+
+const findIdFailure = (id, err: Error) => {
   console.log("Failed to find id for thread", id, err);
   return null;
-}
+};
 
 // Returns the search string that will trigger the onActivate function.
-function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActivate: Function): string {
+const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActivate: Function): string => {
   const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
@@ -88,42 +109,64 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
         return Kefir.constantError(e);
       }
     })
-    .flatMap(ids => {
-      if (Array.isArray(ids)) {
-        if (ids.length > MAX_THREADS_PER_PAGE) {
-          // upgrade to deprecationWarning later
-          console.warn('Received more than MAX_THREADS_PER_PAGE threads, ignoring them');
-          ids = ids.slice(0, MAX_THREADS_PER_PAGE);
+    .flatMap((handlerResult: HandlerResult|Array<ThreadDescriptor>) => {
+      if (Array.isArray(handlerResult)) {
+        // upgrade to deprecationWarning later.
+        console.warn(`
+          Returning an array from a handleCustomListRoute handler will not support
+          pagination. Use an object instead (https://www.inboxsdk.com/docs/#Router).
+        `);
+
+        return Kefir.constant({
+          // default to one page since arrays can't be paginated
+          total: MAX_THREADS_PER_PAGE,
+          threads: copyAndOmitExcessThreads(handlerResult)
+        });
+      } else if (typeof handlerResult === 'object') {
+        const {total, threads} = handlerResult;
+
+        if (!(typeof total === 'number' && Array.isArray(threads))) {
+          return Kefir.constantError(new Error(`
+            handleCustomListRoute result must contain 'total' and 'threads' properties
+          `));
         }
-        return Kefir.constant(ids);
+
+        return Kefir.constant({
+          total,
+          threads: copyAndOmitExcessThreads(threads)
+        });
       } else {
-        return Kefir.constantError(new Error("handleCustomListRoute result must be an array"));
+        return Kefir.constantError(new Error(`
+          handleCustomListRoute result must be an array or an object
+        `));
       }
     })
     .mapErrors(e => {
       driver.getLogger().error(e);
       return [];
     })
-    .map(ids => _.map(ids, id => {
-      if (typeof id === 'string') {
-        if (id[0] == '<') {
-          return {rfcId: id};
-        } else {
-          return {gtid: id};
+    .map(({total, threads}: HandlerResult) => ({
+      total,
+      idPairs: _.compact(threads.map(id => {
+        if (typeof id === 'string') {
+          if (id[0] == '<') {
+            return {rfcId: id};
+          } else {
+            return {gtid: id};
+          }
+        } else if (id) {
+          const obj = {
+            gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
+            rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
+          };
+          if (obj.gtid || obj.rfcId) {
+            return obj;
+          }
         }
-      } else if (id) {
-        const obj = {
-          gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
-          rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
-        };
-        if (obj.gtid || obj.rfcId) {
-          return obj;
-        }
-      }
+      }))
     }))
-    .map(_.compact)
     // Figure out any rfc ids we don't know yet
-    .map((idPairs: Array<{rfcId: string}|{gtid: string}|{rfcId: string, gtid: string}>) =>
+    .map(({total, idPairs}: {total: number, idPairs: InitialIDPairs}) => (
       RSVP.Promise.all(idPairs.map(pair => {
         if (pair.rfcId) {
           return pair;
@@ -132,11 +175,10 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
-      }))
-    )
+      })).then((pairs: IDPairsWithRFC) => ({total, idPairs: _.compact(pairs)}))
+    ))
     .flatMap(Kefir.fromPromise)
-    .map(_.compact)
-    .onValue((idPairs: Array<{rfcId: string, gtid?: string}>) => {
+    .onValue(({total, idPairs}: {total: number, idPairs: IDPairsWithRFC}) => {
       const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
@@ -161,7 +203,7 @@ function setupSearchReplacing(driver: GmailDriver, customRouteID: string, onActi
           )
           .map(x => x.response)
           .take(1)
-      ]).onValue(([idPairs, response]: [Array<{rfcId: string, gtid: string}>, string]) => {
+      ]).onValue(([idPairs, response]: [CompletedIDPairs, string]) => {
         driver.signalCustomThreadListActivity(customRouteID);
 
         let newResponse;
