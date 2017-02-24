@@ -46,9 +46,9 @@ import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
 import threadParser from './detection/thread/parser';
 import messageParser from './detection/message/parser';
+import attachmentCardParser from './detection/attachmentCard/parser';
 
 import getNativeDrawerStream from './getNativeDrawerStream';
-import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
@@ -59,7 +59,7 @@ import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import InboxThreadView from './views/inbox-thread-view';
 import InboxMessageView from './views/inbox-message-view';
-import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
+import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
@@ -88,7 +88,7 @@ class InboxDriver {
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
   _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
   _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
-  _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
+  _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
   _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
@@ -201,10 +201,23 @@ class InboxDriver {
       }
     );
 
-    this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
-      getAttachmentCardViewDriverStream(this, topRowElPool, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._attachmentCardViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('attachmentCard'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = attachmentCardParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (attachmentCard)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxAttachmentCardView({element: el, parsed}, this);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+
     this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
       getAttachmentOverlayViewStream(this).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
@@ -316,7 +329,9 @@ class InboxDriver {
   getMessageViewDriverStream() {
     return toItemWithLifetimeStream(this._messageViewDriverLiveSet).map(({el})=>el);
   }
-  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
+  getAttachmentCardViewDriverStream() {
+    return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
+  }
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getNativeDrawerPool() {return this._nativeDrawerPool;}

@@ -6,7 +6,10 @@ const pageParserOptions: PageParserTreeOptions = {
   tags: {
     message: {
       ownedBy: ['thread']
-    }
+    },
+    attachmentCard: {
+      ownedBy: ['message', 'threadRow', 'bundleRow']
+    },
   },
   finders: {
     thread: {
@@ -18,7 +21,15 @@ const pageParserOptions: PageParserTreeOptions = {
       fn(root) {
         return root.querySelectorAll('div[role=listitem][aria-expanded][data-msg-id*="msg-"]');
       }
-    }
+    },
+    attachmentCard: {
+      fn(root) {
+        return root.querySelectorAll(`
+          div[data-msg-id] section > div > div[tabindex][title],
+          div[jsaction*="update_chip_carousel_arrows"] div[role=listitem][tabindex][jsaction]
+        `);
+      }
+    },
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
@@ -67,6 +78,25 @@ const pageParserOptions: PageParserTreeOptions = {
       '[role=list]',
       'div',
       {$watch: {attributeFilter: ['role', 'data-msg-id'], cond: '[role=listitem][data-msg-id]'}}
+    ]},
+
+    {sources: ['message'], tag: 'attachmentCard', selectors: [
+      '*',
+      '*',
+      'section',
+      '*',
+      {$filter: el => el.style.display !== 'none'},
+      'div[tabindex]',
+      {$filter: el => el.style.display !== 'none'}
+    ]},
+    {sources: ['bundleRow', 'threadRow'], tag: 'attachmentCard', selectors: [
+      '*',
+      '[jsaction]',
+      '[role=list][jsaction]',
+      '*',
+      'div[role=listitem]',
+      {$watch: {attributeFilter: ['tabindex'], cond: '[tabindex]'}},
+      {$filter: el => el.style.display !== 'none'}
     ]},
   ]
 };
