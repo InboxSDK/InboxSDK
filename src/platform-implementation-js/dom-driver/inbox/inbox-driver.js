@@ -181,12 +181,12 @@ class InboxDriver {
                 }
               }
               const view = new InboxMessageView(el, this, parsed);
-              unsub.takeUntilBy(view.getStopper()).onValue(() => {
-                view.destroy();
-              });
               view.getStopper().takeUntilBy(unsub).onValue(() => {
                 controller.remove(view);
                 newView(false);
+              });
+              unsub.takeUntilBy(view.getStopper()).onValue(() => {
+                view.destroy();
               });
               controller.add(view);
             };
