@@ -361,7 +361,12 @@ export function readDraftId(response: string, messageID: string): ?string {
   return null;
 }
 
-export function replaceThreadsInResponse(response: string, replacementThreads: Thread[], start: number): string {
+export function replaceThreadsInResponse(
+  response: string,
+  replacementThreads: Thread[],
+  start: number,
+  total?: number
+): string {
   const {value, options} = deserialize(response);
 
   const actionResponseMode = value.length === 1 &&
@@ -417,6 +422,9 @@ it all back together.
     const preTbGroup = [];
     const postTbGroup = [];
     group.forEach(item => {
+      if (total && item[0] === 'ti') {
+        item[2] = item[10] = total;
+      }
       if (item[0] === 'tb') {
         hasSeenTb = tbSeenInThisGroup = true;
         if (preTbGroup.length) {

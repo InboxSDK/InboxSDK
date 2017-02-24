@@ -214,7 +214,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
             .compact()
             .value();
 
-          newResponse = GRP.replaceThreadsInResponse(response, newThreads, start);
+          newResponse = GRP.replaceThreadsInResponse(response, newThreads, start, total);
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -230,7 +230,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
           }
           try {
             driver.getPageCommunicator().setCustomListResults(
-              newQuery, GRP.replaceThreadsInResponse(response, [], start));
+              newQuery, GRP.replaceThreadsInResponse(response, [], start, total));
           } catch(e2) {
             driver.getLogger().error(e2);
             // The original response will be used.
