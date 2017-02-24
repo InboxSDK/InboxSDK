@@ -6,7 +6,6 @@ import Logger from '../../../../lib/logger';
 import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import selectorStream from '../../../../lib/dom/selectorStream';
-import messageWatcher from '../message/watcher';
 
 export default function watcher(
   root: Document=document,

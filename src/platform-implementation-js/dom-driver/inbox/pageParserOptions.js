@@ -3,11 +3,20 @@
 import type {PageParserTreeOptions} from 'page-parser-tree';
 
 const pageParserOptions: PageParserTreeOptions = {
-  tags: {},
+  tags: {
+    message: {
+      ownedBy: ['thread']
+    }
+  },
   finders: {
     thread: {
       fn(root) {
         return root.querySelectorAll('div[aria-expanded=true][data-item-id*="#gmail:thread-"], div.scroll-list-item-open[data-item-id*="#gmail:thread-"]');
+      }
+    },
+    message: {
+      fn(root) {
+        return root.querySelectorAll('div[role=listitem][aria-expanded][data-msg-id*="msg-"]');
       }
     }
   },
@@ -51,6 +60,13 @@ const pageParserOptions: PageParserTreeOptions = {
     ]},
     {sources: ['threadRow'], tag: 'thread', selectors: [
       {$watch: {attributeFilter: ['aria-expanded', 'class'], cond: '[aria-expanded=true], .scroll-list-item-open'}}
+    ]},
+    {sources: ['thread'], tag: 'message', selectors: [
+      '*',
+      ':not([role=heading])',
+      '[role=list]',
+      'div',
+      {$watch: {attributeFilter: ['role', 'data-msg-id'], cond: '[role=listitem][data-msg-id]'}}
     ]},
   ]
 };

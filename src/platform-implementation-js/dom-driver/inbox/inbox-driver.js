@@ -11,7 +11,9 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
-import type LiveSet from 'live-set';
+import LiveSet from 'live-set';
+import lsFilter from 'live-set/filter';
+import lsFlatMap from 'live-set/flatMap';
 import lsMapWithRemoval from 'live-set/mapWithRemoval';
 import type PageParserTree from 'page-parser-tree';
 import makePageParserTree from './makePageParserTree';
@@ -39,14 +41,13 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getMessageElStream from './detection/message/stream';
 import getSearchBarStream from './detection/searchBar/stream';
 import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
 import threadParser from './detection/thread/parser';
+import messageParser from './detection/message/parser';
 
 import getNativeDrawerStream from './getNativeDrawerStream';
-import getMessageViewStream from './getMessageViewStream';
 import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
@@ -57,7 +58,7 @@ import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import InboxThreadView from './views/inbox-thread-view';
-import type InboxMessageView from './views/inbox-message-view';
+import InboxMessageView from './views/inbox-message-view';
 import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
@@ -86,7 +87,7 @@ class InboxDriver {
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
   _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
-  _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
+  _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
   _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
@@ -125,9 +126,7 @@ class InboxDriver {
     const topRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('topRow'));
     const threadRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('threadRow'));
     const threadElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('thread'));
-    const messageElPool = new ItemWithLifetimePool(
-      getMessageElStream(this, threadElPool).takeUntilBy(this._stopper)
-    );
+    const messageElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('message'));
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
@@ -146,10 +145,60 @@ class InboxDriver {
       return view;
     });
 
-    this._messageViewDriverPool = new ItemWithLifetimePool(
-      getMessageViewStream(this, messageElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
+    this._messageViewDriverLiveSet = lsFlatMap(
+      this._page.tree.getAllByTag('message'),
+      node => {
+        const el = node.getValue();
+        let parsed = messageParser(el);
+        this._logger.errorSite(new Error('parse errors (message)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+        if (parsed.attributes.isDraft) return LiveSet.constant(new Set());
+        return new LiveSet({
+          read() {
+            throw new Error();
+          },
+          listen: (setValues, controller) => {
+            setValues(new Set());
+            const unsub = kefirStopper();
+
+            // If the InboxMessageView is destroyed before the element is removed,
+            // then make a new InboxMessageView out of the same element. Inbox re-uses
+            // elements for different messages in some cases.
+            const newView = firstRun => {
+              if (!firstRun) {
+                parsed = messageParser(el);
+                if (parsed.errors.length > 0) {
+                  this._logger.errorSite(new Error(`message reparse errors`), {
+                    score: parsed.score,
+                    errors: parsed.errors,
+                    html: censorHTMLtree(el)
+                  });
+                }
+              }
+              const view = new InboxMessageView(el, this, parsed);
+              unsub.takeUntilBy(view.getStopper()).onValue(() => {
+                view.destroy();
+              });
+              view.getStopper().takeUntilBy(unsub).onValue(() => {
+                controller.remove(view);
+                newView(false);
+              });
+              controller.add(view);
+            };
+
+            newView(true);
+
+            return () => {
+              unsub.destroy();
+            };
+          }
+        });
+      }
     );
+
     this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
       getAttachmentCardViewDriverStream(this, topRowElPool, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
@@ -262,7 +311,9 @@ class InboxDriver {
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
   }
-  getMessageViewDriverStream() {return this._messageViewDriverPool.items().map(({el})=>el);}
+  getMessageViewDriverStream() {
+    return toItemWithLifetimeStream(this._messageViewDriverLiveSet).map(({el})=>el);
+  }
   getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}

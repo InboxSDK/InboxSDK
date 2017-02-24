@@ -5,17 +5,20 @@ import fs from 'fs';
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
+import lsMap from 'live-set/map';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
-import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
-import ItemWithLifetimePool from '../src/platform-implementation-js/lib/ItemWithLifetimePool';
-
-import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/message/finder';
+import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
-import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/message/watcher';
+
+function finder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return pageParserOptions.finders.message.fn(documentElement);
+}
 
 import {
   page20160614,
@@ -25,12 +28,6 @@ import {
   page20160818_2,
   page20160819,
 } from './lib/pages';
-
-function makeThreadPool(root) {
-  return toItemWithLifetimePool(
-    makePageParserTree(null, root).tree.getAllByTag('thread')
-  );
-}
 
 describe('Inbox Message Detection', function() {
   this.slow(5000);
@@ -155,94 +152,64 @@ describe('Inbox Message Detection', function() {
   });
 
   describe('watcher', function() {
-    it('2016-06-14', function(cb) {
+    it('2016-06-14', function() {
       const message = querySelector(page20160614(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160614(), makeThreadPool(page20160614()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, message));
-          cb();
-        });
+      const root = page20160614();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
 
-    it('2016-06-20 fullscreen and bundled inline', function(cb) {
+    it('2016-06-20 fullscreen and bundled inline', function() {
       const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160620(), makeThreadPool(pageFullscreen20160620()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, message));
-          cb();
-        });
+      const root = pageFullscreen20160620();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
 
-    it('2016-08-10 message', function(cb) {
+    it('2016-08-10 message', function() {
       const message = querySelector(page20160810(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160810(), makeThreadPool(page20160810()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, message));
-          cb();
-        });
+      const root = page20160810();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
 
-    it('2016-08-10 message with attachments', function(cb) {
+    it('2016-08-10 message with attachments', function() {
       const message = querySelector(page20160810_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160810_2(), makeThreadPool(page20160810_2()))
-      .takeUntilBy(Kefir.later(50))
-      .onValue(spy)
-      .onEnd(() => {
-        const results = spy.args.map(callArgs => callArgs[0].el);
-        assert.strictEqual(results.length, 1);
-        assert(_.includes(results, message));
-        cb();
-      });
+      const root = page20160810_2();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
 
-    it('2016-08-18', function(cb) {
+    it('2016-08-18', function() {
       const message = querySelector(page20160818_2(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160818_2(), makeThreadPool(page20160818_2()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, message));
-          cb();
-        });
+      const root = page20160818_2();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
 
-    it('2016-08-19 draft in thread', function(cb) {
+    it('2016-08-19 draft in thread', function() {
       const message = querySelector(page20160819(), '[data-test-id=message]');
 
       const spy = sinon.spy();
-      watcher(page20160819(), makeThreadPool(page20160819()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, message));
-          cb();
-        });
+      const root = page20160819();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(message));
     });
   });
 });
