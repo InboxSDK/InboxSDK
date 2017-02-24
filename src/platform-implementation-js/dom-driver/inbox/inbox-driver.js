@@ -150,11 +150,13 @@ class InboxDriver {
       node => {
         const el = node.getValue();
         let parsed = messageParser(el);
-        this._logger.errorSite(new Error('parse errors (message)'), {
-          score: parsed.score,
-          errors: parsed.errors,
-          html: censorHTMLtree(el)
-        });
+        if (parsed.errors.length > 0) {
+          this._logger.errorSite(new Error('parse errors (message)'), {
+            score: parsed.score,
+            errors: parsed.errors,
+            html: censorHTMLtree(el)
+          });
+        }
         if (parsed.attributes.isDraft) return LiveSet.constant(new Set());
         return new LiveSet({
           read() {
