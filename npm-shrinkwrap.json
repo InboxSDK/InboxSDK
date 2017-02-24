@@ -3840,9 +3840,9 @@
       "resolved": "https://registry.npmjs.org/liftoff/-/liftoff-2.3.0.tgz"
     },
     "live-set": {
-      "version": "0.3.7",
+      "version": "0.3.8",
       "from": "live-set@>=0.3.6 <0.4.0",
-      "resolved": "https://registry.npmjs.org/live-set/-/live-set-0.3.7.tgz"
+      "resolved": "https://registry.npmjs.org/live-set/-/live-set-0.3.8.tgz"
     },
     "load-json-file": {
       "version": "1.1.0",
