@@ -11,12 +11,15 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
+import type LiveSet from 'live-set';
+import lsMapWithRemoval from 'live-set/mapWithRemoval';
 import type PageParserTree from 'page-parser-tree';
 import makePageParserTree from './makePageParserTree';
 
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
+import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import populateRouteID from '../../lib/populateRouteID';
@@ -36,13 +39,13 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getThreadElStream from './detection/thread/stream';
 import getMessageElStream from './detection/message/stream';
 import getSearchBarStream from './detection/searchBar/stream';
 import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
+import threadParser from './detection/thread/parser';
+
 import getNativeDrawerStream from './getNativeDrawerStream';
-import getThreadViewStream from './getThreadViewStream';
 import getMessageViewStream from './getMessageViewStream';
 import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
 import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
@@ -53,7 +56,7 @@ import setupRouteViewDriverStream from './setupRouteViewDriverStream';
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
-import type InboxThreadView from './views/inbox-thread-view';
+import InboxThreadView from './views/inbox-thread-view';
 import type InboxMessageView from './views/inbox-message-view';
 import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
@@ -82,7 +85,7 @@ class InboxDriver {
   _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
-  _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
+  _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
   _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
   _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
   _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
@@ -121,17 +124,28 @@ class InboxDriver {
 
     const topRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('topRow'));
     const threadRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('threadRow'));
-    const threadElPool = new ItemWithLifetimePool(
-      getThreadElStream(this, threadRowElPool).takeUntilBy(this._stopper)
-    );
+    const threadElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('thread'));
     const messageElPool = new ItemWithLifetimePool(
       getMessageElStream(this, threadElPool).takeUntilBy(this._stopper)
     );
 
-    this._threadViewDriverPool = new ItemWithLifetimePool(
-      getThreadViewStream(this, threadElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = threadParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (thread)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxThreadView(el, this, parsed);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+
     this._messageViewDriverPool = new ItemWithLifetimePool(
       getMessageViewStream(this, messageElPool).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
@@ -219,11 +233,16 @@ class InboxDriver {
     // animating out. We need to clear the old thread view's sidebar
     // immediately when a new thread view comes in.
     let _currentThreadView = null;
-    this._threadViewDriverPool.items().onValue(({el: threadView}) => {
-      if (_currentThreadView) {
-        _currentThreadView.removePanels();
-      }
-      _currentThreadView = threadView;
+    this._threadViewDriverLiveSet.subscribe(changes => {
+      changes.forEach(change => {
+        if (change.type === 'add') {
+          const threadView = change.value;
+          if (_currentThreadView) {
+            _currentThreadView.removePanels();
+          }
+          _currentThreadView = threadView;
+        }
+      });
     });
   }
 
@@ -240,7 +259,9 @@ class InboxDriver {
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
   getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
-  getThreadViewDriverStream() {return this._threadViewDriverPool.items().map(({el})=>el);}
+  getThreadViewDriverStream() {
+    return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
+  }
   getMessageViewDriverStream() {return this._messageViewDriverPool.items().map(({el})=>el);}
   getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}

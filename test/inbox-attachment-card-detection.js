@@ -12,7 +12,6 @@ import querySelector from '../src/platform-implementation-js/lib/dom/querySelect
 import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
 import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
 import ItemWithLifetimePool from '../src/platform-implementation-js/lib/ItemWithLifetimePool';
-import threadWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/watcher';
 import messageWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/message/watcher';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentCard/finder';
@@ -30,7 +29,7 @@ function makePools(root) {
   const {tree} = makePageParserTree(null, root);
   const topRowPool = toItemWithLifetimePool(tree.getAllByTag('topRow'));
   const threadRowPool = toItemWithLifetimePool(tree.getAllByTag('threadRow'));
-  const threadPool = new ItemWithLifetimePool(threadWatcher(root, threadRowPool));
+  const threadPool = toItemWithLifetimePool(tree.getAllByTag('thread'));
   const messagePool = new ItemWithLifetimePool(messageWatcher(root, threadPool));
   return [topRowPool, threadRowPool, messagePool];
 }

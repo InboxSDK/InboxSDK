@@ -3,7 +3,13 @@
 import type {PageParserTreeOptions} from 'page-parser-tree';
 
 const pageParserOptions: PageParserTreeOptions = {
-  tags: {
+  tags: {},
+  finders: {
+    thread: {
+      fn(root) {
+        return root.querySelectorAll('div[aria-expanded=true][data-item-id*="#gmail:thread-"], div.scroll-list-item-open[data-item-id*="#gmail:thread-"]');
+      }
+    }
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
@@ -43,8 +49,10 @@ const pageParserOptions: PageParserTreeOptions = {
       '*',
       '[role=listitem]'
     ]},
-  ],
-  finders: {}
+    {sources: ['threadRow'], tag: 'thread', selectors: [
+      {$watch: {attributeFilter: ['aria-expanded', 'class'], cond: '[aria-expanded=true], .scroll-list-item-open'}}
+    ]},
+  ]
 };
 
 export default pageParserOptions;

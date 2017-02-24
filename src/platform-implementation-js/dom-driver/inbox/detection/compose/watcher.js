@@ -8,7 +8,6 @@ import type ItemWithLifetimePool from '../../../../lib/ItemWithLifetimePool';
 import type {ElementWithLifetime} from '../../../../lib/dom/make-element-child-stream';
 import makeElementStreamMerger from '../../../../lib/dom/make-element-stream-merger';
 import selectorStream from '../../../../lib/dom/selectorStream';
-import threadWatcher from '../thread/watcher';
 
 export default function watcher(
   root: Document=document,

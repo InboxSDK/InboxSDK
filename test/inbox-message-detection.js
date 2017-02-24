@@ -12,7 +12,6 @@ import querySelector from '../src/platform-implementation-js/lib/dom/querySelect
 import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
 import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
 import ItemWithLifetimePool from '../src/platform-implementation-js/lib/ItemWithLifetimePool';
-import threadWatcher from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/watcher';
 
 import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/message/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
@@ -28,10 +27,9 @@ import {
 } from './lib/pages';
 
 function makeThreadPool(root) {
-  const threadRowPool = toItemWithLifetimePool(
-    makePageParserTree(null, root).tree.getAllByTag('threadRow')
+  return toItemWithLifetimePool(
+    makePageParserTree(null, root).tree.getAllByTag('thread')
   );
-  return new ItemWithLifetimePool(threadWatcher(root, threadRowPool));
 }
 
 describe('Inbox Message Detection', function() {
