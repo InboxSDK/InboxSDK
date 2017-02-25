@@ -203,17 +203,43 @@ describe('replaceThreadsInResponse', () => {
   });
 
   it('respects start parameter', () => {
-    const data = require('./gmail-response-processor/second-page-response.json');
-    const serialized = GmailResponseProcessor.serialize(data, {
+    const dataWithStart0 = require('./gmail-response-processor/second-page-response-start-0.json');
+    const dataWithStart50 = require('./gmail-response-processor/second-page-response-start-50.json');
+
+    const serializedWithStart0 = GmailResponseProcessor.serialize(dataWithStart0, {
+      includeLengths: true,
+      noArrayNewLines: true,
+      suggestionMode: false
+    });
+    const serializedWithStart50 = GmailResponseProcessor.serialize(dataWithStart50, {
       includeLengths: true,
       noArrayNewLines: true,
       suggestionMode: false
     });
 
-    const threads = GmailResponseProcessor.extractThreads(serialized);
-    expect(threads.length).toBe(1);
+    const threadsWithStart0 = GmailResponseProcessor.extractThreads(serializedWithStart0);
+    const threadsWithStart50 = GmailResponseProcessor.extractThreads(serializedWithStart50);
 
-    expect(GmailResponseProcessor.replaceThreadsInResponse(serialized, threads, 50)).toBe(serialized);
+    expect(threadsWithStart0.length).toBe(1);
+    expect(threadsWithStart50.length).toBe(1);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithStart50,
+      threadsWithStart50,
+      50
+    )).toBe(serializedWithStart50);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithStart0,
+      threadsWithStart0,
+      50
+    )).toBe(serializedWithStart50);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithStart50,
+      threadsWithStart50,
+      0
+    )).toBe(serializedWithStart0);
   });
 
   it("works on action responses", () => {
