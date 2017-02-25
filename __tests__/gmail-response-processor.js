@@ -203,8 +203,8 @@ describe('replaceThreadsInResponse', () => {
   });
 
   it('respects start parameter', () => {
-    const dataWithStart0 = require('./gmail-response-processor/second-page-response-start-0.json');
-    const dataWithStart50 = require('./gmail-response-processor/second-page-response-start-50.json');
+    const dataWithStart0 = require('./gmail-response-processor/search-response-start-0.json');
+    const dataWithStart50 = require('./gmail-response-processor/search-response-start-50.json');
 
     const serializedWithStart0 = GmailResponseProcessor.serialize(dataWithStart0, {
       includeLengths: true,
@@ -240,6 +240,49 @@ describe('replaceThreadsInResponse', () => {
       threadsWithStart50,
       0
     )).toBe(serializedWithStart0);
+  });
+
+  it('respects total parameter', () => {
+    const dataWithTotal1 = require('./gmail-response-processor/search-response-total-1.json');
+    const dataWithTotal50 = require('./gmail-response-processor/search-response-total-50.json');
+
+    const serializedWithTotal1 = GmailResponseProcessor.serialize(dataWithTotal1, {
+      includeLengths: true,
+      noArrayNewLines: true,
+      suggestionMode: false
+    });
+    const serializedWithTotal50 = GmailResponseProcessor.serialize(dataWithTotal50, {
+      includeLengths: true,
+      noArrayNewLines: true,
+      suggestionMode: false
+    });
+
+    const threadsWithTotal1 = GmailResponseProcessor.extractThreads(serializedWithTotal1);
+    const threadsWithTotal50 = GmailResponseProcessor.extractThreads(serializedWithTotal50);
+
+    expect(threadsWithTotal1.length).toBe(1);
+    expect(threadsWithTotal50.length).toBe(1);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithTotal1,
+      threadsWithTotal1,
+      0,
+      1
+    )).toBe(serializedWithTotal1);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithTotal1,
+      threadsWithTotal1,
+      0,
+      50
+    )).toBe(serializedWithTotal50);
+
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithTotal50,
+      threadsWithTotal50,
+      0,
+      1
+    )).toBe(serializedWithTotal1);
   });
 
   it("works on action responses", () => {
