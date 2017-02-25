@@ -364,8 +364,7 @@ export function readDraftId(response: string, messageID: string): ?string {
 export function replaceThreadsInResponse(
   response: string,
   replacementThreads: Thread[],
-  start: number,
-  total?: number
+  { start, total }: { start: number, total?: number|'MANY' }
 ): string {
   const {value, options} = deserialize(response);
 
@@ -423,8 +422,20 @@ it all back together.
     const postTbGroup = [];
     group.forEach(item => {
       if (total && item[0] === 'ti') {
-        item[2] = item[10] = total;
+        if (typeof total === 'number') {
+          item[2] = item[10] = total;
+        } else if (total === 'MANY') {
+          // large total to ensure it is always larger than the actual
+          // number of threads.
+          item[2] = item[10] = 100 * 1000;
+          // flip response from number-total mode into 'many'-total mode.
+          item [3] = 1;
+
+          const query = item[5];
+          item[6][0] = [query, 1];
+        }
       }
+
       if (item[0] === 'tb') {
         hasSeenTb = tbSeenInThisGroup = true;
         if (preTbGroup.length) {

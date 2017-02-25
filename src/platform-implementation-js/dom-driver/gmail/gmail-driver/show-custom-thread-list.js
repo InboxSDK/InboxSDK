@@ -19,7 +19,7 @@ type InitialIDPairs = Array<
 type IDPairsWithRFC = Array<{rfcId: string, gtid?: string}>;
 type CompletedIDPairs = Array<{rfcId: string, gtid: string}>;
 
-type HandlerResult = {total: number, threads: Array<ThreadDescriptor>};
+type HandlerResult = {total: number|'MANY', threads: Array<ThreadDescriptor>};
 
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
@@ -92,7 +92,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
   if (preexistingQuery) {
     return preexistingQuery;
   }
-  let start;
+  let start: number;
   const newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
@@ -125,7 +125,10 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       } else if (typeof handlerResult === 'object') {
         const {total, threads} = handlerResult;
 
-        if (!(typeof total === 'number' && Array.isArray(threads))) {
+        if (
+          !((typeof total === 'number' || total === 'MANY') &&
+          Array.isArray(threads))
+        ) {
           return Kefir.constantError(new Error(`
             handleCustomListRoute result must contain 'total' and 'threads' properties
           `));
@@ -166,7 +169,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       }))
     }))
     // Figure out any rfc ids we don't know yet
-    .map(({total, idPairs}: {total: number, idPairs: InitialIDPairs}) => (
+    .map(({total, idPairs}: {total: number|'MANY', idPairs: InitialIDPairs}) => (
       RSVP.Promise.all(idPairs.map(pair => {
         if (pair.rfcId) {
           return pair;
@@ -178,7 +181,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       })).then((pairs: IDPairsWithRFC) => ({total, idPairs: _.compact(pairs)}))
     ))
     .flatMap(Kefir.fromPromise)
-    .onValue(({total, idPairs}: {total: number, idPairs: IDPairsWithRFC}) => {
+    .onValue(({total, idPairs}: {total: number|'MANY', idPairs: IDPairsWithRFC}) => {
       const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
@@ -214,7 +217,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
             .compact()
             .value();
 
-          newResponse = GRP.replaceThreadsInResponse(response, newThreads, start, total);
+          newResponse = GRP.replaceThreadsInResponse(response, newThreads, {start, total});
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -230,7 +233,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
           }
           try {
             driver.getPageCommunicator().setCustomListResults(
-              newQuery, GRP.replaceThreadsInResponse(response, [], start, total));
+              newQuery, GRP.replaceThreadsInResponse(response, [], {start, total}));
           } catch(e2) {
             driver.getLogger().error(e2);
             // The original response will be used.

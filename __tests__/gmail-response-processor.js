@@ -135,34 +135,34 @@ describe('replaceThreadsInResponse', () => {
     const data = require('./gmail-response-processor/search-response.json');
     const threads = GmailResponseProcessor.extractThreads(data.input);
 
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toBe(data.input);
 
     // swap two threads
     threads.push(threads.shift());
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(swapped).not.toBe(data.input);
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(threads);
 
     // put them back
     threads.unshift(threads.pop());
-    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, 0)).toEqual(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {start:0})).toEqual(data.input);
   });
 
   it('works with small number of threads', () => {
     const data = require('./gmail-response-processor/search-response-small.json');
     const threads = GmailResponseProcessor.extractThreads(data.input);
 
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads,0)).toEqual(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toEqual(data.input);
 
     // swap two threads
     threads.push(threads.shift());
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(swapped).not.toBe(data.input);
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(threads);
 
     // put them back
     threads.unshift(threads.pop());
-    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {start:0})).toBe(data.input);
   });
 
   it('works on responses with empty last part', () => {
@@ -170,17 +170,17 @@ describe('replaceThreadsInResponse', () => {
     const threads = GmailResponseProcessor.extractThreads(data.input);
     expect(threads.length).toBe(2);
 
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toBe(data.input);
 
     // swap two threads
     threads.push(threads.shift());
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(swapped).not.toBe(data.input);
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(threads);
 
     // put them back
     threads.unshift(threads.pop());
-    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {start:0})).toBe(data.input);
   });
 
   it('can empty a response', () => {
@@ -188,7 +188,7 @@ describe('replaceThreadsInResponse', () => {
     const threads = GmailResponseProcessor.extractThreads(data.input);
     expect(threads.length).toBe(2);
 
-    const emptied = GmailResponseProcessor.replaceThreadsInResponse(data.input, [], 0);
+    const emptied = GmailResponseProcessor.replaceThreadsInResponse(data.input, [], {start:0});
     const emptiedThreads = GmailResponseProcessor.extractThreads(emptied);
     expect(emptiedThreads.length).toBe(0);
   });
@@ -199,7 +199,7 @@ describe('replaceThreadsInResponse', () => {
     expect(Array.isArray(threads)).toBe(true);
     expect(threads.length).toBe(0);
 
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toBe(data.input);
   });
 
   it('respects start parameter', () => {
@@ -226,25 +226,26 @@ describe('replaceThreadsInResponse', () => {
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithStart50,
       threadsWithStart50,
-      50
+      {start: 50}
     )).toBe(serializedWithStart50);
 
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithStart0,
       threadsWithStart0,
-      50
+      {start: 50}
     )).toBe(serializedWithStart50);
 
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithStart50,
       threadsWithStart50,
-      0
+      {start: 0}
     )).toBe(serializedWithStart0);
   });
 
   it('respects total parameter', () => {
     const dataWithTotal1 = require('./gmail-response-processor/search-response-total-1.json');
     const dataWithTotal50 = require('./gmail-response-processor/search-response-total-50.json');
+    const dataWithTotalMany = require('./gmail-response-processor/search-response-total-many.json');
 
     const serializedWithTotal1 = GmailResponseProcessor.serialize(dataWithTotal1, {
       includeLengths: true,
@@ -256,33 +257,46 @@ describe('replaceThreadsInResponse', () => {
       noArrayNewLines: true,
       suggestionMode: false
     });
+    const serializedWithTotalMany = GmailResponseProcessor.serialize(dataWithTotalMany, {
+      includeLengths: true,
+      noArrayNewLines: true,
+      suggestionMode: false
+    });
 
     const threadsWithTotal1 = GmailResponseProcessor.extractThreads(serializedWithTotal1);
     const threadsWithTotal50 = GmailResponseProcessor.extractThreads(serializedWithTotal50);
+    const threadsWithTotalMany = GmailResponseProcessor.extractThreads(serializedWithTotalMany);
 
     expect(threadsWithTotal1.length).toBe(1);
     expect(threadsWithTotal50.length).toBe(1);
+    expect(threadsWithTotalMany.length).toBe(1);
 
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithTotal1,
       threadsWithTotal1,
-      0,
-      1
+      {start: 0, total: 1}
     )).toBe(serializedWithTotal1);
 
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithTotal1,
       threadsWithTotal1,
-      0,
-      50
+      {start: 0, total: 50}
     )).toBe(serializedWithTotal50);
 
     expect(GmailResponseProcessor.replaceThreadsInResponse(
       serializedWithTotal50,
       threadsWithTotal50,
-      0,
-      1
+      {start: 0, total: 1}
     )).toBe(serializedWithTotal1);
+
+    // We only care about the number -> 'MANY' conversion because we currently
+    // only process responses with a finite count. The 'MANY' -> number
+    // conversion is not supported.
+    expect(GmailResponseProcessor.replaceThreadsInResponse(
+      serializedWithTotal50,
+      threadsWithTotal50,
+      {start: 0, total: 'MANY'}
+    )).toBe(serializedWithTotalMany);
   });
 
   it("works on action responses", () => {
@@ -290,17 +304,17 @@ describe('replaceThreadsInResponse', () => {
     const threads = GmailResponseProcessor.extractThreads(data.input);
 
     expect(threads.length).not.toBe(0);
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toBe(data.input);
 
     // swap two threads
     threads.push(threads.shift());
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(swapped).not.toBe(data.input);
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(threads);
 
     // put them back
     threads.unshift(threads.pop());
-    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {start:0})).toBe(data.input);
   });
 
   it("works on newer response", () => {
@@ -308,7 +322,7 @@ describe('replaceThreadsInResponse', () => {
     const threads = GmailResponseProcessor.extractThreads(data.input);
     expect(threads.length).toBe(1);
 
-    const replaced = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const replaced = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(GmailResponseProcessor.extractThreads(replaced).length).toBe(1);
     expect(replaced).toBe(data.input);
   });
@@ -318,17 +332,17 @@ describe('replaceThreadsInResponse', () => {
     const threads = GmailResponseProcessor.extractThreads(data.input);
 
     expect(threads.length).not.toBe(0);
-    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0})).toBe(data.input);
 
     // swap two threads
     threads.push(threads.shift());
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {start:0});
     expect(swapped).not.toBe(data.input);
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(threads);
 
     // put them back
     threads.unshift(threads.pop());
-    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, 0)).toBe(data.input);
+    expect(GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {start:0})).toBe(data.input);
   });
 
   it("fixes the end marker's section count", () => {
@@ -353,7 +367,7 @@ describe('replaceThreadsInResponse', () => {
       .value();
     expect(moreThreads.length).toBe(12);
 
-    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, moreThreads, 0);
+    const swapped = GmailResponseProcessor.replaceThreadsInResponse(data.input, moreThreads, {start:0});
     expect(GmailResponseProcessor.extractThreads(swapped)).toEqual(moreThreads);
 
     {
