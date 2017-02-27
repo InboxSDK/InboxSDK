@@ -100,8 +100,9 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 
 	sdk.Router.handleCustomListRoute('tlbeep', function(page) {
 		log('tlbeep activate', arguments);
+		const hasMore = page === 0;
 		return delay(500, {
-			total: page === 0 ? 'MANY' : 100,
+			hasMore,
 			threads: [
 				'<CAGNQ5Q=0PfRksEgcz-kfgo41BgY4F=3ccPoAp3ERPZhhiA_cKw@mail.gmail.com>',
 				'<2666328789625116864@messageid.cloud_prod.monitoring-cloud.google.com>',

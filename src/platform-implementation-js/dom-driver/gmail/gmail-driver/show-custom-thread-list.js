@@ -19,8 +19,16 @@ type InitialIDPairs = Array<
 type IDPairsWithRFC = Array<{rfcId: string, gtid?: string}>;
 type CompletedIDPairs = Array<{rfcId: string, gtid: string}>;
 
-type HandlerResult = {total: number|'MANY', threads: Array<ThreadDescriptor>};
+type HandlerResult = {
+  total?: number|'MANY',
+  hasMore?: boolean,
+  threads: Array<ThreadDescriptor>
+};
 
+type NormalizedHandlerResult = {
+  total: number|'MANY',
+  threads: Array<ThreadDescriptor>
+};
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
@@ -123,21 +131,30 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
           threads: copyAndOmitExcessThreads(handlerResult)
         });
       } else if (typeof handlerResult === 'object') {
-        const {total, threads} = handlerResult;
+        const {total, hasMore, threads} = handlerResult;
 
-        if (
-          !((typeof total === 'number' || total === 'MANY') &&
-          Array.isArray(threads))
-        ) {
+        if (!Array.isArray(threads)) {
           return Kefir.constantError(new Error(`
-            handleCustomListRoute result must contain 'total' and 'threads' properties
+            handleCustomListRoute result must contain a 'threads' array.
           `));
         }
 
-        return Kefir.constant({
-          total,
-          threads: copyAndOmitExcessThreads(threads)
-        });
+        if (typeof total === 'number') {
+          return Kefir.constant({
+            total,
+            threads: copyAndOmitExcessThreads(threads)
+          });
+        } else if (typeof hasMore === 'boolean') {
+          return Kefir.constant({
+            total: hasMore ? 'MANY' : start + Math.min(threads.length, MAX_THREADS_PER_PAGE),
+            threads: copyAndOmitExcessThreads(threads)
+          });
+        } else {
+          return Kefir.constantError(new Error(`
+            handleCustomListRoute result must contain either a 'total' number
+            or a 'hasMore' boolean (https://www.inboxsdk.com/docs/#Router).
+          `));
+        }
       } else {
         return Kefir.constantError(new Error(`
           handleCustomListRoute result must be an array or an object
@@ -148,7 +165,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       driver.getLogger().error(e);
       return [];
     })
-    .map(({total, threads}: HandlerResult) => ({
+    .map(({total, threads}: NormalizedHandlerResult) => ({
       total,
       idPairs: _.compact(threads.map(id => {
         if (typeof id === 'string') {
