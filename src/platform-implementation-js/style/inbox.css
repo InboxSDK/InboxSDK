@@ -120,7 +120,6 @@
 .IDMAP_sidebar_iconArea {
   position: absolute;
   right: -16px;
-  z-index: 100;
 
   /* needed to prevent rendering bug in chrome where the element is
   visibly duplicated when the parent becomes position:fixed. */
