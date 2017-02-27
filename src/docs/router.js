@@ -92,16 +92,14 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	* Used to create a custom view that shows a list of threads. When the user navigates
 	* to the given routeID, the handler function will be called. The handler function
 	* will be passed the starting offset (if the user sees 50 threads per page and is on
-	* page 2, then the offset will be 50) and it should return an array of up to 50 thread IDs
-	* or a Promise for an array of thread IDs.
-	* The thread IDs should each be a string that is a Gmail Thread ID or the value of
-	* a message's Message-ID header (which must start with "<" and end with ">"), or for more
-	* efficiency both of them can be supplied together in an object with "gmailThreadId" and
-	* "rfcMessageId" properties.  Returns a function which can be called to unregister
-	* the route handler.
+	* page 2, then the offset will be 50), and a maximum number of threads to return.
+	* It must return a {CustomListDescriptor}, or a promise which resolves to one.
+	*
+	* Returns a function which can be called to unregister the route handler.
 	* ^gmail
-	* @param {string} routeID - which route this handler is registering for
-	* @param {function(offset)} handler - passed a page offset at must return an array (or Promise for an array) of thread ids.
+	* @param {string} routeID - Which route this handler is registering for.
+	* @param {function(offset, max)} handler - Passed a page offset and a maximum
+	* number of threads to return. Must return a {CustomListDescriptor}, or a promise which resolves to one.
 	* @return {function}
 	*/
 	handleCustomListRoute: function() {},
@@ -113,6 +111,70 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	*/
 	getCurrentRouteView: function(){}
 
+};
+
+/**
+ * @class
+ * This type is returned from the handler function passed to
+ * {Router.handleCustomListRoute()} as a way to configure the custom list route.
+ */
+var CustomListDescriptor = /** @lends CustomListDescriptor */{
+	/**
+	 * An array of threads to display in the custom list view. Each thread may
+	 * be in the form of a {ThreadDescriptor} object or a string that is:
+	 * 1. A Gmail Thread ID.
+ 	 * 2. A message's Message-ID header (which must start with "<" and end with ">").
+	 *
+	 * For optimal performance when rendering the list, supply a {ThreadDescriptor}
+	 * with both an {rfcMessageId} and a {gmailThreadId}.
+	 * @type {ThreadDescriptor[]|String[]}
+	 */
+	threads: null,
+
+	/**
+	 * The total number of threads in the custom list view. Note that this is
+	 * different from the number of threads currently shown on the page (e.g.
+   * there may only be 50 threads shown on the page but 150 total threads in the
+   * list, in this case {total} would be 150). If you do not currently know
+	 * the total number of threads, you may either use the string 'MANY' or
+	 * omit this property. Either way, if you do not have a total number you must
+	 * include a {hasMore} property for proper pagination.
+	 * ^optional
+	 * ^default='MANY'
+	 * @type {Number|String}
+	 */
+	total: null,
+
+	/**
+	 * A boolean representing whether or not there are more threads to be shown
+	 * after the current page. Use this when you do not currently know the total
+	 * number of threads in the list.
+	 * ^optional
+	 * @type {Boolean}
+	 */
+	hasMore: null
+};
+
+/**
+ * @class
+ * An object used to describe a specific thread (e.g. when creating a custom
+ * list via {Router.handleCustomListRoute()}). At least one property must
+ * be present to identify a thread.
+ */
+var ThreadDescriptor = /** @lends ThreadDescriptor */{
+	/**
+	 * The value of a message's Message-ID header (which must start with "<" and end with ">").
+	 * ^optional
+	 * @type {String}
+	 */
+	rfcMessageId: null,
+
+	/**
+	 * The Gmail thread ID of a message.
+	 * ^optional
+	 * @type {String}
+	 */
+	gmailThreadId: null
 };
 
 /**
