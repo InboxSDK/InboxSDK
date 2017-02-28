@@ -17,6 +17,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 
 	sdk.Router.handleAllRoutes(function(routeView){
 		log(
+			'handleAllRoutes',
 			'id', routeView.getRouteID(),
 			'type', routeView.getRouteType(),
 			'params', routeView.getParams()

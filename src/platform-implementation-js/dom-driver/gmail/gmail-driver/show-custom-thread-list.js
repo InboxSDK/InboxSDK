@@ -279,13 +279,17 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
   return newQuery;
 }
 
-export default function showCustomThreadList(driver: GmailDriver, customRouteID: string, onActivate: Function) {
+export default function showCustomThreadList(
+  driver: GmailDriver,
+  customRouteID: string,
+  onActivate: Function,
+  params: Array<string>
+) {
   const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
   const customHash = document.location.hash;
 
   const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
-  const searchHash = '#search/'+encodeURIComponent(uniqueSearch);
 
   const searchInput = GmailElementGetter.getSearchInput();
   if (!searchInput) throw new Error('could not find search input');
@@ -296,7 +300,10 @@ export default function showCustomThreadList(driver: GmailDriver, customRouteID:
     searchInput.style.visibility = 'visible';
   });
 
+  // Change the hash *without* making a new history entry.
+  const searchHash = '#search/' + [uniqueSearch, ...params].map(encodeURIComponent).join('/');
   window.history.replaceState(null, null, searchHash);
+  // Create a hashchange event so setup-route-view-driver-stream sees this event.
   const hce = new (window:any).HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '')+customHash,
     newURL: document.location.href.replace(/#.*$/, '')+searchHash
