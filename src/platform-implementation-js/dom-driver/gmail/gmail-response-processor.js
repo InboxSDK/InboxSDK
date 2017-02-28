@@ -423,16 +423,21 @@ it all back together.
     group.forEach(item => {
       if (total && item[0] === 'ti') {
         if (typeof total === 'number') {
+          // does not switch out of 'many'-total mode (we currently never need this).
           item[2] = item[10] = total;
         } else if (total === 'MANY') {
           // large total to ensure it is always larger than the actual
           // number of threads.
           item[2] = item[10] = 100 * 1000;
           // flip response from number-total mode into 'many'-total mode.
-          item [3] = 1;
+          item[3] = 1;
 
           const query = item[5];
-          item[6][0] = [query, 1];
+          if (item[6]) {
+            item[6][0] = [query, 1];
+          } else {
+            console.error('replaceThreadsInResponse(): Missing item[6]');
+          }
         }
       }
 

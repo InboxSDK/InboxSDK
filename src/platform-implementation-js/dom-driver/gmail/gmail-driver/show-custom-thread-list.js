@@ -9,7 +9,10 @@ import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
 
-type ThreadDescriptor = string|{[id: 'gmailThreadId'|'rfcMessageId']: string};
+type ThreadDescriptor = string|{
+  gmailThreadId?: ?string;
+  rfcMessageId?: ?string;
+};
 
 type InitialIDPairs = Array<
   {rfcId: string}|
@@ -185,7 +188,7 @@ const setupSearchReplacing = (
     ) => ({
       start,
       total,
-      threads: _.compact(threads.map(id => {
+      threads: threads.map(id => {
         if (typeof id === 'string') {
           if (id[0] == '<') {
             return {rfcId: id};
@@ -198,10 +201,10 @@ const setupSearchReplacing = (
             rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
           };
           if (obj.gtid || obj.rfcId) {
-            return obj;
+            return (obj: any);
           }
         }
-      }))
+      }).filter(Boolean)
     }))
     // Figure out any rfc ids we don't know yet
     .map(({start, total, threads}: NormalizedHandlerResult<InitialIDPairs>) => (
@@ -213,7 +216,7 @@ const setupSearchReplacing = (
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
-      })).then((pairs: IDPairsWithRFC) => ({start, total, threads: _.compact(pairs)}))
+      })).then((pairs: IDPairsWithRFC) => ({start, total, threads: pairs}))
     ))
     .flatMap(Kefir.fromPromise)
     .onValue((
