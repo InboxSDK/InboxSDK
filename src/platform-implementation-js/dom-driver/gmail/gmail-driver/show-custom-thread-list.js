@@ -25,10 +25,10 @@ type HandlerResult = {
   threads: Array<ThreadDescriptor>
 };
 
-type NormalizedHandlerResult = {
+type NormalizedHandlerResult<T> = {
   start: number,
   total: number|'MANY',
-  threads: Array<ThreadDescriptor>
+  threads: T
 };
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
@@ -99,7 +99,11 @@ const findIdFailure = (id, err: Error) => {
 };
 
 // Returns the search string that will trigger the onActivate function.
-const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActivate: Function): string => {
+const setupSearchReplacing = (
+  driver: GmailDriver,
+  customRouteID: string,
+  onActivate: Function
+): string => {
   const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
     return preexistingQuery;
@@ -176,10 +180,12 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       driver.getLogger().error(e);
       return Kefir.constant({start: 0, total: 0, threads: []});
     })
-    .map(({start, total, threads}: NormalizedHandlerResult) => ({
+    .map((
+      {start, total, threads}: NormalizedHandlerResult<Array<ThreadDescriptor>>
+    ) => ({
       start,
       total,
-      idPairs: _.compact(threads.map(id => {
+      threads: _.compact(threads.map(id => {
         if (typeof id === 'string') {
           if (id[0] == '<') {
             return {rfcId: id};
@@ -198,10 +204,8 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       }))
     }))
     // Figure out any rfc ids we don't know yet
-    .map((
-      {start, total, idPairs}: {start: number, total: number|'MANY', idPairs: InitialIDPairs}
-    ) => (
-      RSVP.Promise.all(idPairs.map(pair => {
+    .map(({start, total, threads}: NormalizedHandlerResult<InitialIDPairs>) => (
+      RSVP.Promise.all(threads.map(pair => {
         if (pair.rfcId) {
           return pair;
         } else if (typeof pair.gtid === 'string') {
@@ -209,14 +213,14 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
-      })).then((pairs: IDPairsWithRFC) => ({start, total, idPairs: _.compact(pairs)}))
+      })).then((pairs: IDPairsWithRFC) => ({start, total, threads: _.compact(pairs)}))
     ))
     .flatMap(Kefir.fromPromise)
     .onValue((
-      {start, total, idPairs}: {start: number, total: number|'MANY', idPairs: IDPairsWithRFC}
+      {start, total, threads}: NormalizedHandlerResult<IDPairsWithRFC>
     ) => {
-      const query: string = idPairs.length > 0 ?
-        idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
+      const query: string = threads.length > 0 ?
+        threads.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
 
       // Outgoing requests for list queries always need to have a `start` of 0,
@@ -226,7 +230,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       driver.getPageCommunicator().setCustomListNewQuery(newQuery, query, 0);
       Kefir.combine([
         // Figure out any gmail thread ids we don't know yet
-        Kefir.fromPromise(RSVP.Promise.all(idPairs.map(pair =>
+        Kefir.fromPromise(RSVP.Promise.all(threads.map(pair =>
           pair.gtid ? pair :
           driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
             .then(gtid => ({gtid, rfcId: pair.rfcId}), err => findIdFailure(pair.rfcId, err))
