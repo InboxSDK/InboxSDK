@@ -164,7 +164,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		log('tlbeep-finite activate', arguments);
 		const threads = customListThreads.slice(
 			offset,
-			Math.min(offset + max, customListThreads.length)
+			offset + max
 		);
 
 		return delay(500, {
@@ -178,7 +178,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		const hasMore = offset + max < customListThreads.length;
 		const threads = customListThreads.slice(
 			offset,
-			Math.min(offset + max, customListThreads.length)
+			offset + max
 		);
 
 		return delay(500, {
