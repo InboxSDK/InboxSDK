@@ -26,6 +26,7 @@ type HandlerResult = {
 };
 
 type NormalizedHandlerResult = {
+  start: number,
   total: number|'MANY',
   threads: Array<ThreadDescriptor>
 };
@@ -103,7 +104,6 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
   if (preexistingQuery) {
     return preexistingQuery;
   }
-  let start: number;
   const newQuery = Date.now()+'-'+Math.random();
   driver.getPageCommunicator().setupCustomListResultsQuery(newQuery);
   driver.getPageCommunicator().ajaxInterceptStream
@@ -111,17 +111,21 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       e.type === 'searchForReplacement' &&
       e.query === newQuery
     )
-    .flatMap(e => {
-      start = e.start;
+    .flatMap(({start}: {start: number}) => {
       driver.signalCustomThreadListActivity(customRouteID);
       try {
-        return Kefir.fromPromise(RSVP.Promise.resolve(onActivate(e.start, MAX_THREADS_PER_PAGE)));
+        return Kefir.fromPromise(
+          RSVP.Promise.resolve(onActivate(start, MAX_THREADS_PER_PAGE))
+            .then((result: HandlerResult) => ({start, result}))
+        );
       } catch(e) {
         return Kefir.constantError(e);
       }
     })
-    .flatMap((handlerResult: HandlerResult|Array<ThreadDescriptor>) => {
-      if (Array.isArray(handlerResult)) {
+    .flatMap((
+      {start, result}: {start: number, result: HandlerResult|Array<ThreadDescriptor>}
+    ) => {
+      if (Array.isArray(result)) {
         driver.getLogger().deprecationWarning(
           'Returning an array from a handleCustomListRoute handler',
           'a CustomListDescriptor object'
@@ -129,11 +133,12 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
 
         return Kefir.constant({
           // default to one page since arrays can't be paginated
+          start,
           total: MAX_THREADS_PER_PAGE,
-          threads: copyAndOmitExcessThreads(handlerResult, driver.getLogger())
+          threads: copyAndOmitExcessThreads(result, driver.getLogger())
         });
-      } else if (typeof handlerResult === 'object') {
-        const {total, hasMore, threads} = handlerResult;
+      } else if (typeof result === 'object') {
+        const {total, hasMore, threads} = result;
 
         if (!Array.isArray(threads)) {
           return Kefir.constantError(new Error(`
@@ -144,11 +149,13 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
 
         if (typeof total === 'number') {
           return Kefir.constant({
+            start,
             total,
             threads: copyAndOmitExcessThreads(threads, driver.getLogger())
           });
         } else if (typeof hasMore === 'boolean') {
           return Kefir.constant({
+            start,
             total: hasMore ? 'MANY' : start + Math.min(threads.length, MAX_THREADS_PER_PAGE),
             threads: copyAndOmitExcessThreads(threads, driver.getLogger())
           });
@@ -167,9 +174,10 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
     })
     .flatMapErrors(e => {
       driver.getLogger().error(e);
-      return Kefir.constant({total: 0, threads: []});
+      return Kefir.constant({start: 0, total: 0, threads: []});
     })
-    .map(({total, threads}: NormalizedHandlerResult) => ({
+    .map(({start, total, threads}: NormalizedHandlerResult) => ({
+      start,
       total,
       idPairs: _.compact(threads.map(id => {
         if (typeof id === 'string') {
@@ -190,7 +198,9 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       }))
     }))
     // Figure out any rfc ids we don't know yet
-    .map(({total, idPairs}: {total: number|'MANY', idPairs: InitialIDPairs}) => (
+    .map((
+      {start, total, idPairs}: {start: number, total: number|'MANY', idPairs: InitialIDPairs}
+    ) => (
       RSVP.Promise.all(idPairs.map(pair => {
         if (pair.rfcId) {
           return pair;
@@ -199,10 +209,12 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
-      })).then((pairs: IDPairsWithRFC) => ({total, idPairs: _.compact(pairs)}))
+      })).then((pairs: IDPairsWithRFC) => ({start, total, idPairs: _.compact(pairs)}))
     ))
     .flatMap(Kefir.fromPromise)
-    .onValue(({total, idPairs}: {total: number|'MANY', idPairs: IDPairsWithRFC}) => {
+    .onValue((
+      {start, total, idPairs}: {start: number, total: number|'MANY', idPairs: IDPairsWithRFC}
+    ) => {
       const query: string = idPairs.length > 0 ?
         idPairs.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
