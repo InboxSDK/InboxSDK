@@ -165,9 +165,9 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
         `));
       }
     })
-    .mapErrors(e => {
+    .flatMapErrors(e => {
       driver.getLogger().error(e);
-      return [];
+      return Kefir.constant({total: 0, threads: []});
     })
     .map(({total, threads}: NormalizedHandlerResult) => ({
       total,
