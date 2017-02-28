@@ -4,8 +4,8 @@ import _ from 'lodash';
 import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
-import Logger from '../../../lib/logger';
 import * as GRP from '../gmail-response-processor';
+import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
 
@@ -81,10 +81,13 @@ for the search>
 
 */
 
-const copyAndOmitExcessThreads = (ids: Array<ThreadDescriptor>): Array<ThreadDescriptor> => {
+const copyAndOmitExcessThreads = (
+  ids: Array<ThreadDescriptor>,
+  logger: Logger
+): Array<ThreadDescriptor> => {
   if (ids.length > MAX_THREADS_PER_PAGE) {
     // upgrade to deprecationWarning later
-    console.warn('Received more than MAX_THREADS_PER_PAGE threads, ignoring them');
+    logger.error(new Error('Received more than MAX_THREADS_PER_PAGE threads, ignoring them'));
   }
   return ids.slice(0, MAX_THREADS_PER_PAGE);
 };
@@ -119,35 +122,35 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
     })
     .flatMap((handlerResult: HandlerResult|Array<ThreadDescriptor>) => {
       if (Array.isArray(handlerResult)) {
-        // upgrade to deprecationWarning later.
-        console.warn(`
-          Returning an array from a handleCustomListRoute handler will not support
-          pagination. Use an object instead (https://www.inboxsdk.com/docs/#Router).
-        `);
+        driver.getLogger().deprecationWarning(
+          'Returning an array from a handleCustomListRoute handler',
+          'a CustomListDescriptor object'
+        );
 
         return Kefir.constant({
           // default to one page since arrays can't be paginated
           total: MAX_THREADS_PER_PAGE,
-          threads: copyAndOmitExcessThreads(handlerResult)
+          threads: copyAndOmitExcessThreads(handlerResult, driver.getLogger())
         });
       } else if (typeof handlerResult === 'object') {
         const {total, hasMore, threads} = handlerResult;
 
         if (!Array.isArray(threads)) {
           return Kefir.constantError(new Error(`
-            handleCustomListRoute result must contain a 'threads' array.
+            handleCustomListRoute result must contain a 'threads' array
+            (https://www.inboxsdk.com/docs/#Router).
           `));
         }
 
         if (typeof total === 'number') {
           return Kefir.constant({
             total,
-            threads: copyAndOmitExcessThreads(threads)
+            threads: copyAndOmitExcessThreads(threads, driver.getLogger())
           });
         } else if (typeof hasMore === 'boolean') {
           return Kefir.constant({
             total: hasMore ? 'MANY' : start + Math.min(threads.length, MAX_THREADS_PER_PAGE),
-            threads: copyAndOmitExcessThreads(threads)
+            threads: copyAndOmitExcessThreads(threads, driver.getLogger())
           });
         } else {
           return Kefir.constantError(new Error(`
@@ -158,6 +161,7 @@ const setupSearchReplacing = (driver: GmailDriver, customRouteID: string, onActi
       } else {
         return Kefir.constantError(new Error(`
           handleCustomListRoute result must be an array or an object
+          (https://www.inboxsdk.com/docs/#Router).
         `));
       }
     })
