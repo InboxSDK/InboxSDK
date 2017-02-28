@@ -227,7 +227,12 @@ const setupSearchReplacing = (
       // because we only ever ask for 1 page-worth of threads per query.
       // When the response comes back, we modify it to have a `start` consistent
       // with whatever page was being loaded so Gmail's UI makes sense.
-      driver.getPageCommunicator().setCustomListNewQuery(newQuery, query, 0);
+      driver.getPageCommunicator().setCustomListNewQuery({
+        newQuery,
+        newStart: 0,
+        query,
+        start
+      });
       Kefir.combine([
         // Figure out any gmail thread ids we don't know yet
         Kefir.fromPromise(RSVP.Promise.all(threads.map(pair =>

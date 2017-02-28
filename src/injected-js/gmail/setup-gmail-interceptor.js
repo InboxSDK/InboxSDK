@@ -344,7 +344,10 @@ export default function setupGmailInterceptor() {
     });
 
     document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
-      if (customListJob.query === event.detail.query) {
+      if (
+        customListJob.query === event.detail.query &&
+        customListJob.start === event.detail.start
+      ) {
         const {newQuery, newStart} = event.detail;
 
         customListJob.newRequestParams.resolve({
