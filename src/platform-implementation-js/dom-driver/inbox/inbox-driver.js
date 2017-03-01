@@ -123,10 +123,7 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const topRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('topRow'));
-    const threadRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('threadRow'));
     const threadElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('thread'));
-    const messageElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('message'));
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
