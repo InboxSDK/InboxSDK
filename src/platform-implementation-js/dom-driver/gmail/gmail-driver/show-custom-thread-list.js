@@ -91,10 +91,10 @@ const copyAndOmitExcessThreads = (
 ): Array<ThreadDescriptor> => {
   if (ids.length > MAX_THREADS_PER_PAGE) {
     // upgrade to deprecationWarning later
-    logger.error(new Error(`
-      Received more than the maximum number of threads specified by handler,
-      ignoring additional threads (https://www.inboxsdk.com/docs/#Router).
-    `));
+    logger.error(new Error(
+      'Received more than the maximum number of threads specified by handler,' +
+      'ignoring additional threads (https://www.inboxsdk.com/docs/#Router).'
+    ));
   }
   return ids.slice(0, MAX_THREADS_PER_PAGE);
 };
@@ -151,18 +151,18 @@ const setupSearchReplacing = (
         const {total, hasMore, threads} = result;
 
         if (!Array.isArray(threads)) {
-          return Kefir.constantError(new Error(`
-            handleCustomListRoute result must contain a 'threads' array
-            (https://www.inboxsdk.com/docs/#Router).
-          `));
+          return Kefir.constantError(new Error(
+            'handleCustomListRoute result must contain a "threads" array' +
+            '(https://www.inboxsdk.com/docs/#Router).'
+          ));
         }
 
-        if (total && hasMore) {
-          return Kefir.constantError(new Error(`
-            handleCustomListRoute result must only contain either
-            a 'total' or a 'hasMore' property, but not both.
-            (https://www.inboxsdk.com/docs/#Router).
-          `));
+        if (total != null && hasMore != null) {
+          return Kefir.constantError(new Error(
+            'handleCustomListRoute result must only contain either' +
+            'a "total" or a "hasMore" property, but not both.' +
+            '(https://www.inboxsdk.com/docs/#Router).'
+          ));
         }
 
         if (typeof total === 'number') {
@@ -179,16 +179,16 @@ const setupSearchReplacing = (
             threads: threadsWithoutExcess
           });
         } else {
-          return Kefir.constantError(new Error(`
-            handleCustomListRoute result must contain either a 'total' number
-            or a 'hasMore' boolean (https://www.inboxsdk.com/docs/#Router).
-          `));
+          return Kefir.constantError(new Error(
+            'handleCustomListRoute result must contain either a "total" number' +
+            'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).'
+          ));
         }
       } else {
-        return Kefir.constantError(new Error(`
-          handleCustomListRoute result must be an array or an object
-          (https://www.inboxsdk.com/docs/#Router).
-        `));
+        return Kefir.constantError(new Error(
+          'handleCustomListRoute result must be an array or an object' +
+          '(https://www.inboxsdk.com/docs/#Router).'
+        ));
       }
     })
     .flatMapErrors(e => {
