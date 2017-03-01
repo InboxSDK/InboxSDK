@@ -1,6 +1,7 @@
 /* @flow */
 
 import type {PageParserTreeOptions} from 'page-parser-tree';
+import t from 'transducers.js';
 
 const pageParserOptions: PageParserTreeOptions = {
   tags: {
@@ -29,6 +30,20 @@ const pageParserOptions: PageParserTreeOptions = {
           div[jsaction*="update_chip_carousel_arrows"] div[role=listitem][tabindex][jsaction]
         `);
       }
+    },
+    attachmentOverlay: {
+      fn: (function() {
+        const _t = t.compose(
+          t.filter(iframe => iframe.style.display !== 'none'),
+          t.mapcat(iframe =>
+            Array.from(iframe.contentDocument.querySelectorAll('div[role=dialog]:not([aria-hidden=true])'))
+          )
+        );
+
+        return root => {
+          return t.toArray(Array.from(root.querySelectorAll('iframe[frameborder]:not([src])')), _t);
+        };
+      })()
     },
   },
   watchers: [
@@ -97,6 +112,13 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[role=listitem]',
       {$watch: {attributeFilter: ['tabindex'], cond: '[tabindex]'}},
       {$filter: el => el.style.display !== 'none'}
+    ]},
+    {sources: [null], tag: 'attachmentOverlay', selectors: [
+      'body',
+      'iframe[id][frameborder]:not([src])',
+      {$map: el => (el:any).contentDocument.body},
+      'div[aria-label][role=dialog]',
+      {$watch: {attributeFilter: ['aria-hidden'], cond: ':not([aria-hidden=true])'}}
     ]},
   ]
 };
