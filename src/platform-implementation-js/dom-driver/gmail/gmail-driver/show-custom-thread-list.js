@@ -23,7 +23,7 @@ type IDPairsWithRFC = Array<{rfcId: string, gtid?: string}>;
 type CompletedIDPairs = Array<{rfcId: string, gtid: string}>;
 
 type HandlerResult = {
-  total?: number|'MANY',
+  total?: number,
   hasMore?: boolean,
   threads: Array<ThreadDescriptor>
 };
