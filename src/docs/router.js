@@ -123,32 +123,36 @@ var CustomListDescriptor = /** @lends CustomListDescriptor */{
 	 * An array of threads to display in the custom list view. Each thread may
 	 * be in the form of a {ThreadDescriptor} object or a string that is:
 	 * 1. A Gmail Thread ID.
- 	 * 2. A message's Message-ID header (which must start with "<" and end with ">").
+	 * 2. A message's Message-ID header (which must start with "<" and end with ">").
 	 *
-	 * For optimal performance when rendering the list, supply a {ThreadDescriptor}
-	 * with both an {rfcMessageId} and a {gmailThreadId}.
-	 * @type {ThreadDescriptor[]|String[]}
+	 * If you already have both the Gmail Thread ID *and* the Message-ID header
+	 * in your existing data for a given message, supply a {ThreadDescriptor}
+	 * with both an {rfcMessageId} and a {gmailThreadId} for better performance.
+	 * If you only have one of the two, the SDK will performantly fetch and cache
+	 * the necessary information automatically.
+	 * @type {Array.<ThreadDescriptor|String>}
 	 */
 	threads: null,
 
 	/**
 	 * The total number of threads in the custom list view. Note that this is
 	 * different from the number of threads currently shown on the page (e.g.
-   * there may only be 50 threads shown on the page but 150 total threads in the
-   * list, in this case {total} would be 150). If you do not currently know
-	 * the total number of threads, you may either use the string 'MANY' or
-	 * omit this property. Either way, if you do not have a total number you must
-	 * include a {hasMore} property for proper pagination.
+	 * there may only be 50 threads currently shown on the page but 150 total
+	 * threads in the list, in this case {total} would be 150). If you won't know
+	 * the total number until you've reached the end of the list (e.g. you're
+	 * fetching data from a search API where calculating a total is expensive),
+	 * omit this property and use {hasMore} instead.
 	 * ^optional
-	 * ^default='MANY'
-	 * @type {Number|String}
+	 * @type {Number}
 	 */
 	total: null,
 
 	/**
 	 * A boolean representing whether or not there are more threads to be shown
-	 * after the current page. Use this when you do not currently know the total
-	 * number of threads in the list.
+	 * after the currently shown threads. Use this when you won't know the total
+	 * number of threads until you've reached the end of the list. If you already
+	 * know the total number of threads in the list (not just the ones currently
+	 * shown), omit this proeprty and use {total} instead.
 	 * ^optional
 	 * @type {Boolean}
 	 */
