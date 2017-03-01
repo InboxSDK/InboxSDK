@@ -157,7 +157,7 @@ const setupSearchReplacing = (
           `));
         }
 
-        if (total && hasMore) {
+        if (total != null && hasMore != null) {
           return Kefir.constantError(new Error(`
             handleCustomListRoute result must only contain either
             a 'total' or a 'hasMore' property, but not both.
