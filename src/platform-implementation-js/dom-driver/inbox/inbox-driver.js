@@ -42,7 +42,6 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getSearchBarStream from './detection/searchBar/stream';
 import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
 
 import threadParser from './detection/thread/parser';
@@ -50,6 +49,7 @@ import messageParser from './detection/message/parser';
 import attachmentCardParser from './detection/attachmentCard/parser';
 import attachmentOverlayParser from './detection/attachmentOverlay/parser';
 import nativeDrawerParser from './detection/nativeDrawer/parser';
+import searchBarParser from './detection/searchBar/parser';
 
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
@@ -298,16 +298,26 @@ class InboxDriver {
         this._logger.errorSite(new Error('Failed to find appToolbarLocation'));
       });
 
-    this._searchBarPool = new ItemWithLifetimePool(
-      getSearchBarStream(this).takeUntilBy(this._stopper)
-    );
+    toValueObservable(this._page.tree.getAllByTag('searchBar')).subscribe(({value: node}) => {
+      const el = node.getValue();
+      const parsed = searchBarParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (searchBar)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+    });
+
+    this._searchBarPool = toItemWithLifetimePool(this._page.tree.getAllByTag('searchBar'));
     Kefir.later(30*1000)
       .takeUntilBy(this._searchBarPool.items())
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
 
-    toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({node}) => {
+    toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({value: node}) => {
       const el = node.getValue();
       const parsed = nativeDrawerParser(el);
       if (parsed.errors.length) {

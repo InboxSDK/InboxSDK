@@ -8,9 +8,15 @@ import Kefir from 'kefir';
 import once from 'lodash/once';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
+import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 
 import locFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/appToolbarLocation/finder';
-import searchBarFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/searchBar/finder';
+
+function searchBarFinder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.searchBar.fn(documentElement));
+}
 
 import {
   page20160614,

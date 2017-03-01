@@ -57,6 +57,11 @@ const pageParserOptions: PageParserTreeOptions = {
         return [];
       }
     },
+    searchBar: {
+      fn(root) {
+        return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
+      }
+    }
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
