@@ -50,8 +50,7 @@ import attachmentCardParser from './detection/attachmentCard/parser';
 import attachmentOverlayParser from './detection/attachmentOverlay/parser';
 import nativeDrawerParser from './detection/nativeDrawer/parser';
 import searchBarParser from './detection/searchBar/parser';
-
-import getChatSidebarViewStream from './getChatSidebarViewStream';
+import chatSidebarParser from './detection/chatSidebar/parser';
 
 import setupRouteViewDriverStream from './setupRouteViewDriverStream';
 
@@ -62,7 +61,7 @@ import InboxThreadView from './views/inbox-thread-view';
 import InboxMessageView from './views/inbox-message-view';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
-import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
+import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -91,7 +90,7 @@ class InboxDriver {
   _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
   _attachmentOverlayViewDriverLiveSet: LiveSet<InboxAttachmentOverlayView>;
-  _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
+  _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
@@ -246,10 +245,23 @@ class InboxDriver {
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
-    this._chatSidebarViewPool = new ItemWithLifetimePool(
-      getChatSidebarViewStream(this).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._chatSidebarViewLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('chatSidebar'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = chatSidebarParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (chatSidebar)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxChatSidebarView(el, parsed);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+    this._chatSidebarViewLiveSet.subscribe({});
 
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
 
@@ -382,7 +394,7 @@ class InboxDriver {
   getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
 
   getCurrentChatSidebarView(): InboxChatSidebarView {
-    const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
+    const view = Array.from(this._chatSidebarViewLiveSet.values())[0];
     if (!view) throw new Error('No chat sidebar found');
     return view;
   }

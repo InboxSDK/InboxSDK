@@ -61,7 +61,13 @@ const pageParserOptions: PageParserTreeOptions = {
       fn(root) {
         return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
       }
-    }
+    },
+    chatSidebar: {
+      interval: count => count === 0 ? 5*1000 : 120*1000,
+      fn(root) {
+        return [root.querySelector('#in')].filter(Boolean);
+      }
+    },
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
@@ -136,6 +142,14 @@ const pageParserOptions: PageParserTreeOptions = {
       {$map: el => (el:any).contentDocument.body},
       'div[aria-label][role=dialog]',
       {$watch: {attributeFilter: ['aria-hidden'], cond: ':not([aria-hidden=true])'}}
+    ]},
+
+    {sources: [null], tag: 'chatSidebar', selectors: [
+      'body',
+      '[id][jsaction]',
+      'div[id]',
+      'div[class]',
+      'div.in#in'
     ]},
   ]
 };
