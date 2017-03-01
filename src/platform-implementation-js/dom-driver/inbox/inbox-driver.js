@@ -15,6 +15,7 @@ import LiveSet from 'live-set';
 import lsFilter from 'live-set/filter';
 import lsFlatMap from 'live-set/flatMap';
 import lsMapWithRemoval from 'live-set/mapWithRemoval';
+import toValueObservable from 'live-set/toValueObservable';
 import type PageParserTree from 'page-parser-tree';
 import makePageParserTree from './makePageParserTree';
 
@@ -48,8 +49,8 @@ import threadParser from './detection/thread/parser';
 import messageParser from './detection/message/parser';
 import attachmentCardParser from './detection/attachmentCard/parser';
 import attachmentOverlayParser from './detection/attachmentOverlay/parser';
+import nativeDrawerParser from './detection/nativeDrawer/parser';
 
-import getNativeDrawerStream from './getNativeDrawerStream';
 import getChatSidebarViewStream from './getChatSidebarViewStream';
 
 import setupRouteViewDriverStream from './setupRouteViewDriverStream';
@@ -100,7 +101,6 @@ class InboxDriver {
   _pageCommunicator: InboxPageCommunicator;
   _appToolbarLocationPool: ItemWithLifetimePool<*>;
   _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
-  _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
@@ -310,9 +310,17 @@ class InboxDriver {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
 
-    this._nativeDrawerPool = new ItemWithLifetimePool(
-      getNativeDrawerStream(this).takeUntilBy(this._stopper)
-    );
+    toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({node}) => {
+      const el = node.getValue();
+      const parsed = nativeDrawerParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (nativeDrawer)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+    });
 
     // When a user goes from one thread to another, a new thread view is made
     // but the old thread view doesn't get destroyed until it finishes
@@ -356,7 +364,6 @@ class InboxDriver {
   }
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
-  getNativeDrawerPool() {return this._nativeDrawerPool;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
@@ -595,11 +602,21 @@ class InboxDriver {
     const drawerView = new InboxDrawerView(options);
     // TODO if a native drawer was already open, we should close the native
     // drawer istead of the new one.
-    this._nativeDrawerPool.items()
-      .takeUntilBy(drawerView.getClosingStream())
-      .onValue(() => {
-        drawerView.close();
-      });
+
+    // If a nativeDrawer is opened while the new SDK drawer is open, then close
+    // the SDK drawer.
+    const sub = this._page.tree.getAllByTag('nativeDrawer').subscribe(changes => {
+      for (let change of changes) {
+        if (change.type === 'add') {
+          drawerView.close();
+          break;
+        }
+      }
+    });
+    drawerView.getClosingStream().take(1).onValue(() => {
+      sub.unsubscribe();
+    });
+
     return drawerView;
   }
 

@@ -2,6 +2,7 @@
 
 import type {PageParserTreeOptions} from 'page-parser-tree';
 import t from 'transducers.js';
+import closest from 'closest-ng';
 
 const pageParserOptions: PageParserTreeOptions = {
   tags: {
@@ -44,6 +45,17 @@ const pageParserOptions: PageParserTreeOptions = {
           return t.toArray(Array.from(root.querySelectorAll('iframe[frameborder]:not([src])')), _t);
         };
       })()
+    },
+    nativeDrawer: {
+      interval: 10*1000,
+      fn(root) {
+        const drawerUploadFilesBtn = root.querySelector('div[jsaction="global.exit_full_screen"] div[role=dialog][aria-busy=true] div[role=link][jsaction$=".open_local_file_picker"]');
+        if (drawerUploadFilesBtn) {
+          const drawer = closest(drawerUploadFilesBtn, '[role=dialog]');
+          if (drawer) return [drawer];
+        }
+        return [];
+      }
     },
   },
   watchers: [
