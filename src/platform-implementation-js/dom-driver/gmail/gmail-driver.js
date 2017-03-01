@@ -228,8 +228,8 @@ class GmailDriver {
 		return this._lastCustomThreadListActivity;
 	}
 
-	showCustomThreadList(customRouteID: string, onActivate: Function) {
-		showCustomThreadList(this, customRouteID, onActivate);
+	showCustomThreadList(customRouteID: string, onActivate: Function, params: Array<string>) {
+		showCustomThreadList(this, customRouteID, onActivate, params);
 	}
 
 	showCustomRouteView(element: HTMLElement) {

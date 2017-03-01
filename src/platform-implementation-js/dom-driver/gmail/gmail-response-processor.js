@@ -361,7 +361,11 @@ export function readDraftId(response: string, messageID: string): ?string {
   return null;
 }
 
-export function replaceThreadsInResponse(response: string, replacementThreads: Thread[]): string {
+export function replaceThreadsInResponse(
+  response: string,
+  replacementThreads: Thread[],
+  { start, total }: { start: number, total?: number|'MANY' }
+): string {
   const {value, options} = deserialize(response);
 
   const actionResponseMode = value.length === 1 &&
@@ -417,6 +421,26 @@ it all back together.
     const preTbGroup = [];
     const postTbGroup = [];
     group.forEach(item => {
+      if (total && item[0] === 'ti') {
+        if (typeof total === 'number') {
+          // does not switch out of 'many'-total mode (we currently never need this).
+          item[2] = item[10] = total;
+        } else if (total === 'MANY') {
+          // large total to ensure it is always larger than the actual
+          // number of threads.
+          item[2] = item[10] = 100 * 1000;
+          // flip response from number-total mode into 'many'-total mode.
+          item[3] = 1;
+
+          const query = item[5];
+          if (item[6]) {
+            item[6][0] = [query, 1];
+          } else {
+            console.error('replaceThreadsInResponse(): Missing item[6]');
+          }
+        }
+      }
+
       if (item[0] === 'tb') {
         hasSeenTb = tbSeenInThisGroup = true;
         if (preTbGroup.length) {
@@ -438,7 +462,7 @@ it all back together.
     }
   });
 
-  const newTbs = _threadsToTbGroups(replacementThreads);
+  const newTbs = _threadsToTbGroups(replacementThreads, start);
   if (preTbItems.length) {
     newTbs[0] = preTbItems.concat(newTbs[0] || []);
   }
@@ -509,12 +533,12 @@ function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[
   return t.toArray(threadResponseArray, _extractThreadArraysFromResponseArrayXf);
 }
 
-const _threadsToTbGroupsXf = t.compose(
-  t.map(thread => thread._originalGmailFormat),
-  t.partition(10),
-  mapIndexed((threadsChunk, i) => [['tb', i*10, threadsChunk]])
-);
-function _threadsToTbGroups(threads: any[]): Array<Array<any>> {
+function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
+  const _threadsToTbGroupsXf = t.compose(
+    t.map(thread => thread._originalGmailFormat),
+    t.partition(10),
+    mapIndexed((threadsChunk, i) => [['tb', start + i*10, threadsChunk]])
+  );
   return t.toArray(threads, _threadsToTbGroupsXf);
 }
 

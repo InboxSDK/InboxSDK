@@ -35,7 +35,7 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 		.filter(event => event.new.hash !== event.old.hash)
 		.map(event => event.new)
 		.map(urlObject => {
-			const hash = urlObject.hash;
+			const {hash, name} = urlObject;
 			for (let routeIDs of customRouteIDs) {
 				let routeID = routeIDmatchesHash(routeIDs, hash);
 				if (routeID) {
@@ -43,7 +43,7 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 				}
 			}
 			for (let [routeIDs] of customListRouteIDs) {
-				let routeID = routeIDmatchesHash(routeIDs, hash);
+				let routeID = routeIDmatchesHash(routeIDs, name);
 				if (routeID) {
 					return {urlObject, type: 'CUSTOM_LIST_TRIGGER', routeID};
 				}
@@ -92,12 +92,10 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 				if (!searchInput) throw new Error('Should not happen');
 				searchInput.value = '';
 
-				if (urlObject.params.length === 1) {
-					driver.hashChangeNoViewChange('#'+customListRouteId);
-					return {
-						type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
-					};
-				}
+				driver.hashChangeNoViewChange('#' + customListRouteId + (urlObject.params[1] ? '/' + urlObject.params[1] : ''));
+				return {
+					type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
+				};
 			}
 		}
 		return options;
@@ -106,7 +104,7 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 		if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
 			driver.showNativeRouteView();
 		} else if (options.type === 'CUSTOM_LIST_TRIGGER') {
-			driver.showCustomThreadList(options.routeID, get(customListRouteIDs, options.routeID));
+			driver.showCustomThreadList(options.routeID, get(customListRouteIDs, options.routeID), options.urlObject.params);
 			return;
 		}
 		return new GmailRouteView(options, gmailRouteProcessor, driver);

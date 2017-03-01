@@ -344,8 +344,16 @@ export default function setupGmailInterceptor() {
     });
 
     document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
-      if (customListJob.query === event.detail.query) {
-        customListJob.newQuery.resolve(event.detail.newQuery);
+      if (
+        customListJob.query === event.detail.query &&
+        customListJob.start === event.detail.start
+      ) {
+        const {newQuery, newStart} = event.detail;
+
+        customListJob.newRequestParams.resolve({
+          query: newQuery,
+          start: newStart
+        });
       }
     });
 
@@ -370,13 +378,16 @@ export default function setupGmailInterceptor() {
           if (customListJob) {
             // Resolve the old one with something because no one else is going
             // to after it's replaced in a moment.
-            customListJob.newQuery.resolve(customListJob.query);
+            customListJob.newRequestParams.resolve({
+              query: customListJob.query,
+              start: customListJob.start
+            });
             customListJob.newResults.resolve(null);
           }
           customListJob = (connection:any)._customListJob = {
             query: params.q,
             start: +params.start,
-            newQuery: defer(),
+            newRequestParams: defer(),
             newResults: defer()
           };
           triggerEvent({
@@ -389,9 +400,10 @@ export default function setupGmailInterceptor() {
         return false;
       },
       requestChanger: function(connection, request) {
-        return (connection:any)._customListJob.newQuery.promise.then(newQuery => {
+        return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
           const newParams = clone(connection.params);
-          newParams.q = newQuery;
+          newParams.q = query;
+          newParams.start = start;
           return {
             method: request.method,
             url: '?'+stringify(newParams),
