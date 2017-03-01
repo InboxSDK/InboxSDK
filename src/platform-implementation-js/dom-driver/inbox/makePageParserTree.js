@@ -15,6 +15,7 @@ export default function makePageParserTree(driver: ?Driver, root: Document|HTMLE
 	function transformOptions(pageParserOptions) {
 		return !_driver ? pageParserOptions : {...pageParserOptions, logError(err, el) {
 			const details = {
+				el,
 				html: el ? censorHTMLtree(el) : null
 			};
 			_driver.getLogger().errorSite(err, details);
