@@ -91,7 +91,10 @@ const copyAndOmitExcessThreads = (
 ): Array<ThreadDescriptor> => {
   if (ids.length > MAX_THREADS_PER_PAGE) {
     // upgrade to deprecationWarning later
-    logger.error(new Error('Received more than MAX_THREADS_PER_PAGE threads, ignoring them'));
+    logger.error(new Error(`
+      Received more than the maximum number of threads specified by handler,
+      ignoring additional threads (https://www.inboxsdk.com/docs/#Router).
+    `));
   }
   return ids.slice(0, MAX_THREADS_PER_PAGE);
 };
@@ -150,6 +153,14 @@ const setupSearchReplacing = (
         if (!Array.isArray(threads)) {
           return Kefir.constantError(new Error(`
             handleCustomListRoute result must contain a 'threads' array
+            (https://www.inboxsdk.com/docs/#Router).
+          `));
+        }
+
+        if (total && hasMore) {
+          return Kefir.constantError(new Error(`
+            handleCustomListRoute result must only contain either
+            a 'total' or a 'hasMore' property, but not both.
             (https://www.inboxsdk.com/docs/#Router).
           `));
         }
