@@ -140,12 +140,12 @@ const setupSearchReplacing = (
           'Returning an array from a handleCustomListRoute handler',
           'a CustomListDescriptor object'
         );
-
+        const threads = copyAndOmitExcessThreads(result, driver.getLogger());
         return Kefir.constant({
           // default to one page since arrays can't be paginated
           start,
-          total: MAX_THREADS_PER_PAGE,
-          threads: copyAndOmitExcessThreads(result, driver.getLogger())
+          total: threads.length,
+          threads
         });
       } else if (typeof result === 'object') {
         const {total, hasMore, threads} = result;
@@ -172,10 +172,11 @@ const setupSearchReplacing = (
             threads: copyAndOmitExcessThreads(threads, driver.getLogger())
           });
         } else if (typeof hasMore === 'boolean') {
+          const threadsWithoutExcess = copyAndOmitExcessThreads(threads, driver.getLogger());
           return Kefir.constant({
             start,
-            total: hasMore ? 'MANY' : start + Math.min(threads.length, MAX_THREADS_PER_PAGE),
-            threads: copyAndOmitExcessThreads(threads, driver.getLogger())
+            total: hasMore ? 'MANY' : start + threads.length,
+            threads: threadsWithoutExcess
           });
         } else {
           return Kefir.constantError(new Error(`
