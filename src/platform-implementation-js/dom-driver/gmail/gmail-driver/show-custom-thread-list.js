@@ -234,7 +234,7 @@ const setupSearchReplacing = (
     .onValue((
       {start, total, threads}: NormalizedHandlerResult<IDPairsWithRFC>
     ) => {
-      const query: string = threads.length > 0 ?
+      const messageIDQuery: string = threads.length > 0 ?
         threads.map(({rfcId}) => 'rfc822msgid:'+rfcId).join(' OR ')
         : ''+Math.random()+Date.now(); // google doesn't like empty searches
 
@@ -243,9 +243,9 @@ const setupSearchReplacing = (
       // When the response comes back, we modify it to have a `start` consistent
       // with whatever page was being loaded so Gmail's UI makes sense.
       driver.getPageCommunicator().setCustomListNewQuery({
-        newQuery,
+        newQuery: messageIDQuery,
         newStart: 0,
-        query,
+        query: newQuery,
         start
       });
       Kefir.combine([
