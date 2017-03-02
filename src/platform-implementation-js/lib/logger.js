@@ -221,8 +221,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     });
 
     replaceFunction(window, 'setTimeout', function(original) {
-      return function wrappedSetTimeout() {
-        var args = _.toArray(arguments);
+      return function wrappedSetTimeout(...args) {
         if (typeof args[0] == 'function') {
           args[0] = makeLoggedFunction(args[0], "setTimeout callback");
         }
@@ -231,8 +230,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     });
 
     replaceFunction(window, 'setInterval', function(original) {
-      return function wrappedSetInterval() {
-        var args = _.toArray(arguments);
+      return function wrappedSetInterval(...args) {
         if (typeof args[0] == 'function') {
           args[0] = makeLoggedFunction(args[0], "setInterval callback");
         }
@@ -242,8 +240,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
 
     var ETp = window.EventTarget ? window.EventTarget.prototype : window.Node.prototype;
     replaceFunction(ETp, 'addEventListener', function(original) {
-      return function wrappedAddEventListener() {
-        var args = _.toArray(arguments);
+      return function wrappedAddEventListener(...args) {
         if (typeof args[1] == 'function') {
           try {
             // If we've made a logger for this function before, use it again,
@@ -267,8 +264,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     });
 
     replaceFunction(ETp, 'removeEventListener', function(original) {
-      return function wrappedRemoveEventListener() {
-        var args = _.toArray(arguments);
+      return function wrappedRemoveEventListener(...args) {
         if (typeof args[1] == 'function' && args[1].__inboxsdk_logged) {
           args[1] = args[1].__inboxsdk_logged;
         }
@@ -279,8 +275,7 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
     replaceFunction(window, 'MutationObserver', function(Original) {
       Original = Original || window.WebKitMutationObserver;
 
-      function WrappedMutationObserver() {
-        var args = _.toArray(arguments);
+      function WrappedMutationObserver(...args) {
         if (typeof args[0] == 'function') {
           args[0] = makeLoggedFunction(args[0], "MutationObserver callback");
         }

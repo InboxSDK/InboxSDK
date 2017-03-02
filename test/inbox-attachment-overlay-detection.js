@@ -5,13 +5,20 @@ import fs from 'fs';
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
+import lsMap from 'live-set/map';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
-import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/finder';
+import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/parser';
-import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/watcher';
+
+function finder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.attachmentOverlay.fn(documentElement));
+}
 
 import {
   page20160816,
@@ -66,31 +73,19 @@ describe('Inbox Attachment Overlay Detection', function() {
   });
 
   describe('watcher', function() {
-    it('2016-08-16 message with attachment', function(cb) {
+    it('2016-08-16 message with attachment', function() {
       const spy = sinon.spy();
-      watcher(page20160816())
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 0);
-          cb();
-        });
+      const root = page20160816();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('attachmentOverlay');
+      assert.strictEqual(liveSet.values().size, 0);
     });
 
-    it('2016-08-17 with preview overlay', function(cb) {
+    it('2016-08-17 with preview overlay', function() {
       const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
-
-      const spy = sinon.spy();
-      watcher(page20160817())
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(results.includes(overlay));
-          cb();
-        });
+      const root = page20160817();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('attachmentOverlay');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(overlay));
     });
   });
 });

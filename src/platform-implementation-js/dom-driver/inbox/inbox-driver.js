@@ -11,12 +11,18 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
+import LiveSet from 'live-set';
+import lsFilter from 'live-set/filter';
+import lsFlatMap from 'live-set/flatMap';
+import lsMapWithRemoval from 'live-set/mapWithRemoval';
+import toValueObservable from 'live-set/toValueObservable';
 import type PageParserTree from 'page-parser-tree';
 import makePageParserTree from './makePageParserTree';
 
 import Logger from '../../lib/logger';
 import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
 import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
+import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import populateRouteID from '../../lib/populateRouteID';
@@ -36,28 +42,25 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getThreadElStream from './detection/thread/stream';
-import getMessageElStream from './detection/message/stream';
-import getSearchBarStream from './detection/searchBar/stream';
-import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
-
-import getNativeDrawerStream from './getNativeDrawerStream';
-import getThreadViewStream from './getThreadViewStream';
-import getMessageViewStream from './getMessageViewStream';
-import getAttachmentCardViewDriverStream from './getAttachmentCardViewDriverStream';
-import getAttachmentOverlayViewStream from './getAttachmentOverlayViewStream';
-import getChatSidebarViewStream from './getChatSidebarViewStream';
+import threadParser from './detection/thread/parser';
+import messageParser from './detection/message/parser';
+import attachmentCardParser from './detection/attachmentCard/parser';
+import attachmentOverlayParser from './detection/attachmentOverlay/parser';
+import nativeDrawerParser from './detection/nativeDrawer/parser';
+import searchBarParser from './detection/searchBar/parser';
+import chatSidebarParser from './detection/chatSidebar/parser';
+import appToolbarLocationParser from './detection/appToolbarLocation/parser';
 
 import setupRouteViewDriverStream from './setupRouteViewDriverStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
-import type InboxThreadView from './views/inbox-thread-view';
-import type InboxMessageView from './views/inbox-message-view';
-import type InboxAttachmentCardView from './views/inbox-attachment-card-view';
-import type InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
-import type InboxChatSidebarView from './views/inbox-chat-sidebar-view';
+import InboxThreadView from './views/inbox-thread-view';
+import InboxMessageView from './views/inbox-message-view';
+import InboxAttachmentCardView from './views/inbox-attachment-card-view';
+import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
+import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -82,11 +85,11 @@ class InboxDriver {
   _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
-  _threadViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxThreadView>>;
-  _messageViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxMessageView>>;
-  _attachmentCardViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentCardView>>;
-  _attachmentOverlayViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxAttachmentOverlayView>>;
-  _chatSidebarViewPool: ItemWithLifetimePool<ItemWithLifetime<InboxChatSidebarView>>;
+  _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
+  _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
+  _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
+  _attachmentOverlayViewDriverLiveSet: LiveSet<InboxAttachmentOverlayView>;
+  _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
   _threadRowViewDriverKefirStream: Kefir.Observable<any>;
@@ -94,9 +97,6 @@ class InboxDriver {
   _butterBarDriver = new InboxButterBarDriver();
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
-  _appToolbarLocationPool: ItemWithLifetimePool<*>;
-  _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
-  _nativeDrawerPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
@@ -119,40 +119,151 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const topRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('topRow'));
-    const threadRowElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('threadRow'));
-    const threadElPool = new ItemWithLifetimePool(
-      getThreadElStream(this, threadRowElPool).takeUntilBy(this._stopper)
-    );
-    const messageElPool = new ItemWithLifetimePool(
-      getMessageElStream(this, threadElPool).takeUntilBy(this._stopper)
+    this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = threadParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (thread)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxThreadView(el, this, parsed);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+
+    this._messageViewDriverLiveSet = lsFlatMap(
+      this._page.tree.getAllByTag('message'),
+      node => {
+        const el = node.getValue();
+        let parsed = messageParser(el);
+        if (parsed.errors.length > 0) {
+          this._logger.errorSite(new Error('parse errors (message)'), {
+            score: parsed.score,
+            errors: parsed.errors,
+            html: censorHTMLtree(el)
+          });
+        }
+        if (parsed.attributes.isDraft) return LiveSet.constant(new Set());
+        return new LiveSet({
+          read() {
+            throw new Error();
+          },
+          listen: (setValues, controller) => {
+            setValues(new Set());
+            const unsub = kefirStopper();
+
+            // If the InboxMessageView is destroyed before the element is removed,
+            // then make a new InboxMessageView out of the same element. Inbox re-uses
+            // elements for different messages in some cases.
+            const newView = firstRun => {
+              if (!firstRun) {
+                parsed = messageParser(el);
+                if (parsed.errors.length > 0) {
+                  this._logger.errorSite(new Error(`message reparse errors`), {
+                    score: parsed.score,
+                    errors: parsed.errors,
+                    html: censorHTMLtree(el)
+                  });
+                }
+              }
+              const view = new InboxMessageView(el, this, parsed);
+              view.getStopper().takeUntilBy(unsub).onValue(() => {
+                controller.remove(view);
+                newView(false);
+              });
+              unsub.takeUntilBy(view.getStopper()).onValue(() => {
+                view.destroy();
+              });
+              controller.add(view);
+            };
+
+            newView(true);
+
+            return () => {
+              unsub.destroy();
+            };
+          }
+        });
+      }
     );
 
-    this._threadViewDriverPool = new ItemWithLifetimePool(
-      getThreadViewStream(this, threadElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
-    this._messageViewDriverPool = new ItemWithLifetimePool(
-      getMessageViewStream(this, messageElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
-    this._attachmentCardViewDriverPool = new ItemWithLifetimePool(
-      getAttachmentCardViewDriverStream(this, topRowElPool, threadRowElPool, messageElPool).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
-    this._attachmentOverlayViewDriverPool = new ItemWithLifetimePool(
-      getAttachmentOverlayViewStream(this).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._attachmentCardViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('attachmentCard'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = attachmentCardParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (attachmentCard)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxAttachmentCardView({element: el, parsed}, this);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+
+    this._attachmentOverlayViewDriverLiveSet = lsFlatMap(this._page.tree.getAllByTag('attachmentOverlay'), node => {
+      const el = node.getValue();
+      const parsed = attachmentOverlayParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (attachmentOverlay)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const cardView = this.getLastInteractedAttachmentCardView();
+      if (!cardView) {
+        this._logger.error(new Error('Encountered overlay without knowing cardView'));
+        return LiveSet.constant(new Set());
+      }
+
+      return new LiveSet({
+        read() {throw new Error()},
+        listen: setValues => {
+          const view = new InboxAttachmentOverlayView(this, el, parsed, cardView);
+          setValues(new Set([view]));
+          return () => {
+            view.destroy();
+          };
+        }
+      });
+    });
+    this._attachmentOverlayViewDriverLiveSet.subscribe({});
+    // force activation because nothing outside of the driver is going to
+    // subscribe to this, unlike some of the other livesets.
+
     this._composeViewDriverPool = new ItemWithLifetimePool(
-      getComposeViewDriverStream(this, threadElPool).takeUntilBy(this._stopper)
+      getComposeViewDriverStream(this, this._page.tree).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 
-    this._chatSidebarViewPool = new ItemWithLifetimePool(
-      getChatSidebarViewStream(this).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._chatSidebarViewLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('chatSidebar'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = chatSidebarParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (chatSidebar)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxChatSidebarView(el, parsed);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
+    this._chatSidebarViewLiveSet.subscribe({});
+    // force activation because nothing outside of the driver is going to
+    // subscribe to this, unlike some of the other livesets.
 
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
 
@@ -192,38 +303,57 @@ class InboxDriver {
       }, waitTime);
     });
 
-    this._appToolbarLocationPool = new ItemWithLifetimePool(
-      getAppToolbarLocationStream(this).takeUntilBy(this._stopper)
-    );
     Kefir.later(30*1000)
-      .takeUntilBy(this._appToolbarLocationPool.items())
+      .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('appToolbarLocation')))
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find appToolbarLocation'));
       });
 
-    this._searchBarPool = new ItemWithLifetimePool(
-      getSearchBarStream(this).takeUntilBy(this._stopper)
-    );
+    toValueObservable(this._page.tree.getAllByTag('searchBar')).subscribe(({value: node}) => {
+      const el = node.getValue();
+      const parsed = searchBarParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (searchBar)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+    });
+
     Kefir.later(30*1000)
-      .takeUntilBy(this._searchBarPool.items())
+      .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('searchBar')))
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
 
-    this._nativeDrawerPool = new ItemWithLifetimePool(
-      getNativeDrawerStream(this).takeUntilBy(this._stopper)
-    );
+    toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({value: node}) => {
+      const el = node.getValue();
+      const parsed = nativeDrawerParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (nativeDrawer)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+    });
 
     // When a user goes from one thread to another, a new thread view is made
     // but the old thread view doesn't get destroyed until it finishes
     // animating out. We need to clear the old thread view's sidebar
     // immediately when a new thread view comes in.
     let _currentThreadView = null;
-    this._threadViewDriverPool.items().onValue(({el: threadView}) => {
-      if (_currentThreadView) {
-        _currentThreadView.removePanels();
-      }
-      _currentThreadView = threadView;
+    this._threadViewDriverLiveSet.subscribe(changes => {
+      changes.forEach(change => {
+        if (change.type === 'add') {
+          const threadView = change.value;
+          if (_currentThreadView) {
+            _currentThreadView.removePanels();
+          }
+          _currentThreadView = threadView;
+        }
+      });
     });
   }
 
@@ -240,12 +370,17 @@ class InboxDriver {
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
   getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
-  getThreadViewDriverStream() {return this._threadViewDriverPool.items().map(({el})=>el);}
-  getMessageViewDriverStream() {return this._messageViewDriverPool.items().map(({el})=>el);}
-  getAttachmentCardViewDriverStream() {return this._attachmentCardViewDriverPool.items().map(({el})=>el);}
+  getThreadViewDriverStream() {
+    return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
+  }
+  getMessageViewDriverStream() {
+    return toItemWithLifetimeStream(this._messageViewDriverLiveSet).map(({el})=>el);
+  }
+  getAttachmentCardViewDriverStream() {
+    return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
+  }
   getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
-  getNativeDrawerPool() {return this._nativeDrawerPool;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
@@ -257,7 +392,7 @@ class InboxDriver {
   getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
 
   getCurrentChatSidebarView(): InboxChatSidebarView {
-    const view = this._chatSidebarViewPool.currentItemWithLifetimes().map(({el}) => el)[0];
+    const view = Array.from(this._chatSidebarViewLiveSet.values())[0];
     if (!view) throw new Error('No chat sidebar found');
     return view;
   }
@@ -270,7 +405,8 @@ class InboxDriver {
   }
 
   getChatSidebarButton(): HTMLElement {
-    const parsed = this._appToolbarLocationPool.currentItemWithLifetimes().map(({parsed}) => parsed)[0];
+    const appToolbarLocationNode = Array.from(this._page.tree.getAllByTag('appToolbarLocation').values())[0];
+    const parsed = appToolbarLocationNode ? appToolbarLocationParser(appToolbarLocationNode.getValue()) : null;
     const el = parsed ? parsed.elements.chatSidebarButton : null;
     if (!el) throw new Error('No chat sidebar button found');
     return el;
@@ -435,7 +571,11 @@ class InboxDriver {
   }
 
   addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<InboxAppToolbarButtonView> {
-    const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
+    const view = new InboxAppToolbarButtonView(
+      buttonDescriptor,
+      this._page.tree.getAllByTag('appToolbarLocation'),
+      this._page.tree.getAllByTag('searchBar')
+    );
     return view.waitForReady();
   }
 
@@ -484,11 +624,20 @@ class InboxDriver {
     const drawerView = new InboxDrawerView(options);
     // TODO if a native drawer was already open, we should close the native
     // drawer istead of the new one.
-    this._nativeDrawerPool.items()
+
+    // If a nativeDrawer is opened while the new SDK drawer is open, then close
+    // the SDK drawer.
+    Kefir.fromESObservable(this._page.tree.getAllByTag('nativeDrawer'))
       .takeUntilBy(drawerView.getClosingStream())
-      .onValue(() => {
-        drawerView.close();
+      .onValue(changes => {
+        for (let change of changes) {
+          if (change.type === 'add') {
+            drawerView.close();
+            break;
+          }
+        }
       });
+
     return drawerView;
   }
 

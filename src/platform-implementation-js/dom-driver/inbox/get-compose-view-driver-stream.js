@@ -2,35 +2,38 @@
 
 import _ from 'lodash';
 import Kefir from 'kefir';
-import udKefir from 'ud-kefir';
+import type {TagTree} from 'tag-tree';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import InboxComposeView from './views/inbox-compose-view';
-import type ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
+import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
+import makeElementStreamMerger from '../../lib/dom/make-element-stream-merger';
 import type InboxDriver from './inbox-driver';
 
-import finder from './detection/compose/finder';
-import watcher from './detection/compose/watcher';
 import parser from './detection/compose/parser';
 
-import detectionRunner from '../../lib/dom/detectionRunner';
+export default function getComposeViewDriverStream(driver: InboxDriver, tree: TagTree<HTMLElement>): Kefir.Observable<InboxComposeView> {
+  const denodeify = ({el, removalStream}) => ({el: el.getValue(), removalStream});
 
-const impStream = udKefir(module, imp);
+  const inlineCompose = toItemWithLifetimeStream(tree.getAllByTag('inlineCompose')).map(denodeify);
+  const regularCompose = toItemWithLifetimeStream(tree.getAllByTag('regularCompose')).map(denodeify);
+  const fullscreenCompose = toItemWithLifetimeStream(tree.getAllByTag('fullscreenCompose')).map(denodeify);
 
-function imp(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxComposeView> {
-  return detectionRunner({
-    name: 'compose',
-    finder, watcher: root => watcher(root, threadElPool), parser,
-    logError(err: Error, details?: any) {
-      driver.getLogger().errorSite(err, details);
+  const compose = Kefir.merge([
+    inlineCompose,
+    regularCompose.merge(fullscreenCompose).flatMap(makeElementStreamMerger())
+  ]);
+
+  return compose.map(({el, removalStream}) => {
+    const parsed = parser(el);
+    if (parsed.errors.length) {
+      this._logger.errorSite(new Error('parse errors (compose)'), {
+        score: parsed.score,
+        errors: parsed.errors,
+        html: censorHTMLtree(el)
+      });
     }
-  })
-    .map(({el, removalStream, parsed}) => {
-      const view = new InboxComposeView(driver, el, parsed);
-      removalStream.take(1).onValue(() => view.destroy());
-      return view;
-    });
-}
-
-export default function getComposeViewDriverStream(driver: InboxDriver, threadElPool: ItemWithLifetimePool<*>): Kefir.Observable<InboxComposeView> {
-  return impStream.flatMapLatest(_imp => _imp(driver, threadElPool));
+    const view = new InboxComposeView(driver, el, parsed);
+    removalStream.take(1).onValue(() => view.destroy());
+    return view;
+  });
 }
