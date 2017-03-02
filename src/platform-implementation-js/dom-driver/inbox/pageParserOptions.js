@@ -99,6 +99,11 @@ const pageParserOptions: PageParserTreeOptions = {
           el => closest(el, '[jsvs]')
         );
 
+        // TODO Are the above arrays expected to contain all of the same items?
+        // We should log if they don't match. Or we should figure out and
+        // comment here if instead they're mutually exclusive that are expected
+        // to mismatch.
+
         const inlineComposes = uniq(inlineComposesByPopoutBtn.concat(inlineComposesByBody))
         return inlineComposes;
       }
