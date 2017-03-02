@@ -116,10 +116,9 @@ const pageParserOptions: PageParserTreeOptions = {
     fullscreenCompose: {
       fn(root) {
         return Array.prototype.filter.call(
-          root.querySelectorAll('div[role=dialog]'),
+          root.querySelectorAll('div[tabindex][jsaction*="exit_full_screen"] div[role=dialog]'),
           el =>
-            el.querySelector('div[jsaction^="compose"][jsaction$=".focus_mole"]') &&
-            closest(el, 'div[tabindex][jsaction*="exit_full_screen"]')
+            el.querySelector('div[jsaction^="compose"][jsaction$=".focus_mole"]')
         );
       }
     },
