@@ -90,7 +90,7 @@ const pageParserOptions: PageParserTreeOptions = {
     inlineCompose: {
       fn(root) {
         const inlineComposesByPopoutBtn = Array.prototype.filter.call(
-          root.querySelectorAll('div[role=main] div[role=list] ~ div div[jslog] div[jsvs] > button, div[role=main] div[role=listitem][aria-multiselectable] div[jslog] div[jsvs] > button'),
+          root.querySelectorAll('div[role=main] div[role=list] div[role=listitem] div[jsvs] button[jsaction$=".quick_compose_popout_mole"]'),
           el => el.style.display !== 'none'
         ).map(el => closest(el, '[jsvs]'));
 
@@ -99,10 +99,8 @@ const pageParserOptions: PageParserTreeOptions = {
           el => closest(el, '[jsvs]')
         );
 
-        // TODO Are the above arrays expected to contain all of the same items?
-        // We should log if they don't match. Or we should figure out and
-        // comment here if instead they're mutually exclusive that are expected
-        // to mismatch.
+        // The above are currently expected to match, though they don't match
+        // for all of our historical data.
 
         const inlineComposes = uniq(inlineComposesByPopoutBtn.concat(inlineComposesByBody))
         return inlineComposes;

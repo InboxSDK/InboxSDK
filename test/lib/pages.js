@@ -55,3 +55,5 @@ export const page20161102: () => Document = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2016-11-02 inline compose.html', 'utf8')));
 export const page20170209 = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-02-09 preview overlay.html', 'utf8')));
+export const page20170302 = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-02 inline compose.html', 'utf8')));

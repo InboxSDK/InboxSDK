@@ -45,6 +45,7 @@ import {
   page20160629_3,
   page20160818,
   page20161102,
+  page20170302,
 } from './lib/pages';
 
 describe('Inbox Compose Detection', function() {
@@ -112,6 +113,14 @@ describe('Inbox Compose Detection', function() {
       const compose = querySelector(page20161102(), '[data-test-id=compose]');
 
       const results = finder(page20161102());
+      assert.strictEqual(results.length, 1);
+      assert(results.includes(compose));
+    });
+
+    it('2017-03-02 inline compose', function() {
+      const compose = querySelector(page20170302(), '[data-test-id=compose]');
+
+      const results = finder(page20170302());
       assert.strictEqual(results.length, 1);
       assert(results.includes(compose));
     });
