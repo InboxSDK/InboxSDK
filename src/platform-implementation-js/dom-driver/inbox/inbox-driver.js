@@ -119,8 +119,6 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    const threadElPool = toItemWithLifetimePool(this._page.tree.getAllByTag('thread'));
-
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
       const parsed = threadParser(el);
