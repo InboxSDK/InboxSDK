@@ -238,7 +238,7 @@ class InboxDriver {
     this._attachmentOverlayViewDriverLiveSet.subscribe({}); // force activation
 
     this._composeViewDriverPool = new ItemWithLifetimePool(
-      getComposeViewDriverStream(this, threadElPool).takeUntilBy(this._stopper)
+      getComposeViewDriverStream(this, this._page.tree).takeUntilBy(this._stopper)
         .map(el => ({el, removalStream: el.getStopper()}))
     );
 

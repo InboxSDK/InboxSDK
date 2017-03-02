@@ -1,7 +1,12 @@
 /* @flow */
 
 import type {PageParserTreeOptions} from 'page-parser-tree';
+
+import Logger from '../../lib/logger';
+import censorHTMLtree from '../../../common/censor-html-tree';
 import t from 'transducers.js';
+import find from 'lodash/find';
+import uniq from 'lodash/uniq';
 import closest from 'closest-ng';
 
 const pageParserOptions: PageParserTreeOptions = {
@@ -11,6 +16,9 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     attachmentCard: {
       ownedBy: ['message', 'threadRow', 'bundleRow']
+    },
+    inlineCompose: {
+      ownedBy: ['thread']
     },
   },
   finders: {
@@ -75,6 +83,43 @@ const pageParserOptions: PageParserTreeOptions = {
         const chatToggle = root.querySelector('div[role=button][jsaction*="global.toggle_chat_roster"]');
         const appToolbarLocation = chatToggle ? (chatToggle:any).parentElement.parentElement.parentElement : null;
         return appToolbarLocation ? [appToolbarLocation] : [];
+      }
+    },
+
+    inlineCompose: {
+      fn(root) {
+        const inlineComposesByPopoutBtn = Array.prototype.filter.call(
+          root.querySelectorAll('div[role=main] div[role=list] ~ div div[jslog] div[jsvs] > button, div[role=main] div[role=listitem][aria-multiselectable] div[jslog] div[jsvs] > button'),
+          el => el.style.display !== 'none'
+        ).map(el => closest(el, '[jsvs]'));
+
+        const inlineComposesByBody = Array.prototype.map.call(
+          root.querySelectorAll('div[role=main] div[role=list] ~ div div[jsvs] div[role=textbox][contenteditable=true][tabindex="0"], div[role=main] div[role=listitem][aria-multiselectable] div[jsvs] div[role=textbox][contenteditable=true][tabindex="0"]'),
+          el => closest(el, '[jsvs]')
+        );
+
+        const inlineComposes = uniq(inlineComposesByPopoutBtn.concat(inlineComposesByBody))
+        return inlineComposes;
+      }
+    },
+    regularCompose: {
+      fn(root) {
+        return Array.prototype.filter.call(
+          root.querySelectorAll('div[role=dialog]'),
+          el =>
+            el.querySelector('div[jsaction^="compose"][jsaction$=".focus_mole"]') &&
+            !closest(el, 'div[tabindex][jsaction*="exit_full_screen"]')
+        );
+      }
+    },
+    fullscreenCompose: {
+      fn(root) {
+        return Array.prototype.filter.call(
+          root.querySelectorAll('div[role=dialog]'),
+          el =>
+            el.querySelector('div[jsaction^="compose"][jsaction$=".focus_mole"]') &&
+            closest(el, 'div[tabindex][jsaction*="exit_full_screen"]')
+        );
       }
     },
   },
@@ -159,6 +204,58 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[id]',
       'div[class]',
       'div.in#in'
+    ]},
+
+    {sources: ['thread'], tag: 'inlineCompose', selectors: [
+      '*',
+      ':not([role=heading])',
+      ':not([role=list])',
+      '*',
+      '[jsvs]',
+      {$map(el) {
+        // <2016-11-02 support
+        const oldButton = find(el.children, child => child.nodeName === 'BUTTON');
+        if (oldButton) return oldButton;
+
+        const buttonEl = el.querySelector('div[jsaction="global.none"] > div[role=button]');
+        if (buttonEl) return (buttonEl.parentElement:any);
+
+        Logger.error(new Error("inline compose button not found"), {
+          el,
+          html: censorHTMLtree(el)
+        });
+      }},
+      {$watch: {attributeFilter: ['style'], cond: el => el.style.display !== 'none'}},
+      {$map: el => (el.parentElement:any)}
+    ]},
+    {sources: [null], tag: 'regularCompose', selectors: [
+      'body',
+      'div[id][jsaction]',
+      'div[id][class]:not([role])',
+      'div[class]',
+      'div[id]',
+      'div[jstcache][class]:not([aria-hidden]):not([tabindex])',
+      {$map(el) {
+        const composeEl = el.querySelector('div[role=dialog]');
+        if (!composeEl) {
+          Logger.error(new Error("compose dialog element not found"), {
+            html: censorHTMLtree(el)
+          });
+        }
+        return composeEl;
+      }}
+    ]},
+    {sources: [null], tag: 'fullscreenCompose', selectors: [
+      'body',
+      '[id][jsaction]',
+      'div[id]:not([jsaction])',
+      'div[tabindex][jsaction*="exit_full_screen"]',
+      '*',
+      '*',
+      '*',
+      '*',
+      '*',
+      '[role=dialog]:not(.inboxsdk__drawer_view)'
     ]},
   ]
 };

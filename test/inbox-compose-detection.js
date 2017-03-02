@@ -5,16 +5,34 @@ import fs from 'fs';
 import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
+import lsMap from 'live-set/map';
 import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
 import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
-import toItemWithLifetimePool from '../src/platform-implementation-js/lib/toItemWithLifetimePool';
+import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 
-import finder from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/finder';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
-import watcher from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/watcher';
+
+function inlineFinder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.inlineCompose.fn(documentElement));
+}
+function regularFinder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.regularCompose.fn(documentElement));
+}
+function fullscreenFinder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.fullscreenCompose.fn(documentElement));
+}
+function finder(document) {
+  return inlineFinder(document).concat(regularFinder(document), fullscreenFinder(document));
+}
 
 import {
   page20160614,
@@ -28,12 +46,6 @@ import {
   page20160818,
   page20161102,
 } from './lib/pages';
-
-function makeThreadRowElPool(root) {
-  return toItemWithLifetimePool(
-    makePageParserTree(null, root).tree.getAllByTag('threadRow')
-  );
-}
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
@@ -196,115 +208,115 @@ describe('Inbox Compose Detection', function() {
   });
 
   describe('watcher', function() {
-    it('2016-06-14', function(cb) {
+    it('2016-06-14', function() {
       const compose1 = querySelector(page20160614(), '[data-test-id=compose1]');
       const compose2 = querySelector(page20160614(), '[data-test-id=compose2]');
       const inlineCompose = querySelector(page20160614(), '[data-test-id=inlinecompose]');
 
       const spy = sinon.spy();
-      watcher(page20160614(), makeThreadRowElPool(page20160614()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 3);
-          assert(_.includes(results, compose1));
-          assert(_.includes(results, compose2));
-          assert(_.includes(results, inlineCompose));
-          cb();
-        });
+      const root = page20160614();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 2);
+      assert(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose1));
+      assert(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose2));
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(inlineCompose));
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
 
-    it('2016-06-14 with chat sidebar', function(cb) {
+    it('2016-06-14 with chat sidebar', function() {
       const compose1 = querySelector(pageWithSidebar20160614(), '[data-test-id=compose1]');
 
       const spy = sinon.spy();
-      watcher(pageWithSidebar20160614(), makeThreadRowElPool(pageWithSidebar20160614()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, compose1));
-          cb();
-        });
+      const root = pageWithSidebar20160614();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose1));
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
 
-    it('2016-06-20 fullscreen and bundled inline', function(cb) {
+    it('2016-06-20 fullscreen and bundled inline', function() {
       const bundledInlineCompose = querySelector(pageFullscreen20160620(), '[data-test-id=bundledInlineCompose]');
       const fullscreenCompose = querySelector(pageFullscreen20160620(), '[data-test-id=fullscreenCompose]');
 
       const spy = sinon.spy();
-      watcher(pageFullscreen20160620(), makeThreadRowElPool(pageFullscreen20160620()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 2);
-          assert(_.includes(results, bundledInlineCompose));
-          assert(_.includes(results, fullscreenCompose));
-          cb();
-        });
+      const root = pageFullscreen20160620();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(bundledInlineCompose));
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('fullscreenCompose'), x => x.getValue()).values().has(fullscreenCompose));
     });
 
-    it('2016-06-28 inline compose in search page', function(cb) {
+    it('2016-06-28 inline compose in search page', function() {
       const compose = querySelector(page20160628(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160628(), makeThreadRowElPool(page20160628()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, compose));
-          cb();
-        });
+      const root = page20160628();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose));
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
 
-    it('2016-06-28-2 regular compose', function(cb) {
+    it('2016-06-28-2 regular compose', function() {
       const compose = querySelector(page20160628_2(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160628_2(), makeThreadRowElPool(page20160628_2()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, compose));
-          cb();
-        });
+      const root = page20160628_2();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose));
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
 
-    it('2016-08-18 inline compose', function(cb) {
+    it('2016-08-18 inline compose', function() {
       const compose = querySelector(page20160818(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20160818(), makeThreadRowElPool(page20160818()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, compose));
-          cb();
-        });
+      const root = page20160818();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose));
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
 
-    it('2016-11-02 inline compose', function(cb) {
+    it('2016-11-02 inline compose', function() {
       const compose = querySelector(page20161102(), '[data-test-id=compose]');
 
       const spy = sinon.spy();
-      watcher(page20161102(), makeThreadRowElPool(page20161102()))
-        .takeUntilBy(Kefir.later(50))
-        .onValue(spy)
-        .onEnd(() => {
-          const results = spy.args.map(callArgs => callArgs[0].el);
-          assert.strictEqual(results.length, 1);
-          assert(_.includes(results, compose));
-          cb();
-        });
+      const root = page20161102();
+      const tree = makePageParserTree(null, root).tree;
+
+      assert.strictEqual(tree.getAllByTag('regularCompose').values().size, 0);
+
+      assert.strictEqual(tree.getAllByTag('inlineCompose').values().size, 1);
+      assert(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose));
+
+      assert.strictEqual(tree.getAllByTag('fullscreenCompose').values().size, 0);
     });
   });
 });
