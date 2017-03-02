@@ -98,7 +98,7 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	* Returns a function which can be called to unregister the route handler.
 	* ^gmail
 	* @param {string} routeID - Which route this handler is registering for.
-	* @param {function(offset, max)} handler - Passed a page offset and a maximum
+	* @param {func(offset, max)} handler - Passed a page offset and a maximum
 	* number of threads to return. Must return a {CustomListDescriptor}, or a promise which resolves to one.
 	* @return {function}
 	*/
@@ -142,6 +142,7 @@ var CustomListDescriptor = /** @lends CustomListDescriptor */{
 	 * the total number until you've reached the end of the list (e.g. you're
 	 * fetching data from a search API where calculating a total is expensive),
 	 * omit this property and use {hasMore} instead.
+	 * ^default=null
 	 * ^optional
 	 * @type {Number}
 	 */
@@ -153,6 +154,7 @@ var CustomListDescriptor = /** @lends CustomListDescriptor */{
 	 * number of threads until you've reached the end of the list. If you already
 	 * know the total number of threads in the list (not just the ones currently
 	 * shown), omit this proeprty and use {total} instead.
+	 * ^default=null
 	 * ^optional
 	 * @type {Boolean}
 	 */
@@ -168,6 +170,7 @@ var CustomListDescriptor = /** @lends CustomListDescriptor */{
 var ThreadDescriptor = /** @lends ThreadDescriptor */{
 	/**
 	 * The value of a message's Message-ID header (which must start with "<" and end with ">").
+	 * ^default=null
 	 * ^optional
 	 * @type {String}
 	 */
@@ -175,6 +178,7 @@ var ThreadDescriptor = /** @lends ThreadDescriptor */{
 
 	/**
 	 * The Gmail thread ID of a message.
+	 * ^default=null
 	 * ^optional
 	 * @type {String}
 	 */
