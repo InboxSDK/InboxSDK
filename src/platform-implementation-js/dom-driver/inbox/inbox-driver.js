@@ -42,8 +42,6 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
-import getAppToolbarLocationStream from './detection/appToolbarLocation/stream';
-
 import threadParser from './detection/thread/parser';
 import messageParser from './detection/message/parser';
 import attachmentCardParser from './detection/attachmentCard/parser';
@@ -51,6 +49,7 @@ import attachmentOverlayParser from './detection/attachmentOverlay/parser';
 import nativeDrawerParser from './detection/nativeDrawer/parser';
 import searchBarParser from './detection/searchBar/parser';
 import chatSidebarParser from './detection/chatSidebar/parser';
+import appToolbarLocationParser from './detection/appToolbarLocation/parser';
 
 import setupRouteViewDriverStream from './setupRouteViewDriverStream';
 
@@ -99,7 +98,6 @@ class InboxDriver {
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
   _appToolbarLocationPool: ItemWithLifetimePool<*>;
-  _searchBarPool: ItemWithLifetimePool<ElementWithLifetime>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
@@ -301,9 +299,7 @@ class InboxDriver {
       }, waitTime);
     });
 
-    this._appToolbarLocationPool = new ItemWithLifetimePool(
-      getAppToolbarLocationStream(this).takeUntilBy(this._stopper)
-    );
+    this._appToolbarLocationPool = toItemWithLifetimePool(this._page.tree.getAllByTag('appToolbarLocation'));
     Kefir.later(30*1000)
       .takeUntilBy(this._appToolbarLocationPool.items())
       .onValue(() => {
@@ -322,9 +318,8 @@ class InboxDriver {
       }
     });
 
-    this._searchBarPool = toItemWithLifetimePool(this._page.tree.getAllByTag('searchBar'));
     Kefir.later(30*1000)
-      .takeUntilBy(this._searchBarPool.items())
+      .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('searchBar')))
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
@@ -407,7 +402,8 @@ class InboxDriver {
   }
 
   getChatSidebarButton(): HTMLElement {
-    const parsed = this._appToolbarLocationPool.currentItemWithLifetimes().map(({parsed}) => parsed)[0];
+    const appToolbarLocationNode = Array.from(this._page.tree.getAllByTag('appToolbarLocation').values())[0];
+    const parsed = appToolbarLocationNode ? appToolbarLocationParser(appToolbarLocationNode.getValue()) : null;
     const el = parsed ? parsed.elements.chatSidebarButton : null;
     if (!el) throw new Error('No chat sidebar button found');
     return el;
@@ -572,7 +568,11 @@ class InboxDriver {
   }
 
   addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<InboxAppToolbarButtonView> {
-    const view = new InboxAppToolbarButtonView(buttonDescriptor, this._appToolbarLocationPool.items(), this._searchBarPool.items());
+    const view = new InboxAppToolbarButtonView(
+      buttonDescriptor,
+      this._page.tree.getAllByTag('appToolbarLocation'),
+      this._page.tree.getAllByTag('searchBar')
+    );
     return view.waitForReady();
   }
 

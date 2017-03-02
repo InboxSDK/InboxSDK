@@ -10,7 +10,11 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 
-import locFinder from '../src/platform-implementation-js/dom-driver/inbox/detection/appToolbarLocation/finder';
+function locFinder(document) {
+  const {documentElement} = document;
+  if (!documentElement) throw new Error();
+  return Array.from(pageParserOptions.finders.appToolbarLocation.fn(documentElement));
+}
 
 function searchBarFinder(document) {
   const {documentElement} = document;

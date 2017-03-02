@@ -4,9 +4,12 @@ import _ from 'lodash';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type LiveSet from 'live-set';
+import type {TagTreeNode} from 'tag-tree';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxAppToolbarTooltipView from './inbox-app-toolbar-tooltip-view';
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
+import toItemWithLifetimeStream from '../../../lib/toItemWithLifetimeStream';
 import setCss from '../../../lib/dom/set-css';
 
 class InboxAppToolbarButtonView {
@@ -17,20 +20,22 @@ class InboxAppToolbarButtonView {
   _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
   _ready: Kefir.Observable<null>&{destroy():void} = kefirStopper();
 
-  constructor(buttonDescriptor: Kefir.Observable<Object>, appToolbarLocationStream: Kefir.Observable<ElementWithLifetime>, searchBarStream: Kefir.Observable<ElementWithLifetime>) {
+  constructor(buttonDescriptor: Kefir.Observable<Object>, appToolbarLocationLiveSet: LiveSet<TagTreeNode<HTMLElement>>, searchBarLiveSet: LiveSet<TagTreeNode<HTMLElement>>) {
     this._buttonDescriptorStream = buttonDescriptor.toProperty().takeUntilBy(this._stopper);
 
     Kefir.combine([
-      searchBarStream.take(1),
-      appToolbarLocationStream.take(1)
+      toItemWithLifetimeStream(searchBarLiveSet).take(1),
+      toItemWithLifetimeStream(appToolbarLocationLiveSet).take(1)
     ], [], searchBar => searchBar)
+      .map(({el: node}) => node.getValue())
       .takeUntilBy(this._stopper)
-      .onValue(({el}) => this._adjustSearchBarMargin(el));
+      .onValue(el => this._adjustSearchBarMargin(el));
 
-    appToolbarLocationStream
+    toItemWithLifetimeStream(appToolbarLocationLiveSet)
       .take(1)
+      .map(({el: node}) => node.getValue())
       .takeUntilBy(this._stopper)
-      .onValue(({el}) => this._setupButton(el));
+      .onValue(el => this._setupButton(el));
   }
 
   _setupButton(appToolbarLocation: HTMLElement) {

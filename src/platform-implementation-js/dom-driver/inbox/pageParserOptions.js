@@ -68,6 +68,15 @@ const pageParserOptions: PageParserTreeOptions = {
         return [root.querySelector('#in')].filter(Boolean);
       }
     },
+    appToolbarLocation: {
+      interval: (count, timeRunning) =>
+        (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000,
+      fn(root) {
+        const chatToggle = root.querySelector('div[role=button][jsaction*="global.toggle_chat_roster"]');
+        const appToolbarLocation = chatToggle ? (chatToggle:any).parentElement.parentElement.parentElement : null;
+        return appToolbarLocation ? [appToolbarLocation] : [];
+      }
+    },
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
