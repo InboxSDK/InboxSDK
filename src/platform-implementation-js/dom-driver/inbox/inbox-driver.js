@@ -97,7 +97,6 @@ class InboxDriver {
   _butterBarDriver = new InboxButterBarDriver();
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
-  _appToolbarLocationPool: ItemWithLifetimePool<*>;
   _lastInteractedAttachmentCardView: ?InboxAttachmentCardView = null;
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
@@ -299,9 +298,8 @@ class InboxDriver {
       }, waitTime);
     });
 
-    this._appToolbarLocationPool = toItemWithLifetimePool(this._page.tree.getAllByTag('appToolbarLocation'));
     Kefir.later(30*1000)
-      .takeUntilBy(this._appToolbarLocationPool.items())
+      .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('appToolbarLocation')))
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find appToolbarLocation'));
       });
