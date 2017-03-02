@@ -236,7 +236,9 @@ class InboxDriver {
         }
       });
     });
-    this._attachmentOverlayViewDriverLiveSet.subscribe({}); // force activation
+    this._attachmentOverlayViewDriverLiveSet.subscribe({});
+    // force activation because nothing outside of the driver is going to
+    // subscribe to this, unlike some of the other livesets.
 
     this._composeViewDriverPool = new ItemWithLifetimePool(
       getComposeViewDriverStream(this, this._page.tree).takeUntilBy(this._stopper)
@@ -260,6 +262,8 @@ class InboxDriver {
       return view;
     });
     this._chatSidebarViewLiveSet.subscribe({});
+    // force activation because nothing outside of the driver is going to
+    // subscribe to this, unlike some of the other livesets.
 
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
 
@@ -623,17 +627,16 @@ class InboxDriver {
 
     // If a nativeDrawer is opened while the new SDK drawer is open, then close
     // the SDK drawer.
-    const sub = this._page.tree.getAllByTag('nativeDrawer').subscribe(changes => {
-      for (let change of changes) {
-        if (change.type === 'add') {
-          drawerView.close();
-          break;
+    Kefir.fromESObservable(this._page.tree.getAllByTag('nativeDrawer'))
+      .takeUntilBy(drawerView.getClosingStream())
+      .onValue(changes => {
+        for (let change of changes) {
+          if (change.type === 'add') {
+            drawerView.close();
+            break;
+          }
         }
-      }
-    });
-    drawerView.getClosingStream().take(1).onValue(() => {
-      sub.unsubscribe();
-    });
+      });
 
     return drawerView;
   }
