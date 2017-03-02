@@ -126,26 +126,26 @@ const pageParserOptions: PageParserTreeOptions = {
   },
   watchers: [
     {sources: [null], tag: 'topRow', selectors: [
-			'body',
-			'[id][jsaction]',
-	    'div[jsaction]:not([role])',
-	    '*',
-	    {$or: [
-	      [
-	        '[role=main]',
-	      ],
-	      [
-	        ':not([role])',
-	        '*',
-	        '[role=main]'
-	      ]
-	    ]},
-	    '[role=application]',
-	    '[role=list]',
-	    '*',
-	    '*',
-	    '.scroll-list-section-body',
-	    '[role=listitem]'
+      'body',
+      '[id][jsaction]',
+      'div[jsaction]:not([role])',
+      '*',
+      {$or: [
+        [
+          '[role=main]',
+        ],
+        [
+          ':not([role])',
+          '*',
+          '[role=main]'
+        ]
+      ]},
+      '[role=application]',
+      '[role=list]',
+      '*',
+      '*',
+      '.scroll-list-section-body',
+      '[role=listitem]'
     ]},
     {sources: ['topRow'], tag: 'bundleRow', selectors: [
       {$filter: el => !/#gmail:thread-/.test(el.getAttribute('data-item-id')||'')}
