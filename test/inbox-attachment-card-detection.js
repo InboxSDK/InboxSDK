@@ -17,7 +17,7 @@ import parser from '../src/platform-implementation-js/dom-driver/inbox/detection
 function finder(document) {
   const {documentElement} = document;
   if (!documentElement) throw new Error();
-  return pageParserOptions.finders.attachmentCard.fn(documentElement);
+  return Array.from(pageParserOptions.finders.attachmentCard.fn(documentElement));
 }
 
 import {
@@ -41,7 +41,7 @@ describe('Inbox Attachment Card Detection', function() {
       const attachment4 = querySelector(page20160810_2(), '[data-test-id=attachment4]');
       const attachment5 = querySelector(page20160810_2(), '[data-test-id=attachment5]');
 
-      const results = Array.from(finder(page20160810_2()));
+      const results = finder(page20160810_2());
       assert.strictEqual(results.length, 5);
       assert(results.includes(attachment1));
       assert(results.includes(attachment2));
@@ -52,21 +52,21 @@ describe('Inbox Attachment Card Detection', function() {
 
     it('2016-08-12 list with card', function() {
       const attachment1 = querySelector(page20160812(), '[data-test-id=attachment1]');
-      const results = Array.from(finder(page20160812()));
+      const results = finder(page20160812());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
 
     it('2016-08-16 message with attachment', function() {
       const attachment1 = querySelector(page20160816(), '[data-test-id=attachment1]');
-      const results = Array.from(finder(page20160816()));
+      const results = finder(page20160816());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
 
     it('2016-09-08 card in bundle', function() {
       const attachment1 = querySelector(page20160908(), '[data-test-id=attachment1]');
-      const results = Array.from(finder(page20160908()));
+      const results = finder(page20160908());
       assert.strictEqual(results.length, 1);
       assert(results.includes(attachment1));
     });
