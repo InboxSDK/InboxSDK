@@ -220,7 +220,10 @@ class InboxDriver {
         });
       }
       const cardView = this.getLastInteractedAttachmentCardView();
-      if (!cardView) return LiveSet.constant(new Set());
+      if (!cardView) {
+        this._logger.error(new Error('Encountered overlay without knowing cardView'));
+        return LiveSet.constant(new Set());
+      }
 
       return new LiveSet({
         read() {throw new Error()},
