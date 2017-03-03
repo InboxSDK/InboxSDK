@@ -228,7 +228,7 @@ const setupSearchReplacing = (
           return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
-      })).then((pairs: IDPairsWithRFC) => ({start, total, threads: pairs}))
+      })).then((pairs: IDPairsWithRFC) => ({start, total, threads: pairs.filter(Boolean)}))
     ))
     .flatMap(Kefir.fromPromise)
     .onValue((
