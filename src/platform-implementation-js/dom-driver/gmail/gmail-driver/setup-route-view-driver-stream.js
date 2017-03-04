@@ -92,10 +92,22 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 				if (!searchInput) throw new Error('Should not happen');
 				searchInput.value = '';
 
-				driver.hashChangeNoViewChange('#' + customListRouteId + (urlObject.params[1] ? '/' + urlObject.params[1] : ''));
-				return {
-					type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
-				};
+				// Only rewrite the url if it's a search query with no further
+				// parameters or it has a page parameter. Don't write URLs with thread
+				// id parameters because currently other parts of the code depend on
+				// being able to parse the URL as a normal thread URL.
+
+				// Additionally, we don't want to treat threads as the CUSTOM_LIST type
+				// since they're not lists.
+				if (
+					urlObject.params.length === 1 ||
+					(urlObject.params.length === 2 && urlObject.params[1][0] === 'p')
+				) {
+					driver.hashChangeNoViewChange('#' + customListRouteId + (urlObject.params[1] ? '/' + urlObject.params[1] : ''));
+					return {
+						type: 'CUSTOM_LIST', urlObject, routeID: customListRouteId
+					};
+				}
 			}
 		}
 		return options;
