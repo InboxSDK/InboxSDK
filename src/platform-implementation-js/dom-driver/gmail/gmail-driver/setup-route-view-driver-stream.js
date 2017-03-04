@@ -85,7 +85,6 @@ export default function setupRouteViewDriverStream(gmailRouteProcessor: GmailRou
 	])
 	.map(options => {
 		const {type, urlObject} = options;
-
 		if (type === 'NATIVE' && urlObject.name === 'search') {
 			const customListRouteId = customListSearchStringsToRouteIds.get(urlObject.params[0]);
 			if (customListRouteId) {
