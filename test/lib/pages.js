@@ -57,3 +57,5 @@ export const page20170209 = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-02-09 preview overlay.html', 'utf8')));
 export const page20170302 = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-02 inline compose.html', 'utf8')));
+export const pageWithNav20170303 = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-03 nav bar.html', 'utf8')));
