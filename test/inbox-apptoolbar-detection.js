@@ -23,17 +23,17 @@ describe('Inbox AppToolbar Support Detection', function() {
 
   describe('location', function() {
     describe('finder', function() {
-      // it('2016-06-14', function() {
-      //   const location = page20160614().querySelector('[data-test-id="apptoolbar-location"]');
-      //   const results = locFinder(page20160614());
-      //   assert.deepEqual(results, [location]);
-      // });
-      //
-      // it('2016-06-14 with chat sidebar', function() {
-      //   const location = pageWithSidebar20160614().querySelector('[data-test-id="apptoolbar-location"]');
-      //   const results = locFinder(pageWithSidebar20160614());
-      //   assert.deepEqual(results, [location]);
-      // });
+      it('2016-06-14', function() {
+        const location = page20160614().querySelector('[data-test-id="apptoolbar-location"]');
+        const results = locFinder(page20160614());
+        assert.deepEqual(results, [location]);
+      });
+
+      it('2016-06-14 with chat sidebar', function() {
+        const location = pageWithSidebar20160614().querySelector('[data-test-id="apptoolbar-location"]');
+        const results = locFinder(pageWithSidebar20160614());
+        assert.deepEqual(results, [location]);
+      });
     });
   });
 });
