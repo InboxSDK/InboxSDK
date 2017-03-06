@@ -48,6 +48,7 @@ import attachmentCardParser from './detection/attachmentCard/parser';
 import attachmentOverlayParser from './detection/attachmentOverlay/parser';
 import nativeDrawerParser from './detection/nativeDrawer/parser';
 import searchBarParser from './detection/searchBar/parser';
+import searchAutocompleteParser from './detection/searchAutocomplete/parser';
 import chatSidebarParser from './detection/chatSidebar/parser';
 import appToolbarLocationParser from './detection/appToolbarLocation/parser';
 
@@ -326,6 +327,21 @@ class InboxDriver {
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find searchBar'));
       });
+
+    lsMapWithRemoval(this._page.tree.getAllByTag('searchAutocomplete'), (node, removal) => {
+      const el = node.getValue();
+      console.info('searchAutocomplete appeared: ', el);
+
+      removal.then(() => console.info('searchAutocomplete disappeared: ', el));
+      const parsed = searchAutocompleteParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (searchAutocomplete)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+    }).subscribe({});
 
     toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({value: node}) => {
       const el = node.getValue();

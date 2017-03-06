@@ -20,6 +20,9 @@ const pageParserOptions: PageParserTreeOptions = {
     inlineCompose: {
       ownedBy: ['thread']
     },
+    searchAutocomplete: {
+      ownedBy: ['searchBar']
+    }
   },
   finders: {
     thread: {
@@ -69,6 +72,11 @@ const pageParserOptions: PageParserTreeOptions = {
         (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000,
       fn(root) {
         return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
+      }
+    },
+    searchAutocomplete: {
+      fn(root) {
+        return root.querySelectorAll('div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox]');
       }
     },
     chatSidebar: {
@@ -207,6 +215,15 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[id]',
       'div[class]',
       'div.in#in'
+    ]},
+
+    {sources: [null], tag: 'searchAutocomplete', selectors: [
+      'body',
+      '[id][jsaction]',
+      '[id][jsaction]',
+      'div[class]',
+      'div[class]',
+      '[role=listbox]'
     ]},
 
     {sources: ['thread'], tag: 'inlineCompose', selectors: [
