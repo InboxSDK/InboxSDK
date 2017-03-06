@@ -22,6 +22,9 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     searchAutocomplete: {
       ownedBy: ['searchBar']
+    },
+    searchAutocompleteResults: {
+      ownedBy: ['searchAutocomplete']
     }
   },
   finders: {
@@ -76,7 +79,22 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     searchAutocomplete: {
       fn(root) {
-        return root.querySelectorAll('div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox]');
+        return Array.prototype.map.call(
+          root.querySelectorAll(
+            'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
+          ),
+          el => (el.parentElement:any)
+        );
+      }
+    },
+    searchAutocompleteResults: {
+      fn(root) {
+        return  Array.prototype.filter.call(
+          root.querySelectorAll(
+            'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
+          ),
+          el => el.style.display !== 'none'
+        );
       }
     },
     chatSidebar: {
@@ -223,7 +241,14 @@ const pageParserOptions: PageParserTreeOptions = {
       '[id][jsaction]',
       'div[class]',
       'div[class]',
-      '[role=listbox]'
+      '[role=listbox]',
+      'ul:last-of-type',
+      {$map: el => (el.parentElement:any)}
+    ]},
+
+    {sources: ['searchAutocomplete'], tag: 'searchAutocompleteResults', selectors: [
+      'ul:last-of-type',
+      {$watch: {attributeFilter: ['style'], cond: el => el.style.display !== 'none'}},
     ]},
 
     {sources: ['thread'], tag: 'inlineCompose', selectors: [

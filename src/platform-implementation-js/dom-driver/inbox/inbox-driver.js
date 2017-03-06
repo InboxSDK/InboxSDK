@@ -343,6 +343,13 @@ class InboxDriver {
       }
     }).subscribe({});
 
+    lsMapWithRemoval(this._page.tree.getAllByTag('searchAutocompleteResults'), (node, removal) => {
+      const el = node.getValue();
+      console.info('searchAutocompleteResults appeared: ', el);
+
+      removal.then(() => console.info('searchAutocompleteResults disappeared: ', el));
+    }).subscribe({});
+
     toValueObservable(this._page.tree.getAllByTag('nativeDrawer')).subscribe(({value: node}) => {
       const el = node.getValue();
       const parsed = nativeDrawerParser(el);
