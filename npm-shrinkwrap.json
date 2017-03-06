@@ -156,9 +156,9 @@
       "resolved": "https://registry.npmjs.org/array-filter/-/array-filter-0.0.1.tgz"
     },
     "array-find-index": {
-      "version": "1.0.1",
-      "from": "array-find-index@1.0.1",
-      "resolved": "https://registry.npmjs.org/array-find-index/-/array-find-index-1.0.1.tgz"
+      "version": "1.0.2",
+      "from": "array-find-index@1.0.2",
+      "resolved": "https://registry.npmjs.org/array-find-index/-/array-find-index-1.0.2.tgz"
     },
     "array-flatten": {
       "version": "1.1.1",
@@ -4755,19 +4755,19 @@
       "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.4.2.tgz"
     },
     "react-draggable-list": {
-      "version": "3.1.3",
+      "version": "3.2.0",
       "from": "react-draggable-list@>=3.1.2 <4.0.0",
-      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.1.3.tgz"
+      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.2.0.tgz"
     },
     "react-float-anchor": {
-      "version": "1.3.6",
+      "version": "1.3.7",
       "from": "react-float-anchor@>=1.3.4 <2.0.0",
-      "resolved": "https://registry.npmjs.org/react-float-anchor/-/react-float-anchor-1.3.6.tgz"
+      "resolved": "https://registry.npmjs.org/react-float-anchor/-/react-float-anchor-1.3.7.tgz"
     },
     "react-menu-list": {
-      "version": "3.2.2",
+      "version": "3.2.3",
       "from": "react-menu-list@>=3.2.2 <4.0.0",
-      "resolved": "https://registry.npmjs.org/react-menu-list/-/react-menu-list-3.2.2.tgz"
+      "resolved": "https://registry.npmjs.org/react-menu-list/-/react-menu-list-3.2.3.tgz"
     },
     "react-motion": {
       "version": "0.4.7",
