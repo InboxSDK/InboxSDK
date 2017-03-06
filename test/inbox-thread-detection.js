@@ -3,7 +3,6 @@
 import _ from 'lodash';
 import fs from 'fs';
 import assert from 'assert';
-import sinon from 'sinon';
 import Kefir from 'kefir';
 import lsMap from 'live-set/map';
 import jsdomDoc from './lib/jsdom-doc';
@@ -109,7 +108,6 @@ describe('Inbox Thread Detection', function() {
     it('2016-06-14', function() {
       const thread = querySelector(page20160614(), '[data-test-id=openthread]');
 
-      const spy = sinon.spy();
       const root = page20160614();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       assert.strictEqual(liveSet.values().size, 1);
@@ -119,7 +117,6 @@ describe('Inbox Thread Detection', function() {
     it('2016-06-20 fullscreen and bundled inline', function() {
       const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
 
-      const spy = sinon.spy();
       const root = pageFullscreen20160620();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       assert.strictEqual(liveSet.values().size, 1);
@@ -129,7 +126,6 @@ describe('Inbox Thread Detection', function() {
     it('2016-07-27 search', function() {
       const thread = querySelector(page20160727(), '[data-test-id=openthread]');
 
-      const spy = sinon.spy();
       const root = page20160727();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       assert.strictEqual(liveSet.values().size, 1);
@@ -139,7 +135,6 @@ describe('Inbox Thread Detection', function() {
     it('2016-08-23 thread in bundle', function() {
       const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
-      const spy = sinon.spy();
       const root = page20160823();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       assert.strictEqual(liveSet.values().size, 1);

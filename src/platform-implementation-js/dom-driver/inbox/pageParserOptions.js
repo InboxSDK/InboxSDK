@@ -19,7 +19,7 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     inlineCompose: {
       ownedBy: ['thread']
-    },
+    }
   },
   finders: {
     thread: {
@@ -69,6 +69,16 @@ const pageParserOptions: PageParserTreeOptions = {
         (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000,
       fn(root) {
         return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
+      }
+    },
+    searchAutocompleteResults: {
+      fn(root) {
+        return  Array.prototype.filter.call(
+          root.querySelectorAll(
+            'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
+          ),
+          el => el.style.display !== 'none'
+        );
       }
     },
     chatSidebar: {
@@ -207,6 +217,17 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[id]',
       'div[class]',
       'div.in#in'
+    ]},
+
+    {sources: [null], tag: 'searchAutocompleteResults', selectors: [
+      'body',
+      '[id][jsaction]',
+      '[id][jsaction]',
+      'div[class]',
+      'div[class]',
+      '[role=listbox]',
+      'ul:last-of-type',
+      {$watch: {attributeFilter: ['style'], cond: el => el.style.display !== 'none'}},
     ]},
 
     {sources: ['thread'], tag: 'inlineCompose', selectors: [

@@ -1,12 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
-import fs from 'fs';
 import assert from 'assert';
-import sinon from 'sinon';
-import Kefir from 'kefir';
-import once from 'lodash/once';
-import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 
@@ -14,12 +8,6 @@ function locFinder(document) {
   const {documentElement} = document;
   if (!documentElement) throw new Error();
   return Array.from(pageParserOptions.finders.appToolbarLocation.fn(documentElement));
-}
-
-function searchBarFinder(document) {
-  const {documentElement} = document;
-  if (!documentElement) throw new Error();
-  return Array.from(pageParserOptions.finders.searchBar.fn(documentElement));
 }
 
 import {
@@ -45,22 +33,6 @@ describe('Inbox AppToolbar Support Detection', function() {
         const location = pageWithSidebar20160614().querySelector('[data-test-id="apptoolbar-location"]');
         const results = locFinder(pageWithSidebar20160614());
         assert.deepEqual(results, [location]);
-      });
-    });
-  });
-
-  describe('search bar', function() {
-    describe('finder', function() {
-      it('2016-06-14', function() {
-        const rightMargin = page20160614().querySelector('[data-test-id="apptoolbar-rightMargin"]');
-        const results = searchBarFinder(page20160614());
-        assert.deepEqual(results, [rightMargin]);
-      });
-
-      it('2016-06-14 with chat sidebar', function() {
-        const rightMargin = pageWithSidebar20160614().querySelector('[data-test-id="apptoolbar-rightMargin"]');
-        const results = searchBarFinder(pageWithSidebar20160614());
-        assert.deepEqual(results, [rightMargin]);
       });
     });
   });
