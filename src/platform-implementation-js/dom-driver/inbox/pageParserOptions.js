@@ -19,12 +19,6 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     inlineCompose: {
       ownedBy: ['thread']
-    },
-    searchAutocomplete: {
-      ownedBy: ['searchBar']
-    },
-    searchAutocompleteResults: {
-      ownedBy: ['searchAutocomplete']
     }
   },
   finders: {
@@ -75,16 +69,6 @@ const pageParserOptions: PageParserTreeOptions = {
         (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000,
       fn(root) {
         return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
-      }
-    },
-    searchAutocomplete: {
-      fn(root) {
-        return Array.prototype.map.call(
-          root.querySelectorAll(
-            'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
-          ),
-          el => (el.parentElement:any)
-        );
       }
     },
     searchAutocompleteResults: {
@@ -235,18 +219,13 @@ const pageParserOptions: PageParserTreeOptions = {
       'div.in#in'
     ]},
 
-    {sources: [null], tag: 'searchAutocomplete', selectors: [
+    {sources: [null], tag: 'searchAutocompleteResults', selectors: [
       'body',
       '[id][jsaction]',
       '[id][jsaction]',
       'div[class]',
       'div[class]',
       '[role=listbox]',
-      'ul:last-of-type',
-      {$map: el => (el.parentElement:any)}
-    ]},
-
-    {sources: ['searchAutocomplete'], tag: 'searchAutocompleteResults', selectors: [
       'ul:last-of-type',
       {$watch: {attributeFilter: ['style'], cond: el => el.style.display !== 'none'}},
     ]},
