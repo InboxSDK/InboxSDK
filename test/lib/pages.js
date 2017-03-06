@@ -59,3 +59,5 @@ export const page20170302 = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-02 inline compose.html', 'utf8')));
 export const pageWithNav20170303 = once(() =>
   jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-03 nav bar.html', 'utf8')));
+export const pageWithAutocomplete20170306 = once(() =>
+  jsdomDoc(fs.readFileSync(__dirname+'/../data/inbox-2017-03-06 search autocomplete.html', 'utf8')));
