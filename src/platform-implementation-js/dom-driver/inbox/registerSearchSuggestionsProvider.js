@@ -6,6 +6,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import searchBarParser from './detection/searchBar/parser';
 
 export default function registerSearchSuggestionsProvider(driver: InboxDriver, handler: Function) {
@@ -15,45 +16,42 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
     .flatMap(({el, removalStream}) => {
       const {searchInput} = searchBarParser(el.getValue()).elements;
       if (searchInput) {
-        return Kefir.constant({searchInput, removalStream});
+        return Kefir.constant({
+          searchInput,
+          searchInputRemovalStream: removalStream
+        });
       } else {
         return Kefir.never();
       }
-    }).flatMap(({searchInput, removalStream}) => {
-      const inputs = Kefir.fromEvents(searchInput, 'input').takeUntilBy(removalStream);
-
-      let searchAutocompleteResults: any = kefirBus();
+    }).flatMap(({searchInput, searchInputRemovalStream}) => (
       toItemWithLifetimeStream(driver.getTagTree().getAllByTag('searchAutocompleteResults'))
-        .takeUntilBy(removalStream)
-        .onValue(item => {
-          if (!searchAutocompleteResults.value) {
-            searchAutocompleteResults = kefirBus();
-          }
-          searchAutocompleteResults.value(item);
-          searchAutocompleteResults.end();
-          searchAutocompleteResults = Kefir.constant(item);
-          item.removalStream.onValue(() => {
-            searchAutocompleteResults = kefirBus();
-          });
-        });
+        .takeUntilBy(searchInputRemovalStream)
+        .map(({el, removalStream}) => ({
+          searchInput,
+          searchInputRemovalStream,
+          resultsEl: el.getValue(),
+          resultsElRemovalStream: removalStream
+        }))
+    )).flatMap(({searchInput, searchInputRemovalStream, resultsEl, resultsElRemovalStream}) => {
+      const inputs = Kefir.fromEvents(searchInput, 'input')
+        .takeUntilBy(searchInputRemovalStream)
+        .takeUntilBy(resultsElRemovalStream);
 
-      return inputs.flatMap(event => (
-        searchAutocompleteResults
-          .take(1)
-          .map(({el, removalStream}) => ({
-            event,
-            item: {el, removalStream: removalStream.merge(inputs).take(1)}
-          }))
-      ))
-    })
-    .takeUntilBy(stopper).onValue(({event, item: {el: resultsNode, removalStream}}) => {
-      const suggestionsElement = document.createElement('div');
+      return inputs.map((event) => ({event, resultsEl}));
+    }).flatMapLatest((item) => (
+      makeMutationObserverChunkedStream(
+        item.resultsEl,
+        {childList: true, subtree: true, characterData: true}
+      ).take(1).map(() => item)
+    )).takeUntilBy(stopper).onValue(({event, resultsEl}) => {
+        const suggestionsElement = document.createElement('div');
 
-      resultsNode.getValue().appendChild(suggestionsElement);
+        console.log('appending suggestions: ', event.target.value);
+        resultsEl.appendChild(suggestionsElement);
 
-      suggestionsElement.textContent = event.target.value;
+        suggestionsElement.textContent = event.target.value;
 
-      removalStream.onValue(() => suggestionsElement.remove());
+        // removalStream.onValue(() => suggestionsElement.remove());
     });
 
   return () => stopper.destroy();

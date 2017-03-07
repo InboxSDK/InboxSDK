@@ -73,11 +73,8 @@ const pageParserOptions: PageParserTreeOptions = {
     },
     searchAutocompleteResults: {
       fn(root) {
-        return  Array.prototype.filter.call(
-          root.querySelectorAll(
-            'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
-          ),
-          el => el.style.display !== 'none'
+        return root.querySelectorAll(
+          'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
         );
       }
     },
@@ -226,8 +223,7 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[class]',
       'div[class]',
       '[role=listbox]',
-      'ul:last-of-type',
-      {$watch: {attributeFilter: ['style'], cond: el => el.style.display !== 'none'}},
+      'ul:last-of-type'
     ]},
 
     {sources: ['thread'], tag: 'inlineCompose', selectors: [
