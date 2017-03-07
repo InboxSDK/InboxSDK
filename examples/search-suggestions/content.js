@@ -4,7 +4,7 @@ function log(...args) {
   console.log('search-suggestions', ...args);
 }
 
-InboxSDK.load(1, 'search-suggestions').then(inboxSDK => {
+InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
   window._sdk = inboxSDK;
 
   inboxSDK.Search.registerSearchSuggestionsProvider(query => {
