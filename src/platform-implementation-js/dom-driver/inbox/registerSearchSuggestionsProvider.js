@@ -37,21 +37,26 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
 
-      return inputs.map((event) => ({event, resultsEl}));
-    }).flatMapLatest((item) => (
-      makeMutationObserverChunkedStream(
+      return inputs.map((event) => ({event, resultsEl, nextInput: inputs}));
+    }).flatMapLatest((item) => {
+      const modifications = makeMutationObserverChunkedStream(
         item.resultsEl,
         {childList: true, subtree: true, characterData: true}
-      ).take(1).map(() => item)
-    )).takeUntilBy(stopper).onValue(({event, resultsEl}) => {
-        const suggestionsElement = document.createElement('div');
+      );
 
-        console.log('appending suggestions: ', event.target.value);
-        resultsEl.appendChild(suggestionsElement);
+      return modifications.take(1).map(() => ({
+        ...item,
+        removalStream: item.nextInput.take(1).flatMap(() => modifications).take(1)
+      }));
+    }).takeUntilBy(stopper).onValue(({event, resultsEl, removalStream}) => {
+      const suggestionsElement = document.createElement('div');
 
-        suggestionsElement.textContent = event.target.value;
+      console.log('appending suggestions: ', event.target.value);
+      resultsEl.appendChild(suggestionsElement);
 
-        // removalStream.onValue(() => suggestionsElement.remove());
+      suggestionsElement.textContent = event.target.value;
+
+      removalStream.onValue(() => suggestionsElement.remove());
     });
 
   return () => stopper.destroy();
