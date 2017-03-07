@@ -12,6 +12,8 @@ import searchBarParser from './detection/searchBar/parser';
 export default function registerSearchSuggestionsProvider(driver: InboxDriver, handler: Function) {
   const stopper = kefirStopper();
 
+  const getResults = (query) => Kefir.later(1000, 'hello there: ' + query).toPromise();
+
   toItemWithLifetimeStream(driver.getTagTree().getAllByTag('searchBar'))
     .flatMap(({el, removalStream}) => {
       const {searchInput} = searchBarParser(el.getValue()).elements;
@@ -43,18 +45,22 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
         item.resultsEl,
         {childList: true, subtree: true, characterData: true}
       );
+      const removalStream = item.nextInput.take(1).flatMap(() => modifications).take(1);
 
-      return modifications.take(1).map(() => ({
-        ...item,
-        removalStream: item.nextInput.take(1).flatMap(() => modifications).take(1)
-      }));
-    }).takeUntilBy(stopper).onValue(({event, resultsEl, removalStream}) => {
+      return Kefir.combine([
+        modifications.take(1).map(() => ({
+          ...item,
+          removalStream
+        })),
+        Kefir.fromPromise(getResults(item.event.target.value))
+      ]).takeUntilBy(removalStream);
+    }).takeUntilBy(stopper).onValue(([{event, resultsEl, removalStream}, results]) => {
       const suggestionsElement = document.createElement('div');
 
-      console.log('appending suggestions: ', event.target.value);
+      console.log('appending suggestions: ', results);
       resultsEl.appendChild(suggestionsElement);
 
-      suggestionsElement.textContent = event.target.value;
+      suggestionsElement.textContent = results;
 
       removalStream.onValue(() => suggestionsElement.remove());
     });
