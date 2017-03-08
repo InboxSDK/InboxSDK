@@ -48,13 +48,14 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
       const removalStream = item.nextInput.take(1).flatMap(() => modifications).take(1);
 
       return Kefir.combine([
-        modifications.take(1).map(() => ({
-          ...item,
-          removalStream
-        })),
-        Kefir.fromPromise(getResults(item.event.target.value))
-      ]).takeUntilBy(removalStream);
-    }).takeUntilBy(stopper).onValue(([{event, resultsEl, removalStream}, results]) => {
+        Kefir.fromPromise(getResults(item.event.target.value)),
+        modifications.take(1)
+      ]).takeUntilBy(removalStream).map(([results]) => ({
+        ...item,
+        removalStream,
+        results
+      }));
+    }).takeUntilBy(stopper).onValue(({event, resultsEl, removalStream, results}) => {
       const suggestionsElement = document.createElement('div');
 
       console.log('appending suggestions: ', results);
