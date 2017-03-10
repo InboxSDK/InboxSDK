@@ -41,15 +41,18 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
 
       return inputs.map((event) => ({event, resultsEl, nextInput: inputs}));
     }).flatMapLatest((item) => {
-      const modifications = makeMutationObserverChunkedStream(
-        item.resultsEl,
-        {childList: true, subtree: true, characterData: true}
-      );
-      const removalStream = item.nextInput.take(1).flatMap(() => modifications).take(1);
+      const suggestionsResponse = Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
+        .filter(({detail: {type, query}}) => (
+          type === 'searchSuggestionsReceieved'
+        )).map(({detail: {query}}) => query);
+
+      const removalStream = item.nextInput.take(1).flatMap(({target}) => (
+        suggestionsResponse
+      )).take(1);
 
       return Kefir.combine([
         Kefir.fromPromise(getResults(item.event.target.value)),
-        modifications.take(1)
+        suggestionsResponse.filter(query => query === item.event.target.value).take(1)
       ]).takeUntilBy(removalStream).map(([results]) => ({
         ...item,
         removalStream,

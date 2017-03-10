@@ -46,7 +46,6 @@ export default function setupAjaxInterceptor() {
       return connection.url.indexOf('suggest') > -1;
     },
     afterListeners: function(connection) {
-      console.log('afterListeners callback: ', connection);
       if (connection.status === 200 && connection.originalSendBody) {
         const originalRequest = JSON.parse(connection.originalSendBody);
         const queryKey = Object.keys(originalRequest).find(key => key !== '1');
