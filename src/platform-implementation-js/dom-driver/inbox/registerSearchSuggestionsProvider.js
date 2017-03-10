@@ -61,6 +61,8 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
       console.log('appending suggestions: ', results);
       resultsEl.appendChild(suggestionsElement);
 
+      resultsEl.style.display = 'block';
+
       suggestionsElement.textContent = results;
 
       removalStream.onValue(() => suggestionsElement.remove());

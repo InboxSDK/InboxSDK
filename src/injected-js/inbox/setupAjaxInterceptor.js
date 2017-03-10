@@ -30,7 +30,7 @@ export default function setupAjaxInterceptor() {
   // Only set up the interception for a fraction of sessions right now.
   // This has the benefit that if something goes wrong, then the user can
   // refresh and most likely not have interception present.
-  const useXHRInterceptor = Math.random() < 0.1;
+  const useXHRInterceptor = true; //Math.random() < 0.1;
 
   if (useXHRInterceptor) {
     global.XMLHttpRequest = XHRProxyFactory(
@@ -40,4 +40,23 @@ export default function setupAjaxInterceptor() {
   }
 
   // xhr proxy wrappers will go here eventually
+
+  main_wrappers.push({
+    isRelevantTo(connection) {
+      return connection.url.indexOf('suggest') > -1;
+    },
+    afterListeners: function(connection) {
+      console.log('afterListeners callback: ', connection);
+      if (connection.status === 200 && connection.originalSendBody) {
+        const originalRequest = JSON.parse(connection.originalSendBody);
+        const queryKey = Object.keys(originalRequest).find(key => key !== '1');
+        const queryObj = originalRequest[queryKey];
+        const query = Object.keys(queryObj).length === 1 && queryObj['1'];
+
+        if (query) {
+          triggerEvent({type: 'searchSuggestionsReceieved', query});
+        }
+      }
+    }
+  });
 }
