@@ -10,10 +10,13 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import searchBarParser from './detection/searchBar/parser';
 import closest from 'closest-ng';
 
-export default function registerSearchSuggestionsProvider(driver: InboxDriver, handler: Function) {
-  const stopper = kefirStopper();
+import type {AutocompleteSearchResult} from '../../../injected-js/gmail/modify-suggestions';
 
-  const getResults = (query) => Kefir.later(1000, 'hello there: ' + query).toPromise();
+export default function registerSearchSuggestionsProvider(
+  driver: InboxDriver,
+  handler: (string) => Promise<Array<AutocompleteSearchResult>>
+) {
+  const stopper = kefirStopper();
 
   toItemWithLifetimeStream(driver.getTagTree().getAllByTag('searchBar'))
     .flatMap(({el, removalStream}) => {
@@ -76,24 +79,75 @@ export default function registerSearchSuggestionsProvider(driver: InboxDriver, h
       ]).take(1);
 
       return Kefir.combine([
-        Kefir.fromPromise(getResults(item.event.target.value)),
+        Kefir.fromPromise(Promise.resolve(handler(item.event.target.value))),
         // Wait to send results to the UI until Inbox's results have come back
         // to avoid rendering too soon.
         suggestionsResponse.take(1)
-      ]).takeUntilBy(removalStream).map(([results]) => ({
+      ]).takeUntilBy(removalStream).map((
+        [results]: [Array<AutocompleteSearchResult>]
+      ) => ({
         ...item,
         removalStream,
         results
       }));
-    }).takeUntilBy(stopper).onValue(({event, resultsEl, removalStream, results}) => {
+    }).takeUntilBy(stopper).flatMap(({resultsEl, removalStream, results}) => {
+      try {
+        if (!Array.isArray(results)) {
+          throw new Error('suggestions must be an array');
+        }
+
+        const validatedResults = results.map(result => {
+          const resultCopy = {...result};
+          if (
+            typeof resultCopy.name !== 'string' &&
+            typeof resultCopy.nameHTML !== 'string'
+          ) {
+            throw new Error('suggestion must have name or nameHTML property');
+          }
+          if (
+            typeof resultCopy.routeName !== 'string' &&
+            typeof resultCopy.externalURL !== 'string' &&
+            typeof resultCopy.searchTerm !== 'string' &&
+            typeof resultCopy.onClick !== 'function'
+          ) {
+            throw new Error(
+              'suggestion must have routeName, externalURL, ' +
+              'searchTerm, or onClick property'
+            );
+          }
+          if (typeof resultCopy.iconURL === 'string') {
+            const iconURL = resultCopy.iconURL;
+            driver.getLogger().deprecationWarning(
+              'AutocompleteSearchResult "iconURL" property',
+              'AutocompleteSearchResult.iconUrl'
+            );
+            if (!resultCopy.iconUrl) {
+              if (driver.getOpts().REQUESTED_API_VERSION === 1) {
+                resultCopy.iconUrl = iconURL;
+              } else {
+                console.error(
+                  'Support for iconURL property was dropped after API version 1'
+                );
+              }
+            }
+            delete resultCopy.iconURL;
+          }
+          return resultCopy;
+        });
+
+        return Kefir.constant({resultsEl, removalStream, results: validatedResults});
+      } catch (error) {
+        return Kefir.constantError(error);
+      }
+    }).onError(error => (
+      driver.getLogger().error(error)
+    )).onValue(({resultsEl, removalStream, results}) => {
       const suggestionsElement = document.createElement('div');
 
       console.log('appending suggestions: ', results);
       resultsEl.appendChild(suggestionsElement);
 
       resultsEl.style.display = 'block';
-
-      suggestionsElement.textContent = results;
 
       removalStream.onValue(() => suggestionsElement.remove());
 
