@@ -9,8 +9,11 @@ import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import searchBarParser from './detection/searchBar/parser';
 import closest from 'closest-ng';
+import autoHtml from 'auto-html';
 
 import type {AutocompleteSearchResult} from '../../../injected-js/gmail/modify-suggestions';
+
+const DEFAULT_RESULT_ICON = '//www.gstatic.com/images/icons/material/system/2x/search_black_24dp.png';
 
 export default function registerSearchSuggestionsProvider(
   driver: InboxDriver,
@@ -142,9 +145,33 @@ export default function registerSearchSuggestionsProvider(
     }).onError(error => (
       driver.getLogger().error(error)
     )).onValue(({resultsEl, removalStream, results}) => {
-      const suggestionsElement = document.createElement('div');
+      const listItems = results.map(result => {
+        const icon = `
+          <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
+        `;
 
-      console.log('appending suggestions: ', results);
+        const description = result.description || result.descriptionHTML ? autoHtml `
+          <span class="inboxsdk__search_suggestion_desc">
+            ${result.description || {__html: result.descriptionHTML}}
+          </span>
+        ` : '';
+
+        return autoHtml `
+          <li class="inboxsdk__search_suggestion">
+            ${{__html: icon}}
+            <span>
+              <span class="inboxsdk__search_suggestion_name" role="option">
+                ${result.name || {__html: result.nameHTML}}
+              </span>
+              ${{__html: description}}
+            </span>
+          </li>
+        `;
+      }).join('');
+
+      const suggestionsElement = document.createElement('div');
+      suggestionsElement.innerHTML = listItems;
+
       resultsEl.appendChild(suggestionsElement);
 
       resultsEl.style.display = 'block';
