@@ -7,19 +7,32 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import insertElementInOrder from '../../lib/dom/insert-element-in-order';
 import searchBarParser from './detection/searchBar/parser';
 import closest from 'closest-ng';
 import autoHtml from 'auto-html';
 
 import type {AutocompleteSearchResult} from '../../../injected-js/gmail/modify-suggestions';
 
+const ORDERING_ATTR = 'data-inboxsdk-search-provider-count';
 const DEFAULT_RESULT_ICON = '//www.gstatic.com/images/icons/material/system/2x/search_black_24dp.png';
+
+const getProviderOrder = () => {
+  const documentElement: HTMLElement = global.document && document.documentElement;
+  const orderAttr = documentElement.getAttribute(ORDERING_ATTR);
+  const providerOrder = (orderAttr ? parseInt(orderAttr) + 1 : 0).toString();
+
+  documentElement.setAttribute(ORDERING_ATTR, providerOrder);
+
+  return providerOrder;
+};
 
 export default function registerSearchSuggestionsProvider(
   driver: InboxDriver,
   handler: (string) => Promise<Array<AutocompleteSearchResult>>
 ) {
   const stopper = kefirStopper();
+  const providerOrder = getProviderOrder();
 
   toItemWithLifetimeStream(driver.getTagTree().getAllByTag('searchBar'))
     .flatMap(({el, removalStream}) => {
@@ -171,8 +184,9 @@ export default function registerSearchSuggestionsProvider(
 
       const suggestionsElement = document.createElement('div');
       suggestionsElement.innerHTML = listItems;
+      suggestionsElement.setAttribute('data-order-hint', providerOrder);
 
-      resultsEl.appendChild(suggestionsElement);
+      insertElementInOrder(resultsEl, suggestionsElement);
 
       resultsEl.style.display = 'block';
 

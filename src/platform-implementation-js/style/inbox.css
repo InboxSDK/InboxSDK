@@ -581,6 +581,10 @@
   overflow: hidden;
 }
 
+.inboxsdk__search_suggestion:hover {
+  background-color: rgba(0,0,0,.03);
+}
+
 .inboxsdk__search_suggestion > img {
   opacity: 0.6;
   flex-shrink: 0;
