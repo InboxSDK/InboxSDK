@@ -244,6 +244,7 @@ export default function registerSearchSuggestionsProvider(
       });
 
       suggestionsElement.setAttribute('data-order-hint', providerOrder);
+      suggestionsElement.classList.add('inboxsdk__search_suggestion_group')
 
       insertElementInOrder(resultsEl, suggestionsElement);
 

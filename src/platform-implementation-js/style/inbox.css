@@ -570,6 +570,12 @@
   width: 24px;
 }
 
+.inboxsdk__search_suggestion_group {
+  border-top: 1px solid #ddd;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
 .inboxsdk__search_suggestion {
   display: flex;
   justify-content: flex-start;
