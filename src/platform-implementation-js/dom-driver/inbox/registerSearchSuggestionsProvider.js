@@ -27,6 +27,66 @@ const getProviderOrder = () => {
   return providerOrder;
 };
 
+const handleResultChosen = ({driver, searchInput, result, event}) => {
+  if (typeof result.onClick === 'function') {
+    result.onClick();
+  }
+
+  if (typeof result.externalURL === 'string') {
+    window.open(result.externalURL);
+  }
+
+  if (result.routeName && result.routeParams) {
+    driver.goto(result.routeName, result.routeParams);
+  }
+
+  if (typeof result.searchTerm === 'string') {
+    // TODO fake change event
+    searchInput.value = result.searchTerm;
+  }
+};
+
+const renderResultsList = ({
+  driver,
+  searchInput,
+  removalStream,
+  suggestionsElement,
+  results
+}) => (
+  results.map(result => {
+    const listItem = document.createElement('li');
+
+    const icon = `
+      <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
+    `;
+
+    const description = result.description || result.descriptionHTML ? autoHtml `
+      <span class="inboxsdk__search_suggestion_desc">
+        ${result.description || {__html: result.descriptionHTML}}
+      </span>
+    ` : '';
+
+    listItem.classList.add('inboxsdk__search_suggestion');
+    listItem.innerHTML = autoHtml `
+      ${{__html: icon}}
+      <span>
+        <span class="inboxsdk__search_suggestion_name" role="option">
+          ${result.name || {__html: result.nameHTML}}
+        </span>
+        ${{__html: description}}
+      </span>
+    `;
+
+    Kefir.fromEvents(listItem, 'click')
+      .takeUntilBy(removalStream)
+      .onValue((event: MouseEvent) => (
+        handleResultChosen({driver, searchInput, result, event})
+      ));
+
+    return listItem;
+  }).forEach((listItem) => suggestionsElement.appendChild(listItem))
+);
+
 export default function registerSearchSuggestionsProvider(
   driver: InboxDriver,
   handler: (string) => Promise<Array<AutocompleteSearchResult>>
@@ -59,7 +119,12 @@ export default function registerSearchSuggestionsProvider(
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
 
-      return inputs.map((event) => ({event, resultsEl, inputStream: inputs}));
+      return inputs.map((event) => ({
+        event,
+        searchInput,
+        resultsEl,
+        inputStream: inputs
+      }));
     }).flatMapLatest((item) => {
       const suggestionsResponse = Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
         .filter(({detail: {type}}) => type === 'searchSuggestionsReceieved');
@@ -106,7 +171,12 @@ export default function registerSearchSuggestionsProvider(
         removalStream,
         results
       }));
-    }).takeUntilBy(stopper).flatMap(({resultsEl, removalStream, results}) => {
+    }).takeUntilBy(stopper).flatMap(({
+      resultsEl,
+      searchInput,
+      removalStream,
+      results
+    }) => {
       try {
         if (!Array.isArray(results)) {
           throw new Error('suggestions must be an array');
@@ -151,39 +221,28 @@ export default function registerSearchSuggestionsProvider(
           return resultCopy;
         });
 
-        return Kefir.constant({resultsEl, removalStream, results: validatedResults});
+        return Kefir.constant({
+          resultsEl,
+          searchInput,
+          removalStream,
+          results: validatedResults
+        });
       } catch (error) {
         return Kefir.constantError(error);
       }
     }).onError(error => (
       driver.getLogger().error(error)
-    )).onValue(({resultsEl, removalStream, results}) => {
-      const listItems = results.map(result => {
-        const icon = `
-          <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
-        `;
-
-        const description = result.description || result.descriptionHTML ? autoHtml `
-          <span class="inboxsdk__search_suggestion_desc">
-            ${result.description || {__html: result.descriptionHTML}}
-          </span>
-        ` : '';
-
-        return autoHtml `
-          <li class="inboxsdk__search_suggestion">
-            ${{__html: icon}}
-            <span>
-              <span class="inboxsdk__search_suggestion_name" role="option">
-                ${result.name || {__html: result.nameHTML}}
-              </span>
-              ${{__html: description}}
-            </span>
-          </li>
-        `;
-      }).join('');
-
+    )).onValue(({resultsEl, searchInput, removalStream, results}) => {
       const suggestionsElement = document.createElement('div');
-      suggestionsElement.innerHTML = listItems;
+
+      renderResultsList({
+        driver,
+        searchInput,
+        removalStream,
+        suggestionsElement,
+        results
+      });
+
       suggestionsElement.setAttribute('data-order-hint', providerOrder);
 
       insertElementInOrder(resultsEl, suggestionsElement);
@@ -203,7 +262,7 @@ export default function registerSearchSuggestionsProvider(
         .takeUntilBy(removalStream)
         .onValue(() => {
           if (suggestionsElement.parentElement !== resultsEl) {
-            resultsEl.appendChild(suggestionsElement);
+            insertElementInOrder(resultsEl, suggestionsElement);
           }
         });
     });
