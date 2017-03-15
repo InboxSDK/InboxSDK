@@ -41,8 +41,8 @@ const handleResultChosen = ({driver, searchInput, result, event}) => {
   }
 
   if (typeof result.searchTerm === 'string') {
-    // TODO fake change event
     searchInput.value = result.searchTerm;
+    searchInput.dispatchEvent(new Event('input'));
   }
 };
 
