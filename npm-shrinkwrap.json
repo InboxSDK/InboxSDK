@@ -4454,9 +4454,9 @@
       "resolved": "https://registry.npmjs.org/p-locate/-/p-locate-2.0.0.tgz"
     },
     "page-parser-tree": {
-      "version": "0.3.2",
-      "from": "page-parser-tree@>=0.3.1 <0.4.0",
-      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.3.2.tgz"
+      "version": "0.3.3",
+      "from": "page-parser-tree@>=0.3.3 <0.4.0",
+      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.3.3.tgz"
     },
     "pako": {
       "version": "0.2.9",
