@@ -18,7 +18,8 @@ const ORDERING_ATTR = 'data-inboxsdk-search-provider-count';
 const DEFAULT_RESULT_ICON = '//www.gstatic.com/images/icons/material/system/2x/search_black_24dp.png';
 
 const getProviderOrder = () => {
-  const documentElement: HTMLElement = global.document && document.documentElement;
+  const {documentElement} = document;
+  if (!documentElement) { throw new Error(); }
   const orderAttr = documentElement.getAttribute(ORDERING_ATTR);
   const providerOrder = (orderAttr ? parseInt(orderAttr) + 1 : 0).toString();
 
@@ -56,10 +57,6 @@ const renderResultsList = ({
   results.map(result => {
     const listItem = document.createElement('li');
 
-    const icon = `
-      <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
-    `;
-
     const description = result.description || result.descriptionHTML ? autoHtml `
       <span class="inboxsdk__search_suggestion_desc">
         ${result.description || {__html: result.descriptionHTML}}
@@ -68,7 +65,7 @@ const renderResultsList = ({
 
     listItem.classList.add('inboxsdk__search_suggestion');
     listItem.innerHTML = autoHtml `
-      ${{__html: icon}}
+      <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
       <span>
         <span class="inboxsdk__search_suggestion_name" role="option">
           ${result.name || {__html: result.nameHTML}}
@@ -230,7 +227,7 @@ export default function registerSearchSuggestionsProvider(
       } catch (error) {
         return Kefir.constantError(error);
       }
-    }).onError(error => (
+    }).filter(({results}) => results.length > 0).onError(error => (
       driver.getLogger().error(error)
     )).onValue(({resultsEl, searchInput, removalStream, results}) => {
       const suggestionsElement = document.createElement('div');
@@ -262,6 +259,7 @@ export default function registerSearchSuggestionsProvider(
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
         .takeUntilBy(removalStream)
         .onValue(() => {
+          resultsEl.style.display = 'block';
           if (suggestionsElement.parentElement !== resultsEl) {
             insertElementInOrder(resultsEl, suggestionsElement);
           }
