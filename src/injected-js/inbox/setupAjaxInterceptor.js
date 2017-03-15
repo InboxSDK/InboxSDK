@@ -27,21 +27,11 @@ function triggerEvent(detail) {
 export default function setupAjaxInterceptor() {
   const main_wrappers = [];
 
-  // Only set up the interception for a fraction of sessions right now.
-  // This has the benefit that if something goes wrong, then the user can
-  // refresh and most likely not have interception present.
-  const useXHRInterceptor = true; //Math.random() < 0.1;
+  global.XMLHttpRequest = XHRProxyFactory(
+    global.XMLHttpRequest, main_wrappers, {logError: logErrorExceptEventListeners}
+  );
 
-  if (useXHRInterceptor) {
-    global.XMLHttpRequest = XHRProxyFactory(
-      global.XMLHttpRequest, main_wrappers, {logError: logErrorExceptEventListeners}
-    );
-    logger.eventSdkPassive('inboxUseXhrProxy');
-  }
-
-  // xhr proxy wrappers will go here eventually
-
-  let currentSuggestionsQuery;
+  let currentSuggestionsConnection;
   main_wrappers.push({
     isRelevantTo(connection) {
       if (/sync\/u\/\d+\/suggest/.test(connection.url)) {
@@ -49,7 +39,7 @@ export default function setupAjaxInterceptor() {
         // if the user is typing 'hello' there's no point in worrying about
         // each of the individual letters. In fact, sending them to our
         // suggestion-handling code leads to extra complexity.
-        currentSuggestionsQuery = connection;
+        currentSuggestionsConnection = connection;
         return true;
       } else {
         return false;
@@ -59,7 +49,7 @@ export default function setupAjaxInterceptor() {
       if (
         connection.status === 200 &&
         connection.originalSendBody &&
-        connection === currentSuggestionsQuery
+        connection === currentSuggestionsConnection
       ) {
         const originalRequest = JSON.parse(connection.originalSendBody);
         // The suggestions request object contains two keys — one is always '1',
