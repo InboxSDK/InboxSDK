@@ -3839,9 +3839,9 @@
       "resolved": "https://registry.npmjs.org/liftoff/-/liftoff-2.3.0.tgz"
     },
     "live-set": {
-      "version": "0.3.12",
-      "from": "live-set@>=0.3.6 <0.4.0",
-      "resolved": "https://registry.npmjs.org/live-set/-/live-set-0.3.12.tgz"
+      "version": "0.4.1",
+      "from": "live-set@>=0.4.1 <0.5.0",
+      "resolved": "https://registry.npmjs.org/live-set/-/live-set-0.4.1.tgz"
     },
     "load-json-file": {
       "version": "1.1.0",
@@ -4431,9 +4431,9 @@
       "resolved": "https://registry.npmjs.org/p-locate/-/p-locate-2.0.0.tgz"
     },
     "page-parser-tree": {
-      "version": "0.2.11",
-      "from": "page-parser-tree@>=0.2.6 <0.3.0",
-      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.2.11.tgz"
+      "version": "0.3.1",
+      "from": "page-parser-tree@>=0.3.1 <0.4.0",
+      "resolved": "https://registry.npmjs.org/page-parser-tree/-/page-parser-tree-0.3.1.tgz"
     },
     "pako": {
       "version": "0.2.9",
@@ -5628,9 +5628,9 @@
       "resolved": "https://registry.npmjs.org/taffydb/-/taffydb-2.6.2.tgz"
     },
     "tag-tree": {
-      "version": "0.3.3",
-      "from": "tag-tree@>=0.3.3 <0.4.0",
-      "resolved": "https://registry.npmjs.org/tag-tree/-/tag-tree-0.3.3.tgz"
+      "version": "0.4.0",
+      "from": "tag-tree@>=0.4.0 <0.5.0",
+      "resolved": "https://registry.npmjs.org/tag-tree/-/tag-tree-0.4.0.tgz"
     },
     "tar-stream": {
       "version": "1.5.2",
