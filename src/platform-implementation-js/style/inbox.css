@@ -576,6 +576,14 @@
   padding-top: 6px;
 }
 
+/*
+When we're displaying custom results alongside Inbox's native results,
+we need to put some padding/margin/border above the first group of custom results
+to separate them from the native ones. When Inbox doesn't have any results to show,
+however, we need to remove all that visual separation. Since the first group
+of custom results will also be the first element in the container in that case
+first-child will do the trick.
+*/
 .inboxsdk__search_suggestion_group:first-child {
   border-top: 0;
   margin-top: 0;
