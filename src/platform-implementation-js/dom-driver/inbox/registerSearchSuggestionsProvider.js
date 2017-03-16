@@ -1,6 +1,7 @@
 /* @flow */
 
 import type InboxDriver from './inbox-driver';
+import type {AutocompleteSearchResult} from '../../../injected-js/gmail/modify-suggestions';
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -9,10 +10,9 @@ import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../lib/dom/insert-element-in-order';
 import searchBarParser from './detection/searchBar/parser';
+import copyAndValidateAutocompleteResults from '../../lib/copyAndValidateAutocompleteResults';
 import closest from 'closest-ng';
 import autoHtml from 'auto-html';
-
-import type {AutocompleteSearchResult} from '../../../injected-js/gmail/modify-suggestions';
 
 const ORDERING_ATTR = 'data-inboxsdk-search-provider-count';
 const DEFAULT_RESULT_ICON = '//www.gstatic.com/images/icons/material/system/2x/search_black_24dp.png';
@@ -182,48 +182,10 @@ export default function registerSearchSuggestionsProvider(
       results
     }) => {
       try {
-        if (!Array.isArray(results)) {
-          throw new Error('suggestions must be an array');
-        }
-
-        const validatedResults = results.map(result => {
-          const resultCopy = {...result};
-          if (
-            typeof resultCopy.name !== 'string' &&
-            typeof resultCopy.nameHTML !== 'string'
-          ) {
-            throw new Error('suggestion must have name or nameHTML property');
-          }
-          if (
-            typeof resultCopy.routeName !== 'string' &&
-            typeof resultCopy.externalURL !== 'string' &&
-            typeof resultCopy.searchTerm !== 'string' &&
-            typeof resultCopy.onClick !== 'function'
-          ) {
-            throw new Error(
-              'suggestion must have routeName, externalURL, ' +
-              'searchTerm, or onClick property'
-            );
-          }
-          if (typeof resultCopy.iconURL === 'string') {
-            const iconURL = resultCopy.iconURL;
-            driver.getLogger().deprecationWarning(
-              'AutocompleteSearchResult "iconURL" property',
-              'AutocompleteSearchResult.iconUrl'
-            );
-            if (!resultCopy.iconUrl) {
-              if (driver.getOpts().REQUESTED_API_VERSION === 1) {
-                resultCopy.iconUrl = iconURL;
-              } else {
-                console.error(
-                  'Support for iconURL property was dropped after API version 1'
-                );
-              }
-            }
-            delete resultCopy.iconURL;
-          }
-          return resultCopy;
-        });
+        const validatedResults = copyAndValidateAutocompleteResults(
+          driver,
+          results
+        );
 
         return Kefir.constant({
           resultsEl,

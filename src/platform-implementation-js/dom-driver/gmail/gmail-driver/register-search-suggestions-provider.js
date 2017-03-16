@@ -8,6 +8,8 @@ import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import gmailElementGetter from '../gmail-element-getter';
+import copyAndValidateAutocompleteResults from '../../../lib/copyAndValidateAutocompleteResults';
+
 import type GmailDriver from '../gmail-driver';
 import type {AutocompleteSearchResult, AutocompleteSearchResultWithId} from '../../../../injected-js/gmail/modify-suggestions';
 
@@ -27,48 +29,21 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     .filter((event) => event.type === 'suggestionsRequest')
     .flatMapLatest(({query}) =>
       Kefir.fromPromise(RSVP.Promise.resolve(handler(query)))
-        .flatMap((suggestions) => {
+        .flatMap((results: Array<AutocompleteSearchResult>) => {
           try {
-            if (!Array.isArray(suggestions)) {
-              throw new Error("suggestions must be an array");
-            }
-            suggestions = suggestions.map(suggestion => {
-              suggestion = Object.assign({}, suggestion, {
-                providerId,
-                id: `${Date.now()}-${Math.random()}`
-              });
-              if (
-                typeof suggestion.name !== 'string' &&
-                typeof suggestion.nameHTML !== 'string'
-              ) {
-                throw new Error("suggestion must have name or nameHTML property");
-              }
-              if (
-                typeof suggestion.routeName !== 'string' &&
-                typeof suggestion.externalURL !== 'string' &&
-                typeof suggestion.searchTerm !== 'string' &&
-                typeof suggestion.onClick !== 'function'
-              ) {
-                throw new Error("suggestion must have routeName, externalURL, searchTerm, or onClick property");
-              }
-              if (typeof suggestion.iconURL === 'string') {
-                const iconURL = suggestion.iconURL;
-                driver.getLogger().deprecationWarning('AutocompleteSearchResult "iconURL" property', 'AutocompleteSearchResult.iconUrl');
-                if (!suggestion.iconUrl) {
-                  if (driver.getOpts().REQUESTED_API_VERSION === 1) {
-                    suggestion.iconUrl = iconURL;
-                  } else {
-                    console.error('Support for iconURL property was dropped after API version 1');
-                  }
-                }
-                delete suggestion.iconURL;
-              }
-              return suggestion;
-            });
+            const validatedResults = copyAndValidateAutocompleteResults(
+              driver,
+              results
+            );
+
+            const validatedResultsWithIds = validatedResults.map(result => (
+              {...result, providerId, id: `${Date.now()}-${Math.random()}`}
+            ));
+
+            return Kefir.constant(validatedResultsWithIds);
           } catch(e) {
             return Kefir.constantError(e);
           }
-          return Kefir.constant((suggestions: AutocompleteSearchResultWithId[]));
         })
         .mapErrors(err => {
           driver.getLogger().error(err);
