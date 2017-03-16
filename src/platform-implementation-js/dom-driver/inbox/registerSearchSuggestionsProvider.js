@@ -51,10 +51,15 @@ const renderResultsList = ({
   driver,
   searchInput,
   removalStream,
-  suggestionsElement,
-  results
-}) => (
-  results.map(result => {
+  results,
+  providerOrder
+}) => {
+  const container = document.createElement('div');
+
+  container.setAttribute('data-order-hint', providerOrder);
+  container.classList.add('inboxsdk__search_suggestion_group');
+
+  results.forEach(result => {
     const listItem = document.createElement('li');
 
     const description = result.description || result.descriptionHTML ? autoHtml `
@@ -80,9 +85,11 @@ const renderResultsList = ({
         handleResultChosen({driver, searchInput, result, event})
       ));
 
-    return listItem;
-  }).forEach((listItem) => suggestionsElement.appendChild(listItem))
-);
+    container.appendChild(listItem);
+  });
+
+  return container;
+};
 
 export default function registerSearchSuggestionsProvider(
   driver: InboxDriver,
@@ -230,18 +237,13 @@ export default function registerSearchSuggestionsProvider(
     }).filter(({results}) => results.length > 0).onError(error => (
       driver.getLogger().error(error)
     )).onValue(({resultsEl, searchInput, removalStream, results}) => {
-      const suggestionsElement = document.createElement('div');
-
-      renderResultsList({
+      const suggestionsElement = renderResultsList({
         driver,
         searchInput,
         removalStream,
-        suggestionsElement,
-        results
+        results,
+        providerOrder
       });
-
-      suggestionsElement.setAttribute('data-order-hint', providerOrder);
-      suggestionsElement.classList.add('inboxsdk__search_suggestion_group');
 
       insertElementInOrder(resultsEl, suggestionsElement);
 
