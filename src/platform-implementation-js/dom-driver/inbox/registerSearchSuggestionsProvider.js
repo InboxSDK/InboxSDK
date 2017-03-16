@@ -241,11 +241,16 @@ export default function registerSearchSuggestionsProvider(
       });
 
       suggestionsElement.setAttribute('data-order-hint', providerOrder);
-      suggestionsElement.classList.add('inboxsdk__search_suggestion_group')
+      suggestionsElement.classList.add('inboxsdk__search_suggestion_group');
 
       insertElementInOrder(resultsEl, suggestionsElement);
 
+      // When we want to show results for a search term but Inbox doesn't have
+      // any results, we need to force the results element to be displayed.
+      // When Inbox hides the element it also removes a class that applies
+      // some padding adjustments, so we have to force that as well.
       resultsEl.style.display = 'block';
+      resultsEl.style.padding = '6px 0';
 
       removalStream.onValue(() => suggestionsElement.remove());
 
@@ -256,6 +261,12 @@ export default function registerSearchSuggestionsProvider(
       // the event loop between getting the AJAX response back and rendering to
       // the DOM. To handle this case, we watch `resultsEl` for mutations
       // and re-add our modifications if they've been cleared.
+      // We also force `resultsEl` to show because the first time
+      // we display modifications that aren't accompanied by native results
+      // Inbox hides `resultsEl` after we force it to show. Because Inbox
+      // removes the previous search's results in the same event loop tick as
+      // hiding `resultsEl`, we can hook into the child element removal and
+      // re-show it before the hidden state gets painted to the screen.
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
         .takeUntilBy(removalStream)
         .onValue(() => {
