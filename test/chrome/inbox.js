@@ -28,7 +28,7 @@ describe('Inbox', function() {
       browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
 
       // Test an inline compose
-      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="no-reply@accounts.google.com"]');
+      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="thread-"] span[email="no-reply@accounts.google.com"]');
       // The thread might take some time to load
       browser.waitForVisible('div[jsaction*=quickCompose][jsaction$=quick_compose_handle_focus]', 30*1000);
       browser.pause(500);
@@ -88,8 +88,8 @@ describe('Inbox', function() {
 
       console.log('Test an attachment card inside a message');
       // Test an attachment card inside a message
-      browser.scroll('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]', 0, -500);
-      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="gmail-thread"] span[email="inboxsdktest@gmail.com"]');
+      browser.scroll('.scroll-list-section-body div[role=listitem][data-item-id-qs*="thread-"] span[email="inboxsdktest@gmail.com"]', 0, -500);
+      browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="thread-"] span[email="inboxsdktest@gmail.com"]');
       browser.waitForVisible('section div[title="foo.txt"]', 10*1000);
       browser.pause(500);
       browser.click('section div[title="foo.txt"]'); // click an attachment card

@@ -24,7 +24,7 @@ const pageParserOptions: PageParserTreeOptions = {
   finders: {
     thread: {
       fn(root) {
-        return root.querySelectorAll('div[aria-expanded=true][data-item-id*="#gmail:thread-"], div.scroll-list-item-open[data-item-id*="#gmail:thread-"]');
+        return root.querySelectorAll('div[aria-expanded=true][data-item-id*="thread-"], div.scroll-list-item-open[data-item-id*="thread-"]');
       }
     },
     message: {
@@ -160,10 +160,10 @@ const pageParserOptions: PageParserTreeOptions = {
       '[role=listitem]'
     ]},
     {sources: ['topRow'], tag: 'bundleRow', selectors: [
-      {$filter: el => !/#gmail:thread-/.test(el.getAttribute('data-item-id')||'')}
+      {$filter: el => !/thread-/.test(el.getAttribute('data-item-id')||'')}
     ]},
     {sources: ['topRow'], tag: 'threadRow', selectors: [
-      {$filter: el => /#gmail:thread-/.test(el.getAttribute('data-item-id') || '')}
+      {$filter: el => /thread-/.test(el.getAttribute('data-item-id') || '')}
     ]},
     {sources: ['bundleRow'], tag: 'threadRow', selectors: [
       {$watch: {attributeFilter: ['aria-expanded'], cond: '[aria-expanded=true]'}},
