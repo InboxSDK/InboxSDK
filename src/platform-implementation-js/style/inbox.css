@@ -601,7 +601,7 @@ first-child will do the trick.
   overflow: hidden;
 }
 
-.inboxsdk__search_suggestion:hover {
+.inboxsdk__search_suggestion.inboxsdk__selected {
   background-color: rgba(0,0,0,.03);
 }
 

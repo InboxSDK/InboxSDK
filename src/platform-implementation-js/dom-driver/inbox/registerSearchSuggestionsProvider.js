@@ -11,6 +11,7 @@ import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-obser
 import insertElementInOrder from '../../lib/dom/insert-element-in-order';
 import searchBarParser from './detection/searchBar/parser';
 import copyAndValidateAutocompleteResults from '../../lib/copyAndValidateAutocompleteResults';
+import setupCustomAutocompleteSelectionHandling from './setupCustomAutocompleteSelectionHandling';
 import closest from 'closest-ng';
 import autoHtml from 'auto-html';
 
@@ -118,7 +119,12 @@ export default function registerSearchSuggestionsProvider(
           resultsEl: el.getValue(),
           resultsElRemovalStream: removalStream
         }))
-    )).flatMap(({searchInput, searchInputRemovalStream, resultsEl, resultsElRemovalStream}) => {
+    )).flatMap(({
+      searchInput,
+      searchInputRemovalStream,
+      resultsEl,
+      resultsElRemovalStream
+    }) => {
       const inputs = Kefir.fromEvents(searchInput, 'input')
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
@@ -127,25 +133,12 @@ export default function registerSearchSuggestionsProvider(
         event,
         searchInput,
         resultsEl,
-        inputStream: inputs
+        inputStream: inputs,
+        resultsElRemovalStream
       }));
     }).flatMapLatest((item) => {
       const suggestionsResponse = Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
         .filter(({detail: {type}}) => type === 'searchSuggestionsReceieved');
-
-      const searchResultsContainer = closest(item.resultsEl, 'div[jsaction]');
-
-      if (!(searchResultsContainer instanceof HTMLElement)) { throw new Error(); }
-
-      // Inbox removes the entire search UI subtree from the document whenever
-      // the user navigates away from search, and re-inserts the same subtree
-      // when the user navigates back to search. As a result the only way we
-      // can cleanup our modifications when the user leaves search is to
-      // detect this subtree removal via observation of the subtree's parent.
-      const searchResultsRemoved = makeMutationObserverChunkedStream(
-        searchResultsContainer,
-        {childList: true}
-      ).filter(() => !(closest(item.resultsEl, 'div[jsaction] > div')));
 
       const removalStream = Kefir.merge([
         // Handle cleanup when a new search query is entered. We want to wait
@@ -160,7 +153,7 @@ export default function registerSearchSuggestionsProvider(
 
         // Handle cleanup when the user deletes their entire search query.
         item.inputStream.filter(({target: {value}}) => value === ''),
-        searchResultsRemoved
+        item.resultsElRemovalStream
       ]).take(1);
 
       return Kefir.combine([
@@ -178,6 +171,7 @@ export default function registerSearchSuggestionsProvider(
     }).takeUntilBy(stopper).flatMap(({
       resultsEl,
       searchInput,
+      resultsElRemovalStream,
       removalStream,
       results
     }) => {
@@ -190,6 +184,7 @@ export default function registerSearchSuggestionsProvider(
         return Kefir.constant({
           resultsEl,
           searchInput,
+          resultsElRemovalStream,
           removalStream,
           results: validatedResults
         });
@@ -198,7 +193,19 @@ export default function registerSearchSuggestionsProvider(
       }
     }).filter(({results}) => results.length > 0).onError(error => (
       driver.getLogger().error(error)
-    )).onValue(({resultsEl, searchInput, removalStream, results}) => {
+    )).onValue(({
+      resultsEl,
+      searchInput,
+      resultsElRemovalStream,
+      removalStream,
+      results
+    }) => {
+      setupCustomAutocompleteSelectionHandling({
+        resultsEl,
+        resultsElRemovalStream,
+        searchInput
+      });
+
       const suggestionsElement = renderResultsList({
         driver,
         searchInput,
