@@ -24,7 +24,7 @@ const pageParserOptions: PageParserTreeOptions = {
   finders: {
     thread: {
       fn(root) {
-        return root.querySelectorAll('div[aria-expanded=true][data-item-id*="#gmail:thread-"], div.scroll-list-item-open[data-item-id*="#gmail:thread-"]');
+        return root.querySelectorAll('div[aria-expanded=true][data-item-id*="thread-"], div.scroll-list-item-open[data-item-id*="thread-"]');
       }
     },
     message: {
