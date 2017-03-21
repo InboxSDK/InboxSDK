@@ -24,6 +24,7 @@ import {
   pageFullscreen20160620,
   page20160727,
   page20160823,
+  page20170317,
 } from './lib/pages';
 
 describe('Inbox Thread Detection', function() {
@@ -61,6 +62,14 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
       const results = finder(page20160823());
+      assert.strictEqual(results.length, 1);
+      assert(_.includes(results, thread));
+    });
+
+    it('2017-03-17 thread', function() {
+      const thread = querySelector(page20170317(), '[data-test-id=thread]');
+
+      const results = finder(page20170317());
       assert.strictEqual(results.length, 1);
       assert(_.includes(results, thread));
     });
@@ -102,6 +111,15 @@ describe('Inbox Thread Detection', function() {
       assert(results.attributes.inBundle);
       assert.strictEqual(results.attributes.threadId, '156b8b59b997b470');
     });
+
+    it('2017-03-17 thread', function() {
+      const thread = querySelector(page20170317(), '[data-test-id=thread]');
+      const results = parser(thread);
+      assert.deepEqual(results.errors, []);
+      assert.strictEqual(results.score, 1);
+      assert(!results.attributes.inBundle);
+      assert.strictEqual(results.attributes.threadId, '15ad8bd56478679f');
+    });
   });
 
   describe('watcher', function() {
@@ -136,6 +154,15 @@ describe('Inbox Thread Detection', function() {
       const thread = querySelector(page20160823(), '[data-test-id=openthread]');
 
       const root = page20160823();
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
+      assert.strictEqual(liveSet.values().size, 1);
+      assert(lsMap(liveSet, x => x.getValue()).values().has(thread));
+    });
+
+    it('2017-03-17 thread', function() {
+      const thread = querySelector(page20170317(), '[data-test-id=thread]');
+
+      const root = page20170317();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       assert.strictEqual(liveSet.values().size, 1);
       assert(lsMap(liveSet, x => x.getValue()).values().has(thread));
