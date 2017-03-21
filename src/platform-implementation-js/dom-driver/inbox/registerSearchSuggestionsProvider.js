@@ -131,9 +131,9 @@ export default function registerSearchSuggestionsProvider(
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
 
-      const enterPresses: Kefir.Observable<KeyboardEvent> = Kefir
+      const enterAndTabPresses: Kefir.Observable<KeyboardEvent> = Kefir
         .fromEvents(searchInput, 'keydown')
-        .filter(({keyCode}) => keyCode === 13)
+        .filter(({keyCode}) => keyCode === 13 || keyCode === 9)
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
 
@@ -142,7 +142,7 @@ export default function registerSearchSuggestionsProvider(
         searchInput,
         resultsEl,
         inputStream: inputs,
-        enterPresses,
+        enterAndTabPresses,
         resultsElRemovalStream
       }));
     }).flatMapLatest((item) => {
@@ -182,7 +182,7 @@ export default function registerSearchSuggestionsProvider(
       searchInput,
       resultsElRemovalStream,
       removalStream,
-      enterPresses,
+      enterAndTabPresses,
       results
     }) => {
       try {
@@ -196,7 +196,7 @@ export default function registerSearchSuggestionsProvider(
           searchInput,
           resultsElRemovalStream,
           removalStream,
-          enterPresses,
+          enterAndTabPresses,
           results: validatedResults
         });
       } catch (error) {
@@ -209,7 +209,7 @@ export default function registerSearchSuggestionsProvider(
       searchInput,
       resultsElRemovalStream,
       removalStream,
-      enterPresses,
+      enterAndTabPresses,
       results
     }) => {
       setupCustomAutocompleteSelectionHandling({
@@ -236,11 +236,15 @@ export default function registerSearchSuggestionsProvider(
       resultsEl.style.padding = '6px 0';
 
       removalStream.onValue(() => {
-        suggestionsElement.remove()
+        suggestionsElement.remove();
 
-        if (searchInput.value === '') {
+        if (searchInput.value === '' || resultsEl.matches(':empty')) {
           resultsEl.style.display = 'none';
         }
+      });
+
+      enterAndTabPresses.take(1).onValue(() => {
+        resultsEl.style.display = 'none';
       });
 
       // When Inbox gets the *first* set of suggestions after opening search,
@@ -257,7 +261,7 @@ export default function registerSearchSuggestionsProvider(
       // hiding `resultsEl`, we can hook into the child element removal and
       // re-show it before the hidden state gets painted to the screen.
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
-        .takeUntilBy(enterPresses.take(1))
+        .takeUntilBy(enterAndTabPresses.take(1))
         .takeUntilBy(removalStream)
         .onValue(() => {
           resultsEl.style.display = 'block';

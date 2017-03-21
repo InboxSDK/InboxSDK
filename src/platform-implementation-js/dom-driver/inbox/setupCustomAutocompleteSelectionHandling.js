@@ -7,7 +7,7 @@ const SELECTION_MASTER_ATTR = 'data-inboxsdk-selection-master-claimed';
 
 const hasNativeResults = (resultsEl: HTMLElement) => (
   resultsEl.querySelectorAll(
-    'li:not(.inboxsdk__search_suggestion'
+    'li:not(.inboxsdk__search_suggestion)'
   ).length > 0
 );
 
@@ -185,7 +185,6 @@ export default function setupCustomAutocompleteSelectionHandling({
   });
 
   enterPresses.onValue(event => {
-    const selectedNativeResult = getSelectedNativeResult(resultsEl);
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );
@@ -193,8 +192,6 @@ export default function setupCustomAutocompleteSelectionHandling({
       event.stopPropagation();
 
       selectedCustomResult.dispatchEvent(new MouseEvent('click'));
-    } else {
-      resultsEl.style.display = 'none';
     }
   });
 
