@@ -8,6 +8,7 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import insertElementInOrder from '../../lib/dom/insert-element-in-order';
 import searchBarParser from './detection/searchBar/parser';
 import copyAndValidateAutocompleteResults from '../../lib/copyAndValidateAutocompleteResults';
@@ -125,7 +126,14 @@ export default function registerSearchSuggestionsProvider(
       resultsEl,
       resultsElRemovalStream
     }) => {
-      const inputs = Kefir.fromEvents(searchInput, 'input')
+      const inputs: Kefir.Observable<{target: HTMLInputElement} & Event> = Kefir
+        .fromEvents(searchInput, 'input')
+        .takeUntilBy(searchInputRemovalStream)
+        .takeUntilBy(resultsElRemovalStream);
+
+      const enterPresses: Kefir.Observable<KeyboardEvent> = Kefir
+        .fromEvents(searchInput, 'keydown')
+        .filter(({keyCode}) => keyCode === 13)
         .takeUntilBy(searchInputRemovalStream)
         .takeUntilBy(resultsElRemovalStream);
 
@@ -134,6 +142,7 @@ export default function registerSearchSuggestionsProvider(
         searchInput,
         resultsEl,
         inputStream: inputs,
+        enterPresses,
         resultsElRemovalStream
       }));
     }).flatMapLatest((item) => {
@@ -173,6 +182,7 @@ export default function registerSearchSuggestionsProvider(
       searchInput,
       resultsElRemovalStream,
       removalStream,
+      enterPresses,
       results
     }) => {
       try {
@@ -186,6 +196,7 @@ export default function registerSearchSuggestionsProvider(
           searchInput,
           resultsElRemovalStream,
           removalStream,
+          enterPresses,
           results: validatedResults
         });
       } catch (error) {
@@ -198,6 +209,7 @@ export default function registerSearchSuggestionsProvider(
       searchInput,
       resultsElRemovalStream,
       removalStream,
+      enterPresses,
       results
     }) => {
       setupCustomAutocompleteSelectionHandling({
@@ -223,7 +235,13 @@ export default function registerSearchSuggestionsProvider(
       resultsEl.style.display = 'block';
       resultsEl.style.padding = '6px 0';
 
-      removalStream.onValue(() => suggestionsElement.remove());
+      removalStream.onValue(() => {
+        suggestionsElement.remove()
+
+        if (searchInput.value === '') {
+          resultsEl.style.display = 'none';
+        }
+      });
 
       // When Inbox gets the *first* set of suggestions after opening search,
       // it clears away the current children of the `resultsEl` element.
@@ -239,6 +257,7 @@ export default function registerSearchSuggestionsProvider(
       // hiding `resultsEl`, we can hook into the child element removal and
       // re-show it before the hidden state gets painted to the screen.
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
+        .takeUntilBy(enterPresses.take(1))
         .takeUntilBy(removalStream)
         .onValue(() => {
           resultsEl.style.display = 'block';
