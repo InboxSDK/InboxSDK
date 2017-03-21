@@ -11,6 +11,10 @@ const hasNativeResults = (resultsEl: HTMLElement) => (
   ).length > 0
 );
 
+const hasCustomResults = (resultsEl: HTMLElement) => (
+  resultsEl.querySelectorAll('.inboxsdk__search_suggestion').length > 0
+);
+
 const getSelectedNativeResult = (resultsEl: HTMLElement) => {
   const nativeResults = resultsEl.querySelectorAll('li:not(.inboxsdk__search_suggestion)');
 
@@ -118,9 +122,10 @@ export default function setupCustomAutocompleteSelectionHandling({
       // with native behavior (hitting the up arrow with the first item selected
       // leaves *nothing* selected).
       selectedCustomResult.classList.remove('inboxsdk__selected');
-    } else if (!(selectedNativeResult || selectedCustomResult)) {
-      // TODO make sure to only do this when there are custom results,
-      // right now it breaks with only native.
+    } else if (
+      hasCustomResults(resultsEl) &&
+      !(selectedNativeResult || selectedCustomResult)
+    ) {
       event.stopPropagation();
 
       const lastCustomResult = resultsEl.querySelector(
