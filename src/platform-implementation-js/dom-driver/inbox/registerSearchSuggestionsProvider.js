@@ -238,11 +238,26 @@ export default function registerSearchSuggestionsProvider(
       removalStream.onValue(() => {
         suggestionsElement.remove();
 
+        // In cases where we go directly from a state with *only* custom results
+        // to having no text in the search box, Inbox doesn't automatically hide
+        // `resultsEl` because as far as it's concered the element was already
+        // hidden to begin with. Similarly, when there are only custom results
+        // and the user subsequently enters a search that returns no native results
+        // *or* custom results, Inbox doesn't think `resultsEl` is visible and
+        // we need to hide manually.
         if (searchInput.value === '' || resultsEl.matches(':empty')) {
           resultsEl.style.display = 'none';
         }
       });
 
+      // Natively in Inbox, both enter and tab cause `resultsEl` to be hidden.
+      // If a native result is selected when this happens, the search term will
+      // simultaneously be modified to match the selected result.
+      // Because the change to modify the search term happens
+      // via Inbox's JS (setting `.value`), no `input` event is triggered,
+      // which means for our code the resulting action is straightforward:
+      // manually hide `resultsEl` since Inbox's attempt will fail (due to our
+      // other mods).
       enterAndTabPresses.take(1).onValue(() => {
         resultsEl.style.display = 'none';
       });
@@ -260,6 +275,11 @@ export default function registerSearchSuggestionsProvider(
       // removes the previous search's results in the same event loop tick as
       // hiding `resultsEl`, we can hook into the child element removal and
       // re-show it before the hidden state gets painted to the screen.
+      // We also need to stop this entire process when tab or enter is pressed,
+      // because if a custom result was selected when the key was pressed
+      // then Inbox will remove the native results that no longer match the
+      // search term — causing this observer to fire and subsequently
+      // re-show `resultsEl` just as we're trying to manually hide it.
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
         .takeUntilBy(enterAndTabPresses.take(1))
         .takeUntilBy(removalStream)
