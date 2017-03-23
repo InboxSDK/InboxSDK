@@ -34,7 +34,7 @@ export default function setupAjaxInterceptor() {
   let currentSuggestionsConnection;
   main_wrappers.push({
     isRelevantTo(connection) {
-      if (/sync\/u\/\d+\/suggest/.test(connection.url)) {
+      if (/sync(?:\/u\/\d+)?\/suggest/.test(connection.url)) {
         // we only want to keep track of the most recent search —
         // if the user is typing 'hello' there's no point in worrying about
         // each of the individual letters. In fact, sending them to our

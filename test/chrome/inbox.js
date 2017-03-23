@@ -1,5 +1,6 @@
 /* @flow */
 declare var browser;
+declare var $;
 
 import fs from 'fs';
 import assert from 'assert';
@@ -132,6 +133,72 @@ describe('Inbox', function() {
         Number((document.head:any).getAttribute('data-test-messageViewsWithNativeCardsSeen'))
       ).value;
       assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
+
+      // Search Suggestions
+      const searchInput = $(
+        'nav[role=banner] div[role=search] input[placeholder="Search"]'
+      );
+
+      searchInput.click();
+      browser.pause(1000); // Wait for animations/transitions to settle
+      searchInput.keys('a');
+
+      const resultsList = $(
+        'div[jsaction="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
+      );
+
+      resultsList.waitForVisible(1000);
+
+      const firstResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
+
+      assert.strictEqual(firstResultSet.length, 2);
+
+      const inboxTabId = browser.getCurrentTabId();
+
+      firstResultSet[0].click();
+
+      browser.waitUntil(() => browser.getTabIds().length > 1, 2000);
+      const externalUrlTabId = browser.getTabIds().find((id) => id !== inboxTabId);
+      browser.switchTab(externalUrlTabId);
+
+      const currentUrl = browser.execute(() => window.location.origin).value;
+      assert(currentUrl === 'https://www.google.com');
+
+      browser.close();
+
+      firstResultSet[1].click();
+
+      searchInput.click();
+      // For some reason Chrome/Inbox get grumpy if you try to send keystrokes
+      // too soon after switching back from a different tab...
+      browser.pause(1000);
+      searchInput.keys('b');
+
+      // If we don't wait for a length of 1, we will most likely end up selecting
+      // the first result set because it hasn't been removed yet.
+      browser.waitUntil(() => (
+        resultsList.$$('li.inboxsdk__search_suggestion').length === 1
+      ), 1000);
+
+      const secondResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
+
+      assert.strictEqual(secondResultSet.length, 1);
+
+      assert(browser.isExisting(
+        'li.inboxsdk__search_suggestion span.test__suggestionName'
+      ));
+
+      assert(browser.isExisting(
+        'li.inboxsdk__search_suggestion span.test__suggestionDesc'
+      ));
+
+      secondResultSet[0].click();
+
+      const searchSugggestionsClicked = browser.execute(() =>
+        Number((document.head:any).getAttribute('data-test-searchSuggestionsClicked'))
+      ).value;
+      assert.strictEqual(searchSugggestionsClicked, 2);
+
     } catch (err) {
       console.error(err.stack || ('Error: '+err.message));
       if (process.env.CI !== 'true') {
