@@ -170,7 +170,7 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 	});
 
 	sdk.Search.registerSearchSuggestionsProvider(query => {
-		if (query !== 'a') {
+		if (query !== 'a' && query !== 'ab' && query !== 'abc') {
 			return [];
 		}
 		return [
@@ -183,14 +183,14 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 				name: 'Test Result 2',
 				description: 'The description for the second test result',
 				onClick() {
-					incrementStat('data-test-searchSuggestionsClicked');
+					incrementStat('data-test-searchSuggestionsClicked1');
 				}
 			}
 		];
 	});
 
 	sdk.Search.registerSearchSuggestionsProvider(query => {
-		if (query !== 'b') {
+		if (query !== 'b' && query !== 'abc') {
 			return [];
 		}
 		return [
@@ -198,7 +198,7 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 				nameHTML: '<span class="test__suggestionName">Test</span> Result 3',
 				descriptionHTML: '<span class="test__suggestionDesc">The description for the third test result</span>',
 				onClick() {
-					incrementStat('data-test-searchSuggestionsClicked');
+					incrementStat('data-test-searchSuggestionsClicked2');
 				}
 			}
 		];

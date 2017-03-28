@@ -13,7 +13,6 @@ import insertElementInOrder from '../../lib/dom/insert-element-in-order';
 import searchBarParser from './detection/searchBar/parser';
 import copyAndValidateAutocompleteResults from '../../lib/copyAndValidateAutocompleteResults';
 import setupCustomAutocompleteSelectionHandling from './setupCustomAutocompleteSelectionHandling';
-import closest from 'closest-ng';
 import autoHtml from 'auto-html';
 
 const ORDERING_ATTR = 'data-inboxsdk-search-provider-count';
@@ -250,6 +249,7 @@ export default function registerSearchSuggestionsProvider(
         }
       });
 
+      // be less verbose plz and point out that we have taken responsibility for show/hide
       // Natively in Inbox, both enter and tab cause `resultsEl` to be hidden.
       // If a native result is selected when this happens, the search term will
       // simultaneously be modified to match the selected result.
@@ -258,7 +258,7 @@ export default function registerSearchSuggestionsProvider(
       // which means for our code the resulting action is straightforward:
       // manually hide `resultsEl` since Inbox's attempt will fail (due to our
       // other mods).
-      enterAndTabPresses.take(1).onValue(() => {
+      enterAndTabPresses.takeUntilBy(removalStream).take(1).onValue(() => {
         resultsEl.style.display = 'none';
       });
 
@@ -281,7 +281,7 @@ export default function registerSearchSuggestionsProvider(
       // search term — causing this observer to fire and subsequently
       // re-show `resultsEl` just as we're trying to manually hide it.
       makeMutationObserverChunkedStream(resultsEl, {childList: true})
-        .takeUntilBy(enterAndTabPresses.take(1))
+        .takeUntilBy(enterAndTabPresses)
         .takeUntilBy(removalStream)
         .onValue(() => {
           resultsEl.style.display = 'block';

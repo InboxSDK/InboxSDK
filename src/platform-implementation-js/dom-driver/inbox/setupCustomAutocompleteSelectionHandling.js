@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import closest from 'closest-ng';
 
 const SELECTION_MASTER_ATTR = 'data-inboxsdk-selection-master-claimed';
 
@@ -42,7 +43,7 @@ const setupCustomResultHoverListeners = (resultsEl, resultsElRemovalStream) => {
   Kefir.fromEvents(resultsEl, 'mouseover')
     .takeUntilBy(resultsElRemovalStream)
     .map(({target}: {target: HTMLElement}) => (
-      target.closest('.inboxsdk__search_suggestion:not(.inboxsdk__selected)')
+      closest(target, '.inboxsdk__search_suggestion:not(.inboxsdk__selected)')
     )).filter(Boolean).onValue(el => {
       const customResults = resultsEl.querySelectorAll(
         '.inboxsdk__search_suggestion.inboxsdk__selected'
@@ -60,7 +61,7 @@ const setupCustomResultHoverListeners = (resultsEl, resultsElRemovalStream) => {
   Kefir.fromEvents(resultsEl, 'mouseout')
     .takeUntilBy(resultsElRemovalStream)
     .map(({target}: {target: HTMLElement}) => (
-      target.closest('.inboxsdk__search_suggestion.inboxsdk__selected')
+      closest(target, '.inboxsdk__search_suggestion.inboxsdk__selected')
     )).filter(Boolean).onValue(el => el.classList.remove('inboxsdk__selected'));
 };
 
@@ -101,7 +102,8 @@ export default function setupCustomAutocompleteSelectionHandling({
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );
-    const customResultGroup = selectedCustomResult && selectedCustomResult.closest(
+    const customResultGroup = selectedCustomResult && closest(
+      selectedCustomResult,
       '.inboxsdk__search_suggestion_group'
     );
 
@@ -124,7 +126,7 @@ export default function setupCustomAutocompleteSelectionHandling({
       selectedCustomResult.classList.remove('inboxsdk__selected');
     } else if (
       hasCustomResults(resultsEl) &&
-      !(selectedNativeResult || selectedCustomResult)
+      !selectedCustomResult
     ) {
       event.stopPropagation();
 
@@ -138,6 +140,9 @@ export default function setupCustomAutocompleteSelectionHandling({
       event.stopPropagation();
       selectedCustomResult.classList.remove('inboxsdk__selected');
 
+      // The case where this is the first result in the first group
+      // has already been handled above, so if this check is true then
+      // the selected result is the first item in a non-first group.
       if (selectedCustomResult.matches(':first-child')) {
         const previousResultGroup = customResultGroup.previousElementSibling;
         const customResultToSelect = previousResultGroup && previousResultGroup
@@ -158,7 +163,8 @@ export default function setupCustomAutocompleteSelectionHandling({
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );
-    const customResultGroup = selectedCustomResult && selectedCustomResult.closest(
+    const customResultGroup = selectedCustomResult && closest(
+      selectedCustomResult,
       '.inboxsdk__search_suggestion_group'
     );
 
@@ -166,7 +172,7 @@ export default function setupCustomAutocompleteSelectionHandling({
       return;
     }
 
-    if (selectedNativeResult && selectedNativeResult.matches(':last-of-type')) {
+    if (selectedNativeResult) {
       selectFirstCustomResult(resultsEl);
     } else if (
       selectedCustomResult &&
@@ -180,18 +186,23 @@ export default function setupCustomAutocompleteSelectionHandling({
       // selected.
       event.stopPropagation();
       selectedCustomResult.classList.remove('inboxsdk__selected');
-    } else if (!(selectedNativeResult || selectedCustomResult)) {
+    } else if (!selectedCustomResult) {
       // Inbox will automatically select the first native result if
       // one exists.
       if (hasNativeResults(resultsEl)) {
         return;
       }
 
+      // Theoretically we could stop propegation here, but inbox doesn't do
+      // anything with the event anyway given that there's no results to select.
       selectFirstCustomResult(resultsEl);
     } else if (selectedCustomResult && customResultGroup) {
       event.stopPropagation();
       selectedCustomResult.classList.remove('inboxsdk__selected');
 
+      // The case where this is the last result in the last group
+      // has already been handled above, so if this check is true then
+      // the selected result is the last item in a non-last group.
       if (selectedCustomResult.matches(':last-child')) {
         const nextResultGroup = customResultGroup.nextElementSibling;
         const customResultToSelect = nextResultGroup && nextResultGroup
