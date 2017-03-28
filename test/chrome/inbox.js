@@ -162,9 +162,6 @@ describe('Inbox', function() {
       searchInput.click();
       // For some reason Chrome/Inbox get grumpy if you try to send keystrokes
       // too soon after switching back from a different tab...
-      browser.pause(1000);
-      searchInput.keys('');
-      browser.pause(3000);
       searchInput.keys('b');
       // If we don't wait for a length of 1, we will most likely end up selecting
       // the first result set because it hasn't been removed yet.
@@ -205,6 +202,32 @@ describe('Inbox', function() {
         }
       }
       assert(seenSelectedSearchResult);
+      let allResultsDeselected = false;
+      for (let i = 0; i < 50 && !allResultsDeselected; i++) {
+        searchInput.keys(['ArrowDown']);
+        if (
+          resultsList.$$('li.inboxsdk__search_suggestion.inboxsdk__selected').length === 0
+        ) {
+          allResultsDeselected = true;
+        }
+      }
+      assert(allResultsDeselected);
+      searchInput.click();
+      searchInput.keys(['Enter']);
+      browser.waitUntil(() => (
+        !resultsList.isVisible()
+      ), 1000);
+      assert(!resultsList.isVisible());
+      searchInput.click();
+      searchInput.keys('a');
+      browser.waitUntil(() => (
+        resultsList.$$('li.inboxsdk__search_suggestion').length === 2
+      ), 1000);
+      searchInput.keys(['Tab']);
+      browser.waitUntil(() => (
+        !resultsList.isVisible()
+      ), 1000);
+      assert(!resultsList.isVisible());
 
     } catch (err) {
       console.error(err.stack || ('Error: '+err.message));
