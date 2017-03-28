@@ -227,6 +227,9 @@ export default function registerSearchSuggestionsProvider(
 
       insertElementInOrder(resultsEl, suggestionsElement);
 
+      // NOTE: Because we're manually overriding the 'display' property, we've
+      // basically taken responsibility for showing/hiding `resultsEl`
+      // since Inbox no longer knows when the element is truly visible.
       // When we want to show results for a search term but Inbox doesn't have
       // any results, we need to force the results element to be displayed.
       // When Inbox hides the element it also removes a class that applies
@@ -237,27 +240,20 @@ export default function registerSearchSuggestionsProvider(
       removalStream.onValue(() => {
         suggestionsElement.remove();
 
-        // In cases where we go directly from a state with *only* custom results
-        // to having no text in the search box, Inbox doesn't automatically hide
-        // `resultsEl` because as far as it's concered the element was already
-        // hidden to begin with. Similarly, when there are only custom results
-        // and the user subsequently enters a search that returns no native results
-        // *or* custom results, Inbox doesn't think `resultsEl` is visible and
-        // we need to hide manually.
+        // Because we've mostly overridden Inbox's native show/hide logic we're
+        // responsible for hiding `resultsEl` in a couple removal cases:
+        // 1) when we go directly from only custom results to having
+        // no text in the search box.
+        // 2) when there are only custom results and the user subsequently
+        // enters a search that returns no results of any type.
         if (searchInput.value === '' || resultsEl.matches(':empty')) {
           resultsEl.style.display = 'none';
         }
       });
 
-      // be less verbose plz and point out that we have taken responsibility for show/hide
-      // Natively in Inbox, both enter and tab cause `resultsEl` to be hidden.
-      // If a native result is selected when this happens, the search term will
-      // simultaneously be modified to match the selected result.
-      // Because the change to modify the search term happens
-      // via Inbox's JS (setting `.value`), no `input` event is triggered,
-      // which means for our code the resulting action is straightforward:
-      // manually hide `resultsEl` since Inbox's attempt will fail (due to our
-      // other mods).
+      // We have to take over responsibility for hiding `resultsEl` when
+      // the user presses enter or tab because our other overrides prevent Inbox
+      // from handling this sensibly.
       enterAndTabPresses.takeUntilBy(removalStream).take(1).onValue(() => {
         resultsEl.style.display = 'none';
       });
@@ -275,7 +271,7 @@ export default function registerSearchSuggestionsProvider(
       // removes the previous search's results in the same event loop tick as
       // hiding `resultsEl`, we can hook into the child element removal and
       // re-show it before the hidden state gets painted to the screen.
-      // We also need to stop this entire process when tab or enter is pressed,
+      // We need to stop this entire process when tab or enter is pressed,
       // because if a custom result was selected when the key was pressed
       // then Inbox will remove the native results that no longer match the
       // search term — causing this observer to fire and subsequently

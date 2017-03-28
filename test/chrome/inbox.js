@@ -147,12 +147,12 @@ describe('Inbox', function() {
       const resultsList = $(
         'div[jsaction="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
       );
-      resultsList.waitForVisible(1000);
+      resultsList.waitForVisible(5000);
       const firstResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
       assert.strictEqual(firstResultSet.length, 2);
       const inboxTabId = browser.getCurrentTabId();
       firstResultSet[0].click();
-      browser.waitUntil(() => browser.getTabIds().length > 1, 2000);
+      browser.waitUntil(() => browser.getTabIds().length > 1, 5000);
       const externalUrlTabId = browser.getTabIds().find((id) => id !== inboxTabId);
       browser.switchTab(externalUrlTabId);
       const currentUrl = browser.execute(() => window.location.origin).value;
@@ -167,7 +167,7 @@ describe('Inbox', function() {
       // the first result set because it hasn't been removed yet.
       browser.waitUntil(() => (
         resultsList.$$('li.inboxsdk__search_suggestion').length === 1
-      ), 1000);
+      ), 5000);
       const secondResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
       assert.strictEqual(secondResultSet.length, 1);
       assert(browser.isExisting(
@@ -189,26 +189,28 @@ describe('Inbox', function() {
       searchInput.keys('abc');
       browser.waitUntil(() => (
         resultsList.$$('li.inboxsdk__search_suggestion').length === 3
-      ), 1000);
+      ), 5000);
       assert.strictEqual(resultsList.$$('li.inboxsdk__search_suggestion').length, 3);
       assert.strictEqual(resultsList.$$('div.inboxsdk__search_suggestion_group').length, 2);
       let seenSelectedSearchResult = false;
-      for (let i = 0; i < 50 && !seenSelectedSearchResult; i++) {
+      for (let i = 0; i < 50; i++) {
         searchInput.keys(['ArrowDown']);
         if (
           resultsList.$$('li.inboxsdk__search_suggestion.inboxsdk__selected').length === 1
         ) {
           seenSelectedSearchResult = true;
+          break;
         }
       }
       assert(seenSelectedSearchResult);
       let allResultsDeselected = false;
-      for (let i = 0; i < 50 && !allResultsDeselected; i++) {
+      for (let i = 0; i < 50; i++) {
         searchInput.keys(['ArrowDown']);
         if (
           resultsList.$$('li.inboxsdk__search_suggestion.inboxsdk__selected').length === 0
         ) {
           allResultsDeselected = true;
+          break;
         }
       }
       assert(allResultsDeselected);
@@ -216,17 +218,17 @@ describe('Inbox', function() {
       searchInput.keys(['Enter']);
       browser.waitUntil(() => (
         !resultsList.isVisible()
-      ), 1000);
+      ), 5000);
       assert(!resultsList.isVisible());
       searchInput.click();
       searchInput.keys('a');
       browser.waitUntil(() => (
         resultsList.$$('li.inboxsdk__search_suggestion').length === 2
-      ), 1000);
+      ), 5000);
       searchInput.keys(['Tab']);
       browser.waitUntil(() => (
         !resultsList.isVisible()
-      ), 1000);
+      ), 5000);
       assert(!resultsList.isVisible());
 
     } catch (err) {
