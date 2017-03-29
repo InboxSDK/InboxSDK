@@ -11,6 +11,7 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 import {defn} from 'ud';
 
+import type {TagTree} from 'tag-tree';
 import LiveSet from 'live-set';
 import lsFilter from 'live-set/filter';
 import lsFlatMap from 'live-set/flatMap';
@@ -63,6 +64,8 @@ import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
+
+import registerSearchSuggestionsProvider from './registerSearchSuggestionsProvider';
 
 import InboxAppToolbarButtonView from './views/inbox-app-toolbar-button-view';
 import InboxPageCommunicator from './inbox-page-communicator';
@@ -389,6 +392,8 @@ class InboxDriver {
   getThreadViewElementsMap() {return this._threadViewElements;}
   getMessageViewElementsMap() {return this._messageViewElements;}
 
+  getTagTree(): TagTree<HTMLElement> {return this._page.tree;}
+
   getCustomRouteIDs(): Set<string> {return this._customRouteIDs;}
 
   getCurrentChatSidebarView(): InboxChatSidebarView {
@@ -563,7 +568,7 @@ class InboxDriver {
   }
 
   registerSearchSuggestionsProvider(handler: Function) {
-    console.log('registerSearchSuggestionsProvider not implemented');
+    registerSearchSuggestionsProvider(this, handler);
   }
 
   registerSearchQueryRewriter(obj: Object) {

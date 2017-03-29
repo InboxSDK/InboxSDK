@@ -7,8 +7,7 @@ import Kefir from 'kefir';
 import type {ItemWithLifetime} from './dom/make-element-child-stream';
 import ItemWithLifetimePool from './ItemWithLifetimePool';
 
-// Temporary module until we fully transition over to LiveSets
-export default function toElementWithLifetimeStream<T>(liveSet: LiveSet<T>): Kefir.Observable<ItemWithLifetime<T>> {
+export default function toItemWithLifetimeStream<T>(liveSet: LiveSet<T>): Kefir.Observable<ItemWithLifetime<T>> {
   return Kefir.fromESObservable(toValueObservable(liveSet).map(event => {
     const value: TagTreeNode<HTMLElement> = event.value;
     const removal: Promise<void> = event.removal;

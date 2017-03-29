@@ -570,6 +570,71 @@
   width: 24px;
 }
 
+.inboxsdk__search_suggestion_group {
+  border-top: 1px solid #ddd;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+/*
+When we're displaying custom results alongside Inbox's native results,
+we need to put some padding/margin/border above the first group of custom results
+to separate them from the native ones. When Inbox doesn't have any results to show,
+however, we need to remove all that visual separation. Since the first group
+of custom results will also be the first element in the container in that case
+first-child will do the trick.
+*/
+.inboxsdk__search_suggestion_group:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.inboxsdk__search_suggestion {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 37px;
+  padding: 5px 24px;
+  box-sizing: border-box;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.inboxsdk__search_suggestion.inboxsdk__selected {
+  background-color: rgba(0,0,0,.03);
+}
+
+.inboxsdk__search_suggestion > img {
+  opacity: 0.6;
+  flex-shrink: 0;
+  border-radius: 12px;
+  height: 24px;
+  width: 24px;
+  margin-right: 24px;
+  -webkit-user-drag: none;
+}
+
+.inboxsdk__search_suggestion > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.inboxsdk__search_suggestion_name {
+  font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.inboxsdk__search_suggestion_desc {
+  color: #757575;
+  font-size: 0.95em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 /* appid warning inbox specific parts */
 .inboxsdk__appid_warning {
   margin: 68px 240px -68px;

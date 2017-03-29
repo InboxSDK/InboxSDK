@@ -1,5 +1,6 @@
 /* @flow */
 declare var browser;
+declare var $;
 
 import fs from 'fs';
 import assert from 'assert';
@@ -132,6 +133,104 @@ describe('Inbox', function() {
         Number((document.head:any).getAttribute('data-test-messageViewsWithNativeCardsSeen'))
       ).value;
       assert.strictEqual(messageViewsWithNativeCardsSeen, 2);
+
+      // Search Suggestions
+      console.log('Search Suggestions');
+      // TODO currently not testing navigation to custom views, should
+      // add tests for that when we start supporting them in earnest.
+      const searchInput = $(
+        'nav[role=banner] div[role=search] input[placeholder="Search"]'
+      );
+      searchInput.click();
+      browser.pause(1000); // Wait for animations/transitions to settle
+      searchInput.keys('ab');
+      const resultsList = $(
+        'div[jsaction="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
+      );
+      resultsList.waitForVisible(5000);
+      const firstResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
+      assert.strictEqual(firstResultSet.length, 2);
+      const inboxTabId = browser.getCurrentTabId();
+      firstResultSet[0].click();
+      browser.waitUntil(() => browser.getTabIds().length > 1, 5000);
+      const externalUrlTabId = browser.getTabIds().find((id) => id !== inboxTabId);
+      browser.switchTab(externalUrlTabId);
+      const currentUrl = browser.execute(() => window.location.origin).value;
+      assert(currentUrl === 'https://www.google.com');
+      browser.close();
+      firstResultSet[1].click();
+      searchInput.click();
+      // For some reason Chrome/Inbox get grumpy if you try to send keystrokes
+      // too soon after switching back from a different tab...
+      searchInput.keys('b');
+      // If we don't wait for a length of 1, we will most likely end up selecting
+      // the first result set because it hasn't been removed yet.
+      browser.waitUntil(() => (
+        resultsList.$$('li.inboxsdk__search_suggestion').length === 1
+      ), 5000);
+      const secondResultSet = resultsList.$$('li.inboxsdk__search_suggestion');
+      assert.strictEqual(secondResultSet.length, 1);
+      assert(browser.isExisting(
+        'li.inboxsdk__search_suggestion span.test__suggestionName'
+      ));
+      assert(browser.isExisting(
+        'li.inboxsdk__search_suggestion span.test__suggestionDesc'
+      ));
+      secondResultSet[0].click();
+      const searchSugggestionsClicked1 = browser.execute(() =>
+        Number((document.head:any).getAttribute('data-test-searchSuggestionsClicked1'))
+      ).value;
+      const searchSugggestionsClicked2 = browser.execute(() =>
+        Number((document.head:any).getAttribute('data-test-searchSuggestionsClicked2'))
+      ).value;
+      assert.strictEqual(searchSugggestionsClicked1, 1);
+      assert.strictEqual(searchSugggestionsClicked2, 1);
+      searchInput.click();
+      searchInput.keys('abc');
+      browser.waitUntil(() => (
+        resultsList.$$('li.inboxsdk__search_suggestion').length === 3
+      ), 5000);
+      assert.strictEqual(resultsList.$$('li.inboxsdk__search_suggestion').length, 3);
+      assert.strictEqual(resultsList.$$('div.inboxsdk__search_suggestion_group').length, 2);
+      let seenSelectedSearchResult = false;
+      for (let i = 0; i < 50; i++) {
+        searchInput.keys(['ArrowDown']);
+        if (
+          resultsList.$$('li.inboxsdk__search_suggestion.inboxsdk__selected').length === 1
+        ) {
+          seenSelectedSearchResult = true;
+          break;
+        }
+      }
+      assert(seenSelectedSearchResult);
+      let allResultsDeselected = false;
+      for (let i = 0; i < 50; i++) {
+        searchInput.keys(['ArrowDown']);
+        if (
+          resultsList.$$('li.inboxsdk__search_suggestion.inboxsdk__selected').length === 0
+        ) {
+          allResultsDeselected = true;
+          break;
+        }
+      }
+      assert(allResultsDeselected);
+      searchInput.click();
+      searchInput.keys(['Enter']);
+      browser.waitUntil(() => (
+        !resultsList.isVisible()
+      ), 5000);
+      assert(!resultsList.isVisible());
+      searchInput.click();
+      searchInput.keys('a');
+      browser.waitUntil(() => (
+        resultsList.$$('li.inboxsdk__search_suggestion').length === 2
+      ), 5000);
+      searchInput.keys(['Tab']);
+      browser.waitUntil(() => (
+        !resultsList.isVisible()
+      ), 5000);
+      assert(!resultsList.isVisible());
+
     } catch (err) {
       console.error(err.stack || ('Error: '+err.message));
       if (process.env.CI !== 'true') {

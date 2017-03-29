@@ -168,4 +168,39 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			}, 0);
 		}
 	});
+
+	sdk.Search.registerSearchSuggestionsProvider(query => {
+		if (query !== 'a' && query !== 'ab' && query !== 'abc') {
+			return [];
+		}
+		return [
+			{
+				name: 'Test Result 1',
+				description: 'The description for the first test result',
+				externalURL: 'https://www.google.com'
+			},
+			{
+				name: 'Test Result 2',
+				description: 'The description for the second test result',
+				onClick() {
+					incrementStat('data-test-searchSuggestionsClicked1');
+				}
+			}
+		];
+	});
+
+	sdk.Search.registerSearchSuggestionsProvider(query => {
+		if (query !== 'b' && query !== 'abc') {
+			return [];
+		}
+		return [
+			{
+				nameHTML: '<span class="test__suggestionName">Test</span> Result 3',
+				descriptionHTML: '<span class="test__suggestionDesc">The description for the third test result</span>',
+				onClick() {
+					incrementStat('data-test-searchSuggestionsClicked2');
+				}
+			}
+		];
+	});
 });

@@ -13,7 +13,7 @@ export type AutocompleteSearchResult = {
   description?: ?string;
   descriptionHTML?: ?string;
   routeName?: ?string;
-  routeParams?: ?{[ix: string]: string};
+  routeParams?: ?{[ix: string]: string|number};
   externalURL?: ?string;
   searchTerm?: ?string;
   iconUrl?: ?string;
