@@ -11,6 +11,7 @@ var Search = /** @lends Search */{
 	* autocomplete results when a user types into a search box. Each providers results are visually
 	* seperated from each other in the UI.
 	* ^gmail
+	* ^inbox
 	* @param {function(query)} handler - A handler that takes in a string {query} and
 	* returns an {Array} (or {Promise} for one) of {AutocompleteSearchResult}s.
 	* @return {void}
