@@ -45,8 +45,8 @@ import insertLinkIntoBody from './gmail-compose-view/insert-link-into-body';
 import getAddressChangesStream from './gmail-compose-view/get-address-changes-stream';
 import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
-import getPresendingStream from './gmail-compose-view/get-presending-stream';
-import getDiscardStream from './gmail-compose-view/get-discard-stream';
+import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
+import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
@@ -272,8 +272,15 @@ class GmailComposeView {
 	_setupStreams() {
 		this._eventStream.plug(getBodyChangesStream(this));
 		this._eventStream.plug(getAddressChangesStream(this));
-		this._eventStream.plug(getPresendingStream(this));
-		this._eventStream.plug(getDiscardStream(this));
+		this._eventStream.plug(getPresendingStream({
+			element: this.getElement(),
+			sendButton: this.getSendButton(),
+			sendAndArchive: this.getSendAndArchiveButton()
+		}));
+		this._eventStream.plug(getDiscardStream({
+			element: this.getElement(),
+			discardButton: this.getDiscardButton()
+		}));
 
 		this._eventStream.plug(
 			Kefir

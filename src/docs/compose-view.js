@@ -404,6 +404,7 @@ var ComposeView = /** @lends ComposeView */ {
 		* Fires when the compose view is discarded (deleted). 'discard' event
 		* handlers will always be called before 'destroy' handlers.
 		* ^gmail
+		* ^inbox
 		* @event ComposeView#discard
 		*/
 
@@ -421,6 +422,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 * applications may modify the message. This event is the only one which allows you to modify or
 	 * cancel the sent message. This event may be emitted multiple times for one message.
 	 * ^gmail
+	 * ^inbox
 	 * @event ComposeView#presending
 	 * @param {function} cancel - a function you can call to cancel the sending of this message. This
 	 * will prevent the message from being sent.
@@ -432,6 +434,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 * may receive a 'sendCanceled' event even if it did not initiate the cancellation.
 	 * This event may be emitted multiple times for one message.
  	 * ^gmail
+	 * ^inbox
  	 * @event ComposeView#sendCanceled
  	 */
 

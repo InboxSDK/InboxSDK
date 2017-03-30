@@ -38,6 +38,12 @@ function parser(el: HTMLElement) {
     'pop-out button',
     () => querySelectorOne(el, 'button[jsaction$=".quick_compose_popout_mole"]')
   ) : null;
+
+  const discardBtn = ec.run(
+    'discard button',
+    () => querySelectorOne(el, 'button[jsaction$=".discard_draft"]')
+  );
+
   const toggleFullscreenButton = isInline ? null : ec.run(
     'fullscreen button',
     () => querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"]')
@@ -103,6 +109,7 @@ function parser(el: HTMLElement) {
     body,
     subject,
     popOutBtn,
+    discardBtn,
     toggleFullscreenButton,
     toggleFullscreenButtonImage,
     closeBtn,

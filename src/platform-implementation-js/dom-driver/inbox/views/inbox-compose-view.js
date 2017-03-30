@@ -19,6 +19,8 @@ import querySelectorOne from '../../../lib/dom/querySelectorOne';
 import ErrorCollector from '../../../lib/ErrorCollector';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
+import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
+import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -96,7 +98,7 @@ class InboxComposeView {
       );
     }
 
-    this._eventStream.plug(this._getAddressChangesStream());
+    this._setupStreams();
 
     handleComposeLinkChips(this);
 
@@ -200,6 +202,23 @@ class InboxComposeView {
       makeChangesStream('cc', ccInput, () => this.getCcRecipients()),
       makeChangesStream('bcc', bccInput, () => this.getBccRecipients())
     ]).takeUntilBy(this._stopper);
+  }
+  _setupStreams() {
+    this._eventStream.plug(this._getAddressChangesStream());
+    this._eventStream.plug(getPresendingStream({
+      element: this.getElement(),
+      sendButton: this.getSendButton()
+    }));
+    this._eventStream.plug(getDiscardStream({
+      element: this.getElement(),
+      discardButton: this.getDiscardButton()
+    }));
+
+    this._eventStream.plug(
+      Kefir
+        .fromEvents(this.getElement(), 'inboxSDKsendCanceled')
+        .map(() => ({eventName: 'sendCanceled'}))
+    );
   }
   getFromContact(): Contact {
     const {fromPickerEmailSpan} = this._els;
@@ -577,6 +596,14 @@ class InboxComposeView {
   }
   closeButtonTooltip(buttonViewController: Object) {
     (buttonViewController:InboxComposeButtonView).closeTooltip();
+  }
+  getDiscardButton(): HTMLElement {
+    if (!this._els.discardBtn) throw new Error('Compose View missing discard button');
+    return this._els.discardBtn;
+  }
+  getSendButton(): HTMLElement {
+    if (!this._els.sendBtn) throw new Error('Compose View missing send button');
+    return this._els.sendBtn;
   }
 }
 
