@@ -2,9 +2,7 @@
 
 import asap from 'asap';
 import Kefir from 'kefir';
-import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
-
-import type GmailComposeView from '../gmail-compose-view';
+import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
 const dispatchCancel = (element) => (
   asap(() => (
@@ -16,11 +14,15 @@ const dispatchCancel = (element) => (
   ))
 );
 
-export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
-
-  const element = gmailComposeView.getElement();
-  const sendButtonElement = gmailComposeView.getSendButton();
-  const sendAndArchiveButtonElement = gmailComposeView.getSendAndArchiveButton();
+export default function({
+  element,
+  sendButton,
+  sendAndArchive
+}: {
+  element: HTMLElement,
+  sendButton: HTMLElement,
+  sendAndArchive?: ?HTMLElement
+}): Kefir.Observable<Object> {
 
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
@@ -33,14 +35,14 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
         [13, 32].indexOf(domEvent.keyCode) > -1
       ))
       .filter(domEvent => (
-        (sendButtonElement && sendButtonElement.contains(domEvent.target)) ||
-        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.target))
+        (sendButton && sendButton.contains(domEvent.target)) ||
+        (sendAndArchive && sendAndArchive.contains(domEvent.target))
       )),
 
     fromEventTargetCapture(element, 'click')
       .filter(domEvent => (
-        (sendButtonElement && sendButtonElement.contains(domEvent.target)) ||
-        (sendAndArchiveButtonElement && sendAndArchiveButtonElement.contains(domEvent.target))
+        (sendButton && sendButton.contains(domEvent.target)) ||
+        (sendAndArchive && sendAndArchive.contains(domEvent.target))
       ))
   ]);
 

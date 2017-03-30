@@ -1,7 +1,7 @@
 /* @flow */
 
 import Kefir from 'kefir';
-import fromEventTargetCapture from '../from-event-target-capture';
+import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
 import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 
