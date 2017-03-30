@@ -19,6 +19,7 @@ import querySelectorOne from '../../../lib/dom/querySelectorOne';
 import ErrorCollector from '../../../lib/ErrorCollector';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
+import getDiscardStream from '../../../lib/dom/get-compose-discard-stream';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -96,7 +97,7 @@ class InboxComposeView {
       );
     }
 
-    this._eventStream.plug(this._getAddressChangesStream());
+    this._setupStreams();
 
     handleComposeLinkChips(this);
 
@@ -200,6 +201,10 @@ class InboxComposeView {
       makeChangesStream('cc', ccInput, () => this.getCcRecipients()),
       makeChangesStream('bcc', bccInput, () => this.getBccRecipients())
     ]).takeUntilBy(this._stopper);
+  }
+  _setupStreams() {
+    this._eventStream.plug(this._getAddressChangesStream());
+    this._eventStream.plug(getDiscardStream(this));
   }
   getFromContact(): Contact {
     const {fromPickerEmailSpan} = this._els;
@@ -577,6 +582,10 @@ class InboxComposeView {
   }
   closeButtonTooltip(buttonViewController: Object) {
     (buttonViewController:InboxComposeButtonView).closeTooltip();
+  }
+  getDiscardButton(): HTMLElement {
+    if (!this._els.discardBtn) throw new Error('Compose View missing discard button');
+    return this._els.discardBtn;
   }
 }
 

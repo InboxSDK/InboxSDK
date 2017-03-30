@@ -1,14 +1,14 @@
 /* @flow */
 
 import Kefir from 'kefir';
-import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
+import fromEventTargetCapture from '../from-event-target-capture';
 
-import type GmailComposeView from '../gmail-compose-view';
+import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
 
-export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
+export default function(composeView: ComposeViewDriver): Kefir.Observable<Object> {
 
-  const element = gmailComposeView.getElement();
-  const discardButton = gmailComposeView.getDiscardButton();
+  const element = composeView.getElement();
+  const discardButton = composeView.getDiscardButton();
 
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')

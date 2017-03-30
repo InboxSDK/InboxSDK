@@ -73,4 +73,5 @@ export type ComposeViewDriver = {
 	getDraftID(): Promise<?string>;
 	addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor): void;
 	closeButtonTooltip(buttonViewController: Object): void;
+	getDiscardButton(): HTMLElement;
 };
