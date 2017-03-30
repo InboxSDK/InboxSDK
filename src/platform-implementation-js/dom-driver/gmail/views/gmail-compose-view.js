@@ -277,7 +277,10 @@ class GmailComposeView {
 			sendButton: this.getSendButton(),
 			sendAndArchive: this.getSendAndArchiveButton()
 		}));
-		this._eventStream.plug(getDiscardStream(this));
+		this._eventStream.plug(getDiscardStream({
+			element: this.getElement(),
+			discardButton: this.getDiscardButton()
+		}));
 
 		this._eventStream.plug(
 			Kefir

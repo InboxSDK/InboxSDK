@@ -3,12 +3,13 @@
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
-import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-driver';
-
-export default function(composeView: ComposeViewDriver): Kefir.Observable<Object> {
-
-  const element = composeView.getElement();
-  const discardButton = composeView.getDiscardButton();
+export default function({
+  element,
+  discardButton
+}: {
+  element: HTMLElement,
+  discardButton: HTMLElement
+}): Kefir.Observable<Object> {
 
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')

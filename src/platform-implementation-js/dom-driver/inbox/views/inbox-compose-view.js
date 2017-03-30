@@ -209,7 +209,10 @@ class InboxComposeView {
       element: this.getElement(),
       sendButton: this.getSendButton()
     }));
-    this._eventStream.plug(getDiscardStream(this));
+    this._eventStream.plug(getDiscardStream({
+      element: this.getElement(),
+      discardButton: this.getDiscardButton()
+    }));
 
     this._eventStream.plug(
       Kefir
