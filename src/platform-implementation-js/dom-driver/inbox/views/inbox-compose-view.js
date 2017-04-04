@@ -591,7 +591,7 @@ class InboxComposeView {
     return null;
   }
   getCurrentDraftID(): Promise<?string> {
-    throw new Error("Not yet implemented");
+    return Promise.resolve(this._draftID);
   }
   getDraftID(): Promise<?string> {
     return Promise.resolve(this._draftID);

@@ -5,11 +5,15 @@ import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 export default class InboxPageCommunicator extends CommonPageCommunicator {
   getDraftIDForComposeView(el: HTMLElement): string {
-    el.dispatchEvent(new CustomEvent('inboxSDKgetDraftIDforComposeView', {
-      bubbles: true,
-      cancelable: false,
-      detail: null
-    }));
+    const draftIDFound = el.hasAttribute('data-inboxsdk-draft-id');
+
+    if (!draftIDFound) {
+      el.dispatchEvent(new CustomEvent('inboxSDKgetDraftIDforComposeView', {
+        bubbles: true,
+        cancelable: false,
+        detail: null
+      }));
+    }
 
     const draftID = el.getAttribute('data-inboxsdk-draft-id');
     if (!draftID) throw new Error('could not find draft ID');
