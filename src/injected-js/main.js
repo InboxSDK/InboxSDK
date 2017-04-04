@@ -23,6 +23,7 @@ if (!global.__InboxSDKInjected) {
     const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
     const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener');
     const setupInboxCustomViewLinkSmuggler = require('./inbox/setupInboxCustomViewLinkSmuggler');
+    const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder');
     const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
     if (document.location.origin === 'https://mail.google.com') {
@@ -32,6 +33,7 @@ if (!global.__InboxSDKInjected) {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
       setupInboxCustomViewLinkSmuggler();
+      setupComposeViewDraftIDFinder();
       setupInboxAjaxInterceptor();
     } else {
       throw new Error("Should not happen");

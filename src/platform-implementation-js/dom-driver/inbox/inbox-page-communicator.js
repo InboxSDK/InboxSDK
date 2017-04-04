@@ -4,6 +4,18 @@ import Kefir from 'kefir';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 export default class InboxPageCommunicator extends CommonPageCommunicator {
+  getDraftIDForComposeView(el: HTMLElement): string {
+    el.dispatchEvent(new CustomEvent('inboxSDKgetDraftIDforComposeView', {
+      bubbles: true,
+      cancelable: false,
+      detail: null
+    }));
+
+    const draftID = el.getAttribute('data-inboxsdk-draft-id');
+    if (!draftID) throw new Error('could not find draft ID');
+
+    return draftID;
+  }
   registerAllowedHashLinkStartTerm(term: string) {
     document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
       bubbles: false,

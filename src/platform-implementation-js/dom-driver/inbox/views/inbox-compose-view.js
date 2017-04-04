@@ -41,6 +41,7 @@ class InboxComposeView {
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
   _lastBodySelectionRange: ?Range;
+  _draftID: string;
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
   _p: Parsed;
@@ -99,6 +100,10 @@ class InboxComposeView {
     }
 
     this._setupStreams();
+
+    this._draftID = this._driver.getPageCommunicator().getDraftIDForComposeView(
+      this.getElement()
+    );
 
     handleComposeLinkChips(this);
 
@@ -589,7 +594,7 @@ class InboxComposeView {
     throw new Error("Not yet implemented");
   }
   getDraftID(): Promise<?string> {
-    throw new Error("Not yet implemented");
+    return Promise.resolve(this._draftID);
   }
   addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
     (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
