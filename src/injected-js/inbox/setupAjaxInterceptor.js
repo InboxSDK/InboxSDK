@@ -1,7 +1,7 @@
 /* @flow */
 
 import isEqual from 'lodash/isEqual';
-import difference from 'lodash/difference';
+import find from 'lodash/find';
 import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 
@@ -46,7 +46,7 @@ export default function setupAjaxInterceptor() {
           return false;
         }
       },
-      afterListeners: function(connection) {
+      afterListeners(connection) {
         if (
           connection.status === 200 &&
           connection.originalSendBody &&
@@ -77,4 +77,44 @@ export default function setupAjaxInterceptor() {
       }
     });
   }
+
+  main_wrappers.push({
+    isRelevantTo(connection) {
+      return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
+    },
+    originalSendBodyLogger(connection) {
+      if (connection.originalSendBody) {
+        const originalRequest = JSON.parse(connection.originalSendBody);
+        const updateContainer = find(originalRequest, value => (
+          typeof value === 'object' && Object.keys(value).length === 1
+        ));
+        if (!updateContainer) return;
+
+        const updateList = updateContainer[Object.keys(updateContainer)[0]];
+        if (!updateList || updateList.length !== 1) return;
+
+        const updateDescriptor = updateList[0] && updateList[0]['2'];
+        const updateDescriptorDetails = (
+          updateDescriptor['2'] &&
+          updateDescriptor['2']['14'] &&
+          updateDescriptor['2']['14']['1']
+        );
+        if (!updateDescriptorDetails) return;
+
+        const draftID = (
+          updateDescriptorDetails['1'] &&
+          updateDescriptorDetails['1'].replace('msg-a:', '')
+        );
+        const actionList = updateDescriptorDetails['11'];
+
+        const isSendRequest = isEqual(actionList, [
+          '^pfg', '^f_bt', '^f_btns', '^f_cl', '^i', '^u'
+        ]);
+
+        if (isSendRequest) {
+          triggerEvent({type: 'emailSending', draftID});
+        }
+      }
+    }
+  });
 }

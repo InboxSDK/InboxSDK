@@ -44,6 +44,7 @@ class InboxComposeView {
   _draftID: string;
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
+  _isSendPending: boolean = false;
   _p: Parsed;
   _els: *;
 
@@ -105,6 +106,16 @@ class InboxComposeView {
       this.getElement()
     );
 
+    this.getEventStream()
+      .takeUntilBy(this._stopper)
+      .filter(({eventName}) => (
+        eventName === 'presending' || eventName === 'sendCanceled'
+      )).map(({eventName}) => (
+        eventName === 'presending'
+      )).onValue(value => {
+        this._isSendPending = value;
+      });
+
     handleComposeLinkChips(this);
 
     const {fromPickerEmailSpan} = this._els;
@@ -158,8 +169,18 @@ class InboxComposeView {
     }
   }
   destroy() {
-    this._eventStream.emit({eventName: 'destroy', data: {}});
-    this._eventStream.end();
+    if (this._isSendPending) {
+      this.getEventStream()
+        .filter(({eventName}) => eventName === 'sending')
+        .take(1)
+        .onValue(() => {
+          this._eventStream.emit({eventName: 'destroy', data: {}});
+          this._eventStream.end();
+        });
+    } else {
+      this._eventStream.emit({eventName: 'destroy', data: {}});
+      this._eventStream.end();
+    }
     this._stopper.destroy();
   }
   getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
@@ -210,10 +231,12 @@ class InboxComposeView {
   }
   _setupStreams() {
     this._eventStream.plug(this._getAddressChangesStream());
+
     this._eventStream.plug(getPresendingStream({
       element: this.getElement(),
       sendButton: this.getSendButton()
     }));
+
     this._eventStream.plug(getDiscardStream({
       element: this.getElement(),
       discardButton: this.getDiscardButton()
@@ -223,6 +246,13 @@ class InboxComposeView {
       Kefir
         .fromEvents(this.getElement(), 'inboxSDKsendCanceled')
         .map(() => ({eventName: 'sendCanceled'}))
+    );
+
+    this._eventStream.plug(
+      this._driver.getPageCommunicator().ajaxInterceptStream
+        .filter(({type, draftID}) => (
+          type === 'emailSending' && draftID === this._draftID
+        )).map(() => ({eventName: 'sending'}))
     );
   }
   getFromContact(): Contact {

@@ -4,6 +4,15 @@ import Kefir from 'kefir';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
 export default class InboxPageCommunicator extends CommonPageCommunicator {
+  ajaxInterceptStream: Kefir.Observable<Object>;
+
+  constructor() {
+    super();
+    this.ajaxInterceptStream = Kefir
+      .fromEvents(document, 'inboxSDKajaxIntercept')
+      .map(x => x.detail);
+  }
+
   getDraftIDForComposeView(el: HTMLElement): string {
     const draftIDFound = el.hasAttribute('data-inboxsdk-draft-id');
 

@@ -145,8 +145,8 @@ export default function registerSearchSuggestionsProvider(
         resultsElRemovalStream
       }));
     }).flatMapLatest((item) => {
-      const suggestionsResponse = Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
-        .filter(({detail: {type}}) => type === 'searchSuggestionsReceieved');
+      const suggestionsResponse = driver.getPageCommunicator().ajaxInterceptStream
+        .filter(({type}) => type === 'searchSuggestionsReceieved');
 
       const removalStream = Kefir.merge([
         // Handle cleanup when a new search query is entered. We want to wait

@@ -18,6 +18,7 @@ function incrementStat(name) {
 }
 
 InboxSDK.load(2, 'simple-example').then(sdk => {
+	window.__sdk = sdk;
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		const button = composeView.addButton({
 			title: 'Monkeys!',
