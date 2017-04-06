@@ -80,6 +80,8 @@ export default function setupAjaxInterceptor() {
 
   {
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"]
+    let currentSendConnection;
+    let currentDraftID;
     main_wrappers.push({
       isRelevantTo(connection) {
         return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
@@ -114,8 +116,18 @@ export default function setupAjaxInterceptor() {
           );
 
           if (isSendRequest) {
+            currentSendConnection = connection;
+            currentDraftID = draftID;
             triggerEvent({type: 'emailSending', draftID});
           }
+        }
+      },
+      afterListeners(connection) {
+        if (
+          connection.status === 200 &&
+          connection === currentSendConnection
+        ) {
+          triggerEvent({type: 'emailSent', draftID: currentDraftID});
         }
       }
     });

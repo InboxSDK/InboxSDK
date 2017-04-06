@@ -170,13 +170,13 @@ class InboxComposeView {
   }
   destroy() {
     if (this._isSendPending) {
-      this.getEventStream()
-        .filter(({eventName}) => eventName === 'sending')
-        .take(1)
-        .onValue(() => {
-          this._eventStream.emit({eventName: 'destroy', data: {}});
-          this._eventStream.end();
-        });
+      Kefir.combine([
+        this.getEventStream().filter(({eventName}) => eventName === 'sending'),
+        this.getEventStream().filter(({eventName}) => eventName === 'sent')
+      ]).take(1).onValue(() => {
+        this._eventStream.emit({eventName: 'destroy', data: {}});
+        this._eventStream.end();
+      });
     } else {
       this._eventStream.emit({eventName: 'destroy', data: {}});
       this._eventStream.end();
@@ -248,11 +248,21 @@ class InboxComposeView {
         .map(() => ({eventName: 'sendCanceled'}))
     );
 
+    const interceptStream = this._driver
+      .getPageCommunicator()
+      .ajaxInterceptStream
+      .filter(({draftID}) => draftID === this._draftID);
+
     this._eventStream.plug(
-      this._driver.getPageCommunicator().ajaxInterceptStream
-        .filter(({type, draftID}) => (
-          type === 'emailSending' && draftID === this._draftID
-        )).map(() => ({eventName: 'sending'}))
+      interceptStream
+        .filter(({type}) => type === 'emailSending')
+        .map(() => ({eventName: 'sending'}))
+    );
+
+    this._eventStream.plug(
+      interceptStream
+        .filter(({type}) => type === 'emailSent')
+        .map(() => ({eventName: 'sent'}))
     );
   }
   getFromContact(): Contact {
