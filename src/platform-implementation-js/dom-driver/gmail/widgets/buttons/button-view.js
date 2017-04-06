@@ -20,6 +20,7 @@ export type ButtonViewOptions = {
 	text?: ?string;
 	title?: ?string;
 	tooltip?: ?string;
+	enabled?: ?boolean;
 	hasDropdown?: ?boolean;
 	buttonColor?: ?string;
 	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
@@ -43,7 +44,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 
 	constructor(options: ButtonViewOptions){
 		this._hasDropdown = false;
-		this._isEnabled = true;
+		this._isEnabled = options.enabled !== false;
 
 		this._iconClass = options.iconClass;
 		this._iconUrl = options.iconUrl;
@@ -62,7 +63,9 @@ var ButtonView = ud.defn(module, class ButtonView {
 		this._eventStream = kefirBus();
 		this._setupEventStream();
 		this._setupAestheticEvents();
-		this._setupKeyboardShortcutEvent();
+		if (options.enabled !== false) {
+			this._setupKeyboardShortcutEvent();
+		}
 	}
 
 	destroy() {
@@ -154,7 +157,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 		this._element.setAttribute('role', 'button');
 		this._element.setAttribute('tabindex', '0');
 
-		if(options.hasButtonToRight){
+		if (options.hasButtonToRight) {
 			this._element.classList.add('T-I-Js-IF');
 		}
 
@@ -162,8 +165,12 @@ var ButtonView = ud.defn(module, class ButtonView {
 			this._element.classList.add('T-I-Js-Gs');
 		}
 
-		if(options.tooltip || options.title){
+		if (options.tooltip || options.title) {
 			this._element.setAttribute('data-tooltip', String(options.tooltip || options.title));
+		}
+
+		if (options.enabled === false) {
+			this._element.classList.add('inboxsdk__button_disabled');
 		}
 	}
 
