@@ -1,6 +1,6 @@
 /* @flow */
 
-import isEqual from 'lodash/isEqual';
+import intersection from 'lodash/intersection';
 import find from 'lodash/find';
 import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
@@ -78,43 +78,46 @@ export default function setupAjaxInterceptor() {
     });
   }
 
-  main_wrappers.push({
-    isRelevantTo(connection) {
-      return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
-    },
-    originalSendBodyLogger(connection) {
-      if (connection.originalSendBody) {
-        const originalRequest = JSON.parse(connection.originalSendBody);
-        const updateContainer = find(originalRequest, value => (
-          typeof value === 'object' && Object.keys(value).length === 1
-        ));
-        if (!updateContainer) return;
+  {
+    const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"]
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
+      },
+      originalSendBodyLogger(connection) {
+        if (connection.originalSendBody) {
+          const originalRequest = JSON.parse(connection.originalSendBody);
+          const updateContainer = find(originalRequest, value => (
+            typeof value === 'object' && Object.keys(value).length === 1
+          ));
+          if (!updateContainer) return;
 
-        const updateList = updateContainer[Object.keys(updateContainer)[0]];
-        if (!updateList || updateList.length !== 1) return;
+          const updateList = updateContainer[Object.keys(updateContainer)[0]];
+          if (!updateList || updateList.length !== 1) return;
 
-        const updateDescriptor = updateList[0] && updateList[0]['2'];
-        const updateDescriptorDetails = (
-          updateDescriptor['2'] &&
-          updateDescriptor['2']['14'] &&
-          updateDescriptor['2']['14']['1']
-        );
-        if (!updateDescriptorDetails) return;
+          const updateDescriptor = updateList[0] && updateList[0]['2'];
+          const updateDescriptorDetails = (
+            updateDescriptor['2'] &&
+            updateDescriptor['2']['14'] &&
+            updateDescriptor['2']['14']['1']
+          );
+          if (!updateDescriptorDetails) return;
 
-        const draftID = (
-          updateDescriptorDetails['1'] &&
-          updateDescriptorDetails['1'].replace('msg-a:', '')
-        );
-        const actionList = updateDescriptorDetails['11'];
+          const draftID = (
+            updateDescriptorDetails['1'] &&
+            updateDescriptorDetails['1'].replace('msg-a:', '')
+          );
+          const actionList = updateDescriptorDetails['11'];
 
-        const isSendRequest = isEqual(actionList, [
-          '^pfg', '^f_bt', '^f_btns', '^f_cl', '^i', '^u'
-        ]);
+          const isSendRequest = (
+            intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
+          );
 
-        if (isSendRequest) {
-          triggerEvent({type: 'emailSending', draftID});
+          if (isSendRequest) {
+            triggerEvent({type: 'emailSending', draftID});
+          }
         }
       }
-    }
-  });
+    });
+  }
 }
