@@ -11,6 +11,8 @@ import type InboxDriver from './inbox-driver';
 
 import parser from './detection/compose/parser';
 
+const activeDrivers: Map<string, InboxComposeView> = new Map();
+
 export default function getComposeViewDriverStream(driver: InboxDriver, tree: TagTree<HTMLElement>): Kefir.Observable<InboxComposeView> {
   const denodeify = ({el, removalStream}) => ({el: el.getValue(), removalStream});
 
@@ -23,7 +25,15 @@ export default function getComposeViewDriverStream(driver: InboxDriver, tree: Ta
     regularCompose.merge(fullscreenCompose).flatMap(makeElementStreamMerger())
   ]);
 
-  return compose.map(({el, removalStream}) => {
+  return compose.flatMap(({el, removalStream}) => {
+    const existingDraftID = el.getAttribute('data-inboxsdk-draft-id');
+    const existingDriver = existingDraftID && activeDrivers.get(existingDraftID);
+
+    if (existingDriver) {
+      existingDriver.addedToDOM();
+      return Kefir.never();
+    }
+
     const parsed = parser(el);
     if (parsed.errors.length) {
       this._logger.errorSite(new Error('parse errors (compose)'), {
@@ -32,8 +42,20 @@ export default function getComposeViewDriverStream(driver: InboxDriver, tree: Ta
         html: censorHTMLtree(el)
       });
     }
+
     const view = new InboxComposeView(driver, el, parsed);
-    removalStream.take(1).onValue(() => view.destroy());
-    return view;
+    const draftID = view.getDraftIDSync();
+    if (!draftID) throw new Error('Couldn not find draft ID');
+
+    activeDrivers.set(draftID, view);
+
+    view.getEventStream()
+      .filter(({eventName}) => eventName === 'destroy')
+      .take(1)
+      .onValue(() => { activeDrivers.delete(draftID) });
+
+    removalStream.take(1).onValue(() => view.removedFromDOM());
+
+    return Kefir.constant(view);
   });
 }

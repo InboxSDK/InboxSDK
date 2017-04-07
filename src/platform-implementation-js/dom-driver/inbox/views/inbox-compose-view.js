@@ -168,20 +168,26 @@ class InboxComposeView {
       );
     }
   }
-  destroy() {
+  removedFromDOM() {
     if (this._isSendPending) {
       Kefir.combine([
         this.getEventStream().filter(({eventName}) => eventName === 'sending'),
         this.getEventStream().filter(({eventName}) => eventName === 'sent')
-      ]).take(1).onValue(() => {
+      ]).takeUntilBy(
+        this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
+      ).take(1).onValue(() => {
         this._eventStream.emit({eventName: 'destroy', data: {}});
         this._eventStream.end();
+        this._stopper.destroy();
       });
     } else {
       this._eventStream.emit({eventName: 'destroy', data: {}});
       this._eventStream.end();
+      this._stopper.destroy();
     }
-    this._stopper.destroy();
+  }
+  addedToDOM() {
+    this._eventStream.emit({eventName: 'sendCanceled'});
   }
   getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
   getStopper(): Kefir.Observable<null> {return this._stopper;}
@@ -635,6 +641,9 @@ class InboxComposeView {
   }
   getDraftID(): Promise<?string> {
     return Promise.resolve(this._draftID);
+  }
+  getDraftIDSync(): ?string {
+    return this._draftID;
   }
   addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
     (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
