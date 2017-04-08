@@ -89,12 +89,11 @@ export default function setupAjaxInterceptor() {
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
           const originalRequest = JSON.parse(connection.originalSendBody);
-          const updateContainer = find(originalRequest, value => (
-            typeof value === 'object' && Object.keys(value).length === 1
-          ));
-          if (!updateContainer) return;
 
-          const updateList = updateContainer[Object.keys(updateContainer)[0]];
+          const updateList = (
+            originalRequest['2'] &&
+            originalRequest['2']['1']
+          );
           if (!updateList || updateList.length !== 1) return;
 
           const updateDescriptor = updateList[0] && updateList[0]['2'];
@@ -124,10 +123,38 @@ export default function setupAjaxInterceptor() {
       },
       afterListeners(connection) {
         if (
-          connection.status === 200 &&
-          connection === currentSendConnection
+          connection === currentSendConnection &&
+          connection.originalResponseText
         ) {
-          triggerEvent({type: 'emailSent', draftID: currentDraftID});
+          if (connection.status !== 200) {
+            triggerEvent({type: 'emailSendFailed', draftID: currentDraftID});
+            return;
+          }
+
+          const originalResponse = JSON.parse(connection.originalResponseText);
+
+          const updateList = (
+            originalResponse['2'] &&
+            originalResponse['2']['6']
+          );
+          if (!updateList || updateList.length !== 1) return;
+
+          const updateDescriptor = updateList[0] && updateList[0]['1'];
+          const updateDescriptorDetails = (
+            updateDescriptor['3'] &&
+            updateDescriptor['3']['7'] &&
+            updateDescriptor['3']['7']['1'] &&
+            updateDescriptor['3']['7']['1']['5'] &&
+            updateDescriptor['3']['7']['1']['5'][0]
+          );
+
+          const rfcID = updateDescriptorDetails['14'];
+
+          triggerEvent({
+            type: 'emailSent',
+            rfcID,
+            draftID: currentDraftID
+          });
         }
       }
     });

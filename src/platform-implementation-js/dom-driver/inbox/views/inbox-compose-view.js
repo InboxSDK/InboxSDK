@@ -37,6 +37,7 @@ class InboxComposeView {
   _element: HTMLElement;
   _driver: InboxDriver;
   _eventStream: Bus<any> = kefirBus();
+  _ajaxInterceptStream: Kefir.Observable<Object>;
   _stopper = kefirStopper();
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
@@ -100,11 +101,17 @@ class InboxComposeView {
       );
     }
 
-    this._setupStreams();
-
     this._draftID = this._driver.getPageCommunicator().getDraftIDForComposeView(
       this.getElement()
     );
+
+    this._ajaxInterceptStream = this._driver
+      .getPageCommunicator()
+      .ajaxInterceptStream
+      .takeUntilBy(this._stopper)
+      .filter(({draftID}) => draftID === this._draftID);
+
+    this._setupStreams();
 
     this.getEventStream()
       .takeUntilBy(this._stopper)
@@ -170,12 +177,15 @@ class InboxComposeView {
   }
   removedFromDOM() {
     if (this._isSendPending) {
-      Kefir.combine([
-        this.getEventStream().filter(({eventName}) => eventName === 'sending'),
-        this.getEventStream().filter(({eventName}) => eventName === 'sent')
-      ]).takeUntilBy(
-        this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
-      ).take(1).onValue(() => {
+      Kefir.merge([
+        Kefir.combine([
+          this.getEventStream().filter(({eventName}) => eventName === 'sending'),
+          this.getEventStream().filter(({eventName}) => eventName === 'sent')
+        ]),
+        this._ajaxInterceptStream.filter(({eventName}) => (
+          eventName === 'emailSendFailed'
+        ))
+      ]).take(1).onValue(() => {
         this._eventStream.emit({eventName: 'destroy', data: {}});
         this._eventStream.end();
         this._stopper.destroy();
@@ -185,9 +195,6 @@ class InboxComposeView {
       this._eventStream.end();
       this._stopper.destroy();
     }
-  }
-  addedToDOM() {
-    this._eventStream.emit({eventName: 'sendCanceled'});
   }
   getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
   getStopper(): Kefir.Observable<null> {return this._stopper;}
@@ -254,19 +261,14 @@ class InboxComposeView {
         .map(() => ({eventName: 'sendCanceled'}))
     );
 
-    const interceptStream = this._driver
-      .getPageCommunicator()
-      .ajaxInterceptStream
-      .filter(({draftID}) => draftID === this._draftID);
-
     this._eventStream.plug(
-      interceptStream
+      this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSending')
         .map(() => ({eventName: 'sending'}))
     );
 
     this._eventStream.plug(
-      interceptStream
+      this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSent')
         .map(() => ({eventName: 'sent'}))
     );
@@ -641,9 +643,6 @@ class InboxComposeView {
   }
   getDraftID(): Promise<?string> {
     return Promise.resolve(this._draftID);
-  }
-  getDraftIDSync(): ?string {
-    return this._draftID;
   }
   addTooltipToButton(buttonViewController: Object, buttonDescriptor: Object, tooltipDescriptor: TooltipDescriptor) {
     (buttonViewController:InboxComposeButtonView).showTooltip(tooltipDescriptor);
