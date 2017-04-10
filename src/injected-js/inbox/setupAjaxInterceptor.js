@@ -80,8 +80,7 @@ export default function setupAjaxInterceptor() {
 
   {
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"]
-    let currentSendConnection;
-    let currentDraftID;
+    const currentConnectionIDs = new WeakMap();
     main_wrappers.push({
       isRelevantTo(connection) {
         return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
@@ -109,25 +108,29 @@ export default function setupAjaxInterceptor() {
             updateDescriptorDetails['1'].replace('msg-a:', '')
           );
           const actionList = updateDescriptorDetails['11'];
+          if (!(actionList && draftID)) return;
 
           const isSendRequest = (
             intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
           );
 
           if (isSendRequest) {
-            currentSendConnection = connection;
-            currentDraftID = draftID;
+            currentConnectionIDs.set(connection, draftID);
             triggerEvent({type: 'emailSending', draftID});
           }
         }
       },
       afterListeners(connection) {
-        if (
-          connection === currentSendConnection &&
-          connection.originalResponseText
-        ) {
-          if (connection.status !== 200) {
-            triggerEvent({type: 'emailSendFailed', draftID: currentDraftID});
+        if (currentConnectionIDs.has(connection)) {
+          const sendFailed = () => {
+            triggerEvent({type: 'emailSendFailed', draftID});
+            currentConnectionIDs.delete(connection);
+          };
+
+          const draftID = currentConnectionIDs.get(connection);
+
+          if (connection.status !== 200 || !connection.originalResponseText) {
+            sendFailed();
             return;
           }
 
@@ -137,7 +140,10 @@ export default function setupAjaxInterceptor() {
             originalResponse['2'] &&
             originalResponse['2']['6']
           );
-          if (!updateList || updateList.length !== 1) return;
+          if (!updateList || updateList.length !== 1) {
+            sendFailed();
+            return;
+          }
 
           const updateDescriptor = updateList[0] && updateList[0]['1'];
           const updateDescriptorDetails = (
@@ -149,12 +155,18 @@ export default function setupAjaxInterceptor() {
           );
 
           const rfcID = updateDescriptorDetails['14'];
+          if (!rfcID) {
+            sendFailed();
+            return;
+          }
 
           triggerEvent({
             type: 'emailSent',
             rfcID,
-            draftID: currentDraftID
+            draftID
           });
+
+          currentConnectionIDs.delete(connection);
         }
       }
     });

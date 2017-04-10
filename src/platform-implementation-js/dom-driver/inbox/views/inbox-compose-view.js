@@ -182,9 +182,7 @@ class InboxComposeView {
           this.getEventStream().filter(({eventName}) => eventName === 'sending'),
           this.getEventStream().filter(({eventName}) => eventName === 'sent')
         ]),
-        this._ajaxInterceptStream.filter(({eventName}) => (
-          eventName === 'emailSendFailed'
-        ))
+        this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed')
       ]).take(1).onValue(() => {
         this._eventStream.emit({eventName: 'destroy', data: {}});
         this._eventStream.end();
