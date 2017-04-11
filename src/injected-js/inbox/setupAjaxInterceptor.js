@@ -79,7 +79,12 @@ export default function setupAjaxInterceptor() {
   }
 
   {
-    const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"]
+    let sending = false;
+
+    document.addEventListener('emailIsSending', () => {
+      sending = true;
+    });
+    const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
     const currentConnectionIDs = new WeakMap();
     main_wrappers.push({
       isRelevantTo(connection) {
@@ -88,33 +93,78 @@ export default function setupAjaxInterceptor() {
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
           const originalRequest = JSON.parse(connection.originalSendBody);
-
+          if (sending) {
+            const newAttr0 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+            newAttr0.push(`originalRequest: ${JSON.stringify(originalRequest)}`);
+            (document: any).head.setAttribute(
+              'data-test-sdkDebugLog',
+              JSON.stringify(newAttr0)
+            );
+          }
           const updateList = (
             originalRequest['2'] &&
             originalRequest['2']['1']
           );
-          if (!updateList || updateList.length !== 1) return;
+          if (sending) {
+            const newAttr1 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+            newAttr1.push(`update list existence: ${JSON.stringify(updateList)}`);
+            newAttr1.push(`update list length: ${updateList && updateList.length}`);
+            (document: any).head.setAttribute(
+              'data-test-sdkDebugLog',
+              JSON.stringify(newAttr1)
+            );
+          }
+          if (!updateList) return;
 
-          const updateDescriptor = updateList[0] && updateList[0]['2'];
-          const updateDescriptorDetails = (
-            updateDescriptor['2'] &&
-            updateDescriptor['2']['14'] &&
-            updateDescriptor['2']['14']['1']
+          // const updateDescriptor = updateList[0] && updateList[0]['2'];
+
+          const sendUpdateMatch = updateList.find((update) => (
+            update['2'] &&
+            update['2']['2'] &&
+            update['2']['2']['14'] &&
+            update['2']['2']['14']['1'] &&
+            update['2']['2']['14']['1']['1'] &&
+            update['2']['2']['14']['1']['1'].indexOf('msg-a:') > -1
+          ));
+          // const updateDescriptorDetails = (
+          //   updateDescriptor['2'] &&
+          //   updateDescriptor['2']['14'] &&
+          //   updateDescriptor['2']['14']['1']
+          // );
+          // if (!updateDescriptorDetails) return;
+          if (!sendUpdateMatch) return;
+          const sendUpdate = (
+            sendUpdateMatch['2'] &&
+            sendUpdateMatch['2']['2'] &&
+            sendUpdateMatch['2']['2']['14'] &&
+            sendUpdateMatch['2']['2']['14']['1']
           );
-          if (!updateDescriptorDetails) return;
 
           const draftID = (
-            updateDescriptorDetails['1'] &&
-            updateDescriptorDetails['1'].replace('msg-a:', '')
+            sendUpdate['1'] &&
+            sendUpdate['1'].replace('msg-a:', '')
           );
-          const actionList = updateDescriptorDetails['11'];
+          const actionList = sendUpdate['11'];
           if (!(actionList && draftID)) return;
 
+          const newAttr2 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+          newAttr2.push('action tokens: ', actionList);
+          newAttr2.push('is SEND_ACTIONS match', intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length);
+          (document: any).head.setAttribute(
+            'data-test-sdkDebugLog',
+            JSON.stringify(newAttr2)
+          );
           const isSendRequest = (
             intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
           );
 
           if (isSendRequest) {
+            const newAttr3 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+            newAttr3.push('dispatching emailSending');
+            (document: any).head.setAttribute(
+              'data-test-sdkDebugLog',
+              JSON.stringify(newAttr3)
+            );
             currentConnectionIDs.set(connection, draftID);
             triggerEvent({type: 'emailSending', draftID});
           }
@@ -140,6 +190,15 @@ export default function setupAjaxInterceptor() {
             originalResponse['2'] &&
             originalResponse['2']['6']
           );
+          if (updateList) {
+            const newAttr4 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+            newAttr4.push(`updateList from resp: ${JSON.stringify(updateList)}`);
+            newAttr4.push(`updateList length from resp: ${JSON.stringify(updateList.length)}`);
+            (document: any).head.setAttribute(
+              'data-test-sdkDebugLog',
+              JSON.stringify(newAttr4)
+            );
+          }
           if (!updateList || updateList.length !== 1) {
             sendFailed();
             return;
@@ -160,6 +219,12 @@ export default function setupAjaxInterceptor() {
             return;
           }
 
+          const newAttr = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+          newAttr.push('dispatching emailSent');
+          (document: any).head.setAttribute(
+            'data-test-sdkDebugLog',
+            JSON.stringify(newAttr)
+          );
           triggerEvent({
             type: 'emailSent',
             rfcID,

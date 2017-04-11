@@ -246,6 +246,8 @@ class InboxComposeView {
     this._eventStream.plug(getPresendingStream({
       element: this.getElement(),
       sendButton: this.getSendButton()
+    }).map((orig) => {
+      return orig;
     }));
 
     this._eventStream.plug(getDiscardStream({
@@ -262,13 +264,29 @@ class InboxComposeView {
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSending')
-        .map(() => ({eventName: 'sending'}))
+        .map(() => {
+          const newAttr = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+          newAttr.push('received emailSending intercept');
+          (document: any).head.setAttribute(
+            'data-test-sdkDebugLog',
+            JSON.stringify(newAttr)
+          );
+          return {eventName: 'sending'};
+        })
     );
 
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSent')
-        .map(() => ({eventName: 'sent'}))
+        .map(() => {
+          const newAttr = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
+          newAttr.push('received emailSent intercept');
+          (document: any).head.setAttribute(
+            'data-test-sdkDebugLog',
+            JSON.stringify(newAttr)
+          );
+          return {eventName: 'sent'};
+        })
     );
   }
   getFromContact(): Contact {

@@ -46,15 +46,20 @@ export default function({
       ))
   ]);
 
-  return domEventStream.map(domEvent => ({
-    eventName: 'presending',
-    data: {
-      cancel() {
-        domEvent.preventDefault();
-        domEvent.stopPropagation();
-        domEvent.stopImmediatePropagation();
-        dispatchCancel(element)
+  return domEventStream.map(domEvent => {
+    document.dispatchEvent(new CustomEvent('emailIsSending', {
+      bubbles: true, cancelable: false
+    }));
+    return {
+      eventName: 'presending',
+      data: {
+        cancel() {
+          domEvent.preventDefault();
+          domEvent.stopPropagation();
+          domEvent.stopImmediatePropagation();
+          dispatchCancel(element)
+        }
       }
-    }
-  }));
+    };
+  });
 }

@@ -17,8 +17,18 @@ function incrementStat(name) {
 	);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+	document.head.setAttribute('data-test-sdkDebugLog', '[]');
+});
+
 InboxSDK.load(2, 'simple-example').then(sdk => {
 	window.__sdk = sdk;
+
+	const appendToLog = (text) => {
+		const newAttr = JSON.parse(document.head.getAttribute('data-test-sdkDebugLog'));
+		newAttr.push(text);
+		document.head.setAttribute('data-test-sdkDebugLog', JSON.stringify(newAttr));
+	};
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		const button = composeView.addButton({
 			title: 'Monkeys!',
@@ -42,6 +52,31 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 		const tooltipEl = document.createElement('div');
 		tooltipEl.appendChild(tooltipButton);
 		button.showTooltip({el: tooltipEl});
+
+		composeView.on('destroy', () => (
+			incrementStat('data-test-composeDestroyEmitted')
+		));
+		composeView.on('discard', () => (
+			incrementStat('data-test-composeDiscardEmitted')
+		));
+		composeView.on('presending', ({cancel}) => {
+			appendToLog('incrementing presending');
+			if(composeView.getSubject().indexOf('cancel send') > -1) {
+				cancel();
+			}
+			incrementStat('data-test-composePresendingEmitted');
+		});
+		composeView.on('sendCanceled', () => (
+			incrementStat('data-test-composeSendCanceledEmitted')
+		));
+		composeView.on('sending', () => {
+			appendToLog('incrementing sending');
+			incrementStat('data-test-composeSendingEmitted');
+		});
+		composeView.on('sent', () => {
+			appendToLog('incrementing sent');
+			incrementStat('data-test-composeSentEmitted');
+		});
 	});
 
 	sdk.Toolbars.addToolbarButtonForApp({
