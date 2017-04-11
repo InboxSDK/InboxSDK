@@ -54,19 +54,9 @@ describe('Inbox', function() {
         body.click();
         body.keys('Test message!');
         browser.click('div[role=dialog] [jsaction$="send"]');
-        console.log('waiting for sent notif');
         browser.waitUntil(() => (
-          browser.$$('[jsaction*="mouseout_transient_notification"] > span').filter((el) => (
-            el.getText() === 'Sent'
-          ))
+          Number(headEl.getAttribute('data-test-composeSentEmitted')) === 1
         ), 20 * 1000);
-        console.log('hitting dismiss');
-        // browser.click('button[jsaction$="dismiss_notification"]');
-        console.log('printing logs');
-        const logs = browser.execute(() => {
-          return JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-        }).value;
-        console.log('logs from content script runtime: ', logs);
         assert.strictEqual(
           Number(headEl.getAttribute('data-test-composePresendingEmitted')),
           1
@@ -102,12 +92,11 @@ describe('Inbox', function() {
         body.click();
         body.keys('Test message!');
         browser.click('div[role=dialog] [jsaction$=send]');
+        browser.waitUntil(() => (
+          Number(headEl.getAttribute('data-test-composePresendingEmitted')) === 2
+        ), 10 * 1000);
         assert(browser.isVisible('div[role=dialog] div[jsaction^=compose]', 1000));
         browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
-        const logs = browser.execute(() => {
-          return JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-        }).value;
-        console.log('logs from content script runtime: ', logs);
         assert.strictEqual(
           Number(headEl.getAttribute('data-test-composePresendingEmitted')),
           2
@@ -149,11 +138,11 @@ describe('Inbox', function() {
       browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
       assert.strictEqual(
         Number(headEl.getAttribute('data-test-composeDiscardEmitted')),
-        2
+        3
       );
       assert.strictEqual(
         Number(headEl.getAttribute('data-test-composeDestroyEmitted')),
-        3
+        4
       );
       // make sure discarding the draft has time to save before test ends
 

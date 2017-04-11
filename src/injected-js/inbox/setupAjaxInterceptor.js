@@ -79,11 +79,6 @@ export default function setupAjaxInterceptor() {
   }
 
   {
-    let sending = false;
-
-    document.addEventListener('emailIsSending', () => {
-      sending = true;
-    });
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
     const currentConnectionIDs = new WeakMap();
     main_wrappers.push({
@@ -93,30 +88,12 @@ export default function setupAjaxInterceptor() {
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
           const originalRequest = JSON.parse(connection.originalSendBody);
-          if (sending) {
-            const newAttr0 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-            newAttr0.push(`originalRequest: ${JSON.stringify(originalRequest)}`);
-            (document: any).head.setAttribute(
-              'data-test-sdkDebugLog',
-              JSON.stringify(newAttr0)
-            );
-          }
+
           const updateList = (
             originalRequest['2'] &&
             originalRequest['2']['1']
           );
-          if (sending) {
-            const newAttr1 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-            newAttr1.push(`update list existence: ${JSON.stringify(updateList)}`);
-            newAttr1.push(`update list length: ${updateList && updateList.length}`);
-            (document: any).head.setAttribute(
-              'data-test-sdkDebugLog',
-              JSON.stringify(newAttr1)
-            );
-          }
           if (!updateList) return;
-
-          // const updateDescriptor = updateList[0] && updateList[0]['2'];
 
           const sendUpdateMatch = updateList.find((update) => (
             update['2'] &&
@@ -126,13 +103,8 @@ export default function setupAjaxInterceptor() {
             update['2']['2']['14']['1']['1'] &&
             update['2']['2']['14']['1']['1'].indexOf('msg-a:') > -1
           ));
-          // const updateDescriptorDetails = (
-          //   updateDescriptor['2'] &&
-          //   updateDescriptor['2']['14'] &&
-          //   updateDescriptor['2']['14']['1']
-          // );
-          // if (!updateDescriptorDetails) return;
           if (!sendUpdateMatch) return;
+
           const sendUpdate = (
             sendUpdateMatch['2'] &&
             sendUpdateMatch['2']['2'] &&
@@ -147,24 +119,11 @@ export default function setupAjaxInterceptor() {
           const actionList = sendUpdate['11'];
           if (!(actionList && draftID)) return;
 
-          const newAttr2 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-          newAttr2.push('action tokens: ', actionList);
-          newAttr2.push('is SEND_ACTIONS match', intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length);
-          (document: any).head.setAttribute(
-            'data-test-sdkDebugLog',
-            JSON.stringify(newAttr2)
-          );
           const isSendRequest = (
             intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
           );
 
           if (isSendRequest) {
-            const newAttr3 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-            newAttr3.push('dispatching emailSending');
-            (document: any).head.setAttribute(
-              'data-test-sdkDebugLog',
-              JSON.stringify(newAttr3)
-            );
             currentConnectionIDs.set(connection, draftID);
             triggerEvent({type: 'emailSending', draftID});
           }
@@ -190,41 +149,36 @@ export default function setupAjaxInterceptor() {
             originalResponse['2'] &&
             originalResponse['2']['6']
           );
-          if (updateList) {
-            const newAttr4 = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-            newAttr4.push(`updateList from resp: ${JSON.stringify(updateList)}`);
-            newAttr4.push(`updateList length from resp: ${JSON.stringify(updateList.length)}`);
-            (document: any).head.setAttribute(
-              'data-test-sdkDebugLog',
-              JSON.stringify(newAttr4)
-            );
-          }
-          if (!updateList || updateList.length !== 1) {
+          if (!updateList) {
             sendFailed();
             return;
           }
 
-          const updateDescriptor = updateList[0] && updateList[0]['1'];
-          const updateDescriptorDetails = (
-            updateDescriptor['3'] &&
-            updateDescriptor['3']['7'] &&
-            updateDescriptor['3']['7']['1'] &&
-            updateDescriptor['3']['7']['1']['5'] &&
-            updateDescriptor['3']['7']['1']['5'][0]
-          );
-
-          const rfcID = updateDescriptorDetails['14'];
-          if (!rfcID) {
+          const sendUpdateMatch = updateList.find((update) => (
+            update['1'] &&
+            update['1']['3'] &&
+            update['1']['3']['7'] &&
+            update['1']['3']['7']['1'] &&
+            update['1']['3']['7']['1']['5'] &&
+            update['1']['3']['7']['1']['5'][0] &&
+            update['1']['3']['7']['1']['5'][0]['14']
+          ));
+          if (!sendUpdateMatch) {
             sendFailed();
             return;
           }
 
-          const newAttr = JSON.parse((document: any).head.getAttribute('data-test-sdkDebugLog'));
-          newAttr.push('dispatching emailSent');
-          (document: any).head.setAttribute(
-            'data-test-sdkDebugLog',
-            JSON.stringify(newAttr)
+          const sendUpdate = (
+            sendUpdateMatch['1'] &&
+            sendUpdateMatch['1']['3'] &&
+            sendUpdateMatch['1']['3']['7'] &&
+            sendUpdateMatch['1']['3']['7']['1'] &&
+            sendUpdateMatch['1']['3']['7']['1']['5'] &&
+            sendUpdateMatch['1']['3']['7']['1']['5'][0]
           );
+
+          const rfcID = sendUpdate['14'];
+
           triggerEvent({
             type: 'emailSent',
             rfcID,
