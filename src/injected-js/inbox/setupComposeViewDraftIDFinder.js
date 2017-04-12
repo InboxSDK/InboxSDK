@@ -2,9 +2,15 @@
 
 const MAX_SEARCH_DEPTH = 3;
 
-const searchCollection = (collection, predicate, maxDepth, currentDepth = 0) => {
-  for (const prop in collection) {
-    const value = collection[prop];
+const searchCollection = (
+  collection: Object,
+  predicate: (?Object) => boolean,
+  maxDepth: number,
+  currentDepth: number = 0
+) => {
+  const ownKeys = Object.keys(collection);
+  for (let i = 0; i < ownKeys.length; i++) {
+    const value = collection[ownKeys[i]];
     if (predicate(value)) {
       return value;
     } else if (currentDepth <= maxDepth && value instanceof Object) {
@@ -19,7 +25,6 @@ const findDraftID = target => {
   const match = searchCollection(target.__cdn.context, value => (
     typeof value === 'string' && value.indexOf('#msg-a:') > -1
   ), MAX_SEARCH_DEPTH);
-
   return match ? match.replace('#msg-a:', '') : null;
 };
 
