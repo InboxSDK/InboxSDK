@@ -115,12 +115,12 @@ class InboxComposeView {
 
     this.getEventStream()
       .takeUntilBy(this._stopper)
-      .filter(({eventName}) => (
-        eventName === 'presending' || eventName === 'sendCanceled'
-      )).map(({eventName}) => (
-        eventName === 'presending'
-      )).onValue(value => {
-        this._isSendPending = value;
+      .onValue(({eventName}) => {
+        if (eventName === 'presending') {
+          this._isSendPending = true;
+        } else if (eventName === 'sendCanceled') {
+          this._isSendPending = false;
+        }
       });
 
     handleComposeLinkChips(this);
@@ -183,6 +183,8 @@ class InboxComposeView {
     };
 
     if (this._isSendPending) {
+      this._driver.getPageCommunicator().notifyEmailSending();
+
       Kefir.merge([
         Kefir.combine([
           this.getEventStream().filter(({eventName}) => eventName === 'sending'),

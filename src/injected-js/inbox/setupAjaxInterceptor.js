@@ -1,7 +1,7 @@
 /* @flow */
 
 import intersection from 'lodash/intersection';
-import find from 'lodash/find';
+import censorJSONTree from '../../common/censorJSONTree';
 import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 
@@ -81,6 +81,21 @@ export default function setupAjaxInterceptor() {
   }
 
   {
+    let isComposeViewSending = false;
+    document.addEventListener('inboxSDKcomposeViewIsSending', () => (
+      isComposeViewSending = true
+    ));
+    const logIfParseFailed = (request) => {
+      if (!isComposeViewSending) return;
+
+      logger.error(
+        new Error ('Failed to identify outgoing send request'),
+        {requestPayload: censorJSONTree(request)}
+      );
+
+      isComposeViewSending = false;
+    };
+
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
     const currentConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
     main_wrappers.push({
@@ -95,7 +110,10 @@ export default function setupAjaxInterceptor() {
             originalRequest['2'] &&
             originalRequest['2']['1']
           );
-          if (!updateList) return;
+          if (!updateList) {
+            logIfParseFailed(originalRequest);
+            return;
+          }
 
           const sendUpdateMatch = updateList.find((update) => (
             update['2'] &&
@@ -105,7 +123,10 @@ export default function setupAjaxInterceptor() {
             update['2']['2']['14']['1']['1'] &&
             update['2']['2']['14']['1']['1'].indexOf('msg-a:') > -1
           ));
-          if (!sendUpdateMatch) return;
+          if (!sendUpdateMatch) {
+            logIfParseFailed(originalRequest);
+            return;
+          }
 
           const sendUpdate = (
             sendUpdateMatch['2'] &&
@@ -119,7 +140,10 @@ export default function setupAjaxInterceptor() {
             sendUpdate['1'].replace('msg-a:', '')
           );
           const actionList = sendUpdate['11'];
-          if (!(actionList && draftID)) return;
+          if (!(actionList && draftID)) {
+            logIfParseFailed(originalRequest);
+            return;
+          }
 
           const isSendRequest = (
             intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
@@ -128,6 +152,9 @@ export default function setupAjaxInterceptor() {
           if (isSendRequest) {
             currentConnectionIDs.set(connection, draftID);
             triggerEvent({type: 'emailSending', draftID});
+            isComposeViewSending = false;
+          } else {
+            logIfParseFailed(originalRequest);
           }
         }
       },

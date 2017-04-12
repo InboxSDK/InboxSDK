@@ -29,6 +29,13 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
 
     return draftID;
   }
+  notifyEmailSending(): void {
+    document.dispatchEvent(new CustomEvent('inboxSDKcomposeViewIsSending', {
+      bubbles: true,
+      cancelable: false,
+      detail: null
+    }));
+  }
   registerAllowedHashLinkStartTerm(term: string) {
     document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
       bubbles: false,
