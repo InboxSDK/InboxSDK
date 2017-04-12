@@ -176,22 +176,28 @@ class InboxComposeView {
     }
   }
   removedFromDOM() {
+    const cleanup = () => {
+      this._eventStream.emit({eventName: 'destroy', data: {}});
+      this._eventStream.end();
+      this._stopper.destroy();
+    };
+
     if (this._isSendPending) {
       Kefir.merge([
         Kefir.combine([
           this.getEventStream().filter(({eventName}) => eventName === 'sending'),
           this.getEventStream().filter(({eventName}) => eventName === 'sent')
         ]),
-        this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed')
-      ]).take(1).onValue(() => {
-        this._eventStream.emit({eventName: 'destroy', data: {}});
-        this._eventStream.end();
-        this._stopper.destroy();
+        this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed'),
+        Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
+          new Error('Timed out waiting for ComposeView send')
+        ))
+      ]).take(1).onValue(cleanup).onError((error) => {
+        this._driver.getLogger().error(error);
+        cleanup();
       });
     } else {
-      this._eventStream.emit({eventName: 'destroy', data: {}});
-      this._eventStream.end();
-      this._stopper.destroy();
+      cleanup();
     }
   }
   getEventStream(): Kefir.Observable<Object> {return this._eventStream;}

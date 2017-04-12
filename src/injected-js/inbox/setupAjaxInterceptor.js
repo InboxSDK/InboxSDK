@@ -5,6 +5,8 @@ import find from 'lodash/find';
 import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 
+import type {XHRProxyConnectionDetails} from '../xhr-proxy-factory';
+
 function logErrorExceptEventListeners(err, details) {
   // Don't log the page's own errors
   if (details !== 'XMLHttpRequest event listener error') {
@@ -80,7 +82,7 @@ export default function setupAjaxInterceptor() {
 
   {
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
-    const currentConnectionIDs = new WeakMap();
+    const currentConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
     main_wrappers.push({
       isRelevantTo(connection) {
         return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
