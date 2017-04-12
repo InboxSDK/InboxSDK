@@ -21,7 +21,6 @@ export type ComposeButtonDescriptor = {
 };
 
 export type ComposeViewDriver = {
-	destroy(): void;
 	getEventStream(): Kefir.Observable<Object>;
 	getStopper(): Kefir.Observable<any>;
 	getElement(): HTMLElement;

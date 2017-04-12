@@ -33,7 +33,7 @@ export default function getComposeViewDriverStream(driver: InboxDriver, tree: Ta
       });
     }
     const view = new InboxComposeView(driver, el, parsed);
-    removalStream.take(1).onValue(() => view.destroy());
+    removalStream.take(1).onValue(() => view.removedFromDOM());
     return view;
   });
 }

@@ -82,6 +82,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 * resolve to null if the draft remains empty and is closed before being
 	 * assigned an ID.
 	 * ^gmail
+	 * ^inbox
 	 * @return {Promise.<string>}
 	 */
 	getDraftID: function() {},
@@ -91,6 +92,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 * does not yet have a draft ID assigned, then the returned Promise resolves
 	 * to null immediately instead of waiting.
 	 * ^gmail
+	 * ^inbox
 	 * @return {Promise.<string>}
 	 */
 	getCurrentDraftID: function() {},
@@ -444,14 +446,17 @@ var ComposeView = /** @lends ComposeView */ {
 	 * as the AJAX request has already been sent. You'd typically use this event to record stats about
 	 * what messages are being sent.
 	 * ^gmail
+	 * ^inbox
 	 * @event ComposeView#sending
 	 */
 
 	/**
 	 * Fires when the Gmail server has confirmed receiving the message. An event
 	 * object containing properties about the sent message will be passed to the
-	 * event listeners.
+	 * event listeners. The threadID and messageID properties are not available
+	 * in Inbox yet.
 	 * ^gmail
+	 * ^inbox
 	 * @event ComposeView#sent
 	 * @param {string} threadID - the thread ID of the message that was just sent
 	 * @param {string} messageID - the message ID of the message that was just sent

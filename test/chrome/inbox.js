@@ -13,6 +13,8 @@ describe('Inbox', function() {
 
       browser.click('.inboxsdk__appid_warning button.inboxsdk__close_button');
 
+      const headEl = $('head');
+
       // Test a regular compose
       const composeButton = browser.execute(() =>
         document.querySelector(`button[aria-labelledby="${Array.prototype.filter.call(document.querySelectorAll('button + label'), el => el.textContent === 'Compose')[0].id}"]`)
@@ -27,6 +29,99 @@ describe('Inbox', function() {
       assert(!browser.isVisible('.test__tooltipButton'));
       assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
+      assert.strictEqual(
+        Number(headEl.getAttribute('data-test-composeDiscardEmitted')),
+        1
+      );
+      assert.strictEqual(
+        Number(headEl.getAttribute('data-test-composeDestroyEmitted')),
+        1
+      );
+      {
+        // Test presending/sending/sent events
+        composeButton.click();
+        browser.waitForVisible('div[role=dialog] div[jsaction^=compose]', 10*1000);
+        const toField = browser.$$('div[role=dialog] input[aria-label="To"]').find((el) => (
+          el.isVisible()
+        ));
+        const subject = $('div[role=dialog] input[title="Subject"]');
+        const body = $('div[role=dialog] [aria-label="Body, Say something"]');
+        toField.click();
+        toField.keys('tesla@streak.com');
+        toField.keys(['Enter']);
+        subject.click();
+        subject.keys(`InboxSDK Inbox ComposeView events test @ ${new Date().getTime()}`);
+        body.click();
+        body.keys('Test message!');
+        browser.click('div[role=dialog] [jsaction$="send"]');
+        browser.waitUntil(() => (
+          Number(headEl.getAttribute('data-test-composeSentEmitted')) === 1
+        ), 20 * 1000);
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composePresendingEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeSendingEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeSentEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeDestroyEmitted')),
+          2
+        );
+      }
+
+      {
+        // Test canceling send
+        composeButton.click();
+        browser.waitForVisible('div[role=dialog] div[jsaction^=compose]', 10*1000);
+        const toField = browser.$$('div[role=dialog] input[aria-label="To"]').find((el) => (
+          el.isVisible()
+        ));
+        const subject = $('div[role=dialog] input[title="Subject"]');
+        const body = $('div[role=dialog] [aria-label="Body, Say something"]');
+        toField.click();
+        toField.keys('tesla@streak.com');
+        toField.keys(['Enter']);
+        subject.click();
+        subject.keys(`InboxSDK Inbox ComposeView cancel send test @ ${new Date().getTime()}`);
+        body.click();
+        body.keys('Test message!');
+        browser.click('div[role=dialog] [jsaction$=send]');
+        browser.waitUntil(() => (
+          Number(headEl.getAttribute('data-test-composePresendingEmitted')) === 2
+        ), 10 * 1000);
+        assert(browser.isVisible('div[role=dialog] div[jsaction^=compose]', 1000));
+        browser.click('button[jsaction^=compose][jsaction$=discard_draft]');
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composePresendingEmitted')),
+          2
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeSendCanceledEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeSendingEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeSentEmitted')),
+          1
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeDiscardEmitted')),
+          2
+        );
+        assert.strictEqual(
+          Number(headEl.getAttribute('data-test-composeDestroyEmitted')),
+          3
+        );
+      }
 
       // Test an inline compose
       browser.click('.scroll-list-section-body div[role=listitem][data-item-id-qs*="thread-"] span[email="no-reply@accounts.google.com"]');
@@ -41,6 +136,14 @@ describe('Inbox', function() {
       assert(!browser.isVisible('.test__tooltipButton'));
       assert(browser.isVisible('div.test__dropdownContent'));
       browser.click('button[jsaction^=quickCompose][jsaction$=discard_draft]');
+      assert.strictEqual(
+        Number(headEl.getAttribute('data-test-composeDiscardEmitted')),
+        3
+      );
+      assert.strictEqual(
+        Number(headEl.getAttribute('data-test-composeDestroyEmitted')),
+        4
+      );
       // make sure discarding the draft has time to save before test ends
 
       // Test thread sidebar

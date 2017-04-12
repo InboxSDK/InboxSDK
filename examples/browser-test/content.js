@@ -18,6 +18,8 @@ function incrementStat(name) {
 }
 
 InboxSDK.load(2, 'simple-example').then(sdk => {
+	window.__sdk = sdk;
+
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		const button = composeView.addButton({
 			title: 'Monkeys!',
@@ -41,6 +43,39 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 		const tooltipEl = document.createElement('div');
 		tooltipEl.appendChild(tooltipButton);
 		button.showTooltip({el: tooltipEl});
+
+		composeView.getDraftID()
+			.then((id) => {
+				if (!/(?:r|r-)?\d+$/i.test(id)) {
+					throw Object.assign(new Error('Bad draft ID'), {id});
+				}
+			}).catch((error) => {
+				setTimeout(() => {
+					throw error;
+				}, 0);
+		  });
+
+		composeView.on('destroy', () => (
+			incrementStat('data-test-composeDestroyEmitted')
+		));
+		composeView.on('discard', () => (
+			incrementStat('data-test-composeDiscardEmitted')
+		));
+		composeView.on('presending', ({cancel}) => {
+			if(composeView.getSubject().indexOf('cancel send') > -1) {
+				cancel();
+			}
+			incrementStat('data-test-composePresendingEmitted');
+		});
+		composeView.on('sendCanceled', () => (
+			incrementStat('data-test-composeSendCanceledEmitted')
+		));
+		composeView.on('sending', () => {
+			incrementStat('data-test-composeSendingEmitted');
+		});
+		composeView.on('sent', () => {
+			incrementStat('data-test-composeSentEmitted');
+		});
 	});
 
 	sdk.Toolbars.addToolbarButtonForApp({
