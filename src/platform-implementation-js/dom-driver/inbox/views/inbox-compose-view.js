@@ -192,7 +192,7 @@ class InboxComposeView {
         Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
           new Error('Timed out waiting for ComposeView send')
         ))
-      ]).take(1).onValue(cleanup).onError((error) => {
+      ]).take(1).takeErrors(1).onValue(cleanup).onError((error) => {
         this._driver.getLogger().error(error);
         cleanup();
       });
