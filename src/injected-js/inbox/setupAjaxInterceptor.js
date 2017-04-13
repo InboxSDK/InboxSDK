@@ -104,69 +104,7 @@ export default function setupAjaxInterceptor() {
       },
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
-          // const originalRequest = JSON.parse(connection.originalSendBody);
-
-          const originalRequest = {
-            "2": {
-              "1": [
-                {
-                  "1": "...",
-                  "2": {
-                    "1": "...",
-                    "2": {
-                      "14": {
-                        "1": {
-                          "1": "...",
-                          "2": {
-                            "1": 1,
-                            "2": "...",
-                            "3": "..."
-                          },
-                          "3": [
-                            {
-                              "1": 1,
-                              "2": "...",
-                              "3": "...",
-                              "6": 0.46617000296456473
-                            }
-                          ],
-                          "7": "...",
-                          "8": "...",
-                          "9": {
-                            "2": [
-                              {
-                                "1": 0,
-                                "2": "..."
-                              }
-                            ]
-                          },
-                          "11": [
-                            "...",
-                            "..."
-                          ],
-                          "16": "...",
-                          "18": "..."
-                        },
-                        "2": "...",
-                        "3": 1,
-                        "5": {
-                          "1": "..."
-                        }
-                      }
-                    }
-                  }
-                }
-              ]
-            },
-            "3": {
-              "1": 1,
-              "2": "...",
-              "5": {
-                "2": 0
-              },
-              "7": 1
-            }
-          };
+          const originalRequest = JSON.parse(connection.originalSendBody);
 
           const updateList = (
             originalRequest['2'] &&
