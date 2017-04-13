@@ -145,6 +145,16 @@ describe('extractThreads', () => {
   });
 });
 
+describe('extractMessageIdsFromThreadBatchRequest', () => {
+  it('works', () => {
+    const data = require('./gmail-response-processor/batch-thread-response.json');
+    const results = GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(data);
+    expect(results).toEqual({
+      "15b687e66fbea0d2": "15b687ed739cae6c"
+    });
+  });
+});
+
 describe('replaceThreadsInResponse', () => {
   it('seems to work', () => {
     const data = require('./gmail-response-processor/search-response.json');

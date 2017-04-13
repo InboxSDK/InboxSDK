@@ -536,6 +536,17 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
   );
 }
 
+const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
+  t.cat,
+  t.cat,
+  t.filter(item => item[0] === 'cs'),
+  t.map(item => [item[1], item[2]])
+);
+export function extractMessageIdsFromThreadBatchRequest(response: string): {[threadId:string]: string} {
+  const {value} = deserialize(response);
+  return t.toObj(value, _extractMessageIdsFromThreadBatchRequestXf);
+}
+
 export function cleanupPeopleLine(peopleHtml: string): string {
   // Removes possible headings like "To: " that get added on the Sent page, and
   // removes a class that's specific to the current preview pane setting.
