@@ -100,9 +100,9 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	});
 
 	const customListThreads = [
-		'<CAGNQ5Q=0PfRksEgcz-kfgo41BgY4F=3ccPoAp3ERPZhhiA_cKw@mail.gmail.com>',
-		'<2666328789625116864@messageid.cloud_prod.monitoring-cloud.google.com>',
-		'<CA+jPuQ-=vTFHW_2+mkzYRKqrhWCVhHtR30_cjbJSgL2SYSdp7A@mail.gmail.com>',
+		// '<CAGNQ5Q=0PfRksEgcz-kfgo41BgY4F=3ccPoAp3ERPZhhiA_cKw@mail.gmail.com>',
+		// '<2666328789625116864@messageid.cloud_prod.monitoring-cloud.google.com>',
+		// '<CA+jPuQ-=vTFHW_2+mkzYRKqrhWCVhHtR30_cjbJSgL2SYSdp7A@mail.gmail.com>',
 		// '15a67bc14fa7cf22',
 		// '15a6779548b80de6',
 		// '15a6736f08e9489d',
@@ -160,10 +160,10 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 		// '15a829cd56a49929'
 
 		// FOR SDK TEST
-		// '15b687e66fbea0d2',
-		// '15b684d8a3fafb2d',
-		// '15b6847cea669fd8',
-		// '15b65fe90b999d16'
+		'15b687e66fbea0d2',
+		'15b684d8a3fafb2d',
+		'15b6847cea669fd8',
+		'15b65fe90b999d16'
 		// '<CAAaf2JeK1o9Lc=a1PFNye718XO7bXtkPcmbLU3qFyo7s22QMjw@mail.gmail.com>',
 		// '<CAAaf2JfQ4fHOWuP0ap8mAfdzXF45J+io_7MqX=j5nuFGiFCgZQ@mail.gmail.com>'
 	]

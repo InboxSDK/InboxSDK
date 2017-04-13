@@ -31,7 +31,7 @@ import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
-import getRfcMessageIdForGmailMessageId from './gmail-driver/get-rfc-message-id-for-gmail-message-id';
+import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
 import MessageIdManager from '../../lib/message-id-manager';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
@@ -113,8 +113,8 @@ class GmailDriver {
 		this._messageIdManager = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
 				getGmailThreadIdForRfcMessageId(this, rfcMessageId),
-			getRfcMessageIdForGmailMessageId: (gmailMessageId) =>
-				getRfcMessageIdForGmailMessageId(this, gmailMessageId)
+			getRfcMessageIdForGmailThreadId: (gmailThreadId) =>
+				getRfcMessageIdForGmailThreadId(this, gmailThreadId)
 		});
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
