@@ -54,7 +54,7 @@ function threadMetadataKey(threadRowMetadata: threadRowParser.ThreadRowMetadata)
 
 function processPreloadedThreads() {
   const preloadScript = find(document.querySelectorAll('script:not([src])'), script =>
-    script.text && script.text.slice(0,100).indexOf('var VIEW_DATA=[[') > -1
+    script.text && script.text.slice(0,500).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {
     logger.error(new Error("Could not read preloaded VIEW_DATA"));

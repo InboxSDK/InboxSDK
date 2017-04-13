@@ -5,7 +5,7 @@ import ajax from '../../common/ajax';
 
 type Options = {
   getGmailThreadIdForRfcMessageId(s: string): Promise<string>;
-  getRfcMessageIdForGmailMessageId(s: string): Promise<string>;
+  getRfcMessageIdForGmailThreadId(s: string): Promise<string>;
   storage?: Storage;
   saveThrottle?: number;
 };
@@ -14,16 +14,16 @@ type Options = {
 // localStorage. Used for custom thread lists.
 export default class MessageIdManager {
   _getGmailThreadIdForRfcMessageId: (s: string) => Promise<string>;
-  _getRfcMessageIdForGmailMessageId: (s: string) => Promise<string>;
+  _getRfcMessageIdForGmailThreadId: (s: string) => Promise<string>;
   _storage: ?Storage;
   _rfcIdsTimestamps: Map<string, number>;
   _rfcIdsToThreadIds: Map<string, string>;
   _threadIdsToRfcIds: Map<string, string>;
   _saveCache: () => void;
 
-  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailMessageId, storage, saveThrottle}: Options) {
+  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailThreadId, storage, saveThrottle}: Options) {
     this._getGmailThreadIdForRfcMessageId = getGmailThreadIdForRfcMessageId;
-    this._getRfcMessageIdForGmailMessageId = getRfcMessageIdForGmailMessageId;
+    this._getRfcMessageIdForGmailThreadId = getRfcMessageIdForGmailThreadId;
     this._storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
     if (saveThrottle == null) {
       saveThrottle = 3000;
@@ -113,7 +113,7 @@ export default class MessageIdManager {
       return Promise.resolve(rfcMessageId);
     }
 
-    const promise = this._getRfcMessageIdForGmailMessageId(gmailThreadId);
+    const promise = this._getRfcMessageIdForGmailThreadId(gmailThreadId);
     promise.then(rfcMessageId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
     }, _.noop);

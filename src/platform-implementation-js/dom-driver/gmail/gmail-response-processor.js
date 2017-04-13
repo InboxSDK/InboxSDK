@@ -146,13 +146,15 @@ export type MessageOptions = {
   includeLengths: boolean;
   suggestionMode: boolean;
   noArrayNewLines: boolean;
+  includeExplicitNulls: boolean;
 };
 
 export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
   const options = {
     includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
-    noArrayNewLines: !/^[,\]]/m.test(threadResponseString)
+    noArrayNewLines: !/^[,\]]/m.test(threadResponseString),
+    includeExplicitNulls: true
   };
 
   const value = [];
@@ -247,19 +249,27 @@ export function deserializeArray(value: string): any[] {
 export function serialize(value: any[], options: MessageOptions): string {
   if (options.suggestionMode) {
     assert(options.includeLengths);
-    return suggestionSerialize(value);
+    return suggestionSerialize(value, options.includeExplicitNulls);
   }
   return threadListSerialize(value, options);
 }
 
-function threadListSerialize(threadResponseArray: any[], options?: MessageOptions): string {
-  const includeLengths = options ? options.includeLengths : true;
-  const noArrayNewLines = options ? options.noArrayNewLines : false;
+function threadListSerialize(threadResponseArray: any[], options: MessageOptions): string {
+  const {
+    includeLengths,
+    noArrayNewLines,
+    includeExplicitNulls
+  } = options;
+
 
   let response = ")]}'\n" + (noArrayNewLines && includeLengths ? '' : '\n');
   for(let ii=0; ii<threadResponseArray.length; ii++){
     const arraySection = threadResponseArray[ii];
-    const arraySectionString = serializeArray(arraySection, noArrayNewLines);
+    const arraySectionString = serializeArray(
+      arraySection,
+      noArrayNewLines,
+      includeExplicitNulls
+    );
 
     if(!includeLengths){
       response += arraySectionString;
@@ -287,11 +297,18 @@ function threadListSerialize(threadResponseArray: any[], options?: MessageOption
   return response + (noArrayNewLines && includeLengths ? '\n' : '');
 }
 
-function suggestionSerialize(suggestionsArray: any[]): string {
+function suggestionSerialize(
+  suggestionsArray: any[],
+  includeExplicitNulls: boolean
+): string {
   let response = "5\n)]}'\n";
   for(let ii=0; ii<suggestionsArray.length; ii++){
     const arraySection = suggestionsArray[ii];
-    const arraySectionString = serializeArray(arraySection);
+    const arraySectionString = serializeArray(
+      arraySection,
+      false,
+      includeExplicitNulls
+    );
 
     const length = arraySectionString.length;
     response += length + '\r\n' + arraySectionString;
@@ -300,17 +317,21 @@ function suggestionSerialize(suggestionsArray: any[]): string {
   return response;
 }
 
-export function serializeArray(array: any[], noArrayNewLines: boolean = false): string {
+function serializeArray(
+  array: any[],
+  noArrayNewLines: boolean,
+  includeExplicitNulls: boolean
+): string {
   let response = '[';
   for(let ii=0; ii<array.length; ii++){
     const item = array[ii];
 
     let addition;
     if(Array.isArray(item)){
-      addition = serializeArray(item, noArrayNewLines);
+      addition = serializeArray(item, noArrayNewLines, includeExplicitNulls);
     }
-    else if(item == null) {
-      addition = '';
+    else if (item == null) {
+      addition = includeExplicitNulls ? 'null' : '';
     }
     else {
       addition = JSON.stringify(item)
@@ -513,6 +534,17 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
       gmailThreadId: thread[0]
     }, '_originalGmailFormat', {value: thread}))
   );
+}
+
+const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
+  t.cat,
+  t.cat,
+  t.filter(item => item[0] === 'cs'),
+  t.map(item => [item[1], item[2]])
+);
+export function extractMessageIdsFromThreadBatchRequest(response: string): {[threadId:string]: string} {
+  const {value} = deserialize(response);
+  return t.toObj(value, _extractMessageIdsFromThreadBatchRequestXf);
 }
 
 export function cleanupPeopleLine(peopleHtml: string): string {

@@ -10,7 +10,7 @@ test("return value from getGmailThreadIdForRfcMessageId is cached", async functi
   const getGmailThreadIdForRfcMessageId = jest.fn(() => Promise.resolve("123"));
   const mim = new MessageIdManager({
     getGmailThreadIdForRfcMessageId,
-    getRfcMessageIdForGmailMessageId(mid) {
+    getRfcMessageIdForGmailThreadId(mid) {
       throw new Error("should not happen");
     },
     storage, saveThrottle: 2
@@ -36,14 +36,14 @@ test("return value from getGmailThreadIdForRfcMessageId is cached", async functi
   expect(cachedThreadIds[0][2]).toBeLessThanOrEqual(endTime);
 });
 
-test("return value from getRfcMessageIdForGmailMessageId is cached", async function() {
+test("return value from getRfcMessageIdForGmailThreadId is cached", async function() {
   const storage: Object = new MockStorage();
-  const getRfcMessageIdForGmailMessageId = jest.fn(() => Promise.resolve("<456>"));
+  const getRfcMessageIdForGmailThreadId = jest.fn(() => Promise.resolve("<456>"));
   const mim = new MessageIdManager({
     getGmailThreadIdForRfcMessageId(rfcId) {
       throw new Error("should not happen");
     },
-    getRfcMessageIdForGmailMessageId,
+    getRfcMessageIdForGmailThreadId,
     storage, saveThrottle: 2
   });
 
@@ -52,7 +52,7 @@ test("return value from getRfcMessageIdForGmailMessageId is cached", async funct
   expect(await mim.getRfcMessageIdForGmailThreadId("456")).toBe("<456>");
   expect(await mim.getRfcMessageIdForGmailThreadId("456")).toBe("<456>");
   expect(await mim.getGmailThreadIdForRfcMessageId("<456>")).toBe("456");
-  expect(getRfcMessageIdForGmailMessageId).toHaveBeenCalledTimes(1);
+  expect(getRfcMessageIdForGmailThreadId).toHaveBeenCalledTimes(1);
   await delay(20);
   const endTime = Date.now();
 
@@ -74,7 +74,7 @@ test("can load from storage", async function() {
     getGmailThreadIdForRfcMessageId(rfcId) {
       throw new Error("should not happen");
     },
-    getRfcMessageIdForGmailMessageId(mid) {
+    getRfcMessageIdForGmailThreadId(mid) {
       throw new Error("should not happen");
     },
     storage, saveThrottle: 2
@@ -90,7 +90,7 @@ test("can load old v1 data containing HTML from storage", async function() {
     getGmailThreadIdForRfcMessageId(rfcId) {
       throw new Error("should not happen");
     },
-    getRfcMessageIdForGmailMessageId(mid) {
+    getRfcMessageIdForGmailThreadId(mid) {
       throw new Error("should not happen");
     },
     storage, saveThrottle: 2
