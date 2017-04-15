@@ -85,12 +85,12 @@ export default function setupAjaxInterceptor() {
     document.addEventListener('inboxSDKcomposeViewIsSending', () => (
       isComposeViewSending = true
     ));
-    const logIfParseFailed = (request) => {
+    const logIfParseFailed = (request, actionList) => {
       if (!isComposeViewSending) return;
 
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request)}
+        {requestPayload: censorJSONTree(request), actionList}
       );
 
       isComposeViewSending = false;
@@ -154,7 +154,7 @@ export default function setupAjaxInterceptor() {
             triggerEvent({type: 'emailSending', draftID});
             isComposeViewSending = false;
           } else {
-            logIfParseFailed(originalRequest);
+            logIfParseFailed(originalRequest, actionList);
           }
         }
       },
