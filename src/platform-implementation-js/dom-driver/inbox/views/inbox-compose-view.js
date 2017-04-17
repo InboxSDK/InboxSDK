@@ -45,7 +45,7 @@ class InboxComposeView {
   _draftID: string;
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
-  _isSendPending: boolean = false;
+  _isPresending: boolean = false;
   _p: Parsed;
   _els: *;
 
@@ -117,9 +117,9 @@ class InboxComposeView {
       .takeUntilBy(this._stopper)
       .onValue(({eventName}) => {
         if (eventName === 'presending') {
-          this._isSendPending = true;
+          this._isPresending = true;
         } else if (eventName === 'sendCanceled') {
-          this._isSendPending = false;
+          this._isPresending = false;
         }
       });
 
@@ -182,7 +182,7 @@ class InboxComposeView {
       this._stopper.destroy();
     };
 
-    if (this._isSendPending) {
+    if (this._isPresending) {
       this._driver.getPageCommunicator().notifyEmailSending();
 
       Kefir.merge([
