@@ -85,12 +85,12 @@ export default function setupAjaxInterceptor() {
     document.addEventListener('inboxSDKcomposeViewIsSending', () => (
       isComposeViewSending = true
     ));
-    const logIfParseFailed = (request) => {
+    const logIfParseFailed = (request, actionList) => {
       if (!isComposeViewSending) return;
 
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request)}
+        {requestPayload: censorJSONTree(request), actionList}
       );
 
       isComposeViewSending = false;
@@ -107,39 +107,45 @@ export default function setupAjaxInterceptor() {
           const originalRequest = JSON.parse(connection.originalSendBody);
 
           const updateList = (
-            originalRequest['2'] &&
-            originalRequest['2']['1']
+            originalRequest[2] &&
+            originalRequest[2][1]
           );
           if (!updateList) {
             logIfParseFailed(originalRequest);
             return;
           }
 
-          const sendUpdateMatch = updateList.find((update) => (
-            update['2'] &&
-            update['2']['2'] &&
-            update['2']['2']['14'] &&
-            update['2']['2']['14']['1'] &&
-            update['2']['2']['14']['1']['1'] &&
-            update['2']['2']['14']['1']['1'].indexOf('msg-a:') > -1
-          ));
+          const sendUpdateMatch = updateList.find((update) => {
+            const updateWrapper = (
+              update[2] &&
+              update[2][2] &&
+              (update[2][2][14] || update[2][2][2])
+            );
+
+            return (
+              updateWrapper &&
+              updateWrapper[1] &&
+              updateWrapper[1][1] &&
+              updateWrapper[1][1].indexOf('msg-a:') > -1
+            );
+          });
           if (!sendUpdateMatch) {
             logIfParseFailed(originalRequest);
             return;
           }
 
-          const sendUpdate = (
-            sendUpdateMatch['2'] &&
-            sendUpdateMatch['2']['2'] &&
-            sendUpdateMatch['2']['2']['14'] &&
-            sendUpdateMatch['2']['2']['14']['1']
+          const sendUpdateWrapper = (
+            sendUpdateMatch[2] &&
+            sendUpdateMatch[2][2] &&
+            (sendUpdateMatch[2][2][14] || sendUpdateMatch[2][2][2])
           );
+          const sendUpdate = sendUpdateWrapper[1];
 
           const draftID = (
-            sendUpdate['1'] &&
-            sendUpdate['1'].replace('msg-a:', '')
+            sendUpdate[1] &&
+            sendUpdate[1].replace('msg-a:', '')
           );
-          const actionList = sendUpdate['11'];
+          const actionList = sendUpdate[11];
           if (!(actionList && draftID)) {
             logIfParseFailed(originalRequest);
             return;
@@ -154,7 +160,7 @@ export default function setupAjaxInterceptor() {
             triggerEvent({type: 'emailSending', draftID});
             isComposeViewSending = false;
           } else {
-            logIfParseFailed(originalRequest);
+            logIfParseFailed(originalRequest, actionList);
           }
         }
       },
@@ -175,8 +181,8 @@ export default function setupAjaxInterceptor() {
           const originalResponse = JSON.parse(connection.originalResponseText);
 
           const updateList = (
-            originalResponse['2'] &&
-            originalResponse['2']['6']
+            originalResponse[2] &&
+            originalResponse[2][6]
           );
           if (!updateList) {
             sendFailed();
@@ -184,13 +190,13 @@ export default function setupAjaxInterceptor() {
           }
 
           const sendUpdateMatch = updateList.find((update) => (
-            update['1'] &&
-            update['1']['3'] &&
-            update['1']['3']['7'] &&
-            update['1']['3']['7']['1'] &&
-            update['1']['3']['7']['1']['5'] &&
-            update['1']['3']['7']['1']['5'][0] &&
-            update['1']['3']['7']['1']['5'][0]['14']
+            update[1] &&
+            update[1][3] &&
+            update[1][3][7] &&
+            update[1][3][7][1] &&
+            update[1][3][7][1][5] &&
+            update[1][3][7][1][5][0] &&
+            update[1][3][7][1][5][0][14]
           ));
           if (!sendUpdateMatch) {
             sendFailed();
@@ -198,15 +204,15 @@ export default function setupAjaxInterceptor() {
           }
 
           const sendUpdate = (
-            sendUpdateMatch['1'] &&
-            sendUpdateMatch['1']['3'] &&
-            sendUpdateMatch['1']['3']['7'] &&
-            sendUpdateMatch['1']['3']['7']['1'] &&
-            sendUpdateMatch['1']['3']['7']['1']['5'] &&
-            sendUpdateMatch['1']['3']['7']['1']['5'][0]
+            sendUpdateMatch[1] &&
+            sendUpdateMatch[1][3] &&
+            sendUpdateMatch[1][3][7] &&
+            sendUpdateMatch[1][3][7][1] &&
+            sendUpdateMatch[1][3][7][1][5] &&
+            sendUpdateMatch[1][3][7][1][5][0]
           );
 
-          const rfcID = sendUpdate['14'];
+          const rfcID = sendUpdate[14];
 
           triggerEvent({
             type: 'emailSent',
