@@ -82,7 +82,6 @@ export default function setupAjaxInterceptor() {
 
   {
     let isComposeViewSending = false;
-    let missedActions = [];
     document.addEventListener('inboxSDKcomposeViewIsSending', () => (
       isComposeViewSending = true
     ));
@@ -91,11 +90,10 @@ export default function setupAjaxInterceptor() {
 
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request), missedActions}
+        {requestPayload: censorJSONTree(request)}
       );
 
       isComposeViewSending = false;
-      missedActions = [];
     };
 
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
@@ -130,20 +128,14 @@ export default function setupAjaxInterceptor() {
               updateWrapper[1][1].indexOf('msg-a:') > -1
             );
 
-            if (isMessageUpdate) {
-              const actionList = updateWrapper[1][11];
-              if (!actionList) return false;
-              const isSendAction = intersection(
-                actionList,
+            return (
+              isMessageUpdate &&
+              updateWrapper[1][11] &&
+              intersection(
+                updateWrapper[1][11],
                 SEND_ACTIONS
-              ).length === SEND_ACTIONS.length;
-              if (!isSendAction) {
-                missedActions.push(actionList);
-              }
-              return isSendAction;
-            } else {
-              return false;
-            }
+              ).length === SEND_ACTIONS.length
+            );
           });
           if (!sendUpdateMatch) {
             logIfParseFailed(originalRequest);
@@ -163,7 +155,6 @@ export default function setupAjaxInterceptor() {
           currentConnectionIDs.set(connection, draftID);
           triggerEvent({type: 'emailSending', draftID});
           isComposeViewSending = false;
-          missedActions = [];
         }
       },
       afterListeners(connection) {
