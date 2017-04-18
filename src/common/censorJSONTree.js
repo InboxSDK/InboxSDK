@@ -1,6 +1,6 @@
 /* @flow */
 
-export default function censorJSONTree(object: Object): string {
+export default function censorJSONTree(object: any): string {
   return JSON.stringify(object, (key, value) => {
     if (typeof value !== 'string' || value.length <= 10) return value;
 

@@ -126,8 +126,10 @@ class InboxComposeView {
           }).onError((error) => {
             this._driver.getLogger().error(error);
           });
+          this._driver.getPageCommunicator().notifyEmailSending();
         } else if (eventName === 'sendCanceled') {
           this._isPresending = false;
+          this._driver.getPageCommunicator().notifyEmailSendCanceled();
         }
       });
 

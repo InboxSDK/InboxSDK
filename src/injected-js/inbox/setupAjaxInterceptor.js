@@ -82,18 +82,29 @@ export default function setupAjaxInterceptor() {
 
   {
     let isComposeViewSending = false;
-    document.addEventListener('inboxSDKcomposeViewIsSending', () => (
-      isComposeViewSending = true
-    ));
+    let sendRequestMisses = [];
+    document.addEventListener('inboxSDKcomposeViewIsSending', () => {
+      isComposeViewSending = true;
+      sendRequestMisses = [];
+    });
+    document.addEventListener('inboxSDKcomposeViewSendCanceled', () => {
+      isComposeViewSending = false;
+      sendRequestMisses = [];
+    });
     const logIfParseFailed = (request) => {
       if (!isComposeViewSending) return;
 
+      sendRequestMisses.push(request);
+
+      if (sendRequestMisses.length < 3) return;
+
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request)}
+        {requestPayloadList: censorJSONTree(sendRequestMisses)}
       );
 
       isComposeViewSending = false;
+      sendRequestMisses = [];
     };
 
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
@@ -155,6 +166,7 @@ export default function setupAjaxInterceptor() {
           currentConnectionIDs.set(connection, draftID);
           triggerEvent({type: 'emailSending', draftID});
           isComposeViewSending = false;
+          sendRequestMisses = [];
         }
       },
       afterListeners(connection) {
