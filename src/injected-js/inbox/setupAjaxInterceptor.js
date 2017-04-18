@@ -106,7 +106,7 @@ export default function setupAjaxInterceptor() {
       },
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
-          // const originalRequest = JSON.parse(connection.originalSendBody);
+          const originalRequest = JSON.parse(connection.originalSendBody);
 
           const updateList = (
             originalRequest[2] &&
