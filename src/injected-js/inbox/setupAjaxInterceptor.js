@@ -82,18 +82,20 @@ export default function setupAjaxInterceptor() {
 
   {
     let isComposeViewSending = false;
+    let missedActions = [];
     document.addEventListener('inboxSDKcomposeViewIsSending', () => (
       isComposeViewSending = true
     ));
-    const logIfParseFailed = (request, actionList) => {
+    const logIfParseFailed = (request) => {
       if (!isComposeViewSending) return;
 
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request), actionList}
+        {requestPayload: censorJSONTree(request), missedActions}
       );
 
       isComposeViewSending = false;
+      missedActions = [];
     };
 
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
@@ -104,7 +106,7 @@ export default function setupAjaxInterceptor() {
       },
       originalSendBodyLogger(connection) {
         if (connection.originalSendBody) {
-          const originalRequest = JSON.parse(connection.originalSendBody);
+          // const originalRequest = JSON.parse(connection.originalSendBody);
 
           const updateList = (
             originalRequest[2] &&
@@ -121,13 +123,27 @@ export default function setupAjaxInterceptor() {
               update[2][2] &&
               (update[2][2][14] || update[2][2][2])
             );
-
-            return (
+            const isMessageUpdate = (
               updateWrapper &&
               updateWrapper[1] &&
               updateWrapper[1][1] &&
               updateWrapper[1][1].indexOf('msg-a:') > -1
             );
+
+            if (isMessageUpdate) {
+              const actionList = updateWrapper[1][11];
+              if (!actionList) return false;
+              const isSendAction = intersection(
+                actionList,
+                SEND_ACTIONS
+              ).length === SEND_ACTIONS.length;
+              if (!isSendAction) {
+                missedActions.push(actionList);
+              }
+              return isSendAction;
+            } else {
+              return false;
+            }
           });
           if (!sendUpdateMatch) {
             logIfParseFailed(originalRequest);
@@ -141,27 +157,13 @@ export default function setupAjaxInterceptor() {
           );
           const sendUpdate = sendUpdateWrapper[1];
 
-          const draftID = (
-            sendUpdate[1] &&
-            sendUpdate[1].replace('msg-a:', '')
-          );
+          const draftID = sendUpdate[1].replace('msg-a:', '');
           const actionList = sendUpdate[11];
-          if (!(actionList && draftID)) {
-            logIfParseFailed(originalRequest);
-            return;
-          }
 
-          const isSendRequest = (
-            intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
-          );
-
-          if (isSendRequest) {
-            currentConnectionIDs.set(connection, draftID);
-            triggerEvent({type: 'emailSending', draftID});
-            isComposeViewSending = false;
-          } else {
-            logIfParseFailed(originalRequest, actionList);
-          }
+          currentConnectionIDs.set(connection, draftID);
+          triggerEvent({type: 'emailSending', draftID});
+          isComposeViewSending = false;
+          missedActions = [];
         }
       },
       afterListeners(connection) {
