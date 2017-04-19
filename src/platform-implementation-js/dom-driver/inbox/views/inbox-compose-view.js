@@ -141,7 +141,7 @@ class InboxComposeView {
           });
           this._driver.getPageCommunicator().notifyEmailSending();
 
-          Kefir.later(100)
+          Kefir.later(10)
             .takeUntilBy(sendCanceledStream)
             .onValue(() => {
               // In cases where Inbox decides to cancel the send client-side,
