@@ -31,14 +31,14 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
   }
   notifyEmailSending(): void {
     document.dispatchEvent(new CustomEvent('inboxSDKcomposeViewIsSending', {
-      bubbles: true,
+      bubbles: false,
       cancelable: false,
       detail: null
     }));
   }
   notifyEmailSendCanceled(): void {
     document.dispatchEvent(new CustomEvent('inboxSDKcomposeViewSendCanceled', {
-      bubbles: true,
+      bubbles: false,
       cancelable: false,
       detail: null
     }));

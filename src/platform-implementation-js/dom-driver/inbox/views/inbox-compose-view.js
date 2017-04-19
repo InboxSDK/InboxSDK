@@ -47,7 +47,6 @@ class InboxComposeView {
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
   _isPresending: boolean = false;
-  _isSent: boolean = false;
   _p: Parsed;
   _els: *;
 
@@ -120,9 +119,21 @@ class InboxComposeView {
       .onValue(({eventName}) => {
         if (eventName === 'presending') {
           this._isPresending = true;
-          this._sendingStream = this._getSendingStream();
+          this._sendingStream = Kefir.merge([
+            Kefir.combine([
+              this.getEventStream().filter(({eventName}) => eventName === 'sending'),
+              this.getEventStream().filter(({eventName}) => eventName === 'sent')
+            ]),
+            this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed'),
+            Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
+              new Error('Timed out waiting for ComposeView send')
+            ))
+          ]).takeUntilBy(
+            this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
+          ).takeUntilBy(this._stopper).take(1).takeErrors(1);
+
           this._sendingStream.onValue(() => {
-            this._isSent = true;
+            this._isPresending = false;
           }).onError((error) => {
             this._driver.getLogger().error(error);
           });
@@ -193,11 +204,7 @@ class InboxComposeView {
     };
 
     if (this._isPresending) {
-      if (this._isSent) {
-        cleanup();
-      } else {
-        this._sendingStream && this._sendingStream.onEnd(cleanup);
-      }
+      this._sendingStream && this._sendingStream.onEnd(cleanup);
     } else {
       cleanup();
     }
@@ -278,20 +285,6 @@ class InboxComposeView {
         .filter(({type}) => type === 'emailSent')
         .map(() => ({eventName: 'sent'}))
     );
-  }
-  _getSendingStream(): Kefir.Observable<Object> {
-    return Kefir.merge([
-      Kefir.combine([
-        this.getEventStream().filter(({eventName}) => eventName === 'sending'),
-        this.getEventStream().filter(({eventName}) => eventName === 'sent')
-      ]),
-      this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed'),
-      Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
-        new Error('Timed out waiting for ComposeView send')
-      ))
-    ]).takeUntilBy(
-      this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
-    ).takeUntilBy(this._stopper).take(1).takeErrors(1);
   }
   getFromContact(): Contact {
     const {fromPickerEmailSpan} = this._els;
