@@ -119,6 +119,10 @@ class InboxComposeView {
       .onValue(({eventName}) => {
         if (eventName === 'presending') {
           this._isPresending = true;
+
+          const sendCanceledStream = this.getEventStream()
+            .filter(({eventName}) => eventName === 'sendCanceled');
+
           this._sendingStream = Kefir.merge([
             Kefir.combine([
               this.getEventStream().filter(({eventName}) => eventName === 'sending'),
@@ -128,9 +132,7 @@ class InboxComposeView {
             Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
               new Error('Timed out waiting for ComposeView send')
             ))
-          ]).takeUntilBy(
-            this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
-          ).takeUntilBy(this._stopper).take(1).takeErrors(1);
+          ]).takeUntilBy(sendCanceledStream).takeUntilBy(this._stopper).take(1).takeErrors(1);
 
           this._sendingStream.onValue(() => {
             this._isPresending = false;
@@ -138,16 +140,19 @@ class InboxComposeView {
             this._driver.getLogger().error(error);
           });
           this._driver.getPageCommunicator().notifyEmailSending();
-          setTimeout(() => {
-            // In cases where Inbox decides to cancel the send client-side,
-            // we need to make sure we realize sending is not going to happen
-            // and inform consumers who might be expecting a send.
-            // The most common case for this is trying to send an email
-            // with no recipients.
-            if (document.contains(this._element)) {
-              this._eventStream.emit({eventName: 'sendCanceled'});
-            }
-          }, 0);
+
+          Kefir.later(0)
+            .takeUntilBy(sendCanceledStream)
+            .onValue(() => {
+              // In cases where Inbox decides to cancel the send client-side,
+              // we need to make sure we realize sending is not going to happen
+              // and inform consumers who might be expecting a send.
+              // The most common case for this is trying to send an email
+              // with no recipients.
+              if (document.contains(this._element)) {
+                this._eventStream.emit({eventName: 'sendCanceled'});
+              }
+            });
         } else if (eventName === 'sendCanceled') {
           this._isPresending = false;
           this._driver.getPageCommunicator().notifyEmailSendCanceled();
