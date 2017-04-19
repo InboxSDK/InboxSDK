@@ -38,6 +38,7 @@ class InboxComposeView {
   _driver: InboxDriver;
   _eventStream: Bus<any> = kefirBus();
   _ajaxInterceptStream: Kefir.Observable<Object>;
+  _sendingStream: ?Kefir.Observable<Object>;
   _stopper = kefirStopper();
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;
@@ -45,7 +46,7 @@ class InboxComposeView {
   _draftID: string;
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
-  _isSendPending: boolean = false;
+  _isPresending: boolean = false;
   _p: Parsed;
   _els: *;
 
@@ -117,9 +118,44 @@ class InboxComposeView {
       .takeUntilBy(this._stopper)
       .onValue(({eventName}) => {
         if (eventName === 'presending') {
-          this._isSendPending = true;
+          this._isPresending = true;
+
+          const sendCanceledStream = this.getEventStream()
+            .filter(({eventName}) => eventName === 'sendCanceled');
+
+          this._sendingStream = Kefir.merge([
+            Kefir.combine([
+              this.getEventStream().filter(({eventName}) => eventName === 'sending'),
+              this.getEventStream().filter(({eventName}) => eventName === 'sent')
+            ]),
+            this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed'),
+            Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
+              new Error('Timed out waiting for ComposeView send')
+            ))
+          ]).takeUntilBy(sendCanceledStream).takeUntilBy(this._stopper).take(1).takeErrors(1);
+
+          this._sendingStream.onValue(() => {
+            this._isPresending = false;
+          }).onError((error) => {
+            this._driver.getLogger().error(error);
+          });
+          this._driver.getPageCommunicator().notifyEmailSending();
+
+          Kefir.later(15)
+            .takeUntilBy(sendCanceledStream)
+            .onValue(() => {
+              // In cases where Inbox decides to cancel the send client-side,
+              // we need to make sure we realize sending is not going to happen
+              // and inform consumers who might be expecting a send.
+              // The most common case for this is trying to send an email
+              // with no recipients.
+              if (document.contains(this._element)) {
+                this._eventStream.emit({eventName: 'sendCanceled'});
+              }
+            });
         } else if (eventName === 'sendCanceled') {
-          this._isSendPending = false;
+          this._isPresending = false;
+          this._driver.getPageCommunicator().notifyEmailSendCanceled();
         }
       });
 
@@ -182,22 +218,8 @@ class InboxComposeView {
       this._stopper.destroy();
     };
 
-    if (this._isSendPending) {
-      this._driver.getPageCommunicator().notifyEmailSending();
-
-      Kefir.merge([
-        Kefir.combine([
-          this.getEventStream().filter(({eventName}) => eventName === 'sending'),
-          this.getEventStream().filter(({eventName}) => eventName === 'sent')
-        ]),
-        this._ajaxInterceptStream.filter(({type}) => type === 'emailSendFailed'),
-        Kefir.later(60 * 1000).flatMap(() => Kefir.constantError(
-          new Error('Timed out waiting for ComposeView send')
-        ))
-      ]).take(1).takeErrors(1).onValue(cleanup).onError((error) => {
-        this._driver.getLogger().error(error);
-        cleanup();
-      });
+    if (this._isPresending) {
+      this._sendingStream && this._sendingStream.onEnd(cleanup);
     } else {
       cleanup();
     }

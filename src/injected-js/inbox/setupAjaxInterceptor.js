@@ -82,18 +82,29 @@ export default function setupAjaxInterceptor() {
 
   {
     let isComposeViewSending = false;
-    document.addEventListener('inboxSDKcomposeViewIsSending', () => (
-      isComposeViewSending = true
-    ));
-    const logIfParseFailed = (request, actionList) => {
+    let sendRequestMisses = [];
+    document.addEventListener('inboxSDKcomposeViewIsSending', () => {
+      isComposeViewSending = true;
+      sendRequestMisses = [];
+    });
+    document.addEventListener('inboxSDKcomposeViewSendCanceled', () => {
+      isComposeViewSending = false;
+      sendRequestMisses = [];
+    });
+    const logIfParseFailed = (request) => {
       if (!isComposeViewSending) return;
+
+      sendRequestMisses.push(request);
+
+      if (sendRequestMisses.length < 3) return;
 
       logger.error(
         new Error ('Failed to identify outgoing send request'),
-        {requestPayload: censorJSONTree(request), actionList}
+        {requestPayloadList: censorJSONTree(sendRequestMisses)}
       );
 
       isComposeViewSending = false;
+      sendRequestMisses = [];
     };
 
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
@@ -121,12 +132,20 @@ export default function setupAjaxInterceptor() {
               update[2][2] &&
               (update[2][2][14] || update[2][2][2])
             );
-
-            return (
+            const isMessageUpdate = (
               updateWrapper &&
               updateWrapper[1] &&
               updateWrapper[1][1] &&
               updateWrapper[1][1].indexOf('msg-a:') > -1
+            );
+
+            return (
+              isMessageUpdate &&
+              updateWrapper[1][11] &&
+              intersection(
+                updateWrapper[1][11],
+                SEND_ACTIONS
+              ).length === SEND_ACTIONS.length
             );
           });
           if (!sendUpdateMatch) {
@@ -141,27 +160,13 @@ export default function setupAjaxInterceptor() {
           );
           const sendUpdate = sendUpdateWrapper[1];
 
-          const draftID = (
-            sendUpdate[1] &&
-            sendUpdate[1].replace('msg-a:', '')
-          );
+          const draftID = sendUpdate[1].replace('msg-a:', '');
           const actionList = sendUpdate[11];
-          if (!(actionList && draftID)) {
-            logIfParseFailed(originalRequest);
-            return;
-          }
 
-          const isSendRequest = (
-            intersection(actionList, SEND_ACTIONS).length === SEND_ACTIONS.length
-          );
-
-          if (isSendRequest) {
-            currentConnectionIDs.set(connection, draftID);
-            triggerEvent({type: 'emailSending', draftID});
-            isComposeViewSending = false;
-          } else {
-            logIfParseFailed(originalRequest, actionList);
-          }
+          currentConnectionIDs.set(connection, draftID);
+          triggerEvent({type: 'emailSending', draftID});
+          isComposeViewSending = false;
+          sendRequestMisses = [];
         }
       },
       afterListeners(connection) {
