@@ -237,6 +237,19 @@ class GmailComposeView {
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
 
+				this.getEventStream()
+					.filter(({eventName}) => eventName === 'presending')
+					.takeUntilBy(this._stopper)
+					.onValue(() => {
+						Kefir.later(15).takeUntilBy(
+							this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
+						).onValue(() => {
+							if (isElementVisible(this._element)) {
+								this._eventStream.emit({eventName: 'sendCanceled'});
+							}
+						});
+					});
+
 				return this;
 			}).toProperty()
 		);
