@@ -140,19 +140,20 @@ class InboxComposeView {
             this._driver.getLogger().error(error);
           });
           this._driver.getPageCommunicator().notifyEmailSending();
-
-          Kefir.later(15)
-            .takeUntilBy(sendCanceledStream)
-            .onValue(() => {
-              // In cases where Inbox decides to cancel the send client-side,
-              // we need to make sure we realize sending is not going to happen
-              // and inform consumers who might be expecting a send.
-              // The most common case for this is trying to send an email
-              // with no recipients.
-              if (document.contains(this._element)) {
-                this._eventStream.emit({eventName: 'sendCanceled'});
-              }
-            });
+          if (!this._p.attributes.isInline) {
+            Kefir.later(15)
+              .takeUntilBy(sendCanceledStream)
+              .onValue(() => {
+                // In cases where Inbox decides to cancel the send client-side,
+                // we need to make sure we realize sending is not going to happen
+                // and inform consumers who might be expecting a send.
+                // The most common case for this is trying to send an email
+                // with no recipients.
+                if (document.contains(this._element)) {
+                  this._eventStream.emit({eventName: 'sendCanceled'});
+                }
+              });
+          }
         } else if (eventName === 'sendCanceled') {
           this._isPresending = false;
           this._driver.getPageCommunicator().notifyEmailSendCanceled();
