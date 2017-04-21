@@ -56,6 +56,30 @@ module.exports = function() {
           (document.head:any).setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
         }
       }
+    } else {
+      const preloadDataSearchString = 'window.BT_EmbeddedAppData=[';
+      const preloadScript = find(document.querySelectorAll('script:not([src])'), script =>
+        script.text && script.text.slice(0,500).indexOf(preloadDataSearchString) > -1
+      );
+      if (!preloadScript) {
+        logger.error(new Error("Could not read preloaded BT_EmbeddedAppData"));
+      } else {
+        const {text} = preloadScript;
+        const firstBracket = text.indexOf('window.BT_EmbeddedAppData=[');
+        const lastBracket = (
+          // I have only seen the case where there is a new line between the
+          // closing bracket and the semicolon, but want to be defensive in
+          // case that changes.
+          text.indexOf(']\n;', firstBracket) ||
+          text.indexOf('];', firstBracket)
+        );
+        const preloadData = JSON.parse(text.slice(
+          firstBracket + preloadDataSearchString.length - 1,
+          lastBracket + 1
+        ));
+
+        (document.head:any).setAttribute('data-inboxsdk-ik-value', preloadData[11]);
+      }
     }
   }).catch(err => {
     function getStatus() {

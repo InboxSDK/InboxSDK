@@ -20,6 +20,18 @@ export default class CommonPageCommunicator {
     return s;
   }
 
+  getIkValue(): string {
+    const ownIk = (document.head:any).getAttribute('data-inboxsdk-ik-value');
+    if (ownIk) {
+      return ownIk;
+    }
+    // For standalone windows.
+    if (window.opener) {
+      return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
+    }
+    throw new Error("Failed to look up 'ik' value");
+  }
+
   resolveUrlRedirects(url: string): Promise<string> {
     return this.pageAjax({url, method: 'HEAD'}).then(result => result.responseURL);
   }
