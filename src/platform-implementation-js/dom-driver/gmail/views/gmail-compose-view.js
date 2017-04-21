@@ -242,11 +242,12 @@ class GmailComposeView {
 					.takeUntilBy(this._stopper)
 					.onValue(() => {
 						Kefir.later(15).takeUntilBy(
-							this.getEventStream().filter(({eventName}) => eventName === 'sendCanceled')
+							this.getEventStream().filter(({eventName}) => (
+								eventName === 'sendCanceled' ||
+								eventName === 'sending'
+							))
 						).onValue(() => {
-							if (isElementVisible(this._element)) {
-								this._eventStream.emit({eventName: 'sendCanceled'});
-							}
+							this._eventStream.emit({eventName: 'sendCanceled'});
 						});
 					});
 
