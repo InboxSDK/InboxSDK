@@ -21,7 +21,7 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
     }
   });
 
-  const messageIdMatch = text.match(/\?view=att&amp;th=([a-z1-9])&/i);
+  const messageIdMatch = text.match(/\?view=att&(?:amp;)?th=([a-z0-9]*)&/i);
   if (!messageIdMatch) {
     throw new Error("Failed to find gmail message id for inbox message id");
   }
