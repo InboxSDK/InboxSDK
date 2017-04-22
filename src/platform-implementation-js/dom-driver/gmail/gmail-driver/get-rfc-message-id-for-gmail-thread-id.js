@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import gmailLimitedAjax from '../gmail-limited-ajax';
+import googleLimitedAjax from '../../../driver-common/googleLimitedAjax';
 import type GmailDriver from '../gmail-driver';
 import htmlToText from '../../../../common/html-to-text';
 import querystring from 'querystring';
@@ -19,7 +19,7 @@ async function getRfcMessageIdForGmailThreadId(driver: GmailDriver, gmailThreadI
     search: 'all'
   };
 
-  const gmailMessageIdResponse = await gmailLimitedAjax({
+  const gmailMessageIdResponse = await googleLimitedAjax({
     method: 'POST',
     url: (document.location:any).origin + document.location.pathname + '?' + querystring.stringify(messageIdQuery),
     canRetry: true,
@@ -36,7 +36,7 @@ async function getRfcMessageIdForGmailThreadId(driver: GmailDriver, gmailThreadI
     throw new Error('Could not find a message ID for given thread ID');
   }
 
-  const response = await gmailLimitedAjax({
+  const response = await googleLimitedAjax({
     method: 'GET',
     url: (document.location:any).origin+document.location.pathname,
     canRetry: true,

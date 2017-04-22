@@ -65,18 +65,6 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return (document.head:any).getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
-  getIkValue(): string {
-    const ownIk = (document.head:any).getAttribute('data-inboxsdk-ik-value');
-    if (ownIk) {
-      return ownIk;
-    }
-    // For standalone windows.
-    if (window.opener) {
-      return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
-    }
-    throw new Error("Failed to look up Gmail 'ik' value");
-  }
-
   getActionTokenValue(): string {
     const s = (document.head:any).getAttribute('data-inboxsdk-action-token-value');
     if (s == null) throw new Error('Failed to read value');

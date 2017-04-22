@@ -28,6 +28,7 @@ import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../
 import {
   getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
+import getGmailMessageIdForInboxMessageId from '../getGmailMessageIdForInboxMessageId';
 
 import type {Parsed} from '../detection/compose/parser';
 
@@ -299,7 +300,11 @@ class InboxComposeView {
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSent')
-        .map(() => ({eventName: 'sent'}))
+        .flatMap(() => (
+          Kefir.fromPromise(
+            getGmailMessageIdForInboxMessageId(this._driver, this._draftID)
+          )
+        )).map((messageID) => ({eventName: 'sent', data: {messageID}}))
     );
   }
   getFromContact(): Contact {
