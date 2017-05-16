@@ -103,7 +103,13 @@ class GmailMessageView {
 			throw new Error('tried to get message contents before message is loaded');
 		}
 
-		return querySelector(this._element, '.adP');
+		try {
+			return querySelector(this._element, 'div.ii.gt');
+		} catch(err) {
+			// Keep old fallback selector until we're confident of the new one.
+			this._driver.getLogger().error(err);
+			return querySelector(this._element, '.adP');
+		}
 	}
 
 	isElementInQuotedArea(element: HTMLElement): boolean {
