@@ -8,17 +8,17 @@ export default function signIn() {
   const authInfo = readAuthInfo();
 
   browser.url('https://inbox.google.com');
-  browser.waitForVisible('input[name=Email]');
-  browser.setValue('input[name=Email]', 'inboxsdktest@gmail.com');
-  browser.click('input#next');
-  browser.waitForVisible('input[name=Passwd]');
-  browser.setValue('input[name=Passwd]', authInfo['inboxsdktest@gmail.com'].password);
-  browser.click('input#signIn');
-  browser.waitForVisible('input[name=Pin]');
-  browser.setValue('input[name=Pin]', googleTotp(authInfo['inboxsdktest@gmail.com'].twofactor));
+  browser.waitForVisible('input[type=email], input[name=Email]');
+  browser.setValue('input[type=email], input[name=Email]', 'inboxsdktest@gmail.com');
+  browser.click('div[role=button]#identifierNext, input#next');
+  browser.waitForVisible('input[type=password], input[name=Passwd]');
+  browser.setValue('input[type=password], input[name=Passwd]', authInfo['inboxsdktest@gmail.com'].password);
+  browser.click('div[role=button]#passwordNext, input#signIn');
+  browser.waitForVisible('input[name=totpPin], input[name=Pin]');
+  browser.setValue('input[name=totpPin], input[name=Pin]', googleTotp(authInfo['inboxsdktest@gmail.com'].twofactor));
 
   const oldTitle = browser.getTitle();
-  browser.click('input#submit');
+  browser.click('div[role=button]#totpNext, input#submit');
   browser.waitUntil(() => browser.getTitle() !== oldTitle);
 
   // Deal with an interstitial page.
