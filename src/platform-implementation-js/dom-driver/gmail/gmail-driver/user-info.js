@@ -61,6 +61,7 @@ export default class UserInfo {
 
   waitForAccountSwitcherReady(): Promise<void> {
     return waitFor(() => this.getAccountSwitcherContactList().length > 0, 10*1000)
+      .then(() => undefined)
       .catch(err => {
         this._failedWaitFor = true;
         Logger.error(err, {
