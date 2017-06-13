@@ -7,16 +7,6 @@ import semver from 'semver';
 import path from 'path';
 import escapeShellArg from './escape-shell-arg';
 
-function getVersionFromUrl(url: string): string {
-  if (/^[a-z]+:\/\//.test(url)) {
-    const m = /-(\d+\.\d+\.\d+(?:-\w+)*)\./.exec(url);
-    if (!m) throw new Error(`Could not find version number in url: ${url}`);
-    return m[1];
-  } else {
-    return url;
-  }
-}
-
 function checkDependency(version: string, depname: string) {
   const depPackage = (require: any)(depname+'/package.json');
   if (!semver.satisfies(depPackage.version, version)) {
@@ -32,7 +22,10 @@ function checkDependenciesRecursive(packagePath: string[], shrinkWrapEntry: Obje
   const packageObj = (require: any)(packagePath.join('/node_modules/')+'/package.json');
   // Don't check our own version number.
   if (packagePath.length != 1) {
-    assert.strictEqual(packageObj.version, getVersionFromUrl(shrinkWrapEntry.version));
+    assert.strictEqual(packageObj.version, shrinkWrapEntry.version);
+    if (packageObj.integrity != null) {
+      assert.strictEqual(packageObj.integrity, shrinkWrapEntry.integrity);
+    }
   }
   _.forOwn(shrinkWrapEntry.dependencies, (shrinkwrapSubEntry, depname) => {
     checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapSubEntry);
