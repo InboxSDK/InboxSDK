@@ -27,16 +27,15 @@ function checkDependency(version: string, depname: string) {
   }
 }
 
-function checkDependenciesRecursive(packagePath: string[], shrinkWrap: Object) {
+function checkDependenciesRecursive(packagePath: string[], shrinkWrapEntry: Object) {
+  if (shrinkWrapEntry.optional) return;
   const packageObj = (require: any)(packagePath.join('/node_modules/')+'/package.json');
   // Don't check our own version number.
   if (packagePath.length != 1) {
-    assert.strictEqual(packageObj.version, getVersionFromUrl(shrinkWrap.version));
+    assert.strictEqual(packageObj.version, getVersionFromUrl(shrinkWrapEntry.version));
   }
-  _.forOwn(shrinkWrap.dependencies, (shrinkwrapPart, depname) => {
-    if (!shrinkwrapPart.optional) {
-      checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
-    }
+  _.forOwn(shrinkWrapEntry.dependencies, (shrinkwrapSubEntry, depname) => {
+    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapSubEntry);
   });
 }
 
