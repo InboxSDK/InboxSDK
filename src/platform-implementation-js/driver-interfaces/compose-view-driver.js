@@ -57,6 +57,7 @@ export type ComposeViewDriver = {
 	isReply(): boolean;
 	isInlineReplyForm(): boolean;
 	getBodyElement(): HTMLElement;
+	getSubjectInput(): ?HTMLInputElement;
 	getHTMLContent(): string;
 	getTextContent(): string;
 	getSelectedBodyHTML(): ?string;

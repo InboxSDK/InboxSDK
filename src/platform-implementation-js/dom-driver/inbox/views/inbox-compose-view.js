@@ -599,6 +599,11 @@ class InboxComposeView {
   isMinimized(): boolean {
     return this._isMinimized;
   }
+
+  getSubjectInput(): ?HTMLInputElement {
+    return this._els.subject;
+  }
+
   getBodyElement(): HTMLElement {
     if (!this._els.body) throw new Error("Compose View missing body element");
     return this._els.body;
