@@ -291,6 +291,12 @@ class InboxComposeView {
     );
 
     this._eventStream.plug(
+      Kefir
+        .fromEvents(this.getElement(), 'inboxSDKdiscardCanceled')
+        .map(() => ({eventName: 'discardCanceled'}))
+    );
+
+    this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSending')
         .map(() => ({eventName: 'sending'}))
@@ -492,6 +498,9 @@ class InboxComposeView {
   send() {
     if (!this._els.sendBtn) throw new Error("Compose View missing send element");
     simulateClick(this._els.sendBtn);
+  }
+  discard() {
+    simulateClick(this.getDiscardButton());
   }
   setMinimized(minimized: boolean) {
     if (minimized !== this.isMinimized()) {
