@@ -114,7 +114,7 @@ function _replaceCurrentlyShowingModal(modalView, modalViewDriver){
     currentlyShowingModal.modalViewDriver.getModalContainerElement().remove();
   } else {
     if (!activeBackdrop) {
-      activeBackdrop = modalView._driver.createBackdrop();
+      activeBackdrop = modalView._driver.createBackdrop(502);
       activeBackdrop.getStopper().onValue(() => {
         activeBackdrop = null;
         hiddenModalStack.slice().forEach(modalView => {
