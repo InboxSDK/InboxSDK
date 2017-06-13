@@ -1,18 +1,14 @@
-var fs = require('fs');
-var _ = require('lodash');
-var assert = require('assert');
-var semver = require('semver');
-var path = require('path');
-var escapeShellArg = require('./escape-shell-arg');
+/* @flow */
 
-// Some of these have issues on linux machines or circleci specifically.
-var optionalDeps = [
-  'fsevents',
-  'browserify-hmr', 'bufferutil', 'bindings', 'utf-8-validate'
-];
+import fs from 'fs';
+import _ from 'lodash';
+import assert from 'assert';
+import semver from 'semver';
+import path from 'path';
+import escapeShellArg from './escape-shell-arg';
 
-function checkDependency(version, depname) {
-  var depPackage = require(depname+'/package.json');
+function checkDependency(version: string, depname: string) {
+  const depPackage = (require: any)(depname+'/package.json');
   if (!semver.satisfies(depPackage.version, version)) {
     throw new Error(
       "Dependency "+depname+" is at version "+depPackage.version+
@@ -21,31 +17,33 @@ function checkDependency(version, depname) {
   }
 }
 
-function checkDependenciesRecursive(packagePath, shrinkWrap) {
-  var packageObj = require(packagePath.join('/node_modules/')+'/package.json');
+function checkDependenciesRecursive(packagePath: string[], shrinkWrapEntry: Object) {
+  if (shrinkWrapEntry.optional) return;
+  const packageObj = (require: any)(packagePath.join('/node_modules/')+'/package.json');
   // Don't check our own version number.
   if (packagePath.length != 1) {
-    assert.strictEqual(packageObj.version, shrinkWrap.version);
-  }
-  _.forOwn(shrinkWrap.dependencies, function(shrinkwrapPart, depname) {
-    if (!_.includes(optionalDeps, depname)) {
-      checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapPart);
+    assert.strictEqual(packageObj.version, shrinkWrapEntry.version);
+    if (packageObj.integrity != null) {
+      assert.strictEqual(packageObj.integrity, shrinkWrapEntry.integrity);
     }
+  }
+  _.forOwn(shrinkWrapEntry.dependencies, (shrinkwrapSubEntry, depname) => {
+    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapSubEntry);
   });
 }
 
-function checkDependencies(packageObj) {
+function checkDependencies(packageObj: Object) {
   try {
-    var shrinkWrapPath = __dirname+'/../../npm-shrinkwrap.json';
+    const shrinkWrapPath = __dirname+'/../../npm-shrinkwrap.json';
     if (fs.existsSync(shrinkWrapPath)) {
-      var shrinkWrap = require(shrinkWrapPath);
+      const shrinkWrap = (require: any)(shrinkWrapPath);
       checkDependenciesRecursive([__dirname+'/../../'], shrinkWrap);
     } else {
       _.forOwn(packageObj.dependencies, checkDependency);
       _.forOwn(packageObj.devDependencies, checkDependency);
     }
   } catch(e) {
-    var pjDir = path.join(__dirname, '../..');
+    const pjDir = path.join(__dirname, '../..');
     console.error(
       "Dependencies check failed. To fix, run:\n" +
       "    (cd "+escapeShellArg(pjDir)+" && rm -rf node_modules && npm install)"
