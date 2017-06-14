@@ -1,7 +1,18 @@
 /* @flow */
 
+import asap from 'asap';
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+
+const dispatchCancel = (element) => (
+  asap(() => (
+    element.dispatchEvent(new CustomEvent('inboxSDKdiscardCanceled', {
+      bubbles: false,
+      cancelable: false,
+      detail: null
+    }))
+  ))
+);
 
 export default function({
   element,
@@ -26,5 +37,15 @@ export default function({
     ))
   ]);
 
-  return domEventStream.map(domEvent => ({eventName: 'discard'}));
+  return domEventStream.map(domEvent => ({
+    eventName: 'discard',
+    data: {
+      cancel() {
+        domEvent.preventDefault();
+        domEvent.stopPropagation();
+        domEvent.stopImmediatePropagation();
+        dispatchCancel(element)
+      }
+    }
+  }));
 }

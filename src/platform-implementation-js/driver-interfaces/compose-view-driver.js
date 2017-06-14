@@ -40,6 +40,7 @@ export type ComposeViewDriver = {
 	focus(): void;
 	close(): void;
 	send(): void;
+	discard(): void;
 	popOut(): void;
 	registerRequestModifier(modifier: Object): void;
 	attachFiles(files: Blob[]): Promise<void>;
@@ -56,6 +57,7 @@ export type ComposeViewDriver = {
 	isReply(): boolean;
 	isInlineReplyForm(): boolean;
 	getBodyElement(): HTMLElement;
+	getSubjectInput(): ?HTMLInputElement;
 	getHTMLContent(): string;
 	getTextContent(): string;
 	getSelectedBodyHTML(): ?string;

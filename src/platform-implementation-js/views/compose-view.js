@@ -97,6 +97,14 @@ class ComposeView extends EventEmitter {
 		get(memberMap, this).composeViewImplementation.send();
 	}
 
+	discard() {
+		get(memberMap, this).composeViewImplementation.discard();
+	}
+
+	getSubjectInput(){
+		return get(memberMap, this).composeViewImplementation.getSubjectInput();
+	}
+
 	getBodyElement(){
 		return get(memberMap, this).composeViewImplementation.getBodyElement();
 	}
