@@ -62,7 +62,12 @@ class ThreadView extends EventEmitter {
 	}
 
 	getThreadID(): string {
+		// TODO mark deprecated
 		return get(memberMap, this).threadViewImplementation.getThreadID();
+	}
+
+	getThreadIDAsync(): Promise<string> {
+		return get(memberMap, this).threadViewImplementation.getThreadIDAsync();
 	}
 }
 

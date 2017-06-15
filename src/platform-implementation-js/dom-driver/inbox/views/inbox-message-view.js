@@ -177,6 +177,11 @@ class InboxMessageView {
     return this._p.attributes.messageId;
   }
 
+  async getMessageIDAsync(): Promise<string> {
+    // TODO handle translating fake IDs into real ones and cache them
+    return this.getMessageID();
+  }
+
   getContentsElement() {
     if (!this._p.elements.body) throw new Error('Could not find body element');
     return this._p.elements.body;

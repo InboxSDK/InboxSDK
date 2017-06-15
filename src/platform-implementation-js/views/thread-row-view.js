@@ -57,7 +57,12 @@ export default class ThreadRowView extends EventEmitter {
   }
 
   getThreadID(): string {
+    // TODO mark deprecated
     return this._threadRowViewDriver.getThreadID();
+  }
+
+  getThreadIDAsync(): Promise<string> {
+    return this._threadRowViewDriver.getThreadIDAsync();
   }
 
   getThreadIDIfStable(): ?string {

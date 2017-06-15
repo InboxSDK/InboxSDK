@@ -83,6 +83,11 @@ class InboxThreadView {
     return this._p.attributes.threadId;
   }
 
+  async getThreadIDAsync(): Promise<string> {
+    // TODO handle translating fake IDs into real ones and cache them
+    return this.getThreadID();
+  }
+
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const panel = this._driver.getAppSidebarView().addSidebarContentPanel(descriptor);
     this._sidebarPanels.add(panel);

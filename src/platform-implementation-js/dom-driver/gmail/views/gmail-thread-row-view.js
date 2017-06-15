@@ -779,6 +779,10 @@ class GmailThreadRowView {
     return threadID;
   }
 
+  async getThreadIDAsync(): Promise<string> {
+    return this.getThreadID();
+  }
+
   getDraftID(): Promise<?string> {
     return this._driver.getThreadRowIdentifier().getDraftIdForThreadRow(this);
   }
