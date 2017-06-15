@@ -94,7 +94,7 @@ describe('Inbox Message Detection', function() {
       assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
-      assert.strictEqual(results.attributes.messageId, '14ff3f449377ba4e');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-f:1512997563584199246');
     });
 
     it('2016-06-20 bundled inline', function() {
@@ -105,7 +105,7 @@ describe('Inbox Message Detection', function() {
       assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
-      assert.strictEqual(results.attributes.messageId, '150058a7ecc2fea4');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-f:1513306953051471524');
     });
 
     it('2016-08-10 message', function() {
@@ -116,7 +116,7 @@ describe('Inbox Message Detection', function() {
       assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
-      assert.strictEqual(results.attributes.messageId, '156755c188c4f67c');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-f:1542295687109342844');
     });
 
     it('2016-08-10 message with attachments', function() {
@@ -127,7 +127,7 @@ describe('Inbox Message Detection', function() {
       assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
-      assert.strictEqual(results.attributes.messageId, '6c908830f9c147cf');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-a:r7822902296672552911');
     });
 
     it('2016-08-18', function() {
@@ -138,7 +138,7 @@ describe('Inbox Message Detection', function() {
       assert(results.attributes.loaded);
       assert.strictEqual(results.attributes.isDraft, false);
       assert.strictEqual(results.attributes.viewState, 'EXPANDED');
-      assert.strictEqual(results.attributes.messageId, '1569ae485ebba663');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-f:1542955973201340003');
     });
 
     it('2016-08-19 draft in thread', function() {
@@ -147,7 +147,7 @@ describe('Inbox Message Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert.strictEqual(results.attributes.isDraft, true);
-      assert.strictEqual(results.attributes.messageId, '9338c46c4d05b3f');
+      assert.strictEqual(results.attributes.inboxMessageId, 'msg-a:r-663027805731183423');
     });
   });
 

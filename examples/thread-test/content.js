@@ -21,7 +21,7 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 	sdk.Conversations.registerMessageViewHandler(messageView => {
 		(async () => {
 			window._lastMessageView = messageView;
-			console.log('messageView', messageView.getMessageID(), messageView.getBodyElement().textContent.slice(0,20));
+			console.log('messageView', await messageView.getMessageIDAsync(), messageView.getBodyElement().textContent.slice(0,20));
 			console.log('messageView.getViewState()', messageView.getViewState());
 			['viewStateChange', 'destroy'].forEach(name => {
 				messageView.on(name, event => {

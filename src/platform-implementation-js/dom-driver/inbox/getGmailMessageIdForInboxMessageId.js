@@ -4,6 +4,10 @@ import {defn} from 'ud';
 import googleLimitedAjax from '../../driver-common/googleLimitedAjax';
 import type InboxDriver from './inbox-driver';
 
+// Messages sent from the local user in Inbox have a fake ID in the DOM (with
+// the "msg-a:r" prefix) that doesn't match up with anything in the Gmail API.
+// This function translates the Inbox ID into the real ID that can be found in
+// the Gmail API.
 async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMessageId: string): Promise<string> {
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   // Inbox omits the account param if there is only one logged in account,
@@ -17,7 +21,7 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',
-      permmsgid: `msg-a:${inboxMessageId}`
+      permmsgid: inboxMessageId
     }
   });
 
