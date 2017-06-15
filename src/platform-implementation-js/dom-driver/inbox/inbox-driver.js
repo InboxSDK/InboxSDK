@@ -567,6 +567,10 @@ class InboxDriver {
     // stub
   }
 
+  setShowNativeAddonSidebar(value: boolean) {
+		// stub
+	}
+
   registerSearchSuggestionsProvider(handler: Function) {
     registerSearchSuggestionsProvider(this, handler);
   }

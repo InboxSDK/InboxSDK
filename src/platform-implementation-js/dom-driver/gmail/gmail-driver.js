@@ -95,6 +95,7 @@ class GmailDriver {
 	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
 	_stopper = kefirStopper();
 	_navMarkerHiddenChanged: Bus<null> = kefirBus();
+	_addonSidebarHiddenChanged: Bus<null> = kefirBus();
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
@@ -309,6 +310,37 @@ class GmailDriver {
 				leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
 				this._stopper.takeUntilBy(this._navMarkerHiddenChanged).onValue(() => {
 					leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
+				});
+			}
+		}
+	}
+
+	setShowNativeAddonSidebar(isNative: boolean) {
+		this._addonSidebarHiddenChanged.emit(null);
+		const addonContainerElement = GmailElementGetter.getAddonSidebarContainerElement();
+		const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+		if(addonContainerElement && mainContentBodyContainerElement){
+			const mainContentBodyContainerWidth  = parseFloat(mainContentBodyContainerElement.style.width);
+
+			if (isNative) {
+				addonContainerElement.classList.remove('inboxsdk__hide_addon_container');
+				const widthExpansion = parseFloat(mainContentBodyContainerElement.getAttribute('data-inboxsdk-width-expansion'));
+				if(!isNaN(widthExpansion) && !isNaN(mainContentBodyContainerWidth)){
+					mainContentBodyContainerElement.style.width = (mainContentBodyContainerWidth - widthExpansion) + 'px';
+					mainContentBodyContainerElement.removeAttribute('data-inboxsdk-width-expansion');
+				}
+			} else {
+				if(addonContainerElement.classList.contains('inboxsdk__hide_addon_container')) return;
+
+				const addonContainerWidth = parseFloat(addonContainerElement.style.width);
+				if(!isNaN(addonContainerWidth) && !isNaN(mainContentBodyContainerWidth)){
+					mainContentBodyContainerElement.style.width = (mainContentBodyContainerWidth + addonContainerWidth) + 'px';
+					mainContentBodyContainerElement.setAttribute('data-inboxsdk-width-expansion', String(addonContainerWidth));
+				}
+
+				addonContainerElement.classList.add('inboxsdk__hide_addon_container');
+				this._stopper.takeUntilBy(this._addonSidebarHiddenChanged).onValue(() => {
+					addonContainerElement.classList.remove('inboxsdk__hide_addon_container');
 				});
 			}
 		}

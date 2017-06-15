@@ -786,6 +786,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   font-weight: normal;
 }
 
+.inboxsdk__hide_addon_container {
+  display: none !important;
+}
+
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
   visibility: visible;
 }

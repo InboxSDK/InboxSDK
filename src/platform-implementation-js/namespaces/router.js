@@ -176,6 +176,7 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 
 function _updateNavMenu(members, newRouteViewDriver){
 	members.driver.setShowNativeNavMarker(newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM);
+	members.driver.setShowNativeAddonSidebar(newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM);
 }
 
 export default defn(module, Router);
