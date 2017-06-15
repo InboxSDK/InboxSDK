@@ -53,13 +53,13 @@ var MessageView = /** @lends MessageView */{
 	getBodyElement: function(){},
 
 	/**
-	* Gets the ID of the message. This will throw an exception if it is called on a message
-	* that isn't loaded yet.
+	* Gets the ID of the message and returns it as a Promise. The promise will
+	* reject with an error if this is called on a message that isn't loaded yet.
 	* ^gmail
 	* ^inbox
-	* @return {string}
+	* @return {Promise.<string>}
 	*/
-	getMessageID: function(){},
+	getMessageIDAsync: function(){},
 
 	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
 	// registerAttachmentCardViewHandler function to listen for other types of

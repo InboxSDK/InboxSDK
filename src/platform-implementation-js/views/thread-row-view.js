@@ -66,10 +66,19 @@ export default class ThreadRowView extends EventEmitter {
   }
 
   getThreadIDIfStable(): ?string {
+    // TODO mark deprecated
     if (this.getVisibleMessageCount() > 0) {
       return this.getThreadID();
     } else {
       return null;
+    }
+  }
+
+  getThreadIDIfStableAsync(): Promise<null|string> {
+    if (this.getVisibleMessageCount() > 0) {
+      return this.getThreadIDAsync();
+    } else {
+      return Promise.resolve(null);
     }
   }
 

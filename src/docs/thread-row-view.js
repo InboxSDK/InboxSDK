@@ -79,23 +79,23 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   getDateString: function(){},
 
   /**
-   * Gets the Gmail Thread ID of the thread.
+   * Gets the Gmail Thread ID of the thread and returns it as a Promise.
    * ^gmail
-   * @return {string}
+   * @return {Promise.<string>}
    */
-  getThreadID: function(){},
+  getThreadIDAsync: function(){},
 
   /**
   * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads
   * such as those with only a single Draft message in them will occasionally change their
   * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
   * if you're not careful about this fact. This method provides you with an easy way to tell if
-  * the thread has a stable ID. It will only return a thread ID if it is expected to stay the same,
-  * otherwise it will return <code>null</code>.
+  * the thread has a stable ID. It will only return a Promise for the thread ID
+  * if it is expected to stay the same, otherwise it will return a Promise for <code>null</code>.
   * ^gmail
-  * @return {string|null}
+  * @return {Promise.<string|null>}
   */
-  getThreadIDIfStable: function(){},
+  getThreadIDIfStableAsync: function(){},
 
   /**
    * Returns a Promise for the thread row's draft ID, if the thread row
