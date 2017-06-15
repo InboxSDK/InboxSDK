@@ -17,11 +17,11 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',
-      permmsgid: inboxMessageId
+      permmsgid: `msg-a:${inboxMessageId}`
     }
   });
 
-  const messageIdMatch = text.match(/\?view=att&th=([a-z1-9])&/i);
+  const messageIdMatch = text.match(/\?view=att&(?:amp;)?th=([a-f0-9]*)&/i);
   if (!messageIdMatch) {
     throw new Error("Failed to find gmail message id for inbox message id");
   }
