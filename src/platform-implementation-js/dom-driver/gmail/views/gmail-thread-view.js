@@ -116,6 +116,10 @@ class GmailThreadView {
 		return this._threadID;
 	}
 
+	async getThreadIDAsync(): Promise<string> {
+		return this.getThreadID();
+	}
+
 	_setupToolbarView() {
 		const toolbarElement = this._findToolbarElement();
 		if (!toolbarElement) throw new Error("No toolbar element found");

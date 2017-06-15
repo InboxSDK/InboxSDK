@@ -336,6 +336,10 @@ class GmailMessageView {
 		}
 	}
 
+	async getMessageIDAsync(): Promise<string> {
+		return this.getMessageID();
+	}
+
 	addAttachmentIcon(iconDescriptor: Object) {
 		if (!this._element) {
 			console.warn('addDateIcon called on destroyed message');

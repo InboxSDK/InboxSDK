@@ -46,12 +46,12 @@ var ThreadView = /** @lends ThreadView */ {
 	getSubject: function(){},
 
 	/**
-	 * Gets the Gmail Thread ID of the thread.
+	 * Gets the Gmail Thread ID of the thread and returns it as a Promise.
 	 * ^gmail
 	 * ^inbox
-	 * @return {string}
+	 * @return {Promise.<string>}
 	 */
-	getThreadID: function(){},
+	getThreadIDAsync: function(){},
 
 	/**
 	 * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}.

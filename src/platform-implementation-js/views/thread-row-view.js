@@ -57,14 +57,28 @@ export default class ThreadRowView extends EventEmitter {
   }
 
   getThreadID(): string {
+    // TODO mark deprecated
     return this._threadRowViewDriver.getThreadID();
   }
 
+  getThreadIDAsync(): Promise<string> {
+    return this._threadRowViewDriver.getThreadIDAsync();
+  }
+
   getThreadIDIfStable(): ?string {
+    // TODO mark deprecated
     if (this.getVisibleMessageCount() > 0) {
       return this.getThreadID();
     } else {
       return null;
+    }
+  }
+
+  getThreadIDIfStableAsync(): Promise<null|string> {
+    if (this.getVisibleMessageCount() > 0) {
+      return this.getThreadIDAsync();
+    } else {
+      return Promise.resolve(null);
     }
   }
 

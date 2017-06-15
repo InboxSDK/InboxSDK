@@ -42,8 +42,6 @@ type Mods = {
 
 const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(module, () => new WeakMap());
 
-const identity = x => x;
-
 function focusAndNoPropagation(event) {
   this.focus();
   event.stopImmediatePropagation();
@@ -65,16 +63,6 @@ function starGroupEventInterceptor(event) {
       this.parentElement.dispatchEvent(newEvent);
     }
   }
-}
-
-// Change a color very slightly to force a re-render
-function tweakColor(color) {
-  // example:
-  // "rgba(255, 255, 255, 0.9)" -> "rgba(254, 254, 254, 0.9)"
-  if (typeof color === 'string') {
-    return color.replace(/(\d+),/g, (full, num) => (num^1)+',');
-  }
-  return color;
 }
 
 type Counts = {
@@ -789,6 +777,10 @@ class GmailThreadRowView {
       throw new Error("Should not happen: thread id was null");
     }
     return threadID;
+  }
+
+  async getThreadIDAsync(): Promise<string> {
+    return this.getThreadID();
   }
 
   getDraftID(): Promise<?string> {

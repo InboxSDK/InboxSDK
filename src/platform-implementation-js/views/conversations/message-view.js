@@ -82,12 +82,17 @@ class MessageView extends EventEmitter {
 	}
 
 	getMessageID(): string {
+		// TODO mark deprecated
 		return get(memberMap, this).messageViewImplementation.getMessageID();
+	}
+
+	getMessageIDAsync(): Promise<string> {
+		return get(memberMap, this).messageViewImplementation.getMessageIDAsync();
 	}
 
 	// TODO non-file-attachment card views are asynchronously loaded. Add some sort of
 	// registerAttachmentCardViewHandler function to listen for other types of
-	// attachment cards.
+	// attachment cards if we want to continue support for them.
 	getFileAttachmentCardViews(): Array<AttachmentCardView> {
 		const {messageViewImplementation, membrane} = get(memberMap, this);
 		return _.chain(messageViewImplementation.getAttachmentCardViewDrivers())
