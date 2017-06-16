@@ -9,6 +9,7 @@ test("return value from getBfromA is cached", async () => {
   const storage: Object = new MockStorage();
   const getBfromA = jest.fn(() => Promise.resolve("123"));
   const mim = new BiMapCache({
+    key: "xyz",
     getBfromA,
     getAfromB(b) {
       throw new Error("should not happen");
@@ -26,7 +27,7 @@ test("return value from getBfromA is cached", async () => {
   const endTime = Date.now();
 
   expect(storage.length).toBe(1);
-  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids")).ids;
+  const cachedThreadIds = JSON.parse(storage.getItem("xyz")).ids;
   expect(cachedThreadIds.length).toBe(1);
   expect(cachedThreadIds[0].length).toBe(3);
   expect(cachedThreadIds[0][0]).toBe("<123>");
@@ -40,6 +41,7 @@ test("return value from getAfromB is cached", async () => {
   const storage: Object = new MockStorage();
   const getAfromB = jest.fn(() => Promise.resolve("<456>"));
   const mim = new BiMapCache({
+    key: "xyz",
     getBfromA(a) {
       throw new Error("should not happen");
     },
@@ -57,7 +59,7 @@ test("return value from getAfromB is cached", async () => {
   const endTime = Date.now();
 
   expect(storage.length).toBe(1);
-  const cachedThreadIds = JSON.parse(storage.getItem("inboxsdk__cached_thread_ids")).ids;
+  const cachedThreadIds = JSON.parse(storage.getItem("xyz")).ids;
   expect(cachedThreadIds.length).toBe(1);
   expect(cachedThreadIds[0].length).toBe(3);
   expect(cachedThreadIds[0][0]).toBe("<456>");
@@ -69,8 +71,9 @@ test("return value from getAfromB is cached", async () => {
 
 test("can load from storage", async () => {
   const storage: Object = new MockStorage();
-  storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify({version: 2, ids: [["<789>", "789", Date.now()]]}));
+  storage.setItem("xyz", JSON.stringify({version: 2, ids: [["<789>", "789", Date.now()]]}));
   const mim = new BiMapCache({
+    key: "xyz",
     getBfromA(a) {
       throw new Error("should not happen");
     },
@@ -91,6 +94,7 @@ test("maxAge", async () => {
     {
       let i = 0;
       const mim = new BiMapCache({
+        key: "xyz",
         getBfromA(a) {
           throw new Error("should not happen");
         },
@@ -110,6 +114,7 @@ test("maxAge", async () => {
 
     {
       const mim = new BiMapCache({
+        key: "xyz",
         getBfromA(a) {
           throw new Error("should not happen");
         },
@@ -135,6 +140,7 @@ test("maxLimit", async () => {
   {
     let i = 0;
     const mim = new BiMapCache({
+      key: "xyz",
       getBfromA(a) {
         throw new Error("should not happen");
       },
@@ -153,6 +159,7 @@ test("maxLimit", async () => {
 
   {
     const mim = new BiMapCache({
+      key: "xyz",
       getBfromA(a) {
         throw new Error("should not happen");
       },

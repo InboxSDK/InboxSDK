@@ -115,6 +115,7 @@ class GmailDriver {
 		// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
 		// localStorage. Used for custom thread lists.
 		const rfcIdCache = new BiMapCache({
+			key: 'inboxsdk__cached_thread_ids',
 			getAfromB: (gmailThreadId) =>
 				getRfcMessageIdForGmailThreadId(this, gmailThreadId),
 			getBfromA: (rfcMessageId) =>

@@ -4,6 +4,7 @@ import throttle from 'lodash/throttle';
 import sortBy from 'lodash/sortBy';
 
 export type Options<A,B> = {
+  key: string;
   getAfromB(b: B): Promise<A>;
   getBfromA(a: A): Promise<B>;
   storage?: Storage;
@@ -13,6 +14,7 @@ export type Options<A,B> = {
 };
 
 export default class BiMapCache<A,B> {
+  _key: string;
   _getAfromB: (b: B) => Promise<A>;
   _getBfromA: (a: A) => Promise<B>;
   _storage: ?Storage;
@@ -21,7 +23,8 @@ export default class BiMapCache<A,B> {
   _bToA: Map<B, A>;
   _saveCache: () => void;
 
-  constructor({getBfromA, getAfromB, storage, saveThrottle, maxLimit, maxAge}: Options<A,B>) {
+  constructor({key, getBfromA, getAfromB, storage, saveThrottle, maxLimit, maxAge}: Options<A,B>) {
+    this._key = key;
     this._getBfromA = getBfromA;
     this._getAfromB = getAfromB;
     this._storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
@@ -60,7 +63,7 @@ export default class BiMapCache<A,B> {
         item.ids = sortBy(item.ids, ([rfcId, b, timestamp]) => timestamp)
           .slice(-maxLimit_);
       }
-      storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
+      storage.setItem(this._key, JSON.stringify(item));
     }, saveThrottle, {leading:false});
 
     this._loadCache();
@@ -70,7 +73,7 @@ export default class BiMapCache<A,B> {
     const storage = this._storage;
     if (!storage) return;
     try {
-      let item = JSON.parse(storage.getItem('inboxsdk__cached_thread_ids')||'null');
+      let item = JSON.parse(storage.getItem(this._key)||'null');
       if (!item || item.version !== 2) return;
       for (let x of item.ids) {
         const [rfcId, b, timestamp] = x;
