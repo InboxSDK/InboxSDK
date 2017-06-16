@@ -76,7 +76,6 @@ class GmailDriver {
 	_customListRouteIDs: Map<string, Function> = new Map();
 	_customListSearchStringsToRouteIds: Map<string, string> = new Map();
 	_messageIDsToThreadIDs: Map<string, string> = new Map();
-	_messageIdManager: MessageIdManager;
 	_threadRowIdentifier: ThreadRowIdentifier;
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
@@ -101,6 +100,9 @@ class GmailDriver {
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 
+	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
+	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
+
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
 		(this: Driver); // interface check
 		customStyle();
@@ -110,12 +112,14 @@ class GmailDriver {
 		this._opts = opts;
 		this._envData = envData;
 
-		this._messageIdManager = new MessageIdManager({
+		const midm = new MessageIdManager({
 			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
 				getGmailThreadIdForRfcMessageId(this, rfcMessageId),
 			getRfcMessageIdForGmailThreadId: (gmailThreadId) =>
 				getRfcMessageIdForGmailThreadId(this, gmailThreadId)
 		});
+		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => midm.getGmailThreadIdForRfcMessageId(rfcMessageId);
+		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => midm.getRfcMessageIdForGmailThreadId(gmailThreadId);
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
@@ -148,7 +152,6 @@ class GmailDriver {
 	getPageCommunicatorPromise(): Promise<PageCommunicator> {return this._pageCommunicatorPromise;}
 	getLogger(): Logger {return this._logger;}
 	getCustomListSearchStringsToRouteIds(): Map<string, string> {return this._customListSearchStringsToRouteIds;}
-	getMessageIdManager(): MessageIdManager {return this._messageIdManager;}
 	getThreadRowIdentifier(): ThreadRowIdentifier {return this._threadRowIdentifier;}
 	getButterBarDriver(): GmailButterBarDriver {return this._butterBarDriver;}
 	getButterBar(): ?ButterBar {return this._butterBar;}
