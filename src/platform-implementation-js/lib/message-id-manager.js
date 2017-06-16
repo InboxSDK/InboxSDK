@@ -2,6 +2,7 @@
 
 import throttle from 'lodash/throttle';
 import unescape from 'lodash/unescape';
+import sortBy from 'lodash/sortBy';
 import ajax from '../../common/ajax';
 
 type Options = {
@@ -9,6 +10,8 @@ type Options = {
   getRfcMessageIdForGmailThreadId(s: string): Promise<string>;
   storage?: Storage;
   saveThrottle?: number;
+  maxLimit?: number;
+  maxAge?: number;
 };
 
 // Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
@@ -22,13 +25,20 @@ export default class MessageIdManager {
   _threadIdsToRfcIds: Map<string, string>;
   _saveCache: () => void;
 
-  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailThreadId, storage, saveThrottle}: Options) {
+  constructor({getGmailThreadIdForRfcMessageId, getRfcMessageIdForGmailThreadId, storage, saveThrottle, maxLimit, maxAge}: Options) {
     this._getGmailThreadIdForRfcMessageId = getGmailThreadIdForRfcMessageId;
     this._getRfcMessageIdForGmailThreadId = getRfcMessageIdForGmailThreadId;
     this._storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
     if (saveThrottle == null) {
       saveThrottle = 3000;
     }
+    if (maxLimit == null) {
+      maxLimit = 1000;
+    }
+    if (maxAge == null) {
+      maxAge = 1000*60*60*24*365; // one year
+    }
+    const maxLimit_ = maxLimit, maxAge_ = maxAge;
 
     this._rfcIdsTimestamps = new Map(); // Map containing times the lookup was last done. Could use for expiration.
     this._rfcIdsToThreadIds = new Map();
@@ -41,11 +51,19 @@ export default class MessageIdManager {
       // everything from localStorage first before overwriting it.
       this._loadCache();
 
+      const minTimestamp = Date.now() - maxAge_;
+
       const item = {version: 2, ids: []};
       this._rfcIdsToThreadIds.forEach((gmailThreadId, rfcId) => {
         const timestamp = this._rfcIdsTimestamps.get(rfcId);
-        item.ids.push([rfcId, gmailThreadId, timestamp]);
+        if (timestamp != null && timestamp > minTimestamp) {
+          item.ids.push([rfcId, gmailThreadId, timestamp]);
+        }
       });
+      if (item.ids.length > maxLimit_) {
+        item.ids = sortBy(item.ids, ([rfcId, gmailThreadId, timestamp]) => timestamp)
+          .slice(-maxLimit_);
+      }
       storage.setItem('inboxsdk__cached_thread_ids', JSON.stringify(item));
     }, saveThrottle, {leading:false});
 
