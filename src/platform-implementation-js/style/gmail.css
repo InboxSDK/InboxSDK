@@ -787,7 +787,18 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 .inboxsdk__hide_addon_container {
-  display: none !important;
+  display: flex !important;
+  flex-direction: row;
+  width: 100% !important;
+}
+
+.inboxsdk__hide_addon_container .bkK.nn {
+  width: auto !important;
+  flex: 1;
+}
+
+.inboxsdk__hide_addon_container .bnl.nn {
+  display: none;
 }
 
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {

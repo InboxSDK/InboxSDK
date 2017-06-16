@@ -319,28 +319,17 @@ class GmailDriver {
 		this._addonSidebarHiddenChanged.emit(null);
 		const addonContainerElement = GmailElementGetter.getAddonSidebarContainerElement();
 		const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+
 		if(addonContainerElement && mainContentBodyContainerElement){
-			const mainContentBodyContainerWidth  = parseFloat(mainContentBodyContainerElement.style.width);
+			const parent = mainContentBodyContainerElement.parentElement;
+			if(!parent) return;
 
 			if (isNative) {
-				addonContainerElement.classList.remove('inboxsdk__hide_addon_container');
-				const widthExpansion = parseFloat(mainContentBodyContainerElement.getAttribute('data-inboxsdk-width-expansion'));
-				if(!isNaN(widthExpansion) && !isNaN(mainContentBodyContainerWidth)){
-					mainContentBodyContainerElement.style.width = (mainContentBodyContainerWidth - widthExpansion) + 'px';
-					mainContentBodyContainerElement.removeAttribute('data-inboxsdk-width-expansion');
-				}
+				parent.classList.remove('inboxsdk__hide_addon_container');
 			} else {
-				if(addonContainerElement.classList.contains('inboxsdk__hide_addon_container')) return;
-
-				const addonContainerWidth = parseFloat(addonContainerElement.style.width);
-				if(!isNaN(addonContainerWidth) && !isNaN(mainContentBodyContainerWidth)){
-					mainContentBodyContainerElement.style.width = (mainContentBodyContainerWidth + addonContainerWidth) + 'px';
-					mainContentBodyContainerElement.setAttribute('data-inboxsdk-width-expansion', String(addonContainerWidth));
-				}
-
-				addonContainerElement.classList.add('inboxsdk__hide_addon_container');
+				parent.classList.add('inboxsdk__hide_addon_container');
 				this._stopper.takeUntilBy(this._addonSidebarHiddenChanged).onValue(() => {
-					addonContainerElement.classList.remove('inboxsdk__hide_addon_container');
+					parent.classList.remove('inboxsdk__hide_addon_container');
 				});
 			}
 		}
