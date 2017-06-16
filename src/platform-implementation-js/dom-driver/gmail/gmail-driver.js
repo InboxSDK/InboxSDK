@@ -32,7 +32,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
-import MessageIdManager from '../../lib/message-id-manager';
+import BiMapCache from '../../lib/BiMapCache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
@@ -112,14 +112,16 @@ class GmailDriver {
 		this._opts = opts;
 		this._envData = envData;
 
-		const midm = new MessageIdManager({
-			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
-				getGmailThreadIdForRfcMessageId(this, rfcMessageId),
-			getRfcMessageIdForGmailThreadId: (gmailThreadId) =>
-				getRfcMessageIdForGmailThreadId(this, gmailThreadId)
+		// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
+		// localStorage. Used for custom thread lists.
+		const rfcIdCache = new BiMapCache({
+			getAfromB: (gmailThreadId) =>
+				getRfcMessageIdForGmailThreadId(this, gmailThreadId),
+			getBfromA: (rfcMessageId) =>
+				getGmailThreadIdForRfcMessageId(this, rfcMessageId)
 		});
-		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => midm.getGmailThreadIdForRfcMessageId(rfcMessageId);
-		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => midm.getRfcMessageIdForGmailThreadId(gmailThreadId);
+		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
+		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
