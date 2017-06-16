@@ -1,7 +1,6 @@
 /* @flow */
 
 import throttle from 'lodash/throttle';
-import unescape from 'lodash/unescape';
 import sortBy from 'lodash/sortBy';
 import ajax from '../../common/ajax';
 
@@ -75,18 +74,7 @@ export default class MessageIdManager {
     if (!storage) return;
     try {
       let item = JSON.parse(storage.getItem('inboxsdk__cached_thread_ids')||'null');
-      if (!item) return;
-      if (Array.isArray(item)) { // old version
-        // There used to be a glitch which could cause the rfcIds to be encoded
-        // as HTML, so we fix that up here.
-        item = {
-          version: 2,
-          ids: item.map(([rfcId, gmailThreadId, timestamp]) =>
-            [unescape(rfcId), gmailThreadId, timestamp]
-          )
-        };
-      }
-      if (item.version !== 2) return;
+      if (!item || item.version !== 2) return;
       for (let x of item.ids) {
         const [rfcId, gmailThreadId, timestamp] = x;
         this._rfcIdsTimestamps.set(rfcId, timestamp);

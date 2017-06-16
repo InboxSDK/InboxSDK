@@ -83,22 +83,6 @@ test("can load from storage", async () => {
   expect(await mim.getGmailThreadIdForRfcMessageId("<789>")).toBe("789");
 });
 
-test("can load old v1 data containing HTML from storage", async () => {
-  const storage: Object = new MockStorage();
-  storage.setItem("inboxsdk__cached_thread_ids", JSON.stringify([["&lt;789&gt;", "789", Date.now()]]));
-  const mim = new MessageIdManager({
-    getGmailThreadIdForRfcMessageId(rfcId) {
-      throw new Error("should not happen");
-    },
-    getRfcMessageIdForGmailThreadId(mid) {
-      throw new Error("should not happen");
-    },
-    storage, saveThrottle: 2
-  });
-  expect(await mim.getRfcMessageIdForGmailThreadId("789")).toBe("<789>");
-  expect(await mim.getGmailThreadIdForRfcMessageId("<789>")).toBe("789");
-});
-
 test("maxAge", async () => {
   const _DateNow = Date.now;
   try {
