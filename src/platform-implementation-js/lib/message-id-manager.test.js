@@ -10,7 +10,7 @@ test("return value from getGmailThreadIdForRfcMessageId is cached", async () => 
   const getGmailThreadIdForRfcMessageId = jest.fn(() => Promise.resolve("123"));
   const mim = new MessageIdManager({
     getGmailThreadIdForRfcMessageId,
-    getRfcMessageIdForGmailThreadId(mid) {
+    getRfcMessageIdForGmailThreadId(tid) {
       throw new Error("should not happen");
     },
     storage, saveThrottle: 2
@@ -74,7 +74,7 @@ test("can load from storage", async () => {
     getGmailThreadIdForRfcMessageId(rfcId) {
       throw new Error("should not happen");
     },
-    getRfcMessageIdForGmailThreadId(mid) {
+    getRfcMessageIdForGmailThreadId(tid) {
       throw new Error("should not happen");
     },
     storage, saveThrottle: 2
@@ -94,8 +94,8 @@ test("maxAge", async () => {
         getGmailThreadIdForRfcMessageId(rfcId) {
           throw new Error("should not happen");
         },
-        async getRfcMessageIdForGmailThreadId(mid) {
-          return `${mid}:${i++}`;
+        async getRfcMessageIdForGmailThreadId(tid) {
+          return `${tid}:${i++}`;
         },
         storage, saveThrottle: 2, maxAge: 1000*60*60*24*365 // one year
       });
@@ -113,7 +113,7 @@ test("maxAge", async () => {
         getGmailThreadIdForRfcMessageId(rfcId) {
           throw new Error("should not happen");
         },
-        async getRfcMessageIdForGmailThreadId(mid) {
+        async getRfcMessageIdForGmailThreadId(tid) {
           return 'notcached';
         },
         storage, saveThrottle: 2, maxAge: 1000*60*60*24*365 // one year
@@ -138,8 +138,8 @@ test("maxLimit", async () => {
       getGmailThreadIdForRfcMessageId(rfcId) {
         throw new Error("should not happen");
       },
-      async getRfcMessageIdForGmailThreadId(mid) {
-        return `${mid}:${i++}`;
+      async getRfcMessageIdForGmailThreadId(tid) {
+        return `${tid}:${i++}`;
       },
       storage, saveThrottle: 2, maxLimit: 3
     });
@@ -156,7 +156,7 @@ test("maxLimit", async () => {
       getGmailThreadIdForRfcMessageId(rfcId) {
         throw new Error("should not happen");
       },
-      async getRfcMessageIdForGmailThreadId(mid) {
+      async getRfcMessageIdForGmailThreadId(tid) {
         return 'notcached';
       },
       storage, saveThrottle: 2, maxLimit: 3
