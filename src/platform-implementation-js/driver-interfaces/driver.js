@@ -6,6 +6,7 @@ import type Logger from '../lib/logger';
 import type {ComposeViewDriver} from './compose-view-driver';
 import type ComposeView from '../views/compose-view';
 import type {RouteViewDriver} from './route-view-driver';
+import type CommonPageCommunicator from '../lib/common-page-communicator';
 
 import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
@@ -50,6 +51,7 @@ export type Driver = {
 	getMessageViewDriverStream(): Kefir.Observable<MessageViewDriver>;
 	getAttachmentCardViewDriverStream(): Kefir.Observable<AttachmentCardViewDriver>;
 	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
+	getPageCommunicator(): CommonPageCommunicator;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];

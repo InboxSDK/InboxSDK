@@ -24,7 +24,7 @@ import type {
 
 class InboxMessageView {
   _element: HTMLElement;
-  _id: ?string = null;
+  _idPromise: ?Promise<string> = null;
   _driver: InboxDriver;
   _p: Parsed;
   _stopper: Kefir.Observable<any>;
@@ -192,10 +192,10 @@ class InboxMessageView {
       throw new Error('Failed to find message id');
     }
     if (/^msg-a:/.test(inboxMessageId)) {
-      if (!this._id) {
-        this._id = await getGmailMessageIdForInboxMessageId(this._driver, inboxMessageId);
+      if (!this._idPromise) {
+        this._idPromise = getGmailMessageIdForInboxMessageId(this._driver, inboxMessageId);
       }
-      return this._id;
+      return await this._idPromise;
     } else {
       const m = /\d+$/.exec(inboxMessageId);
       if (!m) throw new Error('Should not happen');
