@@ -2,7 +2,6 @@
 
 import throttle from 'lodash/throttle';
 import sortBy from 'lodash/sortBy';
-import ajax from '../../common/ajax';
 
 type Options = {
   getGmailThreadIdForRfcMessageId(s: string): Promise<string>;
