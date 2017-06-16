@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import throttle from 'lodash/throttle';
+import unescape from 'lodash/unescape';
 import ajax from '../../common/ajax';
 
 type Options = {
@@ -33,7 +34,7 @@ export default class MessageIdManager {
     this._rfcIdsToThreadIds = new Map();
     this._threadIdsToRfcIds = new Map();
 
-    this._saveCache = _.throttle(() => {
+    this._saveCache = throttle(() => {
       const storage = this._storage;
       if (!storage) return;
       // If there are other SDK extensions running too, it's important we load
@@ -63,7 +64,7 @@ export default class MessageIdManager {
         item = {
           version: 2,
           ids: item.map(([rfcId, gmailThreadId, timestamp]) =>
-            [_.unescape(rfcId), gmailThreadId, timestamp]
+            [unescape(rfcId), gmailThreadId, timestamp]
           )
         };
       }
@@ -101,7 +102,7 @@ export default class MessageIdManager {
     const promise = this._getGmailThreadIdForRfcMessageId(rfcMessageId);
     promise.then(gmailThreadId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
-    }, _.noop);
+    }, () => {});
     return promise;
   }
 
@@ -116,7 +117,7 @@ export default class MessageIdManager {
     const promise = this._getRfcMessageIdForGmailThreadId(gmailThreadId);
     promise.then(rfcMessageId => {
       this._rememberPair(rfcMessageId, gmailThreadId);
-    }, _.noop);
+    }, () => {});
     return promise;
   }
 }
