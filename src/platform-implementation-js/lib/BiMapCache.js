@@ -53,14 +53,14 @@ export default class BiMapCache<A: string|number=string,B: string|number=string>
       const minTimestamp = Date.now() - maxAge_;
 
       const item = {version: 2, ids: []};
-      this._aToB.forEach((b, rfcId) => {
-        const timestamp = this._aToTimestamp.get(rfcId);
+      this._aToB.forEach((b, a) => {
+        const timestamp = this._aToTimestamp.get(a);
         if (timestamp != null && timestamp > minTimestamp) {
-          item.ids.push([rfcId, b, timestamp]);
+          item.ids.push([a, b, timestamp]);
         }
       });
       if (item.ids.length > maxLimit_) {
-        item.ids = sortBy(item.ids, ([rfcId, b, timestamp]) => timestamp)
+        item.ids = sortBy(item.ids, ([a, b, timestamp]) => timestamp)
           .slice(-maxLimit_);
       }
       storage.setItem(this._key, JSON.stringify(item));
@@ -76,10 +76,10 @@ export default class BiMapCache<A: string|number=string,B: string|number=string>
       let item = JSON.parse(storage.getItem(this._key)||'null');
       if (!item || item.version !== 2) return;
       for (let x of item.ids) {
-        const [rfcId, b, timestamp] = x;
-        this._aToTimestamp.set(rfcId, timestamp);
-        this._aToB.set(rfcId, b);
-        this._bToA.set(b, rfcId);
+        const [a, b, timestamp] = x;
+        this._aToTimestamp.set(a, timestamp);
+        this._aToB.set(a, b);
+        this._bToA.set(b, a);
       }
     } catch(e) {
       console.error('failed to load BiMapCache from storage', e);
