@@ -3,7 +3,7 @@
 import throttle from 'lodash/throttle';
 import sortBy from 'lodash/sortBy';
 
-export type Options<A,B> = {
+export type Options<A:string|number=string,B:string|number=string> = {
   key: string;
   getAfromB(b: B): Promise<A>;
   getBfromA(a: A): Promise<B>;
@@ -13,7 +13,9 @@ export type Options<A,B> = {
   maxAge?: number;
 };
 
-export default class BiMapCache<A,B> {
+// The type parameters are mainly so Flow helps us avoid mixing up A and B.
+// Generally you'll probably have them both be strings.
+export default class BiMapCache<A: string|number=string,B: string|number=string> {
   _key: string;
   _getAfromB: (b: B) => Promise<A>;
   _getBfromA: (a: A) => Promise<B>;
