@@ -18,9 +18,11 @@ export default class BiMapCache<A,B> {
   _getAfromB: (b: B) => Promise<A>;
   _getBfromA: (a: A) => Promise<B>;
   _storage: ?Storage;
-  _aToTimestamp: Map<A, number>;
-  _aToB: Map<A, B>;
-  _bToA: Map<B, A>;
+  _aToTimestamp: Map<A, number> = new Map(); // Map containing times of last activity
+  _aToB: Map<A, B> = new Map();
+  _bToA: Map<B, A> = new Map();
+  _aToBpromise: Map<A, Promise<B>> = new Map(); // used for de-duping in-progress lookups
+  _bToApromise: Map<B, Promise<A>> = new Map();
   _saveCache: () => void;
 
   constructor({key, getBfromA, getAfromB, storage, saveThrottle, maxLimit, maxAge}: Options<A,B>) {
@@ -38,10 +40,6 @@ export default class BiMapCache<A,B> {
       maxAge = 1000*60*60*24*365; // one year
     }
     const maxLimit_ = maxLimit, maxAge_ = maxAge;
-
-    this._aToTimestamp = new Map(); // Map containing times the lookup was last done
-    this._aToB = new Map();
-    this._bToA = new Map();
 
     this._saveCache = throttle(() => {
       const storage = this._storage;
@@ -105,10 +103,18 @@ export default class BiMapCache<A,B> {
       return Promise.resolve(b);
     }
 
+    const existingPromise = this._aToBpromise.get(a);
+    if (existingPromise) {
+      return existingPromise;
+    }
     const promise = this._getBfromA(a);
+    this._aToBpromise.set(a, promise);
     promise.then(b => {
+      this._aToBpromise.delete(a);
       this._rememberPair(a, b);
-    }, () => {});
+    }, () => {
+      this._aToBpromise.delete(a);
+    });
     return promise;
   }
 
@@ -119,10 +125,18 @@ export default class BiMapCache<A,B> {
       return Promise.resolve(a);
     }
 
+    const existingPromise = this._bToApromise.get(b);
+    if (existingPromise) {
+      return existingPromise;
+    }
     const promise = this._getAfromB(b);
+    this._bToApromise.set(b, promise);
     promise.then(a => {
+      this._bToApromise.delete(b);
       this._rememberPair(a, b);
-    }, () => {});
+    }, () => {
+      this._bToApromise.delete(b);
+    });
     return promise;
   }
 }
