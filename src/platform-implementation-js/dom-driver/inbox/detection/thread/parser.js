@@ -2,7 +2,6 @@
 
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
-import BigNumber from 'bignumber.js';
 
 export default function parser(el: HTMLElement) {
   const ec = new ErrorCollector('compose');
@@ -13,12 +12,10 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
-  const threadId: ?string = ec.run(
+  const inboxThreadId: ?string = ec.run(
     'thread id',
     () =>
-      new BigNumber(/thread-[^:]+:[^:\d]*(\d+)/.exec(
-        el.getAttribute('data-item-id') || ''
-      )[1]).toString(16)
+      /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
   );
 
   const heading = ec.run(
@@ -45,7 +42,7 @@ export default function parser(el: HTMLElement) {
     elements,
     attributes: {
       inBundle,
-      threadId
+      inboxThreadId
     },
     score,
     errors: ec.getErrorLogs()

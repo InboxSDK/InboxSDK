@@ -225,7 +225,7 @@ const setupSearchReplacing = (
           return pair;
         } else if (typeof pair.gtid === 'string') {
           const gtid = pair.gtid;
-          return driver.getMessageIdManager().getRfcMessageIdForGmailThreadId(gtid)
+          return driver.getRfcMessageIdForGmailThreadId(gtid)
             .then(rfcId => ({gtid, rfcId}), err => findIdFailure(gtid, err));
         }
       })).then((pairs: IDPairsWithRFC) => ({start, total, threads: pairs.filter(Boolean)}))
@@ -252,7 +252,7 @@ const setupSearchReplacing = (
         // Figure out any gmail thread ids we don't know yet
         Kefir.fromPromise(RSVP.Promise.all(threads.map(pair =>
           pair.gtid ? pair :
-          driver.getMessageIdManager().getGmailThreadIdForRfcMessageId(pair.rfcId)
+          driver.getGmailThreadIdForRfcMessageId(pair.rfcId)
             .then(gtid => ({gtid, rfcId: pair.rfcId}), err => findIdFailure(pair.rfcId, err))
         ))).map(_.compact),
 

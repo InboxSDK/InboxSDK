@@ -3,7 +3,6 @@
 import _ from 'lodash';
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
-import BigNumber from 'bignumber.js';
 
 export default function parser(el: HTMLElement) {
   const ec = new ErrorCollector('compose');
@@ -12,12 +11,10 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
-  const messageId: ?string = ec.run(
+  const inboxMessageId: ?string = ec.run(
     'message id',
     () =>
-      new BigNumber(/msg-[^:]+:[^:\d]*(\d+)/.exec(
-        el.getAttribute('data-msg-id') || ''
-      )[1]).toString(16)
+      /msg-[^:]+:[^:\d]*\d+/.exec(el.getAttribute('data-msg-id') || '')[0]
   );
 
   const heading = ec.run(
@@ -76,7 +73,7 @@ export default function parser(el: HTMLElement) {
     attributes: {
       loaded,
       viewState,
-      messageId,
+      inboxMessageId,
       recipientElements,
       isDraft
     },

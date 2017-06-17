@@ -6,6 +6,7 @@ import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
+import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
 import type InboxDriver from '../inbox-driver';
 import type InboxThreadView from './inbox-thread-view';
@@ -171,15 +172,30 @@ class InboxMessageView {
   }
 
   getMessageID(): string {
-    if (!this._p.attributes.messageId) {
+    const {inboxMessageId} = this._p.attributes;
+    if (!inboxMessageId) {
       throw new Error('Failed to find message id');
     }
-    return this._p.attributes.messageId;
+    if (/^msg-a:/.test(inboxMessageId)) {
+      console.warn('MessageView.getMessageID() returned an incorrect message ID. This method will be deprecated soon. Use getMessageIDAsync() instead which does not have this problem.');
+    }
+    const m = /\d+$/.exec(inboxMessageId);
+    if (!m) throw new Error('Should not happen');
+    return new BigNumber(m[0]).toString(16);
   }
 
   async getMessageIDAsync(): Promise<string> {
-    // TODO handle translating fake IDs into real ones and cache them
-    return this.getMessageID();
+    const {inboxMessageId} = this._p.attributes;
+    if (!inboxMessageId) {
+      throw new Error('Failed to find message id');
+    }
+    if (/^msg-a:/.test(inboxMessageId)) {
+      return await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
+    } else {
+      const m = /\d+$/.exec(inboxMessageId);
+      if (!m) throw new Error('Should not happen');
+      return new BigNumber(m[0]).toString(16);
+    }
   }
 
   getContentsElement() {

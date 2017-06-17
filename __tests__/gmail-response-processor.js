@@ -155,6 +155,14 @@ describe('extractMessageIdsFromThreadBatchRequest', () => {
   });
 });
 
+describe('extractGmailThreadIdFromMessageIdSearch', () => {
+  it('works', () => {
+    const data = require('./gmail-response-processor/message-id-search-response.json');
+    const results = GmailResponseProcessor.extractGmailThreadIdFromMessageIdSearch(data);
+    expect(results).toBe('15ca89549b92098b');
+  });
+});
+
 describe('replaceThreadsInResponse', () => {
   it('seems to work', () => {
     const data = require('./gmail-response-processor/search-response.json');
