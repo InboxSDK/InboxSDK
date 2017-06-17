@@ -13,7 +13,6 @@ import type InboxThreadView from './inbox-thread-view';
 import censorHTMLtree from '../../../../common/censor-html-tree';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import InboxAttachmentCardView from './inbox-attachment-card-view';
-import getGmailMessageIdForInboxMessageId from '../getGmailMessageIdForInboxMessageId';
 import findParent from '../../../../common/find-parent';
 import parser from '../detection/message/parser';
 import type {Parsed} from '../detection/message/parser';
@@ -24,7 +23,6 @@ import type {
 
 class InboxMessageView {
   _element: HTMLElement;
-  _idPromise: ?Promise<string> = null;
   _driver: InboxDriver;
   _p: Parsed;
   _stopper: Kefir.Observable<any>;
@@ -192,10 +190,7 @@ class InboxMessageView {
       throw new Error('Failed to find message id');
     }
     if (/^msg-a:/.test(inboxMessageId)) {
-      if (!this._idPromise) {
-        this._idPromise = getGmailMessageIdForInboxMessageId(this._driver, inboxMessageId);
-      }
-      return await this._idPromise;
+      return await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
     } else {
       const m = /\d+$/.exec(inboxMessageId);
       if (!m) throw new Error('Should not happen');

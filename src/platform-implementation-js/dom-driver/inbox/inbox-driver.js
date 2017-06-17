@@ -26,6 +26,9 @@ import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import BiMapCache from '../../lib/BiMapCache';
+import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
+import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
@@ -105,6 +108,9 @@ class InboxDriver {
   _appSidebarView: ?InboxAppSidebarView = null;
   _customRouteIDs: Set<string> = new Set();
 
+  getGmailMessageIdForInboxMessageId: (inboxMessageId: string) => Promise<string>;
+  getThreadIdFromMessageId: (messageId: string) => Promise<string>;
+
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
     (this: Driver); // interface check
     customStyle();
@@ -121,6 +127,26 @@ class InboxDriver {
     this.onready = injectScript().then(() => {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
+
+    const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
+      key: 'inboxsdk__cached_gmail_and_inbox_message_ids',
+      getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
+      getBfromA() {
+        throw new Error('should not happen');
+      }
+    });
+    this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
+      gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
+
+    const threadIdFromMessageIdCache = new BiMapCache({
+      key: 'inboxsdk__cached_thread_and_message_ids',
+      getAfromB: (messageId: string) => getThreadIdFromMessageId(this, messageId),
+      getBfromA() {
+        throw new Error('should not happen');
+      }
+    });
+    this.getThreadIdFromMessageId = messageId =>
+      threadIdFromMessageIdCache.getAfromB(messageId);
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();

@@ -10,7 +10,6 @@ import kefirStopper from 'kefir-stopper';
 import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
-import getThreadIdFromMessageId from '../../../driver-common/getThreadIdFromMessageId';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
@@ -103,7 +102,7 @@ class InboxThreadView {
       if (!firstMessage) throw new Error('Should not happen');
       const messageId = await firstMessage.getMessageIDAsync();
 
-      return await getThreadIdFromMessageId(this._driver, messageId);
+      return await this._driver.getThreadIdFromMessageId(messageId);
     } else {
       const m = /\d+$/.exec(inboxThreadId);
       if (!m) throw new Error('Should not happen');
