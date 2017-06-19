@@ -26,7 +26,7 @@ import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
-import BiMapCache from '../../lib/BiMapCache';
+import BiMapCache from 'bimapcache';
 import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import populateRouteID from '../../lib/populateRouteID';
