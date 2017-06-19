@@ -32,7 +32,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
-import BiMapCache from '../../lib/BiMapCache';
+import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
