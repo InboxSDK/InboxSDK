@@ -780,6 +780,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
   width: auto !important;
+  max-width: 336px;
 }
 
 .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
@@ -789,6 +790,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
   display: block;
   float: left;
+  margin-left: 16px;
+}
+
+.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
+  width: 264px;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .J-KU-Jz {
@@ -796,8 +802,8 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   padding-right: 50px;
 }
 
-.IDMAP_app_sidebar_in_use.app_sidebar_visible + div {
-  display: none;
+.IDMAP_app_sidebar_in_use.app_sidebar_visible > div:first-child {
+  float: right;
 }
 
 .J-KU-Jg[role=tablist] .IDMAP_sidebar_iconArea {
