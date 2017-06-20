@@ -740,6 +740,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 216px !important;
 }
 
+.IDMAP_app_sidebar_in_use div[role=tablist] {
+  height: auto !important;
+}
+
 .IDMAP_app_sidebar_in_use {
   /* Necessary to prevent z-indexes on sidebar items from causing them to show
   above stuff outside of the sidebar. */
@@ -760,6 +764,60 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_area {
   padding-top: 0;
+}
+
+/* gmail addon support */
+
+.container_app_sidebar_in_use.no {
+  display: flex;
+  flex-direction: row;
+}
+
+.container_app_sidebar_in_use .bkK.nn {
+  width: auto !important;
+  flex: 1;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
+  width: auto !important;
+}
+
+.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
+  display: none;
+}
+
+.IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
+  display: block;
+  float: left;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .J-KU-Jz {
+  width: auto;
+  padding-right: 50px;
+}
+
+.IDMAP_app_sidebar_in_use.app_sidebar_visible + div {
+  display: none;
+}
+
+.J-KU-Jg[role=tablist] .IDMAP_sidebar_iconArea {
+  margin-bottom: -16px;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  margin: 16px;
+  border: none;
+  background: #fff;
+  height: 24px;
+  width: 24px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
+  width: 24px;
+  height: 24px;
 }
 
 /* end sidebar */
