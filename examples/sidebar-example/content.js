@@ -2,7 +2,8 @@
 
 InboxSDK.load(2, 'sidebar-example', {
 	appName: 'Streak',
-  appIconUrl: 'https://www.streak.com/images/orangeIcon.png'
+  appIconUrl: 'https://www.streak.com/images/orangeIcon.png',
+	suppressAddonTitle: 'Gmail Add-on Test 2'
 }).then(inboxSDK => {
 	window._sdk = inboxSDK;
 

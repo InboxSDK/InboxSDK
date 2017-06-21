@@ -48,7 +48,7 @@ class ContentPanelViewDriver {
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar} = descriptor;
+        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, addonTitle, appName, appIconUrl} = descriptor;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -63,7 +63,7 @@ class ContentPanelViewDriver {
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
               id: String(id || title),
-              title, iconUrl, iconClass,
+              title, iconUrl, iconClass, appName, appIconUrl,
               hideTitleBar: Boolean(hideTitleBar),
               orderHint: typeof orderHint === 'number' ? orderHint : 0
             }

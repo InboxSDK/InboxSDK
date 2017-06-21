@@ -783,14 +783,16 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   max-width: 336px;
 }
 
-.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
   display: none;
 }
 
-.IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
   display: block;
   float: left;
   margin-left: 16px;
+  height: 100%;
+  overflow: auto;
 }
 
 .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
@@ -810,6 +812,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin-bottom: -16px;
 }
 
+.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
+  filter: grayscale(100%);
+}
+
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin: 16px;
   border: none;
@@ -824,6 +830,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
   width: 24px;
   height: 24px;
+}
+
+.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container[data-count]::after {
+  position: absolute;
+  display: block;
+  bottom: 10px;
+  right: 8px;
+  width: 13px;
+  height: 13px;
+  text-align: center;
+  font: 9pt sans-serif;
+  border-radius: 50%;
+  color: #fff;
+  background: #adadad;
+  content: attr(data-count);
 }
 
 /* end sidebar */

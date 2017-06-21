@@ -17,6 +17,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
+import fakeWindowResize from '../../../lib/fake-window-resize';
 import type GmailDriver from '../gmail-driver';
 
 import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
@@ -33,6 +34,7 @@ class GmailAppSidebarView {
   _el: HTMLElement;
   _instanceId: string;
   _panels: Map<string, ContentPanelViewDriver> = new Map();
+  _buttonContainers: Map<string, HTMLElement> = new Map();
   _activatedWhileLoading: boolean = false;
 
   constructor(driver: GmailDriver, sidebarContainerEl: HTMLElement, addonSidebarElement: ?HTMLElement) {
@@ -216,53 +218,54 @@ class GmailAppSidebarView {
         }
 
         const instanceId = event.detail.instanceId;
+        const appName = event.detail.appName || this._driver.getOpts().appName || event.detail.title;
+        const appIconUrl = event.detail.appIconUrl || this._driver.getOpts().appIconUrl || event.detail.iconUrl;
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
-        const existingButtonContainer = _.find(
-          iconArea.querySelectorAll('.'+idMap('sidebar_button_container')),
-          el => {
-            const button = el.querySelector('button');
-            if (!button || button.title !== event.detail.title) return false;
-            const img = button.querySelector('img');
-            if (!img || img.src !== event.detail.iconUrl) return false;
-            return true;
-          }
-        );
+        const existingButtonContainer = this._buttonContainers.get(appName);
 
         let container;
         if (existingButtonContainer) {
           const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
-          existingButtonContainer.setAttribute('data-count', currentCount+1);
+          existingButtonContainer.setAttribute('data-count', String(currentCount+1));
           container = existingButtonContainer;
         } else {
           container = document.createElement('div');
           container.className = idMap('sidebar_button_container');
           container.innerHTML = autoHtml `
-            <button class="inboxsdk__button_icon" type="button" data-tooltip="${event.detail.title}" title="${event.detail.title}">
-              <img class="inboxsdk__button_iconImg" src="${event.detail.iconUrl}">
+            <button class="inboxsdk__button_icon" type="button" data-tooltip="${appName}" title="${appName}">
+              <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
             </button>
           `;
+
+          this._buttonContainers.set(appName, container);
+
           querySelector(container, 'button').addEventListener('click', (event: MouseEvent) => {
             event.stopPropagation();
 
-            const activeInstanceId = el.getAttribute('data-active-instance-id');
-            if(activeInstanceId === instanceId){
+            const activeAppName = el.getAttribute('data-active-app-name');
+            if(activeAppName === appName){
               if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-              el.removeAttribute('data-active-instance-id');
+              el.removeAttribute('data-active-app-name');
               this._setShouldAppSidebarOpen(false);
+              container.classList.remove('sidebar_button_container_active');
             }
             else{
               const panel = this._panels.get(instanceId);
               if(panel) {
                 if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-                el.setAttribute('data-active-instance-id', instanceId);
+                el.setAttribute('data-active-app-name', appName);
                 panel.scrollIntoView();
                 this._setShouldAppSidebarOpen(true);
+                container.classList.add('sidebar_button_container_active');
 
                 // check and deactivate add-on sidebar
                 const activeAddOnIcon = addonSidebarContainerEl.querySelector('.J-KU-KO');
                 if(activeAddOnIcon) simulateClick(activeAddOnIcon);
+
+                //fake resize to get gmail to fix any heights that are messed up
+                fakeWindowResize();
 
                 //is the tablist still loading
                 const loadingHolderAsAny: any = querySelector(addonSidebarContainerEl, '.bqI').parentElement;
@@ -273,12 +276,12 @@ class GmailAppSidebarView {
                   this._activatedWhileLoading = true;
                   const stillFormingTablist = querySelector(addonSidebarContainerEl, '.J-KU-Jg');
 
-                  makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['role']})
-                    .map(() => addonSidebarContainerEl.querySelector('[role=tablist]'))
+                  makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['style']})
+                    .toProperty(() => null)
+                    .map(() => stillFormingTablist.style.display !== 'none')
                     .filter(Boolean)
                     .take(1)
                     .takeUntilBy(this._stopper)
-                    .delay(10)
                     .onValue(() => {
                       this._activatedWhileLoading = false;
                     });
@@ -290,7 +293,11 @@ class GmailAppSidebarView {
 
           if(this._getShouldAppSidebarOpen()){
             if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-            if(!el.getAttribute('data-active-instance-id')) el.setAttribute('data-active-instance-id', instanceId);
+            if(!el.getAttribute('data-active-app-name')) el.setAttribute('data-active-app-name', appName);
+            container.classList.add('sidebar_button_container_active');
+
+            //fake resize to get gmail to fix any heights that are messed up
+            fakeWindowResize();
           }
         }
       });
@@ -334,17 +341,9 @@ class GmailAppSidebarView {
         iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
         if(!iconArea) return;
 
-        const container = _.find(
-          iconArea.querySelectorAll('.'+idMap('sidebar_button_container')),
-          el => {
-            const button = el.querySelector('button');
-            if (!button || button.title !== event.detail.title) return false;
-            const img = button.querySelector('img');
-            if (!img || img.src !== event.detail.iconUrl) return false;
-            return true;
-          }
-        );
+        const appName = event.detail.appName || this._driver.getOpts().appName || event.detail.title;
 
+        const container = this._buttonContainers.get(appName);
         if(container){
           const currentCount = Number(container.getAttribute('data-count'));
           if (currentCount <= 1) {
@@ -356,11 +355,12 @@ class GmailAppSidebarView {
           }
         }
       });
+
     Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
-        component.scrollPanelIntoView(event.detail.instanceId);
+        //component.scrollPanelIntoView(event.detail.instanceId);
       });
 
     if(addonSidebarContainerEl){
@@ -381,10 +381,12 @@ class GmailAppSidebarView {
 
           this._setShouldAppSidebarOpen(false);
 
-          const activeInstanceId = el.getAttribute('data-active-instance-id');
-          if(activeInstanceId){
+          const activeAppName = el.getAttribute('data-active-app-name');
+          if(activeAppName){
             if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-            el.removeAttribute('data-active-instance-id');
+            el.removeAttribute('data-active-app-name');
+            const container = this._buttonContainers.get(activeAppName);
+            if(container) container.classList.remove('sidebar_button_container_active');
           }
         });
     }
