@@ -812,7 +812,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin-bottom: -16px;
 }
 
-.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
+.IDMAP_app_sidebar_in_use:not(.app_sidebar_visible)  .IDMAP_sidebar_iconArea {
   filter: grayscale(100%);
 }
 

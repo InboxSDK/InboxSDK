@@ -244,58 +244,47 @@ class GmailAppSidebarView {
           querySelector(container, 'button').addEventListener('click', (event: MouseEvent) => {
             event.stopPropagation();
 
-            const activeAppName = el.getAttribute('data-active-app-name');
-            if(activeAppName === appName){
-              if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-              el.removeAttribute('data-active-app-name');
+            if(addonSidebarContainerEl.classList.contains('app_sidebar_visible')){
+              addonSidebarContainerEl.classList.remove('app_sidebar_visible');
               this._setShouldAppSidebarOpen(false);
-              container.classList.remove('sidebar_button_container_active');
             }
             else{
-              const panel = this._panels.get(instanceId);
-              if(panel) {
-                if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-                el.setAttribute('data-active-app-name', appName);
-                panel.scrollIntoView();
-                this._setShouldAppSidebarOpen(true);
-                container.classList.add('sidebar_button_container_active');
+              addonSidebarContainerEl.classList.add('app_sidebar_visible');
 
-                // check and deactivate add-on sidebar
-                const activeAddOnIcon = addonSidebarContainerEl.querySelector('.J-KU-KO');
-                if(activeAddOnIcon) simulateClick(activeAddOnIcon);
+              this._setShouldAppSidebarOpen(true);
 
-                //fake resize to get gmail to fix any heights that are messed up
-                fakeWindowResize();
+              // check and deactivate add-on sidebar
+              const activeAddOnIcon = addonSidebarContainerEl.querySelector('.J-KU-KO');
+              if(activeAddOnIcon) simulateClick(activeAddOnIcon);
 
-                //is the tablist still loading
-                const loadingHolderAsAny: any = querySelector(addonSidebarContainerEl, '.bqI').parentElement;
-                const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
-                if(!loadingHolder) return;
+              //fake resize to get gmail to fix any heights that are messed up
+              fakeWindowResize();
 
-                if(loadingHolder.style.display !== 'none'){
-                  this._activatedWhileLoading = true;
-                  const stillFormingTablist = querySelector(addonSidebarContainerEl, '.J-KU-Jg');
+              //is the tablist still loading
+              const loadingHolderAsAny: any = querySelector(addonSidebarContainerEl, '.bqI').parentElement;
+              const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
+              if(!loadingHolder) return;
 
-                  makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['style']})
-                    .toProperty(() => null)
-                    .map(() => stillFormingTablist.style.display !== 'none')
-                    .filter(Boolean)
-                    .take(1)
-                    .takeUntilBy(this._stopper)
-                    .onValue(() => {
-                      this._activatedWhileLoading = false;
-                    });
-                }
+              if(loadingHolder.style.display !== 'none'){
+                this._activatedWhileLoading = true;
+                const stillFormingTablist = querySelector(addonSidebarContainerEl, '.J-KU-Jg');
+
+                makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['style']})
+                  .toProperty(() => null)
+                  .map(() => stillFormingTablist.style.display !== 'none')
+                  .filter(Boolean)
+                  .take(1)
+                  .takeUntilBy(this._stopper)
+                  .onValue(() => {
+                    this._activatedWhileLoading = false;
+                  });
               }
             }
           }, true);
           iconArea.appendChild(container);
 
           if(this._getShouldAppSidebarOpen()){
-            if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-            if(!el.getAttribute('data-active-app-name')) el.setAttribute('data-active-app-name', appName);
-            container.classList.add('sidebar_button_container_active');
-
+            addonSidebarContainerEl.classList.add('app_sidebar_visible');
             //fake resize to get gmail to fix any heights that are messed up
             fakeWindowResize();
           }
@@ -356,13 +345,6 @@ class GmailAppSidebarView {
         }
       });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
-      .filter(e => e.detail.sidebarId === this._instanceId)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        //component.scrollPanelIntoView(event.detail.instanceId);
-      });
-
     if(addonSidebarContainerEl){
       makeElementChildStream(querySelector(addonSidebarContainerEl, '.J-KU-Jz'))
         .flatMap(({el, removalStream}) =>
@@ -381,12 +363,8 @@ class GmailAppSidebarView {
 
           this._setShouldAppSidebarOpen(false);
 
-          const activeAppName = el.getAttribute('data-active-app-name');
-          if(activeAppName){
-            if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-            el.removeAttribute('data-active-app-name');
-            const container = this._buttonContainers.get(activeAppName);
-            if(container) container.classList.remove('sidebar_button_container_active');
+          if(addonSidebarContainerEl.classList.contains('app_sidebar_visible')){
+            addonSidebarContainerEl.classList.remove('app_sidebar_visible');
           }
         });
     }
@@ -400,8 +378,6 @@ class GmailAppSidebarView {
       .onValue(() => {
         panel.remove();
       });
-
-    this._panels.set(panel.getInstanceId(), panel);
 
     return panel;
   }
