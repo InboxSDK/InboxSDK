@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import once from 'lodash/once';
 import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
@@ -29,6 +30,7 @@ import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
 import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
+import googleLimitedAjax from '../../driver-common/googleLimitedAjax';
 import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
@@ -469,6 +471,23 @@ class InboxDriver {
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
     console.warn('activateShortcut not implemented');
   }
+
+  getGmailActionToken = once(async () => {
+    const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
+    const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
+    const response = await googleLimitedAjax({
+      url: `https://mail.google.com/mail${accountParam}/`,
+      xhrFields: {
+        withCredentials: true
+      },
+      canRetry: true,
+    });
+    const tokenVarMatch = response.text.match(/var GM_ACTION_TOKEN=("[^"]+")/);
+    if (!tokenVarMatch) {
+      throw new Error('Could not find GM_ACTION_TOKEN');
+    }
+    return JSON.parse(tokenVarMatch[1]);
+  });
 
   getUserEmailAddress(): string {
     const s = (document.head:any).getAttribute('data-inboxsdk-user-email-address');

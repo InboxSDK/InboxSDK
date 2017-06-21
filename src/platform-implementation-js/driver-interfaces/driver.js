@@ -52,6 +52,7 @@ export type Driver = {
 	getAttachmentCardViewDriverStream(): Kefir.Observable<AttachmentCardViewDriver>;
 	activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void;
 	getPageCommunicator(): CommonPageCommunicator;
+	getGmailActionToken(): Promise<string>;
 	getUserEmailAddress(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
