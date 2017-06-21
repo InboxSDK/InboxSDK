@@ -39,6 +39,7 @@ export default function getComposeViewDriverLiveSet(driver: InboxDriver, tree: T
   });
 
   return new LiveSet({
+    scheduler: tree.getAllByTag('inlineCompose').getScheduler(),
     read() {
       return new Set();
     },
