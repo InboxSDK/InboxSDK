@@ -5,7 +5,6 @@ import type {TagTreeNode} from 'tag-tree';
 import toValueObservable from 'live-set/toValueObservable'
 import Kefir from 'kefir';
 import type {ItemWithLifetime} from './dom/make-element-child-stream';
-import ItemWithLifetimePool from './ItemWithLifetimePool';
 
 export default function toItemWithLifetimeStream<T>(liveSet: LiveSet<T>): Kefir.Observable<ItemWithLifetime<T>> {
   return Kefir.fromESObservable(toValueObservable(liveSet).map(event => {
