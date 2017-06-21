@@ -22,8 +22,6 @@ import type PageParserTree from 'page-parser-tree';
 import makePageParserTree from './makePageParserTree';
 
 import Logger from '../../lib/logger';
-import ItemWithLifetimePool from '../../lib/ItemWithLifetimePool';
-import toItemWithLifetimePool from '../../lib/toItemWithLifetimePool';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
@@ -39,7 +37,7 @@ import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
-import getComposeViewDriverStream from './get-compose-view-driver-stream';
+import getComposeViewDriverLiveSet from './getComposeViewDriverLiveSet';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
@@ -92,7 +90,7 @@ class InboxDriver {
   _page: PageParserTree;
   _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
-  _composeViewDriverPool: ItemWithLifetimePool<ItemWithLifetime<InboxComposeView>>;
+  _composeViewDriverLiveSet: LiveSet<InboxComposeView>;
   _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
   _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
@@ -271,10 +269,7 @@ class InboxDriver {
     // force activation because nothing outside of the driver is going to
     // subscribe to this, unlike some of the other livesets.
 
-    this._composeViewDriverPool = new ItemWithLifetimePool(
-      getComposeViewDriverStream(this, this._page.tree).takeUntilBy(this._stopper)
-        .map(el => ({el, removalStream: el.getStopper()}))
-    );
+    this._composeViewDriverLiveSet = getComposeViewDriverLiveSet(this, this._page.tree);
 
     this._chatSidebarViewLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('chatSidebar'), (node, removal) => {
       const el = node.getValue();
@@ -301,38 +296,6 @@ class InboxDriver {
     this._rowListViewDriverStream = Kefir.never();
     this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
-
-    this._composeViewDriverPool.items().onError(err => {
-      // If we get here, it's probably because of a waitFor timeout caused by
-      // us failing to find the compose parent. Let's log the results of a few
-      // similar selectors to see if our selector was maybe slightly wrong.
-      function getStatus() {
-        return {
-          mainLength: document.querySelectorAll('[role=main]').length,
-          regularLength: document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
-          noJsActionLength: document.querySelectorAll('body > div[id] > div[id][class]:not([role]) > div[class] > div[id]').length,
-          noNotLength: document.querySelectorAll('body > div[id][jsaction] > div[id][class] > div[class] > div[id]').length,
-          noBodyDirectChildLength: document.querySelectorAll('body div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
-          noBodyLength: document.querySelectorAll('div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id]').length,
-          // We can use class names for logging heuristics. Don't want to use
-          // them anywhere else.
-          classLength: document.querySelectorAll('div.ek div.md > div').length,
-          classEkLength: document.querySelectorAll('.ek').length,
-          classMdLength: document.querySelectorAll('.md').length,
-          composeHtml: _.map(document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id], div.ek div.md > div'), el => censorHTMLtree(el))
-        };
-      }
-
-      var startStatus = getStatus();
-      var waitTime = 180*1000;
-      this._logger.error(err, startStatus);
-      setTimeout(() => {
-        var laterStatus = getStatus();
-        this._logger.eventSdkPassive('waitfor compose data', {
-          startStatus, waitTime, laterStatus
-        });
-      }, waitTime);
-    });
 
     Kefir.later(30*1000)
       .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('appToolbarLocation')))
@@ -400,7 +363,9 @@ class InboxDriver {
   getStopper(): Kefir.Observable<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
-  getComposeViewDriverStream() {return this._composeViewDriverPool.items().map(({el})=>el);}
+  getComposeViewDriverStream() {
+    return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
+  }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
   }
