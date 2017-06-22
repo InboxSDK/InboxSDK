@@ -82,7 +82,7 @@ describe('Inbox Thread Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(!results.attributes.inBundle);
-      assert.strictEqual(results.attributes.threadId, '14ff3f449377ba4e');
+      assert.strictEqual(results.attributes.inboxThreadId, 'thread-f:1512997563584199246');
     });
 
     it('2016-06-20 bundled inline', function() {
@@ -91,7 +91,7 @@ describe('Inbox Thread Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.inBundle);
-      assert.strictEqual(results.attributes.threadId, '150058a7ecc2fea4');
+      assert.strictEqual(results.attributes.inboxThreadId, 'thread-f:1513306953051471524');
     });
 
     it('2016-07-27 search', function() {
@@ -100,7 +100,7 @@ describe('Inbox Thread Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(!results.attributes.inBundle);
-      assert.strictEqual(results.attributes.threadId, '15017c99e43c97be');
+      assert.strictEqual(results.attributes.inboxThreadId, 'thread-f:1513627950174214078');
     });
 
     it('2016-08-23 thread in bundle', function() {
@@ -109,7 +109,7 @@ describe('Inbox Thread Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(results.attributes.inBundle);
-      assert.strictEqual(results.attributes.threadId, '156b8b59b997b470');
+      assert.strictEqual(results.attributes.inboxThreadId, 'thread-f:1543480514786604144');
     });
 
     it('2017-03-17 thread', function() {
@@ -118,7 +118,7 @@ describe('Inbox Thread Detection', function() {
       assert.deepEqual(results.errors, []);
       assert.strictEqual(results.score, 1);
       assert(!results.attributes.inBundle);
-      assert.strictEqual(results.attributes.threadId, '15ad8bd56478679f');
+      assert.strictEqual(results.attributes.inboxThreadId, 'thread-f:1562058394397337503');
     });
   });
 

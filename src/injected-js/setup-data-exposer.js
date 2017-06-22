@@ -33,7 +33,7 @@ module.exports = function() {
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
     (document.head:any).setAttribute('data-inboxsdk-user-language', userLanguage);
 
-    if (global.GLOBALS) {
+    if (global.GLOBALS) { // Gmail
       (document.head:any).setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
       (document.head:any).setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
 
@@ -54,6 +54,35 @@ module.exports = function() {
           var previewPaneMode = (previewPaneLabEnabled && previewPaneEnabled) ?
             (previewPaneVertical ? 'vertical' : 'horizontal') : 'none';
           (document.head:any).setAttribute('data-inboxsdk-user-preview-pane-mode', previewPaneMode);
+        }
+      }
+    } else { // Inbox
+      const preloadDataSearchString = 'window.BT_EmbeddedAppData=[';
+      const preloadScript = find(document.querySelectorAll('script:not([src])'), script =>
+        script.text && script.text.slice(0,500).indexOf(preloadDataSearchString) > -1
+      );
+      if (!preloadScript) {
+        logger.error(new Error("Could not read preloaded BT_EmbeddedAppData"));
+      } else {
+        const {text} = preloadScript;
+        const firstBracket = text.indexOf('window.BT_EmbeddedAppData=[');
+        let lastBracket = text.indexOf(']\n;', firstBracket);
+        if (lastBracket === -1) {
+          // I have only seen the case where there is a new line between the
+          // closing bracket and the semicolon, but want to be defensive in
+          // case that changes.
+          lastBracket = text.indexOf('];', firstBracket);
+        }
+        const preloadData = JSON.parse(text.slice(
+          firstBracket + preloadDataSearchString.length - 1,
+          lastBracket + 1
+        ));
+
+        const ikValue = preloadData[11];
+        if (typeof ikValue !== 'string') {
+          logger.error(new Error("Could not find valid ikValue"));
+        } else {
+          (document.head:any).setAttribute('data-inboxsdk-ik-value', ikValue);
         }
       }
     }
