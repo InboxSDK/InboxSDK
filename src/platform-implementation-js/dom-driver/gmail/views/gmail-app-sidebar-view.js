@@ -216,15 +216,15 @@ class GmailAppSidebarView {
 
 				if(!addonSidebarContainerEl) return;
 
-        asap(() => {
-          iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
-  				if (!iconArea) {
-  					const _iconArea = iconArea = document.createElement('div');
-  					iconArea.className = idMap('sidebar_iconArea');
-  					addIconArea(iconArea, addonSidebarContainerEl, this._stopper);
-  				}
+        iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
+        if (!iconArea) {
+          const _iconArea = iconArea = document.createElement('div');
+          iconArea.className = idMap('sidebar_iconArea');
+          addIconArea(iconArea, addonSidebarContainerEl, this._stopper);
+        }
 
-  				const instanceId = event.detail.instanceId;
+        asap(() => {
+          const instanceId = event.detail.instanceId;
   				const appIconUrl = event.detail.appIconUrl || event.detail.iconUrl;
 
   				// If there's an existing button for the app, then just increment its
@@ -301,7 +301,7 @@ class GmailAppSidebarView {
   					}, true);
 
 
-            addToIconArea(orderManager, appName, container, iconArea);
+            if(iconArea) addToIconArea(orderManager, appName, container, iconArea);
 
   					if(this._getShouldAppSidebarOpen()){
   						if(!el.getAttribute('data-active-app-name')){

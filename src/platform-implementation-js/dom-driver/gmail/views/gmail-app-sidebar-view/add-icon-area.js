@@ -19,6 +19,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
     }
     else{
       const stillFormingTablist = querySelector(addonSidebarContainerEl, '.J-KU-Jg');
+      stillFormingTablist.insertAdjacentElement('afterbegin', iconArea);
 
       makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['role']})
         .map(() => addonSidebarContainerEl.querySelector('[role=tablist]'))
