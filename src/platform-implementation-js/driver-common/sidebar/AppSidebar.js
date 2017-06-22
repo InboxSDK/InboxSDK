@@ -69,9 +69,19 @@ export default class AppSidebar extends React.Component {
   componentWillUnmount() {
     this._stopper.destroy();
   }
-  scrollPanelIntoView(instanceId: string) {
+  scrollPanelIntoView(instanceId: string, useContainer: boolean = false) {
     const panel: Panel = this._list.getItemInstance(instanceId);
-    panel.scrollIntoView();
+
+    if(useContainer && this.props.container) {
+      const container = this.props.container();
+      if(container){
+        const offsetParent = panel.getElement().parentElement;
+        if(offsetParent) container.scrollTop = (offsetParent: any).offsetTop;
+      }
+    }
+    else {
+      panel.scrollIntoView();
+    }
   }
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     return this.props.panels !== nextProps.panels ||
@@ -208,6 +218,9 @@ class Panel extends React.Component {
   scrollIntoView() {
     this._el.scrollIntoView();
   }
+  getElement() {
+    return this._el;
+  }
   getDragHeight() {
     return 40;
   }
@@ -310,6 +323,7 @@ type PanelElementProps = {
 };
 class PanelElement extends React.Component {
   _content: HTMLElement;
+
   componentDidMount() {
     this._content.appendChild(this.props.el);
   }
