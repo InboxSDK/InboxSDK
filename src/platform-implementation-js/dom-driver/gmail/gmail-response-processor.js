@@ -16,8 +16,6 @@ export function interpretSentEmailResponse(responseString: string): {threadID: s
     throw new Error("Failed to read email response");
   }
   return {
-    gmailThreadId: gmailThreadId,
-    gmailMessageId: gmailMessageId,
     threadID: gmailThreadId,
     messageID: gmailMessageId
   };

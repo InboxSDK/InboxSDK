@@ -118,11 +118,11 @@ class GmailComposeView {
 					.filter(event => event.composeId === this.getComposeID())
 					.map((event) => {
 						switch(event.type){
-							case 'emailSending':
+							case 'emailSending': {
 								return [{eventName: 'sending'}];
-
-							case 'emailSent':
-								var response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
+							}
+							case 'emailSent': {
+								const response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								if(_.includes(['tr','eu'], response.messageID)){
 									return [{eventName: 'sendCanceled'}];
 								}
@@ -131,13 +131,21 @@ class GmailComposeView {
 									this._finalMessageId = response.messageID;
 								}
 								this._messageId = null;
-								return [{eventName: 'sent', data: response}];
-							case 'emailDraftSaveSending':
+								const data = {
+									threadID: response.threadID,
+									messageID: response.messageID
+								};
+								Object.defineProperty((data:any), 'gmailThreadId', {value: response.threadID});
+								Object.defineProperty((data:any), 'gmailMessageId', {value: response.messageID});
+								return [{eventName: 'sent', data}];
+							}
+							case 'emailDraftSaveSending': {
 								this._draftSaving = true;
 								return [{eventName: 'draftSaving'}];
-							case 'emailDraftReceived':
+							}
+							case 'emailDraftReceived': {
 								this._draftSaving = false;
-								var response;
+								let response;
 								try{
 									response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
 								}
@@ -170,7 +178,7 @@ class GmailComposeView {
 									}
 								}
 								return events;
-
+							}
 							default:
 								return [];
 						}
