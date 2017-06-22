@@ -95,10 +95,6 @@ class ContentPanelViewDriver {
     return this._stopper;
   }
 
-  getInstanceId(): string {
-    return this._instanceId;
-  }
-
   getEventStream(): Kefir.Observable<*> {
     return this._eventStream;
   }

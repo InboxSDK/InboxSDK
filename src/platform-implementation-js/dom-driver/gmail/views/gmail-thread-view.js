@@ -80,7 +80,7 @@ class GmailThreadView {
 		}
 		let sidebar = this._sidebar;
 		if (!sidebar) {
-			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, (sidebarElement: any), addonSidebarElement);
+			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement);
 			sidebar.getStopper().onValue(() => {
 				if (this._sidebar === sidebar) {
 					this._sidebar = null;

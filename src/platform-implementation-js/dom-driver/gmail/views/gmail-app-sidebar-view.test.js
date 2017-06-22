@@ -10,6 +10,7 @@ import idMap from '../../../lib/idMap';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
 import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailElementGetter from '../gmail-element-getter';
+import MockWebStorage from 'mock-webstorage';
 
 const mockKefirBus = kefirBus;
 
@@ -21,11 +22,7 @@ jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => mockKefirBus();
 });
 
-const localStorageMap = {};
-global.localStorage = {
-  getItem: (key) => localStorageMap[key],
-  setItem: (key, value) => localStorageMap[key] = value
-};
+global.localStorage = new MockWebStorage();
 
 (Element: any).prototype.insertAdjacentElement = function(position, el) {
   switch(position){

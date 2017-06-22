@@ -31,7 +31,7 @@ import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
 class GmailAppSidebarView {
 	_stopper = kefirStopper();
 	_driver: GmailDriver;
-	_sidebarContainerEl: HTMLElement;
+	_sidebarContainerEl: ?HTMLElement;
 	_addonSidebarContainerEl: ?HTMLElement;
 	_el: HTMLElement;
 	_instanceId: string;
@@ -39,10 +39,13 @@ class GmailAppSidebarView {
 	_buttonContainers: Map<string, HTMLElement> = new Map();
 	_activatedWhileLoading: boolean = false;
 
-	constructor(driver: GmailDriver, sidebarContainerEl: HTMLElement, addonSidebarElement: ?HTMLElement) {
+	constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement) {
 		this._driver = driver;
 		this._sidebarContainerEl = sidebarContainerEl;
 		this._addonSidebarContainerEl = addonSidebarElement;
+
+		const sidebarEl = addonSidebarElement || sidebarContainerEl;
+		if(!sidebarEl) return;
 
 		// We need to be able to cooperate with other apps/extensions that are
 		// sharing the app sidebar. We store some properties as attributes in the
@@ -50,7 +53,7 @@ class GmailAppSidebarView {
 		// restricted to being used for references to DOM nodes. When
 		// GmailAppSidebarView is instantiated, we check to see if the element
 		// already exists and create it if it doesn't.
-		const el = (addonSidebarElement || sidebarContainerEl).querySelector('.'+idMap('app_sidebar_container'));
+		const el = sidebarEl.querySelector('.'+idMap('app_sidebar_container'));
 		if (el) {
 			this._el = el;
 			const instanceId = el.getAttribute('data-instance-id');
@@ -96,8 +99,10 @@ class GmailAppSidebarView {
 
 		const addonSidebarContainerEl = this._addonSidebarContainerEl;
 		const sidebarContainerEl = addonSidebarContainerEl || this._sidebarContainerEl;
-		let contentContainer;
 
+		if(!sidebarContainerEl) return;
+
+		let contentContainer;
 		sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
 
 		if(addonSidebarContainerEl){
@@ -111,7 +116,7 @@ class GmailAppSidebarView {
 			}
 		}
 		else {
-			this._sidebarContainerEl.insertBefore(el, this._sidebarContainerEl.firstElementChild);
+			sidebarContainerEl.insertBefore(el, sidebarContainerEl.firstElementChild);
 		}
 
 		if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
@@ -125,7 +130,7 @@ class GmailAppSidebarView {
       el.classList.add('addon_sidebar');
     }
     else {
-			const containerEl = findParent(this._sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
+			const containerEl = findParent(sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
 			container = containerEl ? (() => containerEl) : undefined;
 		}
 
