@@ -25,6 +25,8 @@ class ContentPanelViewDriver {
     this._sidebarId = sidebarId;
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
+    const document = global.document; //fix for unit test
+
     this._eventStream.plug(
       Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
@@ -45,6 +47,7 @@ class ContentPanelViewDriver {
     let hasPlacedAlready = false;
     let appName;
     const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
+
     descriptor
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)

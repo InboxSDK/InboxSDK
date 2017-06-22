@@ -90,7 +90,7 @@ export default class AppSidebar extends React.Component {
   _readExpansionSettings(): ExpansionSettings {
     let data;
     try {
-      data = JSON.parse(localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
+      data = JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
     } catch (err) {
       console.error('Failed to read sidebar settings', err);
     }
@@ -115,7 +115,7 @@ export default class AppSidebar extends React.Component {
       });
     }
     try {
-      localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
+      global.localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
     } catch (err) {
       console.error('Failed to save sidebar settings', err);
     }

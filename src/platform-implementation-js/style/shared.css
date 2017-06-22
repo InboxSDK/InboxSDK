@@ -266,21 +266,6 @@
   position: relative;
 }
 
-.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container[data-count]::after {
-  position: absolute;
-  display: block;
-  bottom: 0;
-  right: -4px;
-  width: 13px;
-  height: 13px;
-  text-align: center;
-  font: 9pt sans-serif;
-  border-radius: 50%;
-  color: #fff;
-  background: #adadad;
-  content: attr(data-count);
-}
-
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon:focus,
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover {
   outline: none;

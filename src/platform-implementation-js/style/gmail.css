@@ -829,11 +829,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   height: 24px;
 }
 
-.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container[data-count]::after {
-  display: none;
-  content: '';
-}
-
 .IDMAP_sidebar_iconArea + div:before {
   position: absolute;
   content: '';

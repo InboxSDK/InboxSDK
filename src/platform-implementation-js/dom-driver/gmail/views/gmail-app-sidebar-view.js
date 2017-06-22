@@ -73,12 +73,12 @@ class GmailAppSidebarView {
 	// itself when available when the chat sidebar isn't present. It's only set
 	// if the user interacts with the app sidebar button.
 	_getShouldAppSidebarOpen(): boolean {
-		return localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
+		return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
 	}
 
 	_setShouldAppSidebarOpen(open: boolean) {
 		try {
-			localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
+			global.localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
 		} catch(err) {
 			console.error('error saving', err);
 		}
@@ -133,14 +133,14 @@ class GmailAppSidebarView {
 		const orderManager = new OrderManager({
 			get() {
 				try {
-					return JSON.parse(localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+					return JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
 				} catch (err) {
 					console.error('failed to read sidebar order data', err);
 				}
 			},
 			set(data) {
 				try {
-					localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+					global.localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
 				} catch (err) {
 					console.error('failed to set sidebar order data', err);
 				}
