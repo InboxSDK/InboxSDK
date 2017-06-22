@@ -128,8 +128,13 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
+    if (global.localStorage) {
+      // We used to not always identify the ids of messages correctly, so we
+      // just drop the old cache and use a new one.
+      global.localStorage.removeItem('inboxsdk__cached_gmail_and_inbox_message_ids');
+    }
     const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
-      key: 'inboxsdk__cached_gmail_and_inbox_message_ids',
+      key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
       getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
       getBfromA() {
         throw new Error('should not happen');
@@ -363,6 +368,7 @@ class InboxDriver {
   getStopper(): Kefir.Observable<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
   getRowListViewDriverStream() {return this._rowListViewDriverStream;}
+  getComposeViewDriverLiveSet() {return this._composeViewDriverLiveSet;}
   getComposeViewDriverStream() {
     return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
   }

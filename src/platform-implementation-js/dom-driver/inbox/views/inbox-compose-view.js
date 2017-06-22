@@ -213,6 +213,9 @@ class InboxComposeView {
     }
   }
   removedFromDOM() {
+    // The element of an inline draft may be re-used with a new ID.
+    this._element.removeAttribute('data-inboxsdk-draft-id');
+
     const cleanup = () => {
       this._eventStream.emit({eventName: 'destroy', data: {}});
       this._eventStream.end();
