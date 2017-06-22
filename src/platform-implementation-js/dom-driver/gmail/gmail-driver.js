@@ -300,7 +300,7 @@ class GmailDriver {
 		return p;
 	}
 
-	setShowNativeNavMarker(value: boolean) {
+	setShowNativeNavMarker(isNative: boolean) {
 		this._navMarkerHiddenChanged.emit(null);
 		const leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
 		if(leftNavContainerElement){
