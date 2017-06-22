@@ -28,6 +28,7 @@ import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../
 import {
   getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
+import getGmailThreadIdForRfcMessageId from '../../../driver-common/getGmailThreadIdForRfcMessageId';
 
 import type {Parsed} from '../detection/compose/parser';
 
@@ -311,7 +312,23 @@ class InboxComposeView {
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSent')
-        .map(() => ({eventName: 'sent'}))
+        .map(event => {
+          const data = {
+            getThreadID: (): Promise<string> =>
+              getGmailThreadIdForRfcMessageId(this._driver, event.rfcID),
+            getMessageID: (): Promise<string> =>
+              this._driver.getGmailMessageIdForInboxMessageId(`msg-a:${event.draftID}`)
+          };
+          ['gmailThreadId', 'gmailMessageId', 'threadID', 'messageID'].forEach(name => {
+            Object.defineProperty(data, name, {get: () => {
+              this._driver.getLogger().deprecationWarning(
+                `ComposeView#sent.${name}`,
+                'ComposeView#sent.getThreadID() or ComposeView#sent.getMessageID()');
+              throw new Error('Not supported');
+            }});
+          });
+          return {eventName: 'sent', data};
+        })
     );
   }
   getFromContact(): Contact {

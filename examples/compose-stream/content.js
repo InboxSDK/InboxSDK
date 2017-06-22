@@ -165,7 +165,12 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 		});
 		composeView.on('presending', console.log.bind(console, 'presending'));
 		composeView.on('sending', console.log.bind(console, 'sending'));
-		composeView.on('sent', console.log.bind(console, 'sent'));
+		composeView.on('sent', event => {
+			(async () => {
+				const [threadId, messageId] = await Promise.all([event.getThreadID(), event.getMessageID()]);
+				console.log(`sent, threadId=${threadId}, messageId=${messageId}`);
+			})();
+		});
 		composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
 		composeView.on('toContactAdded', console.log.bind(console, 'toContactAdded'));

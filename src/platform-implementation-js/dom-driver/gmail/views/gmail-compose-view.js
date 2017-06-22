@@ -132,9 +132,13 @@ class GmailComposeView {
 								}
 								this._messageId = null;
 								const data = {
-									threadID: response.threadID,
-									messageID: response.messageID
+									getThreadID: (): Promise<string> => Promise.resolve(response.threadID),
+									getMessageID: (): Promise<string> => Promise.resolve(response.messageID)
 								};
+								// These properties are nonenumerable. TODO use getter functions
+								// that trigger deprecation warnings.
+								Object.defineProperty((data:any), 'threadID', {value: response.threadID});
+								Object.defineProperty((data:any), 'messageID', {value: response.messageID});
 								Object.defineProperty((data:any), 'gmailThreadId', {value: response.threadID});
 								Object.defineProperty((data:any), 'gmailMessageId', {value: response.messageID});
 								return [{eventName: 'sent', data}];
