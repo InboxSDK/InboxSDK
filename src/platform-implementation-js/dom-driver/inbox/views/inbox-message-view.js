@@ -190,6 +190,17 @@ class InboxMessageView {
       throw new Error('Failed to find message id');
     }
     if (/^msg-a:/.test(inboxMessageId)) {
+      // If there's a composeView with the same id as this message, then that
+      // means this message hasn't been sent as a real email yet, and we need
+      // to wait for the send to complete before we can look up this message's
+      // id.
+      for (let inboxComposeView of this._driver.getComposeViewDriverLiveSet().values()) {
+        const draftId = await inboxComposeView.getDraftID();
+        if (`msg-a:${draftId}` === inboxMessageId) {
+          await inboxComposeView.getStopper().take(1).toPromise();
+          break;
+        }
+      }
       return await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
     } else {
       const m = /\d+$/.exec(inboxMessageId);
