@@ -298,9 +298,7 @@ class GmailAppSidebarView {
 
   							if(loadingHolder.style.display !== 'none'){
   								activatedWhileLoading = true;
-									console.log('activatedWhileLoading!!');
-
-  								makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
+									makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
   									.toProperty(() => null)
   									.map(() => loadingHolder.style.display === 'none')
   									.filter(Boolean)
@@ -308,8 +306,7 @@ class GmailAppSidebarView {
 										.delay(150)
   									.takeUntilBy(this._stopper)
   									.onValue(() => {
-											console.log('loaded!!');
-  										activatedWhileLoading = false;
+											activatedWhileLoading = false;
   									});
   							}
 
@@ -401,7 +398,8 @@ class GmailAppSidebarView {
 			// listen for add-on sidebar contents to become visible which can happen in 1 of two cases
 			//  1. user clicks on an Add-Icon icon
 			//  2. Gmail automatically opens an Add-on sidebar because it was last open in previous thread
-			makeElementChildStream(querySelector(addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR))
+			const addonSidebarContentContainerElement = querySelector(addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR);
+			makeElementChildStream(addonSidebarContentContainerElement)
 				.flatMap(({el, removalStream}) =>
 					makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['style']})
 						.toProperty(() => null)
@@ -410,7 +408,6 @@ class GmailAppSidebarView {
 				)
 				.takeUntilBy(this._stopper)
 				.onValue(() => {
-					console.log('opening!!');
 					// we need to suppress this sidebar from loading
 					if(activatedWhileLoading){
 						const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
