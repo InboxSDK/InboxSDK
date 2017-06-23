@@ -237,6 +237,7 @@ class GmailAppSidebarView {
 				// panel with that app name. This means we need to wait for all the panels for a particular appName
 				// to be added first, and then we can get the correct position
         asap(() => {
+					if(!iconArea) throw new Error('should not happen');
           const instanceId = event.detail.instanceId;
   				const appIconUrl = event.detail.appIconUrl;
 
@@ -262,9 +263,9 @@ class GmailAppSidebarView {
   					buttonContainers.set(appName, container);
 
   					querySelector(container, 'button').addEventListener('click', (event: MouseEvent) => {
-  						event.stopPropagation();
+							event.stopPropagation();
 
-  						const activeButtonContainer = el.querySelector('.sidebar_button_container_active');
+  						const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
               if(activeButtonContainer){
                 activeButtonContainer.classList.remove('sidebar_button_container_active');
               }
@@ -297,15 +298,17 @@ class GmailAppSidebarView {
 
   							if(loadingHolder.style.display !== 'none'){
   								activatedWhileLoading = true;
-  								const stillFormingTablist = querySelector(addonSidebarContainerEl, TAB_LIST_SELECTOR);
+									console.log('activatedWhileLoading!!');
 
-  								makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['style']})
+  								makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
   									.toProperty(() => null)
-  									.map(() => stillFormingTablist.style.display !== 'none')
+  									.map(() => loadingHolder.style.display === 'none')
   									.filter(Boolean)
   									.take(1)
+										.delay(150)
   									.takeUntilBy(this._stopper)
   									.onValue(() => {
+											console.log('loaded!!');
   										activatedWhileLoading = false;
   									});
   							}
@@ -320,7 +323,7 @@ class GmailAppSidebarView {
   					if(this._getShouldAppSidebarOpen()){
 							// if we last had an SDK sidebar open then bring up the SDK sidebar when the first
 							// panel gets added
-							const activeButtonContainer = el.querySelector('.sidebar_button_container_active');
+							const activeButtonContainer = iconArea.querySelector('.sidebar_button_container_active');
   						if(!activeButtonContainer){
                 container.classList.add('sidebar_button_container_active');
                 addonSidebarContainerEl.classList.add('app_sidebar_visible');
@@ -407,6 +410,7 @@ class GmailAppSidebarView {
 				)
 				.takeUntilBy(this._stopper)
 				.onValue(() => {
+					console.log('opening!!');
 					// we need to suppress this sidebar from loading
 					if(activatedWhileLoading){
 						const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
@@ -416,7 +420,7 @@ class GmailAppSidebarView {
 
 					this._setShouldAppSidebarOpen(false);
 
-					const activeButtonContainer = el.querySelector('.sidebar_button_container_active');
+					const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
 					if(activeButtonContainer){
 						addonSidebarContainerEl.classList.remove('app_sidebar_visible');
 						activeButtonContainer.classList.remove('sidebar_button_container_active');
