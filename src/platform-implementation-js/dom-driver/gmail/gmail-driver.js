@@ -321,7 +321,6 @@ class GmailDriver {
 		}
 	}
 
-
 	setShowNativeAddonSidebar(isNative: boolean) {
 		this._addonSidebarHiddenChanged.emit(null);
 		const addonContainerElement = GmailElementGetter.getAddonSidebarContainerElement();
