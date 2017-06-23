@@ -27,6 +27,7 @@ export default function signIn() {
       return browser.getTitle() !== oldTitle;
     } catch (err) {
       // The first call to getTitle() seems prone to throwing a timeout error
+      console.error('caught getTitle error', err);
       return false;
     }
   });
