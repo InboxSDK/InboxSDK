@@ -262,6 +262,15 @@
   margin-bottom: 25px;
 }
 
+.IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container {
+  position: relative;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon:focus,
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover {
+  outline: none;
+}
+
 /* end sidebar */
 
 /* shared parts of app id warning */

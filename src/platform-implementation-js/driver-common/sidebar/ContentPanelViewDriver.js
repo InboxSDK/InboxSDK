@@ -25,6 +25,8 @@ class ContentPanelViewDriver {
     this._sidebarId = sidebarId;
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
+    const document = global.document; //fix for unit test
+
     this._eventStream.plug(
       Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
@@ -43,27 +45,33 @@ class ContentPanelViewDriver {
     const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
+    let appName;
     const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
+
     descriptor
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar} = descriptor;
+        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl} = descriptor;
+        appName = descriptor.appName;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
         const eventName = hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel';
         hasPlacedAlready = true;
+
         el.dispatchEvent(new CustomEvent(
           eventName,
           {
             bubbles: true, cancelable: false,
             detail: {
+              title, iconUrl, iconClass,
               sidebarId: this._sidebarId,
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
               id: String(id || title),
-              title, iconUrl, iconClass,
+              appName: appName || this._driver.getOpts().appName || title,
+              appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
               hideTitleBar: Boolean(hideTitleBar),
               orderHint: typeof orderHint === 'number' ? orderHint : 0
             }
@@ -74,7 +82,11 @@ class ContentPanelViewDriver {
       if (!hasPlacedAlready) return;
       ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
-        detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
+        detail: {
+          sidebarId: this._sidebarId,
+          instanceId: this._instanceId,
+          appName: appName || this._driver.getOpts().appName
+        }
       }));
     });
   }

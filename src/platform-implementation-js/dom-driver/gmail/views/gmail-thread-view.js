@@ -9,6 +9,9 @@ import {parse} from 'querystring';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 
+import querySelector from '../../../lib/dom/querySelectorOrFail';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+
 import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
@@ -43,6 +46,9 @@ class GmailThreadView {
 			// Don't emit anything before anyone has had a chance to start listening!
 			this._setupMessageViewStream();
 		});
+
+		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
+		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 	}
 
 	getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
@@ -67,13 +73,14 @@ class GmailThreadView {
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
 		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-		if (!sidebarElement) {
+		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+		if (!sidebarElement && !addonSidebarElement) {
 			console.warn('This view does not have a sidebar');
 			return;
 		}
 		let sidebar = this._sidebar;
 		if (!sidebar) {
-			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement);
+			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement);
 			sidebar.getStopper().onValue(() => {
 				if (this._sidebar === sidebar) {
 					this._sidebar = null;
@@ -209,6 +216,20 @@ class GmailThreadView {
 			eventName: 'messageCreated',
 			view: messageView
 		});
+	}
+
+	_waitForAddonTitleAndSuppress(addonTitle: string){
+		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+		if(!addonSidebarElement) return;
+
+		makeElementChildStream(querySelector(addonSidebarElement, '.J-KU-Jg'))
+			.filter(({el}) =>
+					el.getAttribute('role') === 'tab' &&
+					el.getAttribute('data-tooltip') === addonTitle
+			)
+			.onValue(({el}) => {
+				el.style.display = 'none';
+			});
 	}
 
 	getReadyStream() {

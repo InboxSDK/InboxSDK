@@ -57,6 +57,7 @@ const memberMap = new WeakMap();
 export type PiOpts = {
 	appName: ?string;
 	appIconUrl: ?string;
+	suppressAddonTitle?: ?string;
 	VERSION: string;
 	globalErrorLogging: boolean;
 	eventTracking: boolean;

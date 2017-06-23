@@ -69,9 +69,10 @@ export default class AppSidebar extends React.Component {
   componentWillUnmount() {
     this._stopper.destroy();
   }
-  scrollPanelIntoView(instanceId: string) {
+  scrollPanelIntoView(instanceId: string, useContainer: boolean = false) {
     const panel: Panel = this._list.getItemInstance(instanceId);
-    panel.scrollIntoView();
+    const getContainer = this.props.container;
+    panel.scrollIntoView(useContainer, getContainer && getContainer());
   }
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     return this.props.panels !== nextProps.panels ||
@@ -80,7 +81,7 @@ export default class AppSidebar extends React.Component {
   _readExpansionSettings(): ExpansionSettings {
     let data;
     try {
-      data = JSON.parse(localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
+      data = JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
     } catch (err) {
       console.error('Failed to read sidebar settings', err);
     }
@@ -105,7 +106,7 @@ export default class AppSidebar extends React.Component {
       });
     }
     try {
-      localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
+      global.localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
     } catch (err) {
       console.error('Failed to save sidebar settings', err);
     }
@@ -205,8 +206,14 @@ type PanelProps = {
 class Panel extends React.Component {
   props: PanelProps;
   _el: HTMLElement;
-  scrollIntoView() {
-    this._el.scrollIntoView();
+  scrollIntoView(useContainer: boolean, container?: ?HTMLElement) {
+    if(useContainer && container) {
+      const offsetParent = this._el.parentElement;
+      if(offsetParent) container.scrollTop = (offsetParent: any).offsetTop;
+    }
+    else {
+      this._el.scrollIntoView();
+    }
   }
   getDragHeight() {
     return 40;
@@ -310,6 +317,7 @@ type PanelElementProps = {
 };
 class PanelElement extends React.Component {
   _content: HTMLElement;
+
   componentDidMount() {
     this._content.appendChild(this.props.el);
   }

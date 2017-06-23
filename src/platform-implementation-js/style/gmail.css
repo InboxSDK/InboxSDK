@@ -740,6 +740,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 216px !important;
 }
 
+.IDMAP_app_sidebar_in_use div[role=tablist] {
+  height: auto !important;
+}
+
 .IDMAP_app_sidebar_in_use {
   /* Necessary to prevent z-indexes on sidebar items from causing them to show
   above stuff outside of the sidebar. */
@@ -760,6 +764,81 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_area {
   padding-top: 0;
+}
+
+/* gmail addon support */
+
+.container_app_sidebar_in_use.no {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.container_app_sidebar_in_use .bkK.nn {
+  width: auto !important;
+  flex: 1;
+  min-width: 0px;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
+  width: 336px !important;
+  flex-shrink: 0;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
+  display: none;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
+  display: block;
+  float: left;
+  margin-left: 16px;
+  height: 100%;
+  overflow: auto;
+}
+
+.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
+  width: 254px;
+  margin-right: 10px;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .J-KU-Jz {
+  width: auto;
+  padding-right: 50px;
+}
+
+.IDMAP_app_sidebar_in_use.app_sidebar_visible > div:first-child {
+  float: right;
+}
+
+.IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  margin: 16px 16px 0px 16px;
+  border: none;
+  background: #fff;
+  height: 24px;
+  width: 24px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+}
+
+.IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
+  width: 24px;
+  height: 24px;
+}
+
+.IDMAP_sidebar_iconArea + div:before {
+  position: absolute;
+  content: '';
+  height: 1px;
+  background: #ddd;
+  width: 100%;
+  top: -8px;
 }
 
 /* end sidebar */
