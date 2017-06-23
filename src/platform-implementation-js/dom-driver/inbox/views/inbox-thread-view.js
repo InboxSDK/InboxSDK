@@ -7,6 +7,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -77,15 +78,36 @@ class InboxThreadView {
   }
 
   getThreadID(): string {
-    if (!this._p.attributes.threadId) {
+    const {inboxThreadId} = this._p.attributes;
+    if (!inboxThreadId) {
       throw new Error('Failed to find thread id');
     }
-    return this._p.attributes.threadId;
+    if (/^msg-a:/.test(inboxThreadId)) {
+      console.warn('ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.');
+    }
+    const m = /\d+$/.exec(inboxThreadId);
+    if (!m) throw new Error('Should not happen');
+    return new BigNumber(m[0]).toString(16);
   }
 
   async getThreadIDAsync(): Promise<string> {
-    // TODO handle translating fake IDs into real ones and cache them
-    return this.getThreadID();
+    const {inboxThreadId} = this._p.attributes;
+    if (!inboxThreadId) {
+      throw new Error('Failed to find message id');
+    }
+    if (/^thread-a:/.test(inboxThreadId)) {
+      // Get the id of any message in the thread, and then use that id in a request
+      // to a gmail endpoint to get the id of the thread that message is in.
+      const firstMessage = this._messageViews[0];
+      if (!firstMessage) throw new Error('Should not happen');
+      const messageId = await firstMessage.getMessageIDAsync();
+
+      return await this._driver.getThreadIdFromMessageId(messageId);
+    } else {
+      const m = /\d+$/.exec(inboxThreadId);
+      if (!m) throw new Error('Should not happen');
+      return new BigNumber(m[0]).toString(16);
+    }
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {

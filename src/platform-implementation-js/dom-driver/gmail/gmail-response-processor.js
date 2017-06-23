@@ -16,8 +16,6 @@ export function interpretSentEmailResponse(responseString: string): {threadID: s
     throw new Error("Failed to read email response");
   }
   return {
-    gmailThreadId: gmailThreadId,
-    gmailMessageId: gmailMessageId,
     threadID: gmailThreadId,
     messageID: gmailMessageId
   };
@@ -49,20 +47,15 @@ export function extractGmailThreadIdFromSentEmail(emailSentArray: any): ?string 
   return threadIdArray[1];
 }
 
-// TODO what is this for?
-function extractHexGmailThreadIdFromMessageIdSearch(responseString: string): any {
-  if(!responseString){
-    return null;
-  }
-
+export function extractGmailThreadIdFromMessageIdSearch(responseString: string): ?string {
   const threadResponseArray = deserialize(responseString).value;
   const threadIdArrayMarker = "cs";
   const threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, markerArray =>
-    markerArray.length > 20
+    markerArray[0] === "cs" && markerArray.length > 20
   );
 
   if(!threadIdArray){
-    return;
+    return null;
   }
 
   return threadIdArray[1];

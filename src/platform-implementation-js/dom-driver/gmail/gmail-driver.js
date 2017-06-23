@@ -30,9 +30,9 @@ import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
-import getGmailThreadIdForRfcMessageId from './gmail-driver/get-gmail-thread-id-for-rfc-message-id';
+import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
-import MessageIdManager from '../../lib/message-id-manager';
+import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
@@ -76,7 +76,6 @@ class GmailDriver {
 	_customListRouteIDs: Map<string, Function> = new Map();
 	_customListSearchStringsToRouteIds: Map<string, string> = new Map();
 	_messageIDsToThreadIDs: Map<string, string> = new Map();
-	_messageIdManager: MessageIdManager;
 	_threadRowIdentifier: ThreadRowIdentifier;
 	_gmailRouteProcessor: GmailRouteProcessor;
 	_keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
@@ -102,6 +101,9 @@ class GmailDriver {
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 
+	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
+	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
+
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
 		(this: Driver); // interface check
 		customStyle();
@@ -111,12 +113,17 @@ class GmailDriver {
 		this._opts = opts;
 		this._envData = envData;
 
-		this._messageIdManager = new MessageIdManager({
-			getGmailThreadIdForRfcMessageId: (rfcMessageId) =>
-				getGmailThreadIdForRfcMessageId(this, rfcMessageId),
-			getRfcMessageIdForGmailThreadId: (gmailThreadId) =>
-				getRfcMessageIdForGmailThreadId(this, gmailThreadId)
+		// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
+		// localStorage. Used for custom thread lists.
+		const rfcIdCache = new BiMapCache({
+			key: 'inboxsdk__cached_thread_ids',
+			getAfromB: (gmailThreadId) =>
+				getRfcMessageIdForGmailThreadId(this, gmailThreadId),
+			getBfromA: (rfcMessageId) =>
+				getGmailThreadIdForRfcMessageId(this, rfcMessageId)
 		});
+		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
+		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
@@ -149,7 +156,6 @@ class GmailDriver {
 	getPageCommunicatorPromise(): Promise<PageCommunicator> {return this._pageCommunicatorPromise;}
 	getLogger(): Logger {return this._logger;}
 	getCustomListSearchStringsToRouteIds(): Map<string, string> {return this._customListSearchStringsToRouteIds;}
-	getMessageIdManager(): MessageIdManager {return this._messageIdManager;}
 	getThreadRowIdentifier(): ThreadRowIdentifier {return this._threadRowIdentifier;}
 	getButterBarDriver(): GmailButterBarDriver {return this._butterBarDriver;}
 	getButterBar(): ?ButterBar {return this._butterBar;}
@@ -333,6 +339,10 @@ class GmailDriver {
 				});
 			}
 		}
+	}
+
+	async getGmailActionToken(): Promise<string> {
+		return this._pageCommunicator.getActionTokenValue();
 	}
 
 	getUserEmailAddress(): string {
