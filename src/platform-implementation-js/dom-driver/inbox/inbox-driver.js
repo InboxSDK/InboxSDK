@@ -579,7 +579,11 @@ class InboxDriver {
     }
   }
 
-  setShowNativeNavMarker(value: boolean) {
+  setShowNativeNavMarker(isNative: boolean) {
+    // stub
+  }
+
+  setShowNativeAddonSidebar(isNative: boolean) {
     // stub
   }
 

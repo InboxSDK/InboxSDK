@@ -94,6 +94,7 @@ class GmailDriver {
 	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
 	_stopper = kefirStopper();
 	_navMarkerHiddenChanged: Bus<null> = kefirBus();
+	_addonSidebarHiddenChanged: Bus<null> = kefirBus();
 	_userInfo: UserInfo;
 	_timestampAccountSwitcherReady: ?number;
 	_timestampGlobalsFound: ?number;
@@ -305,16 +306,36 @@ class GmailDriver {
 		return p;
 	}
 
-	setShowNativeNavMarker(value: boolean) {
+	setShowNativeNavMarker(isNative: boolean) {
 		this._navMarkerHiddenChanged.emit(null);
 		const leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
 		if(leftNavContainerElement){
-			if (value) {
+			if (isNative) {
 				leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
 			} else {
 				leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
 				this._stopper.takeUntilBy(this._navMarkerHiddenChanged).onValue(() => {
 					leftNavContainerElement.classList.remove('inboxsdk__hide_native_marker');
+				});
+			}
+		}
+	}
+
+	setShowNativeAddonSidebar(isNative: boolean) {
+		this._addonSidebarHiddenChanged.emit(null);
+		const addonContainerElement = GmailElementGetter.getAddonSidebarContainerElement();
+		const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+
+		if(addonContainerElement && mainContentBodyContainerElement){
+			const parent = mainContentBodyContainerElement.parentElement;
+			if(!parent) return;
+
+			if (isNative) {
+				parent.classList.remove('inboxsdk__hide_addon_container');
+			} else {
+				parent.classList.add('inboxsdk__hide_addon_container');
+				this._stopper.takeUntilBy(this._addonSidebarHiddenChanged).onValue(() => {
+					parent.classList.remove('inboxsdk__hide_addon_container');
 				});
 			}
 		}
