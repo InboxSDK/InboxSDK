@@ -70,8 +70,8 @@ class ContentPanelViewDriver {
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
               id: String(id || title),
-              appName: appName || this._driver.getOpts().appName,
-              appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl,
+              appName: appName || this._driver.getOpts().appName || title,
+              appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
               hideTitleBar: Boolean(hideTitleBar),
               orderHint: typeof orderHint === 'number' ? orderHint : 0
             }
