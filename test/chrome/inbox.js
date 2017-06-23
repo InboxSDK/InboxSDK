@@ -258,9 +258,11 @@ describe('Inbox', function() {
       browser.waitUntil(() => browser.getTabIds().length > 1, 5000);
       const externalUrlTabId = browser.getTabIds().find((id) => id !== inboxTabId);
       browser.switchTab(externalUrlTabId);
+      browser.pause(2000);
       const currentUrl = browser.execute(() => window.location.origin).value;
       assert(currentUrl === 'https://www.google.com');
       browser.close();
+      browser.pause(2000);
       firstResultSet[1].click();
       searchInput.click();
       // For some reason Chrome/Inbox get grumpy if you try to send keystrokes
