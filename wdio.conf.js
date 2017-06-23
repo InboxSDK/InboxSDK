@@ -139,7 +139,12 @@ exports.config = {
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     mochaOpts: {
+<<<<<<< HEAD
+        timeout: 5*60*1000,
+        noTimeouts: process.env.CI !== 'true',
+=======
         timeout: process.env.CI === 'true' ? 5*60*1000 : Infinity,
+>>>>>>> master
         ui: 'bdd'
     },
     //

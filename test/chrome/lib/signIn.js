@@ -22,7 +22,15 @@ export default function signIn() {
 
   const oldTitle = browser.getTitle();
   browser.click('div[role=button]#totpNext, input#submit');
-  browser.waitUntil(() => browser.getTitle() !== oldTitle);
+  browser.waitUntil(() => {
+    try {
+      return browser.getTitle() !== oldTitle;
+    } catch (err) {
+      // The first call to getTitle() seems prone to throwing a timeout error
+      console.error('caught getTitle error', err);
+      return false;
+    }
+  });
 
   // Deal with an interstitial page.
   if (!browser.getTitle().startsWith('Inbox ')) {
