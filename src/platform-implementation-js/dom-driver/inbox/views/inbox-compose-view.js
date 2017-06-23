@@ -28,6 +28,7 @@ import type {ComposeViewDriver, StatusBar, ComposeButtonDescriptor} from '../../
 import {
   getSelectedHTMLInElement, getSelectedTextInElement
 } from '../../../lib/dom/get-selection';
+import getGmailThreadIdForRfcMessageId from '../../../driver-common/getGmailThreadIdForRfcMessageId';
 
 import type {Parsed} from '../detection/compose/parser';
 
@@ -141,8 +142,11 @@ class InboxComposeView {
           });
           this._driver.getPageCommunicator().notifyEmailSending();
           if (!this._p.attributes.isInline) {
-            Kefir.later(15)
-              .takeUntilBy(sendCanceledStream)
+            // TODO make this code less fragile on slow machines/connections
+            Kefir.later(5*1000)
+              .takeUntilBy(this.getEventStream()
+                .filter(({eventName}) => ['sendCanceled', 'presending'].indexOf(eventName) !== -1)
+              )
               .onValue(() => {
                 // In cases where Inbox decides to cancel the send client-side,
                 // we need to make sure we realize sending is not going to happen
@@ -308,7 +312,23 @@ class InboxComposeView {
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({type}) => type === 'emailSent')
-        .map(() => ({eventName: 'sent'}))
+        .map(event => {
+          const data = {
+            getThreadID: (): Promise<string> =>
+              getGmailThreadIdForRfcMessageId(this._driver, event.rfcID),
+            getMessageID: (): Promise<string> =>
+              this._driver.getGmailMessageIdForInboxMessageId(`msg-a:${event.draftID}`)
+          };
+          ['gmailThreadId', 'gmailMessageId', 'threadID', 'messageID'].forEach(name => {
+            Object.defineProperty(data, name, {get: () => {
+              this._driver.getLogger().deprecationWarning(
+                `ComposeView sent event.${name}`,
+                'ComposeView sent event.getThreadID() or event.getMessageID()');
+              throw new Error('Not supported');
+            }});
+          });
+          return {eventName: 'sent', data};
+        })
     );
   }
   getFromContact(): Contact {
