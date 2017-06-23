@@ -107,6 +107,14 @@ const GmailElementGetter = {
 		return document.querySelector('.aeN');
 	},
 
+	getAddonSidebarContainerElement(): ?HTMLElement {
+		return document.querySelector('.no > .nn.bnl');
+	},
+
+	getMainContentBodyContainerElement(): ?HTMLElement {
+		return document.querySelector('.no > .nn.bkK');
+	},
+
 	getGtalkButtons(): ?HTMLElement {
 		return document.querySelector('.aeN .aj5.J-KU-Jg');
 	},

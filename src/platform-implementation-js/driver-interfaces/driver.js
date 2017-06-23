@@ -64,7 +64,8 @@ export type Driver = {
 	addCustomRouteID(routeID: string): () => void;
 	addCustomListRouteID(routeID: string, handler: Function): () => void;
 	showCustomRouteView(el: HTMLElement): void;
-	setShowNativeNavMarker(a: any): any;
+	setShowNativeNavMarker(isNative: boolean): any;
+	setShowNativeAddonSidebar(isNative: boolean): any;
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
 	addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<Object>;
