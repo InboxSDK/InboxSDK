@@ -140,6 +140,7 @@ exports.config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
         timeout: 5*60*1000,
+        noTimeouts: process.env.CI !== 'true',
         ui: 'bdd'
     },
     //
