@@ -322,8 +322,8 @@ class InboxComposeView {
           ['gmailThreadId', 'gmailMessageId', 'threadID', 'messageID'].forEach(name => {
             Object.defineProperty(data, name, {get: () => {
               this._driver.getLogger().deprecationWarning(
-                `ComposeView#sent.${name}`,
-                'ComposeView#sent.getThreadID() or ComposeView#sent.getMessageID()');
+                `ComposeView sent event.${name}`,
+                'ComposeView sent event.getThreadID() or event.getMessageID()');
               throw new Error('Not supported');
             }});
           });

@@ -50,9 +50,6 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 	getBodyElement: function(){},
 
-	/* NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS */
-	getComposeID: function(){},
-
 	/**
 	 * Returns the initial message ID of the draft. If this is a new compose then the
 	 * message ID will be null. If the user has opened an existing draft then this function
@@ -63,9 +60,6 @@ var ComposeView = /** @lends ComposeView */ {
 	 * @return {string}
 	 */
 	getInitialMessageID: function(){},
-
-	/* deprecated */
-	getMessageID: function() {},
 
 	/**
 	 * Returns the thread ID of the draft. If the draft is not a reply, then this
@@ -453,13 +447,12 @@ var ComposeView = /** @lends ComposeView */ {
 	/**
 	 * Fires when the Gmail server has confirmed receiving the message. An event
 	 * object containing properties about the sent message will be passed to the
-	 * event listeners. The threadID and messageID properties are not available
-	 * in Inbox yet.
+	 * event listeners.
 	 * ^gmail
 	 * ^inbox
 	 * @event ComposeView#sent
-	 * @param {string} threadID - the thread ID of the message that was just sent
-	 * @param {string} messageID - the message ID of the message that was just sent
+	 * @param {Promise.<string>} getThreadID() - retrieves the thread ID of the message that was just sent
+	 * @param {Promise.<string>} getMessageID() - retrieves the message ID of the message that was just sent
 	 */
 
 	/**
