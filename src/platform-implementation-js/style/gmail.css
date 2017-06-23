@@ -771,11 +771,13 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .container_app_sidebar_in_use.no {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .container_app_sidebar_in_use .bkK.nn {
   width: auto !important;
   flex: 1;
+  min-width: 0px;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
