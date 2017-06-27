@@ -56,6 +56,8 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
         // in total to an individual user.
       }
       return await googleLimitedAjax(opts);
+    } else if (e && typeof e.status === 'number' && e.status >= 500) {
+      return await googleLimitedAjax(opts);
     } else {
       throw e;
     }
