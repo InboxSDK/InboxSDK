@@ -47,6 +47,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
         stringData = null;
       }
     }
+    const canRetry: boolean = opts.canRetry != null ? opts.canRetry : (method === "GET" || method === "HEAD");
 
     const match = url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//);
     if (!match) {
@@ -68,8 +69,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       if ((opts.retryNum || 0) < MAX_RETRIES) {
         if (
           xhr.status === 502 ||
-          ((xhr.status === 0 || xhr.status >= 500) &&
-            (method === "GET" || method === "HEAD" || opts.canRetry === true))
+          ((xhr.status === 0 || xhr.status >= 500) && canRetry)
         ) {
           resolve(_retry(opts));
           return;
