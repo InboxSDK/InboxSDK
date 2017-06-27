@@ -17,6 +17,13 @@ function incrementStat(name) {
 	);
 }
 
+// Rethrow an error where the SDK will see and log it.
+function rethrow(err) {
+	setTimeout(() => {
+		throw err;
+	}, 1);
+}
+
 InboxSDK.load(2, 'simple-example').then(sdk => {
 	window.__sdk = sdk;
 
@@ -49,11 +56,8 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 				if (!/(?:r|r-)?\d+$/i.test(id)) {
 					throw Object.assign(new Error('Bad draft ID'), {id});
 				}
-			}).catch((error) => {
-				setTimeout(() => {
-					throw error;
-				}, 0);
-		  });
+				incrementStat('data-test-compose-getDraftID');
+			}).catch(rethrow);
 
 		composeView.on('destroy', () => (
 			incrementStat('data-test-composeDestroyEmitted')
@@ -137,22 +141,24 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			});
 		}
 
-		const id = threadView.getThreadID();
-		if (!/[0-9a-f]{12,16}/i.test(id)) {
-			throw Object.assign(new Error('Bad thread id'), {id});
-		}
+		threadView.getThreadIDAsync().then(id => {
+			if (!/[0-9a-f]{12,16}/i.test(id)) {
+				throw Object.assign(new Error('Bad thread id'), {id});
+			}
+			incrementStat('data-test-threadView-getThreadIDAsync');
 
-		const messageViews = threadView.getMessageViewsAll();
-		if (messageViews.length === 0) {
-			throw new Error('No message views found');
-		}
-		setTimeout(() => {
-			messageViews.forEach(messageView => {
-				if (!handledMessageViews.has(messageView)) {
-					throw new Error('No handler called for message view in thread');
-				}
-			});
-		}, 0);
+			const messageViews = threadView.getMessageViewsAll();
+			if (messageViews.length === 0) {
+				throw new Error('No message views found');
+			}
+			setTimeout(() => {
+				messageViews.forEach(messageView => {
+					if (!handledMessageViews.has(messageView)) {
+						throw new Error('No handler called for message view in thread');
+					}
+				});
+			}, 0);
+		}).catch(rethrow);
 	});
 
 	sdk.Conversations.registerMessageViewHandlerAll(messageView => {
@@ -160,6 +166,8 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 	});
 
 	sdk.Conversations.registerMessageViewHandler(messageView => {
+		incrementStat('data-test-messageViewsSeen');
+
 		messageView.getFileAttachmentCardViews().forEach(cardView => {
 			cardView.addButton({
 				iconUrl: arrowIconUrl,
@@ -170,21 +178,23 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 		if (messageView.isLoaded() !== true)
 			throw new Error('message view was expected to be loaded');
 
-		const id = messageView.getMessageID();
-		if (!/[0-9a-f]{12,16}/i.test(id)) {
-			throw Object.assign(new Error('Bad message id'), {id});
-		}
+		messageView.getMessageIDAsync().then(id => {
+			if (!/[0-9a-f]{12,16}/i.test(id)) {
+				throw Object.assign(new Error('Bad message id'), {id});
+			}
+			incrementStat('data-test-messageView-getMessageIDAsync');
 
-		const cards = messageView.getFileAttachmentCardViews();
-		if (cards.length > 0) {
-			setTimeout(() => {
-				cards.forEach(card => {
-					if (!handledFileAttachmentCardViews.has(card)) {
-						throw new Error('No handler called for card in message');
-					}
-				});
-			}, 0);
-		}
+			const cards = messageView.getFileAttachmentCardViews();
+			if (cards.length > 0) {
+				setTimeout(() => {
+					cards.forEach(card => {
+						if (!handledFileAttachmentCardViews.has(card)) {
+							throw new Error('No handler called for card in message');
+						}
+					});
+				}, 0);
+			}
+		}).catch(rethrow);
 	});
 
 	sdk.Conversations.registerFileAttachmentCardViewHandler(cardView => {
@@ -238,4 +248,4 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			}
 		];
 	});
-});
+}).catch(rethrow);

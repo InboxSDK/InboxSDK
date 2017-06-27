@@ -28,7 +28,7 @@ import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
 import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
-import googleLimitedAjax from '../../driver-common/googleLimitedAjax';
+import gmailAjax from '../../driver-common/gmailAjax';
 import populateRouteID from '../../lib/populateRouteID';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
@@ -446,7 +446,7 @@ class InboxDriver {
   getGmailActionToken = once(async () => {
     const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
     const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
-    const response = await googleLimitedAjax({
+    const response = await gmailAjax({
       url: `https://mail.google.com/mail${accountParam}/`,
       xhrFields: {
         withCredentials: true

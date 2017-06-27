@@ -339,6 +339,28 @@ describe('Inbox', function() {
       ), 5000);
       assert(!resultsList.isVisible());
 
+      {
+        const threadViewsSeen = browser.execute(() =>
+          Number((document.head:any).getAttribute('data-test-threadViewsSeen'))
+        ).value;
+        assert.strictEqual(threadViewsSeen, 2);
+
+        const threadViewsWithIDsLookedUp = browser.execute(() =>
+          Number((document.head:any).getAttribute('data-test-threadView-getThreadIDAsync'))
+        ).value;
+        assert.strictEqual(threadViewsWithIDsLookedUp, threadViewsSeen);
+
+        const messageViewsSeen = browser.execute(() =>
+          Number((document.head:any).getAttribute('data-test-messageViewsSeen'))
+        ).value;
+        assert(messageViewsSeen >= threadViewsSeen);
+
+        const messageViewsWithIDsLookedUp = browser.execute(() =>
+          Number((document.head:any).getAttribute('data-test-messageView-getMessageIDAsync'))
+        ).value;
+        assert.strictEqual(messageViewsWithIDsLookedUp, messageViewsSeen);
+      }
+
     } catch (err) {
       console.error(err.stack || ('Error: '+err.message));
       if (process.env.CI !== 'true') {

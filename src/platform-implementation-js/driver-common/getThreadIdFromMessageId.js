@@ -2,7 +2,7 @@
 
 import {defn} from 'ud';
 import querystring from 'querystring';
-import googleLimitedAjax from './googleLimitedAjax';
+import gmailAjax from './gmailAjax';
 import {extractGmailThreadIdFromMessageIdSearch} from '../dom-driver/gmail/gmail-response-processor';
 import type {Driver} from '../driver-interfaces/driver';
 
@@ -24,7 +24,7 @@ async function getThreadIdFromMessageId(driver: Driver, messageId: string): Prom
     type: messageId
   };
 
-  const {text} = await googleLimitedAjax({
+  const {text} = await gmailAjax({
     method: 'POST',
     url: `https://mail.google.com/mail${accountParam}?${querystring.stringify(queryParameters)}`,
     canRetry: true
