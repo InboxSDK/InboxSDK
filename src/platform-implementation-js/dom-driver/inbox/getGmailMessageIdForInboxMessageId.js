@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import googleLimitedAjax from '../../driver-common/googleLimitedAjax';
+import gmailAjax from '../../driver-common/gmailAjax';
 import type InboxDriver from './inbox-driver';
 
 // Messages sent from the local user in Inbox have a fake ID in the DOM (with
@@ -14,7 +14,7 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
   // but this page is backed by Gmail's backend which will always include it.
   const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
 
-  const {text} = await googleLimitedAjax({
+  const {text} = await gmailAjax({
     method: 'GET',
     url: `https://mail.google.com/mail${accountParam}`,
     canRetry: true,

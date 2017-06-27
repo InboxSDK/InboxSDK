@@ -2,7 +2,7 @@
 
 import {defn} from 'ud';
 import {extractThreads} from '../dom-driver/gmail/gmail-response-processor';
-import googleLimitedAjax from './googleLimitedAjax';
+import gmailAjax from './gmailAjax';
 import type {Driver} from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: string): Promise<string> {
@@ -11,7 +11,7 @@ async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: str
   // but this page is backed by Gmail's backend which will always include it.
   const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
 
-  const response = await googleLimitedAjax({
+  const response = await gmailAjax({
     method: 'POST',
     url: `https://mail.google.com/mail${accountParam}/`,
     data: {
