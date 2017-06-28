@@ -797,7 +797,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   overflow: auto;
 }
 
-.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
+.container_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
   width: 254px;
   margin-right: 10px;
 }
