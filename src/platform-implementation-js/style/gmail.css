@@ -735,12 +735,12 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* sidebar */
 
-.IDMAP_app_sidebar_in_use div[role=complementary] {
+.IDMAP_app_sidebar_in_use > div[role=complementary] {
   position: static !important;
   width: 216px !important;
 }
 
-.IDMAP_app_sidebar_in_use div[role=tablist] {
+.IDMAP_app_sidebar_in_use > div[role=tablist] {
   height: auto !important;
 }
 
