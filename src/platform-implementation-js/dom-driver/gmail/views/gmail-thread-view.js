@@ -2,11 +2,13 @@
 
 import asap from 'asap';
 import _ from 'lodash';
+import delay from 'pdelay';
 import {defn} from 'ud';
 import util from 'util';
 import Kefir from 'kefir';
 import {parse} from 'querystring';
 import kefirBus from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 import type {Bus} from 'kefir-bus';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -19,12 +21,15 @@ import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
 
+let hasLoggedAddonInfo = false;
+
 class GmailThreadView {
 	_element: HTMLElement;
 	_routeViewDriver: any;
 	_driver: GmailDriver;
 	_isPreviewedThread: boolean;
 	_eventStream: Bus<any>;
+	_stopper = kefirStopper();
 	_sidebar: ?GmailAppSidebarView = null;
 
 	_toolbarView: any;
@@ -49,6 +54,7 @@ class GmailThreadView {
 
 		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
+		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 	}
 
 	getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
@@ -60,6 +66,7 @@ class GmailThreadView {
 
 	destroy() {
 		this._eventStream.end();
+		this._stopper.destroy();
 		this._toolbarView.destroy();
 		if (this._sidebar) this._sidebar.destroy();
 		this._messageViewDrivers.forEach(messageView => {
@@ -73,7 +80,7 @@ class GmailThreadView {
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>, appId: string){
 		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+		const addonSidebarElement = null; //TODO re-enable GmailElementGetter.getAddonSidebarContainerElement();
 		if (!sidebarElement && !addonSidebarElement) {
 			console.warn('This view does not have a sidebar');
 			return;
@@ -234,6 +241,42 @@ class GmailThreadView {
 
 	getReadyStream() {
 		return delayAsap(null);
+	}
+
+	async _logAddonElementInfo() {
+		if (hasLoggedAddonInfo) return;
+
+		function readInfo() {
+			const container = GmailElementGetter.getAddonSidebarContainerElement();
+			if (!container) return null;
+
+			const isDisplayNone = {
+				parent: container.parentElement ? (container.parentElement:any).style.display === 'none' : null,
+				self: container.style.display === 'none',
+				children: Array.from(container.children).map(el => el.style ? el.style.display === 'none' : null)
+			};
+
+			const rect = container.getBoundingClientRect();
+			const size = {
+				width: rect.width,
+				height: rect.height
+			};
+			return {isDisplayNone, size};
+		}
+
+		const eventData = {time: {}};
+		eventData.time[0] = readInfo();
+
+		await Promise.all([30, 5000].map(async time => {
+			await delay(time);
+			if (this._stopper.stopped) return;
+			eventData.time[time] = readInfo();
+		}));
+		if (this._stopper.stopped) return;
+
+		this._driver.getLogger().eventSdkPassive('gmailSidebarElementInfo', eventData);
+
+		hasLoggedAddonInfo = true;
 	}
 }
 
