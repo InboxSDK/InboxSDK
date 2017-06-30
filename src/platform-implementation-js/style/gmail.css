@@ -770,19 +770,23 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .container_app_sidebar_in_use.no {
   display: flex;
+  display: -webkit-flex;
   flex-direction: row;
+  -webkit-flex-direction: row;
   width: 100%;
 }
 
 .container_app_sidebar_in_use .bkK.nn {
   width: auto !important;
   flex: 1;
+  -webkit-flex: 1;
   min-width: 0px;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
   width: 336px !important;
   flex-shrink: 0;
+  -webkit-flex-shrink: 0;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
@@ -867,13 +871,16 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 .inboxsdk__hide_addon_container {
   display: flex !important;
+  display: -webkit-flex !important;
   flex-direction: row;
+  -webkit-flex-direction: row;
   width: 100% !important;
 }
 
 .inboxsdk__hide_addon_container > .bkK.nn {
   width: auto !important;
   flex: 1;
+  -webkit-flex: 1;
   min-width: 0;
 }
 
