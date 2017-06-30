@@ -871,12 +871,13 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100% !important;
 }
 
-.inboxsdk__hide_addon_container .bkK.nn {
+.inboxsdk__hide_addon_container > .bkK.nn {
   width: auto !important;
   flex: 1;
+  min-width: 0;
 }
 
-.inboxsdk__hide_addon_container .bnl.nn {
+.inboxsdk__hide_addon_container > .bnl.nn {
   display: none;
 }
 
