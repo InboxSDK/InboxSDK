@@ -37,7 +37,6 @@ class GmailAppSidebarView {
 	_driver: GmailDriver;
 	_sidebarContainerEl: ?HTMLElement;
 	_addonSidebarContainerEl: ?HTMLElement;
-	_el: HTMLElement;
 	_instanceId: string;
 
 	constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement) {
@@ -56,7 +55,6 @@ class GmailAppSidebarView {
 		// already exists and create it if it doesn't.
 		const el = sidebarEl.querySelector('.'+idMap('app_sidebar_container'));
 		if (el) {
-			this._el = el;
 			const instanceId = el.getAttribute('data-instance-id');
 			if (instanceId == null) throw new Error('Failed to find instance id');
 			this._instanceId = instanceId;
@@ -94,7 +92,7 @@ class GmailAppSidebarView {
 
 		this._instanceId = `${Date.now()}-${Math.random()}`;
 
-		const el = this._el = document.createElement('div');
+		const el = document.createElement('div');
 		el.className = idMap('app_sidebar_container');
 		el.setAttribute('data-instance-id', this._instanceId);
 
