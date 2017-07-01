@@ -44,19 +44,17 @@ class GmailAppSidebarView {
 		this._sidebarContainerEl = sidebarContainerEl;
 		this._addonSidebarContainerEl = addonSidebarElement;
 
-		const sidebarEl = addonSidebarElement || sidebarContainerEl;
-		if(!sidebarEl) throw new Error('should not happen');
-
 		// We need to be able to cooperate with other apps/extensions that are
 		// sharing the app sidebar. We store some properties as attributes in the
 		// shared DOM instead of as class properties; class properties are mostly
 		// restricted to being used for references to DOM nodes. When
-		// GmailAppSidebarView is instantiated, we check to see if the element
-		// already exists and create it if it doesn't.
-		const el = sidebarEl.querySelector('.'+idMap('app_sidebar_container'));
-		if (el) {
-			const instanceId = el.getAttribute('data-instance-id');
-			if (instanceId == null) throw new Error('Failed to find instance id');
+		// GmailAppSidebarView is instantiated, we check the element for an
+		// attribute to see whether a previous extension's GmailAppSidebarView has
+		// already set up the sidebar or not.
+		const idElement = addonSidebarElement || sidebarContainerEl;
+		if(!idElement) throw new Error('should not happen');
+		const instanceId = idElement.getAttribute('data-sdk-sidebar-instance-id');
+		if (instanceId != null) {
 			this._instanceId = instanceId;
 		} else {
 			this._createElement();
@@ -92,9 +90,14 @@ class GmailAppSidebarView {
 
 		this._instanceId = `${Date.now()}-${Math.random()}`;
 
+		{
+			const idElement = this._addonSidebarContainerEl || this._sidebarContainerEl;
+			if(!idElement) throw new Error('should not happen');
+			idElement.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
+		}
+
 		const el = document.createElement('div');
 		el.className = idMap('app_sidebar_container');
-		el.setAttribute('data-instance-id', this._instanceId);
 
 		const addonSidebarContainerEl = this._addonSidebarContainerEl;
 		const sidebarContainerEl = addonSidebarContainerEl || this._sidebarContainerEl;
