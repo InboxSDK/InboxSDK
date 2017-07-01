@@ -35,14 +35,10 @@ const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 class GmailAppSidebarView {
 	_stopper = kefirStopper();
 	_driver: GmailDriver;
-	_sidebarContainerEl: ?HTMLElement;
-	_addonSidebarContainerEl: ?HTMLElement;
 	_instanceId: string;
 
 	constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement) {
 		this._driver = driver;
-		this._sidebarContainerEl = sidebarContainerEl;
-		this._addonSidebarContainerEl = addonSidebarElement;
 
 		// We need to be able to cooperate with other apps/extensions that are
 		// sharing the app sidebar. We store some properties as attributes in the
@@ -57,7 +53,7 @@ class GmailAppSidebarView {
 		if (instanceId != null) {
 			this._instanceId = instanceId;
 		} else {
-			this._createElement();
+			this._createElement(sidebarContainerEl, addonSidebarElement);
 		}
 	}
 
@@ -84,14 +80,14 @@ class GmailAppSidebarView {
 		}
 	}
 
-	_createElement() {
+	_createElement(_sidebarContainerEl: ?HTMLElement, _addonSidebarContainerEl: ?HTMLElement) {
 		let container, iconArea;
 		let component: AppSidebar;
 
 		this._instanceId = `${Date.now()}-${Math.random()}`;
 
 		{
-			const idElement = this._addonSidebarContainerEl || this._sidebarContainerEl;
+			const idElement = _addonSidebarContainerEl || _sidebarContainerEl;
 			if(!idElement) throw new Error('should not happen');
 			idElement.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
 		}
@@ -99,8 +95,8 @@ class GmailAppSidebarView {
 		const el = document.createElement('div');
 		el.className = idMap('app_sidebar_container');
 
-		const addonSidebarContainerEl = this._addonSidebarContainerEl;
-		const sidebarContainerEl = addonSidebarContainerEl || this._sidebarContainerEl;
+		const addonSidebarContainerEl = _addonSidebarContainerEl;
+		const sidebarContainerEl = addonSidebarContainerEl || _sidebarContainerEl;
 
 		if(!sidebarContainerEl) throw new Error('should not happen');
 
