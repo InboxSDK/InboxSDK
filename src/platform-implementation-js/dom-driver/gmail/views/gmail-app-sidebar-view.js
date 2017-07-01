@@ -35,33 +35,25 @@ const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 class GmailAppSidebarView {
 	_stopper = kefirStopper();
 	_driver: GmailDriver;
-	_sidebarContainerEl: ?HTMLElement;
-	_addonSidebarContainerEl: ?HTMLElement;
-	_el: HTMLElement;
 	_instanceId: string;
 
 	constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement) {
 		this._driver = driver;
-		this._sidebarContainerEl = sidebarContainerEl;
-		this._addonSidebarContainerEl = addonSidebarElement;
-
-		const sidebarEl = addonSidebarElement || sidebarContainerEl;
-		if(!sidebarEl) throw new Error('should not happen');
 
 		// We need to be able to cooperate with other apps/extensions that are
 		// sharing the app sidebar. We store some properties as attributes in the
 		// shared DOM instead of as class properties; class properties are mostly
 		// restricted to being used for references to DOM nodes. When
-		// GmailAppSidebarView is instantiated, we check to see if the element
-		// already exists and create it if it doesn't.
-		const el = sidebarEl.querySelector('.'+idMap('app_sidebar_container'));
-		if (el) {
-			this._el = el;
-			const instanceId = el.getAttribute('data-instance-id');
-			if (instanceId == null) throw new Error('Failed to find instance id');
+		// GmailAppSidebarView is instantiated, we check the element for an
+		// attribute to see whether a previous extension's GmailAppSidebarView has
+		// already set up the sidebar or not.
+		const idElement = addonSidebarElement || sidebarContainerEl;
+		if(!idElement) throw new Error('should not happen');
+		const instanceId = idElement.getAttribute('data-sdk-sidebar-instance-id');
+		if (instanceId != null) {
 			this._instanceId = instanceId;
 		} else {
-			this._createElement();
+			this._createElement(sidebarContainerEl, addonSidebarElement);
 		}
 	}
 
@@ -88,39 +80,81 @@ class GmailAppSidebarView {
 		}
 	}
 
-	_createElement() {
+	_createElement(_sidebarContainerEl: ?HTMLElement, _addonSidebarContainerEl: ?HTMLElement) {
 		let container, iconArea;
 		let component: AppSidebar;
 
 		this._instanceId = `${Date.now()}-${Math.random()}`;
 
-		const el = this._el = document.createElement('div');
+		{
+			const idElement = _addonSidebarContainerEl || _sidebarContainerEl;
+			if(!idElement) throw new Error('should not happen');
+			idElement.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
+			this._stopper.onValue(() => {
+				idElement.removeAttribute('data-sdk-sidebar-instance-id');
+			});
+		}
+
+		const el = document.createElement('div');
 		el.className = idMap('app_sidebar_container');
-		el.setAttribute('data-instance-id', this._instanceId);
-
-		const addonSidebarContainerEl = this._addonSidebarContainerEl;
-		const sidebarContainerEl = addonSidebarContainerEl || this._sidebarContainerEl;
-
-		if(!sidebarContainerEl) throw new Error('should not happen');
-
-		let contentContainer;
-		sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
 
 		const buttonContainers: Map<string, HTMLElement> = new Map();
 		let activatedWhileLoading: boolean = false;
 
-		if(addonSidebarContainerEl){
+		let contentContainer;
+		let usedAddonsSidebar = false;
+		if(_addonSidebarContainerEl){
 			const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
 			if(mainContentBodyContainerElement){
 				contentContainer = mainContentBodyContainerElement.parentElement;
-				if(contentContainer) {
-					contentContainer.classList.add('container_app_sidebar_in_use');
-					querySelector(addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR).insertAdjacentElement('beforebegin', el);
+				if(!contentContainer) throw new Error('should not happen');
+				contentContainer.classList.add('container_app_sidebar_in_use');
+				querySelector(_addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR).insertAdjacentElement('beforebegin', el);
+
+				// See if the element is visible.
+				// Give it some content temporarily to check if it becomes sized to show it.
+				_addonSidebarContainerEl.classList.add('app_sidebar_visible');
+				_addonSidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
+				el.textContent = 'x';
+				const elRect = el.getBoundingClientRect();
+				el.textContent = '';
+				// This gets re-added later once the panel has some content to show
+				_addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+
+				const supportedScreenSize = window.innerWidth >= 1024 && window.innerHeight >= 600;
+				if (!global._APP_SIDEBAR_TEST && (
+					elRect.width == 0 ||
+					elRect.height == 0 ||
+					(supportedScreenSize && Math.floor(elRect.right) > Math.floor(window.innerWidth))
+				)) {
+					this._driver.getLogger().error(new Error('SDK sidebar inserted into add-ons sidebar was not visible'), {
+						rect: { // rect's properties aren't enumerable so we have to do this
+							top: elRect.top,
+							bottom: elRect.bottom,
+							left: elRect.left,
+							right: elRect.right,
+							width: elRect.width,
+							height: elRect.height
+						},
+						window: {
+							innerWidth: window.innerWidth,
+							innerHeight: window.innerHeight
+						}
+					});
+					contentContainer.classList.remove('container_app_sidebar_in_use');
+					_addonSidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
+				} else {
+					usedAddonsSidebar = true;
 				}
 			}
 		}
-		else {
+
+		const addonSidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : null;
+		const sidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : _sidebarContainerEl;
+		if(!sidebarContainerEl) throw new Error('should not happen');
+		if (!usedAddonsSidebar) {
 			sidebarContainerEl.insertBefore(el, sidebarContainerEl.firstElementChild);
+			sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
 		}
 
 		if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
