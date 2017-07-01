@@ -121,7 +121,12 @@ class GmailAppSidebarView {
 				// This gets re-added later once the panel has some content to show
 				_addonSidebarContainerEl.classList.remove('app_sidebar_visible');
 
-				if (elRect.width == 0 || elRect.height == 0) {
+				const supportedScreenSize = window.innerWidth >= 1024 && window.innerHeight >= 600;
+				if (
+					elRect.width == 0 ||
+					elRect.height == 0 ||
+					(supportedScreenSize && Math.floor(elRect.right) > Math.floor(window.innerWidth))
+				) {
 					this._driver.getLogger().error(new Error('SDK sidebar inserted into add-ons sidebar was not visible'), {
 						rect: { // rect's properties aren't enumerable so we have to do this
 							top: elRect.top,
@@ -130,6 +135,10 @@ class GmailAppSidebarView {
 							right: elRect.right,
 							width: elRect.width,
 							height: elRect.height
+						},
+						window: {
+							innerWidth: window.innerWidth,
+							innerHeight: window.innerHeight
 						}
 					});
 					contentContainer.classList.remove('container_app_sidebar_in_use');
