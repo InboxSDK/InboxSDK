@@ -90,34 +90,62 @@ class GmailAppSidebarView {
 			const idElement = _addonSidebarContainerEl || _sidebarContainerEl;
 			if(!idElement) throw new Error('should not happen');
 			idElement.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
+			this._stopper.onValue(() => {
+				idElement.removeAttribute('data-sdk-sidebar-instance-id');
+			});
 		}
 
 		const el = document.createElement('div');
 		el.className = idMap('app_sidebar_container');
 
-		const addonSidebarContainerEl = _addonSidebarContainerEl;
-		const sidebarContainerEl = addonSidebarContainerEl || _sidebarContainerEl;
-
-		if(!sidebarContainerEl) throw new Error('should not happen');
-
-		let contentContainer;
-		sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
-
 		const buttonContainers: Map<string, HTMLElement> = new Map();
 		let activatedWhileLoading: boolean = false;
 
-		if(addonSidebarContainerEl){
+		let contentContainer;
+		let usedAddonsSidebar = false;
+		if(_addonSidebarContainerEl){
 			const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
 			if(mainContentBodyContainerElement){
 				contentContainer = mainContentBodyContainerElement.parentElement;
-				if(contentContainer) {
-					contentContainer.classList.add('container_app_sidebar_in_use');
-					querySelector(addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR).insertAdjacentElement('beforebegin', el);
+				if(!contentContainer) throw new Error('should not happen');
+				contentContainer.classList.add('container_app_sidebar_in_use');
+				querySelector(_addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR).insertAdjacentElement('beforebegin', el);
+
+				// See if the element is visible.
+				// Give it some content temporarily to check if it becomes sized to show it.
+				_addonSidebarContainerEl.classList.add('app_sidebar_visible');
+				_addonSidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
+				el.textContent = 'x';
+				const elRect = el.getBoundingClientRect();
+				el.textContent = '';
+				// This gets re-added later once the panel has some content to show
+				_addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+
+				if (elRect.width == 0 || elRect.height == 0) {
+					this._driver.getLogger().error(new Error('SDK sidebar inserted into add-ons sidebar was not visible'), {
+						rect: { // rect's properties aren't enumerable so we have to do this
+							top: elRect.top,
+							bottom: elRect.bottom,
+							left: elRect.left,
+							right: elRect.right,
+							width: elRect.width,
+							height: elRect.height
+						}
+					});
+					contentContainer.classList.remove('container_app_sidebar_in_use');
+					_addonSidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
+				} else {
+					usedAddonsSidebar = true;
 				}
 			}
 		}
-		else {
+
+		const addonSidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : null;
+		const sidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : _sidebarContainerEl;
+		if(!sidebarContainerEl) throw new Error('should not happen');
+		if (!usedAddonsSidebar) {
 			sidebarContainerEl.insertBefore(el, sidebarContainerEl.firstElementChild);
+			sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
 		}
 
 		if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
