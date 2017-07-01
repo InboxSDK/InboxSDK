@@ -23,6 +23,7 @@ jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
 });
 
 global.localStorage = new MockWebStorage();
+global._APP_SIDEBAR_TEST = true;
 
 (Element: any).prototype.insertAdjacentElement = function(position, el) {
   switch(position){
@@ -134,7 +135,15 @@ describe('With add-ons', function(){
 function makeDriver(appId, opts): any {
   return {
     getAppId: () => appId || 'test',
-    getOpts: () => opts || ({appName: 'Test', appIconUrl: 'testImage.png'})
+    getOpts: () => opts || ({appName: 'Test', appIconUrl: 'testImage.png'}),
+    getLogger() {
+      return {
+        error(err, details) {
+          console.error('logger.error called:', err, details);
+          throw err;
+        }
+      };
+    }
   };
 };
 
