@@ -234,6 +234,7 @@ class GmailThreadView {
 					el.getAttribute('role') === 'tab' &&
 					el.getAttribute('data-tooltip') === addonTitle
 			)
+			.takeUntilBy(this._stopper)
 			.onValue(({el}) => {
 				el.style.display = 'none';
 			});

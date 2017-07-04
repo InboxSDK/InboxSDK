@@ -28,7 +28,6 @@ import GmailElementGetter from '../gmail-element-getter';
 import addIconArea from './gmail-app-sidebar-view/add-icon-area';
 import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
 
-const TAB_LIST_SELECTOR = '.J-KU-Jg';
 const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 
@@ -69,7 +68,7 @@ class GmailAppSidebarView {
 	// itself when available when the chat sidebar isn't present. It's only set
 	// if the user interacts with the app sidebar button.
 	_getShouldAppSidebarOpen(): boolean {
-		return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
+		return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') !== 'false';
 	}
 
 	_setShouldAppSidebarOpen(open: boolean) {
@@ -141,10 +140,18 @@ class GmailAppSidebarView {
 							innerHeight: window.innerHeight
 						}
 					});
+				} else if (
+					global._APP_SIDEBAR_TEST ||
+					localStorage.getItem('inboxsdk__beta_sidebar_integration') === 'true' ||
+					this._driver.getUserEmailAddress().match(/@streak\.com$/)
+				) {
+					this._driver.getLogger().eventSdkPassive('using beta sidebar integration');
+					usedAddonsSidebar = true;
+				}
+
+				if (!usedAddonsSidebar) {
 					contentContainer.classList.remove('container_app_sidebar_in_use');
 					_addonSidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
-				} else {
-					usedAddonsSidebar = true;
 				}
 			}
 		}
