@@ -138,6 +138,7 @@ function makeDriver(appId, opts): any {
     getOpts: () => opts || ({appName: 'Test', appIconUrl: 'testImage.png'}),
     getLogger() {
       return {
+        eventSdkPassive() {},
         error(err, details) {
           console.error('logger.error called:', err, details);
           throw err;
