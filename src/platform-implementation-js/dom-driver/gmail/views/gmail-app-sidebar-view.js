@@ -28,7 +28,6 @@ import GmailElementGetter from '../gmail-element-getter';
 import addIconArea from './gmail-app-sidebar-view/add-icon-area';
 import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
 
-const TAB_LIST_SELECTOR = '.J-KU-Jg';
 const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 
