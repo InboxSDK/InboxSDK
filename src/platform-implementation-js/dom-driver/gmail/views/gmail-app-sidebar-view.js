@@ -68,7 +68,7 @@ class GmailAppSidebarView {
 	// itself when available when the chat sidebar isn't present. It's only set
 	// if the user interacts with the app sidebar button.
 	_getShouldAppSidebarOpen(): boolean {
-		return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') === 'true';
+		return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') !== 'false';
 	}
 
 	_setShouldAppSidebarOpen(open: boolean) {
