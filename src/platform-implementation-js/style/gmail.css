@@ -783,10 +783,18 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   min-width: 0px;
 }
 
-.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
-  width: 336px !important;
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use {
+  width: 56px !important;
   flex-shrink: 0;
   -webkit-flex-shrink: 0;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
+  width: 336px !important;
+}
+
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use > .J-KU-Jg {
+  display: block !important;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {

@@ -32,16 +32,13 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
       const stillFormingTablist = querySelector(addonSidebarContainerEl, TAB_LIST_SELECTOR);
       stillFormingTablist.insertAdjacentElement('afterbegin', iconArea);
 
-      makeMutationObserverChunkedStream(stillFormingTablist, {attributes: true, attributeFilter: ['role']})
-        .map(() => addonSidebarContainerEl.querySelector('[role=tablist]'))
-        .filter(Boolean)
-        .take(1)
+      // Gmail periodically clears the children of this element before it's
+      // visible, so we fight back.
+      makeMutationObserverChunkedStream(stillFormingTablist, {childList: true})
+        .filter(() => iconArea.parentElement !== stillFormingTablist)
         .takeUntilBy(stopper)
         .onValue(() => {
-          // This query selector may find the same element as stillFormingTablist.
-          // We need to re-add the iconArea because Gmail replaces all of its
-          // children when adding the role=tablist attribute.
-          querySelector(addonSidebarContainerEl, '[role=tablist]').insertAdjacentElement('afterbegin', iconArea);
+          stillFormingTablist.insertAdjacentElement('afterbegin', iconArea);
         });
     }
   }
