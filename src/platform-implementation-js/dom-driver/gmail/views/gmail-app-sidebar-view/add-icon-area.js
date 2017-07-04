@@ -38,6 +38,9 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
         .take(1)
         .takeUntilBy(stopper)
         .onValue(() => {
+          // This query selector may find the same element as stillFormingTablist.
+          // We need to re-add the iconArea because Gmail replaces all of its
+          // children when adding the role=tablist attribute.
           querySelector(addonSidebarContainerEl, '[role=tablist]').insertAdjacentElement('afterbegin', iconArea);
         });
     }
