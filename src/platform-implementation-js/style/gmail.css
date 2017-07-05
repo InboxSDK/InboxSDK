@@ -885,6 +885,11 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100% !important;
 }
 
+body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
+  flex-direction: row-reverse;
+  -webkit-flex-direction: row-reverse;
+}
+
 .inboxsdk__hide_addon_container > .bkK.nn {
   width: auto !important;
   flex: 1;
