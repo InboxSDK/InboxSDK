@@ -128,30 +128,34 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    if (global.localStorage) {
-      // We used to not always identify the ids of messages correctly, so we
-      // just drop the old cache and use a new one.
-      global.localStorage.removeItem('inboxsdk__cached_gmail_and_inbox_message_ids');
+    {
+      if (global.localStorage) {
+        // We used to not always identify the ids of messages correctly, so we
+        // just drop the old cache and use a new one.
+        global.localStorage.removeItem('inboxsdk__cached_gmail_and_inbox_message_ids');
+      }
+      const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+        getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
+        gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
-    const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
-      key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
-      getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
-      getBfromA() {
-        throw new Error('should not happen');
-      }
-    });
-    this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
-      gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
 
-    const threadIdFromMessageIdCache = new BiMapCache({
-      key: 'inboxsdk__cached_thread_and_message_ids',
-      getAfromB: (messageId: string) => getThreadIdFromMessageId(this, messageId),
-      getBfromA() {
-        throw new Error('should not happen');
-      }
-    });
-    this.getThreadIdFromMessageId = messageId =>
-      threadIdFromMessageIdCache.getAfromB(messageId);
+    {
+      const threadIdFromMessageIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_thread_and_message_ids',
+        getAfromB: (messageId: string) => getThreadIdFromMessageId(this, messageId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getThreadIdFromMessageId = messageId =>
+        threadIdFromMessageIdCache.getAfromB(messageId);
+    }
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
