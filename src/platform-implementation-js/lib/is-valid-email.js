@@ -1,6 +1,6 @@
 /* @flow */
 
-const re = /^([^<>()[\]\\,;:\s\"]+|\".+\")@[^\s<>]+$/;
+const re = /^([^<>()[\]\\,;:\s"]+|".+")@[^\s<>]+$/;
 
 // This function is supposed to be pretty forgiving because emails can have
 // almost anything in their From header. This function exists as a sanity check

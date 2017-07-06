@@ -1,10 +1,12 @@
-var fs = require('fs');
+/* eslint-disable flowtype/require-valid-file-annotation */
 
-var testOutputDir = `${__dirname}/chromeTestOutput`;
+const fs = require('fs');
+
+const testOutputDir = `${__dirname}/chromeTestOutput`;
 
 try {
     fs.statSync(testOutputDir);
-} catch(err) {
+} catch (err) {
     fs.mkdirSync(testOutputDir);
 }
 
@@ -204,4 +206,4 @@ exports.config = {
     // possible to defer the end of the process using a promise.
     // onComplete: function(exitCode) {
     // }
-}
+};

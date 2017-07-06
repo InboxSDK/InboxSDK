@@ -1,14 +1,16 @@
+/* @flow */
+
 import assert from 'assert';
 
 import makeRevocableFunction from '../src/platform-implementation-js/lib/make-revocable-function';
 
 describe('makeRevocableFunction', function() {
   it('works', function() {
-    var adder = {
+    const adder = {
       value: 0,
-      add(x, y=0) {
-        this.value += x + y;
-        return this.value;
+      add: (x, y=0) => {
+        adder.value += x + y;
+        return adder.value;
       }
     };
 
@@ -32,15 +34,15 @@ describe('makeRevocableFunction', function() {
   });
 
   it('revokedFn parameter works', function() {
-    var adder = {
+    const adder = {
       value: 0,
-      add(x, y=0) {
-        this.value += x + y;
-        return this.value;
+      add: (x, y=0) => {
+        adder.value += x + y;
+        return adder.value;
       },
-      subtract(x, y=0) {
-        this.value -= x + y;
-        return this.value;
+      subtract: (x, y=0) => {
+        adder.value -= x + y;
+        return adder.value;
       }
     };
 

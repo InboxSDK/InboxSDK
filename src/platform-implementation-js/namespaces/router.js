@@ -49,7 +49,7 @@ class Router {
 					type: 'handleRouteViewChange',
 					routeID: routeViewDriver.getRouteID()
 				}
-			)
+			);
 		});
 
 		driver.getStopper().onValue(function() {
@@ -73,7 +73,7 @@ class Router {
 			driver.getLogger().deprecationWarning(
 				'Router.goto param string',
 				'param object (e.g. {param: value})'
-			)
+			);
 		}
 		driver.goto(routeID, params);
 	}

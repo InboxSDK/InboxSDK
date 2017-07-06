@@ -1,4 +1,12 @@
-module.exports = {
+/* @flow */
+
+type ButtonColors = {
+	INACTIVE_CLASS: string;
+	HOVER_CLASS: string;
+	ACTIVE_CLASS: string;
+};
+
+const ButtonColorClasses: {[name:string]: ButtonColors} = {
 	"default": {
 		INACTIVE_CLASS: 'T-I-ax7',
 		HOVER_CLASS: 'T-I-JW',
@@ -35,3 +43,5 @@ module.exports = {
 		ACTIVE_CLASS: 'inboxsdk__button_green_active'
 	}
 };
+
+export default ButtonColorClasses;

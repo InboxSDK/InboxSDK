@@ -21,7 +21,7 @@ export default function arrayToLifetimes<T>(
 
     function listener(event) {
       switch (event.type) {
-      case 'value':
+      case 'value': {
         const els = event.value;
         const elKeys = keyFn ? Array.prototype.map.call(els, keyFn) : els;
 
@@ -43,6 +43,7 @@ export default function arrayToLifetimes<T>(
           }
         }
         break;
+      }
       case 'error':
         emitter.error(event.value);
         break;

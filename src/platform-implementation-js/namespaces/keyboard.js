@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 
 import * as ud from 'ud';
 import get from '../../common/get-or-fail';

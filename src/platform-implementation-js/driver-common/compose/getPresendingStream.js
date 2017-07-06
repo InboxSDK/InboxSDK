@@ -53,7 +53,7 @@ export default function({
         domEvent.preventDefault();
         domEvent.stopPropagation();
         domEvent.stopImmediatePropagation();
-        dispatchCancel(element)
+        dispatchCancel(element);
       }
     }
   }));

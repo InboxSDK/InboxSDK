@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 
 import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';

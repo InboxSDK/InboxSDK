@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 
 import getPrototypeChain from '../src/platform-implementation-js/lib/get-prototype-chain';

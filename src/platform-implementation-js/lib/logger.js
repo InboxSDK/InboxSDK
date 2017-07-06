@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 
 import _ from 'lodash';
 import Sha256 from 'sha.js/sha256';

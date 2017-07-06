@@ -342,7 +342,7 @@ class GmailMessageView {
 
 	addAttachmentIcon(iconDescriptor: Object) {
 		if (!this._element) {
-			console.warn('addDateIcon called on destroyed message');
+			console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
 			return;
 		}
 
@@ -448,7 +448,7 @@ class GmailMessageView {
 			makeMutationObserverStream(this._element, {
 				attributes: true, attributeFilter: ['class'], attributeOldValue: true
 			}).takeUntilBy(this._stopper)
-			  .map(function(mutation) {
+			.map(function(mutation) {
 				const currentClassList = (mutation.target: any).classList;
 				const mutationOldValue: string = (mutation.oldValue: any);
 
@@ -512,7 +512,7 @@ class GmailMessageView {
 
 		let messageId;
 		try {
-		 	messageId = this.getMessageID(true);
+			messageId = this.getMessageID(true);
 		} catch(err) {
 			this._driver.getLogger().error(err);
 			return;
@@ -590,14 +590,14 @@ class GmailMessageView {
 		var self = this;
 		this._eventStream.plug(
 			Kefir.fromEvents(this._element, 'mouseover')
-				 .map(e => e.target)
-				 .filter(function(element){
-				 	return element && element.getAttribute('email');
-				 })
-				 .map(function(element){
-				 	var addressInformation = self._getUpdatedContact(_extractContactInformation(element));
+				.map(e => e.target)
+				.filter(function(element){
+					return element && element.getAttribute('email');
+				})
+				.map(function(element){
+					let addressInformation = self._getUpdatedContact(_extractContactInformation(element));
 
-				 	var contactType = null;
+					let contactType = null;
 
 					if(!self._element.classList.contains('h7')){
 						contactType = 'sender';
@@ -612,14 +612,13 @@ class GmailMessageView {
 					}
 
 
-				 	return {
-				 		eventName: 'contactHover',
-				 		contact: addressInformation,
-				 		contactType: contactType,
-				 		messageViewDriver: self
-				 	};
-				 })
-
+					return {
+						eventName: 'contactHover',
+						contact: addressInformation,
+						contactType: contactType,
+						messageViewDriver: self
+					};
+				})
 		);
 	}
 

@@ -38,7 +38,9 @@ class PersistentQueue<T> {
         queue.push(val);
         this._putSavedQueue(queue);
         success = true;
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
     }
     if (!success) {
       this._fallbackQueue.push(val);
@@ -53,7 +55,9 @@ class PersistentQueue<T> {
         var tmpRet = queue.shift();
         this._putSavedQueue(queue);
         ret = tmpRet;
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
     }
     // If we didn't get anything from the localStorage queue, or if we
     // failed to update the queue, then try the fallback instead.
@@ -70,7 +74,9 @@ class PersistentQueue<T> {
         var queue = this._getSavedQueue();
         this._clearSavedQueue();
         ret = queue;
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
     }
     if (ret === undefined) {
       ret = [];
@@ -85,7 +91,9 @@ class PersistentQueue<T> {
     if (global.localStorage) {
       try {
         ret = this._getSavedQueue();
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
     }
     if (ret === undefined) {
       ret = [];
@@ -98,7 +106,9 @@ class PersistentQueue<T> {
     if (global.localStorage) {
       try {
         this._clearSavedQueue();
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
     }
     this._fallbackQueue.length = 0;
   }

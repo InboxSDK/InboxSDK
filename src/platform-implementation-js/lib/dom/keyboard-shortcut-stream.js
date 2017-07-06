@@ -12,4 +12,4 @@ export default function keyboardShortcutStream(chord: string): Kefir.Observable<
 			return false;
 		}, 'keydown');
 	});
-};
+}

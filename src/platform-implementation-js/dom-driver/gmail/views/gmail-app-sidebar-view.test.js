@@ -140,13 +140,13 @@ function makeDriver(appId, opts): any {
       return {
         eventSdkPassive() {},
         error(err, details) {
-          console.error('logger.error called:', err, details);
+          console.error('logger.error called:', err, details); //eslint-disable-line no-console
           throw err;
         }
       };
     }
   };
-};
+}
 
 function makeAddonSidebar(): HTMLElement {
   const mainContainer = document.createElement('div');

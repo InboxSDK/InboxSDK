@@ -128,30 +128,34 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
-    if (global.localStorage) {
-      // We used to not always identify the ids of messages correctly, so we
-      // just drop the old cache and use a new one.
-      global.localStorage.removeItem('inboxsdk__cached_gmail_and_inbox_message_ids');
+    {
+      if (global.localStorage) {
+        // We used to not always identify the ids of messages correctly, so we
+        // just drop the old cache and use a new one.
+        global.localStorage.removeItem('inboxsdk__cached_gmail_and_inbox_message_ids');
+      }
+      const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+        getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
+        gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
-    const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
-      key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
-      getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
-      getBfromA() {
-        throw new Error('should not happen');
-      }
-    });
-    this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
-      gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
 
-    const threadIdFromMessageIdCache = new BiMapCache({
-      key: 'inboxsdk__cached_thread_and_message_ids',
-      getAfromB: (messageId: string) => getThreadIdFromMessageId(this, messageId),
-      getBfromA() {
-        throw new Error('should not happen');
-      }
-    });
-    this.getThreadIdFromMessageId = messageId =>
-      threadIdFromMessageIdCache.getAfromB(messageId);
+    {
+      const threadIdFromMessageIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_thread_and_message_ids',
+        getAfromB: (messageId: string) => getThreadIdFromMessageId(this, messageId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getThreadIdFromMessageId = messageId =>
+        threadIdFromMessageIdCache.getAfromB(messageId);
+    }
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
@@ -260,7 +264,9 @@ class InboxDriver {
       }
 
       return new LiveSet({
-        read() {throw new Error()},
+        read() {
+          throw new Error();
+        },
         listen: setValues => {
           const view = new InboxAttachmentOverlayView(this, el, parsed, cardView);
           setValues(new Set([view]));
@@ -440,7 +446,7 @@ class InboxDriver {
   }
 
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
-    console.warn('activateShortcut not implemented');
+    console.warn('activateShortcut not implemented'); //eslint-disable-line no-console
   }
 
   getGmailActionToken = once(async () => {
@@ -478,7 +484,7 @@ class InboxDriver {
   }
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
-    console.log('addNavItem not implemented');
+    console.log('addNavItem not implemented'); //eslint-disable-line no-console
     const obj = {
       getEventStream: _.constant(Kefir.never()),
       addNavItem: () => obj
@@ -512,8 +518,8 @@ class InboxDriver {
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
-    console.log('addCustomListRouteID not implemented');
-    return _.noop;
+    console.log('addCustomListRouteID not implemented'); //eslint-disable-line no-console
+    return () => {};
   }
 
   showCustomRouteView(el: HTMLElement): void {
@@ -592,7 +598,7 @@ class InboxDriver {
   }
 
   registerSearchQueryRewriter(obj: Object) {
-    console.log('registerSearchQueryRewriter not implemented');
+    console.log('registerSearchQueryRewriter not implemented'); //eslint-disable-line no-console
   }
 
   addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<InboxAppToolbarButtonView> {

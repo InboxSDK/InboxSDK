@@ -1,16 +1,19 @@
+/* @flow */
+
 const assert = require('assert');
-const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
 // Mock element suitable for use with MockMutationObserver
 class MockElementParent extends EventEmitter {
-  constructor(children=[]) {
+  children: Object[];
+
+  constructor(children: Object[]=[]) {
     super();
     assert(Array.isArray(children), 'children must be array');
     this.children = children;
   }
 
-  appendAndRemoveChildren(toAdd=[], toRemove=[]) {
+  appendAndRemoveChildren(toAdd: Object[]=[], toRemove: Object[]=[]) {
     const presentTargets = [];
     for (let target of toRemove) {
       const ix = this.children.indexOf(target);
@@ -32,24 +35,24 @@ class MockElementParent extends EventEmitter {
     });
   }
 
-  appendChildren(targets) {
+  appendChildren(targets: Object[]) {
     return this.appendAndRemoveChildren(targets, undefined);
   }
 
-  removeChildren(targets) {
+  removeChildren(targets: Object[]) {
     return this.appendAndRemoveChildren(undefined, targets);
   }
 
-  appendChild(target) {
+  appendChild(target: Object) {
     return this.appendChildren([target]);
   }
 
-  removeChild(target) {
+  removeChild(target: Object) {
     return this.removeChildren([target]);
   }
 }
 
-MockElementParent.prototype._emitsMutations = true;
-MockElementParent.prototype.nodeType = 1;
+(MockElementParent:any).prototype._emitsMutations = true;
+(MockElementParent:any).prototype.nodeType = 1;
 
-module.exports = MockElementParent;
+export default MockElementParent;

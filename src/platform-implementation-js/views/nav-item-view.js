@@ -133,7 +133,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 		case 'mouseenter':
 
 			if (navItemDescriptor.routeID ||
-				  typeof navItemDescriptor.onClick === 'function') {
+					typeof navItemDescriptor.onClick === 'function') {
 				navItemViewDriver.setHighlight(true);
 			}
 
@@ -148,7 +148,7 @@ function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [
 			if (typeof navItemDescriptor.onClick === 'function') {
 				let defaultPrevented = false;
 				const syntheticEvent = {
-					preventDefault() { defaultPrevented = true }
+					preventDefault() { defaultPrevented = true; }
 				};
 
 				navItemDescriptor.onClick(syntheticEvent);

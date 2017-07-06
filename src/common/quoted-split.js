@@ -3,11 +3,11 @@
 // Splits a string on spaces, but ignores spaces inside quotes.
 
 export default function quotedSplit(s: string): string[] {
-  var split: string[] = [];
-  var lastEnd = 0;
-  var quoteRe = /"[^"]*"/g;
-  while (true) {
-    var match = quoteRe.exec(s);
+  let split: string[] = [];
+  let lastEnd = 0;
+  const quoteRe = /"[^"]*"/g;
+  while (true) { //eslint-disable-line no-constant-condition
+    const match = quoteRe.exec(s);
     split = split.concat(
       (
         match ? s.substring(lastEnd, match.index) : s.substring(lastEnd)

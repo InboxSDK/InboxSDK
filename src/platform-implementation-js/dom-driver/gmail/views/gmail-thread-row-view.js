@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 
 import _ from 'lodash';
 import {defn, defonce} from 'ud';

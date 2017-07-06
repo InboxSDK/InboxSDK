@@ -1,16 +1,20 @@
+/* @flow */
+
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
-export default class MockMutationObserver {
-  constructor(callback) {
+class MockMutationObserver {
+  _callback: (mutations: MutationRecord[]) => void;
+  _records: MutationRecord[] = [];
+  _updateQueued: boolean = false;
+  _stopper = kefirBus();
+
+  constructor(callback: (mutations: MutationRecord[]) => void) {
     this._callback = callback;
-    this._records = [];
-    this._updateQueued = false;
-    this._stopper = kefirBus();
   }
 
-  observe(element, options) {
+  observe(element: Node, options: MutationObserverInit) {
     assert(element);
     assert(options);
 
@@ -20,16 +24,16 @@ export default class MockMutationObserver {
         .takeUntilBy( Kefir.fromEvents(element, 'removed') )
         .takeUntilBy( this._stopper )
         .map(event => {
-          const newEvent = {target: event.target};
-          if (options.childList && event.addedNodes) {
+          const newEvent: Object = {target: event.target};
+          if ((options:any).childList && event.addedNodes) {
             newEvent.addedNodes = event.addedNodes;
             newEvent.removedNodes = event.removedNodes;
           }
           if (
-            options.attributes && event.attributeName &&
+            (options:any).attributes && event.attributeName &&
             (
-              !options.attributeFilter ||
-              options.attributeFilter.includes(event.attributeName)
+              !(options:any).attributeFilter ||
+              (options:any).attributeFilter.includes(event.attributeName)
             )
           ) {
             newEvent.attributeName = event.attributeName;
@@ -47,12 +51,12 @@ export default class MockMutationObserver {
   }
 
   takeRecords() {
-    var records = this._records;
+    const records = this._records;
     this._records = [];
     return records;
   }
 
-  _queueMutation(mutation) {
+  _queueMutation(mutation: MutationRecord) {
     this._records.push(mutation);
     if (!this._updateQueued) {
       this._updateQueued = true;
@@ -65,3 +69,5 @@ export default class MockMutationObserver {
     }
   }
 }
+
+export default ((MockMutationObserver: any): Class<MutationObserver>);

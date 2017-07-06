@@ -175,8 +175,8 @@ class GmailRowListView {
 			.flatMap(threadRowView => {
 				if(threadRowView.getAlreadyHadModifications()){
 					// Performance hack: If the row already has old modifications on it, wait
-			    // a moment before we re-emit the thread row and process our new
-			    // modifications.
+					// a moment before we re-emit the thread row and process our new
+					// modifications.
 
 					return laterStream.flatMap(() =>
 						threadRowView.waitForReady()

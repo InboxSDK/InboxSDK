@@ -174,7 +174,7 @@ describe('Inbox', function() {
       assert(!browser.isVisible('.test__modalContent'));
       browser.waitForVisible('.inboxsdk__inbox_backdrop', undefined, true);
 
-      function switchToOverlayFrame() {
+      const switchToOverlayFrame = () => {
         console.log('switching to overlay frame');
         const frames = browser.elements('iframe:not([src])').value;
         for (let i=0; i<frames.length; i++) {
@@ -188,7 +188,7 @@ describe('Inbox', function() {
           if (el) return;
         }
         throw new Error('Did not find overlay frame');
-      }
+      };
 
       console.log('Test an attachment card inside a message');
       // Test an attachment card inside a message
@@ -204,7 +204,7 @@ describe('Inbox', function() {
       browser.waitForVisible('button[aria-label="CV"]', 10*1000);
       console.log('found CV, clicking "Close"');
       browser.click('div[role=button][data-tooltip="Close"]');
-      console.log('clicked "Close", switching back to frame parent')
+      console.log('clicked "Close", switching back to frame parent');
       browser.frameParent();
       browser.pause(1000);
       console.log('switched to frame parent, clicking heading');
@@ -373,7 +373,7 @@ describe('Inbox', function() {
       if (errors.length) {
         console.log('Logged errors:');
         console.log(JSON.stringify(errors, null, 2));
-        throw new Error('One or more javascript errors were logged');
+        throw new Error('One or more javascript errors were logged'); //eslint-disable-line no-unsafe-finally
       }
     }
   });

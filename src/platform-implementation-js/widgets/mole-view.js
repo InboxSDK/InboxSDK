@@ -1,55 +1,47 @@
-'use strict';
+/* @flow */
 
-var _ = require('lodash');
-var util = require('util');
+import get from '../../common/get-or-fail';
+import EventEmitter from '../lib/safe-event-emitter';
 
-var EventEmitter = require('../lib/safe-event-emitter');
-
-var memberMap = new WeakMap();
+const memberMap = new WeakMap();
 
 // documented in src/docs/
-function MoleView(options) {
-  EventEmitter.call(this);
+export default class MoleView extends EventEmitter {
+  destroyed: boolean = false;
 
-  this.destroyed = false;
-  var members = {
-    driver: options.moleViewDriver
-  };
-  memberMap.set(this, members);
+  constructor(options: {moleViewDriver: Object}) {
+    super();
+    const members = {
+      driver: options.moleViewDriver
+    };
+    memberMap.set(this, members);
 
-  members.driver.getEventStream().onValue(e => {
-    this.emit(e.eventName, e.detail);
-  });
-  members.driver.getEventStream().onEnd(() => {
-    this.destroyed = true;
-    this.emit('destroy');
-  });
-}
-
-util.inherits(MoleView, EventEmitter);
-
-_.assign(MoleView.prototype, {
-
-  close() {
-    var members = memberMap.get(this);
-    members.driver.destroy();
-  },
-
-  setTitle(text) {
-    var members = memberMap.get(this);
-    members.driver.setTitle(text);
-  },
-
-  setMinimized(minimized) {
-    var members = memberMap.get(this);
-    members.driver.setMinimized(minimized);
-  },
-
-  getMinimized() {
-    var members = memberMap.get(this);
-    return members.driver.getMinimized();
+    members.driver.getEventStream().onValue(e => {
+      this.emit(e.eventName, e.detail);
+    });
+    members.driver.getEventStream().onEnd(() => {
+      this.destroyed = true;
+      this.emit('destroy');
+    });
   }
 
-});
+  close() {
+    const members = get(memberMap, this);
+    members.driver.destroy();
+  }
 
-module.exports = MoleView;
+  setTitle(text: string) {
+    const members = get(memberMap, this);
+    members.driver.setTitle(text);
+  }
+
+  setMinimized(minimized: boolean) {
+    const members = get(memberMap, this);
+    members.driver.setMinimized(minimized);
+  }
+
+  getMinimized() {
+    const members = get(memberMap, this);
+    return members.driver.getMinimized();
+  }
+}

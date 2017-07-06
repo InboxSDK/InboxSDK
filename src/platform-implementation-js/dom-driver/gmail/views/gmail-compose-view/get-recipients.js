@@ -22,10 +22,10 @@ export default function getRecipients(gmailComposeView: GmailComposeView, contac
 		if(contact != null){
 			contacts.push(contact);
 		}
-	})
+	});
 
 	return contacts;
-};
+}
 
 
 function _getContactRows(gmailComposeView){

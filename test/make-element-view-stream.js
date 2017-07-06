@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 const {EventEmitter} = require('events');
 import Marker from '../src/common/marker';
-const MockElementParent = require('./lib/mock-element-parent');
+import MockElementParent from './lib/mock-element-parent';
 import fakePageGlobals from './lib/fake-page-globals';
 
 import makeElementViewStream from '../src/platform-implementation-js/lib/dom/make-element-view-stream';
@@ -18,12 +18,12 @@ describe('makeElementViewStream', function() {
     const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const stopper = kefirBus();
-    var activeViewCount = 0;
+    let activeViewCount = 0;
 
     const target = new MockElementParent([child1, child2]);
 
-    var call = 0;
-    makeElementChildStream(target)
+    let call = 0;
+    makeElementChildStream((target:Object))
       .takeUntilBy(stopper)
       .flatMap(makeElementViewStream(function(el) {
         activeViewCount++;

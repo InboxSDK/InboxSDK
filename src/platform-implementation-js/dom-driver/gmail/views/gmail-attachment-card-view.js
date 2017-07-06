@@ -87,7 +87,7 @@ class GmailAttachmentCardView {
 			// Only files and unloaded ever lack a link.
 			return 'FILE';
 		}
-		if (link.match(/^https?:\/\/([^\/]*\.)?google(usercontent)?\.com\//)) {
+		if (link.match(/^https?:\/\/([^/]*\.)?google(usercontent)?\.com\//)) {
 			return 'DRIVE';
 		}
 		return 'UNKNOWN';

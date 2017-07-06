@@ -68,4 +68,4 @@ export default function updateIcon(iconSettings: Object, containerElement: HTMLE
 		iconSettings.iconElement.setAttribute('class', 'inboxsdk__button_icon ' + newIconClass);
 		iconSettings.iconClass = newIconClass;
 	}
-};
+}

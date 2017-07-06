@@ -1,13 +1,14 @@
-var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
+/* eslint-disable flowtype/require-valid-file-annotation */
 
-var NavItemViewDriver = function(){
+import BasicClass from '../lib/basic-class';
+
+export default function NavItemViewDriver() {
 	BasicClass.call(this);
-};
+}
 
 NavItemViewDriver.prototype = Object.create(BasicClass.prototype);
 
-_.extend(NavItemViewDriver.prototype, {
+Object.assign(NavItemViewDriver.prototype, {
 
 	addNavItem: null,
 
@@ -22,6 +23,3 @@ _.extend(NavItemViewDriver.prototype, {
 	setActive: null
 
 });
-
-
-module.exports = NavItemViewDriver;

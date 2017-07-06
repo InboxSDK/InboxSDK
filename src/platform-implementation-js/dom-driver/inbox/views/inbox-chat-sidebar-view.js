@@ -31,7 +31,7 @@ class InboxChatSidebarView {
     const parent: HTMLElement = (this._el.parentElement: any);
     const parentComputedStyle = window.getComputedStyle(parent);
     if (parseInt(parentComputedStyle.bottom) === 0) {
-      return 'SIDEBAR'
+      return 'SIDEBAR';
     }
     if (parseInt(parentComputedStyle.top) > 0) {
       return 'DROPDOWN';

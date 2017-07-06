@@ -17,7 +17,7 @@ describe('Membrane', function() {
   it('works', function() {
     const mappers = [
       [FooDriver, sinon.spy(fooDriver => new Foo(fooDriver))]
-    ]
+    ];
     const membrane = new Membrane(mappers);
 
     const fd = new FooDriver();

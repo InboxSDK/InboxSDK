@@ -108,7 +108,7 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 			groupToggleButtonViewController.destroy();
 		});
 	});
-};
+}
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&

@@ -1,7 +1,9 @@
-var _ = require('lodash');
+/* @flow */
 
-module.exports = function(delay) {
-	return _.once(function() {
+import once from 'lodash/once';
+
+module.exports = function(delay: number) {
+	return once(function() {
 		return new Promise(function(resolve, reject) {
 			setTimeout(function() {
 				try {

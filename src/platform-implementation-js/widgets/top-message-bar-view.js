@@ -1,31 +1,20 @@
-'use strict';
+/* @flow */
 
-import _ from 'lodash';
-import util from 'util';
-
+import get from '../../common/get-or-fail';
 import EventEmitter from '../lib/safe-event-emitter';
 
 const memberMap = new WeakMap();
 
-
-function TopMessageBarView(options) {
-  EventEmitter.call(this);
-
-  var members = {
-    driver: options.topMessageBarViewDriver
-  };
-
-  memberMap.set(this, members);
-}
-
-util.inherits(TopMessageBarView, EventEmitter);
-
-_.assign(TopMessageBarView.prototype, {
-
-  remove: function(){
-  	memberMap.get(this).driver.remove();
+export default class TopMessageBarView extends EventEmitter {
+  constructor(options: {topMessageBarViewDriver: Object}) {
+    super();
+    const members = {
+      driver: options.topMessageBarViewDriver
+    };
+    memberMap.set(this, members);
   }
 
-});
-
-module.exports = TopMessageBarView;
+  remove() {
+    get(memberMap, this).driver.remove();
+  }
+}

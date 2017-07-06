@@ -52,7 +52,7 @@ export type LoadScriptOptions = {
 export default function loadScript(url: string, opts?: LoadScriptOptions): Promise<void> {
   let pr;
   if (isContentScript()) {
-    function attempt(retryNum: number, lastErr: ?Error): Promise<void> {
+    const attempt = function(retryNum: number, lastErr: ?Error): Promise<void> {
       if (retryNum > 3) {
         throw lastErr || new Error("Ran out of loadScript attempts for unknown reason");
       }
@@ -113,14 +113,14 @@ export default function loadScript(url: string, opts?: LoadScriptOptions): Promi
           program();
         }
       });
-    }
+    };
     pr = attempt(0, null);
   } else {
     // Try to add script as CORS first so we can get error stack data from it.
     pr = addScriptToPage(url, true).catch(() => {
       // Only show the warning if we successfully load the script on retry.
       return addScriptToPage(url, false).then(() => {
-        console.warn("Script "+url+" included without CORS headers. Error logs might be censored by the browser.");
+        console.warn("Script "+url+" included without CORS headers. Error logs might be censored by the browser."); //eslint-disable-line no-console
       });
     });
   }
@@ -133,7 +133,7 @@ export default function loadScript(url: string, opts?: LoadScriptOptions): Promi
         response: (err && err.xhr) ? err.xhr.responseText : null,
         message: 'Failed to load script'
       }, {});
-    })
+    });
   });
   return pr;
 }

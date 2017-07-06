@@ -11,4 +11,4 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
     return makeMutationObserverStream(bodyElement, {childList: true, subtree: true, characterData: true}).map(function(){
         return {eventName: 'bodyChanged'};
     });
-};
+}

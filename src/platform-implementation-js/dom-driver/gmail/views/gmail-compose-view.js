@@ -34,6 +34,9 @@ import sizeFixer from './gmail-compose-view/size-fixer';
 import addTooltipToButton from './gmail-compose-view/add-tooltip-to-button';
 import addRecipientRow from './gmail-compose-view/add-recipient-row';
 import addButton from './gmail-compose-view/add-button';
+import setRecipients from './gmail-compose-view/set-recipients';
+import focus from './gmail-compose-view/focus';
+// import addOuterSidebar from './gmail-compose-view/add-outer-sidebar';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
@@ -371,7 +374,7 @@ class GmailComposeView {
 	}
 
 	focus() {
-		require('./gmail-compose-view/focus')(this);
+		focus(this);
 	}
 
 	insertBodyTextAtCursor(text: string): ?HTMLElement {
@@ -416,19 +419,19 @@ class GmailComposeView {
 	}
 
 	setToRecipients(emails: string[]) {
-		require('./gmail-compose-view/set-recipients')(this, 0, emails);
+		setRecipients(this, 0, emails);
 
 		this._triggerDraftSave();
 	}
 
 	setCcRecipients(emails: string[]) {
-		require('./gmail-compose-view/set-recipients')(this, 1, emails);
+		setRecipients(this, 1, emails);
 
 		this._triggerDraftSave();
 	}
 
 	setBccRecipients(emails: string[]) {
-		require('./gmail-compose-view/set-recipients')(this, 2, emails);
+		setRecipients(this, 2, emails);
 
 		this._triggerDraftSave();
 	}
@@ -470,23 +473,24 @@ class GmailComposeView {
 		}
 	}
 
-	addOuterSidebar(options: {title: string, el: HTMLElement}) {
-		if(this.isInlineReplyForm()){
-			console.warn("Trying to add an outer sidebar to an inline reply which doesn't work.");
-			return;
-		}
-
-		require('./gmail-compose-view/add-outer-sidebar')(this, options);
-	}
-
-	addInnerSidebar(options: {el: HTMLElement}) {
-		if(this.isInlineReplyForm()){
-			console.warn("Trying to add an inner sidebar to an inline reply which doesn't work.");
-			return;
-		}
-
-		require('./gmail-compose-view/add-inner-sidebar')(this, options);
-	}
+	// Incomplete
+	// addOuterSidebar(options: {title: string, el: HTMLElement}) {
+	// 	if(this.isInlineReplyForm()){
+	// 		console.warn("Trying to add an outer sidebar to an inline reply which doesn't work."); //eslint-disable-line no-console
+	// 		return;
+	// 	}
+	//
+	// 	addOuterSidebar(this, options);
+	// }
+	//
+	// addInnerSidebar(options: {el: HTMLElement}) {
+	// 	if(this.isInlineReplyForm()){
+	// 		console.warn("Trying to add an inner sidebar to an inline reply which doesn't work."); //eslint-disable-line no-console
+	// 		return;
+	// 	}
+	//
+	// 	require('./gmail-compose-view/add-inner-sidebar')(this, options);
+	// }
 
 	addStatusBar(options: {height?: number, orderHint?: number}={}): StatusBar {
 		var statusBar = addStatusBar(this, options);
@@ -508,7 +512,7 @@ class GmailComposeView {
 
 	close() {
 		if(this.isInlineReplyForm()){
-			console.warn("Trying to close an inline reply which doesn't work.");
+			console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
 			return;
 		}
 
@@ -545,7 +549,7 @@ class GmailComposeView {
 	}
 
 	_hideDropzones() {
-		setCss('compose dropzone hider', 'body > .aC7 .aC9 {visibility: hidden;}')
+		setCss('compose dropzone hider', 'body > .aC7 .aC9 {visibility: hidden;}');
 	}
 
 	_reenableDropzones() {
@@ -848,7 +852,7 @@ class GmailComposeView {
 			// request finishes. If we fail to get our draft ID and we see that our
 			// message ID has changed since we made the request, then we try again.
 			let lastMessageId = null;
-			while (true) {
+			while (true) { //eslint-disable-line no-constant-condition
 				i++;
 
 				const messageId = this._messageId;
@@ -1039,8 +1043,8 @@ class GmailComposeView {
 								return x;
 							})
 						.catch((err) => {
-							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams)
-							 this._driver.getLogger().error(err);
+							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams);
+							this._driver.getLogger().error(err);
 						});
 			});
 

@@ -19,7 +19,7 @@ describe('makeMutationObserverStream', function() {
     const target = new MockElementParent([child1, child2]);
 
     let call = 0;
-    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    makeMutationObserverStream((target:Object), {childList:true}).onValue(function(event) {
       switch(++call) {
         case 1:
           assert.deepEqual(event.addedNodes, []);
@@ -48,7 +48,7 @@ describe('makeMutationObserverStream', function() {
 
     let call = 0;
     let criticalSection = false;
-    makeMutationObserverStream(target, {childList:true}).onValue(function(event) {
+    makeMutationObserverStream((target:Object), {childList:true}).onValue(function(event) {
       if (criticalSection) {
         throw new Error("Re-entrance detected!");
       }

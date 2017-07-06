@@ -50,7 +50,7 @@ describe('deserializeArray', () => {
     const input = `[5,'a',,,6]`;
     const decoded = GmailResponseProcessor.deserializeArray(input);
 
-    const expected = [5,'a',,,6];
+    const expected = [5, 'a', undefined, undefined, 6];
     expect(decoded).toEqual(expected);
   });
 });

@@ -179,9 +179,7 @@ class InboxComposeView {
 
     const {minimizeBtnImage} = this._els;
     if (minimizeBtnImage) {
-      function isMinimized() {
-        return /_maximize_/.test(minimizeBtnImage.src);
-      }
+      const isMinimized = () => /_maximize_/.test(minimizeBtnImage.src);
       const minimizeButtonChanges = makeMutationObserverChunkedStream(minimizeBtnImage, {attributes: true});
       minimizeButtonChanges
         .toProperty(() => null)
@@ -198,9 +196,7 @@ class InboxComposeView {
 
     const {toggleFullscreenButtonImage} = this._els;
     if (toggleFullscreenButtonImage) {
-      function isFullscreenMode() {
-        return !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
-      }
+      const isFullscreenMode = () => !/_enter_full_screen/.test(toggleFullscreenButtonImage.src);
       const toggleButtonChanges = makeMutationObserverChunkedStream(toggleFullscreenButtonImage, {attributes: true});
       toggleButtonChanges
         .toProperty(() => null)
@@ -695,10 +691,10 @@ class InboxComposeView {
     throw new Error("This method was discontinued");
   }
   getInitialMessageID(): ?string {
-    throw new Error("composeView.getInitialMessageID is not implemented in Inbox")
+    throw new Error("composeView.getInitialMessageID is not implemented in Inbox");
   }
   getMessageID(): ?string {
-    throw new Error("composeView.getMessageID is not implemented in Inbox")
+    throw new Error("composeView.getMessageID is not implemented in Inbox");
   }
   getThreadID(): ?string {
     // TODO

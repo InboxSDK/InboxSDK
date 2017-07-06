@@ -44,7 +44,7 @@ function checkDependencies(packageObj: Object) {
     }
   } catch(e) {
     const pjDir = path.join(__dirname, '../..');
-    console.error(
+    console.error( //eslint-disable-line no-console
       "Dependencies check failed. To fix, run:\n" +
       "    (cd "+escapeShellArg(pjDir)+" && rm -rf node_modules && npm install)"
     );

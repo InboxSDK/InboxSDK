@@ -11,6 +11,7 @@
     "auto-html": "^1.0.4",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",
+    "babel-eslint": "^7.2.3",
     "babel-jest": "^20.0.1",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
@@ -33,6 +34,9 @@
     "contain-by-screen": "^1.0.3",
     "entities": "1.1.1",
     "envify": "^4.0.0",
+    "eslint": "^4.1.1",
+    "eslint-plugin-flowtype": "^2.34.1",
+    "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.2",
     "flow-bin": "^0.46.0",
     "glob": "^7.0.3",
@@ -120,8 +124,10 @@
     "flow_check": "flow check",
     "jest": "jest",
     "start": "gulp default --single --watch --reloader",
-    "test": "mocha && jest",
-    "test-browser": "wdio"
+    "test": "npm run lint && npm run flow_check && mocha && jest",
+    "test-browser": "wdio",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
   },
   "version": "0.7.24"
 }

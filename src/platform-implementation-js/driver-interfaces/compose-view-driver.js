@@ -51,8 +51,8 @@ export type ComposeViewDriver = {
 	setMinimized(minimized: boolean): void;
 	addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Observable<?Object>): () => void;
-	addOuterSidebar(options: {title: string, el: HTMLElement}): void;
-	addInnerSidebar(options: {el: HTMLElement}): void;
+	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
+	// addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar;
 	isReply(): boolean;
 	isInlineReplyForm(): boolean;

@@ -1,0 +1,10 @@
+*~
+/flow-typed
+/flow-libs
+/src/docs
+/dist
+/overrides
+/coverage
+/examples
+#/examples/*/inboxsdk.js*
+/chromeTestOutput

@@ -1,6 +1,9 @@
+/* @flow */
+
 import assert from 'assert';
 import RSVP from './lib/rsvp';
-import {EventEmitter} from 'events';
+import events from 'events';
+const {EventEmitter} = events;
 import Marker from '../src/common/marker';
 
 import MutationObserver from './lib/mock-mutation-observer';
@@ -19,7 +22,7 @@ describe('MockMutationObserver', function() {
         resolve();
       });
 
-      const el = new EventEmitter();
+      const el: Object = new EventEmitter();
       el._emitsMutations = true;
       obs.observe(el, {childList:true});
 
@@ -39,7 +42,7 @@ describe('MockMutationObserver', function() {
         resolve();
       });
 
-      const elBad = new EventEmitter();
+      const elBad: Object = new EventEmitter();
       elBad._emitsMutations = true;
       obs.observe(elBad, {childList:true});
       elBad.emit('mutation', {addedNodes:[c2], removedNodes:[c3]});
@@ -47,7 +50,7 @@ describe('MockMutationObserver', function() {
       obs.disconnect();
       elBad.emit('mutation', {addedNodes:[c2], removedNodes:[c3]});
 
-      const elGood = new EventEmitter();
+      const elGood: Object = new EventEmitter();
       elGood._emitsMutations = true;
       obs.observe(elGood, {childList:true});
       elGood.emit('mutation', {addedNodes:[c1], removedNodes:[]});

@@ -174,7 +174,7 @@ class GmailCollapsibleSectionView {
 		var titleInnerHTML = '';
 
 		if(this._isCollapsible){
-			 titleInnerHTML += '<span class="Wp Wq"></span>';
+			titleInnerHTML += '<span class="Wp Wq"></span>';
 		}
 
 
@@ -398,10 +398,10 @@ class GmailCollapsibleSectionView {
 			eventStream.plug(
 				Kefir
 					.fromEvents(rowElement, 'click')
-					.map(() => { return {
+					.map(() => ({
 						eventName: 'rowClicked',
 						rowDescriptor: result
-					}})
+					}))
 			);
 		});
 	}
@@ -455,12 +455,12 @@ class GmailCollapsibleSectionView {
 
 			this._eventStream.plug(
 				Kefir.fromEvents(footerLinkElement, 'click')
-					 .map(() => {
-					 	return {
-					 		eventName: 'footerClicked',
-					 		sectionDescriptor: this._collapsibleSectionDescriptor
-					 	};
-					 })
+					.map(() => {
+						return {
+							eventName: 'footerClicked',
+							sectionDescriptor: this._collapsibleSectionDescriptor
+						};
+					})
 			);
 
 			footerElement.appendChild(footerLinkElement);
@@ -771,6 +771,5 @@ function _getLabelHTML(label){
 
 	return retArray.join('');
 }
-GmailCollapsibleSectionView = defn(module, GmailCollapsibleSectionView);
 
-export default GmailCollapsibleSectionView;
+export default defn(module, GmailCollapsibleSectionView);

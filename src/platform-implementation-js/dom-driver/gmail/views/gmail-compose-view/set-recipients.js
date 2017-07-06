@@ -1,18 +1,20 @@
+/* @flow */
+
 import _ from 'lodash';
 
+import type GmailComposeView from '../gmail-compose-view';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
-
 import simulateClick from '../../../../lib/dom/simulate-click';
 import simulateKey from '../../../../lib/dom/simulate-key';
 
 const ADDRESS_TYPES = ['to', 'cc', 'bcc'];
 
 // contactRowIndex values: 0:to, 1:cc, 2:bcc
-export default function(gmailComposeView, contactRowIndex, emailAddresses){
+export default function(gmailComposeView: GmailComposeView, contactRowIndex: number, emailAddresses: string[]) {
 	if(_areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses)){
 		return;
 	}
-
 
 	const contactRows = gmailComposeView.getRecipientRowElements();
 
@@ -23,7 +25,7 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 	const contactRow = contactRows[contactRowIndex];
 	const emailAddressEntry = contactRow.querySelector('textarea.vO');
 
-	if(!emailAddressEntry){
+	if(!emailAddressEntry || !(emailAddressEntry instanceof HTMLTextAreaElement)){
 		return;
 	}
 
@@ -40,14 +42,14 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 	const oldRange = gmailComposeView.getLastSelectionRange();
 
 	// Focus the recipients preview label so Gmail re-renders it.
-	const cover = gmailComposeView.getElement().querySelector('div.aoD.hl');
+	const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
 	cover.dispatchEvent(new FocusEvent('focus'));
 
 	if (contactRowIndex == 1) {
-		const ccButton = gmailComposeView.getElement().querySelector('span.aB.gQ.pE');
+		const ccButton = querySelector(gmailComposeView.getElement(), 'span.aB.gQ.pE');
 		simulateClick(ccButton);
 	} else if (contactRowIndex == 2) {
-		const bccButton = gmailComposeView.getElement().querySelector('span.aB.gQ.pB');
+		const bccButton = querySelector(gmailComposeView.getElement(), 'span.aB.gQ.pB');
 		simulateClick(bccButton);
 	}
 
@@ -57,6 +59,7 @@ export default function(gmailComposeView, contactRowIndex, emailAddresses){
 	}
 	if (oldRange) {
 		const sel = document.getSelection();
+		if (!sel) throw new Error();
 		sel.removeAllRanges();
 		sel.addRange(oldRange);
 	}

@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 import openDraftByMessageID, {makeNewHash}
   from '../src/platform-implementation-js/dom-driver/gmail/gmail-driver/open-draft-by-message-id';

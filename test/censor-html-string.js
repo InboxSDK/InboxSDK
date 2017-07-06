@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 
 import censorHTMLstring from '../src/common/censor-html-string';

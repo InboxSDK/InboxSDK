@@ -1,15 +1,16 @@
-var _ = require('lodash');
-var BasicClass = require('../../../lib/basic-class');
+/* eslint-disable flowtype/require-valid-file-annotation */
 
-var GmailDropdownView = function(){
+import BasicClass from '../../../lib/basic-class';
+
+export default function GmailDropdownView() {
 	BasicClass.call(this);
 
 	this._setupElement();
-};
+}
 
 GmailDropdownView.prototype = Object.create(BasicClass.prototype);
 
-_.extend(GmailDropdownView.prototype, {
+Object.assign(GmailDropdownView.prototype, {
 
 	__memberVariables: [
 		{name: '_containerElement', destroy: true, get: true},
@@ -26,5 +27,3 @@ _.extend(GmailDropdownView.prototype, {
 		this._containerElement.appendChild(this._contentElement);
 	}
 });
-
-module.exports = GmailDropdownView;

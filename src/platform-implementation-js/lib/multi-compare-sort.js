@@ -1,14 +1,15 @@
-var _ = require('lodash');
+/* @flow */
 
-module.exports = function(array, comparisonFunctions){
+import _ from 'lodash';
+
+export default function multiCompareSort(array: Array<any>, comparisonFunctions: Array<Function>){
     array.sort(
 		_.chain(comparisonFunctions)
-		 .map(_makeComparisonFunction)
-		 .reduceRight(_getGenericComparer, _getFallbackCompareFunction)
-		 .value()
+      .map(_makeComparisonFunction)
+      .reduceRight(_getGenericComparer, _getFallbackCompareFunction)
+      .value()
 	);
-};
-
+}
 
 // If given a string, it returns a comparison function for comparing
 // two objects by that field name (or calls the method if it's a method).
@@ -53,5 +54,5 @@ function _getGenericComparer(fnA, fnB){
 function _getFallbackCompareFunction(){
 	return function(a, b) {
 		return 0;
-	}
+	};
 }
