@@ -47,6 +47,7 @@ import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
 
 import threadParser from './detection/thread/parser';
+import threadRowParser from './detection/thread-row/parser';
 import messageParser from './detection/message/parser';
 import attachmentCardParser from './detection/attachmentCard/parser';
 import attachmentOverlayParser from './detection/attachmentOverlay/parser';
@@ -61,6 +62,7 @@ import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import InboxThreadView from './views/inbox-thread-view';
+import InboxThreadRowView from './views/inbox-thread-row-view';
 import InboxMessageView from './views/inbox-message-view';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
@@ -91,6 +93,7 @@ class InboxDriver {
   _routeViewDriverStream: Kefir.Observable<*>;
   _rowListViewDriverStream: Kefir.Observable<any>;
   _composeViewDriverLiveSet: LiveSet<InboxComposeView>;
+  _threadRowViewDriverLiveSet: LiveSet<InboxThreadRowView>;
   _threadViewDriverLiveSet: LiveSet<InboxThreadView>;
   _messageViewDriverLiveSet: LiveSet<InboxMessageView>;
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
@@ -98,7 +101,6 @@ class InboxDriver {
   _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
-  _threadRowViewDriverKefirStream: Kefir.Observable<any>;
   _toolbarViewDriverStream: Kefir.Observable<any>;
   _butterBarDriver = new InboxButterBarDriver();
   _butterBar: ButterBar;
@@ -152,6 +154,23 @@ class InboxDriver {
     });
     this.getThreadIdFromMessageId = messageId =>
       threadIdFromMessageIdCache.getAfromB(messageId);
+
+    this._threadRowViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('collapsedThreadRow'), (node, removal) => {
+      const el = node.getValue();
+      const parsed = threadRowParser(el);
+      if (parsed.errors.length) {
+        this._logger.errorSite(new Error('parse errors (threadRow)'), {
+          score: parsed.score,
+          errors: parsed.errors,
+          html: censorHTMLtree(el)
+        });
+      }
+      const view = new InboxThreadRowView(el, this, parsed);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
 
     this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
       const el = node.getValue();
@@ -299,7 +318,6 @@ class InboxDriver {
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
 
     this._rowListViewDriverStream = Kefir.never();
-    this._threadRowViewDriverKefirStream = Kefir.never();
     this._toolbarViewDriverStream = Kefir.never();
 
     Kefir.later(30*1000)
@@ -372,6 +390,9 @@ class InboxDriver {
   getComposeViewDriverStream() {
     return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
   }
+  getThreadRowViewDriverStream() {
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
+  }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
   }
@@ -381,7 +402,6 @@ class InboxDriver {
   getAttachmentCardViewDriverStream() {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
   }
-  getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
   getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
