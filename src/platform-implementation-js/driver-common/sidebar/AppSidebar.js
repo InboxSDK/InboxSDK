@@ -83,7 +83,7 @@ export default class AppSidebar extends React.Component {
     try {
       data = JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_expansion_settings') || 'null');
     } catch (err) {
-      console.error('Failed to read sidebar settings', err);
+      console.error('Failed to read sidebar settings', err); //eslint-disable-line no-console
     }
     if (data) return data;
     return {apps: {}};
@@ -108,7 +108,7 @@ export default class AppSidebar extends React.Component {
     try {
       global.localStorage.setItem('inboxsdk__sidebar_expansion_settings', JSON.stringify(data));
     } catch (err) {
-      console.error('Failed to save sidebar settings', err);
+      console.error('Failed to save sidebar settings', err); //eslint-disable-line no-console
     }
   }
   _expandedToggle(appId: string, id: string, expanded: boolean) {
@@ -316,6 +316,7 @@ type PanelElementProps = {
   el: HTMLElement;
 };
 class PanelElement extends React.Component {
+  props: PanelElementProps;
   _content: HTMLElement;
 
   componentDidMount() {

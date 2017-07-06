@@ -7,7 +7,8 @@
  * prevent memory leaks
  *
  */
-// DEPRECATED, superseded by add-accessors.js
+/* eslint-disable flowtype/require-valid-file-annotation */
+// DEPRECATED, superseded by standard ES6 classes!
 
 import _ from 'lodash';
 import getPrototypeChain from './get-prototype-chain';
@@ -143,6 +144,7 @@ function nullifyMemberVariable(memberVariable, doDestroy) {
 						value[key].remove();
 					}
 					catch(err){
+            console.error('basic-class caught error', err); //eslint-disable-line no-console
 					}
 				}
 			}

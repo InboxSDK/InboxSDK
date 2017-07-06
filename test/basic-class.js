@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 import sinon from 'sinon';
 
@@ -24,7 +26,7 @@ describe('BasicClass', function() {
 
     assert.throws(() => {
       const test = new Test();
-    }, 'name is a required parameter to memberVariables');
+    }, /name is a required parameter to memberVariables/);
   });
 
   it('memberVariables are only validated on first construction', function() {
@@ -32,7 +34,7 @@ describe('BasicClass', function() {
 
     class Test extends BasicClass {}
     Test.prototype.__memberVariables = [
-      Object.defineProperties({name: '_foo'}, {
+      (Object:any).defineProperties({name: '_foo'}, {
         destroy: {get: destroySpy}
       })
     ];

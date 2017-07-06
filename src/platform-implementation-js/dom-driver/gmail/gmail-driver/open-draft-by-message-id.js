@@ -1,10 +1,13 @@
-import qs from 'querystring';
+/* @flow */
 
-export default function openDraftByMessageID(driver, messageID) {
+import qs from 'querystring';
+import type GmailDriver from '../gmail-driver';
+
+export default function openDraftByMessageID(driver: GmailDriver, messageID: string) {
   window.location.hash = makeNewHash(window.location.hash, messageID);
 }
 
-export function makeNewHash(oldHash, messageID) {
+export function makeNewHash(oldHash: string, messageID: string): string {
   oldHash = '#' + oldHash.replace(/^#/, '');
   const [pre, query] = oldHash.split('?');
   const params = qs.parse(query);

@@ -20,7 +20,7 @@ function CustomEvent(type, options={}) {
   const event = (global.document || docCb()).createEvent("CustomEvent");
   (event: any).initCustomEvent(type, options.bubbles, options.cancelable, options.detail);
   return event;
-};
+}
 
 export default function fakePageGlobals() {
   if (global.before) { // We're in mocha

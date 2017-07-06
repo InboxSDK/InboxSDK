@@ -109,7 +109,7 @@ const pageParserOptions: PageParserTreeOptions = {
         // The above are currently expected to match, though they don't match
         // for all of our historical data.
 
-        const inlineComposes = uniq(inlineComposesByPopoutBtn.concat(inlineComposesByBody))
+        const inlineComposes = uniq(inlineComposesByPopoutBtn.concat(inlineComposesByBody));
         return inlineComposes;
       }
     },

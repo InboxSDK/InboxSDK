@@ -264,7 +264,9 @@ class InboxDriver {
       }
 
       return new LiveSet({
-        read() {throw new Error()},
+        read() {
+          throw new Error();
+        },
         listen: setValues => {
           const view = new InboxAttachmentOverlayView(this, el, parsed, cardView);
           setValues(new Set([view]));
@@ -444,7 +446,7 @@ class InboxDriver {
   }
 
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
-    console.warn('activateShortcut not implemented');
+    console.warn('activateShortcut not implemented'); //eslint-disable-line no-console
   }
 
   getGmailActionToken = once(async () => {
@@ -482,7 +484,7 @@ class InboxDriver {
   }
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
-    console.log('addNavItem not implemented');
+    console.log('addNavItem not implemented'); //eslint-disable-line no-console
     const obj = {
       getEventStream: _.constant(Kefir.never()),
       addNavItem: () => obj
@@ -516,8 +518,8 @@ class InboxDriver {
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
-    console.log('addCustomListRouteID not implemented');
-    return _.noop;
+    console.log('addCustomListRouteID not implemented'); //eslint-disable-line no-console
+    return () => {};
   }
 
   showCustomRouteView(el: HTMLElement): void {
@@ -596,7 +598,7 @@ class InboxDriver {
   }
 
   registerSearchQueryRewriter(obj: Object) {
-    console.log('registerSearchQueryRewriter not implemented');
+    console.log('registerSearchQueryRewriter not implemented'); //eslint-disable-line no-console
   }
 
   addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<InboxAppToolbarButtonView> {

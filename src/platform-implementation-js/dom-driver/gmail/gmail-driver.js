@@ -301,7 +301,7 @@ class GmailDriver {
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
-		const p = getNativeNavItem('sent')
+		const p = getNativeNavItem('sent');
 		p.catch(err => this._logger.error(err));
 		return p;
 	}

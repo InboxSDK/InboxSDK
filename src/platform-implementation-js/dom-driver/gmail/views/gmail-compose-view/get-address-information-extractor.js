@@ -30,4 +30,4 @@ export default function getAddressInformationExtractor(addressType: string): (no
 			return null;
 		}
 	};
-};
+}

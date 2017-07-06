@@ -17,4 +17,4 @@ export default function ensureGroupingIsOpen(gmailComposeViewElement: HTMLElemen
 	}
 
 	simulateClick(groupedButton);
-};
+}

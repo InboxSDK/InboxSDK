@@ -53,9 +53,9 @@ export default class InboxRouteView {
     this._params = getParams(path);
     this._routeType = this._routeID === 'UNKNOWN' ? 'UNKNOWN' : 'LIST';
 
-    console.log('el jsan', el.getAttribute('jsan'));
-    if (this._type === 'CUSTOM') {
-    }
+    // console.log('el jsan', el.getAttribute('jsan'));
+    // if (this._type === 'CUSTOM') {
+    // }
   }
 
   getStopper() {
@@ -89,10 +89,6 @@ export default class InboxRouteView {
 
   getEventStream(): Kefir.Observable<Object> {
     return this._eventStream;
-  }
-
-  getCustomViewElement(): ?HTMLElement{
-    return null;
   }
 
   refresh() {

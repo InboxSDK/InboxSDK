@@ -25,8 +25,10 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
   const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
   if(menuButtonElement){
     //the modal that contains this email address is not visible, so we need to bring the modal up
-    function block(event: MouseEvent){event.stopPropagation();};
-    function modifyFocusEvent(event){
+    const block = (event: MouseEvent) => {
+      event.stopPropagation();
+    };
+    const modifyFocusEvent = event => {
       event.shouldIgnore = true;
     };
     element.addEventListener('click', block);

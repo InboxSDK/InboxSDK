@@ -12,7 +12,7 @@ export default function makeElementStreamMerger<T>(): (event: ItemWithLifetime<T
     let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
-        console.warn('element is part of multiple element streams', stopperPool.getSize(), event.el);
+        console.warn('element is part of multiple element streams', stopperPool.getSize(), event.el); //eslint-disable-line no-console
       }
       stopperPool.add(event.removalStream.flatMap(delayAsap));
       return Kefir.never();

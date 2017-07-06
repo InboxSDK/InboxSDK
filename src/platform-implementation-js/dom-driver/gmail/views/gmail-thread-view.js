@@ -82,7 +82,7 @@ class GmailThreadView {
 		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
 		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
 		if (!sidebarElement && !addonSidebarElement) {
-			console.warn('This view does not have a sidebar');
+			console.warn('This view does not have a sidebar'); //eslint-disable-line no-console
 			return;
 		}
 		let sidebar = this._sidebar;

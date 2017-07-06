@@ -1,3 +1,5 @@
+/* eslint-disable flowtype/require-valid-file-annotation, no-undef */
+
 if (!global.__InboxSDKInjected) {
   global.__InboxSDKInjected = true;
 

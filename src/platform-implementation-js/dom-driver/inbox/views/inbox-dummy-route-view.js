@@ -63,10 +63,6 @@ export default class InboxDummyRouteView {
     throw new Error('should not happen');
   }
 
-  getCustomViewElement(): ?HTMLElement {
-    throw new Error('should not happen');
-  }
-
   addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
     throw new Error('should not happen');
   }

@@ -41,7 +41,7 @@ class Compose {
       }, SAMPLE_RATE, {
         type: 'composeViewHandler',
         isInlineReplyForm: view.isInlineReplyForm()
-      })
+      });
     });
   }
 

@@ -1,4 +1,6 @@
-var oldDefine;
+/* eslint-disable flowtype/require-valid-file-annotation, no-undef */
+
+let oldDefine;
 try {
   if (typeof define !== "undefined" && define && define.amd) {
     // work around amd compatibility issue

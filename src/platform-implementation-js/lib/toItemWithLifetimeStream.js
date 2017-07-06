@@ -2,7 +2,7 @@
 
 import type LiveSet from 'live-set';
 import type {TagTreeNode} from 'tag-tree';
-import toValueObservable from 'live-set/toValueObservable'
+import toValueObservable from 'live-set/toValueObservable';
 import Kefir from 'kefir';
 import type {ItemWithLifetime} from './dom/make-element-child-stream';
 

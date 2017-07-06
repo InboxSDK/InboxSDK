@@ -1,11 +1,11 @@
 /* @flow */
 
-const once = require('lodash/once');
+import once from 'lodash/once';
 import loadScript from '../../common/load-script';
 
 import type {PlatformImplementation} from '../../platform-implementation-js/platform-implementation';
 
-var PlatformImplementationLoader = {
+const PlatformImplementationLoader = {
   load(appId: string, opts: Object): Promise<PlatformImplementation> {
     return Promise.resolve().then(() => {
       if (!global.__InboxSDKImpLoader) {
@@ -26,7 +26,7 @@ var PlatformImplementationLoader = {
       try {
         disableSourceMappingURL = localStorage.getItem('inboxsdk__enable_sourcemap') !== 'true';
       } catch(err) {
-        console.error(err);
+        console.error(err); //eslint-disable-line no-console
       }
     }
 

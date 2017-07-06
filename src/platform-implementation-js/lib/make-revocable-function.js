@@ -1,3 +1,5 @@
+/* @flow */
+
 // Takes an input function, and returns {fn, revoke}.
 // Before revoke is called, calling fn is equivalent to calling the input
 // function.
@@ -8,23 +10,24 @@
 // The optional second parameter revokedFn is a function to make fn call after
 // it has been revoked.
 
-import _ from 'lodash';
+import once from 'lodash/once';
+import noop from 'lodash/noop';
 
-export default function makeRevocableFunction(inputFn, revokedFn=_.noop) {
-  var key = {};
+export default function makeRevocableFunction<F: Function>(inputFn: F, revokedFn: Function=noop): {fn: F, revoke: ()=>void} {
+  let key = {};
 
   return {
     fn: (function() {
       const _revokedFn = revokedFn;
       const wm = new WeakMap();
       wm.set(key, inputFn);
-      inputFn = revokedFn = null;
+      inputFn = revokedFn = (null:any);
 
-      return function() {
-        return (key ? wm.get(key) : _revokedFn).apply(this, arguments);
-      };
+      return (function() {
+        return ((key ? wm.get(key) : _revokedFn):any).apply(this, arguments);
+      }: any);
     })(),
-    revoke: _.once(function() {
+    revoke: once(function() {
       key = null;
     })
   };

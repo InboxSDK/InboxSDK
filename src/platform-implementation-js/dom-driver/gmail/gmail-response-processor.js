@@ -70,7 +70,7 @@ export function rewriteSingleQuotes(s: string): string {
   // i is our position in the input string. result is our result string that
   // we'll copy the parts of the input to as we interpret them.
   let i = 0, resultParts = [];
-  while (true) {
+  while (true) { //eslint-disable-line no-constant-condition
     // Find the position of the next singly or doubly quoted part.
     // `i` is increasing monotonically every round of this loop, and the loop
     // ends as soon as no matches are found after the `i`th position in the
@@ -83,7 +83,7 @@ export function rewriteSingleQuotes(s: string): string {
     // Copy the unquoted part preceding the quoted section we found into the
     // result, and put a double-quote into the result to begin the quoted
     // section we found.
-    resultParts.push(s.substr(i,nextQuoteIndex-i))
+    resultParts.push(s.substr(i,nextQuoteIndex-i));
     resultParts.push('"');
     i = nextQuoteIndex + 1;
     if (s[nextQuoteIndex] === '"') {
@@ -278,7 +278,7 @@ function threadListSerialize(threadResponseArray: any[], options: MessageOptions
       const firstLines = lines.slice(0, -3);
       const lastLines = lines.slice(-3);
       response = firstLines.join('\n');
-      response += '\n' + lastLines[0] + lastLines[1].replace(/\"/g, "'");
+      response += '\n' + lastLines[0] + lastLines[1].replace(/"/g, "'");
     } else {
       const prev = response;
       // A 16-digit hexadecimal string is often at the end, but sometimes it
@@ -450,7 +450,7 @@ it all back together.
           if (item[6]) {
             item[6][0] = [query, 1];
           } else {
-            console.error('replaceThreadsInResponse(): Missing item[6]');
+            console.error('replaceThreadsInResponse(): Missing item[6]'); //eslint-disable-line no-console
           }
         }
       }

@@ -94,7 +94,7 @@ class InboxAppSidebarView {
     try {
       localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
     } catch(err) {
-      console.error('error saving', err);
+      console.error('error saving', err); //eslint-disable-line no-console
     }
   }
 
@@ -157,14 +157,14 @@ class InboxAppSidebarView {
         try {
           return JSON.parse(localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
         } catch (err) {
-          console.error('failed to read sidebar order data', err);
+          console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
         }
       },
       set(data) {
         try {
           localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
         } catch (err) {
-          console.error('failed to set sidebar order data', err);
+          console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
         }
       }
     });

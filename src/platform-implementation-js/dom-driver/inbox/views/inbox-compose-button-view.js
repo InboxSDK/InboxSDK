@@ -90,7 +90,7 @@ class InboxComposeButtonView {
       if (dropdown) {
         dropdown.close();
       }
-    })
+    });
   }
 
   showTooltip(tooltipDescriptor: TooltipDescriptor) {

@@ -83,7 +83,7 @@ class InboxThreadView {
       throw new Error('Failed to find thread id');
     }
     if (/^msg-a:/.test(inboxThreadId)) {
-      console.warn('ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.');
+      console.warn('ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.'); //eslint-disable-line no-console
     }
     const m = /\d+$/.exec(inboxThreadId);
     if (!m) throw new Error('Should not happen');

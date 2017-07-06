@@ -11,4 +11,4 @@ export default function positionFormattingToolbar(gmailComposeView: GmailCompose
 		const left = buttonElement.offsetLeft+buttonElement.clientWidth/2-arrowElement.offsetWidth/2;
 		arrowElement.style.left = left + 'px';
 	}
-};
+}

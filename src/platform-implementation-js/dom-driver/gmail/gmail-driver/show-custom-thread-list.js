@@ -100,7 +100,7 @@ const copyAndOmitExcessThreads = (
 };
 
 const findIdFailure = (id, err: Error) => {
-  console.log("Failed to find id for thread", id, err);
+  console.log("Failed to find id for thread", id, err); //eslint-disable-line no-console
   return null;
 };
 
@@ -282,7 +282,7 @@ const setupSearchReplacing = (
             //response: isStreakAppId(driver.getAppId()) ? response : null,
             idPairsLength: idPairs.length
           });
-          const butterBar = driver.getButterBar()
+          const butterBar = driver.getButterBar();
           if(butterBar){
             butterBar.showError({
               text: 'Failed to load custom thread list'
@@ -317,7 +317,7 @@ const setupSearchReplacing = (
   driver.getCustomListSearchStringsToRouteIds().set(newQuery, customRouteID);
   threadListHandlersToSearchStrings.set(onActivate, newQuery);
   return newQuery;
-}
+};
 
 export default function showCustomThreadList(
   driver: GmailDriver,

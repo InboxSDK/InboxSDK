@@ -1,6 +1,9 @@
+/* @flow */
+
 import assert from 'assert';
 import Kefir from 'kefir';
-import {EventEmitter} from 'events';
+import events from 'events';
+const {EventEmitter} = events;
 import Marker from '../src/common/marker';
 import MockElementParent from './lib/mock-element-parent';
 import kefirBus from 'kefir-bus';
@@ -12,12 +15,12 @@ describe('kefirMakeElementChildStream', function() {
   fakePageGlobals();
 
   it('should work', function(done) {
-    var child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
+    let child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
 
     const target = new MockElementParent([child1, child2]);
 
-    var call = 0;
-    kefirMakeElementChildStream(target).onValue(function(event) {
+    let call = 0;
+    kefirMakeElementChildStream((target:Object)).onValue(event => {
       switch(++call) {
         case 1:
           assert.strictEqual(event.el, child1);
@@ -45,15 +48,15 @@ describe('kefirMakeElementChildStream', function() {
   });
 
   it('triggers removals when no longer listened on', function(done) {
-    var child1 = Marker('child1'), child2 = Marker('child2');
-    var stopper = kefirBus();
+    let child1 = Marker('child1'), child2 = Marker('child2');
+    let stopper = kefirBus();
 
     const target = new MockElementParent([child1]);
 
-    var call = 0;
-    var child1Removed = 0, child2Removed = 0;
-    var child1Ended = false, child2Ended = false;
-    var stream = kefirMakeElementChildStream(target).takeUntilBy(stopper);
+    let call = 0;
+    let child1Removed = 0, child2Removed = 0;
+    let child1Ended = false, child2Ended = false;
+    let stream = kefirMakeElementChildStream((target:Object)).takeUntilBy(stopper);
     stream.onValue(function(event) {
       switch(++call) {
         case 1:
@@ -105,8 +108,8 @@ describe('kefirMakeElementChildStream', function() {
 
     const target = new MockElementParent([child1]);
 
-    var i = 0;
-    const stream = kefirMakeElementChildStream(target);
+    let i = 0;
+    const stream = kefirMakeElementChildStream((target:Object));
     stream.onValue(event => {
       switch(++i) {
         case 1:
@@ -128,8 +131,8 @@ describe('kefirMakeElementChildStream', function() {
 
     const target = new MockElementParent([child1, child2]);
 
-    var i = 0;
-    const stream = kefirMakeElementChildStream(target);
+    let i = 0;
+    const stream = kefirMakeElementChildStream((target:Object));
     stream.onValue(event => {
       switch(++i) {
         case 1:

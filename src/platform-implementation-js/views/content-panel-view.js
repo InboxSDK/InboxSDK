@@ -9,7 +9,7 @@ export default class ContentPanelView extends EventEmitter {
   _contentPanelViewImplementation: Object;
 
   constructor(contentPanelViewImplementation: Object){
-    super()
+    super();
 
     this._contentPanelViewImplementation = contentPanelViewImplementation;
     this._bindToStreamEvents();

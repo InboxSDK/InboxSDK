@@ -40,7 +40,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     }
 
     if (!(err instanceof Error)) {
-      console.warn('First parameter to Logger.error was not an error object:', err);
+      console.warn('First parameter to Logger.error was not an error object:', err); //eslint-disable-line no-console
       err = new Error("Logger.error called with non-error: "+err);
       markErrorAsSeen(err);
     }
@@ -83,7 +83,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", loaderVersion]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", implVersion]);
 
-    console.error.apply(console, stuffToLog);
+    console.error.apply(console, stuffToLog); //eslint-disable-line no-console
 
     const report = {
       message: err && err.message || err,
@@ -137,7 +137,7 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
         try {
           return !!(e: any).__inboxsdk_extensionHasSeenError;
         } catch(err) {
-          console.error(err);
+          console.error(err); //eslint-disable-line no-console
           return false;
         }
       }
@@ -156,7 +156,7 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
             value: true
           });
         } catch(err) {
-          console.error(err);
+          console.error(err); //eslint-disable-line no-console
         }
       }
     }
@@ -197,6 +197,6 @@ const sendError = rateLimit(function(report: Object) {
 }, 60*1000, 10);
 
 function tooManyErrors(err2: Error, originalArgs: any) {
-  console.error("ERROR REPORTING ERROR", err2);
-  console.error("ORIGINAL ERROR", originalArgs);
+  console.error("ERROR REPORTING ERROR", err2); //eslint-disable-line no-console
+  console.error("ORIGINAL ERROR", originalArgs); //eslint-disable-line no-console
 }

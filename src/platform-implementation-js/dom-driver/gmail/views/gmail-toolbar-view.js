@@ -289,10 +289,10 @@ class GmailToolbarView {
 	}
 
 	_getSectionElementForButtonSelector(buttonSelector: string): ?HTMLElement {
-		var sectionElements = this._element.querySelectorAll('.G-Ni');
+		const sectionElements = this._element.querySelectorAll('.G-Ni');
 
-		for(var ii=0; ii<sectionElements.length; ii++){
-			if(!!sectionElements[ii].querySelector(buttonSelector)){
+		for (let ii=0; ii<sectionElements.length; ii++) {
+			if (sectionElements[ii].querySelector(buttonSelector)) {
 				return sectionElements[ii];
 			}
 		}
@@ -456,8 +456,8 @@ class GmailToolbarView {
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
-				 buttonDescriptor.iconUrl ? '<img src="' + _.escape(buttonDescriptor.iconUrl) + '" />' : '',
-				 buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + _.escape(buttonDescriptor.iconClass) + '"></span>' : '',
+				buttonDescriptor.iconUrl ? '<img src="' + _.escape(buttonDescriptor.iconUrl) + '" />' : '',
+				buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + _.escape(buttonDescriptor.iconClass) + '"></span>' : '',
 				_.escape(buttonDescriptor.title),
 			'</div>'
 		].join('');

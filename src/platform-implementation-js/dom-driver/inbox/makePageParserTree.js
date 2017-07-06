@@ -24,7 +24,7 @@ export default function makePageParserTree(driver: ?Driver, root: Document|HTMLE
 
 	const page = new PageParserTree(root, transformOptions(pageParserOptions));
 	pageParserOptionsStream.changes().onValue(pageParserOptions => {
-		console.log('replacing PageParserTree options');
+		console.log('replacing PageParserTree options'); //eslint-disable-line no-console
 		page.replaceOptions(transformOptions(pageParserOptions));
 	});
 	return page;

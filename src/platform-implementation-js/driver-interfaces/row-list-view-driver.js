@@ -1,16 +1,15 @@
-var _ = require('lodash');
-var BasicClass = require('../lib/basic-class');
+/* eslint-disable flowtype/require-valid-file-annotation */
 
-var RowListViewDriver = function(){
+import BasicClass from '../lib/basic-class';
+
+export default function RowListViewDriver() {
 	BasicClass.call(this);
-};
+}
 
 RowListViewDriver.prototype = Object.create(BasicClass.prototype);
 
-_.extend(RowListViewDriver.prototype, {
+Object.assign(RowListViewDriver.prototype, {
 
 	getSelectedThreadRows: null
 
 });
-
-module.exports = RowListViewDriver;

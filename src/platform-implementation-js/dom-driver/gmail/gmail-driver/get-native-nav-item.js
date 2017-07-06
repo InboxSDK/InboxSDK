@@ -30,4 +30,4 @@ export default function getNativeNavItem(label: string): Promise<NativeGmailNavI
 
 		throw err;
 	});
-};
+}

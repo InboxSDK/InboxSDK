@@ -1,11 +1,13 @@
-module.exports = function(){
+/* @flow */
+
+export default function setupGmonkeyHandler() {
   const gmonkeyPromise = setupGmonkey();
 
   document.addEventListener('inboxSDKtellMeIsConversationViewDisabled', function() {
     gmonkeyPromise.then(gmonkey => {
       const answer = gmonkey.isConversationViewDisabled();
       const event = document.createEvent('CustomEvent');
-      event.initCustomEvent('inboxSDKgmonkeyResponse', false, false, answer);
+      (event:any).initCustomEvent('inboxSDKgmonkeyResponse', false, false, answer);
       document.dispatchEvent(event);
     });
   });
@@ -13,7 +15,7 @@ module.exports = function(){
   document.addEventListener('inboxSDKtellMeCurrentThreadId', function(event) {
     let threadId;
 
-    if(event.detail.isPreviewedThread){
+    if((event:any).detail.isPreviewedThread){
       const rows = document.querySelectorAll('[gh=tl] tr.aps');
       if(rows.length > 0){
         threadId = rows[0].getAttribute('data-inboxsdk-threadid');
@@ -25,10 +27,10 @@ module.exports = function(){
     }
 
     if (threadId) {
-      event.target.setAttribute('data-inboxsdk-currentthreadid', threadId);
+      (event:any).target.setAttribute('data-inboxsdk-currentthreadid', threadId);
     }
-   });
-};
+  });
+}
 
 function setupGmonkey() {
   return new Promise((resolve, reject) => {

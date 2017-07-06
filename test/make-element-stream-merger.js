@@ -124,7 +124,7 @@ describe('makeElementStreamMerger', function() {
   it('warns if element stays in multiple streams', function(done) {
     sinon.stub(console, "warn");
     after(function() {
-      console.warn.restore();
+      console.warn.restore(); // eslint-disable-line no-console
     });
     var e1 = {
       el: Marker('e1.el'),
@@ -150,7 +150,7 @@ describe('makeElementStreamMerger', function() {
           case 1:
             break;
           case 2:
-            assert(console.warn.called > 0, 'console.warn was called');
+            assert(console.warn.called > 0, 'console.warn was called'); // eslint-disable-line no-console
             done();
             break;
           default:

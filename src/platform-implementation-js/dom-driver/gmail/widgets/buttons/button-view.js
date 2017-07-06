@@ -10,7 +10,7 @@ import simulateHover from '../../../../lib/dom/simulate-hover';
 import keyboardShortcutStream from '../../../../lib/dom/keyboard-shortcut-stream';
 import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 
-var BUTTON_COLOR_CLASSES = require('./button-color-classes');
+import BUTTON_COLOR_CLASSES from './button-color-classes';
 
 export type ButtonViewOptions = {
 	hasButtonToLeft?: ?boolean;
@@ -26,7 +26,7 @@ export type ButtonViewOptions = {
 	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
 };
 
-var ButtonView = ud.defn(module, class ButtonView {
+const ButtonView = ud.defn(module, class ButtonView {
 	_element: HTMLElement;
 	_innerElement: any;
 	_textElement: any;
@@ -194,7 +194,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 		this._textElement.textContent = this._title;
 
 		if(this._iconElement){
-			var parent = this._iconElement.parentElement;
+			const parent = this._iconElement.parentElement;
 			if (!parent) throw new Error("Could not find parent");
 			parent.insertBefore(this._textElement, this._iconElement.nextSibling);
 		} else {
@@ -207,7 +207,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 			return;
 		}
 
-		var iconElement = this._iconElement = document.createElement('div');
+		const iconElement = this._iconElement = document.createElement('div');
 		iconElement.classList.add('inboxsdk__button_icon');
 
 		if(this._iconClass){
@@ -226,13 +226,13 @@ var ButtonView = ud.defn(module, class ButtonView {
 		if (!this._iconElement) {
 			this._createIconElement();
 		}
-		var iconElement = this._iconElement;
+		const iconElement = this._iconElement;
 		if (!iconElement) throw new Error("Should not happen");
 		if(iconElement.innerHTML !== ''){
 			iconElement.innerHTML = '';
 		}
 
-		var iconImgElement = this._iconImgElement = document.createElement('img');
+		const iconImgElement = this._iconImgElement = document.createElement('img');
 		iconImgElement.classList.add('inboxsdk__button_iconImg');
 
 		if (this._iconUrl) {
@@ -328,9 +328,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	}
 
 	_setupEventStream(){
-		var self = this;
-
-		var clickEventStream = Kefir.fromEvents(this._element, 'click');
+		const clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
@@ -346,9 +344,9 @@ var ButtonView = ud.defn(module, class ButtonView {
 			})
 		);
 
-		var isEnterOrSpace = event => _.includes([32 /* space */, 13 /* enter */], event.which);
-		var keydownEventStream = Kefir.fromEvents(this._element, 'keydown').filter(() => this.isEnabled());
-		var enterEventStream = keydownEventStream.filter(isEnterOrSpace);
+		const isEnterOrSpace = event => _.includes([32/* space */, 13/* enter */], event.which);
+		const keydownEventStream = Kefir.fromEvents(this._element, 'keydown').filter(() => this.isEnabled());
+		const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
 		this._eventStream.plug(
 			enterEventStream.map(function(event){
@@ -367,7 +365,7 @@ var ButtonView = ud.defn(module, class ButtonView {
 	}
 
 	_setupKeyboardShortcutEvent(){
-		var keyboardShortcutHandle = this._keyboardShortcutHandle;
+		const keyboardShortcutHandle = this._keyboardShortcutHandle;
 		if(keyboardShortcutHandle){
 			this._eventStream.plug(
 				keyboardShortcutStream(keyboardShortcutHandle.chord)

@@ -1,9 +1,9 @@
 /* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var cproc = require('child_process');
-var globp = RSVP.denodeify(require('glob'));
+const _ = require('lodash');
+const RSVP = require('rsvp');
+const cproc = require('child_process');
+const globp = RSVP.denodeify(require('glob'));
 
 // Support Chrome Extensions Reloader
 // https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid
@@ -19,23 +19,23 @@ function getUserHome(): string {
 // Returns null if no Chrome profiles have the extension installed. If it the
 // extension is installed, it returns the name of Chrome name suffix (such as
 // "", " Canary", etc).
-var getchromeSuffixWithReloaderExtension = _.once(function() {
-  var path = getUserHome() +
+const getchromeSuffixWithReloaderExtension = _.once(function() {
+  const path = getUserHome() +
     '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
   return globp(path).then(function(results) {
-    var path = results[0];
+    const path = results[0];
     if (path) {
-      return path.match(/Chrome([^\/]*)\//)[1];
+      return path.match(/Chrome([^/]*)\//)[1];
     }
     return null;
   });
 });
 
-var getChromeLocation = _.memoize(function(chromeSuffix) {
+const getChromeLocation = _.memoize(function(chromeSuffix) {
   if (!chromeSuffix) {
     chromeSuffix = '';
   }
-  var path =
+  const path =
     '/Applications/Google Chrome'+chromeSuffix+'.app/Contents/MacOS/Google Chrome*';
   return globp(path).then(function(results) {
     return results[0];

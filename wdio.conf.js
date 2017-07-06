@@ -1,10 +1,12 @@
-var fs = require('fs');
+/* @flow */
 
-var testOutputDir = `${__dirname}/chromeTestOutput`;
+const fs = require('fs');
+
+const testOutputDir = `${__dirname}/chromeTestOutput`;
 
 try {
     fs.statSync(testOutputDir);
-} catch(err) {
+} catch (err) {
     fs.mkdirSync(testOutputDir);
 }
 
@@ -157,7 +159,7 @@ exports.config = {
     //
     // Gets executed before test execution begins. At this point you can access all global
     // variables, such as `browser`. It is the perfect place to define custom commands.
-    before: function (capabilities, specs) {
+    before: function (capabilities: any, specs: any) {
         require('babel-register');
     },
     //
@@ -204,4 +206,4 @@ exports.config = {
     // possible to defer the end of the process using a promise.
     // onComplete: function(exitCode) {
     // }
-}
+};

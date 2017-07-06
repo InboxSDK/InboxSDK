@@ -1,5 +1,6 @@
 #!/usr/bin/env babel-node
 /* @flow */
+/* eslint-disable no-console */
 
 import concatStream from 'concat-stream';
 import {deserialize} from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';

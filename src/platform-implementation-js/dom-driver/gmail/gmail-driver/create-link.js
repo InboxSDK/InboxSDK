@@ -9,7 +9,7 @@ import type {RouteParams} from '../../../namespaces/router';
 import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 
 export default function createLink(GmailRouteProcessor: GmailRouteProcessor, routeID: string, params: ?RouteParams|string): string {
-	params = !!params ? _.clone(params) : {};
+	params = params ? _.clone(params) : {};
 	routeID = GmailRouteProcessor.getCompatibleRouteID(routeID);
 
 	if(typeof params === 'string'){

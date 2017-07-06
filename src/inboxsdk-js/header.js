@@ -1,3 +1,4 @@
+/* @flow */
 /*!
  * InboxSDK
  * https://www.inboxsdk.com/

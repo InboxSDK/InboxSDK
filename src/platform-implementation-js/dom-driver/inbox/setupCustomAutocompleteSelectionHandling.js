@@ -235,5 +235,5 @@ export default function setupCustomAutocompleteSelectionHandling({
 
   keyboardEvents.onEnd(() => resultsEl.removeAttribute(SELECTION_MASTER_ATTR));
 
-  setupCustomResultHoverListeners(resultsEl, resultsElRemovalStream)
+  setupCustomResultHoverListeners(resultsEl, resultsElRemovalStream);
 }

@@ -22,7 +22,6 @@ import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
 import GmailElementGetter from '../../gmail-element-getter';
 
-import assertInterface from '../../../../lib/assert-interface';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
@@ -129,10 +128,7 @@ class GmailRouteView {
 		else{
 			params = this._getNativeParams();
 			const routeID = this.getRouteID();
-			if(!routeID){
-				params = params;
-			}
-			else{
+			if(routeID){
 				const routeIDParams = this._extractParamKeysFromRouteID(routeID);
 				const routeParams = {};
 				routeIDParams.forEach(function(param){

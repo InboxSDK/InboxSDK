@@ -1,3 +1,5 @@
+/* @flow */
+
 import assert from 'assert';
 import Kefir from 'kefir';
 import Marker from '../src/common/marker';

@@ -99,7 +99,7 @@ export default function setupAjaxInterceptor() {
       if (sendRequestMisses.length < 3) return;
 
       logger.error(
-        new Error ('Failed to identify outgoing send request'),
+        new Error('Failed to identify outgoing send request'),
         {requestPayloadList: censorJSONTree(sendRequestMisses)}
       );
 

@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
-var fs = require('fs');
+const fs = require('fs');
 
 // Returns a promise that resolves once the injected script has been injected
 // and has done its initial load stuff.
@@ -21,7 +21,7 @@ const injectScript: () => Promise<null> = _.once(function() {
     try {
       disableSourceMappingURL = localStorage.getItem('inboxsdk__enable_sourcemap') !== 'true';
     } catch(err) {
-      console.error(err);
+      console.error(err); //eslint-disable-line no-console
     }
 
     let codeParts = [];

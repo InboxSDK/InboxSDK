@@ -1,3 +1,5 @@
+/* eslint-disable flowtype/require-valid-file-annotation, no-undef */
+
 if (!global.__InboxSDKImpLoader) {
   var piMainStarted = Date.now();
   var wasAccountSwitcherReadyAtStart = !!document.querySelector('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]');
