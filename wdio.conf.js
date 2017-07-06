@@ -1,4 +1,4 @@
-/* @flow */
+/* eslint-disable flowtype/require-valid-file-annotation */
 
 const fs = require('fs');
 
@@ -159,7 +159,7 @@ exports.config = {
     //
     // Gets executed before test execution begins. At this point you can access all global
     // variables, such as `browser`. It is the perfect place to define custom commands.
-    before: function (capabilities: any, specs: any) {
+    before: function (capabilities, specs) {
         require('babel-register');
     },
     //
