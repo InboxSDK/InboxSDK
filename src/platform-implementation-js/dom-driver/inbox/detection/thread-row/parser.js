@@ -4,7 +4,7 @@ import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
 export default function parser(el: HTMLElement) {
-  const ec = new ErrorCollector('thread');
+  const ec = new ErrorCollector('threadRow');
 
   const inBundle = !el.hasAttribute('aria-multiselectable');
 
@@ -18,24 +18,15 @@ export default function parser(el: HTMLElement) {
       /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
   );
 
-  const heading = ec.run(
-    'heading',
-    () => el.querySelector('div[role=heading]')
-  );
-  const stickyHeading = !heading ? null : ec.run('stickyHeading', () => {
-    const el = heading.firstElementChild;
-    if (el instanceof HTMLDivElement) return el;
-    throw new Error('child missing');
-  });
-  const list = ec.run(
-    'list',
-    () => el.querySelector('div[role=list]')
-  );
+  const subject = ec.run('subject', () => (
+    querySelectorOne(
+      el,
+      'div[jsaction] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child) > div:not([style]):not(:first-child):not(:last-child)'
+    )
+  ));
 
   const elements = {
-    heading,
-    stickyHeading,
-    list
+    subject
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
