@@ -3,13 +3,14 @@
 import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view.js';
+import type InboxThreadRowView from '../dom-driver/inbox/views/inbox-thread-row-view.js';
 
 // documented in src/docs/
 export default class ThreadRowView extends EventEmitter {
   destroyed: boolean;
-  _threadRowViewDriver: GmailThreadRowView;
+  _threadRowViewDriver: GmailThreadRowView|InboxThreadRowView;
 
-  constructor(threadRowViewDriver: GmailThreadRowView){
+  constructor(threadRowViewDriver: GmailThreadRowView|InboxThreadRowView){
     super();
     this.destroyed = false;
     this._threadRowViewDriver = threadRowViewDriver;

@@ -391,7 +391,9 @@ class InboxDriver {
     return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
   }
   getThreadRowViewDriverStream() {
-    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
+    // uncomment for testing/working locally
+    // return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
+    return Kefir.never();
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);

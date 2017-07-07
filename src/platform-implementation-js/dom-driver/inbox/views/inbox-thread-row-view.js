@@ -38,6 +38,9 @@ class InboxThreadRowView {
     return this._stopper;
   }
 
+  // keeping this here for now since the rest of the system expects it.
+  // in Gmail it's used to pass a ThreadRowView interface to addButton()
+  // onClick callbacks, but not sure if it will be needed in the end.
   setUserView(userView: Object) {
     this._userView = userView;
   }
@@ -48,6 +51,14 @@ class InboxThreadRowView {
 
   addButton() {
     throw new Error('Not supported in Inbox');
+  }
+
+  addActionButton() {
+    throw new Error('not yet implemented');
+  }
+
+  addImage() {
+    throw new Error('not yet implemented');
   }
 
   addLabel() {
@@ -69,8 +80,33 @@ class InboxThreadRowView {
     throw new Error('not yet implemented');
   }
 
+  async getThreadIDAsync(): Promise<string> {
+    // dummy return val for now.
+    return Promise.resolve('');
+  }
+
+  getDraftID() {
+    throw new Error('not yet implemented');
+  }
+
+  getVisibleDraftCount() {
+    throw new Error('not yet implemented');
+  }
+
+  getVisibleMessageCount() {
+    throw new Error('not yet implemented');
+  }
+
+  getContacts() {
+    throw new Error('not yet implemented');
+  }
+
   replaceDate() {
     throw new Error('Not supported in Inbox');
+  }
+
+  replaceDraftLabel() {
+    throw new Error('not yet implemented');
   }
 
   destroy() {
