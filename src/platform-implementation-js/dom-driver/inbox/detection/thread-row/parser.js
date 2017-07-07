@@ -18,7 +18,16 @@ export default function parser(el: HTMLElement) {
       /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
   );
 
-  const elements = {};
+  const subject = ec.run('subject', () => (
+    querySelectorOne(
+      el,
+      'div[jsaction] div:not(:first-child):not(:last-child) > div > div > div:not([jsan]):not([jsl]) > div[jsan]:not(:last-child) > span[jsinstance]:not([email]):first-child:last-child'
+    )
+  ));
+
+  const elements = {
+    subject
+  };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
     elements,
