@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import EventEmitter from '../lib/safe-event-emitter';
@@ -16,6 +15,12 @@ import ToolbarView from '../views/toolbar-view'; //only used for internal bookke
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 
 const memberMap = new WeakMap();
+
+const sectionNames = Object.freeze({
+	'INBOX_STATE': 'INBOX_STATE',
+	'METADATA_STATE': 'METADATA_STATE',
+	'OTHER': 'OTHER'
+});
 
 // documented in src/docs/
 export default class Toolbars extends EventEmitter {
@@ -102,62 +107,37 @@ function _setupToolbarViewDriverWatcher(toolbars, members){
 		});
 }
 
-function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
+function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver): Object {
 	const {membrane} = members;
-	var buttonOptions = _.clone(buttonDescriptor);
-	var oldOnClick = buttonOptions.onClick || function(){};
+	const buttonOptions = Object.assign({}, buttonDescriptor);
+	const oldOnClick = buttonOptions.onClick || function(){};
 
-	buttonOptions.onClick = function(event){
+	buttonOptions.onClick = function(event) {
 		event = event || {};
 
-		if(toolbarViewDriver.getRowListViewDriver()){
-			Object.assign(event, {
-				threadRowViews: _getThreadRowViews(toolbarViewDriver, membrane),
-				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membrane)
-			});
-		}
-		else if(toolbarViewDriver.getThreadViewDriver()){
+		if (toolbarViewDriver.getRowListViewDriver()) {
+			const threadRowViewDrivers = Array.from(
+				toolbarViewDriver
+					.getRowListViewDriver()
+					.getThreadRowViewDrivers()
+					.values()
+			);
+
+			const threadRowViews = threadRowViewDrivers
+				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
+
+			const selectedThreadRowViews = threadRowViewDrivers
+				.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
+				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
+
+			Object.assign(event, {threadRowViews, selectedThreadRowViews});
+		} else if (toolbarViewDriver.getThreadViewDriver()) {
 			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
 			event.threadView = threadView;
 		}
 
 		oldOnClick(event);
-
 	};
 
 	return buttonOptions;
 }
-
-function _getThreadRowViews(toolbarViewDriver, membrane: Membrane){
-	return Array.from(
-			toolbarViewDriver
-				.getRowListViewDriver()
-				.getThreadRowViewDrivers()
-				.values()
-		).map(_getThreadRowView(membrane));
-}
-
-function _getSelectedThreadRowViews(toolbarViewDriver, membrane: Membrane){
-	return _.chain(Array.from(
-			toolbarViewDriver
-				.getRowListViewDriver()
-				.getThreadRowViewDrivers()
-				.values()
-		))
-		.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
-		.map(_getThreadRowView(membrane))
-		.value();
-}
-
-function _getThreadRowView(membrane: Membrane){
-	return function(threadRowViewDriver){
-		const threadRowView = membrane.get(threadRowViewDriver);
-		return threadRowView;
-	};
-}
-
-var sectionNames = Object.freeze({
-	'INBOX_STATE': 'INBOX_STATE',
-	'METADATA_STATE': 'METADATA_STATE',
-	'OTHER': 'OTHER'
-});
