@@ -171,6 +171,11 @@ const pageParserOptions: PageParserTreeOptions = {
       '*',
       '[role=listitem]'
     ]},
+    {sources: ['threadRow'], tag: 'collapsedThreadRow', selectors: [
+      {$watch: {attributeFilter: ['aria-expanded', 'class'], cond: '[aria-expanded=false]:not(.scroll-list-item-open)'}},
+      ':first-child',
+      {$map: (el) => (el: any).parentElement}
+    ]},
     {sources: ['threadRow'], tag: 'thread', selectors: [
       {$watch: {attributeFilter: ['aria-expanded', 'class'], cond: '[aria-expanded=true], .scroll-list-item-open'}}
     ]},
