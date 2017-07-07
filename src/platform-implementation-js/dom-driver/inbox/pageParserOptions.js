@@ -277,6 +277,12 @@ const pageParserOptions: PageParserTreeOptions = {
       '*',
       '[role=dialog]:not(.inboxsdk__drawer_view)'
     ]},
+
+    {sources: ['searchBar'], tag: 'listToolBar', selectors: [
+      {$map: el => (el.parentElement:any)},
+      'div:empty + div:not(:empty) + div',
+      'ul[jsaction]',
+    ]},
   ]
 };
 
