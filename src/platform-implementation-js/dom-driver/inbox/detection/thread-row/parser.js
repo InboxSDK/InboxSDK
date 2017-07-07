@@ -21,7 +21,7 @@ export default function parser(el: HTMLElement) {
   const subject = ec.run('subject', () => (
     querySelectorOne(
       el,
-      'div[jsaction] div:not(:first-child):not(:last-child) > div > div > div:not([jsan]):not([jsl]) > div[jsan]:not(:last-child) > span[jsinstance]:not([email]):first-child:last-child'
+      'div[jsaction] > div:not(:first-child):not(:last-child) > div:last-child > div:not([jstcache]):not([jsl]):not([jsan]) > div:not([jstcache]) > div[jsan]:not([style]):not(:first-child):not(:last-child)'
     )
   ));
 
