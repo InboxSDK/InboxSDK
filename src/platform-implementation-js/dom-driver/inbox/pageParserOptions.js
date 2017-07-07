@@ -68,7 +68,7 @@ const pageParserOptions: PageParserTreeOptions = {
       interval: (count, timeRunning) =>
         (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000,
       fn(root) {
-        return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:not(:empty)');
+        return root.querySelectorAll('nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:empty + div:not(:empty)');
       }
     },
     searchAutocompleteResults: {
