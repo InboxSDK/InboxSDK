@@ -92,19 +92,14 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 function _setupToolbarViewDriverWatcher(toolbars, members){
 	members.driver.getToolbarViewDriverStream()
 		.onValue(toolbarViewDriver => {
-			_handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver);
+			const toolbarView = new ToolbarView(toolbarViewDriver);
+
+			if (toolbarViewDriver.getRowListViewDriver()) {
+				members.listButtonHandlerRegistry.addTarget(toolbarView);
+			} else if (toolbarViewDriver.getThreadViewDriver()) {
+				members.threadViewHandlerRegistry.addTarget(toolbarView);
+			}
 		});
-}
-
-function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
-	var toolbarView = new ToolbarView(toolbarViewDriver);
-
-	if(toolbarViewDriver.getRowListViewDriver()){
-		members.listButtonHandlerRegistry.addTarget(toolbarView);
-	}
-	else if(toolbarViewDriver.getThreadViewDriver()){
-		members.threadViewHandlerRegistry.addTarget(toolbarView);
-	}
 }
 
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
