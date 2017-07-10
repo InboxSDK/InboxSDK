@@ -14,7 +14,16 @@ import ToolbarView from '../views/toolbar-view'; //only used for internal bookke
 
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 
-const memberMap = new WeakMap();
+type Members = {
+	appId: string;
+	driver: Driver;
+	membrane: Membrane;
+	piOpts: PiOpts;
+	listButtonHandlerRegistry: HandlerRegistry<ToolbarView>;
+	threadViewHandlerRegistry: HandlerRegistry<ToolbarView>;
+};
+
+const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
 
 const sectionNames = Object.freeze({
 	'INBOX_STATE': 'INBOX_STATE',
@@ -29,10 +38,10 @@ export default class Toolbars extends EventEmitter {
 	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
 
-		const members = {
+		const members: Members = {
 			appId, driver, membrane, piOpts,
-			listButtonHandlerRegistry: new HandlerRegistry(),
-			threadViewHandlerRegistry: new HandlerRegistry()
+			listButtonHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
+			threadViewHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
 		};
 		memberMap.set(this, members);
 
@@ -65,7 +74,7 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	addToolbarButtonForApp(buttonDescriptor: Object){
-		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
+		const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 		const appToolbarButtonViewDriverPromise = get(memberMap, this).driver.addToolbarButtonForApp(buttonDescriptorStream);
 		const appToolbarButtonView = new AppToolbarButtonView(get(memberMap, this).driver, appToolbarButtonViewDriverPromise);
 
@@ -99,9 +108,9 @@ function _setupToolbarViewDriverWatcher(toolbars, members){
 		.onValue(toolbarViewDriver => {
 			const toolbarView = new ToolbarView(toolbarViewDriver);
 
-			if (toolbarViewDriver.getRowListViewDriver()) {
+			if (toolbarViewDriver.isForRowList()) {
 				members.listButtonHandlerRegistry.addTarget(toolbarView);
-			} else if (toolbarViewDriver.getThreadViewDriver()) {
+			} else if (toolbarViewDriver.isForThread()) {
 				members.threadViewHandlerRegistry.addTarget(toolbarView);
 			}
 		});
@@ -115,10 +124,9 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver):
 	buttonOptions.onClick = function(event) {
 		event = event || {};
 
-		if (toolbarViewDriver.getRowListViewDriver()) {
+		if (toolbarViewDriver.isForRowList()) {
 			const threadRowViewDrivers = Array.from(
 				toolbarViewDriver
-					.getRowListViewDriver()
 					.getThreadRowViewDrivers()
 					.values()
 			);
@@ -131,8 +139,8 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver):
 				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
 
 			Object.assign(event, {threadRowViews, selectedThreadRowViews});
-		} else if (toolbarViewDriver.getThreadViewDriver()) {
-			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
+		} else if (toolbarViewDriver.isForThread()) {
+			const threadView = membrane.get(toolbarViewDriver.isForThread());
 			event.threadView = threadView;
 		}
 

@@ -86,8 +86,21 @@ class GmailToolbarView {
 	getElement(): HTMLElement {return this._element;}
 	getRouteViewDriver(): RouteViewDriver {return this._routeViewDriver;}
 
-	getThreadViewDriver(): ?GmailThreadView {return this._threadViewDriver;}
-	getRowListViewDriver(): ?GmailRowListView {return this._rowListViewDriver;}
+	isForRowList(): boolean {
+		return this._rowListViewDriver != null;
+	}
+
+	isForThread(): boolean {
+		return this._threadViewDriver != null;
+	}
+
+	getThreadRowViewDrivers() {
+		if (!this._rowListViewDriver) {
+			console.error('missing this._rowListViewDriver'); //eslint-disable-line no-console
+			return new Set();
+		}
+		return this._rowListViewDriver.getThreadRowViewDrivers();
+	}
 
 	addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string){
 		this._ready.onValue(() => {
@@ -111,8 +124,8 @@ class GmailToolbarView {
 						JSON.stringify({
 							id,
 							title: buttonDescriptor.title,
-							hasThreadViewDriver: !!this.getThreadViewDriver(),
-							hasRowListViewDriver: !!this.getRowListViewDriver()
+							hasThreadViewDriver: this.isForThread(),
+							hasRowListViewDriver: this.isForRowList()
 						})
 					);
 
