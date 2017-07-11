@@ -56,11 +56,21 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
-		return get(memberMap, this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		const members = get(memberMap, this);
+		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
+			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForList does not support section=OTHER and hasDropdown=true together'));
+			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
+		}
+		return members.listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	registerToolbarButtonForThreadView(buttonDescriptor: Object){
-		return get(memberMap, this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		const members = get(memberMap, this);
+		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
+			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForThreadView does not support section=OTHER and hasDropdown=true together'));
+			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
+		}
+		return members.threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	setAppToolbarButton(appToolbarButtonDescriptor: Object){
