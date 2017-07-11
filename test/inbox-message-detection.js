@@ -10,7 +10,7 @@ import jsdomDoc from './lib/jsdom-doc';
 import fakePageGlobals from './lib/fake-page-globals';
 import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
 
-import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import makePageParserTree from './lib/makePageParserTree';
 import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
 
