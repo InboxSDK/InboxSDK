@@ -502,7 +502,8 @@ class InboxDriver {
   }
 
   getAccountSwitcherContactList(): Contact[] {
-    throw new Error('not implemented yet');
+    console.log('getAccountSwitcherContactList not implemented'); //eslint-disable-line no-console
+    return [this.getUserContact()];
   }
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
