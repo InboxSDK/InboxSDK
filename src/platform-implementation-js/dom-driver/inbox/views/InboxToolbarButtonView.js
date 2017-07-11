@@ -38,7 +38,8 @@ class InboxToolbarButtonView {
           this._buttonEl.classList.add('inboxsdk__active');
           dropdown = new DropdownView(new InboxDropdownView(), div);
           dropdown.setPlacementOptions({
-            vAlign: 'bottom'
+            hAlign: 'right',
+            vAlign: 'bottom', forceVAlign: true
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
