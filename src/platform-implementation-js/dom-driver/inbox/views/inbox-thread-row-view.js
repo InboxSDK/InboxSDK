@@ -66,10 +66,10 @@ class InboxThreadRowView {
   }
 
   getDateString() {
-    throw new Error('not yet implemented');
+    throw new Error('Not supported in Inbox');
   }
 
-  getSubject() {
+  getSubject(): string {
     if (!this._p.elements.subject) {
       throw new Error('Failed to find subject');
     }
@@ -77,7 +77,7 @@ class InboxThreadRowView {
   }
 
   getThreadID() {
-    throw new Error('not yet implemented');
+    throw new Error('Not supported in Inbox. Please use getThreadIDAsync() instead');
   }
 
   async getThreadIDAsync(): Promise<string> {
@@ -85,20 +85,42 @@ class InboxThreadRowView {
     return Promise.resolve('');
   }
 
-  getDraftID() {
+  getThreadIDIfStable() {
+    throw new Error('Not supported in Inbox. Please use getThreadIDIfStableAsync() instead');
+  }
+
+  getThreadIDIfStableAsync(): Promise<null|string> {
     throw new Error('not yet implemented');
   }
 
-  getVisibleDraftCount() {
-    throw new Error('not yet implemented');
+  async getDraftID(): Promise<?string> {
+    const {isOnlyDraft, inboxThreadId} = this._p.attributes;
+
+    if (isOnlyDraft && inboxThreadId) {
+      const m = /\d+$/.exec(inboxThreadId);
+      if (!m) throw new Error('Should not happen');
+      return m[0];
+    } else {
+      return null;
+    }
   }
 
-  getVisibleMessageCount() {
-    throw new Error('not yet implemented');
+  getVisibleDraftCount(): number {
+    const {visibleDraftCount} = this._p.attributes;
+    if (typeof visibleDraftCount !== 'number') throw new Error('Failed to find visible draft count');
+    return visibleDraftCount;
   }
 
-  getContacts() {
-    throw new Error('not yet implemented');
+  getVisibleMessageCount(): number {
+    const {visibleMessageCount} = this._p.attributes;
+    if (typeof visibleMessageCount !== 'number') throw new Error('Failed to find visible message count');
+    return visibleMessageCount;
+  }
+
+  getContacts(): Contact[] {
+    const {contacts} = this._p.attributes;
+    if (!Array.isArray(contacts)) throw new Error('Failed to find contacts');
+    return contacts;
   }
 
   replaceDate() {

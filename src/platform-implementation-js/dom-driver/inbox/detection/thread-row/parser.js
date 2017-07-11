@@ -12,18 +12,71 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
-  const inboxThreadId: ?string = ec.run(
-    'thread id',
-    () =>
-      /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
-  );
-
   const subject = ec.run('subject', () => (
     querySelectorOne(
       el,
       'div[jsaction] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child) > div:not([style]):not(:first-child):not(:last-child)'
     )
   ));
+
+  const recipients = ec.run(
+    'recipients',
+    () => el.querySelectorAll('div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span[email]')
+  );
+
+  const isOnlyDraft = ec.run(
+    'isOnlyDraft',
+    () => !(recipients && recipients.length > 0)
+  );
+
+  const inboxThreadId: ?string = ec.run(
+    'thread id',
+    () =>
+      /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
+  );
+
+  const visibleMessageCount = ec.run(
+    'visibleMessageCount',
+    () => {
+      const countEl = el.querySelector('div[jsaction] > div:not(:first-child):not(:last-child) > div > span > span');
+      const match = countEl && /^\((\d+)\)$/.exec(countEl.textContent);
+      if (!match) return 1;
+      return parseInt(match[1]);
+    }
+  );
+
+  const visibleDraftCount = ec.run(
+    'visibleDraftCount',
+    () => {
+      if (isOnlyDraft && visibleMessageCount) return visibleMessageCount;
+
+      const recipientEl = recipients && recipients[0];
+      const draftCandidates = (
+        recipientEl &&
+        recipientEl.parentElement &&
+        recipientEl.parentElement.querySelectorAll('span:not([email])')
+      );
+      if (!draftCandidates) return 0;
+
+      return Array.from(draftCandidates).filter((candidate) => (
+        !(candidate.textContent.includes(' .. ') || candidate.textContent.includes(', '))
+      )).length;
+    }
+  );
+
+  const contacts = ec.run(
+    'contacts',
+    () => {
+      if (!recipients) return null;
+
+      return Array.from(recipients).map((recipientEl) => {
+        const emailAddress = recipientEl.getAttribute('email');
+        if (!emailAddress) return null;
+
+        return {name: null, emailAddress};
+      }).filter(Boolean);
+    }
+  );
 
   const elements = {
     subject
@@ -32,8 +85,12 @@ export default function parser(el: HTMLElement) {
   return {
     elements,
     attributes: {
+      isOnlyDraft,
       inBundle,
-      inboxThreadId
+      inboxThreadId,
+      visibleMessageCount,
+      visibleDraftCount,
+      contacts
     },
     score,
     errors: ec.getErrorLogs()
