@@ -42,6 +42,10 @@ class InboxToolbarView {
     return false;
   }
 
+  getThreadViewDriver() {
+    throw new Error('should not happen');
+  }
+
   addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string) {
     new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._stopper, this._el);
   }

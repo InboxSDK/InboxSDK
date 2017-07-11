@@ -86,7 +86,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 	// Used to help track our duplicate toolbar button issue.
 	const id = `${Date.now()}-${Math.random()}-${buttonDescriptor.title}`;
 
-	return toolbarView => {
+	return (toolbarView: ToolbarView) => {
 		const members = get(memberMap, toolbarsInstance);
 
 		const toolbarViewDriver = toolbarView.getToolbarViewDriver();
@@ -140,7 +140,7 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver):
 
 			event = {...event, threadRowViews, selectedThreadRowViews};
 		} else if (toolbarViewDriver.isForThread()) {
-			const threadView = membrane.get(toolbarViewDriver.isForThread());
+			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
 			event = {...event, threadView};
 		}
 

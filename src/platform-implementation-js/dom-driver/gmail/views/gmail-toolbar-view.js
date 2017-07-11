@@ -86,6 +86,10 @@ class GmailToolbarView {
 	getElement(): HTMLElement {return this._element;}
 	getRouteViewDriver(): RouteViewDriver {return this._routeViewDriver;}
 
+	getThreadViewDriver() {
+		return this._threadViewDriver;
+	}
+
 	isForRowList(): boolean {
 		return this._rowListViewDriver != null;
 	}
