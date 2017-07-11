@@ -509,7 +509,8 @@ class InboxDriver {
     console.log('addNavItem not implemented'); //eslint-disable-line no-console
     const obj = {
       getEventStream: _.constant(Kefir.never()),
-      addNavItem: () => obj
+      addNavItem: () => obj,
+      destroy: () => {}
     };
     return obj;
   }
