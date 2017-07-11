@@ -5,7 +5,7 @@ import querySelector from '../src/platform-implementation-js/lib/dom/querySelect
 import fakePageGlobals from './lib/fake-page-globals';
 import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/searchBar/parser';
-import makePageParserTree from '../src/platform-implementation-js/dom-driver/inbox/makePageParserTree';
+import makePageParserTree from './lib/makePageParserTree';
 import lsMap from 'live-set/map';
 
 function searchBarFinder(document) {
