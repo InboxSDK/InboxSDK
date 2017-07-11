@@ -3,7 +3,7 @@
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-
+import InboxToolbarButtonView from './InboxToolbarButtonView';
 import type InboxDriver from '../inbox-driver';
 
 class InboxToolbarView {
@@ -14,6 +14,8 @@ class InboxToolbarView {
   constructor(el: HTMLElement, driver: InboxDriver) {
     this._el = el;
     this._driver = driver;
+
+    this._el.classList.add('inboxsdk__list_toolbar');
   }
 
   getStopper(): Kefir.Observable<*> {
@@ -42,7 +44,7 @@ class InboxToolbarView {
   }
 
   addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string) {
-    console.log('add button wooo'); //eslint-disable-line no-console
+    new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._stopper, this._el);
   }
 }
 
