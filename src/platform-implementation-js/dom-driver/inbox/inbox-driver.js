@@ -411,10 +411,11 @@ class InboxDriver {
   getComposeViewDriverStream() {
     return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
   }
+  getThreadRowViewDriverLiveSet() {
+    return this._threadRowViewDriverLiveSet;
+  }
   getThreadRowViewDriverStream() {
-    // uncomment for testing/working locally
-    // return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
-    return Kefir.never();
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);

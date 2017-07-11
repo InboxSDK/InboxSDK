@@ -25,8 +25,15 @@ export default function parser(el: HTMLElement) {
     )
   ));
 
+  const checkbox = ec.run('checkbox', () => (
+    querySelectorOne(
+      el,
+      'div[jsaction] > div > div[jsaction] > div[role=checkbox]'
+    )
+  ));
+
   const elements = {
-    subject
+    subject, checkbox
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

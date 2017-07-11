@@ -27,8 +27,7 @@ class InboxToolbarView {
   }
 
   getThreadRowViewDrivers() {
-    // TODO
-    return new Set();
+    return this._driver.getThreadRowViewDriverLiveSet().values();
   }
 
   getRouteViewDriver() {
