@@ -510,6 +510,7 @@ class InboxDriver {
     const obj = {
       getEventStream: _.constant(Kefir.never()),
       addNavItem: () => obj,
+      setCollapsed: () => {},
       destroy: () => {}
     };
     return obj;
