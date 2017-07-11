@@ -138,10 +138,10 @@ function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver):
 				.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
 				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
 
-			Object.assign(event, {threadRowViews, selectedThreadRowViews});
+			event = {...event, threadRowViews, selectedThreadRowViews};
 		} else if (toolbarViewDriver.isForThread()) {
 			const threadView = membrane.get(toolbarViewDriver.isForThread());
-			event.threadView = threadView;
+			event = {...event, threadView};
 		}
 
 		oldOnClick(event);
