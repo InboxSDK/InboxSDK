@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import RSVP from 'rsvp';
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';

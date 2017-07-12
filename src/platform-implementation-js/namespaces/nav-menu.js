@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import get from '../../common/get-or-fail';

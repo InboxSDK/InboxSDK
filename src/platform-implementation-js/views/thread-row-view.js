@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view.js';
 import type InboxThreadRowView from '../dom-driver/inbox/views/inbox-thread-row-view.js';

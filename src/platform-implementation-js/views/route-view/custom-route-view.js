@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import RouteView from './route-view';
 import type {RouteViewDriver} from '../../driver-interfaces/route-view-driver';

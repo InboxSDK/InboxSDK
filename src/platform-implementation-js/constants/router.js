@@ -1,6 +1,6 @@
 /* @flow */
 
-const NATIVE_ROUTE_IDS = Object.freeze({
+export const NATIVE_ROUTE_IDS: {[k:string]: string} = Object.freeze({
 	'INBOX': 'inbox/:page',
 	'ALL_MAIL': 'all/:page',
 	'SENT': 'sent/:page',
@@ -22,9 +22,8 @@ const NATIVE_ROUTE_IDS = Object.freeze({
 	'SETTINGS': 'settings/:section',
 	'ANY_LIST': '*'
 });
-exports.NATIVE_ROUTE_IDS = NATIVE_ROUTE_IDS;
 
-const NATIVE_LIST_ROUTE_IDS = Object.freeze({
+export const NATIVE_LIST_ROUTE_IDS: {[k:string]: string} = Object.freeze({
 	'INBOX': NATIVE_ROUTE_IDS.INBOX,
 	'ALL_MAIL': NATIVE_ROUTE_IDS.ALL_MAIL,
 	'SENT': NATIVE_ROUTE_IDS.SENT,
@@ -40,9 +39,8 @@ const NATIVE_LIST_ROUTE_IDS = Object.freeze({
 	'SEARCH': NATIVE_ROUTE_IDS.SEARCH,
 	'ANY_LIST': NATIVE_ROUTE_IDS.ANY_LIST
 });
-exports.NATIVE_LIST_ROUTE_IDS = NATIVE_LIST_ROUTE_IDS;
 
-const ROUTE_TYPES = Object.freeze({
+export const ROUTE_TYPES: {[k:string]: string} = Object.freeze({
 	'LIST': 'LIST',
 	'THREAD': 'THREAD',
 	'SETTINGS': 'SETTINGS',
@@ -50,4 +48,3 @@ const ROUTE_TYPES = Object.freeze({
 	'CUSTOM': 'CUSTOM',
 	'UNKNOWN': 'UNKNOWN'
 });
-exports.ROUTE_TYPES = ROUTE_TYPES;

@@ -1,7 +1,5 @@
 /* @flow */
 
-var _ = require('lodash');
-
 export type Options = {
 	activateFunction?: ?()=>void;
 	onClick?: ?()=>void;

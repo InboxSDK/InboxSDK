@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import RSVP from 'rsvp';
@@ -177,6 +177,6 @@ function _handleRouteViewChange(navItemViewDriver, [navItemDescriptor, routeView
 	navItemViewDriver.setActive(
 		navItemDescriptor &&
 		routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
-		_.isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams())
+		isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams())
 	);
 }

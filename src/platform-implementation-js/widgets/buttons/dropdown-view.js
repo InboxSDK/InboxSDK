@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import asap from 'asap';
 import util from 'util';
 import EventEmitter from '../../lib/safe-event-emitter';

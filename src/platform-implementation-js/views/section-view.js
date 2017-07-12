@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
 import EventEmitter from '../lib/safe-event-emitter';
@@ -51,7 +50,7 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
 			}
 
-			if(_.isFunction(rowDescriptor.onClick)){
+			if(typeof rowDescriptor.onClick === 'function'){
 				rowDescriptor.onClick();
 			}
 		});

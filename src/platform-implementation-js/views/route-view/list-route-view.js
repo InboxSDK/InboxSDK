@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn} from 'ud';
 import RouteView from './route-view';
 import Kefir from 'kefir';

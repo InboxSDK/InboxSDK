@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
+import intersection from 'lodash/intersection';
 import {defn, defonce} from 'ud';
 
 import HandlerRegistry from '../lib/handler-registry';
@@ -36,7 +37,7 @@ class Router {
 			membrane,
 			listRouteHandlerRegistries: {}
 		};
-		_.forOwn(NATIVE_LIST_ROUTE_IDS, value => {
+		Object.values(NATIVE_LIST_ROUTE_IDS).forEach((value: any) => {
 			members.listRouteHandlerRegistries[value] = new HandlerRegistry();
 		});
 		memberMap.set(this, members);
@@ -54,7 +55,7 @@ class Router {
 
 		driver.getStopper().onValue(function() {
 			members.allRoutesHandlerRegistry.dumpHandlers();
-			_.forOwn(members.listRouteHandlerRegistries, reg => {
+			Object.values(members.listRouteHandlerRegistries).forEach((reg: any) => {
 				reg.dumpHandlers();
 			});
 		});
@@ -154,8 +155,8 @@ function _handleRouteViewChange(router, members, routeViewDriver){
 function _informRelevantCustomRoutes(members, routeViewDriver, routeView){
 	const routeID = routeView.getRouteID();
 	const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
-	const relevantCustomRoute = _.find(members.customRoutes, customRoute =>
-		_.intersection(
+	const relevantCustomRoute = find(members.customRoutes, customRoute =>
+		intersection(
 			Array.isArray(customRoute.routeID) ? customRoute.routeID : [customRoute.routeID],
 			routeIDArray
 		).length
