@@ -4,7 +4,8 @@ module.exports = {
   ],
   "rules": {
     "deprecate/import": ["error",
-      "lodash"
+      "lodash",
+      "crypto",
     ]
   }
 };

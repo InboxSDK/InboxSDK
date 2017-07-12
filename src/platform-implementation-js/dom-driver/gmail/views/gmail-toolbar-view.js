@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import uniq from 'lodash/uniq';
+import escape from 'lodash/escape';
 import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
@@ -140,7 +141,7 @@ class GmailToolbarView {
 							Kefir.later(1000, 1000)
 						])
 						.map(delay => {
-							const duplicates: Object[] = _.chain(sectionElement.children)
+							const duplicates: Object[] = Array.from(sectionElement.children)
 								.filter(el =>
 									buttonViewController.getView().getElement()
 										.getAttribute('data-rowlist-toolbar') ===
@@ -152,13 +153,12 @@ class GmailToolbarView {
 								.filter(el => el.hasAttribute('data-add-button-debug'))
 								.map(el =>
 									Object.assign({
-										ownedByExtension: !!el.__addButton_ownedByExtension
-									}, JSON.parse(el.getAttribute('data-add-button-debug')))
+										ownedByExtension: !!(el:any).__addButton_ownedByExtension
+									}, JSON.parse(el.getAttribute('data-add-button-debug') || 'null'))
 								)
 								.filter(({title}) =>
 									title === buttonDescriptor.title
-								)
-								.value();
+								);
 							return {delay, duplicates};
 						})
 						.filter(({duplicates}) => duplicates.length > 1)
@@ -251,11 +251,10 @@ class GmailToolbarView {
 	_determineToolbarIconMode(){
 		const moveSectionElement = this._getMoveSectionElement();
 		if (!moveSectionElement) throw new Error("No move section element");
-		const isIconMode = _.some(
-			moveSectionElement.querySelectorAll('[role=button]'),
-			buttonElement =>
+		const isIconMode = Array.from(moveSectionElement.querySelectorAll('[role=button]'))
+			.some(buttonElement =>
 				buttonElement.hasAttribute('title') || buttonElement.hasAttribute('data-tooltip')
-		);
+			);
 		this._element.setAttribute('data-toolbar-icononly', isIconMode ? 'true' : 'false');
 	}
 
@@ -392,16 +391,14 @@ class GmailToolbarView {
 	}
 
 	_addMoreItems(){
-		var self = this;
-
 		this._clearMoreItems();
 
 		if(this._toolbarState !== 'EXPANDED'){
 			return;
 		}
 
-		this._moreMenuItems.forEach(function(item){
-			self._addToOpenMoreMenu(item.buttonDescriptor, item.appId);
+		this._moreMenuItems.forEach(item => {
+			this._addToOpenMoreMenu(item.buttonDescriptor, item.appId);
 		});
 	}
 
@@ -411,16 +408,14 @@ class GmailToolbarView {
 			return;
 		}
 
-		_.chain(this._moreMenuItems)
-			.map('appId')
-			.uniq()
-			.map(function(appId){
-				return moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
-			})
-			.compact()
-			.each(function(container){
+		uniq(this._moreMenuItems.map(x => x.appId))
+			.map(appId =>
+				moreMenu.querySelector('[data-group-order-hint=' + appId + ']')
+			)
+			.filter(Boolean)
+			.forEach(container => {
 				container.remove();
-			}).value();
+			});
 	}
 
 	_addToOpenMoreMenu(buttonDescriptor: Object, appId: string){
@@ -473,9 +468,9 @@ class GmailToolbarView {
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
-				buttonDescriptor.iconUrl ? '<img src="' + _.escape(buttonDescriptor.iconUrl) + '" />' : '',
-				buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + _.escape(buttonDescriptor.iconClass) + '"></span>' : '',
-				_.escape(buttonDescriptor.title),
+				buttonDescriptor.iconUrl ? '<img src="' + escape(buttonDescriptor.iconUrl) + '" />' : '',
+				buttonDescriptor.iconClass ? '<span class="inboxsdk__icon ' + escape(buttonDescriptor.iconClass) + '"></span>' : '',
+				escape(buttonDescriptor.title),
 			'</div>'
 		].join('');
 
