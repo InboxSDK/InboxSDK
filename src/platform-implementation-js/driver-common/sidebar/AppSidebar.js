@@ -90,12 +90,12 @@ export default class AppSidebar extends React.Component {
     return {apps: {}};
   }
   _saveExpansionSettings(data: ExpansionSettings) {
-    const allSidebarIds: [string,string] = flatMap(
+    const allSidebarIds: Array<[string,string]> = flatMap(
       Object.keys(data.apps),
       appId => Object.keys(data.apps[appId].ids).map(id => [appId, id])
     );
     if (allSidebarIds.length > MAX_SIDEBAR_SETTINGS) {
-      const idsToRemove: [string,string] = _.chain(allSidebarIds)
+      const idsToRemove: Array<[string,string]> = _.chain(allSidebarIds)
         .sortBy(([appId, id]) => data.apps[appId].ids[id].lastUse)
         .take(allSidebarIds.length - MAX_SIDEBAR_SETTINGS)
         .value();
