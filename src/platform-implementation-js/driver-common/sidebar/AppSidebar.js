@@ -1,6 +1,7 @@
 /* @flow */
 
 import _ from 'lodash';
+import flatMap from 'lodash/flatMap';
 import cx from 'classnames';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -89,7 +90,7 @@ export default class AppSidebar extends React.Component {
     return {apps: {}};
   }
   _saveExpansionSettings(data: ExpansionSettings) {
-    const allSidebarIds: [string,string] = _.flatMap(
+    const allSidebarIds: [string,string] = flatMap(
       Object.keys(data.apps),
       appId => Object.keys(data.apps[appId].ids).map(id => [appId, id])
     );

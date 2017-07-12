@@ -1,9 +1,9 @@
 /* @flow */
 
-var _ = require('lodash');
-var asap = require('asap');
-var RSVP = require('rsvp');
-var Kefir = require('kefir');
+import once from 'lodash/once';
+import asap from 'asap';
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
 import Logger from './logger';
 import type {AjaxOpts} from '../../common/ajax';
 
@@ -75,7 +75,7 @@ export default class CommonPageCommunicator {
     // create error here for stacktrace
     var error = new Error("Forgot to unsilence page errors");
     var unsilenced = false;
-    var unsilence = _.once(() => {
+    var unsilence = once(() => {
       unsilenced = true;
       document.dispatchEvent(new CustomEvent('inboxSDKunsilencePageErrors', {
         bubbles: false,

@@ -10,24 +10,27 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 // DEPRECATED, superseded by standard ES6 classes!
 
-import _ from 'lodash';
+import memoize from 'lodash/memoize';
+import has from 'lodash/has';
+import clone from 'lodash/clone';
+import isObject from 'lodash/isObject';
 import getPrototypeChain from './get-prototype-chain';
 
-const getGetterName = _.memoize(variableName =>
+const getGetterName = memoize(variableName =>
   'get' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
 );
 
-const getSetterName = _.memoize(variableName =>
+const getSetterName = memoize(variableName =>
   'set' + variableName.charAt(1).toUpperCase() + variableName.slice(2)
 );
 
-const makeGetter = _.memoize(variableName =>
+const makeGetter = memoize(variableName =>
   function() {
     return this[variableName];
   }
 );
 
-const makeSetter = _.memoize(variableName =>
+const makeSetter = memoize(variableName =>
   function(x) {
     this[variableName] = x;
   }
@@ -44,9 +47,9 @@ let shouldMakeMethod;
 		const objectProto = Object.getPrototypeOf(object);
 		let protoCache = __cachedShouldMakeMethod.get(objectProto);
 		if (!protoCache) {
-			protoCache = _.memoize((memberProto, methodName) => {
+			protoCache = memoize((memberProto, methodName) => {
 				for (let currentProto of getPrototypeChain(object)) {
-					if (_.has(currentProto, methodName)) {
+					if (has(currentProto, methodName)) {
 						return false;
 					}
 					if (currentProto === memberProto) {
@@ -109,14 +112,14 @@ function nullifyMemberVariable(memberVariable, doDestroy) {
 	}
 
 	if(memberVariable.destroyFunction){
-		if(_.isFunction(value[memberVariable.destroyFunction])){
+		if(typeof value[memberVariable.destroyFunction] === 'function'){
 			value[memberVariable.destroyFunction]();
 			return;
 		}
 	}
 
-	if (_.isArray(value)) {
-		var valueClone = _.clone(value);
+	if (Array.isArray(value)) {
+		var valueClone = clone(value);
 		for (var c = 0; c < valueClone.length; c++) {
 			if(!valueClone[c]){
 				continue;
@@ -134,7 +137,7 @@ function nullifyMemberVariable(memberVariable, doDestroy) {
 		value.destroy();
 	} else if(value.remove){
 		value.remove();
-	} else if (_.isObject(value)) {
+	} else if (isObject(value)) {
 		for (var key in value) {
 			if(value[key]){
 				if (value[key].destroy) {
@@ -149,7 +152,7 @@ function nullifyMemberVariable(memberVariable, doDestroy) {
 				}
 			}
 		}
-	} else if (_.isFunction(value)){
+	} else if (typeof value === 'function'){
 		value();
 	}
 }
@@ -185,7 +188,7 @@ function makeSetterFunction(object, name, prototype) {
 function initializeDefaultValues(object) {
 	memberVariableIterate(object, function(memberVariable){
 		if (memberVariable.defaultValue !== undefined) {
-			this[memberVariable.name] = _.clone(memberVariable.defaultValue);
+			this[memberVariable.name] = clone(memberVariable.defaultValue);
 		}
 	});
 }
@@ -209,7 +212,7 @@ function BasicClass() {
 	initializeDefaultValues(this);
 }
 
-_.extend(BasicClass.prototype, {
+Object.assign(BasicClass.prototype, {
 
 	//__memberVariables: [],
 
