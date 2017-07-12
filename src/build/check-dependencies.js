@@ -26,7 +26,7 @@ function checkDependenciesRecursive(packagePath: string[], shrinkWrapEntry: Obje
       assert.strictEqual(packageObj.integrity, shrinkWrapEntry.integrity);
     }
   }
-  Object.entries(shrinkWrapEntry.dependencies).forEach(([depname, shrinkwrapSubEntry]) => {
+  Object.entries(shrinkWrapEntry.dependencies || {}).forEach(([depname, shrinkwrapSubEntry]) => {
     checkDependenciesRecursive(packagePath.concat([depname]), (shrinkwrapSubEntry:any));
   });
 }
@@ -38,8 +38,8 @@ function checkDependencies(packageObj: Object) {
       const shrinkWrap = (require: any)(shrinkWrapPath);
       checkDependenciesRecursive([__dirname+'/../../'], shrinkWrap);
     } else {
-      Object.entries(packageObj.dependencies)
-        .concat(Object.entries(packageObj.devDependencies))
+      Object.entries(packageObj.dependencies || {})
+        .concat(Object.entries(packageObj.devDependencies || {}))
         .forEach(([depname, version]) => {
           checkDependency((version:any), depname);
         });
