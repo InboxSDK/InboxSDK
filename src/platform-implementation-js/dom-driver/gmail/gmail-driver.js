@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import RSVP from 'rsvp';
 import {defn} from 'ud';
 import Kefir from 'kefir';

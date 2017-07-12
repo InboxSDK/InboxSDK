@@ -1,7 +1,5 @@
 /* @flow */
 
-var _ = require('lodash');
-
 export type URLObject = {
 	name: string;
 	params: string[];
@@ -10,7 +8,7 @@ export type URLObject = {
 };
 
 export default function getURLObject(url: string): URLObject {
-	var m = url.match(/#([^?]*)(?:\?(.*))?/);
+	const m = url.match(/#([^?]*)(?:\?(.*))?/);
 	if (!m) {
 		return {
 			name: 'inbox',
@@ -20,16 +18,15 @@ export default function getURLObject(url: string): URLObject {
 		};
 	}
 
-	var hash = m[1];
-	var hashParts = hash.split('/');
+	const hash = m[1];
+	const hashParts = hash.split('/');
 
 	return {
 		name: decodeURIComponent(hashParts[0]),
-		params: _.chain(hashParts)
-			.tail()
+		params: hashParts
+			.slice(1)
 			.map(part => part.replace(/\+/g, ' '))
-			.map(decodeURIComponent)
-			.value(),
+			.map(decodeURIComponent),
 		query: m[2],
 		hash
 	};

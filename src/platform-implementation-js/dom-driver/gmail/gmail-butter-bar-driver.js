@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 
 import streamWaitFor from '../../lib/stream-wait-for';
@@ -63,7 +62,7 @@ export default class GmailButterBarDriver {
 
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
     // events if it only becomes active once a message has started.
-    noticeAvailableStream.onValue(_.noop);
+    noticeAvailableStream.onValue(() => {});
   }
 
   getNoticeAvailableStream(): Kefir.Observable<any> {

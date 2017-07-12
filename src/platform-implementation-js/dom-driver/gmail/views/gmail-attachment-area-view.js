@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import RSVP from 'rsvp';
 import {defn} from 'ud';
 import type GmailDriver from '../gmail-driver';
@@ -39,7 +38,7 @@ const GmailAttachmentAreaView = defn(module, class GmailAttachmentAreaView {
 
 	getAttachmentCardViews() {
 		const attachments = this._element.querySelectorAll('.aQH > span');
-		return _.map(attachments, attachment => {
+		return Array.from(attachments).map(attachment => {
 			let cardView = this._elsToCardViews.get(attachment);
 			if (!cardView) {
 				cardView = new GmailAttachmentCardView(

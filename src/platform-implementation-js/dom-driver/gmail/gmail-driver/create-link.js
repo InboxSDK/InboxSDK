@@ -1,7 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
-
 import populateRouteID from '../../../lib/populateRouteID';
 import Logger from '../../../lib/logger';
 
@@ -9,7 +7,7 @@ import type {RouteParams} from '../../../namespaces/router';
 import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 
 export default function createLink(GmailRouteProcessor: GmailRouteProcessor, routeID: string, params: ?RouteParams|string): string {
-	params = params ? _.clone(params) : {};
+	params = typeof params === 'string' ? params : (params ? Object.assign({}, params) : {});
 	routeID = GmailRouteProcessor.getCompatibleRouteID(routeID);
 
 	if(typeof params === 'string'){

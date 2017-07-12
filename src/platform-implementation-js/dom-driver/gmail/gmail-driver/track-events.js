@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
@@ -33,7 +32,7 @@ function _getLogFunction(gmailDriver, composeViewDriver) {
 
 
 	return function(eventName, extraOptions){
-		logger.eventSite(eventName, _.extend({}, composeStats, extraOptions));
+		logger.eventSite(eventName, {...composeStats, ...extraOptions});
 	};
 }
 

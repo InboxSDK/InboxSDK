@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
@@ -254,7 +254,7 @@ const setupSearchReplacing = (
           pair.gtid ? pair :
           driver.getGmailThreadIdForRfcMessageId(pair.rfcId)
             .then(gtid => ({gtid, rfcId: pair.rfcId}), err => findIdFailure(pair.rfcId, err))
-        ))).map(_.compact),
+        ))).map(list => list.filter(Boolean)),
 
         driver.getPageCommunicator().ajaxInterceptStream
           .filter(e =>
@@ -269,10 +269,9 @@ const setupSearchReplacing = (
         let newResponse;
         try {
           const extractedThreads = GRP.extractThreads(response);
-          const newThreads: typeof extractedThreads = _.chain(idPairs)
-            .map(({gtid}) => _.find(extractedThreads, t => t.gmailThreadId === gtid))
-            .compact()
-            .value();
+          const newThreads: typeof extractedThreads = idPairs
+            .map(({gtid}) => find(extractedThreads, t => t.gmailThreadId === gtid))
+            .filter(Boolean);
 
           newResponse = GRP.replaceThreadsInResponse(response, newThreads, {start, total});
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
