@@ -68,6 +68,7 @@
   left: 0;
   right: 0;
   /* needs to take up the whole screen so that it blocks clicks to elements behind it. */
+  display: flex;
   display: -webkit-flex;
   min-height: 100%;
   background: rgb(242, 242, 242);
