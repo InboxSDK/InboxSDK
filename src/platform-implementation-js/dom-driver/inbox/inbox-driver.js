@@ -415,7 +415,8 @@ class InboxDriver {
     return this._threadRowViewDriverLiveSet;
   }
   getThreadRowViewDriverStream() {
-    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el)
+      .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
@@ -427,7 +428,8 @@ class InboxDriver {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
   }
   getToolbarViewDriverStream() {
-    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el);
+    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el)
+      .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
