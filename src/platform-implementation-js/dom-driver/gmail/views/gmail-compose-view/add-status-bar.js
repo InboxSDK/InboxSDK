@@ -1,54 +1,48 @@
 /* @flow */
 
-var _ = require('lodash');
-var Kefir = require('kefir');
+import once from 'lodash/once';
+import Kefir from 'kefir';
 
 import Logger from '../../../../lib/logger';
 import SafeEventEmitter from '../../../../lib/safe-event-emitter';
+import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function addStatusBar(gmailComposeView: GmailComposeView, options: Object) {
-	var height: number = options.height || 40;
-	var orderHint: number = options.orderHint || 0;
+	const height: number = options.height || 40;
+	const orderHint: number = options.orderHint || 0;
 
-	var composeEl = gmailComposeView.getElement();
-	var isInline = gmailComposeView.isInlineReplyForm();
-	var el: HTMLElement = document.createElement('div');
+	const composeEl = gmailComposeView.getElement();
+	const isInline = gmailComposeView.isInlineReplyForm();
+	const el: HTMLElement = document.createElement('div');
 	el.className = 'aDh inboxsdk__compose_statusbar';
-	el.setAttribute('data-orderhint', String(orderHint));
+	el.setAttribute('data-order-hint', String(orderHint));
 	el.style.height = height+'px';
 
 	try {
-		var statusArea = gmailComposeView.getStatusArea();
+		const statusArea = gmailComposeView.getStatusArea();
 		composeEl.classList.add('inboxsdk__compose_statusbarActive');
-		var nextEl = _.chain(statusArea.children)
-			.filter(el => el.classList.contains('inboxsdk__compose_statusbar'))
-			.map(el => ({el, orderHint: +el.getAttribute('data-orderhint')}))
-			.filter(bar => bar.orderHint > orderHint)
-			.sortBy(bar => bar.orderHint)
-			.map(bar => bar.el)
-			.head()
-			.value();
-		statusArea.insertBefore(el, nextEl);
+
+		insertElementInOrder(statusArea, el);
 
 		if (isInline) {
-			var currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
+			const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
 			composeEl.style.paddingBottom = (currentPad+height)+'px';
 		}
 	} catch (err) {
 		Logger.error(err);
 	}
 
-	var statusbar = _.assign(new SafeEventEmitter(), {
+	const statusbar = Object.assign((new SafeEventEmitter(): Object), {
 		el,
 		destroyed: false,
-		destroy: _.once(() => {
+		destroy: once(() => {
 			statusbar.destroyed = true;
 			statusbar.emit('destroy');
 			(el:any).remove();
 
 			if (isInline) {
-				var currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
+				const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
 				composeEl.style.paddingBottom = (currentPad-height)+'px';
 			}
 		})

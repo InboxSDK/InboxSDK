@@ -1,7 +1,6 @@
 /* @flow */
 
 import fs from 'fs';
-import _ from 'lodash';
 import assert from 'assert';
 import semver from 'semver';
 import path from 'path';
@@ -27,8 +26,8 @@ function checkDependenciesRecursive(packagePath: string[], shrinkWrapEntry: Obje
       assert.strictEqual(packageObj.integrity, shrinkWrapEntry.integrity);
     }
   }
-  _.forOwn(shrinkWrapEntry.dependencies, (shrinkwrapSubEntry, depname) => {
-    checkDependenciesRecursive(packagePath.concat([depname]), shrinkwrapSubEntry);
+  Object.entries(shrinkWrapEntry.dependencies).forEach(([depname, shrinkwrapSubEntry]) => {
+    checkDependenciesRecursive(packagePath.concat([depname]), (shrinkwrapSubEntry:any));
   });
 }
 
@@ -39,8 +38,11 @@ function checkDependencies(packageObj: Object) {
       const shrinkWrap = (require: any)(shrinkWrapPath);
       checkDependenciesRecursive([__dirname+'/../../'], shrinkWrap);
     } else {
-      _.forOwn(packageObj.dependencies, checkDependency);
-      _.forOwn(packageObj.devDependencies, checkDependency);
+      Object.entries(packageObj.dependencies)
+        .concat(Object.entries(packageObj.devDependencies))
+        .forEach(([depname, version]) => {
+          checkDependency((version:any), depname);
+        });
     }
   } catch(e) {
     const pjDir = path.join(__dirname, '../..');

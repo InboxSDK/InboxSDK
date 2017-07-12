@@ -1,13 +1,16 @@
 /* @flow */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
+import startsWith from 'lodash/startsWith';
+import findIndex from 'lodash/findIndex';
+import once from 'lodash/once';
 import Kefir from 'kefir';
 import delayAsap from '../../../../lib/delay-asap';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import cssSelectorEscape from '../../../../lib/css-selector-escape';
 import type GmailComposeView from '../gmail-compose-view';
 
-var getSizeFixerSheet: () => CSSStyleSheet = _.once(() => {
+var getSizeFixerSheet: () => CSSStyleSheet = once(() => {
   const style: HTMLStyleElement = (document.createElement('style'):any);
   style.type = 'text/css';
   style.className = 'inboxsdk__compose_size_fixer';
@@ -33,7 +36,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
-    .filter(e => _.includes(['resize', 'fullscreenChanged'], e.eventName))
+    .filter(e => includes(['resize', 'fullscreenChanged'], e.eventName))
     .merge(delayAsap(null));
 
   var statusAreaParent: HTMLElement = (gmailComposeView.getStatusArea().parentElement:any);
@@ -48,7 +51,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
 
   function setRuleForSelector(selector: string, rule: string) {
     var fullSelector = byId(composeId)+' '+selector;
-    var ix = _.findIndex(sheet.cssRules, cssRule => cssRule.selectorText === fullSelector);
+    var ix = findIndex(sheet.cssRules, cssRule => cssRule.selectorText === fullSelector);
     if (ix !== -1) {
       sheet.deleteRule(ix);
     }
@@ -88,7 +91,7 @@ height: ${parseInt(scrollBody.style.height, 10)-unexpectedHeight}px !important;
     // order. If we went through in ascending order, we'd have to worry about
     // the list shrinking out from under us.
     for (var ix=sheet.cssRules.length-1; ix>=0; ix--) {
-      if (_.startsWith((sheet.cssRules:any)[ix].selectorText, byId(composeId)+' ')) {
+      if (startsWith((sheet.cssRules:any)[ix].selectorText, byId(composeId)+' ')) {
         sheet.deleteRule(ix);
       }
     }

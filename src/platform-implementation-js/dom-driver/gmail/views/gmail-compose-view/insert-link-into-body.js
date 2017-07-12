@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import RSVP from 'rsvp';
 
 import simulateClick from '../../../../lib/dom/simulate-click';

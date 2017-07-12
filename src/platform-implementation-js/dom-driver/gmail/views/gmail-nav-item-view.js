@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';

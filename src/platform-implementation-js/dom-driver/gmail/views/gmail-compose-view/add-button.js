@@ -1,8 +1,7 @@
 /* @flow */
 
-var _ = require('lodash');
-var RSVP = require('rsvp');
-var Kefir = require('kefir');
+import RSVP from 'rsvp';
+import Kefir from 'kefir';
 
 import ButtonView from '../../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
@@ -102,12 +101,12 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 }
 
 function _getButtonViewController(buttonDescriptor: Object){
-	var buttonView = new ButtonView(buttonDescriptor);
-	var options = _.assign({buttonView}, buttonDescriptor);
+	const buttonView = new ButtonView(buttonDescriptor);
+	const options = {buttonView, ...buttonDescriptor};
 
-	var buttonViewController;
+	let buttonViewController;
 	if(buttonDescriptor.hasDropdown){
-		_.assign(options, {
+		Object.assign(options, {
 			dropdownViewDriverClass: GmailDropdownView,
 			dropdownPositionOptions: {vAlign: 'top'}
 		});
@@ -126,13 +125,14 @@ function _processButtonDescriptor(buttonDescriptor: ?Object, extraOnClickOptions
 		return null;
 	}
 
-	var buttonOptions = _.extend({
-		type: 'MODIFIER'
-	}, buttonDescriptor);
+	const buttonOptions = {
+		type: 'MODIFIER',
+		...buttonDescriptor
+	};
 
-	var oldOnClick = buttonOptions.onClick;
+	const oldOnClick = buttonOptions.onClick;
 	buttonOptions.onClick = function(event){
-		oldOnClick(_.extend({}, extraOnClickOptions, event));
+		oldOnClick({...extraOnClickOptions, ...event});
 	};
 
 	if(buttonDescriptor.hasDropdown){

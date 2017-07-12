@@ -44,8 +44,8 @@ const getSidebarClassnames: () => {
   if (classRegexes.length === 0) throw new Error('no class names on element');
 
   // rules will contain both the chat and nav sidebar rules.
-  const rules = t.toArray(Array.from(document.styleSheets), t.compose(
-    t.mapcat(sheet => Array.from(sheet.cssRules || [])),
+  const rules = t.toArray(document.styleSheets, t.compose(
+    t.mapcat(sheet => sheet.cssRules || []),
     t.mapcat(rulesToStyleRules),
     // We have all page rules. Filter it down to just rules mentioning one of
     // [role=application]'s classnames.

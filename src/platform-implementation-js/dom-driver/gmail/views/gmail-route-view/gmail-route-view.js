@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
+import last from 'lodash/last';
 import once from 'lodash/once';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
@@ -68,7 +69,7 @@ class GmailRouteView {
 				driver.showNativeRouteView();
 				window.location.hash = '#inbox';
 			});
-		} else if (_.includes(['NATIVE', 'CUSTOM_LIST'], this._type)) {
+		} else if (includes(['NATIVE', 'CUSTOM_LIST'], this._type)) {
 			this._setupSubViews();
 		}
 
@@ -344,7 +345,7 @@ class GmailRouteView {
 	}
 
 	getRouteType(): string {
-		if(_.includes(['CUSTOM', 'OTHER_APP_CUSTOM'], this._type)) {
+		if(includes(['CUSTOM', 'OTHER_APP_CUSTOM'], this._type)) {
 			return this._gmailRouteProcessor.RouteTypes.CUSTOM;
 		}
 		else if(this._isListRoute()){
@@ -404,7 +405,7 @@ class GmailRouteView {
 
 	_getThreadRouteParams(): Object {
 		if(this._paramsArray && this._paramsArray.length > 0){
-			const threadID = _.last(this._paramsArray);
+			const threadID = last(this._paramsArray);
 
 			if(threadID && threadID.length === 16){
 				return {

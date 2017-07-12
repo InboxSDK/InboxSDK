@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
+import find from 'lodash/find';
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import simulateClick from '../../../lib/dom/simulate-click';
@@ -94,7 +95,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
   const providedRows: Kefir.Observable<HTMLElement[]> = suggestionsBoxTbodyStream
     .sampledBy(suggestionsBoxGmailChanges)
     .map(suggestionsBoxTbody =>
-      _.toArray(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(providerId).length > 0)
+      Array.from(suggestionsBoxTbody.children).filter(row => row.getElementsByClassName(providerId).length > 0)
     );
 
   providedRows.onValue(rows => {
@@ -133,7 +134,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
       const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
       const itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;
 
-      const clearSearch = _.once(() => {
+      const clearSearch = once(() => {
         event.stopImmediatePropagation();
         event.preventDefault();
         searchBox.blur();
@@ -142,7 +143,7 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
 
       if (itemData) {
         const {id} = itemData;
-        const suggestion = _.find(suggestions, s => s.id === id);
+        const suggestion = find(suggestions, s => s.id === id);
         if (!suggestion) {
           // I can imagine this happening if Gmail caches old suggestions
           // results. Unknown if it does that so let's log. If it does, then

@@ -2,6 +2,8 @@
 
 import isNumber from 'isnumber';
 
+// Use insert-element-in-order instead
+
 export default function getInsertBeforeElement(checkElement: HTMLElement, childElements: any, dataAttributes: string[]): ?HTMLElement {
 	const checkValues = {};
 	let insertBeforeElement: ?HTMLElement = null;

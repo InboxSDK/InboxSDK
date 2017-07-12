@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import asap from 'asap';
 import {defn, defonce} from 'ud';
 import ButtonView from '../../widgets/buttons/button-view';
@@ -291,8 +290,8 @@ function _positionGroupToolbar(gmailComposeView){
 		const heElements = gmailComposeView.getElement().querySelectorAll('td.HE');
 		Logger.error(new Error('bottom toolbar had bad height'), {
 			bottomToolbarHeight,
-			heElementHeights: _.map(heElements, el => el.clientHeight),
-			heElementsHTML: _.map(heElements, censorHTMLtree)
+			heElementHeights: Array.from(heElements).map(el => el.clientHeight),
+			heElementsHTML: Array.from(heElements).map(censorHTMLtree)
 		});
 	}
 }

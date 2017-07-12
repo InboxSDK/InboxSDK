@@ -1,6 +1,11 @@
 /* @flow */
 
-import _ from 'lodash';
+import t from 'transducers.js';
+import once from 'lodash/once';
+import escape from 'lodash/escape';
+import includes from 'lodash/includes';
+import constant from 'lodash/constant';
+import find from 'lodash/find';
 import asap from 'asap';
 import delay from 'pdelay';
 import RSVP from 'rsvp';
@@ -126,7 +131,7 @@ class GmailComposeView {
 							}
 							case 'emailSent': {
 								const response = GmailResponseProcessor.interpretSentEmailResponse(event.response);
-								if(_.includes(['tr','eu'], response.messageID)){
+								if(includes(['tr','eu'], response.messageID)){
 									return [{eventName: 'sendCanceled'}];
 								}
 								this._emailWasSent = true;
@@ -225,7 +230,7 @@ class GmailComposeView {
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		const initialBodyElement = this.getMaybeBodyElement();
-		this.ready = _.constant(
+		this.ready = constant(
 			(
 				initialBodyElement ?
 					Kefir.constant(initialBodyElement) :
@@ -378,7 +383,7 @@ class GmailComposeView {
 	}
 
 	insertBodyTextAtCursor(text: string): ?HTMLElement {
-		return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
+		return this.insertBodyHTMLAtCursor(escape(text).replace(/\n/g, '<br>'));
 	}
 
 	insertBodyHTMLAtCursor(html: string): ?HTMLElement {
@@ -557,7 +562,7 @@ class GmailComposeView {
 	}
 
 	_dropzonesVisible(): boolean {
-		return _.filter(document.querySelectorAll('body > .aC7:not(.aWP)'), isElementVisible).length > 0;
+		return find(document.querySelectorAll('body > .aC7:not(.aWP)'), isElementVisible) != null;
 	}
 
 	_findDropzoneForThisCompose(inline: boolean): HTMLElement {
@@ -565,18 +570,18 @@ class GmailComposeView {
 		// this compose.
 		const rect = this._element.getBoundingClientRect();
 		const dropzoneSelector = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
-		const el = _.chain(document.querySelectorAll(dropzoneSelector))
-			.filter(isElementVisible)
-			.filter(dropzone => {
+		const el: ?HTMLElement = t.toArray(document.querySelectorAll(dropzoneSelector), t.compose(
+			t.filter(isElementVisible),
+			t.filter(dropzone => {
 				const top = parseInt(dropzone.style.top, 10);
 				const bottom = top + parseInt(dropzone.style.height, 10);
 				const left = parseInt(dropzone.style.left, 10);
 				const right = left + parseInt(dropzone.style.width, 10);
 				return top >= rect.top && left >= rect.left &&
 					right <= rect.right && bottom <= rect.bottom;
-			})
-			.head()
-			.value();
+			}),
+			t.take(1)
+		))[0];
 		if (!el) {
 			throw new Error("Failed to find dropzone");
 		}
@@ -585,10 +590,10 @@ class GmailComposeView {
 
 	async _attachFiles(files: Blob[], inline: boolean): Promise<void> {
 		this._hideDropzones();
-		const endDrag = _.once(() => simulateDragEnd(this._element, files));
+		const endDrag = once(() => simulateDragEnd(this._element, files));
 		try {
 			let firstLoop = true;
-			for (let files of _.chunk(files, 3)) {
+			for (let files of t.partition(Array.from(files), 3)) {
 				if (firstLoop) {
 					firstLoop = false;
 				} else {
@@ -891,7 +896,7 @@ class GmailComposeView {
 	}
 
 	getRecipientRowElements(): HTMLElement[] {
-		return _.filter(this._element.querySelectorAll('.GS tr'), (tr) => !tr.classList.contains('inboxsdk__recipient_row'));
+		return Array.prototype.filter.call(this._element.querySelectorAll('.GS tr'), (tr) => !tr.classList.contains('inboxsdk__recipient_row'));
 	}
 
 	addManagedViewController(viewController: {destroy(): void}) {
@@ -905,7 +910,7 @@ class GmailComposeView {
 	isMinimized(): boolean {
 		const element = this.getElement();
 		const bodyElement = this.getMaybeBodyElement();
-		const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+		const bodyContainer = find(element.children, child => child.contains(bodyElement));
 		if (!bodyContainer) {
 			if (!hasReportedMissingBody) {
 				hasReportedMissingBody = true;
