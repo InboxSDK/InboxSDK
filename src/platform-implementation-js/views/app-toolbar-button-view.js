@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
