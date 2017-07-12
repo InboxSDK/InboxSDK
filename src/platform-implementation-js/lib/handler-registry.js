@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import remove from 'lodash/remove';
 import asap from 'asap';
 import Logger from './logger';
 
@@ -30,8 +30,8 @@ export default class HandlerRegistry<T> {
     }
 
     return () => {
-      _.remove(this._pendingHandlers, h => h === handler);
-      _.remove(this._handlers, h => h === handler);
+      remove(this._pendingHandlers, h => h === handler);
+      remove(this._handlers, h => h === handler);
     };
   }
 
@@ -48,7 +48,7 @@ export default class HandlerRegistry<T> {
   }
 
   removeTarget(target: T) {
-    _.remove(this._targets, t => t === target);
+    remove(this._targets, t => t === target);
   }
 
   dumpHandlers() {

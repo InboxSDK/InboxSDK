@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import get from '../../common/get-or-fail';
 import ThreadView from '../views/conversations/thread-view';

@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
 import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
@@ -9,7 +9,7 @@ const fs = require('fs');
 
 // Returns a promise that resolves once the injected script has been injected
 // and has done its initial load stuff.
-const injectScript: () => Promise<null> = _.once(function() {
+const injectScript: () => Promise<null> = once(function() {
   if (!(document.head:any).hasAttribute('data-inboxsdk-script-injected')) {
     const url = 'https://www.inboxsdk.com/build/injected.js';
 

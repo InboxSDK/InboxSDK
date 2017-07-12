@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';

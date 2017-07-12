@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
 import Kefir from 'kefir';
 import {defn} from 'ud';
 import querySelector from './dom/querySelectorOrFail';
@@ -30,7 +30,7 @@ const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDri
       });
 
       const bodyElement = composeView.getBodyElement();
-      const fixupCursorFunction = _.once(_fixupCursor.bind(null, composeView));
+      const fixupCursorFunction = once(_fixupCursor.bind(null, composeView));
 
       composeView.getEventStream()
         .filter(event => event.eventName === 'bodyChanged')
@@ -54,23 +54,23 @@ export default handleComposeLinkChips;
 const doFixing = defn(module, function(composeView: ComposeViewDriver, bodyElement: HTMLElement, fixupCursorFunction: ()=>void) {
   const chips = _getChipElements(bodyElement);
 
-  _.chain(chips)
+  chips
     .filter(_isNotEnhanced)
-    .each(_addEnhancements)
-    .each(fixupCursorFunction)
-    .value();
+    .forEach(chip => {
+      _addEnhancements(chip);
+      fixupCursorFunction(chip);
+    });
 
-  _.chain(chips)
+  chips
     .filter(_isOurEnhanced)
-    .each(_checkAndRemoveBrokenChip.bind(null, composeView))
-    .value();
+    .forEach(_checkAndRemoveBrokenChip.bind(null, composeView));
 }, 'doFixing');
 
 const doPresendFixing = defn(module, function(composeView: ComposeViewDriver, bodyElement: HTMLElement) {
   const chips = _getChipElements(bodyElement);
-  _.chain(chips)
+  chips
     .filter(_isOurEnhanced)
-    .each(chip => {
+    .forEach(chip => {
       const xBtn = chip.querySelector(`img[src="${X_URL}"]`);
       if (xBtn) {
         xBtn.remove();
@@ -79,13 +79,12 @@ const doPresendFixing = defn(module, function(composeView: ComposeViewDriver, bo
       if (title) {
         title.style.textDecoration = 'none';
       }
-    })
-    .value();
+    });
 }, 'doPresendFixing');
 
 function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   const chipInnerEls = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-  return _.map(chipInnerEls, x => x.parentElement)
+  return Array.from(chipInnerEls).map(x => (x.parentElement: any))
     .concat(Array.from(bodyElement.querySelectorAll('[hspace=inboxsdk__chip_main]')));
 }
 

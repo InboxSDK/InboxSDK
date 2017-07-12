@@ -1,10 +1,9 @@
 /* @flow */
 
-import _ from 'lodash';
 import triggerRelayEvent from './trigger-relay-event';
 
 function makeDataTransferObj(files: Blob[]) {
-	const fileNames: string[] = _.map(files, file => file.name);
+	const fileNames: Array<?string> = Array.from(files).map(file => typeof file.name === 'string' ? file.name : undefined);
 	return {files, fileNames};
 }
 
