@@ -65,6 +65,14 @@ class InboxModalView {
   setButtons(buttons: Object[]) {
     const buttonContainer = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
 
+    if (buttons.length === 0) {
+      buttonContainer.style.display = 'none';
+      this._modalContainerElement.classList.add('inboxsdk__modal_content_no_buttons');
+    } else {
+      buttonContainer.style.display = '';
+      this._modalContainerElement.classList.remove('inboxsdk__modal_content_no_buttons');
+    }
+
     buttonContainer.innerHTML = '';
     _.sortBy(buttons, [
       button => button.type === 'PRIMARY_ACTION' ? 0 : 1,
