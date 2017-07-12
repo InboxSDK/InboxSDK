@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -66,7 +66,7 @@ class InboxModalView {
     const buttonContainer = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
 
     buttonContainer.innerHTML = '';
-    _.sortBy(buttons, [
+    sortBy(buttons, [
       button => button.type === 'PRIMARY_ACTION' ? 0 : 1,
       button => button.orderHint || 0
     ])

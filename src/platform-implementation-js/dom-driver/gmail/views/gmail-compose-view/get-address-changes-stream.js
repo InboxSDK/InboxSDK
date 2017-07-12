@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import RSVP from 'rsvp';
 
@@ -48,8 +47,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.toProperty(() => {
 					return {addedNodes: rowElements[rowIndex].querySelectorAll('.vR')};
 				})
-				.map(e => e.addedNodes)
-				.map(_.toArray)
+				.map(e => Array.from(e.addedNodes))
 				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))
@@ -57,8 +55,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
 
 			mainSubAddressStream
-				.map(e => e.removedNodes)
-				.map(_.toArray)
+				.map(e => Array.from(e.removedNodes))
 				.flatten()
 				.filter(_isRecipientNode)
 				.map(getAddressInformationExtractor(addressType))

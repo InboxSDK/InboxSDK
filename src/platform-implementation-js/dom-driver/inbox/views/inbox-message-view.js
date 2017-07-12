@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn} from 'ud';
 import asap from 'asap';
 import Kefir from 'kefir';
@@ -127,7 +126,7 @@ class InboxMessageView {
           contactType = 'sender';
         } else if (
           this._p.attributes.recipientElements &&
-          _.some(this._p.attributes.recipientElements, el => el.contains(element))
+          Array.from(this._p.attributes.recipientElements).some(el => el.contains(element))
         ) {
           contactType = 'recipient';
         } else {

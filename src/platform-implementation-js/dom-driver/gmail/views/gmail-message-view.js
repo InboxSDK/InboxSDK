@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
+import once from 'lodash/once';
 import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
@@ -136,11 +137,11 @@ class GmailMessageView {
 	getRecipients(): Array<Contact> {
 		let recipients = this._recipients;
 		if(recipients) return recipients;
-		var receipientSpans = this._element.querySelectorAll('.hb span[email]');
-		recipients = this._recipients = _.map(receipientSpans, (span) => {
+		const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));
+		recipients = this._recipients = receipientSpans.map(span => {
 			return this._getUpdatedContact({
 				name: span.getAttribute('name'),
-				emailAddress: span.getAttribute('email')
+				emailAddress: span.getAttribute('email') || ''
 			});
 		});
 
@@ -170,7 +171,7 @@ class GmailMessageView {
 	}
 
 	addMoreMenuItem(options: Object) {
-		this._moreMenuItemDescriptors = _.sortBy(
+		this._moreMenuItemDescriptors = sortBy(
 			this._moreMenuItemDescriptors.concat([options]),
 			o => o.orderHint
 		);
@@ -346,7 +347,7 @@ class GmailMessageView {
 			return;
 		}
 
-		const getImgElement = _.once(() => {
+		const getImgElement = once(() => {
 			const img = document.createElement('img');
 			img.src = 'images/cleardot.gif';
 			return img;

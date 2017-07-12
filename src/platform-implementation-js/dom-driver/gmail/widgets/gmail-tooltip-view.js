@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
+import escape from 'lodash/escape';
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -143,10 +144,10 @@ export default class GmailTooltipView {
 								//image goes here
 							'</div>',
 							'<div class="aRR">',
-								_.escape(options.title || ""),
+								escape(options.title || ""),
 							'</div>',
 							'<div class="aRQ">',
-								_.escape(options.subtitle || ""),
+								escape(options.subtitle || ""),
 							'</div>',
 							'<div class="inboxsdk__tooltip_button">',
 								//button goes here
@@ -187,7 +188,7 @@ export default class GmailTooltipView {
 			}
 
 			if(options.button){
-				const buttonOptions = _.clone(options.button);
+				const buttonOptions = Object.assign({}, options.button);
 
 				buttonOptions.buttonColor = 'blue';
 
@@ -299,7 +300,7 @@ export default class GmailTooltipView {
 			boundingBoxWrappers[ii].smallestDistance = this._getSmallestDistance(boundingBoxWrappers[ii]);
 		}
 
-		return _.sortBy(boundingBoxWrappers, function(boundingBoxWrapper){
+		return sortBy(boundingBoxWrappers, function(boundingBoxWrapper){
 			return boundingBoxWrapper.smallestDistance;
 		}).reverse()[0];
 	}
@@ -312,7 +313,7 @@ export default class GmailTooltipView {
 			((document.body:any):HTMLElement).clientHeight - boundingBoxWrapper.value[1].y //bottom
 		];
 
-		return _.sortBy(distances, function(distance){
+		return sortBy(distances, function(distance){
 			return distance;
 		})[0];
 	}

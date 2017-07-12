@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 import BigNumber from 'bignumber.js';

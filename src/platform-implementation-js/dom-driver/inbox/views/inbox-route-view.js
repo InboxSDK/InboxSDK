@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -13,7 +13,7 @@ function getRouteID(path) {
   if (path === '') {
     return NATIVE_ROUTE_IDS.INBOX;
   }
-  if (_.includes(['snoozed', 'reminders', 'done', 'spam', 'trash'], path)) {
+  if (includes(['snoozed', 'reminders', 'done', 'spam', 'trash'], path)) {
     return NATIVE_ROUTE_IDS[path.toUpperCase()];
   }
   if (/search\//.test(path)) {

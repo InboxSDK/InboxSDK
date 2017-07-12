@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';

@@ -1,7 +1,6 @@
 /* @flow */
 
 import asap from 'asap';
-import _ from 'lodash';
 import delay from 'pdelay';
 import {defn} from 'ud';
 import util from 'util';

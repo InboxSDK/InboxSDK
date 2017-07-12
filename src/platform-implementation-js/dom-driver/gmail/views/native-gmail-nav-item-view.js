@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -108,7 +107,7 @@ export default class NativeGmailNavItemView {
 		})
 			.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
 			.toProperty(() => [])
-			.map(_.constant(element));
+			.map(() => element);
 
 		classChangeStream
 			.filter(el =>
@@ -127,13 +126,13 @@ export default class NativeGmailNavItemView {
 			this._eventStream.plug(
 					makeMutationObserverStream((parentElement: any), {childList: true})
 						.map(mutation =>
-							_.toArray(mutation.removedNodes)
+							Array.from(mutation.removedNodes)
 						)
 						.flatten()
 					.filter(removedNode =>
 						removedNode === element
 					)
-					.map(_.constant({eventName: 'invalidated'}))
+					.map(() => ({eventName: 'invalidated'}))
 			);
 		}
 	}

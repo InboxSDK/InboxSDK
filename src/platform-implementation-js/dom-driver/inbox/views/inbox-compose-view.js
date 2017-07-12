@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import escape from 'lodash/escape';
+import find from 'lodash/find';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
@@ -11,6 +12,7 @@ import autoHtml from 'auto-html';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import delayAsap from '../../../lib/delay-asap';
 import arrayToLifetimes from '../../../lib/array-to-lifetimes';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
@@ -333,7 +335,7 @@ class InboxComposeView {
       return this._driver.getUserContact();
     }
     const email = fromPickerEmailSpan.textContent;
-    const contact = _.find(this.getFromContactChoices(), c => c.emailAddress === email);
+    const contact = find(this.getFromContactChoices(), c => c.emailAddress === email);
     if (!contact) {
       throw new Error('Failed to find from contact');
     }
@@ -367,12 +369,11 @@ class InboxComposeView {
         return cachedFromContacts;
       }
 
-      cachedFromContacts = _.chain(fromOptionEls)
+      cachedFromContacts = Array.from(fromOptionEls)
         .map(el => ({
-          name: el.querySelector('span[title]').title,
-          emailAddress: el.querySelector('span:not([title])').textContent
-        }))
-        .value();
+          name: querySelector(el, 'span[title]').title,
+          emailAddress: querySelector(el, 'span:not([title])').textContent
+        }));
     } finally {
       if (needToOpenMenu) {
         simulateClick((document.body:any));
@@ -401,7 +402,7 @@ class InboxComposeView {
         simulateClick(fromPicker);
         fromOptionEls = grandUncle.querySelectorAll('li[role=menuitem][data-jsaction*=".switch_custom_from"]');
       }
-      const fromOptionEl = _.find(fromOptionEls, el =>
+      const fromOptionEl = find(fromOptionEls, el =>
         el.querySelector('span:not([title])').textContent === email
       );
       if (!fromOptionEl) {
@@ -430,7 +431,7 @@ class InboxComposeView {
     }
   }
   insertBodyTextAtCursor(text: string): ?HTMLElement {
-    return this.insertBodyHTMLAtCursor(_.escape(text).replace(/\n/g, '<br>'));
+    return this.insertBodyHTMLAtCursor(escape(text).replace(/\n/g, '<br>'));
   }
   insertBodyHTMLAtCursor(html: string): ?HTMLElement {
     var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastBodySelectionRange);
@@ -659,15 +660,14 @@ class InboxComposeView {
     const chipContainer = inputElement.parentElement;
     if (!chipContainer) throw new Error("Should not happen");
 
-    return _.chain(chipContainer.children)
+    return Array.from(chipContainer.children)
       .filter(el =>
         el.nodeName === 'DIV' && el.hasAttribute('email') && el.style.display !== 'none'
       )
       .map(chip => ({
-        emailAddress: chip.getAttribute('email'),
+        emailAddress: chip.getAttribute('email') || '',
         name: chip.textContent
-      }))
-      .value();
+      }));
   }
   getToRecipients(): Contact[] {
     if (this._p.attributes.isInline) throw new Error("Can't get recipients of inline compose");
