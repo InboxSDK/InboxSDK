@@ -378,7 +378,7 @@ export default class GmailNavItemView {
 					return true;
 				}
 
-				const navItems = Array.prototype.filter.call(domEvent.path, el => el.classList && el.classList.contains('inboxsdk__navItem'));
+				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
 				return navItems[0] === self._element;
 			})
 			.onValue(function(domEvent){
