@@ -593,7 +593,7 @@ class GmailComposeView {
 		const endDrag = once(() => simulateDragEnd(this._element, files));
 		try {
 			let firstLoop = true;
-			for (let files of t.partition(Array.from(files), 3)) {
+			for (let files of t.partition(files, 3)) {
 				if (firstLoop) {
 					firstLoop = false;
 				} else {
