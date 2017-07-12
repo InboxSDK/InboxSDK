@@ -1,7 +1,7 @@
 /* @flow */
 
 import Kefir from 'kefir';
-import RSVP from 'rsvp';
+import t from 'transducers.js';
 
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import getAddressInformationExtractor from './get-address-information-extractor';
@@ -47,20 +47,22 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.toProperty(() => {
 					return {addedNodes: rowElements[rowIndex].querySelectorAll('.vR')};
 				})
-				.map(e => Array.from(e.addedNodes))
-				.flatten()
-				.filter(_isRecipientNode)
-				.map(getAddressInformationExtractor(addressType))
-				.filter(Boolean)
-				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
+				.transduce(t.compose(
+					t.mapcat(e => Array.from(e.addedNodes)),
+					t.filter(_isRecipientNode),
+					t.map(getAddressInformationExtractor(addressType)),
+					t.keep(),
+					t.map(_convertToEvent.bind(null, addressType + 'ContactAdded'))
+				)),
 
 			mainSubAddressStream
-				.map(e => Array.from(e.removedNodes))
-				.flatten()
-				.filter(_isRecipientNode)
-				.map(getAddressInformationExtractor(addressType))
-				.filter(Boolean)
-				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
+				.transduce(t.compose(
+					t.mapcat(e => Array.from(e.removedNodes)),
+					t.filter(_isRecipientNode),
+					t.map(getAddressInformationExtractor(addressType)),
+					t.keep(),
+					t.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
+				))
 		]);
 	});
 }
