@@ -44,7 +44,8 @@ var args = stdio.getopt({
   'single': {key: 's', description: 'Single bundle build (for development)'},
   'minify': {key: 'm', description: 'Minify build'},
   'production': {key: 'p', description: 'Production build'},
-  'copy': {key: 'c', description: 'Also copy to Streak'}
+  'copy': {key: 'c', description: 'Also copy to Streak'},
+  'fullPaths': {key: 'f', description: 'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)'},
 });
 
 // Don't let production be built without minification.
@@ -56,8 +57,8 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (args.production && (args.watch || args.single)) {
-  throw new Error("--production can not be used with --watch or --single");
+if (args.production && (args.watch || args.single || args.fullPaths)) {
+  throw new Error("--production can not be used with --watch, --single, or --fullPaths");
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
@@ -133,6 +134,7 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
     let bundler = browserify({
       entries: entry,
       debug: true,
+      fullPaths: args.fullPaths,
       cache: {}, packageCache: {}
     }).transform(babelify.configure({
       presets: args.hot && port ? ["react-hmre"] : [],
