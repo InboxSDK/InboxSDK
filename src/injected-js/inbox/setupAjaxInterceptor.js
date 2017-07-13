@@ -230,31 +230,4 @@ export default function setupAjaxInterceptor() {
       }
     });
   }
-
-  // {
-  //   main_wrappers.push({
-  //     isRelevantTo({url}) {
-  //       return /sync(?:\/u\/\d+)?\/i\/fd/.test(url);
-  //     },
-  //     requestChanger(connection, request) {
-  //       if (!request.body) return request;
-  //
-  //       const originalRequest = JSON.parse(request.body);
-  //
-  //       if (
-  //         originalRequest &&
-  //         originalRequest[1] &&
-  //         originalRequest[1].length === 1 &&
-  //         originalRequest[1][0][1] &&
-  //         originalRequest[1][0][1].includes('thread-f:') &&
-  //         originalRequest[1][0][3][0].includes('msg-a:')
-  //       ) {
-  //         console.log('found match!', originalRequest);
-  //         originalRequest[1][0][3] = [];
-  //         return Object.assign({}, request, {body: JSON.stringify(originalRequest)});
-  //       }
-  //       return request;
-  //     }
-  //   });
-  // }
 }
