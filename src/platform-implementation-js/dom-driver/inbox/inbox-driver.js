@@ -27,6 +27,7 @@ import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
 import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
+import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThreadId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
 import populateRouteID from '../../lib/populateRouteID';
@@ -114,6 +115,7 @@ class InboxDriver {
   _customRouteIDs: Set<string> = new Set();
 
   getGmailMessageIdForInboxMessageId: (inboxMessageId: string) => Promise<string>;
+  getInboxMessageIdForInboxThreadId: (inboxThreadId: string) => Promise<string>;
   getThreadIdFromMessageId: (messageId: string) => Promise<string>;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
@@ -149,6 +151,9 @@ class InboxDriver {
       this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
         gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
+
+    this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
+      getInboxMessageIdForInboxThreadId(this, inboxThreadId)
 
     {
       const threadIdFromMessageIdCache = new BiMapCache({

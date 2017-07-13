@@ -13,6 +13,13 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       .map(x => x.detail);
   }
 
+  getXsrfToken(): string {
+    const token = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
+    if (!token) throw new Error("Failed to look up xsrf token");
+
+    return token;
+  }
+
   getDraftIDForComposeView(el: HTMLElement): string {
     const draftIDFound = el.hasAttribute('data-inboxsdk-draft-id');
 
