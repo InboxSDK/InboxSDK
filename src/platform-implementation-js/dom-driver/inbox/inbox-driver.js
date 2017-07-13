@@ -153,7 +153,7 @@ class InboxDriver {
     }
 
     this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
-      getInboxMessageIdForInboxThreadId(this, inboxThreadId)
+      getInboxMessageIdForInboxThreadId(this, inboxThreadId);
 
     {
       const threadIdFromMessageIdCache = new BiMapCache({
