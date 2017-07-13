@@ -14,19 +14,19 @@ class InboxToolbarButtonView {
   _buttonEl: HTMLElement;
 
   constructor(buttonDescriptor: Object, groupOrderHint: string, stopper: Kefir.Observable<null>, container: HTMLElement) {
-    const div = this._buttonEl = document.createElement('li');
-    div.setAttribute('role', 'button');
-    div.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
-    div.tabIndex = 0;
-    div.className = 'inboxsdk__button_icon';
+    const buttonEl = this._buttonEl = document.createElement('li');
+    buttonEl.setAttribute('role', 'button');
+    buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.tabIndex = 0;
+    buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
     img.className = 'inboxsdk__button_iconImg';
     let onClick = () => {};
     let hasDropdown = false;
     let dropdown = null;
     Kefir.merge([
-      Kefir.fromEvents(div, 'click'),
-      fromEventTargetCapture(div, 'keyup').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
+      Kefir.fromEvents(buttonEl, 'click'),
+      fromEventTargetCapture(buttonEl, 'keyup').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
     ]).onValue(event => {
       event.preventDefault();
       event.stopPropagation();
@@ -36,7 +36,7 @@ class InboxToolbarButtonView {
           return;
         } else {
           this._buttonEl.classList.add('inboxsdk__active');
-          dropdown = new DropdownView(new InboxDropdownView(), div);
+          dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
           dropdown.setPlacementOptions({
             hAlign: 'right',
             vAlign: 'bottom', forceVAlign: true
@@ -53,25 +53,25 @@ class InboxToolbarButtonView {
 
     {
       hasDropdown = buttonDescriptor.hasDropdown;
-      div.title = buttonDescriptor.title;
-      div.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
+      buttonEl.title = buttonDescriptor.title;
+      buttonEl.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
       onClick = buttonDescriptor.onClick;
       if (buttonDescriptor.iconUrl) {
         img.src = buttonDescriptor.iconUrl;
-        div.appendChild(img);
+        buttonEl.appendChild(img);
       } else {
         img.remove();
       }
       const orderHint = buttonDescriptor.orderHint||0;
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
-        div.setAttribute('data-order-hint', String(orderHint));
-        insertElementInOrder(container, div);
+        buttonEl.setAttribute('data-order-hint', String(orderHint));
+        insertElementInOrder(container, buttonEl);
       }
     }
 
     stopper.onValue(() => {
-      div.remove();
+      buttonEl.remove();
       if (dropdown) {
         dropdown.close();
       }
