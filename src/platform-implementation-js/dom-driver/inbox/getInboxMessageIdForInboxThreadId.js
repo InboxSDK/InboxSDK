@@ -16,7 +16,7 @@ async function getInboxMessageIdForInboxThreadId(driver: InboxDriver, inboxThrea
     headers: {
       'Content-Type': 'application/json',
       'X-Framework-Xsrf-Token': driver.getPageCommunicator().getXsrfToken(),
-      'X-Gmail-BTAI': '{"3":{"6":0,"10":1,"11":0,"13":0,"15":0,"16":0,"17":0,"18":0,"19":0,"20":0,"21":0,"22":0,"23":0,"24":0,"25":0,"26":0},"5":"980401df73","7":7,"8":"gmail_bigtop_web_170709.24_p1","9":6,"10":5,"11":"","12":-25200000,"13":"America/Los_Angeles","14":1,"16":161345177,"17":""}',
+      'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
       'X-Google-BTD': '1'
     },
     data: JSON.stringify({

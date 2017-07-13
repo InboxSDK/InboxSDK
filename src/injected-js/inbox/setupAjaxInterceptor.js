@@ -230,4 +230,24 @@ export default function setupAjaxInterceptor() {
       }
     });
   }
+
+  {
+    const saveBTAIHeader = (header) => {
+      if (!(document.head:any).hasAttribute('data-inboxsdk-btai-header')) {
+        (document.head:any).setAttribute('data-inboxsdk-btai-header', header);
+        triggerEvent({type: 'btaiHeaderReceived'});
+      }
+    };
+
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return /sync(?:\/u\/\d+)?\//.test(connection.url);
+      },
+      originalSendBodyLogger(connection) {
+        if (connection.headers['X-Gmail-BTAI']) {
+          saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
+        }
+      }
+    });
+  }
 }
