@@ -352,9 +352,6 @@
   padding: 110px 50px 50px 50px;
   pointer-events: none;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_content {
-  margin-bottom: 0px;
-}
 .inboxsdk__modal_container {
   position: relative;
   background: #fff;
