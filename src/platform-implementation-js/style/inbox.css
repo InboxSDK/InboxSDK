@@ -407,7 +407,7 @@
 .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_container {
   padding-bottom: 0;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_content {
   margin-bottom: 0;
 }
 .inboxsdk__modal_buttons input {

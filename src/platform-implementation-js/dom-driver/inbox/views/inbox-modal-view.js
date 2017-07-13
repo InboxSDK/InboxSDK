@@ -39,7 +39,7 @@ class InboxModalView {
     this.setTitle(options.title);
     this.setContentElement(options.el);
     this.setButtons(options.buttons || []);
-    this.setChromeClasses(options.chrome, options.showCloseButton, (options.buttons||[]).length > 0);
+    this.setChromeClasses(options.chrome, options.showCloseButton);
   }
 
   setTitle(title: string) {
@@ -65,6 +65,12 @@ class InboxModalView {
   setButtons(buttons: Object[]) {
     const buttonContainer = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
 
+    if (buttons.length > 0) {
+      this._modalContainerElement.classList.add('inboxsdk__modal_hasButtons');
+    } else {
+      this._modalContainerElement.classList.remove('inboxsdk__modal_hasButtons');
+    }
+
     buttonContainer.innerHTML = '';
     sortBy(buttons, [
       button => button.type === 'PRIMARY_ACTION' ? 0 : 1,
@@ -83,7 +89,7 @@ class InboxModalView {
       });
   }
 
-  setChromeClasses(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
+  setChromeClasses(chrome: boolean, showCloseButton: boolean) {
     if (chrome === false) {
       this._modalContainerElement.classList.add('inboxsdk__modal_chromeless');
     } else {
@@ -93,11 +99,6 @@ class InboxModalView {
       this._modalContainerElement.classList.add('inboxsdk__modal_showCloseButton');
     } else {
       this._modalContainerElement.classList.remove('inboxsdk__modal_showCloseButton');
-    }
-    if (hasButtons) {
-      this._modalContainerElement.classList.add('inboxsdk__modal_hasButtons');
-    } else {
-      this._modalContainerElement.classList.remove('inboxsdk__modal_hasButtons');
     }
   }
 
