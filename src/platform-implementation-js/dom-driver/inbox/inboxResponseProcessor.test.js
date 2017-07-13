@@ -19,6 +19,6 @@ describe('extractMessageIdsFromThreadResponse()', () => {
     const invalidJSON = JSON.stringify({junkKey: 'junkValue'});
 
     expect(() => extractMessageIdsFromThreadResponse(invalidJSON)).toThrow();
-    expect(() => extractMessageIdsFromThreadResponse(null)).toThrow();
+    expect(() => extractMessageIdsFromThreadResponse('')).toThrow();
   });
 });
