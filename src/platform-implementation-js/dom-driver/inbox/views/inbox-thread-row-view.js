@@ -106,14 +106,6 @@ class InboxThreadRowView {
     }
   }
 
-  getThreadIDIfStable() {
-    throw new Error('Not supported in Inbox. Please use getThreadIDIfStableAsync() instead');
-  }
-
-  getThreadIDIfStableAsync(): Promise<null|string> {
-    throw new Error('not yet implemented');
-  }
-
   async getDraftID(): Promise<?string> {
     const {isOnlyDraft, inboxThreadId} = this._p.attributes;
 
