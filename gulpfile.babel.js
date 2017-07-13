@@ -335,6 +335,6 @@ function transformClass(c) {
 function isFileEligbleForDocs(filename) {
   return filename.endsWith(".js") && (
     filename.includes("src/docs/") ||
-    filename.includes("src/platform-implementation-js/constants/")
+    filename.endsWith("src/platform-implementation-js/constants/nav-item-types.js")
   );
 }
