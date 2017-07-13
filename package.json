@@ -35,6 +35,7 @@
     "entities": "1.1.1",
     "envify": "^4.0.0",
     "eslint": "^4.1.1",
+    "eslint-plugin-deprecate": "^0.4.2",
     "eslint-plugin-flowtype": "^2.34.1",
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.2",

@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import last from 'lodash/last';
 import {defn} from 'ud';
 import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
@@ -106,7 +106,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
 
   show() {
     var doShow = (moleParent) => {
-      moleParent.insertBefore(this._element, _.last(moleParent.children));
+      moleParent.insertBefore(this._element, last(moleParent.children));
       const dw = findParent(moleParent, el => el.nodeName === 'DIV' && el.classList.contains('dw'));
       if (dw) {
         dw.classList.add('inboxsdk__moles_in_use');
@@ -134,7 +134,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
       // right.
       const moleParent = this._element.parentElement;
       if (moleParent && this._element.getBoundingClientRect().left < 0) {
-        moleParent.insertBefore(this._element, _.last(moleParent.children));
+        moleParent.insertBefore(this._element, last(moleParent.children));
       }
 
       this._eventStream.emit({eventName:'restore'});

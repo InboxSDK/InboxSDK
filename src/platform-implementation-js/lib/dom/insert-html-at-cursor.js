@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import * as ud from 'ud';
 import Kefir from 'kefir';
 

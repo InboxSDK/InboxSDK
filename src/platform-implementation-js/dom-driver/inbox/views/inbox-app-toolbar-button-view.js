@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
+import includes from 'lodash/includes';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -39,7 +40,7 @@ class InboxAppToolbarButtonView {
   }
 
   _setupButton(appToolbarLocation: HTMLElement) {
-    let appToolbarButtonContainer = _.find(appToolbarLocation.children, el => el.classList.contains('inboxsdk__appButton_container'));
+    let appToolbarButtonContainer = find(appToolbarLocation.children, el => el.classList.contains('inboxsdk__appButton_container'));
     if (!appToolbarButtonContainer) {
       appToolbarButtonContainer = document.createElement('div');
       appToolbarButtonContainer.className = 'inboxsdk__appButton_container';
@@ -64,7 +65,7 @@ class InboxAppToolbarButtonView {
 
     Kefir.merge([
       Kefir.fromEvents(button, 'click'),
-      Kefir.fromEvents(button, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+      Kefir.fromEvents(button, 'keypress').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
     ])
     .takeUntilBy(this._stopper)
     .onValue(event => {

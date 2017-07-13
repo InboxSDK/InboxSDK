@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import _ from 'lodash';
+import once from 'lodash/once';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Parsed} from '../detection/chatSidebar/parser';
@@ -39,7 +39,7 @@ class InboxChatSidebarView {
     return 'HIDDEN';
   }
 
-  getModeStream: () => Kefir.Observable<Mode> = _.once(() => {
+  getModeStream: () => Kefir.Observable<Mode> = once(() => {
     const parent: HTMLElement = (this._el.parentElement: any);
     return makeMutationObserverChunkedStream(
       parent, {attributes: true, attributeFilter: ['class']}

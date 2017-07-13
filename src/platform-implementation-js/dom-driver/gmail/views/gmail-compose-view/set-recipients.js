@@ -1,7 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
-
 import type GmailComposeView from '../gmail-compose-view';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
@@ -30,7 +28,7 @@ export default function(gmailComposeView: GmailComposeView, contactRowIndex: num
 	}
 
 	// Remove existing recipients
-	_.forEach(contactRow.querySelectorAll('.vR .vM'), el => {
+	Array.from(contactRow.querySelectorAll('.vR .vM')).forEach(el => {
 		simulateClick(el);
 	});
 

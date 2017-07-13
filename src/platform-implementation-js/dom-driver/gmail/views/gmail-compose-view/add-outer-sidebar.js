@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import type GmailComposeView from '../gmail-compose-view';
 
 type Options = {
@@ -13,7 +12,7 @@ export default function addOuterSidebar(gmailComposeView: GmailComposeView, opti
 	// 	_createOuterSidebar(gmailComposeView);
 	// }
 	//
-	// gmailComposeView.getAdditionalAreas().outerSidebar.querySelector('.inboxsdk__compose_outerSidebar_header').innerHTML = _.escape(options.title);
+	// gmailComposeView.getAdditionalAreas().outerSidebar.querySelector('.inboxsdk__compose_outerSidebar_header').innerHTML = escape(options.title);
 	// gmailComposeView.getAdditionalAreas().outerSidebar.querySelector('.inboxsdk__compose_outerSidebar_footer').appendChild(options.el);
 }
 

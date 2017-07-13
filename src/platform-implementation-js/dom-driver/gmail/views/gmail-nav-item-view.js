@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -243,13 +243,13 @@ export default class GmailNavItemView {
 		switch(type){
 			case NAV_ITEM_TYPES.NAVIGATION:
 				if(!nameElement || nameElement.tagName !== 'SPAN'){
-					querySelector(this._element, '.aip').innerHTML += `<span class="nU n1 inboxsdk__navItem_name" role="link">${_.escape(this._name)}</span>`;
+					querySelector(this._element, '.aip').innerHTML += autoHtml `<span class="nU n1 inboxsdk__navItem_name" role="link">${this._name}</span>`;
 				}
 			break;
 			case NAV_ITEM_TYPES.LINK:
 			case NAV_ITEM_TYPES.MANAGE:
 				if(!nameElement || nameElement.tagName !== 'A'){
-					querySelector(this._element, '.aip').innerHTML += `<a href="#" class="inboxsdk__navItem_name CK">${_.escape(this._name)}</a>`;
+					querySelector(this._element, '.aip').innerHTML += autoHtml `<a href="#" class="inboxsdk__navItem_name CK">${this._name}</a>`;
 				}
 			break;
 		}
@@ -333,7 +333,7 @@ export default class GmailNavItemView {
 	}
 
 	_createIconButtonAccessory(accessoryDescriptor: Object){
-		var buttonOptions = _.clone(accessoryDescriptor);
+		const buttonOptions = Object.assign({}, accessoryDescriptor);
 		buttonOptions.buttonColor = 'pureIcon';
 		buttonOptions.buttonView  = new ButtonView(buttonOptions);
 
@@ -344,7 +344,7 @@ export default class GmailNavItemView {
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
-		const buttonOptions = _.clone(accessoryDescriptor);
+		const buttonOptions = Object.assign({}, accessoryDescriptor);
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
@@ -378,7 +378,7 @@ export default class GmailNavItemView {
 					return true;
 				}
 
-				var navItems = _.filter(domEvent.path, function(el){return el.classList && el.classList.contains('inboxsdk__navItem');});
+				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
 				return navItems[0] === self._element;
 			})
 			.onValue(function(domEvent){

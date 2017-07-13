@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import type {TagTree} from 'tag-tree';
 import LiveSet from 'live-set';
@@ -69,7 +68,7 @@ export default function getComposeViewDriverLiveSet(driver: InboxDriver, tree: T
               classLength: document.querySelectorAll('div.ek div.md > div').length,
               classEkLength: document.querySelectorAll('.ek').length,
               classMdLength: document.querySelectorAll('.md').length,
-              composeHtml: _.map(document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id], div.ek div.md > div'), el => censorHTMLtree(el))
+              composeHtml: Array.from(document.querySelectorAll('body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id], div.ek div.md > div')).map(el => censorHTMLtree(el))
             };
           }
 

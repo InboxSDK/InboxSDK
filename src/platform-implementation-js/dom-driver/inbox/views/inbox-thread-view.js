@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
@@ -150,7 +150,7 @@ class InboxThreadView {
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
-        const existingButtonContainer = _.find(
+        const existingButtonContainer = find(
           iconArea.querySelectorAll('.'+idMap('sidebar_button_container')),
           el => {
             const button = el.querySelector('button');

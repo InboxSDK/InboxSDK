@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn} from 'ud';
 
 import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view.js';
@@ -52,7 +51,7 @@ class DropdownButtonViewController {
 		const view = this._view;
 		if (!view) throw new Error("Already destroyed");
 		view.activate();
-		
+
 		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), view.getElement(), null);
 		if (this._dropdownPositionOptions) {
 			dropdownView.setPlacementOptions(this._dropdownPositionOptions);

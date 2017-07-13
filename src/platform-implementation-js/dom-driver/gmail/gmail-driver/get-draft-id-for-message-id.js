@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import memoize from 'lodash/memoize';
 import {defn} from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
 import {readDraftId} from '../gmail-response-processor';
@@ -8,7 +8,7 @@ import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
 
 const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<?string> =
-  _.memoize(async function(driver: GmailDriver, messageID: string): Promise<?string> {
+  memoize(async function(driver: GmailDriver, messageID: string): Promise<?string> {
     const response = await gmailAjax({
       method: 'GET',
       url: (document.location:any).origin+document.location.pathname,

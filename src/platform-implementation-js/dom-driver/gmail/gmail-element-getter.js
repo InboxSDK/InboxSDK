@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
 import RSVP from 'rsvp';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import {defobj} from 'ud';
@@ -15,7 +15,7 @@ const GmailElementGetter = {
 		return waitForGmailModeToSettle().toPromise(RSVP.Promise);
 	},
 
-	getMainContentElementChangedStream: _.once(function(){
+	getMainContentElementChangedStream: once(function(){
 		return getMainContentElementChangedStream(this);
 	}),
 
@@ -65,7 +65,7 @@ const GmailElementGetter = {
 	},
 
 	getRowListElements(): HTMLElement[] {
-		return _.toArray(document.querySelectorAll('[gh=tl]'));
+		return Array.from(document.querySelectorAll('[gh=tl]'));
 	},
 
 	getSearchInput(): ?HTMLInputElement {

@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-console */
 
-import _ from 'lodash';
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';

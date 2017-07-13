@@ -1,6 +1,6 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
 
 // only used for constants
 import {NATIVE_ROUTE_IDS, NATIVE_LIST_ROUTE_IDS, ROUTE_TYPES} from '../../../../constants/router';
@@ -13,7 +13,7 @@ export default function GmailRouteProcessor() {
 	this._setupCompatibleRouteIDMap();
 }
 
-_.extend(GmailRouteProcessor.prototype, {
+Object.assign(GmailRouteProcessor.prototype, {
 
 	NativeRouteIDs: NATIVE_ROUTE_IDS,
 	NativeListRouteIDs: NATIVE_LIST_ROUTE_IDS,
@@ -25,7 +25,7 @@ _.extend(GmailRouteProcessor.prototype, {
 			return false;
 		}
 
-		return _.includes(Object.values(NATIVE_LIST_ROUTE_IDS), routeID);
+		return includes(Object.values(NATIVE_LIST_ROUTE_IDS), routeID);
 	},
 
 	isSettingsRouteName: function(routeName){

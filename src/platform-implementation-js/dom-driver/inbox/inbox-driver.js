@@ -1,7 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
 import once from 'lodash/once';
+import constant from 'lodash/constant';
 import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
@@ -529,7 +529,7 @@ class InboxDriver {
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented'); //eslint-disable-line no-console
     const obj = {
-      getEventStream: _.constant(Kefir.never()),
+      getEventStream: constant(Kefir.never()),
       addNavItem: () => obj,
       setCollapsed: () => {},
       destroy: () => {}

@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import _ from 'lodash';
+import escape from 'lodash/escape';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -128,7 +128,7 @@ class GmailCollapsibleSectionView {
 		const element = this._element = document.createElement('div');
 		element.setAttribute('class', 'inboxsdk__resultsSection');
 		element.setAttribute('data-group-order-hint', String(this._groupOrderHint));
-		element.setAttribute('data-order-hint', String(_.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0));
+		element.setAttribute('data-order-hint', String(typeof collapsibleSectionDescriptor.orderHint === 'number' ? collapsibleSectionDescriptor.orderHint : 0));
 
 		this._setupHeader(collapsibleSectionDescriptor);
 
@@ -179,11 +179,11 @@ class GmailCollapsibleSectionView {
 
 
 		if(this._isSearch){
-			titleInnerHTML += '<h3 class="Wd">' + _.escape(collapsibleSectionDescriptor.title) + '</h3>';
+			titleInnerHTML += '<h3 class="Wd">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
 		}
 		else{
 			headerElement.classList.add('Wg');
-			titleInnerHTML += '<h3 class="Wr">' + _.escape(collapsibleSectionDescriptor.title) + '</h3>';
+			titleInnerHTML += '<h3 class="Wr">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
 		}
 
 		titleElement.innerHTML = titleInnerHTML;
@@ -213,7 +213,7 @@ class GmailCollapsibleSectionView {
 	_updateElement(collapsibleSectionDescriptor: Object){
 		if(this._collapsibleSectionDescriptor.orderHint !== collapsibleSectionDescriptor.orderHint){
 			const element = this._element;
-			if(element) element.setAttribute('data-order-hint', "" + (_.isNumber(collapsibleSectionDescriptor.orderHint) ? collapsibleSectionDescriptor.orderHint : 0));
+			if(element) element.setAttribute('data-order-hint', "" + (typeof collapsibleSectionDescriptor.orderHint === 'number' ? collapsibleSectionDescriptor.orderHint : 0));
 
 			this._eventStream.emit({
 				type: 'update',
@@ -547,7 +547,7 @@ class GmailCollapsibleSectionView {
 
 			//now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
 			//and calling our "recollapse" helper function on them
-			var elementsToRecollapse = _.toArray(otherCollapseContainer.children[0].children).concat(_.toArray(otherCollapseContainer.children[1].children));
+			var elementsToRecollapse = Array.from(otherCollapseContainer.children[0].children).concat(Array.from(otherCollapseContainer.children[1].children));
 
 			if(otherCollapseContainer) this._pulloutSectionsFromCollapsedContainer((otherCollapseContainer: any));
 			this._recollapse(elementsToRecollapse);
@@ -571,7 +571,7 @@ class GmailCollapsibleSectionView {
 			return;
 		}
 
-		var elementsToRecollapse = _.toArray(container.children[0].children).concat(_.toArray(container.children[1].children));
+		var elementsToRecollapse = Array.from(container.children[0].children).concat(Array.from(container.children[1].children));
 		this._pulloutSectionsFromCollapsedContainer((container: any));
 		this._destroyCollapsedContainer();
 
@@ -581,13 +581,13 @@ class GmailCollapsibleSectionView {
 	}
 
 	_pulloutSectionsFromCollapsedContainer(container: HTMLElement){
-		var prependedChildren = _.toArray(container.children[0].children);
-		_.each(prependedChildren, function(child){
+		var prependedChildren = Array.from(container.children[0].children);
+		Array.prototype.forEach.call(prependedChildren, function(child){
 			(container: any).insertAdjacentElement('beforebegin', child);
 		});
 
-		var appendedChildren = _.toArray(container.children[1].children).reverse();
-		_.each(appendedChildren, function(child){
+		var appendedChildren = Array.from(container.children[1].children).reverse();
+		Array.prototype.forEach.call(appendedChildren, function(child){
 			(container: any).insertAdjacentElement('afterend', child);
 		});
 	}
@@ -631,7 +631,7 @@ class GmailCollapsibleSectionView {
 	}
 
 	_recollapse(children: Array<Object> ){
-		_.each(children, function(child){
+		Array.prototype.forEach.call(children, function(child){
 			var event = document.createEvent("CustomEvent");
 			(event: any).initCustomEvent('removeCollapsedContainer', false, false, null);
 			child.dispatchEvent(event);
@@ -692,7 +692,7 @@ function _getRowHTML(result){
 		'<td class="xY yX inboxsdk__resultsSection_result_title">',
 			'<div>',
 				'<span ' + (result.isRead ? '' : 'class="zF"') + '>',
-					_.escape(result.title),
+					escape(result.title),
 				'</span>',
 			'</div>',
 		'</td>'
@@ -707,7 +707,7 @@ function _getRowHTML(result){
 				'<span class="ya35Wb">'
 	]);
 
-	if(_.isArray(result.labels)){
+	if(Array.isArray(result.labels)){
 		result.labels.forEach(function(label){
 			rowArr = rowArr.concat(_getLabelHTML(label));
 		});
@@ -715,7 +715,7 @@ function _getRowHTML(result){
 
 	rowArr = rowArr.concat([
 					(result.isRead ? '' : '<b>'),
-						_.escape(result.body || ''),
+						escape(result.body || ''),
 					(result.isRead ? '' : '</b>'),
 				'</span>',
 			'</div>',
@@ -723,7 +723,7 @@ function _getRowHTML(result){
 	]);
 
 	rowArr.push('<td class="xY"></td>');
-	rowArr.push('<td class="xY xW"><span class="sehUKb">' + _.escape(result.shortDetailText || '') + '</span></td>');
+	rowArr.push('<td class="xY xW"><span class="sehUKb">' + escape(result.shortDetailText || '') + '</span></td>');
 
 	return rowArr.join('');
 }

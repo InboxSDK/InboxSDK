@@ -1,19 +1,19 @@
 /* @flow */
 
-var _ = require('lodash');
-var isNumber = require('isnumber');
+import t from 'transducers.js';
+import isNumber from 'isnumber';
 
-var DEFAULT_ORDER_ATTRS = ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint'];
+const DEFAULT_ORDER_ATTRS = ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint'];
 
 export default function insertElementInOrder(container: HTMLElement, el: HTMLElement, orderAttrs: string[]=DEFAULT_ORDER_ATTRS) {
   // get the first element with higher order hints
-  var insertBeforeElement: ?HTMLElement = _.chain(container.children)
-    .filter(cel => {
-      for (var name of orderAttrs) {
-        if (!el.hasAttribute(name) || !cel.hasAttribute(name)) continue;
-        var attr = el.getAttribute(name);
-        var cattr = cel.getAttribute(name);
-        var comparison;
+  const insertBeforeElement: ?HTMLElement = t.toArray(container.children, t.compose(
+    t.filter((cel: HTMLElement) => {
+      for (let name of orderAttrs) {
+        const attr = el.getAttribute(name);
+        const cattr = cel.getAttribute(name);
+        if (attr == null || cattr == null) continue;
+        let comparison;
         if (isNumber(attr) && isNumber(cattr)) {
           comparison = parseFloat(cattr) - parseFloat(attr);
         } else {
@@ -24,9 +24,9 @@ export default function insertElementInOrder(container: HTMLElement, el: HTMLEle
         // If the elements had equal hint values, then check the next hint.
       }
       return false;
-    })
-    .head()
-    .value();
+    }),
+    t.take(1)
+  ))[0];
 
   container.insertBefore(el, insertBeforeElement);
 }

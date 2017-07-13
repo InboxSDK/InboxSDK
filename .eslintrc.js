@@ -1,8 +1,8 @@
 module.exports = {
+  "root": true,
   "parser": "babel-eslint",
   "env": {
     "browser": true,
-    "jest": true,
     "node": true,
     "es6": true
   },
@@ -15,7 +15,7 @@ module.exports = {
     "sourceType": "module"
   },
   "plugins": [
-    "react", "flowtype"
+    "react", "flowtype", "deprecate"
   ],
   "rules": {
     "flowtype/define-flow-type": 1,
@@ -34,5 +34,35 @@ module.exports = {
     "no-whitespace-before-property": ["error"],
     "space-before-blocks": ["off"], //["error", "always"],
     "keyword-spacing": ["off"], //["error"],
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "excludedFiles": "*.test.js",
+      "rules": {
+        "deprecate/import": ["error",
+          "lodash",
+          "crypto",
+        ]
+      },
+    },
+    {
+      "files": ["__tests__/**", "**/*.test.js"],
+      "env": {
+        "jest": true
+      },
+    },
+    {
+      "files": ["test/**"],
+      "env": {
+        "mocha": true
+      },
+    },
+    {
+      "files": ["test/chrome/**"],
+      "rules": {
+        "no-console": ["off"],
+      },
+    },
+  ],
 };

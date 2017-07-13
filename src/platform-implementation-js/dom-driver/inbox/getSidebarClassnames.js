@@ -1,6 +1,10 @@
 /* @flow */
 
-import _ from 'lodash';
+import difference from 'lodash/difference';
+import once from 'lodash/once';
+import flatMap from 'lodash/flatMap';
+import last from 'lodash/last';
+import t from 'transducers.js';
 import cssParser from 'postcss-selector-parser';
 import Logger from '../../lib/logger';
 import querySelector from '../../lib/dom/querySelectorOrFail';
@@ -18,7 +22,7 @@ const cssProcessor = cssParser();
 
 const getSidebarClassnames: () => {
   chat: ?string, nav: ?string, centerList: ?string
-} = _.once(() => {
+} = once(() => {
   // We know that the page has a CSS rule which looks like
   //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
   // where .chat is the chat sidebar classname that we want to know, and .foo
@@ -39,34 +43,29 @@ const getSidebarClassnames: () => {
     .map(x => new RegExp('\\.'+x+'\\b'));
   if (classRegexes.length === 0) throw new Error('no class names on element');
 
-  function rulesToStyleRules(rule: CSSRule): Object[] {
-    if (rule instanceof window.CSSMediaRule) {
-      return _.flatMap(rule.cssRules, rulesToStyleRules);
-    } else if (rule instanceof window.CSSStyleRule) {
-      return [rule];
-    }
-    return [];
-  }
-
   // rules will contain both the chat and nav sidebar rules.
-  const rules = _.chain(document.styleSheets)
-    .flatMap(sheet => Array.from(sheet.cssRules || []))
-    .flatMap(rulesToStyleRules)
+  const rules = t.toArray(document.styleSheets, t.compose(
+    t.mapcat(sheet => sheet.cssRules || []),
+    t.mapcat(rulesToStyleRules),
     // We have all page rules. Filter it down to just rules mentioning one of
     // [role=application]'s classnames.
-    .filter(rule => classRegexes.some(r => r.test(rule.selectorText)))
+    t.filter(rule => classRegexes.some(r => r.test(rule.selectorText))),
     // Now just the rules that contain both margin-left and -right rules.
-    .filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
-    .value();
+    t.filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
+  ));
 
-  const onlyNavSidebarRule = _.chain(rules)
-    .filter(rule =>
+  const onlyNavSidebarRule = t.toArray(rules, t.compose(
+    t.filter(rule =>
       parseFloat(rule.style['margin-left']) > parseFloat(rule.style['margin-right'])
-    ).head().value();
-  const onlyChatSidebarRule = _.chain(rules)
-    .filter(rule =>
+    ),
+    t.take(1)
+  ))[0];
+  const onlyChatSidebarRule = t.toArray(rules, t.compose(
+    t.filter(rule =>
       parseFloat(rule.style['margin-left']) < parseFloat(rule.style['margin-right'])
-    ).head().value();
+    ),
+    t.take(1)
+  ))[0];
   if (!onlyNavSidebarRule || !onlyChatSidebarRule) {
     const err = new Error('Failed to parse element CSS rules');
     Logger.error(err, {
@@ -81,7 +80,7 @@ const getSidebarClassnames: () => {
     switch (node.type) {
       case 'root':
       case 'selector':
-        return _.flatMap(node.nodes, getMentionedClassNames);
+        return flatMap(node.nodes, getMentionedClassNames);
       case 'class':
         return [node.value];
       default:
@@ -96,18 +95,18 @@ const getSidebarClassnames: () => {
     cssProcessor.process(onlyChatSidebarRule.selectorText).res
   );
 
-  const chatSidebarClassNames: string[] = _.difference(
+  const chatSidebarClassNames: string[] = difference(
     onlyChatSidebarRuleClassNames,
     onlyNavSidebarRuleClassNames
   );
 
-  const navSidebarClassNames: string[] = _.difference(
+  const navSidebarClassNames: string[] = difference(
     onlyNavSidebarRuleClassNames,
     onlyChatSidebarRuleClassNames
   );
 
-  const centerListClassName: ?string = _.last(onlyNavSidebarRuleClassNames) === _.last(onlyChatSidebarRuleClassNames) ?
-    _.last(onlyNavSidebarRuleClassNames) : null;
+  const centerListClassName: ?string = last(onlyNavSidebarRuleClassNames) === last(onlyChatSidebarRuleClassNames) ?
+    last(onlyNavSidebarRuleClassNames) : null;
 
   if (chatSidebarClassNames.length !== 1 || navSidebarClassNames.length !== 1 || !centerListClassName) {
     Logger.error(new Error('Failed to find sidebar classnames'), {
@@ -127,3 +126,12 @@ const getSidebarClassnames: () => {
 });
 
 export default getSidebarClassnames;
+
+function rulesToStyleRules(rule: CSSRule): Object[] {
+  if (rule instanceof window.CSSMediaRule) {
+    return flatMap(rule.cssRules, rulesToStyleRules);
+  } else if (rule instanceof window.CSSStyleRule) {
+    return [rule];
+  }
+  return [];
+}

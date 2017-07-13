@@ -1,7 +1,6 @@
 /* @flow */
 
-const _ = require('lodash');
-const Kefir = require('kefir');
+import Kefir from 'kefir';
 import {defn} from 'ud';
 import GmailElementGetter from '../gmail-element-getter';
 import onMouseDownAndUp from '../../../lib/dom/on-mouse-down-and-up';

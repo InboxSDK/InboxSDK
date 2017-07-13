@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import last from 'lodash/last';
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
@@ -52,7 +52,7 @@ export default function parser(el: HTMLElement) {
   const attachmentsArea: ?HTMLElement = (isDraft || !body || viewState !== 'EXPANDED') ? null : ec.run(
     'attachments area',
     () => {
-      const lastSection = _.last((body.parentElement:any).querySelectorAll('section:last-child'));
+      const lastSection = last((body.parentElement:any).querySelectorAll('section:last-child'));
       if (!lastSection) {
         throw new Error('element not found');
       }

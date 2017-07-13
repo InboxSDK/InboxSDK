@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import ModalView from '../widgets/modal-view';
 import get from '../../common/get-or-fail';

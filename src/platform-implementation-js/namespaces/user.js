@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import * as ud from 'ud';
 import get from '../../common/get-or-fail';
 import type {Driver} from '../driver-interfaces/driver';
@@ -30,7 +30,7 @@ class User {
 	getAccountSwitcherContactList() {
 		let list = get(memberMap, this).driver.getAccountSwitcherContactList();
 		const userEmail = this.getEmailAddress();
-		const listHasUser = !!_.find(list, item => item.emailAddress === userEmail);
+		const listHasUser = !!find(list, item => item.emailAddress === userEmail);
 		if (!listHasUser) {
 			// This happens for delegated accounts.
 			list = list.concat([{name: userEmail, emailAddress: userEmail}]);

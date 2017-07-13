@@ -1,7 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
-
 import Logger from '../../../../lib/logger';
 import simulateClick from '../../../../lib/dom/simulate-click';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';

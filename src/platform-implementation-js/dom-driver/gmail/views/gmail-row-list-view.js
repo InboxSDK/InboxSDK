@@ -1,8 +1,8 @@
 /* @flow */
 
 import {defn} from 'ud';
-
-import _ from 'lodash';
+import find from 'lodash/find';
+import zip from 'lodash/zip';
 import asap from 'asap';
 import assert from 'assert';
 import Kefir from 'kefir';
@@ -10,6 +10,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import delayAsap from '../../../lib/delay-asap';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailThreadRowView from './gmail-thread-row-view';
@@ -105,7 +106,7 @@ class GmailRowListView {
 		if (firstTry) {
 			return firstTry;
 		}
-		const el = _.find(document.querySelectorAll('[gh=tm]'), toolbarContainerElement =>
+		const el = find(document.querySelectorAll('[gh=tm]'), toolbarContainerElement =>
 			toolbarContainerElement.parentElement.parentElement ===
 			(this._element:any).parentElement.parentElement.parentElement.parentElement.parentElement ||
 			toolbarContainerElement.parentElement.parentElement ===
@@ -127,7 +128,7 @@ class GmailRowListView {
 			const firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
 			const newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
 			assert.strictEqual(firstCols.length, newCols.length);
-			_.zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
+			zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
 				newCol.style.width = firstCol.style.width;
 			});
 		}
@@ -143,7 +144,7 @@ class GmailRowListView {
 
 	_expandColumnJob() {
 		this._pendingExpansions.forEach((width, colSelector) => {
-			_.each(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
+			Array.prototype.forEach.call(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
 				const currentWidth = parseInt(col.style.width, 10);
 				if (isNaN(currentWidth) || currentWidth < width) {
 					col.style.width = width+'px';
@@ -154,11 +155,11 @@ class GmailRowListView {
 	}
 
 	_startWatchingForRowViews() {
-		const tableDivParents = _.toArray(this._element.querySelectorAll('div.Cp'));
+		const tableDivParents = Array.from(this._element.querySelectorAll('div.Cp'));
 
 		const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(tableDivParents.map(makeElementChildStream)).flatMap(event => {
 			this._fixColumnWidths(event.el);
-			const tbody = event.el.querySelector('table > tbody');
+			const tbody = querySelector(event.el, 'table > tbody');
 
 			// In vertical preview pane mode, each thread row has three <tr>
 			// elements. We just want to pass the first one (which has an id) to

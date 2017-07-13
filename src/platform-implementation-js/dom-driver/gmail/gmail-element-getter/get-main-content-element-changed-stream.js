@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import last from 'lodash/last';
 import Kefir from 'kefir';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
@@ -20,7 +20,7 @@ export default function getMainContentElementChangedStream(GmailElementGetter: G
 								attributes: true,
 								attributeFilter: ['style']
 							})
-							.map(_.last)
+							.map(last)
 							.toProperty(() => {
 								return {target: el};
 							})

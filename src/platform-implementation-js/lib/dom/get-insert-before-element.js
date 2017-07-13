@@ -1,19 +1,20 @@
 /* @flow */
 
-import _ from 'lodash';
 import isNumber from 'isnumber';
 
+// Use insert-element-in-order instead
+
 export default function getInsertBeforeElement(checkElement: HTMLElement, childElements: any, dataAttributes: string[]): ?HTMLElement {
-	var checkValues = {};
-	var insertBeforeElement: ?HTMLElement = null;
+	const checkValues = {};
+	let insertBeforeElement: ?HTMLElement = null;
 
 	dataAttributes.forEach(function(attribute){
-		var value = checkElement.getAttribute(attribute);
+		const value = checkElement.getAttribute(attribute);
 		checkValues[attribute] = isNumber(value) ? parseFloat(value) : value;
 	});
 
-	for(var ii=0; ii<childElements.length; ii++){
-		var child: HTMLElement = (childElements[ii]:any);
+	for(let ii=0; ii<childElements.length; ii++){
+		const child: HTMLElement = (childElements[ii]:any);
 
 		if(_isChildAfter(checkValues, child, dataAttributes)){
 			insertBeforeElement = child;
@@ -25,9 +26,9 @@ export default function getInsertBeforeElement(checkElement: HTMLElement, childE
 }
 
 function _isChildAfter(checkValues: Object, child: HTMLElement, dataAttributes: string[]): boolean {
-	for(var ii=0; ii<dataAttributes.length; ii++){
-		var attribute = dataAttributes[ii];
-		var value = child.getAttribute(attribute);
+	for(let ii=0; ii<dataAttributes.length; ii++){
+		const attribute = dataAttributes[ii];
+		let value = child.getAttribute(attribute);
 
 		value = isNumber(value) ? parseFloat(value) : value;
 

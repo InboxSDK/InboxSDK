@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-console */
 
-import _ from 'lodash';
 import Sha256 from 'sha.js/sha256';
 import ajax from '../../common/ajax';
 import RSVP from 'rsvp';
@@ -38,7 +37,7 @@ const _extensionIsLoggerMaster = (function() {
   }
 })();
 
-function getAllAppIds(): string[] {
+function getAllAppIds(): typeof _extensionAppIds {
   const str = global.document && ((document.documentElement:any):HTMLElement).getAttribute('data-inboxsdk-active-app-ids') || '[]';
   return JSON.parse(str);
 }
@@ -75,7 +74,7 @@ class Logger {
       document.addEventListener('inboxSDKinjectedError', (event:any) => {
         var detail = event.detail;
         this.error(
-          _.assign(new Error(detail.message), {stack: detail.stack}),
+          Object.assign(new Error(detail.message), {stack: detail.stack}),
           detail.details
         );
       });
@@ -308,18 +307,18 @@ function _extensionLoggerSetup(appId: string, opts: any, loaderVersion: string, 
 }
 
 function getAppIdsProperty(causedByAppId: ?string, onlyExtensionApps: boolean=true): any[] {
-  var appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
+  const appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
     return appIds;
   } else {
-    var appIdsWithCause = _.cloneDeep(appIds);
-    var hasSetCause = false;
-    appIdsWithCause.forEach(function(entry) {
+    const appIdsWithCause = appIds.slice();
+    let hasSetCause = false;
+    appIdsWithCause.forEach((entry, i) => {
       if (!hasSetCause && entry.appId === causedByAppId) {
         hasSetCause = true;
-        entry.causedBy = true;
+        appIdsWithCause[i] = {...entry, causedBy: true};
       }
-      Object.freeze(entry);
+      Object.freeze(appIdsWithCause[i]);
     });
     return Object.freeze(appIdsWithCause);
   }
@@ -366,7 +365,7 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
   if (properties && typeof properties != 'object') {
     throw new Error("properties must be object or null: "+properties);
   }
-  var event = {
+  let event: Object = {
     type: type,
     event: eventName,
     timestamp: Date.now()*1000,
@@ -379,12 +378,12 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
   };
 
   if (type != 'gmail') {
-    _.extend(event, {
+    Object.assign(event, {
       extensionId: getExtensionId(),
       appIds: getAppIdsProperty(appId)
     });
   } else {
-    _.extend(event, {
+    Object.assign(event, {
       appIds: getAppIdsProperty(null, false)
     });
   }

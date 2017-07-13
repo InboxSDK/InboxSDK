@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import get from '../../common/get-or-fail';
 import HandlerRegistry from '../lib/handler-registry';
 import ThreadRowView from '../views/thread-row-view';

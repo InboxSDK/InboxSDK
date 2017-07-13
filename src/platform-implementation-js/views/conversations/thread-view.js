@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
@@ -43,18 +42,16 @@ class ThreadView extends EventEmitter {
 	getMessageViews(): Array<MessageView> {
 		const {threadViewImplementation, membrane} = get(memberMap, this);
 
-		return _.chain(threadViewImplementation.getMessageViewDrivers())
+		return threadViewImplementation.getMessageViewDrivers()
 			.filter(messageViewDriver => messageViewDriver.isLoaded())
-			.map(messageViewDriver => membrane.get(messageViewDriver))
-			.value();
+			.map(messageViewDriver => membrane.get(messageViewDriver));
 	}
 
 	getMessageViewsAll(): Array<MessageView> {
 		const {threadViewImplementation, membrane} = get(memberMap, this);
 
-		return _.chain(threadViewImplementation.getMessageViewDrivers())
-			.map(messageViewDriver => membrane.get(messageViewDriver))
-			.value();
+		return threadViewImplementation.getMessageViewDrivers()
+			.map(messageViewDriver => membrane.get(messageViewDriver));
 	}
 
 	getSubject(): string {

@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import autoHtml from 'auto-html';
 import censorHTMLstring, {ATTRIBUTE_WHITELIST} from './censor-html-string';
 
@@ -10,7 +9,7 @@ export default function censorHTMLtree(target: HTMLElement): string {
   let parent = target;
   let lastIndex = 0;
   while (parent) {
-    const attrHtml: string = _.map(parent.attributes, ({name, value}) =>
+    const attrHtml: string = Array.from(parent.attributes).map(({name, value}) =>
       autoHtml ` ${name}="${ATTRIBUTE_WHITELIST.has(name) ? value : '...'}"`
     ).join('');
     const headerElCount = lastIndex;
@@ -21,7 +20,7 @@ export default function censorHTMLtree(target: HTMLElement): string {
     closers.push(autoHtml `${footers}</${parent.nodeName.toLowerCase()}>`);
 
     if (parent.parentElement) {
-      lastIndex = _.indexOf(parent.parentElement.children, parent);
+      lastIndex = Array.from(parent.parentElement.children).indexOf(parent);
     }
     parent = parent.parentElement;
   }

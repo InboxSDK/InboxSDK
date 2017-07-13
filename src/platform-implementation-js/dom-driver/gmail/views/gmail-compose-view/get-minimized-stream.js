@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
@@ -15,7 +15,7 @@ export default function getMinimizedStream(gmailComposeView: GmailComposeView): 
 function getMinimizedStream_(gmailComposeView: GmailComposeView): Kefir.Observable<boolean> {
 	const element = gmailComposeView.getElement();
 	const bodyElement = gmailComposeView.getBodyElement();
-	const bodyContainer = _.find(element.children, child => child.contains(bodyElement));
+	const bodyContainer = find(element.children, child => child.contains(bodyElement));
 
 	return makeMutationObserverStream(bodyContainer, {attributes: true, attributeFilter: ['style']})
 		.map(() => gmailComposeView.isMinimized());

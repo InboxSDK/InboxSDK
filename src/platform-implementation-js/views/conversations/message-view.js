@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import {defn, defonce} from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
@@ -24,7 +23,10 @@ class MessageView extends EventEmitter {
 	constructor(messageViewImplementation: MessageViewDriver, appId: string, membrane: Membrane, Conversations: Object, driver: Driver){
 		super();
 
-		const members = {messageViewImplementation, membrane, Conversations, driver, linksInBody: null};
+		const members = {
+			messageViewImplementation, membrane, Conversations, driver,
+			linksInBody: (null: ?Array<MessageViewLinkDescriptor>)
+		};
 		memberMap.set(this, members);
 
 		_bindToEventStream(this, members, messageViewImplementation.getEventStream());
@@ -95,10 +97,9 @@ class MessageView extends EventEmitter {
 	// attachment cards if we want to continue support for them.
 	getFileAttachmentCardViews(): Array<AttachmentCardView> {
 		const {messageViewImplementation, membrane} = get(memberMap, this);
-		return _.chain(messageViewImplementation.getAttachmentCardViewDrivers())
+		return messageViewImplementation.getAttachmentCardViewDrivers()
 			.filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
-			.map(attachmentCardViewDriver => membrane.get(attachmentCardViewDriver))
-			.value();
+			.map(attachmentCardViewDriver => membrane.get(attachmentCardViewDriver));
 	}
 
 	// Deprecated name
@@ -123,7 +124,7 @@ class MessageView extends EventEmitter {
 		const members = get(memberMap, this);
 		if(!members.linksInBody){
 			const anchors = this.getBodyElement().querySelectorAll('a');
-			members.linksInBody = _.map(anchors, anchor => ({
+			members.linksInBody = Array.from((anchors: any)).map((anchor: HTMLAnchorElement) => ({
 				text: anchor.textContent,
 				html: anchor.innerHTML,
 				href: anchor.href,

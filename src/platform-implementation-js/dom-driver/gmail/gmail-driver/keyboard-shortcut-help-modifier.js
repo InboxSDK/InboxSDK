@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import escape from 'lodash/escape';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
@@ -102,7 +102,7 @@ export default class KeyboardShortcutHelpModifier {
 		header.innerHTML = [
 			'<div class="aow">',
 				'<span class="inboxsdk__shortcutHelp_title">',
-					_.escape(this._appName || this._appId) + ' keyboard shortcuts',
+					escape(this._appName || this._appId) + ' keyboard shortcuts',
 				'</span>',
 			'</div>'
 		].join('');
@@ -157,7 +157,7 @@ export default class KeyboardShortcutHelpModifier {
 				_getShortcutHTML(keyboardShortcutHandle.chord),
 			'</td>',
 			'<td class="we Dn"> ',
-				_.escape(keyboardShortcutHandle.description || ""),
+				escape(keyboardShortcutHandle.description || ""),
 			'</td>'
 		].join('');
 
@@ -172,7 +172,7 @@ function _getShortcutHTML(chord: string): string {
 	const separators = chord.match(/[\s+]/g);
 
 	for(var ii=0; ii<parts.length; ii++){
-		retArray.push('<span class="wh">' + _.escape(_getAngledBracket(parts[ii])) + '</span>');
+		retArray.push('<span class="wh">' + escape(_getAngledBracket(parts[ii])) + '</span>');
 		if(separators && separators[ii]){
 			retArray.push(_getSeparatorHTML(separators[ii]));
 		}

@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import RSVP from 'rsvp';
@@ -225,7 +225,7 @@ class GmailAttachmentCardView {
 		this._addHoverEvents();
 
 		if(options.buttons){
-			var downloadButton = _.find(options.buttons, function(button){
+			const downloadButton = find(options.buttons, function(button){
 				return button.downloadUrl;
 			});
 
@@ -336,13 +336,13 @@ class GmailAttachmentCardView {
 	}
 
 	_addMoreButtons(buttonDescriptors: ?Object[]){
-		_.chain(buttonDescriptors)
+		(buttonDescriptors || [])
 			.filter(function(buttonDescriptor){
 				return !buttonDescriptor.downloadUrl;
 			})
 			.forEach(desc => {
 				this.addButton(desc);
-			}).value();
+			});
 	}
 
 	_addButton(buttonView: ButtonView) {

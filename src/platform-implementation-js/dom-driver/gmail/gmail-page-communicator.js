@@ -3,7 +3,6 @@
 import type {AutocompleteSearchResultWithId} from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 
-import _ from 'lodash';
 import asap from 'asap';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';

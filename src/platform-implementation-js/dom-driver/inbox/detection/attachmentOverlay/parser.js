@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import t from 'transducers.js';
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
@@ -14,11 +14,11 @@ function parser(el: HTMLElement) {
   });
 
   const downloadButton: ?HTMLElement = ec.run('downloadButton', () => {
-    const candidate = _.chain(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'))
-      .filter(el =>
+    const candidate: ?HTMLElement = t.toArray(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'), t.compose(
+      t.filter(el =>
         el.childElementCount === 1 && el.firstElementChild.childElementCount === 0
-      )
-      .filter(el => {
+      ),
+      t.filter(el => {
         if (global.document) {
           const rect = el.getBoundingClientRect();
           if (rect.top > 100) return false;
@@ -28,17 +28,17 @@ function parser(el: HTMLElement) {
           // little and depending on an exact class name.
           return el.parentElement.classList.contains('ndfHFb-c4YZDc-Wrql6b-C7uZwb-b0t70b');
         }
-      })
-      .filter(el => {
+      }),
+      t.filter(el => {
         const elIx = Array.prototype.indexOf.call(el.parentElement.children, el);
         const nextDivSibling = Array.prototype.filter.call(
           el.parentElement.children,
           (el, i) => i > elIx && el.nodeName === 'DIV'
         )[0];
         return nextDivSibling && nextDivSibling.getAttribute('aria-haspopup') === 'true';
-      })
-      .first()
-      .value();
+      }),
+      t.take(1)
+    ))[0];
     if (!candidate) throw new Error('Failed to find element');
     if (candidate.getAttribute('aria-label') === 'Print') throw new Error('Found print button instead');
     return candidate;

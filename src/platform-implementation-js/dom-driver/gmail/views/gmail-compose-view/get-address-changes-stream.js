@@ -1,8 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
-import RSVP from 'rsvp';
+import t from 'transducers.js';
 
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import getAddressInformationExtractor from './get-address-information-extractor';
@@ -10,19 +9,19 @@ import getAddressInformationExtractor from './get-address-information-extractor'
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Object> {
-	var recipientRowElements = gmailComposeView.getRecipientRowElements();
+	const recipientRowElements = gmailComposeView.getRecipientRowElements();
 
 	if(!recipientRowElements || recipientRowElements.length === 0){
 		return Kefir.never();
 	}
 
-	var mergedStream = Kefir.merge([
+	const mergedStream = Kefir.merge([
 		_makeSubAddressStream('to', recipientRowElements, 0),
 		_makeSubAddressStream('cc', recipientRowElements, 1),
 		_makeSubAddressStream('bcc', recipientRowElements, 2)
 	]);
 
-	var umbrellaStream = mergedStream.map(_groupChangeEvents);
+	const umbrellaStream = mergedStream.map(_groupChangeEvents);
 
 	return Kefir.merge([mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView)]);
 }
@@ -32,7 +31,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 		return Kefir.never();
 	}
 
-	var mainSubAddressStream =
+	const mainSubAddressStream =
 		makeMutationObserverStream(
 			rowElements[rowIndex],
 			{
@@ -48,22 +47,22 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.toProperty(() => {
 					return {addedNodes: rowElements[rowIndex].querySelectorAll('.vR')};
 				})
-				.map(e => e.addedNodes)
-				.map(_.toArray)
-				.flatten()
-				.filter(_isRecipientNode)
-				.map(getAddressInformationExtractor(addressType))
-				.filter(Boolean)
-				.map(_convertToEvent.bind(null, addressType + 'ContactAdded')),
+				.transduce(t.compose(
+					t.mapcat(e => Array.from(e.addedNodes)),
+					t.filter(_isRecipientNode),
+					t.map(getAddressInformationExtractor(addressType)),
+					t.keep(),
+					t.map(_convertToEvent.bind(null, addressType + 'ContactAdded'))
+				)),
 
 			mainSubAddressStream
-				.map(e => e.removedNodes)
-				.map(_.toArray)
-				.flatten()
-				.filter(_isRecipientNode)
-				.map(getAddressInformationExtractor(addressType))
-				.filter(Boolean)
-				.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
+				.transduce(t.compose(
+					t.mapcat(e => Array.from(e.removedNodes)),
+					t.filter(_isRecipientNode),
+					t.map(getAddressInformationExtractor(addressType)),
+					t.keep(),
+					t.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
+				))
 		]);
 	});
 }

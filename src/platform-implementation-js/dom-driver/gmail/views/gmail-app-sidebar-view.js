@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import findIndex from 'lodash/findIndex';
 import asap from 'asap';
 import {defn} from 'ud';
 import autoHtml from 'auto-html';
@@ -379,7 +379,7 @@ class GmailAppSidebarView {
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = _.findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
+        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
           id: orderedItems[index].value.id,
@@ -399,7 +399,7 @@ class GmailAppSidebarView {
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = _.findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
+        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
         if (index === -1) throw new Error('should not happen: failed to find orderItem');
         currentIds.delete(orderedItems[index].id);
         orderManager.removeItemByIndex(index);

@@ -2866,6 +2866,11 @@
         }
       }
     },
+    "eslint-plugin-deprecate": {
+      "version": "0.4.2",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-deprecate/-/eslint-plugin-deprecate-0.4.2.tgz",
+      "integrity": "sha1-TvIi2JVBoeWa4fGof3NIHK3oLOY="
+    },
     "eslint-plugin-flowtype": {
       "version": "2.34.1",
       "resolved": "https://registry.npmjs.org/eslint-plugin-flowtype/-/eslint-plugin-flowtype-2.34.1.tgz",

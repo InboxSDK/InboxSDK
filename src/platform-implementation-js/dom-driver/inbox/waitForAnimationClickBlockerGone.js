@@ -1,12 +1,13 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
+import find from 'lodash/find';
 import Kefir from 'kefir';
 
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-const getAnimationClickBlocker: () => HTMLElement = _.once(() =>
-  _.find(((document.body:any):HTMLElement).children, el => {
+const getAnimationClickBlocker: () => HTMLElement = once(() =>
+  find(((document.body:any):HTMLElement).children, el => {
     const c = window.getComputedStyle(el);
     return c.position === 'fixed' &&
       parseFloat(c.top) === 0 &&

@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
@@ -88,7 +87,7 @@ export default function trackGmailStyles() {
         characterData: true,
         childList: true
       };
-      _.forEach(document.styleSheets, sheet => {
+      Array.from(document.styleSheets).forEach(sheet => {
         if (sheet.ownerNode.tagName == 'STYLE') {
           observer.observe(sheet.ownerNode, options);
         }

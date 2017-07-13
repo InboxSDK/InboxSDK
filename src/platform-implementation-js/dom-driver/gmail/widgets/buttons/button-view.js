@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -344,7 +344,7 @@ const ButtonView = ud.defn(module, class ButtonView {
 			})
 		);
 
-		const isEnterOrSpace = event => _.includes([32/* space */, 13/* enter */], event.which);
+		const isEnterOrSpace = event => includes([32/* space */, 13/* enter */], event.which);
 		const keydownEventStream = Kefir.fromEvents(this._element, 'keydown').filter(() => this.isEnabled());
 		const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 

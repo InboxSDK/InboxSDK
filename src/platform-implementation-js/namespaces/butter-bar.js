@@ -1,6 +1,8 @@
 /* @flow */
 
-import _ from 'lodash';
+import defaults from 'lodash/defaults';
+import sortBy from 'lodash/sortBy';
+import find from 'lodash/find';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -32,7 +34,7 @@ export default class ButterBar {
   }
 
   showMessage(options: Object): Message {
-    _.defaults(options, {
+    defaults(options, {
       priority: 0,
       time: 15*1000,
       hideOnViewChanged: true,
@@ -48,11 +50,11 @@ export default class ButterBar {
       let queue = butterBarDriver.getSharedMessageQueue();
       queue.unshift({
         messageId, priority: options.priority, persistent: options.persistent});
-      queue = _.sortBy(queue, item => -item.priority);
+      queue = sortBy(queue, item => -item.priority);
       queue = queue.filter((item, i) => i===0 || item.persistent);
       butterBarDriver.setSharedMessageQueue(queue);
 
-      if (!_.find(queue, item => item.messageId === messageId)) {
+      if (!find(queue, item => item.messageId === messageId)) {
         return dummyPacket;
       }
     }
@@ -117,7 +119,7 @@ export default class ButterBar {
   }
 
   showLoading(options: Object ={}): Message {
-    _.defaults(options, {
+    defaults(options, {
       text: 'Loading...',
       priority: -3,
       time: Infinity,
@@ -131,14 +133,14 @@ export default class ButterBar {
   }
 
   showError(options: Object): Message {
-    _.defaults(options, {
+    defaults(options, {
       priority: 100
     });
     return this.showMessage(options);
   }
 
   showSaving(options: Object={}): Object {
-    _.defaults(options, {
+    defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
       confirmationTime: 1*1000,

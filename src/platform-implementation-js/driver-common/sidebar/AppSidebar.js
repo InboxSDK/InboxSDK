@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import flatMap from 'lodash/flatMap';
+import sortBy from 'lodash/sortBy';
 import cx from 'classnames';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -89,15 +90,16 @@ export default class AppSidebar extends React.Component {
     return {apps: {}};
   }
   _saveExpansionSettings(data: ExpansionSettings) {
-    const allSidebarIds: [string,string] = _.flatMap(
+    const allSidebarIds: Array<[string,string]> = flatMap(
       Object.keys(data.apps),
       appId => Object.keys(data.apps[appId].ids).map(id => [appId, id])
     );
     if (allSidebarIds.length > MAX_SIDEBAR_SETTINGS) {
-      const idsToRemove: [string,string] = _.chain(allSidebarIds)
-        .sortBy(([appId, id]) => data.apps[appId].ids[id].lastUse)
-        .take(allSidebarIds.length - MAX_SIDEBAR_SETTINGS)
-        .value();
+      const idsToRemove: Array<[string,string]> = sortBy(
+          allSidebarIds,
+          ([appId, id]) => data.apps[appId].ids[id].lastUse
+        )
+        .slice(0, allSidebarIds.length - MAX_SIDEBAR_SETTINGS);
       idsToRemove.forEach(([appId, id]) => {
         delete data.apps[appId].ids[id];
         if (Object.keys(data.apps[appId].ids).length === 0) {

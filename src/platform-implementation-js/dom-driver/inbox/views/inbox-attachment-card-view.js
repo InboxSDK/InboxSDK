@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import includes from 'lodash/includes';
 import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
@@ -125,7 +125,7 @@ class InboxAttachmentCardView {
     this._previewClicks.plug(
       Kefir.merge([
         Kefir.fromEvents(this._element, 'click'),
-        Kefir.fromEvents(this._element, 'keypress').filter(e => _.includes([32/*space*/, 13/*enter*/], e.which))
+        Kefir.fromEvents(this._element, 'keypress').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
       ])
     );
 

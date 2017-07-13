@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import RSVP from 'rsvp';
 import * as ud from 'ud';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';

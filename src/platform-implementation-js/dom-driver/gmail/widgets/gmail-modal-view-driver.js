@@ -1,6 +1,6 @@
 /* @flow */
 
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
@@ -68,7 +68,7 @@ class GmailModalViewDriver {
       this._modalContainerElement.classList.remove('inboxsdk__modal_content_no_buttons');
     }
 
-    _.sortBy(buttons, button => button.orderHint || 0)
+    sortBy(buttons, button => button.orderHint || 0)
       .forEach(this._addButton.bind(this, buttonsEl));
   }
 
@@ -110,13 +110,13 @@ class GmailModalViewDriver {
   }
 
   _addButton(buttonContainer: HTMLElement, buttonDescriptor: Object) {
-    var buttonOptions = _.clone(buttonDescriptor);
+    const buttonOptions = Object.assign({}, buttonDescriptor);
     buttonOptions.buttonColor = (buttonDescriptor.type === 'PRIMARY_ACTION' ? 'blue' : 'default');
 
-    var buttonView = new ButtonView(buttonOptions);
+    const buttonView = new ButtonView(buttonOptions);
 
     buttonOptions.buttonView = buttonView;
-    var buttonViewController = new BasicButtonViewController(buttonOptions);
+    const buttonViewController = new BasicButtonViewController(buttonOptions);
 
     if (buttonDescriptor.type === 'PRIMARY_ACTION') {
       buttonContainer.insertBefore(buttonView.getElement(), (buttonContainer.firstElementChild:any));

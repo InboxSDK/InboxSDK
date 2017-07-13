@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import find from 'lodash/find';
+import uniqBy from 'lodash/uniqBy';
 import censorHTMLstring from '../../../../common/censor-html-string';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
@@ -16,11 +17,11 @@ export default class UserInfo {
 
   // deprecated
   getUserName(): string {
-    var nameEl = document.querySelector('div.gb_w div.gb_B .gb_D');
+    const nameEl = document.querySelector('div.gb_w div.gb_B .gb_D');
     if (nameEl) {
       return nameEl.textContent;
     }
-    var contact: Contact = _.find(
+    const contact: Contact = find(
       this.getAccountSwitcherContactList(),
       (contact: Contact) => contact.emailAddress === this._userEmail);
     if (contact && contact.name != null) {
@@ -30,33 +31,32 @@ export default class UserInfo {
   }
 
   getAccountSwitcherContactList(): Contact[] {
-    var main: Contact[] = _.chain(document.querySelectorAll('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]'))
-      .take(1)
+    const main: Contact[] = Array.from(document.querySelectorAll('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]'))
+      .slice(0, 1)
       .map((btn: HTMLElement) => {
-        var btnParent: HTMLElement = (btn:any).parentElement;
-        var nameEl = btnParent.children[0];
-        var emailAddressEl = btnParent.children[1];
+        const btnParent: HTMLElement = (btn:any).parentElement;
+        const nameEl = btnParent.children[0];
+        const emailAddressEl = btnParent.children[1];
         if (!nameEl || !emailAddressEl) return null;
         return {
           name: nameEl.textContent,
           emailAddress: emailAddressEl.textContent
         };
       })
-      .filter()
-      .value();
-    var extras: Contact[] = _.map(
-      document.querySelectorAll('[role=banner] div[aria-label] div > a[target="_blank"] > img + div'),
-      (el: HTMLElement) => {
-        const match = el.children[1].textContent.match(/\S+/);
-        if (!match) {
-          throw new Error("Failed to match");
-        }
-        return {
-          name: el.children[0].textContent,
-          emailAddress: match[0]
-        };
-      });
-    return _.chain([main, extras]).flatten().uniqBy(x => x.emailAddress.toLowerCase()).value();
+      .filter(Boolean);
+    const extras: Contact[] = Array.from(
+      document.querySelectorAll('[role=banner] div[aria-label] div > a[target="_blank"] > img + div')
+    ).map((el: HTMLElement) => {
+      const match = el.children[1].textContent.match(/\S+/);
+      if (!match) {
+        throw new Error("Failed to match");
+      }
+      return {
+        name: el.children[0].textContent,
+        emailAddress: match[0]
+      };
+    });
+    return uniqBy(main.concat(extras), x => x.emailAddress.toLowerCase());
   }
 
   waitForAccountSwitcherReady(): Promise<void> {
@@ -66,9 +66,9 @@ export default class UserInfo {
         this._failedWaitFor = true;
         Logger.error(err, {
           reason: "waiting for user account switcher",
-          switcherHTML: _.map(
-            document.querySelectorAll('div.gb_w[aria-label], div.gb_va[aria-label]'),
-            (el: HTMLElement) => censorHTMLstring(el.outerHTML))
+          switcherHTML: Array.from(
+            document.querySelectorAll('div.gb_w[aria-label], div.gb_va[aria-label]')
+          ).map((el: HTMLElement) => censorHTMLstring(el.outerHTML))
         });
       });
   }
