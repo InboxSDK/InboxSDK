@@ -152,8 +152,17 @@ class InboxDriver {
         gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
 
-    this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
-      getInboxMessageIdForInboxThreadId(this, inboxThreadId);
+    {
+      const inboxMessageIdForInboxThreadIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_inbox_message_and_inbox_thread_ids',
+        getAfromB: (inboxThreadId: string) => getInboxMessageIdForInboxThreadId(this, inboxThreadId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
+        inboxMessageIdForInboxThreadIdCache.getAfromB(inboxThreadId);
+    }
 
     {
       const threadIdFromMessageIdCache = new BiMapCache({
@@ -420,8 +429,7 @@ class InboxDriver {
     return this._threadRowViewDriverLiveSet;
   }
   getThreadRowViewDriverStream() {
-    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el)
-      .filter(() => false); // TODO re-enable when threadRowViews are ready
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
