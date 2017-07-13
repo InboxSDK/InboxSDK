@@ -45,6 +45,13 @@ class InboxThreadRowView {
     this._userView = userView;
   }
 
+  isSelected(): boolean {
+    if (!this._p.elements.checkbox) {
+      throw new Error('Did not find checkbox element');
+    }
+    return this._p.elements.checkbox.getAttribute('aria-checked') === 'true';
+  }
+
   addAttachmentIcon() {
     throw new Error('Not supported in Inbox');
   }

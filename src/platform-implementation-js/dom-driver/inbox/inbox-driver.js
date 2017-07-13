@@ -60,6 +60,7 @@ import setupRouteViewDriverStream from './setupRouteViewDriverStream';
 
 import type InboxRouteView from './views/inbox-route-view';
 import type InboxCustomRouteView from './views/inbox-custom-route-view';
+import type InboxDummyRouteView from './views/inbox-dummy-route-view';
 import type InboxComposeView from './views/inbox-compose-view';
 import InboxThreadView from './views/inbox-thread-view';
 import InboxThreadRowView from './views/inbox-thread-row-view';
@@ -67,6 +68,7 @@ import InboxMessageView from './views/inbox-message-view';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
+import InboxListToolbarView from './views/InboxListToolbarView';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -99,9 +101,10 @@ class InboxDriver {
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
   _attachmentOverlayViewDriverLiveSet: LiveSet<InboxAttachmentOverlayView>;
   _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
+  _toolbarViewDriverLiveSet: LiveSet<InboxListToolbarView>;
+  _currentRouteViewDriver: InboxRouteView|InboxDummyRouteView|InboxCustomRouteView;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
-  _toolbarViewDriverStream: Kefir.Observable<any>;
   _butterBarDriver = new InboxButterBarDriver();
   _butterBar: ButterBar;
   _pageCommunicator: InboxPageCommunicator;
@@ -322,9 +325,11 @@ class InboxDriver {
     // subscribe to this, unlike some of the other livesets.
 
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
+    this._routeViewDriverStream.takeUntilBy(this._stopper).onValue(routeViewDriver => {
+      this._currentRouteViewDriver = routeViewDriver;
+    });
 
     this._rowListViewDriverStream = Kefir.never();
-    this._toolbarViewDriverStream = Kefir.never();
 
     Kefir.later(30*1000)
       .takeUntilBy(toItemWithLifetimeStream(this._page.tree.getAllByTag('appToolbarLocation')))
@@ -378,6 +383,15 @@ class InboxDriver {
         }
       });
     });
+
+    this._toolbarViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
+      const el = node.getValue();
+      const view = new InboxListToolbarView(el, this);
+      removal.then(() => {
+        view.destroy();
+      });
+      return view;
+    });
   }
 
   destroy() {
@@ -391,15 +405,18 @@ class InboxDriver {
   getLogger(): Logger {return this._logger;}
   getStopper(): Kefir.Observable<null> {return this._stopper;}
   getRouteViewDriverStream() {return this._routeViewDriverStream;}
-  getRowListViewDriverStream() {return this._rowListViewDriverStream;}
+  getCurrentRouteViewDriver() {return this._currentRouteViewDriver;}
+  getRowListViewDriverStream() {return Kefir.never();}
   getComposeViewDriverLiveSet() {return this._composeViewDriverLiveSet;}
   getComposeViewDriverStream() {
     return toItemWithLifetimeStream(this._composeViewDriverLiveSet).map(({el})=>el);
   }
+  getThreadRowViewDriverLiveSet() {
+    return this._threadRowViewDriverLiveSet;
+  }
   getThreadRowViewDriverStream() {
-    // uncomment for testing/working locally
-    // return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
-    return Kefir.never();
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el)
+      .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
@@ -410,7 +427,10 @@ class InboxDriver {
   getAttachmentCardViewDriverStream() {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
   }
-  getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
+  getToolbarViewDriverStream() {
+    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el)
+      .filter(() => false); // TODO re-enable when threadRowViews are ready
+  }
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}

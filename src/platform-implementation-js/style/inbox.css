@@ -21,6 +21,8 @@
 .inboxsdk__appButton.inboxsdk__button_icon:focus {
   outline: none;
 }
+.inboxsdk__compose_actionToolbar .inboxsdk__button_icon::before,
+.inboxsdk__list_toolbar > .inboxsdk__button_icon::before,
 .inboxsdk__appButton.inboxsdk__button_icon::before {
   content: ' ';
   position: absolute;
@@ -35,6 +37,9 @@
 .inboxsdk__appButton.inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__appButton.inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.1);
+}
+.inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
+  background-color: rgba(0,0,0,0.12);
 }
 
 .inboxsdk__appButton_tooltip_container {
@@ -161,6 +166,7 @@
   -webkit-user-select: none;
   user-select: none;
   cursor: pointer;
+  position: relative;
 }
 
 .inboxsdk__button_iconImg {
@@ -184,17 +190,6 @@
   opacity: 1;
   outline: none;
 }
-.inboxsdk__compose_actionToolbar .inboxsdk__button_icon::before {
-  content: ' ';
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: -4px;
-  right: -4px;
-  margin: auto;
-  padding: 4px;
-  border-radius: 50%;
-}
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.1);
@@ -204,6 +199,26 @@
   width: 24px;
   height: 24px;
   vertical-align: middle;
+}
+
+.inboxsdk__list_toolbar > .inboxsdk__button_icon {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+  opacity: 0.6;
+}
+
+.inboxsdk__list_toolbar > .inboxsdk__button_icon:focus,
+.inboxsdk__list_toolbar > .inboxsdk__button_icon:hover {
+  outline: none;
+  opacity: 1;
+}
+
+.inboxsdk__list_toolbar > .inboxsdk__button_icon > img {
+  max-width: 24px;
+  max-height: 24px;
 }
 
 .inboxsdk__dropdown {

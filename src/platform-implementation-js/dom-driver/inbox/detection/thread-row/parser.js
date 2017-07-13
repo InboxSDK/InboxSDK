@@ -19,6 +19,13 @@ export default function parser(el: HTMLElement) {
     )
   ));
 
+  const checkbox = ec.run('checkbox', () => (
+    querySelectorOne(
+      el,
+      'div[jsaction] > div > div[jsaction] > div[role=checkbox]'
+    )
+  ));
+
   const recipients = ec.run(
     'recipients',
     () => el.querySelectorAll('div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span[email]')
@@ -79,7 +86,7 @@ export default function parser(el: HTMLElement) {
   );
 
   const elements = {
-    subject
+    subject, checkbox
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

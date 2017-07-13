@@ -7,12 +7,14 @@
  */
 
 import EventEmitter from '../lib/safe-event-emitter';
+import type InboxListToolbarView from '../dom-driver/inbox/views/InboxListToolbarView';
+import type GmailToolbarView from '../dom-driver/gmail/views/gmail-toolbar-view';
 
 export default class ToolbarView extends EventEmitter {
 	destroyed: boolean;
-	_toolbarViewDriver: ?Object;
+	_toolbarViewDriver: InboxListToolbarView|GmailToolbarView;
 
-	constructor(toolbarViewDriver: Object) {
+	constructor(toolbarViewDriver: InboxListToolbarView|GmailToolbarView) {
 		super();
 		this.destroyed = false;
 		this._toolbarViewDriver = toolbarViewDriver;
@@ -20,15 +22,11 @@ export default class ToolbarView extends EventEmitter {
 		toolbarViewDriver.getStopper().onValue(() => {
 			this.destroyed = true;
 			this.emit('destroy');
-			this._toolbarViewDriver = null;
 		});
 	}
 
-	// Remove this method if this class ever becomes public.
-	getToolbarViewDriver(): Object {
-		if (!this._toolbarViewDriver) {
-			throw new Error("ToolbarView was already destroyed");
-		}
+	// Move this method somewhere private if this class ever becomes public.
+	getToolbarViewDriver(): InboxListToolbarView|GmailToolbarView {
 		return this._toolbarViewDriver;
 	}
 }

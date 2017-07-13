@@ -50,7 +50,9 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys 3',
 		section: inboxSDK.Toolbars.SectionNames.METADATA_STATE,
-		onClick: function(event){
+		hasDropdown: true,
+		onClick(event) {
+			event.dropdown.el.textContent = `Selected rows: ${event.selectedThreadRowViews.length}`;
 			event.selectedThreadRowViews.forEach(function(threadRowView){
 				threadRowView.getContacts().forEach(function(contact){
 					threadRowView.addLabel({

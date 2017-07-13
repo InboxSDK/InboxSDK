@@ -1,6 +1,5 @@
 /* @flow */
 
-import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import EventEmitter from '../lib/safe-event-emitter';
@@ -15,7 +14,22 @@ import ToolbarView from '../views/toolbar-view'; //only used for internal bookke
 
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 
-const memberMap = new WeakMap();
+type Members = {
+	appId: string;
+	driver: Driver;
+	membrane: Membrane;
+	piOpts: PiOpts;
+	listButtonHandlerRegistry: HandlerRegistry<ToolbarView>;
+	threadViewHandlerRegistry: HandlerRegistry<ToolbarView>;
+};
+
+const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
+
+const sectionNames = Object.freeze({
+	'INBOX_STATE': 'INBOX_STATE',
+	'METADATA_STATE': 'METADATA_STATE',
+	'OTHER': 'OTHER'
+});
 
 // documented in src/docs/
 export default class Toolbars extends EventEmitter {
@@ -24,10 +38,10 @@ export default class Toolbars extends EventEmitter {
 	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
 
-		const members = {
+		const members: Members = {
 			appId, driver, membrane, piOpts,
-			listButtonHandlerRegistry: new HandlerRegistry(),
-			threadViewHandlerRegistry: new HandlerRegistry()
+			listButtonHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
+			threadViewHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
 		};
 		memberMap.set(this, members);
 
@@ -42,11 +56,21 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
-		return get(memberMap, this).listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		const members = get(memberMap, this);
+		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
+			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForList does not support section=OTHER and hasDropdown=true together'));
+			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
+		}
+		return members.listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	registerToolbarButtonForThreadView(buttonDescriptor: Object){
-		return get(memberMap, this).threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		const members = get(memberMap, this);
+		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
+			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForThreadView does not support section=OTHER and hasDropdown=true together'));
+			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
+		}
+		return members.threadViewHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
 	}
 
 	setAppToolbarButton(appToolbarButtonDescriptor: Object){
@@ -60,7 +84,7 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	addToolbarButtonForApp(buttonDescriptor: Object){
-		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
+		const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 		const appToolbarButtonViewDriverPromise = get(memberMap, this).driver.addToolbarButtonForApp(buttonDescriptorStream);
 		const appToolbarButtonView = new AppToolbarButtonView(get(memberMap, this).driver, appToolbarButtonViewDriverPromise);
 
@@ -72,7 +96,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 	// Used to help track our duplicate toolbar button issue.
 	const id = `${Date.now()}-${Math.random()}-${buttonDescriptor.title}`;
 
-	return toolbarView => {
+	return (toolbarView: ToolbarView) => {
 		const members = get(memberMap, toolbarsInstance);
 
 		const toolbarViewDriver = toolbarView.getToolbarViewDriver();
@@ -92,77 +116,46 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 function _setupToolbarViewDriverWatcher(toolbars, members){
 	members.driver.getToolbarViewDriverStream()
 		.onValue(toolbarViewDriver => {
-			_handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver);
+			const toolbarView = new ToolbarView(toolbarViewDriver);
+
+			if (toolbarViewDriver.isForRowList()) {
+				members.listButtonHandlerRegistry.addTarget(toolbarView);
+			} else if (toolbarViewDriver.isForThread()) {
+				members.threadViewHandlerRegistry.addTarget(toolbarView);
+			}
 		});
 }
 
-function _handleNewToolbarViewDriver(toolbars, members, toolbarViewDriver){
-	var toolbarView = new ToolbarView(toolbarViewDriver);
-
-	if(toolbarViewDriver.getRowListViewDriver()){
-		members.listButtonHandlerRegistry.addTarget(toolbarView);
-	}
-	else if(toolbarViewDriver.getThreadViewDriver()){
-		members.threadViewHandlerRegistry.addTarget(toolbarView);
-	}
-}
-
-function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver){
+function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver): Object {
 	const {membrane} = members;
-	var buttonOptions = _.clone(buttonDescriptor);
-	var oldOnClick = buttonOptions.onClick || function(){};
+	const buttonOptions = Object.assign({}, buttonDescriptor);
+	const oldOnClick = buttonOptions.onClick || function(){};
 
-	buttonOptions.onClick = function(event){
+	buttonOptions.onClick = function(event) {
 		event = event || {};
 
-		if(toolbarViewDriver.getRowListViewDriver()){
-			Object.assign(event, {
-				threadRowViews: _getThreadRowViews(toolbarViewDriver, membrane),
-				selectedThreadRowViews: _getSelectedThreadRowViews(toolbarViewDriver, membrane)
-			});
-		}
-		else if(toolbarViewDriver.getThreadViewDriver()){
+		if (toolbarViewDriver.isForRowList()) {
+			const threadRowViewDrivers = Array.from(
+				toolbarViewDriver
+					.getThreadRowViewDrivers()
+					.values()
+			);
+
+			const threadRowViews = threadRowViewDrivers
+				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
+
+			const selectedThreadRowViews = threadRowViewDrivers
+				.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
+				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
+
+			event = {...event, threadRowViews, selectedThreadRowViews};
+		} else if (toolbarViewDriver.isForThread()) {
 			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
-			event.threadView = threadView;
+			event = {...event, threadView};
 		}
 
 		oldOnClick(event);
-
 	};
 
 	return buttonOptions;
 }
-
-function _getThreadRowViews(toolbarViewDriver, membrane: Membrane){
-	return Array.from(
-			toolbarViewDriver
-				.getRowListViewDriver()
-				.getThreadRowViewDrivers()
-				.values()
-		).map(_getThreadRowView(membrane));
-}
-
-function _getSelectedThreadRowViews(toolbarViewDriver, membrane: Membrane){
-	return _.chain(Array.from(
-			toolbarViewDriver
-				.getRowListViewDriver()
-				.getThreadRowViewDrivers()
-				.values()
-		))
-		.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
-		.map(_getThreadRowView(membrane))
-		.value();
-}
-
-function _getThreadRowView(membrane: Membrane){
-	return function(threadRowViewDriver){
-		const threadRowView = membrane.get(threadRowViewDriver);
-		return threadRowView;
-	};
-}
-
-var sectionNames = Object.freeze({
-	'INBOX_STATE': 'INBOX_STATE',
-	'METADATA_STATE': 'METADATA_STATE',
-	'OTHER': 'OTHER'
-});
