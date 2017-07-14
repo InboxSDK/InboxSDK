@@ -15,6 +15,7 @@ import {defn} from 'ud';
 import type {TagTree} from 'tag-tree';
 import LiveSet from 'live-set';
 import lsFilter from 'live-set/filter';
+import lsMerge from 'live-set/merge';
 import lsFlatMap from 'live-set/flatMap';
 import lsMapWithRemoval from 'live-set/mapWithRemoval';
 import toValueObservable from 'live-set/toValueObservable';
@@ -384,14 +385,24 @@ class InboxDriver {
       });
     });
 
-    this._toolbarViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
-      const el = node.getValue();
-      const view = new InboxListToolbarView(el, this);
-      removal.then(() => {
-        view.destroy();
-      });
-      return view;
-    });
+    this._toolbarViewDriverLiveSet = lsMerge([
+      lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
+        const el = node.getValue();
+        const view = new InboxListToolbarView(el, this, null);
+        removal.then(() => {
+          view.destroy();
+        });
+        return view;
+      }),
+      lsMapWithRemoval(this._threadViewDriverLiveSet, (inboxThreadView, removal) => {
+        const el = inboxThreadView.getToolbarElement();
+        const view = new InboxListToolbarView(el, this, inboxThreadView);
+        removal.then(() => {
+          view.destroy();
+        });
+        return view;
+      })
+    ]);
   }
 
   destroy() {
@@ -415,8 +426,8 @@ class InboxDriver {
     return this._threadRowViewDriverLiveSet;
   }
   getThreadRowViewDriverStream() {
-    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el)
-      .filter(() => false); // TODO re-enable when threadRowViews are ready
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
+      // .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
@@ -428,8 +439,8 @@ class InboxDriver {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
   }
   getToolbarViewDriverStream() {
-    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el)
-      .filter(() => false); // TODO re-enable when threadRowViews are ready
+    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el);
+      // .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}

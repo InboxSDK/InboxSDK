@@ -70,6 +70,13 @@ class InboxThreadView {
     return this._messageViews;
   }
 
+  getToolbarElement(): HTMLElement {
+    if (!this._p.elements.toolbar) {
+      throw new Error('Failed to find toolbar');
+    }
+    return this._p.elements.toolbar;
+  }
+
   getSubject(): string {
     if (!this._p.elements.heading) {
       throw new Error('Failed to find subject');

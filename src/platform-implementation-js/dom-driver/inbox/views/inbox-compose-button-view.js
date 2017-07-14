@@ -47,6 +47,8 @@ class InboxComposeButtonView {
           this._buttonEl.classList.add('inboxsdk__active');
           dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
           dropdown.setPlacementOptions({
+            position: 'top',
+            hAlign: 'left',
             vAlign: 'bottom'
           });
           dropdown.on('destroy', () => {

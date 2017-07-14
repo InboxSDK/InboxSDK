@@ -27,6 +27,10 @@ export default function parser(el: HTMLElement) {
     if (el instanceof HTMLDivElement) return el;
     throw new Error('child missing');
   });
+  const toolbar = !stickyHeading ? null : ec.run(
+    'toolbar',
+    () => querySelectorOne(stickyHeading, 'ul')
+  );
   const list = ec.run(
     'list',
     () => el.querySelector('div[role=list]')
@@ -35,6 +39,7 @@ export default function parser(el: HTMLElement) {
   const elements = {
     heading,
     stickyHeading,
+    toolbar,
     list
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
