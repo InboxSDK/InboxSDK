@@ -1,7 +1,7 @@
 /* @flow */
 
 import {defn} from 'ud';
-import googleLimitedAjax from '../../driver-common/googleLimitedAjax';
+import inboxAjax from '../../driver-common/inboxAjax';
 import {extractMessageIdsFromThreadResponse} from './inboxResponseProcessor';
 
 import type InboxDriver from './inbox-driver';
@@ -10,7 +10,7 @@ async function getInboxMessageIdForInboxThreadId(driver: InboxDriver, inboxThrea
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   const accountParam = accountParamMatch ? accountParamMatch[1] : '';
 
-  const {text} = await googleLimitedAjax({
+  const {text} = await inboxAjax({
     method: 'POST',
     url: `https://inbox.google.com/sync${accountParam}/i/fd`,
     headers: {
