@@ -45,7 +45,7 @@ const pageParserOptions: PageParserTreeOptions = {
         const _t = t.compose(
           t.filter(iframe => iframe.style.display !== 'none'),
           t.mapcat(iframe =>
-            iframe.contentDocument.querySelectorAll('div[role=dialog]:not([aria-hidden=true])')
+            Array.prototype.slice.call(iframe.contentDocument.querySelectorAll('div[role=dialog]:not([aria-hidden=true])'))
           )
         );
 
