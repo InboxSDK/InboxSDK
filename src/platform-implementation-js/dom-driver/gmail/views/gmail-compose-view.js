@@ -570,7 +570,7 @@ class GmailComposeView {
 		// this compose.
 		const rect = this._element.getBoundingClientRect();
 		const dropzoneSelector = inline ? 'body > .aC7:not(.aWP)' : 'body > .aC7.aWP';
-		const el: ?HTMLElement = t.toArray(document.querySelectorAll(dropzoneSelector), t.compose(
+		const el: ?HTMLElement = t.toArray(Array.prototype.slice.call(document.querySelectorAll(dropzoneSelector)), t.compose(
 			t.filter(isElementVisible),
 			t.filter(dropzone => {
 				const top = parseInt(dropzone.style.top, 10);
