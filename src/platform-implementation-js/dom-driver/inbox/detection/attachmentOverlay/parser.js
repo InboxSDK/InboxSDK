@@ -14,7 +14,7 @@ function parser(el: HTMLElement) {
   });
 
   const downloadButton: ?HTMLElement = ec.run('downloadButton', () => {
-    const candidate: ?HTMLElement = t.toArray(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])'), t.compose(
+    const candidate: ?HTMLElement = t.toArray(Array.prototype.slice.call(el.querySelectorAll('div[role=button][tabindex][data-tooltip]:not([aria-disabled=true]):not([aria-pressed]):not([aria-expanded])')), t.compose(
       t.filter(el =>
         el.childElementCount === 1 && el.firstElementChild.childElementCount === 0
       ),

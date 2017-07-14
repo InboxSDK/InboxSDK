@@ -50,7 +50,7 @@ const pageParserOptions: PageParserTreeOptions = {
         );
 
         return root => {
-          return t.toArray(root.querySelectorAll('iframe[frameborder]:not([src])'), _t);
+          return t.toArray(Array.prototype.slice.call(root.querySelectorAll('iframe[frameborder]:not([src])')), _t);
         };
       })()
     },
