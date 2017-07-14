@@ -69,7 +69,7 @@ import InboxMessageView from './views/inbox-message-view';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
-import InboxListToolbarView from './views/InboxListToolbarView';
+import InboxToolbarView from './views/InboxToolbarView';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -102,7 +102,7 @@ class InboxDriver {
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
   _attachmentOverlayViewDriverLiveSet: LiveSet<InboxAttachmentOverlayView>;
   _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
-  _toolbarViewDriverLiveSet: LiveSet<InboxListToolbarView>;
+  _toolbarViewDriverLiveSet: LiveSet<InboxToolbarView>;
   _currentRouteViewDriver: InboxRouteView|InboxDummyRouteView|InboxCustomRouteView;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
@@ -388,7 +388,7 @@ class InboxDriver {
     this._toolbarViewDriverLiveSet = lsMerge([
       lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
         const el = node.getValue();
-        const view = new InboxListToolbarView(el, this, null);
+        const view = new InboxToolbarView(el, this, null);
         removal.then(() => {
           view.destroy();
         });
@@ -396,7 +396,7 @@ class InboxDriver {
       }),
       lsMapWithRemoval(this._threadViewDriverLiveSet, (inboxThreadView, removal) => {
         const el = inboxThreadView.getToolbarElement();
-        const view = new InboxListToolbarView(el, this, inboxThreadView);
+        const view = new InboxToolbarView(el, this, inboxThreadView);
         removal.then(() => {
           view.destroy();
         });
