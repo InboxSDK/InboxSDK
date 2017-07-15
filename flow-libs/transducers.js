@@ -20,7 +20,7 @@ declare module "transducers.js" {
     toObj: (coll: Array<any>|Iterable<any>, xform?: Transform) => Object;
     toIter: (coll: Array<any>|Iterable<any>, xform?: Transform) => Iterator<any>;
     into: Function;
-    compose: (...fns: Array<any>) => Function;
+    compose: (...fns: Array<Function>) => Function;
     map: <T,U>(fn: (value: T) => U) => Transducer;
     filter: <T>(fn: (value: T) => any) => Transducer;
     remove: <T>(fn: (value: T) => any) => Transducer;
