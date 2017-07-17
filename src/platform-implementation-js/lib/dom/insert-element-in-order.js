@@ -7,7 +7,7 @@ const DEFAULT_ORDER_ATTRS = ['data-group-order-hint', 'data-order-hint', 'data-i
 
 export default function insertElementInOrder(container: HTMLElement, el: HTMLElement, orderAttrs: string[]=DEFAULT_ORDER_ATTRS) {
   // get the first element with higher order hints
-  const insertBeforeElement: ?HTMLElement = t.toArray(container.children, t.compose(
+  const insertBeforeElement: ?HTMLElement = t.toArray(Array.prototype.slice.call(container.children), t.compose(
     t.filter((cel: HTMLElement) => {
       for (let name of orderAttrs) {
         const attr = el.getAttribute(name);

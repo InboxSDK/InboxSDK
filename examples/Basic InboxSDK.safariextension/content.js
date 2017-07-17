@@ -14,6 +14,13 @@ function main() {
 
 	InboxSDK.load(2, 'Hello World!').then(function(sdk){
 
+		sdk.NavMenu.addNavItem({
+			name: 'Test',
+			onClick: function(){
+				alert('hi');
+			}
+		});
+
 		sdk.Router.handleAllRoutes(function(routeView) {
 			console.log('got a routeView', routeView);
 			console.log('routeType', routeView.getRouteType());

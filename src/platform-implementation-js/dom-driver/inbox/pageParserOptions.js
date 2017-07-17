@@ -45,12 +45,12 @@ const pageParserOptions: PageParserTreeOptions = {
         const _t = t.compose(
           t.filter(iframe => iframe.style.display !== 'none'),
           t.mapcat(iframe =>
-            iframe.contentDocument.querySelectorAll('div[role=dialog]:not([aria-hidden=true])')
+            Array.prototype.slice.call(iframe.contentDocument.querySelectorAll('div[role=dialog]:not([aria-hidden=true])'))
           )
         );
 
         return root => {
-          return t.toArray(root.querySelectorAll('iframe[frameborder]:not([src])'), _t);
+          return t.toArray(Array.prototype.slice.call(root.querySelectorAll('iframe[frameborder]:not([src])')), _t);
         };
       })()
     },

@@ -44,8 +44,8 @@ const getSidebarClassnames: () => {
   if (classRegexes.length === 0) throw new Error('no class names on element');
 
   // rules will contain both the chat and nav sidebar rules.
-  const rules = t.toArray(document.styleSheets, t.compose(
-    t.mapcat(sheet => sheet.cssRules || []),
+  const rules = t.toArray(Array.prototype.slice.call(document.styleSheets), t.compose(
+    t.mapcat(sheet => Array.prototype.slice.call(sheet.cssRules || [])),
     t.mapcat(rulesToStyleRules),
     // We have all page rules. Filter it down to just rules mentioning one of
     // [role=application]'s classnames.
@@ -54,13 +54,13 @@ const getSidebarClassnames: () => {
     t.filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
   ));
 
-  const onlyNavSidebarRule = t.toArray(rules, t.compose(
+  const onlyNavSidebarRule = t.toArray(Array.prototype.slice.call(rules), t.compose(
     t.filter(rule =>
       parseFloat(rule.style['margin-left']) > parseFloat(rule.style['margin-right'])
     ),
     t.take(1)
   ))[0];
-  const onlyChatSidebarRule = t.toArray(rules, t.compose(
+  const onlyChatSidebarRule = t.toArray(Array.prototype.slice.call(rules), t.compose(
     t.filter(rule =>
       parseFloat(rule.style['margin-left']) < parseFloat(rule.style['margin-right'])
     ),
