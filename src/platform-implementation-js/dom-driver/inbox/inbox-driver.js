@@ -576,11 +576,6 @@ class InboxDriver {
       const {chat, nav} = getSidebarClassnames();
 
       setCss('custom_view_base_margins', `
-        .inboxsdk__custom_view >
-        .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
-          -webkit-flex: 1;
-          min-width: 0;
-        }
         .inboxsdk__custom_view.${nav||'nav_sidebar'} >
         .${idMap('custom_view_container')}.${idMap('custom_view_min_margins')} {
           margin-left: 232px;
