@@ -87,16 +87,23 @@ class InboxThreadRowView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    // dummy return val for now.
-    return Promise.resolve('');
-  }
+    const {inboxThreadId} = this._p.attributes;
+    if (!inboxThreadId) {
+      throw new Error('Failed to find thread id');
+    }
+    if (/^thread-a:/.test(inboxThreadId)) {
+      // Get the inbox message id of any message in the thread, convert it to
+      // a gmail message id, and then use that id in a request
+      // to a gmail endpoint to get the id of the thread that message is in.
+      const inboxMessageId = await this._driver.getInboxMessageIdForInboxThreadId(inboxThreadId);
+      const gmailMessageId = await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
 
-  getThreadIDIfStable() {
-    throw new Error('Not supported in Inbox. Please use getThreadIDIfStableAsync() instead');
-  }
-
-  getThreadIDIfStableAsync(): Promise<null|string> {
-    throw new Error('not yet implemented');
+      return await this._driver.getThreadIdFromMessageId(gmailMessageId);
+    } else {
+      const m = /\d+$/.exec(inboxThreadId);
+      if (!m) throw new Error('Should not happen');
+      return new BigNumber(m[0]).toString(16);
+    }
   }
 
   async getDraftID(): Promise<?string> {

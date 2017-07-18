@@ -84,6 +84,13 @@ module.exports = function() {
         } else {
           (document.head:any).setAttribute('data-inboxsdk-ik-value', ikValue);
         }
+
+        const xsrfToken = preloadData[12];
+        if (typeof xsrfToken !== 'string') {
+          logger.error(new Error("Could not find valid xsrfToken"));
+        } else {
+          (document.head:any).setAttribute('data-inboxsdk-xsrf-token', xsrfToken);
+        }
       }
     }
   }).catch(err => {

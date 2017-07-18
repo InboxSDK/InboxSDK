@@ -2,11 +2,15 @@
 
 import {defn} from 'ud';
 import Kefir from 'kefir';
-import googleLimitedAjax from './googleLimitedAjax';
-import type {AjaxOpts, AjaxResponse} from '../../common/ajax';
 import imageRequest from '../lib/imageRequest';
+import rateLimitQueuer from '../../common/rate-limit-queuer';
+import ajax from '../../common/ajax';
+
+import type {AjaxOpts, AjaxResponse} from '../../common/ajax';
 
 const IMAGE_REQUEST_TIMEOUT = 1000*60; // one minute
+
+const limitedAjax = rateLimitQueuer(ajax, 1000, 10);
 
 // Tool for making ajax requests to Gmail endpoints. When used in Inbox, this
 // function is able to handle the issue that happens when the user has no Gmail
@@ -17,11 +21,11 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
   }
 
   if (document.location.origin === 'https://mail.google.com') {
-    return await googleLimitedAjax(opts);
+    return await limitedAjax(opts);
   }
 
   try {
-    return await googleLimitedAjax({...opts, canRetry: false});
+    return await limitedAjax({...opts, canRetry: false});
   } catch (e) {
     if (e && e.status === 0) {
       // The connection failed for an unspecified reason. One possible reason
@@ -55,9 +59,9 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
         // where the user has no Gmail cookies is expected to happen maybe once
         // in total to an individual user.
       }
-      return await googleLimitedAjax(opts);
+      return await limitedAjax(opts);
     } else if (e && typeof e.status === 'number' && e.status >= 500) {
-      return await googleLimitedAjax(opts);
+      return await limitedAjax(opts);
     } else {
       throw e;
     }
