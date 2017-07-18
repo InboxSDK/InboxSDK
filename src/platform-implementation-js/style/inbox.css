@@ -83,6 +83,12 @@
   margin-top: 56px;
 }
 
+.IDMAP_custom_view_min_margins {
+  flex: 1;
+  -webkit-flex: 1;
+  min-width: 0;
+}
+
 /* sidebar */
 
 .IDMAP_app_sidebar {
