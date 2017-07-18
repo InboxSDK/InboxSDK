@@ -24,6 +24,7 @@ export type Opts = {
  * @property {string} method
  * @property {string} url
  * @property {Object} params - parameters decoded from the URL
+ * @property {Object} headers - request headers set on the XHR
  * @property {string} responseType
  * @property {string} originalSendBody - data passed to send method
  * @property {number} status - HTTP response status
@@ -36,6 +37,7 @@ export type XHRProxyConnectionDetails = {
   method: string;
   url: string;
   params: {[key:string]: string};
+  headers: {[name:string]: string};
   responseType: string;
   originalSendBody: ?string;
 };
@@ -403,6 +405,9 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     if (this.readyState != 1) {
       throw new Error("Can't set headers now at readyState "+this.readyState);
     }
+
+    this._connection.headers[name] = value;
+
     if (this._connection.async && this._requestChangers.length) {
       this._events.once('realOpen', function() {
         self._realxhr.setRequestHeader(name, value);
@@ -455,6 +460,7 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       method: method,
       url: url,
       params: deparam(url.split('?')[1] || ''),
+      headers: {},
       async: arguments.length < 3 || !!async
     };
     this._clientStartedSend = false;

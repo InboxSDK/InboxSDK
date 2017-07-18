@@ -27,6 +27,7 @@ import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
 import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
+import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThreadId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
 import populateRouteID from '../../lib/populateRouteID';
@@ -114,6 +115,7 @@ class InboxDriver {
   _customRouteIDs: Set<string> = new Set();
 
   getGmailMessageIdForInboxMessageId: (inboxMessageId: string) => Promise<string>;
+  getInboxMessageIdForInboxThreadId: (inboxThreadId: string) => Promise<string>;
   getThreadIdFromMessageId: (messageId: string) => Promise<string>;
 
   constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
@@ -148,6 +150,18 @@ class InboxDriver {
       });
       this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
         gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
+    }
+
+    {
+      const inboxMessageIdForInboxThreadIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_inbox_message_and_inbox_thread_ids',
+        getAfromB: (inboxThreadId: string) => getInboxMessageIdForInboxThreadId(this, inboxThreadId),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
+        inboxMessageIdForInboxThreadIdCache.getAfromB(inboxThreadId);
     }
 
     {
@@ -415,8 +429,7 @@ class InboxDriver {
     return this._threadRowViewDriverLiveSet;
   }
   getThreadRowViewDriverStream() {
-    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el)
-      .filter(() => false); // TODO re-enable when threadRowViews are ready
+    return toItemWithLifetimeStream(this._threadRowViewDriverLiveSet).map(({el})=>el);
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);

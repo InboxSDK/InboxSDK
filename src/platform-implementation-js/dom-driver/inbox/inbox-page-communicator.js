@@ -13,6 +13,29 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       .map(x => x.detail);
   }
 
+  getXsrfToken(): string {
+    const token = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
+    if (!token) throw new Error("Failed to look up xsrf token");
+
+    return token;
+  }
+
+  async getBtaiHeader(): Promise<string> {
+    const existingHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
+    if (existingHeader) {
+      return existingHeader;
+    } else {
+      await this.ajaxInterceptStream
+        .filter(({type}) => type === 'btaiHeaderReceived')
+        .take(1)
+        .toPromise();
+
+      const newHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
+      if (!newHeader) throw new Error("Failed to look up BTAI header");
+      return newHeader;
+    }
+  }
+
   getDraftIDForComposeView(el: HTMLElement): string {
     const draftIDFound = el.hasAttribute('data-inboxsdk-draft-id');
 
