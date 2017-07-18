@@ -16,9 +16,9 @@ declare module "transducers.js" {
     merge: Function;
     transduce: Function;
     seq: Function;
-    toArray: (coll: Array<any>|Iterable<any>, xform?: Transform) => Array<any>;
-    toObj: (coll: Array<any>|Iterable<any>, xform?: Transform) => Object;
-    toIter: (coll: Array<any>|Iterable<any>, xform?: Transform) => Iterator<any>;
+    toArray: (coll: Array<any>|Iterable<any>, xform?: Transducer) => Array<any>;
+    toObj: (coll: Array<any>|Iterable<any>, xform?: Transducer) => Object;
+    toIter: (coll: Array<any>|Iterable<any>, xform?: Transducer) => Iterator<any>;
     into: Function;
     compose: (...fns: Array<Function>) => Function;
     map: <T,U>(fn: (value: T) => U) => Transducer;
