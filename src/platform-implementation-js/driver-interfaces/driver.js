@@ -57,6 +57,7 @@ export type Driver = {
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
 	getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>;
+	registerThreadButton(options: Object): ()=>void;
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;

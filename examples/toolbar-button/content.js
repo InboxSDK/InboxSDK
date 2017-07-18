@@ -8,6 +8,16 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		description: 'have fun'
 	});
 
+	inboxSDK.Toolbars.registerThreadButton({
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		title: 'Monkeys',
+		onClick(event) {
+			console.log('thread button click event', event);
+			window._e = event;
+			alert('clicked a thing');
+		}
+	});
+
 	inboxSDK.Toolbars.registerToolbarButtonForThreadView({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys',

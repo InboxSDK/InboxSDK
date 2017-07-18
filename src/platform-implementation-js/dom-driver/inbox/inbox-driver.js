@@ -550,6 +550,20 @@ class InboxDriver {
     return [this.getUserContact()];
   }
 
+  registerThreadButton(options: Object) {
+    console.log('registerThreadButton', options); //eslint-disable-line no-console
+    const removal = kefirStopper();
+
+    const sub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
+      inboxToolbarView.addButton({...options});
+    });
+
+    return () => {
+      sub.unsubscribe();
+      removal.destroy();
+    };
+  }
+
   addNavItem(appId: string, navItemDescriptor: Object): Object {
     console.log('addNavItem not implemented'); //eslint-disable-line no-console
     const obj = {

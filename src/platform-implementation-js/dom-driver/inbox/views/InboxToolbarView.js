@@ -52,7 +52,7 @@ class InboxToolbarView {
     return this._inboxThreadView;
   }
 
-  addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string) {
+  addButton(buttonDescriptor: Object, toolbarSections?: Object, appId?: string, id?: string) {
     new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._stopper, this._el);
   }
 }

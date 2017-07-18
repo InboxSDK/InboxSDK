@@ -198,6 +198,11 @@ class GmailDriver {
 		};
 	}
 
+	registerThreadButton(options: Object) {
+		console.error('TODO registerThreadButton not implemented in Gmail yet'); //eslint-disable-line
+		return () => {};
+	}
+
 	hashChangeNoViewChange(hash: string) {
 		if (hash[0] !== '#') {
 			throw new Error("bad hash");

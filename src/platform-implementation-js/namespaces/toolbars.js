@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
+import kefirStopper from 'kefir-stopper';
 import EventEmitter from '../lib/safe-event-emitter';
 import HandlerRegistry from '../lib/handler-registry';
 import type {Driver} from '../driver-interfaces/driver';
@@ -11,17 +12,16 @@ import get from '../../common/get-or-fail';
 import ThreadRowView from '../views/thread-row-view';
 import ThreadView from '../views/conversations/thread-view';
 import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
-
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 
-type Members = {
+type Members = {|
 	appId: string;
 	driver: Driver;
 	membrane: Membrane;
 	piOpts: PiOpts;
 	listButtonHandlerRegistry: HandlerRegistry<ToolbarView>;
 	threadViewHandlerRegistry: HandlerRegistry<ToolbarView>;
-};
+|};
 
 const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
 
@@ -38,10 +38,10 @@ export default class Toolbars extends EventEmitter {
 	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
 
-		const members: Members = {
+		const members = {
 			appId, driver, membrane, piOpts,
-			listButtonHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
-			threadViewHandlerRegistry: (new HandlerRegistry(): HandlerRegistry<ToolbarView>),
+			listButtonHandlerRegistry: new HandlerRegistry(),
+			threadViewHandlerRegistry: new HandlerRegistry(),
 		};
 		memberMap.set(this, members);
 
@@ -53,6 +53,27 @@ export default class Toolbars extends EventEmitter {
 		this.SectionNames = sectionNames;
 
 		_setupToolbarViewDriverWatcher(this, members);
+	}
+
+	registerThreadButton(buttonDescriptor: Object) {
+		const members = get(memberMap, this);
+		const stopper = kefirStopper();
+		const sub = members.driver.getRouteViewDriverStream().takeUntilBy(stopper).onValue(routeViewDriver => {
+			if (buttonDescriptor.hideFor) {
+				const routeView = members.membrane.get(routeViewDriver);
+				if (buttonDescriptor.hideFor(routeView)) {
+					return;
+				}
+			}
+
+			const remove = members.driver.registerThreadButton(buttonDescriptor);
+			routeViewDriver.getStopper().merge(stopper).take(1).onValue(() => {
+				remove();
+			});
+		});
+		return () => {
+			stopper.destroy();
+		};
 	}
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
