@@ -27,7 +27,7 @@ import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 
-import updateIcon from '../lib/update-icon/update-icon';
+import updateIcon from '../../../driver-common/update-icon';
 
 type LabelMod = {gmailLabelView: Object, remove(): void};
 type ActionButtonMod = {gmailActionButtonView: GmailActionButtonView, remove(): void};
