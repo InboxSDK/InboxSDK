@@ -77,6 +77,10 @@ class InboxThreadRowView {
       console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
       return;
     }
+
+    const labelParentDiv = this._p.elements.labelParent;
+    if (!labelParentDiv) throw new Error('Could not find label parent element');
+
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     let labelMod = null;
 
@@ -97,9 +101,6 @@ class InboxThreadRowView {
         }
 
         labelMod.inboxLabelView.updateLabelDescriptor(labelDescriptor);
-
-        const labelParentDiv = this._p.elements.labelParent;
-        if (!labelParentDiv) throw new Error('Could not find label parent element');
 
         if (!includes(labelParentDiv.children, labelMod.inboxLabelView.getElement())) {
           labelParentDiv.insertBefore(
