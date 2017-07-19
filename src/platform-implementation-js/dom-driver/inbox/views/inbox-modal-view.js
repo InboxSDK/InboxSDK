@@ -13,7 +13,7 @@ class InboxModalView {
   _modalContainerElement: HTMLElement;
 
   constructor(options: Object) {
-    this._setupModalContainerElement(options);
+    this._setupModalContainerElement();
 
     this._processOptions(options);
 

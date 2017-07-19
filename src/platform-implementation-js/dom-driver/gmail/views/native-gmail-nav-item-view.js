@@ -55,7 +55,7 @@ export default class NativeGmailNavItemView {
 		gmailNavItemView
 			.getEventStream()
 			.filter(eventNameFilter('orderChanged'))
-			.onValue(x => this._addNavItemElement(gmailNavItemView, x));
+			.onValue(() => this._addNavItemElement(gmailNavItemView));
 
 		gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
@@ -113,13 +113,13 @@ export default class NativeGmailNavItemView {
 			.filter(el =>
 				el.classList.contains('ain')
 			)
-			.onValue((e) => this._createActiveMarkerElement(e));
+			.onValue(() => this._createActiveMarkerElement());
 
 		classChangeStream
 			.filter(el =>
 				!el.classList.contains('ain')
 			)
-			.onValue((e) => this._removeActiveMarkerElement(e));
+			.onValue(() => this._removeActiveMarkerElement());
 
 		const parentElement = element.parentElement;
 		if(parentElement){

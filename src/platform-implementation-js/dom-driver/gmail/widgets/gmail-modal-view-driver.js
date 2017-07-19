@@ -14,7 +14,7 @@ class GmailModalViewDriver {
   _modalContainerElement: HTMLElement;
 
   constructor(options: Object) {
-    this._setupModalContainerElement(options);
+    this._setupModalContainerElement();
 
     this._processOptions(options);
     this._eventStream = kefirBus();

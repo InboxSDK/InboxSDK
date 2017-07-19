@@ -2,7 +2,7 @@
 
 import Kefir from 'kefir';
 
-const requestIdleCallback = global.requestIdleCallback || (cb => setTimeout(cb, 0));
+const requestIdleCallback = global.requestIdleCallback || ((cb, ignoredOptions) => setTimeout(cb, 0));
 const cancelIdleCallback = global.cancelIdleCallback || clearTimeout;
 
 // Returns a stream that emits a value using requestIdleCallback. Works well
