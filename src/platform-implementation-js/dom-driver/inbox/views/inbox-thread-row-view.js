@@ -114,7 +114,7 @@ class InboxThreadRowView {
           iconWrapper.setAttribute('title', iconDescriptor.tooltip);
         }
 
-        if (!includes(labelParent.children, iconWrapper)) {
+        if (labelParent !== iconWrapper.parentElement) {
           const threadLabels = labelParent.querySelectorAll('.inboxsdk__inbox_thread_row_label');
           const insertionPoint = threadLabels.length > 0 ?
                                 threadLabels[threadLabels.length - 1].nextElementSibling :
