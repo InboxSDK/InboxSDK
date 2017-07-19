@@ -644,6 +644,7 @@ first-child will do the trick.
 
 .inboxsdk__inbox_thread_row_label {
   border-radius: 2px;
+  display: -webkit-flex;
   display: flex;
   font-weight: bold;
   margin-right: .333em;
@@ -651,6 +652,7 @@ first-child will do the trick.
   padding: 0 8px;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
+  -webkit-align-items: center;
   align-items: center;
 }
 
