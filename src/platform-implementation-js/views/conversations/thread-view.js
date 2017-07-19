@@ -31,7 +31,7 @@ class ThreadView extends EventEmitter {
 
 		members.driver.getLogger().eventSdkPassive('threadView.addSidebarContentPanel');
 
-		const contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream, members.appId);
+		const contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(descriptorPropertyStream);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}

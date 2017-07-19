@@ -51,23 +51,23 @@ class InboxThreadRowView {
     return this._p.elements.checkbox.getAttribute('aria-checked') === 'true';
   }
 
-  addAttachmentIcon() {
+  addAttachmentIcon(options: Object) {
     throw new Error('Not supported in Inbox');
   }
 
-  addButton() {
+  addButton(options: Object) {
     throw new Error('Not supported in Inbox');
   }
 
-  addActionButton() {
+  addActionButton(options: Object) {
     throw new Error('not yet implemented');
   }
 
-  addImage() {
+  addImage(options: Object) {
     throw new Error('not yet implemented');
   }
 
-  addLabel() {
+  addLabel(options: Object) {
     throw new Error('not yet implemented');
   }
 
@@ -136,11 +136,11 @@ class InboxThreadRowView {
     return contacts;
   }
 
-  replaceDate() {
+  replaceDate(options: Object) {
     throw new Error('Not supported in Inbox');
   }
 
-  replaceDraftLabel() {
+  replaceDraftLabel(options: Object) {
     throw new Error('not yet implemented');
   }
 

@@ -107,7 +107,7 @@ export default class GmailNavItemView {
 		gmailNavItemView
 			.getEventStream()
 			.filter(eventNameFilter('orderChanged'))
-			.onValue(x => this._addNavItemElement(gmailNavItemView, x));
+			.onValue(() => this._addNavItemElement(gmailNavItemView));
 
 		gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 

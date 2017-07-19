@@ -129,7 +129,7 @@ function _setupToolbarViewDriverWatcher(toolbars, members){
 function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver): Object {
 	const {membrane} = members;
 	const buttonOptions = Object.assign({}, buttonDescriptor);
-	const oldOnClick = buttonOptions.onClick || function(){};
+	const oldOnClick = buttonOptions.onClick || function(ignored){};
 
 	buttonOptions.onClick = function(event) {
 		event = event || {};

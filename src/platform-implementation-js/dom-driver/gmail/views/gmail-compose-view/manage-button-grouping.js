@@ -96,7 +96,7 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 		if(gmailComposeView.isDestroyed() || !_doButtonsNeedToGroup(gmailComposeView)) return;
 
 		var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
-		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView, groupedActionToolbarContainer);
+		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView);
 
 		_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
 		_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);

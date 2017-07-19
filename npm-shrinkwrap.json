@@ -2973,9 +2973,9 @@
       "integrity": "sha1-b2Ma7zNtbEY2K1F2QETOIWvjwFE="
     },
     "event-listener-with-options": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/event-listener-with-options/-/event-listener-with-options-1.0.2.tgz",
-      "integrity": "sha1-SFgWglQaCxERKamYmd8K9PobBLg="
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/event-listener-with-options/-/event-listener-with-options-1.0.3.tgz",
+      "integrity": "sha512-DcHUHdbqF3V92gRO4b5pgheZmEg8DtmEXX7UntTFTuDxDslaZnWz+nH1k0mxCtNHYuUHLIIStm/Q5T5tIMtUhg=="
     },
     "event-stream": {
       "version": "3.1.7",
@@ -3332,9 +3332,9 @@
       "integrity": "sha1-2uRqnXj74lKSJYzB54CkHZXAN4I="
     },
     "flow-bin": {
-      "version": "0.46.0",
-      "resolved": "https://registry.npmjs.org/flow-bin/-/flow-bin-0.46.0.tgz",
-      "integrity": "sha1-Bq1/4Z3dsQQiZEOAZKKjL+4SuHI="
+      "version": "0.50.0",
+      "resolved": "https://registry.npmjs.org/flow-bin/-/flow-bin-0.50.0.tgz",
+      "integrity": "sha1-1M2yQw3uGjWZ8Otv5VEUbjAnJWo="
     },
     "for-in": {
       "version": "1.0.2",
@@ -7635,14 +7635,14 @@
       }
     },
     "react-draggable-list": {
-      "version": "3.3.0",
-      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.3.0.tgz",
-      "integrity": "sha1-sJCRPazqF/6lUjpelt+0LbrBtcw=",
+      "version": "3.3.1",
+      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.3.1.tgz",
+      "integrity": "sha1-Da5LSjIUTn8UDvjSUHhidY5WDZM=",
       "requires": {
         "babel-runtime": "6.23.0",
         "immutability-helper": "2.2.3",
         "prop-types": "15.5.10",
-        "react-motion": "0.4.8",
+        "react-motion": "0.5.0",
         "react-save-refs": "1.0.2"
       }
     },
@@ -7653,7 +7653,7 @@
       "requires": {
         "babel-runtime": "6.23.0",
         "contain-by-screen": "1.1.0",
-        "event-listener-with-options": "1.0.2",
+        "event-listener-with-options": "1.0.3",
         "kefir": "3.6.1",
         "kefir-bus": "2.2.1",
         "lodash": "4.17.4",
@@ -7675,11 +7675,10 @@
       }
     },
     "react-motion": {
-      "version": "0.4.8",
-      "resolved": "https://registry.npmjs.org/react-motion/-/react-motion-0.4.8.tgz",
-      "integrity": "sha1-I7st0nwtjgDSKeRVctEF789Ao14=",
+      "version": "0.5.0",
+      "resolved": "https://registry.npmjs.org/react-motion/-/react-motion-0.5.0.tgz",
+      "integrity": "sha1-Fwj8Ku5VKQDSHB5r7Sg0aGPgF7Y=",
       "requires": {
-        "create-react-class": "15.6.0",
         "performance-now": "0.2.0",
         "prop-types": "15.5.10",
         "raf": "3.3.2"
@@ -9335,9 +9334,9 @@
       "integrity": "sha1-zZ3S+GSTs/RNvu7zeA/adMXuFL4="
     },
     "ud": {
-      "version": "3.1.0",
-      "resolved": "https://registry.npmjs.org/ud/-/ud-3.1.0.tgz",
-      "integrity": "sha1-0MmreVlokq2LD/FoorR2SHqOEYQ=",
+      "version": "3.1.1",
+      "resolved": "https://registry.npmjs.org/ud/-/ud-3.1.1.tgz",
+      "integrity": "sha512-ufNOT0pCwgq2IzPwwBshiD78fMS8m7HaeH0Cx1fzcN9CdFY76drDkdsm7hU9ZXOItgVdibudaf/mz85b9e5rKw==",
       "requires": {
         "array-range": "1.0.1",
         "babel-runtime": "6.23.0",
@@ -9350,7 +9349,7 @@
       "integrity": "sha1-PDV+hyorH5R/2jbFgN5fPcqdLmo=",
       "requires": {
         "babel-runtime": "6.23.0",
-        "ud": "3.1.0"
+        "ud": "3.1.1"
       }
     },
     "uglify-js": {

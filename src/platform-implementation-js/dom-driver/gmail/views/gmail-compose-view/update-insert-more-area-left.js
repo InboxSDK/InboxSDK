@@ -12,7 +12,7 @@ export default function updateInsertMoreAreaLeft(gmailComposeView: GmailComposeV
 	window.requestAnimationFrame(() => {
 		updateAreaSet.delete(gmailComposeView);
 		if(gmailComposeView.isDestroyed()) return;
-		var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft(true);
+		var newFormattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
 		var insertMoreAreaLeft = parseInt(gmailComposeView.getInsertMoreArea().style.left, 10);
 		var diff = newFormattingAreaOffsetLeft - oldFormattingAreaOffsetLeft;
 		gmailComposeView.getInsertMoreArea().style.left = (insertMoreAreaLeft + diff) + 'px';

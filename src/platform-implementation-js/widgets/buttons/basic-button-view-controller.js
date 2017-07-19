@@ -17,8 +17,8 @@ export default class BasicButtonViewController {
 		this._view
 			.getEventStream()
 			.filter(event => event.eventName === 'click')
-			.onValue(e => {
-				this.activate(e);
+			.onValue(() => {
+				this.activate();
 			});
 	}
 

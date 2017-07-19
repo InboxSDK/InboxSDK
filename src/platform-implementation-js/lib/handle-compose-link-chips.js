@@ -30,7 +30,7 @@ const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDri
       });
 
       const bodyElement = composeView.getBodyElement();
-      const fixupCursorFunction = once(_fixupCursor.bind(null, composeView));
+      const fixupCursorFunction = once(() => _fixupCursor(composeView));
 
       composeView.getEventStream()
         .filter(event => event.eventName === 'bodyChanged')
@@ -58,7 +58,7 @@ const doFixing = defn(module, function(composeView: ComposeViewDriver, bodyEleme
     .filter(_isNotEnhanced)
     .forEach(chip => {
       _addEnhancements(chip);
-      fixupCursorFunction(chip);
+      fixupCursorFunction();
     });
 
   chips
