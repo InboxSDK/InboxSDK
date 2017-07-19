@@ -2,6 +2,7 @@
 
 import {defn} from 'ud';
 import includes from 'lodash/includes';
+import updateIcon from '../../../driver-common/update-icon';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -68,8 +69,62 @@ class InboxThreadRowView {
     throw new Error('not yet implemented');
   }
 
-  addImage() {
-    throw new Error('not yet implemented');
+  addImage(icon: Object) {
+    if (this._isDestroyed) {
+      console.warn('addImage called on destroyed thread row'); //eslint-disable-line no-console
+      return;
+    }
+
+    const {labelParent} = this._p.elements;
+    if (!labelParent) throw new Error('Could not find label parent element');
+
+    const prop = kefirCast((Kefir: any), icon)
+      .takeUntilBy(this._stopper)
+      .toProperty();
+
+    let imageMod = null;
+
+    prop.onValue((iconDescriptor) => {
+      if (!iconDescriptor) {
+        if (imageMod) {
+          imageMod.remove();
+          imageMod = null;
+        }
+      } else {
+        if (!imageMod) {
+          imageMod = {
+            iconSettings: {},
+            iconWrapper: document.createElement('div'),
+            remove() {
+              this.iconWrapper.remove();
+            }
+          };
+          imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
+        }
+        const {iconSettings, iconWrapper} = imageMod;
+
+        updateIcon(
+          iconSettings,
+          iconWrapper,
+          false,
+          iconDescriptor.imageClass,
+          iconDescriptor.imageUrl
+        );
+
+        if (iconDescriptor.tooltip) {
+          iconWrapper.setAttribute('title', iconDescriptor.tooltip);
+        }
+
+        if (!includes(labelParent.children, iconWrapper)) {
+          const threadLabels = labelParent.querySelectorAll('.inboxsdk__inbox_thread_row_label');
+          const insertionPoint = threadLabels.length > 0 ?
+                                threadLabels[threadLabels.length - 1].nextElementSibling :
+                                labelParent.firstChild;
+
+          labelParent.insertBefore(iconWrapper, insertionPoint);
+        }
+      }
+    });
   }
 
   addLabel(label: Object) {
