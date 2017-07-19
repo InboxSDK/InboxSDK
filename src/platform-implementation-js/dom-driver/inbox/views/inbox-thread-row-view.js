@@ -1,7 +1,6 @@
 /* @flow */
 
 import {defn} from 'ud';
-import includes from 'lodash/includes';
 import updateIcon from '../../../driver-common/update-icon';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
@@ -132,7 +131,11 @@ class InboxThreadRowView {
       console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), label).takeUntilBy(this._stopper).toProperty();
+
+    const labelParentDiv = this._p.elements.labelParent;
+    if (!labelParentDiv) throw new Error('Could not find label parent element');
+
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     let labelMod = null;
 
     prop.onValue((labelDescriptor) => {
@@ -153,13 +156,15 @@ class InboxThreadRowView {
 
         labelMod.inboxLabelView.updateLabelDescriptor(labelDescriptor);
 
-        const labelParentDiv = this._p.elements.labelParent;
-        if (!labelParentDiv) throw new Error('Could not find label parent element');
+        if (labelParentDiv !== labelMod.inboxLabelView.getElement().parentElement) {
+          const threadLabels = labelParentDiv.querySelectorAll('.inboxsdk__inbox_thread_row_label');
+          const insertionPoint = threadLabels.length > 0 ?
+                                threadLabels[threadLabels.length - 1].nextElementSibling :
+                                labelParentDiv.firstChild;
 
-        if (!includes(labelParentDiv.children, labelMod.inboxLabelView.getElement())) {
           labelParentDiv.insertBefore(
             labelMod.inboxLabelView.getElement(),
-            labelParentDiv.firstChild
+            insertionPoint
           );
         }
       }
