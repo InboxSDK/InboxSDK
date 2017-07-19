@@ -288,7 +288,7 @@ class GmailThreadRowView {
         labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
 
         const labelParentDiv = this._getLabelParent();
-        if (!includes(labelParentDiv.children, labelMod.gmailLabelView.getElement())) {
+        if (labelParentDiv.children !== labelMod.gmailLabelView.getElement().parentElement) {
           labelParentDiv.insertBefore(
             labelMod.gmailLabelView.getElement(), labelParentDiv.lastChild);
         }

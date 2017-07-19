@@ -1,7 +1,6 @@
 /* @flow */
 
 import {defn} from 'ud';
-import includes from 'lodash/includes';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -102,10 +101,15 @@ class InboxThreadRowView {
 
         labelMod.inboxLabelView.updateLabelDescriptor(labelDescriptor);
 
-        if (!includes(labelParentDiv.children, labelMod.inboxLabelView.getElement())) {
+        if (labelParentDiv !== labelMod.inboxLabelView.getElement().parentElement) {
+          const threadLabels = labelParentDiv.querySelectorAll('.inboxsdk__inbox_thread_row_label');
+          const insertionPoint = threadLabels.length > 0 ?
+                                threadLabels[threadLabels.length - 1].nextElementSibling :
+                                labelParentDiv.firstChild;
+
           labelParentDiv.insertBefore(
             labelMod.inboxLabelView.getElement(),
-            labelParentDiv.firstChild
+            insertionPoint
           );
         }
       }
