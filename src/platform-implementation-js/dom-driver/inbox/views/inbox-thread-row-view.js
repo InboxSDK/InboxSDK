@@ -77,7 +77,7 @@ class InboxThreadRowView {
       console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), label).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     let labelMod = null;
 
     prop.onValue((labelDescriptor) => {

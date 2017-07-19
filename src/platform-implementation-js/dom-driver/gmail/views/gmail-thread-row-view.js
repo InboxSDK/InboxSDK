@@ -258,7 +258,7 @@ class GmailThreadRowView {
       console.warn('addLabel called on destroyed thread row');
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), label).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     var labelMod = null;
 
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([labelDescriptor]) => {
@@ -302,7 +302,7 @@ class GmailThreadRowView {
       console.warn('addImage called on destroyed thread row');
       return;
     }
-    const prop = kefirCast((Kefir: any), inIconDescriptor)
+    const prop = kefirCast(Kefir, inIconDescriptor)
       .toProperty()
       .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
       .takeUntilBy(this._stopper);
@@ -375,7 +375,7 @@ class GmailThreadRowView {
     var buttonMod = null;
 
 
-    var prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), buttonDescriptor).toProperty().takeUntilBy(this._stopper);
+    var prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
     prop.beforeEnd(() => null).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
@@ -492,7 +492,7 @@ class GmailThreadRowView {
     if (this._elements.length !== 1) {
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
     let actionMod = null;
 
     prop.onEnd(() => {
@@ -564,7 +564,7 @@ class GmailThreadRowView {
     var added = false;
     var currentIconUrl;
 
-    var prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), opts).toProperty();
+    var prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       if (!opts) {
         if (added) {
@@ -625,7 +625,7 @@ class GmailThreadRowView {
     }
     let labelMod;
     let draftElement, countElement;
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), opts).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const originalLabel = querySelector(this._elements[0], 'td > div.yW');
       const recipientsContainer = originalLabel.parentElement;
@@ -688,7 +688,7 @@ class GmailThreadRowView {
       return;
     }
     let dateMod;
-    const prop: Kefir.Observable<?Object> = kefirCast((Kefir: any), opts).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
       const dateContainer = querySelector(this._elements[0], 'td.xW, td.yf > div.apm');
       const originalDateSpan = dateContainer.firstElementChild;
