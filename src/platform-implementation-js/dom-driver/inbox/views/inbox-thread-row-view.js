@@ -6,10 +6,13 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
+import kefirCast from 'kefir-cast';
 import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import InboxLabelView from './InboxLabelView';
+
 import type InboxDriver from '../inbox-driver';
 import type {Parsed} from '../detection/thread-row/parser';
 
@@ -20,6 +23,7 @@ class InboxThreadRowView {
   _userView: ?Object;
   _eventStream: Bus<any> = kefirBus();
   _stopper: Kefir.Observable<null>;
+  _isDestroyed: boolean = false;
 
   constructor(element: HTMLElement, driver: InboxDriver, parsed: Parsed) {
     this._element = element;
@@ -67,8 +71,49 @@ class InboxThreadRowView {
     throw new Error('not yet implemented');
   }
 
-  addLabel() {
-    throw new Error('not yet implemented');
+  addLabel(label: Object) {
+    if (this._isDestroyed) {
+      console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
+      return;
+    }
+
+    const labelParentDiv = this._p.elements.labelParent;
+    if (!labelParentDiv) throw new Error('Could not find label parent element');
+
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    let labelMod = null;
+
+    prop.onValue((labelDescriptor) => {
+      if(!labelDescriptor){
+        if (labelMod) {
+          labelMod.remove();
+          labelMod = null;
+        }
+      } else {
+        if (!labelMod) {
+          const inboxLabelView = new InboxLabelView();
+          const el = inboxLabelView.getElement();
+          labelMod = {
+            inboxLabelView,
+            remove: el.remove.bind(el)
+          };
+        }
+
+        labelMod.inboxLabelView.updateLabelDescriptor(labelDescriptor);
+
+        if (labelParentDiv !== labelMod.inboxLabelView.getElement().parentElement) {
+          const threadLabels = labelParentDiv.querySelectorAll('.inboxsdk__inbox_thread_row_label');
+          const insertionPoint = threadLabels.length > 0 ?
+                                threadLabels[threadLabels.length - 1].nextElementSibling :
+                                labelParentDiv.firstChild;
+
+          labelParentDiv.insertBefore(
+            labelMod.inboxLabelView.getElement(),
+            insertionPoint
+          );
+        }
+      }
+    });
   }
 
   getDateString() {
@@ -145,6 +190,7 @@ class InboxThreadRowView {
   }
 
   destroy() {
+    this._isDestroyed = true;
     this._eventStream.end();
   }
 }

@@ -18,7 +18,7 @@ import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-import updateIcon from '../lib/update-icon/update-icon';
+import updateIcon from '../../../driver-common/update-icon';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 

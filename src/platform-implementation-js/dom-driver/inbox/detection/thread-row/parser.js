@@ -85,8 +85,18 @@ export default function parser(el: HTMLElement) {
     }
   );
 
+  const labelParent = ec.run(
+    'labelParent',
+    () => (
+      querySelectorOne(
+        el,
+        'div[jsaction] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child)'
+      )
+    )
+  );
+
   const elements = {
-    subject, checkbox
+    subject, checkbox, labelParent
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {
