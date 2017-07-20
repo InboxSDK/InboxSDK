@@ -671,8 +671,22 @@ first-child will do the trick.
 }
 
 .inboxsdk__thread_row_icon_wrapper {
-  min-width: 25px;
+  width: 20px;
+  min-width: 20px;
+  min-height: 20px;
   margin-right: 5px;
+  position: relative;
+}
+
+.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
+  height: 20px;
+  width: 20px;
+  margin-top: -10px;
+}
+
+.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+  height: 20px;
+  width: 20px;
 }
 
 /* appid warning inbox specific parts */
