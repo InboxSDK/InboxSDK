@@ -671,6 +671,7 @@ first-child will do the trick.
 }
 
 .inboxsdk__thread_row_icon_wrapper {
+  min-width: 25px;
   margin-right: 5px;
 }
 
