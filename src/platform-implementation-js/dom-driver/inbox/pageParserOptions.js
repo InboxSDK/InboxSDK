@@ -172,10 +172,7 @@ const pageParserOptions: PageParserTreeOptions = {
       '[role=listitem]'
     ]},
     {sources: ['threadRow'], tag: 'collapsedThreadRow', selectors: [
-      {$watch: {attributeFilter: ['class'], cond: (el) => (
-        !el.classList.contains('scroll-list-item-open') ||
-        el.classList.contains('scroll-list-item-measuring-open')
-      )}},
+      {$watch: {attributeFilter: ['class'], cond: ':not(.scroll-list-item-open), .scroll-list-item-measuring-open'}},
       ':first-child',
       {$map: (el) => (el: any).parentElement}
     ]},
