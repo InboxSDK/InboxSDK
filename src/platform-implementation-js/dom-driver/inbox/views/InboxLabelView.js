@@ -5,20 +5,15 @@ import isEqual from 'lodash/isEqual';
 import updateIcon from '../../../driver-common/update-icon';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
-class GmailLabelView {
+class InboxLabelView {
 	_element: HTMLElement;
 	_labelDescriptor: Object;
 	_iconSettings: Object;
 
 	constructor(opts={}) {
 		this._element = document.createElement('div');
-		this._element.className = 'inboxsdk__gmail_label ar as ' + (opts.classes || []).join(' ');
-		this._element.innerHTML = `
-			<div class="at">
-				<div class="au">
-					<div class="av"></div>
-				</div>
-			</div>`;
+		this._element.className = 'inboxsdk__inbox_thread_row_label ' + (opts.classes || []).join(' ');
+		this._element.innerHTML = '<span></span>';
 
 		this._labelDescriptor = {};
 		this._iconSettings = {};
@@ -33,7 +28,7 @@ class GmailLabelView {
 	}
 
 	_handleNewLabelDescriptor(labelDescriptor: ?Object){
-		if(!labelDescriptor){
+		if (!labelDescriptor) {
 			this._labelDescriptor = {};
 			return;
 		}
@@ -48,13 +43,19 @@ class GmailLabelView {
 		}
 
 		updateIcon(
-			this._iconSettings, querySelector(this._element, '.at'),
-			false, labelDescriptor.iconClass, labelDescriptor.iconUrl);
+			this._iconSettings,
+			this._element,
+			false,
+			labelDescriptor.iconClass,
+			labelDescriptor.iconUrl
+		);
+
 		if (labelDescriptor.iconClass || labelDescriptor.iconUrl) {
 			this._element.classList.add('inboxsdk__label_has_icon');
 		} else {
 			this._element.classList.remove('inboxsdk__label_has_icon');
 		}
+
 		this._updateBackgroundColor(labelDescriptor.backgroundColor);
 		this._updateForegroundColor(labelDescriptor.foregroundColor);
 		this._updateIconBackgroundColor(labelDescriptor.iconBackgroundColor);
@@ -64,23 +65,19 @@ class GmailLabelView {
 	}
 
 	_updateBackgroundColor(backgroundColor: string){
-		if(this._labelDescriptor.backgroundColor === backgroundColor){
+		if (this._labelDescriptor.backgroundColor === backgroundColor) {
 			return;
 		}
 
-		const elToChange = querySelector(this._element, '.at');
-		elToChange.style.backgroundColor = backgroundColor;
-		elToChange.style.borderColor = backgroundColor;
-
-		querySelector(this._element, '.au').style.borderColor = backgroundColor;
+		this._element.style.backgroundColor = backgroundColor;
 	}
 
 	_updateForegroundColor(foregroundColor: string){
-		if(this._labelDescriptor.foregroundColor === foregroundColor){
+		if (this._labelDescriptor.foregroundColor === foregroundColor) {
 			return;
 		}
 
-		querySelector(this._element, '.at').style.color = foregroundColor;
+		this._element.style.color = foregroundColor;
 	}
 
 	_updateIconBackgroundColor(iconBackgroundColor: ?string) {
@@ -91,13 +88,12 @@ class GmailLabelView {
 	}
 
 	_updateTitle(title: string){
-		if(this._labelDescriptor.title === title){
+		if (this._labelDescriptor.title === title) {
 			return;
 		}
 
-		querySelector(this._element, '.av').textContent = title;
-		this._element.children[0].setAttribute('data-tooltip', title);
+		querySelector(this._element, 'span').textContent = title;
 	}
 }
 
-export default defn(module, GmailLabelView);
+export default defn(module, InboxLabelView);

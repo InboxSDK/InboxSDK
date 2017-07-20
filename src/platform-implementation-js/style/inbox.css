@@ -642,6 +642,38 @@ first-child will do the trick.
   overflow: hidden;
 }
 
+.inboxsdk__inbox_thread_row_label {
+  border-radius: 2px;
+  display: -webkit-flex;
+  display: flex;
+  font-weight: bold;
+  margin-right: .333em;
+  outline: 1px solid transparent;
+  padding: 0 8px;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+.inboxsdk__inbox_thread_row_label .inboxsdk__button_icon,
+.inboxsdk__inbox_thread_row_label .inboxsdk__button_iconImg {
+  height: 11px;
+  width: 11px;
+}
+
+.inboxsdk__inbox_thread_row_label .inboxsdk__button_icon {
+  margin-right: 5px;
+}
+
+.inboxsdk__inbox_thread_row_label .inboxsdk__button_iconImg {
+  position: absolute;
+}
+
+.inboxsdk__thread_row_icon_wrapper {
+  margin-right: 5px;
+}
+
 /* appid warning inbox specific parts */
 .inboxsdk__appid_warning {
   margin: 68px 240px -68px;
