@@ -551,19 +551,27 @@ class InboxDriver {
   }
 
   registerThreadButton(options: Object) {
-    console.log('registerThreadButton', options); //eslint-disable-line no-console
-
     const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
-      inboxToolbarView.addButton({...options, onClick: event => {
-        const selectedThreadRowViewDrivers = Array.from(this.getThreadRowViewDriverLiveSet().values())
-          .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
+      if (inboxToolbarView.isForThread()) {
+        inboxToolbarView.addButton({...options, onClick: event => {
+          options.onClick({
+            dropdown: event.dropdown,
+            selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
+            selectedThreadRowViewDrivers: []
+          });
+        }});
+      } else if (inboxToolbarView.isForRowList()) {
+        inboxToolbarView.addButton({...options, onClick: event => {
+          const selectedThreadRowViewDrivers = Array.from(this.getThreadRowViewDriverLiveSet().values())
+            .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
 
-        options.onClick({
-          dropdown: event.dropdown,
-          selectedThreadViewDrivers: [],
-          selectedThreadRowViewDrivers
-        });
-      }});
+          options.onClick({
+            dropdown: event.dropdown,
+            selectedThreadViewDrivers: [],
+            selectedThreadRowViewDrivers
+          });
+        }});
+      }
     });
 
     const threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
