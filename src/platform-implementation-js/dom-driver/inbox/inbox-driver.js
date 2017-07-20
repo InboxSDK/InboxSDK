@@ -552,12 +552,9 @@ class InboxDriver {
 
   registerThreadButton(options: Object) {
     console.log('registerThreadButton', options); //eslint-disable-line no-console
-    const removal = kefirStopper();
 
-    const sub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
+    const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
       inboxToolbarView.addButton({...options, onClick: event => {
-        if (!options.onClick) return;
-
         const selectedThreadRowViewDrivers = Array.from(this.getThreadRowViewDriverLiveSet().values())
           .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
 
@@ -569,9 +566,19 @@ class InboxDriver {
       }});
     });
 
+    const threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
+      inboxThreadRowView.addToolbarButton({...options, onClick: event => {
+        options.onClick({
+          dropdown: event.dropdown,
+          selectedThreadViewDrivers: [],
+          selectedThreadRowViewDrivers: [inboxThreadRowView]
+        });
+      }});
+    });
+
     return () => {
-      sub.unsubscribe();
-      removal.destroy();
+      toolbarViewSub.unsubscribe();
+      threadRowViewSub.unsubscribe();
     };
   }
 

@@ -13,6 +13,7 @@ import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import InboxLabelView from './InboxLabelView';
+import InboxToolbarButtonView from './InboxToolbarButtonView';
 
 import type InboxDriver from '../inbox-driver';
 import type {Parsed} from '../detection/thread-row/parser';
@@ -54,6 +55,15 @@ class InboxThreadRowView {
       throw new Error('Did not find checkbox element');
     }
     return this._p.elements.checkbox.getAttribute('aria-checked') === 'true';
+  }
+
+  addToolbarButton(options: Object) {
+    const {toolbar} = this._p.elements;
+    if (!toolbar) {
+      throw new Error('could not find toolbar element');
+    }
+    toolbar.classList.add('inboxsdk__list_toolbar');
+    new InboxToolbarButtonView(options, this._driver.getAppId(), this._stopper, toolbar);
   }
 
   addAttachmentIcon(options: Object) {
