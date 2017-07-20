@@ -66,7 +66,14 @@ export default class Toolbars extends EventEmitter {
 				}
 			}
 
-			const remove = members.driver.registerThreadButton(buttonDescriptor);
+			const remove = members.driver.registerThreadButton({...buttonDescriptor, onClick: event => {
+				if (!buttonDescriptor.onClick) return;
+				buttonDescriptor.onClick({
+					dropdown: event.dropdown,
+					selectedThreadViews: event.selectedThreadViewDrivers.map(x => members.membrane.get(x)),
+					selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(x => members.membrane.get(x)),
+				});
+			}});
 			routeViewDriver.getStopper().merge(stopper).take(1).onValue(() => {
 				remove();
 			});

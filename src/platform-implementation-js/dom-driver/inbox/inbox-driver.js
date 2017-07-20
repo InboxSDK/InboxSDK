@@ -555,7 +555,18 @@ class InboxDriver {
     const removal = kefirStopper();
 
     const sub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
-      inboxToolbarView.addButton({...options});
+      inboxToolbarView.addButton({...options, onClick: event => {
+        if (!options.onClick) return;
+
+        const selectedThreadRowViewDrivers = Array.from(this.getThreadRowViewDriverLiveSet().values())
+          .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
+
+        options.onClick({
+          dropdown: event.dropdown,
+          selectedThreadViewDrivers: [],
+          selectedThreadRowViewDrivers
+        });
+      }});
     });
 
     return () => {
