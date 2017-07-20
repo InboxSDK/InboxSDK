@@ -2,7 +2,7 @@ function log() {
 	console.log.apply(console, ['thread-rows'].concat(Array.prototype.slice.call(arguments)));
 }
 
-InboxSDK.load(1, 'thread-rows').then(function(inboxSDK) {
+InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
 	window._sdk = inboxSDK;
 	var i = 0;
 

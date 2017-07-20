@@ -5,7 +5,7 @@ import censorHTMLtree from '../../../../common/censor-html-tree';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
-import updateIcon from '../lib/update-icon/update-icon';
+import updateIcon from '../../../driver-common/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
