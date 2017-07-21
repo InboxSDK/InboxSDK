@@ -11,7 +11,9 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 	inboxSDK.Toolbars.registerThreadButton({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys',
+		hasDropdown: true,
 		onClick(event) {
+			event.dropdown.el.innerHTML = '<div><button type="button">foo</button></div><div>text</div>';
 			console.log('thread button click event', event);
 			window._e = event;
 			alert('clicked a thing');

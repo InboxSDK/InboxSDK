@@ -1,6 +1,7 @@
 /* @flow */
 
 import RSVP from 'rsvp';
+import type LiveSet from 'live-set';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -53,6 +54,9 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 
+import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
+import toLiveSet from '../../lib/toLiveSet';
+
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type {RouteParams} from '../../namespaces/router';
@@ -62,6 +66,7 @@ import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-drive
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
+import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
@@ -87,7 +92,7 @@ class GmailDriver {
 	_rowListViewDriverStream: Kefir.Observable<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Observable<Object>;
 	_threadViewDriverStream: Kefir.Observable<GmailThreadView>;
-	_toolbarViewDriverStream: Kefir.Observable<Object>;
+	_toolbarViewDriverLiveSet: LiveSet<GmailToolbarView>;
 	_composeViewDriverStream: Kefir.Observable<GmailComposeView>;
 	_xhrInterceptorStream: Kefir.Observable<Object>;
 	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
@@ -181,7 +186,9 @@ class GmailDriver {
 			.map(messageView => messageView.getAttachmentCardViewDrivers())
 			.flatten();
 	}
-	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
+	getToolbarViewDriverStream() {
+		return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el);
+	}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream() {return this._messageViewDriverStream;}
@@ -429,7 +436,7 @@ class GmailDriver {
 	}
 
 	_setupToolbarViewDriverStream() {
-		this._toolbarViewDriverStream = Kefir.merge([
+		this._toolbarViewDriverLiveSet = toLiveSet(Kefir.merge([
 											this._rowListViewDriverStream.map(function(gmailRowListView){
 												return gmailRowListView.getToolbarView();
 											}),
@@ -441,7 +448,10 @@ class GmailDriver {
 										.flatMap(function(gmailToolbarView){
 											return gmailToolbarView.waitForReady();
 										})
-										.takeUntilBy(this._stopper);
+										.map(gmailToolbarView => ({
+											el: gmailToolbarView, removalStream: gmailToolbarView.getStopper()
+										}))
+										.takeUntilBy(this._stopper));
 	}
 
 	_setupMessageViewDriverStream() {
