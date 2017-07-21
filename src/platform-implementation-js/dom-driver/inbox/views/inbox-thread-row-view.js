@@ -124,6 +124,12 @@ class InboxThreadRowView {
         }
       }
     });
+
+    this._stopper.onEnd(() => {
+      if (imageMod) {
+        imageMod.remove();
+      }
+    });
   }
 
   addLabel(label: Object) {
@@ -167,6 +173,12 @@ class InboxThreadRowView {
             insertionPoint
           );
         }
+      }
+    });
+
+    this._stopper.onEnd(() => {
+      if (labelMod) {
+        labelMod.remove();
       }
     });
   }
