@@ -15,7 +15,7 @@ export default function parser(el: HTMLElement) {
   const subject = ec.run('subject', () => (
     querySelectorOne(
       el,
-      'div[jsaction] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child) > div:not([style]):not(:first-child):not(:last-child)'
+      'div[jsaction][jslog] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child) > div:not([style]):not(:first-child):not(:last-child):not([class*="inboxsdk"])'
     )
   ));
 
@@ -90,7 +90,7 @@ export default function parser(el: HTMLElement) {
     () => (
       querySelectorOne(
         el,
-        'div[jsaction] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child)'
+        'div[jsaction][jslog] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child)'
       )
     )
   );
