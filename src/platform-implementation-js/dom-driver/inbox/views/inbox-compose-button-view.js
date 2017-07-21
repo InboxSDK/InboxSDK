@@ -29,7 +29,7 @@ class InboxComposeButtonView {
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
     img.className = 'inboxsdk__button_iconImg';
-    let onClick = () => {};
+    let onClick = ignored => {};
     let hasDropdown = false;
     let dropdown = null;
     Kefir.merge([

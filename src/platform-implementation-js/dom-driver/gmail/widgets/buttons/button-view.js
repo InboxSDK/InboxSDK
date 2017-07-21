@@ -144,8 +144,8 @@ const ButtonView = ud.defn(module, class ButtonView {
 
 		this._createInnerElement(options);
 
-		this._createTextElement(options);
-		this._createIconElement(options);
+		this._createTextElement();
+		this._createIconElement();
 	}
 
 	_createMainElement(options: ButtonViewOptions){
