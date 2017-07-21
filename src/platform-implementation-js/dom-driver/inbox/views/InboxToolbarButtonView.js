@@ -67,7 +67,7 @@ class InboxToolbarButtonView {
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
         buttonEl.setAttribute('data-order-hint', String(orderHint));
-        insertElementInOrder(container, buttonEl);
+        insertElementInOrder(container, buttonEl, undefined, true);
       }
     }
 
