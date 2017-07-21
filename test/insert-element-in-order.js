@@ -10,6 +10,7 @@ describe('insertElementInOrder', function() {
 <html>
 <head><title>foo</title></head>
 <body>
+  <div id="zero">element with no order attributes</div>
   <div id="alpha"   data-group-order-hint="foo1234"></div>
   <div id="beta"    data-group-order-hint="foo124"></div>
   <div id="charlie" data-group-order-hint="foo124" data-order-hint="30"></div>
@@ -17,6 +18,7 @@ describe('insertElementInOrder', function() {
 </body>
 </html>`);
 
+  const zero = document.getElementById('zero');
   const alpha = document.getElementById('alpha');
   const beta = document.getElementById('beta');
   const charlie = document.getElementById('charlie');
@@ -28,14 +30,30 @@ describe('insertElementInOrder', function() {
 
   it("works", function() {
     const alpha2 = document.createElement('div');
+    alpha2.id = 'alpha2';
     alpha2.setAttribute('data-group-order-hint', 'foo1235');
     insertElementInOrder((document.body:any), alpha2);
     assert.strictEqual(index(alpha2), index(alpha)+1);
 
     const charlie2 = document.createElement('div');
+    charlie2.id = 'charlie2';
     charlie2.setAttribute('data-group-order-hint', 'foo124');
     charlie2.setAttribute('data-order-hint', '45');
     insertElementInOrder((document.body:any), charlie2);
     assert.strictEqual(index(charlie2), index(charlie)+1);
+  });
+
+  it("insertBeforeNonSdk", function() {
+    const alpha3 = document.createElement('div');
+    alpha3.id = 'alpha3';
+    alpha3.setAttribute('data-group-order-hint', 'foo3');
+    insertElementInOrder((document.body:any), alpha3, undefined, true);
+    assert.strictEqual(index(alpha3), index(zero)-1);
+
+    const alpha4 = document.createElement('div');
+    alpha4.id = 'alpha4';
+    alpha4.setAttribute('data-group-order-hint', 'foo4');
+    insertElementInOrder((document.body:any), alpha4, undefined, true);
+    assert.strictEqual(index(alpha4), index(zero)-1);
   });
 });
