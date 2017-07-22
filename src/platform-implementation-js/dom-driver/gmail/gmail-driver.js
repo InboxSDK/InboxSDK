@@ -4,6 +4,7 @@ import RSVP from 'rsvp';
 import type LiveSet from 'live-set';
 import toValueObservable from 'live-set/toValueObservable';
 import {defn} from 'ud';
+import t from 'transducers.js';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -105,6 +106,7 @@ class GmailDriver {
 	_timestampGlobalsFound: ?number;
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
+	_currentRouteViewDriver: GmailRouteView;
 
 	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
@@ -209,8 +211,40 @@ class GmailDriver {
 	}
 
 	registerThreadButton(options: Object) {
-		console.error('TODO registerThreadButton not implemented in Gmail yet'); //eslint-disable-line
-		return () => {};
+		const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: gmailToolbarView}: {value: GmailToolbarView}) => {
+			if (gmailToolbarView.isForThread()) {
+				gmailToolbarView.addButton({
+					...options,
+					section: options.threadSection || 'METADATA_STATE',
+					onClick: event => {
+						options.onClick({
+							dropdown: event.dropdown,
+							selectedThreadViewDrivers: [gmailToolbarView.getThreadViewDriver()],
+							selectedThreadRowViewDrivers: []
+						});
+					}
+				});
+			} else if (gmailToolbarView.isForRowList()) {
+				const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
+					.filter(gmailThreadRow => gmailThreadRow.isSelected());
+
+				gmailToolbarView.addButton({
+					...options,
+					section: options.listSection || 'METADATA_STATE',
+					onClick: event => {
+						options.onClick({
+							dropdown: event.dropdown,
+							selectedThreadViewDrivers: [],
+							selectedThreadRowViewDrivers
+						});
+					}
+				});
+			}
+		});
+
+		return () => {
+			toolbarViewSub.unsubscribe();
+		};
 	}
 
 	hashChangeNoViewChange(hash: string) {
@@ -400,6 +434,10 @@ class GmailDriver {
 			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
 			).takeUntilBy(this._stopper).toProperty();
+
+			this._routeViewDriverStream.onValue(gmailRouteView => {
+				this._currentRouteViewDriver = gmailRouteView;
+			});
 
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntilBy(this._stopper);
 

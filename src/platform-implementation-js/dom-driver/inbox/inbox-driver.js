@@ -553,21 +553,27 @@ class InboxDriver {
   registerThreadButton(options: Object) {
     const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
       if (inboxToolbarView.isForThread()) {
-        inboxToolbarView.addButton({...options, onClick: event => {
-          options.onClick({
-            dropdown: event.dropdown,
-            selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
-            selectedThreadRowViewDrivers: []
-          });
-        }});
+        inboxToolbarView.addButton({
+          ...options,
+          onClick: event => {
+            options.onClick({
+              dropdown: event.dropdown,
+              selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
+              selectedThreadRowViewDrivers: []
+            });
+          }
+        });
       } else if (inboxToolbarView.isForRowList()) {
-        inboxToolbarView.addButton({...options, onClick: event => {
-          options.onClick({
-            dropdown: event.dropdown,
-            selectedThreadViewDrivers: [],
-            selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
-          });
-        }});
+        inboxToolbarView.addButton({
+          ...options,
+          onClick: event => {
+            options.onClick({
+              dropdown: event.dropdown,
+              selectedThreadViewDrivers: [],
+              selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
+            });
+          }
+        });
       }
     });
 
