@@ -562,13 +562,10 @@ class InboxDriver {
         }});
       } else if (inboxToolbarView.isForRowList()) {
         inboxToolbarView.addButton({...options, onClick: event => {
-          const selectedThreadRowViewDrivers = Array.from(this.getThreadRowViewDriverLiveSet().values())
-            .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
-
           options.onClick({
             dropdown: event.dropdown,
             selectedThreadViewDrivers: [],
-            selectedThreadRowViewDrivers
+            selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
           });
         }});
       }
@@ -588,6 +585,11 @@ class InboxDriver {
       toolbarViewSub.unsubscribe();
       threadRowViewSub.unsubscribe();
     };
+  }
+
+  getSelectedThreadRowViewDrivers(): Array<InboxThreadRowView> {
+    return Array.from(this.getThreadRowViewDriverLiveSet().values())
+      .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
   }
 
   addNavItem(appId: string, navItemDescriptor: Object): Object {
