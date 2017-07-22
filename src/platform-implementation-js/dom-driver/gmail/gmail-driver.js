@@ -2,6 +2,7 @@
 
 import RSVP from 'rsvp';
 import type LiveSet from 'live-set';
+import toValueObservable from 'live-set/toValueObservable';
 import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';

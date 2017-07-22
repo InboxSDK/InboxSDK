@@ -94,7 +94,7 @@ class GmailRowListView {
 		var toolbarElement = this._findToolbarElement();
 
 		if (toolbarElement) {
-			this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
+			this._toolbarView = new GmailToolbarView(toolbarElement, this._gmailDriver, this._routeViewDriver, this);
 		} else {
 			this._toolbarView = null;
 		}

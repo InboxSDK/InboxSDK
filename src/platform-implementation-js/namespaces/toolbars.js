@@ -13,6 +13,7 @@ import ThreadRowView from '../views/thread-row-view';
 import ThreadView from '../views/conversations/thread-view';
 import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
+import {SECTION_NAMES} from '../constants/toolbars';
 
 type Members = {|
 	appId: string;
@@ -25,15 +26,9 @@ type Members = {|
 
 const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
 
-const sectionNames = Object.freeze({
-	'INBOX_STATE': 'INBOX_STATE',
-	'METADATA_STATE': 'METADATA_STATE',
-	'OTHER': 'OTHER'
-});
-
 // documented in src/docs/
 export default class Toolbars extends EventEmitter {
-	SectionNames: Object;
+	SectionNames = SECTION_NAMES;
 
 	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
@@ -50,7 +45,7 @@ export default class Toolbars extends EventEmitter {
 			members.threadViewHandlerRegistry.dumpHandlers();
 		});
 
-		this.SectionNames = sectionNames;
+		this.SectionNames = SECTION_NAMES;
 
 		_setupToolbarViewDriverWatcher(this, members);
 	}
@@ -136,7 +131,7 @@ function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
 			}
 		}
 
-		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), toolbarsInstance.SectionNames, members.appId, id);
+		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), id);
 	};
 }
 
