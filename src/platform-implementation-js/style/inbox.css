@@ -689,6 +689,14 @@ first-child will do the trick.
   width: 20px;
 }
 
+.inboxsdk__thread_row_draft_label_replaced > span:not(.inboxsdk__thread_row_custom_draft_label) {
+  display: none;
+}
+
+.inboxsdk__thread_row_custom_draft_label {
+  color: rgb(210, 63, 49);
+}
+
 /* appid warning inbox specific parts */
 .inboxsdk__appid_warning {
   margin: 68px 240px -68px;

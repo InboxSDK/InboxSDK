@@ -252,8 +252,48 @@ class InboxThreadRowView {
     throw new Error('Not supported in Inbox');
   }
 
-  replaceDraftLabel(options: Object) {
-    throw new Error('not yet implemented');
+  replaceDraftLabel(label: Object) {
+    if (this._isDestroyed) {
+      console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
+      return;
+    }
+
+    // We don't want to replace draft labels on messages without drafts
+    if (this._p.attributes.visibleDraftCount === 0) return;
+
+    const {recipientParent} = this._p.elements;
+    if (!recipientParent) throw new Error('Could not find recipientParent parent element');
+
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    let labelMod = null;
+
+    prop.onValue((labelDescriptor) => {
+      if(!labelDescriptor){
+        if (labelMod) {
+          labelMod.remove();
+          labelMod = null;
+
+          recipientParent.classList.remove('inboxsdk__thread_row_draft_label_replaced');
+        }
+      } else {
+        if (!labelMod) {
+          labelMod = {
+            el: document.createElement('span'),
+            remove() { this.el.remove(); }
+          };
+
+          labelMod.el.className = 'inboxsdk__thread_row_custom_draft_label';
+
+          recipientParent.classList.add('inboxsdk__thread_row_draft_label_replaced');
+        }
+
+        labelMod.el.textContent = labelDescriptor.text;
+
+        if (recipientParent !== labelMod.el.parentElement) {
+          recipientParent.appendChild(labelMod.el);
+        }
+      }
+    });
   }
 
   destroy() {
