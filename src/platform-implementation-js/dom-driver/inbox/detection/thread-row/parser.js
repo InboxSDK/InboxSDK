@@ -76,11 +76,16 @@ export default function parser(el: HTMLElement) {
       /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
   );
 
+  const messageCountParent = ec.run(
+    'messageCountParent',
+    () => recipientParent && recipientParent.nextElementSibling
+  );
+
   const visibleMessageCount = ec.run(
     'visibleMessageCount',
     () => {
-      const countEl = el.querySelector('div[jsaction] > div:not(:first-child):not(:last-child) > div > span > span');
-      const match = countEl && /^\((\d+)\)$/.exec(countEl.textContent);
+      const messageCountEl = messageCountParent && messageCountParent.querySelector('span');
+      const match = messageCountEl && /^\((\d+)\)$/.exec(messageCountEl.textContent);
       if (!match) return 1;
       return parseInt(match[1]);
     }
@@ -121,7 +126,7 @@ export default function parser(el: HTMLElement) {
   );
 
   const elements = {
-    subject, checkbox, labelParent, recipientParent
+    subject, checkbox, labelParent, recipientParent, messageCountParent
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

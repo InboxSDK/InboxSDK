@@ -261,8 +261,8 @@ class InboxThreadRowView {
     // We don't want to replace draft labels on messages without drafts
     if (this._p.attributes.visibleDraftCount === 0) return;
 
-    const {recipientParent} = this._p.elements;
-    if (!recipientParent) throw new Error('Could not find recipientParent parent element');
+    const {recipientParent, messageCountParent} = this._p.elements;
+    if (!recipientParent || !messageCountParent) throw new Error('Could not find necessary parent elements');
 
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     let labelMod = null;
@@ -272,25 +272,55 @@ class InboxThreadRowView {
         if (labelMod) {
           labelMod.remove();
           labelMod = null;
-
-          recipientParent.classList.remove('inboxsdk__thread_row_draft_label_replaced');
         }
       } else {
+        const {text, count} = labelDescriptor;
         if (!labelMod) {
           labelMod = {
-            el: document.createElement('span'),
-            remove() { this.el.remove(); }
+            countEl: document.createElement('span'),
+            draftEl: document.createElement('span'),
+            remove() {
+              this.countEl.remove();
+              this.draftEl.remove();
+
+              recipientParent.classList.remove('inboxsdk__thread_row_draft_label_replaced');
+              messageCountParent.classList.remove('inboxsdk__thread_row_draft_count_replaced');
+
+              if (!messageCountParent.querySelector('span:not(.inboxsdk__thread_row_custom_draft_count)')) {
+                ((messageCountParent: any): HTMLElement).style.display = 'none';
+              }
+            }
           };
 
-          labelMod.el.className = 'inboxsdk__thread_row_custom_draft_label';
+          labelMod.draftEl.className = 'inboxsdk__thread_row_custom_draft_label';
+          labelMod.countEl.className = 'inboxsdk__thread_row_custom_draft_count';
 
           recipientParent.classList.add('inboxsdk__thread_row_draft_label_replaced');
         }
 
-        labelMod.el.textContent = labelDescriptor.text;
+        labelMod.draftEl.textContent = text;
 
-        if (recipientParent !== labelMod.el.parentElement) {
-          recipientParent.appendChild(labelMod.el);
+        if (recipientParent !== labelMod.draftEl.parentElement) {
+          recipientParent.appendChild(labelMod.draftEl);
+        }
+
+        const hasExistingCountEl = messageCountParent.querySelector('span:not(.inboxsdk__thread_row_custom_draft_count)');
+
+        if (count && count > 1) {
+          messageCountParent.classList.add('inboxsdk__thread_row_draft_count_replaced');
+          ((messageCountParent: any): HTMLElement).style.display = 'inline';
+
+          labelMod.countEl.innerHTML = hasExistingCountEl ? autoHtml `(${count})` : autoHtml `&nbsp;(${count})`;
+
+          if (messageCountParent !== labelMod.countEl.parentElement) {
+            messageCountParent.appendChild(labelMod.countEl);
+          }
+        } else {
+          messageCountParent.classList.remove('inboxsdk__thread_row_draft_count_replaced');
+          if (!hasExistingCountEl) {
+            ((messageCountParent: any): HTMLElement).style.display = 'none';
+          }
+          labelMod.countEl.remove();
         }
       }
     });
