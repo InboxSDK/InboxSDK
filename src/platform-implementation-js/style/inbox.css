@@ -646,7 +646,7 @@ first-child will do the trick.
   border-radius: 2px;
   display: -webkit-flex;
   display: flex;
-  font-weight: bold;
+  font-weight: 300;
   margin-right: .333em;
   outline: 1px solid transparent;
   padding: 0 8px;
