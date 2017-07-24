@@ -2,6 +2,7 @@
 
 import once from 'lodash/once';
 import constant from 'lodash/constant';
+import includes from 'lodash/includes';
 import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
@@ -553,43 +554,50 @@ class InboxDriver {
   registerThreadButton(options: Object) {
     const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
       if (inboxToolbarView.isForThread()) {
-        inboxToolbarView.addButton({
-          ...options,
-          onClick: event => {
-            options.onClick({
-              dropdown: event.dropdown,
-              selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
-              selectedThreadRowViewDrivers: []
-            });
-          }
-        });
+        if (!options.positions || includes(options.positions, 'THREAD')) {
+          inboxToolbarView.addButton({
+            ...options,
+            onClick: event => {
+              options.onClick({
+                dropdown: event.dropdown,
+                selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
+                selectedThreadRowViewDrivers: []
+              });
+            }
+          });
+        }
       } else if (inboxToolbarView.isForRowList()) {
-        inboxToolbarView.addButton({
-          ...options,
-          onClick: event => {
-            options.onClick({
-              dropdown: event.dropdown,
-              selectedThreadViewDrivers: [],
-              selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
-            });
-          }
-        });
+        if (!options.positions || includes(options.positions, 'LIST')) {
+          inboxToolbarView.addButton({
+            ...options,
+            onClick: event => {
+              options.onClick({
+                dropdown: event.dropdown,
+                selectedThreadViewDrivers: [],
+                selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
+              });
+            }
+          });
+        }
       }
     });
 
-    const threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
-      inboxThreadRowView.addToolbarButton({...options, onClick: event => {
-        options.onClick({
-          dropdown: event.dropdown,
-          selectedThreadViewDrivers: [],
-          selectedThreadRowViewDrivers: [inboxThreadRowView]
-        });
-      }});
-    });
+    let threadRowViewSub;
+    if (!options.positions || includes(options.positions, 'ROW')) {
+      threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
+        inboxThreadRowView.addToolbarButton({...options, onClick: event => {
+          options.onClick({
+            dropdown: event.dropdown,
+            selectedThreadViewDrivers: [],
+            selectedThreadRowViewDrivers: [inboxThreadRowView]
+          });
+        }});
+      });
+    }
 
     return () => {
       toolbarViewSub.unsubscribe();
-      threadRowViewSub.unsubscribe();
+      if (threadRowViewSub) threadRowViewSub.unsubscribe();
     };
   }
 

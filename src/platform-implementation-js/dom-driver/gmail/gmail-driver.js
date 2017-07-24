@@ -10,6 +10,7 @@ import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import asap from 'asap';
+import includes from 'lodash/includes';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
@@ -213,32 +214,36 @@ class GmailDriver {
 	registerThreadButton(options: Object) {
 		const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: gmailToolbarView}: {value: GmailToolbarView}) => {
 			if (gmailToolbarView.isForThread()) {
-				gmailToolbarView.addButton({
-					...options,
-					section: options.threadSection || 'METADATA_STATE',
-					onClick: event => {
-						options.onClick({
-							dropdown: event.dropdown,
-							selectedThreadViewDrivers: [gmailToolbarView.getThreadViewDriver()],
-							selectedThreadRowViewDrivers: []
-						});
-					}
-				});
+				if (!options.positions || includes(options.positions, 'THREAD')) {
+					gmailToolbarView.addButton({
+						...options,
+						section: options.threadSection || 'METADATA_STATE',
+						onClick: event => {
+							options.onClick({
+								dropdown: event.dropdown,
+								selectedThreadViewDrivers: [gmailToolbarView.getThreadViewDriver()],
+								selectedThreadRowViewDrivers: []
+							});
+						}
+					});
+				}
 			} else if (gmailToolbarView.isForRowList()) {
-				const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
-					.filter(gmailThreadRow => gmailThreadRow.isSelected());
+				if (!options.positions || includes(options.positions, 'LIST')) {
+					const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
+						.filter(gmailThreadRow => gmailThreadRow.isSelected());
 
-				gmailToolbarView.addButton({
-					...options,
-					section: options.listSection || 'METADATA_STATE',
-					onClick: event => {
-						options.onClick({
-							dropdown: event.dropdown,
-							selectedThreadViewDrivers: [],
-							selectedThreadRowViewDrivers
-						});
-					}
-				});
+					gmailToolbarView.addButton({
+						...options,
+						section: options.listSection || 'METADATA_STATE',
+						onClick: event => {
+							options.onClick({
+								dropdown: event.dropdown,
+								selectedThreadViewDrivers: [],
+								selectedThreadRowViewDrivers
+							});
+						}
+					});
+				}
 			}
 		});
 
