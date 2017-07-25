@@ -10,13 +10,12 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 
 	inboxSDK.Toolbars.registerThreadButton({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
-		title: 'Monkeys',
+		title: 'Monkeys (registerThreadButton)',
 		hasDropdown: true,
 		onClick(event) {
 			event.dropdown.el.innerHTML = '<div><button type="button">foo</button></div><div>text</div>';
 			console.log('thread button click event', event);
 			window._e = event;
-			alert('clicked a thing');
 		}
 	});
 
@@ -30,7 +29,6 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		},
 		keyboardShortcutHandle: shortcutHandle
 	});
-
 
 	var shortcutHandle2 = inboxSDK.Keyboard.createShortcutHandle({
 		chord: 'ctrl+shift+x',
@@ -90,15 +88,6 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 			console.log('selected: ', event.selectedThreadRowViews.length);
 		}
 	});
-
-	// Testing duplicate
-	// inboxSDK.Toolbars.registerToolbarButtonForList({
-	// 	title: 'Monkeys 2',
-	// 	section: inboxSDK.Toolbars.SectionNames.INBOX_STATE,
-	// 	onClick: function(event){
-	// 		console.log('selected: ', event.selectedThreadRowViews.length);
-	// 	}
-	// });
 
 	var button = inboxSDK.Toolbars.addToolbarButtonForApp({
 		iconUrl: 'https://ssl.gstatic.com/s2/oz/images/notifications/spinner_32_4152eb447e3e756250b29a0b19b2bbf9.gif',

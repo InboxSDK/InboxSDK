@@ -4,14 +4,10 @@ import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import EventEmitter from '../lib/safe-event-emitter';
-import HandlerRegistry from '../lib/handler-registry';
 import type {Driver} from '../driver-interfaces/driver';
 import type {PiOpts} from '../platform-implementation';
 import type Membrane from '../lib/Membrane';
 import get from '../../common/get-or-fail';
-import ThreadRowView from '../views/thread-row-view';
-import ThreadView from '../views/conversations/thread-view';
-import ToolbarView from '../views/toolbar-view'; //only used for internal bookkeeping
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 import {SECTION_NAMES} from '../constants/toolbars';
 
@@ -20,8 +16,6 @@ type Members = {|
 	driver: Driver;
 	membrane: Membrane;
 	piOpts: PiOpts;
-	listButtonHandlerRegistry: HandlerRegistry<ToolbarView>;
-	threadViewHandlerRegistry: HandlerRegistry<ToolbarView>;
 |};
 
 const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
@@ -32,22 +26,10 @@ export default class Toolbars extends EventEmitter {
 
 	constructor(appId: string, driver: Driver, membrane: Membrane, piOpts: PiOpts) {
 		super();
-
 		const members = {
-			appId, driver, membrane, piOpts,
-			listButtonHandlerRegistry: new HandlerRegistry(),
-			threadViewHandlerRegistry: new HandlerRegistry(),
+			appId, driver, membrane, piOpts
 		};
 		memberMap.set(this, members);
-
-		driver.getStopper().onValue(function() {
-			members.listButtonHandlerRegistry.dumpHandlers();
-			members.threadViewHandlerRegistry.dumpHandlers();
-		});
-
-		this.SectionNames = SECTION_NAMES;
-
-		_setupToolbarViewDriverWatcher(this, members);
 	}
 
 	registerThreadButton(buttonDescriptor: Object) {
@@ -154,72 +136,4 @@ export default class Toolbars extends EventEmitter {
 
 		return appToolbarButtonView;
 	}
-}
-
-function _getToolbarButtonHandler(buttonDescriptor, toolbarsInstance){
-	// Used to help track our duplicate toolbar button issue.
-	const id = `${Date.now()}-${Math.random()}-${buttonDescriptor.title}`;
-
-	return (toolbarView: ToolbarView) => {
-		const members = get(memberMap, toolbarsInstance);
-
-		const toolbarViewDriver = toolbarView.getToolbarViewDriver();
-
-		if(buttonDescriptor.hideFor){
-			const routeView = members.membrane.get(toolbarViewDriver.getRouteViewDriver());
-			if(buttonDescriptor.hideFor(routeView)){
-				return;
-			}
-		}
-
-		toolbarViewDriver.addButton(_processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver), id);
-	};
-}
-
-
-function _setupToolbarViewDriverWatcher(toolbars, members){
-	members.driver.getToolbarViewDriverStream()
-		.onValue(toolbarViewDriver => {
-			const toolbarView = new ToolbarView(toolbarViewDriver);
-
-			if (toolbarViewDriver.isForRowList()) {
-				members.listButtonHandlerRegistry.addTarget(toolbarView);
-			} else if (toolbarViewDriver.isForThread()) {
-				members.threadViewHandlerRegistry.addTarget(toolbarView);
-			}
-		});
-}
-
-function _processButtonDescriptor(buttonDescriptor, members, toolbarViewDriver): Object {
-	const {membrane} = members;
-	const buttonOptions = Object.assign({}, buttonDescriptor);
-	const oldOnClick = buttonOptions.onClick || function(ignored){};
-
-	buttonOptions.onClick = function(event) {
-		event = event || {};
-
-		if (toolbarViewDriver.isForRowList()) {
-			const threadRowViewDrivers = Array.from(
-				toolbarViewDriver
-					.getThreadRowViewDrivers()
-					.values()
-			);
-
-			const threadRowViews = threadRowViewDrivers
-				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
-
-			const selectedThreadRowViews = threadRowViewDrivers
-				.filter(threadRowViewDriver => threadRowViewDriver.isSelected())
-				.map(threadRowViewDriver => membrane.get(threadRowViewDriver));
-
-			event = {...event, threadRowViews, selectedThreadRowViews};
-		} else if (toolbarViewDriver.isForThread()) {
-			const threadView = membrane.get(toolbarViewDriver.getThreadViewDriver());
-			event = {...event, threadView};
-		}
-
-		oldOnClick(event);
-	};
-
-	return buttonOptions;
 }

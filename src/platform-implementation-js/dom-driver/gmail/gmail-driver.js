@@ -532,6 +532,7 @@ class GmailDriver {
 				el: gmailToolbarView, removalStream: gmailToolbarView.getStopper()
 			}))
 			.takeUntilBy(this._stopper));
+		this._toolbarViewDriverLiveSet.subscribe({});
 	}
 
 	_setupMessageViewDriverStream() {
