@@ -3,6 +3,8 @@
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
 
+const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
+
 export default function parser(el: HTMLElement) {
   const ec = new ErrorCollector('threadRow');
 
@@ -36,17 +38,54 @@ export default function parser(el: HTMLElement) {
     () => !(recipients && recipients.length > 0)
   );
 
+  const draftLabels = ec.run(
+    'draftLabels',
+    () => {
+      const recipientCandidates = el.querySelectorAll('div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span');
+
+      // We have to locate draft labels via text color because it's impossible
+      // to locate them with reliable CSS selectors
+      return Array.from(recipientCandidates).filter((candidate) => {
+        const colorString = getComputedStyle(candidate).getPropertyValue('color');
+        const colorMatch = RGB_REGEX.exec(colorString);
+        if (!colorMatch) throw new Error("Failed to read color string");
+
+        const r = +colorMatch[1], g = +colorMatch[2], b = +colorMatch[3];
+
+        return r > 200 && g < 100 && b < 100; // Draft labels are red
+      });
+    }
+  );
+
+  const recipientParent = ec.run(
+    'recipientParent',
+    () => {
+      if (recipients && recipients.length > 0) return recipients[0].parentElement;
+
+      // There are no recipient elements with an email attr, which means this
+      // thread only has drafts. In order to find the recipient parent we need
+      // to work from a draft label upwards.
+      if (!(draftLabels && draftLabels.length > 0)) throw new Error('Could not locate draft labels');
+      return draftLabels[0].parentElement;
+    }
+  );
+
   const inboxThreadId: ?string = ec.run(
     'thread id',
     () =>
       /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
   );
 
+  const messageCountParent = ec.run(
+    'messageCountParent',
+    () => recipientParent && recipientParent.nextElementSibling
+  );
+
   const visibleMessageCount = ec.run(
     'visibleMessageCount',
     () => {
-      const countEl = el.querySelector('div[jsaction] > div:not(:first-child):not(:last-child) > div > span > span');
-      const match = countEl && /^\((\d+)\)$/.exec(countEl.textContent);
+      const messageCountEl = messageCountParent && messageCountParent.querySelector('span');
+      const match = messageCountEl && /^\((\d+)\)$/.exec(messageCountEl.textContent);
       if (!match) return 1;
       return parseInt(match[1]);
     }
@@ -57,17 +96,8 @@ export default function parser(el: HTMLElement) {
     () => {
       if (isOnlyDraft && visibleMessageCount) return visibleMessageCount;
 
-      const recipientEl = recipients && recipients[0];
-      const draftCandidates = (
-        recipientEl &&
-        recipientEl.parentElement &&
-        recipientEl.parentElement.querySelectorAll('span:not([email])')
-      );
-      if (!draftCandidates) return 0;
-
-      return Array.from(draftCandidates).filter((candidate) => (
-        !(candidate.textContent.includes(' .. ') || candidate.textContent.includes(', '))
-      )).length;
+      if (!draftLabels) throw new Error('Could not locate draft labels');
+      return draftLabels.length;
     }
   );
 
@@ -101,7 +131,7 @@ export default function parser(el: HTMLElement) {
   );
 
   const elements = {
-    subject, checkbox, labelParent, toolbar
+    subject, checkbox, labelParent, toolbar, recipientParent, messageCountParent
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

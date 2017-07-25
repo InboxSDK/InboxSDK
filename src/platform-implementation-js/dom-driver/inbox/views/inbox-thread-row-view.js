@@ -9,9 +9,6 @@ import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import kefirCast from 'kefir-cast';
 import BigNumber from 'bignumber.js';
-import delayAsap from '../../../lib/delay-asap';
-import idMap from '../../../lib/idMap';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import InboxLabelView from './InboxLabelView';
 import InboxToolbarButtonView from './InboxToolbarButtonView';
 
@@ -262,8 +259,84 @@ class InboxThreadRowView {
     throw new Error('Not supported in Inbox');
   }
 
-  replaceDraftLabel(options: Object) {
-    throw new Error('not yet implemented');
+  replaceDraftLabel(label: Object) {
+    if (this._isDestroyed) {
+      console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
+      return;
+    }
+
+    // We don't want to replace draft labels on messages without drafts
+    if (this._p.attributes.visibleDraftCount === 0) return;
+
+    const {recipientParent, messageCountParent} = this._p.elements;
+    if (!recipientParent || !messageCountParent) throw new Error('Could not find necessary parent elements');
+
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    let labelMod = null;
+
+    prop.onValue((labelDescriptor) => {
+      if(!labelDescriptor){
+        if (labelMod) {
+          labelMod.remove();
+          labelMod = null;
+        }
+      } else {
+        const {text, count} = labelDescriptor;
+        if (!labelMod) {
+          labelMod = {
+            countEl: document.createElement('span'),
+            draftEl: document.createElement('span'),
+            remove() {
+              this.countEl.remove();
+              this.draftEl.remove();
+
+              recipientParent.classList.remove('inboxsdk__thread_row_draft_label_replaced');
+              messageCountParent.classList.remove('inboxsdk__thread_row_draft_count_replaced');
+
+              if (!messageCountParent.querySelector('span:not(.inboxsdk__thread_row_custom_draft_count)')) {
+                ((messageCountParent: any): HTMLElement).style.display = 'none';
+              }
+            }
+          };
+
+          labelMod.draftEl.className = 'inboxsdk__thread_row_custom_draft_label';
+          labelMod.countEl.className = 'inboxsdk__thread_row_custom_draft_count';
+
+          recipientParent.classList.add('inboxsdk__thread_row_draft_label_replaced');
+        }
+
+        labelMod.draftEl.textContent = text;
+
+        if (recipientParent !== labelMod.draftEl.parentElement) {
+          recipientParent.appendChild(labelMod.draftEl);
+        }
+
+        const hasExistingCountEl = messageCountParent.querySelector('span:not(.inboxsdk__thread_row_custom_draft_count)');
+
+        if (count && count > 1) {
+          messageCountParent.classList.add('inboxsdk__thread_row_draft_count_replaced');
+          ((messageCountParent: any): HTMLElement).style.display = 'inline';
+
+          labelMod.countEl.innerHTML = hasExistingCountEl ? autoHtml `(${count})` : autoHtml `&nbsp;(${count})`;
+
+          if (messageCountParent !== labelMod.countEl.parentElement) {
+            messageCountParent.appendChild(labelMod.countEl);
+          }
+        } else {
+          messageCountParent.classList.remove('inboxsdk__thread_row_draft_count_replaced');
+          if (!hasExistingCountEl) {
+            ((messageCountParent: any): HTMLElement).style.display = 'none';
+          }
+          labelMod.countEl.remove();
+        }
+      }
+
+      this._stopper.onEnd(() => {
+        if (labelMod) {
+          labelMod.remove();
+        }
+      });
+    });
   }
 
   destroy() {
