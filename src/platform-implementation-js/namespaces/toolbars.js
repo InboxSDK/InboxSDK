@@ -53,17 +53,18 @@ export default class Toolbars extends EventEmitter {
 	registerThreadButton(buttonDescriptor: Object) {
 		const members = get(memberMap, this);
 		const stopper = kefirStopper();
+		const {hideFor, ..._buttonDescriptor} = buttonDescriptor;
 		const sub = members.driver.getRouteViewDriverStream().takeUntilBy(stopper).onValue(routeViewDriver => {
-			if (buttonDescriptor.hideFor) {
+			if (hideFor) {
 				const routeView = members.membrane.get(routeViewDriver);
-				if (buttonDescriptor.hideFor(routeView)) {
+				if (hideFor(routeView)) {
 					return;
 				}
 			}
 
-			const remove = members.driver.registerThreadButton({...buttonDescriptor, onClick: event => {
-				if (!buttonDescriptor.onClick) return;
-				buttonDescriptor.onClick({
+			const remove = members.driver.registerThreadButton({..._buttonDescriptor, onClick: event => {
+				if (!_buttonDescriptor.onClick) return;
+				_buttonDescriptor.onClick({
 					dropdown: event.dropdown,
 					selectedThreadViews: event.selectedThreadViewDrivers.map(x => members.membrane.get(x)),
 					selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(x => members.membrane.get(x)),
