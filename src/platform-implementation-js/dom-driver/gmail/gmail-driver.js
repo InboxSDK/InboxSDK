@@ -247,8 +247,35 @@ class GmailDriver {
 			}
 		});
 
+		let threadRowViewSub = null;
+		if (!options.positions || includes(options.positions, 'ROW')) {
+			const perThreadRow = (gmailThreadRow: GmailThreadRowView) => {
+				gmailThreadRow.addButton({
+					hasDropdown: options.hasDropdown,
+					iconClass: options.iconClass,
+					iconUrl: options.iconUrl,
+					onClick: event => {
+						if (!options.onClick) return;
+						options.onClick({
+							dropdown: event.dropdown,
+							selectedThreadViewDrivers: [],
+							selectedThreadRowViewDrivers: [gmailThreadRow]
+						});
+					},
+				});
+			};
+
+			this._currentRouteViewDriver.getRowListViews().forEach(gmailRowListView => {
+				gmailRowListView.getThreadRowViewDrivers().forEach(perThreadRow);
+			});
+			threadRowViewSub = this._threadRowViewDriverKefirStream.observe({
+				value: perThreadRow
+			});
+		}
+
 		return () => {
 			toolbarViewSub.unsubscribe();
+			if (threadRowViewSub) threadRowViewSub.unsubscribe();
 		};
 	}
 

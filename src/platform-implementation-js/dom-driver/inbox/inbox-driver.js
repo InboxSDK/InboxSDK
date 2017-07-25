@@ -582,7 +582,7 @@ class InboxDriver {
       }
     });
 
-    let threadRowViewSub;
+    let threadRowViewSub = null;
     if (!options.positions || includes(options.positions, 'ROW')) {
       threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
         inboxThreadRowView.addToolbarButton({...options, onClick: event => {
