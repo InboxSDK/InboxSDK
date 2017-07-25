@@ -22,7 +22,8 @@ function _insertLinkIntoBody(gmailComposeView, text, href){
 	const range = selection.getRangeAt(0);
 	const link = document.createElement('a');
 	link.href = href;
-	range.surroundContents(link);
+	link.appendChild(range.extractContents());
+	range.insertNode(link);
 	link.textContent = text;
 
 	selection.selectAllChildren(link);
