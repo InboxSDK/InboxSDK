@@ -9,9 +9,6 @@ import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import kefirCast from 'kefir-cast';
 import BigNumber from 'bignumber.js';
-import delayAsap from '../../../lib/delay-asap';
-import idMap from '../../../lib/idMap';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import InboxLabelView from './InboxLabelView';
 
 import type InboxDriver from '../inbox-driver';
