@@ -559,6 +559,7 @@ class InboxDriver {
             ...options,
             onClick: event => {
               options.onClick({
+                position: 'THREAD',
                 dropdown: event.dropdown,
                 selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
                 selectedThreadRowViewDrivers: []
@@ -572,6 +573,7 @@ class InboxDriver {
             ...options,
             onClick: event => {
               options.onClick({
+                position: 'LIST',
                 dropdown: event.dropdown,
                 selectedThreadViewDrivers: [],
                 selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
@@ -587,6 +589,7 @@ class InboxDriver {
       threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
         inboxThreadRowView.addToolbarButton({...options, onClick: event => {
           options.onClick({
+            position: 'ROW',
             dropdown: event.dropdown,
             selectedThreadViewDrivers: [],
             selectedThreadRowViewDrivers: [inboxThreadRowView]

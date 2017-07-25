@@ -220,6 +220,7 @@ class GmailDriver {
 						section: options.threadSection || 'METADATA_STATE',
 						onClick: event => {
 							options.onClick({
+								position: 'THREAD',
 								dropdown: event.dropdown,
 								selectedThreadViewDrivers: [gmailToolbarView.getThreadViewDriver()],
 								selectedThreadRowViewDrivers: []
@@ -237,6 +238,7 @@ class GmailDriver {
 						section: options.listSection || 'METADATA_STATE',
 						onClick: event => {
 							options.onClick({
+								position: 'LIST',
 								dropdown: event.dropdown,
 								selectedThreadViewDrivers: [],
 								selectedThreadRowViewDrivers
@@ -257,6 +259,7 @@ class GmailDriver {
 					onClick: event => {
 						if (!options.onClick) return;
 						options.onClick({
+							position: 'ROW',
 							dropdown: event.dropdown,
 							selectedThreadViewDrivers: [],
 							selectedThreadRowViewDrivers: [gmailThreadRow]
