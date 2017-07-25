@@ -230,13 +230,13 @@ class GmailDriver {
 				}
 			} else if (gmailToolbarView.isForRowList()) {
 				if (!options.positions || includes(options.positions, 'LIST')) {
-					const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
-						.filter(gmailThreadRow => gmailThreadRow.isSelected());
-
 					gmailToolbarView.addButton({
 						...options,
 						section: options.listSection || 'METADATA_STATE',
 						onClick: event => {
+							const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
+								.filter(gmailThreadRow => gmailThreadRow.isSelected());
+
 							options.onClick({
 								position: 'LIST',
 								dropdown: event.dropdown,
