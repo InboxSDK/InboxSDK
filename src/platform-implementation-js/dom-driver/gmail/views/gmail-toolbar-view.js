@@ -491,7 +491,7 @@ class GmailToolbarView {
 
 		itemElement.addEventListener('click', function(e: MouseEvent){
 			if(buttonDescriptor.onClick){
-				buttonDescriptor.onClick();
+				buttonDescriptor.onClick({});
 			}
 		});
 

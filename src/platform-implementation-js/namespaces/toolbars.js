@@ -85,7 +85,29 @@ export default class Toolbars extends EventEmitter {
 			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForList does not support section=OTHER and hasDropdown=true together'));
 			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
 		}
-		return members.listButtonHandlerRegistry.registerHandler(_getToolbarButtonHandler(buttonDescriptor, this));
+		return this.registerThreadButton({
+			positions: ['LIST'],
+			listSection: buttonDescriptor.section,
+
+			title: buttonDescriptor.title,
+			iconUrl: buttonDescriptor.iconUrl,
+			iconClass: buttonDescriptor.iconClass,
+			onClick: event => {
+				if (!buttonDescriptor.onClick) return;
+				buttonDescriptor.onClick({
+					dropdown: event.dropdown,
+					selectedThreadRowViews: event.selectedThreadRowViews,
+					get threadRowViews() {
+						members.driver.getLogger().deprecationWarning(
+							'Toolbars.registerToolbarButtonForList onClick event.threadRowViews');
+						return event.selectedThreadRowViews;
+					}
+				});
+			},
+			hasDropdown: buttonDescriptor.hasDropdown,
+			hideFor: buttonDescriptor.hideFor,
+			keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle
+		});
 	}
 
 	registerToolbarButtonForThreadView(buttonDescriptor: Object){

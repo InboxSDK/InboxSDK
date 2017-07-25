@@ -7,7 +7,7 @@ export type Options = {
 };
 
 export default class BasicButtonViewController {
-	_activateFunction: ?()=>void;
+	_activateFunction: ?(event: Object)=>void;
 	_view: Object;
 
 	constructor(options: Options) {
@@ -31,13 +31,13 @@ export default class BasicButtonViewController {
 		return this._view;
 	}
 
-	setActivateFunction(f: ()=>void) {
+	setActivateFunction(f: (event: Object)=>void) {
 		this._activateFunction = f;
 	}
 
 	activate(){
 		if(this._activateFunction){
-			this._activateFunction();
+			this._activateFunction({});
 		}
 	}
 }
