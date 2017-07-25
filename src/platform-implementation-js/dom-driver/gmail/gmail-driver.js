@@ -192,9 +192,6 @@ class GmailDriver {
 			.map(messageView => messageView.getAttachmentCardViewDrivers())
 			.flatten();
 	}
-	getToolbarViewDriverStream() {
-		return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el);
-	}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream() {return this._messageViewDriverStream;}

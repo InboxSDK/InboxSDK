@@ -452,10 +452,6 @@ class InboxDriver {
   getAttachmentCardViewDriverStream() {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
   }
-  getToolbarViewDriverStream() {
-    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el);
-      // .filter(() => false); // TODO re-enable when threadRowViews are ready
-  }
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
   setButterBar(bb: ButterBar) {this._butterBar = bb;}
