@@ -259,7 +259,7 @@ class GmailThreadRowView {
       return;
     }
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
-    var labelMod = null;
+    let labelMod = null;
 
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([labelDescriptor]) => {
       if(!labelDescriptor){
@@ -371,13 +371,12 @@ class GmailThreadRowView {
     }
     if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
-    var activeDropdown = null;
-    var buttonMod = null;
+    let activeDropdown = null;
+    let buttonMod = null;
 
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
 
-    var prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
-
-    prop.beforeEnd(() => null).onValue(buttonDescriptor => {
+    prop.merge(this._stopper).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
@@ -386,7 +385,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.onEnd(() => {
+    this._stopper.onValue(() => {
       if (buttonMod && buttonMod.buttonSpan) {
         (buttonMod.buttonSpan:any).onclick = null;
       }
@@ -495,7 +494,7 @@ class GmailThreadRowView {
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
     let actionMod = null;
 
-    prop.onEnd(() => {
+    this._stopper.onEnd(() => {
       if (actionMod) {
         actionMod.gmailActionButtonView.setOnClick(null);
       }
