@@ -323,6 +323,12 @@ class InboxThreadRowView {
           labelMod.countEl.remove();
         }
       }
+
+      this._stopper.onEnd(() => {
+        if (labelMod) {
+          labelMod.remove();
+        }
+      });
     });
   }
 
