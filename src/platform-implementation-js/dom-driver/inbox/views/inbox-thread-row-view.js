@@ -201,6 +201,7 @@ class InboxThreadRowView {
       throw new Error('Failed to find thread id');
     }
     if (/^thread-a:/.test(inboxThreadId)) {
+      this._driver.trackThreadRowIdCall(false, inboxThreadId);
       // Get the inbox message id of any message in the thread, convert it to
       // a gmail message id, and then use that id in a request
       // to a gmail endpoint to get the id of the thread that message is in.
@@ -209,6 +210,7 @@ class InboxThreadRowView {
 
       return await this._driver.getThreadIdFromMessageId(gmailMessageId);
     } else {
+      this._driver.trackThreadRowIdCall(true, inboxThreadId);
       const m = /\d+$/.exec(inboxThreadId);
       if (!m) throw new Error('Should not happen');
       return new BigNumber(m[0]).toString(16);

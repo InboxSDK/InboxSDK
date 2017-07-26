@@ -85,6 +85,8 @@ import type {RouteParams} from '../../namespaces/router';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 
+const THREAD_ID_STAT_SAMPLE_RATE = 0.3;
+
 class InboxDriver {
   _appId: string;
   _logger: Logger;
@@ -113,6 +115,15 @@ class InboxDriver {
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
   _customRouteIDs: Set<string> = new Set();
+  _threadIdStats: {
+    threadRows: {
+      totalThreads: Set<string>;
+      totalCalls: number;
+      threadsWithoutGmailId: Set<string>;
+      callsWithoutGmailId: number;
+      threadsWithFetch: number;
+    }
+  };
 
   getGmailMessageIdForInboxMessageId: (inboxMessageId: string) => Promise<string>;
   getInboxMessageIdForInboxThreadId: (inboxThreadId: string) => Promise<string>;
@@ -135,6 +146,8 @@ class InboxDriver {
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
     });
 
+    this._setupThreadIdStats();
+
     {
       if (global.localStorage) {
         // We used to not always identify the ids of messages correctly, so we
@@ -155,7 +168,10 @@ class InboxDriver {
     {
       const inboxMessageIdForInboxThreadIdCache = new BiMapCache({
         key: 'inboxsdk__cached_inbox_message_and_inbox_thread_ids',
-        getAfromB: (inboxThreadId: string) => getInboxMessageIdForInboxThreadId(this, inboxThreadId),
+        getAfromB: (inboxThreadId: string) => {
+          this._threadIdStats.threadRows.threadsWithFetch += 1;
+          return getInboxMessageIdForInboxThreadId(this, inboxThreadId);
+        },
         getBfromA() {
           throw new Error('should not happen');
         }
@@ -406,6 +422,48 @@ class InboxDriver {
       });
       return view;
     });
+  }
+
+  _setupThreadIdStats() {
+    this._resetThreadIdStats();
+    if (!(Math.random() < THREAD_ID_STAT_SAMPLE_RATE)) return;
+
+    setInterval(() => {
+      if (this._threadIdStats.threadRows.totalCalls === 0) return;
+
+      const {threadRows} = this._threadIdStats;
+      const stats = {};
+      stats.threadRows = Object.assign({}, threadRows, {
+        totalThreads: threadRows.totalThreads.size,
+        threadsWithoutGmailId: threadRows.threadsWithoutGmailId.size
+      });
+
+      this._logger.eventSdkPassive('inboxThreadIdStats', stats);
+
+      this._resetThreadIdStats();
+    }, 1000 * 60 * 60);
+  }
+
+  _resetThreadIdStats() {
+    this._threadIdStats = {
+      threadRows: {
+        totalThreads: new Set(),
+        totalCalls: 0,
+        threadsWithoutGmailId: new Set(),
+        callsWithoutGmailId: 0,
+        threadsWithFetch: 0
+      }
+    };
+  }
+
+  trackThreadRowIdCall(hasGmailId: boolean, inboxThreadId: string) {
+    this._threadIdStats.threadRows.totalCalls += 1;
+    this._threadIdStats.threadRows.totalThreads.add(inboxThreadId);
+
+    if (!hasGmailId) {
+      this._threadIdStats.threadRows.callsWithoutGmailId += 1;
+      this._threadIdStats.threadRows.threadsWithoutGmailId.add(inboxThreadId);
+    }
   }
 
   destroy() {
