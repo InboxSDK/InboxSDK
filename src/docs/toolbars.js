@@ -119,7 +119,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 
 	/**
 	* An optional array of strings specifying the locations the button will be displayed in.
-	* The default value of null is treated as equal to the array ['THREAD', 'ROW', 'LIST'].
+	* The default value of null is treated as equal to the array of all of the possible values: "THREAD", "ROW", and "LIST".
 	* ^optional
 	* ^default=null
 	* @type {Array.<string>}
