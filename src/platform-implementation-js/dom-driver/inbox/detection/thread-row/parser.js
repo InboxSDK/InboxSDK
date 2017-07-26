@@ -125,8 +125,13 @@ export default function parser(el: HTMLElement) {
     )
   );
 
+  const toolbar = ec.run(
+    'toolbar',
+    () => querySelectorOne(el, 'div[jsaction] div[jsaction] > ul[aria-label]')
+  );
+
   const elements = {
-    subject, checkbox, labelParent, recipientParent, messageCountParent
+    subject, checkbox, labelParent, toolbar, recipientParent, messageCountParent
   };
   const score = 1 - (ec.errorCount() / ec.runCount());
   return {

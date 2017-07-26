@@ -1,12 +1,16 @@
 /* @flow */
 
 import RSVP from 'rsvp';
+import type LiveSet from 'live-set';
+import toValueObservable from 'live-set/toValueObservable';
 import {defn} from 'ud';
+import t from 'transducers.js';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import asap from 'asap';
+import includes from 'lodash/includes';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
@@ -53,6 +57,9 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 
+import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
+import toLiveSet from '../../lib/toLiveSet';
+
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type {RouteParams} from '../../namespaces/router';
@@ -62,6 +69,7 @@ import type {ComposeViewDriver} from '../../driver-interfaces/compose-view-drive
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
+import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
@@ -86,8 +94,8 @@ class GmailDriver {
 	_routeViewDriverStream: Kefir.Observable<GmailRouteView>;
 	_rowListViewDriverStream: Kefir.Observable<Object>;
 	_threadRowViewDriverKefirStream: Kefir.Observable<Object>;
-	_threadViewDriverStream: Kefir.Observable<GmailThreadView>;
-	_toolbarViewDriverStream: Kefir.Observable<Object>;
+	_threadViewDriverLiveSet: LiveSet<GmailThreadView>;
+	_toolbarViewDriverLiveSet: LiveSet<GmailToolbarView>;
 	_composeViewDriverStream: Kefir.Observable<GmailComposeView>;
 	_xhrInterceptorStream: Kefir.Observable<Object>;
 	_messageViewDriverStream: Kefir.Observable<GmailMessageView>;
@@ -99,6 +107,7 @@ class GmailDriver {
 	_timestampGlobalsFound: ?number;
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
+	_currentRouteViewDriver: GmailRouteView;
 
 	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
@@ -167,7 +176,9 @@ class GmailDriver {
 	getRouteViewDriverStream() {return this._routeViewDriverStream;}
 	getRowListViewDriverStream() {return this._rowListViewDriverStream;}
 	getThreadRowViewDriverStream() {return this._threadRowViewDriverKefirStream;}
-	getThreadViewDriverStream() {return this._threadViewDriverStream;}
+	getThreadViewDriverStream() {
+		return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(({el})=>el);
+	}
 	getAttachmentCardViewDriverStream() {
 		return this._messageViewDriverStream
 			.flatMap(messageViewDriver =>
@@ -181,7 +192,6 @@ class GmailDriver {
 			.map(messageView => messageView.getAttachmentCardViewDrivers())
 			.flatten();
 	}
-	getToolbarViewDriverStream() {return this._toolbarViewDriverStream;}
 	getComposeViewDriverStream() {return this._composeViewDriverStream;}
 	getXhrInterceptorStream(): Kefir.Observable<Object> {return this._xhrInterceptorStream;}
 	getMessageViewDriverStream() {return this._messageViewDriverStream;}
@@ -195,6 +205,77 @@ class GmailDriver {
 			globalsFound: this._timestampGlobalsFound,
 			accountSwitcherReady: this._timestampAccountSwitcherReady,
 			onready: this._timestampOnready
+		};
+	}
+
+	registerThreadButton(options: Object) {
+		const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: gmailToolbarView}: {value: GmailToolbarView}) => {
+			if (gmailToolbarView.isForThread()) {
+				if (!options.positions || includes(options.positions, 'THREAD')) {
+					gmailToolbarView.addButton({
+						...options,
+						section: options.threadSection || 'METADATA_STATE',
+						onClick: event => {
+							options.onClick({
+								position: 'THREAD',
+								dropdown: event.dropdown,
+								selectedThreadViewDrivers: [gmailToolbarView.getThreadViewDriver()],
+								selectedThreadRowViewDrivers: []
+							});
+						}
+					});
+				}
+			} else if (gmailToolbarView.isForRowList()) {
+				if (!options.positions || includes(options.positions, 'LIST')) {
+					gmailToolbarView.addButton({
+						...options,
+						section: options.listSection || 'METADATA_STATE',
+						onClick: event => {
+							const selectedThreadRowViewDrivers = Array.from(gmailToolbarView.getThreadRowViewDrivers())
+								.filter(gmailThreadRow => gmailThreadRow.isSelected());
+
+							options.onClick({
+								position: 'LIST',
+								dropdown: event.dropdown,
+								selectedThreadViewDrivers: [],
+								selectedThreadRowViewDrivers
+							});
+						}
+					});
+				}
+			}
+		});
+
+		let threadRowViewSub = null;
+		if (!options.positions || includes(options.positions, 'ROW')) {
+			const perThreadRow = (gmailThreadRow: GmailThreadRowView) => {
+				gmailThreadRow.addButton({
+					hasDropdown: options.hasDropdown,
+					iconClass: options.iconClass,
+					iconUrl: options.iconUrl,
+					onClick: event => {
+						if (!options.onClick) return;
+						options.onClick({
+							position: 'ROW',
+							dropdown: event.dropdown,
+							selectedThreadViewDrivers: [],
+							selectedThreadRowViewDrivers: [gmailThreadRow]
+						});
+					},
+				});
+			};
+
+			this._currentRouteViewDriver.getRowListViews().forEach(gmailRowListView => {
+				gmailRowListView.getThreadRowViewDrivers().forEach(perThreadRow);
+			});
+			threadRowViewSub = this._threadRowViewDriverKefirStream.observe({
+				value: perThreadRow
+			});
+		}
+
+		return () => {
+			toolbarViewSub.unsubscribe();
+			if (threadRowViewSub) threadRowViewSub.unsubscribe();
 		};
 	}
 
@@ -386,10 +467,20 @@ class GmailDriver {
 				this._gmailRouteProcessor, this
 			).takeUntilBy(this._stopper).toProperty();
 
+			this._routeViewDriverStream.onValue(gmailRouteView => {
+				this._currentRouteViewDriver = gmailRouteView;
+			});
+
 			this._rowListViewDriverStream = this._setupRouteSubViewDriver('newGmailRowListView').takeUntilBy(this._stopper);
 
 			this._setupThreadRowViewDriverKefirStream();
-			this._threadViewDriverStream = this._setupRouteSubViewDriver('newGmailThreadView').takeUntilBy(this._stopper);
+			this._threadViewDriverLiveSet = toLiveSet(
+				this._setupRouteSubViewDriver('newGmailThreadView')
+					.takeUntilBy(this._stopper)
+					.map(gmailThreadView => ({
+						el: gmailThreadView, removalStream: gmailThreadView.getStopper()
+					}))
+			);
 
 			this._setupToolbarViewDriverStream();
 			this._setupMessageViewDriverStream();
@@ -424,30 +515,29 @@ class GmailDriver {
 	}
 
 	_setupToolbarViewDriverStream() {
-		this._toolbarViewDriverStream = Kefir.merge([
-											this._rowListViewDriverStream.map(function(gmailRowListView){
-												return gmailRowListView.getToolbarView();
-											}),
-											this._threadViewDriverStream.map(function(gmailThreadView){
-												return gmailThreadView.getToolbarView();
-											})
-										])
-										.filter(Boolean)
-										.flatMap(function(gmailToolbarView){
-											return gmailToolbarView.waitForReady();
-										})
-										.takeUntilBy(this._stopper);
+		this._toolbarViewDriverLiveSet = toLiveSet(Kefir.merge([
+				this._rowListViewDriverStream.map(gmailRowListView =>
+					gmailRowListView.getToolbarView()
+				),
+				this.getThreadViewDriverStream().map(gmailThreadView =>
+					gmailThreadView.getToolbarView()
+				)
+			])
+			.filter(Boolean)
+			.flatMap(gmailToolbarView => gmailToolbarView.waitForReady())
+			.map(gmailToolbarView => ({
+				el: gmailToolbarView, removalStream: gmailToolbarView.getStopper()
+			}))
+			.takeUntilBy(this._stopper));
+		this._toolbarViewDriverLiveSet.subscribe({});
 	}
 
 	_setupMessageViewDriverStream() {
-		this._messageViewDriverStream = this._threadViewDriverStream.flatMap(function(gmailThreadView){
-			return gmailThreadView.getEventStream().filter(function(event){
-				return event.eventName === 'messageCreated';
-			})
-			.map(function(event){
-				return event.view;
-			});
-		}).takeUntilBy(this._stopper);
+		this._messageViewDriverStream = this.getThreadViewDriverStream().flatMap(gmailThreadView =>
+			gmailThreadView.getEventStream()
+				.filter(event => event.eventName === 'messageCreated')
+				.map(event => event.view)
+		).takeUntilBy(this._stopper);
 	}
 
 	isRunningInPageContext(): boolean {

@@ -36,10 +36,11 @@ class InboxToolbarButtonView {
           return;
         } else {
           this._buttonEl.classList.add('inboxsdk__active');
-          dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
+          dropdown = new DropdownView(new InboxDropdownView('inboxsdk__toolbar_dropdown'), buttonEl);
           dropdown.setPlacementOptions({
+            position: 'bottom',
             hAlign: 'right',
-            vAlign: 'bottom', forceVAlign: true
+            vAlign: 'top'
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
@@ -66,7 +67,7 @@ class InboxToolbarButtonView {
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
         buttonEl.setAttribute('data-order-hint', String(orderHint));
-        insertElementInOrder(container, buttonEl);
+        insertElementInOrder(container, buttonEl, undefined, true);
       }
     }
 

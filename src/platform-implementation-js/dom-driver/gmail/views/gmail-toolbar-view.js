@@ -22,12 +22,16 @@ import DropdownButtonViewController from '../../../widgets/buttons/dropdown-butt
 import GmailThreadView from './gmail-thread-view';
 import GmailRowListView from './gmail-row-list-view';
 
+import {SECTION_NAMES} from '../../../constants/toolbars';
+
+import type GmailDriver from '../gmail-driver';
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
 import Logger from '../../../lib/logger';
 
 class GmailToolbarView {
 	_element: HTMLElement;
+	_driver: GmailDriver;
 	_ready: Kefir.Observable<GmailToolbarView>;
 	_stopper: Stopper;
 	_routeViewDriver: RouteViewDriver;
@@ -38,7 +42,7 @@ class GmailToolbarView {
 	_rowListViewDriver: ?GmailRowListView;
 	_isUpdateButtonClassesScheduled: boolean = false;
 
-	constructor(element: HTMLElement, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
+	constructor(element: HTMLElement, driver: GmailDriver, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
 		// Important: Multiple GmailToolbarViews will be created for the same
 		// toolbar element in preview pane mode! When a GmailToolbarView is
 		// created, it adds some attributes to the element corresponding to the
@@ -47,6 +51,7 @@ class GmailToolbarView {
 		// hide the buttons with attributes that don't currently match the toolbar
 		// element.
 		this._element = element;
+		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._routeViewDriver = routeViewDriver;
 		this._buttonViewControllers = [];
@@ -107,7 +112,9 @@ class GmailToolbarView {
 		return this._rowListViewDriver.getThreadRowViewDrivers();
 	}
 
-	addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string){
+	addButton(buttonDescriptor: Object, id?: string){
+		const appId = this._driver.getAppId();
+		const toolbarSections = SECTION_NAMES;
 		this._ready.onValue(() => {
 			if(buttonDescriptor.section === toolbarSections.OTHER){
 				this._moreMenuItems.push({
@@ -484,7 +491,7 @@ class GmailToolbarView {
 
 		itemElement.addEventListener('click', function(e: MouseEvent){
 			if(buttonDescriptor.onClick){
-				buttonDescriptor.onClick();
+				buttonDescriptor.onClick({});
 			}
 		});
 

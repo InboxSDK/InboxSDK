@@ -56,6 +56,10 @@ class GmailThreadView {
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 	}
 
+	isLoadingStub() {
+		return false;
+	}
+	getStopper() { return this._stopper; }
 	getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
 	getElement(): HTMLElement { return this._element; }
 	getRouteViewDriver(): any { return this._routeViewDriver; }
@@ -137,7 +141,7 @@ class GmailThreadView {
 		const toolbarElement = this._findToolbarElement();
 		if (!toolbarElement) throw new Error("No toolbar element found");
 
-		this._toolbarView = new GmailToolbarView(toolbarElement, this._routeViewDriver, this);
+		this._toolbarView = new GmailToolbarView(toolbarElement, this._driver, this._routeViewDriver, this);
 	}
 
 	_findToolbarElement(): ?HTMLElement {

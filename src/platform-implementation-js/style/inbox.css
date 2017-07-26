@@ -38,6 +38,7 @@
 .inboxsdk__appButton.inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.1);
 }
+.inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.12);
 }
@@ -214,8 +215,10 @@
   width: 24px;
   height: 24px;
   opacity: 0.6;
+  background-position: center;
 }
 
+.inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:hover {
   outline: none;
@@ -234,12 +237,17 @@
   outline: none;
 }
 .inboxsdk__dropdown_content {
-  background: white;
+  background: #fff;
+  color: #212121;
   min-width: 1em;
   min-height: 1em;
   padding: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
+  border-radius: 2px;
+}
+
+.inboxsdk__dropdown.inboxsdk__toolbar_dropdown {
+  padding: 10px 0;
 }
 
 .inboxsdk__tooltip {
@@ -640,6 +648,10 @@ first-child will do the trick.
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.inboxsdk__thread_row_force_toolbar_visible {
+  display: block !important;
 }
 
 .inboxsdk__inbox_thread_row_label {
