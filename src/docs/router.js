@@ -24,7 +24,6 @@ var Router = /** @lends Router */ {
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
 	* Returns the encoded URL string.
 	* ^gmail
-	* ^inbox
 	* @param {string} routeID - A route specifying where the link should navigate the user to.
 	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
@@ -48,7 +47,8 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a custom route which matches the routeID you provide.
 	* Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
-	* {CustomRouteView} whose contents you may modify. Returns a function which can be called to unregister the route handler.
+	* {CustomRouteView} whose contents you may modify.
+	* This function returns a function which removes the handler registration.
 	* ^gmail
 	* ^inbox
 	* @param {string} routeID - which route this handler is registering for
@@ -61,8 +61,8 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to any route (both customs and built in routes).
 	* Because this can apply to any route, your callback will be given only a generic {RouteView}. This is typically used
-	* when you want to monitor for page changes but don't necessarily need to modify the page. Returns a function
-	* which can be called to unregister the route handler.
+	* when you want to monitor for page changes but don't necessarily need to modify the page.
+	* This function returns a function which removes the handler registration.
 	* ^gmail
 	* @param {func(RouteView)} handler - The callback to call when the route changes
 	* @return {function}
@@ -72,8 +72,8 @@ var Router = /** @lends Router */ {
 	/**
 	* Registers a handler (callback) to be called when the user navigates to a list route which matches the routeID you provide.
 	* Gmail and Inbox have several built in routes which are "Lists". These include routes like Inbox, All Mail, Sent, Drafts, etc.
-	* You'll typically use this to modify Gmail's and Inbox's built in List routes.  Returns a function which can be called
-	* to unregister the route handler.
+	* You'll typically use this to modify Gmail's and Inbox's built in List routes.
+	* This function returns a function which removes the handler registration.
 	* ^gmail
 	* @example
 InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
@@ -95,7 +95,7 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 	* page 2, then the offset will be 50), and a maximum number of threads to return.
 	* It must return a {CustomListDescriptor}, or a promise which resolves to one.
 	*
-	* Returns a function which can be called to unregister the route handler.
+	* This function returns a function which removes the handler registration.
 	* ^gmail
 	* @param {string} routeID - Which route this handler is registering for.
 	* @param {func(offset, max)} handler - Passed a page offset and a maximum
