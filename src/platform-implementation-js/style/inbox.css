@@ -38,6 +38,7 @@
 .inboxsdk__appButton.inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.1);
 }
+.inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.12);
 }
@@ -216,6 +217,7 @@
   opacity: 0.6;
 }
 
+.inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:hover {
   outline: none;
