@@ -60,7 +60,18 @@ class InboxThreadRowView {
       throw new Error('could not find toolbar element');
     }
     toolbar.classList.add('inboxsdk__list_toolbar');
-    new InboxToolbarButtonView(options, this._driver.getAppId(), this._stopper, toolbar);
+    new InboxToolbarButtonView({
+      ...options,
+      onClick: event => {
+        if (event.dropdown) {
+          toolbar.classList.add('inboxsdk__thread_row_force_toolbar_visible');
+          event.dropdown.once('destroy', () => {
+            toolbar.classList.remove('inboxsdk__thread_row_force_toolbar_visible');
+          });
+        }
+        if (options.onClick) options.onClick(event);
+      }
+    }, this._driver.getAppId(), this._stopper, toolbar);
   }
 
   addAttachmentIcon(options: Object) {

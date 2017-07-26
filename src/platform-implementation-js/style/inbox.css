@@ -642,6 +642,10 @@ first-child will do the trick.
   overflow: hidden;
 }
 
+.inboxsdk__thread_row_force_toolbar_visible {
+  display: block !important;
+}
+
 .inboxsdk__inbox_thread_row_label {
   border-radius: 2px;
   display: -webkit-flex;
