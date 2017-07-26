@@ -47,6 +47,7 @@ export default class Toolbars extends EventEmitter {
 			const remove = members.driver.registerThreadButton({..._buttonDescriptor, onClick: event => {
 				if (!_buttonDescriptor.onClick) return;
 				_buttonDescriptor.onClick({
+					position: event.position,
 					dropdown: event.dropdown,
 					selectedThreadViews: event.selectedThreadViewDrivers.map(x => members.membrane.get(x)),
 					selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(x => members.membrane.get(x)),
