@@ -31,6 +31,8 @@ export default function parser(el: HTMLElement) {
     'toolbar',
     () => querySelectorOne(stickyHeading, 'ul')
   );
+
+  // This will be null for threads that are still loading.
   const list = ec.run(
     'list',
     () => el.querySelector('div[role=list]')

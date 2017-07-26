@@ -195,22 +195,59 @@ class InboxDriver {
       return view;
     });
 
-    this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
-      const el = node.getValue();
-      const parsed = threadParser(el);
-      if (parsed.errors.length) {
-        this._logger.errorSite(new Error('parse errors (thread)'), {
-          score: parsed.score,
-          errors: parsed.errors,
-          html: censorHTMLtree(el)
+    this._threadViewDriverLiveSet = lsFlatMap(
+      this._page.tree.getAllByTag('thread'),
+      node => {
+        const el = node.getValue();
+        let parsed = threadParser(el);
+        if (parsed.errors.length) {
+          this._logger.errorSite(new Error('parse errors (thread)'), {
+            score: parsed.score,
+            errors: parsed.errors,
+            html: censorHTMLtree(el)
+          });
+        }
+        return new LiveSet({
+          read() {
+            throw new Error();
+          },
+          listen: (setValues, controller) => {
+            setValues(new Set());
+            const unsub = kefirStopper();
+
+            // If the InboxThreadView is destroyed before the element is removed,
+            // then make a new InboxThreadView out of the same element.
+            const newView = firstRun => {
+              if (!firstRun) {
+                parsed = threadParser(el);
+                if (parsed.errors.length > 0) {
+                  this._logger.errorSite(new Error('thread reparse errors'), {
+                    score: parsed.score,
+                    errors: parsed.errors,
+                    html: censorHTMLtree(el)
+                  });
+                }
+              }
+              const view = new InboxThreadView(el, this, parsed);
+              view.getStopper().takeUntilBy(unsub).onValue(() => {
+                controller.remove(view);
+                newView(false);
+              });
+              unsub.takeUntilBy(view.getStopper()).onValue(() => {
+                view.destroy();
+              });
+              controller.add(view);
+            };
+
+            newView(true);
+
+            return () => {
+              unsub.destroy();
+            };
+          }
         });
       }
-      const view = new InboxThreadView(el, this, parsed);
-      removal.then(() => {
-        view.destroy();
-      });
-      return view;
-    });
+    );
 
     this._messageViewDriverLiveSet = lsFlatMap(
       this._page.tree.getAllByTag('message'),

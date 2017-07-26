@@ -11,6 +11,7 @@ import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
 import idMap from '../../../lib/idMap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
@@ -43,6 +44,20 @@ class InboxThreadView {
         this._p = parser(this._element);
       })
       .toProperty();
+
+    if (this.isLoadingStub()) {
+      makeMutationObserverChunkedStream(this._element, {attributes: true, attributeFilter: ['aria-busy']})
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          if (!this.isLoadingStub()) {
+            this.destroy();
+          }
+        });
+    }
+  }
+
+  isLoadingStub(): boolean {
+    return this._element.getAttribute('aria-busy') === 'true';
   }
 
   getEventStream(): Kefir.Observable<any> {

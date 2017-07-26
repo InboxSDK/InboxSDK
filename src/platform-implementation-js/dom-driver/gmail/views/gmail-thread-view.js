@@ -56,6 +56,9 @@ class GmailThreadView {
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 	}
 
+	isLoadingStub() {
+		return false;
+	}
 	getStopper() { return this._stopper; }
 	getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
 	getElement(): HTMLElement { return this._element; }

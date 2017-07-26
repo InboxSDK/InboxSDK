@@ -53,7 +53,7 @@ class Conversations {
 				members.attachmentCardViewHandlerRegistry.addTarget(attachmentCardView);
 			});
 
-		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream(), ThreadView, members.threadViewHandlerRegistry, this, membrane, driver);
+		_setupViewDriverWatcher(appId, driver.getThreadViewDriverStream().filter(t => !t.isLoadingStub()), ThreadView, members.threadViewHandlerRegistry, this, membrane, driver);
 		_setupViewDriverWatcher(appId, driver.getMessageViewDriverStream(), MessageView, members.messageViewHandlerRegistries.all, this, membrane, driver);
 
 		_setupViewDriverWatcher(
