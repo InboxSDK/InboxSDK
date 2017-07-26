@@ -85,8 +85,6 @@ import type {RouteParams} from '../../namespaces/router';
 import type {Driver} from '../../driver-interfaces/driver';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 
-const THREAD_ID_STAT_SAMPLE_RATE = 0.3;
-
 class InboxDriver {
   _appId: string;
   _logger: Logger;
@@ -426,7 +424,6 @@ class InboxDriver {
 
   _setupThreadIdStats() {
     this._resetThreadIdStats();
-    if (!(Math.random() < THREAD_ID_STAT_SAMPLE_RATE)) return;
 
     setInterval(() => {
       if (this._threadIdStats.threadRows.totalCalls === 0) return;
