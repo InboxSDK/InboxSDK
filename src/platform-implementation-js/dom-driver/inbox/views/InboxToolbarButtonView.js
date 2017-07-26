@@ -36,7 +36,7 @@ class InboxToolbarButtonView {
           return;
         } else {
           this._buttonEl.classList.add('inboxsdk__active');
-          dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
+          dropdown = new DropdownView(new InboxDropdownView('inboxsdk__toolbar_dropdown'), buttonEl);
           dropdown.setPlacementOptions({
             position: 'bottom',
             hAlign: 'right',
