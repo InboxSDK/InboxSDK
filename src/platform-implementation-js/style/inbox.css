@@ -645,8 +645,8 @@ first-child will do the trick.
 .inboxsdk__inbox_thread_row_label {
   border-radius: 2px;
   display: -webkit-flex;
+  font-size: 11px;
   display: flex;
-  font-weight: 300;
   margin-right: .333em;
   outline: 1px solid transparent;
   padding: 0 8px;
