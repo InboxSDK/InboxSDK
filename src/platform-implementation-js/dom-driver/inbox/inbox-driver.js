@@ -117,9 +117,11 @@ class InboxDriver {
   _customRouteIDs: Set<string> = new Set();
   _threadIdStats: {
     threadRows: {
-      totalCalls: number,
-      callsWithFetch: number,
-      callsWithoutGmailId: number
+      totalThreads: Set<string>;
+      totalCalls: number;
+      threadsWithoutGmailId: Set<string>;
+      callsWithoutGmailId: number;
+      threadsWithFetch: number;
     }
   };
 
@@ -167,7 +169,7 @@ class InboxDriver {
       const inboxMessageIdForInboxThreadIdCache = new BiMapCache({
         key: 'inboxsdk__cached_inbox_message_and_inbox_thread_ids',
         getAfromB: (inboxThreadId: string) => {
-          this._threadIdStats.threadRows.callsWithFetch += 1;
+          this._threadIdStats.threadRows.threadsWithFetch += 1;
           return getInboxMessageIdForInboxThreadId(this, inboxThreadId);
         },
         getBfromA() {
@@ -429,7 +431,14 @@ class InboxDriver {
     setInterval(() => {
       if (this._threadIdStats.threadRows.totalCalls === 0) return;
 
-      this._logger.eventSdkPassive('inboxThreadIdStats', this._threadIdStats);
+      const {threadRows} = this._threadIdStats;
+      const stats = {};
+      stats.threadRows = Object.assign({}, threadRows, {
+        totalThreads: threadRows.totalThreads.size,
+        threadsWithoutGmailId: threadRows.threadsWithoutGmailId.size
+      });
+
+      this._logger.eventSdkPassive('inboxThreadIdStats', stats);
 
       this._resetThreadIdStats();
     }, 1000 * 60 * 60);
@@ -438,14 +447,23 @@ class InboxDriver {
   _resetThreadIdStats() {
     this._threadIdStats = {
       threadRows: {
-        totalCalls: 0, callsWithFetch: 0, callsWithoutGmailId: 0
+        totalThreads: new Set(),
+        totalCalls: 0,
+        threadsWithoutGmailId: new Set(),
+        callsWithoutGmailId: 0,
+        threadsWithFetch: 0
       }
     };
   }
 
-  trackThreadRowIdCall(hasGmailId: boolean) {
+  trackThreadRowIdCall(hasGmailId: boolean, inboxThreadId: string) {
     this._threadIdStats.threadRows.totalCalls += 1;
-    if (!hasGmailId) this._threadIdStats.threadRows.callsWithoutGmailId += 1;
+    this._threadIdStats.threadRows.totalThreads.add(inboxThreadId);
+
+    if (!hasGmailId) {
+      this._threadIdStats.threadRows.callsWithoutGmailId += 1;
+      this._threadIdStats.threadRows.threadsWithoutGmailId.add(inboxThreadId);
+    }
   }
 
   destroy() {
