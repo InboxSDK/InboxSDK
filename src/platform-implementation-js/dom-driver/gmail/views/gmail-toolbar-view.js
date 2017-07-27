@@ -10,7 +10,7 @@ import type {Stopper} from 'kefir-stopper';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
-import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import isElementVisible from '../../../../common/isElementVisible';
 
 import GmailElementGetter from '../gmail-element-getter';
@@ -141,7 +141,8 @@ class GmailToolbarView {
 						})
 					);
 
-					sectionElement.appendChild(buttonViewController.getView().getElement());
+					buttonViewController.getView().getElement().setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
+					insertElementInOrder(sectionElement, buttonViewController.getView().getElement());
 
 					Kefir.merge([
 							Kefir.constant(-1),
@@ -431,21 +432,14 @@ class GmailToolbarView {
 			return;
 		}
 
-		var appDiv = this._getMoreMenuItemsContainer(moreMenu, appId);
-		var menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
+		const appDiv = this._getMoreMenuItemsContainer(moreMenu, appId);
+		const menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
 
-		var insertBeforeElement = getInsertBeforeElement(menuItemElement, appDiv.querySelectorAll('[role=menuitem]'), ['data-order-hint']);
-
-		if(insertBeforeElement){
-			appDiv.insertBefore(menuItemElement, insertBeforeElement);
-		}
-		else{
-			appDiv.appendChild(menuItemElement);
-		}
+		insertElementInOrder(appDiv, menuItemElement);
 	}
 
 	_getMoreMenuItemsContainer(moreMenu: HTMLElement, appId: string): HTMLElement {
-		var container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
+		let container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
 		if(container){
 			return container;
 		}
@@ -454,15 +448,7 @@ class GmailToolbarView {
 		container.setAttribute('data-group-order-hint', appId);
 		container.innerHTML = '<div class="J-Kh"></div>';
 
-		var containers = moreMenu.querySelectorAll('[data-group-order-hint]');
-		var insertBeforeElement = getInsertBeforeElement(container, containers, ['data-group-order-hint']);
-
-		if(insertBeforeElement){
-			moreMenu.insertBefore(container, insertBeforeElement);
-		}
-		else{
-			moreMenu.appendChild(container);
-		}
+		insertElementInOrder(moreMenu, container);
 
 		return container;
 	}
