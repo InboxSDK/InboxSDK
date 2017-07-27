@@ -174,6 +174,14 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	hideFor:null,
 
 	/**
+	* If multiple buttons are placed next to each other, then they will be ordered by this value.
+	* ^optional
+	* ^default=0
+	* @type {number}
+	*/
+	orderHint:null,
+
+	/**
 	* The keyboard shortcut that will activate this button. This is currently only supported in Gmail.
 	* ^optional
 	* ^default=null
