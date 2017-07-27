@@ -25,6 +25,7 @@ class InboxComposeButtonView {
     const buttonEl = this._buttonEl = document.createElement('div');
     buttonEl.setAttribute('role', 'button');
     buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.setAttribute('data-group-order-hint', groupOrderHint);
     buttonEl.tabIndex = 0;
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');

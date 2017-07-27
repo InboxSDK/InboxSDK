@@ -253,6 +253,7 @@ class GmailDriver {
 					hasDropdown: options.hasDropdown,
 					iconClass: options.iconClass,
 					iconUrl: options.iconUrl,
+					orderHint: options.orderHint,
 					onClick: event => {
 						if (!options.onClick) return;
 						options.onClick({

@@ -15,6 +15,7 @@ import type {Bus} from 'kefir-bus';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
 import type {ThreadRowViewDriver} from '../../../driver-interfaces/thread-row-view-driver';
 import delayAsap from '../../../lib/delay-asap';
@@ -417,6 +418,7 @@ class GmailThreadRowView {
             buttonSpan = document.createElement('span');
             buttonSpan.className = 'inboxsdk__thread_row_button';
             buttonSpan.setAttribute('tabindex', "-1");
+            buttonSpan.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
             (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);
 
             iconSettings = {
@@ -468,8 +470,8 @@ class GmailThreadRowView {
         }
 
         updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-        if (!includes(starGroup.children, buttonSpan)) {
-          starGroup.appendChild(buttonSpan);
+        if (buttonSpan.parentElement !== starGroup) {
+          insertElementInOrder(starGroup, buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
 
           // Don't let the whole column count as the star for click and mouse over purposes.

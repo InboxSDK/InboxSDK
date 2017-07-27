@@ -88,6 +88,7 @@ export default class Toolbars extends EventEmitter {
 				});
 			},
 			hasDropdown: buttonDescriptor.hasDropdown,
+			orderHint: buttonDescriptor.orderHint,
 			hideFor: buttonDescriptor.hideFor,
 			keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle
 		});
@@ -115,6 +116,7 @@ export default class Toolbars extends EventEmitter {
 				});
 			},
 			hasDropdown: buttonDescriptor.hasDropdown,
+			orderHint: buttonDescriptor.orderHint,
 			hideFor: buttonDescriptor.hideFor,
 			keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle
 		});
