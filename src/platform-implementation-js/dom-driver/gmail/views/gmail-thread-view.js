@@ -56,6 +56,16 @@ class GmailThreadView {
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 	}
 
+	// TODO use livesets eventually
+	getMessageViewDriverStream(): Kefir.Observable<GmailMessageView> {
+		return Kefir.constant(this._messageViewDrivers).flatten()
+			.merge(
+				this._eventStream.filter(event =>
+					event.type === 'internal' && event.eventName === 'messageCreated'
+				).map(event => event.view)
+			);
+	}
+
 	isLoadingStub() {
 		return false;
 	}
@@ -65,7 +75,7 @@ class GmailThreadView {
 	getRouteViewDriver(): any { return this._routeViewDriver; }
 	getIsPreviewedThread(): boolean { return this._isPreviewedThread; }
 	getToolbarView(): any { return this._toolbarView; }
-	getMessageViewDrivers(): any[] { return this._messageViewDrivers; }
+	getMessageViewDrivers(): GmailMessageView[] { return this._messageViewDrivers; }
 
 	destroy() {
 		this._eventStream.end();

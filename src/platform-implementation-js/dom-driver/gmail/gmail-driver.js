@@ -534,9 +534,7 @@ class GmailDriver {
 
 	_setupMessageViewDriverStream() {
 		this._messageViewDriverStream = this.getThreadViewDriverStream().flatMap(gmailThreadView =>
-			gmailThreadView.getEventStream()
-				.filter(event => event.eventName === 'messageCreated')
-				.map(event => event.view)
+			gmailThreadView.getMessageViewDriverStream()
 		).takeUntilBy(this._stopper);
 	}
 
