@@ -36,7 +36,7 @@ class GmailToolbarView {
 	_stopper: Stopper;
 	_routeViewDriver: RouteViewDriver;
 	_buttonViewControllers: Object[];
-	_moreMenuItems: Object[];
+	_moreMenuItems: Array<{buttonDescriptor: Object}>;
 	_toolbarState: ?string;
 	_threadViewDriver: ?GmailThreadView;
 	_rowListViewDriver: ?GmailRowListView;
@@ -117,11 +117,8 @@ class GmailToolbarView {
 		const toolbarSections = SECTION_NAMES;
 		this._ready.onValue(() => {
 			if(buttonDescriptor.section === toolbarSections.OTHER){
-				this._moreMenuItems.push({
-					buttonDescriptor: buttonDescriptor,
-					appId: appId
-				});
-				this._addToOpenMoreMenu(buttonDescriptor, appId);
+				this._moreMenuItems.push({buttonDescriptor});
+				this._addToOpenMoreMenu(buttonDescriptor);
 			}
 			else{
 				const sectionElement = this._getSectionElement(buttonDescriptor.section, toolbarSections);
@@ -406,7 +403,7 @@ class GmailToolbarView {
 		}
 
 		this._moreMenuItems.forEach(item => {
-			this._addToOpenMoreMenu(item.buttonDescriptor, item.appId);
+			this._addToOpenMoreMenu(item.buttonDescriptor);
 		});
 	}
 
@@ -416,29 +413,26 @@ class GmailToolbarView {
 			return;
 		}
 
-		uniq(this._moreMenuItems.map(x => x.appId))
-			.map(appId =>
-				moreMenu.querySelector('[data-group-order-hint=' + appId + ']')
-			)
-			.filter(Boolean)
-			.forEach(container => {
-				container.remove();
-			});
+		const container = moreMenu.querySelector('[data-group-order-hint=' + this._driver.getAppId() + ']');
+		if (container) {
+			container.remove();
+		}
 	}
 
-	_addToOpenMoreMenu(buttonDescriptor: Object, appId: string){
+	_addToOpenMoreMenu(buttonDescriptor: Object){
 		const moreMenu = GmailElementGetter.getActiveMoreMenu();
 		if(!moreMenu){
 			return;
 		}
 
-		const appDiv = this._getMoreMenuItemsContainer(moreMenu, appId);
+		const appDiv = this._getMoreMenuItemsContainer(moreMenu);
 		const menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
 
 		insertElementInOrder(appDiv, menuItemElement);
 	}
 
-	_getMoreMenuItemsContainer(moreMenu: HTMLElement, appId: string): HTMLElement {
+	_getMoreMenuItemsContainer(moreMenu: HTMLElement): HTMLElement {
+		const appId = this._driver.getAppId();
 		let container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
 		if(container){
 			return container;
