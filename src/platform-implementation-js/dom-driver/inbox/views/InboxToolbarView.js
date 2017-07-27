@@ -53,7 +53,11 @@ class InboxToolbarView {
   }
 
   addButton(buttonDescriptor: Object, id?: string) {
-    new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._stopper, this._el);
+    const button = new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._el);
+    this._stopper.takeUntilBy(button.getStopper()).onValue(() => {
+      button.destroy();
+    });
+    return button;
   }
 }
 

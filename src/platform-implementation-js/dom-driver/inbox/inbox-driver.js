@@ -640,10 +640,18 @@ class InboxDriver {
   }
 
   registerThreadButton(options: Object) {
+    const unregister = kefirStopper();
+
+    const removeButtonOnUnregister = button => {
+      unregister.takeUntilBy(button.getStopper()).onValue(() => {
+        button.destroy();
+      });
+    };
+
     const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
       if (inboxToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
-          inboxToolbarView.addButton({
+          removeButtonOnUnregister(inboxToolbarView.addButton({
             ...options,
             onClick: event => {
               options.onClick({
@@ -653,11 +661,11 @@ class InboxDriver {
                 selectedThreadRowViewDrivers: []
               });
             }
-          });
+          }));
         }
       } else if (inboxToolbarView.isForRowList()) {
         if (!options.positions || includes(options.positions, 'LIST')) {
-          inboxToolbarView.addButton({
+          removeButtonOnUnregister(inboxToolbarView.addButton({
             ...options,
             onClick: event => {
               options.onClick({
@@ -667,28 +675,35 @@ class InboxDriver {
                 selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
               });
             }
-          });
+          }));
         }
       }
     });
+    unregister.onValue(() => {
+      toolbarViewSub.unsubscribe();
+    });
 
-    let threadRowViewSub = null;
     if (!options.positions || includes(options.positions, 'ROW')) {
-      threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
-        inboxThreadRowView.addToolbarButton({...options, onClick: event => {
-          options.onClick({
-            position: 'ROW',
-            dropdown: event.dropdown,
-            selectedThreadViewDrivers: [],
-            selectedThreadRowViewDrivers: [inboxThreadRowView]
-          });
-        }});
+      const threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
+        removeButtonOnUnregister(inboxThreadRowView.addToolbarButton({
+          ...options,
+          onClick: event => {
+            options.onClick({
+              position: 'ROW',
+              dropdown: event.dropdown,
+              selectedThreadViewDrivers: [],
+              selectedThreadRowViewDrivers: [inboxThreadRowView]
+            });
+          }
+        }));
+      });
+      unregister.onValue(() => {
+        threadRowViewSub.unsubscribe();
       });
     }
 
     return () => {
-      toolbarViewSub.unsubscribe();
-      if (threadRowViewSub) threadRowViewSub.unsubscribe();
+      unregister.destroy();
     };
   }
 
