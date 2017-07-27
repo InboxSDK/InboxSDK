@@ -471,7 +471,7 @@ class GmailToolbarView {
 		var itemElement = document.createElement('div');
 		itemElement.setAttribute('class', 'J-N inboxsdk__menuItem');
 		itemElement.setAttribute('role', 'menuitem');
-		itemElement.setAttribute('orderHint', String(buttonDescriptor.orderHint || 0));
+		itemElement.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
