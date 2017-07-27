@@ -130,7 +130,7 @@ class GmailToolbarView {
 					this._buttonViewControllers.push(buttonViewController);
 
 					// Debugging code to track our duplicate toolbar button issue.
-					buttonViewController.getView().getElement().__addButton_ownedByExtension = true;
+					(buttonViewController.getView().getElement():any).__addButton_ownedByExtension = true;
 					buttonViewController.getView().getElement().setAttribute(
 						'data-add-button-debug',
 						JSON.stringify({
@@ -191,7 +191,7 @@ class GmailToolbarView {
 		return this._ready;
 	}
 
-	_createButtonViewController(buttonDescriptor: Object): Object {
+	_createButtonViewController(buttonDescriptor: Object): DropdownButtonViewController|BasicButtonViewController {
 		var buttonView = this._getButtonView(buttonDescriptor);
 		buttonDescriptor.buttonView = buttonView;
 
