@@ -233,7 +233,8 @@
 }
 
 .inboxsdk__dropdown {
-  padding-bottom: 5px;
+  padding: 0;
+  margin-bottom: 5px;
   overflow: visible;
   z-index: 100;
   outline: none;
@@ -250,7 +251,7 @@
 }
 
 .inboxsdk__dropdown.inboxsdk__toolbar_dropdown {
-  padding: 10px 0;
+  margin: 10px 0;
 }
 
 .inboxsdk__tooltip {
