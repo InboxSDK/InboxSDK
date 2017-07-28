@@ -266,9 +266,11 @@ class GmailDriver {
 				});
 			};
 
-			this._currentRouteViewDriver.getRowListViews().forEach(gmailRowListView => {
-				gmailRowListView.getThreadRowViewDrivers().forEach(perThreadRow);
-			});
+			if (this._currentRouteViewDriver) {
+				this._currentRouteViewDriver.getRowListViews().forEach(gmailRowListView => {
+					gmailRowListView.getThreadRowViewDrivers().forEach(perThreadRow);
+				});
+			}
 			threadRowViewSub = this._threadRowViewDriverKefirStream.observe({
 				value: perThreadRow
 			});
