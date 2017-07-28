@@ -1,7 +1,8 @@
 /* @flow */
 
 import {defn} from 'ud';
-
+import type Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view.js';
 import DropdownView from './dropdown-view';
 
@@ -11,6 +12,7 @@ class DropdownButtonViewController {
 	_dropdownView: ?DropdownView;
 	_DropdownViewDriverClass: Class<any>;
 	_dropdownPositionOptions: Object;
+	_stopper = kefirStopper();
 
 	constructor(options: Object){
 		this._dropdownShowFunction = options.dropdownShowFunction;
@@ -26,6 +28,10 @@ class DropdownButtonViewController {
 		this._bindToViewEvents();
 	}
 
+	getStopper(): Kefir.Observable<null> {
+		return this._stopper;
+	}
+
 	destroy() {
 		if (this._view) {
 			this._view.destroy();
@@ -35,6 +41,7 @@ class DropdownButtonViewController {
 			this._dropdownView.close();
 			this._dropdownView = null;
 		}
+		this._stopper.destroy();
 	}
 
 	getView(): ButtonView {

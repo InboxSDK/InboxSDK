@@ -1,5 +1,8 @@
 /* @flow */
 
+import type Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+
 export type Options = {
 	activateFunction?: ?()=>void;
 	onClick?: ?()=>void;
@@ -9,6 +12,7 @@ export type Options = {
 export default class BasicButtonViewController {
 	_activateFunction: ?(event: Object)=>void;
 	_view: Object;
+	_stopper = kefirStopper();
 
 	constructor(options: Options) {
 		this._activateFunction = options.activateFunction || options.onClick;
@@ -22,9 +26,14 @@ export default class BasicButtonViewController {
 			});
 	}
 
+	getStopper(): Kefir.Observable<null> {
+		return this._stopper;
+	}
+
 	destroy() {
 		this._activateFunction = null;
 		this._view.destroy();
+		this._stopper.destroy();
 	}
 
 	getView(): Object {

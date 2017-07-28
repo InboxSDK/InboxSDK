@@ -60,7 +60,7 @@ class InboxThreadRowView {
       throw new Error('could not find toolbar element');
     }
     toolbar.classList.add('inboxsdk__list_toolbar');
-    new InboxToolbarButtonView({
+    const button = new InboxToolbarButtonView({
       ...options,
       onClick: event => {
         if (event.dropdown) {
@@ -71,7 +71,11 @@ class InboxThreadRowView {
         }
         if (options.onClick) options.onClick(event);
       }
-    }, this._driver.getAppId(), this._stopper, toolbar);
+    }, this._driver.getAppId(), toolbar);
+    this._stopper.takeUntilBy(button.getStopper()).onValue(() => {
+      button.destroy();
+    });
+    return button;
   }
 
   addAttachmentIcon(options: Object) {
