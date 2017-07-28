@@ -211,10 +211,16 @@ class GmailDriver {
 	registerThreadButton(options: Object) {
 		const unregister = kefirStopper();
 
+		const removeButtonOnUnregister = button => {
+			unregister.takeUntilBy(button.getStopper()).onValue(() => {
+				button.destroy();
+			});
+		};
+
 		const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: gmailToolbarView}: {value: GmailToolbarView}) => {
 			if (gmailToolbarView.isForThread()) {
 				if (!options.positions || includes(options.positions, 'THREAD')) {
-					gmailToolbarView.addButton({
+					removeButtonOnUnregister(gmailToolbarView.addButton({
 						...options,
 						section: options.threadSection || 'METADATA_STATE',
 						onClick: event => {
@@ -225,11 +231,11 @@ class GmailDriver {
 								selectedThreadRowViewDrivers: []
 							});
 						}
-					});
+					}));
 				}
 			} else if (gmailToolbarView.isForRowList()) {
 				if (!options.positions || includes(options.positions, 'LIST')) {
-					gmailToolbarView.addButton({
+					removeButtonOnUnregister(gmailToolbarView.addButton({
 						...options,
 						section: options.listSection || 'METADATA_STATE',
 						onClick: event => {
@@ -243,7 +249,7 @@ class GmailDriver {
 								selectedThreadRowViewDrivers
 							});
 						}
-					});
+					}));
 				}
 			}
 		});
