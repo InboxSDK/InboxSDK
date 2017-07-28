@@ -19,10 +19,10 @@ Object.assign(GmailDropdownView.prototype, {
 
 	_setupElement: function(){
 		this._containerElement = document.createElement('div');
-		this._containerElement.setAttribute('class', 'J-M uEPqDe inboxsdk__menu');
+		this._containerElement.setAttribute('class', 'inboxsdk__menu');
 
 		this._contentElement = document.createElement('div');
-		this._contentElement.setAttribute('class', 'SK AX');
+		this._contentElement.setAttribute('class', 'inboxsdk__menuContent');
 
 		this._containerElement.appendChild(this._contentElement);
 	}

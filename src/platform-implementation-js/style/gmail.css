@@ -74,12 +74,29 @@ div.T-I.inboxsdk__button {
   text-shadow: none;
 }
 
-.J-M.inboxsdk__menu {
+.inboxsdk__menu {
   min-width: 1em;
   min-height: 1em;
   padding: 0px;
   overflow: visible;
   max-height: none;
+
+  /* Copied from Gmail's .J-M class */
+  z-index: 7;
+  cursor: default;
+  font-size: 13px;
+  margin: 0;
+  outline: none;
+}
+
+.inboxsdk__menu > .inboxsdk__menuContent {
+  padding: 0;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  -webkit-transition: opacity .218s;
+  transition: opacity .218s;
+  border: 1px solid rgba(0,0,0,.2);
+  background: #fff;
 }
 
 .f4.J-N-JX.inboxsdk__message_more_icon {
