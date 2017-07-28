@@ -52,18 +52,26 @@ export default class Toolbars extends EventEmitter {
 			return registerThreadButton();
 		} else {
 			const stopper = kefirStopper();
+			let currentRemover = null;
 			const sub = members.driver.getRouteViewDriverStream().takeUntilBy(stopper).onValue(routeViewDriver => {
 				const routeView = members.membrane.get(routeViewDriver);
 				if (hideFor(routeView)) {
-					return;
+					if (currentRemover) {
+						currentRemover();
+						currentRemover = null;
+					}
+				} else {
+					if (!currentRemover) {
+						currentRemover = registerThreadButton();
+					}
 				}
-				const remove = registerThreadButton();
-				routeViewDriver.getStopper().merge(stopper).take(1).onValue(() => {
-					remove();
-				});
 			});
 			return () => {
 				stopper.destroy();
+				if (currentRemover) {
+					currentRemover();
+					currentRemover = null;
+				}
 			};
 		}
 	}
