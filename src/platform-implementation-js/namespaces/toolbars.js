@@ -34,6 +34,12 @@ export default class Toolbars extends EventEmitter {
 
 	registerThreadButton(buttonDescriptor: Object) {
 		const members = get(memberMap, this);
+
+		if ((buttonDescriptor.listSection === 'OTHER' || buttonDescriptor.threadSection === 'OTHER') && buttonDescriptor.hasDropdown) {
+			members.driver.getLogger().errorApp(new Error('registerThreadButton does not support listSection=OTHER or threadSection=OTHER and hasDropdown=true together'));
+			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
+		}
+
 		const {hideFor, ..._buttonDescriptor} = buttonDescriptor;
 
 		const registerThreadButton = () => {
@@ -78,10 +84,6 @@ export default class Toolbars extends EventEmitter {
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
 		const members = get(memberMap, this);
-		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
-			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForList does not support section=OTHER and hasDropdown=true together'));
-			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
-		}
 		return this.registerThreadButton({
 			positions: ['LIST'],
 			listSection: buttonDescriptor.section,
@@ -109,11 +111,6 @@ export default class Toolbars extends EventEmitter {
 	}
 
 	registerToolbarButtonForThreadView(buttonDescriptor: Object){
-		const members = get(memberMap, this);
-		if (buttonDescriptor.section === 'OTHER' && buttonDescriptor.hasDropdown) {
-			members.driver.getLogger().errorApp(new Error('registerToolbarButtonForThreadView does not support section=OTHER and hasDropdown=true together'));
-			buttonDescriptor = {...buttonDescriptor, hasDropdown: false};
-		}
 		return this.registerThreadButton({
 			positions: ['THREAD'],
 			threadSection: buttonDescriptor.section,
