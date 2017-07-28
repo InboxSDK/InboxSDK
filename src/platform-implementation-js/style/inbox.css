@@ -216,6 +216,8 @@
   height: 24px;
   opacity: 0.6;
   background-position: center;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active,
