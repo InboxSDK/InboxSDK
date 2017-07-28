@@ -34,17 +34,10 @@ export default class Toolbars extends EventEmitter {
 
 	registerThreadButton(buttonDescriptor: Object) {
 		const members = get(memberMap, this);
-		const stopper = kefirStopper();
 		const {hideFor, ..._buttonDescriptor} = buttonDescriptor;
-		const sub = members.driver.getRouteViewDriverStream().takeUntilBy(stopper).onValue(routeViewDriver => {
-			if (hideFor) {
-				const routeView = members.membrane.get(routeViewDriver);
-				if (hideFor(routeView)) {
-					return;
-				}
-			}
 
-			const remove = members.driver.registerThreadButton({..._buttonDescriptor, onClick: event => {
+		const registerThreadButton = () => {
+			return members.driver.registerThreadButton({..._buttonDescriptor, onClick: event => {
 				if (!_buttonDescriptor.onClick) return;
 				_buttonDescriptor.onClick({
 					position: event.position,
@@ -53,13 +46,26 @@ export default class Toolbars extends EventEmitter {
 					selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(x => members.membrane.get(x)),
 				});
 			}});
-			routeViewDriver.getStopper().merge(stopper).take(1).onValue(() => {
-				remove();
-			});
-		});
-		return () => {
-			stopper.destroy();
 		};
+
+		if (!hideFor) {
+			return registerThreadButton();
+		} else {
+			const stopper = kefirStopper();
+			const sub = members.driver.getRouteViewDriverStream().takeUntilBy(stopper).onValue(routeViewDriver => {
+				const routeView = members.membrane.get(routeViewDriver);
+				if (hideFor(routeView)) {
+					return;
+				}
+				const remove = registerThreadButton();
+				routeViewDriver.getStopper().merge(stopper).take(1).onValue(() => {
+					remove();
+				});
+			});
+			return () => {
+				stopper.destroy();
+			};
+		}
 	}
 
 	registerToolbarButtonForList(buttonDescriptor: Object){
