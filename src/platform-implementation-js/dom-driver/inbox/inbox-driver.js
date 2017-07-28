@@ -651,6 +651,10 @@ class InboxDriver {
     const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
       if (inboxToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
+          if (options.threadSection === 'OTHER') {
+            console.warn('registerThreadButton does not support OTHER section items in Inbox yet.'); //eslint-disable-line no-console
+            return;
+          }
           removeButtonOnUnregister(inboxToolbarView.addButton({
             ...options,
             onClick: event => {
@@ -665,6 +669,10 @@ class InboxDriver {
         }
       } else if (inboxToolbarView.isForRowList()) {
         if (!options.positions || includes(options.positions, 'LIST')) {
+          if (options.listSection === 'OTHER') {
+            console.warn('registerThreadButton does not support OTHER section items in Inbox yet.'); //eslint-disable-line no-console
+            return;
+          }
           removeButtonOnUnregister(inboxToolbarView.addButton({
             ...options,
             onClick: event => {
