@@ -41,6 +41,7 @@ class GmailToolbarView {
 	_threadViewDriver: ?GmailThreadView;
 	_rowListViewDriver: ?GmailRowListView;
 	_isUpdateButtonClassesScheduled: boolean = false;
+	_moreMenuItemsContainer: ?HTMLElement = null;
 
 	constructor(element: HTMLElement, driver: GmailDriver, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
 		// Important: Multiple GmailToolbarViews will be created for the same
@@ -257,8 +258,13 @@ class GmailToolbarView {
 			.toProperty(() => null)
 			.takeUntilBy(this._stopper)
 			.map(() => moreButtonElement.getAttribute('aria-expanded'))
-			.filter(ariaExpanded => ariaExpanded === 'true')
-			.onValue(() => { this._addMoreItems(); });
+			.onValue(ariaExpanded => {
+				if (ariaExpanded !== 'true') {
+					this._clearMoreItems();
+				} else {
+					this._addMoreItems();
+				}
+			});
 	}
 
 	_determineToolbarState(){
@@ -428,14 +434,9 @@ class GmailToolbarView {
 	}
 
 	_clearMoreItems(){
-		const moreMenu = GmailElementGetter.getActiveMoreMenu();
-		if(!moreMenu){
-			return;
-		}
-
-		const container = moreMenu.querySelector('[data-group-order-hint=' + this._driver.getAppId() + ']');
-		if (container) {
-			container.remove();
+		if (this._moreMenuItemsContainer) {
+			this._moreMenuItemsContainer.remove();
+			this._moreMenuItemsContainer = null;
 		}
 	}
 
@@ -452,14 +453,12 @@ class GmailToolbarView {
 	}
 
 	_getMoreMenuItemsContainer(moreMenu: HTMLElement): HTMLElement {
-		const appId = this._driver.getAppId();
-		let container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
-		if(container){
-			return container;
+		if (this._moreMenuItemsContainer) {
+			return this._moreMenuItemsContainer;
 		}
 
-		container = document.createElement('div');
-		container.setAttribute('data-group-order-hint', appId);
+		const container = this._moreMenuItemsContainer = document.createElement('div');
+		container.setAttribute('data-group-order-hint', this._driver.getAppId());
 		container.innerHTML = '<div class="J-Kh"></div>';
 
 		insertElementInOrder(moreMenu, container);
