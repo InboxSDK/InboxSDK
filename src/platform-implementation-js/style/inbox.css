@@ -216,6 +216,8 @@
   height: 24px;
   opacity: 0.6;
   background-position: center;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active,
@@ -231,7 +233,8 @@
 }
 
 .inboxsdk__dropdown {
-  padding-bottom: 5px;
+  padding: 0;
+  margin: 0;
   overflow: visible;
   z-index: 100;
   outline: none;
@@ -242,12 +245,10 @@
   min-width: 1em;
   min-height: 1em;
   padding: 0;
+  margin: 0;
   box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
   border-radius: 2px;
-}
-
-.inboxsdk__dropdown.inboxsdk__toolbar_dropdown {
-  padding: 10px 0;
+  position: relative;
 }
 
 .inboxsdk__tooltip {

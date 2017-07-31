@@ -50,7 +50,8 @@ class InboxComposeButtonView {
           dropdown.setPlacementOptions({
             position: 'top',
             hAlign: 'left',
-            vAlign: 'bottom'
+            vAlign: 'bottom',
+            buffer: 5
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');

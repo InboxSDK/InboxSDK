@@ -39,11 +39,12 @@ class InboxToolbarButtonView {
           return;
         } else {
           this._buttonEl.classList.add('inboxsdk__active');
-          dropdown = new DropdownView(new InboxDropdownView('inboxsdk__toolbar_dropdown'), buttonEl);
+          dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
           dropdown.setPlacementOptions({
             position: 'bottom',
             hAlign: 'right',
-            vAlign: 'top'
+            vAlign: 'top',
+            buffer: 10
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
