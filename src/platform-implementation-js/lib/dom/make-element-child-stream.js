@@ -3,8 +3,9 @@
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<any>};
+export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<null>};
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.
@@ -15,7 +16,7 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
   }
 
   return Kefir.stream((emitter) => {
-    const removalStreams: Map<HTMLElement, Object> = new Map();
+    const removalStreams: Map<HTMLElement, Stopper> = new Map();
     let ended = false;
 
     function newEl(el: HTMLElement) {
