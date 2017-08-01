@@ -3,8 +3,9 @@
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import type {Stopper} from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<any>};
+export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<null>};
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.
@@ -15,14 +16,23 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
   }
 
   return Kefir.stream((emitter) => {
-    const removalStreams: Map<HTMLElement, Object> = new Map();
+    const removalStreams: Map<HTMLElement, Stopper> = new Map();
     let ended = false;
 
     function newEl(el: HTMLElement) {
       if (el.nodeType !== 1) return;
+
+      if (removalStreams.has(el)) {
+        throwLater(new Error("Already had removalStream for element with class "+el.className));
+      }
+
       const removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
-      emitter.emit({el, removalStream});
+      try {
+        emitter.emit({el, removalStream});
+      } catch (err) {
+        throwLater(err);
+      }
     }
 
     function removedEl(el: HTMLElement) {
@@ -30,13 +40,14 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       const removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
-      if(removalStream){
-        removalStream.destroy();
+      if (removalStream) {
+        try {
+          removalStream.destroy();
+        } catch (err) {
+          throwLater(err);
+        }
       } else {
-        const err = new Error("Could not find removalStream for element with class "+el.className);
-        setTimeout(() => {
-          throw err;
-        }, 1);
+        throwLater(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
@@ -51,7 +62,7 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
     // stream listeners are subscribed.
     asap(() => {
       if (!ended) {
-        observer.observe(element, ({childList: true}: any));
+        observer.observe(element, {childList: true});
         // Clone child list first because it can change
         Array.prototype.slice.call(element.children).forEach(newEl);
       }
@@ -67,4 +78,13 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       });
     };
   });
+}
+
+// Throw error at a later time where our error-logger can pick it up. This
+// avoids having this module depend on logger.js which we can't import because
+// this module is used in the injected script too.
+function throwLater(err) {
+  setTimeout(() => {
+    throw err;
+  }, 1);
 }
