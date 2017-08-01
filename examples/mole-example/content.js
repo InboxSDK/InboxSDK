@@ -1,4 +1,4 @@
-InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
+InboxSDK.load(2, 'simple-example').then(function(inboxSDK) {
 	var i = 0;
 
 	window.makeMoleWidget = function() {
