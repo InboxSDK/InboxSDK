@@ -20,6 +20,14 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
 
     function newEl(el: HTMLElement) {
       if (el.nodeType !== 1) return;
+
+      if (removalStreams.has(el)) {
+        const err = new Error("Already had removalStream for element with class "+el.className);
+        setTimeout(() => {
+          throw err;
+        }, 1);
+      }
+
       const removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
       emitter.emit({el, removalStream});
@@ -51,7 +59,7 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
     // stream listeners are subscribed.
     asap(() => {
       if (!ended) {
-        observer.observe(element, ({childList: true}: any));
+        observer.observe(element, {childList: true});
         // Clone child list first because it can change
         Array.prototype.slice.call(element.children).forEach(newEl);
       }
