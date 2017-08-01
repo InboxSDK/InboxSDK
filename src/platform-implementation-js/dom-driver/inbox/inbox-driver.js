@@ -39,6 +39,7 @@ import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverLiveSet from './getComposeViewDriverLiveSet';
+import addNavItem from './addNavItem';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
@@ -594,15 +595,8 @@ class InboxDriver {
     return [this.getUserContact()];
   }
 
-  addNavItem(appId: string, navItemDescriptor: Object): Object {
-    console.log('addNavItem not implemented'); //eslint-disable-line no-console
-    const obj = {
-      getEventStream: constant(Kefir.never()),
-      addNavItem: () => obj,
-      setCollapsed: () => {},
-      destroy: () => {}
-    };
-    return obj;
+  addNavItem(appId: string, navItemDescriptor: Kefir.Observable<Object>): Object {
+    return addNavItem(appId, navItemDescriptor, this._page.tree.getAllByTag('leftNav'));
   }
 
   getSentMailNativeNavItem(): Promise<Object> {

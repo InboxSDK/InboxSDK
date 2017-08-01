@@ -708,6 +708,125 @@ first-child will do the trick.
   flex-shrink: 0;
 }
 
+.inboxsdk__navItem_appContainer {
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+  list-style: none;
+  padding: 0 0 8px 0;
+  position: relative;
+}
+
+.inboxsdk__navItem_appContainer:focus,
+.inboxsdk__navItem_wrapper:focus,
+.inboxsdk__navItem_name:focus,
+.inboxsdk__navItem_subNav:focus {
+  outline: none;
+}
+
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem_subNav {
+  display: none;
+}
+
+.inboxsdk__navItem {
+  cursor: pointer;
+  align-items: center;
+  -webkit-align-items: center;
+  display: -webkit-flex;
+  display: flex;
+  padding-left: 16px;
+  padding-right: 12px;
+}
+
+.inboxsdk__navItem:hover {
+  background-color: rgba(0,0,0,.03);
+  border-radius: 2px;
+}
+
+.inboxsdk__navItem:focus {
+  background-color: rgba(0,0,0,.05);
+  outline: 2px solid transparent;
+}
+
+.inboxsdk__navItem_active {
+  background-color: rgba(0,0,0,.05);
+  border-radius: 2px;
+  color: #212121;
+  font-weight: bold;
+}
+
+.inboxsdk__navItem_name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name {
+  padding-left: 24px;
+}
+
+.inboxsdk__navItem_link > .inboxsdk__navItem_name {
+  color: #3c80f6;
+}
+
+.inboxsdk__navItem_link:hover > .inboxsdk__navItem_name,
+.inboxsdk__navItem_link:focus > .inboxsdk__navItem_name,
+.inboxsdk__navItem_link:active > .inboxsdk__navItem_name {
+  color: #1c3aa9;
+}
+
+.inboxsdk__navItem .inboxsdk__button_icon,
+.inboxsdk__navItem .inboxsdk__button_iconImg {
+  width: 24px;
+  height: 24px;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:hover,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active {
+  background-color: transparent;
+  border-radius: 0;
+  outline: none;
+  font-size: .9em;
+  font-weight: normal;
+  line-height: 24px;
+  white-space: normal;
+  outline: none;
+  cursor: default;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:hover > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active > .inboxsdk__navItem_name {
+  color: #616161;
+}
+
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren > .inboxsdk__navItem_subNav {
+  padding-left: 48px;
+}
+
+.inboxsdk__navItem_level2,
+.inboxsdk__navItem_level3 {
+  line-height: 26px;
+}
+
+.inboxsdk__navItem_level2 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level3 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name {
+  padding-left: 10px;
+}
+
+.inboxsdk__navItem_level2 > .inboxsdk__navItem .inboxsdk__button_icon,
+.inboxsdk__navItem_level2 > .inboxsdk__navItem .inboxsdk__button_iconImg,
+.inboxsdk__navItem_level3 > .inboxsdk__navItem .inboxsdk__button_icon,
+.inboxsdk__navItem_level3 > .inboxsdk__navItem .inboxsdk__button_iconImg {
+  width: 18px;
+  height: 18px;
+}
+
 /* appid warning inbox specific parts */
 .inboxsdk__appid_warning {
   margin: 68px 240px -68px;
