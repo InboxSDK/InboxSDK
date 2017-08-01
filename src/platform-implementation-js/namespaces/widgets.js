@@ -24,9 +24,10 @@ class Widgets {
       options.buttons = options.buttons.map(button => {
         if (button.onClick) {
           const appOnClick = button.onClick;
-          return Object.assign({}, button, {
+          return {
+            ...button,
             onClick() { appOnClick({modalView}); }
-          });
+          };
         }
         return button;
       });
@@ -40,10 +41,8 @@ class Widgets {
   }
 
   showMoleView(options: Object): MoleView {
-    var moleViewDriver = get(memberMap, this).driver.createMoleViewDriver(options);
-    var moleView = new MoleView({
-      moleViewDriver: moleViewDriver
-    });
+    const moleViewDriver = get(memberMap, this).driver.createMoleViewDriver(options);
+    const moleView = new MoleView({moleViewDriver});
     moleViewDriver.show();
 
     return moleView;
