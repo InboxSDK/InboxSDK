@@ -23,15 +23,16 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       if (el.nodeType !== 1) return;
 
       if (removalStreams.has(el)) {
-        const err = new Error("Already had removalStream for element with class "+el.className);
-        setTimeout(() => {
-          throw err;
-        }, 1);
+        throwLater(new Error("Already had removalStream for element with class "+el.className));
       }
 
       const removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
-      emitter.emit({el, removalStream});
+      try {
+        emitter.emit({el, removalStream});
+      } catch (err) {
+        throwLater(err);
+      }
     }
 
     function removedEl(el: HTMLElement) {
@@ -39,13 +40,14 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       const removalStream = removalStreams.get(el);
       removalStreams.delete(el);
 
-      if(removalStream){
-        removalStream.destroy();
+      if (removalStream) {
+        try {
+          removalStream.destroy();
+        } catch (err) {
+          throwLater(err);
+        }
       } else {
-        const err = new Error("Could not find removalStream for element with class "+el.className);
-        setTimeout(() => {
-          throw err;
-        }, 1);
+        throwLater(new Error("Could not find removalStream for element with class "+el.className));
       }
     }
 
@@ -76,4 +78,13 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       });
     };
   });
+}
+
+// Throw error at a later time where our error-logger can pick it up. This
+// avoids having this module depend on logger.js which we can't import because
+// this module is used in the injected script too.
+function throwLater(err) {
+  setTimeout(() => {
+    throw err;
+  }, 1);
 }
