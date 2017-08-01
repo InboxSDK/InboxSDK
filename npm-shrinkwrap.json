@@ -8472,6 +8472,11 @@
         }
       }
     },
+    "sinon-test": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/sinon-test/-/sinon-test-2.0.0.tgz",
+      "integrity": "sha1-X0J+qLYRp1MsfNWzt/O+abzC/xU="
+    },
     "slash": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/slash/-/slash-1.0.0.tgz",

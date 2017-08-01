@@ -1,6 +1,9 @@
 /* @flow */
 
 import assert from 'assert';
+import delay from 'pdelay';
+import sinon from 'sinon';
+const sinonTest = require('sinon-test')(sinon, {useFakeTimers: false});
 import Kefir from 'kefir';
 import events from 'events';
 const {EventEmitter} = events;
@@ -148,4 +151,62 @@ describe('kefirMakeElementChildStream', function() {
       }
     });
   });
+
+  it.only("is exception-safe while emitting", sinonTest(async function() {
+    let testErrorCatchCount = 0;
+    const testError = new Error('child2 test error');
+    {
+      const _setTimeout = setTimeout;
+      this.stub(global, 'setTimeout').callsFake((fn, delay, ...args) => {
+        return _setTimeout(function() {
+          try {
+            return fn.apply(this, arguments);
+          } catch (err) {
+            if (err === testError) {
+              testErrorCatchCount++;
+            } else {
+              throw err;
+            }
+          }
+        }, delay, ...args);
+      });
+    }
+
+    const child1 = Marker('child1'), child2 = Marker('child2'), child3 = Marker('child3');
+    const child3RemovalSpy = sinon.spy();
+
+    const target = new MockElementParent([child1, child2, child3]);
+
+    let i = 0;
+    const stream = kefirMakeElementChildStream((target:Object));
+    stream.onValue(event => {
+      switch(++i) {
+        case 1:
+          assert.strictEqual(event.el, child1);
+          target.removeChild(child1);
+          break;
+        case 2:
+          assert.strictEqual(event.el, child2);
+          throw testError;
+        case 3:
+          assert.strictEqual(event.el, child3);
+          event.removalStream.onValue(child3RemovalSpy);
+          break;
+        default:
+          throw new Error("should not happen");
+      }
+    });
+
+    await delay(20);
+
+    assert.strictEqual(testErrorCatchCount, 1);
+    assert.strictEqual(i, 3);
+    assert(child3RemovalSpy.notCalled);
+
+    target.removeChild(child3);
+
+    await delay(20);
+
+    assert(child3RemovalSpy.calledOnce);
+  }));
 });
