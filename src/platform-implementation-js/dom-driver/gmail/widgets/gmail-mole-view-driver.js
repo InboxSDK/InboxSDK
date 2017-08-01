@@ -29,12 +29,13 @@ export type Options = {
   chrome?: boolean;
 };
 
-const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
+class GmailMoleViewDriver {
   _eventStream = kefirBus();
   _stopper = kefirStopper();
   _element: HTMLElement;
 
   constructor(options: Options) {
+    (this: MoleViewDriver); // interface check
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view '+(options.className||''),
       innerHTML: getHTMLString(options)
@@ -105,7 +106,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   }
 
   show() {
-    var doShow = (moleParent) => {
+    const doShow = (moleParent) => {
       moleParent.insertBefore(this._element, last(moleParent.children));
       const dw = findParent(moleParent, el => el.nodeName === 'DIV' && el.classList.contains('dw'));
       if (dw) {
@@ -113,7 +114,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
       }
     };
 
-    var moleParent = GmailElementGetter.getMoleParent();
+    const moleParent = GmailElementGetter.getMoleParent();
     if (moleParent) {
       doShow(moleParent);
     } else {
@@ -153,7 +154,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   }
 
   _setTitleEl(el: HTMLElement) {
-    var container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default');
+    const container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default');
     if(container){
       container.textContent = '';
       container.appendChild(el);
@@ -161,7 +162,7 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   }
 
   _setMinimizedTitleEl(el: HTMLElement) {
-    var container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized');
+    const container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized');
     if(container){
       this._element.classList.add('inboxsdk__mole_use_minimize_title');
       container.textContent = '';
@@ -174,12 +175,13 @@ const GmailMoleViewDriver = defn(module, class GmailMoleViewDriver {
   }
 
   destroy() {
-    (this._element:any).remove();
+    this._element.remove();
     this._eventStream.end();
     this._stopper.destroy();
   }
-});
-export default GmailMoleViewDriver;
+}
+
+export default defn(module, GmailMoleViewDriver);
 
 function getHTMLString(options: Options){
   return `
@@ -203,10 +205,4 @@ function getTitleHTMLString(options: Options){
     <h2 class="inboxsdk__mole_minimized"></h2>
     </div>`;
   }
-}
-
-// This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-function __interfaceCheck() {
-	var test: MoleViewDriver = new GmailMoleViewDriver(({}:any));
 }
