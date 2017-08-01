@@ -152,7 +152,9 @@ describe('kefirMakeElementChildStream', function() {
     });
   });
 
-  it.only("is exception-safe while emitting", sinonTest(async function() {
+  it("is exception-safe while emitting", sinonTest(async function() {
+    this.slow();
+
     let testErrorCatchCount = 0;
     const testError = new Error('child2 test error');
     {
