@@ -72,6 +72,7 @@ import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
 import InboxToolbarView from './views/InboxToolbarView';
+import InboxMoleViewDriver from './views/InboxMoleViewDriver';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -878,8 +879,8 @@ class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createMoleViewDriver(options: Object): Object {
-    throw new Error("Not implemented");
+  createMoleViewDriver(options: Object): InboxMoleViewDriver {
+    return new InboxMoleViewDriver(options);
   }
 
   createModalViewDriver(options: Object): InboxModalView {

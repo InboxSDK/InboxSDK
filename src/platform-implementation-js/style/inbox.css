@@ -728,3 +728,44 @@ first-child will do the trick.
 .inboxsdk__appid_warning .inboxsdk__close_button {
   float: right;
 }
+
+/* mole */
+
+.inboxsdk__mole_view {
+  box-sizing: border-box;
+  direction: ltr;
+  margin-right: 15px;
+  display: table-cell;
+  max-width: 480px;
+}
+
+.inboxsdk__mole_view_mid {
+  position: relative;
+}
+
+.inboxsdk__mole_view_inner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  outline: none;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.45);
+  border-top-left-radius: 7.5px;
+  border-top-right-radius: 7.5px;
+  transform: translateZ(0);
+  background: white;
+  max-width: 480px;
+  /* copied from the compose's CSS */
+  max-height: calc(100vh - 56px - 20px - 24px - 1px - 8px);
+}
+
+.inboxsdk__mole_view_titlebar {
+  background: #424242;
+  color: #fff;
+  height: 18px;
+  line-height: 18px;
+  outline: none;
+  padding: 11px 20px;
+  transform: translateZ(0);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
