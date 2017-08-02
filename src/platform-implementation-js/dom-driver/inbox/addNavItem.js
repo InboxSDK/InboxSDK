@@ -4,6 +4,7 @@ import Kefir from 'kefir';
 import InboxNavItemView from './views/inboxNavItemView';
 import Logger from '../../lib/logger';
 import insertElementInOrder from '../../lib/dom/insert-element-in-order';
+import eventNameFilter from '../../lib/event-name-filter';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 
@@ -23,9 +24,15 @@ export default function addNavItem(
   toItemWithLifetimeStream(leftNavLiveSet).take(1)
     .map(({el: node}) => node.getValue())
     .onValue((el) => {
+      inboxNavItemView.getEventStream()
+        .filter(eventNameFilter('orderChanged'))
+        .onValue(() => (
+          insertElementInOrder(containerEl, inboxNavItemView.getElement())
+        ));
+
       if (el.contains(containerEl)) {
         // This app has already added its nav container to Inbox's UI
-        containerEl.appendChild(inboxNavItemView.getElement());
+        insertElementInOrder(containerEl, inboxNavItemView.getElement());
         return;
       }
 
@@ -41,10 +48,10 @@ export default function addNavItem(
 
       nativeFolderSection.insertAdjacentElement('afterend', containerEl);
 
-      containerEl.appendChild(inboxNavItemView.getElement());
+      insertElementInOrder(containerEl, inboxNavItemView.getElement());
     });
 
-  inboxNavItemView.setNavItemDescriptor(navItemDescriptor);
+    inboxNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   return inboxNavItemView;
 }

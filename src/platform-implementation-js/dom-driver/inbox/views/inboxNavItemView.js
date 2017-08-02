@@ -3,6 +3,8 @@
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
+import eventNameFilter from '../../../lib/event-name-filter';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
@@ -17,6 +19,7 @@ export default class InboxNavItemView {
   _children: number = 0;
   _name: string = '';
   _type: ?string = null;
+  _orderHint: number = Number.MAX_SAFE_INTEGER;
   _disabled: boolean = false;
   _iconSettings: Object = {};
   _elements: {
@@ -51,9 +54,15 @@ export default class InboxNavItemView {
   addNavItem(orderGroup: number | string, navItemDescriptor: Object): InboxNavItemView {
     const childNavItemView = new InboxNavItemView(orderGroup, this._level + 1);
 
+    childNavItemView.getEventStream()
+      .filter(eventNameFilter('orderChanged'))
+      .onValue(() => (
+        insertElementInOrder(this._elements.subNav, childNavItemView.getElement())
+      ));
+
     childNavItemView.setNavItemDescriptor(navItemDescriptor);
 
-    this._elements.subNav.appendChild(childNavItemView.getElement());
+    insertElementInOrder(this._elements.subNav, childNavItemView.getElement());
 
     this._children += 1;
 
@@ -102,6 +111,7 @@ export default class InboxNavItemView {
 
     wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
     wrapper.setAttribute('tabindex', '-1');
+    wrapper.setAttribute('data-order-hint', String(this._orderHint));
     navItem.setAttribute('role', 'menuitem');
 
     navItem.classList.add('inboxsdk__navItem');
@@ -128,6 +138,7 @@ export default class InboxNavItemView {
     this._updateType(descriptor.type);
     this._updateIcon(descriptor);
     this._updateDisabledState(descriptor);
+    this._updateOrder(descriptor.orderHint || Number.MAX_SAFE_INTEGER);
   }
 
   _updateName(name: string) {
@@ -170,6 +181,14 @@ export default class InboxNavItemView {
       !(descriptor.routeID || descriptor.onClick) ||
       (this._level === 0 && this._children > 0)
     );
+  }
+
+  _updateOrder(orderHint: number) {
+    if (this._orderHint === orderHint) return;
+
+    this._elements.wrapper.setAttribute('data-order-hint', String(orderHint));
+    this._orderHint = orderHint;
+    this._eventStream.emit({eventName: 'orderChanged'});
   }
 
   _updateChildrenClass() {
