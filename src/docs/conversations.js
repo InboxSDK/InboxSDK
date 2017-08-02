@@ -18,46 +18,50 @@ var Conversations = /** @lends Conversations */{
 	/**
 	* Registers your handler to be called when the user navigates to a ThreadView. Your handler is given a
 	* ThreadView which you can then further manipulate.
+	* This function returns a function which removes the handler registration.
 	* @param {func(ThreadView)} handler - The handler to call when a ThreadView is displayed. This handler
 	* is passed one parameter, a ThreadView.
 	* ^gmail
 	* ^inbox
-	* @return {void}
+	* @return {Function}
 	*/
 	registerThreadViewHandler: function(){},
 
 	/**
 	* Registers your handler to be called when a MessageView is displayed. Your handler is given a
 	* MessageView which you can then further manipulate.
+	* This function returns a function which removes the handler registration.
 	*
 	* IMPORTANT: Your handler will only be called for {MessageView}s that are "loaded". See docs for
 	* {MessageView} to understand the distinction.
 	* ^gmail
 	* ^inbox
 	* @param {func(MessageView)} handler - The handler to call when a MessageView is displayed.
-	* @return {void}
+	* @return {Function}
 	*/
 	registerMessageViewHandler: function(){},
 
 	/**
 	* Registers your handler to be called when the user navigates to a MessageView. Your handler is given a
 	* MessageView which you can then further manipulate.
+	* This function returns a function which removes the handler registration.
 	*
 	* IMPORTANT: Your handler will be called for MessageViews that are both "loaded" and "unloaded". See docs for
 	* ^gmail
 	* ^inbox
 	* {MessageView} to understand the distinction.
 	* @param {func(MessageView)} handler - The handler to call when a message view is displayed.
-	* @return {void}
+	* @return {Function}
 	*/
 	registerMessageViewHandlerAll: function(){},
 
 	/**
 	* Registers your handler to be called when an AttachmentCardView is visible.
+	* This function returns a function which removes the handler registration.
 	* ^gmail
 	* ^inbox
 	* @param {func(AttachmentCardView)} handler
-	* @return {void}
+	* @return {Function}
 	*/
 	registerFileAttachmentCardViewHandler: function(){}
 

@@ -10,6 +10,7 @@ import kefirStopper from 'kefir-stopper';
 import kefirCast from 'kefir-cast';
 import BigNumber from 'bignumber.js';
 import InboxLabelView from './InboxLabelView';
+import InboxToolbarButtonView from './InboxToolbarButtonView';
 
 import type InboxDriver from '../inbox-driver';
 import type {Parsed} from '../detection/thread-row/parser';
@@ -51,6 +52,30 @@ class InboxThreadRowView {
       throw new Error('Did not find checkbox element');
     }
     return this._p.elements.checkbox.getAttribute('aria-checked') === 'true';
+  }
+
+  addToolbarButton(options: Object) {
+    const {toolbar} = this._p.elements;
+    if (!toolbar) {
+      throw new Error('could not find toolbar element');
+    }
+    toolbar.classList.add('inboxsdk__list_toolbar');
+    const button = new InboxToolbarButtonView({
+      ...options,
+      onClick: event => {
+        if (event.dropdown) {
+          toolbar.classList.add('inboxsdk__thread_row_force_toolbar_visible');
+          event.dropdown.once('destroy', () => {
+            toolbar.classList.remove('inboxsdk__thread_row_force_toolbar_visible');
+          });
+        }
+        if (options.onClick) options.onClick(event);
+      }
+    }, this._driver.getAppId(), toolbar);
+    this._stopper.takeUntilBy(button.getStopper()).onValue(() => {
+      button.destroy();
+    });
+    return button;
   }
 
   addAttachmentIcon(options: Object) {

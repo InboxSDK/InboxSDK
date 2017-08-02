@@ -2,6 +2,7 @@
 
 import once from 'lodash/once';
 import constant from 'lodash/constant';
+import includes from 'lodash/includes';
 import autoHtml from 'auto-html';
 import RSVP from 'rsvp';
 
@@ -15,6 +16,7 @@ import {defn} from 'ud';
 import type {TagTree} from 'tag-tree';
 import LiveSet from 'live-set';
 import lsFilter from 'live-set/filter';
+import lsMerge from 'live-set/merge';
 import lsFlatMap from 'live-set/flatMap';
 import lsMapWithRemoval from 'live-set/mapWithRemoval';
 import toValueObservable from 'live-set/toValueObservable';
@@ -70,7 +72,7 @@ import InboxMessageView from './views/inbox-message-view';
 import InboxAttachmentCardView from './views/inbox-attachment-card-view';
 import InboxAttachmentOverlayView from './views/inbox-attachment-overlay-view';
 import InboxChatSidebarView from './views/inbox-chat-sidebar-view';
-import InboxListToolbarView from './views/InboxListToolbarView';
+import InboxToolbarView from './views/InboxToolbarView';
 
 import InboxAppSidebarView from './views/inbox-app-sidebar-view';
 
@@ -103,7 +105,7 @@ class InboxDriver {
   _attachmentCardViewDriverLiveSet: LiveSet<InboxAttachmentCardView>;
   _attachmentOverlayViewDriverLiveSet: LiveSet<InboxAttachmentOverlayView>;
   _chatSidebarViewLiveSet: LiveSet<InboxChatSidebarView>;
-  _toolbarViewDriverLiveSet: LiveSet<InboxListToolbarView>;
+  _toolbarViewDriverLiveSet: LiveSet<InboxToolbarView>;
   _currentRouteViewDriver: InboxRouteView|InboxDummyRouteView|InboxCustomRouteView;
   _threadViewElements: WeakMap<HTMLElement, InboxThreadView> = new WeakMap();
   _messageViewElements: WeakMap<HTMLElement, InboxMessageView> = new WeakMap();
@@ -208,22 +210,59 @@ class InboxDriver {
       return view;
     });
 
-    this._threadViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('thread'), (node, removal) => {
-      const el = node.getValue();
-      const parsed = threadParser(el);
-      if (parsed.errors.length) {
-        this._logger.errorSite(new Error('parse errors (thread)'), {
-          score: parsed.score,
-          errors: parsed.errors,
-          html: censorHTMLtree(el)
+    this._threadViewDriverLiveSet = lsFlatMap(
+      this._page.tree.getAllByTag('thread'),
+      node => {
+        const el = node.getValue();
+        let parsed = threadParser(el);
+        if (parsed.errors.length) {
+          this._logger.errorSite(new Error('parse errors (thread)'), {
+            score: parsed.score,
+            errors: parsed.errors,
+            html: censorHTMLtree(el)
+          });
+        }
+        return new LiveSet({
+          read() {
+            throw new Error();
+          },
+          listen: (setValues, controller) => {
+            setValues(new Set());
+            const unsub = kefirStopper();
+
+            // If the InboxThreadView is destroyed before the element is removed,
+            // then make a new InboxThreadView out of the same element.
+            const newView = firstRun => {
+              if (!firstRun) {
+                parsed = threadParser(el);
+                if (parsed.errors.length > 0) {
+                  this._logger.errorSite(new Error('thread reparse errors'), {
+                    score: parsed.score,
+                    errors: parsed.errors,
+                    html: censorHTMLtree(el)
+                  });
+                }
+              }
+              const view = new InboxThreadView(el, this, parsed);
+              view.getStopper().takeUntilBy(unsub).onValue(() => {
+                controller.remove(view);
+                newView(false);
+              });
+              unsub.takeUntilBy(view.getStopper()).onValue(() => {
+                view.destroy();
+              });
+              controller.add(view);
+            };
+
+            newView(true);
+
+            return () => {
+              unsub.destroy();
+            };
+          }
         });
       }
-      const view = new InboxThreadView(el, this, parsed);
-      removal.then(() => {
-        view.destroy();
-      });
-      return view;
-    });
+    );
 
     this._messageViewDriverLiveSet = lsFlatMap(
       this._page.tree.getAllByTag('message'),
@@ -413,14 +452,24 @@ class InboxDriver {
       });
     });
 
-    this._toolbarViewDriverLiveSet = lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
-      const el = node.getValue();
-      const view = new InboxListToolbarView(el, this);
-      removal.then(() => {
-        view.destroy();
-      });
-      return view;
-    });
+    this._toolbarViewDriverLiveSet = lsMerge([
+      lsMapWithRemoval(this._page.tree.getAllByTag('listToolBar'), (node, removal) => {
+        const el = node.getValue();
+        const view = new InboxToolbarView(el, this, null);
+        removal.then(() => {
+          view.destroy();
+        });
+        return view;
+      }),
+      lsMapWithRemoval(this._threadViewDriverLiveSet, (inboxThreadView, removal) => {
+        const el = inboxThreadView.getToolbarElement();
+        const view = new InboxToolbarView(el, this, inboxThreadView);
+        removal.then(() => {
+          view.destroy();
+        });
+        return view;
+      })
+    ]);
   }
 
   _setupThreadIdStats() {
@@ -495,10 +544,6 @@ class InboxDriver {
   }
   getAttachmentCardViewDriverStream() {
     return toItemWithLifetimeStream(this._attachmentCardViewDriverLiveSet).map(({el})=>el);
-  }
-  getToolbarViewDriverStream() {
-    return toItemWithLifetimeStream(this._toolbarViewDriverLiveSet).map(({el})=>el)
-      .filter(() => false); // TODO re-enable when threadRowViews are ready
   }
   getButterBarDriver(): Object {return this._butterBarDriver;}
   getButterBar(): ButterBar {return this._butterBar;}
@@ -593,6 +638,87 @@ class InboxDriver {
   getAccountSwitcherContactList(): Contact[] {
     console.log('getAccountSwitcherContactList not implemented'); //eslint-disable-line no-console
     return [this.getUserContact()];
+  }
+
+  registerThreadButton(options: Object) {
+    const unregister = kefirStopper();
+
+    const removeButtonOnUnregister = button => {
+      unregister.takeUntilBy(button.getStopper()).onValue(() => {
+        button.destroy();
+      });
+    };
+
+    const toolbarViewSub = toValueObservable(this._toolbarViewDriverLiveSet).subscribe(({value: inboxToolbarView}: {value: InboxToolbarView}) => {
+      if (inboxToolbarView.isForThread()) {
+        if (!options.positions || includes(options.positions, 'THREAD')) {
+          if (options.threadSection === 'OTHER') {
+            console.warn('registerThreadButton does not support OTHER section items in Inbox yet.'); //eslint-disable-line no-console
+            return;
+          }
+          removeButtonOnUnregister(inboxToolbarView.addButton({
+            ...options,
+            onClick: event => {
+              options.onClick({
+                position: 'THREAD',
+                dropdown: event.dropdown,
+                selectedThreadViewDrivers: [inboxToolbarView.getThreadViewDriver()],
+                selectedThreadRowViewDrivers: []
+              });
+            }
+          }));
+        }
+      } else if (inboxToolbarView.isForRowList()) {
+        if (!options.positions || includes(options.positions, 'LIST')) {
+          if (options.listSection === 'OTHER') {
+            console.warn('registerThreadButton does not support OTHER section items in Inbox yet.'); //eslint-disable-line no-console
+            return;
+          }
+          removeButtonOnUnregister(inboxToolbarView.addButton({
+            ...options,
+            onClick: event => {
+              options.onClick({
+                position: 'LIST',
+                dropdown: event.dropdown,
+                selectedThreadViewDrivers: [],
+                selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
+              });
+            }
+          }));
+        }
+      }
+    });
+    unregister.onValue(() => {
+      toolbarViewSub.unsubscribe();
+    });
+
+    if (!options.positions || includes(options.positions, 'ROW')) {
+      const threadRowViewSub = toValueObservable(this._threadRowViewDriverLiveSet).subscribe(({value: inboxThreadRowView}: {value: InboxThreadRowView}) => {
+        removeButtonOnUnregister(inboxThreadRowView.addToolbarButton({
+          ...options,
+          onClick: event => {
+            options.onClick({
+              position: 'ROW',
+              dropdown: event.dropdown,
+              selectedThreadViewDrivers: [],
+              selectedThreadRowViewDrivers: [inboxThreadRowView]
+            });
+          }
+        }));
+      });
+      unregister.onValue(() => {
+        threadRowViewSub.unsubscribe();
+      });
+    }
+
+    return () => {
+      unregister.destroy();
+    };
+  }
+
+  getSelectedThreadRowViewDrivers(): Array<InboxThreadRowView> {
+    return Array.from(this.getThreadRowViewDriverLiveSet().values())
+      .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
   }
 
   addNavItem(appId: string, navItemDescriptor: Kefir.Observable<Object>): Object {

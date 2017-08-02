@@ -13,18 +13,35 @@
 var Toolbars = /** @lends Toolbars */ {
 
 	/**
-	* Registers a toolbar button to appear in any List such as the Inbox or Sent Mail.
+	* Registers a toolbar button to appear on thread rows, above the thread list when some rows
+	* are checked, and above threads.
+	* This function returns a function which removes the button registration.
 	* ^gmail
+	* ^inbox
 	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
-	* @return {void}
+	* @return {Function}
+	*/
+	registerThreadButton: function(){},
+
+	/**
+	* (This function is deprecated in favor of registerThreadButton.)
+	* Registers a toolbar button to appear above any list page such as the Inbox or Sent Mail.
+	* This function returns a function which removes the button registration.
+	* ^gmail
+	* ^inbox
+	* @param {LegacyToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
+	* @return {Function}
 	*/
 	registerToolbarButtonForList: function(){},
 
 	/**
-	* Registers a toolbar button to appear in a conversation view.
+	* (This function is deprecated in favor of registerThreadButton.)
+	* Registers a toolbar button to appear when viewing a thread.
+	* This function returns a function which removes the button registration.
 	* ^gmail
-	* @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
-	* @return {void}
+	* ^inbox
+	* @param {LegacyToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
+	* @return {Function}
 	*/
 	registerToolbarButtonForThreadView: function(){},
 
@@ -49,7 +66,7 @@ var Toolbars = /** @lends Toolbars */ {
 var sectionNames = Object.freeze(/** @lends SectionNames */ {
 
 	/**
-	* The section is for buttons that move emails out of or into the users inbox
+	* The section is for buttons that move emails out of or into the users inbox.
 	* @type string
 	*/
 	'INBOX_STATE': 'INBOX_STATE',
@@ -69,11 +86,9 @@ var sectionNames = Object.freeze(/** @lends SectionNames */ {
 
 });
 
-
 /**
 * @class
-* This type is passed into the {Toolbars.registerToolbarButtonForList()} and
-* {Toolbars.registerToolbarButtonForThreadView()} method as a way to configure
+* This type is passed into the {Toolbars.registerThreadButton()} to configure
 * the toolbar button shown.
 */
 var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
@@ -87,7 +102,7 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	title:null,
 
 	/**
-	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL. While iconUrl is an optional parameter at least one of iconUrl or iconClass is required.
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL. Either this property, iconClass, or both must be specified.
 	* ^optional
 	* ^default=null
 	* @type {string}
@@ -95,7 +110,112 @@ var ToolbarButtonDescriptor = /** @lends ToolbarButtonDescriptor */{
 	iconUrl:null,
 
 	/**
-	* An optional class to apply to the icon. While iconClass is an optional parameter at least one of iconUrl or iconClass is required.
+	* An optional class to apply to the icon. Either this property, iconUrl, or both must be specified.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconClass: null,
+
+	/**
+	* An optional array of strings specifying the locations the button will be displayed in.
+	* The default value of null is treated as equal to the array of all of the possible values: "THREAD", "ROW", and "LIST".
+	* ^optional
+	* ^default=null
+	* @type {Array.<string>}
+	*/
+	positions: null,
+
+	/**
+	* The section of the toolbar to place the button when placing it on a thread.
+	* Currently this option only has an effect in Gmail.
+	* ^optional
+	* ^default='METADATA_STATE'
+	* @type {SectionNames}
+	*/
+	threadSection:null,
+
+	/**
+	* The section of the toolbar to place the button when placing it above a thread list.
+	* Currently this option only has an effect in Gmail.
+	* ^optional
+	* ^default='METADATA_STATE'
+	* @type {SectionNames}
+	*/
+	listSection:null,
+
+	/**
+	* This is called when the button is clicked, and gets passed an event object.
+	* The event object will have a {position} property set to 'THREAD', 'ROW', or 'LIST'
+	* specifying where the button was that was interacted with.
+	* The event object will have {selectedThreadViews} ({ThreadView[]}) and {selectedThreadRowViews} ({ThreadRowView[]}) properties containing the thread or thread row objects that this button was activated on.
+	* The event object will have a {dropdown} ({DropdownView}) property if the {hasDropdown} property was set to true on the button descriptor.
+	* @type {func(event)}
+	*/
+	onClick:null,
+
+	/**
+	* If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
+	* allows the dropdown to be customized when opened.
+	* ^optional
+	* ^default=false
+	* @type {boolean}
+	*/
+	hasDropdown:null,
+
+	/**
+	* A function that determines when this toolbar button should be hidden. You may want to hide the
+	* toolbar button on certain Routes or in certain conditions. The function should return true when
+	* the toolbar button should be hidden. Your function is passed a {RouteView}.
+	* ^optional
+	* ^default=null
+	* @type {func(RouteView)}
+	*/
+	hideFor:null,
+
+	/**
+	* If multiple buttons are placed next to each other, then they will be ordered by this value.
+	* ^optional
+	* ^default=0
+	* @type {number}
+	*/
+	orderHint:null,
+
+	/**
+	* The keyboard shortcut that will activate this button. This is currently only supported in Gmail.
+	* ^optional
+	* ^default=null
+	* @type {keyboardShortcutHandle}
+	*/
+	 keyboardShortcutHandle: null
+};
+
+/**
+* @class
+* This type is passed into the {Toolbars.registerToolbarButtonForList()} and
+* {Toolbars.registerToolbarButtonForThreadView()} method as a way to configure
+* the toolbar button shown.
+*/
+var LegacyToolbarButtonDescriptor = /** @lends LegacyToolbarButtonDescriptor */{
+
+	/**
+	* Text to show when the user hovers the mouse over the button, or to show on
+	* the button when the user has the Gmail "Button labels" setting set to
+	* "Text".
+	* @type {string}
+	*/
+	title:null,
+
+	/**
+	* URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL. Either this property, iconClass, or both must be specified.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	iconUrl:null,
+
+	/**
+	* An optional class to apply to the icon. Either this property, iconUrl, or both must be specified.
 	* ^optional
 	* ^default=null
 	* @type {string}

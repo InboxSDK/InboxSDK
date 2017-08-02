@@ -8,19 +8,27 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 		description: 'have fun'
 	});
 
+	inboxSDK.Toolbars.registerThreadButton({
+		iconUrl: chrome.runtime.getURL('monkey.png'),
+		title: 'Monkeys (registerThreadButton)',
+		hasDropdown: true,
+		onClick(event) {
+			event.dropdown.el.innerHTML = '<div><button type="button">foo</button></div><div>text</div>';
+			console.log('thread button click event', event);
+			window._e = event;
+		}
+	});
+
 	inboxSDK.Toolbars.registerToolbarButtonForThreadView({
 		iconUrl: chrome.runtime.getURL('monkey.png'),
 		title: 'Monkeys',
 		section: inboxSDK.Toolbars.SectionNames.METADATA_STATE,
 		hasDropdown: true,
 		onClick: function(event){
-			setTimeout(function(){
-				event.dropdown.el.textContent = 'Subject: ' + event.threadView.getSubject() + '\n' + 'Messages: ' + event.threadView.getMessageViews().map(function(messageView){messageView.getRecipients(); return messageView.getSender().name}).join(', ');
-			}, 500);
+			event.dropdown.el.textContent = 'Subject: ' + event.threadView.getSubject() + '\n' + 'Messages: ' + event.threadView.getMessageViews().map(function(messageView){messageView.getRecipients(); return messageView.getSender().name}).join(', ');
 		},
 		keyboardShortcutHandle: shortcutHandle
 	});
-
 
 	var shortcutHandle2 = inboxSDK.Keyboard.createShortcutHandle({
 		chord: 'ctrl+shift+x',
@@ -80,15 +88,6 @@ InboxSDK.load(1, 'toolbar-example', {appIconUrl: chrome.runtime.getURL('monkey.p
 			console.log('selected: ', event.selectedThreadRowViews.length);
 		}
 	});
-
-	// Testing duplicate
-	// inboxSDK.Toolbars.registerToolbarButtonForList({
-	// 	title: 'Monkeys 2',
-	// 	section: inboxSDK.Toolbars.SectionNames.INBOX_STATE,
-	// 	onClick: function(event){
-	// 		console.log('selected: ', event.selectedThreadRowViews.length);
-	// 	}
-	// });
 
 	var button = inboxSDK.Toolbars.addToolbarButtonForApp({
 		iconUrl: 'https://ssl.gstatic.com/s2/oz/images/notifications/spinner_32_4152eb447e3e756250b29a0b19b2bbf9.gif',

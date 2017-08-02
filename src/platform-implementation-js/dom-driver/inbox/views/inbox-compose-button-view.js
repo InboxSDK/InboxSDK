@@ -25,6 +25,7 @@ class InboxComposeButtonView {
     const buttonEl = this._buttonEl = document.createElement('div');
     buttonEl.setAttribute('role', 'button');
     buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.setAttribute('data-group-order-hint', groupOrderHint);
     buttonEl.tabIndex = 0;
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
@@ -47,7 +48,10 @@ class InboxComposeButtonView {
           this._buttonEl.classList.add('inboxsdk__active');
           dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
           dropdown.setPlacementOptions({
-            vAlign: 'bottom'
+            position: 'top',
+            hAlign: 'left',
+            vAlign: 'bottom',
+            buffer: 5
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');

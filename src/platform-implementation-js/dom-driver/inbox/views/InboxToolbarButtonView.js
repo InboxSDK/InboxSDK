@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 import includes from 'lodash/includes';
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
@@ -11,12 +12,14 @@ import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 let insertionOrderHint: number = 0;
 
 class InboxToolbarButtonView {
+  _stopper = kefirStopper();
   _buttonEl: HTMLElement;
 
-  constructor(buttonDescriptor: Object, groupOrderHint: string, stopper: Kefir.Observable<null>, container: HTMLElement) {
+  constructor(buttonDescriptor: Object, groupOrderHint: string, container: HTMLElement) {
     const buttonEl = this._buttonEl = document.createElement('li');
     buttonEl.setAttribute('role', 'button');
     buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.setAttribute('data-group-order-hint', groupOrderHint);
     buttonEl.tabIndex = 0;
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
@@ -38,8 +41,10 @@ class InboxToolbarButtonView {
           this._buttonEl.classList.add('inboxsdk__active');
           dropdown = new DropdownView(new InboxDropdownView(), buttonEl);
           dropdown.setPlacementOptions({
+            position: 'bottom',
             hAlign: 'right',
-            vAlign: 'bottom', forceVAlign: true
+            vAlign: 'top',
+            buffer: 10
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
@@ -66,16 +71,24 @@ class InboxToolbarButtonView {
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
         buttonEl.setAttribute('data-order-hint', String(orderHint));
-        insertElementInOrder(container, buttonEl);
+        insertElementInOrder(container, buttonEl, undefined, true);
       }
     }
 
-    stopper.onValue(() => {
+    this._stopper.onValue(() => {
       buttonEl.remove();
       if (dropdown) {
         dropdown.close();
       }
     });
+  }
+
+  destroy() {
+    this._stopper.destroy();
+  }
+
+  getStopper(): Kefir.Observable<null> {
+    return this._stopper;
   }
 }
 

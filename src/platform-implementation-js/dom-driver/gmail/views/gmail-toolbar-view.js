@@ -10,7 +10,7 @@ import type {Stopper} from 'kefir-stopper';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
-import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
+import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import isElementVisible from '../../../../common/isElementVisible';
 
 import GmailElementGetter from '../gmail-element-getter';
@@ -22,23 +22,28 @@ import DropdownButtonViewController from '../../../widgets/buttons/dropdown-butt
 import GmailThreadView from './gmail-thread-view';
 import GmailRowListView from './gmail-row-list-view';
 
+import {SECTION_NAMES} from '../../../constants/toolbars';
+
+import type GmailDriver from '../gmail-driver';
 import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
 
 import Logger from '../../../lib/logger';
 
 class GmailToolbarView {
 	_element: HTMLElement;
+	_driver: GmailDriver;
 	_ready: Kefir.Observable<GmailToolbarView>;
 	_stopper: Stopper;
 	_routeViewDriver: RouteViewDriver;
-	_buttonViewControllers: Object[];
-	_moreMenuItems: Object[];
+	_buttonViewControllers: Set<DropdownButtonViewController|BasicButtonViewController> = new Set();
+	_moreMenuItems: Array<{buttonDescriptor: Object}> = [];
 	_toolbarState: ?string;
 	_threadViewDriver: ?GmailThreadView;
 	_rowListViewDriver: ?GmailRowListView;
 	_isUpdateButtonClassesScheduled: boolean = false;
+	_moreMenuItemsContainer: ?HTMLElement = null;
 
-	constructor(element: HTMLElement, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
+	constructor(element: HTMLElement, driver: GmailDriver, routeViewDriver: RouteViewDriver, parent: GmailThreadView|GmailRowListView){
 		// Important: Multiple GmailToolbarViews will be created for the same
 		// toolbar element in preview pane mode! When a GmailToolbarView is
 		// created, it adds some attributes to the element corresponding to the
@@ -47,10 +52,9 @@ class GmailToolbarView {
 		// hide the buttons with attributes that don't currently match the toolbar
 		// element.
 		this._element = element;
+		this._driver = driver;
 		this._stopper = kefirStopper();
 		this._routeViewDriver = routeViewDriver;
-		this._buttonViewControllers = [];
-		this._moreMenuItems = [];
 
 		if (this._getMoveSectionElement()) {
 			this._ready = Kefir.constant(this);
@@ -107,23 +111,37 @@ class GmailToolbarView {
 		return this._rowListViewDriver.getThreadRowViewDrivers();
 	}
 
-	addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string){
-		this._ready.onValue(() => {
+	addButton(buttonDescriptor: Object, id?: string): {getStopper(): Kefir.Observable<null>; destroy(): void} {
+		const buttonStopper = kefirStopper();
+
+		this._stopper.takeUntilBy(buttonStopper).onValue(() => {
+			buttonStopper.destroy();
+		});
+
+		const appId = this._driver.getAppId();
+		const toolbarSections = SECTION_NAMES;
+		this._ready.takeUntilBy(buttonStopper).onValue(() => {
 			if(buttonDescriptor.section === toolbarSections.OTHER){
-				this._moreMenuItems.push({
-					buttonDescriptor: buttonDescriptor,
-					appId: appId
+				const entry = {buttonDescriptor};
+				this._moreMenuItems.push(entry);
+				this._addToOpenMoreMenu(buttonDescriptor);
+				buttonStopper.onValue(() => {
+					this._moreMenuItems = this._moreMenuItems.filter(_entry => _entry !== entry);
+					this._addMoreItems();
 				});
-				this._addToOpenMoreMenu(buttonDescriptor, appId);
 			}
 			else{
 				const sectionElement = this._getSectionElement(buttonDescriptor.section, toolbarSections);
 				if (sectionElement) {
 					const buttonViewController = this._createButtonViewController(buttonDescriptor);
-					this._buttonViewControllers.push(buttonViewController);
+					this._buttonViewControllers.add(buttonViewController);
+					buttonStopper.onValue(() => {
+						this._buttonViewControllers.delete(buttonViewController);
+						buttonViewController.destroy();
+					});
 
 					// Debugging code to track our duplicate toolbar button issue.
-					buttonViewController.getView().getElement().__addButton_ownedByExtension = true;
+					(buttonViewController.getView().getElement():any).__addButton_ownedByExtension = true;
 					buttonViewController.getView().getElement().setAttribute(
 						'data-add-button-debug',
 						JSON.stringify({
@@ -134,7 +152,8 @@ class GmailToolbarView {
 						})
 					);
 
-					sectionElement.appendChild(buttonViewController.getView().getElement());
+					buttonViewController.getView().getElement().setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
+					insertElementInOrder(sectionElement, buttonViewController.getView().getElement());
 
 					Kefir.merge([
 							Kefir.constant(-1),
@@ -177,13 +196,20 @@ class GmailToolbarView {
 				}
 			}
 		});
+
+		return {
+			getStopper: () => buttonStopper,
+			destroy: () => {
+				buttonStopper.destroy();
+			}
+		};
 	}
 
 	waitForReady(): Kefir.Observable<GmailToolbarView> {
 		return this._ready;
 	}
 
-	_createButtonViewController(buttonDescriptor: Object): Object {
+	_createButtonViewController(buttonDescriptor: Object): DropdownButtonViewController|BasicButtonViewController {
 		var buttonView = this._getButtonView(buttonDescriptor);
 		buttonDescriptor.buttonView = buttonView;
 
@@ -232,8 +258,13 @@ class GmailToolbarView {
 			.toProperty(() => null)
 			.takeUntilBy(this._stopper)
 			.map(() => moreButtonElement.getAttribute('aria-expanded'))
-			.filter(ariaExpanded => ariaExpanded === 'true')
-			.onValue(() => { this._addMoreItems(); });
+			.onValue(ariaExpanded => {
+				if (ariaExpanded !== 'true') {
+					this._clearMoreItems();
+				} else {
+					this._addMoreItems();
+				}
+			});
 	}
 
 	_determineToolbarState(){
@@ -384,8 +415,8 @@ class GmailToolbarView {
 	}
 
 	_updateButtonEnabledState(){
-		var enabled = this._toolbarState === 'EXPANDED';
-		this._buttonViewControllers.forEach(function(buttonViewController){
+		const enabled = this._toolbarState === 'EXPANDED';
+		this._buttonViewControllers.forEach(buttonViewController => {
 			buttonViewController.getView().setEnabled(enabled);
 		});
 	}
@@ -398,64 +429,39 @@ class GmailToolbarView {
 		}
 
 		this._moreMenuItems.forEach(item => {
-			this._addToOpenMoreMenu(item.buttonDescriptor, item.appId);
+			this._addToOpenMoreMenu(item.buttonDescriptor);
 		});
 	}
 
 	_clearMoreItems(){
+		if (this._moreMenuItemsContainer) {
+			this._moreMenuItemsContainer.remove();
+			this._moreMenuItemsContainer = null;
+		}
+	}
+
+	_addToOpenMoreMenu(buttonDescriptor: Object){
 		const moreMenu = GmailElementGetter.getActiveMoreMenu();
 		if(!moreMenu){
 			return;
 		}
 
-		uniq(this._moreMenuItems.map(x => x.appId))
-			.map(appId =>
-				moreMenu.querySelector('[data-group-order-hint=' + appId + ']')
-			)
-			.filter(Boolean)
-			.forEach(container => {
-				container.remove();
-			});
+		const appDiv = this._getMoreMenuItemsContainer(moreMenu);
+		const menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
+
+		insertElementInOrder(appDiv, menuItemElement);
 	}
 
-	_addToOpenMoreMenu(buttonDescriptor: Object, appId: string){
-		const moreMenu = GmailElementGetter.getActiveMoreMenu();
-		if(!moreMenu){
-			return;
+	_getMoreMenuItemsContainer(moreMenu: HTMLElement): HTMLElement {
+		if (this._moreMenuItemsContainer) {
+			return this._moreMenuItemsContainer;
 		}
 
-		var appDiv = this._getMoreMenuItemsContainer(moreMenu, appId);
-		var menuItemElement = this._getMoreMenuItemElement(buttonDescriptor);
-
-		var insertBeforeElement = getInsertBeforeElement(menuItemElement, appDiv.querySelectorAll('[role=menuitem]'), ['data-order-hint']);
-
-		if(insertBeforeElement){
-			appDiv.insertBefore(menuItemElement, insertBeforeElement);
-		}
-		else{
-			appDiv.appendChild(menuItemElement);
-		}
-	}
-
-	_getMoreMenuItemsContainer(moreMenu: HTMLElement, appId: string): HTMLElement {
-		var container = moreMenu.querySelector('[data-group-order-hint=' + appId + ']');
-		if(container){
-			return container;
-		}
-
-		container = document.createElement('div');
-		container.setAttribute('data-group-order-hint', appId);
+		const container = this._moreMenuItemsContainer = document.createElement('div');
+		container.setAttribute('data-group-order-hint', this._driver.getAppId());
 		container.innerHTML = '<div class="J-Kh"></div>';
 
-		var containers = moreMenu.querySelectorAll('[data-group-order-hint]');
-		var insertBeforeElement = getInsertBeforeElement(container, containers, ['data-group-order-hint']);
-
-		if(insertBeforeElement){
-			moreMenu.insertBefore(container, insertBeforeElement);
-		}
-		else{
-			moreMenu.appendChild(container);
-		}
+		insertElementInOrder(moreMenu, container);
 
 		return container;
 	}
@@ -464,7 +470,7 @@ class GmailToolbarView {
 		var itemElement = document.createElement('div');
 		itemElement.setAttribute('class', 'J-N inboxsdk__menuItem');
 		itemElement.setAttribute('role', 'menuitem');
-		itemElement.setAttribute('orderHint', String(buttonDescriptor.orderHint || 0));
+		itemElement.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
 
 		itemElement.innerHTML = [
 			'<div class="J-N-Jz" style="-webkit-user-select: none;">',
@@ -484,7 +490,7 @@ class GmailToolbarView {
 
 		itemElement.addEventListener('click', function(e: MouseEvent){
 			if(buttonDescriptor.onClick){
-				buttonDescriptor.onClick();
+				buttonDescriptor.onClick({});
 			}
 		});
 
@@ -503,10 +509,6 @@ class GmailToolbarView {
 
 		this._clearMoreItems();
 		this._stopper.destroy();
-		this._buttonViewControllers.forEach(button => {
-			button.destroy();
-		});
-		this._buttonViewControllers.length = 0;
 		this._updateButtonClasses(element);
 	}
 }

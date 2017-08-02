@@ -4,16 +4,19 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import InboxToolbarButtonView from './InboxToolbarButtonView';
+import type InboxThreadView from './inbox-thread-view';
 import type InboxDriver from '../inbox-driver';
 
 class InboxToolbarView {
   _stopper = kefirStopper();
   _el: HTMLElement;
   _driver: InboxDriver;
+  _inboxThreadView: ?InboxThreadView;
 
-  constructor(el: HTMLElement, driver: InboxDriver) {
+  constructor(el: HTMLElement, driver: InboxDriver, inboxThreadView: ?InboxThreadView) {
     this._el = el;
     this._driver = driver;
+    this._inboxThreadView = inboxThreadView;
 
     this._el.classList.add('inboxsdk__list_toolbar');
   }
@@ -35,19 +38,26 @@ class InboxToolbarView {
   }
 
   isForRowList(): boolean {
-    return true;
+    return this._inboxThreadView == null;
   }
 
   isForThread(): boolean {
-    return false;
+    return this._inboxThreadView != null;
   }
 
   getThreadViewDriver() {
-    throw new Error('should not happen');
+    if (!this._inboxThreadView) {
+      throw new Error('this toolbarview is not for a thread');
+    }
+    return this._inboxThreadView;
   }
 
-  addButton(buttonDescriptor: Object, toolbarSections: Object, appId: string, id: string) {
-    new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._stopper, this._el);
+  addButton(buttonDescriptor: Object, id?: string) {
+    const button = new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._el);
+    this._stopper.takeUntilBy(button.getStopper()).onValue(() => {
+      button.destroy();
+    });
+    return button;
   }
 }
 
