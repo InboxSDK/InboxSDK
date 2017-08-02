@@ -5,6 +5,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import eventNameFilter from '../../../lib/event-name-filter';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
@@ -21,9 +22,11 @@ export default class InboxNavItemView {
   _type: ?string = null;
   _orderHint: number = Number.MAX_SAFE_INTEGER;
   _disabled: boolean = false;
+  _isCollapsed: boolean = false;
   _iconSettings: Object = {};
   _elements: {
     wrapper: HTMLElement;
+    expander: HTMLElement;
     navItem: HTMLElement;
     name: HTMLElement;
     subNav: HTMLElement;
@@ -34,6 +37,7 @@ export default class InboxNavItemView {
 		this._level = level || 0;
     this._elements = {
       wrapper: document.createElement('div'),
+      expander: document.createElement('div'),
       navItem: document.createElement('div'),
       name: document.createElement('span'),
       subNav: document.createElement('div')
@@ -87,7 +91,21 @@ export default class InboxNavItemView {
   }
 
   toggleCollapse() {
-    // not yet implemented
+    this._isCollapsed = !this._isCollapsed;
+
+    this._isCollapsed ? this._collapse() : this._expand();
+  }
+
+  setCollapsed(value: boolean) {
+    if (this._isCollapsed === value) return;
+
+    this._isCollapsed = value;
+
+    this._isCollapsed ? this._collapse() : this._expand();
+  }
+
+  isCollapsed(): boolean {
+    return this._isCollapsed;
   }
 
   getElement(): HTMLElement {
@@ -104,20 +122,26 @@ export default class InboxNavItemView {
 
   destroy() {
     this._eventStream.end();
+    this._elements.wrapper.remove();
   }
 
   _setupElements() {
-    const {wrapper, navItem, name, subNav} = this._elements;
+    const {wrapper, expander, navItem, name, subNav} = this._elements;
 
     wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
     wrapper.setAttribute('tabindex', '-1');
     wrapper.setAttribute('data-order-hint', String(this._orderHint));
     navItem.setAttribute('role', 'menuitem');
 
+    expander.classList.add('inboxsdk__navItem_expander');
     navItem.classList.add('inboxsdk__navItem');
     name.classList.add('inboxsdk__navItem_name');
     subNav.classList.add('inboxsdk__navItem_subNav');
 
+    // Arrow SVG
+    expander.innerHTML = '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon><svg>';
+
+    navItem.appendChild(expander);
     navItem.appendChild(name);
     wrapper.appendChild(navItem);
     wrapper.appendChild(subNav);
@@ -131,13 +155,30 @@ export default class InboxNavItemView {
           return {eventName: 'click', domEvent};
         })
     );
+
+    Kefir.fromEvents(expander, 'click')
+      .takeUntilBy(this._stopper)
+      .filter(() => this._children > 0)
+      .onValue((domEvent: MouseEvent) => {
+        this.toggleCollapse();
+        domEvent.stopPropagation();
+      });
+  }
+
+  _collapse() {
+    this._elements.wrapper.classList.add('inboxsdk__navItem_collapsed');
+  }
+
+  _expand() {
+    this._elements.wrapper.classList.remove('inboxsdk__navItem_collapsed');
   }
 
   _update(descriptor: Object) {
     this._updateName(descriptor.name);
     this._updateType(descriptor.type);
-    this._updateIcon(descriptor);
+    this._updateExpander(descriptor);
     this._updateDisabledState(descriptor);
+    this._updateIcon(descriptor);
     this._updateOrder(descriptor.orderHint || Number.MAX_SAFE_INTEGER);
   }
 
@@ -161,10 +202,17 @@ export default class InboxNavItemView {
     this._type = type;
   }
 
+  _updateExpander({expanderBackgroundColor, expanderForegroundColor}: Object) {
+    this._elements.expander.style.backgroundColor = expanderBackgroundColor || '';
+
+    const arrow = querySelector(this._elements.expander, 'polygon');
+    (arrow.style: any).fill = expanderForegroundColor || '';
+  }
+
   _updateIcon(descriptor: Object) {
     this._elements.navItem.classList.toggle(
       'inboxsdk__navItem_hasIcon',
-      Boolean(descriptor.iconUrl || descriptor.iconClass)
+      (!this._disabled || this._level > 0) && Boolean(descriptor.iconUrl || descriptor.iconClass)
     );
 
     updateIcon(
@@ -172,7 +220,8 @@ export default class InboxNavItemView {
       this._elements.navItem,
       false,
       descriptor.iconClass,
-      descriptor.iconUrl
+      descriptor.iconUrl,
+      this._elements.name
     );
   }
 
@@ -180,6 +229,10 @@ export default class InboxNavItemView {
     this._disabled = (
       !(descriptor.routeID || descriptor.onClick) ||
       (this._level === 0 && this._children > 0)
+    );
+    this._elements.wrapper.classList.toggle(
+      'inboxsdk__navItem_disabled',
+      this._disabled
     );
   }
 

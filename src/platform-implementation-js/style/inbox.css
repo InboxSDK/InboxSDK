@@ -713,7 +713,12 @@ first-child will do the trick.
   box-sizing: border-box;
   list-style: none;
   padding: 0 0 8px 0;
+  margin: 13px 0;
   position: relative;
+}
+
+.inboxsdk__navItem_appContainer:empty {
+  display: none;
 }
 
 .inboxsdk__navItem_appContainer:focus,
@@ -723,7 +728,8 @@ first-child will do the trick.
   outline: none;
 }
 
-.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem_subNav {
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem_subNav,
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem > .inboxsdk__navItem_expander {
   display: none;
 }
 
@@ -747,11 +753,41 @@ first-child will do the trick.
   outline: 2px solid transparent;
 }
 
-.inboxsdk__navItem_active {
+.inboxsdk__navItem_active > .inboxsdk__navItem {
   background-color: rgba(0,0,0,.05);
   border-radius: 2px;
   color: #212121;
   font-weight: bold;
+}
+
+.inboxsdk__navItem_expander {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  margin-right: 24px;
+  border-radius: 50%;
+}
+
+.inboxsdk__navItem_expander:hover {
+  background-color: rgba(0,0,0,.12);
+}
+
+.inboxsdk__navItem_expander > svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 200ms ease-out;
+}
+
+.inboxsdk__navItem_expander > svg > polygon {
+  fill: #616161;
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed > .inboxsdk__navItem > .inboxsdk__navItem_expander > svg {
+  transform: rotate(-90deg);
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed > .inboxsdk__navItem_subNav {
+  display: none;
 }
 
 .inboxsdk__navItem_name {
@@ -783,10 +819,10 @@ first-child will do the trick.
   height: 24px;
 }
 
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:hover,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active {
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem,
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:hover,
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:focus,
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:active {
   background-color: transparent;
   border-radius: 0;
   outline: none;
@@ -798,6 +834,30 @@ first-child will do the trick.
   cursor: default;
 }
 
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled {
+  border-top: 1px solid #ddd;
+  margin: 13px 0;
+  padding-top: 13px;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled:last-child {
+  margin-bottom: 0;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem > .inboxsdk__button_icon {
+  display: none;
+}
+
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem > .inboxsdk__navItem_expander {
+  display: none;
+}
+
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:hover > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus > .inboxsdk__navItem_name,
@@ -805,15 +865,27 @@ first-child will do the trick.
   color: #616161;
 }
 
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren .inboxsdk__navItem_subNav {
+  padding-left: 48px;
+}
+
+.inboxsdk__navItem_level2.inboxsdk__navItem_hasChildren .inboxsdk__navItem_subNav {
+  padding-left: 34px;
+}
+
 .inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren > .inboxsdk__navItem_subNav {
   padding-left: 48px;
 }
 
-.inboxsdk__navItem_level2,
-.inboxsdk__navItem_level3 {
+.inboxsdk__navItem_level2 {
   line-height: 26px;
 }
 
+.inboxsdk__navItem_level2 .inboxsdk__navItem_expander {
+  margin-right: 10px;
+}
+
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level2 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level3 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name {
   padding-left: 10px;
