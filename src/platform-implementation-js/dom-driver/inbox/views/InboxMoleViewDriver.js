@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import kefirBus from 'kefir-bus';
 
@@ -37,9 +38,23 @@ class InboxMoleViewDriver {
     );
   }
   show() {
+    if (this._element.parentElement) {
+      throw new Error('show was called twice');
+    }
     const container = document.getElementById('OPOhoe');
     if (!container) throw new Error('could not insert moleview');
     container.insertBefore(this._element, container.firstElementChild);
+
+    // Keep the mole as the first item in the list
+    makeMutationObserverChunkedStream(container, {childList: true})
+      .takeUntilBy(this._stopper)
+      .onValue(muts => {
+        const composeWasAdded = container.firstElementChild && !container.firstElementChild.classList.contains('inboxsdk__mole_view');
+
+        if (composeWasAdded) {
+          container.insertBefore(this._element, container.firstElementChild);
+        }
+      });
   }
   setTitle(title: string) {
     this._title = title;

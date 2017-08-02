@@ -116,7 +116,7 @@ const pageParserOptions: PageParserTreeOptions = {
     regularCompose: {
       fn(root) {
         return Array.prototype.filter.call(
-          root.querySelectorAll('div[role=dialog]'),
+          root.querySelectorAll('div[role=dialog]:not(.inboxsdk__mole_view)'),
           el =>
             el.querySelector('div[jsaction^="compose"][jsaction$=".focus_mole"]') &&
             !closest(el, 'div[tabindex][jsaction*="exit_full_screen"]')
@@ -261,7 +261,7 @@ const pageParserOptions: PageParserTreeOptions = {
       'div[id]',
       'div[jstcache][class]:not([aria-hidden]):not([tabindex])',
       {$map(el) {
-        const composeEl = el.querySelector('div[role=dialog]');
+        const composeEl = el.querySelector('div[role=dialog]:not(.inboxsdk__mole_view)');
         if (!composeEl) {
           Logger.error(new Error("compose dialog element not found"), {
             html: censorHTMLtree(el)
