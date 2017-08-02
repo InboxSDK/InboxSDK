@@ -56,6 +56,10 @@ export default class InboxNavItemView {
   }
 
   addNavItem(orderGroup: number | string, navItemDescriptor: Object): InboxNavItemView {
+    if (this._level > 1) {
+      console.warn('Adding NavItems more than 3 levels deep is not supported'); //eslint-disable-line no-console
+    }
+
     const childNavItemView = new InboxNavItemView(orderGroup, this._level + 1);
 
     childNavItemView.getEventStream()
