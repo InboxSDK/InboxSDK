@@ -167,10 +167,18 @@ export default class InboxNavItemView {
 
   _collapse() {
     this._elements.wrapper.classList.add('inboxsdk__navItem_collapsed');
+
+    this._eventStream.emit({
+      eventName: 'collapsed'
+    });
   }
 
   _expand() {
     this._elements.wrapper.classList.remove('inboxsdk__navItem_collapsed');
+
+    this._eventStream.emit({
+      eventName: 'expanded'
+    });
   }
 
   _update(descriptor: Object) {
