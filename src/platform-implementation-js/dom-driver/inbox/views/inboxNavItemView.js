@@ -33,8 +33,8 @@ export default class InboxNavItemView {
   };
 
   constructor(orderGroup: number|string, level: number) {
-		this._eventStream = kefirBus();
-		this._level = level || 0;
+    this._eventStream = kefirBus();
+    this._level = level || 0;
     this._elements = {
       wrapper: document.createElement('div'),
       expander: document.createElement('div'),
@@ -113,8 +113,8 @@ export default class InboxNavItemView {
   }
 
   getEventStream(): Kefir.Observable<Object> {
-		return this._eventStream;
-	}
+    return this._eventStream;
+  }
 
   getStopper(): Kefir.Observable<null> {
     return this._stopper;
