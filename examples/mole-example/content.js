@@ -47,7 +47,7 @@ InboxSDK.load(2, 'simple-example').then(function(inboxSDK) {
 		return mole;
 	};
 
-	makeMoleWidget();
+	window._mole = makeMoleWidget();
 
 
 	window.makeChromelessMoleWidget = function(){

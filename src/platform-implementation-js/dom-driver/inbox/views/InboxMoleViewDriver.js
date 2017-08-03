@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import kefirBus from 'kefir-bus';
 
@@ -33,6 +34,7 @@ class InboxMoleViewDriver {
       <MoleViewContents
         zIndex={this._zIndex}
         title={this._title}
+        el={this._options.el}
       />,
       this._element
     );
@@ -44,6 +46,7 @@ class InboxMoleViewDriver {
     const container = document.getElementById('OPOhoe');
     if (!container) throw new Error('could not insert moleview');
     container.insertBefore(this._element, container.firstElementChild);
+    this._setupWidth();
 
     // Keep the mole as the first item in the list
     makeMutationObserverChunkedStream(container, {childList: true})
@@ -54,7 +57,17 @@ class InboxMoleViewDriver {
         if (composeWasAdded) {
           container.insertBefore(this._element, container.firstElementChild);
         }
+        this._setupWidth();
       });
+    makeMutationObserverChunkedStream(this._options.el, {attributes: true, attributeFilter: ['class', 'style']})
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._setupWidth();
+      });
+  }
+  _setupWidth() {
+    const naturalWidth = querySelector(this._element, '.inboxsdk__mole_view_inner').getBoundingClientRect().width;
+    this._element.style.width = naturalWidth+'px';
   }
   setTitle(title: string) {
     this._title = title;
@@ -88,10 +101,12 @@ export default defn(module, InboxMoleViewDriver);
 type MoleViewContentsProps = {
   zIndex: number;
   title: string;
+  el: HTMLElement;
 };
 
 class MoleViewContents extends React.Component {
   props: MoleViewContentsProps;
+  _content: HTMLElement;
 
   render() {
     return (
@@ -105,11 +120,13 @@ class MoleViewContents extends React.Component {
           <div className="inboxsdk__mole_view_titlebar">
             {this.props.title}
           </div>
-          <div className="inboxsdk__mole_view_content">
-            foo bar of foo
-          </div>
+          <div className="inboxsdk__mole_view_content" ref={el => this._content = el} />
         </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    this._content.appendChild(this.props.el);
   }
 }

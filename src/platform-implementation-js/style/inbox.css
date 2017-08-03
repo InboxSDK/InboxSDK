@@ -736,7 +736,6 @@ first-child will do the trick.
   direction: ltr;
   margin-right: 15px;
   display: table-cell;
-  max-width: 480px;
 }
 
 .inboxsdk__mole_view_mid {
