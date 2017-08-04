@@ -66,6 +66,7 @@ class InboxMoleViewDriver {
         this._setupWidth();
       });
     Kefir.fromEvents(this._element, 'click')
+      .merge(fromEventTargetCapture(this._element, 'focus'))
       .takeUntilBy(this._stopper)
       .onValue(() => {
         this._bringToFront();
