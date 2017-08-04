@@ -756,7 +756,7 @@ first-child will do the trick.
   padding-right: 12px;
 }
 
-.inboxsdk__navItem:hover {
+.inboxsdk__navItem:not(.inboxsdk__navItem_link):hover {
   background-color: rgba(0,0,0,.03);
   border-radius: 2px;
 }
