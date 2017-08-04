@@ -788,7 +788,7 @@ first-child will do the trick.
 .inboxsdk__navItem_expander > svg {
   width: 100%;
   height: 100%;
-  transition: transform 200ms ease-out;
+  transition: transform 150ms ease-out;
 }
 
 .inboxsdk__navItem_expander > svg > polygon {
@@ -797,10 +797,6 @@ first-child will do the trick.
 
 .inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed > .inboxsdk__navItem > .inboxsdk__navItem_expander > svg {
   transform: rotate(-90deg);
-}
-
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed > .inboxsdk__navItem_subNav {
-  display: none;
 }
 
 .inboxsdk__navItem_name {
@@ -876,6 +872,15 @@ first-child will do the trick.
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active > .inboxsdk__navItem_name {
   color: #616161;
+}
+
+.inboxsdk__navItem_subNav,
+.inboxsdk__navItem_subNavInner {
+  overflow: hidden;
+}
+
+.inboxsdk__navItem_subNav {
+  transition: height 150ms ease-in-out;
 }
 
 .inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren .inboxsdk__navItem_subNav {

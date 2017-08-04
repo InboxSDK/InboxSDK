@@ -13,9 +13,10 @@ import updateIcon from '../../../driver-common/update-icon';
 
 export default class InboxNavItemView {
 
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any> = kefirBus();
   _level: number;
   _stopper: Kefir.Observable<null>;
+  _transitionResetter: Bus<null> = kefirBus();
   _navItemDescriptor: ?Object;
   _children: number = 0;
   _name: string = '';
@@ -30,17 +31,18 @@ export default class InboxNavItemView {
     navItem: HTMLElement;
     name: HTMLElement;
     subNav: HTMLElement;
+    subNavInner: HTMLElement;
   };
 
   constructor(navItemDescriptor: Kefir.Observable<Object>, level: number) {
-    this._eventStream = kefirBus();
     this._level = level || 0;
     this._elements = {
       wrapper: document.createElement('div'),
       expander: document.createElement('div'),
       navItem: document.createElement('div'),
       name: document.createElement('span'),
-      subNav: document.createElement('div')
+      subNav: document.createElement('div'),
+      subNavInner: document.createElement('div')
     };
 
     if (this._level > 2) {
@@ -63,10 +65,10 @@ export default class InboxNavItemView {
     childNavItemView.getEventStream()
       .filter(eventNameFilter('orderChanged'))
       .onValue(() => (
-        insertElementInOrder(this._elements.subNav, childNavItemView.getElement())
+        insertElementInOrder(this._elements.subNavInner, childNavItemView.getElement())
       ));
 
-    insertElementInOrder(this._elements.subNav, childNavItemView.getElement());
+    insertElementInOrder(this._elements.subNavInner, childNavItemView.getElement());
 
     this._children += 1;
 
@@ -126,7 +128,14 @@ export default class InboxNavItemView {
   }
 
   _setupElements() {
-    const {wrapper, expander, navItem, name, subNav} = this._elements;
+    const {
+      wrapper,
+      expander,
+      navItem,
+      name,
+      subNav,
+      subNavInner
+    } = this._elements;
 
     wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
     wrapper.setAttribute('tabindex', '-1');
@@ -137,6 +146,7 @@ export default class InboxNavItemView {
     navItem.classList.add('inboxsdk__navItem');
     name.classList.add('inboxsdk__navItem_name');
     subNav.classList.add('inboxsdk__navItem_subNav');
+    subNavInner.classList.add('inboxsdk__navItem_subNavInner');
 
     // Arrow SVG
     expander.innerHTML = '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon></svg>';
@@ -144,6 +154,8 @@ export default class InboxNavItemView {
     navItem.appendChild(expander);
     navItem.appendChild(name);
     wrapper.appendChild(navItem);
+
+    subNav.appendChild(subNavInner);
     wrapper.appendChild(subNav);
 
     this._eventStream.plug(
@@ -166,7 +178,21 @@ export default class InboxNavItemView {
   }
 
   _collapse() {
+    const {subNav, subNavInner} = this._elements;
+
+    this._transitionResetter.emit(null);
     this._elements.wrapper.classList.add('inboxsdk__navItem_collapsed');
+
+    subNav.style.height = `${subNavInner.clientHeight}px`;
+    subNav.clientHeight; // Force layout
+    subNav.style.height = '0';
+
+    Kefir.merge([Kefir.fromEvents(subNav, 'transitionend'), Kefir.later(750)])
+      .takeUntilBy(this._transitionResetter)
+      .take(1)
+      .onValue(() => {
+        subNav.style.display = 'none';
+      });
 
     this._eventStream.emit({
       eventName: 'collapsed'
@@ -174,7 +200,20 @@ export default class InboxNavItemView {
   }
 
   _expand() {
+    const {subNav, subNavInner} = this._elements;
+
+    this._transitionResetter.emit(null);
     this._elements.wrapper.classList.remove('inboxsdk__navItem_collapsed');
+
+    subNav.style.display = '';
+    subNav.style.height = `${subNavInner.clientHeight}px`;
+
+    Kefir.merge([Kefir.fromEvents(subNav, 'transitionend'), Kefir.later(750)])
+      .takeUntilBy(this._transitionResetter)
+      .take(1)
+      .onValue(() => {
+        subNav.style.height = '';
+      });
 
     this._eventStream.emit({
       eventName: 'expanded'
