@@ -9,6 +9,7 @@ import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import ElementContainer from '../../../lib/react/ElementContainer';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import kefirBus from 'kefir-bus';
 
@@ -176,7 +177,6 @@ type MoleViewContentsProps = {
 
 class MoleViewContents extends React.Component {
   props: MoleViewContentsProps;
-  _content: HTMLElement;
 
   render() {
     const titlebar = this.props.chrome === false ? null : (
@@ -191,13 +191,9 @@ class MoleViewContents extends React.Component {
       >
         <div className="inboxsdk__mole_view_inner">
           {titlebar}
-          <div className="inboxsdk__mole_view_content" ref={el => this._content = el} />
+          <ElementContainer className="inboxsdk__mole_view_content" el={this.props.el} />
         </div>
       </div>
     );
-  }
-
-  componentDidMount() {
-    this._content.appendChild(this.props.el);
   }
 }
