@@ -36,6 +36,7 @@ class InboxMoleViewDriver {
       <MoleViewContents
         title={this._title}
         el={this._options.el}
+        chrome={this._options.chrome}
       />,
       this._element
     );
@@ -170,6 +171,7 @@ export default defn(module, InboxMoleViewDriver);
 type MoleViewContentsProps = {
   title: string;
   el: HTMLElement;
+  chrome?: ?boolean;
 };
 
 class MoleViewContents extends React.Component {
@@ -177,14 +179,18 @@ class MoleViewContents extends React.Component {
   _content: HTMLElement;
 
   render() {
+    const titlebar = this.props.chrome === false ? null : (
+      <div className="inboxsdk__mole_view_titlebar">
+        {this.props.title}
+      </div>
+    );
+
     return (
       <div
         className="inboxsdk__mole_view_mid"
       >
         <div className="inboxsdk__mole_view_inner">
-          <div className="inboxsdk__mole_view_titlebar">
-            {this.props.title}
-          </div>
+          {titlebar}
           <div className="inboxsdk__mole_view_content" ref={el => this._content = el} />
         </div>
       </div>
