@@ -116,6 +116,7 @@ class InboxDriver {
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
   _customRouteIDs: Set<string> = new Set();
+  _navMenuContainer: ?HTMLElement;
   _threadIdStats: {
     threadRows: {
       totalThreads: Set<string>;
@@ -722,7 +723,16 @@ class InboxDriver {
   }
 
   addNavItem(appId: string, navItemDescriptor: Kefir.Observable<Object>): Object {
-    return addNavItem(appId, navItemDescriptor, this._page.tree.getAllByTag('leftNav'));
+    if (!this._navMenuContainer) {
+      this._navMenuContainer = document.createElement('div');
+      this._navMenuContainer.classList.add('inboxsdk__navItem_appContainer');
+    }
+
+    return addNavItem(
+      navItemDescriptor,
+      this._page.tree.getAllByTag('leftNav'),
+      (this._navMenuContainer: any)
+    );
   }
 
   getSentMailNativeNavItem(): Promise<Object> {

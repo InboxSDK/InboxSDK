@@ -46,8 +46,10 @@ export default function updateIcon(
 	append: boolean,
 	newIconClass: ?string,
 	newIconUrl: ?string,
-	insertBeforeEl: ?HTMLElement
+	insertBeforeEl: ?HTMLElement // Should not be used with append: true — the append flag will override
 ) {
+	if (append && insertBeforeEl) throw new Error('append and insertBeforeEl should not be used together');
+
 	if(!iconSettings.iconUrl && newIconUrl){
 		iconSettings.iconUrl = newIconUrl;
 		createIconImgElement(iconSettings, containerElement, append, insertBeforeEl);

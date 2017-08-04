@@ -32,7 +32,7 @@ export default class InboxNavItemView {
     subNav: HTMLElement;
   };
 
-  constructor(orderGroup: number|string, level: number) {
+  constructor(navItemDescriptor: Kefir.Observable<Object>, level: number) {
     this._eventStream = kefirBus();
     this._level = level || 0;
     this._elements = {
@@ -43,32 +43,28 @@ export default class InboxNavItemView {
       subNav: document.createElement('div')
     };
 
+    if (this._level > 2) {
+      console.warn('Adding NavItems more than 3 levels deep is not supported'); //eslint-disable-line no-console
+    }
+
     this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null).toProperty();
 
     this._setupElements();
-  }
 
-  setNavItemDescriptor(navItemDescriptorPropertyStream: Kefir.Observable<Object>) {
-    navItemDescriptorPropertyStream.takeUntilBy(this._stopper).onValue((descriptor) => {
+    navItemDescriptor.takeUntilBy(this._stopper).onValue((descriptor) => {
       this._update(descriptor);
       this._navItemDescriptor = descriptor;
     });
   }
 
-  addNavItem(orderGroup: number | string, navItemDescriptor: Object): InboxNavItemView {
-    if (this._level > 1) {
-      console.warn('Adding NavItems more than 3 levels deep is not supported'); //eslint-disable-line no-console
-    }
-
-    const childNavItemView = new InboxNavItemView(orderGroup, this._level + 1);
+  addNavItem(orderGroup: number | string, navItemDescriptor: Kefir.Observable<Object>): InboxNavItemView {
+    const childNavItemView = new InboxNavItemView(navItemDescriptor, this._level + 1);
 
     childNavItemView.getEventStream()
       .filter(eventNameFilter('orderChanged'))
       .onValue(() => (
         insertElementInOrder(this._elements.subNav, childNavItemView.getElement())
       ));
-
-    childNavItemView.setNavItemDescriptor(navItemDescriptor);
 
     insertElementInOrder(this._elements.subNav, childNavItemView.getElement());
 
@@ -143,7 +139,7 @@ export default class InboxNavItemView {
     subNav.classList.add('inboxsdk__navItem_subNav');
 
     // Arrow SVG
-    expander.innerHTML = '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon><svg>';
+    expander.innerHTML = '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon></svg>';
 
     navItem.appendChild(expander);
     navItem.appendChild(name);
@@ -191,7 +187,10 @@ export default class InboxNavItemView {
     this._updateExpander(descriptor);
     this._updateDisabledState(descriptor);
     this._updateIcon(descriptor);
-    this._updateOrder(descriptor.orderHint || Number.MAX_SAFE_INTEGER);
+    this._updateOrder(
+      descriptor.orderHint ||
+      descriptor.orderHint === 0 ? descriptor.orderHint : Number.MAX_SAFE_INTEGER
+    );
   }
 
   _updateName(name: string) {
