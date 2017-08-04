@@ -89,8 +89,11 @@ class InboxMoleViewDriver {
 
     const firstComposeParent = find(container.children, isComposeParentElement);
 
+    const changeId = String((Number(container.getAttribute('data-change-id') || 0)+1)%Number.MAX_SAFE_INTEGER);
+    container.setAttribute('data-change-id', changeId);
+
     if (firstComposeParent) {
-      // emit a fake focus event so Inbox puts this composeview on top
+      // emit a fake focus event so Inbox puts this (the right-most) composeview on top
       firstComposeParent.dispatchEvent(new FocusEvent('focus'));
     }
 
@@ -114,15 +117,14 @@ class InboxMoleViewDriver {
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
-        // Array.prototype.forEach.call(container.children, child => {
-        //   if (child.classList.contains('inboxsdk__mole_view')) {
-        //
-        //   }
-        // });
-        const {firstElementChild} = this._element;
-        if (!firstElementChild) return;
-        if ((firstElementChild:any).style.zIndex === String(count)) {
-          (firstElementChild:any).style.zIndex = '1';
+        if (container.getAttribute('data-change-id') === changeId) {
+          container.removeAttribute('data-change-id');
+          Array.prototype.forEach.call(container.children, child => {
+            if (isComposeParentElement(child)) return;
+            const zIndexedChild = find(child.children, child => child.style.zIndex);
+            if (!zIndexedChild) return;
+            zIndexedChild.style.zIndex = '1';
+          });
         }
       });
   }
