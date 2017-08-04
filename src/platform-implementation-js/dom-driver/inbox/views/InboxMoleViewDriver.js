@@ -81,16 +81,19 @@ class InboxMoleViewDriver {
     if (selfIndex < 0) throw new Error('should not happen');
     const count = container.children.length;
 
-    for (let i = 0; i < selfIndex; i++) {
-      const zIndexedChild = find(container.children[i].children, child => child.style.zIndex);
-      if (!zIndexedChild) continue;
-      zIndexedChild.style.zIndex = String(count);
+    const firstComposeParent = find(container.children, isComposeParentElement);
+
+    if (firstComposeParent) {
+      // emit a fake focus event so Inbox puts this composeview on top
+      firstComposeParent.dispatchEvent(new FocusEvent('focus'));
     }
-    for (let i = selfIndex; i < count; i++) {
-      const zIndexedChild = find(container.children[i].children, child => child.style.zIndex);
-      if (!zIndexedChild) continue;
-      zIndexedChild.style.zIndex = String(count-i);
-    }
+
+    Array.prototype.forEach.call(container.children, (child, i) => {
+      if (isComposeParentElement(child)) return;
+      const zIndexedChild = find(child.children, child => child.style.zIndex);
+      if (!zIndexedChild) return;
+      zIndexedChild.style.zIndex = String(i > selfIndex ? count-i : count);
+    });
 
     Kefir.merge(Array.prototype.map.call(container.children, el => {
       const zIndexedChild = find(el.children, child => child.style.zIndex);
@@ -134,6 +137,10 @@ class InboxMoleViewDriver {
     this._eventStream.end();
     this._element.remove();
   }
+}
+
+function isComposeParentElement(el: Element): boolean {
+  return !el.classList.contains('inboxsdk__mole_view') && el.hasAttribute('jsaction');
 }
 
 export default defn(module, InboxMoleViewDriver);
