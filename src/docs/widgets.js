@@ -186,7 +186,7 @@ var MoleOptions = /** @lends MoleOptions */{
   * the title and mimize/close buttons. This means the app is totally responsible for the
   * look and behavior of the mole, while the SDK is responsible only for the positioning.
   * ^optional
-  * ^default=false
+  * ^default=true
   * @type {boolean}
   */
   chrome:null
