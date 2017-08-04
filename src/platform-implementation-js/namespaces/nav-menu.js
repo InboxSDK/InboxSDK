@@ -24,7 +24,7 @@ export default class NavMenu {
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
 		const members = get(memberMap, this);
-		const navItemDescriptorPropertyStream = kefirCast((Kefir: any), navItemDescriptor).toProperty();
+		const navItemDescriptorPropertyStream = kefirCast(Kefir, navItemDescriptor).toProperty();
 
 		const navItemView = new NavItemView(members.appId, members.driver, navItemDescriptorPropertyStream);
 

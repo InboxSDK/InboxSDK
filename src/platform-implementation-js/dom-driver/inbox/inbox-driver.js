@@ -41,6 +41,7 @@ import censorHTMLstring from '../../../common/censor-html-string';
 import censorHTMLtree from '../../../common/censor-html-tree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getComposeViewDriverLiveSet from './getComposeViewDriverLiveSet';
+import addNavItem from './addNavItem';
 
 import type {ItemWithLifetime, ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
@@ -115,6 +116,7 @@ class InboxDriver {
   _lastInteractedAttachmentCardViewSet: Bus<any> = kefirBus();
   _appSidebarView: ?InboxAppSidebarView = null;
   _customRouteIDs: Set<string> = new Set();
+  _navMenuContainer: ?HTMLElement;
   _threadIdStats: {
     threadRows: {
       totalThreads: Set<string>;
@@ -720,15 +722,17 @@ class InboxDriver {
       .filter(threadRowViewDriver => threadRowViewDriver.isSelected());
   }
 
-  addNavItem(appId: string, navItemDescriptor: Object): Object {
-    console.log('addNavItem not implemented'); //eslint-disable-line no-console
-    const obj = {
-      getEventStream: constant(Kefir.never()),
-      addNavItem: () => obj,
-      setCollapsed: () => {},
-      destroy: () => {}
-    };
-    return obj;
+  addNavItem(appId: string, navItemDescriptor: Kefir.Observable<Object>): Object {
+    if (!this._navMenuContainer) {
+      this._navMenuContainer = document.createElement('div');
+      this._navMenuContainer.classList.add('inboxsdk__navItem_appContainer');
+    }
+
+    return addNavItem(
+      navItemDescriptor,
+      this._page.tree.getAllByTag('leftNav'),
+      (this._navMenuContainer: any)
+    );
   }
 
   getSentMailNativeNavItem(): Promise<Object> {

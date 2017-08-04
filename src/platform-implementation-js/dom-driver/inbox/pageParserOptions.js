@@ -134,6 +134,12 @@ const pageParserOptions: PageParserTreeOptions = {
     },
   },
   watchers: [
+    {sources: [null], tag: 'leftNav', selectors: [
+      'body',
+      '[id][jsaction]',
+      'nav[aria-hidden]:not([role])',
+      'div[role=menu]'
+    ]},
     {sources: [null], tag: 'topRow', selectors: [
       'body',
       '[id][jsaction]',

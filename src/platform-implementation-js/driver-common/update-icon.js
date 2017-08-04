@@ -1,21 +1,33 @@
 /* @flow */
 
-function createIconElement(iconSettings: Object, containerElement: HTMLElement, append: boolean){
+function createIconElement(
+	iconSettings: Object,
+	containerElement: HTMLElement,
+	append: boolean,
+	insertBeforeEl: ?HTMLElement
+) {
 	iconSettings.iconElement = document.createElement('div');
 	iconSettings.iconElement.classList.add('inboxsdk__button_icon');
 	iconSettings.iconElement.innerHTML = '&nbsp;';
 
-	if(append){
+	if (append) {
 		containerElement.appendChild(iconSettings.iconElement);
-	}
-	else{
-		containerElement.insertBefore(iconSettings.iconElement, (containerElement:any).firstElementChild);
+	} else {
+		containerElement.insertBefore(
+			iconSettings.iconElement,
+			insertBeforeEl || (containerElement:any).firstElementChild
+		);
 	}
 }
 
-function createIconImgElement(iconSettings: Object, containerElement: HTMLElement, append: boolean){
+function createIconImgElement(
+	iconSettings: Object,
+	containerElement: HTMLElement,
+	append: boolean,
+	insertBeforeEl: ?HTMLElement
+) {
 	if(!iconSettings.iconElement){
-		createIconElement(iconSettings, containerElement, append);
+		createIconElement(iconSettings, containerElement, append, insertBeforeEl);
 	}
 
 	iconSettings.iconElement.innerHTML = '';
@@ -28,10 +40,19 @@ function createIconImgElement(iconSettings: Object, containerElement: HTMLElemen
 }
 
 // TODO make this return a class instead of taking the iconSettings state object
-export default function updateIcon(iconSettings: Object, containerElement: HTMLElement, append: boolean, newIconClass: ?string, newIconUrl: ?string){
+export default function updateIcon(
+	iconSettings: Object,
+	containerElement: HTMLElement,
+	append: boolean,
+	newIconClass: ?string,
+	newIconUrl: ?string,
+	insertBeforeEl: ?HTMLElement // Should not be used with append: true — the append flag will override
+) {
+	if (append && insertBeforeEl) throw new Error('append and insertBeforeEl should not be used together');
+
 	if(!iconSettings.iconUrl && newIconUrl){
 		iconSettings.iconUrl = newIconUrl;
-		createIconImgElement(iconSettings, containerElement, append);
+		createIconImgElement(iconSettings, containerElement, append, insertBeforeEl);
 	}
 	else if(iconSettings.iconUrl && !newIconUrl){
 		iconSettings.iconImgElement.remove();
@@ -50,7 +71,7 @@ export default function updateIcon(iconSettings: Object, containerElement: HTMLE
 	}
 
 	if(!iconSettings.iconElement && newIconClass){
-		createIconElement(iconSettings, containerElement, append);
+		createIconElement(iconSettings, containerElement, append, insertBeforeEl);
 	}
 	else if(iconSettings.iconClass && !newIconClass){
 		if(!iconSettings.iconUrl){
