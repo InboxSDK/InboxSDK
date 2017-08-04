@@ -97,14 +97,14 @@ class InboxMoleViewDriver {
     });
 
     Kefir.merge([
-      !firstComposeParent ? Kefir.never() : fromEventTargetCapture(firstComposeParent, 'focus')
+      !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus')
     ].concat(Array.prototype.map.call(container.children, el => {
       const zIndexedChild = find(el.children, child => child.style.zIndex);
-      if (!zIndexedChild) return Kefir.never();
+      if (!zIndexedChild) return null;
       const currentZindex = zIndexedChild.style.zIndex;
       return makeMutationObserverChunkedStream(zIndexedChild, {attributes: true, attributeFilter: ['style']})
         .filter(() => zIndexedChild.style.zIndex !== currentZindex);
-    })))
+    })).filter(Boolean))
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
