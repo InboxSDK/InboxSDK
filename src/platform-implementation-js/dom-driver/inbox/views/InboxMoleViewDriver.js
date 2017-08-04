@@ -8,6 +8,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import kefirBus from 'kefir-bus';
 
@@ -95,13 +96,15 @@ class InboxMoleViewDriver {
       zIndexedChild.style.zIndex = String(i > selfIndex ? count-i : count);
     });
 
-    Kefir.merge(Array.prototype.map.call(container.children, el => {
+    Kefir.merge([
+      !firstComposeParent ? Kefir.never() : fromEventTargetCapture(firstComposeParent, 'focus')
+    ].concat(Array.prototype.map.call(container.children, el => {
       const zIndexedChild = find(el.children, child => child.style.zIndex);
       if (!zIndexedChild) return Kefir.never();
       const currentZindex = zIndexedChild.style.zIndex;
       return makeMutationObserverChunkedStream(zIndexedChild, {attributes: true, attributeFilter: ['style']})
         .filter(() => zIndexedChild.style.zIndex !== currentZindex);
-    }))
+    })))
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
