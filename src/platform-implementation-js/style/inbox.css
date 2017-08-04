@@ -779,6 +779,9 @@ first-child will do the trick.
   height: 24px;
   margin-right: 24px;
   border-radius: 50%;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .inboxsdk__navItem_expander:hover {
