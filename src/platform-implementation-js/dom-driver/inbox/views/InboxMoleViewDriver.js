@@ -53,7 +53,11 @@ class InboxMoleViewDriver {
     makeMutationObserverChunkedStream(container, {childList: true})
       .takeUntilBy(this._stopper)
       .onValue(muts => {
-        const composeWasAdded = container.firstElementChild && !container.firstElementChild.classList.contains('inboxsdk__mole_view');
+        const composeWasAdded = muts.some(mutation =>
+          Array.prototype.some.call(mutation.addedNodes, node =>
+            node.nodeType === 1 && !node.classList.contains('inboxsdk__mole_view')
+          )
+        );
 
         if (composeWasAdded) {
           container.insertBefore(this._element, container.firstElementChild);
@@ -100,6 +104,7 @@ class InboxMoleViewDriver {
     Kefir.merge([
       !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus')
     ].concat(Array.prototype.map.call(container.children, el => {
+      // if (!isComposeParentElement(el)) return null;
       const zIndexedChild = find(el.children, child => child.style.zIndex);
       if (!zIndexedChild) return null;
       const currentZindex = zIndexedChild.style.zIndex;
@@ -109,6 +114,11 @@ class InboxMoleViewDriver {
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
+        // Array.prototype.forEach.call(container.children, child => {
+        //   if (child.classList.contains('inboxsdk__mole_view')) {
+        //
+        //   }
+        // });
         const {firstElementChild} = this._element;
         if (!firstElementChild) return;
         if ((firstElementChild:any).style.zIndex === String(count)) {
