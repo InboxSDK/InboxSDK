@@ -81,6 +81,9 @@ class InboxMoleViewDriver {
     this._element.style.width = naturalWidth+'px';
   }
   _bringToFront() {
+    if (this._element.classList.contains('inboxsdk__mole_at_front')) return;
+    this._element.classList.add('inboxsdk__mole_at_front');
+
     const container = this._element.parentElement;
     if (!container) throw new Error('mole not in document');
     const selfIndex = Array.prototype.indexOf.call(container.children, this._element);
@@ -88,26 +91,29 @@ class InboxMoleViewDriver {
     const count = container.children.length;
 
     const firstComposeParent = find(container.children, isComposeParentElement);
-
-    const changeId = String((Number(container.getAttribute('data-change-id') || 0)+1)%Number.MAX_SAFE_INTEGER);
-    container.setAttribute('data-change-id', changeId);
-
     if (firstComposeParent) {
       // emit a fake focus event so Inbox puts this (the right-most) composeview on top
       firstComposeParent.dispatchEvent(new FocusEvent('focus'));
     }
 
     Array.prototype.forEach.call(container.children, (child, i) => {
-      if (isComposeParentElement(child)) return;
+      if (!child.classList.contains('inboxsdk__mole_view')) return;
+      if (child !== this._element) {
+        child.classList.remove('inboxsdk__mole_at_front');
+      }
       const zIndexedChild = find(child.children, child => child.style.zIndex);
       if (!zIndexedChild) return;
       zIndexedChild.style.zIndex = String(i > selfIndex ? count-(i-selfIndex) : count);
     });
 
+    // Wait until the next time either a compose is brought to the front or a
+    // mole is brought to the front. If a compose was brought to the front, then
+    // we need to put all the moles to the back. If a mole was brought to the
+    // front, then do nothing because that mole's _bringToFront function will
+    // handle the composes and the moles.
     Kefir.merge([
       !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus')
     ].concat(Array.prototype.map.call(container.children, el => {
-      // if (!isComposeParentElement(el)) return null;
       const zIndexedChild = find(el.children, child => child.style.zIndex);
       if (!zIndexedChild) return null;
       const currentZindex = zIndexedChild.style.zIndex;
@@ -117,8 +123,8 @@ class InboxMoleViewDriver {
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
-        if (container.getAttribute('data-change-id') === changeId) {
-          container.removeAttribute('data-change-id');
+        if (this._element.classList.contains('inboxsdk__mole_at_front')) {
+          this._element.classList.remove('inboxsdk__mole_at_front');
           Array.prototype.forEach.call(container.children, child => {
             if (isComposeParentElement(child)) return;
             const zIndexedChild = find(child.children, child => child.style.zIndex);
