@@ -94,7 +94,7 @@ class InboxMoleViewDriver {
       if (isComposeParentElement(child)) return;
       const zIndexedChild = find(child.children, child => child.style.zIndex);
       if (!zIndexedChild) return;
-      zIndexedChild.style.zIndex = String(i > selfIndex ? count-i : count);
+      zIndexedChild.style.zIndex = String(i > selfIndex ? count-(i-selfIndex) : count);
     });
 
     Kefir.merge([
