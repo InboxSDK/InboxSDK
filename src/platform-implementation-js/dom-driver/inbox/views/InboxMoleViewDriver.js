@@ -31,6 +31,34 @@ class InboxMoleViewDriver {
 
     this._render();
     (this._element.firstElementChild:any).style.zIndex = '1';
+
+    Kefir.fromEvents(this._element, 'click')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        this._reemitClickEvent(event);
+      });
+  }
+  _reemitClickEvent(event: MouseEvent) {
+    // Inbox is going to block this event from bubbling to the body. We
+    // want to manually dispatch an event that looks like it so that if
+    // the extension is using React (which listens to events on the body)
+    // then React will see it.
+    const fakeEvent = new MouseEvent('click');
+    Object.defineProperties(fakeEvent, {
+      target: {value: event.target},
+      detail: {value: event.detail},
+      screenX: {value: event.screenX},
+      screenY: {value: event.screenY},
+      clientX: {value: event.clientX},
+      clientY: {value: event.clientY},
+      button: {value: event.button},
+      buttons: {value: event.buttons},
+      ctrlKey: {value: event.ctrlKey},
+      shiftKey: {value: event.shiftKey},
+      altKey: {value: event.altKey},
+      metaKey: {value: event.metaKey},
+    });
+    document.dispatchEvent(fakeEvent);
   }
   _render() {
     ReactDOM.render(
@@ -40,6 +68,12 @@ class InboxMoleViewDriver {
         el={this._options.el}
         chrome={this._options.chrome}
         minimized={this.getMinimized()}
+        onClose={() => {
+          Promise.resolve().then(() => {
+            this.destroy();
+          });
+        }}
+        onSetMinimize={minimized => this.setMinimized(minimized)}
       />,
       this._element
     );
@@ -146,9 +180,11 @@ class InboxMoleViewDriver {
   setMinimized(minimized: boolean) {
     if (minimized) {
       this._element.classList.add('inboxsdk__minimized');
+      this._render();
       this._eventStream.emit({eventName:'minimize'});
     } else {
       this._element.classList.remove('inboxsdk__minimized');
+      this._render();
       this._eventStream.emit({eventName:'restore'});
     }
   }
@@ -179,6 +215,8 @@ type MoleViewContentsProps = {
   el: HTMLElement;
   chrome?: ?boolean;
   minimized: boolean;
+  onClose: ()=>void;
+  onSetMinimize: (minimized: boolean)=>void;
 };
 
 class MoleViewContents extends React.Component {
@@ -209,14 +247,18 @@ class MoleViewContents extends React.Component {
       titlebar = (
         <div className="inboxsdk__mole_view_titlebar">
           {title}
+          <button type="button" onClick={() => this.props.onClose()}>
+            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
+          </button>
+          <button type="button" onClick={() => this.props.onSetMinimize(!this.props.minimized)}>
+            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png" />
+          </button>
         </div>
       );
     }
 
     return (
-      <div
-        className="inboxsdk__mole_view_mid"
-      >
+      <div className="inboxsdk__mole_view_mid">
         <div className="inboxsdk__mole_view_inner">
           {titlebar}
           <ElementContainer className="inboxsdk__mole_view_content" el={this.props.el} />

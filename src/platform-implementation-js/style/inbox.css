@@ -780,3 +780,11 @@ first-child will do the trick.
   min-width: 98px;
   width: 100%;
 }
+
+.inboxsdk__mole_view_titlebar > button {
+  float: right;
+}
+
+.inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content {
+  display: none;
+}
