@@ -768,3 +768,15 @@ first-child will do the trick.
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+
+.inboxsdk__mole_view_title {
+  display: inline-block;
+  height: 18px;
+  overflow: hidden;
+  padding: 0 10px 0 0;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  min-width: 98px;
+  width: 100%;
+}

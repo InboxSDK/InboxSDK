@@ -185,23 +185,30 @@ class MoleViewContents extends React.Component {
   props: MoleViewContentsProps;
 
   render() {
-    let titlebar;
-    if (this.props.chrome === false) {
-      titlebar = null;
-    } else if (this.props.minimized && this.props.minimizedTitleEl) {
-      titlebar = <ElementContainer
-        className="inboxsdk__mole_view_titlebar"
-        el={this.props.minimizedTitleEl}
-      />;
-    } else if (this.props.titleEl) {
-      titlebar = <ElementContainer
-        className="inboxsdk__mole_view_titlebar"
-        el={this.props.titleEl}
-      />;
-    } else {
+    let titlebar = null;
+    if (this.props.chrome !== false) {
+      let title;
+      if (this.props.minimized && this.props.minimizedTitleEl) {
+        title = <ElementContainer
+          className="inboxsdk__mole_view_title"
+          el={this.props.minimizedTitleEl}
+        />;
+      } else if (this.props.titleEl) {
+        title = <ElementContainer
+          className="inboxsdk__mole_view_title"
+          el={this.props.titleEl}
+        />;
+      } else {
+        title = (
+          <div className="inboxsdk__mole_view_title">
+            {this.props.title}
+          </div>
+        );
+      }
+
       titlebar = (
         <div className="inboxsdk__mole_view_titlebar">
-          {this.props.title}
+          {title}
         </div>
       );
     }
