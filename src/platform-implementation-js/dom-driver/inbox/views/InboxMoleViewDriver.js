@@ -39,6 +39,7 @@ class InboxMoleViewDriver {
         titleEl={this._options.titleEl}
         el={this._options.el}
         chrome={this._options.chrome}
+        minimized={this.getMinimized()}
       />,
       this._element
     );
@@ -174,8 +175,10 @@ export default defn(module, InboxMoleViewDriver);
 type MoleViewContentsProps = {
   title: string;
   titleEl?: ?HTMLElement;
+  minimizedTitleEl?: ?HTMLElement;
   el: HTMLElement;
   chrome?: ?boolean;
+  minimized: boolean;
 };
 
 class MoleViewContents extends React.Component {
@@ -185,6 +188,11 @@ class MoleViewContents extends React.Component {
     let titlebar;
     if (this.props.chrome === false) {
       titlebar = null;
+    } else if (this.props.minimized && this.props.minimizedTitleEl) {
+      titlebar = <ElementContainer
+        className="inboxsdk__mole_view_titlebar"
+        el={this.props.minimizedTitleEl}
+      />;
     } else if (this.props.titleEl) {
       titlebar = <ElementContainer
         className="inboxsdk__mole_view_titlebar"
