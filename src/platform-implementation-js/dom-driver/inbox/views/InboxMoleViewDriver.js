@@ -36,6 +36,7 @@ class InboxMoleViewDriver {
     ReactDOM.render(
       <MoleViewContents
         title={this._title}
+        titleEl={this._options.titleEl}
         el={this._options.el}
         chrome={this._options.chrome}
       />,
@@ -98,6 +99,7 @@ class InboxMoleViewDriver {
       firstComposeParent.dispatchEvent(new FocusEvent('focus'));
     }
 
+    // Put all the moles into the proper order.
     Array.prototype.forEach.call(container.children, (child, i) => {
       if (!child.classList.contains('inboxsdk__mole_view')) return;
       if (child !== this._element) {
@@ -171,6 +173,7 @@ export default defn(module, InboxMoleViewDriver);
 
 type MoleViewContentsProps = {
   title: string;
+  titleEl?: ?HTMLElement;
   el: HTMLElement;
   chrome?: ?boolean;
 };
@@ -179,11 +182,21 @@ class MoleViewContents extends React.Component {
   props: MoleViewContentsProps;
 
   render() {
-    const titlebar = this.props.chrome === false ? null : (
-      <div className="inboxsdk__mole_view_titlebar">
-        {this.props.title}
-      </div>
-    );
+    let titlebar;
+    if (this.props.chrome === false) {
+      titlebar = null;
+    } else if (this.props.titleEl) {
+      titlebar = <ElementContainer
+        className="inboxsdk__mole_view_titlebar"
+        el={this.props.titleEl}
+      />;
+    } else {
+      titlebar = (
+        <div className="inboxsdk__mole_view_titlebar">
+          {this.props.title}
+        </div>
+      );
+    }
 
     return (
       <div
