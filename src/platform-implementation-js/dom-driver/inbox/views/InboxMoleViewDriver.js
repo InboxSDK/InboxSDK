@@ -260,13 +260,13 @@ class MoleViewContents extends React.Component {
             type="button"
             key={i}
             title={descriptor.title}
-            className={descriptor.iconClass}
+            className="inboxsdk__mole_custom_title_button"
             onClick={event => {
               event.stopPropagation();
               descriptor.onClick();
             }}
           >
-            <img src={descriptor.iconUrl} alt="" aria-hidden="true" />
+            <img className={descriptor.iconClass} src={descriptor.iconUrl} alt="" aria-hidden="true" />
           </button>
         );
       });

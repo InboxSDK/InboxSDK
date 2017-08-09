@@ -813,9 +813,9 @@ first-child will do the trick.
   outline: none;
 }
 
-.inboxsdk__mole_title_buttons > button > img {
-  max-width: 18px;
-  max-height: 18px;
+.inboxsdk__mole_title_buttons > button.inboxsdk__mole_custom_title_button > img {
+  width: 18px;
+  height: 18px;
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content {
