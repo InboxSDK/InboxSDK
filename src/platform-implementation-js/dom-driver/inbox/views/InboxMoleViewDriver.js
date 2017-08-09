@@ -92,7 +92,7 @@ class InboxMoleViewDriver {
     const container = document.getElementById('OPOhoe');
     if (!container) {
       const err = new Error('could find element to insert moleview into');
-      this._driver.getLogger.error(err);
+      this._driver.getLogger().error(err);
       throw err;
     }
     container.insertBefore(this._element, container.firstElementChild);
