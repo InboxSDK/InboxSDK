@@ -10,7 +10,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import ElementContainer from '../../../lib/react/ElementContainer';
-import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
+import type {MoleViewDriver, MoleOptions, MoleButtonDescriptor} from '../../../driver-interfaces/mole-view-driver';
 import kefirBus from 'kefir-bus';
 
 class InboxMoleViewDriver {
@@ -27,7 +27,7 @@ class InboxMoleViewDriver {
     this._element.className = 'inboxsdk__mole_view '+(options.className||'');
     this._element.setAttribute('jsaction', 'global.none');
 
-    this._title = this._options.title || '';
+    this._title = String(this._options.title || '');
 
     this._render();
     (this._element.firstElementChild:any).style.zIndex = '1';
@@ -67,6 +67,7 @@ class InboxMoleViewDriver {
         titleEl={this._options.titleEl}
         el={this._options.el}
         chrome={this._options.chrome}
+        titleButtons={this._options.titleButtons}
         minimized={this.getMinimized()}
         onClose={() => {
           Promise.resolve().then(() => {
@@ -174,7 +175,7 @@ class InboxMoleViewDriver {
       });
   }
   setTitle(title: string) {
-    this._title = title;
+    this._title = String(title);
     this._render();
   }
   setMinimized(minimized: boolean) {
@@ -214,6 +215,7 @@ type MoleViewContentsProps = {
   minimizedTitleEl?: ?HTMLElement;
   el: HTMLElement;
   chrome?: ?boolean;
+  titleButtons?: ?Array<MoleButtonDescriptor>;
   minimized: boolean;
   onClose: ()=>void;
   onSetMinimize: (minimized: boolean)=>void;
@@ -244,14 +246,47 @@ class MoleViewContents extends React.Component {
         );
       }
 
+      const titleButtons = (this.props.titleButtons || []).map((descriptor, i) => {
+        return (
+          <button
+            type="button"
+            key={i}
+            title={descriptor.title}
+            onClick={() => {
+              descriptor.onClick();
+            }}
+          >
+            <img className={descriptor.iconClass} src={descriptor.iconUrl} alt="" aria-hidden="true" />
+          </button>
+        );
+      });
+
       titlebar = (
         <div className="inboxsdk__mole_view_titlebar">
           {title}
-          <button type="button" onClick={() => this.props.onClose()}>
-            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
-          </button>
-          <button type="button" onClick={() => this.props.onSetMinimize(!this.props.minimized)}>
+          <button
+            type="button"
+            style={{display: this.props.minimized ? "none" : ""}}
+            title="Minimize"
+            onClick={() => this.props.onSetMinimize(true)}
+          >
             <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png" />
+          </button>
+          <button
+            type="button"
+            style={{display: this.props.minimized ? "" : "none"}}
+            title="Expand"
+            onClick={() => this.props.onSetMinimize(false)}
+          >
+            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_maximize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_maximize_white_18dp.png" />
+          </button>
+          {titleButtons}
+          <button
+            type="button"
+            title="Close"
+            onClick={() => this.props.onClose()}
+          >
+            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
           </button>
         </div>
       );

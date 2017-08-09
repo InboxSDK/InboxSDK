@@ -767,10 +767,14 @@ first-child will do the trick.
   transform: translateZ(0);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  display: -webkit-flex;
+  display: flex;
 }
 
 .inboxsdk__mole_view_title {
   display: inline-block;
+  flex: 1;
+  -webkit-flex: 1;
   height: 18px;
   overflow: hidden;
   padding: 0 10px 0 0;
@@ -782,7 +786,35 @@ first-child will do the trick.
 }
 
 .inboxsdk__mole_view_titlebar > button {
-  float: right;
+  height: 24px;
+  width: 24px;
+  opacity: 0.6;
+  padding: 0 0 3px 7px;
+
+  margin-right: 4px;
+
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+
+  outline: none;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.inboxsdk__mole_view_titlebar > button:focus,
+.inboxsdk__mole_view_titlebar > button:hover {
+  opacity: 1;
+  outline: none;
+}
+
+.inboxsdk__mole_view_titlebar > button > img {
+  max-width: 18px;
+  max-height: 18px;
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content {
