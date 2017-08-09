@@ -752,7 +752,6 @@ first-child will do the trick.
   border-top-right-radius: 7.5px;
   transform: translateZ(0);
   background: white;
-  max-width: 480px;
   /* copied from the compose's CSS */
   max-height: calc(100vh - 56px - 20px - 24px - 1px - 8px);
 }
