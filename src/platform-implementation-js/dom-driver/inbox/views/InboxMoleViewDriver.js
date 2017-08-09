@@ -70,6 +70,8 @@ class InboxMoleViewDriver {
         titleButtons={this._options.titleButtons}
         minimized={this.getMinimized()}
         onClose={() => {
+          // React doesn't like it when you unmount a component within a React
+          // event handler, so we do it async.
           Promise.resolve().then(() => {
             this.destroy();
           });
