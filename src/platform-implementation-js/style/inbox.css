@@ -780,8 +780,9 @@ first-child will do the trick.
   text-overflow: ellipsis;
   vertical-align: top;
   white-space: nowrap;
-  min-width: 98px;
-  width: 100%;
+
+  /* Because of flex, the title can become wider than this if the mole contents are */
+  width: 98px;
 }
 
 .inboxsdk__mole_view_titlebar > button {
