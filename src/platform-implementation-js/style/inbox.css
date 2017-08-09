@@ -745,7 +745,8 @@ first-child will do the trick.
 }
 
 .inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem_subNav,
-.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem > .inboxsdk__navItem_expander {
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem > .inboxsdk__navItem_expander,
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem > .inboxsdk__navItem_expander > svg {
   display: none;
 }
 
@@ -818,6 +819,11 @@ first-child will do the trick.
   padding-left: 24px;
 }
 
+.inboxsdk__navItem_level0:not(.inboxsdk__navItem_disabled):not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon),
+.inboxsdk__navItem_level1:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon) {
+  padding-left: 64px;
+}
+
 .inboxsdk__navItem_link > .inboxsdk__navItem_name {
   color: #3c80f6;
 }
@@ -862,6 +868,7 @@ first-child will do the trick.
   white-space: normal;
   outline: none;
   cursor: default;
+  padding-left: 16px;
 }
 
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled {
