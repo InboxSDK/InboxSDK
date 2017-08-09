@@ -362,6 +362,15 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	downloadUrl:null,
 
 	/**
+	* If the URL is a data: or blob: URI, then this sets the filename for the file to be saved as.
+	* This works by setting the "download" attribute on an anchor element
+	* to the given value.
+	* ^optional
+	* @type {string}
+	*/
+	downloadFilename:null,
+
+	/**
 	* A callback that is called when the user presses the download button. Note, this is called <b>in addition</b> to file
 	* actually downloading which happens automatically.
 	* @type {func(event)}

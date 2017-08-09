@@ -290,16 +290,16 @@ class GmailAttachmentCardView {
 	}
 
 	_addDownloadButton(options: Object) {
-		var buttonView = new ButtonView({
+		const buttonView = new ButtonView({
 			tooltip: 'Download',
 			iconClass: 'aSK J-J5-Ji aYr'
 		});
 
 		buttonView.getElement().setAttribute('data-inboxsdk-download-url', options.downloadUrl);
 
-		var basicButtonViewController = new BasicButtonViewController({
+		const basicButtonViewController = new BasicButtonViewController({
 			activateFunction: function(){
-				var prevented = false;
+				let prevented = false;
 
 				if(options.onClick){
 					options.onClick({
@@ -313,8 +313,11 @@ class GmailAttachmentCardView {
 					return;
 				}
 
-				var downloadLink = document.createElement('a');
+				const downloadLink = document.createElement('a');
 				downloadLink.href = options.downloadUrl;
+				if (options.downloadFilename) {
+					downloadLink.download = options.downloadFilename;
+				}
 
 				downloadLink.addEventListener('click', function(e: MouseEvent) {
 					e.stopPropagation();

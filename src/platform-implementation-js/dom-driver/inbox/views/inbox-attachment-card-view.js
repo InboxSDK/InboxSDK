@@ -180,6 +180,9 @@ class InboxAttachmentCardView {
           if (prevented) return;
           const downloadLink = document.createElement('a');
           downloadLink.href = button.downloadUrl;
+          if (button.downloadFilename) {
+            downloadLink.download = button.downloadFilename;
+          }
           downloadLink.addEventListener('click', function(e: MouseEvent) {
             e.stopPropagation();
           }, true);
