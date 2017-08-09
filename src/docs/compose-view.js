@@ -360,9 +360,12 @@ var ComposeView = /** @lends ComposeView */ {
 	/**
 	 * Attaches a set of files into the compose view. The parameter must be an
 	 * array of File objects, or Blob objects with their name properties set.
+	 * This function's implementation is asynchronous, and the function returns a
+	 * Promise that resolves after the InboxSDK has handed the files to the page
+	 * to be uploaded and the file has begun uploading.
 	 * ^gmail
 	 * @param {Blob[]} files
-	 * @return {void}
+	 * @return {Promise.<void>}
 	 */
 	attachFiles: function(files){},
 
@@ -370,9 +373,12 @@ var ComposeView = /** @lends ComposeView */ {
 	 * Attaches a set of files into the compose view inline in the message if
 	 * possible. This works with images. The parameter must be an array of File
 	 * objects, or Blob objects with their name properties set.
+	 * This function's implementation is asynchronous, and the function returns a
+	 * Promise that resolves after the InboxSDK has handed the files to the page
+	 * to be uploaded and the file has begun uploading.
 	 * ^gmail
 	 * @param {Blob[]} files
-	 * @return {void}
+	 * @return {Promise.<void>}
 	 */
 	attachInlineFiles: function(files){},
 
