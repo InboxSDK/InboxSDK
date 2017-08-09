@@ -363,7 +363,8 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 
 	/**
 	* If the URL is a data: or blob: URI, then this sets the filename to for the file to be saved as.
-	* This works by setting the "download" attribute on an anchor element.
+	* This works by setting the "download" attribute on an anchor element
+	* to the given value.
 	* ^optional
 	* @type {string}
 	*/
