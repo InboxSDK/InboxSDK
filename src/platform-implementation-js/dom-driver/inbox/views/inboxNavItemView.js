@@ -6,6 +6,8 @@ import type {Bus} from 'kefir-bus';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import eventNameFilter from '../../../lib/event-name-filter';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import DropdownView from '../../../widgets/buttons/dropdown-view';
+import InboxDropdownView from './inbox-dropdown-view';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
@@ -285,7 +287,7 @@ export default class InboxNavItemView {
     );
   }
 
-  _updateAccessory(accessory: Object, forceUpdate: boolean = false) {
+  _updateAccessory(accessory: ?Object, forceUpdate: boolean = false) {
     if (!forceUpdate && this._accessory === accessory) return;
 
     if (this._accessoryView) {
@@ -332,6 +334,8 @@ export default class InboxNavItemView {
         return this._createCreateAccessory(accessory);
       case 'ICON_BUTTON':
         return this._createIconButtonAccessory(accessory);
+      case 'DROPDOWN_BUTTON':
+        return this._createDropdownButtonAccessory(accessory);
       default:
         throw new Error('A type must be specified for NavItem accessories');
     }
@@ -345,7 +349,17 @@ export default class InboxNavItemView {
     });
   }
 
-  _createIconButtonAccessory(accessory: Object): {destroy: () => void} {
+  _createDropdownButtonAccessory(accessory: Object): {destroy: () => void} {
+    const {onClick} = accessory;
+    return this._createIconButtonAccessory({
+      onClick,
+      iconUrl: '//www.gstatic.com/images/icons/material/system/2x/settings_black_18dp.png'
+    }, true);
+  }
+
+  _createIconButtonAccessory(accessory: Object, hasDropdown: boolean = false): {destroy: () => void} {
+    if (!accessory.onClick) throw new Error('An onClick handler is required');
+
     this._elements.wrapper.classList.add('inboxsdk__navItem_hasAccessory');
 
     updateIcon(
@@ -357,13 +371,46 @@ export default class InboxNavItemView {
     );
 
     const destroyBus = kefirBus();
+    const destroyStopper = destroyBus.beforeEnd(() => null).toProperty();
+    let dropdown = null;
 
     Kefir.fromEvents(this._elements.accessory, 'click')
       .takeUntilBy(this._stopper)
-      .takeUntilBy(destroyBus.beforeEnd(() => null).toProperty())
+      .takeUntilBy(destroyStopper)
       .onValue(() => {
-        if (accessory.onClick) accessory.onClick();
+        event.preventDefault();
+        event.stopPropagation();
+        if (hasDropdown) {
+          if (dropdown) {
+            dropdown.close();
+            return;
+          } else {
+            this._elements.accessory.classList.add('inboxsdk__active');
+
+            dropdown = new DropdownView(
+              new InboxDropdownView(),
+              this._elements.accessory
+            );
+            dropdown.setPlacementOptions({
+              position: 'right',
+              hAlign: 'left',
+              vAlign: 'top',
+              buffer: 10
+            });
+            dropdown.on('destroy', () => {
+              this._elements.accessory.classList.remove('inboxsdk__active');
+              dropdown = null;
+            });
+          }
+        }
+        accessory.onClick({dropdown});
       });
+
+    this._stopper.takeUntilBy(destroyStopper).onEnd(() => {
+      if (dropdown) {
+        dropdown.close();
+      }
+    });
 
     const destroy = () => {
       this._elements.wrapper.classList.remove('inboxsdk__navItem_hasAccessory');
