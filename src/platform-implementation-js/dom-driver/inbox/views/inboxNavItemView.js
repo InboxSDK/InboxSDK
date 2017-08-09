@@ -154,7 +154,7 @@ export default class InboxNavItemView {
     expander.classList.add('inboxsdk__navItem_expander');
     navItem.classList.add('inboxsdk__navItem');
     name.classList.add('inboxsdk__navItem_name');
-    accessory.classList.add('inboxsdk__navItem_accessory')
+    accessory.classList.add('inboxsdk__navItem_accessory');
     subNav.classList.add('inboxsdk__navItem_subNav');
     subNavInner.classList.add('inboxsdk__navItem_subNavInner');
 
