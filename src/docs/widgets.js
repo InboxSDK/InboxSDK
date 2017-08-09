@@ -219,9 +219,8 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
   iconClass:null,
 
   /**
-  * This is called when the button is clicked, and gets passed an event object.
-  * The event object will have a modalView property.
-  * @type {function(event)}
+  * This is called when the button is clicked.
+  * @type {function()}
   */
   onClick:null
 };
