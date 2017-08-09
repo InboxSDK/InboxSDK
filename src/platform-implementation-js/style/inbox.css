@@ -785,13 +785,14 @@ first-child will do the trick.
   width: 98px;
 }
 
-.inboxsdk__mole_view_titlebar > button {
+.inboxsdk__mole_title_buttons > button {
   height: 24px;
   width: 24px;
   opacity: 0.6;
   padding: 0 0 3px 7px;
 
   margin-right: 4px;
+  vertical-align: top;
 
   user-drag: none;
   -webkit-user-drag: none;
@@ -806,13 +807,13 @@ first-child will do the trick.
   cursor: pointer;
 }
 
-.inboxsdk__mole_view_titlebar > button:focus,
-.inboxsdk__mole_view_titlebar > button:hover {
+.inboxsdk__mole_title_buttons > button:focus,
+.inboxsdk__mole_title_buttons > button:hover {
   opacity: 1;
   outline: none;
 }
 
-.inboxsdk__mole_view_titlebar > button > img {
+.inboxsdk__mole_title_buttons > button > img {
   max-width: 18px;
   max-height: 18px;
 }

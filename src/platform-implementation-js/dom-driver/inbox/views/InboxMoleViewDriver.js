@@ -260,12 +260,13 @@ class MoleViewContents extends React.Component {
             type="button"
             key={i}
             title={descriptor.title}
+            className={descriptor.iconClass}
             onClick={event => {
               event.stopPropagation();
               descriptor.onClick();
             }}
           >
-            <img className={descriptor.iconClass} src={descriptor.iconUrl} alt="" aria-hidden="true" />
+            <img src={descriptor.iconUrl} alt="" aria-hidden="true" />
           </button>
         );
       });
@@ -280,30 +281,32 @@ class MoleViewContents extends React.Component {
           }}
         >
           {title}
-          <button
-            type="button"
-            style={{display: this.props.minimized ? "none" : ""}}
-            title="Minimize"
-            onClick={() => this.props.onSetMinimize(true)}
-          >
-            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png" />
-          </button>
-          <button
-            type="button"
-            style={{display: this.props.minimized ? "" : "none"}}
-            title="Expand"
-            onClick={() => this.props.onSetMinimize(false)}
-          >
-            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_maximize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_maximize_white_18dp.png" />
-          </button>
-          {titleButtons}
-          <button
-            type="button"
-            title="Close"
-            onClick={() => this.props.onClose()}
-          >
-            <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
-          </button>
+          <div className="inboxsdk__mole_title_buttons">
+            <button
+              type="button"
+              style={{display: this.props.minimized ? "none" : ""}}
+              title="Minimize"
+              onClick={() => this.props.onSetMinimize(true)}
+            >
+              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png" />
+            </button>
+            <button
+              type="button"
+              style={{display: this.props.minimized ? "" : "none"}}
+              title="Expand"
+              onClick={() => this.props.onSetMinimize(false)}
+            >
+              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_maximize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_maximize_white_18dp.png" />
+            </button>
+            {titleButtons}
+            <button
+              type="button"
+              title="Close"
+              onClick={() => this.props.onClose()}
+            >
+              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
+            </button>
+          </div>
         </div>
       );
     }
