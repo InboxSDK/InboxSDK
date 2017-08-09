@@ -126,6 +126,15 @@ class InboxMoleViewDriver {
   _setupWidth() {
     const naturalWidth = querySelector(this._element, '.inboxsdk__mole_view_inner').getBoundingClientRect().width;
     this._element.style.width = naturalWidth+'px';
+
+    // If this mole is the leftmost mole/compose element in the mole-container, give it some padding-left
+    // so it can't go off the screen's edge. Inbox does the same for its composeviews.
+    const parent = this._element.parentElement;
+    if (parent && Array.prototype.indexOf.call(parent.children, this._element) === parent.children.length-2) {
+      this._element.style.paddingLeft = naturalWidth+'px';
+    } else {
+      this._element.style.paddingLeft = '';
+    }
   }
   _bringToFront() {
     if (this._element.classList.contains('inboxsdk__mole_at_front')) return;
