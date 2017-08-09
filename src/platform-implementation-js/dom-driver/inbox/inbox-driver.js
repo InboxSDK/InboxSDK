@@ -880,7 +880,7 @@ class InboxDriver {
   }
 
   createMoleViewDriver(options: Object): InboxMoleViewDriver {
-    return new InboxMoleViewDriver(options);
+    return new InboxMoleViewDriver(options, this);
   }
 
   createModalViewDriver(options: Object): InboxModalView {

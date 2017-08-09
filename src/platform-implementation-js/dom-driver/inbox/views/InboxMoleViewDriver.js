@@ -12,18 +12,21 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import ElementContainer from '../../../lib/react/ElementContainer';
 import type {MoleViewDriver, MoleOptions, MoleButtonDescriptor} from '../../../driver-interfaces/mole-view-driver';
+import type InboxDriver from '../inbox-driver';
 import kefirBus from 'kefir-bus';
 
 class InboxMoleViewDriver {
+  _driver: InboxDriver;
   _options: MoleOptions;
   _stopper = kefirStopper();
   _eventStream = kefirBus();
   _element: HTMLElement;
   _title: string;
 
-  constructor(options: MoleOptions) {
+  constructor(options: MoleOptions, driver: InboxDriver) {
     (this: MoleViewDriver);
     this._options = options;
+    this._driver = driver;
     this._element = document.createElement('div');
     this._element.className = 'inboxsdk__mole_view '+(options.className||'');
     this._element.setAttribute('jsaction', 'global.none');
@@ -87,7 +90,11 @@ class InboxMoleViewDriver {
       throw new Error('show was called twice');
     }
     const container = document.getElementById('OPOhoe');
-    if (!container) throw new Error('could not insert moleview');
+    if (!container) {
+      const err = new Error('could find element to insert moleview into');
+      this._driver.getLogger.error(err);
+      throw err;
+    }
     container.insertBefore(this._element, container.firstElementChild);
 
     // The extension might not populate the element until after creating the
