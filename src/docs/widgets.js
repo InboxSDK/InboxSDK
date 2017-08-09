@@ -20,6 +20,7 @@ var Widgets = /** @lends Widgets */{
    * attached to the bottom of the viewport and has minimize and close buttons
    * just like a compose view.
    * ^gmail
+   * ^inbox
    * @param {MoleOptions} options - The options to configure the returned {MoleView}.
    * @return {MoleView}
    */
