@@ -260,7 +260,8 @@ class MoleViewContents extends React.Component {
             type="button"
             key={i}
             title={descriptor.title}
-            onClick={() => {
+            onClick={event => {
+              event.stopPropagation();
               descriptor.onClick();
             }}
           >
@@ -270,7 +271,14 @@ class MoleViewContents extends React.Component {
       });
 
       titlebar = (
-        <div className="inboxsdk__mole_view_titlebar">
+        <div
+          className="inboxsdk__mole_view_titlebar"
+          onClick={() => {
+            if (this.props.minimized) {
+              this.props.onSetMinimize(false);
+            }
+          }}
+        >
           {title}
           <button
             type="button"
