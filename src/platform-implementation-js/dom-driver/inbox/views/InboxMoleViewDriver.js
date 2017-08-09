@@ -126,7 +126,7 @@ class InboxMoleViewDriver {
     this._element.classList.add('inboxsdk__mole_at_front');
 
     const container = this._element.parentElement;
-    if (!container) throw new Error('mole not in document');
+    if (!(container instanceof HTMLElement)) throw new Error('mole not in document');
     const selfIndex = Array.prototype.indexOf.call(container.children, this._element);
     if (selfIndex < 0) throw new Error('should not happen');
     const count = container.children.length;
@@ -154,7 +154,13 @@ class InboxMoleViewDriver {
     // front, then do nothing because that mole's _bringToFront function will
     // handle the composes and the moles.
     Kefir.merge([
-      !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus')
+      // The user tried to focus the compose that Inbox still thinks is at the
+      // front.
+      !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus'),
+
+      // A new compose was added.
+      makeMutationObserverChunkedStream(container, {childList: true})
+        .filter(mutations => mutations.some(mutation => mutation.addedNodes.length > 0))
     ].concat(Array.prototype.map.call(container.children, el => {
       const zIndexedChild = find(el.children, child => child.style.zIndex);
       if (!zIndexedChild) return null;
