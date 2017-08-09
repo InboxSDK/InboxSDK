@@ -1,5 +1,6 @@
 /* @flow */
 
+import asap from 'asap';
 import {defn} from 'ud';
 import find from 'lodash/find';
 import React from 'react';
@@ -72,7 +73,7 @@ class InboxMoleViewDriver {
         onClose={() => {
           // React doesn't like it when you unmount a component within a React
           // event handler, so we do it async.
-          Promise.resolve().then(() => {
+          asap(() => {
             this.destroy();
           });
         }}
@@ -88,7 +89,12 @@ class InboxMoleViewDriver {
     const container = document.getElementById('OPOhoe');
     if (!container) throw new Error('could not insert moleview');
     container.insertBefore(this._element, container.firstElementChild);
-    this._setupWidth();
+
+    // The extension might not populate the element until after creating the
+    // mole, so calculate the width after that.
+    asap(() => {
+      this._setupWidth();
+    });
 
     // Keep the mole as the first item in the list
     makeMutationObserverChunkedStream(container, {childList: true})
