@@ -11,6 +11,7 @@ import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
 import get from '../../../common/get-or-fail';
 import idMap from '../../lib/idMap';
+import ElementContainer from '../../lib/react/ElementContainer';
 
 const springConfig = {stiffness: 400, damping: 50};
 
@@ -307,40 +308,12 @@ class Panel extends React.Component {
           expanded={!showControls || expanded}
           heightTransition=".15s ease"
         >
-          <PanelElement el={el} />
+          <ElementContainer
+            className={idMap('app_sidebar_content_panel_content')}
+            el={el}
+          />
         </SmoothCollapse>
       </div>
-    );
-  }
-}
-
-type PanelElementProps = {
-  el: HTMLElement;
-};
-class PanelElement extends React.Component {
-  props: PanelElementProps;
-  _content: HTMLElement;
-
-  componentDidMount() {
-    this._content.appendChild(this.props.el);
-  }
-  componentDidUpdate(prevProps: PanelElementProps) {
-    if (prevProps.el !== this.props.el) {
-      while (this._content.lastElementChild) {
-        this._content.lastElementChild.remove();
-      }
-      this._content.appendChild(this.props.el);
-    }
-  }
-  shouldComponentUpdate(nextProps: PanelElementProps) {
-    return this.props.el !== nextProps.el;
-  }
-  render() {
-    return (
-      <div
-        className={idMap('app_sidebar_content_panel_content')}
-        ref={el => this._content = el}
-      />
     );
   }
 }

@@ -94,6 +94,24 @@ class Logger {
     return _extensionUserEmailHash === 'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785';
   }
 
+  static run<T>(cb: () => T, details?: any): T {
+    try {
+      return cb();
+    } catch (err) {
+      Logger.error(err, details);
+      throw err;
+    }
+  }
+
+  run<T>(cb: () => T, details?: any): T {
+    try {
+      return cb();
+    } catch (err) {
+      this.error(err, details);
+      throw err;
+    }
+  }
+
   static error(err: Error, details?: any) {
     _logError(err, details, null, false);
   }
@@ -336,16 +354,9 @@ function _logError(err: Error, details: any, appId: ?string, sentByApp: boolean)
 }
 
 function makeLoggedFunction(func: Function, name: ?string): Function {
-  var msg = name ? "Uncaught error in "+name : "Uncaught error";
+  const msg = name ? "Uncaught error in "+name : "Uncaught error";
   return function() {
-    var functionArgs = arguments;
-
-    try {
-      return func.apply(this, arguments);
-    } catch (err) {
-      Logger.error(err, msg);
-      throw err;
-    }
+    return Logger.run(() => func.apply(this, arguments), msg);
   };
 }
 

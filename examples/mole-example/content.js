@@ -1,18 +1,20 @@
-InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
-	var i = 0;
+'use strict';
+
+InboxSDK.load(2, 'simple-example').then(function(inboxSDK) {
+	let i = 0;
 
 	window.makeMoleWidget = function() {
-		var div = document.createElement('div');
+		const div = document.createElement('div');
 		// div.style.width = '200px';
 		// div.style.height = '400px';
 		// div.style.backgroundColor = 'red';
-		div.innerHTML = '<div class="streak__tasklist_mole" tabindex="0"><div data-reactid=".0"><div class="streak__tasklist_mole_items" data-reactid=".0.0"></div><div class="streak__tasklist_mole_newItem" data-reactid=".0.$newTaskInput"><div class="streak__task_body" data-reactid=".0.$newTaskInput.0"><div class="streak__task_prefix" data-reactid=".0.$newTaskInput.0.0">+</div><div class="streak__task_title" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.1"><div class="streak__gmailTextarea streak__gmailTextarea_textOnly streak__inputDecorator_gmailBorder" tabindex="-1"><div class="R5 streak__placeholder streak__gmailTextarea_multiLine" contenteditable="true" data-placeholder="New task (e.g. Follow up with ...)"></div></div></div><div class="streak__task_setdate_wrapper" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.2"><div class="streak__taskListMoleButtonType" tabindex="0"><div class="reactMountPoint"><div><div data-reactid=".1"><div class="streak__task_setdate_outline" data-reactid=".1.0"><div class="streak__task_setdate" data-reactid=".1.0.0"></div></div></div></div></div></div></div></div></div><div class="streak__hide" data-reactid=".0.2"><div class="streak__collapsibleSection_header bbHand" data-reactid=".0.2.0"><span class="streak__collapsibleSection_header_arrow" data-reactid=".0.2.0.0">▾ </span><span data-reactid=".0.2.0.1">Completed Tasks</span></div><div class="" data-reactid=".0.2.1"></div></div></div></div>';
+		div.innerHTML = '<div class="streak__tasklist_mole"><div data-reactid=".0"><div class="streak__tasklist_mole_items" data-reactid=".0.0"></div><div class="streak__tasklist_mole_newItem" data-reactid=".0.$newTaskInput"><div class="streak__task_body" data-reactid=".0.$newTaskInput.0"><div class="streak__task_prefix" data-reactid=".0.$newTaskInput.0.0">+</div><div class="streak__task_title" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.1"><div class="streak__gmailTextarea streak__gmailTextarea_textOnly streak__inputDecorator_gmailBorder"><div class="R5 streak__placeholder streak__gmailTextarea_multiLine" contenteditable="true" data-placeholder="New task (e.g. Follow up with ...)"></div></div></div><div class="streak__task_setdate_wrapper" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.2"><div class="streak__taskListMoleButtonType" ><div class="reactMountPoint"><div><div data-reactid=".1"><div class="streak__task_setdate_outline" data-reactid=".1.0"><div class="streak__task_setdate" data-reactid=".1.0.0"></div></div></div></div></div></div></div></div></div><div class="streak__hide" data-reactid=".0.2"><div class="streak__collapsibleSection_header bbHand" data-reactid=".0.2.0"><span class="streak__collapsibleSection_header_arrow" data-reactid=".0.2.0.0">▾ </span><span data-reactid=".0.2.0.1">Completed Tasks</span></div><div class="" data-reactid=".0.2.1"></div></div></div></div>';
 
-		var titleEl = document.createElement('div');
+		const titleEl = document.createElement('div');
 		titleEl.innerHTML = '<em>Foo</em> Bar';
-		var minimizedTitleEl = document.createElement('div');
+		const minimizedTitleEl = document.createElement('div');
 		minimizedTitleEl.innerHTML = '<em>Bar</em> Foo';
-		var mole = inboxSDK.Widgets.showMoleView({
+		const mole = inboxSDK.Widgets.showMoleView({
 			el: div,
 			className: 'foobartest',
 			title: 'Mole Example '+(++i),
@@ -47,18 +49,20 @@ InboxSDK.load(1, 'simple-example').then(function(inboxSDK) {
 		return mole;
 	};
 
-	makeMoleWidget();
+	window._mole = makeMoleWidget();
 
 
 	window.makeChromelessMoleWidget = function(){
-		var div = document.createElement('div');
+		const div = document.createElement('div');
 		div.innerHTML = 'hello world';
 		div.style.height = '500px';
 
-		var mole = inboxSDK.Widgets.showMoleView({
+		const mole = inboxSDK.Widgets.showMoleView({
 			el: div,
 			chrome: false
 		});
+
+		return mole;
 	}
 
 });

@@ -20,6 +20,7 @@ var Widgets = /** @lends Widgets */{
    * attached to the bottom of the viewport and has minimize and close buttons
    * just like a compose view.
    * ^gmail
+   * ^inbox
    * @param {MoleOptions} options - The options to configure the returned {MoleView}.
    * @return {MoleView}
    */
@@ -186,7 +187,7 @@ var MoleOptions = /** @lends MoleOptions */{
   * the title and mimize/close buttons. This means the app is totally responsible for the
   * look and behavior of the mole, while the SDK is responsible only for the positioning.
   * ^optional
-  * ^default=false
+  * ^default=true
   * @type {boolean}
   */
   chrome:null
@@ -219,9 +220,8 @@ var MoleButtonDescriptor = /** @lends MoleButtonDescriptor */{
   iconClass:null,
 
   /**
-  * This is called when the button is clicked, and gets passed an event object.
-  * The event object will have a modalView property.
-  * @type {function(event)}
+  * This is called when the button is clicked.
+  * @type {function()}
   */
   onClick:null
 };

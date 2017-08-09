@@ -18,6 +18,8 @@ export type ThreadViewDriver = GmailThreadView|InboxThreadView;
 
 import type {ThreadRowViewDriver} from './thread-row-view-driver';
 
+import type {MoleViewDriver} from './mole-view-driver';
+
 import type {MessageViewDriver} from './message-view-driver';
 
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
@@ -75,7 +77,7 @@ export type Driver = {
 	isRunningInPageContext(): boolean;
 	showAppIdWarning(): void;
 	createModalViewDriver(options: Object): Object;
-	createMoleViewDriver(options: Object): Object;
+	createMoleViewDriver(options: Object): MoleViewDriver;
 	createTopMessageBarDriver(options: Object): Object;
 	createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
 	createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop;
