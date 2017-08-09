@@ -25,6 +25,8 @@ export default class InboxNavItemView {
   _disabled: boolean = false;
   _isCollapsed: boolean = false;
   _iconSettings: Object = {};
+  _accessory: ?Object = null;
+  _accessoryView: ?Object = null;
   _elements: {
     wrapper: HTMLElement;
     expander: HTMLElement;
@@ -32,6 +34,7 @@ export default class InboxNavItemView {
     name: HTMLElement;
     subNav: HTMLElement;
     subNavInner: HTMLElement;
+    accessory: HTMLElement;
   };
 
   constructor(navItemDescriptor: Kefir.Observable<Object>, level: number) {
@@ -42,7 +45,8 @@ export default class InboxNavItemView {
       navItem: document.createElement('div'),
       name: document.createElement('span'),
       subNav: document.createElement('div'),
-      subNavInner: document.createElement('div')
+      subNavInner: document.createElement('div'),
+      accessory: document.createElement('div')
     };
 
     if (this._level > 2) {
@@ -76,10 +80,12 @@ export default class InboxNavItemView {
       this._children -= 1;
       this._updateChildrenClass();
       this._updateDisabledState(this._navItemDescriptor || {});
+      this._updateAccessory(this._accessory, true);
     });
 
     this._updateChildrenClass();
     this._updateDisabledState(this._navItemDescriptor || {});
+    this._updateAccessory(this._accessory, true);
 
     return childNavItemView;
   }
@@ -134,7 +140,8 @@ export default class InboxNavItemView {
       navItem,
       name,
       subNav,
-      subNavInner
+      subNavInner,
+      accessory
     } = this._elements;
 
     wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
@@ -145,6 +152,7 @@ export default class InboxNavItemView {
     expander.classList.add('inboxsdk__navItem_expander');
     navItem.classList.add('inboxsdk__navItem');
     name.classList.add('inboxsdk__navItem_name');
+    accessory.classList.add('inboxsdk__navItem_accessory')
     subNav.classList.add('inboxsdk__navItem_subNav');
     subNavInner.classList.add('inboxsdk__navItem_subNavInner');
 
@@ -153,6 +161,7 @@ export default class InboxNavItemView {
 
     navItem.appendChild(expander);
     navItem.appendChild(name);
+    navItem.appendChild(accessory);
     wrapper.appendChild(navItem);
 
     subNav.appendChild(subNavInner);
@@ -226,6 +235,7 @@ export default class InboxNavItemView {
     this._updateExpander(descriptor);
     this._updateDisabledState(descriptor);
     this._updateIcon(descriptor);
+    this._updateAccessory(descriptor.accessory);
     this._updateOrder(
       descriptor.orderHint ||
       descriptor.orderHint === 0 ? descriptor.orderHint : Number.MAX_SAFE_INTEGER
@@ -275,6 +285,21 @@ export default class InboxNavItemView {
     );
   }
 
+  _updateAccessory(accessory: Object, forceUpdate: boolean = false) {
+    if (!forceUpdate && this._accessory === accessory) return;
+
+    if (this._accessoryView) {
+      this._accessoryView.destroy();
+      this._accessoryView = null;
+    }
+
+    if (accessory && !this._disabled) {
+      this._accessoryView = this._createAccessory(accessory);
+    }
+
+    this._accessory = accessory;
+  }
+
   _updateDisabledState(descriptor: Object) {
     this._disabled = (
       !(descriptor.routeID || descriptor.onClick) ||
@@ -299,5 +324,53 @@ export default class InboxNavItemView {
       'inboxsdk__navItem_hasChildren',
       this._children > 0
     );
+  }
+
+  _createAccessory(accessory: Object): {destroy: () => void} {
+    switch (accessory.type) {
+      case 'CREATE':
+        return this._createCreateAccessory(accessory);
+      case 'ICON_BUTTON':
+        return this._createIconButtonAccessory(accessory);
+      default:
+        throw new Error('A type must be specified for NavItem accessories');
+    }
+  }
+
+  _createCreateAccessory(accessory: Object): {destroy: () => void} {
+    const {onClick} = accessory;
+    return this._createIconButtonAccessory({
+      onClick,
+      iconUrl: '//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/ic_add-cluster_24px_g60_r3_2x.png'
+    });
+  }
+
+  _createIconButtonAccessory(accessory: Object): {destroy: () => void} {
+    this._elements.wrapper.classList.add('inboxsdk__navItem_hasAccessory');
+
+    updateIcon(
+      {},
+      this._elements.accessory,
+      false,
+      accessory.iconClass,
+      accessory.iconUrl
+    );
+
+    const destroyBus = kefirBus();
+
+    Kefir.fromEvents(this._elements.accessory, 'click')
+      .takeUntilBy(this._stopper)
+      .takeUntilBy(destroyBus.beforeEnd(() => null).toProperty())
+      .onValue(() => {
+        if (accessory.onClick) accessory.onClick();
+      });
+
+    const destroy = () => {
+      this._elements.wrapper.classList.remove('inboxsdk__navItem_hasAccessory');
+      this._elements.accessory.innerHTML = '';
+      destroyBus.end();
+    };
+
+    return {destroy};
   }
 }
