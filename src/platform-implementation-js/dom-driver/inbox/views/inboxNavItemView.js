@@ -264,11 +264,11 @@ export default class InboxNavItemView {
     this._type = type;
   }
 
-  _updateExpander({backgroundColor, foregroundColor}: Object) {
+  _updateExpander({backgroundColor, expanderForegroundColor}: Object) {
     this._elements.expander.style.backgroundColor = backgroundColor || '';
 
     const arrow = querySelector(this._elements.expander, 'polygon');
-    (arrow.style: any).fill = foregroundColor || '';
+    (arrow.style: any).fill = expanderForegroundColor || '';
 
     this._elements.wrapper.classList.toggle(
       'inboxsdk__navItem_hasColor',
