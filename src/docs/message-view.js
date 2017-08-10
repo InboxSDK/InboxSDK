@@ -366,6 +366,7 @@ var DownloadButtonDescriptor = /** @lends DownloadButtonDescriptor */{
 	* This works by setting the "download" attribute on an anchor element
 	* to the given value.
 	* ^optional
+	* ^default=null
 	* @type {string}
 	*/
 	downloadFilename:null,
