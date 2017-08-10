@@ -23,7 +23,7 @@
 }
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon::before,
-.inboxsdk__navItem_accessory::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon::before,
 .inboxsdk__appButton.inboxsdk__button_icon::before {
   content: ' ';
   position: absolute;
@@ -40,8 +40,8 @@
   background-color: rgba(0,0,0,0.1);
 }
 .inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active::before,
-.inboxsdk__navItem_accessory:focus > .inboxsdk__button_icon::before,
-.inboxsdk__navItem_accessory:focus::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.12);
 }
@@ -845,7 +845,7 @@ first-child will do the trick.
   display: none;
 }
 
-.inboxsdk__navItem > .inboxsdk__navItem_accessory:focus {
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus {
   outline: 2px solid transparent;
 }
 
@@ -900,17 +900,18 @@ first-child will do the trick.
   position: relative;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory {
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
   opacity: 0;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem:hover > .inboxsdk__navItem_accessory,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory.inboxsdk__navItem_active > .inboxsdk__navItem > .inboxsdk__navItem_accessory {
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem:hover > .inboxsdk__navItem_accessory > .inboxsdk__button_icon,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory.inboxsdk__navItem_active > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
   opacity: 0.6;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:hover,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:focus {
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:hover > .inboxsdk__button_icon,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:focus > .inboxsdk__button_icon,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
   opacity: 1;
 }
 

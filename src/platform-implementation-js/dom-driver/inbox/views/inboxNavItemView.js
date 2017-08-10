@@ -2,7 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
+import kefirStopper from 'kefir-stopper';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import eventNameFilter from '../../../lib/event-name-filter';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -12,6 +12,10 @@ import InboxDropdownView from './inbox-dropdown-view';
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 import updateIcon from '../../../driver-common/update-icon';
+
+import type {Bus} from 'kefir-bus';
+
+type Destroyable = {destroy: () => void};
 
 export default class InboxNavItemView {
 
@@ -28,7 +32,7 @@ export default class InboxNavItemView {
   _isCollapsed: boolean = false;
   _iconSettings: Object = {};
   _accessory: ?Object = null;
-  _accessoryView: ?Object = null;
+  _accessoryView: ?Destroyable = null;
   _elements: {
     wrapper: HTMLElement;
     expander: HTMLElement;
@@ -328,7 +332,7 @@ export default class InboxNavItemView {
     );
   }
 
-  _createAccessory(accessory: Object): {destroy: () => void} {
+  _createAccessory(accessory: Object): Destroyable {
     switch (accessory.type) {
       case 'CREATE':
         return this._createCreateAccessory(accessory);
@@ -341,7 +345,7 @@ export default class InboxNavItemView {
     }
   }
 
-  _createCreateAccessory(accessory: Object): {destroy: () => void} {
+  _createCreateAccessory(accessory: Object): Destroyable {
     const {onClick} = accessory;
     return this._createIconButtonAccessory({
       onClick,
@@ -349,7 +353,7 @@ export default class InboxNavItemView {
     });
   }
 
-  _createDropdownButtonAccessory(accessory: Object): {destroy: () => void} {
+  _createDropdownButtonAccessory(accessory: Object): Destroyable {
     const {onClick} = accessory;
     return this._createIconButtonAccessory({
       onClick,
@@ -357,7 +361,7 @@ export default class InboxNavItemView {
     }, true);
   }
 
-  _createIconButtonAccessory(accessory: Object, hasDropdown: boolean = false): {destroy: () => void} {
+  _createIconButtonAccessory(accessory: Object, hasDropdown: boolean = false): Destroyable {
     if (!accessory.onClick) throw new Error('An onClick handler is required');
 
     this._elements.wrapper.classList.add('inboxsdk__navItem_hasAccessory');
@@ -370,8 +374,10 @@ export default class InboxNavItemView {
       accessory.iconUrl
     );
 
-    const destroyBus = kefirBus();
-    const destroyStopper = destroyBus.beforeEnd(() => null).toProperty();
+    const iconEl = querySelector(this._elements.accessory, '.inboxsdk__button_icon');
+    iconEl.setAttribute('tabindex', '-1');
+
+    const destroyStopper = kefirStopper();
     let dropdown = null;
 
     Kefir.fromEvents(this._elements.accessory, 'click')
@@ -385,7 +391,7 @@ export default class InboxNavItemView {
             dropdown.close();
             return;
           } else {
-            this._elements.accessory.classList.add('inboxsdk__active');
+            iconEl.classList.add('inboxsdk__active');
 
             dropdown = new DropdownView(
               new InboxDropdownView(),
@@ -398,7 +404,7 @@ export default class InboxNavItemView {
               buffer: 10
             });
             dropdown.on('destroy', () => {
-              this._elements.accessory.classList.remove('inboxsdk__active');
+              iconEl.classList.remove('inboxsdk__active');
               dropdown = null;
             });
           }
@@ -406,7 +412,7 @@ export default class InboxNavItemView {
         accessory.onClick({dropdown});
       });
 
-    this._stopper.takeUntilBy(destroyStopper).onEnd(() => {
+    Kefir.merge([this._stopper, destroyStopper]).take(1).onValue(() => {
       if (dropdown) {
         dropdown.close();
       }
@@ -415,7 +421,7 @@ export default class InboxNavItemView {
     const destroy = () => {
       this._elements.wrapper.classList.remove('inboxsdk__navItem_hasAccessory');
       this._elements.accessory.innerHTML = '';
-      destroyBus.end();
+      destroyStopper.destroy();
     };
 
     return {destroy};
