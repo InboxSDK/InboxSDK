@@ -909,8 +909,8 @@ first-child will do the trick.
   opacity: 0.6;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:hover > .inboxsdk__button_icon,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory:focus > .inboxsdk__button_icon,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:hover,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus,
 .inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
   opacity: 1;
 }
