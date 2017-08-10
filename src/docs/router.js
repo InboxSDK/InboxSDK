@@ -24,7 +24,9 @@ var Router = /** @lends Router */ {
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
 	* Returns the encoded URL string.
 	* ^gmail
-	* @param {string} routeID - A route specifying where the link should navigate the user to.
+	* @param {string} routeID - A route specifying where the link should navigate the user to. This should
+	* either be a routeID registered with Router.handleCustomRoute or Router.handleCustomListRoute, or a value
+	* from Router.{NativeRouteIDs}.
 	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
@@ -33,10 +35,13 @@ var Router = /** @lends Router */ {
 	createLink: function(){},
 
 	/**
-	* Change the route to be the one with the given ID and have the given parameters
+	* Change the route to be the one with the given ID and have the given parameters.
 	* ^gmail
 	* ^inbox
-	* @param {string} routeID - A route specifying where the link should navigate the user to.
+	* @param {string} routeID - A route specifying where the link should navigate the user to. This should
+	* either be a routeID registered with Router.handleCustomRoute or Router.handleCustomListRoute, a value
+	* from Router.{NativeRouteIDs}, or a value previously returned by Router.createLink. If it's a value
+	* previously returned by Router.createLink, then the {params} argument must be omitted.
 	* @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
 	* subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
 	* only simple key value pairs with no nested arrays/objects.
