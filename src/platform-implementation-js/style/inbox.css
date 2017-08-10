@@ -23,6 +23,7 @@
 }
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon::before,
 .inboxsdk__appButton.inboxsdk__button_icon::before {
   content: ' ';
   position: absolute;
@@ -39,6 +40,8 @@
   background-color: rgba(0,0,0,0.1);
 }
 .inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus::before,
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
   background-color: rgba(0,0,0,0.12);
 }
@@ -831,6 +834,21 @@ first-child will do the trick.
   height: 24px;
 }
 
+.inboxsdk__navItem > .inboxsdk__navItem_accessory .inboxsdk__button_icon,
+.inboxsdk__navItem > .inboxsdk__navItem_accessory .inboxsdk__button_iconImg {
+  width: 18px;
+  height: 18px;
+}
+
+.inboxsdk__navItem > .inboxsdk__navItem_accessory {
+  line-height: 18px;
+  display: none;
+}
+
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus {
+  outline: 2px solid transparent;
+}
+
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem,
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:hover,
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:focus,
@@ -875,6 +893,26 @@ first-child will do the trick.
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus > .inboxsdk__navItem_name,
 .inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active > .inboxsdk__navItem_name {
   color: #616161;
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory {
+  display: block;
+  position: relative;
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
+  opacity: 0;
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem:hover > .inboxsdk__navItem_accessory > .inboxsdk__button_icon,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory.inboxsdk__navItem_active > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
+  opacity: 0.6;
+}
+
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:hover,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus,
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
+  opacity: 1;
 }
 
 .inboxsdk__navItem_subNav,
