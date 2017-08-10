@@ -27,17 +27,23 @@ export default function addNavItem(
         ));
 
       if (!el.contains(containerEl)) {
-        // Locate <ul> with native folders by finding draft icon image
-        const draftsImg = querySelector(el, 'ul > li > img[src*="ic_draft"]');
+        const existingCustomSections = el.querySelectorAll('.inboxsdk__navItem_appContainer');
+        if (existingCustomSections.length > 0) {
+          const lastCustomSection = existingCustomSections[existingCustomSections.length - 1];
+          lastCustomSection.insertAdjacentElement('afterend', containerEl);
+        } else {
+          // Locate <ul> with native folders by finding draft icon image
+          const draftsImg = querySelector(el, 'ul > li > img[src*="ic_draft"]');
 
-        const nativeFolderSection = (
-          draftsImg.parentElement &&
-          draftsImg.parentElement.parentElement
-        );
+          const nativeFolderSection = (
+            draftsImg.parentElement &&
+            draftsImg.parentElement.parentElement
+          );
 
-        if (!nativeFolderSection) throw new Error('could not locate insertion point');
+          if (!nativeFolderSection) throw new Error('could not locate insertion point');
 
-        nativeFolderSection.insertAdjacentElement('afterend', containerEl);
+          nativeFolderSection.insertAdjacentElement('afterend', containerEl);
+        }
       }
 
       insertElementInOrder(containerEl, inboxNavItemView.getElement());
