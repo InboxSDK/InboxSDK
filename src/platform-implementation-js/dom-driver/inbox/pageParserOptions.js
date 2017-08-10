@@ -22,6 +22,14 @@ const pageParserOptions: PageParserTreeOptions = {
     }
   },
   finders: {
+    leftNav: {
+      interval: (count, timeRunning) => (
+        (count === 0 && timeRunning < 60*1000) ? 300 : 2*60*1000
+      ),
+      fn(root) {
+        return root.querySelectorAll('nav[aria-hidden]:not([role]) div[role=menu]');
+      }
+    },
     thread: {
       fn(root) {
         return root.querySelectorAll('div[aria-expanded=true][data-item-id*="thread-"], div.scroll-list-item-open[data-item-id*="thread-"]');
