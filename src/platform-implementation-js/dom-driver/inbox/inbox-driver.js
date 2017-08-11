@@ -743,8 +743,11 @@ class InboxDriver {
     return new Promise((resolve, reject) => {});
   }
 
-  createLink(routeID: string, params: ?RouteParams): any {
-    throw new Error("Not implemented");
+  createLink(routeID: string, params: ?RouteParams): string {
+    if (!this._customRouteIDs.has(routeID)) {
+      throw new Error(`Invalid routeID: ${routeID}`);
+    }
+    return '#' + populateRouteID(routeID, params);
   }
 
   goto(routeID: string, params: ?RouteParams): void {
