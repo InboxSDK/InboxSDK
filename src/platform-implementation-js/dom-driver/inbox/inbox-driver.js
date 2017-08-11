@@ -754,7 +754,7 @@ class InboxDriver {
         routeID = routeID.slice(1);
       }
       let foundRouteID = false;
-      if (params) {
+      if (!params) { // If params were given, then we don't assume it was a resolved/populated URL
         for (let routeIDs of this._customRouteIDs) {
           if (routeIDmatchesHash(routeIDs, routeID)) {
             foundRouteID = true;
