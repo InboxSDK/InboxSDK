@@ -15,6 +15,8 @@ var NavItemView = /** @lends NavItemView */ {
 
 	/**
 	* Add a nested child NavItemView
+	* ^gmail
+	* ^inbox
 	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
 	* @return {NavItemView}
 	*/
@@ -22,18 +24,24 @@ var NavItemView = /** @lends NavItemView */ {
 
 	/**
 	* Remove this NavItemView from its parent
+	* ^gmail
+	* ^inbox
 	* @return {void}
 	*/
 	remove: function(){},
 
 	/**
 	* Whether the NavItemView is currently collapsed and hiding its children
+	* ^gmail
+	* ^inbox
 	* @return {boolean}
 	*/
 	isCollapsed: function(){},
 
 	/**
 	* Collapse or uncollapse this NavItemView
+	* ^gmail
+	* ^inbox
 	* @param {boolean} collapseValue - whether to collapse or uncollapse
 	* @return {void}
 	*/
@@ -41,6 +49,8 @@ var NavItemView = /** @lends NavItemView */ {
 
 	/**
 	 * This property is set to true once the view is destroyed.
+	 * ^gmail
+	 * ^inbox
 	 * @type {boolean}
 	 */
 	destroyed: false,
