@@ -130,19 +130,6 @@ export default class NavItemView extends EventEmitter {
 
 function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [navItemDescriptor, event]){
 	switch(event.eventName){
-		case 'mouseenter':
-
-			if (navItemDescriptor.routeID ||
-					typeof navItemDescriptor.onClick === 'function') {
-				navItemViewDriver.setHighlight(true);
-			}
-
-			break;
-		case 'mouseleave':
-
-			navItemViewDriver.setHighlight(false);
-
-			break;
 		case 'click':
 
 			if (typeof navItemDescriptor.onClick === 'function') {

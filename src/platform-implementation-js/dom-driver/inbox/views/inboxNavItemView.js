@@ -100,10 +100,6 @@ export default class InboxNavItemView {
     this._elements.navItem.classList.toggle('inboxsdk__navItem_active', value);
   }
 
-  setHighlight(value: boolean) {
-    // dummy until i go in and refactor the common code to not include highlight handling
-  }
-
   toggleCollapse() {
     this._isCollapsed = !this._isCollapsed;
 
