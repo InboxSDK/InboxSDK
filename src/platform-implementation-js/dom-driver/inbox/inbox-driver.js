@@ -749,6 +749,10 @@ class InboxDriver {
 
   goto(routeID: string, params: ?RouteParams): void {
     if (!this._customRouteIDs.has(routeID)) {
+      const startedWithHash = routeID[0] === '#';
+      if (startedWithHash) {
+        routeID = routeID.slice(1);
+      }
       let foundRouteID = false;
       if (params) {
         for (let routeIDs of this._customRouteIDs) {
@@ -760,6 +764,9 @@ class InboxDriver {
       }
       if (!foundRouteID) {
         throw new Error(`Invalid routeID: ${routeID}`);
+      }
+      if (!startedWithHash) {
+        this._logger.deprecationWarning('Router.goto resolved routeID without "#" prefix');
       }
     }
     document.location.hash = populateRouteID(routeID, params);

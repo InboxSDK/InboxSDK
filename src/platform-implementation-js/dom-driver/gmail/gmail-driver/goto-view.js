@@ -10,6 +10,13 @@ import type GmailDriver from '../gmail-driver';
 import type {RouteParams} from '../../../namespaces/router';
 
 const gotoView = ud.defn(module, function gotoView(gmailDriver: GmailDriver, viewName: string, params: ?RouteParams|string) {
+	if (viewName[0] === '#') {
+		if (params) {
+			throw new Error("params parameter can't be passed with resolved URL");
+		}
+		viewName = viewName.slice(1);
+	}
+
 	const newHash = gmailDriver.createLink(viewName, params);
 
 	if (includes(NATIVE_ROUTE_IDS, viewName)) {
