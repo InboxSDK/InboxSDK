@@ -13,6 +13,15 @@
 * Items can also have accessories which provide secondary actions like opening a dropdown (like Gmails labels) or
 * providing a "create new" action. There are several predefined accesories, see {CreateAccessoryDescriptor},
 * {IconButtonAccessoryDescriptor} or {DropdownButtonAccessoryDescriptor}.
+*
+* In Inbox, adding children to a 'root' level {NavItemView} (i.e. an item which
+* is not a child of another item) causes the parent to become a 'section header'.
+* Section headers are styled to resemble the labels for Inbox's native sections
+* like "Bundled in the inbox", and add a horizontal dividing line above themselves.
+* When a {NavItemView} becomes a section header, it is no longer interactive
+* and does not navigate to its routeID or trigger an onClick handler.
+* Using section headers can be useful for breaking up your app's navigation
+* into categories or groups.
 */
 var NavMenu = /** @lends NavMenu */{
 
@@ -20,6 +29,7 @@ var NavMenu = /** @lends NavMenu */{
 	* Adds a navigation item to the root of the navigation menu. Navigation items from your app are grouped together
 	* where possible but ultimately the SDK optimizes for the best user experience when displaying navigation items.
 	* ^gmail
+	* ^inbox
 	* @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
 	* @return {NavItemView}
 	*/
@@ -101,6 +111,28 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
 	iconClass: null,
 
 	/**
+	* In Inbox, providing a {backgroundColor} will add a colored circle indicator
+	* on the left of a {NavItemView}, provided that it is either a root NavItem with
+	* no children or a {NavItemView} 1 level deep.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	backgroundColor: null,
+
+	/**
+	* In Inbox, {expanderForegroundColor} controls the color of the expand/collapse
+	* arrow for {NavItemView}s with children that are 1 level deep.
+	* This arrow will appear on top of the colored circle defined by {backgroundColor},
+	* and should be complimentary if {backgroundColor} and {expanderForegroundColor}
+	* are both provided.
+	* ^optional
+	* ^default=null
+	* @type {string}
+	*/
+	expanderForegroundColor: null,
+
+	/**
 	* The nav item type affects how the item is displayed.
 	* ^optional
 	* ^default=NAVIGATION
@@ -176,13 +208,13 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
 	type: 'DROPDOWN_BUTTON',
 
 	/**
-	* The color of the background of the dropdown button.
+	* The color of the background of the dropdown button. Ignored in Inbox.
 	* @type {string}
 	*/
 	buttonBackgroundColor: null,
 
 	/**
-	* The color of the foreground of the dropdown button.
+	* The color of the foreground of the dropdown button. Ignored in Inbox.
 	* @type {string}
 	*/
 	buttonForegroundColor: null,
