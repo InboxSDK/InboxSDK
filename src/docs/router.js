@@ -24,6 +24,7 @@ var Router = /** @lends Router */ {
 	* Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
 	* Returns the encoded URL string.
 	* ^gmail
+	* ^inbox
 	* @param {string} routeID - A route specifying where the link should navigate the user to. This should
 	* either be a routeID registered with Router.handleCustomRoute or Router.handleCustomListRoute, or a value
 	* from Router.{NativeRouteIDs}.
