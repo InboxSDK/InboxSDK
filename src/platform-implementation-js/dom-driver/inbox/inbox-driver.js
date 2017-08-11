@@ -32,8 +32,6 @@ import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessa
 import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThreadId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
-import populateRouteID from '../../lib/populateRouteID';
-import routeIDmatchesHash from '../../lib/routeIDmatchesHash';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import querySelector from '../../lib/dom/querySelectorOrFail';
@@ -50,6 +48,8 @@ import idMap from '../../lib/idMap';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import getSidebarClassnames from './getSidebarClassnames';
 import InboxButterBarDriver from './inbox-butter-bar-driver';
+import createLink from './createLink';
+import gotoView from './gotoView';
 
 import threadParser from './detection/thread/parser';
 import threadRowParser from './detection/thread-row/parser';
@@ -743,33 +743,12 @@ class InboxDriver {
     return new Promise((resolve, reject) => {});
   }
 
-  createLink(routeID: string, params: ?RouteParams): any {
-    throw new Error("Not implemented");
+  createLink(routeID: string, params: ?RouteParams): string {
+    return createLink(this, routeID, params);
   }
 
   goto(routeID: string, params: ?RouteParams): void {
-    if (!this._customRouteIDs.has(routeID)) {
-      const startedWithHash = routeID[0] === '#';
-      if (startedWithHash) {
-        routeID = routeID.slice(1);
-      }
-      let foundRouteID = false;
-      if (!params) { // If params were given, then we don't assume it was a resolved/populated URL
-        for (let routeIDs of this._customRouteIDs) {
-          if (routeIDmatchesHash(routeIDs, routeID)) {
-            foundRouteID = true;
-            break;
-          }
-        }
-      }
-      if (!foundRouteID) {
-        throw new Error(`Invalid routeID: ${routeID}`);
-      }
-      if (!startedWithHash) {
-        this._logger.deprecationWarning('Router.goto resolved routeID without "#" prefix');
-      }
-    }
-    document.location.hash = populateRouteID(routeID, params);
+    gotoView(this, routeID, params);
   }
 
   addCustomRouteID(routeID: string): () => void {
