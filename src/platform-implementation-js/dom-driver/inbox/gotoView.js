@@ -1,11 +1,16 @@
 /* @flow */
 
+import includes from 'lodash/includes';
 import type InboxDriver from './inbox-driver';
 import populateRouteID from '../../lib/populateRouteID';
 import type {RouteParams} from '../../namespaces/router';
 import routeIDmatchesHash from '../../lib/routeIDmatchesHash';
+import {NATIVE_ROUTE_IDS} from '../../constants/router';
 
 export default function gotoView(driver: InboxDriver, routeID: string, params: ?RouteParams): void {
+  if (includes(Object.values(NATIVE_ROUTE_IDS), routeID)) {
+    throw new Error('NativeRouteIDs are not currently supported in Inbox');
+  }
   if (!driver.getCustomRouteIDs().has(routeID)) {
     const startedWithHash = routeID[0] === '#';
     if (startedWithHash) {
