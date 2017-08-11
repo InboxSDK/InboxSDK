@@ -33,6 +33,7 @@ import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThread
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
 import populateRouteID from '../../lib/populateRouteID';
+import routeIDmatchesHash from '../../lib/routeIDmatchesHash';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import querySelector from '../../lib/dom/querySelectorOrFail';
@@ -748,7 +749,25 @@ class InboxDriver {
 
   goto(routeID: string, params: ?RouteParams): void {
     if (!this._customRouteIDs.has(routeID)) {
-      throw new Error(`Invalid routeID: ${routeID}`);
+      const startedWithHash = routeID[0] === '#';
+      if (startedWithHash) {
+        routeID = routeID.slice(1);
+      }
+      let foundRouteID = false;
+      if (!params) { // If params were given, then we don't assume it was a resolved/populated URL
+        for (let routeIDs of this._customRouteIDs) {
+          if (routeIDmatchesHash(routeIDs, routeID)) {
+            foundRouteID = true;
+            break;
+          }
+        }
+      }
+      if (!foundRouteID) {
+        throw new Error(`Invalid routeID: ${routeID}`);
+      }
+      if (!startedWithHash) {
+        this._logger.deprecationWarning('Router.goto resolved routeID without "#" prefix');
+      }
     }
     document.location.hash = populateRouteID(routeID, params);
   }
