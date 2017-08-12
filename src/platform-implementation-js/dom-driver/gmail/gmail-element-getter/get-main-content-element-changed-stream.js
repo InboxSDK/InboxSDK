@@ -37,7 +37,7 @@ export default function getMainContentElementChangedStream(GmailElementGetter: G
 }
 
 function waitForMainContentContainer(GmailElementGetter){
-	if (GmailElementGetter.isStandalone()) {
+	if (GmailElementGetter.isStandaloneComposeWindow()) {
 		return Kefir.never();
 	}
 	return streamWaitFor(() => GmailElementGetter.getMainContentContainer());
