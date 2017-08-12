@@ -240,7 +240,7 @@ gulp.task('docs', function(cb) {
       var classes = _.chain(files)
         .filter(Boolean)
         .map(x => x.classes)
-        .flattenDeep()
+        .flatten()
         .filter(Boolean)
         .map(transformClass)
         .forEach(checkForDocIssues)
@@ -325,7 +325,7 @@ function transformClass(c) {
         prop.default = defaultM[1];
         return '';
       }
-      throw new Error(`Unknown rule ^${rule}`);
+      throw new Error(`Unknown property rule ^${rule}`);
     });
   });
 

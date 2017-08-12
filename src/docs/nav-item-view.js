@@ -49,8 +49,6 @@ var NavItemView = /** @lends NavItemView */ {
 
 	/**
 	 * This property is set to true once the view is destroyed.
-	 * ^gmail
-	 * ^inbox
 	 * @type {boolean}
 	 */
 	destroyed: false,
