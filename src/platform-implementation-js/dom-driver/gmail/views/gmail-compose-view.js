@@ -743,7 +743,7 @@ class GmailComposeView {
 	}
 
 	getSendButton(): HTMLElement {
-		return querySelector(this._element, '.IZ .Up > div > [role=button]');
+		return querySelector(this._element, '.IZ .Up > div > [role=button]:not([class*=inboxsdk])');
 	}
 
 	getSendAndArchiveButton(): ?HTMLElement {
