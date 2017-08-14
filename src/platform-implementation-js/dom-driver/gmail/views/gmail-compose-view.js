@@ -522,8 +522,8 @@ class GmailComposeView {
 		sendButton.style.display = 'none';
 
 		const sendAndArchiveParent = sendAndArchive && sendAndArchive.parentElement;
-		if (sendAndArchiveParent) {
-			(sendAndArchiveParent: any).style.display = 'none';
+		if (sendAndArchiveParent instanceof HTMLElement) {
+			sendAndArchiveParent.style.display = 'none';
 		}
 
 		const container = document.createElement('div');
@@ -535,8 +535,8 @@ class GmailComposeView {
 		return () => {
 			container.remove();
 			sendButton.style.display = '';
-			if (sendAndArchiveParent) {
-				(sendAndArchiveParent: any).style.display = '';
+			if (sendAndArchiveParent instanceof HTMLElement) {
+				sendAndArchiveParent.style.display = '';
 			}
 		};
 	}
