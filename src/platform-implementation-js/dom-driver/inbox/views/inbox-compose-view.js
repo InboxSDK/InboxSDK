@@ -509,8 +509,20 @@ class InboxComposeView {
   }
 
   replaceSendButton(el: HTMLElement): () => void {
-    return () => {
+    const {sendBtn} = this._p.elements;
+    if (!sendBtn) throw new Error('Could not locate send button');
 
+    sendBtn.style.display = 'none';
+
+    const container = document.createElement('div');
+		container.classList.add('inboxsdk__compose_customSendContainer');
+		container.appendChild(el);
+
+		sendBtn.insertAdjacentElement('afterend', container);
+
+    return () => {
+      container.remove();
+      sendBtn.style.display = '';
     };
   }
 
