@@ -114,7 +114,7 @@ export default class GmailNavItemView {
 		return gmailNavItemView;
 	}
 
-	setHighlight(value: boolean){
+	_setHighlight(value: boolean){
 		if(!this._element || this._type === NAV_ITEM_TYPES.LINK || this._type === NAV_ITEM_TYPES.MANAGE){
 			return;
 		}
@@ -192,8 +192,13 @@ export default class GmailNavItemView {
 
 		const innerElement = querySelector(this._element, '.TO');
 
-		this._eventStream.plug(Kefir.fromEvents(innerElement, 'mouseenter').map(this._makeEventMapper('mouseenter')));
-		this._eventStream.plug(Kefir.fromEvents(innerElement, 'mouseleave').map(this._makeEventMapper('mouseleave')));
+		Kefir.merge([
+			Kefir.fromEvents(innerElement, 'mouseenter').map(this._makeEventMapper('mouseenter')),
+			Kefir.fromEvents(innerElement, 'mouseleave').map(this._makeEventMapper('mouseleave'))
+		]).onValue((event) => {
+			this._updateHighlight(event);
+		});
+
 		this._eventStream.plug(Kefir.fromEvents(innerElement, 'click').map(this._makeEventMapper('click')));
 	}
 
@@ -207,6 +212,24 @@ export default class GmailNavItemView {
 				domEvent: domEvent
 			};
 		};
+	}
+
+	_updateHighlight({eventName}: {eventName: string}) {
+		switch (eventName) {
+			case 'mouseenter':
+
+				if (this._navItemDescriptor.routeID ||
+						typeof this._navItemDescriptor.onClick === 'function') {
+					this._setHighlight(true);
+				}
+
+				break;
+			case 'mouseleave':
+
+				this._setHighlight(false);
+
+				break;
+		}
 	}
 
 	_updateValues(navItemDescriptor: Object){

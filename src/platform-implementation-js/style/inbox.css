@@ -770,7 +770,7 @@ first-child will do the trick.
   outline: 2px solid transparent;
 }
 
-.inboxsdk__navItem_active > .inboxsdk__navItem {
+.inboxsdk__navItem.inboxsdk__navItem_active {
   background-color: rgba(0,0,0,.05);
   border-radius: 2px;
   color: #212121;
@@ -907,18 +907,18 @@ first-child will do the trick.
   position: relative;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
+.inboxsdk__navItem_accessory > .inboxsdk__button_icon {
   opacity: 0;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem:hover > .inboxsdk__navItem_accessory > .inboxsdk__button_icon,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory.inboxsdk__navItem_active > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
+.inboxsdk__navItem:hover > .inboxsdk__navItem_accessory > .inboxsdk__button_icon,
+.inboxsdk__navItem.inboxsdk__navItem_active > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
   opacity: 0.6;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:hover,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus,
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
+.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:hover,
+.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus,
+.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
   opacity: 1;
 }
 
