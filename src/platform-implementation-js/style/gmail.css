@@ -183,6 +183,17 @@ div.T-I.inboxsdk__button {
   margin-left: 4px;
 }
 
+.inboxsdk__compose_customSendContainer {
+  display: inline-block;
+  position: relative;
+  outline: 0;
+  height: 29px;
+  margin: 6px 0;
+  padding: 0;
+  line-height: 29px;
+  vertical-align: middle;
+}
+
 /* end */
 
 /* appid warning gmail specific parts */
