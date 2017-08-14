@@ -507,6 +507,13 @@ class InboxComposeView {
       simulateClick(toggleCcBccButton);
     }
   }
+
+  replaceSendButton(el: HTMLElement): () => void {
+    return () => {
+
+    };
+  }
+
   close() {
     if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose");

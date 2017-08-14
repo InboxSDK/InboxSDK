@@ -515,6 +515,32 @@ class GmailComposeView {
 		return statusBar;
 	}
 
+	replaceSendButton(el: HTMLElement): () => void {
+		const sendButton = this.getSendButton();
+		const sendAndArchive = this.getSendAndArchiveButton();
+
+		sendButton.style.display = 'none';
+
+		const sendAndArchiveParent = sendAndArchive && sendAndArchive.parentElement;
+		if (sendAndArchiveParent) {
+			(sendAndArchiveParent: any).style.display = 'none';
+		}
+
+		const container = document.createElement('div');
+		container.classList.add('inboxsdk__compose_customSendContainer');
+		container.appendChild(el);
+
+		sendButton.insertAdjacentElement('afterend', container);
+
+		return () => {
+			container.remove();
+			sendButton.style.display = '';
+			if (sendAndArchiveParent) {
+				(sendAndArchiveParent: any).style.display = '';
+			}
+		};
+	}
+
 	close() {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
