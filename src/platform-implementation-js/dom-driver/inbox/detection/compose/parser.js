@@ -44,6 +44,11 @@ function parser(el: HTMLElement) {
     () => querySelectorOne(el, 'button[jsaction$=".discard_draft"]')
   );
 
+  const titleBar = isInline ? null : ec.run(
+    'title bar',
+    () => querySelectorOne(el, 'div[jsaction$=".focus_mole"]')
+  );
+
   const toggleFullscreenButton = isInline ? null : ec.run(
     'fullscreen button',
     () => querySelectorOne(el, 'button[jsaction$=".toggle_full_screen"]')
@@ -110,6 +115,7 @@ function parser(el: HTMLElement) {
     subject,
     popOutBtn,
     discardBtn,
+    titleBar,
     toggleFullscreenButton,
     toggleFullscreenButtonImage,
     closeBtn,

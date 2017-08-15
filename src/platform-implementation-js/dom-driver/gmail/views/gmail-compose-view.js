@@ -976,6 +976,10 @@ class GmailComposeView {
 		}
 	}
 
+	setTitleBarColor(color: string): () => void {
+		return () => {};
+	}
+
 	_triggerDraftSave() {
 		if(this._isTriggeringADraftSavePending){
 			return;
