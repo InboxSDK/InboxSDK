@@ -559,6 +559,19 @@ class InboxComposeView {
       toggleFullscreenButton.click();
     }
   }
+
+  setTitleBarColor(color: string): () => void {
+    const {isInline} = this._p.attributes;
+    if (isInline) throw new Error('Cannot set title bar of inline compose');
+
+    const {titleBar} = this._p.elements;
+    if (!titleBar) throw new Error('Could not locate compose title bar');
+
+    titleBar.style.backgroundColor = color;
+
+    return () => { titleBar.style.backgroundColor = ''; };
+  }
+
   addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
     return RSVP.Promise.resolve({

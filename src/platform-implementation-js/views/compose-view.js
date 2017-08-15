@@ -224,6 +224,10 @@ class ComposeView extends EventEmitter {
 		get(memberMap, this).composeViewImplementation.setMinimized(minimized);
 	}
 
+	setTitleBarColor(color: string): () => void {
+		return get(memberMap, this).composeViewImplementation.setTitleBarColor(color);
+	}
+
 	popOut(): Promise<ComposeView> {
 		get(memberMap, this).composeViewImplementation.popOut();
 		return get(memberMap, this).composeViewStream.take(1).toPromise(RSVP.Promise);

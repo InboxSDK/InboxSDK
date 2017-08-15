@@ -976,6 +976,25 @@ class GmailComposeView {
 		}
 	}
 
+	setTitleBarColor(color: string): () => void {
+		const elementsToModify = [
+			querySelector(this._element, '.nH.Hy.aXJ .pi > .l.o'),
+			querySelector(this._element, '.nH.Hy.aXJ .l.m'),
+			querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n'),
+			querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n > .k')
+		];
+
+		elementsToModify.forEach((el) => {
+			el.style.backgroundColor = color;
+		});
+
+		return () => {
+			elementsToModify.forEach((el) => {
+				el.style.backgroundColor = '';
+			});
+		};
+	}
+
 	_triggerDraftSave() {
 		if(this._isTriggeringADraftSavePending){
 			return;

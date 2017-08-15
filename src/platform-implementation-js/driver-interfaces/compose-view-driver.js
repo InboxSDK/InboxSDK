@@ -50,6 +50,7 @@ export type ComposeViewDriver = {
 	setFullscreen(fullscreen: boolean): void;
 	isMinimized(): boolean;
 	setMinimized(minimized: boolean): void;
+	setTitleBarColor(color: string): () => void;
 	addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Observable<?Object>): () => void;
 	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
