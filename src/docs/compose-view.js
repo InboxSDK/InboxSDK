@@ -265,6 +265,18 @@ var ComposeView = /** @lends ComposeView */ {
 	popOut: function() {},
 
 	/**
+	 * Sets the background color of the title bar for non-inline compose views.
+	 * Will not work for inline compose views (you can check for this via
+	 * {ComposeView.isInlineReplyForm()}). Returns a function which removes
+	 * the custom title bar color when called.
+	 * ^gmail
+	 * ^inbox
+	 * @param  {string} color - A valid CSS color string (rgba, hex, hsla, etc.)
+	 * @return {function}
+	 */
+	setTitleBarColor: function(){},
+
+	/**
 	 * Whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
 	 * You typically will not need to use this.
 	 * ^gmail
