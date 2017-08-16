@@ -532,7 +532,30 @@ class GmailComposeView {
 
 		sendButton.insertAdjacentElement('afterend', container);
 
+		const removalStopper = kefirStopper();
+
+		Kefir.fromEvents(this.getBodyElement(), 'keydown')
+			.takeUntilBy(this._stopper)
+			.takeUntilBy(removalStopper)
+			.filter((domEvent) => domEvent.which === 9 || domEvent.keyCode === 9)
+			.onValue(() => {
+				// Because of the way the compose DOM is structured, the natural
+				// tab order does not flow from the compose body to the status bar.
+				// Gmail modifies this flow programatically by focusing the send button,
+				// so we have replicate this behavior when the native send button isn't
+				// visible.
+				const statusArea = this.getStatusArea();
+				const focusableEls = statusArea.querySelectorAll('[tabindex]');
+				if (focusableEls.length === 0) return;
+
+				const firstVisibleEl = Array.from(focusableEls).find((el) => el.offsetParent !== null);
+				if (!firstVisibleEl) return;
+
+				firstVisibleEl.focus();
+			});
+
 		return () => {
+			removalStopper.destroy();
 			container.remove();
 			sendButton.style.display = '';
 			if (sendAndArchiveParent instanceof HTMLElement) {
