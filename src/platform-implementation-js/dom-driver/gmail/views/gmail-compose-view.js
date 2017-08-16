@@ -548,7 +548,7 @@ class GmailComposeView {
 
 		return () => {
 			discardBtn.style.display = '';
-		}
+		};
 	}
 
 	close() {
