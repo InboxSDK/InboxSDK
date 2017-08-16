@@ -541,6 +541,16 @@ class GmailComposeView {
 		};
 	}
 
+	hideDiscardButton(): () => void {
+		const discardBtn = this.getDiscardButton();
+
+		discardBtn.style.display = 'none';
+
+		return () => {
+			discardBtn.style.display = '';
+		}
+	}
+
 	close() {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
