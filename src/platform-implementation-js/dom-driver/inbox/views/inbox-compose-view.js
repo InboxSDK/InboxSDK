@@ -23,7 +23,6 @@ import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
-import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -523,17 +522,6 @@ class InboxComposeView {
 		sendBtn.insertAdjacentElement('afterend', container);
 
     const removalStopper = kefirStopper();
-
-    fromEventTargetCapture(this._element, 'keydown')
-      .takeUntilBy(this._stopper)
-      .takeUntilBy(removalStopper)
-      .filter(domEvent => domEvent.ctrlKey || domEvent.metaKey)
-      .filter(domEvent => domEvent.which === 13 || domEvent.keyCode === 13)
-      .onValue((domEvent) => {
-        domEvent.preventDefault();
-        domEvent.stopPropagation();
-        domEvent.stopImmediatePropagation();
-      });
 
     return () => {
       removalStopper.destroy();

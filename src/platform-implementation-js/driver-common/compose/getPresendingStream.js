@@ -46,8 +46,15 @@ export default function({
   ]);
 
   return domEventStream
-    .filter(() => !element.hasAttribute('data-inboxsdk-send-replaced'))
-    .map(domEvent => ({
+    .filter((domEvent) => {
+      if (element.hasAttribute('data-inboxsdk-send-replaced')) {
+        domEvent.preventDefault();
+        domEvent.stopPropagation();
+        domEvent.stopImmediatePropagation();
+        return false;
+      }
+      return true;
+    }).map(domEvent => ({
       eventName: 'presending',
       data: {
         cancel() {
