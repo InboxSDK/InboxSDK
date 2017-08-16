@@ -526,6 +526,24 @@ class InboxComposeView {
     };
   }
 
+  hideDiscardButton(): () => void {
+    const {discardBtn} = this._p.elements;
+    if (!discardBtn) throw new Error('Could not locate discard button');
+
+    const discardDivider = discardBtn.previousElementSibling;
+    if (!(discardDivider instanceof HTMLElement)) {
+      throw new Error('Could not locate discard button divider');
+    }
+
+    discardBtn.style.display = 'none';
+    discardDivider.style.display = 'none';
+
+    return () => {
+      discardBtn.style.display = '';
+      discardDivider.style.display = '';
+    };
+  }
+
   close() {
     if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose");

@@ -43,6 +43,7 @@ export type ComposeViewDriver = {
 	discard(): void;
 	popOut(): void;
 	replaceSendButton(el: HTMLElement): () => void;
+	hideDiscardButton(): () => void;
 	registerRequestModifier(modifier: Object): void;
 	attachFiles(files: Blob[]): Promise<void>;
 	attachInlineFiles(files: Blob[]): Promise<void>;
