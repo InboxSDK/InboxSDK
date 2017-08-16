@@ -517,11 +517,16 @@ class InboxComposeView {
     const container = document.createElement('div');
 		container.classList.add('inboxsdk__compose_customSendContainer');
 		container.appendChild(el);
+    this._element.setAttribute('data-inboxsdk-send-replaced', '');
 
 		sendBtn.insertAdjacentElement('afterend', container);
 
+    const removalStopper = kefirStopper();
+
     return () => {
+      removalStopper.destroy();
       container.remove();
+      this._element.removeAttribute('data-inboxsdk-send-replaced');
       sendBtn.style.display = '';
     };
   }
