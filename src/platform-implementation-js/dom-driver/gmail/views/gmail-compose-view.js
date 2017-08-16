@@ -48,6 +48,7 @@ import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
 import censorHTMLstring from '../../../../common/censor-html-string';
+import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 
 import insertLinkIntoBody from './gmail-compose-view/insert-link-into-body';
 import getAddressChangesStream from './gmail-compose-view/get-address-changes-stream';
@@ -531,6 +532,7 @@ class GmailComposeView {
 		container.appendChild(el);
 
 		sendButton.insertAdjacentElement('afterend', container);
+		this._element.setAttribute('data-inboxsdk-send-replaced', '');
 
 		const removalStopper = kefirStopper();
 
@@ -554,9 +556,22 @@ class GmailComposeView {
 				firstVisibleEl.focus();
 			});
 
+			fromEventTargetCapture(this._element, 'keydown')
+				.takeUntilBy(this._stopper)
+				.takeUntilBy(removalStopper)
+				.filter(domEvent => domEvent.ctrlKey || domEvent.metaKey)
+				.filter(domEvent => domEvent.which === 13 || domEvent.keyCode === 13)
+				.onValue((domEvent) => {
+					domEvent.preventDefault();
+					domEvent.stopPropagation();
+					domEvent.stopImmediatePropagation();
+				});
+
 		return () => {
 			removalStopper.destroy();
 			container.remove();
+			this._element.removeAttribute('data-inboxsdk-send-replaced');
+
 			sendButton.style.display = '';
 			if (sendAndArchiveParent instanceof HTMLElement) {
 				sendAndArchiveParent.style.display = '';

@@ -23,7 +23,6 @@ export default function({
   sendButton: HTMLElement,
   sendAndArchive?: ?HTMLElement
 }): Kefir.Observable<Object> {
-
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
       .filter(domEvent => domEvent.ctrlKey || domEvent.metaKey)
@@ -46,15 +45,17 @@ export default function({
       ))
   ]);
 
-  return domEventStream.map(domEvent => ({
-    eventName: 'presending',
-    data: {
-      cancel() {
-        domEvent.preventDefault();
-        domEvent.stopPropagation();
-        domEvent.stopImmediatePropagation();
-        dispatchCancel(element);
+  return domEventStream
+    .filter(() => !element.hasAttribute('data-inboxsdk-send-replaced'))
+    .map(domEvent => ({
+      eventName: 'presending',
+      data: {
+        cancel() {
+          domEvent.preventDefault();
+          domEvent.stopPropagation();
+          domEvent.stopImmediatePropagation();
+          dispatchCancel(element);
+        }
       }
-    }
-  }));
+    }));
 }
