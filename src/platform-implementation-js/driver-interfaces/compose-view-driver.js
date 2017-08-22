@@ -54,6 +54,8 @@ export type ComposeViewDriver = {
 	setTitleBarColor(color: string): () => void;
 	addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object>;
 	addRecipientRow(options: Kefir.Observable<?Object>): () => void;
+	forceRecipientRowsOpen(): () => void;
+	hideNativeRecipientRows(): () => void;
 	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	// addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar;

@@ -445,6 +445,28 @@ class GmailComposeView {
 		return addRecipientRow(this, options);
 	}
 
+	forceRecipientRowsOpen(): () => void {
+		this._element.classList.add('inboxsdk__compose_forceRecipientsOpen');
+
+		return () => {
+			this._element.classList.remove('inboxsdk__compose_forceRecipientsOpen');
+		};
+	}
+
+	hideNativeRecipientRows(): () => void {
+		const nativeRecipientRows = this.getRecipientRowElements();
+
+		nativeRecipientRows.forEach((row) => {
+			row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
+		});
+
+		return () => {
+			nativeRecipientRows.forEach((row) => {
+				row.classList.remove('inboxsdk__compose_forceRecipientRowHidden');
+			});
+		};
+	}
+
 	getFromContact() {
 		return fromManager.getFromContact(this._driver, this);
 	}

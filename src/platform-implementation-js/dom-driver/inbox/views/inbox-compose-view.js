@@ -634,6 +634,12 @@ class InboxComposeView {
   addRecipientRow(options: Kefir.Observable<?Object>): () => void {
     throw new Error("Not implemented");
   }
+  forceRecipientRowsOpen(): () => void {
+    throw new Error("Not implemented");
+  }
+  hideNativeRecipientRows(): () => void {
+    throw new Error("Not implemented");
+  }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {
     throw new Error("Not implemented");
   }
