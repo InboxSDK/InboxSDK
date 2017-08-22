@@ -57,6 +57,7 @@ export type ComposeViewDriver = {
 	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	// addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar;
+	hideNativeStatusBar(): () => void;
 	isReply(): boolean;
 	isInlineReplyForm(): boolean;
 	getBodyElement(): HTMLElement;

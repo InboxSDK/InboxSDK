@@ -643,6 +643,9 @@ class InboxComposeView {
   addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar {
     throw new Error("Not implemented");
   }
+  hideNativeStatusBar(): () => void {
+    throw new Error('Not Implemented');
+  }
   isReply(): boolean {
     if (this._p.attributes.isInline) return true;
     throw new Error("Not implemented");
