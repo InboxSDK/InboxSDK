@@ -4,6 +4,7 @@ import escape from 'lodash/escape';
 import find from 'lodash/find';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
+import closest from 'closest-ng';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -642,7 +643,40 @@ class InboxComposeView {
     return () => {};
   }
   hideNativeRecipientRows(): () => void {
-    throw new Error("Not implemented");
+    const {toInput, ccInput, bccInput} = this._els;
+    if (!(toInput && ccInput && bccInput)) throw new Error('Could not locate recipient inputs');
+
+    const toAncestor = closest(toInput, 'div > button[jsaction$=".toggle_cc_bcc"] + div');
+    const toWrapper = (
+      toAncestor &&
+      toAncestor.parentElement
+    );
+
+    const ccAncestor = closest(ccInput, 'div[class] > label + div[role=list]');
+    const ccWrapper = (
+      ccAncestor &&
+      ccAncestor.parentElement
+    );
+
+    const bccAncestor = closest(bccInput, 'div[class] > label + div[role=list]');
+    const bccWrapper = (
+      bccAncestor &&
+      bccAncestor.parentElement
+    );
+
+    if (!(toWrapper && ccWrapper && bccWrapper)) throw new Error('Could not locate recipient wrappers');
+
+    const rows = [toWrapper, ccWrapper, bccWrapper];
+
+    rows.forEach((row) => {
+      row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
+    });
+
+    return () => {
+      rows.forEach((row) => {
+        row.classList.remove('inboxsdk__compose_forceRecipientRowHidden');
+      });
+    };
   }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {
     throw new Error("Not implemented");

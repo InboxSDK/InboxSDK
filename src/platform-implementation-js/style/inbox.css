@@ -247,6 +247,10 @@
   box-sizing: border-box;
 }
 
+.inboxsdk__compose_forceRecipientRowHidden {
+  display: none !important;
+}
+
 .inboxsdk__list_toolbar > .inboxsdk__button_icon {
   display: inline-block;
   margin-left: 8px;
