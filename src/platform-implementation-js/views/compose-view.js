@@ -83,6 +83,10 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.addStatusBar(statusBarDescriptor);
 	}
 
+	hideNativeStatusBar(): () => void {
+		return get(memberMap, this).composeViewImplementation.hideNativeStatusBar();
+	}
+
 	addRecipientRow(options){
 		return {
 			destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(kefirCast((Kefir: any), options))

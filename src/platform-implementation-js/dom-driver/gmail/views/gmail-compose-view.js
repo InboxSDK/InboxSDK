@@ -515,6 +515,17 @@ class GmailComposeView {
 		return statusBar;
 	}
 
+	hideNativeStatusBar(): () => void {
+		const statusArea = this.getStatusArea();
+		const nativeStatusBar = querySelector(statusArea, 'table');
+
+		nativeStatusBar.style.display = 'none';
+
+		return () => {
+			nativeStatusBar.style.display = '';
+		};
+	}
+
 	replaceSendButton(el: HTMLElement): () => void {
 		const sendButton = this.getSendButton();
 		const sendAndArchive = this.getSendAndArchiveButton();
