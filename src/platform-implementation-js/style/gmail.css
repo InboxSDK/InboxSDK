@@ -465,6 +465,15 @@ div.inboxsdk__compose_statusbar {
   padding: 0px 3px 3px 3px;
 }
 
+.inboxsdk__compose_forceRecipientsOpen .fX.aXjCH {
+  display: block !important;
+}
+
+.inboxsdk__compose_forceRecipientsOpen .aoD.hl,
+.inboxsdk__compose_forceRecipientRowHidden {
+  display: none !important;
+}
+
 /* toolbar visibility */
 
 [data-thread-toolbar=true] [data-rowlist-toolbar=true] {
