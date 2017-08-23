@@ -638,7 +638,8 @@ class InboxComposeView {
     return addRecipientRow(this, options);
   }
   forceRecipientRowsOpen(): () => void {
-    throw new Error("Not implemented");
+    console.warn('ComposeView.forceRecipientRowsOpen() is a no-op in Inbox'); // eslint-disable-line no-console
+    return () => {};
   }
   hideNativeRecipientRows(): () => void {
     throw new Error("Not implemented");
