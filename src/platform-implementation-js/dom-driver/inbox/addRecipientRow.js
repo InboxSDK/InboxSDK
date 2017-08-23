@@ -11,7 +11,7 @@ type Options = {
   el?: ?HTMLElement;
 };
 
-const createRowElement = ({labelText, el}: Object): HTMLElement => {
+const createRowElement = ({labelText, el}: Options): HTMLElement => {
   const row = document.createElement('div');
   const label = document.createElement('span');
   const content = document.createElement('div');
@@ -35,7 +35,7 @@ const createRowElement = ({labelText, el}: Object): HTMLElement => {
 
 export default function addRecipientRow(
   inboxComposeView: InboxComposeView,
-  recipientRowOptionStream: Kefir.Observable<?Object>
+  recipientRowOptionStream: Kefir.Observable<?Options>
 ): () => void {
   let row: ?HTMLElement = null;
 
