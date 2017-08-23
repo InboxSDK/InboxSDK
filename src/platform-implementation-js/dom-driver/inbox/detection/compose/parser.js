@@ -2,6 +2,7 @@
 
 import ErrorCollector from '../../../../lib/ErrorCollector';
 import querySelectorOne from '../../../../lib/dom/querySelectorOne';
+import closest from 'closest-ng';
 
 import {defn} from 'ud';
 
@@ -108,6 +109,54 @@ function parser(el: HTMLElement) {
     () => querySelectorOne(el, 'button[jsaction*=".toggle_cc_bcc"]')
   );
 
+  const toRow = isInline ? null : ec.run(
+    'to row',
+    () => {
+      if (!toInput) throw new Error('Could not locate To input');
+
+      const toInputAncestor = closest(toInput, 'div > button[jsaction$=".toggle_cc_bcc"] + div');
+      const toRow = (
+        toInputAncestor &&
+        toInputAncestor.parentElement
+      );
+      if (!(toRow instanceof HTMLElement)) throw new Error('Could not locate To row');
+
+      return toRow;
+    }
+  );
+
+  const ccRow = isInline ? null : ec.run(
+    'cc row',
+    () => {
+      if (!ccInput) throw new Error('Could not locate CC input');
+
+      const ccInputAncestor = closest(ccInput, 'div[class] > label + div[role=list]');
+      const ccRow = (
+        ccInputAncestor &&
+        ccInputAncestor.parentElement
+      );
+      if (!(ccRow instanceof HTMLElement)) throw new Error('Could not locate CC row');
+
+      return ccRow;
+    }
+  );
+
+  const bccRow = isInline ? null : ec.run(
+    'bcc row',
+    () => {
+      if (!bccInput) throw new Error('Could not locate BCC input');
+
+      const bccInputAncestor = closest(bccInput, 'div[class] > label + div[role=list]');
+      const bccRow = (
+        bccInputAncestor &&
+        bccInputAncestor.parentElement
+      );
+      if (!(bccRow instanceof HTMLElement)) throw new Error('Could not locate BCC row');
+
+      return bccRow;
+    }
+  );
+
   const elements = {
     sendBtn,
     attachBtn,
@@ -125,6 +174,7 @@ function parser(el: HTMLElement) {
     fromPicker,
     fromPickerEmailSpan,
     toInput, ccInput, bccInput,
+    toRow, ccRow, bccRow,
     toggleCcBccButton
   };
   const score = 1 - (ec.errorCount() / ec.runCount());

@@ -11,20 +11,6 @@ type Options = {
   el?: ?HTMLElement;
 };
 
-const getInsertionPoint = (inboxComposeView) => {
-  const bccInput = inboxComposeView.getBCCInput();
-  if (!bccInput) throw new Error('Could not locate BCC input');
-
-  const bccAncestor = closest(bccInput, 'div[class] > label + div[role=list]');
-  const bccWrapper = (
-    bccAncestor &&
-    bccAncestor.parentElement
-  );
-  if (!bccWrapper) throw new Error('Could not locate BCC field wrapper');
-
-  return bccWrapper;
-};
-
 const createRowElement = ({labelText, el}: Object): HTMLElement => {
   const row = document.createElement('div');
   const label = document.createElement('span');
@@ -53,7 +39,7 @@ export default function addRecipientRow(
 ): () => void {
   let row: ?HTMLElement = null;
 
-  const insertionPoint = getInsertionPoint(inboxComposeView);
+  const insertionPoint = inboxComposeView.getBCCRow();
   const destroyStopper = kefirStopper();
 
   recipientRowOptionStream

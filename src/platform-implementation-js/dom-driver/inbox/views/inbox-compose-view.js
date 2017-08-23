@@ -643,30 +643,9 @@ class InboxComposeView {
     return () => {};
   }
   hideNativeRecipientRows(): () => void {
-    const {toInput, ccInput, bccInput} = this._els;
-    if (!(toInput && ccInput && bccInput)) throw new Error('Could not locate recipient inputs');
+    if (this._p.attributes.isInline) throw new Error('Cannot hide recipient rows on inline compose views');
 
-    const toAncestor = closest(toInput, 'div > button[jsaction$=".toggle_cc_bcc"] + div');
-    const toWrapper = (
-      toAncestor &&
-      toAncestor.parentElement
-    );
-
-    const ccAncestor = closest(ccInput, 'div[class] > label + div[role=list]');
-    const ccWrapper = (
-      ccAncestor &&
-      ccAncestor.parentElement
-    );
-
-    const bccAncestor = closest(bccInput, 'div[class] > label + div[role=list]');
-    const bccWrapper = (
-      bccAncestor &&
-      bccAncestor.parentElement
-    );
-
-    if (!(toWrapper && ccWrapper && bccWrapper)) throw new Error('Could not locate recipient wrappers');
-
-    const rows = [toWrapper, ccWrapper, bccWrapper];
+    const rows = [this.getToRow(), this.getCCRow(), this.getBCCRow()];
 
     rows.forEach((row) => {
       row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
@@ -726,8 +705,25 @@ class InboxComposeView {
     return this._els.subject;
   }
 
-  getBCCInput(): ?HTMLInputElement {
-    return this._els.bccInput;
+  getToRow(): HTMLElement {
+    const {toRow} = this._els;
+    if (!toRow) throw new Error('Could not locate To row');
+
+    return toRow;
+  }
+
+  getCCRow(): HTMLElement {
+    const {ccRow} = this._els;
+    if (!ccRow) throw new Error('Could not locate CC row');
+
+    return ccRow;
+  }
+
+  getBCCRow(): HTMLElement {
+    const {bccRow} = this._els;
+    if (!bccRow) throw new Error('Could not locate BCC row');
+
+    return bccRow;
   }
 
   getBodyElement(): HTMLElement {
