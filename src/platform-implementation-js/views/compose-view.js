@@ -89,7 +89,7 @@ class ComposeView extends EventEmitter {
 
 	addRecipientRow(options){
 		return {
-			destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(kefirCast((Kefir: any), options))
+			destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(kefirCast(Kefir, options))
 		};
 	}
 

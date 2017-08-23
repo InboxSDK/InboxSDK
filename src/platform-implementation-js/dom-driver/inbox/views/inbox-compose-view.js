@@ -23,6 +23,7 @@ import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
+import addRecipientRow from '../addRecipientRow';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -632,7 +633,9 @@ class InboxComposeView {
     return div;
   }
   addRecipientRow(options: Kefir.Observable<?Object>): () => void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error('Cannot add recipient rows to inline compose views');
+
+    return addRecipientRow(this, options);
   }
   forceRecipientRowsOpen(): () => void {
     throw new Error("Not implemented");
@@ -686,6 +689,10 @@ class InboxComposeView {
 
   getSubjectInput(): ?HTMLInputElement {
     return this._els.subject;
+  }
+
+  getBCCInput(): ?HTMLInputElement {
+    return this._els.bccInput;
   }
 
   getBodyElement(): HTMLElement {

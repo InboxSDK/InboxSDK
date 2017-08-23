@@ -217,6 +217,36 @@
   line-height: 2.8;
 }
 
+.inboxsdk__recipient_row {
+  padding: 0 20px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+
+.inboxsdk__recipient_row > .inboxsdk__recipient_label {
+  color: #757575;
+  display: inline-block;
+  padding-right: 6px;
+  padding-top: 9px;
+  min-width: 34px;
+  -webkit-flex-grow: 0;
+  flex-grow: 0;
+}
+
+.inboxsdk__recipient_row > .inboxsdk__recipient_content {
+  display: flex;
+  -webkit-flex: 1;
+  flex: 1;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  position: relative;
+  padding: 7px 0;
+  min-height: 35px;
+  box-sizing: border-box;
+}
+
 .inboxsdk__list_toolbar > .inboxsdk__button_icon {
   display: inline-block;
   margin-left: 8px;
