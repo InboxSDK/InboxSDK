@@ -31,7 +31,7 @@ const createRowElement = ({labelText, el}: Options): HTMLElement => {
   }
 
   return row;
-}
+};
 
 export default function addRecipientRow(
   inboxComposeView: InboxComposeView,
