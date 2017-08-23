@@ -57,7 +57,7 @@ export default function addRecipientRow(
       }
     });
 
-    destroyStopper.takeUntilBy(inboxComposeView.getStopper()).onValue(() => {
+    destroyStopper.merge(inboxComposeView.getStopper()).take(1).onValue(() => {
       if (row) {
         row.remove();
         row = null;
