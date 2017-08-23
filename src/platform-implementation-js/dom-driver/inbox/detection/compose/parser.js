@@ -130,7 +130,7 @@ function parser(el: HTMLElement) {
     () => {
       if (!ccInput) throw new Error('Could not locate CC input');
 
-      const ccInputAncestor = closest(ccInput, 'div[class] > label + div[role=list]');
+      const ccInputAncestor = closest(ccInput, 'div[class] > label + div');
       const ccRow = (
         ccInputAncestor &&
         ccInputAncestor.parentElement
@@ -146,7 +146,7 @@ function parser(el: HTMLElement) {
     () => {
       if (!bccInput) throw new Error('Could not locate BCC input');
 
-      const bccInputAncestor = closest(bccInput, 'div[class] > label + div[role=list]');
+      const bccInputAncestor = closest(bccInput, 'div[class] > label + div');
       const bccRow = (
         bccInputAncestor &&
         bccInputAncestor.parentElement
