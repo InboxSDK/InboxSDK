@@ -4,6 +4,7 @@ import escape from 'lodash/escape';
 import find from 'lodash/find';
 import {defn} from 'ud';
 import RSVP from 'rsvp';
+import closest from 'closest-ng';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -23,6 +24,7 @@ import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
+import addRecipientRow from '../addRecipientRow';
 import type InboxDriver from '../inbox-driver';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import InboxComposeButtonView from './inbox-compose-button-view';
@@ -632,13 +634,28 @@ class InboxComposeView {
     return div;
   }
   addRecipientRow(options: Kefir.Observable<?Object>): () => void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error('Cannot add recipient rows to inline compose views');
+
+    return addRecipientRow(this, options);
   }
   forceRecipientRowsOpen(): () => void {
-    throw new Error("Not implemented");
+    console.warn('ComposeView.forceRecipientRowsOpen() is a no-op in Inbox'); // eslint-disable-line no-console
+    return () => {};
   }
   hideNativeRecipientRows(): () => void {
-    throw new Error("Not implemented");
+    if (this._p.attributes.isInline) throw new Error('Cannot hide recipient rows on inline compose views');
+
+    const rows = [this.getToRow(), this.getCCRow(), this.getBCCRow()];
+
+    rows.forEach((row) => {
+      row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
+    });
+
+    return () => {
+      rows.forEach((row) => {
+        row.classList.remove('inboxsdk__compose_forceRecipientRowHidden');
+      });
+    };
   }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {
     throw new Error("Not implemented");
@@ -686,6 +703,27 @@ class InboxComposeView {
 
   getSubjectInput(): ?HTMLInputElement {
     return this._els.subject;
+  }
+
+  getToRow(): HTMLElement {
+    const {toRow} = this._els;
+    if (!toRow) throw new Error('Could not locate To row');
+
+    return toRow;
+  }
+
+  getCCRow(): HTMLElement {
+    const {ccRow} = this._els;
+    if (!ccRow) throw new Error('Could not locate CC row');
+
+    return ccRow;
+  }
+
+  getBCCRow(): HTMLElement {
+    const {bccRow} = this._els;
+    if (!bccRow) throw new Error('Could not locate BCC row');
+
+    return bccRow;
   }
 
   getBodyElement(): HTMLElement {
