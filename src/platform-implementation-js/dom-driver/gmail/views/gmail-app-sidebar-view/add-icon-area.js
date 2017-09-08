@@ -11,7 +11,7 @@ const TAB_LIST_SELECTOR = '.J-KU-Jg';
 
 function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement, stopper: Kefir.Observable<*>){
   const tabList = addonSidebarContainerEl.querySelector('[role=tablist]');
-  const loadingHolderAsAny: any = querySelector(addonSidebarContainerEl, '.bqI').parentElement;
+  const loadingHolderAsAny: any = addonSidebarContainerEl.firstElementChild;
   const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
   if(!loadingHolder) return;
 
