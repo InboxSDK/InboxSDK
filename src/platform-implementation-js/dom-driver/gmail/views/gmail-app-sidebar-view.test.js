@@ -91,7 +91,6 @@ describe('With new add-ons html', function(){
   });
 
   it('sidebar is added', async () => {
-    debugger;
     const sidebarContainer = makeAddonSidebarWithV2HTML();
     const gmailAppSidebarView =
       new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
