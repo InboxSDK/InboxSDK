@@ -1050,6 +1050,7 @@ class GmailComposeView {
 	}
 
 	setTitleBarColor(color: string): () => void {
+		const buttonParent = querySelector(this._element, '.nH.Hy.aXJ table.cf.Ht td.Hm');
 		const elementsToModify = [
 			querySelector(this._element, '.nH.Hy.aXJ .pi > .l.o'),
 			querySelector(this._element, '.nH.Hy.aXJ .l.m'),
@@ -1057,11 +1058,15 @@ class GmailComposeView {
 			querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n > .k')
 		];
 
+		buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
+
 		elementsToModify.forEach((el) => {
 			el.style.backgroundColor = color;
 		});
 
 		return () => {
+			buttonParent.classList.remove('inboxsdk__compose_customTitleBarColor');
+
 			elementsToModify.forEach((el) => {
 				el.style.backgroundColor = '';
 			});
