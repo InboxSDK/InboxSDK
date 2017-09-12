@@ -540,11 +540,23 @@ class GmailComposeView {
 	hideNativeStatusBar(): () => void {
 		const statusArea = this.getStatusArea();
 		const nativeStatusBar = querySelector(statusArea, 'table');
+		const formattingToolbar = this.getFormattingToolbar();
+		const isFormattingToolbarOpen = (
+			formattingToolbar && formattingToolbar.style.display !== 'none'
+		);
 
 		nativeStatusBar.style.display = 'none';
 
+		if (formattingToolbar && isFormattingToolbarOpen) {
+			formattingToolbar.style.display = 'none';
+		}
+
 		return () => {
 			nativeStatusBar.style.display = '';
+
+			if (formattingToolbar && isFormattingToolbarOpen) {
+				formattingToolbar.style.display = '';
+			}
 		};
 	}
 
