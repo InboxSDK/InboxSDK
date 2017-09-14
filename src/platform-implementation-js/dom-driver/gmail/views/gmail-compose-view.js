@@ -540,11 +540,23 @@ class GmailComposeView {
 	hideNativeStatusBar(): () => void {
 		const statusArea = this.getStatusArea();
 		const nativeStatusBar = querySelector(statusArea, 'table');
+		const formattingToolbar = this.getFormattingToolbar();
+		const isFormattingToolbarOpen = (
+			formattingToolbar && formattingToolbar.style.display !== 'none'
+		);
 
 		nativeStatusBar.style.display = 'none';
 
+		if (formattingToolbar && isFormattingToolbarOpen) {
+			formattingToolbar.style.display = 'none';
+		}
+
 		return () => {
 			nativeStatusBar.style.display = '';
+
+			if (formattingToolbar && isFormattingToolbarOpen) {
+				formattingToolbar.style.display = '';
+			}
 		};
 	}
 
@@ -1050,6 +1062,7 @@ class GmailComposeView {
 	}
 
 	setTitleBarColor(color: string): () => void {
+		const buttonParent = querySelector(this._element, '.nH.Hy.aXJ table.cf.Ht td.Hm');
 		const elementsToModify = [
 			querySelector(this._element, '.nH.Hy.aXJ .pi > .l.o'),
 			querySelector(this._element, '.nH.Hy.aXJ .l.m'),
@@ -1057,11 +1070,15 @@ class GmailComposeView {
 			querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n > .k')
 		];
 
+		buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
+
 		elementsToModify.forEach((el) => {
 			el.style.backgroundColor = color;
 		});
 
 		return () => {
+			buttonParent.classList.remove('inboxsdk__compose_customTitleBarColor');
+
 			elementsToModify.forEach((el) => {
 				el.style.backgroundColor = '';
 			});

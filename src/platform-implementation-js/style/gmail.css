@@ -194,6 +194,12 @@ div.T-I.inboxsdk__button {
   vertical-align: middle;
 }
 
+.inboxsdk__compose_customTitleBarColor > img.Hl,
+.inboxsdk__compose_customTitleBarColor > img.Hq,
+.inboxsdk__compose_customTitleBarColor > img.Ha {
+  background-color: transparent !important;
+}
+
 .inboxsdk__compose_hasCustomTitleBarText,
 .inboxsdk__compose_hasCustomTitleBarText > tbody > tr {
   display: -webkit-flex;
