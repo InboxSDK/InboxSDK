@@ -866,7 +866,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 /* hide the native addon loading div */
-.IDMAP_app_sidebar_in_use > div:first-child {
+.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use > div:first-child {
   display: none !important;
 }
 
