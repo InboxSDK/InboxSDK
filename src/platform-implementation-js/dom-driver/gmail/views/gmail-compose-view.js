@@ -1069,6 +1069,10 @@ class GmailComposeView {
 	}
 
 	setTitleBarText(text: string): () => void {
+		if (this.isInlineReplyForm()) {
+			throw new Error('setTitleBarText() is not supported on inline compose views');
+		}
+
 		const titleBarTable = querySelector(
 			this._element,
 			'.nH.Hy.aXJ table.cf.Ht'
