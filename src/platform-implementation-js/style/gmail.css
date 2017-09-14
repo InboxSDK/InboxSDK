@@ -227,6 +227,14 @@ div.T-I.inboxsdk__button {
   margin-left: auto;
 }
 
+.inboxsdk__compose_statusBarPrependContainer {
+  border-top: 1px solid #cfcfcf;
+}
+
+.inboxsdk__compose_statusBarPrependContainer + table td.gU {
+  border-top: none;
+}
+
 /* end */
 
 /* appid warning gmail specific parts */
