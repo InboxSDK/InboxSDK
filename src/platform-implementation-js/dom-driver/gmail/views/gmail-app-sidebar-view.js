@@ -114,11 +114,14 @@ class GmailAppSidebarView {
         // Give it some content temporarily to check if it becomes sized to show it.
         _addonSidebarContainerEl.classList.add('app_sidebar_visible');
         _addonSidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
+        contentContainer.classList.add('container_app_sidebar_visible');
+
         el.textContent = 'x';
         const elRect = el.getBoundingClientRect();
         el.textContent = '';
         // This gets re-added later once the panel has some content to show
         _addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+        contentContainer.classList.remove('container_app_sidebar_visible');
 
         const supportedScreenSize = window.innerWidth >= 1024 && window.innerHeight >= 600;
         if (!global._APP_SIDEBAR_TEST && (
@@ -150,7 +153,7 @@ class GmailAppSidebarView {
         }
 
         if (!usedAddonsSidebar) {
-          contentContainer.classList.remove('container_app_sidebar_in_use');
+          if(contentContainer) contentContainer.classList.remove('container_app_sidebar_in_use');
           _addonSidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
         }
       }
@@ -232,6 +235,7 @@ class GmailAppSidebarView {
         contentContainer = mainContentBodyContainerElement.parentElement;
         if(contentContainer) {
           contentContainer.classList.remove('container_app_sidebar_in_use');
+          contentContainer.classList.remove('container_app_sidebar_visible');
         }
       }
     });
@@ -313,11 +317,13 @@ class GmailAppSidebarView {
 
               if(activeButtonContainer === container) {
                 addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+                if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
                 this._setShouldAppSidebarOpen(false);
               }
               else {
                 addonSidebarContainerEl.classList.add('app_sidebar_visible');
                 container.classList.add('sidebar_button_container_active');
+                if(contentContainer) contentContainer.classList.add('container_app_sidebar_visible');
 
                 this._setShouldAppSidebarOpen(true);
 
@@ -365,6 +371,7 @@ class GmailAppSidebarView {
               if(!activeButtonContainer){
                 container.classList.add('sidebar_button_container_active');
                 addonSidebarContainerEl.classList.add('app_sidebar_visible');
+                if(contentContainer) contentContainer.classList.add('container_app_sidebar_visible');
 
                 //fake resize to get gmail to fix any heights that are messed up
                 fakeWindowResize();
@@ -425,6 +432,7 @@ class GmailAppSidebarView {
             buttonContainers.delete(appName);
             if(container === activeButtonContainer){
               addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+              if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
               this._setShouldAppSidebarOpen(false);
             }
           } else if (currentCount === 2) {
@@ -445,23 +453,30 @@ class GmailAppSidebarView {
           makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['style']})
             .toProperty(() => null)
             .map(() => el.style.display !== 'none')
-            .filter(Boolean)
         )
         .takeUntilBy(this._stopper)
-        .onValue(() => {
-          // we need to suppress this sidebar from loading
-          if(activatedWhileLoading){
-            const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
-            if(activeAddOnIcon) simulateClick(activeAddOnIcon);
-            return;
+        .onValue((isDisplayingGmailAddonSidebar) => {
+          if(isDisplayingGmailAddonSidebar){
+            if(contentContainer) contentContainer.classList.add('container_addon_sidebar_visible');
+
+            // we need to suppress this sidebar from loading
+            if(activatedWhileLoading){
+              const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
+              if(activeAddOnIcon) simulateClick(activeAddOnIcon);
+              return;
+            }
+
+            this._setShouldAppSidebarOpen(false);
+
+            const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
+            if(activeButtonContainer){
+              addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+              activeButtonContainer.classList.remove('sidebar_button_container_active');
+              if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
+            }
           }
-
-          this._setShouldAppSidebarOpen(false);
-
-          const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
-          if(activeButtonContainer){
-            addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-            activeButtonContainer.classList.remove('sidebar_button_container_active');
+          else {
+            if(contentContainer) contentContainer.classList.remove('container_addon_sidebar_visible');
           }
         });
     }
