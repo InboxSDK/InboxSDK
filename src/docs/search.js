@@ -136,7 +136,7 @@ var SearchQueryRewriter = /** @lends SearchQueryRewriter */ {
 	term: null,
 
 	/**
-	* A function which takes returns a String (or Promise) with the query to actually perform.
+	* A function which returns a String (or Promise for a string) to replace the specified term in the search query.
 	* @type {function}
 	*/
 	termReplacer: null
