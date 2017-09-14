@@ -1085,6 +1085,48 @@ class GmailComposeView {
 		};
 	}
 
+	setTitleBarText(text: string): () => void {
+		if (this.isInlineReplyForm()) {
+			throw new Error('setTitleBarText() is not supported on inline compose views');
+		}
+
+		const titleBarTable = querySelector(
+			this._element,
+			'.nH.Hy.aXJ table.cf.Ht'
+		);
+
+		if (titleBarTable.classList.contains('inboxsdk__compose_hasCustomTitleBarText')) {
+			throw new Error('Custom title bar text is already registered for this compose view');
+		}
+
+		const titleTextParent = querySelector(titleBarTable, 'div.Hp').parentElement;
+		if (!(titleTextParent instanceof HTMLElement)) {
+			throw new Error('Could not locate title bar text parent');
+		}
+
+		titleBarTable.classList.add('inboxsdk__compose_hasCustomTitleBarText');
+		titleTextParent.classList.add('inboxsdk__compose_nativeTitleBarText');
+
+		const customTitleText = document.createElement('td');
+		customTitleText.classList.add('inboxsdk__compose_customTitleBarText');
+		customTitleText.innerHTML = `
+			<div class="Hp">
+				<h2 class="a3E">
+					<div class="aYF">${text}</div>
+				</h2>
+			</div>
+		`;
+
+		titleTextParent.insertAdjacentElement('afterend', customTitleText);
+
+		return () => {
+			customTitleText.remove();
+
+			titleBarTable.classList.remove('inboxsdk__compose_hasCustomTitleBarText');
+			titleTextParent.classList.remove('inboxsdk__compose_nativeTitleBarText');
+		};
+	}
+
 	_triggerDraftSave() {
 		if(this._isTriggeringADraftSavePending){
 			return;

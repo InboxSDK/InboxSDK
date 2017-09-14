@@ -200,6 +200,33 @@ div.T-I.inboxsdk__button {
   background-color: transparent !important;
 }
 
+.inboxsdk__compose_hasCustomTitleBarText,
+.inboxsdk__compose_hasCustomTitleBarText > tbody > tr {
+  display: -webkit-flex;
+  display: flex;
+}
+
+.inboxsdk__compose_hasCustomTitleBarText > tbody > tr {
+  align-items: center;
+}
+
+.inboxsdk__compose_hasCustomTitleBarText > tbody {
+  width: 100%;
+}
+
+.inboxsdk__compose_nativeTitleBarText {
+  display: none !important;
+}
+
+.inboxsdk__compose_customTitleBarText {
+  width: calc(100% - 80px);
+}
+
+.inboxsdk__compose_hasCustomTitleBarText td.Hm {
+  margin-right: 10px;
+  margin-left: auto;
+}
+
 /* end */
 
 /* appid warning gmail specific parts */
