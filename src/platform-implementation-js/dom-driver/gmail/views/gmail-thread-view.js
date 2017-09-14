@@ -150,6 +150,8 @@ class GmailThreadView {
 	_setupToolbarView() {
 		const toolbarElement = this._findToolbarElement();
 		if (!toolbarElement) throw new Error("No toolbar element found");
+		const toolbarParent = toolbarElement.parentElement;
+		if(toolbarParent) toolbarParent.classList.add('inboxsdk__thread_toolbar_parent');
 
 		this._toolbarView = new GmailToolbarView(toolbarElement, this._driver, this._routeViewDriver, this);
 	}

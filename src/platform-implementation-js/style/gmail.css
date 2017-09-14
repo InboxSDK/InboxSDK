@@ -807,17 +807,17 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
    to line up properly */
 
 /* when no siebar is visible */
-.container_app_sidebar_in_use.no .G-atb {
+.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
   margin-right: -57px !important;
 }
 
 /* when addon sidebar visible */
-.container_addon_sidebar_visible.container_app_sidebar_in_use.no .G-atb {
+.container_addon_sidebar_visible.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
   margin-right: -321px !important;
 }
 
 /* when sdk sidebar visible */
-.container_app_sidebar_visible.container_app_sidebar_in_use.no .G-atb {
+.container_app_sidebar_visible.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
   margin-right: -321px !important;
 }
 
