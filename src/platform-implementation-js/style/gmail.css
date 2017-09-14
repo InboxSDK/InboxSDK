@@ -194,6 +194,12 @@ div.T-I.inboxsdk__button {
   vertical-align: middle;
 }
 
+.inboxsdk__compose_customTitleBarColor > img.Hl,
+.inboxsdk__compose_customTitleBarColor > img.Hq,
+.inboxsdk__compose_customTitleBarColor > img.Ha {
+  background-color: transparent !important;
+}
+
 /* end */
 
 /* appid warning gmail specific parts */
