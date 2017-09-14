@@ -519,13 +519,16 @@ class GmailComposeView {
 	// 	require('./gmail-compose-view/add-inner-sidebar')(this, options);
 	// }
 
-	addStatusBar(options: {height?: number, orderHint?: number}={}): StatusBar {
-		var statusBar = addStatusBar(this, options);
+	addStatusBar(
+		options: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean} = {}
+	): StatusBar {
+		const statusBar = addStatusBar(this, options);
+
 		this._element.dispatchEvent(new CustomEvent('resize', {
 			bubbles: false, cancelable: false, detail: null
 		}));
+
 		Kefir.fromEvents(statusBar, 'destroy')
-			.map(() => ({eventName:'statusBarRemoved'}))
 			.flatMap(delayAsap)
 			.takeUntilBy(this._stopper)
 			.onValue(() => {

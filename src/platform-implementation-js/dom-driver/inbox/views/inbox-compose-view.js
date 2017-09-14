@@ -667,7 +667,7 @@ class InboxComposeView {
   addInnerSidebar(options: {el: HTMLElement}): void {
     throw new Error("Not implemented");
   }
-  addStatusBar(options?: {height?: number, orderHint?: number}): StatusBar {
+  addStatusBar(options?: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}): StatusBar {
     throw new Error("Not implemented");
   }
   hideNativeStatusBar(): () => void {
