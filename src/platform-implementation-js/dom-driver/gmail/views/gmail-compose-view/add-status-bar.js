@@ -8,26 +8,45 @@ import SafeEventEmitter from '../../../../lib/safe-event-emitter';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function addStatusBar(gmailComposeView: GmailComposeView, options: Object) {
-	const height: number = options.height || 40;
-	const orderHint: number = options.orderHint || 0;
+export default function addStatusBar(
+	gmailComposeView: GmailComposeView,
+	options: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}
+) {
+	const {height, orderHint, addAboveNativeStatusBar} = {
+		height: 40,
+		orderHint: 0,
+		addAboveNativeStatusBar: false,
+		...options
+	};
 
+	let prependContainer;
 	const composeEl = gmailComposeView.getElement();
 	const isInline = gmailComposeView.isInlineReplyForm();
-	const el: HTMLElement = document.createElement('div');
+	const el = document.createElement('div');
 	el.className = 'aDh inboxsdk__compose_statusbar';
 	el.setAttribute('data-order-hint', String(orderHint));
-	el.style.height = height+'px';
+	el.style.height = height + 'px';
 
 	try {
 		const statusArea = gmailComposeView.getStatusArea();
 		composeEl.classList.add('inboxsdk__compose_statusbarActive');
 
-		insertElementInOrder(statusArea, el);
+		if (addAboveNativeStatusBar) {
+			prependContainer = (
+				statusArea.querySelector('.inboxsdk__compose_statusBarPrependContainer') ||
+				document.createElement('div')
+			);
+			prependContainer.classList.add('inboxsdk__compose_statusBarPrependContainer');
+			statusArea.insertAdjacentElement('afterbegin', prependContainer);
+
+			insertElementInOrder(prependContainer, el);
+		} else {
+			insertElementInOrder(statusArea, el);
+		}
 
 		if (isInline) {
 			const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-			composeEl.style.paddingBottom = (currentPad+height)+'px';
+			composeEl.style.paddingBottom = (currentPad + height) + 'px';
 		}
 	} catch (err) {
 		Logger.error(err);
@@ -39,16 +58,26 @@ export default function addStatusBar(gmailComposeView: GmailComposeView, options
 		destroy: once(() => {
 			statusbar.destroyed = true;
 			statusbar.emit('destroy');
-			(el:any).remove();
+			el.remove();
+
+			if (
+				addAboveNativeStatusBar &&
+				prependContainer &&
+				prependContainer.children.length === 0
+			) {
+				prependContainer.remove();
+			}
 
 			if (isInline) {
 				const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-				composeEl.style.paddingBottom = (currentPad-height)+'px';
+				composeEl.style.paddingBottom = (currentPad - height) + 'px';
 			}
 		})
 	});
+
 	gmailComposeView.getStopper()
 		.takeUntilBy(Kefir.fromEvents(statusbar, 'destroy'))
 		.onValue(statusbar.destroy);
+
 	return statusbar;
 }
