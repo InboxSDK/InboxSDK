@@ -771,10 +771,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 216px !important;
 }
 
-.IDMAP_app_sidebar_in_use > div[role=tablist] {
-  height: auto !important;
-}
-
 .IDMAP_app_sidebar_in_use {
   /* Necessary to prevent z-indexes on sidebar items from causing them to show
   above stuff outside of the sidebar. */
@@ -807,6 +803,24 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100%;
 }
 
+/* overwrite margin right of the gmail page next/back and settings icon buttons
+   to line up properly */
+
+/* when no siebar is visible */
+.container_app_sidebar_in_use.no .G-atb {
+  margin-right: -57px !important;
+}
+
+/* when addon sidebar visible */
+.container_addon_sidebar_visible.container_app_sidebar_in_use.no .G-atb {
+  margin-right: -321px !important;
+}
+
+/* when sdk sidebar visible */
+.container_app_sidebar_visible.container_app_sidebar_in_use.no .G-atb {
+  margin-right: -321px !important;
+}
+
 .container_app_sidebar_in_use .bkK.nn {
   width: auto !important;
   flex: 1;
@@ -815,13 +829,13 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use {
-  min-width: 56px !important;
+  min-width: 57px !important;
   flex-shrink: 0;
   -webkit-flex-shrink: 0;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible {
-  min-width: 336px !important;
+  min-width: 321px !important;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use > .J-KU-Jg {
@@ -835,14 +849,15 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
   display: block;
   float: left;
-  margin-left: 16px;
   height: 100%;
   overflow: auto;
+  border-left: 1px solid #e0e0e0;
+  padding-left: 16px;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
-  width: 254px;
-  margin-right: 10px;
+  width: 237px;
+  padding-right: 10px;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .J-KU-Jz {
@@ -850,8 +865,14 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   padding-right: 50px;
 }
 
-.IDMAP_app_sidebar_in_use.app_sidebar_visible > div:first-child {
-  float: right;
+/* hide the native addon loading div */
+.IDMAP_app_sidebar_in_use > div:first-child {
+  display: none !important;
+}
+
+/* remove extraneous left border from our clone of the addon loading div */
+.IDMAP_app_sidebar_in_use .inboxsdk__addon_icon_loading > div {
+  border-left: none !important;
 }
 
 .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
