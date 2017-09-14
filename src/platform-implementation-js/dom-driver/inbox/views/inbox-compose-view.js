@@ -597,6 +597,10 @@ class InboxComposeView {
     return () => { titleBar.style.backgroundColor = ''; };
   }
 
+  setTitleBarText(text: string): () => void {
+    throw new Error('Not supported in Inbox');
+  }
+
   addButton(buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object): Promise<?Object> {
     var buttonViewController = new InboxComposeButtonView(this, buttonDescriptor, groupOrderHint, extraOnClickOptions);
     return RSVP.Promise.resolve({
