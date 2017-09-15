@@ -586,8 +586,10 @@ class GmailComposeView {
 		Kefir.fromEvents(this.getBodyElement(), 'keydown')
 			.takeUntilBy(this._stopper)
 			.takeUntilBy(removalStopper)
-			.filter((domEvent) => domEvent.which === 9 || domEvent.keyCode === 9)
-			.onValue((domEvent) => {
+			.filter((domEvent) => (
+				(domEvent.which === 9 || domEvent.keyCode === 9) &&
+				!domEvent.shiftKey
+			)).onValue((domEvent) => {
 				// Because of the way the compose DOM is structured, the natural
 				// tab order does not flow from the compose body to the status bar.
 				// Gmail modifies this flow programatically by focusing the send button,
