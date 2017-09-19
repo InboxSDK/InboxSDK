@@ -20,12 +20,13 @@ export default function addStatusBar(
 	};
 
 	let prependContainer;
+	let currentHeight = height;
 	const composeEl = gmailComposeView.getElement();
 	const isInline = gmailComposeView.isInlineReplyForm();
 	const el = document.createElement('div');
 	el.className = 'aDh inboxsdk__compose_statusbar';
 	el.setAttribute('data-order-hint', String(orderHint));
-	el.style.height = height + 'px';
+	el.style.height = currentHeight + 'px';
 
 	try {
 		const statusArea = gmailComposeView.getStatusArea();
@@ -46,7 +47,7 @@ export default function addStatusBar(
 
 		if (isInline) {
 			const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-			composeEl.style.paddingBottom = (currentPad + height) + 'px';
+			composeEl.style.paddingBottom = (currentPad + currentHeight) + 'px';
 		}
 	} catch (err) {
 		Logger.error(err);
@@ -70,9 +71,17 @@ export default function addStatusBar(
 
 			if (isInline) {
 				const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
-				composeEl.style.paddingBottom = (currentPad - height) + 'px';
+				composeEl.style.paddingBottom = (currentPad - currentHeight) + 'px';
 			}
-		})
+		}),
+		setHeight: (newHeight: number) => {
+			el.style.height = newHeight + 'px';
+			if (isInline) {
+				const currentPad = parseInt(composeEl.style.paddingBottom, 10) || 0;
+				composeEl.style.paddingBottom = ((currentPad - currentHeight) + newHeight) + 'px';
+			}
+			currentHeight = newHeight;
+		}
 	});
 
 	gmailComposeView.getStopper()
