@@ -284,10 +284,9 @@ class InboxDrawerView {
 
     const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView, closeWithCompose);
 
-    if (this._backdrop) {
-      insertionTarget.appendChild(this._backdrop.getElement());
-    }
-    insertionTarget.appendChild(this._containerEl);
+    if (this._backdrop) insertionTarget.appendChild(this._backdrop.getElement());
+    if (this._containerEl.parentElement !== insertionTarget) insertionTarget.appendChild(this._containerEl);
+
 
     const composeNeedToMoveLeft = this._setupComposeAnimation(composeView, composeRect, false);
     this._positionCompose(composeView, composeNeedToMoveLeft);
