@@ -649,8 +649,14 @@ class GmailComposeView {
 		}
 	}
 
-	send() {
-		simulateClick(this.getSendButton());
+	send({sendAndArchive}: {sendAndArchive: boolean}) {
+		const sendAndArchiveButton = this.getSendAndArchiveButton();
+
+		if (sendAndArchive && sendAndArchiveButton) {
+			simulateClick(sendAndArchiveButton);
+		} else {
+			simulateClick(this.getSendButton());
+		}
 	}
 
 	discard() {

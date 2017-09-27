@@ -559,7 +559,7 @@ class InboxComposeView {
       simulateClick(this._els.closeBtn);
     }
   }
-  send() {
+  send({sendAndArchive}: {sendAndArchive: boolean}) {
     if (!this._els.sendBtn) throw new Error("Compose View missing send element");
     simulateClick(this._els.sendBtn);
   }

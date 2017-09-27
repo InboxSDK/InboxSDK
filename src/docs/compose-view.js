@@ -38,6 +38,7 @@ var ComposeView = /** @lends ComposeView */ {
 	 * Simulates clicking the compose's send button.
 	 * ^gmail
 	 * ^inbox
+	 * @param {SendOptions} sendOptions - An optional configuration object for the send.
 	 * @return {void}
 	 */
 	send: function() {},
@@ -626,6 +627,23 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 	 * @type {boolean}
 	 */
 	enabled: null
+};
+
+/**
+ * @class
+ * This type is optionally passed into the {ComposeView.send()} method as a way to configure the send.
+ */
+var SendOptions = /** @lends SendOptions */{
+	/**
+	 * Whether or not the message should be sent using Gmail's 'send and archive'
+	 * feature when available. If you set this to true but the ComposeView does
+	 * not have a Send and Archive button available, {ComposeView.send()}
+	 * will fall back to the normal Send button.
+	 * ^optional
+	 * ^default=false
+	 * @type {boolean}
+	 */
+	sendAndArchive:null
 };
 
 
