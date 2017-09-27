@@ -370,7 +370,7 @@ export function readDraftId(response: string, messageID: string): ?string {
     t.map(x => x[60])
   ))[0];
   if (msgA) {
-    const match = msgA.match(/^msg-a:(\S+)$/i);
+    const match = msgA.match(/^msg-[^:]:(\S+)$/i);
     return match && match[1];
   }
   return null;
