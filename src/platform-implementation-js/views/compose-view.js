@@ -105,8 +105,8 @@ class ComposeView extends EventEmitter {
 		get(memberMap, this).composeViewImplementation.close();
 	}
 
-	send() {
-		get(memberMap, this).composeViewImplementation.send();
+	send({sendAndArchive}: {sendAndArchive: boolean} = {sendAndArchive: false}) {
+		get(memberMap, this).composeViewImplementation.send({sendAndArchive});
 	}
 
 	discard() {

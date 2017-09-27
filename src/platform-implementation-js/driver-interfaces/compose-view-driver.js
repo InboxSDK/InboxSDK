@@ -41,7 +41,7 @@ export type ComposeViewDriver = {
 	setFromEmail(email: string): void;
 	focus(): void;
 	close(): void;
-	send(): void;
+	send({sendAndArchive: boolean}): void;
 	discard(): void;
 	popOut(): void;
 	replaceSendButton(el: HTMLElement): () => void;
