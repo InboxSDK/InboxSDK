@@ -510,6 +510,8 @@ div.inboxsdk__compose_statusbar {
   display: block !important;
 }
 
+.inboxsdk__compose_hideRecipientArea .fX.aXjCH,
+.inboxsdk__compose_hideRecipientArea .aoD.hl,
 .inboxsdk__compose_forceRecipientsOpen .aoD.hl,
 .inboxsdk__compose_forceRecipientRowHidden {
   display: none !important;

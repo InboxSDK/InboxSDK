@@ -101,6 +101,10 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.hideNativeRecipientRows();
 	}
 
+	hideRecipientArea(): () => void {
+		return get(memberMap, this).composeViewImplementation.hideRecipientArea();
+	}
+
 	close(){
 		get(memberMap, this).composeViewImplementation.close();
 	}
