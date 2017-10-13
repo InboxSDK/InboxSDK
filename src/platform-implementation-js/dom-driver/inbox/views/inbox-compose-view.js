@@ -661,6 +661,9 @@ class InboxComposeView {
       });
     };
   }
+  hideRecipientArea(): () => void {
+    throw new Error('Not implemented');
+  }
   addOuterSidebar(options: {title: string, el: HTMLElement}): void {
     throw new Error("Not implemented");
   }

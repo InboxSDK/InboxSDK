@@ -467,6 +467,14 @@ class GmailComposeView {
 		};
 	}
 
+	hideRecipientArea(): () => void {
+		this._element.classList.add('inboxsdk__compose_hideRecipientArea');
+
+		return () => {
+			this._element.classList.remove('inboxsdk__compose_hideRecipientArea');
+		};
+	}
+
 	getFromContact() {
 		return fromManager.getFromContact(this._driver, this);
 	}

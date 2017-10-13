@@ -59,6 +59,7 @@ export type ComposeViewDriver = {
 	addRecipientRow(options: Kefir.Observable<?Object>): () => void;
 	forceRecipientRowsOpen(): () => void;
 	hideNativeRecipientRows(): () => void;
+	hideRecipientArea(): () => void;
 	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	// addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}): StatusBar;
