@@ -303,6 +303,7 @@ class GmailAppSidebarView {
               <button class="inboxsdk__button_icon" type="button" data-tooltip="${appName}">
                 <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
               </button>
+              <div class="inboxsdk__button_selectedIndicator"></div>
             `;
 
             buttonContainers.set(appName, container);

@@ -934,11 +934,21 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   overflow: hidden;
   padding: 0;
   cursor: pointer;
+  position: relative;
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
   width: 24px;
   height: 24px;
+}
+
+.IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+  height: 24px;
+  width: 4px;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgb(66, 133, 244);
 }
 
 .IDMAP_sidebar_iconArea + div:before {
