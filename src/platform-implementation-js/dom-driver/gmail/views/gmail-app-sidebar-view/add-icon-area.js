@@ -17,6 +17,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
 
   if(tabList){
     tabList.insertAdjacentElement('afterbegin', iconArea);
+    maintainIconArea(iconArea, tabList, stopper);
   }
   else{
     // the very first time that a thread is loaded the add-ons icon area is not visible
@@ -26,15 +27,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
     // is discoverable, so that we don't get multiple iconAreas from different extensions
     const stillFormingTablist = querySelector(addonSidebarContainerEl, TAB_LIST_SELECTOR);
     stillFormingTablist.insertAdjacentElement('afterbegin', iconArea);
-
-    // Gmail periodically clears the children of this element before it's
-    // visible, so we fight back.
-    makeMutationObserverChunkedStream(stillFormingTablist, {childList: true})
-      .filter(() => iconArea.parentElement !== stillFormingTablist)
-      .takeUntilBy(stopper)
-      .onValue(() => {
-        stillFormingTablist.insertAdjacentElement('afterbegin', iconArea);
-      });
+    maintainIconArea(iconArea, stillFormingTablist, stopper);
   }
 
   // if the addon loading div is visible then we create a clone of it and put the clone in a
@@ -52,9 +45,22 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
       .takeUntilBy(stopper)
       .onValue(() => {
         loadingClone.remove();
-        querySelector(addonSidebarContainerEl, '[role=tablist]').insertAdjacentElement('afterbegin', iconArea);
+        const tabList = querySelector(addonSidebarContainerEl, '[role=tablist]');
+        tabList.insertAdjacentElement('afterbegin', iconArea);
+        maintainIconArea(iconArea, tabList, stopper);
       });
   }
+}
+
+// Gmail periodically clears the children of this element before it's
+// visible, so we fight back.
+function maintainIconArea(iconArea, tabList, stopper){
+  makeMutationObserverChunkedStream(tabList, {childList: true})
+    .filter(() => iconArea.parentElement !== tabList)
+    .takeUntilBy(stopper)
+    .onValue(() => {
+      tabList.insertAdjacentElement('afterbegin', iconArea);
+    });
 }
 
 export default defn(module, addIconArea);
