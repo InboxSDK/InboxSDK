@@ -12,6 +12,7 @@ import type {Bus} from 'kefir-bus';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import simulateClick from '../../../lib/dom/simulate-click';
 
 import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
@@ -19,6 +20,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
+import WidthManager from './gmail-thread-view/width-manager';
 
 let hasLoggedAddonInfo = false;
 
@@ -30,6 +32,7 @@ class GmailThreadView {
 	_eventStream: Bus<any>;
 	_stopper = kefirStopper();
 	_sidebar: ?GmailAppSidebarView = null;
+	_widthManager: ?WidthManager = null;
 
 	_toolbarView: any;
 	_messageViewDrivers: any[];
@@ -82,6 +85,7 @@ class GmailThreadView {
 		this._stopper.destroy();
 		this._toolbarView.destroy();
 		if (this._sidebar) this._sidebar.destroy();
+
 		this._messageViewDrivers.forEach(messageView => {
 			messageView.destroy();
 		});
@@ -100,7 +104,11 @@ class GmailThreadView {
 		}
 		let sidebar = this._sidebar;
 		if (!sidebar) {
-			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement);
+			let widthManager;
+			if(addonSidebarElement){
+				widthManager = this._setupWidthManager();
+			}
+			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement, widthManager);
 			sidebar.getStopper().onValue(() => {
 				if (this._sidebar === sidebar) {
 					this._sidebar = null;
@@ -244,6 +252,8 @@ class GmailThreadView {
 		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
 		if(!addonSidebarElement) return;
 
+		const widthManager = this._setupWidthManager();
+
 		makeElementChildStream(querySelector(addonSidebarElement, '.J-KU-Jg'))
 			.filter(({el}) =>
 					el.getAttribute('role') === 'tab' &&
@@ -251,8 +261,31 @@ class GmailThreadView {
 			)
 			.takeUntilBy(this._stopper)
 			.onValue(({el}) => {
+				if(el.classList.contains('.J-KU-KO')){
+					// it is currently open, so let's close
+					simulateClick(el);
+				}
+
 				el.style.display = 'none';
+				widthManager.fixWidths();
 			});
+	}
+
+	_setupWidthManager(){
+		let widthManager = this._widthManager;
+		if(!widthManager){
+			const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+			if(!addonSidebarElement) throw new Error('addonSidebarElement not found');
+
+			const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+      if(!mainContentBodyContainerElement) throw new Error('mainContentBodyContainerElement not found');
+			const contentContainer = mainContentBodyContainerElement.parentElement;
+			if(!contentContainer) throw new Error('mainContentBodyContainerElement has no parent element');
+
+			this._widthManager = widthManager = new WidthManager((contentContainer: any), addonSidebarElement);
+		}
+
+		return widthManager;
 	}
 
 	getReadyStream() {
