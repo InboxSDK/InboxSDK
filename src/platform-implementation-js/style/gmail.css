@@ -840,7 +840,8 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 
 /* gmail addon support */
 
-.container_app_sidebar_in_use.no {
+.container_app_sidebar_in_use.no,
+.IDMAP_container_app_sidebar_no_icons.no {
   display: flex;
   display: -webkit-flex;
   flex-direction: row;
@@ -866,11 +867,23 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin-right: -321px !important;
 }
 
-.container_app_sidebar_in_use .bkK.nn {
+/* no sdk icons and no native addons */
+.IDMAP_container_app_sidebar_no_icons .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
+  margin-right: 0px !important;
+}
+
+.container_app_sidebar_in_use .bkK.nn,
+.IDMAP_container_app_sidebar_no_icons .bkK.nn {
   width: auto !important;
   flex: 1;
   -webkit-flex: 1;
   min-width: 0px;
+}
+
+/* when removing addon icons */
+.IDMAP_container_app_sidebar_no_icons .bnl.nn {
+  z-index: -1;
+  position: absolute;
 }
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use {
@@ -929,7 +942,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   margin: 16px 16px 0px 16px;
   border: none;
   background: #fff;
-  height: 24px;
+  height: 25px;
   width: 24px;
   overflow: hidden;
   padding: 0;

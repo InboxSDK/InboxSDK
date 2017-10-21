@@ -31,12 +31,14 @@ import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
 const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 
+import type WidthManager from './gmail-thread-view/width-manager';
+
 class GmailAppSidebarView {
   _stopper = kefirStopper();
   _driver: GmailDriver;
   _instanceId: string;
 
-  constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement) {
+  constructor(driver: GmailDriver, sidebarContainerEl?: ?HTMLElement, addonSidebarElement: ?HTMLElement, widthManager: ?WidthManager) {
     this._driver = driver;
 
     // We need to be able to cooperate with other apps/extensions that are
@@ -52,7 +54,7 @@ class GmailAppSidebarView {
     if (instanceId != null) {
       this._instanceId = instanceId;
     } else {
-      this._createElement(sidebarContainerEl, addonSidebarElement);
+      this._createElement(sidebarContainerEl, addonSidebarElement, widthManager);
     }
   }
 
@@ -79,7 +81,7 @@ class GmailAppSidebarView {
     }
   }
 
-  _createElement(_sidebarContainerEl: ?HTMLElement, _addonSidebarContainerEl: ?HTMLElement) {
+  _createElement(_sidebarContainerEl: ?HTMLElement, _addonSidebarContainerEl: ?HTMLElement, widthManager: ?WidthManager) {
     let container, iconArea;
     let component: AppSidebar;
 
@@ -365,6 +367,8 @@ class GmailAppSidebarView {
 
             if(iconArea) addToIconArea(orderManager, appName, container, iconArea);
 
+            if(widthManager) widthManager.fixWidths();
+
             if(this._getShouldAppSidebarOpen()){
               // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
               // panel gets added
@@ -418,6 +422,8 @@ class GmailAppSidebarView {
         }
 
         if(!addonSidebarContainerEl) return;
+
+        if(widthManager) widthManager.fixWidths();
 
         iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
         if(!iconArea) return;

@@ -3,7 +3,7 @@
 InboxSDK.load(2, 'sidebar-example', {
 	appName: 'Twitter',
   appIconUrl: 'http://materialdesignblog.com/wp-content/uploads/2015/04/387b93c8b66379c32e1cc2b98dcf5197.png',
-	suppressAddonTitle: 'Gmail Add-on Test 2'
+	suppressAddonTitle: 'Streak'
 }).then(inboxSDK => {
 	window._sdk = inboxSDK;
 
@@ -68,7 +68,7 @@ InboxSDK.load(2, 'sidebar-example', {
 			return contentPanel;
 		};
 
-		window._firstPanel = window.activate();
+		//window._firstPanel = window.activate();
 	});
 
 });
