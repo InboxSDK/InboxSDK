@@ -104,7 +104,7 @@ class GmailAppSidebarView {
 
     let contentContainer;
     let usedAddonsSidebar = false;
-    if(_addonSidebarContainerEl && widthManager){
+    if(_addonSidebarContainerEl){
       const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
       if(mainContentBodyContainerElement){
         contentContainer = mainContentBodyContainerElement.parentElement;

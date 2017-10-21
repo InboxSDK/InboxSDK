@@ -21,12 +21,12 @@ export default class WidthManager {
     if(!tabList) return;
 
     if(this._addonSidebarContainerEl.classList.contains(idMap('app_sidebar_in_use'))){
-      this._contentContainerEl.classList.remove('container_app_sidebar_no_icons');
+      this._contentContainerEl.classList.remove(idMap('container_app_sidebar_no_icons'));
       return;
     }
 
     const noIconsVisible = ![...tabList.children].some(child => child.style.display !== 'none');
-    if(noIconsVisible) this._contentContainerEl.classList.add('container_app_sidebar_no_icons');
-    else this._contentContainerEl.classList.remove('container_app_sidebar_no_icons');
+    if(noIconsVisible) this._contentContainerEl.classList.add(idMap('container_app_sidebar_no_icons'));
+    else this._contentContainerEl.classList.remove(idMap('container_app_sidebar_no_icons'));
   }
 }
