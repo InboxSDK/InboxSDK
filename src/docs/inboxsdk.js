@@ -50,7 +50,7 @@ var LoadOptions = /** @lends LoadOptions */{
 	appIconUrl:null,
 
 	/**
-	 * The name of the Gmail Add-On you want to hide. Use this if you have both an extensions
+	 * The name of the Gmail Add-On you want to hide. Use this if you have both an extension
 	 * and a Gmail Add-On that provide similar functionality.
 	 * ^optional
 	 * ^default=null
