@@ -150,7 +150,7 @@ class InboxDrawerView {
     if (!composeOffsetParent.hasAttribute('data-drawer-old-zindex')) {
       composeOffsetParent.setAttribute('data-drawer-old-zindex', composeOffsetParent.style.zIndex);
     }
-    composeOffsetParent.style.zIndex = String(zIndex+1);
+    composeOffsetParent.style.zIndex = String(zIndex+2); // 1 more than compose
 
     this._closed
       .merge(this._composeChanges)
@@ -177,7 +177,7 @@ class InboxDrawerView {
 
     this._containerEl = document.createElement('div');
     this._containerEl.className = 'inboxsdk__drawer_view_container';
-    this._containerEl.style.zIndex = String(zIndex+2);
+    this._containerEl.style.zIndex = String(zIndex+1);
 
     this._el = document.createElement('div');
     this._el.setAttribute('role', 'dialog');
