@@ -203,6 +203,9 @@ function _collapseGroupButtonToolbar(gmailComposeView, buttonViewController) {
 
 	buttonViewController.getView().deactivate();
 	localStorage['inboxsdk__compose_groupedActionButton_state'] = 'collapsed';
+
+	const bottomToolbarTable = gmailComposeView.getBottomBarTable();
+	bottomToolbarTable.style.position = '';
 }
 
 function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
@@ -284,7 +287,10 @@ function _positionGroupToolbar(gmailComposeView){
 		groupedActionToolbarArrow.style.left = (groupedToolbarButton.offsetLeft-1) + 'px';
 	}
 
-	const bottomToolbarHeight = gmailComposeView.getBottomToolbarContainer().clientHeight;
+	const bottomToolbarTable = gmailComposeView.getBottomBarTable();
+	bottomToolbarTable.style.position = 'relative';
+
+	const bottomToolbarHeight = gmailComposeView.getBottomBarTable().clientHeight;
 	groupedActionToolbarContainer.style.bottom = `${bottomToolbarHeight + 1}px`;
 	if (bottomToolbarHeight < 1) {
 		const heElements = gmailComposeView.getElement().querySelectorAll('td.HE');
