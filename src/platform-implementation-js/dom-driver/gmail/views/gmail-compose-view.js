@@ -848,6 +848,10 @@ class GmailComposeView {
 		return btn;
 	}
 
+	getStatusBarPrependContainer(): ?HTMLElement {
+		return this._element.querySelector('.inboxsdk__compose_statusBarPrependContainer');
+	}
+
 	getScrollBody(): HTMLElement {
 		var scrollBody = this._element.querySelector('table .GP');
 		if (!scrollBody) {
