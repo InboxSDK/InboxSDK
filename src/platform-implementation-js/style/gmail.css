@@ -849,8 +849,8 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100%;
 }
 
-.container_app_sidebar_in_use.no[dir=ltr],
-.idm5_container_app_sidebar_no_icons.no[dir=ltr] {
+body[dir=rtl] .container_app_sidebar_in_use.no[dir=ltr],
+body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
   flex-direction: row-reverse;
   -webkit-flex-direction: row-reverse;
 }
