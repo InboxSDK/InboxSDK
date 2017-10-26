@@ -849,6 +849,12 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100%;
 }
 
+body[dir=rtl] .container_app_sidebar_in_use.no[dir=ltr],
+body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
+  flex-direction: row-reverse;
+  -webkit-flex-direction: row-reverse;
+}
+
 /* overwrite margin right of the gmail page next/back and settings icon buttons
    to line up properly */
 
