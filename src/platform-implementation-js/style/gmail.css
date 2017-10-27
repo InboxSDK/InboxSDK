@@ -157,6 +157,9 @@ div.T-I.inboxsdk__button {
     opacity: 1
   }
 
+.inboxsdk__compose_groupedActionToolbar_visible .aDg .aDh {
+  overflow-y: visible;
+}
 
 .inboxsdk__compose_groupedActionToolbar {
   position: absolute;
