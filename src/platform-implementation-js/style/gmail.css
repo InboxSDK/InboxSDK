@@ -487,6 +487,10 @@ div.inboxsdk__compose_statusbar {
   height: auto !important;
 }
 
+.inboxsdk__compose_statusbarActive .aDl {
+  z-index: unset;
+}
+
 /* compose size fixing */
 .inboxsdk__compose .qz {
   max-height: inherit !important;
