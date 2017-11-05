@@ -35,6 +35,7 @@ import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
+import ensureAppButtonToolbarsAreClosed from './gmail-compose-view/ensure-app-button-toolbars-are-closed';
 import sizeFixer from './gmail-compose-view/size-fixer';
 import addTooltipToButton from './gmail-compose-view/add-tooltip-to-button';
 import addRecipientRow from './gmail-compose-view/add-recipient-row';
@@ -639,6 +640,15 @@ class GmailComposeView {
 		};
 	}
 
+	ensureFormattingToolbarIsHidden() {
+		const formattingToggleButton = this.getFormattingToolbarToggleButton();
+		const formattingToolbar = this.getFormattingToolbar();
+
+		if(formattingToggleButton && formattingToolbar && formattingToolbar.style.display === ''){
+			simulateClick(formattingToggleButton);
+		}
+	}
+
 	close() {
 		if(this.isInlineReplyForm()){
 			console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
@@ -1039,6 +1049,10 @@ class GmailComposeView {
 
 	ensureGroupingIsOpen(type: string) {
 		ensureGroupingIsOpen(this._element, type);
+	}
+
+	ensureAppButtonToolbarsAreClosed(): void {
+		ensureAppButtonToolbarsAreClosed(this._element);
 	}
 
 	isMinimized(): boolean {

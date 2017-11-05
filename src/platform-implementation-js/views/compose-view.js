@@ -341,6 +341,14 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.hideDiscardButton();
 	}
 
+	ensureFormattingToolbarIsHidden() {
+		get(memberMap, this).composeViewImplementation.ensureFormattingToolbarIsHidden();
+	}
+
+	ensureAppButtonToolbarsAreClosed() {
+		get(memberMap, this).composeViewImplementation.ensureAppButtonToolbarsAreClosed();
+	}
+
 	// TODO remove
 	overrideEditSubject(){
 		const {driver, composeViewImplementation} = get(memberMap, this);

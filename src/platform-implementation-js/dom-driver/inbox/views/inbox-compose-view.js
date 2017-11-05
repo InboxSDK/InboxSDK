@@ -829,6 +829,12 @@ class InboxComposeView {
     if (!this._els.sendBtn) throw new Error('Compose View missing send button');
     return this._els.sendBtn;
   }
+  ensureAppButtonToolbarsAreClosed() {
+    //TODO
+  }
+  ensureFormattingToolbarIsHidden() {
+    //TODO
+  }
 }
 
 export default defn(module, InboxComposeView);
