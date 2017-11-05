@@ -60,6 +60,8 @@ export type ComposeViewDriver = {
 	forceRecipientRowsOpen(): () => void;
 	hideNativeRecipientRows(): () => void;
 	hideRecipientArea(): () => void;
+	ensureFormattingToolbarIsHidden(): void;
+	ensureAppButtonToolbarsAreClosed(): void;
 	// addOuterSidebar(options: {title: string, el: HTMLElement}): void;
 	// addInnerSidebar(options: {el: HTMLElement}): void;
 	addStatusBar(options?: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}): StatusBar;
