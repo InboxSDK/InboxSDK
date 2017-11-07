@@ -102,7 +102,7 @@ class InboxDrawerView {
       );
     }
     Kefir.merge(closeEvents)
-      .takeUntilBy(this._closing)
+      .takeUntilBy(this._closing.merge(this._composeChanges))
       .onValue(() => this.close());
 
 
