@@ -360,7 +360,7 @@ class GmailAppSidebarView {
                     });
                 }
 
-                component.scrollPanelIntoView(instanceId, true);
+                component.scrollPanelIntoView(instanceId);
               }
             }, true);
 

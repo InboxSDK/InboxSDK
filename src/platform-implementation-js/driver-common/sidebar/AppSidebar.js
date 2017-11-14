@@ -215,7 +215,9 @@ class Panel extends React.Component {
       if(offsetParent) container.scrollTop = (offsetParent: any).offsetTop;
     }
     else {
-      this._el.scrollIntoView();
+      this._el.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   }
   getDragHeight() {
