@@ -30,9 +30,9 @@ class InboxDrawerView {
     let insertionTarget = ((document.body:any):HTMLElement);
     let composeRect = null;
 
-    const {composeView, closeWithCompose} = options;
+    const {composeView, closeWithCompose, closeOnMinimize} = options;
     if (composeView) {
-      const ret = this._setupComposeInsertionTarget(composeView, closeWithCompose);
+      const ret = this._setupComposeInsertionTarget(composeView, closeWithCompose, closeOnMinimize);
       insertionTarget = ret.insertionTarget;
       composeRect = ret.composeRect;
     }
@@ -79,7 +79,11 @@ class InboxDrawerView {
       });
   }
 
-  _setupComposeInsertionTarget(composeView: ComposeView, closeWithCompose: ?boolean): {composeRect: ClientRect, insertionTarget: HTMLElement} {
+  _setupComposeInsertionTarget(
+    composeView: ComposeView,
+    closeWithCompose: ?boolean,
+    closeOnMinimize: ?boolean
+  ): {composeRect: ClientRect, insertionTarget: HTMLElement} {
     if (composeView.isMinimized()) {
       throw new Error("Can't attach DrawerView to minimized ComposeView");
     }
@@ -96,10 +100,13 @@ class InboxDrawerView {
       )
     ];
     if (closeWithCompose) {
-      closeEvents.push(
-        Kefir.fromEvents(composeView, 'destroy'),
-        Kefir.fromEvents(composeView, 'minimized')
-      );
+      closeEvents.push(Kefir.fromEvents(composeView, 'destroy'));
+    }
+    // If closeOnMinimize is an explicit `true`, always listen to minimize,
+    // and if closeWithCompose is true then default to closing on minimize
+    // unless explicitly set to `false`.
+    if (closeOnMinimize || (closeWithCompose && closeOnMinimize !== false)) {
+      closeEvents.push(Kefir.fromEvents(composeView, 'minimized'));
     }
     Kefir.merge(closeEvents)
       .takeUntilBy(this._closing.merge(this._composeChanges))
@@ -279,10 +286,14 @@ class InboxDrawerView {
     }
   }
 
-  associateComposeView(composeView: ComposeView, closeWithCompose: boolean) {
+  associateComposeView(
+    composeView: ComposeView,
+    closeWithCompose: boolean,
+    closeOnMinimize: boolean
+  ) {
     this._composeChanges.emit(null);
 
-    const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView, closeWithCompose);
+    const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView, closeWithCompose, closeOnMinimize);
 
     if (this._backdrop) insertionTarget.appendChild(this._backdrop.getElement());
     if (this._containerEl.parentElement !== insertionTarget) insertionTarget.appendChild(this._containerEl);
