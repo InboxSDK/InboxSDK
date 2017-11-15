@@ -153,7 +153,6 @@ class InboxDrawerView {
     composeOffsetParent.style.zIndex = String(zIndex+2); // 1 more than compose
 
     this._closed
-      .merge(this._composeChanges)
       .takeUntilBy(Kefir.fromEvents(insertionTarget, TAKE_OVER_EVENT))
       .onValue(() => {
         insertionTarget.style.zIndex = '';
@@ -290,6 +289,10 @@ class InboxDrawerView {
 
     const composeNeedToMoveLeft = this._setupComposeAnimation(composeView, composeRect, false);
     this._positionCompose(composeView, composeNeedToMoveLeft);
+  }
+
+  disassociateComposeView() {
+    this._composeChanges.emit(null);
   }
 
   getSlideAnimationDone() {

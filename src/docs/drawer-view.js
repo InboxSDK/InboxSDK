@@ -21,6 +21,14 @@ var DrawerView = /** @lends DrawerView */{
   associateComposeView: function(composeView, closeWithCompose) {},
 
   /**
+   * If there is a ComposeView currently associated, this will remove its
+   * association and visually place the ComposeView back behind the darkened
+   * DrawerView backdrop.
+   * @return {void}
+   */
+  disassociateComposeView: function() {},
+
+  /**
    * This property is set to true once the view is destroyed.
    * @type {boolean}
    */
