@@ -17,7 +17,7 @@ var DrawerView = /** @lends DrawerView */{
    * @param {boolean} closeWithCompose - Controls whether the DrawerView should
    *  close if the ComposeView is closed or otherwise becomes inaccessible (defaults to false).
    * @param {boolean} closeOnMinimize - Controls whether the DrawerView should
-   *  close if the ComposeView is minimized (defaults to true if closeWithCompose is true, false otherwise).
+   *  close if the ComposeView is minimized (defaults to the value of closeWithCompose).
    * @return {void}
    */
   associateComposeView: function(composeView, closeWithCompose, closeOnMinimize) {},
