@@ -273,5 +273,13 @@ var DrawerOptions = /** @lends ModalOptions */{
   * ^default=false
   * @type {boolean}
   */
-  closeWithCompose:null
+  closeWithCompose:null,
+
+  /**
+  * Whether or not to close the DrawerView when its associated ComposeView is
+  * minimized. This will default to the value of closeWithCompose.
+  * ^optional
+  * @type {boolean}
+  */
+  closeOnMinimize:null
 };
