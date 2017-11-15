@@ -32,13 +32,15 @@ InboxSDK.load(2, 'sidebar-example', {
 			var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
 			var monkeyIndex = 1;
 
-			// var el2 = document.createElement('div');
-			// el2.textContent = `Hello world ${Math.random()}`;
+			const newEl = document.createElement('div');
+			newEl.classList.add('clearbit-connect');
+			newEl.innerHTML = el.innerHTML;
 
 			var options = {
+				appName: 'Random ' + Math.random(),
 				title: 'Monkey 2',
 				iconUrl: monkeyImages[monkeyIndex],
-				el: el,
+				el: newEl,
 				orderHint: 1
 			};
 

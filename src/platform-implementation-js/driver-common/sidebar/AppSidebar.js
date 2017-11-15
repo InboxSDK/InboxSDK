@@ -212,7 +212,12 @@ class Panel extends React.Component {
   scrollIntoView(useContainer: boolean, container?: ?HTMLElement) {
     if(useContainer && container) {
       const offsetParent = this._el.parentElement;
-      if(offsetParent) container.scrollTop = (offsetParent: any).offsetTop;
+      if(offsetParent) {
+        (container: any).scrollTo({
+          top: (offsetParent: any).offsetTop,
+          behavior: 'smooth'
+        });
+      }
     }
     else {
       this._el.scrollIntoView({
