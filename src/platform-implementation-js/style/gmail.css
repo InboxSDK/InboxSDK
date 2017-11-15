@@ -827,12 +827,6 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   will-change: position;
 }
 
-.IDMAP_app_sidebar {
-  position: relative;
-  height: 100%;
-  overflow: auto;
-}
-
 .IDMAP_app_sidebar_content_panel {
   background: #ffffff;
 }
@@ -924,7 +918,9 @@ body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
   border-left: 1px solid #e0e0e0;
   padding-left: 16px;
   width: calc(100% - 74px);
+  overflow: auto;
 }
+
 
 .container_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
   width: calc(100% - 16px);
