@@ -6152,9 +6152,9 @@
       "integrity": "sha1-SB8YuidPxVgBddtcxnznqCKOolA="
     },
     "kefir-cast": {
-      "version": "3.2.0",
-      "resolved": "https://registry.npmjs.org/kefir-cast/-/kefir-cast-3.2.0.tgz",
-      "integrity": "sha512-UQanlwnhM6XRoyhG73IZyffoSt4JY3wNMKwMw2wcbrYQR7fRENwiDLXdEA36arqd4S0lWqt3KNNfYaMUS/ffBg=="
+      "version": "3.2.1",
+      "resolved": "https://registry.npmjs.org/kefir-cast/-/kefir-cast-3.2.1.tgz",
+      "integrity": "sha512-Sev2d4+8m2PGpfEYXpyLkv2JX+gNwNUQ/QjUgBksB2l7Hojxv2O/4b/2Y0z5iTJ6rr/GGhN2Vx6spt3PR8FwRA=="
     },
     "kefir-stopper": {
       "version": "2.1.1",
