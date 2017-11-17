@@ -59,7 +59,7 @@
     "jsdom": "^9.2.1",
     "kefir": "~3.6.1",
     "kefir-bus": "^2.2.0",
-    "kefir-cast": "^3.2.1",
+    "kefir-cast": "^3.2.2",
     "kefir-stopper": "^2.1.0",
     "lazypipe": "^1.0.1",
     "live-set": "^0.4.1",
