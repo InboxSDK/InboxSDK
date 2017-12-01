@@ -257,7 +257,6 @@ class GmailComposeView {
 				this._setupStreams();
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
-				this._setupKeyboardEventReemiting();
 
 				this.getEventStream()
 					.filter(({eventName}) => eventName === 'presending')
@@ -366,44 +365,6 @@ class GmailComposeView {
 		} catch(err) {
 			this._driver.getLogger().error(err);
 		}
-	}
-
-	_setupKeyboardEventReemiting() {
-		// Gmail stops propagation of keyboard events from escaping
-		// a specific compose window, which prevents any React components rendered
-		// in the compose window's subtree from getting them (since React adds
-		// a single event listener on the document). By stopping propagation of
-		// the original event and reemiting it on the document, we preserve
-		// exisitng behavior while giving React a chance to hear it.
-
-		Kefir.merge([
-			Kefir.fromEvents(this._element, 'keypress'),
-			Kefir.fromEvents(this._element, 'keydown'),
-			Kefir.fromEvents(this._element, 'keyup')
-		]).takeUntilBy(this._stopper).onValue((event: KeyboardEvent) => {
-			event.stopPropagation();
-
-			const fakeEvent = new KeyboardEvent(event.type);
-			Object.defineProperties(fakeEvent, {
-				cancelable: {value: event.cancelable},
-				bubbles: {value: event.bubbles},
-				target: {value: event.target},
-				detail: {value: event.detail},
-				key: {value: event.key},
-				code: {value: event.code},
-				location: {value: event.location},
-				ctrlKey: {value: event.ctrlKey},
-				shiftKey: {value: event.shiftKey},
-				altKey: {value: event.altKey},
-				metaKey: {value: event.metaKey},
-				repeat: {value: event.repeat},
-				isComposing: {value: event.isComposing},
-				charCode: {value: event.charCode},
-				keyCode: {value: event.keyCode},
-				which: {value: event.which},
-			});
-			document.dispatchEvent(fakeEvent);
-		});
 	}
 
 	_setupIDs() {
