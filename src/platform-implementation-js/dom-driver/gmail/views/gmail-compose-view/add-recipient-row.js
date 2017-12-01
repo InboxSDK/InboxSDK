@@ -10,13 +10,13 @@ export default function addRecipientRow(gmailComposeView: GmailComposeView, reci
 		.takeUntilBy(gmailComposeView.getStopper())
 		.onValue((options) => {
 			if(row){
-				(row:any).remove();
+				row.remove();
 				row = null;
 			}
 
 			if(options) {
 				row = _createRecipientRowElement(gmailComposeView, options);
-				_reemitKeyboardEvents(row, gmailComposeView.getStopper());
+				_reemitKeyboardEvents(row);
 			}
 			gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
 				bubbles: false, cancelable: false, detail: null
@@ -25,7 +25,7 @@ export default function addRecipientRow(gmailComposeView: GmailComposeView, reci
 
 	return () => {
 		if (row) {
-			(row:any).remove();
+			row.remove();
 			row = null;
 			gmailComposeView.getElement().dispatchEvent(new CustomEvent('resize', {
 				bubbles: false, cancelable: false, detail: null
@@ -66,7 +66,7 @@ function _createRecipientRowElement(gmailComposeView: GmailComposeView, options:
 	return row;
 }
 
-function _reemitKeyboardEvents(rowEl: HTMLElement, stopper: Kefir.Observable<null>) {
+function _reemitKeyboardEvents(rowEl: HTMLElement) {
 	// Gmail stops propagation of keyboard events from escaping
 	// a specific compose window, which prevents any React components rendered
 	// in the compose window's subtree from getting them (since React adds
@@ -78,7 +78,7 @@ function _reemitKeyboardEvents(rowEl: HTMLElement, stopper: Kefir.Observable<nul
 		Kefir.fromEvents(rowEl, 'keypress'),
 		Kefir.fromEvents(rowEl, 'keydown'),
 		Kefir.fromEvents(rowEl, 'keyup')
-	]).takeUntilBy(stopper).onValue((event: KeyboardEvent) => {
+	]).onValue((event: KeyboardEvent) => {
 		event.stopPropagation();
 
 		const fakeEvent = new KeyboardEvent(event.type);
