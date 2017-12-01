@@ -33,7 +33,6 @@ const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 
 import type WidthManager from './gmail-thread-view/width-manager';
-import type Bus from 'kefir-bus';
 
 class GmailAppSidebarView {
   _stopper = kefirStopper();
@@ -107,8 +106,8 @@ class GmailAppSidebarView {
     let contentContainer;
     let usedAddonsSidebar = false;
 
-    const updateHighlightedAppIconBus: Bus = kefirBus();
-    this._stopper.onEnd(() => updateHighlightedAppIconBus.end());
+    const updateHighlightedAppIconBus = kefirBus();
+    this._stopper.onEnd(() => {updateHighlightedAppIconBus.end();});
 
     if(_addonSidebarContainerEl){
       const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
@@ -210,21 +209,25 @@ class GmailAppSidebarView {
 
     updateHighlightedAppIconBus
       .debounce(150)
+      .takeUntilBy(this._stopper)
       .onValue(() => {
         if(!usedAddonsSidebar) return;
 
-        const scrollTop = el.getBoundingClientRect().top + el.scrollTop;
+        const elBoundingBox = el.getBoundingClientRect();
+        const boundingTop = elBoundingBox.top + el.scrollTop;
+        const boundingBottom = boundingTop + elBoundingBox.height;
+
         const titleBars = Array.from(el.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
 
-        let titleBar;
-        for(let ii=0; ii<titleBars.length; ii++){
-          titleBar = titleBars[ii];
-          if(titleBar.getBoundingClientRect().top > scrollTop) break;
-        }
+        const titleBar = titleBars.find(t => {
+          const tBoundingBox = t.getBoundingClientRect();
+          return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom
+        });
 
         if(titleBar){
           const instanceId = titleBar.getAttribute('data-instance-id');
           const appName = titleBar.getAttribute('data-app-name');
+          if(!appName) return;
           const appButton = buttonContainers.get(appName);
           if(!appButton || !iconArea) return;
 
@@ -245,11 +248,11 @@ class GmailAppSidebarView {
             orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
-          onExpandedToggle={() => updateHighlightedAppIconBus.emit(null)}
+          onExpandedToggle={() => {updateHighlightedAppIconBus.emit(null);}}
           container={container}
         />,
         el,
-        () => updateHighlightedAppIconBus.emit(null)
+        () => {updateHighlightedAppIconBus.emit(null);}
       ): any);
     };
     render();
@@ -528,7 +531,7 @@ class GmailAppSidebarView {
       //listen for scroll and update active icon if needed
       Kefir.fromEvents(el, 'scroll')
         .takeUntilBy(this._stopper)
-        .onValue(() => updateHighlightedAppIconBus.emit(null));
+        .onValue(() => {updateHighlightedAppIconBus.emit(null);});
     }
   }
 
