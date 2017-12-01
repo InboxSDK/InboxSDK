@@ -1,9 +1,6 @@
 /* @flow */
 
 import Kefir from 'kefir';
-import kefirStopper from 'kefir-stopper';
-
-import type {Stopper} from 'kefir-stopper';
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function addRecipientRow(gmailComposeView: GmailComposeView, recipientRowOptionStream: Kefir.Observable<?Object>): ()=>void {
