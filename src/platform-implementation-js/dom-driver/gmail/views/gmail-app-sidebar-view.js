@@ -382,7 +382,9 @@ class GmailAppSidebarView {
                 // to bring up an Add-On sidebar (since that was last visible from Gmail's perspective)
                 // so we need to suppress Gmail bringing up their sidebar. This handles the flag of if we
                 // need to suppress
-                const loadingHolderAsAny: any = addonSidebarContainerEl.firstElementChild;
+                const nativeIconArea = addonSidebarContainerEl.firstElementChild;
+                if(!nativeIconArea) return;
+                const loadingHolderAsAny: any = nativeIconArea.firstElementChild;
                 const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
                 if(!loadingHolder) return;
 
