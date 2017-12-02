@@ -63,7 +63,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   const tabListRoleStream =
     makeMutationObserverChunkedStream(tabList, {attributes: true, attributeFilter: ['role']})
       .toProperty(() => null)
-      .filter(() => tabList.getAttribute('role') === 'tablist')
+      .filter(() => tabList.getAttribute('role') === 'tablist');
 
   // first we add sdk icon container as previous sibling to native tablist
   tabList.insertAdjacentElement('beforebegin', iconArea);
@@ -79,7 +79,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   .onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
     maintainIconArea(iconArea, tabList, stopper);
-  })
+  });
 
   // if the addon loading div is visible then we create a clone of it and put the clone in a
   // better place that works with our icons better. the native addon loading div is hidden with css

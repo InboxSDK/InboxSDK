@@ -221,7 +221,7 @@ class GmailAppSidebarView {
 
         const titleBar = titleBars.find(t => {
           const tBoundingBox = t.getBoundingClientRect();
-          return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom
+          return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom;
         });
 
         if(titleBar){
