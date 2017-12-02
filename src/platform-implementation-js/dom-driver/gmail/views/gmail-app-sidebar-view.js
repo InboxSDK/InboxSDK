@@ -6,6 +6,7 @@ import {defn} from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import kefirBus from 'kefir-bus';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import findParent from '../../../../common/find-parent';
@@ -104,6 +105,10 @@ class GmailAppSidebarView {
 
     let contentContainer;
     let usedAddonsSidebar = false;
+
+    const updateHighlightedAppIconBus = kefirBus();
+    this._stopper.onEnd(() => {updateHighlightedAppIconBus.end();});
+
     if(_addonSidebarContainerEl){
       const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
       if(mainContentBodyContainerElement){
@@ -202,6 +207,39 @@ class GmailAppSidebarView {
       }
     });
 
+    updateHighlightedAppIconBus
+      .debounce(150)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        if(!usedAddonsSidebar) return;
+
+        const elBoundingBox = el.getBoundingClientRect();
+        const boundingTop = elBoundingBox.top + el.scrollTop;
+        const boundingBottom = boundingTop + elBoundingBox.height;
+
+        const titleBars = Array.from(el.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
+
+        const titleBar = titleBars.find(t => {
+          const tBoundingBox = t.getBoundingClientRect();
+          return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom
+        });
+
+        if(titleBar){
+          const instanceId = titleBar.getAttribute('data-instance-id');
+          const appName = titleBar.getAttribute('data-app-name');
+          if(!appName) return;
+          const appButton = buttonContainers.get(appName);
+          if(!appButton || !iconArea) return;
+
+          const activeButtonContainer = iconArea.querySelector('.sidebar_button_container_active');
+          if(activeButtonContainer){
+            activeButtonContainer.classList.remove('sidebar_button_container_active');
+          }
+
+          appButton.classList.add('sidebar_button_container_active');
+        }
+      });
+
     const render = () => {
       component = (ReactDOM.render(
         <AppSidebar
@@ -210,9 +248,11 @@ class GmailAppSidebarView {
             orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
+          onExpandedToggle={() => {updateHighlightedAppIconBus.emit(null);}}
           container={container}
         />,
-        el
+        el,
+        () => {updateHighlightedAppIconBus.emit(null);}
       ): any);
     };
     render();
@@ -383,6 +423,7 @@ class GmailAppSidebarView {
               }
             }
           }
+
         });
       });
 
@@ -486,6 +527,11 @@ class GmailAppSidebarView {
             if(contentContainer) contentContainer.classList.remove('container_addon_sidebar_visible');
           }
         });
+
+      //listen for scroll and update active icon if needed
+      Kefir.fromEvents(el, 'scroll')
+        .takeUntilBy(this._stopper)
+        .onValue(() => {updateHighlightedAppIconBus.emit(null);});
     }
   }
 

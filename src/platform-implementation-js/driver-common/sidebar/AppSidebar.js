@@ -35,12 +35,14 @@ type PanelDescriptor = {
   iconUrl: ?string;
   hideTitleBar: boolean;
   el: HTMLElement;
+  appName?: string;
 };
 type Props = {
   panels: PanelDescriptor[];
   onClose?: () => void;
   onOutsideClick?: () => void;
   onMoveEnd(newList: PanelDescriptor[], item: PanelDescriptor, oldIndex: number, newIndex: number): void;
+  onExpandedToggle?: () => void;
   container?: () => HTMLElement;
 };
 type State = {
@@ -127,7 +129,7 @@ export default class AppSidebar extends React.Component {
       lastUse: Date.now(),
       expanded
     };
-    this.setState({expansionSettings});
+    this.setState({expansionSettings}, this.props.onExpandedToggle);
     this._saveExpansionSettings(expansionSettings);
   }
   render() {
@@ -267,7 +269,7 @@ class Panel extends React.Component {
   render() {
     const {
       dragHandle, itemSelected, item: {
-        panelDescriptor: {title, iconClass, iconUrl, el},
+        panelDescriptor: {title, appName, iconClass, iconUrl, el},
         showControls, expanded, onExpandedToggle
       }
     } = this.props;
@@ -287,7 +289,10 @@ class Panel extends React.Component {
           boxShadow: shadow === 0 ? 'none' : `0px 0px ${shadow}px 0px rgba(0, 0, 0, 0.3)`
         }}
       >
-        <div className={idMap('app_sidebar_content_panel_top_line')}>
+        <div
+          className={idMap('app_sidebar_content_panel_top_line')}
+          data-app-name={appName}
+        >
           {(showControls ? dragHandle : (x=>x))(
             <span className={idMap('app_sidebar_content_panel_title')}>
               <div className={idMap('app_sidebar_content_panel_grip')} />
