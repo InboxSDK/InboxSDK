@@ -229,7 +229,7 @@ class InboxComposeView {
 
     const cleanup = () => {
       this._eventStream.emit({eventName: 'destroy', data: {
-        closedByUser: !this._closedProgrammatically
+        closedByInboxSDK: this._closedProgrammatically
       }});
       this._eventStream.end();
       this._stopper.destroy();

@@ -294,7 +294,7 @@ class GmailComposeView {
 	destroy() {
 		this._eventStream.emit({eventName: 'destroy', data: {
 			messageID: this.getMessageID(),
-			closedByUser: !this._closedProgrammatically
+			closedByInboxSDK: this._closedProgrammatically
 		}});
 		this._eventStream.end();
 		this._managedViewControllers.forEach(vc => {
