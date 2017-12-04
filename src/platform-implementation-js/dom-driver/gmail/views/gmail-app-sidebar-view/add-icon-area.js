@@ -90,12 +90,14 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
     loadingClone.classList.add('inboxsdk__addon_icon_loading');
     iconArea.insertAdjacentElement('afterend', loadingClone);
 
-    loadingDivStream
-      .take(1)
-      .takeUntilBy(stopper)
-      .onValue(() => {
-        loadingClone.remove();
-      });
+    Kefir.merge([
+      loadingDivStream,
+      stopper
+    ])
+    .take(1)
+    .onValue(() => {
+      loadingClone.remove();
+    });
   }
 }
 
