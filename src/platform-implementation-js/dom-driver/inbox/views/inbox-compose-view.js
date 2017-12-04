@@ -52,6 +52,7 @@ class InboxComposeView {
   _isMinimized: boolean = false;
   _isFullscreenMode: boolean = false;
   _isPresending: boolean = false;
+  _closedProgrammatically: boolean = false;
   _p: Parsed;
   _els: *;
 
@@ -106,6 +107,12 @@ class InboxComposeView {
           .map(() => ({eventName: 'bodyChanged'}))
       );
     }
+
+    Kefir.fromEvents(this._element, 'closedProgrammatically')
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._closedProgrammatically = true;
+      });
 
     this._draftID = this._driver.getPageCommunicator().getDraftIDForComposeView(
       this.getElement()
@@ -221,7 +228,9 @@ class InboxComposeView {
     this._element.removeAttribute('data-inboxsdk-draft-id');
 
     const cleanup = () => {
-      this._eventStream.emit({eventName: 'destroy', data: {}});
+      this._eventStream.emit({eventName: 'destroy', data: {
+        closedByInboxSDK: this._closedProgrammatically
+      }});
       this._eventStream.end();
       this._stopper.destroy();
     };
@@ -555,8 +564,15 @@ class InboxComposeView {
     if (this._p.attributes.isInline) {
       throw new Error("Not implemented for inline compose");
     }
-    if (this._els.closeBtn) {
-      simulateClick(this._els.closeBtn);
+
+    const {closeBtn} = this._els;
+
+    if (closeBtn) {
+      this._element.dispatchEvent(new CustomEvent('closedProgrammatically', {
+        bubbles: false, cancelable: false, detail: null
+      }));
+
+      simulateClick(closeBtn);
     }
   }
   send({sendAndArchive}: {sendAndArchive: boolean}) {

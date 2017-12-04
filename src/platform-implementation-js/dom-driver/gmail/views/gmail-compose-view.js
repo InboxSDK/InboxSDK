@@ -94,6 +94,7 @@ class GmailComposeView {
 	_requestModifiers: {[key: string]: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>};
 	_isListeningToAjaxInterceptStream: boolean;
 	_formattingArea: ?HTMLElement;
+	_closedProgrammatically: boolean = false;
 	_destroyed: boolean = false;
 	ready: () => Kefir.Observable<GmailComposeView>;
 	getEventStream: () => Kefir.Observable<any>;
@@ -228,6 +229,12 @@ class GmailComposeView {
 			])
 		);
 
+		Kefir.fromEvents(this._element, 'closedProgrammatically')
+			.takeUntilBy(this._stopper)
+			.onValue(() => {
+				this._closedProgrammatically = true;
+			});
+
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
 		const initialBodyElement = this.getMaybeBodyElement();
@@ -286,7 +293,8 @@ class GmailComposeView {
 
 	destroy() {
 		this._eventStream.emit({eventName: 'destroy', data: {
-			messageID: this.getMessageID()
+			messageID: this.getMessageID(),
+			closedByInboxSDK: this._closedProgrammatically
 		}});
 		this._eventStream.end();
 		this._managedViewControllers.forEach(vc => {
@@ -654,6 +662,10 @@ class GmailComposeView {
 			console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
 			return;
 		}
+
+		this._element.dispatchEvent(new CustomEvent('closedProgrammatically', {
+			bubbles: false, cancelable: false, detail: null
+		}));
 
 		if(this._isFullscreen){
 			this._eventStream
