@@ -413,6 +413,9 @@ var ComposeView = /** @lends ComposeView */ {
 	 * @param {string} messageID - If the composeView was closed without being sent and the draft
 	 * was saved, then this property will have the draft's message ID after it saved. Otherwise it
 	 * will be null. This property is only present in Gmail.
+	 * @param {boolean} closedByUser - Whether or not the ComposeView was closed due to a user action
+	 * like clicking the discard/close buttons, or hitting escape. False if the ComposeView was closed
+	 * by an extension calling ComposeView.close(), including other extensions besides yours.
 	 */
 
 	 /**
