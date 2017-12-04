@@ -229,9 +229,11 @@ class GmailComposeView {
 			])
 		);
 
-		Kefir.fromEvents(this._element, 'closedProgrammatically').onValue(() => {
-			this._closedProgrammatically = true;
-		});
+		Kefir.fromEvents(this._element, 'closedProgrammatically')
+			.takeUntilBy(this._stopper)
+			.onValue(() => {
+				this._closedProgrammatically = true;
+			});
 
 		this._buttonViewControllerTooltipMap = new WeakMap();
 
