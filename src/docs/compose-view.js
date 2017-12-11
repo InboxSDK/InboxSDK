@@ -634,7 +634,7 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */{
 };
 
 /**
- * @class
+ * @class SendOptions
  * This type is optionally passed into the {ComposeView.send()} method as a way to configure the send.
  */
 var SendOptions = /** @lends SendOptions */{
