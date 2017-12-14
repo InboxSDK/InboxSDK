@@ -11,18 +11,27 @@ export function getFromContact(driver: GmailDriver, gmailComposeView: GmailCompo
   if (!emailAddress) {
     return driver.getUserContact();
   }
-  const name = find(getFromContactChoices(driver, gmailComposeView),
-    contact => contact.emailAddress == emailAddress).name;
+  const fromContactChoices = getFromContactChoices(driver, gmailComposeView);
+  const matchingContact: ?Contact = find(fromContactChoices, contact => contact.emailAddress === emailAddress);
+  let name;
+  if (!matchingContact) {
+    name = emailAddress;
+    driver.getLogger().error(new Error('getFromContact failed to find name'), {
+      fromContactChoicesLength: fromContactChoices.length
+    });
+  } else {
+    name = matchingContact.name;
+  }
   return {emailAddress, name};
 }
 
 export function getFromContactChoices(driver: GmailDriver, gmailComposeView: GmailComposeView): Contact[] {
-  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
-  if (!choiceParent) {
+  const choiceEls = gmailComposeView.getElement().querySelectorAll('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]');
+  if (choiceEls.length == 0) {
     // From field isn't present
     return [driver.getUserContact()];
   }
-  return Array.from(choiceParent.children).map(item => ({
+  return Array.from(choiceEls).map(item => ({
     emailAddress: item.getAttribute('value') || '',
     name: item.textContent.replace(/<.*/, '').trim()
   }));
