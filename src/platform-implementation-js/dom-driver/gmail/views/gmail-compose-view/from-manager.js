@@ -26,12 +26,12 @@ export function getFromContact(driver: GmailDriver, gmailComposeView: GmailCompo
 }
 
 export function getFromContactChoices(driver: GmailDriver, gmailComposeView: GmailComposeView): Contact[] {
-  const choiceParent = gmailComposeView.getElement().querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
-  if (!choiceParent) {
+  const choiceEls = gmailComposeView.getElement().querySelectorAll('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]');
+  if (choiceEls.length == 0) {
     // From field isn't present
     return [driver.getUserContact()];
   }
-  return Array.from(choiceParent.children).map(item => ({
+  return Array.from(choiceEls).map(item => ({
     emailAddress: item.getAttribute('value') || '',
     name: item.textContent.replace(/<.*/, '').trim()
   }));
