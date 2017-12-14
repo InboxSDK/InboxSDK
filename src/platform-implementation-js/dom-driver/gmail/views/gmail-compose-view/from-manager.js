@@ -11,8 +11,17 @@ export function getFromContact(driver: GmailDriver, gmailComposeView: GmailCompo
   if (!emailAddress) {
     return driver.getUserContact();
   }
-  const name = find(getFromContactChoices(driver, gmailComposeView),
-    contact => contact.emailAddress == emailAddress).name;
+  const fromContactChoices = getFromContactChoices(driver, gmailComposeView);
+  const matchingContact: ?Contact = find(fromContactChoices, contact => contact.emailAddress === emailAddress);
+  let name;
+  if (!matchingContact) {
+    name = emailAddress;
+    driver.getLogger().error(new Error('getFromContact failed to find name'), {
+      fromContactChoicesLength: fromContactChoices.length
+    });
+  } else {
+    name = matchingContact.name;
+  }
   return {emailAddress, name};
 }
 
