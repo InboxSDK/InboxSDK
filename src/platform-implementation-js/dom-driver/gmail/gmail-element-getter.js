@@ -69,7 +69,9 @@ const GmailElementGetter = {
 	},
 
 	getSearchInput(): ?HTMLInputElement {
-		return ((document.getElementById('gbqfq'): any): ?HTMLInputElement);
+		const classicUIInput = ((document.getElementById('gbqfq'): any): ?HTMLInputElement);
+		const materialUIInput = ((document.querySelector('input.gb_Ze'): any): ?HTMLInputElement);
+		return classicUIInput || materialUIInput;
 	},
 
 	getSearchSuggestionsBoxParent(): ?HTMLElement {
