@@ -345,12 +345,12 @@ export default function setupGmailInterceptor() {
         const searchString = payload[4];
         const pageOffset = payload[10];
 
-        const isSyncAPISearch = (
+        const isSyncAPISearchWithCustomTerm = (
           payload[1] === 79 &&
           typeof searchString === 'string' &&
           (customSearchTerm = intersection(customSearchTerms, quotedSplit(searchString))[0])
         );
-        if (!isSyncAPISearch) return Promise.resolve(request);
+        if (!isSyncAPISearchWithCustomTerm) return Promise.resolve(request);
 
         if (queryReplacement && queryReplacement.query === searchString && queryReplacement.start != pageOffset) {
           // If this is the same query that was made last, but just for a
