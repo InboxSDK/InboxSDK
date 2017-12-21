@@ -20,6 +20,8 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
   });
 
 
+  inboxSDK.Search.registerSearchQueryRewriter({term: 'has:testing', termReplacer: () => '.'});
+
   inboxSDK.Search.registerSearchSuggestionsProvider(query => {
     log('search autocompleter', query);
     return delay(0, [

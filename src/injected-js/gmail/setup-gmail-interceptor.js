@@ -272,6 +272,7 @@ export default function setupGmailInterceptor() {
       }
     });
 
+    // classic Gmail API intercept
     js_frame_wrappers.push({
       isRelevantTo: function(connection) {
         let customSearchTerm;
@@ -324,6 +325,69 @@ export default function setupGmailInterceptor() {
             method: request.method,
             url: '?'+stringify(newParams),
             body: request.body
+          };
+        });
+      }
+    });
+
+    // newer, sync API based request intercept
+    main_wrappers.push({
+      isRelevantTo: function(connection) {
+        return (
+          connection.method === 'POST' &&
+          /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
+        );
+      },
+      requestChanger: function(connection, request) {
+        let customSearchTerm;
+        const body = JSON.parse(request.body);
+        const payload = body[1];
+        const searchString = payload[4];
+        const pageOffset = payload[10];
+
+        const isSyncAPISearch = (
+          payload[1] === 79 &&
+          typeof searchString === 'string' &&
+          (customSearchTerm = intersection(customSearchTerms, quotedSplit(searchString))[0])
+        );
+        if (!isSyncAPISearch) return Promise.resolve(request);
+
+        if (queryReplacement && queryReplacement.query === searchString && queryReplacement.start != pageOffset) {
+          // If this is the same query that was made last, but just for a
+          // different page, then re-use the replacement query we got last time.
+          // Don't wait on the extension to come up with it again (and risk it
+          // giving an inconsistent answer between pages).
+          (connection:any)._queryReplacement = queryReplacement;
+          // Mark the old queryReplacement with this page now so we can tell on
+          // a later request whether the page was changed or the list refresh
+          // button was hit.
+          queryReplacement.start = pageOffset;
+        } else {
+          if (queryReplacement) {
+            // Resolve the old one with something because no one else is going
+            // to after it's replaced in a moment.
+            queryReplacement.newQuery.resolve(queryReplacement.query);
+          }
+          queryReplacement = (connection:any)._queryReplacement = {
+            term: customSearchTerm,
+            query: searchString,
+            start: pageOffset,
+            newQuery: defer()
+          };
+
+          triggerEvent({
+            type: 'searchQueryForReplacement',
+            term: customSearchTerm,
+            query: searchString
+          });
+        }
+
+        return (connection:any)._queryReplacement.newQuery.promise.then(function(newQuery) {
+          body[1][4] = newQuery;
+          return {
+            method: request.method,
+            url: request.url,
+            body: JSON.stringify(body)
           };
         });
       }
