@@ -36,6 +36,7 @@ module.exports = function() {
     if (global.GLOBALS) { // Gmail
       (document.head:any).setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
       (document.head:any).setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
+      (document.head:any).setAttribute('data-inboxsdk-using-sync-api', !!GLOBALS[51]);
 
       var globalSettingsHolder = find(GLOBALS[17], (item) => item[0] === 'p');
 

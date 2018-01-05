@@ -14,6 +14,8 @@ import quotedSplit from '../../common/quoted-split';
 import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
 
+import type {XHRProxyConnectionDetails} from '../xhr-proxy-factory';
+
 function logErrorExceptEventListeners(err, details) {
   // Don't log Gmail's errors
   if (details !== 'XMLHttpRequest event listener error') {
@@ -485,6 +487,158 @@ export default function setupGmailInterceptor() {
         return (connection:any)._customListJob.newResults.promise.then(newResults =>
           newResults === null ? response : newResults
         );
+      }
+    });
+  }
+
+  {
+    // Sync API-based compose sending intercept
+
+    const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
+    const currentDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+    const currentSendConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
+      },
+      originalSendBodyLogger(connection) {
+        if (connection.originalSendBody) {
+          const originalRequest = JSON.parse(connection.originalSendBody);
+
+          const updateList = (
+            originalRequest[2] &&
+            originalRequest[2][1]
+          );
+          if (!updateList) return;
+
+          const messageUpdates = updateList.filter((update) => {
+            const updateWrapper = (
+              update[2] &&
+              update[2][2] &&
+              (update[2][2][14] || update[2][2][2])
+            );
+            return (
+              updateWrapper &&
+              updateWrapper[1] &&
+              updateWrapper[1][1] &&
+              updateWrapper[1][1].indexOf('msg-a:') > -1
+            );
+          });
+
+          if (!messageUpdates.length) return;
+
+          const sendUpdateMatch = messageUpdates.find((update) => {
+            const updateWrapper = (
+              update[2] &&
+              update[2][2] &&
+              (update[2][2][14] || update[2][2][2])
+            );
+
+            return (
+              updateWrapper[1][11] &&
+              intersection(
+                updateWrapper[1][11],
+                SEND_ACTIONS
+              ).length === SEND_ACTIONS.length
+            );
+          });
+
+          if (sendUpdateMatch) {
+            const sendUpdateWrapper = (
+              sendUpdateMatch[2] &&
+              sendUpdateMatch[2][2] &&
+              (sendUpdateMatch[2][2][14] || sendUpdateMatch[2][2][2])
+            );
+            const sendUpdate = sendUpdateWrapper[1];
+
+            const draftID = sendUpdate[1].replace('msg-a:', '');
+
+            currentSendConnectionIDs.set(connection, draftID);
+            triggerEvent({type: 'emailSending', draftID});
+          } else {
+            // There's a small chance that an update list could contain the
+            // draft saves for multiple drafts in some situations — we've never
+            // seen this so currently just picking the first update and assuming
+            // that if there are multiple updates in the request they are for
+            // queued up versions of the same draft.
+
+            const firstMessageUpdate = messageUpdates[0];
+            const updateWrapper = (
+              firstMessageUpdate[2] &&
+              firstMessageUpdate[2][2] &&
+              (firstMessageUpdate[2][2][14] || firstMessageUpdate[2][2][2])
+            );
+            const update = updateWrapper[1];
+
+            const draftID = update[1].replace('msg-a:', '');
+
+            currentDraftSaveConnectionIDs.set(connection, draftID);
+            triggerEvent({type: 'emailDraftSaveSending', draftID});
+          }
+        }
+      },
+      afterListeners(connection) {
+        if (
+          currentSendConnectionIDs.has(connection) ||
+          currentDraftSaveConnectionIDs.has(connection)
+        ) {
+          const sendFailed = () => {
+            triggerEvent({type: 'emailSendFailed', draftID});
+            currentSendConnectionIDs.delete(connection);
+          };
+
+          const draftID = currentSendConnectionIDs.get(connection) || currentDraftSaveConnectionIDs.get(connection);
+
+          if (connection.status !== 200 || !connection.originalResponseText) {
+            sendFailed();
+            return;
+          }
+
+          const originalResponse = JSON.parse(connection.originalResponseText);
+
+          const updateList = (
+            originalResponse[2] &&
+            originalResponse[2][6]
+          );
+          if (!updateList) {
+            sendFailed();
+            return;
+          }
+
+          const sendUpdateMatch = updateList.find((update) => (
+            update[1] &&
+            update[1][3] &&
+            update[1][3][7] &&
+            update[1][3][7][1] &&
+            update[1][3][7][1][5] &&
+            update[1][3][7][1][5][0] &&
+            update[1][3][7][1][5][0][14]
+          ));
+          if (!sendUpdateMatch) {
+            sendFailed();
+            return;
+          }
+
+          const sendUpdate = (
+            sendUpdateMatch[1] &&
+            sendUpdateMatch[1][3] &&
+            sendUpdateMatch[1][3][7] &&
+            sendUpdateMatch[1][3][7][1] &&
+            sendUpdateMatch[1][3][7][1][5] &&
+            sendUpdateMatch[1][3][7][1][5][0]
+          );
+
+          const rfcID = sendUpdate[14];
+
+          triggerEvent({
+            type: currentSendConnectionIDs.has(connection) ? 'emailSent' : 'emailDraftReceived',
+            rfcID,
+            draftID
+          });
+
+          currentSendConnectionIDs.delete(connection);
+          currentDraftSaveConnectionIDs.delete(connection);
+        }
       }
     });
   }

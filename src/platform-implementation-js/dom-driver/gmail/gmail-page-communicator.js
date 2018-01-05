@@ -70,6 +70,12 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s;
   }
 
+  isUsingSyncAPI(): string {
+    const s = (document.head:any).getAttribute('data-inboxsdk-using-sync-api');
+    if (s == null) throw new Error('Failed to read value');
+    return s;
+  }
+
   isConversationViewDisabled(): Promise<boolean> {
     return new RSVP.Promise((resolve, reject) => {
       Kefir.fromEvents(document, 'inboxSDKgmonkeyResponse')
