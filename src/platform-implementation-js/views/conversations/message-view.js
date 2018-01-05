@@ -84,7 +84,7 @@ class MessageView extends EventEmitter {
 	}
 
 	getMessageID(): string {
-		// TODO mark deprecated
+		get(memberMap, this).driver.getLogger().deprecationWarning('messageView.getMessageID', 'messageView.getMessageIDAsync');
 		return get(memberMap, this).messageViewImplementation.getMessageID();
 	}
 
