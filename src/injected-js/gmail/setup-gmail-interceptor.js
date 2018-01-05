@@ -33,8 +33,6 @@ export default function setupGmailInterceptor() {
   {
     const js_frame_element = top.document.getElementById('js_frame');
     if (js_frame_element) {
-      threadIdentifier.setup();
-
       const js_frame = js_frame_element.contentDocument.defaultView;
       const js_frame_originalXHR = js_frame.XMLHttpRequest;
       js_frame.XMLHttpRequest = XHRProxyFactory(
@@ -49,6 +47,8 @@ export default function setupGmailInterceptor() {
     top.XMLHttpRequest = XHRProxyFactory(
       main_originalXHR, main_wrappers, {logError: logErrorExceptEventListeners});
   }
+
+  threadIdentifier.setup();
 
   //email sending modifier/notifier
   {
