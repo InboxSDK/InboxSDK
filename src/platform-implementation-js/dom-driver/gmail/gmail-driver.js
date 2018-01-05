@@ -444,6 +444,10 @@ class GmailDriver {
 		return this._pageCommunicator.getUserEmailAddress();
 	}
 
+	isConversationViewDisabled(): Promise<boolean> {
+		return this._pageCommunicator.isConversationViewDisabled();
+	}
+
 	getUserContact(): Contact {
 		return {
 			emailAddress: this.getUserEmailAddress(),

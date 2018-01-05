@@ -631,6 +631,10 @@ class InboxDriver {
     return s;
   }
 
+  isConversationViewDisabled(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
   getUserContact(): Contact {
     return {
       emailAddress: this.getUserEmailAddress(),
