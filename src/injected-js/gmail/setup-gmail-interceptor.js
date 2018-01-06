@@ -641,6 +641,36 @@ export default function setupGmailInterceptor() {
         }
       }
     });
+
+    {
+      const saveBTAIHeader = (header) => {
+        (document.head:any).setAttribute('data-inboxsdk-btai-header', header);
+        triggerEvent({type: 'btaiHeaderReceived'});
+      };
+
+      const saveXsrfTokenHeader = (header) => {
+        (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
+        triggerEvent({type: 'xsrfTokenHeaderReceived'});
+      }
+
+      main_wrappers.push({
+        isRelevantTo(connection) {
+          return (
+            /sync(?:\/u\/\d+)?\//.test(connection.url) &&
+            !(document.head:any).hasAttribute('data-inboxsdk-btai-header')
+          );
+        },
+        originalSendBodyLogger(connection) {
+          if (connection.headers['X-Gmail-BTAI']) {
+            saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
+          }
+
+          if(connection.headers['X-Framework-Xsrf-Token']) {
+            saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
+          }
+        }
+      });
+    }
   }
 }
 

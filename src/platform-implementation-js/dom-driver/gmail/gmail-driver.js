@@ -57,6 +57,9 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 
+import getOldGmailThreadIdFromSyncThreadId from './gmail-driver/getOldGmailThreadIdFromSyncThreadId';
+import getSyncThreadIdForOldGmailThreadId from './gmail-driver/getSyncThreadIdForOldGmailThreadId';
+
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import toLiveSet from '../../lib/toLiveSet';
 
@@ -111,6 +114,8 @@ class GmailDriver {
 
 	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
+	getSyncThreadIdForOldGmailThreadId: (threadId: string) => Promise<string>;
+	getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
 
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
 		(this: Driver); // interface check
@@ -123,15 +128,37 @@ class GmailDriver {
 
 		// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
 		// localStorage. Used for custom thread lists.
-		const rfcIdCache = new BiMapCache({
-			key: 'inboxsdk__cached_thread_ids',
-			getAfromB: (gmailThreadId) =>
-				getRfcMessageIdForGmailThreadId(this, gmailThreadId),
-			getBfromA: (rfcMessageId) =>
-				getGmailThreadIdForRfcMessageId(this, rfcMessageId)
-		});
-		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
-		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
+		{
+			const rfcIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_thread_ids',
+				getAfromB: (gmailThreadId) =>
+					getRfcMessageIdForGmailThreadId(this, gmailThreadId),
+				getBfromA: (rfcMessageId) =>
+					getGmailThreadIdForRfcMessageId(this, rfcMessageId)
+			});
+			this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
+			this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
+		}
+
+		// Manages mapping between old hex thread ids and new sync based thread ids
+		{
+      const syncThreadIdToOldGmailThreadIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
+        getAfromB: (oldGmailThreadId: string) => {
+          return getSyncThreadIdForOldGmailThreadId(this, oldGmailThreadId);
+        },
+        getBfromA: (syncThreadId: string) => {
+					return getOldGmailThreadIdFromSyncThreadId(this, syncThreadId);
+        }
+      });
+      this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
+        syncThreadIdToOldGmailThreadIdCache.getAfromB(oldGmailThreadId);
+
+			this.getOldGmailThreadIdFromSyncThreadId = syncThreadId =>
+				syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
+    }
+
+
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();

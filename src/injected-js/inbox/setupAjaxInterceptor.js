@@ -237,6 +237,11 @@ export default function setupAjaxInterceptor() {
       triggerEvent({type: 'btaiHeaderReceived'});
     };
 
+    const saveXsrfTokenHeader = (header) => {
+      (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
+      triggerEvent({type: 'xsrfTokenHeaderReceived'});
+    }
+
     main_wrappers.push({
       isRelevantTo(connection) {
         return (
@@ -247,6 +252,10 @@ export default function setupAjaxInterceptor() {
       originalSendBodyLogger(connection) {
         if (connection.headers['X-Gmail-BTAI']) {
           saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
+        }
+
+        if(connection.headers['x-framework-xsrf-token']) {
+          saveXsrfTokenHeader(connection.headers['x-framework-xsrf-token']);
         }
       }
     });

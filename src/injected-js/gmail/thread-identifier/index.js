@@ -72,14 +72,22 @@ function processPreloadedThreads() {
 
 function getThreadIdFromUrl(url: string): ?string {
   var tid = parse(url).th;
-  if (!tid) {
-    // Draft URLs have the thread id after the hash
+  if (tid){
+    var tidHasMatch = tid.match(/#(.*)/);
+    if (tidHasMatch) {
+      // we are in new sync world
+      tid = tidHasMatch[1];
+    }
+  }
+  else {
     var urlHashMatch = url.match(/#(.*)/);
     if (urlHashMatch) {
+      // drafts have the hash in them without the th=
       url = decodeURIComponent(decodeURIComponent(urlHashMatch[1]));
       tid = parse(url).th;
     }
   }
+
   return tid;
 }
 

@@ -15,7 +15,7 @@ async function getInboxMessageIdForInboxThreadId(driver: InboxDriver, inboxThrea
     url: `https://inbox.google.com/sync${accountParam}/i/fd`,
     headers: {
       'Content-Type': 'application/json',
-      'X-Framework-Xsrf-Token': driver.getPageCommunicator().getXsrfToken(),
+      'X-Framework-Xsrf-Token': await driver.getPageCommunicator().getXsrfToken(),
       'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
       'X-Google-BTD': '1'
     },
