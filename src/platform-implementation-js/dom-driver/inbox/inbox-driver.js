@@ -751,7 +751,7 @@ class InboxDriver {
     return createLink(this, routeID, params);
   }
 
-  goto(routeID: string, params: ?RouteParams): void {
+  async goto(routeID: string, params: ?RouteParams): Promise<void> {
     gotoView(this, routeID, params);
   }
 

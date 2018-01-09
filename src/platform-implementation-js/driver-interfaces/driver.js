@@ -64,7 +64,7 @@ export type Driver = {
 	addNavItem(appId: string, navItemDescriptor: Object): Object;
 	getSentMailNativeNavItem(): Promise<Object>;
 	createLink(a: any, b: any): any;
-	goto(routeID: string, params: any): void;
+	goto(routeID: string, params: any): Promise<void>;
 	addCustomRouteID(routeID: string): () => void;
 	addCustomListRouteID(routeID: string, handler: Function): () => void;
 	showCustomRouteView(el: HTMLElement): void;
