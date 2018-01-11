@@ -40,6 +40,10 @@ export default class CommonPageCommunicator {
     throw new Error("Failed to look up 'ik' value");
   }
 
+  isUsingSyncAPI(): boolean {
+    return false;
+  }
+
   async getXsrfToken(): Promise<string> {
     const existingHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
     if (existingHeader) {

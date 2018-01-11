@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import * as GRP from '../gmail-response-processor';
+import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
@@ -264,16 +265,31 @@ const setupSearchReplacing = (
           .map(x => x.response)
           .take(1)
       ]).onValue(([idPairs, response]: [CompletedIDPairs, string]) => {
+        // override thread list response so that we show results in the same
+        // order that user passed in
         driver.signalCustomThreadListActivity(customRouteID);
 
         let newResponse;
         try {
-          const extractedThreads = GRP.extractThreads(response);
-          const newThreads: typeof extractedThreads = idPairs
-            .map(({gtid}) => find(extractedThreads, t => t.gmailThreadId === gtid))
-            .filter(Boolean);
+          if(driver.getPageCommunicator().isUsingSyncAPI()){
+            const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(response);
 
-          newResponse = GRP.replaceThreadsInResponse(response, newThreads, {start, total});
+            const reorderedThreads: typeof extractedThreads = idPairs
+              .map(({gtid}) => find(extractedThreads, t => t.oldGmailThreadId === gtid))
+              .filter(Boolean);
+
+            newResponse = SyncGRP.replaceThreadsInSearchResponse(response, reorderedThreads, {start, total});
+          }
+          else {
+            const extractedThreads = GRP.extractThreads(response);
+
+            const reorderedThreads: typeof extractedThreads = idPairs
+              .map(({gtid}) => find(extractedThreads, t => t.gmailThreadId === gtid))
+              .filter(Boolean);
+
+            newResponse = GRP.replaceThreadsInResponse(response, reorderedThreads, {start, total});
+          }
+
           driver.getPageCommunicator().setCustomListResults(newQuery, newResponse);
         } catch(e) {
           driver.getLogger().error(e, {
@@ -288,8 +304,14 @@ const setupSearchReplacing = (
             });
           }
           try {
-            driver.getPageCommunicator().setCustomListResults(
-              newQuery, GRP.replaceThreadsInResponse(response, [], {start, total}));
+            if(driver.getPageCommunicator().isUsingSyncAPI()){
+              driver.getPageCommunicator().setCustomListResults(
+                newQuery, SyncGRP.replaceThreadsInSearchResponse(response, [], {start, total}));
+            }
+            else{
+              driver.getPageCommunicator().setCustomListResults(
+                newQuery, GRP.replaceThreadsInResponse(response, [], {start, total}));
+            }
           } catch(e2) {
             driver.getLogger().error(e2);
             // The original response will be used.

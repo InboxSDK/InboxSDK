@@ -396,39 +396,39 @@ export default function setupGmailInterceptor() {
     });
   }
 
+  // Search results replacer.
+  // The content script tells us a search query to watch for. Whenever we see
+  // the search query, trigger an event containing the query, trigger an
+  // event containing the response, and then wait for a response event from
+  // the content script that contains new results to substitute in.
+  const customSearchQueries = [];
+  let customListJob;
+
+  document.addEventListener('inboxSDKcustomListRegisterQuery', (event: any) => {
+    customSearchQueries.push(event.detail.query);
+  });
+
+  document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
+    if (
+      customListJob.query === event.detail.query &&
+      customListJob.start === event.detail.start
+    ) {
+      const {newQuery, newStart} = event.detail;
+
+      customListJob.newRequestParams.resolve({
+        query: newQuery,
+        start: newStart
+      });
+    }
+  });
+
+  document.addEventListener('inboxSDKcustomListResults', (event: any) => {
+    if (customListJob.query === event.detail.query) {
+      customListJob.newResults.resolve(event.detail.newResults);
+    }
+  });
+
   {
-    // Search results replacer.
-    // The content script tells us a search query to watch for. Whenever we see
-    // the search query, trigger an event containing the query, trigger an
-    // event containing the response, and then wait for a response event from
-    // the content script that contains new results to substitute in.
-    const customSearchQueries = [];
-    let customListJob;
-
-    document.addEventListener('inboxSDKcustomListRegisterQuery', (event: any) => {
-      customSearchQueries.push(event.detail.query);
-    });
-
-    document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
-      if (
-        customListJob.query === event.detail.query &&
-        customListJob.start === event.detail.start
-      ) {
-        const {newQuery, newStart} = event.detail;
-
-        customListJob.newRequestParams.resolve({
-          query: newQuery,
-          start: newStart
-        });
-      }
-    });
-
-    document.addEventListener('inboxSDKcustomListResults', (event: any) => {
-      if (customListJob.query === event.detail.query) {
-        customListJob.newResults.resolve(event.detail.newResults);
-      }
-    });
-
     js_frame_wrappers.push({
       isRelevantTo: function(connection) {
         let customSearchQuery;
@@ -492,8 +492,98 @@ export default function setupGmailInterceptor() {
   }
 
   {
-    // Sync API-based compose sending intercept
+    // Sync API-based custom thread list interception
+    main_wrappers.push({
+      isRelevantTo: function(connection) {
+        const params = connection.params;
+        if (
+          /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
+        ) {
+          if (customListJob) {
+            // Resolve the old one with something because no one else is going
+            // to after it's replaced in a moment.
+            customListJob.newRequestParams.resolve({
+              query: customListJob.query,
+              start: customListJob.start
+            });
+            customListJob.newResults.resolve(null);
+          }
+          return true;
+        }
+        return false;
+      },
+      requestChanger: async function(connection, request) {
+        let requestPromise;
+        try{
 
+          if(request.body){
+            const parsedBody = JSON.parse(request.body);
+            const requestType = (
+              parsedBody &&
+              parsedBody[1] &&
+              parsedBody[1][6]
+            );
+
+            if(requestType === 'itemlist-efa-6'){
+              // we are a search!
+              const searchQuery = parsedBody[1][4];
+              if(find(customSearchQueries, x => x === searchQuery)) {
+                customListJob = (connection:any)._customListJob = {
+                  query: searchQuery,
+                  start: parsedBody[1][10],
+                  newRequestParams: defer(),
+                  newResults: defer()
+                };
+                triggerEvent({
+                  type: 'searchForReplacement',
+                  query: customListJob.query,
+                  start: customListJob.start
+                });
+
+                return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
+                  parsedBody[1][4] = query;
+                  parsedBody[1][10] = start;
+
+                  return {
+                    method: request.method,
+                    url: request.url,
+                    body: JSON.stringify(parsedBody)
+                  };
+                });
+              }
+            }
+          }
+        }
+        catch(e){
+          //do nothing for now
+        }
+
+        return requestPromise || request;
+      },
+      responseTextChanger: async function(connection, response) {
+        if((connection:any)._customListJob){
+          triggerEvent({
+            type: 'searchResultsResponse',
+            query: (connection:any)._customListJob.query,
+            start: (connection:any)._customListJob.start,
+            response
+          });
+
+          /*
+          return (connection:any)._customListJob.newResults.promise.then(newResults =>
+            newResults === null ? response : newResults
+          );
+          */
+
+          return response;
+        }
+        else{
+          return response;
+        }
+      }
+    });
+
+    // Sync API-based compose sending intercept
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
     const currentDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
     const currentSendConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
