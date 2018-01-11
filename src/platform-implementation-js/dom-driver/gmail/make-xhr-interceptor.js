@@ -16,47 +16,63 @@ export default function makeXhrInterceptor(): {xhrInterceptStream: Kefir.Observa
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSending';
     }).map(function(detail) {
-      var body = parse(detail.body);
-      return {
-        type: 'emailSending',
-        composeId: body.composeid,
-        draft: body.draft
-      };
+      if (detail.draftID) {
+        return detail;
+      } else {
+        var body = parse(detail.body);
+        return {
+          type: 'emailSending',
+          composeId: body.composeid,
+          draft: body.draft
+        };
+      }
     }),
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailSent';
     }).map(function(detail) {
-      var body = parse(detail.originalSendBody);
-      var response = detail.responseText;
-      return {
-        type: 'emailSent',
-        composeId: body.composeid,
-        draft: body.draft,
-        response: response
-      };
+      if (detail.draftID) {
+        return detail;
+      } else {
+        var body = parse(detail.originalSendBody);
+        var response = detail.responseText;
+        return {
+          type: 'emailSent',
+          composeId: body.composeid,
+          draft: body.draft,
+          response: response
+        };
+      }
     }),
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailDraftSaveSending';
     }).map(function(detail) {
-      var body = parse(detail.body);
-      return {
-        type: 'emailDraftSaveSending',
-        composeId: body.composeid,
-        draft: body.draft
-      };
+      if (detail.draftID) {
+        return detail;
+      } else {
+        var body = parse(detail.body);
+        return {
+          type: 'emailDraftSaveSending',
+          composeId: body.composeid,
+          draft: body.draft
+        };
+      }
     }),
     rawInterceptStream.filter(function(detail) {
       return detail.type === 'emailDraftReceived';
     }).map(function(detail) {
-      var body = parse(detail.originalSendBody);
-      var response = detail.responseText;
-      return {
-        type: 'emailDraftReceived',
-        composeId: body.composeid,
-        draft: body.draft,
-        response: response,
-        connectionDetails: detail.connectionDetails
-      };
+      if (detail.draftID) {
+        return detail;
+      } else {
+        var body = parse(detail.originalSendBody);
+        var response = detail.responseText;
+        return {
+          type: 'emailDraftReceived',
+          composeId: body.composeid,
+          draft: body.draft,
+          response: response,
+          connectionDetails: detail.connectionDetails
+        };
+      }
     })
   ]);
 
