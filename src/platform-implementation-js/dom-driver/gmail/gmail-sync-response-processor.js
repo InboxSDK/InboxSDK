@@ -89,7 +89,7 @@ export function replaceThreadsInSearchResponse(
 
   const parsedResponse = JSON.parse(response);
 
-  parsedResponse[2] = replacementThreads.map(({rawResponse}) => rawResponse);
+  parsedResponse[3] = replacementThreads.map(({rawResponse}, index) => ({...rawResponse, '2': index}));
   parsedResponse[15][1] = replacementThreads.map(({extraMetaData}) => extraMetaData.snippet);
   parsedResponse[15][2] = replacementThreads.map(({extraMetaData}) => extraMetaData.messageIDs);
 

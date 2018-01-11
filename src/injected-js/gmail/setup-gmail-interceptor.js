@@ -569,13 +569,9 @@ export default function setupGmailInterceptor() {
             response
           });
 
-          /*
           return (connection:any)._customListJob.newResults.promise.then(newResults =>
             newResults === null ? response : newResults
           );
-          */
-
-          return response;
         }
         else{
           return response;
