@@ -557,6 +557,10 @@ class GmailDriver {
 		return !!(global.GLOBALS && global._GM_main);
 	}
 
+	isGmailV2UI(): boolean {
+		return GmailElementGetter.isGmailV2UI();
+	}
+
 	showAppIdWarning() {
 		showAppIdWarning(this);
 	}

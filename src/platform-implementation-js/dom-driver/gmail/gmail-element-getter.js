@@ -155,6 +155,10 @@ const GmailElementGetter = {
 		return topAccountContainer.querySelectorAll('a[href*="https://plus"][href*="upgrade"]').length === 0;
 	},
 
+	isGmailV2UI(): boolean {
+		return true;
+	},
+
 	StandaloneCompose: {
 		getComposeWindowContainer(): ?HTMLElement {
 			return document.querySelector('[role=main]');
