@@ -160,7 +160,7 @@ const GmailElementGetter = {
 	},
 
 	isGmailV2UI(): boolean {
-		return true;
+		return document.querySelector('header[role="banner"][id]') != null;
 	},
 
 	StandaloneCompose: {
