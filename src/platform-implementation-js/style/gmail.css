@@ -1066,7 +1066,7 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   margin-left: -18px;
 }
 
-.inboxsdk__navItem_container {
+body.inboxsdk__gmailv1css .inboxsdk__navItem_container {
   margin-left: -14px;
 }
 
