@@ -477,7 +477,10 @@ export default class GmailNavItemView {
 			e.stopPropagation();
 		});
 
-		const insertionPoint = this._element.querySelector('.aip');
+		const insertionPoint = this._driver.isGmailV2UI() ?
+			this._element.querySelector('.TN.aik') :
+			this._element.querySelector('.aip');
+
 		if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
 
 		if(this._isCollapsed){
