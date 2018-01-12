@@ -15,17 +15,21 @@ import GmailElementGetter from '../gmail-element-getter';
 import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
 import GmailNavItemView from './gmail-nav-item-view';
 
+import type GmailDriver from '../gmail-driver';
+
 const LEFT_INDENTATION_PADDING = 14;
 
 export default class NativeGmailNavItemView {
 
+	_driver: GmailDriver;
 	_element: HTMLElement;
 	_navItemName: string;
 	_activeMarkerElement: ?HTMLElement = null;
 	_eventStream: Bus<any>;
 	_itemContainerElement: ?HTMLElement = null;
 
-	constructor(nativeElement: HTMLElement, navItemName: string) {
+	constructor(driver: GmailDriver, nativeElement: HTMLElement, navItemName: string) {
+		this._driver = driver;
 		this._element = nativeElement;
 		this._eventStream = kefirBus();
 
@@ -50,7 +54,7 @@ export default class NativeGmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number, navItemDescriptor: Object): GmailNavItemView {
-		var gmailNavItemView = new GmailNavItemView(orderGroup, 1);
+		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
 
 		gmailNavItemView
 			.getEventStream()

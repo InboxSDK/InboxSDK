@@ -22,11 +22,14 @@ import updateIcon from '../../../driver-common/update-icon';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
+import type GmailDriver from '../gmail-driver';
+
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 const LEFT_INDENTATION_PADDING = 14;
 
 export default class GmailNavItemView {
 
+	_driver: GmailDriver;
 	_navItemDescriptor: Object;
 	_element: HTMLElement;
 	_activeMarkerElement: ?HTMLElement = null;
@@ -49,8 +52,9 @@ export default class GmailNavItemView {
 	_navItemNumber: number;
 	_isActive: boolean = false;
 
-	constructor(orderGroup: number | string, level: number){
+	constructor(driver: GmailDriver, orderGroup: number | string, level: number){
 
+		this._driver = driver;
 		this._orderGroup = orderGroup;
 		this._eventStream = kefirBus();
 		this._level = level || 0;
@@ -102,7 +106,7 @@ export default class GmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number | string, navItemDescriptor: Object): GmailNavItemView {
-		var gmailNavItemView = new GmailNavItemView(orderGroup, this._level + 1);
+		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
 
 		gmailNavItemView
 			.getEventStream()

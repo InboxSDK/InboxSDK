@@ -392,11 +392,11 @@ class GmailDriver {
 	}
 
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return addNavItem(appId, navItemDescriptor);
+		return addNavItem(this, appId, navItemDescriptor);
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
-		const p = getNativeNavItem('sent');
+		const p = getNativeNavItem(this, 'sent');
 		p.catch(err => this._logger.error(err));
 		return p;
 	}
