@@ -186,15 +186,32 @@ export default class GmailNavItemView {
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
-		this._element.innerHTML = [
-			'<div class="TO">',
-				'<div class="TN aik">',
-					'<div class="aio aip">',
+		if (this._driver.isGmailV2UI()) {
+			this._element.innerHTML = [
+				'<div class="TO">',
+					'<div class="TN aik">',
+
+						'<div class="qj">',
+						'</div>',
+
+						'<div class="aio aip">',
+						'</div>',
 
 					'</div>',
-				'</div>',
-			'</div>'
-		].join('');
+				'</div>'
+			].join('');
+		}
+		else {
+			this._element.innerHTML = [
+				'<div class="TO">',
+					'<div class="TN aik">',
+						'<div class="aio aip">',
+
+						'</div>',
+					'</div>',
+				'</div>'
+			].join('');
+		}
 
 		const innerElement = querySelector(this._element, '.TO');
 
