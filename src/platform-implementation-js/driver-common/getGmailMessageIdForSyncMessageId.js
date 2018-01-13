@@ -1,14 +1,14 @@
 /* @flow */
 
 import {defn} from 'ud';
-import gmailAjax from '../../driver-common/gmailAjax';
-import type InboxDriver from './inbox-driver';
+import gmailAjax from './gmailAjax';
+import type {Driver} from '../driver-interfaces/driver';
 
 // Messages sent from the local user in Inbox have a fake ID in the DOM (with
 // the "msg-a:r" prefix) that doesn't match up with anything in the Gmail API.
 // This function translates the Inbox ID into the real ID that can be found in
 // the Gmail API.
-async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMessageId: string): Promise<string> {
+async function getGmailMessageIdForSyncMessageId(driver: Driver, syncMessageId: string): Promise<string> {
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   // Inbox omits the account param if there is only one logged in account,
   // but this page is backed by Gmail's backend which will always include it.
@@ -21,7 +21,7 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       view: 'om',
-      permmsgid: inboxMessageId
+      permmsgid: syncMessageId
     }
   });
 
@@ -32,4 +32,4 @@ async function getGmailMessageIdForInboxMessageId(driver: InboxDriver, inboxMess
   return messageIdMatch[1];
 }
 
-export default defn(module, getGmailMessageIdForInboxMessageId);
+export default defn(module, getGmailMessageIdForSyncMessageId);

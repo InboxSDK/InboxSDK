@@ -200,7 +200,7 @@ class InboxMessageView {
           break;
         }
       }
-      return await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
+      return await this._driver.getGmailMessageIdForSyncMessageId(inboxMessageId);
     } else {
       const m = /\d+$/.exec(inboxMessageId);
       if (!m) throw new Error('Should not happen');

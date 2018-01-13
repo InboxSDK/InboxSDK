@@ -4,6 +4,7 @@ import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
 import intersection from 'lodash/intersection';
+import BigNumber from 'bignumber.js';
 
 import Kefir from 'kefir';
 import * as logger from '../injected-logger';
@@ -581,8 +582,10 @@ export default function setupGmailInterceptor() {
 
     // Sync API-based compose sending intercept
     const SEND_ACTIONS = ["^pfg", "^f_bt", "^f_btns", "^f_cl"];
-    const currentDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+    const INITIAL_DRAFT_SAVE_ACTIONS = ["^r_bt"]
     const currentSendConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+    const currentDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+    const currentFirstDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
     main_wrappers.push({
       isRelevantTo(connection) {
         return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
@@ -611,69 +614,90 @@ export default function setupGmailInterceptor() {
             );
           });
 
-          if (!messageUpdates.length) return;
+          if (messageUpdates.length) {
+            const sendUpdateMatch = messageUpdates.find((update) => {
+              const updateWrapper = (
+                update[2] &&
+                update[2][2] &&
+                (update[2][2][14] || update[2][2][2])
+              );
 
-          const sendUpdateMatch = messageUpdates.find((update) => {
-            const updateWrapper = (
+              return (
+                updateWrapper[1][11] &&
+                intersection(
+                  updateWrapper[1][11],
+                  SEND_ACTIONS
+                ).length === SEND_ACTIONS.length
+              );
+            });
+
+            if (sendUpdateMatch) {
+              const sendUpdateWrapper = (
+                sendUpdateMatch[2] &&
+                sendUpdateMatch[2][2] &&
+                (sendUpdateMatch[2][2][14] || sendUpdateMatch[2][2][2])
+              );
+              const sendUpdate = sendUpdateWrapper[1];
+
+              const draftID = sendUpdate[1].replace('msg-a:', '');
+
+              currentSendConnectionIDs.set(connection, draftID);
+              triggerEvent({type: 'emailSending', draftID});
+            }
+            else {
+              // There's a small chance that an update list could contain the
+              // draft saves for multiple drafts in some situations — we've never
+              // seen this so currently just picking the first update and assuming
+              // that if there are multiple updates in the request they are for
+              // queued up versions of the same draft.
+
+              const firstMessageUpdate = messageUpdates[0];
+              const updateWrapper = (
+                firstMessageUpdate[2] &&
+                firstMessageUpdate[2][2] &&
+                (firstMessageUpdate[2][2][14] || firstMessageUpdate[2][2][2])
+              );
+              const update = updateWrapper[1];
+
+              const draftID = update[1].replace('msg-a:', '');
+              currentFirstDraftSaveConnectionIDs.set(connection, draftID);
+            }
+          }
+          else {
+            // the first time a draft is saved it has a different response format
+            const messageUpdates = updateList.map(update =>
               update[2] &&
               update[2][2] &&
-              (update[2][2][14] || update[2][2][2])
-            );
+              update[2][2][3] &&
+              update[2][2][3][1] &&
+              update[2][2][3][1][5] &&
+              update[2][2][3][1][5][0]
+            ).filter(Boolean);
 
-            return (
-              updateWrapper[1][11] &&
-              intersection(
-                updateWrapper[1][11],
-                SEND_ACTIONS
-              ).length === SEND_ACTIONS.length
-            );
-          });
-
-          if (sendUpdateMatch) {
-            const sendUpdateWrapper = (
-              sendUpdateMatch[2] &&
-              sendUpdateMatch[2][2] &&
-              (sendUpdateMatch[2][2][14] || sendUpdateMatch[2][2][2])
-            );
-            const sendUpdate = sendUpdateWrapper[1];
-
-            const draftID = sendUpdate[1].replace('msg-a:', '');
-
-            currentSendConnectionIDs.set(connection, draftID);
-            triggerEvent({type: 'emailSending', draftID});
-          } else {
-            // There's a small chance that an update list could contain the
-            // draft saves for multiple drafts in some situations — we've never
-            // seen this so currently just picking the first update and assuming
-            // that if there are multiple updates in the request they are for
-            // queued up versions of the same draft.
-
+            if(messageUpdates.length === 0) return;
             const firstMessageUpdate = messageUpdates[0];
-            const updateWrapper = (
-              firstMessageUpdate[2] &&
-              firstMessageUpdate[2][2] &&
-              (firstMessageUpdate[2][2][14] || firstMessageUpdate[2][2][2])
-            );
-            const update = updateWrapper[1];
 
-            const draftID = update[1].replace('msg-a:', '');
-
+            const draftID = firstMessageUpdate[1].replace('msg-a:', '');
             currentDraftSaveConnectionIDs.set(connection, draftID);
-            triggerEvent({type: 'emailDraftSaveSending', draftID});
           }
+
         }
       },
       afterListeners(connection) {
         if (
           currentSendConnectionIDs.has(connection) ||
-          currentDraftSaveConnectionIDs.has(connection)
-        ) {
+          currentDraftSaveConnectionIDs.has(connection) ||
+          currentFirstDraftSaveConnectionIDs.has(connection)
+				) {
           const sendFailed = () => {
             triggerEvent({type: 'emailSendFailed', draftID});
             currentSendConnectionIDs.delete(connection);
           };
 
-          const draftID = currentSendConnectionIDs.get(connection) || currentDraftSaveConnectionIDs.get(connection);
+          const draftID =
+            currentSendConnectionIDs.get(connection) ||
+            currentDraftSaveConnectionIDs.get(connection) ||
+            currentFirstDraftSaveConnectionIDs.get(connection);
 
           if (connection.status !== 200 || !connection.originalResponseText) {
             sendFailed();
@@ -682,48 +706,79 @@ export default function setupGmailInterceptor() {
 
           const originalResponse = JSON.parse(connection.originalResponseText);
 
-          const updateList = (
-            originalResponse[2] &&
-            originalResponse[2][6]
-          );
-          if (!updateList) {
-            sendFailed();
-            return;
+          if(currentFirstDraftSaveConnectionIDs.has(connection)){
+            const wrapper = (
+              originalResponse[2] &&
+              originalResponse[2][6] &&
+              originalResponse[2][6][1]
+            );
+
+            if(wrapper){
+              const saveUpdate = (
+                wrapper[3] &&
+                wrapper[3][1] &&
+                wrapper[3][1][1]
+              );
+
+              if(saveUpdate){
+                triggerEvent({
+      						draftID: draftID,
+      						type: 'emailDraftReceived',
+                  rfcID: saveUpdate[14],
+                  messageID: saveUpdate[1],
+                  oldMessageID: new BigNumber(saveUpdate[48]).toString(16),
+                  threadID: wrapper[1]
+                });
+              }
+            }
           }
+          else {
+            const updateList = (
+              originalResponse[2] &&
+              originalResponse[2][6]
+            );
+            if (!updateList) {
+              sendFailed();
+              return;
+            }
 
-          const sendUpdateMatch = updateList.find((update) => (
-            update[1] &&
-            update[1][3] &&
-            update[1][3][7] &&
-            update[1][3][7][1] &&
-            update[1][3][7][1][5] &&
-            update[1][3][7][1][5][0] &&
-            update[1][3][7][1][5][0][14]
-          ));
-          if (!sendUpdateMatch) {
-            sendFailed();
-            return;
+            const sendUpdateMatch = updateList.find((update) => (
+              update[1] &&
+              update[1][3] &&
+              update[1][3][7] &&
+              update[1][3][7][1] &&
+              update[1][3][7][1][5] &&
+              update[1][3][7][1][5][0] &&
+              update[1][3][7][1][5][0][14]
+            ));
+            if (!sendUpdateMatch) {
+              sendFailed();
+              return;
+            }
+
+            const sendUpdateWrapper = (
+              sendUpdateMatch[1] &&
+              sendUpdateMatch[1][3] &&
+              sendUpdateMatch[1][3][7] &&
+              sendUpdateMatch[1][3][7][1]
+            );
+
+            const sendUpdate = sendUpdateWrapper[5][0];
+
+            triggerEvent({
+  						draftID: draftID,
+  						type: currentSendConnectionIDs.has(connection) ? 'emailSent' : 'emailDraftReceived',
+              rfcID: sendUpdate[14],
+              messageID: sendUpdate[1],
+              oldMessageID: new BigNumber(sendUpdate[48]).toString(16),
+              threadID: sendUpdateWrapper[4],
+              oldThreadID: new BigNumber(sendUpdateWrapper[18]).toString(16)
+            });
           }
-
-          const sendUpdate = (
-            sendUpdateMatch[1] &&
-            sendUpdateMatch[1][3] &&
-            sendUpdateMatch[1][3][7] &&
-            sendUpdateMatch[1][3][7][1] &&
-            sendUpdateMatch[1][3][7][1][5] &&
-            sendUpdateMatch[1][3][7][1][5][0]
-          );
-
-          const rfcID = sendUpdate[14];
-
-          triggerEvent({
-            type: currentSendConnectionIDs.has(connection) ? 'emailSent' : 'emailDraftReceived',
-            rfcID,
-            draftID
-          });
 
           currentSendConnectionIDs.delete(connection);
           currentDraftSaveConnectionIDs.delete(connection);
+          currentFirstDraftSaveConnectionIDs.delete(connection);
         }
       }
     });

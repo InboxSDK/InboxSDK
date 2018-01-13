@@ -67,12 +67,12 @@ class ThreadRowIdentifier {
     return null;
   }
 
-  async getDraftIdForThreadRow(gmailThreadRowView: GmailThreadRowView): Promise<?string> {
+  getDraftIdForThreadRow(gmailThreadRowView: GmailThreadRowView): Promise<?string> {
     if (
       gmailThreadRowView.getVisibleMessageCount() > 0 ||
       gmailThreadRowView.getVisibleDraftCount() == 0
     ) {
-      return null;
+      return Promise.resolve(null);
     }
     const composeView = this._findComposeForThreadRow(gmailThreadRowView);
     if (composeView) {

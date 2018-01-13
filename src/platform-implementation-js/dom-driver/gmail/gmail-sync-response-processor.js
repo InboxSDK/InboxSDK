@@ -46,7 +46,7 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
 }
 
 
-export function extractThreadsFromThreadResponse(response: string): SyncThread {
+export function extractThreadsFromThreadResponse(response: string): SyncThread[] {
   const parsedResponse = JSON.parse(response);
 
   const threadDescriptors = (

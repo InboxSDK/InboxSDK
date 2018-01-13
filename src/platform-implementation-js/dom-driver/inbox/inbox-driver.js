@@ -28,8 +28,8 @@ import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import injectScript from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
-import getGmailMessageIdForInboxMessageId from './getGmailMessageIdForInboxMessageId';
 import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThreadId';
+import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
 import simulateKey from '../../lib/dom/simulate-key';
@@ -129,7 +129,7 @@ class InboxDriver {
     }
   };
 
-  getGmailMessageIdForInboxMessageId: (inboxMessageId: string) => Promise<string>;
+  getGmailMessageIdForSyncMessageId: (inboxMessageId: string) => Promise<string>;
   getInboxMessageIdForInboxThreadId: (inboxThreadId: string) => Promise<string>;
   getThreadIdFromMessageId: (messageId: string) => Promise<string>;
 
@@ -160,12 +160,12 @@ class InboxDriver {
       }
       const gmailMessageIdForInboxMessageIdCache = new BiMapCache({
         key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
-        getAfromB: (inboxMessageId: string) => getGmailMessageIdForInboxMessageId(this, inboxMessageId),
+        getAfromB: (inboxMessageId: string) => getGmailMessageIdForSyncMessageId(this, inboxMessageId),
         getBfromA() {
           throw new Error('should not happen');
         }
       });
-      this.getGmailMessageIdForInboxMessageId = inboxMessageId =>
+      this.getGmailMessageIdForSyncMessageId = inboxMessageId =>
         gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
 

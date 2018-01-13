@@ -80,6 +80,8 @@ function getThreadIdFromUrl(url: string): ?string {
     }
   }
   else {
+    // drafts in sync world can have weird urls that kind of
+    // look like old style urls, and get handled properly here
     var urlHashMatch = url.match(/#(.*)/);
     if (urlHashMatch) {
       // drafts have the hash in them without the th=
@@ -88,7 +90,9 @@ function getThreadIdFromUrl(url: string): ?string {
     }
   }
 
-  return tid;
+  // if we're in sync world and it's a
+  // draft then a hash can come through in the beginning
+  return tid.replace('#', '');
 }
 
 function getGmailThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {

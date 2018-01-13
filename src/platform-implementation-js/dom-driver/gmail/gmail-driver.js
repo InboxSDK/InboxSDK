@@ -35,6 +35,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
+import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
 import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
@@ -116,6 +117,7 @@ class GmailDriver {
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
 	getSyncThreadIdForOldGmailThreadId: (threadId: string) => Promise<string>;
 	getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
+	getGmailMessageIdForSyncMessageId: (syncMessageId: string) => Promise<string>;
 
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
 		(this: Driver); // interface check
@@ -158,7 +160,18 @@ class GmailDriver {
 				syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
     }
 
-
+		// mapping between sync message ids and old message ids
+		{
+      const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
+        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+        getAfromB: (sync: string) => getGmailMessageIdForSyncMessageId(this, sync),
+        getBfromA() {
+          throw new Error('should not happen');
+        }
+      });
+      this.getGmailMessageIdForSyncMessageId = syncMessageId =>
+        gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
+    }
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
