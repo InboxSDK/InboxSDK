@@ -34,10 +34,7 @@ export default class GmailNavItemView {
 	_driver: GmailDriver;
 	_navItemDescriptor: Object;
 	_element: HTMLElement;
-	_activeMarkerElement: ?HTMLElement = null;
 	_eventStream: Bus<any>;
-	_iconElement: ?HTMLElement = null;
-	_iconImgElement: ?HTMLElement = null;
 	_itemContainerElement: ?HTMLElement = null;
 	_expandoElement: ?HTMLElement = null;
 	_isCollapsed: boolean = false;
@@ -68,10 +65,7 @@ export default class GmailNavItemView {
 
 	destroy(){
 		this._element.remove();
-		if(this._activeMarkerElement) this._activeMarkerElement.remove();
 		if(this._eventStream) this._eventStream.end();
-		if(this._iconElement) this._iconElement.remove();
-		if(this._iconImgElement) this._iconImgElement.remove();
 		if(this._itemContainerElement) this._itemContainerElement.remove();
 		if(this._expandoElement) this._expandoElement.remove();
 		if(this._accessoryViewController) this._accessoryViewController.destroy();
