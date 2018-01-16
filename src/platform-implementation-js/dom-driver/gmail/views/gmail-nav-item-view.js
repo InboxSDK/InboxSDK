@@ -256,9 +256,13 @@ export default class GmailNavItemView {
 		this._updateType(navItemDescriptor.type);
 		this._updateName(navItemDescriptor.name);
 
+		const iconContainerElement = this._driver.isGmailV2UI() ?
+			querySelector(this._element, '.qj') :
+			querySelector(this._element, '.aio');
+
 		updateIcon(
 			this._iconSettings,
-			querySelector(this._element, '.aio'),
+			iconContainerElement,
 			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
 			navItemDescriptor.iconClass,
 			navItemDescriptor.iconUrl
