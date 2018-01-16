@@ -392,11 +392,11 @@ class GmailDriver {
 	}
 
 	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return addNavItem(appId, navItemDescriptor);
+		return addNavItem(this, appId, navItemDescriptor);
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
-		const p = getNativeNavItem('sent');
+		const p = getNativeNavItem(this, 'sent');
 		p.catch(err => this._logger.error(err));
 		return p;
 	}
@@ -478,6 +478,11 @@ class GmailDriver {
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
+
+			if (!GmailElementGetter.isGmailV2UI()) {
+				((document.body:any):HTMLElement).classList.add('inboxsdk__gmailv1css');
+			}
+
 			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
 			).takeUntilBy(this._stopper).toProperty();
@@ -555,6 +560,10 @@ class GmailDriver {
 
 	isRunningInPageContext(): boolean {
 		return !!(global.GLOBALS && global._GM_main);
+	}
+
+	isGmailV2UI(): boolean {
+		return GmailElementGetter.isGmailV2UI();
 	}
 
 	showAppIdWarning() {

@@ -10,8 +10,10 @@ import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
-export default function addNavItem(orderGroup: string, navItemDescriptor: Kefir.Observable<Object>): GmailNavItemView {
-	const gmailNavItemView = new GmailNavItemView(orderGroup, 1);
+import type GmailDriver from '../gmail-driver';
+
+export default function addNavItem(driver: GmailDriver, orderGroup: string, navItemDescriptor: Kefir.Observable<Object>): GmailNavItemView {
+	const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
 
 	const attacher = _attachNavItemView(gmailNavItemView);
 

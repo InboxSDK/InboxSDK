@@ -22,11 +22,16 @@ import updateIcon from '../../../driver-common/update-icon';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
+import type GmailDriver from '../gmail-driver';
+
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
-const LEFT_INDENTATION_PADDING = 14;
+
+const GMAIL_V1_LEFT_INDENTATION_PADDING = 14;
+const GMAIL_V2_LEFT_INDENTATION_PADDING = 12;
 
 export default class GmailNavItemView {
 
+	_driver: GmailDriver;
 	_navItemDescriptor: Object;
 	_element: HTMLElement;
 	_activeMarkerElement: ?HTMLElement = null;
@@ -49,8 +54,9 @@ export default class GmailNavItemView {
 	_navItemNumber: number;
 	_isActive: boolean = false;
 
-	constructor(orderGroup: number | string, level: number){
+	constructor(driver: GmailDriver, orderGroup: number | string, level: number){
 
+		this._driver = driver;
 		this._orderGroup = orderGroup;
 		this._eventStream = kefirBus();
 		this._level = level || 0;
@@ -102,7 +108,7 @@ export default class GmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number | string, navItemDescriptor: Object): GmailNavItemView {
-		var gmailNavItemView = new GmailNavItemView(orderGroup, this._level + 1);
+		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
 
 		gmailNavItemView
 			.getEventStream()
@@ -180,15 +186,32 @@ export default class GmailNavItemView {
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
-		this._element.innerHTML = [
-			'<div class="TO">',
-				'<div class="TN aik">',
-					'<div class="aio aip">',
+		if (this._driver.isGmailV2UI()) {
+			this._element.innerHTML = [
+				'<div class="TO">',
+					'<div class="TN aik">',
+
+						'<div class="qj">',
+						'</div>',
+
+						'<div class="aio aip">',
+						'</div>',
 
 					'</div>',
-				'</div>',
-			'</div>'
-		].join('');
+				'</div>'
+			].join('');
+		}
+		else {
+			this._element.innerHTML = [
+				'<div class="TO">',
+					'<div class="TN aik">',
+						'<div class="aio aip">',
+
+						'</div>',
+					'</div>',
+				'</div>'
+			].join('');
+		}
 
 		const innerElement = querySelector(this._element, '.TO');
 
@@ -435,7 +458,7 @@ export default class GmailNavItemView {
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
 		var element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = (LEFT_INDENTATION_PADDING * this._level) + 'px';
+		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * this._level) + 'px';
 
 		this._setHeights();
 	}
@@ -471,7 +494,10 @@ export default class GmailNavItemView {
 			e.stopPropagation();
 		});
 
-		const insertionPoint = this._element.querySelector('.aip');
+		const insertionPoint = this._driver.isGmailV2UI() ?
+			this._element.querySelector('.TN.aik') :
+			this._element.querySelector('.aip');
+
 		if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
 
 		if(this._isCollapsed){
@@ -554,4 +580,8 @@ export default class GmailNavItemView {
 		}
 	}
 
+}
+
+export function getLeftIndentationPaddingValue(driver: GmailDriver): number {
+	return driver.isGmailV2UI() ? GMAIL_V2_LEFT_INDENTATION_PADDING : GMAIL_V1_LEFT_INDENTATION_PADDING;
 }
