@@ -1049,6 +1049,15 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
   right: -4px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 36px;
+  margin-left: 0;
+  padding-left: 24px;
+}
+
 [dir=rtl] .inboxsdk__navItem_link {
   left: -4px;
   right: initial;
@@ -1078,10 +1087,12 @@ body.inboxsdk__gmailv1css .inboxsdk__navItem_container {
   z-index: 1;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a,
 .aip .CK {
   color: #15c;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
 .aip .CK:hover {
   text-decoration: underline;
 }

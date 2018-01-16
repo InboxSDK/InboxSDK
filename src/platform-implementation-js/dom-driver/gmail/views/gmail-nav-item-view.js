@@ -356,7 +356,12 @@ export default class GmailNavItemView {
 
 	_createLinkButtonAccessory(accessoryDescriptor: Object){
 		var linkDiv = document.createElement('div');
-		linkDiv.setAttribute('class', 'CL inboxsdk__navItem_link');
+
+		const linkDivClassName = this._driver.isGmailV2UI() ?
+			'inboxsdk__navItem_link' :
+			'CL inboxsdk__navItem_link';
+
+		linkDiv.setAttribute('class', linkDivClassName);
 
 
 		var anchor = document.createElement('a');
