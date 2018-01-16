@@ -50,6 +50,7 @@ export default class GmailNavItemView {
 	_level: number;
 	_navItemNumber: number;
 	_isActive: boolean = false;
+	_iconSettings: Object = {};
 
 	constructor(driver: GmailDriver, orderGroup: number | string, level: number){
 
@@ -256,7 +257,7 @@ export default class GmailNavItemView {
 		this._updateName(navItemDescriptor.name);
 
 		updateIcon(
-			this,
+			this._iconSettings,
 			querySelector(this._element, '.aio'),
 			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
 			navItemDescriptor.iconClass,
