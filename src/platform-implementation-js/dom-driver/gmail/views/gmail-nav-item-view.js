@@ -186,7 +186,7 @@ export default class GmailNavItemView {
 				'<div class="TO">',
 					'<div class="TN aik">',
 
-						'<div class="qj">',
+						'<div class="qj" style="">',
 						'</div>',
 
 						'<div class="aio aip">',
