@@ -15,6 +15,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
+import SimpleElementView from '../../../views/SimpleElementView';
 import parser from '../detection/thread/parser';
 import type {Parsed} from '../detection/thread/parser';
 
@@ -223,6 +224,25 @@ class InboxThreadView {
     this._sidebarPanels.forEach(panel => {
       panel.remove();
     });
+  }
+
+  addNoticeBar(): SimpleElementView {
+    const el = document.createElement('div');
+    el.className = idMap('thread_noticeBar');
+
+    const {heading} = this._p.elements;
+    if (!heading) {
+      throw new Error('Failed to find subject');
+    }
+
+    heading.insertAdjacentElement('afterend', el);
+    const view = new SimpleElementView(el);
+
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(view, 'destroy'))
+      .onValue(() => view.destroy());
+
+    return view;
   }
 
   getReadyStream() {

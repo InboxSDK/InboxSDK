@@ -3,6 +3,7 @@
 import {defn, defonce} from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
+import type SimpleElementView from '../../views/SimpleElementView';
 import kefirCast from 'kefir-cast';
 import Kefir from 'kefir';
 import ContentPanelView from '../content-panel-view';
@@ -37,6 +38,11 @@ class ThreadView extends EventEmitter {
 		}
 
 		return null;
+	}
+
+	addNoticeBar(): SimpleElementView {
+		const members = get(memberMap, this);
+		return members.threadViewImplementation.addNoticeBar();
 	}
 
 	getMessageViews(): Array<MessageView> {
