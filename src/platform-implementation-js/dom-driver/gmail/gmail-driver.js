@@ -391,8 +391,8 @@ class GmailDriver {
 		return new GmailBackdrop(zIndex, target);
 	}
 
-	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return addNavItem(this, appId, navItemDescriptor);
+	addNavItem(appId: string, navItemDescriptorPropertyStream: Kefir.Observable<Object>): Object {
+		return addNavItem(this, appId, navItemDescriptorPropertyStream);
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
