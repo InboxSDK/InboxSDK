@@ -1039,6 +1039,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
   font-size: 14px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM.aj0 {
+  display: flex;
+  display: -webkit-flex;
+  visibility: visible;
+}
+
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
   visibility: visible;
 }
