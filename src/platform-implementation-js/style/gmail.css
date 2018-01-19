@@ -1083,7 +1083,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_name {
   padding-bottom: 2px;
 }
 
-.ain .inboxsdk__navItem_container {
+body.inboxsdk__gmailv1css .ain .inboxsdk__navItem_container {
   margin-left: -18px;
 }
 
