@@ -405,7 +405,11 @@ export default class GmailNavItemView {
 
 		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
 
-		querySelector(this._element, '.aio').appendChild(buttonOptions.buttonView.getElement());
+		const insertionPoint = this._driver.isGmailV2UI() ?
+			querySelector(this._element, '.TN') :
+			querySelector(this._element, '.aio');
+
+		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
