@@ -1050,20 +1050,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link {
-  display: flex;
-  align-items: center;
   cursor: pointer;
-  height: 36px;
   margin-left: auto;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a {
   margin-left: 16px;
-}
-
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_name {
-  display: flex;
-  align-items: center;
 }
 
 [dir=rtl] .inboxsdk__navItem_link {
