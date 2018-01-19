@@ -1045,6 +1045,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM.aj0 {
   visibility: visible;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem.inboxsdk__navItem_nonClickable > .TO:active {
+  background-color: initial;
+}
+
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
   visibility: visible;
 }

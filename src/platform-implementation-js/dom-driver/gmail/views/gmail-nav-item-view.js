@@ -269,6 +269,7 @@ export default class GmailNavItemView {
 		);
 
 		this._updateAccessory(navItemDescriptor.accessory);
+		this._updateClickability(navItemDescriptor)
 		this._updateOrder(navItemDescriptor);
 	}
 
@@ -314,6 +315,20 @@ export default class GmailNavItemView {
 			this._expandoElement.title = `Expand ${name}`;
 		}
 		this._name = name;
+	}
+
+	_updateClickability(navItemDescriptor: Object) {
+		if (!this._driver.isGmailV2UI()) return;
+
+		if (navItemDescriptor.type === NAV_ITEM_TYPES.LINK
+			|| navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
+			|| (!navItemDescriptor.routeID && typeof navItemDescriptor.onClick !== 'function')) {
+
+			this._element.classList.add('inboxsdk__navItem_nonClickable');
+		}
+		else {
+			this._element.classList.remove('inboxsdk__navItem_nonClickable');
+		}
 	}
 
 	_updateAccessory(accessory: Object){
