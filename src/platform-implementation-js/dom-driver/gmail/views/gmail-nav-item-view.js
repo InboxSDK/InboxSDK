@@ -414,7 +414,11 @@ export default class GmailNavItemView {
 			innerElement.classList.remove('inboxsdk__navItem_hover');
 		});
 
-		querySelector(this._element, '.aio').appendChild(buttonOptions.buttonView.getElement());
+		const insertionPoint = this._driver.isGmailV2UI() ?
+			querySelector(this._element, '.TN') :
+			querySelector(this._element, '.aio');
+
+		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
 		const self = this;
 
