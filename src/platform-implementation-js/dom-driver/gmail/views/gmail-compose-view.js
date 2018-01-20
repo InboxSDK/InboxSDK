@@ -96,6 +96,7 @@ class GmailComposeView {
 	_formattingArea: ?HTMLElement;
 	_closedProgrammatically: boolean = false;
 	_destroyed: boolean = false;
+	_destroyCalledStopper: Stopper;
 	ready: () => Kefir.Observable<GmailComposeView>;
 	getEventStream: () => Kefir.Observable<any>;
 
@@ -119,6 +120,7 @@ class GmailComposeView {
 		this._isListeningToAjaxInterceptStream = false;
 
 		this._eventStream = kefirBus();
+		this._destroyCalledStopper = kefirStopper();
 
 		this._isTriggeringADraftSavePending = false;
 
@@ -131,7 +133,7 @@ class GmailComposeView {
 				.map((event) => {
 					switch (event.type) {
 						case 'emailSending': {
-							return [{eventName: 'sending'}];
+							return {eventName: 'sending'};
 						}
 						case 'emailSent': {
 							// `data` will get filled in with getMessageID + getThreadID props from
@@ -140,23 +142,33 @@ class GmailComposeView {
 							this._messageId = event.oldMessageID;
 							this._threadID = event.oldThreadID;
 
-							return [{eventName: 'sent', data: {
+							return {eventName: 'sent', data: {
 								getThreadID() {
 									return Promise.resolve(event.oldThreadID);
 								},
 								getMessageID() {
 									return Promise.resolve(event.oldMessageID);
 								}
-							}}];
+							}};
 						}
 						case 'emailSendFailed': {
-							return [{eventName: 'sendCanceled'}];
+							return {eventName: 'sendCanceled'};
 						}
 						case 'emailDraftReceived': {
 							this._messageId = event.oldMessageID;
 							this._threadID = event.oldThreadID;
 
-							return null;
+							return {
+								eventName: 'draftSaved',
+								data: {
+									getThreadID() {
+										return Promise.resolve(event.oldThreadID);
+									},
+									getMessageID() {
+										return Promise.resolve(event.oldMessageID);
+									}
+								}
+							};
 						}
 						default: {
 							return null;
@@ -312,6 +324,7 @@ class GmailComposeView {
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
 
+				/*
 				this.getEventStream()
 					.filter(({eventName}) => eventName === 'presending')
 					.takeUntilBy(this._stopper)
@@ -325,6 +338,7 @@ class GmailComposeView {
 							this._eventStream.emit({eventName: 'sendCanceled'});
 						});
 					});
+				*/
 
 				return this;
 			}).toProperty()
@@ -336,9 +350,48 @@ class GmailComposeView {
 				class: this.getElement().getAttribute('class')
 			});
 		});
+
+		// v2 Data behaves differently whereby the compose element is removed
+		// from the page while the send is in flight instead of waiting for the
+		// send to come back, so we have to handle that difference
+		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+			Kefir.merge([
+				// if we get a presending then we let the other stream wait for
+				// sent. But if we get a sendCanceled, then a regular destroy can
+				// pass through
+				this._destroyCalledStopper
+					.filterBy(
+						this._eventStream
+							.filter(({eventName}) => eventName === 'presending' || eventName === 'sendCanceled')
+							.map(({eventName}) => eventName !== 'presending')
+							.toProperty(() => true)
+					),
+
+				// if we get a presending event then hold off on calling destroy
+				// until sent is called
+				this._eventStream
+					.filter(({eventName}) => eventName === 'presending')
+					.flatMapLatest(() =>
+						Kefir.combine([
+							this._destroyCalledStopper,
+							this._eventStream
+								.filter(({eventName}) => eventName === 'sent')
+						])
+					)
+			])
+			.take(1)
+			.onValue(() => this._destroy());
+		}
+		else {
+			this._destroyCalledStopper.onValue(() => this._destroy());
+		}
 	}
 
 	destroy() {
+		this._destroyCalledStopper.destroy();
+	}
+
+	_destroy() {
 		this._eventStream.emit({eventName: 'destroy', data: {
 			messageID: this.getMessageID(),
 			closedByInboxSDK: this._closedProgrammatically
@@ -423,24 +476,39 @@ class GmailComposeView {
 	}
 
 	_setupIDs() {
-		if(this._driver.isUsingSyncAPI()){
+		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
 			const syncMessageId = this._getMessageIDfromForm();
-			this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
-				.then(
-					(gmailMessageId) => {
-						this._messageId = gmailMessageId;
-					}
-				)
-				.catch(() => {
-					//do nothing because this means the message hasn't been saved yet
-				});
+			if(syncMessageId){
+				this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
+					.then(
+						(gmailMessageId) => {
+							this._messageId = gmailMessageId;
+						}
+					)
+					.catch(() => {
+						//do nothing because this means the message hasn't been saved yet
+					});
+			}
+
+			const syncThreadId = this._getThreadID();
+			if(syncThreadId){
+				this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadId)
+					.then(
+						gmailThreadId => {
+							this._threadID = gmailThreadId;
+						}
+					)
+					.catch(() => {
+						//do nothing because this means the message hasn't been saved yet
+					});
+			}
 		}
 		else {
 			this._messageId = this._initialMessageId = this._getMessageIDfromForm();
+			this._threadID = this._getThreadID();
 		}
 
 		this._targetMessageID = this._getTargetMessageID();
-		this._threadID = this._getThreadID();
 	}
 
 	_updateComposeFullscreenState() {
@@ -1059,7 +1127,9 @@ class GmailComposeView {
 
 	async getCurrentDraftID(): Promise<?string> {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			return this._getDraftIDfromForm();
+			// messageid is set when draft exists on server
+			if(this._messageId) return this._getDraftIDfromForm();
+			else return null;
 		}
 		else {
 			if (!this.getMessageID()) {
@@ -1080,7 +1150,18 @@ class GmailComposeView {
 
 	async _getDraftIDimplementation(): Promise<?string> {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			return this._getDraftIDfromForm();
+			// if messageId exists then draft is saved on server
+			if(this._messageId) {
+				return this._getDraftIDfromForm();
+			}
+			else {
+				return this._eventStream
+								.filter(({eventName}) => eventName === 'draftSaved')
+								.map(() => this._getDraftIDfromForm())
+								.take(1)
+								.takeUntilBy(this._stopper)
+								.toPromise();
+			}
 		}
 		else {
 			let i = -1;
@@ -1332,7 +1413,13 @@ class GmailComposeView {
 	}
 
 	registerRequestModifier(modifier: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>){
-		const modifierId = this._driver.getPageCommunicator().registerComposeRequestModifier(this.getComposeID(), this._driver.getAppId());
+		const keyId =
+			this._driver.getPageCommunicator().isUsingSyncAPI() ?
+				this._getDraftIDfromForm() : this.getComposeID();
+
+		if(!keyId) throw new Error('keyId should be set here');
+
+		const modifierId = this._driver.getPageCommunicator().registerComposeRequestModifier(keyId, this._driver.getAppId());
 		this._requestModifiers[modifierId] = modifier;
 		this._startListeningForModificationRequests();
 	}
@@ -1342,16 +1429,24 @@ class GmailComposeView {
 			return;
 		}
 
+		const keyId =
+			this._driver.getPageCommunicator().isUsingSyncAPI() ?
+				this._getDraftIDfromForm() : this.getComposeID();
+
+		if(!keyId) throw new Error('keyId should be set here');
+
 		this._driver
 			.getPageCommunicator()
 			.ajaxInterceptStream
-			.filter(({type, composeid, modifierId}) =>
-						type === 'inboxSDKmodifyComposeRequest' &&
-						composeid === this.getComposeID() &&
-						Boolean(this._requestModifiers[modifierId])
-			)
+			.filter(({type, composeid, draftID, modifierId}) => {
+				return (
+					type === 'inboxSDKmodifyComposeRequest' &&
+					(composeid === keyId || keyId === draftID) &&
+					Boolean(this._requestModifiers[modifierId])
+				)
+			})
 			.takeUntilBy(this._stopper)
-			.onValue(({composeid, modifierId, composeParams}) => {
+			.onValue(({modifierId, composeParams}) => {
 
 				if(this._driver.getLogger().shouldTrackEverything()){
 					this._driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
@@ -1360,7 +1455,7 @@ class GmailComposeView {
 				const modifier = this._requestModifiers[modifierId];
 				const result = new Promise(resolve => resolve(modifier(composeParams)));
 
-				result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, newComposeParams || composeParams))
+				result.then(newComposeParams => this._driver.getPageCommunicator().modifyComposeRequest(keyId, modifierId, newComposeParams || composeParams))
 							.then(x => {
 								if(this._driver.getLogger().shouldTrackEverything()){
 									this._driver.getLogger().eventSite('composeRequestModified');
@@ -1368,7 +1463,7 @@ class GmailComposeView {
 								return x;
 							})
 						.catch((err) => {
-							this._driver.getPageCommunicator().modifyComposeRequest(composeid, modifierId, composeParams);
+							this._driver.getPageCommunicator().modifyComposeRequest(keyId, modifierId, composeParams);
 							this._driver.getLogger().error(err);
 						});
 			});
