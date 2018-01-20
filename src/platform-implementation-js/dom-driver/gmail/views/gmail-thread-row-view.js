@@ -234,17 +234,30 @@ class GmailThreadRowView {
   getCounts(): Counts {
     let counts = this._counts;
     if(!counts){
-      const thing = querySelector(this._elements[0], 'td div.yW');
-      const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
+      const recipientsElement = querySelector(this._elements[0], 'td div.yW');
 
-      const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+      if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+        const draftCount = recipientsElement.querySelectorAll('.boq').length;
+        const messageCountMatch = recipientsElement.innerHTML.match(/\((\d+)\)$/);
+        const messageCount =
+          messageCountMatch ?
+            +messageCountMatch[1] :
+          draftCount ? 0 : 1;
 
-      const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-      const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+        counts = this._counts = {messageCount, draftCount};
+      }
+      else {
+        const [preDrafts, drafts] = recipientsElement.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
 
-      const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-      const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
-      counts = this._counts = {messageCount, draftCount};
+        const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+
+        const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
+        const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+
+        const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
+        const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
+        counts = this._counts = {messageCount, draftCount};
+      }
     }
 
     return counts;
