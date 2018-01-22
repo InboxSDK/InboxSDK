@@ -58,7 +58,7 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 
-import getOldGmailThreadIdFromSyncThreadId from './gmail-driver/getOldGmailThreadIdFromSyncThreadId';
+import getThreadFromSyncThreadId from './gmail-driver/getThreadFromSyncThreadId';
 import getSyncThreadIdForOldGmailThreadId from './gmail-driver/getSyncThreadIdForOldGmailThreadId';
 
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
@@ -149,8 +149,8 @@ class GmailDriver {
         getAfromB: (oldGmailThreadId: string) => {
           return getSyncThreadIdForOldGmailThreadId(this, oldGmailThreadId);
         },
-        getBfromA: (syncThreadId: string) => {
-					return getOldGmailThreadIdFromSyncThreadId(this, syncThreadId);
+        getBfromA: (syncThreadID: string) => {
+					return getThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
         }
       });
       this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>

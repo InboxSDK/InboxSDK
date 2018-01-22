@@ -9,7 +9,9 @@ import {extractThreadsFromThreadResponse} from '../gmail-sync-response-processor
 
 import type GmailDriver from '../gmail-driver';
 
-export default async function getOldGmailThreadIdFromSyncThreadId(driver: GmailDriver, syncThreadId: string): Promise<string> {
+import type {SyncThread} from '../gmail-sync-response-processor';
+
+export default async function getThreadFromSyncThreadId(driver: GmailDriver, syncThreadId: string): Promise<SyncThread> {
 
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   const accountParam = accountParamMatch ? accountParamMatch[1] : '';
@@ -34,6 +36,6 @@ export default async function getOldGmailThreadIdFromSyncThreadId(driver: GmailD
   });
 
   const threadDescriptors = extractThreadsFromThreadResponse(text);
-  if(threadDescriptors.length > 0) return threadDescriptors[0].oldGmailThreadId;
+  if(threadDescriptors.length > 0) return threadDescriptors[0];
   else throw new Error('thread not available');
 }

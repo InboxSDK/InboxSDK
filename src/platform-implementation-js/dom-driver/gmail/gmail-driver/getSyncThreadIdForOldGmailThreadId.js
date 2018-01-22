@@ -32,5 +32,5 @@ export default async function getSyncThreadIdForOldGmailThreadId(driver: GmailDr
   });
 
   const threadDescriptors = extractThreadsFromSearchResponse(text);
-  return threadDescriptors[0].syncThreadId;
+  return threadDescriptors[0].syncThreadID;
 }

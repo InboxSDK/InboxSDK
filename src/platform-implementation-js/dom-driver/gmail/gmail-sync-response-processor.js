@@ -2,11 +2,11 @@
 
 import BigNumber from 'bignumber.js';
 
-type SyncThread = {
+export type SyncThread = {
   subject: string;
   snippet: string;
-  syncThreadId: string;
-  oldGmailThreadId: string;
+  syncThreadID: string;
+  oldGmailThreadID: string;
   rawResponse: Object;
   extraMetaData: {
     snippet: string;
@@ -31,8 +31,8 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
     return {
       subject: descriptor[1],
       snippet: descriptor[2],
-      syncThreadId: descriptor[4],
-      oldGmailThreadId: new BigNumber(descriptor[18]).toString(16),
+      syncThreadID: descriptor[4],
+      oldGmailThreadID: new BigNumber(descriptor[18]).toString(16),
       rawResponse: descriptorWrapper,
       extraMetaData: {
         snippet: parsedResponse[15][1][index],
@@ -58,21 +58,32 @@ export function extractThreadsFromThreadResponse(response: string): SyncThread[]
 
   return threadDescriptors.map(descriptorWrapper => {
     const descriptor = (
+      descriptorWrapper[2]
+    );
+
+    const threadDescriptor = (
       descriptorWrapper[2] &&
       descriptorWrapper[2][1]
     );
 
-    if(!descriptor) return null;
+    const messageDescriptors = (
+      descriptorWrapper[2] &&
+      descriptorWrapper[2][2]
+    ) || [];
+
+    if(!threadDescriptor) return null;
 
     return {
-      subject: descriptor[2],
-      snippet: descriptor[3],
-      syncThreadId: descriptor[1],
-      oldGmailThreadId: new BigNumber(descriptor[14]).toString(16),
+      subject: threadDescriptor[2],
+      snippet: threadDescriptor[3],
+      syncThreadID: threadDescriptor[1],
+      oldGmailThreadID: new BigNumber(threadDescriptor[14]).toString(16),
       rawResponse: descriptorWrapper,
       extraMetaData: {
         snippet: '',
-        messageIDs: []
+        messageIDs: messageDescriptors.map(md => (
+          md[1]
+        ))
       }
     };
   })

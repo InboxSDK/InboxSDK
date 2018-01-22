@@ -2,6 +2,9 @@
 
 import {defn} from 'ud';
 import Kefir from 'kefir';
+
+import getThreadFromSyncThreadId from './getThreadFromSyncThreadId';
+
 import type GmailDriver from '../gmail-driver';
 import type GmailComposeView from '../views/gmail-compose-view';
 import type GmailThreadRowView from '../views/gmail-thread-row-view';
@@ -67,7 +70,7 @@ class ThreadRowIdentifier {
     return null;
   }
 
-  getDraftIdForThreadRow(gmailThreadRowView: GmailThreadRowView): Promise<?string> {
+  async getDraftIdForThreadRow(gmailThreadRowView: GmailThreadRowView): Promise<?string> {
     if (
       gmailThreadRowView.getVisibleMessageCount() > 0 ||
       gmailThreadRowView.getVisibleDraftCount() == 0
@@ -78,7 +81,22 @@ class ThreadRowIdentifier {
     if (composeView) {
       return composeView.getDraftID();
     }
-    return this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+
+    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+      const syncThreadID = await gmailThreadRowView.getSyncThreadID();
+      if(!syncThreadID) return null;
+
+      const syncThread = await getThreadFromSyncThreadId(this._driver, syncThreadID);
+      if(syncThread.extraMetaData.messageIDs.length > 0){
+        return syncThread.extraMetaData.messageIDs[0].replace('msg-a:', '');
+      }
+      else {
+        return null;
+      }
+    }
+    else {
+      return this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+    }
   }
 
   _findComposeForThreadRow(gmailThreadRowView: GmailThreadRowView): ?GmailComposeView {

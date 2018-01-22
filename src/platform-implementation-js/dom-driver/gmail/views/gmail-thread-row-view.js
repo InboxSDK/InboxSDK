@@ -84,6 +84,7 @@ class GmailThreadRowView {
   _driver: GmailDriver;
   _userView: ?Object;
   _cachedThreadID: ?string;
+  _cachedSyncThreadID: ?string;
   _imageFixer: ?Bus<any>;
   _imageFixerTask: ?Kefir.Observable<any>;
   _stopper = kefirStopper();
@@ -781,10 +782,20 @@ class GmailThreadRowView {
     const threadID = this._driver.getThreadRowIdentifier()
       .getThreadIdForThreadRow(this, this._elements);
     if (threadID) {
-      this._cachedThreadID = threadID;
+      if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+        this._cachedSyncThreadID = threadID;
+        this._driver.getOldGmailThreadIdFromSyncThreadId(threadID)
+          .then(oldGmailThreadID => {
+            this._cachedThreadID = oldGmailThreadID;
+          });
+
+        return null;
+      }
+      else {
+        this._cachedThreadID = threadID;
+      }
     }
     return threadID;
-
   }
 
   getThreadID(): string {
@@ -795,10 +806,15 @@ class GmailThreadRowView {
     return threadID;
   }
 
+  getSyncThreadID(): Promise<?string> {
+    return Promise.resolve(this._cachedSyncThreadID);
+  }
+
   async getThreadIDAsync(): Promise<string> {
-    const threadId = this.getThreadID();
     if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-      return this._driver.getOldGmailThreadIdFromSyncThreadId(threadId);
+      const syncThreadID = await this.getSyncThreadID();
+      if(!syncThreadID) throw new Error('Should not happen: syncThreadID should not be null here');
+      return this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
     }
     else {
       return this.getThreadID();

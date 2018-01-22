@@ -73,7 +73,7 @@ async function forSyncAPI(driver: Driver, rfcMessageId: string): Promise<string>
   });
 
   const threadDescriptors = extractThreadsFromSearchResponse(text);
-  return threadDescriptors[0].oldGmailThreadId;
+  return threadDescriptors[0].oldGmailThreadID;
 }
 
 export default defn(module, getGmailThreadIdForRfcMessageId);

@@ -307,7 +307,7 @@ class GmailComposeView {
 					)
 			)
 			.takeUntilBy(this._stopper)
-			.map(bodyElement => {
+			.flatMap(bodyElement => {
 				this._seenBodyElement = bodyElement;
 
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
@@ -318,8 +318,9 @@ class GmailComposeView {
 					this._messageIDElement = document.createElement('div');
 				}
 
-				this._setupIDs();
-
+				return Kefir.fromPromise(this._setupIDs());
+			})
+			.map(() => {
 				this._setupStreams();
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
@@ -475,33 +476,40 @@ class GmailComposeView {
 		}
 	}
 
-	_setupIDs() {
+	async _setupIDs() {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+			let promisesThatNeedToResolve = [];
 			const syncMessageId = this._getMessageIDfromForm();
 			if(syncMessageId){
-				this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
-					.then(
-						(gmailMessageId) => {
-							this._messageId = gmailMessageId;
-						}
-					)
-					.catch(() => {
-						//do nothing because this means the message hasn't been saved yet
-					});
+				promisesThatNeedToResolve.push(
+					this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
+						.then(
+							(gmailMessageId) => {
+								this._messageId = gmailMessageId;
+							}
+						)
+						.catch(() => {
+							//do nothing because this means the message hasn't been saved yet
+						})
+					);
 			}
 
 			const syncThreadId = this._getThreadID();
 			if(syncThreadId){
-				this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadId)
-					.then(
-						gmailThreadId => {
-							this._threadID = gmailThreadId;
-						}
-					)
-					.catch(() => {
-						//do nothing because this means the message hasn't been saved yet
-					});
+				promisesThatNeedToResolve.push(
+					this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadId)
+						.then(
+							gmailThreadId => {
+								this._threadID = gmailThreadId;
+							}
+						)
+						.catch(() => {
+							//do nothing because this means the message hasn't been saved yet
+						})
+					);
 			}
+
+			await Promise.all(promisesThatNeedToResolve);
 		}
 		else {
 			this._messageId = this._initialMessageId = this._getMessageIDfromForm();
