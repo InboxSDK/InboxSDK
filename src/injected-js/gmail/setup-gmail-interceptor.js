@@ -687,42 +687,39 @@ export default function setupGmailInterceptor() {
         requestChanger: async function(connection, request) {
           let requestPromise;
           try{
-
             if(request.body){
               const parsedBody = JSON.parse(request.body);
-              const requestType = (
+
+              // we are a search!
+              const searchQuery = (
                 parsedBody &&
                 parsedBody[1] &&
-                parsedBody[1][6]
-              );
+                parsedBody[1][4]
+              ) || '';
 
-              if(requestType === 'itemlist-efa-6'){
-                // we are a search!
-                const searchQuery = parsedBody[1][4];
-                if(find(customSearchQueries, x => x === searchQuery)) {
-                  customListJob = (connection:any)._customListJob = {
-                    query: searchQuery,
-                    start: parsedBody[1][10],
-                    newRequestParams: defer(),
-                    newResults: defer()
+              if(find(customSearchQueries, x => x === searchQuery)) {
+                customListJob = (connection:any)._customListJob = {
+                  query: searchQuery,
+                  start: parsedBody[1][10],
+                  newRequestParams: defer(),
+                  newResults: defer()
+                };
+                triggerEvent({
+                  type: 'searchForReplacement',
+                  query: customListJob.query,
+                  start: customListJob.start
+                });
+
+                return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
+                  parsedBody[1][4] = query;
+                  parsedBody[1][10] = start;
+
+                  return {
+                    method: request.method,
+                    url: request.url,
+                    body: JSON.stringify(parsedBody)
                   };
-                  triggerEvent({
-                    type: 'searchForReplacement',
-                    query: customListJob.query,
-                    start: customListJob.start
-                  });
-
-                  return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
-                    parsedBody[1][4] = query;
-                    parsedBody[1][10] = start;
-
-                    return {
-                      method: request.method,
-                      url: request.url,
-                      body: JSON.stringify(parsedBody)
-                    };
-                  });
-                }
+                });
               }
             }
           }

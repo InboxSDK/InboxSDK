@@ -274,9 +274,25 @@ const setupSearchReplacing = (
           if(driver.getPageCommunicator().isUsingSyncAPI()){
             const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(response);
 
-            const reorderedThreads: typeof extractedThreads = idPairs
-              .map(({gtid}) => find(extractedThreads, t => t.oldGmailThreadId === gtid))
-              .filter(Boolean);
+            const doesNeedReorder = idPairs.some(({gtid}, index) => extractedThreads[index].oldGmailThreadID !== gtid);
+
+            const reorderedThreads: typeof extractedThreads = doesNeedReorder ?
+              idPairs
+                .map(({gtid}) => find(extractedThreads, t => t.oldGmailThreadID === gtid))
+                .filter(Boolean)
+                .map((extractedThread, index) => {
+                  const newTime = String(Date.now() - index);
+                  extractedThread.rawResponse[1][3] = newTime;
+                  extractedThread.rawResponse[1][8] = newTime;
+                  (extractedThread.rawResponse[1][5] || []).forEach(md => {
+                    md[7] = newTime;
+                    md[18] = newTime;
+                    md[31] = newTime;
+                  });
+                  return extractedThread;
+                })
+              :
+              extractedThreads;
 
             newResponse = SyncGRP.replaceThreadsInSearchResponse(response, reorderedThreads, {start, total});
           }
