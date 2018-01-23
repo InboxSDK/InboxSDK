@@ -47,7 +47,7 @@ export default class LabelDropdownButtonView {
 
 		this._element.innerHTML = [
 			'<div class="pM ' + (isDefault ? 'aj0': '') + '" style="color: ' + foregroundColor + '; background-color: ' + backgroundColor + '; border-color: ' + backgroundColor + '" role="button">',
-				'<div class="p6 style="background-color: ' + backgroundColor + '">',
+				'<div class="p6" style="background-color: ' + backgroundColor + '">',
 					'<div class="p8">▼</div>',
 				'</div>',
 			'</div>'
