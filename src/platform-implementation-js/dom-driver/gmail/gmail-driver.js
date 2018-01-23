@@ -536,9 +536,14 @@ class GmailDriver {
 			this._threadViewDriverLiveSet = toLiveSet(
 				this._setupRouteSubViewDriver('newGmailThreadView')
 					.takeUntilBy(this._stopper)
+					.flatMap(gmailThreadView => (
+						gmailThreadView.getReadyStream()
+							.map(() => gmailThreadView)
+					))
 					.map(gmailThreadView => ({
 						el: gmailThreadView, removalStream: gmailThreadView.getStopper()
-					}))
+					})
+				)
 			);
 
 			this._setupToolbarViewDriverStream();

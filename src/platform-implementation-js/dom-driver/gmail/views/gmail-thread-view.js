@@ -51,17 +51,18 @@ class GmailThreadView {
 		this._eventStream = kefirBus();
 		this._messageViewDrivers = [];
 
-		this._setupToolbarView();
-		asap(() => {
-			// Don't emit anything before anyone has had a chance to start listening!
-			this._setupMessageViewStream();
-		});
-
 		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
-		this._readyStream = Kefir.fromPromise(this.getThreadIDAsync());
+		this._readyStream =
+			Kefir.fromPromise(this.getThreadIDAsync())
+				.map(() => {
+					this._setupMessageViewStream();
+					this._setupToolbarView();
+
+					return null;
+				});
 	}
 
 	// TODO use livesets eventually
