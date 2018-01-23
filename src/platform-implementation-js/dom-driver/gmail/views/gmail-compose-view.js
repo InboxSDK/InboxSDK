@@ -1446,13 +1446,11 @@ class GmailComposeView {
 		this._driver
 			.getPageCommunicator()
 			.ajaxInterceptStream
-			.filter(({type, composeid, draftID, modifierId}) => {
-				return (
-					type === 'inboxSDKmodifyComposeRequest' &&
-					(composeid === keyId || keyId === draftID) &&
-					Boolean(this._requestModifiers[modifierId])
-				)
-			})
+			.filter(({type, composeid, draftID, modifierId}) => (
+				type === 'inboxSDKmodifyComposeRequest' &&
+				(composeid === keyId || keyId === draftID) &&
+				Boolean(this._requestModifiers[modifierId])
+			))
 			.takeUntilBy(this._stopper)
 			.onValue(({modifierId, composeParams}) => {
 

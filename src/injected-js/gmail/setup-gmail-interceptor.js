@@ -760,7 +760,7 @@ export default function setupGmailInterceptor() {
     const saveXsrfTokenHeader = (header) => {
       (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
       triggerEvent({type: 'xsrfTokenHeaderReceived'});
-    }
+    };
 
     main_wrappers.push({
       isRelevantTo(connection) {

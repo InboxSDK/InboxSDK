@@ -54,7 +54,7 @@ export default class NativeGmailNavItemView {
 							currentContainerElement.remove();
 							this._itemContainerElement = null;
 						}
-						this._elementBus.emit(newElement)
+						this._elementBus.emit(newElement);
 					}
 				});
 		}
@@ -63,7 +63,7 @@ export default class NativeGmailNavItemView {
 			this._element = element;
 			this._monitorElementForActiveChanges();
 			this.setActive(this._isActive);
-		})
+		});
 	}
 
 	destroy(){
