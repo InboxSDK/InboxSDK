@@ -58,8 +58,8 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 
-import getThreadFromSyncThreadId from './gmail-driver/getThreadFromSyncThreadId';
-import getSyncThreadIdForOldGmailThreadId from './gmail-driver/getSyncThreadIdForOldGmailThreadId';
+import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
+import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
 
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import toLiveSet from '../../lib/toLiveSet';
@@ -147,10 +147,10 @@ class GmailDriver {
       const syncThreadIdToOldGmailThreadIdCache = new BiMapCache({
         key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
         getAfromB: (oldGmailThreadId: string) => {
-          return getSyncThreadIdForOldGmailThreadId(this, oldGmailThreadId);
+          return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(({syncThreadID}) => syncThreadID);
         },
         getBfromA: (syncThreadID: string) => {
-					return getThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
+					return getSyncThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
         }
       });
       this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
@@ -412,7 +412,7 @@ class GmailDriver {
 	}
 
 	openDraftByMessageID(messageID: string) {
-		return openDraftByMessageID(this, messageID);
+		openDraftByMessageID(this, messageID);
 	}
 
 	createModalViewDriver(options: Object): GmailModalViewDriver {

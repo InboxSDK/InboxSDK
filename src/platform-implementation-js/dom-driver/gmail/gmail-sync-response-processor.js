@@ -10,7 +10,7 @@ export type SyncThread = {
   rawResponse: Object;
   extraMetaData: {
     snippet: string;
-    messageIDs: string[];
+    syncMessageIDs: string[];
   };
 };
 
@@ -35,8 +35,12 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
       oldGmailThreadID: new BigNumber(descriptor[18]).toString(16),
       rawResponse: descriptorWrapper,
       extraMetaData: {
-        snippet: parsedResponse[15][1][index],
-        messageIDs: parsedResponse[15][2][index]
+        snippet: (
+          parsedResponse[15] &&
+          parsedResponse[15][1] &&
+          parsedResponse[15][1][index]
+        ) || '',
+        syncMessageIDs: descriptor[5].map(md => md[1])
       }
     };
 
@@ -81,7 +85,7 @@ export function extractThreadsFromThreadResponse(response: string): SyncThread[]
       rawResponse: descriptorWrapper,
       extraMetaData: {
         snippet: '',
-        messageIDs: messageDescriptors.map(md => (
+        syncMessageIDs: messageDescriptors.map(md => (
           md[1]
         ))
       }
@@ -102,7 +106,7 @@ export function replaceThreadsInSearchResponse(
 
   parsedResponse[3] = replacementThreads.map(({rawResponse}, index) => ({...rawResponse, '2': index}));
   parsedResponse[15][1] = replacementThreads.map(({extraMetaData}) => extraMetaData.snippet);
-  parsedResponse[15][2] = replacementThreads.map(({extraMetaData}) => extraMetaData.messageIDs);
+  parsedResponse[15][2] = replacementThreads.map(({extraMetaData}) => extraMetaData.syncMessageIDs);
 
   return JSON.stringify(parsedResponse);
 

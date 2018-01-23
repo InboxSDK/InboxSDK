@@ -2,13 +2,14 @@
 
 import {defn} from 'ud';
 import {extractThreads} from '../dom-driver/gmail/gmail-response-processor';
-import {extractThreadsFromSearchResponse} from '../dom-driver/gmail/gmail-sync-response-processor';
+import getSyncThreadsForSearch from './getSyncThreadsForSearch';
 import gmailAjax from './gmailAjax';
 import type {Driver} from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: string): Promise<string> {
   if((driver.getPageCommunicator(): any).isUsingSyncAPI()){
-    return forSyncAPI(driver, rfcMessageId);
+    const threadDescriptors = await getSyncThreadsForSearch(driver, 'rfc822msgid:' + rfcMessageId);
+    return threadDescriptors[0].oldGmailThreadID;
   }
   else {
     return forOldAPI(driver, rfcMessageId);
@@ -49,31 +50,6 @@ async function forOldAPI(driver: Driver, rfcMessageId: string): Promise<string> 
     throw new Error("Failed to find gmail thread id for rfc message id. Message may not exist in user's account.");
   }
   return threads[0].gmailThreadId;
-}
-
-async function forSyncAPI(driver: Driver, rfcMessageId: string): Promise<string> {
-  const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
-  const accountParam = accountParamMatch ? accountParamMatch[1] : '';
-
-  const {text} = await gmailAjax({
-    method: 'POST',
-    url: `https://mail.google.com/sync${accountParam}/i/bv`,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Framework-Xsrf-Token': await driver.getPageCommunicator().getXsrfToken(),
-      'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
-      'X-Google-BTD': '1'
-    },
-    data: JSON.stringify({
-      '1': {
-        '4':"rfc822msgid:" + rfcMessageId,
-        '6':"itemlist-$ea-8"
-      }
-    })
-  });
-
-  const threadDescriptors = extractThreadsFromSearchResponse(text);
-  return threadDescriptors[0].oldGmailThreadID;
 }
 
 export default defn(module, getGmailThreadIdForRfcMessageId);

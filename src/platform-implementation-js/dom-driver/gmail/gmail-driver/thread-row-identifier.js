@@ -3,7 +3,7 @@
 import {defn} from 'ud';
 import Kefir from 'kefir';
 
-import getThreadFromSyncThreadId from './getThreadFromSyncThreadId';
+import getSyncThreadFromSyncThreadId from './getSyncThreadFromSyncThreadId';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailComposeView from '../views/gmail-compose-view';
@@ -86,9 +86,9 @@ class ThreadRowIdentifier {
       const syncThreadID = await gmailThreadRowView.getSyncThreadID();
       if(!syncThreadID) return null;
 
-      const syncThread = await getThreadFromSyncThreadId(this._driver, syncThreadID);
-      if(syncThread.extraMetaData.messageIDs.length > 0){
-        return syncThread.extraMetaData.messageIDs[0].replace('msg-a:', '');
+      const syncThread = await getSyncThreadFromSyncThreadId(this._driver, syncThreadID);
+      if(syncThread.extraMetaData.syncMessageIDs.length > 0){
+        return syncThread.extraMetaData.syncMessageIDs[0].replace('msg-a:', '');
       }
       else {
         return null;

@@ -1,16 +1,14 @@
 /* @flow */
 
 import {defn} from 'ud';
-import BigNumber from 'bignumber.js';
+import {extractThreads} from '../dom-driver/gmail/gmail-response-processor';
+import {extractThreadsFromSearchResponse} from '../dom-driver/gmail/gmail-sync-response-processor';
+import gmailAjax from './gmailAjax';
+import type {Driver} from '../driver-interfaces/driver';
 
-import gmailAjax from '../../../driver-common/gmailAjax';
+import type {SyncThread} from '../dom-driver/gmail/gmail-sync-response-processor';
 
-import {extractThreadsFromSearchResponse} from '../gmail-sync-response-processor';
-
-import type GmailDriver from '../gmail-driver';
-
-export default async function getSyncThreadIdForOldGmailThreadId(driver: GmailDriver, oldGmailThreadId: string): Promise<string> {
-
+async function getSyncThreadsForSearch(driver: Driver, searchTerm: string): Promise<SyncThread[]> {
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   const accountParam = accountParamMatch ? accountParamMatch[1] : '';
 
@@ -25,12 +23,13 @@ export default async function getSyncThreadIdForOldGmailThreadId(driver: GmailDr
     },
     data: JSON.stringify({
       '1': {
-        '4':"threadid:" + new BigNumber(oldGmailThreadId, 16).toString(10),
-        '6':"itemlist-$ea-8"
+        '2': 1,
+        '4':searchTerm
       }
     })
   });
 
-  const threadDescriptors = extractThreadsFromSearchResponse(text);
-  return threadDescriptors[0].syncThreadID;
+  return extractThreadsFromSearchResponse(text);
 }
+
+export default defn(module, getSyncThreadsForSearch);
