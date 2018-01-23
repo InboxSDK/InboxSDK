@@ -1463,16 +1463,20 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* app toolbar */
 
-.inboxsdk__appButton {
+.inboxsdk__gmailv1css .inboxsdk__appButton {
   margin-right: -15px;
 }
 
-  .inboxsdk__appButton:first-child {
+  .inboxsdk__gmailv1css .inboxsdk__appButton:first-child {
     margin-left: -45px;
   }
 
-  .inboxsdk__appButton + .inboxsdk__appButton {
+  .inboxsdk__gmailv1css .inboxsdk__appButton + .inboxsdk__appButton {
     margin-left: 35px;
+  }
+
+  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
+    margin-left: 20px;
   }
 
   .inboxsdk__appButton.inboxsdk__appButton_noGPlus {
