@@ -1,5 +1,6 @@
 /* @flow */
 
+import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
 import {defn} from 'ud';
@@ -37,7 +38,9 @@ class GmailThreadView {
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_newMessageMutationObserver: ?MutationObserver;
+	_readyStream: Kefir.Observable<any>;
 	_threadID: ?string;
+	_syncThreadID: ?string;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
 		this._element = element;
@@ -57,6 +60,8 @@ class GmailThreadView {
 		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
+
+		this._readyStream = Kefir.fromPromise(this.getThreadIDAsync());
 	}
 
 	// TODO use livesets eventually
@@ -129,18 +134,20 @@ class GmailThreadView {
 	}
 
 	getThreadID(): string {
-		if(this._threadID){
-			return this._threadID;
-		}
+		if(this._threadID) return this._threadID;
+		else throw new Error('should not happen');
+	}
 
+	async getThreadIDAsync(): Promise<string> {
+		let threadID;
 		if(this._isPreviewedThread){
-			this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+			threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
 		}
 		else{
 			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
 			if(params && params.threadID){
-				this._threadID = params.threadID;
+				threadID = params.threadID;
 			} else {
 				const err = new Error('Failed to get id for thread');
 				this._driver.getLogger().error(err);
@@ -148,17 +155,16 @@ class GmailThreadView {
 			}
 		}
 
-		return this._threadID;
-	}
-
-	async getThreadIDAsync(): Promise<string> {
-		const threadId = this.getThreadID();
-		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			return this._driver.getOldGmailThreadIdFromSyncThreadId(threadId);
+		if(this._driver.getPageCommunicator().isUsingSyncAPI() && !this._isPreviewedThread){
+			this._syncThreadID = threadID;
+			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
 		}
 		else{
-			return threadId;
+			this._threadID = threadID;
 		}
+
+		if(this._threadID) return this._threadID;
+		else throw new Error('Failed to get id for thread');
 	}
 
 	_setupToolbarView() {
@@ -295,7 +301,7 @@ class GmailThreadView {
 	}
 
 	getReadyStream() {
-		return delayAsap(null);
+		return this._readyStream;
 	}
 
 	async _logAddonElementInfo() {
