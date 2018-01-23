@@ -415,10 +415,23 @@ export default class GmailNavItemView {
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
 		const buttonOptions = Object.assign({}, accessoryDescriptor);
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
-		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
 		buttonOptions.dropdownPositionOptions = {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
+		};
+		buttonOptions.dropdownShowFunction = ({dropdown}) => {
+			buttonOptions.onClick({dropdown});
+
+			const innerButtonElement = buttonOptions.buttonView.getElement().firstElementChild;
+			if (innerButtonElement) innerButtonElement.classList.add('aj1');
+
+			Kefir
+				.fromEvents(dropdown, 'destroy')
+				.take(1)
+				.takeUntilBy(this._eventStream.onEnd(() => undefined))
+				.onValue(() => {
+					if (innerButtonElement) innerButtonElement.classList.remove('aj1');
+				});
 		};
 
 		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
