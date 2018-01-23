@@ -35,7 +35,7 @@ export default class LabelDropdownButtonView {
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'nL aig');
 
-		var isDefault = !backgroundColor && !foregroundColor;
+		const isDefault = !backgroundColor && !foregroundColor;
 
 		if(!backgroundColor){
 			backgroundColor = 'rgb(194, 194, 194)';
@@ -55,7 +55,7 @@ export default class LabelDropdownButtonView {
 	}
 
 	_setupEventStream(){
-		var clickEventStream = Kefir.fromEvents(this._element, 'click');
+		const clickEventStream = Kefir.fromEvents(this._element, 'click');
 
 		clickEventStream.onValue(function(event){
 			event.stopPropagation();
