@@ -57,7 +57,8 @@ function processPreloadedThreads() {
     script.text && script.text.slice(0,500).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {
-    logger.error(new Error("Could not read preloaded VIEW_DATA"));
+    // preloadScript is not available in gmail v2, so let's stop logging an error
+    return;
   } else {
     const firstBracket = preloadScript.text.indexOf('[');
     const lastBracket = preloadScript.text.lastIndexOf(']');

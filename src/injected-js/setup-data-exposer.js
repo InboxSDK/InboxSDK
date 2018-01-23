@@ -33,18 +33,20 @@ module.exports = function() {
       GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
     (document.head:any).setAttribute('data-inboxsdk-user-language', userLanguage);
 
+
+    (document.head:any).setAttribute('data-inboxsdk-using-sync-api', global.GM_SPT_ENABLED);
+    (document.head:any).setAttribute('data-inboxsdk-using-material-ui', global.GM_RFT_ENABLED);
+
+
     if (global.GLOBALS) { // Gmail
       (document.head:any).setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
       (document.head:any).setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
-      (document.head:any).setAttribute('data-inboxsdk-using-sync-api', !!GLOBALS[51]);
 
       var globalSettingsHolder = find(GLOBALS[17], (item) => item[0] === 'p');
 
       if(!globalSettingsHolder){
-        logger.error(new Error('failed to find globalSettings'), {
-          GLOBALSpresent: !!global.GLOBALS,
-          GLOBALS17present: !!(global.GLOBALS && GLOBALS[17])
-        });
+        // global settings doesn't exist on gmail v2, so we don't need to log this anymore
+        return;
       }
       else{
         var globalSettings = globalSettingsHolder[1];
