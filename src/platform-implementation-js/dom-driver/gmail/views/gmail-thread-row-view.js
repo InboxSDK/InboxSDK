@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 
 import once from 'lodash/once';
+import flatten from 'lodash/flatten';
 import includes from 'lodash/includes';
 import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
@@ -779,23 +780,37 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    const threadID = this._driver.getThreadRowIdentifier()
-      .getThreadIdForThreadRow(this, this._elements);
-    if (threadID) {
-      if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-        this._cachedSyncThreadID = threadID;
-        this._driver.getOldGmailThreadIdFromSyncThreadId(threadID)
-          .then(oldGmailThreadID => {
-            this._cachedThreadID = oldGmailThreadID;
-          });
+    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+      const elementWithId =
+        flatten(
+          this._elements.map(
+            el => Array.from(el.querySelectorAll('[data-thread-id]'))
+          )
+        ).filter(Boolean)[0];
 
-        return null;
+      if(elementWithId){
+        this._cachedSyncThreadID = elementWithId.getAttribute('data-thread-id').replace('#', '');
+        this._cachedThreadID = elementWithId.getAttribute('data-legacy-thread-id').replace('#', '');
+
+        return this._cachedThreadID;
       }
       else {
-        this._cachedThreadID = threadID;
+        const threadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+        this._cachedSyncThreadID = threadID;
+
+        if(threadID){
+          this._driver.getOldGmailThreadIdFromSyncThreadId(threadID)
+            .then(oldGmailThreadID => {
+              this._cachedThreadID = oldGmailThreadID;
+            });
+        }
       }
     }
-    return threadID;
+    else {
+      this._cachedThreadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+    }
+
+    return this._cachedThreadID;
   }
 
   getThreadID(): string {
