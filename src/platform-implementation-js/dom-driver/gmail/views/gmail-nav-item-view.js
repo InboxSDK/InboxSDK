@@ -422,6 +422,10 @@ export default class GmailNavItemView {
 		buttonOptions.dropdownShowFunction = ({dropdown}) => {
 			buttonOptions.onClick({dropdown});
 
+			if (this._driver.isGmailV2UI()) {
+				dropdown.el.style.marginLeft = '16px';
+			}
+
 			const innerButtonElement = buttonOptions.buttonView.getElement().firstElementChild;
 			if (innerButtonElement) innerButtonElement.classList.add('aj1');
 
