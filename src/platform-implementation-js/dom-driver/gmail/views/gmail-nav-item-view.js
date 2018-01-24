@@ -270,7 +270,7 @@ export default class GmailNavItemView {
 		);
 
 		this._updateAccessory(navItemDescriptor.accessory);
-		this._updateClickability(navItemDescriptor)
+		this._updateClickability(navItemDescriptor);
 		this._updateOrder(navItemDescriptor);
 	}
 
