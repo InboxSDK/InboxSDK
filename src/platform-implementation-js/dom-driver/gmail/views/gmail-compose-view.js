@@ -477,6 +477,8 @@ class GmailComposeView {
 	}
 
 	async _setupIDs() {
+		this._targetMessageID = this._getTargetMessageID();
+		
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
 			let promisesThatNeedToResolve = [];
 			const syncMessageId = this._getMessageIDfromForm();
@@ -515,8 +517,6 @@ class GmailComposeView {
 			this._messageId = this._initialMessageId = this._getMessageIDfromForm();
 			this._threadID = this._getThreadID();
 		}
-
-		this._targetMessageID = this._getTargetMessageID();
 	}
 
 	_updateComposeFullscreenState() {

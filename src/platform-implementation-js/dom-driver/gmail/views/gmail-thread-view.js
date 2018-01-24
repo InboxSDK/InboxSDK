@@ -58,11 +58,18 @@ class GmailThreadView {
 		this._readyStream =
 			Kefir.fromPromise(this.getThreadIDAsync())
 				.map(() => {
-					this._setupMessageViewStream();
 					this._setupToolbarView();
 
 					return null;
 				});
+
+		// wait until thread view is ready and everybody is subscribed
+		// to the threadView streams before creating the message stream
+		this._readyStream
+			.delay(1)
+			.onValue(() => {
+				this._setupMessageViewStream();
+			});
 	}
 
 	// TODO use livesets eventually
