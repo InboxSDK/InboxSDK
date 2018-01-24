@@ -1471,6 +1471,10 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
     margin-left: -45px;
   }
 
+  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton:first-child {
+    margin-left: -15px;
+  }
+
   .inboxsdk__gmailv1css .inboxsdk__appButton + .inboxsdk__appButton {
     margin-left: 35px;
   }
