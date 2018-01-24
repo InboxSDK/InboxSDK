@@ -26,7 +26,10 @@ const gotoView = ud.defn(module, async function gotoView(gmailDriver: GmailDrive
 					const int = parseInt(threadID, 16);
 					if(!isNaN(int)){ //we got an old id
 						const syncThreadId = await gmailDriver.getSyncThreadIdForOldGmailThreadId(threadID);
-						params.threadID = '#' + syncThreadId;
+						params = {
+							...params,
+							threadID: '#' + syncThreadId
+						};
 					}
 				}
 			}

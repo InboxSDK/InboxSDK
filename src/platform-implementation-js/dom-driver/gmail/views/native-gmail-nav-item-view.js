@@ -37,6 +37,9 @@ export default class NativeGmailNavItemView {
 
 		this._navItemName = navItemName;
 
+		// gmail v2 continually replaces the native nav elements
+		// so we have to monitor for this replacement and then
+		// readd any sub nav items
 		const parentElement = nativeElement.parentElement;
 		if(parentElement){
 			makeMutationObserverChunkedStream((parentElement: any), {childList: true})

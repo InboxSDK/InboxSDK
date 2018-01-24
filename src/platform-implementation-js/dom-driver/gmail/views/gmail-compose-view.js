@@ -22,6 +22,7 @@ import simulateClick from '../../../lib/dom/simulate-click';
 import simulateKey from '../../../lib/dom/simulate-key';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
+import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {simulateDragOver, simulateDrop, simulateDragEnd} from '../../../lib/dom/simulate-drag-and-drop';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
@@ -96,7 +97,7 @@ class GmailComposeView {
 	_formattingArea: ?HTMLElement;
 	_closedProgrammatically: boolean = false;
 	_destroyed: boolean = false;
-	_destroyCalledStopper: Stopper;
+	_removedFromDOMStopper: Stopper;
 	ready: () => Kefir.Observable<GmailComposeView>;
 	getEventStream: () => Kefir.Observable<any>;
 
@@ -120,7 +121,7 @@ class GmailComposeView {
 		this._isListeningToAjaxInterceptStream = false;
 
 		this._eventStream = kefirBus();
-		this._destroyCalledStopper = kefirStopper();
+		this._removedFromDOMStopper = kefirStopper();
 
 		this._isTriggeringADraftSavePending = false;
 
@@ -325,21 +326,32 @@ class GmailComposeView {
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
 
-				/*
-				this.getEventStream()
-					.filter(({eventName}) => eventName === 'presending')
-					.takeUntilBy(this._stopper)
-					.onValue(() => {
-						Kefir.later(15).takeUntilBy(
-							this.getEventStream().filter(({eventName}) => (
-								eventName === 'sendCanceled' ||
-								eventName === 'sending'
-							))
-						).onValue(() => {
-							this._eventStream.emit({eventName: 'sendCanceled'});
+
+				{
+					// try and handle the case where the user types in a bad email address
+					// we get the presending event but then no other events will pass because
+					// a modal comes up informing the user of the bad email address
+					this.getEventStream()
+						.filter(({eventName}) => eventName === 'presending')
+						.takeUntilBy(this._stopper)
+						.onValue(() => {
+							makeElementChildStream(((document.body:any):HTMLElement))
+								.map(event => event.el)
+								.filter(node => node.getAttribute && node.getAttribute('role') === 'alertdialog')
+								.takeUntilBy(
+									Kefir.merge([
+										this.getEventStream().filter(({eventName}) => (
+											eventName === 'sendCanceled' ||
+											eventName === 'sending'
+										)),
+										Kefir.later(15)
+									])
+								)
+								.onValue(() => {
+									this._eventStream.emit({eventName: 'sendCanceled'});
+								});
 						});
-					});
-				*/
+				}
 
 				return this;
 			}).toProperty()
@@ -360,36 +372,34 @@ class GmailComposeView {
 				// if we get a presending then we let the other stream wait for
 				// sent. But if we get a sendCanceled, then a regular destroy can
 				// pass through
-				this._destroyCalledStopper
+				this._removedFromDOMStopper
 					.filterBy(
 						this._eventStream
 							.filter(({eventName}) => eventName === 'presending' || eventName === 'sendCanceled')
-							.map(({eventName}) => eventName !== 'presending')
+							.map(({eventName}) => eventName === 'sendCanceled')
 							.toProperty(() => true)
 					),
 
-				// if we get a presending event then hold off on calling destroy
-				// until sent is called
-				this._eventStream
-					.filter(({eventName}) => eventName === 'presending')
-					.flatMapLatest(() =>
-						Kefir.combine([
-							this._destroyCalledStopper,
-							this._eventStream
-								.filter(({eventName}) => eventName === 'sent')
-						])
-					)
+					Kefir.combine([
+						this._removedFromDOMStopper,
+						this._eventStream
+							.filter(({eventName}) => eventName === 'sent')
+					])
 			])
 			.take(1)
+			// we delay asap here so that the event stream is not destroyed before listeners here the sent event
+			.flatMap(() => delayAsap(null))
 			.onValue(() => this._destroy());
 		}
 		else {
-			this._destroyCalledStopper.onValue(() => this._destroy());
+			this._removedFromDOMStopper.onValue(() => this._destroy());
 		}
 	}
 
 	destroy() {
-		this._destroyCalledStopper.destroy();
+		// this gets called when the element gets removed from the DOM
+		// however we don't want to pass through that destroy event right away
+		this._removedFromDOMStopper.destroy();
 	}
 
 	_destroy() {

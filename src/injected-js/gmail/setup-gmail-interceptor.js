@@ -570,107 +570,51 @@ export default function setupGmailInterceptor() {
     });
   }
 
-  // Search results replacer.
-  // The content script tells us a search query to watch for. Whenever we see
-  // the search query, trigger an event containing the query, trigger an
-  // event containing the response, and then wait for a response event from
-  // the content script that contains new results to substitute in.
-  const customSearchQueries = [];
-  let customListJob;
-
-  document.addEventListener('inboxSDKcustomListRegisterQuery', (event: any) => {
-    customSearchQueries.push(event.detail.query);
-  });
-
-  document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
-    if (
-      customListJob.query === event.detail.query &&
-      customListJob.start === event.detail.start
-    ) {
-      const {newQuery, newStart} = event.detail;
-
-      customListJob.newRequestParams.resolve({
-        query: newQuery,
-        start: newStart
-      });
-    }
-  });
-
-  document.addEventListener('inboxSDKcustomListResults', (event: any) => {
-    if (customListJob.query === event.detail.query) {
-      customListJob.newResults.resolve(event.detail.newResults);
-    }
-  });
-
   {
-    js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
-        let customSearchQuery;
-        const params = connection.params;
-        if (
-          connection.method === 'POST' &&
-          params.search && params.view === 'tl' &&
-          connection.url.match(/^\?/) &&
-          params.q &&
-          !params.act &&
-          (customSearchQuery = find(customSearchQueries, x => x === params.q))
-        ) {
-          if (customListJob) {
-            // Resolve the old one with something because no one else is going
-            // to after it's replaced in a moment.
-            customListJob.newRequestParams.resolve({
-              query: customListJob.query,
-              start: customListJob.start
-            });
-            customListJob.newResults.resolve(null);
-          }
-          customListJob = (connection:any)._customListJob = {
-            query: params.q,
-            start: +params.start,
-            newRequestParams: defer(),
-            newResults: defer()
-          };
-          triggerEvent({
-            type: 'searchForReplacement',
-            query: customListJob.query,
-            start: customListJob.start
-          });
-          return true;
-        }
-        return false;
-      },
-      requestChanger: function(connection, request) {
-        return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
-          const newParams = clone(connection.params);
-          newParams.q = query;
-          newParams.start = start;
-          return {
-            method: request.method,
-            url: '?'+stringify(newParams),
-            body: request.body
-          };
+    // Search results replacer.
+    // The content script tells us a search query to watch for. Whenever we see
+    // the search query, trigger an event containing the query, trigger an
+    // event containing the response, and then wait for a response event from
+    // the content script that contains new results to substitute in.
+    const customSearchQueries = [];
+    let customListJob;
+
+    document.addEventListener('inboxSDKcustomListRegisterQuery', (event: any) => {
+      customSearchQueries.push(event.detail.query);
+    });
+
+    document.addEventListener('inboxSDKcustomListNewQuery', (event: any) => {
+      if (
+        customListJob.query === event.detail.query &&
+        customListJob.start === event.detail.start
+      ) {
+        const {newQuery, newStart} = event.detail;
+
+        customListJob.newRequestParams.resolve({
+          query: newQuery,
+          start: newStart
         });
-      },
-      responseTextChanger: function(connection, response) {
-        triggerEvent({
-          type: 'searchResultsResponse',
-          query: (connection:any)._customListJob.query,
-          start: (connection:any)._customListJob.start,
-          response
-        });
-        return (connection:any)._customListJob.newResults.promise.then(newResults =>
-          newResults === null ? response : newResults
-        );
+      }
+    });
+
+    document.addEventListener('inboxSDKcustomListResults', (event: any) => {
+      if (customListJob.query === event.detail.query) {
+        customListJob.newResults.resolve(event.detail.newResults);
       }
     });
 
     {
-      // Sync API-based custom thread list interception
-      main_wrappers.push({
+      js_frame_wrappers.push({
         isRelevantTo: function(connection) {
+          let customSearchQuery;
           const params = connection.params;
           if (
-            /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
+            connection.method === 'POST' &&
+            params.search && params.view === 'tl' &&
+            connection.url.match(/^\?/) &&
+            params.q &&
+            !params.act &&
+            (customSearchQuery = find(customSearchQueries, x => x === params.q))
           ) {
             if (customListJob) {
               // Resolve the old one with something because no one else is going
@@ -681,13 +625,68 @@ export default function setupGmailInterceptor() {
               });
               customListJob.newResults.resolve(null);
             }
+            customListJob = (connection:any)._customListJob = {
+              query: params.q,
+              start: +params.start,
+              newRequestParams: defer(),
+              newResults: defer()
+            };
+            triggerEvent({
+              type: 'searchForReplacement',
+              query: customListJob.query,
+              start: customListJob.start
+            });
             return true;
           }
           return false;
         },
-        requestChanger: async function(connection, request) {
-          let requestPromise;
-          try{
+        requestChanger: function(connection, request) {
+          return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
+            const newParams = clone(connection.params);
+            newParams.q = query;
+            newParams.start = start;
+            return {
+              method: request.method,
+              url: '?'+stringify(newParams),
+              body: request.body
+            };
+          });
+        },
+        responseTextChanger: function(connection, response) {
+          triggerEvent({
+            type: 'searchResultsResponse',
+            query: (connection:any)._customListJob.query,
+            start: (connection:any)._customListJob.start,
+            response
+          });
+          return (connection:any)._customListJob.newResults.promise.then(newResults =>
+            newResults === null ? response : newResults
+          );
+        }
+      });
+
+      {
+        // Sync API-based custom thread list interception
+        main_wrappers.push({
+          isRelevantTo: function(connection) {
+            const params = connection.params;
+            if (
+              /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
+            ) {
+              if (customListJob) {
+                // Resolve the old one with something because no one else is going
+                // to after it's replaced in a moment.
+                customListJob.newRequestParams.resolve({
+                  query: customListJob.query,
+                  start: customListJob.start
+                });
+                customListJob.newResults.resolve(null);
+              }
+              return true;
+            }
+            return false;
+          },
+          requestChanger: async function(connection, request) {
             if(request.body){
               const parsedBody = JSON.parse(request.body);
 
@@ -723,31 +722,28 @@ export default function setupGmailInterceptor() {
                 });
               }
             }
-          }
-          catch(e){
-            //do nothing for now
-          }
 
-          return requestPromise || request;
-        },
-        responseTextChanger: async function(connection, response) {
-          if((connection:any)._customListJob){
-            triggerEvent({
-              type: 'searchResultsResponse',
-              query: (connection:any)._customListJob.query,
-              start: (connection:any)._customListJob.start,
-              response
-            });
+            return request;
+          },
+          responseTextChanger: async function(connection, response) {
+            if((connection:any)._customListJob){
+              triggerEvent({
+                type: 'searchResultsResponse',
+                query: (connection:any)._customListJob.query,
+                start: (connection:any)._customListJob.start,
+                response
+              });
 
-            return (connection:any)._customListJob.newResults.promise.then(newResults =>
-              newResults === null ? response : newResults
-            );
+              return (connection:any)._customListJob.newResults.promise.then(newResults =>
+                newResults === null ? response : newResults
+              );
+            }
+            else{
+              return response;
+            }
           }
-          else{
-            return response;
-          }
-        }
-      });
+        });
+      }
     }
   }
 
@@ -757,12 +753,6 @@ export default function setupGmailInterceptor() {
       (document.head:any).setAttribute('data-inboxsdk-btai-header', header);
       triggerEvent({type: 'btaiHeaderReceived'});
     };
-
-    const saveXsrfTokenHeader = (header) => {
-      (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
-      triggerEvent({type: 'xsrfTokenHeaderReceived'});
-    };
-
     main_wrappers.push({
       isRelevantTo(connection) {
         return (
@@ -774,7 +764,21 @@ export default function setupGmailInterceptor() {
         if (connection.headers['X-Gmail-BTAI']) {
           saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
         }
+      }
+    });
 
+    const saveXsrfTokenHeader = (header) => {
+      (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
+      triggerEvent({type: 'xsrfTokenHeaderReceived'});
+    };
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return (
+          /sync(?:\/u\/\d+)?\//.test(connection.url) &&
+          !(document.head:any).hasAttribute('data-inboxsdk-xsrf-token')
+        );
+      },
+      originalSendBodyLogger(connection) {
         if(connection.headers['X-Framework-Xsrf-Token']) {
           saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
         }

@@ -55,18 +55,24 @@ class GmailThreadView {
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
-		this._readyStream =
-			Kefir.fromPromise(this.getThreadIDAsync())
-				.map(() => {
-					this._setupToolbarView();
+		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.getPageCommunicator().isUsingSyncAPI()){
+			this._readyStream =
+				Kefir.fromPromise(this.getThreadIDAsync())
+					.map(() => {
+						this._setupToolbarView();
 
-					return null;
-				});
+						return null;
+					});
+		}
+		else {
+			this._readyStream = Kefir.constant(null);
+			this._setupToolbarView();
+		}
 
 		// wait until thread view is ready and everybody is subscribed
 		// to the threadView streams before creating the message stream
 		this._readyStream
-			.delay(1)
+			.flatMap(() => delayAsap())
 			.onValue(() => {
 				this._setupMessageViewStream();
 			});
@@ -143,7 +149,25 @@ class GmailThreadView {
 
 	getThreadID(): string {
 		if(this._threadID) return this._threadID;
-		else throw new Error('should not happen');
+
+		let threadID;
+		if(this._isPreviewedThread){
+			threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+		}
+		else{
+			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
+
+			if(params && params.threadID){
+				threadID = params.threadID;
+			} else {
+				const err = new Error('Failed to get id for thread');
+				this._driver.getLogger().error(err);
+				throw err;
+			}
+		}
+
+		this._threadID = threadID;
+		return threadID;
 	}
 
 	async getThreadIDAsync(): Promise<string> {

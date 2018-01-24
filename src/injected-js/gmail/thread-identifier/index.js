@@ -73,14 +73,7 @@ function processPreloadedThreads() {
 
 function getThreadIdFromUrl(url: string): ?string {
   var tid = parse(url).th;
-  if (tid){
-    var tidHasMatch = tid.match(/#(.*)/);
-    if (tidHasMatch) {
-      // we are in new sync world
-      tid = tidHasMatch[1];
-    }
-  }
-  else {
+  if (!tid) {
     // drafts in sync world can have weird urls that kind of
     // look like old style urls, and get handled properly here
     var urlHashMatch = url.match(/#(.*)/);

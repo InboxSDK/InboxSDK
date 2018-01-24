@@ -144,34 +144,34 @@ class GmailDriver {
 
 		// Manages mapping between old hex thread ids and new sync based thread ids
 		{
-      const syncThreadIdToOldGmailThreadIdCache = new BiMapCache({
-        key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
-        getAfromB: (oldGmailThreadId: string) => {
-          return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(({syncThreadID}) => syncThreadID);
-        },
-        getBfromA: (syncThreadID: string) => {
+			const syncThreadIdToOldGmailThreadIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
+				getAfromB: (oldGmailThreadId: string) => {
+					return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(({syncThreadID}) => syncThreadID);
+				},
+				getBfromA: (syncThreadID: string) => {
 					return getSyncThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
-        }
-      });
-      this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
-        syncThreadIdToOldGmailThreadIdCache.getAfromB(oldGmailThreadId);
+				}
+			});
+			this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
+				syncThreadIdToOldGmailThreadIdCache.getAfromB(oldGmailThreadId);
 
 			this.getOldGmailThreadIdFromSyncThreadId = syncThreadId =>
 				syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
-    }
+		}
 
 		// mapping between sync message ids and old message ids
 		{
-      const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
-        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
-        getAfromB: (sync: string) => getGmailMessageIdForSyncMessageId(this, sync),
-        getBfromA() {
-          throw new Error('should not happen');
-        }
-      });
-      this.getGmailMessageIdForSyncMessageId = syncMessageId =>
-        gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
-    }
+			const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+				getAfromB: (sync: string) => getGmailMessageIdForSyncMessageId(this, sync),
+				getBfromA() {
+					throw new Error('should not happen');
+				}
+			});
+			this.getGmailMessageIdForSyncMessageId = syncMessageId =>
+				gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
+		}
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
