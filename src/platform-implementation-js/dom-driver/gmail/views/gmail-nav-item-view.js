@@ -370,7 +370,7 @@ export default class GmailNavItemView {
 	}
 
 	_createLinkButtonAccessory(accessoryDescriptor: Object){
-		var linkDiv = document.createElement('div');
+		const linkDiv = document.createElement('div');
 
 		const linkDivClassName = this._driver.isGmailV2UI() ?
 			'inboxsdk__navItem_link' :
@@ -379,7 +379,7 @@ export default class GmailNavItemView {
 		linkDiv.setAttribute('class', linkDivClassName);
 
 
-		var anchor = document.createElement('a');
+		const anchor = document.createElement('a');
 		anchor.classList.add('CK');
 		anchor.textContent = accessoryDescriptor.name;
 
