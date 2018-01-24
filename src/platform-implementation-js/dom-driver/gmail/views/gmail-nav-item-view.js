@@ -436,11 +436,11 @@ export default class GmailNavItemView {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
 		};
 		buttonOptions.dropdownShowFunction = ({dropdown}) => {
-			buttonOptions.onClick({dropdown});
-
 			if (this._driver.isGmailV2UI()) {
 				dropdown.el.style.marginLeft = '16px';
 			}
+
+			buttonOptions.onClick({dropdown});
 		};
 
 		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
