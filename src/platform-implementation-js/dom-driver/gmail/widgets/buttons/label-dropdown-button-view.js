@@ -1,7 +1,6 @@
 /* @flow */
 
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 
 export default class LabelDropdownButtonView {
