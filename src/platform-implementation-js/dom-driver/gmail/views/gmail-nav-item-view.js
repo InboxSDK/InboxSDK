@@ -13,6 +13,7 @@ import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
 
 import ButtonView from '../widgets/buttons/button-view';
 import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
+import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
@@ -365,8 +366,24 @@ export default class GmailNavItemView {
 	}
 
 	_createCreateAccessory(accessoryDescriptor: Object){
-		accessoryDescriptor.name = '+ New';
-		this._createLinkButtonAccessory(accessoryDescriptor);
+		if (this._driver.isGmailV2UI()) {
+			this._createPlusButtonAccessory(accessoryDescriptor);
+		}
+		else {
+			accessoryDescriptor.name = '+ New';
+			this._createLinkButtonAccessory(accessoryDescriptor);
+		}
+	}
+
+	_createPlusButtonAccessory(accessoryDescriptor: Object){
+		const buttonOptions = {...accessoryDescriptor};
+		buttonOptions.buttonView  = new CreateAccessoryButtonView(buttonOptions);
+
+		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
+
+		const insertionPoint = querySelector(this._element, '.TN');
+
+		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 	}
 
 	_createLinkButtonAccessory(accessoryDescriptor: Object){
