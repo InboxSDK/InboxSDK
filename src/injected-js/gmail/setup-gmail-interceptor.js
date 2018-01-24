@@ -249,7 +249,8 @@ export default function setupGmailInterceptor() {
               const wrapper = (
                 originalResponse[2] &&
                 originalResponse[2][6] &&
-                originalResponse[2][6][1]
+                originalResponse[2][6][1] &&
+                originalResponse[2][6][1][1]
               );
 
               if(wrapper){
@@ -266,7 +267,7 @@ export default function setupGmailInterceptor() {
                     rfcID: saveUpdate[14],
                     messageID: saveUpdate[1],
                     oldMessageID: new BigNumber(saveUpdate[48]).toString(16),
-                    threadID: wrapper[1]
+                    syncThreadID: wrapper[1]
                   });
                 }
               }

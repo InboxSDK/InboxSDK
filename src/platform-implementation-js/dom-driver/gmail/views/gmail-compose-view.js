@@ -477,10 +477,17 @@ class GmailComposeView {
 	}
 
 	async _setupIDs() {
-		this._targetMessageID = this._getTargetMessageID();
-		
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
 			let promisesThatNeedToResolve = [];
+
+			const syncTargetMessageID = this._getTargetMessageID();
+			if(syncTargetMessageID){
+				promisesThatNeedToResolve.push(
+					this._driver.getGmailMessageIdForSyncMessageId(syncTargetMessageID)
+						.then(gmailMessageId => this._targetMessageID = gmailMessageId)
+				);
+			}
+
 			const syncMessageId = this._getMessageIDfromForm();
 			if(syncMessageId){
 				promisesThatNeedToResolve.push(
@@ -514,6 +521,7 @@ class GmailComposeView {
 			await Promise.all(promisesThatNeedToResolve);
 		}
 		else {
+			this._targetMessageID = this._getTargetMessageID();
 			this._messageId = this._initialMessageId = this._getMessageIDfromForm();
 			this._threadID = this._getThreadID();
 		}
@@ -1391,7 +1399,7 @@ class GmailComposeView {
 	// we're replying to.
 	_getTargetMessageID(): ?string {
 		const input = this._element.querySelector('input[name="rm"]');
-		return input && typeof input.value === 'string' && input.value != 'undefined' ? input.value : null;
+		return input && typeof input.value === 'string' && input.value != 'undefined' ? input.value.replace('#', '') : null;
 	}
 
 	_getThreadID(): ?string {
