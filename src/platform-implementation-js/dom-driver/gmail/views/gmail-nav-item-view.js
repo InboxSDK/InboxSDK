@@ -432,7 +432,7 @@ export default class GmailNavItemView {
 			Kefir
 				.fromEvents(dropdown, 'destroy')
 				.take(1)
-				.takeUntilBy(this._eventStream.onEnd(() => undefined))
+				.takeUntilBy(this._eventStream.ignoreValues().beforeEnd(() => undefined))
 				.onValue(() => {
 					if (innerButtonElement) innerButtonElement.classList.remove('aj1');
 				});
