@@ -398,8 +398,7 @@ export default class GmailNavItemView {
 	}
 
 	_createIconButtonAccessory(accessoryDescriptor: Object){
-		const buttonOptions = Object.assign({}, accessoryDescriptor);
-		buttonOptions.buttonColor = 'pureIcon';
+		const buttonOptions = {...accessoryDescriptor, buttonColor: 'pureIcon'};
 		buttonOptions.buttonView  = new ButtonView(buttonOptions);
 
 
@@ -413,7 +412,7 @@ export default class GmailNavItemView {
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
-		const buttonOptions = Object.assign({}, accessoryDescriptor);
+		const buttonOptions = {...accessoryDescriptor};
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
 		buttonOptions.dropdownPositionOptions = {
