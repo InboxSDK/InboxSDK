@@ -27,9 +27,15 @@ export default class LabelDropdownButtonView {
 		return this._eventStream;
 	}
 
-	activate(){/* do nothing */}
+	activate(){
+		const innerButtonElement = this._element.firstElementChild;
+		if (innerButtonElement) innerButtonElement.classList.add('aj1');
+	}
 
-	deactivate(){/* do nothing */}
+	deactivate(){
+		const innerButtonElement = this._element.firstElementChild;
+		if (innerButtonElement) innerButtonElement.classList.remove('aj1');
+	}
 
 	_setupElement(backgroundColor: string, foregroundColor: string){
 		this._element = document.createElement('div');

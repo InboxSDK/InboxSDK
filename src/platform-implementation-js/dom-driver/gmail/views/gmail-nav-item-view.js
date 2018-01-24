@@ -425,17 +425,6 @@ export default class GmailNavItemView {
 			if (this._driver.isGmailV2UI()) {
 				dropdown.el.style.marginLeft = '16px';
 			}
-
-			const innerButtonElement = buttonOptions.buttonView.getElement().firstElementChild;
-			if (innerButtonElement) innerButtonElement.classList.add('aj1');
-
-			Kefir
-				.fromEvents(dropdown, 'destroy')
-				.take(1)
-				.takeUntilBy(this._eventStream.ignoreValues().beforeEnd(() => undefined))
-				.onValue(() => {
-					if (innerButtonElement) innerButtonElement.classList.remove('aj1');
-				});
 		};
 
 		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
