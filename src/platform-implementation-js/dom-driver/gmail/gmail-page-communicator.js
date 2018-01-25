@@ -13,14 +13,6 @@ import Logger from '../../lib/logger';
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
-  ajaxInterceptStream: Kefir.Observable<Object>;
-
-  constructor() {
-    super();
-    this.ajaxInterceptStream =
-      Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
-            .map(x => x.detail);
-  }
 
   getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
@@ -68,6 +60,18 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     const s = (document.head:any).getAttribute('data-inboxsdk-action-token-value');
     if (s == null) throw new Error('Failed to read value');
     return s;
+  }
+
+  isUsingSyncAPI(): boolean {
+    const s = (document.head:any).getAttribute('data-inboxsdk-using-sync-api');
+    if (s == null) throw new Error('Failed to read value');
+    return s === 'true';
+  }
+
+  isUsingMaterialUI(): boolean {
+    const s = (document.head:any).getAttribute('data-inboxsdk-using-material-ui');
+    if (s == null) throw new Error('Failed to read value');
+    return s === 'true';
   }
 
   isConversationViewDisabled(): Promise<boolean> {
@@ -148,23 +152,31 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     }));
   }
 
-  registerComposeRequestModifier(composeid: string, appId: string): string{
+  registerComposeRequestModifier(keyId: string, appId: string): string{
     const modifierId = (new Date()).getTime() + '_' + appId + '_' + Math.random();
 
+    const detail: Object = {modifierId};
+    if(this.isUsingSyncAPI()) detail.draftID = keyId;
+    else detail.composeid = keyId;
+
     document.dispatchEvent(new CustomEvent('inboxSDKregisterComposeRequestModifier', {
+      detail,
       bubbles: false,
-      cancelable: false,
-      detail: {composeid, modifierId}
+      cancelable: false
     }));
 
     return modifierId;
   }
 
-  modifyComposeRequest(composeid: string, modifierId: string, composeParams: Object){
+  modifyComposeRequest(keyId: string, modifierId: string, composeParams: Object){
+    const detail: Object = {modifierId, composeParams};
+    if(this.isUsingSyncAPI()) detail.draftID = keyId;
+    else detail.composeid = keyId;
+
     document.dispatchEvent(new CustomEvent('inboxSDKcomposeRequestModified', {
+      detail,
       bubbles: false,
-      cancelable: false,
-      detail:{composeid, modifierId, composeParams}
+      cancelable: false
     }));
   }
 }

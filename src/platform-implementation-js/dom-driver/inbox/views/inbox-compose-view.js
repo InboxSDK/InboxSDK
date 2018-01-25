@@ -326,7 +326,7 @@ class InboxComposeView {
             getThreadID: (): Promise<string> =>
               getGmailThreadIdForRfcMessageId(this._driver, event.rfcID),
             getMessageID: (): Promise<string> =>
-              this._driver.getGmailMessageIdForInboxMessageId(`msg-a:${event.draftID}`)
+              this._driver.getGmailMessageIdForSyncMessageId(`msg-a:${event.draftID}`)
           };
           ['gmailThreadId', 'gmailMessageId', 'threadID', 'messageID'].forEach(name => {
             Object.defineProperty(data, name, {get: () => {

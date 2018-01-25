@@ -2,6 +2,9 @@
 
 import {defn} from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
+
+import getOriginalMessagePage from '../../../driver-common/getOriginalMessagePage';
+
 import type GmailDriver from '../gmail-driver';
 import htmlToText from '../../../../common/html-to-text';
 import querystring from 'querystring';
@@ -36,18 +39,8 @@ async function getRfcMessageIdForGmailThreadId(driver: GmailDriver, gmailThreadI
     throw new Error('Could not find a message ID for given thread ID');
   }
 
-  const response = await gmailAjax({
-    method: 'GET',
-    url: (document.location:any).origin+document.location.pathname,
-    canRetry: true,
-    data: {
-      ik: driver.getPageCommunicator().getIkValue(),
-      view: 'om',
-      th: gmailMessageId
-    }
-  });
-
-  const match = response.text.match(/^Message-ID:\s+(\S+)\s*$/im);
+  const text = await getOriginalMessagePage(driver, {oldGmailMessageID: gmailMessageId});
+  const match = text.match(/^Message-ID:\s+(\S+)\s*$/im);
   if (!match) {
     throw new Error("Failed to find rfc id for gmail thread id. Message may not exist in user's account.");
   }

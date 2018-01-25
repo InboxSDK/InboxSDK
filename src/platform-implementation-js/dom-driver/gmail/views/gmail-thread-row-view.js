@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 
 import once from 'lodash/once';
+import flatten from 'lodash/flatten';
 import includes from 'lodash/includes';
 import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
@@ -84,6 +85,7 @@ class GmailThreadRowView {
   _driver: GmailDriver;
   _userView: ?Object;
   _cachedThreadID: ?string;
+  _cachedSyncThreadID: ?string;
   _imageFixer: ?Bus<any>;
   _imageFixerTask: ?Kefir.Observable<any>;
   _stopper = kefirStopper();
@@ -234,17 +236,30 @@ class GmailThreadRowView {
   getCounts(): Counts {
     let counts = this._counts;
     if(!counts){
-      const thing = querySelector(this._elements[0], 'td div.yW');
-      const [preDrafts, drafts] = thing.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
+      const recipientsElement = querySelector(this._elements[0], 'td div.yW');
 
-      const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+      if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+        const draftCount = recipientsElement.querySelectorAll('.boq').length;
+        const messageCountMatch = recipientsElement.innerHTML.match(/\((\d+)\)$/);
+        const messageCount =
+          messageCountMatch ?
+            +messageCountMatch[1] :
+          draftCount ? 0 : 1;
 
-      const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-      const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+        counts = this._counts = {messageCount, draftCount};
+      }
+      else {
+        const [preDrafts, drafts] = recipientsElement.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
 
-      const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-      const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
-      counts = this._counts = {messageCount, draftCount};
+        const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+
+        const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
+        const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+
+        const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
+        const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
+        counts = this._counts = {messageCount, draftCount};
+      }
     }
 
     return counts;
@@ -765,13 +780,37 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    const threadID = this._driver.getThreadRowIdentifier()
-      .getThreadIdForThreadRow(this, this._elements);
-    if (threadID) {
-      this._cachedThreadID = threadID;
-    }
-    return threadID;
+    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+      const elementWithId =
+        flatten(
+          this._elements.map(
+            el => Array.from(el.querySelectorAll('[data-thread-id]'))
+          )
+        ).filter(Boolean)[0];
 
+      if(elementWithId){
+        this._cachedSyncThreadID = elementWithId.getAttribute('data-thread-id').replace('#', '');
+        this._cachedThreadID = elementWithId.getAttribute('data-legacy-thread-id').replace('#', '');
+
+        return this._cachedThreadID;
+      }
+      else {
+        const threadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+        this._cachedSyncThreadID = threadID;
+
+        if(threadID){
+          this._driver.getOldGmailThreadIdFromSyncThreadId(threadID)
+            .then(oldGmailThreadID => {
+              this._cachedThreadID = oldGmailThreadID;
+            });
+        }
+      }
+    }
+    else {
+      this._cachedThreadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+    }
+
+    return this._cachedThreadID;
   }
 
   getThreadID(): string {
@@ -782,8 +821,19 @@ class GmailThreadRowView {
     return threadID;
   }
 
+  getSyncThreadID(): Promise<?string> {
+    return Promise.resolve(this._cachedSyncThreadID);
+  }
+
   async getThreadIDAsync(): Promise<string> {
-    return this.getThreadID();
+    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+      const syncThreadID = await this.getSyncThreadID();
+      if(!syncThreadID) throw new Error('Should not happen: syncThreadID should not be null here');
+      return this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+    }
+    else {
+      return this.getThreadID();
+    }
   }
 
   getDraftID(): Promise<?string> {

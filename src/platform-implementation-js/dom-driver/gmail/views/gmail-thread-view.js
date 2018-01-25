@@ -1,5 +1,6 @@
 /* @flow */
 
+import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
 import {defn} from 'ud';
@@ -37,7 +38,9 @@ class GmailThreadView {
 	_toolbarView: any;
 	_messageViewDrivers: any[];
 	_newMessageMutationObserver: ?MutationObserver;
+	_readyStream: Kefir.Observable<any>;
 	_threadID: ?string;
+	_syncThreadID: ?string;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
 		this._element = element;
@@ -48,15 +51,31 @@ class GmailThreadView {
 		this._eventStream = kefirBus();
 		this._messageViewDrivers = [];
 
-		this._setupToolbarView();
-		asap(() => {
-			// Don't emit anything before anyone has had a chance to start listening!
-			this._setupMessageViewStream();
-		});
-
 		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
+
+		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.getPageCommunicator().isUsingSyncAPI()){
+			this._readyStream =
+				Kefir.fromPromise(this.getThreadIDAsync())
+					.map(() => {
+						this._setupToolbarView();
+
+						return null;
+					});
+		}
+		else {
+			this._readyStream = Kefir.constant(null);
+			this._setupToolbarView();
+		}
+
+		// wait until thread view is ready and everybody is subscribed
+		// to the threadView streams before creating the message stream
+		this._readyStream
+			.flatMap(() => delayAsap())
+			.onValue(() => {
+				this._setupMessageViewStream();
+			});
 	}
 
 	// TODO use livesets eventually
@@ -129,18 +148,17 @@ class GmailThreadView {
 	}
 
 	getThreadID(): string {
-		if(this._threadID){
-			return this._threadID;
-		}
+		if(this._threadID) return this._threadID;
 
+		let threadID;
 		if(this._isPreviewedThread){
-			this._threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+			threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
 		}
 		else{
 			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
 			if(params && params.threadID){
-				this._threadID = params.threadID;
+				threadID = params.threadID;
 			} else {
 				const err = new Error('Failed to get id for thread');
 				this._driver.getLogger().error(err);
@@ -148,11 +166,37 @@ class GmailThreadView {
 			}
 		}
 
-		return this._threadID;
+		this._threadID = threadID;
+		return threadID;
 	}
 
 	async getThreadIDAsync(): Promise<string> {
-		return this.getThreadID();
+		let threadID;
+		if(this._isPreviewedThread){
+			threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+		}
+		else{
+			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
+
+			if(params && params.threadID){
+				threadID = params.threadID;
+			} else {
+				const err = new Error('Failed to get id for thread');
+				this._driver.getLogger().error(err);
+				throw err;
+			}
+		}
+
+		if(this._driver.getPageCommunicator().isUsingSyncAPI() && !this._isPreviewedThread){
+			this._syncThreadID = threadID;
+			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
+		}
+		else{
+			this._threadID = threadID;
+		}
+
+		if(this._threadID) return this._threadID;
+		else throw new Error('Failed to get id for thread');
 	}
 
 	_setupToolbarView() {
@@ -289,7 +333,7 @@ class GmailThreadView {
 	}
 
 	getReadyStream() {
-		return delayAsap(null);
+		return this._readyStream;
 	}
 
 	async _logAddonElementInfo() {

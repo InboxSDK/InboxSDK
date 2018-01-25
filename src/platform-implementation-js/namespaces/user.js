@@ -18,6 +18,10 @@ class User {
 		return get(memberMap, this).driver.getUserEmailAddress();
 	}
 
+	isConversationViewDisabled() {
+		return get(memberMap, this).driver.isConversationViewDisabled();
+	}
+
 	getUserContact() {
 		const {driver, piOpts} = get(memberMap, this);
 		driver.getLogger().deprecationWarning('User.getUserContact', 'User.getEmailAddress');

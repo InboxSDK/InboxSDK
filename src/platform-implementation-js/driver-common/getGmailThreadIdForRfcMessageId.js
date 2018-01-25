@@ -2,10 +2,21 @@
 
 import {defn} from 'ud';
 import {extractThreads} from '../dom-driver/gmail/gmail-response-processor';
+import getSyncThreadsForSearch from './getSyncThreadsForSearch';
 import gmailAjax from './gmailAjax';
 import type {Driver} from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: string): Promise<string> {
+  if((driver.getPageCommunicator(): any).isUsingSyncAPI()){
+    const threadDescriptors = await getSyncThreadsForSearch(driver, 'rfc822msgid:' + rfcMessageId);
+    return threadDescriptors[0].oldGmailThreadID;
+  }
+  else {
+    return forOldAPI(driver, rfcMessageId);
+  }
+}
+
+async function forOldAPI(driver: Driver, rfcMessageId: string): Promise<string> {
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   // Inbox omits the account param if there is only one logged in account,
   // but this page is backed by Gmail's backend which will always include it.

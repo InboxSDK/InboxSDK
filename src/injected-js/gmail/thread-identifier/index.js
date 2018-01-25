@@ -57,7 +57,8 @@ function processPreloadedThreads() {
     script.text && script.text.slice(0,500).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {
-    logger.error(new Error("Could not read preloaded VIEW_DATA"));
+    // preloadScript is not available in gmail v2, so let's stop logging an error
+    return;
   } else {
     const firstBracket = preloadScript.text.indexOf('[');
     const lastBracket = preloadScript.text.lastIndexOf(']');
@@ -73,14 +74,19 @@ function processPreloadedThreads() {
 function getThreadIdFromUrl(url: string): ?string {
   var tid = parse(url).th;
   if (!tid) {
-    // Draft URLs have the thread id after the hash
+    // drafts in sync world can have weird urls that kind of
+    // look like old style urls, and get handled properly here
     var urlHashMatch = url.match(/#(.*)/);
     if (urlHashMatch) {
+      // drafts have the hash in them without the th=
       url = decodeURIComponent(decodeURIComponent(urlHashMatch[1]));
       tid = parse(url).th;
     }
   }
-  return tid;
+
+  // if we're in sync world and it's a
+  // draft then a hash can come through in the beginning
+  return tid.replace('#', '');
 }
 
 function getGmailThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {

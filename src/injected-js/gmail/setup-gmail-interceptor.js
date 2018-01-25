@@ -4,6 +4,7 @@ import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
 import intersection from 'lodash/intersection';
+import BigNumber from 'bignumber.js';
 
 import Kefir from 'kefir';
 import * as logger from '../injected-logger';
@@ -13,6 +14,10 @@ import * as threadIdentifier from './thread-identifier';
 import quotedSplit from '../../common/quoted-split';
 import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
+
+import {getDetailsOfComposeRequest, replaceEmailBodyForSendRequest} from './sync-compose-request-processor';
+
+import type {XHRProxyConnectionDetails} from '../xhr-proxy-factory';
 
 function logErrorExceptEventListeners(err, details) {
   // Don't log Gmail's errors
@@ -31,8 +36,6 @@ export default function setupGmailInterceptor() {
   {
     const js_frame_element = top.document.getElementById('js_frame');
     if (js_frame_element) {
-      threadIdentifier.setup();
-
       const js_frame = js_frame_element.contentDocument.defaultView;
       const js_frame_originalXHR = js_frame.XMLHttpRequest;
       js_frame.XMLHttpRequest = XHRProxyFactory(
@@ -48,18 +51,20 @@ export default function setupGmailInterceptor() {
       main_originalXHR, main_wrappers, {logError: logErrorExceptEventListeners});
   }
 
+  threadIdentifier.setup();
+
   //email sending modifier/notifier
   {
     let modifiers: {[key: string]: Array<string>} = {};
 
-
     Kefir.fromEvents(document, 'inboxSDKregisterComposeRequestModifier')
           .onValue(({detail}) => {
-            if(!modifiers[detail.compoesid]){
-              modifiers[detail.composeid] = [];
+            const keyId = detail.composeid || detail.draftID;
+            if(!modifiers[keyId]){
+              modifiers[keyId] = [];
             }
 
-            modifiers[detail.composeid].push(detail.modifierId);
+            modifiers[keyId].push(detail.modifierId);
           });
 
 
@@ -74,7 +79,6 @@ export default function setupGmailInterceptor() {
         });
       },
       requestChanger: async function(connection, request) {
-
         let composeParams = querystring.parse(request.body);
         const composeid = composeParams.composeid;
         const composeModifierIds = modifiers[composeParams.composeid];
@@ -124,54 +128,226 @@ export default function setupGmailInterceptor() {
         }
       }
     });
+
+    js_frame_wrappers.push({
+      isRelevantTo: function(connection) {
+        return connection.params.act === 'sd';
+      },
+      originalSendBodyLogger: function(connection, body) {
+        triggerEvent({
+          type: 'emailDraftSaveSending',
+          body: body
+        });
+      },
+      afterListeners: function(connection) {
+        if(connection.status === 200) {
+          triggerEvent({
+            type: 'emailDraftReceived',
+            responseText: connection.originalResponseText,
+            originalSendBody: connection.originalSendBody,
+            connectionDetails: {
+              method: connection.method,
+              url: connection.url,
+              params: connection.params,
+              responseType: connection.responseType
+            }
+          });
+        }
+      }
+    });
+
+    {
+      // Sync API-based compose sending intercept
+      const currentSendConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+      const currentDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+      const currentFirstDraftSaveConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> = new WeakMap();
+      main_wrappers.push({
+        isRelevantTo(connection) {
+          return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
+        },
+        originalSendBodyLogger(connection) {
+          if (connection.originalSendBody) {
+            const composeRequestDetails = getDetailsOfComposeRequest(connection.originalSendBody);
+            if(!composeRequestDetails) return;
+
+            const {draftID} = composeRequestDetails;
+
+            switch(composeRequestDetails.type){
+              case 'FIRST_DRAFT_SAVE':
+                currentFirstDraftSaveConnectionIDs.set(connection, draftID);
+              break;
+              case 'DRAFT_SAVE':
+                currentDraftSaveConnectionIDs.set(connection, draftID);
+              break;
+              case 'SEND':
+                currentSendConnectionIDs.set(connection, draftID);
+                triggerEvent({type: 'emailSending', draftID});
+              break;
+            }
+          }
+        },
+        requestChanger: async function(connection, request) {
+          const composeRequestDetails = getDetailsOfComposeRequest(request.body);
+          if(!composeRequestDetails || composeRequestDetails.type !== 'SEND') return request;
+
+          const {draftID, body, type} = composeRequestDetails;
+
+          const composeModifierIds = modifiers[draftID];
+          if(!composeModifierIds || composeModifierIds.length === 0) return request;
+
+          let newEmailBody = composeRequestDetails.body;
+          for(let ii=0; ii<composeModifierIds.length; ii++) {
+            const modifierId = composeModifierIds[ii];
+
+            const modificationPromise = Kefir.fromEvents(document, 'inboxSDKcomposeRequestModified')
+                                              .filter(({detail}) => detail.draftID === draftID && detail.modifierId === modifierId)
+                                              .take(1)
+                                              .map(({detail}) => detail.composeParams)
+                                              .toPromise(Promise);
+
+            triggerEvent({
+              type: 'inboxSDKmodifyComposeRequest',
+              draftID,
+              modifierId,
+              composeParams: {
+                body: newEmailBody,
+                isPlainText: false
+              }
+            });
+
+
+            const newComposeParams = await modificationPromise;
+            newEmailBody = newComposeParams.body;
+          }
+
+          return Object.assign({}, request, {body: replaceEmailBodyForSendRequest(request.body, newEmailBody)});
+        },
+        afterListeners(connection) {
+          if (
+            currentSendConnectionIDs.has(connection) ||
+            currentDraftSaveConnectionIDs.has(connection) ||
+            currentFirstDraftSaveConnectionIDs.has(connection)
+          ) {
+            const sendFailed = () => {
+              triggerEvent({type: 'emailSendFailed', draftID});
+              currentSendConnectionIDs.delete(connection);
+            };
+
+            const draftID =
+              currentSendConnectionIDs.get(connection) ||
+              currentDraftSaveConnectionIDs.get(connection) ||
+              currentFirstDraftSaveConnectionIDs.get(connection);
+
+            if (connection.status !== 200 || !connection.originalResponseText) {
+              sendFailed();
+              return;
+            }
+
+            const originalResponse = JSON.parse(connection.originalResponseText);
+
+            if(currentFirstDraftSaveConnectionIDs.has(connection)){
+              const wrapper = (
+                originalResponse[2] &&
+                originalResponse[2][6] &&
+                originalResponse[2][6][1] &&
+                originalResponse[2][6][1][1]
+              );
+
+              if(wrapper){
+                const saveUpdate = (
+                  wrapper[3] &&
+                  wrapper[3][1] &&
+                  wrapper[3][1][1]
+                );
+
+                if(saveUpdate){
+                  triggerEvent({
+                    draftID: draftID,
+                    type: 'emailDraftReceived',
+                    rfcID: saveUpdate[14],
+                    messageID: saveUpdate[1],
+                    oldMessageID: new BigNumber(saveUpdate[48]).toString(16),
+                    syncThreadID: wrapper[1]
+                  });
+                }
+              }
+            }
+            else {
+              const updateList = (
+                originalResponse[2] &&
+                originalResponse[2][6]
+              );
+              if (!updateList) {
+                sendFailed();
+                return;
+              }
+
+              const sendUpdateMatch = updateList.find((update) => (
+                update[1] &&
+                update[1][3] &&
+                update[1][3][7] &&
+                update[1][3][7][1] &&
+                update[1][3][7][1][5] &&
+                update[1][3][7][1][5][0] &&
+                update[1][3][7][1][5][0][14]
+              ));
+              if (!sendUpdateMatch) {
+                sendFailed();
+                return;
+              }
+
+              const sendUpdateWrapper = (
+                sendUpdateMatch[1] &&
+                sendUpdateMatch[1][3] &&
+                sendUpdateMatch[1][3][7] &&
+                sendUpdateMatch[1][3][7][1]
+              );
+
+              const sendUpdate = sendUpdateWrapper[5][0];
+
+              triggerEvent({
+                draftID: draftID,
+                type: currentSendConnectionIDs.has(connection) ? 'emailSent' : 'emailDraftReceived',
+                rfcID: sendUpdate[14],
+                messageID: sendUpdate[1],
+                oldMessageID: new BigNumber(sendUpdate[48]).toString(16),
+                threadID: sendUpdateWrapper[4],
+                oldThreadID: new BigNumber(sendUpdateWrapper[18]).toString(16)
+              });
+            }
+
+            currentSendConnectionIDs.delete(connection);
+            currentDraftSaveConnectionIDs.delete(connection);
+            currentFirstDraftSaveConnectionIDs.delete(connection);
+          }
+        }
+      });
+    }
   }
 
-  js_frame_wrappers.push({
-    isRelevantTo: function(connection) {
-      return connection.params.act === 'sd';
-    },
-    originalSendBodyLogger: function(connection, body) {
-      triggerEvent({
-        type: 'emailDraftSaveSending',
-        body: body
-      });
-    },
-    afterListeners: function(connection) {
-      if(connection.status === 200) {
-        triggerEvent({
-          type: 'emailDraftReceived',
-          responseText: connection.originalResponseText,
-          originalSendBody: connection.originalSendBody,
-          connectionDetails: {
-            method: connection.method,
-            url: connection.url,
-            params: connection.params,
-            responseType: connection.responseType
-          }
-        });
-      }
-    }
-  });
 
-  js_frame_wrappers.push({
-    isRelevantTo(connection) {
-      return !!connection.params.search && connection.params.view === 'tl';
-    },
-    async responseTextChanger(connection, responseText) {
-      // Presence of a responseTextChanger blocks Gmail from getting the partial
-      // values as this loads. We want our originalResponseTextLogger to run
-      // before Gmail has seen any of the response.
-      return responseText;
-    },
-    originalResponseTextLogger(connection) {
-      if (connection.status === 200) {
-        const search = connection.params.search;
-        const responseText = connection.originalResponseText;
+  // intercept and process thread responses
+  {
+    js_frame_wrappers.push({
+      isRelevantTo(connection) {
+        return !!connection.params.search && connection.params.view === 'tl';
+      },
+      async responseTextChanger(connection, responseText) {
+        // Presence of a responseTextChanger blocks Gmail from getting the partial
+        // values as this loads. We want our originalResponseTextLogger to run
+        // before Gmail has seen any of the response.
+        return responseText;
+      },
+      originalResponseTextLogger(connection) {
+        if (connection.status === 200) {
+          const search = connection.params.search;
+          const responseText = connection.originalResponseText;
 
-        threadIdentifier.processThreadListResponse(responseText);
+          threadIdentifier.processThreadListResponse(responseText);
+        }
       }
-    }
-  });
+    });
+  }
 
   // Search suggestions modifier
   // The content scripts tell us when they're interested in adding
@@ -427,64 +603,185 @@ export default function setupGmailInterceptor() {
       }
     });
 
-    js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
-        let customSearchQuery;
-        const params = connection.params;
-        if (
-          connection.method === 'POST' &&
-          params.search && params.view === 'tl' &&
-          connection.url.match(/^\?/) &&
-          params.q &&
-          !params.act &&
-          (customSearchQuery = find(customSearchQueries, x => x === params.q))
-        ) {
-          if (customListJob) {
-            // Resolve the old one with something because no one else is going
-            // to after it's replaced in a moment.
-            customListJob.newRequestParams.resolve({
+    {
+      js_frame_wrappers.push({
+        isRelevantTo: function(connection) {
+          let customSearchQuery;
+          const params = connection.params;
+          if (
+            connection.method === 'POST' &&
+            params.search && params.view === 'tl' &&
+            connection.url.match(/^\?/) &&
+            params.q &&
+            !params.act &&
+            (customSearchQuery = find(customSearchQueries, x => x === params.q))
+          ) {
+            if (customListJob) {
+              // Resolve the old one with something because no one else is going
+              // to after it's replaced in a moment.
+              customListJob.newRequestParams.resolve({
+                query: customListJob.query,
+                start: customListJob.start
+              });
+              customListJob.newResults.resolve(null);
+            }
+            customListJob = (connection:any)._customListJob = {
+              query: params.q,
+              start: +params.start,
+              newRequestParams: defer(),
+              newResults: defer()
+            };
+            triggerEvent({
+              type: 'searchForReplacement',
               query: customListJob.query,
               start: customListJob.start
             });
-            customListJob.newResults.resolve(null);
+            return true;
           }
-          customListJob = (connection:any)._customListJob = {
-            query: params.q,
-            start: +params.start,
-            newRequestParams: defer(),
-            newResults: defer()
-          };
-          triggerEvent({
-            type: 'searchForReplacement',
-            query: customListJob.query,
-            start: customListJob.start
+          return false;
+        },
+        requestChanger: function(connection, request) {
+          return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
+            const newParams = clone(connection.params);
+            newParams.q = query;
+            newParams.start = start;
+            return {
+              method: request.method,
+              url: '?'+stringify(newParams),
+              body: request.body
+            };
           });
-          return true;
+        },
+        responseTextChanger: function(connection, response) {
+          triggerEvent({
+            type: 'searchResultsResponse',
+            query: (connection:any)._customListJob.query,
+            start: (connection:any)._customListJob.start,
+            response
+          });
+          return (connection:any)._customListJob.newResults.promise.then(newResults =>
+            newResults === null ? response : newResults
+          );
         }
-        return false;
-      },
-      requestChanger: function(connection, request) {
-        return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
-          const newParams = clone(connection.params);
-          newParams.q = query;
-          newParams.start = start;
-          return {
-            method: request.method,
-            url: '?'+stringify(newParams),
-            body: request.body
-          };
+      });
+
+      {
+        // Sync API-based custom thread list interception
+        main_wrappers.push({
+          isRelevantTo: function(connection) {
+            const params = connection.params;
+            if (
+              /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
+            ) {
+              if (customListJob) {
+                // Resolve the old one with something because no one else is going
+                // to after it's replaced in a moment.
+                customListJob.newRequestParams.resolve({
+                  query: customListJob.query,
+                  start: customListJob.start
+                });
+                customListJob.newResults.resolve(null);
+              }
+              return true;
+            }
+            return false;
+          },
+          requestChanger: async function(connection, request) {
+            if(request.body){
+              const parsedBody = JSON.parse(request.body);
+
+              // we are a search!
+              const searchQuery = (
+                parsedBody &&
+                parsedBody[1] &&
+                parsedBody[1][4]
+              ) || '';
+
+              if(find(customSearchQueries, x => x === searchQuery)) {
+                customListJob = (connection:any)._customListJob = {
+                  query: searchQuery,
+                  start: parsedBody[1][10],
+                  newRequestParams: defer(),
+                  newResults: defer()
+                };
+                triggerEvent({
+                  type: 'searchForReplacement',
+                  query: customListJob.query,
+                  start: customListJob.start
+                });
+
+                return (connection:any)._customListJob.newRequestParams.promise.then(({query, start}) => {
+                  parsedBody[1][4] = query;
+                  parsedBody[1][10] = start;
+
+                  return {
+                    method: request.method,
+                    url: request.url,
+                    body: JSON.stringify(parsedBody)
+                  };
+                });
+              }
+            }
+
+            return request;
+          },
+          responseTextChanger: async function(connection, response) {
+            if((connection:any)._customListJob){
+              triggerEvent({
+                type: 'searchResultsResponse',
+                query: (connection:any)._customListJob.query,
+                start: (connection:any)._customListJob.start,
+                response
+              });
+
+              return (connection:any)._customListJob.newResults.promise.then(newResults =>
+                newResults === null ? response : newResults
+              );
+            }
+            else{
+              return response;
+            }
+          }
         });
-      },
-      responseTextChanger: function(connection, response) {
-        triggerEvent({
-          type: 'searchResultsResponse',
-          query: (connection:any)._customListJob.query,
-          start: (connection:any)._customListJob.start,
-          response
-        });
-        return (connection:any)._customListJob.newResults.promise.then(newResults =>
-          newResults === null ? response : newResults
+      }
+    }
+  }
+
+  // sync token savers
+  {
+    const saveBTAIHeader = (header) => {
+      (document.head:any).setAttribute('data-inboxsdk-btai-header', header);
+      triggerEvent({type: 'btaiHeaderReceived'});
+    };
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return (
+          /sync(?:\/u\/\d+)?\//.test(connection.url) &&
+          !(document.head:any).hasAttribute('data-inboxsdk-btai-header')
         );
+      },
+      originalSendBodyLogger(connection) {
+        if (connection.headers['X-Gmail-BTAI']) {
+          saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
+        }
+      }
+    });
+
+    const saveXsrfTokenHeader = (header) => {
+      (document.head:any).setAttribute('data-inboxsdk-xsrf-token', header);
+      triggerEvent({type: 'xsrfTokenHeaderReceived'});
+    };
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        return (
+          /sync(?:\/u\/\d+)?\//.test(connection.url) &&
+          !(document.head:any).hasAttribute('data-inboxsdk-xsrf-token')
+        );
+      },
+      originalSendBodyLogger(connection) {
+        if(connection.headers['X-Framework-Xsrf-Token']) {
+          saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
+        }
       }
     });
   }

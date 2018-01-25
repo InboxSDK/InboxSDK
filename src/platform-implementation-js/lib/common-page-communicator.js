@@ -8,6 +8,14 @@ import Logger from './logger';
 import type {AjaxOpts} from '../../common/ajax';
 
 export default class CommonPageCommunicator {
+  ajaxInterceptStream: Kefir.Observable<Object>;
+
+  constructor(){
+    this.ajaxInterceptStream =
+      Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
+            .map(x => x.detail);
+  }
+
   getUserEmailAddress(): string {
     const s = (document.head:any).getAttribute('data-inboxsdk-user-email-address');
     if (typeof s !== 'string') throw new Error('should not happen');
@@ -30,6 +38,42 @@ export default class CommonPageCommunicator {
       return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
     }
     throw new Error("Failed to look up 'ik' value");
+  }
+
+  isUsingSyncAPI(): boolean {
+    return false;
+  }
+
+  async getXsrfToken(): Promise<string> {
+    const existingHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
+    if (existingHeader) {
+      return existingHeader;
+    } else {
+      await this.ajaxInterceptStream
+        .filter(({type}) => type === 'xsrfTokenHeaderReceived')
+        .take(1)
+        .toPromise();
+
+      const newHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
+      if (!newHeader) throw new Error("Failed to look up BTAI header");
+      return newHeader;
+    }
+  }
+
+  async getBtaiHeader(): Promise<string> {
+    const existingHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
+    if (existingHeader) {
+      return existingHeader;
+    } else {
+      await this.ajaxInterceptStream
+        .filter(({type}) => type === 'btaiHeaderReceived')
+        .take(1)
+        .toPromise();
+
+      const newHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
+      if (!newHeader) throw new Error("Failed to look up BTAI header");
+      return newHeader;
+    }
   }
 
   resolveUrlRedirects(url: string): Promise<string> {

@@ -231,7 +231,7 @@ class InboxThreadRowView {
       // a gmail message id, and then use that id in a request
       // to a gmail endpoint to get the id of the thread that message is in.
       const inboxMessageId = await this._driver.getInboxMessageIdForInboxThreadId(inboxThreadId);
-      const gmailMessageId = await this._driver.getGmailMessageIdForInboxMessageId(inboxMessageId);
+      const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(inboxMessageId);
 
       return await this._driver.getThreadIdFromMessageId(gmailMessageId);
     } else {
