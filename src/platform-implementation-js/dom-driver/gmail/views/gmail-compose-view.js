@@ -1187,10 +1187,9 @@ class GmailComposeView {
 						// draft doesn't exist so we wait until it does
 						await this._eventStream
 										.filter(({eventName}) => eventName === 'draftSaved')
+										.beforeEnd(() => null)
 										.map(() => this._getDraftIDfromForm())
 										.take(1)
-										.takeUntilBy(this._stopper)
-										.merge(this._stopper)
 										.toPromise();
 					}
 
@@ -1209,7 +1208,6 @@ class GmailComposeView {
 						.filter(event => event.eventName === 'messageIDChange')
 						.beforeEnd(() => null)
 						.take(1)
-						.merge(this._stopper)
 						.toPromise();
 
 					if (!this._messageId) {
@@ -1239,7 +1237,6 @@ class GmailComposeView {
 							await this._eventStream
 								.filter(event => event.eventName === 'messageIDChange')
 								.beforeEnd(() => null)
-								.merge(this._stopper)
 								.take(1)
 								.toPromise();
 							continue;
