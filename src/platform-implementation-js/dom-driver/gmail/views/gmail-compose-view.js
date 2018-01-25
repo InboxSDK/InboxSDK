@@ -308,7 +308,7 @@ class GmailComposeView {
 					)
 			)
 			.takeUntilBy(this._stopper)
-			.flatMap(bodyElement => {
+			.map((bodyElement) => {
 				this._seenBodyElement = bodyElement;
 
 				this._composeID = ((this._element.querySelector('input[name="composeid"]'): any): HTMLInputElement).value;
@@ -319,13 +319,10 @@ class GmailComposeView {
 					this._messageIDElement = document.createElement('div');
 				}
 
-				return Kefir.fromPromise(this._setupIDs());
-			})
-			.map(() => {
+				this._setupIDs();
 				this._setupStreams();
 				this._setupConsistencyCheckers();
 				this._updateComposeFullscreenState();
-
 
 				{
 					// try and handle the case where the user types in a bad email address
@@ -458,21 +455,21 @@ class GmailComposeView {
 				)
 		);
 
-		const messageIDChangeStream = makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']});
-
-		messageIDChangeStream
-			.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
-			.map(() => this._getMessageIDfromForm())
-			.filter(messageID =>
-				messageID && !this._emailWasSent && this._messageId !== messageID
-			)
-			.onValue(messageID => {
-				this._messageId = messageID;
-				this._eventStream.emit({
-					eventName: 'messageIDChange',
-					data: this._messageId
+		if(!this._driver.getPageCommunicator().isUsingSyncAPI()){
+			makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
+				.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
+				.map(() => this._getMessageIDfromForm())
+				.filter(messageID =>
+					messageID && !this._emailWasSent && this._messageId !== messageID
+				)
+				.onValue(messageID => {
+					this._messageId = messageID;
+					this._eventStream.emit({
+						eventName: 'messageIDChange',
+						data: this._messageId
+					});
 				});
-			});
+		}
 	}
 
 	_setupConsistencyCheckers() {
@@ -486,36 +483,36 @@ class GmailComposeView {
 		}
 	}
 
-	async _setupIDs() {
+	_setupIDs() {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			let promisesThatNeedToResolve = [];
+			let targetMessageIDPromise;
 
 			const syncTargetMessageID = this._getTargetMessageID();
 			if(syncTargetMessageID){
-				promisesThatNeedToResolve.push(
-					this._driver.getGmailMessageIdForSyncMessageId(syncTargetMessageID)
-						.then(gmailMessageId => this._targetMessageID = gmailMessageId)
-				);
+				targetMessageIDPromise = this._driver.getGmailMessageIdForSyncMessageId(syncTargetMessageID)
+					.then(gmailMessageId => this._targetMessageID = gmailMessageId);
+			}
+			else {
+				targetMessageIDPromise = Promise.resolve(null);
 			}
 
 			const syncMessageId = this._getMessageIDfromForm();
 			if(syncMessageId){
-				promisesThatNeedToResolve.push(
-					this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
-						.then(
-							(gmailMessageId) => {
-								this._messageId = gmailMessageId;
-							}
-						)
-						.catch(() => {
-							//do nothing because this means the message hasn't been saved yet
-						})
-					);
+				this._driver.getGmailMessageIdForSyncMessageId(syncMessageId)
+					.then(
+						(gmailMessageId) => {
+							this._initialMessageId = gmailMessageId;
+							this._messageId = gmailMessageId;
+						}
+					)
+					.catch(() => {
+						//do nothing because this means the message hasn't been saved yet
+					});
 			}
 
-			const syncThreadId = this._getThreadID();
-			if(syncThreadId){
-				promisesThatNeedToResolve.push(
+			targetMessageIDPromise.then(targetMessageId => {
+				const syncThreadId = this._getThreadID();
+				if(syncThreadId){
 					this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadId)
 						.then(
 							gmailThreadId => {
@@ -524,11 +521,9 @@ class GmailComposeView {
 						)
 						.catch(() => {
 							//do nothing because this means the message hasn't been saved yet
-						})
-					);
-			}
-
-			await Promise.all(promisesThatNeedToResolve);
+						});
+				}
+			});
 		}
 		else {
 			this._targetMessageID = this._getTargetMessageID();
@@ -1153,9 +1148,7 @@ class GmailComposeView {
 
 	async getCurrentDraftID(): Promise<?string> {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			// messageid is set when draft exists on server
-			if(this._messageId) return this._getDraftIDfromForm();
-			else return null;
+			return this._getDraftIDfromForm();
 		}
 		else {
 			if (!this.getMessageID()) {
@@ -1176,17 +1169,33 @@ class GmailComposeView {
 
 	async _getDraftIDimplementation(): Promise<?string> {
 		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-			// if messageId exists then draft is saved on server
+			const draftID = this._getDraftIDfromForm();
+			// we want to keep the semantics that getDraftID doesn't return until
+			// the draft is actually saved on Gmail's servers
 			if(this._messageId) {
-				return this._getDraftIDfromForm();
+				// if we have a messageId that means there is a draft on the server
+				return draftID;
 			}
 			else {
-				return this._eventStream
-								.filter(({eventName}) => eventName === 'draftSaved')
-								.map(() => this._getDraftIDfromForm())
-								.take(1)
-								.takeUntilBy(this._stopper)
-								.toPromise();
+				// there may be a draft on the server, so let's find out
+				const syncMessageId = this._getMessageIDfromForm();
+				if(syncMessageId){
+					try{
+						const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(syncMessageId);
+					}
+					catch(e){
+						// draft doesn't exist so we wait until it does
+						await this._eventStream
+										.filter(({eventName}) => eventName === 'draftSaved')
+										.map(() => this._getDraftIDfromForm())
+										.merge(this._stopper)
+										.take(1)
+										.takeUntilBy(this._stopper)
+										.toPromise();
+					}
+
+					return draftID;
+				}
 			}
 		}
 		else {
@@ -1199,6 +1208,7 @@ class GmailComposeView {
 					await this._eventStream
 						.filter(event => event.eventName === 'messageIDChange')
 						.beforeEnd(() => null)
+						.merge(this._stopper)
 						.take(1)
 						.toPromise();
 
@@ -1229,6 +1239,7 @@ class GmailComposeView {
 							await this._eventStream
 								.filter(event => event.eventName === 'messageIDChange')
 								.beforeEnd(() => null)
+								.merge(this._stopper)
 								.take(1)
 								.toPromise();
 							continue;
