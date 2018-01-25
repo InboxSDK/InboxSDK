@@ -1134,10 +1134,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
   margin-bottom: 8px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections > div + div {
-  padding-top: 1px;
-}
-
 .inboxsdk__gmailv1css .inboxsdk__resultsSection {
   padding-top: 20px;
 }
