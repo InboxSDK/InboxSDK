@@ -154,7 +154,7 @@ class GmailRouteView {
 	}
 
 	_addCollapsibleSection(collapsibleSectionDescriptorProperty: Object, groupOrderHint: any, isCollapsible: boolean): GmailCollapsibleSectionView {
-		var gmailResultsSectionView = new GmailCollapsibleSectionView(groupOrderHint, this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
+		var gmailResultsSectionView = new GmailCollapsibleSectionView(this._driver, groupOrderHint, this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH, isCollapsible);
 
 		var sectionsContainer = this._getSectionsContainer();
 		gmailResultsSectionView

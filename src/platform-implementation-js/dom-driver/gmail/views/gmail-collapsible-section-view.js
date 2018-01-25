@@ -13,8 +13,11 @@ import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-vi
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 
+import type GmailDriver from '../gmail-driver';
+
 
 class GmailCollapsibleSectionView {
+	_driver: GmailDriver;
 	_groupOrderHint: number;
 	_isReadyDeferred: Object;
 	_isCollapsible: boolean;
@@ -34,7 +37,8 @@ class GmailCollapsibleSectionView {
 	_inboxDropdownButtonView: ?Object = null;
 	_dropdownViewController: ?Object = null;
 
-	constructor(groupOrderHint: number, isSearch: boolean, isCollapsible: boolean){
+	constructor(driver: GmailDriver, groupOrderHint: number, isSearch: boolean, isCollapsible: boolean){
+		this._driver = driver;
 		this._isSearch = isSearch;
 		this._groupOrderHint = groupOrderHint;
 		this._isCollapsible = isCollapsible;
