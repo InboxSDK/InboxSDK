@@ -1130,8 +1130,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
   margin-bottom: 0px;
 }
 
-.inboxsdk__resultsSection {
+.inboxsdk__gmailv1css .inboxsdk__resultsSection {
   padding-top: 20px;
+}
+
+body:not(.inboxsdk__gmailv1css) > div + div {
+  padding-top: 1px;
 }
 
   .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection {
