@@ -554,13 +554,18 @@ class GmailMessageView {
 		var self = this;
 		var currentReplyElementRemovalStream = null;
 
-		makeMutationObserverChunkedStream(
-			replyContainer,
-			{
-				attributes: true, attributeFilter: ['class']
-			}
-		)
-		.merge(delayAsap())
+		// hold off on emitting the mutation for a millisecond so
+		// that compose-view-driver-stream is listening to reply stream
+		Kefir.combine([
+			makeMutationObserverChunkedStream(
+				replyContainer,
+				{
+					attributes: true, attributeFilter: ['class']
+				}
+			),
+			Kefir.later(1, null)
+		])
+		.merge(Kefir.later(1))
 		.takeUntilBy(this._stopper)
 		.beforeEnd(() => 'END')
 		.onValue(mutation => {
