@@ -68,12 +68,6 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s === 'true';
   }
 
-  isUsingMaterialUI(): boolean {
-    const s = (document.head:any).getAttribute('data-inboxsdk-using-material-ui');
-    if (s == null) throw new Error('Failed to read value');
-    return s === 'true';
-  }
-
   isConversationViewDisabled(): Promise<boolean> {
     return new RSVP.Promise((resolve, reject) => {
       Kefir.fromEvents(document, 'inboxSDKgmonkeyResponse')

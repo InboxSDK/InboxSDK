@@ -238,7 +238,7 @@ class GmailThreadRowView {
     if(!counts){
       const recipientsElement = querySelector(this._elements[0], 'td div.yW');
 
-      if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+      if(this._driver.isUsingSyncAPI()){
         const draftCount = recipientsElement.querySelectorAll('.boq').length;
         const messageCountMatch = recipientsElement.innerHTML.match(/\((\d+)\)$/);
         const messageCount =
@@ -780,7 +780,7 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+    if(this._driver.isUsingSyncAPI()){
       const elementWithId =
         flatten(
           this._elements.map(
@@ -826,7 +826,7 @@ class GmailThreadRowView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+    if(this._driver.isUsingSyncAPI()){
       const syncThreadID = await this.getSyncThreadID();
       if(!syncThreadID) throw new Error('Should not happen: syncThreadID should not be null here');
       return this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);

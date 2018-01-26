@@ -138,7 +138,7 @@ const GmailElementGetter = {
 	},
 
 	getTopAccountContainer(): ?HTMLElement {
-		if (this.isGmailV2UI()) {
+		if (this.isUsingMaterialUI()) {
 			return document.querySelector('header[role="banner"] > div:nth-child(2) > div:nth-child(3)');
 		}
 
@@ -159,8 +159,10 @@ const GmailElementGetter = {
 		return topAccountContainer.querySelectorAll('a[href*="https://plus"][href*="upgrade"]').length === 0;
 	},
 
-	isGmailV2UI(): boolean {
-		return document.querySelector('header[role="banner"][id]') != null;
+	isUsingMaterialUI(): boolean {
+		const s = (document.head:any).getAttribute('data-inboxsdk-using-material-ui');
+    if (s == null) throw new Error('Failed to read value');
+    return s === 'true';
 	},
 
 	StandaloneCompose: {

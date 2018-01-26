@@ -55,7 +55,7 @@ class GmailThreadView {
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
-		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.getPageCommunicator().isUsingSyncAPI()){
+		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.isUsingSyncAPI()){
 			this._readyStream =
 				Kefir.fromPromise(this.getThreadIDAsync())
 					.map(() => {
@@ -180,7 +180,7 @@ class GmailThreadView {
 			}
 		}
 
-		if(this._driver.getPageCommunicator().isUsingSyncAPI() && !this._isPreviewedThread){
+		if(this._driver.isUsingSyncAPI() && !this._isPreviewedThread){
 			this._syncThreadID = threadID;
 			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
 		}

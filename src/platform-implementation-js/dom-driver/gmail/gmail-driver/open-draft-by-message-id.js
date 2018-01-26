@@ -9,7 +9,7 @@ import type GmailDriver from '../gmail-driver';
 
 export default async function openDraftByMessageID(driver: GmailDriver, messageID: string) {
   let newHash;
-  if(driver.getPageCommunicator().isUsingSyncAPI()){
+  if(driver.isUsingSyncAPI()){
     if(!messageID.includes('msg-a:')) messageID = 'msg-a:' + messageID;
     const rfcMessageID = await getRfcMessageIDForSyncMessageID(driver, messageID);
     const threads = await getSyncThreadsForSearch(driver, 'rfc822msgid:' + rfcMessageID);

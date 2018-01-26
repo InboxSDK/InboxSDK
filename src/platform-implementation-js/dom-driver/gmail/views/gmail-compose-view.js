@@ -126,7 +126,7 @@ class GmailComposeView {
 		this._isTriggeringADraftSavePending = false;
 
 		let saveAndSendStream;
-		if (this._driver.getPageCommunicator().isUsingSyncAPI()) {
+		if (this._driver.isUsingSyncAPI()) {
 			saveAndSendStream = xhrInterceptorStream
 				// we know _getDraftIDfromForm will work because by the time we're
 				// getting an ajax event Gmail's JS has generated an ID and added it to the DOM.
@@ -364,7 +364,7 @@ class GmailComposeView {
 		// v2 Data behaves differently whereby the compose element is removed
 		// from the page while the send is in flight instead of waiting for the
 		// send to come back, so we have to handle that difference
-		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+		if(this._driver.isUsingSyncAPI()){
 			Kefir.merge([
 				// if we get a presending then we let the other stream wait for
 				// sent. But if we get a sendCanceled, then a regular destroy can
@@ -455,7 +455,7 @@ class GmailComposeView {
 				)
 		);
 
-		if(!this._driver.getPageCommunicator().isUsingSyncAPI()){
+		if(!this._driver.isUsingSyncAPI()){
 			makeMutationObserverChunkedStream(this._messageIDElement, {attributes:true, attributeFilter:['value']})
 				.takeUntilBy(this._eventStream.filter(()=>false).beforeEnd(()=>null))
 				.map(() => this._getMessageIDfromForm())
@@ -484,7 +484,7 @@ class GmailComposeView {
 	}
 
 	_setupIDs() {
-		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+		if(this._driver.isUsingSyncAPI()){
 			let targetMessageIDPromise;
 
 			const syncTargetMessageID = this._getTargetMessageID();
@@ -1104,7 +1104,7 @@ class GmailComposeView {
 	_getDraftIDfromForm(): ?string {
 		const value = this._messageIDElement && this._messageIDElement.value || null;
 		if (typeof value === 'string' && value !== 'undefined' && value !== 'null') {
-			if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+			if(this._driver.isUsingSyncAPI()){
 				return value.replace('#', '').replace('msg-a:', '');
 			} else {
 				this._driver.getLogger().error(new Error("Invalid draft id in element"), {
@@ -1118,7 +1118,7 @@ class GmailComposeView {
 	_getMessageIDfromForm(): ?string {
 		const value = this._messageIDElement && this._messageIDElement.value || null;
 		if (typeof value === 'string' && value !== 'undefined' && value !== 'null') {
-			if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+			if(this._driver.isUsingSyncAPI()){
 				return value.replace('#', ''); //annoyingly the hash is included
 			}
 			else {
@@ -1147,7 +1147,7 @@ class GmailComposeView {
 	}
 
 	async getCurrentDraftID(): Promise<?string> {
-		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+		if(this._driver.isUsingSyncAPI()){
 			return this._getDraftIDfromForm();
 		}
 		else {
@@ -1168,7 +1168,7 @@ class GmailComposeView {
 	}
 
 	async _getDraftIDimplementation(): Promise<?string> {
-		if(this._driver.getPageCommunicator().isUsingSyncAPI()){
+		if(this._driver.isUsingSyncAPI()){
 			const draftID = this._getDraftIDfromForm();
 			// we want to keep the semantics that getDraftID doesn't return until
 			// the draft is actually saved on Gmail's servers
@@ -1448,7 +1448,7 @@ class GmailComposeView {
 
 	registerRequestModifier(modifier: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>){
 		const keyId =
-			this._driver.getPageCommunicator().isUsingSyncAPI() ?
+			this._driver.isUsingSyncAPI() ?
 				this._getDraftIDfromForm() : this.getComposeID();
 
 		if(!keyId) throw new Error('keyId should be set here');
@@ -1464,7 +1464,7 @@ class GmailComposeView {
 		}
 
 		const keyId =
-			this._driver.getPageCommunicator().isUsingSyncAPI() ?
+			this._driver.isUsingSyncAPI() ?
 				this._getDraftIDfromForm() : this.getComposeID();
 
 		if(!keyId) throw new Error('keyId should be set here');

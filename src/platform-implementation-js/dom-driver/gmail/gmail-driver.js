@@ -523,7 +523,7 @@ class GmailDriver {
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
 
-			if (!GmailElementGetter.isGmailV2UI()) {
+			if (!GmailElementGetter.isUsingMaterialUI()) {
 				((document.body:any):HTMLElement).classList.add('inboxsdk__gmailv1css');
 			}
 
@@ -611,9 +611,13 @@ class GmailDriver {
 		return !!(global.GLOBALS && global._GM_main);
 	}
 
-	isGmailV2UI(): boolean {
-		return GmailElementGetter.isGmailV2UI();
+	isUsingMaterialUI(): boolean {
+		return GmailElementGetter.isUsingMaterialUI();
 	}
+
+	isUsingSyncAPI(): boolean {
+		return this._pageCommunicator.isUsingSyncAPI();
+  }
 
 	showAppIdWarning() {
 		showAppIdWarning(this);

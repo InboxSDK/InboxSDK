@@ -271,7 +271,7 @@ const setupSearchReplacing = (
 
         let newResponse;
         try {
-          if(driver.getPageCommunicator().isUsingSyncAPI()){
+          if(driver.isUsingSyncAPI()){
             const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(response);
 
             const doesNeedReorder = idPairs.some(({gtid}, index) => extractedThreads[index].oldGmailThreadID !== gtid);
@@ -320,7 +320,7 @@ const setupSearchReplacing = (
             });
           }
           try {
-            if(driver.getPageCommunicator().isUsingSyncAPI()){
+            if(driver.isUsingSyncAPI()){
               driver.getPageCommunicator().setCustomListResults(
                 newQuery, SyncGRP.replaceThreadsInSearchResponse(response, [], {start, total}));
             }

@@ -182,7 +182,7 @@ export default class GmailNavItemView {
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
-		if (this._driver.isGmailV2UI()) {
+		if (this._driver.isUsingMaterialUI()) {
 			this._element.innerHTML = [
 				'<div class="TO">',
 					'<div class="TN aik">',
@@ -257,7 +257,7 @@ export default class GmailNavItemView {
 		this._updateType(navItemDescriptor.type);
 		this._updateName(navItemDescriptor.name);
 
-		const iconContainerElement = this._driver.isGmailV2UI() ?
+		const iconContainerElement = this._driver.isUsingMaterialUI() ?
 			querySelector(this._element, '.qj') :
 			querySelector(this._element, '.aio');
 
@@ -319,7 +319,7 @@ export default class GmailNavItemView {
 	}
 
 	_updateClickability(navItemDescriptor: Object) {
-		if (!this._driver.isGmailV2UI()) return;
+		if (!this._driver.isUsingMaterialUI()) return;
 
 		if (navItemDescriptor.type === NAV_ITEM_TYPES.LINK
 			|| navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
@@ -366,7 +366,7 @@ export default class GmailNavItemView {
 	}
 
 	_createCreateAccessory(accessoryDescriptor: Object){
-		if (this._driver.isGmailV2UI()) {
+		if (this._driver.isUsingMaterialUI()) {
 			this._createPlusButtonAccessory(accessoryDescriptor);
 		}
 		else {
@@ -389,7 +389,7 @@ export default class GmailNavItemView {
 	_createLinkButtonAccessory(accessoryDescriptor: Object){
 		const linkDiv = document.createElement('div');
 
-		const linkDivClassName = this._driver.isGmailV2UI() ?
+		const linkDivClassName = this._driver.isUsingMaterialUI() ?
 			'inboxsdk__navItem_link' :
 			'CL inboxsdk__navItem_link';
 
@@ -421,7 +421,7 @@ export default class GmailNavItemView {
 
 		this._accessoryViewController = new BasicButtonViewController(buttonOptions);
 
-		const insertionPoint = this._driver.isGmailV2UI() ?
+		const insertionPoint = this._driver.isUsingMaterialUI() ?
 			querySelector(this._element, '.TN') :
 			querySelector(this._element, '.aio');
 
@@ -436,7 +436,7 @@ export default class GmailNavItemView {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
 		};
 		buttonOptions.dropdownShowFunction = ({dropdown}) => {
-			if (this._driver.isGmailV2UI()) {
+			if (this._driver.isUsingMaterialUI()) {
 				dropdown.el.style.marginLeft = '16px';
 			}
 
@@ -455,7 +455,7 @@ export default class GmailNavItemView {
 			innerElement.classList.remove('inboxsdk__navItem_hover');
 		});
 
-		const insertionPoint = this._driver.isGmailV2UI() ?
+		const insertionPoint = this._driver.isUsingMaterialUI() ?
 			querySelector(this._element, '.TN') :
 			querySelector(this._element, '.aio');
 
@@ -543,7 +543,7 @@ export default class GmailNavItemView {
 			e.stopPropagation();
 		});
 
-		const insertionPoint = this._driver.isGmailV2UI() ?
+		const insertionPoint = this._driver.isUsingMaterialUI() ?
 			this._element.querySelector('.TN.aik') :
 			this._element.querySelector('.aip');
 
@@ -632,5 +632,5 @@ export default class GmailNavItemView {
 }
 
 export function getLeftIndentationPaddingValue(driver: GmailDriver): number {
-	return driver.isGmailV2UI() ? GMAIL_V2_LEFT_INDENTATION_PADDING : GMAIL_V1_LEFT_INDENTATION_PADDING;
+	return driver.isUsingMaterialUI() ? GMAIL_V2_LEFT_INDENTATION_PADDING : GMAIL_V1_LEFT_INDENTATION_PADDING;
 }

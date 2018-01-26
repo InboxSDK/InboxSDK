@@ -7,7 +7,7 @@ import gmailAjax from './gmailAjax';
 import type {Driver} from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: string): Promise<string> {
-  if((driver.getPageCommunicator(): any).isUsingSyncAPI()){
+  if((driver:any).isUsingSyncAPI && (driver:any).isUsingSyncAPI()){
     const threadDescriptors = await getSyncThreadsForSearch(driver, 'rfc822msgid:' + rfcMessageId);
     return threadDescriptors[0].oldGmailThreadID;
   }

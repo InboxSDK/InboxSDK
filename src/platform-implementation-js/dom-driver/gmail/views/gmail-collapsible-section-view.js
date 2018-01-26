@@ -169,7 +169,7 @@ class GmailCollapsibleSectionView {
 	}
 
 	_setupHeader(collapsibleSectionDescriptor: Object){
-		if (this._driver.isGmailV2UI()) {
+		if (this._driver.isUsingMaterialUI()) {
 			this._setupGmailv2Header(collapsibleSectionDescriptor);
 			return;
 		}
@@ -268,7 +268,7 @@ class GmailCollapsibleSectionView {
 
 	_updateTitle(collapsibleSectionDescriptor: Object){
 		if(this._collapsibleSectionDescriptor.title !== collapsibleSectionDescriptor.title){
-			const selector = this._driver.isGmailV2UI() ? 'h3 > .Wn' : 'h3';
+			const selector = this._driver.isUsingMaterialUI() ? 'h3 > .Wn' : 'h3';
 
 			if(this._titleElement) {
 				querySelector(this._titleElement, selector).textContent = collapsibleSectionDescriptor.title;
@@ -293,7 +293,7 @@ class GmailCollapsibleSectionView {
 					subtitleElement.classList.add('inboxsdk__resultsSection_title_subtitle');
 					const h3 = titleElement.querySelector('h3');
 					if(h3) {
-						if (this._driver.isGmailV2UI()) {
+						if (this._driver.isUsingMaterialUI()) {
 							(h3: any).insertAdjacentElement('afterend', subtitleElement);
 						}
 						else {
@@ -535,7 +535,7 @@ class GmailCollapsibleSectionView {
 			this._addToCollapsedContainer();
 		}
 
-		const selector = this._driver.isGmailV2UI() ? 'h3 > img.Wp' : '.Wp';
+		const selector = this._driver.isUsingMaterialUI() ? 'h3 > img.Wp' : '.Wp';
 		if(this._titleElement){
 			const arrowSpan = querySelector(this._titleElement, selector);
 			if (arrowSpan) {
@@ -564,7 +564,7 @@ class GmailCollapsibleSectionView {
 			this._removeFromCollapsedContainer();
 		}
 
-		const selector = this._driver.isGmailV2UI() ? 'h3 > img.Wp' : '.Wp';
+		const selector = this._driver.isUsingMaterialUI() ? 'h3 > img.Wp' : '.Wp';
 		if(this._titleElement){
 			const arrowSpan = querySelector(this._titleElement, selector);
 			if (arrowSpan) {
