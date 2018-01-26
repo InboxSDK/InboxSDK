@@ -35,6 +35,7 @@ import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
+import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
 import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
@@ -56,6 +57,9 @@ import getNativeNavItem from './gmail-driver/get-native-nav-item';
 import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
+
+import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
+import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
 
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import toLiveSet from '../../lib/toLiveSet';
@@ -111,6 +115,9 @@ class GmailDriver {
 
 	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
+	getSyncThreadIdForOldGmailThreadId: (threadId: string) => Promise<string>;
+	getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
+	getGmailMessageIdForSyncMessageId: (syncMessageId: string) => Promise<string>;
 
 	constructor(appId: string, LOADER_VERSION: string, IMPL_VERSION: string, logger: Logger, opts: PiOpts, envData: EnvData) {
 		(this: Driver); // interface check
@@ -123,15 +130,48 @@ class GmailDriver {
 
 		// Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
 		// localStorage. Used for custom thread lists.
-		const rfcIdCache = new BiMapCache({
-			key: 'inboxsdk__cached_thread_ids',
-			getAfromB: (gmailThreadId) =>
-				getRfcMessageIdForGmailThreadId(this, gmailThreadId),
-			getBfromA: (rfcMessageId) =>
-				getGmailThreadIdForRfcMessageId(this, rfcMessageId)
-		});
-		this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
-		this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
+		{
+			const rfcIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_thread_ids',
+				getAfromB: (gmailThreadId) =>
+					getRfcMessageIdForGmailThreadId(this, gmailThreadId),
+				getBfromA: (rfcMessageId) =>
+					getGmailThreadIdForRfcMessageId(this, rfcMessageId)
+			});
+			this.getGmailThreadIdForRfcMessageId = (rfcMessageId) => rfcIdCache.getBfromA(rfcMessageId);
+			this.getRfcMessageIdForGmailThreadId = (gmailThreadId) => rfcIdCache.getAfromB(gmailThreadId);
+		}
+
+		// Manages mapping between old hex thread ids and new sync based thread ids
+		{
+			const syncThreadIdToOldGmailThreadIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
+				getAfromB: (oldGmailThreadId: string) => {
+					return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(({syncThreadID}) => syncThreadID);
+				},
+				getBfromA: (syncThreadID: string) => {
+					return getSyncThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
+				}
+			});
+			this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
+				syncThreadIdToOldGmailThreadIdCache.getAfromB(oldGmailThreadId);
+
+			this.getOldGmailThreadIdFromSyncThreadId = syncThreadId =>
+				syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
+		}
+
+		// mapping between sync message ids and old message ids
+		{
+			const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
+				key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+				getAfromB: (sync: string) => getGmailMessageIdForSyncMessageId(this, sync),
+				getBfromA() {
+					throw new Error('should not happen');
+				}
+			});
+			this.getGmailMessageIdForSyncMessageId = syncMessageId =>
+				gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
+		}
 
 		this._gmailRouteProcessor = new GmailRouteProcessor();
 		this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
@@ -372,7 +412,7 @@ class GmailDriver {
 	}
 
 	openDraftByMessageID(messageID: string) {
-		return openDraftByMessageID(this, messageID);
+		openDraftByMessageID(this, messageID);
 	}
 
 	createModalViewDriver(options: Object): GmailModalViewDriver {
@@ -444,6 +484,10 @@ class GmailDriver {
 		return this._pageCommunicator.getUserEmailAddress();
 	}
 
+	isConversationViewDisabled(): Promise<boolean> {
+		return this._pageCommunicator.isConversationViewDisabled();
+	}
+
 	getUserContact(): Contact {
 		return {
 			emailAddress: this.getUserEmailAddress(),
@@ -497,9 +541,14 @@ class GmailDriver {
 			this._threadViewDriverLiveSet = toLiveSet(
 				this._setupRouteSubViewDriver('newGmailThreadView')
 					.takeUntilBy(this._stopper)
+					.flatMap(gmailThreadView => (
+						gmailThreadView.getReadyStream()
+							.map(() => gmailThreadView)
+					))
 					.map(gmailThreadView => ({
 						el: gmailThreadView, removalStream: gmailThreadView.getStopper()
-					}))
+					})
+				)
 			);
 
 			this._setupToolbarViewDriverStream();

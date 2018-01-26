@@ -9,6 +9,7 @@ import eventNameFilter from '../../../lib/event-name-filter';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import findParent from '../../../../common/find-parent';
 
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -24,21 +25,56 @@ export default class NativeGmailNavItemView {
 	_navItemName: string;
 	_activeMarkerElement: ?HTMLElement = null;
 	_eventStream: Bus<any>;
+	_elementBus: Bus<HTMLElement>;
+	_elementStream: Kefir.Observable<HTMLElement>;
+	_isActive: boolean = false;
 	_itemContainerElement: ?HTMLElement = null;
 
 	constructor(driver: GmailDriver, nativeElement: HTMLElement, navItemName: string) {
 		this._driver = driver;
 		this._element = nativeElement;
 		this._eventStream = kefirBus();
+		this._elementBus = kefirBus();
+		this._elementStream = this._elementBus.toProperty(() => nativeElement);
 
 		this._navItemName = navItemName;
 
-		this._monitorElementForActiveChanges();
+		// gmail v2 continually replaces the native nav elements
+		// so we have to monitor for this replacement and then
+		// readd any sub nav items
+		const parentElement = nativeElement.parentElement;
+		if(parentElement){
+			makeMutationObserverChunkedStream((parentElement: any), {childList: true})
+				.map(() =>parentElement.querySelector(`.aim a[href*="#${this._navItemName}"]`))
+				.filter(Boolean)
+				.map(link => findParent(link, el => el.classList.contains('aim')))
+				.filter(Boolean)
+				.filter(newElement => newElement !== this._element)
+				.onValue(newElement => {
+					if(newElement){
+						const currentContainerElement = this._itemContainerElement;
+						if(currentContainerElement){
+							//if we have an existing container then remove it
+							//so a new one can be created and get things back into a good state
+							currentContainerElement.remove();
+							this._itemContainerElement = null;
+						}
+						this._elementBus.emit(newElement);
+					}
+				});
+		}
+
+		this._elementStream.onValue(element => {
+			this._element = element;
+			this._monitorElementForActiveChanges();
+			this.setActive(this._isActive);
+		});
 	}
 
 	destroy(){
 		this._element.classList.remove('inboxsdk__navItem_claimed');
 		this._eventStream.end();
+		this._elementBus.end();
 		if(this._activeMarkerElement) this._activeMarkerElement.remove();
 		if(this._itemContainerElement) this._itemContainerElement.remove();
 	}
@@ -54,10 +90,14 @@ export default class NativeGmailNavItemView {
 	addNavItem(orderGroup: number, navItemDescriptor: Object): GmailNavItemView {
 		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
 
-		gmailNavItemView
-			.getEventStream()
-			.filter(eventNameFilter('orderChanged'))
-			.onValue(() => this._addNavItemElement(gmailNavItemView));
+		Kefir.merge([
+			gmailNavItemView
+				.getEventStream()
+				.filter(eventNameFilter('orderChanged')),
+
+			this._elementStream
+		])
+		.onValue(() => this._addNavItemElement(gmailNavItemView));
 
 		gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
@@ -65,6 +105,7 @@ export default class NativeGmailNavItemView {
 	}
 
 	setActive(value: boolean){
+		this._isActive = value;
 		const toElement = querySelector(this._element, '.TO');
 		if(value){
 			this._element.classList.add('ain');
@@ -122,21 +163,6 @@ export default class NativeGmailNavItemView {
 				!el.classList.contains('ain')
 			)
 			.onValue(() => this._removeActiveMarkerElement());
-
-		const parentElement = element.parentElement;
-		if(parentElement){
-			this._eventStream.plug(
-					makeMutationObserverStream((parentElement: any), {childList: true})
-						.map(mutation =>
-							Array.from(mutation.removedNodes)
-						)
-						.flatten()
-					.filter(removedNode =>
-						removedNode === element
-					)
-					.map(() => ({eventName: 'invalidated'}))
-			);
-		}
 	}
 
 	_addNavItemElement(gmailNavItemView: GmailNavItemView){

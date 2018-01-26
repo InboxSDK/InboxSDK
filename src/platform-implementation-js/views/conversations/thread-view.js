@@ -59,7 +59,7 @@ class ThreadView extends EventEmitter {
 	}
 
 	getThreadID(): string {
-		// TODO mark deprecated
+		get(memberMap, this).driver.getLogger().deprecationWarning('threadView.getThreadID', 'threadView.getThreadIDAsync');
 		return get(memberMap, this).threadViewImplementation.getThreadID();
 	}
 

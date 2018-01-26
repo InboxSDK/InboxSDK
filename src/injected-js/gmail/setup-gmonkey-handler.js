@@ -16,9 +16,15 @@ export default function setupGmonkeyHandler() {
     let threadId;
 
     if((event:any).detail.isPreviewedThread){
-      const rows = document.querySelectorAll('[gh=tl] tr.aps');
+      const rows = Array.from(document.querySelectorAll('[gh=tl] tr.aps'));
       if(rows.length > 0){
-        threadId = rows[0].getAttribute('data-inboxsdk-threadid');
+        const elementWithId = rows.map(row => row.querySelector('[data-legacy-thread-id]')).filter(Boolean)[0];
+        if(elementWithId){
+          threadId = elementWithId.getAttribute('data-legacy-thread-id');
+        }
+        else {
+          threadId = rows[0].getAttribute('data-inboxsdk-threadid');
+        }
       }
     }
     else{

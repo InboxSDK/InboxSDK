@@ -297,6 +297,14 @@ class GmailMessageView {
 		if(!ignoreLoadStatus && !this._messageLoaded){
 			throw new Error('tried to get message id before message is loaded');
 		}
+
+		const messageIdElement = this._element.querySelector('[data-legacy-message-id]');
+		if(messageIdElement){
+			const messageId = messageIdElement.getAttribute('data-legacy-message-id');
+			if(!messageId) throw new Error('message id attribute with no value, wtf?');
+			return messageId;
+		}
+
 		const messageEl = this._element.querySelector("div.ii.gt");
 		if (!messageEl) {
 			const err = new Error("Could not find message id element");
@@ -546,28 +554,36 @@ class GmailMessageView {
 		var self = this;
 		var currentReplyElementRemovalStream = null;
 
-		makeMutationObserverChunkedStream(
-			replyContainer,
-			{
-				attributes: true, attributeFilter: ['class']
-			}
-		)
-		.merge(delayAsap())
+		// hold off on emitting the mutation for a millisecond so
+		// that compose-view-driver-stream is listening to reply stream
+		Kefir.combine([
+			makeMutationObserverChunkedStream(
+				replyContainer,
+				{
+					attributes: true, attributeFilter: ['class']
+				}
+			),
+			Kefir.later(1, null)
+		])
+		.merge(Kefir.later(1))
 		.takeUntilBy(this._stopper)
 		.beforeEnd(() => 'END')
 		.onValue(mutation => {
 			if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
 				if (!currentReplyElementRemovalStream) {
-					self._replyElement = replyContainer;
+					const replyElement = replyContainer.firstElementChild;
+					self._replyElement = (replyElement: any);
 
-					currentReplyElementRemovalStream = kefirBus();
-					self._eventStream.emit({
-						type: 'internal',
-						eventName: 'replyElement',
-						change: {
-							el: replyContainer, removalStream: currentReplyElementRemovalStream
-						}
-					});
+					if(replyElement){
+						currentReplyElementRemovalStream = kefirBus();
+						self._eventStream.emit({
+							type: 'internal',
+							eventName: 'replyElement',
+							change: {
+								el: replyElement, removalStream: currentReplyElementRemovalStream
+							}
+						});
+					}
 				}
 			} else {
 				if (currentReplyElementRemovalStream) {
