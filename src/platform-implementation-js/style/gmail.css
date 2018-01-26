@@ -1155,8 +1155,13 @@ body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div {
   display: inline;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer.Wg {
+  height: auto;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
@@ -1165,7 +1170,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
-  display: flex;
+  display: inline-flex;
 }
 
   .Wc .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
@@ -1197,6 +1202,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   .Wc .inboxsdk__resultsSection_title_subtitle {
     font-size: 80%;
   }
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
+  min-height: 40px;
+  line-height: 40px;
+}
 
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title .Wp {
   float: left;
