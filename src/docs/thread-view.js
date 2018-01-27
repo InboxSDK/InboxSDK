@@ -1,8 +1,19 @@
 /**
-* @class
-* Object that represents a visible thread view that the user has navigated to
-*/
+ * @class
+ * Object that represents a visible thread view that the user has navigated to
+ */
 var ThreadView = /** @lends ThreadView */ {
+
+	/**
+	 * Inserts a "notice bar" element below the thread subject. The element
+	 * defaults to having a yellow background color and specific padding to make
+	 * it look like a warning on the thread, but your code may override these
+	 * styles of the element.
+	 * ^gmail
+	 * ^inbox
+	 * @return {SimpleElementView}
+	 */
+	addNoticeBar: function(){},
 
 	/**
 	 * Inserts a content panel into the sidebar of a thread view. A content panel
