@@ -187,6 +187,11 @@ export default class GmailNavItemView {
 				'<div class="TO">',
 					'<div class="TN aik">',
 
+						// This element needs a style attribute defined on it as there is a Gmail css rule of
+						// selecting for "gj[style]" the sets the opacity to 1 rather than 0.6.
+						// The qj class has "margin-right: 24px" by default, but we tweak that here so icons
+						// properly align with the Gmail label icons, which have 3px of of margin-left in the
+						// element inside their qj container.
 						'<div class="qj" style="margin-left: 3px; margin-right: 21px;">',
 						'</div>',
 
