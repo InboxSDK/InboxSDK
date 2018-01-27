@@ -4,7 +4,7 @@ import type GmailComposeView from '../gmail-compose-view';
 
 const composeViewActionToolbars = new WeakMap();
 
-function getAdditionalActionToolbar(gmailComposeView: GmailComposeView){
+function getAdditionalActionToolbar(isUsingMaterialUI: boolean, gmailComposeView: GmailComposeView){
 	var groupedActionToolbar = gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar > div');
 	if(groupedActionToolbar){
 		return groupedActionToolbar;
@@ -17,7 +17,7 @@ function getAdditionalActionToolbar(gmailComposeView: GmailComposeView){
 
 	actionToolbar = composeViewActionToolbars.get(gmailComposeView);
 	if (!actionToolbar) {
-		const _actionToolbar = actionToolbar = _addActionToolbar(gmailComposeView);
+		const _actionToolbar = actionToolbar = _addActionToolbar(isUsingMaterialUI, gmailComposeView);
 		gmailComposeView.getStopper().onValue(() => {
 			_actionToolbar.remove();
 		});
@@ -26,19 +26,21 @@ function getAdditionalActionToolbar(gmailComposeView: GmailComposeView){
 	return actionToolbar;
 }
 
-function _addActionToolbar(gmailComposeView: GmailComposeView){
+function _addActionToolbar(isUsingMaterialUI: boolean, gmailComposeView: GmailComposeView){
 	const td = document.createElement('td');
 	td.setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
 	const formattingArea = gmailComposeView.getFormattingArea();
 	if (!formattingArea) throw new Error('formatting area missing');
 	formattingArea.insertAdjacentElement('beforebegin', td);
 
-	const separator = document.createElement('td');
-	separator.setAttribute('class', 'inboxsdk__compose_separator gU');
-	separator.innerHTML = '<div class="Uz"></div>';
+	if(!isUsingMaterialUI){
+		const separator = document.createElement('td');
+		separator.setAttribute('class', 'inboxsdk__compose_separator gU');
+		separator.innerHTML = '<div class="Uz"></div>';
 
-	td.insertAdjacentElement('afterend', separator);
-
+		td.insertAdjacentElement('afterend', separator);
+	}
+	
 	let parent = td.parentElement;
 	while(parent){
 		if(parent.tagName === 'TABLE') break;

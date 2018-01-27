@@ -668,25 +668,6 @@ class GmailComposeView {
 		}
 	}
 
-	// Incomplete
-	// addOuterSidebar(options: {title: string, el: HTMLElement}) {
-	// 	if(this.isInlineReplyForm()){
-	// 		console.warn("Trying to add an outer sidebar to an inline reply which doesn't work."); //eslint-disable-line no-console
-	// 		return;
-	// 	}
-	//
-	// 	addOuterSidebar(this, options);
-	// }
-	//
-	// addInnerSidebar(options: {el: HTMLElement}) {
-	// 	if(this.isInlineReplyForm()){
-	// 		console.warn("Trying to add an inner sidebar to an inline reply which doesn't work."); //eslint-disable-line no-console
-	// 		return;
-	// 	}
-	//
-	// 	require('./gmail-compose-view/add-inner-sidebar')(this, options);
-	// }
-
 	addStatusBar(
 		options: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean} = {}
 	): StatusBar {
@@ -985,7 +966,7 @@ class GmailComposeView {
 	}
 
 	getAdditionalActionToolbar(): HTMLElement {
-		return require('./gmail-compose-view/get-additional-action-toolbar')(this);
+		return require('./gmail-compose-view/get-additional-action-toolbar')(this._driver.isUsingMaterialUI(), this);
 	}
 
 	updateInsertMoreAreaLeft(oldFormattingAreaOffsetLeft: number) {
