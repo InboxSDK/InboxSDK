@@ -109,6 +109,19 @@ div.T-I.inboxsdk__button {
 
 /* compose buttons */
 
+/* in material Gmail reduce padding between buttons  */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__sdk_compose_withButtons .gU:not(:first-child) {
+  padding-left: 15px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__sdk_compose_withButtons .inboxsdk__compose_actionToolbar div.inboxsdk__button:first-child {
+  margin-right: 0px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__sdk_compose_withButtons .wG:not(:first-child) {
+  margin-left: 15px;
+}
+
 .T-I.inboxsdk__button.inboxsdk__compose_sendButton {
   min-width: 0px;
   margin-right: 0px;
@@ -136,14 +149,22 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar {
   padding: 0px 0px 0px 5px;
 }
 
-.inboxsdk__compose_actionToolbar div.inboxsdk__button {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_actionToolbar div.inboxsdk__button {
+  width: 20px;
+  max-width: 20px;
+  min-width: 20px;
+  height: 20px;
+  margin-top: -2px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar div.inboxsdk__button {
   min-width: 27px;
   height: 27px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_actionToolbar div.inboxsdk__button + div.inboxsdk__button {
   margin-right: 0px;
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon {
