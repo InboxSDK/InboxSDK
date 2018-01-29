@@ -635,6 +635,10 @@ class InboxDriver {
     return Promise.resolve(false);
   }
 
+  getUserLanguage(): string {
+    return this._pageCommunicator.getUserLanguage();
+  }
+
   getUserContact(): Contact {
     return {
       emailAddress: this.getUserEmailAddress(),

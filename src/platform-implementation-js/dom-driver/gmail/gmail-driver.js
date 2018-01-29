@@ -488,6 +488,10 @@ class GmailDriver {
 		return this._pageCommunicator.isConversationViewDisabled();
 	}
 
+	getUserLanguage(): string {
+		return this._pageCommunicator.getUserLanguage();
+	}
+
 	getUserContact(): Contact {
 		return {
 			emailAddress: this.getUserEmailAddress(),

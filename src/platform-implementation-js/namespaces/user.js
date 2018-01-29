@@ -22,6 +22,10 @@ class User {
 		return get(memberMap, this).driver.isConversationViewDisabled();
 	}
 
+	getLanguage() {
+		return get(memberMap, this).driver.getUserLanguage();
+	}
+
 	getUserContact() {
 		const {driver, piOpts} = get(memberMap, this);
 		driver.getLogger().deprecationWarning('User.getUserContact', 'User.getEmailAddress');

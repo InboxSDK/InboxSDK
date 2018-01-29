@@ -57,6 +57,7 @@ export type Driver = {
 	getGmailActionToken(): Promise<string>;
 	getUserEmailAddress(): string;
 	isConversationViewDisabled(): Promise<boolean>;
+	getUserLanguage(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
 	getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>;
