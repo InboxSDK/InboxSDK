@@ -708,6 +708,11 @@ div.inboxsdk__compose_statusbar {
   left: auto !important;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__drawers_in_use .aDi,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
+  position: static;
+}
+
 /* Make it so the compose/mole layer doesn't wrap, so we don't have to do a lot
  * of fancy logic to hide moles ourselves when things get too crowded. */
 .inboxsdk__moles_in_use .nH > .nH > .no {
