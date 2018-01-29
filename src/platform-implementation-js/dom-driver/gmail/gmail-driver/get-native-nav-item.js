@@ -5,7 +5,9 @@ import GmailElementGetter from '../gmail-element-getter';
 import findParent from '../../../../common/find-parent';
 import waitFor from '../../../lib/wait-for';
 
-export default function getNativeNavItem(label: string): Promise<NativeGmailNavItemView> {
+import type GmailDriver from '../gmail-driver';
+
+export default function getNativeNavItem(driver: GmailDriver, label: string): Promise<NativeGmailNavItemView> {
 	return waitFor(() => {
 		const navContainer = GmailElementGetter.getLeftNavContainerElement();
 		if (!navContainer) return null;
@@ -18,7 +20,7 @@ export default function getNativeNavItem(label: string): Promise<NativeGmailNavI
 		}
 
 		if(!(labelElement:any).__nativeGmailNavItemView){
-			(labelElement:any).__nativeGmailNavItemView = new NativeGmailNavItemView(labelElement, label);
+			(labelElement:any).__nativeGmailNavItemView = new NativeGmailNavItemView(driver, labelElement, label);
 		}
 
 		return (labelElement:any).__nativeGmailNavItemView;

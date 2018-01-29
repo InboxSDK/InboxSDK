@@ -138,6 +138,10 @@ const GmailElementGetter = {
 	},
 
 	getTopAccountContainer(): ?HTMLElement {
+		if (this.isUsingMaterialUI()) {
+			return document.querySelector('header[role="banner"] > div:nth-child(2) > div:nth-child(3)');
+		}
+
 		var gPlusMenu = document.getElementById('gbsfw');
 		if(!gPlusMenu){
 			return null;
@@ -153,6 +157,12 @@ const GmailElementGetter = {
 		}
 
 		return topAccountContainer.querySelectorAll('a[href*="https://plus"][href*="upgrade"]').length === 0;
+	},
+
+	isUsingMaterialUI(): boolean {
+		const s = (document.head:any).getAttribute('data-inboxsdk-using-material-ui');
+    if (s == null) throw new Error('Failed to read value');
+    return s === 'true';
 	},
 
 	StandaloneCompose: {

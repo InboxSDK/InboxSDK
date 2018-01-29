@@ -431,12 +431,12 @@ class GmailDriver {
 		return new GmailBackdrop(zIndex, target);
 	}
 
-	addNavItem(appId: string, navItemDescriptor: Object): Object {
-		return addNavItem(appId, navItemDescriptor);
+	addNavItem(appId: string, navItemDescriptorPropertyStream: Kefir.Observable<Object>): Object {
+		return addNavItem(this, appId, navItemDescriptorPropertyStream);
 	}
 
 	getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
-		const p = getNativeNavItem('sent');
+		const p = getNativeNavItem(this, 'sent');
 		p.catch(err => this._logger.error(err));
 		return p;
 	}
@@ -526,6 +526,11 @@ class GmailDriver {
 			return this._userInfo.waitForAccountSwitcherReady();
 		}).then(() => {
 			this._timestampAccountSwitcherReady = Date.now();
+
+			if (!GmailElementGetter.isUsingMaterialUI()) {
+				((document.body:any):HTMLElement).classList.add('inboxsdk__gmailv1css');
+			}
+
 			this._routeViewDriverStream = setupRouteViewDriverStream(
 				this._gmailRouteProcessor, this
 			).takeUntilBy(this._stopper).toProperty();
@@ -609,6 +614,14 @@ class GmailDriver {
 	isRunningInPageContext(): boolean {
 		return !!(global.GLOBALS && global._GM_main);
 	}
+
+	isUsingMaterialUI(): boolean {
+		return GmailElementGetter.isUsingMaterialUI();
+	}
+
+	isUsingSyncAPI(): boolean {
+		return this._pageCommunicator.isUsingSyncAPI();
+  }
 
 	showAppIdWarning() {
 		showAppIdWarning(this);

@@ -3,13 +3,13 @@
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
-export default class LabelDropdownButtonView {
+export default class CreateAccessoryButtonView {
 	_element: HTMLElement;
 	_eventStream: Kefir.Observable<Object>;
 	_stopper = kefirStopper();
 
-	constructor(options: Object){
-		this._setupElement(options.buttonBackgroundColor, options.buttonForegroundColor);
+	constructor(options?: Object){
+		this._setupElement();
 		this._setupEventStream();
 	}
 
@@ -36,23 +36,14 @@ export default class LabelDropdownButtonView {
 		if (innerButtonElement) innerButtonElement.classList.remove('aj1');
 	}
 
-	_setupElement(backgroundColor: string, foregroundColor: string){
+	_setupElement(){
 		this._element = document.createElement('div');
 		this._element.setAttribute('class', 'nL aig');
-
-		const isDefault = !backgroundColor && !foregroundColor;
-
-		if(!backgroundColor){
-			backgroundColor = 'rgb(194, 194, 194)';
-		}
-
-		if(!foregroundColor){
-			foregroundColor = 'rgb(255, 255, 255)';
-		}
+		this._element.setAttribute('style', 'left: 7px');
 
 		this._element.innerHTML = [
-			'<div class="pM ' + (isDefault ? 'aj0': '') + '" style="color: ' + foregroundColor + '; background-color: ' + backgroundColor + '; border-color: ' + backgroundColor + '" role="button">',
-				'<div class="p6" style="background-color: ' + backgroundColor + '">',
+			'<div class="pM aRw" style="display: inline-flex; margin-left: 16px;" role="button">',
+				'<div class="p6">',
 					'<div class="p8">▼</div>',
 				'</div>',
 			'</div>'
@@ -62,18 +53,14 @@ export default class LabelDropdownButtonView {
 	_setupEventStream(){
 		const clickEventStream = Kefir.fromEvents(this._element, 'click');
 
-		clickEventStream.onValue(function(event){
+		clickEventStream.onValue((event) => {
 			event.stopPropagation();
 			event.preventDefault();
 		});
 
 		this._eventStream =
-			clickEventStream.map(function(event){
-				return {
-					eventName: 'click',
-					domEvent: event
-				};
-			})
-			.takeUntilBy(this._stopper);
+			clickEventStream
+				.map((event) => ({eventName: 'click', domEvent: event}))
+				.takeUntilBy(this._stopper);
 	}
 }

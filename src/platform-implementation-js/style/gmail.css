@@ -1035,14 +1035,41 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   display: none;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
+  font-size: 14px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM.aj0 {
+  display: flex;
+  display: -webkit-flex;
+  visibility: visible;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem.inboxsdk__navItem_nonClickable > .TO:active {
+  background-color: initial;
+}
+
 .inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
   visibility: visible;
 }
 
-.inboxsdk__navItem_link {
+.inboxsdk__gmailv1css .inboxsdk__navItem_link {
   position: absolute;
   top: 0px;
   right: -4px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link {
+  cursor: pointer;
+  margin-left: auto;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a {
+  margin-left: 16px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .inboxsdk__button {
+  margin-right: 0;
 }
 
 [dir=rtl] .inboxsdk__navItem_link {
@@ -1062,11 +1089,11 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   padding-bottom: 2px;
 }
 
-.ain .inboxsdk__navItem_container {
+body.inboxsdk__gmailv1css .ain .inboxsdk__navItem_container {
   margin-left: -18px;
 }
 
-.inboxsdk__navItem_container {
+body.inboxsdk__gmailv1css .inboxsdk__navItem_container {
   margin-left: -14px;
 }
 
@@ -1074,10 +1101,12 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   z-index: 1;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a,
 .aip .CK {
   color: #15c;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
 .aip .CK:hover {
   text-decoration: underline;
 }
@@ -1101,7 +1130,11 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   margin-bottom: 0px;
 }
 
-.inboxsdk__resultsSection {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
+  margin-bottom: 8px;
+}
+
+.inboxsdk__gmailv1css .inboxsdk__resultsSection {
   padding-top: 20px;
 }
 
@@ -1118,13 +1151,26 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
     padding: 0px;
   }
 
-.inboxsdk__results_collapsedContainer > div {
+body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div {
   display: inline;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer.Wg {
+  height: auto;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-block;
   margin-right: 20px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
+  display: inline-flex;
 }
 
   .Wc .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
@@ -1140,6 +1186,9 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
   cursor: pointer;
   display: inline-block;
 }
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
+  display: flex;
+}
 
   .Wc .inboxsdk__resultsSection_title {
     padding: 3px 0 3px 8px;
@@ -1154,14 +1203,19 @@ body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
     font-size: 80%;
   }
 
-.inboxsdk__resultsSection_title .Wp {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
+  min-height: 40px;
+  line-height: 40px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title .Wp {
   float: left;
   height: 10px;
   width: 20px;
   margin-top: 3px;
 }
 
-.inboxsdk__resultsSection_title h3 {
+body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   margin-bottom: 10px;
   margin-top: 20px;
   display: inline;
@@ -1434,16 +1488,24 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* app toolbar */
 
-.inboxsdk__appButton {
+.inboxsdk__gmailv1css .inboxsdk__appButton {
   margin-right: -15px;
 }
 
-  .inboxsdk__appButton:first-child {
+  .inboxsdk__gmailv1css .inboxsdk__appButton:first-child {
     margin-left: -45px;
   }
 
-  .inboxsdk__appButton + .inboxsdk__appButton {
+  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton:first-child {
+    margin-left: -15px;
+  }
+
+  .inboxsdk__gmailv1css .inboxsdk__appButton + .inboxsdk__appButton {
     margin-left: 35px;
+  }
+
+  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
+    margin-left: 20px;
   }
 
   .inboxsdk__appButton.inboxsdk__appButton_noGPlus {

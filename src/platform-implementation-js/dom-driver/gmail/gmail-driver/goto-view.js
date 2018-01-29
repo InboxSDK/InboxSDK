@@ -18,7 +18,7 @@ const gotoView = ud.defn(module, async function gotoView(gmailDriver: GmailDrive
 	}
 
 	if (includes(NATIVE_ROUTE_IDS, viewName)) {
-		if(gmailDriver.getPageCommunicator().isUsingSyncAPI()){
+		if(gmailDriver.isUsingSyncAPI()){
 			// need to go to the new url
 			if(params && typeof params !== 'string'){
 				const threadID = params.threadID;

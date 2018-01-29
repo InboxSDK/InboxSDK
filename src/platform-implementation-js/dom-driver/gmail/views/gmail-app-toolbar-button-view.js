@@ -145,7 +145,7 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
     throw err;
   }
 
-  const insertionElement: ?HTMLElement = (topAccountContainer.children[0]: any);
+  const insertionElement: ?HTMLElement = driver.isUsingMaterialUI() ? topAccountContainer : (topAccountContainer.children[0]: any);
   if(!insertionElement){
     const err = new Error("Could not make button");
     driver.getLogger().error(err, {

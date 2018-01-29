@@ -13,8 +13,11 @@ import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-vi
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 
+import type GmailDriver from '../gmail-driver';
+
 
 class GmailCollapsibleSectionView {
+	_driver: GmailDriver;
 	_groupOrderHint: number;
 	_isReadyDeferred: Object;
 	_isCollapsible: boolean;
@@ -34,7 +37,8 @@ class GmailCollapsibleSectionView {
 	_inboxDropdownButtonView: ?Object = null;
 	_dropdownViewController: ?Object = null;
 
-	constructor(groupOrderHint: number, isSearch: boolean, isCollapsible: boolean){
+	constructor(driver: GmailDriver, groupOrderHint: number, isSearch: boolean, isCollapsible: boolean){
+		this._driver = driver;
 		this._isSearch = isSearch;
 		this._groupOrderHint = groupOrderHint;
 		this._isCollapsible = isCollapsible;
@@ -165,6 +169,11 @@ class GmailCollapsibleSectionView {
 	}
 
 	_setupHeader(collapsibleSectionDescriptor: Object){
+		if (this._driver.isUsingMaterialUI()) {
+			this._setupGmailv2Header(collapsibleSectionDescriptor);
+			return;
+		}
+
 		const headerElement = this._headerElement = document.createElement('div');
 		headerElement.classList.add('inboxsdk__resultsSection_header');
 
@@ -203,6 +212,32 @@ class GmailCollapsibleSectionView {
 		if(this._element) this._element.appendChild(headerElement);
 	}
 
+	_setupGmailv2Header(collapsibleSectionDescriptor: Object) {
+		const headerElement = this._headerElement = document.createElement('div');
+		headerElement.classList.add('inboxsdk__resultsSection_header');
+		if (!this._isSearch) headerElement.classList.add('Wg');
+
+		const titleElement = this._titleElement = document.createElement('div');
+		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
+
+
+		titleElement.innerHTML = [
+			'<h3 class="Wr">',
+				'<img alt="" src="//ssl.gstatic.com/ui/v1/icons/mail/images/cleardot.gif" class="qi Wp Wq">',
+				'<div class="Wn">' + escape(collapsibleSectionDescriptor.title) + '</div>',
+			'</h3>'
+		].join('');
+
+		const floatRightElement = document.createElement('div');
+		floatRightElement.classList.add('Cr');
+		if(this._isSearch) floatRightElement.classList.add('Wg');
+
+
+		headerElement.appendChild(titleElement);
+		headerElement.appendChild(floatRightElement);
+		if(this._element) this._element.appendChild(headerElement);
+	}
+
 	_setupFooter(collapsibleSectionDescriptor: Object){
 		const footerElement = this._footerElement = document.createElement('div');
 		footerElement.classList.add('inboxsdk__resultsSection_footer');
@@ -233,7 +268,11 @@ class GmailCollapsibleSectionView {
 
 	_updateTitle(collapsibleSectionDescriptor: Object){
 		if(this._collapsibleSectionDescriptor.title !== collapsibleSectionDescriptor.title){
-			if(this._titleElement) querySelector(this._titleElement, 'h3').textContent = collapsibleSectionDescriptor.title;
+			const selector = this._driver.isUsingMaterialUI() ? 'h3 > .Wn' : 'h3';
+
+			if(this._titleElement) {
+				querySelector(this._titleElement, selector).textContent = collapsibleSectionDescriptor.title;
+			}
 		}
 	}
 
@@ -253,7 +292,14 @@ class GmailCollapsibleSectionView {
 				if(subtitleElement && titleElement){
 					subtitleElement.classList.add('inboxsdk__resultsSection_title_subtitle');
 					const h3 = titleElement.querySelector('h3');
-					if(h3) (h3: any).insertAdjacentElement('afterend', subtitleElement);
+					if(h3) {
+						if (this._driver.isUsingMaterialUI()) {
+							(h3: any).insertAdjacentElement('afterend', subtitleElement);
+						}
+						else {
+							(h3: any).appendChild(subtitleElement);
+						}
+					}
 				}
 			}
 
@@ -489,10 +535,13 @@ class GmailCollapsibleSectionView {
 			this._addToCollapsedContainer();
 		}
 
+		const selector = this._driver.isUsingMaterialUI() ? 'h3 > img.Wp' : '.Wp';
 		if(this._titleElement){
-			var arrowSpan = this._titleElement.children[0];
-			arrowSpan.classList.remove('Wq');
-			arrowSpan.classList.add('Wo');
+			const arrowSpan = querySelector(this._titleElement, selector);
+			if (arrowSpan) {
+				arrowSpan.classList.remove('Wq');
+				arrowSpan.classList.add('Wo');
+			}
 		}
 
 		if(this._bodyElement) this._bodyElement.style.display = 'none';
@@ -515,10 +564,13 @@ class GmailCollapsibleSectionView {
 			this._removeFromCollapsedContainer();
 		}
 
+		const selector = this._driver.isUsingMaterialUI() ? 'h3 > img.Wp' : '.Wp';
 		if(this._titleElement){
-			var arrowSpan = this._titleElement.children[0];
-			arrowSpan.classList.remove('Wo');
-			arrowSpan.classList.add('Wq');
+			const arrowSpan = querySelector(this._titleElement, selector);
+			if (arrowSpan) {
+				arrowSpan.classList.remove('Wo');
+				arrowSpan.classList.add('Wq');
+			}
 		}
 
 
@@ -543,7 +595,7 @@ class GmailCollapsibleSectionView {
 			if(!previousSibling) throw new Error('previousSibling does not exist');
 			if(!otherCollapseContainer) throw new Error('otherCollapseContainer does not exist');
 
-			const anchor = previousSibling.children[1].appendChild(element);
+			const anchor = previousSibling.children[0].appendChild(element);
 
 			//now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
 			//and calling our "recollapse" helper function on them
@@ -622,7 +674,7 @@ class GmailCollapsibleSectionView {
 			collapsedContainer.children[0].insertBefore(element, collapsedContainer.children[0].firstElementChild);
 		}
 		else if(collapsedContainer){
-			collapsedContainer.children[1].appendChild(element);
+			collapsedContainer.children[0].appendChild(element);
 		}
 	}
 
