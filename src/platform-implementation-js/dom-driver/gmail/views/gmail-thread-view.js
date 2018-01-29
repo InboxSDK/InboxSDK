@@ -14,6 +14,8 @@ import type {Bus} from 'kefir-bus';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import simulateClick from '../../../lib/dom/simulate-click';
+import idMap from '../../../lib/idMap';
+import SimpleElementView from '../../../views/SimpleElementView';
 
 import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
@@ -128,6 +130,21 @@ class GmailThreadView {
 			});
 		}
 		return sidebar.addSidebarContentPanel(descriptor);
+	}
+
+	addNoticeBar(): SimpleElementView {
+		const el = document.createElement('div');
+		el.className = idMap('thread_noticeBar');
+		const subjectContainer = this._element.querySelector('.if > .nH');
+		if (!subjectContainer) throw new Error('Failed to find subject container');
+		subjectContainer.insertAdjacentElement('afterend', el);
+		const view = new SimpleElementView(el);
+
+		this._stopper
+			.takeUntilBy(Kefir.fromEvents(view, 'destroy'))
+			.onValue(() => view.destroy());
+
+		return view;
 	}
 
 	getSubject(): string {

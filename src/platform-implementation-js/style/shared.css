@@ -319,3 +319,9 @@ a.inboxsdk__appid_register {
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   margin-top: 0px;
 }
+
+.IDMAP_thread_noticeBar {
+  background: #f8ebc0;
+  margin-bottom: 10px;
+  padding: 12px 4px 6px 12px;
+}

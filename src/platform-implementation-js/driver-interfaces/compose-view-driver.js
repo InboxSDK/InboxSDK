@@ -5,10 +5,10 @@ import type EventEmitter from 'events';
 import type {TooltipDescriptor} from '../views/compose-button-view';
 
 export type StatusBar = EventEmitter & {
-	el: HTMLElement,
-	destroyed: boolean,
-	destroy: () => void,
-	setHeight: (number) => void
+	el: HTMLElement;
+	destroyed: boolean;
+	destroy(): void;
+	setHeight(height: number): void;
 };
 
 export type ComposeButtonDescriptor = {
