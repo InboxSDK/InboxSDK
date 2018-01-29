@@ -150,12 +150,8 @@ class GmailAppSidebarView {
               innerHeight: window.innerHeight
             }
           });
-        } else if (
-          global._APP_SIDEBAR_TEST ||
-          localStorage.getItem('inboxsdk__beta_sidebar_integration') === 'true' ||
-          this._driver.getUserEmailAddress().match(/@streak\.com$/)
-        ) {
-          this._driver.getLogger().eventSdkPassive('using beta sidebar integration');
+        }
+        else {
           usedAddonsSidebar = true;
         }
 
