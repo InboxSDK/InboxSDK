@@ -170,52 +170,42 @@ class GmailCollapsibleSectionView {
 	}
 
 	_setupHeader(collapsibleSectionDescriptor: Object){
-		if (this._driver.isUsingMaterialUI()) {
-			this._setupGmailv2Header(collapsibleSectionDescriptor);
-			return;
-		}
-
-		const headerElement = this._headerElement = document.createElement('div');
-		headerElement.classList.add('inboxsdk__resultsSection_header');
-
-		const titleElement = this._titleElement = document.createElement('div');
-		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
-
-		let titleInnerHTML = '<span class="Wp Wq"></span>';
-
-		if(this._isSearch){
-			titleInnerHTML += '<h3 class="Wd">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
-		}
-		else{
-			headerElement.classList.add('Wg');
-			titleInnerHTML += '<h3 class="Wr">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
-		}
-
-		titleElement.innerHTML = titleInnerHTML;
-
-		var floatRightElement = document.createElement('div');
-		floatRightElement.classList.add('Cr');
-
-		if(this._isSearch){
-			floatRightElement.classList.add('Wg');
-		}
-		else{
-			titleElement.classList.add('Wn');
-		}
-
-		headerElement.appendChild(titleElement);
-		headerElement.appendChild(floatRightElement);
-		if(this._element) this._element.appendChild(headerElement);
-	}
-
-	_setupGmailv2Header(collapsibleSectionDescriptor: Object) {
 		const headerElement = this._headerElement = document.createElement('div');
 		headerElement.classList.add('inboxsdk__resultsSection_header');
 		if (!this._isSearch) headerElement.classList.add('Wg');
 
+		if (this._driver.isUsingMaterialUI()) {
+			this._setupGmailv2Header(headerElement, collapsibleSectionDescriptor);
+		}
+		else {
+			this._setupGmailv1Header(headerElement, collapsibleSectionDescriptor);
+		}
+
+		if(this._element) this._element.appendChild(headerElement);
+	}
+
+	_setupGmailv1Header(headerElement: HTMLElement, collapsibleSectionDescriptor: Object) {
 		const titleElement = this._titleElement = document.createElement('div');
 		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
+		titleElement.innerHTML = '<span class="Wp Wq"></span>'
+			+ '<h3 class="' + (this._isSearch ? 'Wd' : 'Wr') + '">'
+			+ escape(collapsibleSectionDescriptor.title)
+			+ '</h3>';
+
+		const floatRightElement = document.createElement('div');
+		floatRightElement.classList.add('Cr');
+
+		if(this._isSearch) floatRightElement.classList.add('Wg');
+		else titleElement.classList.add('Wn');
+
+		headerElement.appendChild(titleElement);
+		headerElement.appendChild(floatRightElement);
+	}
+
+	_setupGmailv2Header(headerElement: HTMLElement, collapsibleSectionDescriptor: Object) {
+		const titleElement = this._titleElement = document.createElement('div');
+		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
 		titleElement.innerHTML = [
 			'<h3 class="Wr">',
@@ -228,10 +218,8 @@ class GmailCollapsibleSectionView {
 		floatRightElement.classList.add('Cr');
 		if(this._isSearch) floatRightElement.classList.add('Wg');
 
-
 		headerElement.appendChild(titleElement);
 		headerElement.appendChild(floatRightElement);
-		if(this._element) this._element.appendChild(headerElement);
 	}
 
 	_setupFooter(collapsibleSectionDescriptor: Object){
