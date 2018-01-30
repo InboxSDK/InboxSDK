@@ -7,7 +7,9 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   var threadIds = new Set();
 
   sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
-    threadIds.add(threadRowView.getThreadID());
+    threadRowView.getThreadIDAsync().then(threadId => {
+      threadIds.add(threadId);
+    });
   });
 
   sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView) {

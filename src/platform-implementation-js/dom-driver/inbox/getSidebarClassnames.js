@@ -45,6 +45,16 @@ const getSidebarClassnames: () => {
 
   // rules will contain both the chat and nav sidebar rules.
   const rules = t.toArray(Array.prototype.slice.call(document.styleSheets), t.compose(
+    t.filter(sheet => {
+      try {
+        return sheet.cssRules && sheet.cssRules.length;
+      } catch (err) {
+        // ignore. Sometimes pages have stylesheets that don't permit their
+        // rules to be enumerated. Possibly caused by other extensions including
+        // a css file from another domain?
+        return false;
+      }
+    }),
     t.mapcat(sheet => Array.prototype.slice.call(sheet.cssRules || [])),
     t.mapcat(rulesToStyleRules),
     // We have all page rules. Filter it down to just rules mentioning one of
