@@ -352,11 +352,27 @@ input.inboxsdk__x_close_button {
 
 .inboxsdk__thread_row_button {
   outline: 0;
-  padding: 0 5px;
+  height: 20px;
+  width: 20px;
+  padding: 0px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_custom_date_container {
+  max-width: inherit;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_button .inboxsdk__button_iconImg {
+  height: 20px;
+  width: 20px;
+  margin-top: 0px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__thread_row_button {
   position: relative;
+  padding: 0 5px;
+  top: -2px;
   height: 15px;
   width: 15px;
-  top: -2px;
 }
 
 .inboxsdk__gmail_action {
@@ -428,6 +444,10 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   margin-left: 3px;
   width: 16px;
   height: 16px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
+  max-width: inherit;
 }
 
 .inboxsdk__thread_row_icon_wrapper {
