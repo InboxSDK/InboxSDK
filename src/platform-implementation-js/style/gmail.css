@@ -478,6 +478,15 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
   position: relative;
 }
 
+/* don't cutoff sdk images in thread row */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_image_added .a4W,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_image_added .xS,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_image_added .xT,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_image_added .y6
+{
+  overflow: visible;
+}
+
 /* end thread rows */
 
 td.gH div.gK span:first-child > img {
