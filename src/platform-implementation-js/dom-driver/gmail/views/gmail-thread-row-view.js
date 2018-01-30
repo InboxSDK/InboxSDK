@@ -941,9 +941,33 @@ class GmailThreadRowView {
     // us a little bit of work.
     let refresher = this._refresher;
     if(!refresher){
-      refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
-        childList: true
-      }).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+      let changeStream;
+      if(this._isVertical){
+        const imageContainerElement = this._elements.length === 3 ? this._elements[2] : this._elements[1];
+        const classChangeStream = makeMutationObserverChunkedStream(imageContainerElement, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+
+        changeStream = Kefir.merge([
+          makeMutationObserverChunkedStream(this._getWatchElement(), {
+            childList: true
+          }),
+          classChangeStream
+            .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
+            .filter(() =>
+              imageContainerElement.querySelectorAll('.inboxsdk__thread_row_icon_wrapper').length > 0 &&
+              !imageContainerElement.classList.contains('inboxsdk__thread_row_image_added')
+            )
+        ]);
+      }
+      else {
+        changeStream = makeMutationObserverChunkedStream(this._getWatchElement(), {
+          childList: true
+        });
+      }
+
+      refresher = this._refresher = changeStream.map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
     }
 
     return refresher;
