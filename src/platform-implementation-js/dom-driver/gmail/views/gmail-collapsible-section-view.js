@@ -133,6 +133,7 @@ class GmailCollapsibleSectionView {
 		element.setAttribute('class', 'inboxsdk__resultsSection');
 		element.setAttribute('data-group-order-hint', String(this._groupOrderHint));
 		element.setAttribute('data-order-hint', String(typeof collapsibleSectionDescriptor.orderHint === 'number' ? collapsibleSectionDescriptor.orderHint : 0));
+		if (!this._isCollapsible) element.classList.add('inboxsdk__resultsSection_nonCollapsible');
 
 		this._setupHeader(collapsibleSectionDescriptor);
 
@@ -180,12 +181,7 @@ class GmailCollapsibleSectionView {
 		const titleElement = this._titleElement = document.createElement('div');
 		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
-		var titleInnerHTML = '';
-
-		if(this._isCollapsible){
-			titleInnerHTML += '<span class="Wp Wq"></span>';
-		}
-
+		let titleInnerHTML = '<span class="Wp Wq"></span>';
 
 		if(this._isSearch){
 			titleInnerHTML += '<h3 class="Wd">' + escape(collapsibleSectionDescriptor.title) + '</h3>';

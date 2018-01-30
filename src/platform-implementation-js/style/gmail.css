@@ -1214,6 +1214,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
   padding-top: 20px;
 }
 
+.inboxsdk__resultsSection.inboxsdk__resultsSection_nonCollapsible .inboxsdk__resultsSection_title .Wp {
+  visibility: hidden;
+}
+
   .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection {
     padding-top: 0px;
   }
