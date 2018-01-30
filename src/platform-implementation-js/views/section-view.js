@@ -41,11 +41,8 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 
 	sectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'rowClicked';
-		})
-		.map(e => e.rowDescriptor)
-		.onValue(function(rowDescriptor){
+		.filter(({eventName}) => eventName === 'rowClicked')
+		.onValue(({rowDescriptor}) => {
 			if(rowDescriptor.routeID){
 				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
 			}
@@ -57,11 +54,8 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 
 	sectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'summaryClicked';
-		})
-		.map(e => e.sectionDescriptor)
-		.onValue(function(sectionDescriptor){
+		.filter(({eventName}) => eventName === 'summaryClicked')
+		.onValue(({sectionDescriptor}) => {
 			if(sectionDescriptor.onTitleLinkClick){
 				sectionDescriptor.onTitleLinkClick(sectionView);
 			}
@@ -69,11 +63,8 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver){
 
 	sectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'footerClicked';
-		})
-		.map(e => e.sectionDescriptor)
-		.onValue(function(sectionDescriptor){
+		.filter(({eventName}) => eventName === 'footerClicked')
+		.onValue(({sectionDescriptor}) => {
 			if(sectionDescriptor.onFooterLinkClick){
 				sectionDescriptor.onFooterLinkClick(sectionView);
 			}

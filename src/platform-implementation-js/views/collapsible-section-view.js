@@ -44,10 +44,8 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 
 	collapsibleSectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'rowClicked';
-		})
-		.onValue(function({rowDescriptor}){
+		.filter(({eventName}) => eventName === 'rowClicked')
+		.onValue(({rowDescriptor}) => {
 			if(rowDescriptor.routeID){
 				driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
 			}
@@ -59,10 +57,8 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 
 	collapsibleSectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'titleLinkClicked';
-		})
-		.onValue(function({sectionDescriptor}){
+		.filter(({eventName}) => eventName === 'titleLinkClicked')
+		.onValue(({sectionDescriptor}) => {
 			if(sectionDescriptor.onTitleLinkClick){
 				sectionDescriptor.onTitleLinkClick(collapsibleSectionView);
 			}
@@ -70,10 +66,8 @@ function _bindToEventStream(collapsibleSectionView, collapsibleSectionViewDriver
 
 	collapsibleSectionViewDriver
 		.getEventStream()
-		.filter(function(event){
-			return event.eventName === 'footerClicked';
-		})
-		.onValue(function({sectionDescriptor}){
+		.filter(({eventName}) => eventName === 'footerClicked')
+		.onValue(({sectionDescriptor}) => {
 			if(sectionDescriptor.onFooterLinkClick){
 				sectionDescriptor.onFooterLinkClick(collapsibleSectionView);
 			}
