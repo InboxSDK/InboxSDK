@@ -70,7 +70,7 @@ const GmailElementGetter = {
 
 	getSearchInput(): ?HTMLInputElement {
 		const classicUIInput = ((document.getElementById('gbqfq'): any): ?HTMLInputElement);
-		const materialUIInput = ((document.querySelector('input.gb_Ze'): any): ?HTMLInputElement);
+		const materialUIInput = ((document.querySelector('form[role=search] input'): any): ?HTMLInputElement);
 		return classicUIInput || materialUIInput;
 	},
 
