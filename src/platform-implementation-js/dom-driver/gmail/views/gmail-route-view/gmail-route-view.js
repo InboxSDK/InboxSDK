@@ -428,6 +428,8 @@ class GmailRouteView {
 			threadID = parse(document.location.search, null, null).th || '';
 		}
 
+		// hash is included in the sync id route url, so we also need to take it out
+		threadID = threadID.replace('#', '');
 		return {threadID};
 	}
 
