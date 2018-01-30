@@ -647,20 +647,20 @@ div.inboxsdk__compose_statusbar {
 /* toolbar visibility */
 
 [data-thread-toolbar=true] [data-rowlist-toolbar=true] {
-  display: none;
+  display: none !important;
 }
 
 [data-toolbar-expanded=true] [data-toolbar-expanded=false] {
-  display: none;
+  display: none !important;
 }
 
 [data-toolbar-expanded=false] [data-toolbar-expanded=true] {
-  display: none;
+  display: none !important;
 }
 
 
 [data-toolbar-icononly=true] .inboxsdk__button_text {
-  display: none;
+  display: none !important;
 }
 
 .inboxsdk__menuItem img, .inboxsdk__menuItem .inboxsdk__icon {
