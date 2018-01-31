@@ -738,6 +738,9 @@ first-child will do the trick.
   height: 20px;
   width: 20px;
   margin-top: -10px;
+  position: absolute;
+  top: 50%;
+  overflow: hidden;
 }
 
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {

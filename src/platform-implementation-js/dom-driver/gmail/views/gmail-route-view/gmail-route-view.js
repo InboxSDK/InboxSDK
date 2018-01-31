@@ -407,9 +407,15 @@ class GmailRouteView {
 		if(this._paramsArray && this._paramsArray.length > 0){
 			const threadID = last(this._paramsArray);
 
-			if(threadID && threadID.length === 16){
+			if(
+				threadID &&
+				(
+					threadID.length === 16 || //for old hex style
+					threadID[0] === '#' //new sync style thread id
+				)
+			){
 				return {
-					threadID: threadID
+					threadID: threadID.replace('#', '')
 				};
 			}
 		}
