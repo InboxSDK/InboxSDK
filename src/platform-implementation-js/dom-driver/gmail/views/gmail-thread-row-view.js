@@ -91,6 +91,7 @@ class GmailThreadRowView {
   _stopper = kefirStopper();
   _refresher: ?Kefir.Observable<any>;
   _subjectRefresher: ?Kefir.Observable<any>;
+  _imageRefresher: ?Kefir.Observable<any>;
   _counts: ?Counts;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
@@ -146,6 +147,7 @@ class GmailThreadRowView {
     this._imageFixerTask = null;
     this._refresher = null;
     this._subjectRefresher = null;
+    this._imageRefresher = null;
     this._counts = null;
 
     this._elements[0].classList.add('inboxsdk__thread_row');
@@ -320,7 +322,7 @@ class GmailThreadRowView {
     }
     const prop = kefirCast(Kefir, inIconDescriptor)
       .toProperty()
-      .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
+      .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher(), this._getImageContainerRefresher()]))
       .takeUntilBy(this._stopper);
 
     let imageMod = null;
@@ -459,7 +461,7 @@ class GmailThreadRowView {
         }
 
         // could also be trash icon
-        const starGroup = querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
+        const starGroup = buttonToolbar ? null : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
         buttonSpan = buttonMod.buttonSpan;
         iconSettings = buttonMod.iconSettings;
 
@@ -498,7 +500,7 @@ class GmailThreadRowView {
         if(buttonToolbar && buttonSpan.parentElement !== buttonToolbar){
           insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
         }
-        else if (buttonSpan.parentElement !== starGroup) {
+        else if (starGroup && buttonSpan.parentElement !== starGroup) {
           insertElementInOrder(starGroup, buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
 
@@ -941,33 +943,10 @@ class GmailThreadRowView {
     // us a little bit of work.
     let refresher = this._refresher;
     if(!refresher){
-      let changeStream;
-      if(this._isVertical){
-        const imageContainerElement = this._elements.length === 3 ? this._elements[2] : this._elements[1];
-        const classChangeStream = makeMutationObserverChunkedStream(imageContainerElement, {
-          attributes: true,
-          attributeFilter: ['class']
-        });
-
-        changeStream = Kefir.merge([
-          makeMutationObserverChunkedStream(this._getWatchElement(), {
-            childList: true
-          }),
-          classChangeStream
-            .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
-            .filter(() =>
-              imageContainerElement.querySelectorAll('.inboxsdk__thread_row_icon_wrapper').length > 0 &&
-              !imageContainerElement.classList.contains('inboxsdk__thread_row_image_added')
-            )
-        ]);
-      }
-      else {
-        changeStream = makeMutationObserverChunkedStream(this._getWatchElement(), {
-          childList: true
-        });
-      }
-
-      refresher = this._refresher = changeStream.map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+      refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
+        childList: true
+      })
+      .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
     }
 
     return refresher;
@@ -998,6 +977,32 @@ class GmailThreadRowView {
     }
 
     return subjectRefresher;
+  }
+
+  _getImageContainerRefresher(): Kefir.Observable<any> {
+    let imageRefresher = this._imageRefresher;
+    if(!imageRefresher){
+      if(this._isVertical){
+        const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
+        const classChangeStream = makeMutationObserverChunkedStream(containerRow, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+
+        imageRefresher = this._imageRefresher =  classChangeStream
+            .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
+            .filter(() =>
+              containerRow.querySelectorAll('.inboxsdk__thread_row_icon_wrapper').length > 0 &&
+              !containerRow.classList.contains('inboxsdk__thread_row_image_added')
+            )
+            .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+      }
+      else {
+        imageRefresher = this._imageRefresher = Kefir.constant(null);
+      }
+    }
+
+    return imageRefresher;
   }
 }
 
