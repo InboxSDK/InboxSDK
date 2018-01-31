@@ -1338,6 +1338,11 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   position: initial;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA:hover > .xW {
+  /* Gmailv2 tries to hide the "xW" element when a "zA" element is hovered. This prevent that. */
+  display: flex;
+}
+
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
   -webkit-align-items:  center;
