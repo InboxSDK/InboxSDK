@@ -760,6 +760,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
   cursor: pointer;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
+  border-radius: 4px 4px 0 0;
+}
+
 .inboxsdk__mole_view_titlebar h2 {
   font-size: inherit;
   font-weight: inherit;
