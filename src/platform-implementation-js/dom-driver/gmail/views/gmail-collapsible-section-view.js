@@ -405,7 +405,7 @@ class GmailCollapsibleSectionView {
 
 		tableRows.forEach((result) => {
 			const rowElement = document.createElement('tr');
-			rowElement.setAttribute('class', 'zA ' + (result.isRead ? 'yO' : 'zE'));
+			rowElement.setAttribute('class', 'inboxsdk__resultsSection_tableRow zA ' + (result.isRead ? 'yO' : 'zE'));
 			rowElement.innerHTML = _getRowHTML(result);
 
 			if (!tbody) throw new Error('should not happen');
@@ -679,12 +679,12 @@ class GmailCollapsibleSectionView {
 function _getTableHTML(){
 	return [
 		'<colgroup>',
+			'<col class="k0vOLb">',
 			'<col class="Ci">',
 			'<col class="y5">',
+			'<col class="WA">',
 			'<col class="yY">',
-			'<col class="yF">',
-			'<col>',
-			'<col class="yg">',
+			'<col class="null">',
 			'<col class="xX">',
 		'</colgroup>',
 		'<tbody>',
@@ -693,53 +693,48 @@ function _getTableHTML(){
 }
 
 function _getRowHTML(result){
-	let rowArr = ['<td class="xY dk5WUd">'];
-	if(result.iconUrl){
-		rowArr.push('<img class="inboxsdk__resultsSection_result_icon" src="' + result.iconUrl + '">');
-	}
-	else if(result.iconClass){
-		rowArr.push('<div class="' + result.iconClass + '"></div>');
-	}
-	rowArr.push('</td>');
+	let iconHtml = ''
+	if(result.iconUrl) iconHtml = ('<img class="inboxsdk__resultsSection_result_icon" src="' + result.iconUrl + '">');
+	else if(result.iconClass) iconHtml = ('<div class="' + result.iconClass + '"></div>');
 
-	rowArr.push('<td class="xY"></td>');
+	const labelsHtml = Array.isArray(result.labels) ? result.labels.map(_getLabelHTML).join('') : '';
 
-	rowArr = rowArr.concat([
+	const rowArr = [
+		'<td class="xY PF"></td>',
+		'<td class="xY oZ-x3"></td>',
+		'<td class="xY WA">',
+			iconHtml,
+		'</td>',
+		'<td class="xY WA"></td>',
 		'<td class="xY yX inboxsdk__resultsSection_result_title">',
-			'<div>',
+			'<div class="yW">',
 				'<span ' + (result.isRead ? '' : 'class="zF"') + '>',
 					escape(result.title),
 				'</span>',
 			'</div>',
-		'</td>'
-	]);
-
-	rowArr.push('<td class="xY"></td>');
-
-
-	rowArr = rowArr.concat([
-		'<td class="xY">',
-			'<div class="V3">',
-				'<span class="ya35Wb">'
-	]);
-
-	if(Array.isArray(result.labels)){
-		rowArr = rowArr.concat(
-			result.labels.map(label => _getLabelHTML(label))
-		);
-	}
-
-	rowArr = rowArr.concat([
-					(result.isRead ? '' : '<b>'),
-						escape(result.body || ''),
-					(result.isRead ? '' : '</b>'),
-				'</span>',
+		'</td>',
+		'<td class="xY a4W">',
+			'<div class="xS">',
+				'<div class="xT">',
+					'<div class="yi">',
+						labelsHtml,
+					'</div>',
+					'<div class="y6">',
+						'<span class="bog">',
+							(result.isRead ? '' : '<b>'),
+								escape(result.body || ''),
+							(result.isRead ? '' : '</b>'),
+						'</span>',
+					'</div>',
+				'</div>',
 			'</div>',
+		'</td>',
+		'<td class="xY xW">',
+			'<span' + (result.isRead ? '' : ' class="bq3"') + '>',
+				escape(result.shortDetailText || ''),
+			'</span>',
 		'</td>'
-	]);
-
-	rowArr.push('<td class="xY"></td>');
-	rowArr.push('<td class="xY xW"><span class="sehUKb">' + escape(result.shortDetailText || '') + '</span></td>');
+	];
 
 	return rowArr.join('');
 }
@@ -750,7 +745,8 @@ function _getLabelHTML(label){
 
 	const retArray = [
 		autoHtml `<div class="ar as" data-tooltip="${label.title}">
-			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">`
+			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">
+				<div class="au" style="border-color: ${backgroundColor};">`
 	];
 
 	const styleHtml = label.iconBackgroundColor ?
@@ -777,8 +773,9 @@ function _getLabelHTML(label){
 
 	retArray.push(
 		autoHtml `
-				<div class="av" style="color: ${foregroundColor}">
-					${label.title}
+					<div class="av" style="color: ${foregroundColor}">
+						${label.title}
+					</div>
 				</div>
 			</div>
 		</div>

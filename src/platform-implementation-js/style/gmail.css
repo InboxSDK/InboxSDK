@@ -1330,7 +1330,17 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
 .inboxsdk__resultsSection .inboxsdk__resultsSection_result_icon {
   height: 15px;
   width: 15px;
-  margin-left: 9px;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA  {
+  /* For reasons not entirely clear to me, the position of this element can't be "relative" (which
+  the zA class sets it to) or "border-radius" does not work on any of the children */
+  position: initial;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
+  align-items: center;
+  -webkit-align-items:  center;
 }
 
 .inboxsdk__resultsSection .xX {
@@ -1358,15 +1368,15 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   position: relative;
 }
 
-.inboxsdk__resultsSection .at > * {
-  display: inline-block;
-}
-
 .inboxsdk__resultsSection_label_icon {
   height: 11px;
   width: 11px;
   position: absolute;
+  top: 2px;
   margin-left: 4px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
 
