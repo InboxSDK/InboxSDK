@@ -91,6 +91,7 @@ class GmailThreadRowView {
   _stopper = kefirStopper();
   _refresher: ?Kefir.Observable<any>;
   _subjectRefresher: ?Kefir.Observable<any>;
+  _imageRefresher: ?Kefir.Observable<any>;
   _counts: ?Counts;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
@@ -146,6 +147,7 @@ class GmailThreadRowView {
     this._imageFixerTask = null;
     this._refresher = null;
     this._subjectRefresher = null;
+    this._imageRefresher = null;
     this._counts = null;
 
     this._elements[0].classList.add('inboxsdk__thread_row');
@@ -320,7 +322,7 @@ class GmailThreadRowView {
     }
     const prop = kefirCast(Kefir, inIconDescriptor)
       .toProperty()
-      .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher()]))
+      .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher(), this._getImageContainerRefresher()]))
       .takeUntilBy(this._stopper);
 
     let imageMod = null;
@@ -423,15 +425,21 @@ class GmailThreadRowView {
           delete buttonDescriptor.className;
         }
 
-        // could also be trash icon
-        const starGroup = querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
-
         let buttonSpan, iconSettings;
+        const buttonToolbar = this._elements[0].querySelector('ul[role=toolbar]');
+
         if (!buttonMod) {
           buttonMod = this._modifications.button.unclaimed.shift();
           if (!buttonMod) {
-            buttonSpan = document.createElement('span');
-            buttonSpan.className = 'inboxsdk__thread_row_button';
+            if(buttonToolbar){
+              buttonSpan = document.createElement('li');
+              buttonSpan.classList.add('bqX');
+            }
+            else {
+              buttonSpan = document.createElement('span');
+            }
+
+            buttonSpan.classList.add('inboxsdk__thread_row_button');
             buttonSpan.setAttribute('tabindex', "-1");
             buttonSpan.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
             (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);
@@ -452,6 +460,8 @@ class GmailThreadRowView {
           this._modifications.button.claimed.push(buttonMod);
         }
 
+        // could also be trash icon
+        const starGroup = buttonToolbar ? null : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
         buttonSpan = buttonMod.buttonSpan;
         iconSettings = buttonMod.iconSettings;
 
@@ -464,11 +474,13 @@ class GmailThreadRowView {
             if (buttonDescriptor.hasDropdown) {
               if (activeDropdown) {
                 this._elements[0].classList.remove('inboxsdk__dropdown_active');
+                this._elements[0].classList.remove('buL'); // gmail class to force row button toolbar to be visible
                 activeDropdown.close();
                 activeDropdown = null;
                 return;
               } else {
                 this._elements[0].classList.add('inboxsdk__dropdown_active');
+                this._elements[0].classList.add('buL'); // gmail class to force row button toolbar to be visible
                 appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
                 activeDropdown.setPlacementOptions({
                   position: 'bottom', hAlign: 'left', vAlign: 'top'
@@ -485,7 +497,10 @@ class GmailThreadRowView {
         }
 
         updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-        if (buttonSpan.parentElement !== starGroup) {
+        if(buttonToolbar && buttonSpan.parentElement !== buttonToolbar){
+          insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
+        }
+        else if (starGroup && buttonSpan.parentElement !== starGroup) {
           insertElementInOrder(starGroup, buttonSpan);
           this._expandColumn('col.y5', 26*starGroup.children.length);
 
@@ -582,10 +597,15 @@ class GmailThreadRowView {
 
     var prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
     prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
+      const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
       if (!opts) {
         if (added) {
           getImgElement().remove();
           added = false;
+
+          if(!attachmentDiv.querySelector('.inboxsdk__thread_row_attachment_icon')) {
+            attachmentDiv.classList.remove('inboxsdk__thread_row_attachment_icons_present');
+          }
         }
       } else {
         const img = getImgElement();
@@ -604,7 +624,6 @@ class GmailThreadRowView {
           currentIconUrl = opts.iconUrl;
         }
 
-        const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
         if (!attachmentDiv.contains(img)) {
           attachmentDiv.appendChild(img);
           added = true;
@@ -613,6 +632,7 @@ class GmailThreadRowView {
             this._fixDateColumnWidth();
           }
         }
+        attachmentDiv.classList.add('inboxsdk__thread_row_attachment_icons_present');
       }
     });
   }
@@ -674,15 +694,27 @@ class GmailThreadRowView {
 
         if (needToAdd || !draftElement) {
           labelMod.el.innerHTML = originalLabel.innerHTML;
-          draftElement = labelMod.el.querySelector('font');
-          if (!draftElement) {
-            return;
+          const materiaUIlDraftElements = Array.from(labelMod.el.querySelectorAll('.boq'));
+          if(materiaUIlDraftElements.length > 0){
+            materiaUIlDraftElements.forEach(el => el.remove());
+            draftElement = Object.assign(document.createElement('span'), {
+              className: 'boq'});
+            labelMod.el.appendChild(draftElement);
           }
+          else {
+            draftElement = labelMod.el.querySelector('font');
+            if (!draftElement) {
+              return;
+            }
+
+            const nextSibling = draftElement.nextElementSibling;
+            if (nextSibling) {
+              nextSibling.remove();
+            }
+          }
+
           draftElement.classList.add('inboxsdk__thread_row_custom_draft_part');
-          const nextSibling = draftElement.nextElementSibling;
-          if (nextSibling) {
-            nextSibling.remove();
-          }
+
           countElement = Object.assign(document.createElement('span'), {
             className: 'inboxsdk__thread_row_custom_draft_count'});
           labelMod.el.appendChild(countElement);
@@ -724,6 +756,7 @@ class GmailThreadRowView {
               el: Object.assign(document.createElement('span'), {className: 'inboxsdk__thread_row_custom_date'}),
               remove() {
                 this.el.remove();
+                dateContainer.classList.remove('inboxsdk__thread_row_custom_date_container');
               }
             };
           }
@@ -742,6 +775,7 @@ class GmailThreadRowView {
 
         if (!includes(dateContainer.children, dateMod.el)) {
           dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
+          dateContainer.classList.add('inboxsdk__thread_row_custom_date_container');
         }
 
         this._fixDateColumnWidth();
@@ -911,7 +945,8 @@ class GmailThreadRowView {
     if(!refresher){
       refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
         childList: true
-      }).map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+      })
+      .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
     }
 
     return refresher;
@@ -942,6 +977,32 @@ class GmailThreadRowView {
     }
 
     return subjectRefresher;
+  }
+
+  _getImageContainerRefresher(): Kefir.Observable<any> {
+    let imageRefresher = this._imageRefresher;
+    if(!imageRefresher){
+      if(this._isVertical){
+        const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
+        const classChangeStream = makeMutationObserverChunkedStream(containerRow, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+
+        imageRefresher = this._imageRefresher =  classChangeStream
+            .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
+            .filter(() =>
+              containerRow.querySelectorAll('.inboxsdk__thread_row_icon_wrapper').length > 0 &&
+              !containerRow.classList.contains('inboxsdk__thread_row_image_added')
+            )
+            .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+      }
+      else {
+        imageRefresher = this._imageRefresher = Kefir.constant(null);
+      }
+    }
+
+    return imageRefresher;
   }
 }
 

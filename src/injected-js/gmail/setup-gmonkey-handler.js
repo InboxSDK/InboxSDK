@@ -33,6 +33,8 @@ export default function setupGmonkeyHandler() {
     }
 
     if (threadId) {
+      // hash is included in the sync id route url, so we also need to take it out
+      threadId = threadId.replace('#', '');
       (event:any).target.setAttribute('data-inboxsdk-currentthreadid', threadId);
     }
   });

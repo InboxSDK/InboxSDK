@@ -310,12 +310,6 @@ a.inboxsdk__appid_register {
   display: inline-block;
 }
 
-.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
-  position: absolute;
-  top: 50%;
-  overflow: hidden;
-}
-
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   margin-top: 0px;
 }
