@@ -809,6 +809,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
   cursor: pointer;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
+  border-radius: 4px 4px 0 0;
+}
+
 .inboxsdk__mole_view_titlebar h2 {
   font-size: inherit;
   font-weight: inherit;
@@ -1263,6 +1267,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
   padding-top: 20px;
 }
 
+.inboxsdk__resultsSection.inboxsdk__resultsSection_nonCollapsible .inboxsdk__resultsSection_title .Wp {
+  visibility: hidden;
+}
+
   .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection {
     padding-top: 0px;
   }
@@ -1360,10 +1368,6 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   margin-right: 13px;
 }
 
-.inboxsdk__resultsSection_header_summaryText.Wm + .aAE {
-  margin-left: 3px;
-}
-
 .inboxsdk__resultsSection .TB.TC {
   text-align: center;
 }
@@ -1375,7 +1379,26 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
 .inboxsdk__resultsSection .inboxsdk__resultsSection_result_icon {
   height: 15px;
   width: 15px;
-  margin-left: 9px;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA  {
+  /* For reasons not entirely clear to me, the position of this element can't be "relative" (which
+  the zA class sets it to) or "border-radius" does not work on any of the children */
+  position: initial;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA:hover > .xW {
+  /* Gmailv2 tries to hide the "xW" element when a "zA" element is hovered. This prevent that. */
+  display: flex;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
+  align-items: center;
+  -webkit-align-items:  center;
+}
+
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .WA > div {
+  width: 100%;
 }
 
 .inboxsdk__resultsSection .xX {
@@ -1403,10 +1426,6 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   position: relative;
 }
 
-.inboxsdk__resultsSection .at > * {
-  display: inline-block;
-}
-
 .inboxsdk__thread_row_label {
   flex-shrink: 0;
   align-self: center;
@@ -1416,7 +1435,11 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   height: 11px;
   width: 11px;
   position: absolute;
+  top: 2px;
   margin-left: 4px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
 

@@ -72,7 +72,7 @@ class GmailCollapsibleSectionView {
 	}
 
 	setCollapsibleSectionDescriptorProperty(collapsibleSectionDescriptorProperty: Kefir.Observable<?Object>){
-		var stoppedProperty = collapsibleSectionDescriptorProperty
+		const stoppedProperty = collapsibleSectionDescriptorProperty
 								.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null));
 
 		stoppedProperty.onValue(x => this._updateValues(x));
@@ -84,13 +84,9 @@ class GmailCollapsibleSectionView {
 			return;
 		}
 
-		this._isReadyDeferred.promise.then(function(self){
-			if(value){
-				self._collapse();
-			}
-			else{
-				self._expand();
-			}
+		this._isReadyDeferred.promise.then(() => {
+			if(value) this._collapse();
+			else this._expand();
 		});
 	}
 
@@ -133,11 +129,12 @@ class GmailCollapsibleSectionView {
 		element.setAttribute('class', 'inboxsdk__resultsSection');
 		element.setAttribute('data-group-order-hint', String(this._groupOrderHint));
 		element.setAttribute('data-order-hint', String(typeof collapsibleSectionDescriptor.orderHint === 'number' ? collapsibleSectionDescriptor.orderHint : 0));
+		if (!this._isCollapsible) element.classList.add('inboxsdk__resultsSection_nonCollapsible');
 
 		this._setupHeader(collapsibleSectionDescriptor);
 
 		const bodyElement = this._bodyElement = document.createElement('div');
-		var bodyContentsElement = document.createElement('div');
+		const bodyContentsElement = document.createElement('div');
 		bodyContentsElement.classList.add('zE');
 		bodyElement.appendChild(bodyContentsElement);
 
@@ -169,57 +166,42 @@ class GmailCollapsibleSectionView {
 	}
 
 	_setupHeader(collapsibleSectionDescriptor: Object){
-		if (this._driver.isUsingMaterialUI()) {
-			this._setupGmailv2Header(collapsibleSectionDescriptor);
-			return;
-		}
-
-		const headerElement = this._headerElement = document.createElement('div');
-		headerElement.classList.add('inboxsdk__resultsSection_header');
-
-		const titleElement = this._titleElement = document.createElement('div');
-		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
-
-		var titleInnerHTML = '';
-
-		if(this._isCollapsible){
-			titleInnerHTML += '<span class="Wp Wq"></span>';
-		}
-
-
-		if(this._isSearch){
-			titleInnerHTML += '<h3 class="Wd">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
-		}
-		else{
-			headerElement.classList.add('Wg');
-			titleInnerHTML += '<h3 class="Wr">' + escape(collapsibleSectionDescriptor.title) + '</h3>';
-		}
-
-		titleElement.innerHTML = titleInnerHTML;
-
-		var floatRightElement = document.createElement('div');
-		floatRightElement.classList.add('Cr');
-
-		if(this._isSearch){
-			floatRightElement.classList.add('Wg');
-		}
-		else{
-			titleElement.classList.add('Wn');
-		}
-
-		headerElement.appendChild(titleElement);
-		headerElement.appendChild(floatRightElement);
-		if(this._element) this._element.appendChild(headerElement);
-	}
-
-	_setupGmailv2Header(collapsibleSectionDescriptor: Object) {
 		const headerElement = this._headerElement = document.createElement('div');
 		headerElement.classList.add('inboxsdk__resultsSection_header');
 		if (!this._isSearch) headerElement.classList.add('Wg');
 
+		if (this._driver.isUsingMaterialUI()) {
+			this._setupGmailv2Header(headerElement, collapsibleSectionDescriptor);
+		}
+		else {
+			this._setupGmailv1Header(headerElement, collapsibleSectionDescriptor);
+		}
+
+		if(this._element) this._element.appendChild(headerElement);
+	}
+
+	_setupGmailv1Header(headerElement: HTMLElement, collapsibleSectionDescriptor: Object) {
 		const titleElement = this._titleElement = document.createElement('div');
 		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
+		titleElement.innerHTML = '<span class="Wp Wq"></span>'
+			+ '<h3 class="' + (this._isSearch ? 'Wd' : 'Wr') + '">'
+			+ escape(collapsibleSectionDescriptor.title)
+			+ '</h3>';
+
+		const floatRightElement = document.createElement('div');
+		floatRightElement.classList.add('Cr');
+
+		if(this._isSearch) floatRightElement.classList.add('Wg');
+		else titleElement.classList.add('Wn');
+
+		headerElement.appendChild(titleElement);
+		headerElement.appendChild(floatRightElement);
+	}
+
+	_setupGmailv2Header(headerElement: HTMLElement, collapsibleSectionDescriptor: Object) {
+		const titleElement = this._titleElement = document.createElement('div');
+		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
 		titleElement.innerHTML = [
 			'<h3 class="Wr">',
@@ -232,10 +214,8 @@ class GmailCollapsibleSectionView {
 		floatRightElement.classList.add('Cr');
 		if(this._isSearch) floatRightElement.classList.add('Wg');
 
-
 		headerElement.appendChild(titleElement);
 		headerElement.appendChild(floatRightElement);
-		if(this._element) this._element.appendChild(headerElement);
 	}
 
 	_setupFooter(collapsibleSectionDescriptor: Object){
@@ -327,18 +307,16 @@ class GmailCollapsibleSectionView {
 						'<div class="J-J5-Ji amH">',
 							'<span class="Dj"><b>',
 							'</b></span>',
+							'&nbsp;',
 						'</div>',
 					'</span>'
 				].join('');
 
-				var self = this;
 				this._eventStream.plug(
-					Kefir.fromEvents(summaryTextElement, 'click').map(function(){
-						return {
-							eventName: 'titleLinkClicked',
-							sectionDescriptor: self._collapsibleSectionDescriptor
-						};
-					})
+					Kefir.fromEvents(summaryTextElement, 'click').map(() => ({
+						eventName: 'titleLinkClicked',
+						sectionDescriptor: this._collapsibleSectionDescriptor
+					}))
 				);
 
 				const _summaryTextElement = summaryTextElement;
@@ -401,7 +379,7 @@ class GmailCollapsibleSectionView {
 	}
 
 	_updateTableRows(collapsibleSectionDescriptor: Object){
-		var tableRows = collapsibleSectionDescriptor.tableRows;
+		const {tableRows} = collapsibleSectionDescriptor;
 		const tableBodyElement = this._tableBodyElement;
 		if(!tableBodyElement) return;
 
@@ -417,25 +395,18 @@ class GmailCollapsibleSectionView {
 	}
 
 	_renderTable(tableRows: Array<Object>){
-		var tableElement = document.createElement('table');
+		const tableElement = document.createElement('table');
 		tableElement.setAttribute('class', 'F cf zt');
 		tableElement.innerHTML = _getTableHTML();
 
 		if(this._tableBodyElement) this._tableBodyElement.appendChild(tableElement);
 
-		var tbody = tableElement.querySelector('tbody');
-		var eventStream = this._eventStream;
+		const tbody = tableElement.querySelector('tbody');
+		const eventStream = this._eventStream;
 
-		tableRows.forEach(function(result){
-			var rowElement = document.createElement('tr');
-
-			if(result.isRead){
-				rowElement.setAttribute('class', 'zA yO');
-			}
-			else{
-				rowElement.setAttribute('class', 'zA zE');
-			}
-
+		tableRows.forEach((result) => {
+			const rowElement = document.createElement('tr');
+			rowElement.setAttribute('class', 'inboxsdk__resultsSection_tableRow zA ' + (result.isRead ? 'yO' : 'zE'));
 			rowElement.innerHTML = _getRowHTML(result);
 
 			if (!tbody) throw new Error('should not happen');
@@ -495,7 +466,7 @@ class GmailCollapsibleSectionView {
 		else{
 			footerElement.style.display = '';
 
-			var footerLinkElement = document.createElement('span');
+			const footerLinkElement = document.createElement('span');
 			footerLinkElement.setAttribute('class', 'e Wb');
 			footerLinkElement.textContent = collapsibleSectionDescriptor.footerLinkText;
 
@@ -599,7 +570,7 @@ class GmailCollapsibleSectionView {
 
 			//now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
 			//and calling our "recollapse" helper function on them
-			var elementsToRecollapse = Array.from(otherCollapseContainer.children[0].children).concat(Array.from(otherCollapseContainer.children[1].children));
+			const elementsToRecollapse = Array.from(otherCollapseContainer.children[0].children).concat(Array.from(otherCollapseContainer.children[1].children));
 
 			if(otherCollapseContainer) this._pulloutSectionsFromCollapsedContainer((otherCollapseContainer: any));
 			this._recollapse(elementsToRecollapse);
@@ -611,7 +582,7 @@ class GmailCollapsibleSectionView {
 
 	_removeFromCollapsedContainer(){
 		if(this._headerElement) this._headerElement.classList.add('Wg');
-		var element = this._element;
+		const element = this._element;
 		if(!element) return;
 
 		const parentElement = element.parentElement;
@@ -623,25 +594,19 @@ class GmailCollapsibleSectionView {
 			return;
 		}
 
-		var elementsToRecollapse = Array.from(container.children[0].children).concat(Array.from(container.children[1].children));
+		const elementsToRecollapse = Array.from(container.children[0].children).concat(Array.from(container.children[1].children));
 		this._pulloutSectionsFromCollapsedContainer((container: any));
 		this._destroyCollapsedContainer();
 
-		this._recollapse(elementsToRecollapse.filter(function(child){
-			return child !== element;
-		}));
+		this._recollapse(elementsToRecollapse.filter((child) => child !== element));
 	}
 
 	_pulloutSectionsFromCollapsedContainer(container: HTMLElement){
-		var prependedChildren = Array.from(container.children[0].children);
-		Array.prototype.forEach.call(prependedChildren, function(child){
-			(container: any).insertAdjacentElement('beforebegin', child);
-		});
+		const prependedChildren = Array.from(container.children[0].children);
+		prependedChildren.forEach((child) => (container: any).insertAdjacentElement('beforebegin', child));
 
-		var appendedChildren = Array.from(container.children[1].children).reverse();
-		Array.prototype.forEach.call(appendedChildren, function(child){
-			(container: any).insertAdjacentElement('afterend', child);
-		});
+		const appendedChildren = Array.from(container.children[1].children).reverse();
+		appendedChildren.forEach((child) => (container: any).insertAdjacentElement('afterend', child));
 	}
 
 	_readdToCollapsedContainer(){
@@ -653,8 +618,8 @@ class GmailCollapsibleSectionView {
 			return;
 		}
 
-		var collapsedContainer;
-		var isPrepend;
+		let collapsedContainer;
+		let isPrepend;
 
 		if(this._isCollapsedContainer(element.previousElementSibling)){
 			isPrepend = false;
@@ -683,14 +648,14 @@ class GmailCollapsibleSectionView {
 	}
 
 	_recollapse(children: Array<Object> ){
-		Array.prototype.forEach.call(children, function(child){
-			var event = document.createEvent("CustomEvent");
-			(event: any).initCustomEvent('removeCollapsedContainer', false, false, null);
-			child.dispatchEvent(event);
+		children.forEach((child) => {
+			const removeEvent = document.createEvent("CustomEvent");
+			(removeEvent: any).initCustomEvent('removeCollapsedContainer', false, false, null);
+			child.dispatchEvent(removeEvent);
 
-			event = document.createEvent("CustomEvent");
-			(event: any).initCustomEvent('readdToCollapsedContainer', false, false, null);
-			child.dispatchEvent(event);
+			const readdEvent = document.createEvent("CustomEvent");
+			(readdEvent: any).initCustomEvent('readdToCollapsedContainer', false, false, null);
+			child.dispatchEvent(readdEvent);
 		});
 	}
 
@@ -715,12 +680,12 @@ class GmailCollapsibleSectionView {
 function _getTableHTML(){
 	return [
 		'<colgroup>',
+			'<col class="k0vOLb">',
 			'<col class="Ci">',
 			'<col class="y5">',
+			'<col class="WA">',
 			'<col class="yY">',
-			'<col class="yF">',
 			'<col>',
-			'<col class="yg">',
 			'<col class="xX">',
 		'</colgroup>',
 		'<tbody>',
@@ -729,64 +694,60 @@ function _getTableHTML(){
 }
 
 function _getRowHTML(result){
-	var rowArr = ['<td class="xY dk5WUd">'];
-	if(result.iconUrl){
-		rowArr.push('<img class="inboxsdk__resultsSection_result_icon" src="' + result.iconUrl + '">');
-	}
-	else if(result.iconClass){
-		rowArr.push('<div class="' + result.iconClass + '"></div>');
-	}
-	rowArr.push('</td>');
+	let iconHtml = '';
+	if(result.iconUrl) iconHtml = autoHtml `<img class="inboxsdk__resultsSection_result_icon" src="${result.iconUrl}">`;
+	else if(result.iconClass) iconHtml = autoHtml `<div class="${result.iconClass}"></div>`;
 
-	rowArr.push('<td class="xY"></td>');
+	const labelsHtml = Array.isArray(result.labels) ? result.labels.map(_getLabelHTML).join('') : '';
 
-	rowArr = rowArr.concat([
+	const rowArr = [
+		'<td class="xY PF"></td>',
+		'<td class="xY oZ-x3"></td>',
+		'<td class="xY WA">',
+			iconHtml,
+		'</td>',
+		'<td class="xY WA"></td>',
 		'<td class="xY yX inboxsdk__resultsSection_result_title">',
-			'<div>',
+			'<div class="yW">',
 				'<span ' + (result.isRead ? '' : 'class="zF"') + '>',
 					escape(result.title),
 				'</span>',
 			'</div>',
-		'</td>'
-	]);
-
-	rowArr.push('<td class="xY"></td>');
-
-
-	rowArr = rowArr.concat([
-		'<td class="xY">',
-			'<div class="V3">',
-				'<span class="ya35Wb">'
-	]);
-
-	if(Array.isArray(result.labels)){
-		result.labels.forEach(function(label){
-			rowArr = rowArr.concat(_getLabelHTML(label));
-		});
-	}
-
-	rowArr = rowArr.concat([
-					(result.isRead ? '' : '<b>'),
-						escape(result.body || ''),
-					(result.isRead ? '' : '</b>'),
-				'</span>',
+		'</td>',
+		'<td class="xY a4W">',
+			'<div class="xS">',
+				'<div class="xT">',
+					'<div class="yi">',
+						labelsHtml,
+					'</div>',
+					'<div class="y6">',
+						'<span class="bog">',
+							(result.isRead ? '' : '<b>'),
+								escape(result.body || ''),
+							(result.isRead ? '' : '</b>'),
+						'</span>',
+					'</div>',
+				'</div>',
 			'</div>',
+		'</td>',
+		'<td class="xY xW">',
+			'<span' + (result.isRead ? '' : ' class="bq3"') + '>',
+				escape(result.shortDetailText || ''),
+			'</span>',
 		'</td>'
-	]);
-
-	rowArr.push('<td class="xY"></td>');
-	rowArr.push('<td class="xY xW"><span class="sehUKb">' + escape(result.shortDetailText || '') + '</span></td>');
+	];
 
 	return rowArr.join('');
 }
 
 function _getLabelHTML(label){
-	var backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
-	var foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
+	const backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
+	const foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
 
-	var retArray = [
+	const retArray = [
 		autoHtml `<div class="ar as" data-tooltip="${label.title}">
-			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">`
+			<div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">
+				<div class="au" style="border-color: ${backgroundColor};">`
 	];
 
 	const styleHtml = label.iconBackgroundColor ?
@@ -813,8 +774,9 @@ function _getLabelHTML(label){
 
 	retArray.push(
 		autoHtml `
-				<div class="av" style="color: ${foregroundColor}">
-					${label.title}
+					<div class="av" style="color: ${foregroundColor}">
+						${label.title}
+					</div>
 				</div>
 			</div>
 		</div>
