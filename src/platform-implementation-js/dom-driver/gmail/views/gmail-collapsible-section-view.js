@@ -693,7 +693,7 @@ function _getTableHTML(){
 }
 
 function _getRowHTML(result){
-	let iconHtml = ''
+	let iconHtml = '';
 	if(result.iconUrl) iconHtml = ('<img class="inboxsdk__resultsSection_result_icon" src="' + result.iconUrl + '">');
 	else if(result.iconClass) iconHtml = ('<div class="' + result.iconClass + '"></div>');
 
