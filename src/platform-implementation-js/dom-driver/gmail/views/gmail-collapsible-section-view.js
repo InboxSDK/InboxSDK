@@ -307,6 +307,7 @@ class GmailCollapsibleSectionView {
 						'<div class="J-J5-Ji amH">',
 							'<span class="Dj"><b>',
 							'</b></span>',
+							'&nbsp;',
 						'</div>',
 					'</span>'
 				].join('');
