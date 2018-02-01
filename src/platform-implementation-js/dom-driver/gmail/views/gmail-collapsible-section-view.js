@@ -684,7 +684,7 @@ function _getTableHTML(){
 			'<col class="y5">',
 			'<col class="WA">',
 			'<col class="yY">',
-			'<col class="null">',
+			'<col>',
 			'<col class="xX">',
 		'</colgroup>',
 		'<tbody>',
