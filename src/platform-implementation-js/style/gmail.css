@@ -1175,7 +1175,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj[style*="border-colo
   border-color: inherit;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM.aj0 {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM {
   display: flex;
   display: -webkit-flex;
   visibility: visible;
