@@ -1191,7 +1191,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem.inboxsdk__navItem_nonClickabl
 
 .inboxsdk__gmailv1css .inboxsdk__navItem_link {
   position: absolute;
-  top: 0px;
+  top: 1px;
   right: -4px;
 }
 

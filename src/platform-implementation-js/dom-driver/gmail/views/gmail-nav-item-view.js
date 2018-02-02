@@ -196,6 +196,8 @@ export default class GmailNavItemView {
 						'</div>',
 
 						'<div class="aio aip">',
+							'<span class="nU" role="link">',
+							'</span>',
 						'</div>',
 
 					'</div>',
@@ -207,7 +209,8 @@ export default class GmailNavItemView {
 				'<div class="TO">',
 					'<div class="TN aik">',
 						'<div class="aio aip">',
-
+							'<span class="nU" role="link">',
+							'</span>',
 						'</div>',
 					'</div>',
 				'</div>'
@@ -306,13 +309,13 @@ export default class GmailNavItemView {
 		switch(type){
 			case NAV_ITEM_TYPES.NAVIGATION:
 				if(!nameElement || nameElement.tagName !== 'SPAN'){
-					querySelector(this._element, '.aip').innerHTML += autoHtml `<span class="nU n1 inboxsdk__navItem_name" role="link">${this._name}</span>`;
+					querySelector(this._element, '.nU').innerHTML += autoHtml `<span class="inboxsdk__navItem_name">${this._name}</span>`;
 				}
 			break;
 			case NAV_ITEM_TYPES.LINK:
 			case NAV_ITEM_TYPES.MANAGE:
 				if(!nameElement || nameElement.tagName !== 'A'){
-					querySelector(this._element, '.aip').innerHTML += autoHtml `<a href="#" class="inboxsdk__navItem_name CK">${this._name}</a>`;
+					querySelector(this._element, '.nU').innerHTML += autoHtml `<a href="#" class="CK inboxsdk__navItem_name">${this._name}</a>`;
 				}
 			break;
 		}
