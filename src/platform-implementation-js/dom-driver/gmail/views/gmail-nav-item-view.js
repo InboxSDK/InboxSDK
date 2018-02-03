@@ -198,6 +198,8 @@ export default class GmailNavItemView {
 						'<div class="aio aip">',
 							'<span class="nU" role="link">',
 							'</span>',
+							'<span class="bsU">',
+							'</span>',
 						'</div>',
 
 					'</div>',
@@ -289,6 +291,7 @@ export default class GmailNavItemView {
 		}
 
 		this._updateAccessory(navItemDescriptor.accessory);
+		this._updateSubtitle(navItemDescriptor);
 		this._updateClickability(navItemDescriptor);
 		this._updateOrder(navItemDescriptor);
 	}
@@ -349,6 +352,12 @@ export default class GmailNavItemView {
 		else {
 			this._element.classList.remove('inboxsdk__navItem_nonClickable');
 		}
+	}
+
+	_updateSubtitle(navItemDescriptor: Object) {
+		if (!this._driver.isUsingMaterialUI() ||(navItemDescriptor.accessory && navItemDescriptor.accessory.type !== 'DROPDOWN_BUTTON')) return;
+
+		querySelector(this._element, '.bsU').innerHTML += autoHtml `${navItemDescriptor.subtitle || ''}`;
 	}
 
 	_updateAccessory(accessory: Object){
