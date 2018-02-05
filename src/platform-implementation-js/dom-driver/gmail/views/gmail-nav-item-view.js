@@ -489,22 +489,18 @@ export default class GmailNavItemView {
 
 		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
-		const self = this;
-
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
-			.takeWhile(function(){
-				return self._accessoryViewController === accessoryViewController;
-			})
-			.filter(function(domEvent){
-				if(domEvent.target === self._element){
+			.takeWhile(() => this._accessoryViewController === accessoryViewController)
+			.filter((domEvent) => {
+				if(domEvent.target === this._element){
 					return true;
 				}
 
 				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
-				return navItems[0] === self._element;
+				return navItems[0] === this._element;
 			})
-			.onValue(function(domEvent){
+			.onValue((domEvent) => {
 				domEvent.preventDefault();
 
 				accessoryViewController.showDropdown();
