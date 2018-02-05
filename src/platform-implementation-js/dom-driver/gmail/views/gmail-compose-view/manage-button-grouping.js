@@ -93,20 +93,38 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 	window.requestAnimationFrame(() => {
 		groupButtonsIfNeededMap.delete(gmailComposeView);
 
-		if(gmailComposeView.isDestroyed() || !_doButtonsNeedToGroup(gmailComposeView)) return;
+		if(gmailComposeView.isDestroyed()) return;
 
-		var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
-		var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView);
+		_narrowButtonsIfNeeded(gmailComposeView);
 
-		_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
-		_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
-		_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+		if(_doButtonsNeedToGroup(gmailComposeView)) {
+			var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(gmailComposeView);
+			var groupToggleButtonViewController = _createGroupToggleButtonViewController(gmailComposeView);
 
-		gmailComposeView.getStopper().onValue(function(){
-			(groupedActionToolbarContainer:any).remove();
-			groupToggleButtonViewController.destroy();
-		});
+			_swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
+			_checkAndSetInitialState(gmailComposeView, groupToggleButtonViewController);
+			_startMonitoringFormattingToolbar(gmailComposeView, groupToggleButtonViewController);
+
+			// remove narrow buttons class
+			gmailComposeView.getElement().classList.remove('inboxsdk__compose_narrow_buttons');
+
+			gmailComposeView.getStopper().onValue(function(){
+				(groupedActionToolbarContainer:any).remove();
+				groupToggleButtonViewController.destroy();
+			});
+		}
 	});
+}
+
+function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
+	if(
+		!_doButtonsNeedToGroup(gmailComposeView) ||
+		gmailComposeView.getElement().classList.contains(('inboxsdk__compose_narrow_buttons'))
+	) return;
+
+	gmailComposeView.getElement().classList.add('inboxsdk__compose_narrow_buttons');
+	//force reflow
+	gmailComposeView.getElement().offsetTop;
 }
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {

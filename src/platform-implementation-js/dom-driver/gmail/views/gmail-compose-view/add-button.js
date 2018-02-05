@@ -13,8 +13,6 @@ import type GmailComposeView from '../gmail-compose-view';
 
 export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Observable<?Object>, groupOrderHint: string, extraOnClickOptions: Object){
 	return new RSVP.Promise(function(resolve, reject){
-		gmailComposeView.getElement().classList.add('inboxsdk__sdk_compose_withButtons');
-
 		var buttonViewController;
 
 		buttonDescriptorStream
