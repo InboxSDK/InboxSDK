@@ -12,6 +12,7 @@ import eventNameFilter from '../../../lib/event-name-filter';
 import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
 
 import ButtonView from '../widgets/buttons/button-view';
+import ArrowDropdownButtonView from '../widgets/buttons/arrow-dropdown-button-view';
 import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
@@ -463,18 +464,12 @@ export default class GmailNavItemView {
 		if (!this._driver.isUsingMaterialUI()) this._createSettingsButtonAccessory(accessoryDescriptor);
 
 		const buttonOptions = {...accessoryDescriptor};
-		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
+		buttonOptions.buttonView  = new ArrowDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
 		buttonOptions.dropdownPositionOptions = {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
 		};
-		buttonOptions.dropdownShowFunction = ({dropdown}) => {
-			if (this._driver.isUsingMaterialUI()) {
-				dropdown.el.style.marginLeft = '16px';
-			}
-
-			buttonOptions.onClick({dropdown});
-		};
+		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 
 		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
 		this._accessoryViewController = accessoryViewController;
@@ -488,11 +483,9 @@ export default class GmailNavItemView {
 			innerElement.classList.remove('inboxsdk__navItem_hover');
 		});
 
-		const insertionPoint = this._driver.isUsingMaterialUI() ?
-			querySelector(this._element, '.TN') :
-			querySelector(this._element, '.aio');
+		const insertionPoint = querySelector(this._element, '.TN');
 
-		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
+		insertionPoint.insertBefore(buttonOptions.buttonView.getElement(), insertionPoint.firstElementChild);
 
 		Kefir
 			.fromEvents(this._element, 'contextmenu')

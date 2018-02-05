@@ -1181,6 +1181,27 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM {
   visibility: visible;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .afM {
+  cursor: pointer;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .afM {
+  display: block;
+  visibility: visible;
+}
+
+/* This does slightly break from the native Gmail behavior, but we keep the dropdown button
+  visible while it has an active dropdown */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO img.afM.afO {
+  display: block;
+  visibility: visible;
+}
+
+/* Keep the subtitle hidden while the dropdown is active */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO img.afM.afO ~ .aio > .bsU {
+  display: none;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .bsU {
   display: none;
 }
