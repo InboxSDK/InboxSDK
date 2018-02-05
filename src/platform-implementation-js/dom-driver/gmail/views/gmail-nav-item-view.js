@@ -388,6 +388,9 @@ export default class GmailNavItemView {
 			case 'DROPDOWN_BUTTON':
 				this._createDropdownButtonAccessory(accessoryDescriptor);
 			break;
+			case 'SETTINGS_BUTTON':
+				this._createSettingsButtonAccessory(accessoryDescriptor);
+			break;
 		}
 
 		this._accessoryCreated = true;
@@ -457,6 +460,59 @@ export default class GmailNavItemView {
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
+		if (!this._driver.isUsingMaterialUI()) this._createSettingsButtonAccessory(accessoryDescriptor);
+
+		const buttonOptions = {...accessoryDescriptor};
+		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
+		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
+		buttonOptions.dropdownPositionOptions = {
+			position: 'bottom', hAlign: 'left', vAlign: 'top'
+		};
+		buttonOptions.dropdownShowFunction = ({dropdown}) => {
+			if (this._driver.isUsingMaterialUI()) {
+				dropdown.el.style.marginLeft = '16px';
+			}
+
+			buttonOptions.onClick({dropdown});
+		};
+
+		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
+		this._accessoryViewController = accessoryViewController;
+
+		const innerElement = querySelector(this._element, '.TO');
+		innerElement.addEventListener('mouseenter', function(){
+			innerElement.classList.add('inboxsdk__navItem_hover');
+		});
+
+		innerElement.addEventListener('mouseleave', function(){
+			innerElement.classList.remove('inboxsdk__navItem_hover');
+		});
+
+		const insertionPoint = this._driver.isUsingMaterialUI() ?
+			querySelector(this._element, '.TN') :
+			querySelector(this._element, '.aio');
+
+		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
+
+		Kefir
+			.fromEvents(this._element, 'contextmenu')
+			.takeWhile(() => this._accessoryViewController === accessoryViewController)
+			.filter((domEvent) => {
+				if(domEvent.target === this._element){
+					return true;
+				}
+
+				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
+				return navItems[0] === this._element;
+			})
+			.onValue((domEvent) => {
+				domEvent.preventDefault();
+
+				accessoryViewController.showDropdown();
+			});
+	}
+
+	_createSettingsButtonAccessory(accessoryDescriptor: Object){
 		const buttonOptions = {...accessoryDescriptor};
 		buttonOptions.buttonView  = new LabelDropdownButtonView(buttonOptions);
 		buttonOptions.dropdownViewDriverClass = GmailDropdownView;
