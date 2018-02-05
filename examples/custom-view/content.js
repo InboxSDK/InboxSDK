@@ -48,7 +48,15 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   sdk.NavMenu.addNavItem({
     name: 'beep',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-    routeID: 'beep'
+    routeID: 'beep',
+    subtitle: '123',
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'red',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
   });
 
   sdk.Router.handleCustomRoute('beep', function(customRouteView) {
@@ -88,8 +96,9 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   var monkey = lion.addNavItem({
     name: 'Saved View',
     iconUrl: chrome.runtime.getURL('monkey.png'),
+    subtitle: '456',
     accessory: {
-      type: 'DROPDOWN_BUTTON',
+      type: 'SETTINGS_BUTTON',
       onClick: function(event) {
         event.dropdown.el.innerHTML = 'Hello world!';
       }
@@ -99,8 +108,10 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   sdk.NavMenu.addNavItem({
     name: 'Saved View 2',
     orderHint: -1,
+    subtitle: '789',
     accessory: {
       type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'red',
       onClick: function(event) {
         event.dropdown.el.innerHTML = 'Hello world!';
       }
