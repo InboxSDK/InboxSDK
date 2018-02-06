@@ -437,7 +437,7 @@ export default class GmailNavItemView {
 
 		anchor.href = '#';
 
-		anchor.addEventListener('click', function(e: MouseEvent){
+		anchor.addEventListener('click', (e: MouseEvent) => {
 			e.stopPropagation();
 			e.preventDefault();
 
@@ -476,13 +476,8 @@ export default class GmailNavItemView {
 		this._accessoryViewController = accessoryViewController;
 
 		const innerElement = querySelector(this._element, '.TO');
-		innerElement.addEventListener('mouseenter', function(){
-			innerElement.classList.add('inboxsdk__navItem_hover');
-		});
-
-		innerElement.addEventListener('mouseleave', function(){
-			innerElement.classList.remove('inboxsdk__navItem_hover');
-		});
+		innerElement.addEventListener('mouseenter', () => innerElement.classList.add('inboxsdk__navItem_hover'));
+		innerElement.addEventListener('mouseleave', () => innerElement.classList.remove('inboxsdk__navItem_hover'));
 
 		const insertionPoint = querySelector(this._element, '.TN');
 
@@ -517,13 +512,8 @@ export default class GmailNavItemView {
 		this._accessoryViewController = accessoryViewController;
 
 		const innerElement = querySelector(this._element, '.TO');
-		innerElement.addEventListener('mouseenter', function(){
-			innerElement.classList.add('inboxsdk__navItem_hover');
-		});
-
-		innerElement.addEventListener('mouseleave', function(){
-			innerElement.classList.remove('inboxsdk__navItem_hover');
-		});
+		innerElement.addEventListener('mouseenter', () => innerElement.classList.add('inboxsdk__navItem_hover'));
+		innerElement.addEventListener('mouseleave', () => innerElement.classList.remove('inboxsdk__navItem_hover'));
 
 		const insertionPoint = this._driver.isUsingMaterialUI() ?
 			querySelector(this._element, '.TN') :
@@ -595,9 +585,8 @@ export default class GmailNavItemView {
 		expandoElement.setAttribute('role', 'link');
 		expandoElement.title = `Expand ${this._name || ''}`;
 
-		var self = this;
-		expandoElement.addEventListener('click', function(e: MouseEvent){
-			self._toggleCollapse();
+		expandoElement.addEventListener('click', (e: MouseEvent) => {
+			this._toggleCollapse();
 			e.stopPropagation();
 		});
 
