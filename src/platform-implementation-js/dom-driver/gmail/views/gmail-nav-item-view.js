@@ -199,6 +199,7 @@ export default class GmailNavItemView {
 						'<div class="aio aip">',
 							'<span class="nU" role="link">',
 							'</span>',
+							// This bsU element is the container "subtitle" text.
 							'<span class="bsU">',
 							'</span>',
 						'</div>',
