@@ -122,16 +122,24 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__sdk_compose_withButtons .wG:not(:firs
   margin-left: 15px;
 }
 
+/* send button */
 .T-I.inboxsdk__button.inboxsdk__compose_sendButton {
-  min-width: 0px;
+  margin-left: -6px;
+  min-width: 27px;
   margin-right: 0px;
-  margin-left: 0px;
   padding:0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .T-I.inboxsdk__button.inboxsdk__compose_sendButton {
-  margin-left: -6px;
-  min-width: 27px;
+  .inboxsdk__button.inboxsdk__compose_sendButton .inboxsdk__button_iconImg {
+    height: 17px;
+    width: 17px;
+    padding: 2px;
+  }
+
+body.inboxsdk__gmailv1css .T-I.inboxsdk__button.inboxsdk__compose_sendButton {
+  min-width: 0px;
+  margin-left: 0px;
+  margin-top: 6px;
 }
 
   .T-I.inboxsdk__button.inboxsdk__compose_sendButton > div {
