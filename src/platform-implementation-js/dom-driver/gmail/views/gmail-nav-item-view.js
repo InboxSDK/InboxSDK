@@ -105,7 +105,7 @@ export default class GmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number | string, navItemDescriptor: Object): GmailNavItemView {
-		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
+		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
 
 		gmailNavItemView
 			.getEventStream()
@@ -309,7 +309,7 @@ export default class GmailNavItemView {
 		}
 
 
-		var nameElement = this._element.querySelector('.inboxsdk__navItem_name');
+		const nameElement = this._element.querySelector('.inboxsdk__navItem_name');
 
 		switch(type){
 			case NAV_ITEM_TYPES.NAVIGATION:
@@ -549,12 +549,12 @@ export default class GmailNavItemView {
 	}
 
 	_addNavItemElement(gmailNavItemView: GmailNavItemView){
-		var itemContainerElement = this._getItemContainerElement();
+		const itemContainerElement = this._getItemContainerElement();
 
-		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
+		const insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
-		var element = gmailNavItemView.getElement();
+		const element = gmailNavItemView.getElement();
 		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * this._level) + 'px';
 
 		this._setHeights();
