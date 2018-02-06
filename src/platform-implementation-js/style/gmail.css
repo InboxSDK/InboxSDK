@@ -1168,6 +1168,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
   font-size: 14px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .bsU:empty {
+  display: none;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj[style*="border-color"]:empty::after {
   content: '';
   border: 8px solid;
