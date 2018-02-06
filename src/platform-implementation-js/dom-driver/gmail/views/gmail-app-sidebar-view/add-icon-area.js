@@ -15,7 +15,7 @@ As of Dec 2nd, 2017.
 
 
 div.bvq can be display none sometimes, we don't ever want that to happen
-so in css we force div.bvq to be visible (on line 936 on gmail.css)
+so in css we force div.bvq to be visible (search for "div.bvq" in gmail.css)
 
 There are 3 states that the native icon area can be in:
 1. first time you go to a thread in that session, or the user has no add-ons
@@ -84,7 +84,7 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   // if the addon loading div is visible then we create a clone of it and put the clone in a
   // better place that works with our icons better. the native addon loading div is hidden with css
   // but the style attribute still gets modified by gmail so we know when the loading should go away
-  if(loadingHolder.style.display !== 'none') {
+  if(loadingHolder.style.display !== 'none' && (nativeIconArea: any).style.display !== 'none') {
     const loadingClone = document.createElement('div');
     loadingClone.innerHTML = loadingHolder.innerHTML;
     loadingClone.classList.add('inboxsdk__addon_icon_loading');
