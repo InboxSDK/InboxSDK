@@ -44,8 +44,6 @@ export default class GmailNavItemView {
 	_orderHint: any;
 	_type: ?string = null;
 	_name: string = '';
-	_iconUrl: ?string = null;
-	_iconClass: ?string = null;
 	_accessory: ?Object = null;
 	_accessoryCreated: boolean = false;
 	_accessoryViewController: ?Object = null;
