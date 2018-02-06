@@ -491,14 +491,6 @@ export default class GmailNavItemView {
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
 			.takeWhile(() => this._accessoryViewController === accessoryViewController)
-			.filter((domEvent) => {
-				if(domEvent.target === this._element){
-					return true;
-				}
-
-				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
-				return navItems[0] === this._element;
-			})
 			.onValue((domEvent) => {
 				domEvent.preventDefault();
 
@@ -542,14 +534,6 @@ export default class GmailNavItemView {
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
 			.takeWhile(() => this._accessoryViewController === accessoryViewController)
-			.filter((domEvent) => {
-				if(domEvent.target === this._element){
-					return true;
-				}
-
-				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
-				return navItems[0] === this._element;
-			})
 			.onValue((domEvent) => {
 				domEvent.preventDefault();
 
