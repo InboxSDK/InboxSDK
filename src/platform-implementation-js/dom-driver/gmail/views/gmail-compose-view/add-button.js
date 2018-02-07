@@ -132,11 +132,11 @@ function _processButtonDescriptor(buttonDescriptor: ?Object, extraOnClickOptions
 		oldOnClick({...extraOnClickOptions, ...event});
 	};
 
-	if(buttonDescriptor.hasDropdown){
-		buttonOptions.dropdownShowFunction = buttonDescriptor.onClick;
+	if(buttonOptions.hasDropdown){
+		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 	}
 	else{
-		buttonOptions.activateFunction = buttonDescriptor.onClick;
+		buttonOptions.activateFunction = buttonOptions.onClick;
 	}
 
 	buttonOptions.noArrow = true;
