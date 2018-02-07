@@ -460,7 +460,10 @@ export default class GmailNavItemView {
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
-		if (!this._driver.isUsingMaterialUI()) this._createSettingsButtonAccessory(accessoryDescriptor);
+		if (!this._driver.isUsingMaterialUI()) {
+			this._createSettingsButtonAccessory(accessoryDescriptor);
+			return;
+		}
 
 		const buttonOptions = {...accessoryDescriptor};
 		buttonOptions.buttonView  = new ArrowDropdownButtonView(buttonOptions);
