@@ -481,24 +481,7 @@ export default class GmailNavItemView {
 
 		insertionPoint.insertBefore(buttonOptions.buttonView.getElement(), insertionPoint.firstElementChild);
 
-		Kefir
-			.fromEvents(this._element, 'contextmenu')
-			.takeWhile(() => this._accessoryViewController === accessoryViewController)
-			.filter((domEvent) => {
-				// Because nested nav-items are children of their parent nav-items, we need this filter to
-				// make sure that the contextmenu click was on this nav-item and not on a child nav-item.
-				if(domEvent.target === this._element){
-					return true;
-				}
-
-				const navItems = Array.prototype.filter.call(domEvent.path || [], el => el.classList && el.classList.contains('inboxsdk__navItem'));
-				return navItems[0] === this._element;
-			})
-			.onValue((domEvent) => {
-				domEvent.preventDefault();
-
-				accessoryViewController.showDropdown();
-			});
+		this._setupContextClickHandler(accessoryViewController);
 	}
 
 	_createSettingsButtonAccessory(accessoryDescriptor: Object){
@@ -529,10 +512,16 @@ export default class GmailNavItemView {
 
 		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
+		this._setupContextClickHandler(accessoryViewController);
+	}
+
+	_setupContextClickHandler(accessoryViewController: Object) {
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
 			.takeWhile(() => this._accessoryViewController === accessoryViewController)
 			.filter((domEvent) => {
+				// Because nested nav-items are children of their parent nav-items, we need this filter to
+				// make sure that the contextmenu click was on this nav-item and not on a child nav-item.
 				if(domEvent.target === this._element){
 					return true;
 				}
