@@ -30,7 +30,7 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 					}
 				}
 				else{
-					buttonViewController.getView().update(buttonOptions);
+					buttonViewController.update(buttonOptions);
 				}
 			})
 			.onEnd(() => {

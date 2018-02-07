@@ -36,11 +36,16 @@ export default class BasicButtonViewController {
 		this._stopper.destroy();
 	}
 
+	update(options: ?Object) {
+		this.getView().update(options);
+		this.setActivateFunction(options && (options.activateFunction || options.onClick));
+	}
+
 	getView(): Object {
 		return this._view;
 	}
 
-	setActivateFunction(f: (event: Object)=>void) {
+	setActivateFunction(f: ?(event: Object)=>void) {
 		this._activateFunction = f;
 	}
 
