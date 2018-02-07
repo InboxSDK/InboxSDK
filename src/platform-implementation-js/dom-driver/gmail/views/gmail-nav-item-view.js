@@ -267,29 +267,7 @@ export default class GmailNavItemView {
 		this._updateType(navItemDescriptor.type);
 		this._updateName(navItemDescriptor.name);
 
-		const iconContainerElement = this._driver.isUsingMaterialUI() ?
-			querySelector(this._element, '.qj') :
-			querySelector(this._element, '.aio');
-
-		updateIcon(
-			this._iconSettings,
-			iconContainerElement,
-			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
-			navItemDescriptor.iconClass,
-			navItemDescriptor.iconUrl
-		);
-
-		// Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
-		// css rule that will render a circle of border-color if the icon container element has no
-		// children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
-		if (this._driver.isUsingMaterialUI() && (
-				navItemDescriptor.backgroundColor ||
-				(navItemDescriptor.accessory && navItemDescriptor.accessory.buttonBackgroundColor)
-			)) {
-			const circleColor = navItemDescriptor.backgroundColor || navItemDescriptor.accessory.buttonBackgroundColor;
-			iconContainerElement.style.borderColor = circleColor;
-		}
-
+		this._updateIcon(navItemDescriptor);
 		this._updateAccessory(navItemDescriptor.accessory);
 		this._updateSubtitle(navItemDescriptor);
 		this._updateClickability(navItemDescriptor);
@@ -338,6 +316,31 @@ export default class GmailNavItemView {
 			this._expandoElement.title = `Expand ${name}`;
 		}
 		this._name = name;
+	}
+
+	_updateIcon(navItemDescriptor: Object) {
+		const iconContainerElement = this._driver.isUsingMaterialUI() ?
+			querySelector(this._element, '.qj') :
+			querySelector(this._element, '.aio');
+
+		updateIcon(
+			this._iconSettings,
+			iconContainerElement,
+			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
+			navItemDescriptor.iconClass,
+			navItemDescriptor.iconUrl
+		);
+
+		// Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
+		// css rule that will render a circle of border-color if the icon container element has no
+		// children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
+		if (this._driver.isUsingMaterialUI() && (
+				navItemDescriptor.backgroundColor ||
+				(navItemDescriptor.accessory && navItemDescriptor.accessory.buttonBackgroundColor)
+			)) {
+			const circleColor = navItemDescriptor.backgroundColor || navItemDescriptor.accessory.buttonBackgroundColor;
+			iconContainerElement.style.borderColor = circleColor;
+		}
 	}
 
 	_updateClickability(navItemDescriptor: Object) {
