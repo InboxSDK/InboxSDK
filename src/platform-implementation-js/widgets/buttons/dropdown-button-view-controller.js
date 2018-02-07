@@ -44,6 +44,11 @@ class DropdownButtonViewController {
 		this._stopper.destroy();
 	}
 
+	update(options: ?Object) {
+		this.getView().update(options);
+		this.setDropdownShowFunction(options && options.dropdownShowFunction);
+	}
+
 	getView(): ButtonView {
 		if (!this._view) throw new Error("Already destroyed");
 		return this._view;

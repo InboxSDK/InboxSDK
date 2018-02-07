@@ -1,6 +1,6 @@
-InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inboxSDK) {
-	'use strict';
+'use strict';
 
+InboxSDK.load(2, 'compose-stream-example').then(inboxSDK => {
 	window._sdk = inboxSDK;
 
 	const fileInput = document.createElement('input');
@@ -21,30 +21,32 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 
 		window._lastComposeView = composeView;
 
-		var monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
-		var monkeyIndex = 0;
+		const monkeyImages = [chrome.runtime.getURL('monkey.png'), chrome.runtime.getURL('monkey-face.jpg')];
+		let monkeyIndex = 0;
 
-		composeView.addButton(Bacon.fromBinder(function(sinkFunction){
+		composeView.addButton(Bacon.fromBinder(sinkFunction => {
 
-			var buttonOptions = {
+			let buttonOptions = {
 				title: 'Monkeys!',
 				iconUrl: monkeyImages[monkeyIndex],
-				onClick: function(event){
+				onClick(event) {
 					monkeyIndex++;
-					buttonOptions.iconUrl = monkeyImages[monkeyIndex%2];
-					buttonOptions.iconClass = monkeyIndex%2 ? 'special_style' : '';
+					buttonOptions = {
+						...buttonOptions,
+						iconUrl: monkeyImages[monkeyIndex%2],
+						iconClass: monkeyIndex%2 ? 'special_style' : '',
+					};
 
 					if (monkeyIndex >= 2) {
 						sinkFunction(null);
-						setTimeout(function() {
+						setTimeout(() => {
 							sinkFunction(buttonOptions);
 						}, 2000);
 					} else {
 						sinkFunction(buttonOptions);
 					}
 
-
-					var element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
+					const element = event.composeView.insertHTMLIntoBodyAtCursor('<b>monkey face</b>');
 					element.textContent = 'monkey time';
 				},
 				section: 'TRAY_LEFT'
@@ -53,7 +55,6 @@ InboxSDK.load(1, 'compose-stream-example', {inboxBeta: true}).then(function(inbo
 			sinkFunction(buttonOptions);
 
 			return function(){};
-
 		}));
 
 		composeView.addButton(Bacon.fromBinder(function(sink){
