@@ -460,7 +460,10 @@ export default class GmailNavItemView {
 	}
 
 	_createDropdownButtonAccessory(accessoryDescriptor: Object){
-		if (!this._driver.isUsingMaterialUI()) this._createSettingsButtonAccessory(accessoryDescriptor);
+		if (!this._driver.isUsingMaterialUI()) {
+			this._createSettingsButtonAccessory(accessoryDescriptor);
+			return;
+		}
 
 		const buttonOptions = {...accessoryDescriptor};
 		buttonOptions.buttonView  = new ArrowDropdownButtonView(buttonOptions);
@@ -481,14 +484,7 @@ export default class GmailNavItemView {
 
 		insertionPoint.insertBefore(buttonOptions.buttonView.getElement(), insertionPoint.firstElementChild);
 
-		Kefir
-			.fromEvents(this._element, 'contextmenu')
-			.takeWhile(() => this._accessoryViewController === accessoryViewController)
-			.onValue((domEvent) => {
-				domEvent.preventDefault();
-
-				accessoryViewController.showDropdown();
-			});
+		this._setupContextClickHandler(accessoryViewController);
 	}
 
 	_createSettingsButtonAccessory(accessoryDescriptor: Object){
@@ -519,10 +515,15 @@ export default class GmailNavItemView {
 
 		insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
+		this._setupContextClickHandler(accessoryViewController);
+	}
+
+	_setupContextClickHandler(accessoryViewController: Object) {
 		Kefir
 			.fromEvents(this._element, 'contextmenu')
 			.takeWhile(() => this._accessoryViewController === accessoryViewController)
 			.onValue((domEvent) => {
+				domEvent.stopPropagation();
 				domEvent.preventDefault();
 
 				accessoryViewController.showDropdown();
