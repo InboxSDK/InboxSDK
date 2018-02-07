@@ -485,6 +485,8 @@ export default class GmailNavItemView {
 			.fromEvents(this._element, 'contextmenu')
 			.takeWhile(() => this._accessoryViewController === accessoryViewController)
 			.filter((domEvent) => {
+				// Because nested nav-items are children of their parent nav-items, we need this filter to
+				// make sure that the contextmenu click was on this nav-item and not on a child nav-item.
 				if(domEvent.target === this._element){
 					return true;
 				}
