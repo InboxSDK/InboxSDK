@@ -358,7 +358,12 @@ export default class GmailNavItemView {
 	}
 
 	_updateSubtitle(navItemDescriptor: Object) {
-		if (!this._driver.isUsingMaterialUI() ||(navItemDescriptor.accessory && navItemDescriptor.accessory.type !== 'DROPDOWN_BUTTON')) return;
+		if (
+			!this._driver.isUsingMaterialUI() ||
+			(navItemDescriptor.accessory && !['SETTINGS_BUTTON', 'DROPDOWN_BUTTON'].includes(navItemDescriptor.accessory.type))
+			) {
+			return;
+		}
 
 		querySelector(this._element, '.bsU').innerHTML += autoHtml `${navItemDescriptor.subtitle || ''}`;
 	}
