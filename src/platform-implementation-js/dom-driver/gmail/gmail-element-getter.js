@@ -113,6 +113,14 @@ const GmailElementGetter = {
 		return document.querySelector('.no > .nn.bnl');
 	},
 
+	getCompanionSidebarContentContainerElement(): ?HTMLElement {
+		return document.querySelector('.brC-brG-btc');
+	},
+
+	getCompanionSidebarIconContainerElement(): ?HTMLElement {
+		return document.querySelector('.brC-aT5-aOt-Jw');
+	},
+
 	getMainContentBodyContainerElement(): ?HTMLElement {
 		return document.querySelector('.no > .nn.bkK');
 	},

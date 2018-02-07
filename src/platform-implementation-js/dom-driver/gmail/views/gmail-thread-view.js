@@ -112,6 +112,7 @@ class GmailThreadView {
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>){
 		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
 		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+		const companionSidebarContentContainerElement = GmailElementGetter.getCompanionSidebarContentContainerElement();
 		if (!sidebarElement && !addonSidebarElement) {
 			console.warn('This view does not have a sidebar'); //eslint-disable-line no-console
 			return;
@@ -122,7 +123,7 @@ class GmailThreadView {
 			if(addonSidebarElement){
 				widthManager = this._setupWidthManager();
 			}
-			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement, widthManager);
+			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement, companionSidebarContentContainerElement, widthManager);
 			sidebar.getStopper().onValue(() => {
 				if (this._sidebar === sidebar) {
 					this._sidebar = null;
