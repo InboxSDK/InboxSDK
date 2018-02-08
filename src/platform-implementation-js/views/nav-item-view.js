@@ -7,6 +7,8 @@ import RSVP from 'rsvp';
 import get from '../../common/get-or-fail';
 import EventEmitter from '../lib/safe-event-emitter';
 
+import NAV_ITEM_TYPES from '../constants/nav-item-types';
+
 import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = new WeakMap();
@@ -131,6 +133,9 @@ export default class NavItemView extends EventEmitter {
 function _handleViewDriverStreamEvent(eventEmitter, navItemViewDriver, driver, [navItemDescriptor, event]){
 	switch(event.eventName){
 		case 'click':
+
+			// When in Gmailv2, we ignore the onClick, routeID, and routeParams options on GROUPER nav-items
+			if (navItemDescriptor.type === NAV_ITEM_TYPES.GROUPER && (driver: any).isUsingMaterialUI()) return;
 
 			if (typeof navItemDescriptor.onClick === 'function') {
 				let defaultPrevented = false;

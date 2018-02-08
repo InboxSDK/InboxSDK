@@ -1234,6 +1234,25 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
   font-size: 14px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO.n4 {
+  display: block;
+  padding-left: 0;
+}
+
+/* The qj class has "margin-right: 24px" by default, but we tweak that here so icons
+ properly align with the Gmail label icons, which have 3px of of margin-left in the
+ element inside their qj container. The one exception to this is for GROUPER type
+ nav-items (which have the "n4" class) where we use Gmail css for the icon.
+ */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:not(.n4) .qj {
+  margin-left: 3px;
+  margin-right: 21px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO.n4 .qj > .G-asx {
+  margin-right: 0;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .bsU:empty {
   display: none;
 }
@@ -1531,6 +1550,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSect
 .inboxsdk__thread_row_label {
   flex-shrink: 0;
   align-self: center;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_label {
+  align-self: flex-end;
 }
 
 .inboxsdk__resultsSection_label_icon {

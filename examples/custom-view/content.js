@@ -119,6 +119,61 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   });
 
   lion.addNavItem({
-    name: 'Lion item'
+    name: 'Lion item',
+    onClick: () => {
+      console.log('LION ITEM WAS CLICKED');
+    }
+  });
+
+  var grouperNavItem = navItem.addNavItem({
+    name: 'GROUPER Monkeys',
+    subtitle: 'grouper',
+    type: sdk.NavMenu.NavItemTypes.GROUPER,
+    // All the following options should be ignored in Gmailv2
+    iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+    routeID: 'example/:monkeyName',
+    routeParams: 'george {} {} {}',
+    onClick: () => {
+      console.log('GROUPER ITEM WAS CLICKED');
+    },
+    accessory: {
+      type: 'CREATE',
+      onClick: function() {
+        log('create monkeys');
+      }
+    }
+  });
+
+  grouperNavItem.addNavItem({
+    name: 'Saved View 3',
+    subtitle: 'test',
+    onClick: () => {
+      console.log('SV2 CLICKED');
+    },
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
+
+  const grouperSub = grouperNavItem.addNavItem({
+    name: 'Saved View 4',
+    iconUrl: chrome.runtime.getURL('monkey.png'),
+    subtitle: '456',
+    accessory: {
+      type: 'SETTINGS_BUTTON',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
+
+  grouperSub.addNavItem({
+    name: 'Lion item',
+    onClick: () => {
+      console.log('LION ITEM WAS CLICKED');
+    }
   });
 });

@@ -103,7 +103,8 @@ export default class GmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number | string, navItemDescriptor: Object): GmailNavItemView {
-		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
+		const nestedNavItemLevel = (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) ? this._level : (this._level + 1);
+		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, nestedNavItemLevel);
 
 		gmailNavItemView
 			.getEventStream()
@@ -188,10 +189,7 @@ export default class GmailNavItemView {
 
 						// This element needs a style attribute defined on it as there is a Gmail css rule of
 						// selecting for "gj[style]" the sets the opacity to 1 rather than 0.6.
-						// The qj class has "margin-right: 24px" by default, but we tweak that here so icons
-						// properly align with the Gmail label icons, which have 3px of of margin-left in the
-						// element inside their qj container.
-						'<div class="qj" style="margin-left: 3px; margin-right: 21px;">',
+						'<div class="qj" style="">',
 						'</div>',
 
 						'<div class="aio aip">',
@@ -266,34 +264,17 @@ export default class GmailNavItemView {
 
 		this._updateType(navItemDescriptor.type);
 		this._updateName(navItemDescriptor.name);
+		this._updateSubtitle(navItemDescriptor);
+		this._updateOrder(navItemDescriptor);
 
-		const iconContainerElement = this._driver.isUsingMaterialUI() ?
-			querySelector(this._element, '.qj') :
-			querySelector(this._element, '.aio');
-
-		updateIcon(
-			this._iconSettings,
-			iconContainerElement,
-			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
-			navItemDescriptor.iconClass,
-			navItemDescriptor.iconUrl
-		);
-
-		// Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
-		// css rule that will render a circle of border-color if the icon container element has no
-		// children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
-		if (this._driver.isUsingMaterialUI() && (
-				navItemDescriptor.backgroundColor ||
-				(navItemDescriptor.accessory && navItemDescriptor.accessory.buttonBackgroundColor)
-			)) {
-			const circleColor = navItemDescriptor.backgroundColor || navItemDescriptor.accessory.buttonBackgroundColor;
-			iconContainerElement.style.borderColor = circleColor;
+		if (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) {
+			this._setupGrouper(navItemDescriptor);
+			return;
 		}
 
+		this._updateIcon(navItemDescriptor);
 		this._updateAccessory(navItemDescriptor.accessory);
-		this._updateSubtitle(navItemDescriptor);
 		this._updateClickability(navItemDescriptor);
-		this._updateOrder(navItemDescriptor);
 	}
 
 	_updateType(type: string){
@@ -310,6 +291,7 @@ export default class GmailNavItemView {
 		const nameElement = this._element.querySelector('.inboxsdk__navItem_name');
 
 		switch(type){
+			case NAV_ITEM_TYPES.GROUPER:
 			case NAV_ITEM_TYPES.NAVIGATION:
 				if(!nameElement || nameElement.tagName !== 'SPAN'){
 					querySelector(this._element, '.nU').innerHTML += autoHtml `<span class="inboxsdk__navItem_name">${this._name}</span>`;
@@ -340,6 +322,31 @@ export default class GmailNavItemView {
 		this._name = name;
 	}
 
+	_updateIcon(navItemDescriptor: Object) {
+		const iconContainerElement = this._driver.isUsingMaterialUI() ?
+			querySelector(this._element, '.qj') :
+			querySelector(this._element, '.aio');
+
+		updateIcon(
+			this._iconSettings,
+			iconContainerElement,
+			navItemDescriptor.iconPosition !== 'BEFORE_NAME',
+			navItemDescriptor.iconClass,
+			navItemDescriptor.iconUrl
+		);
+
+		// Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
+		// css rule that will render a circle of border-color if the icon container element has no
+		// children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
+		if (this._driver.isUsingMaterialUI() && (
+				navItemDescriptor.backgroundColor ||
+				(navItemDescriptor.accessory && navItemDescriptor.accessory.buttonBackgroundColor)
+			)) {
+			const circleColor = navItemDescriptor.backgroundColor || navItemDescriptor.accessory.buttonBackgroundColor;
+			iconContainerElement.style.borderColor = circleColor;
+		}
+	}
+
 	_updateClickability(navItemDescriptor: Object) {
 		if (!this._driver.isUsingMaterialUI()) return;
 
@@ -355,7 +362,14 @@ export default class GmailNavItemView {
 	}
 
 	_updateSubtitle(navItemDescriptor: Object) {
-		if (!this._driver.isUsingMaterialUI() ||(navItemDescriptor.accessory && navItemDescriptor.accessory.type !== 'DROPDOWN_BUTTON')) return;
+		if (
+			!this._driver.isUsingMaterialUI() || (
+				navItemDescriptor.accessory &&
+				!['SETTINGS_BUTTON', 'DROPDOWN_BUTTON'].includes(navItemDescriptor.accessory.type) &&
+				navItemDescriptor.type !== NAV_ITEM_TYPES.GROUPER
+			)) {
+			return;
+		}
 
 		querySelector(this._element, '.bsU').innerHTML += autoHtml `${navItemDescriptor.subtitle || ''}`;
 	}
@@ -547,14 +561,36 @@ export default class GmailNavItemView {
 		this._orderHint = navItemDescriptor.orderHint;
 	}
 
+	_setupGrouper(navItemDescriptor: Object) {
+		const navItemElement = this._element.firstElementChild;
+		if (navItemElement) {
+			navItemElement.classList.add('n4');
+
+			navItemElement.addEventListener('click', (e: MouseEvent) => {
+				e.stopPropagation();
+				this._toggleCollapse();
+			});
+		}
+
+		const iconContainerElement = querySelector(this._element, '.qj');
+		iconContainerElement.innerHTML = '<div class="G-asx T-I-J3 J-J5-Ji">&nbsp;</div>';
+	}
+
 	_addNavItemElement(gmailNavItemView: GmailNavItemView){
 		const itemContainerElement = this._getItemContainerElement();
 
 		const insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
+		// If the current nav-item is of type GROUPER and we are in Gmailv2, then any nested nav-items
+		// should be at the same indentation as the current nav-item. Somewhat confusingly, this._level
+		// is normally the indentationFactor for the nested children of the current nav-item, so we
+		// actually use this._level - 1 as the indentationFactor if we don't want to further indent the
+		// nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
+		const indentationFactor = (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) ? (this._level - 1) : this._level;
+
 		const element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * this._level) + 'px';
+		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * indentationFactor) + 'px';
 
 		this._setHeights();
 	}
@@ -578,6 +614,8 @@ export default class GmailNavItemView {
 	}
 
 	_createExpando(){
+		if (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) return;
+
 		const expandoElement = this._expandoElement = document.createElement('div');
 
 		expandoElement.setAttribute('class', 'TH aih J-J5-Ji inboxsdk__expando');
@@ -604,7 +642,7 @@ export default class GmailNavItemView {
 	}
 
 	_toggleCollapse(){
-		if(!this._expandoElement){
+		if(!this._expandoElement && !(this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI())){
 			this._isCollapsed = !this._isCollapsed;
 			return;
 		}
@@ -618,8 +656,15 @@ export default class GmailNavItemView {
 	}
 
 	_collapse(){
-		if(this._expandoElement) this._expandoElement.classList.remove('aih');
-		if(this._expandoElement) this._expandoElement.classList.add('aii');
+		const expandoElement = this._expandoElement;
+		if(expandoElement) {
+			expandoElement.classList.remove('aih');
+			expandoElement.classList.add('aii');
+		}
+		else if (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) {
+			const navItemElement = this._element.firstElementChild;
+			if (navItemElement) navItemElement.classList.remove('air');
+		}
 
 		if(this._itemContainerElement) this._itemContainerElement.style.display = 'none';
 
@@ -638,7 +683,10 @@ export default class GmailNavItemView {
 			expandoElement.classList.add('aih');
 			expandoElement.classList.remove('aii');
 		}
-
+		else if (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) {
+			const navItemElement = this._element.firstElementChild;
+			if (navItemElement) navItemElement.classList.add('air');
+		}
 
 		if(this._itemContainerElement) this._itemContainerElement.style.display = '';
 
