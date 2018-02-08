@@ -218,7 +218,7 @@ export default class NativeGmailNavItemView {
 			if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
 		}
 		else {
-			const insertionPoint = this._element.querySelector('.aip');
+			const insertionPoint = this._element.querySelector('.nU');
 			if(insertionPoint) (insertionPoint: any).insertAdjacentElement('beforebegin', expandoElement);
 		}
 
