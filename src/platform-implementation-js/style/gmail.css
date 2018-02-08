@@ -1552,6 +1552,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSect
   align-self: center;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_label {
+  align-self: flex-end;
+}
+
 .inboxsdk__resultsSection_label_icon {
   height: 11px;
   width: 11px;
