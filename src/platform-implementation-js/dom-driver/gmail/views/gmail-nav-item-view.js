@@ -103,7 +103,8 @@ export default class GmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number | string, navItemDescriptor: Object): GmailNavItemView {
-		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, this._level + 1);
+		const nestedNavItemLevel = (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) ? this._level : (this._level + 1);
+		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, nestedNavItemLevel);
 
 		gmailNavItemView
 			.getEventStream()
@@ -581,8 +582,15 @@ export default class GmailNavItemView {
 		const insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
+		// If the current nav-item is of type GROUPER and we are in Gmailv2, then any nested nav-items
+		// should be at the same indentation as the current nav-item. Somewhat confusingly, this._level
+		// is normally the indentationFactor for the nested children of the current nav-item, so we
+		// actually use this._level - 1 as the indentationFactor if we don't want to further indent the
+		// nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
+		const indentationFactor = (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) ? (this._level - 1) : this._level;
+
 		const element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * this._level) + 'px';
+		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * indentationFactor) + 'px';
 
 		this._setHeights();
 	}
