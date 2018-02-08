@@ -3,7 +3,7 @@
 import includes from 'lodash/includes';
 import * as ud from 'ud';
 import {NATIVE_ROUTE_IDS} from '../../../constants/router';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import getURLObject from './get-url-object';
 
 import type GmailDriver from '../gmail-driver';

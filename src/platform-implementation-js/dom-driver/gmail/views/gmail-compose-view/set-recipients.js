@@ -3,7 +3,7 @@
 import type GmailComposeView from '../gmail-compose-view';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../../lib/dom/simulate-key';
 
 const ADDRESS_TYPES = ['to', 'cc', 'bcc'];

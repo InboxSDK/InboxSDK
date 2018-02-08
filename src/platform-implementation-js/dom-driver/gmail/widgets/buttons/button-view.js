@@ -6,7 +6,7 @@ import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import Logger from '../../../../lib/logger';
 import * as ud from 'ud';
-import simulateHover from '../../../../lib/dom/simulate-hover';
+import {simulateHover} from '../../../../lib/dom/simulate-mouse-event';
 import keyboardShortcutStream from '../../../../lib/dom/keyboard-shortcut-stream';
 import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 

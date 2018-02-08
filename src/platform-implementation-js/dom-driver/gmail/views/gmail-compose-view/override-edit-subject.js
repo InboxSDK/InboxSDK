@@ -1,7 +1,7 @@
 /* @flow */
 
 import censorHTMLtree from '../../../../../common/censor-html-tree';
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 
 
 import type GmailDriver from '../../gmail-driver';

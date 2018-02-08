@@ -30,10 +30,10 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   if(!tabList) return;
 
   // emits when the loading div style becomes display none
-  const loadingDivStream =
+  const loadingDivDisplayValueStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
       .toProperty(() => null)
-      .filter(() => loadingHolder.style.display === 'none');
+      .map(() => loadingHolder.style.display === 'none');
 
   // emits when the tablist div gets role=tablist
   const tabListRoleStream =
@@ -47,7 +47,7 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   // now we wait for loading to be gone and tablist to be formed, and then we
   // add sdk icon container to tablist
   Kefir.combine([
-    loadingDivStream,
+    loadingDivDisplayValueStream.filter(Boolean),
     tabListRoleStream
   ])
   .takeUntilBy(stopper)
@@ -57,24 +57,28 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
     maintainIconArea(iconArea, tabList, stopper);
   });
 
-  // if the addon loading div is visible then we create a clone of it and put the clone in a
+  // if the addon loading div becomes visible then we create a clone of it and put the clone in a
   // better place that works with our icons better. the native addon loading div is hidden with css
   // but the style attribute still gets modified by gmail so we know when the loading should go away
-  if(loadingHolder.style.display !== 'none' && (nativeIconArea: any).style.display !== 'none') {
-    const loadingClone = document.createElement('div');
-    loadingClone.innerHTML = loadingHolder.innerHTML;
-    loadingClone.classList.add('inboxsdk__addon_icon_loading');
-    iconArea.insertAdjacentElement('afterend', loadingClone);
-
-    Kefir.merge([
-      loadingDivStream,
-      stopper
-    ])
+  loadingDivDisplayValueStream
+    .filter(isDisplayNone => !isDisplayNone)
     .take(1)
+    .takeUntilBy(stopper)
     .onValue(() => {
-      loadingClone.remove();
+      const loadingClone = document.createElement('div');
+      loadingClone.innerHTML = loadingHolder.innerHTML;
+      loadingClone.classList.add('inboxsdk__addon_icon_loading');
+      iconArea.insertAdjacentElement('afterend', loadingClone);
+
+      Kefir.merge([
+        loadingDivDisplayValueStream.filter(Boolean),
+        stopper
+      ])
+      .take(1)
+      .onValue(() => {
+        loadingClone.remove();
+      });
     });
-  }
 }
 
 // Gmail periodically clears the children of this element before it's

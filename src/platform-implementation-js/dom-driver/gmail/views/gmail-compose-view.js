@@ -18,7 +18,7 @@ import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';
 
 import delayAsap from '../../../lib/delay-asap';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';

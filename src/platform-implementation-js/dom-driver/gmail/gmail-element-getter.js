@@ -114,7 +114,7 @@ const GmailElementGetter = {
 	},
 
 	getCompanionSidebarContentContainerElement(): ?HTMLElement {
-		return document.querySelector('.brC-brG-btc');
+		return document.querySelector('.brC-brG');
 	},
 
 	getCompanionSidebarIconContainerElement(): ?HTMLElement {

@@ -4,7 +4,7 @@ import once from 'lodash/once';
 import find from 'lodash/find';
 import Kefir from 'kefir';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';

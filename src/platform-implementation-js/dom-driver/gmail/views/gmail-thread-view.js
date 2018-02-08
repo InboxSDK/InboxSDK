@@ -13,7 +13,7 @@ import type {Bus} from 'kefir-bus';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 
@@ -304,12 +304,14 @@ class GmailThreadView {
 	}
 
 	_waitForAddonTitleAndSuppress(addonTitle: string){
-		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
-		if(!addonSidebarElement) return;
+		const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
+		const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
 
-		const widthManager = this._setupWidthManager();
+		if(!iconContainerElement) return;
 
-		makeElementChildStream(querySelector(addonSidebarElement, '.J-KU-Jg'))
+		const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
+
+		makeElementChildStream(querySelector(iconContainerElement, '.J-KU-Jg'))
 			.filter(({el}) =>
 					el.getAttribute('role') === 'tab' &&
 					el.getAttribute('data-tooltip') === addonTitle
@@ -322,7 +324,7 @@ class GmailThreadView {
 				}
 
 				el.style.display = 'none';
-				widthManager.fixWidths();
+				if(widthManager) widthManager.fixWidths();
 			});
 	}
 
