@@ -1,6 +1,6 @@
 /* @flow */
 
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 
 export default function ensureAppButtonToolbarsAreClosed(gmailComposeViewElement: HTMLElement) {
 	var groupedButton = gmailComposeViewElement.querySelector('.inboxsdk__compose_groupedActionButton');

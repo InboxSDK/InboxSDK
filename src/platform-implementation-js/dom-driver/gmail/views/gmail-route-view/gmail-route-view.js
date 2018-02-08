@@ -23,7 +23,7 @@ import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
 import GmailElementGetter from '../../gmail-element-getter';
 
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
 import type GmailDriver from '../../gmail-driver';

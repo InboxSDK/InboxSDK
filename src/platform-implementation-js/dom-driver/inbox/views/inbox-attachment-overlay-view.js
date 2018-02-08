@@ -7,7 +7,7 @@ import autoHtml from 'auto-html';
 
 import sharedStyle from '../../../lib/shared-style';
 import customStyle from '../../../dom-driver/inbox/custom-style';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import ajax from '../../../../common/ajax';
 
 import type InboxDriver from '../inbox-driver';

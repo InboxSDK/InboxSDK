@@ -15,7 +15,7 @@ import delayAsap from '../../../lib/delay-asap';
 import arrayToLifetimes from '../../../lib/array-to-lifetimes';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import querySelectorOne from '../../../lib/dom/querySelectorOne';

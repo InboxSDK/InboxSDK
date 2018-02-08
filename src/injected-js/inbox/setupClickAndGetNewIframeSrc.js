@@ -2,7 +2,7 @@
 
 import once from 'lodash/once';
 import Kefir from 'kefir';
-import simulateClick from '../../platform-implementation-js/lib/dom/simulate-click';
+import {simulateClick} from '../../platform-implementation-js/lib/dom/simulate-mouse-event';
 import makeElementChildStream from '../../platform-implementation-js/lib/dom/make-element-child-stream';
 
 export default function setupClickAndGetNewIframeSrc() {

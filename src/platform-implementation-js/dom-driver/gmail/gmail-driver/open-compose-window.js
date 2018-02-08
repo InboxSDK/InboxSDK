@@ -1,6 +1,6 @@
 /* @flow */
 
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import GmailElementGetter from '../gmail-element-getter';
 
 import waitFor from '../../../lib/wait-for';
