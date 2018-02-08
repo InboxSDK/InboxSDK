@@ -19,5 +19,3 @@ export function simulateClick(element: HTMLElement){
 	simulateMouseEvent(element, 'mouseout');
 	element.blur();
 }
-
-window.simulateMouseEvent = simulateMouseEvent;
