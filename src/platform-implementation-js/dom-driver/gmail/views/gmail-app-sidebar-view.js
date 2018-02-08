@@ -34,7 +34,7 @@ const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 const ACTIVE_GLOBAL_ADD_ON_CLASS_NAME = 'bse-bvF-I-KO';
 const ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR = `.${ACTIVE_GLOBAL_ADD_ON_CLASS_NAME}`;
-const GLOBAL_ADD_ON_SELECTOR = '.bse-bvF-I';
+const GLOBAL_ADD_ON_ICON_SELECTOR = '.bse-bvF-I';
 
 import type WidthManager from './gmail-thread-view/width-manager';
 
@@ -174,7 +174,7 @@ class GmailAppSidebarView {
 
     const companionSidebarContentContainerEl = _companionSidebarContentContanerEl; //assign to const to make flow happy
     const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
-    let lastActiveGlobalAddOn = null;
+    let lastActiveNativeGlobalAddOnIconEl = null;
 
     const addonSidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : null;
     const sidebarContainerEl = companionSidebarContentContainerEl || (usedAddonsSidebar ? _addonSidebarContainerEl : _sidebarContainerEl);
@@ -195,9 +195,11 @@ class GmailAppSidebarView {
       el.classList.add('addon_sidebar');
       if(companionSidebarIconContainerEl){
         companionSidebarIconContainerEl.classList.add(idMap('app_sidebar_in_use'));
-        lastActiveGlobalAddOn = companionSidebarIconContainerEl.querySelector(ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR);
 
-        Array.from(companionSidebarIconContainerEl.querySelectorAll(GLOBAL_ADD_ON_SELECTOR))
+        // keep track of what is the last active native global addon
+        // so that we can restore that state if they leave the thread while the SDK sidebar
+        // is open
+        Array.from(companionSidebarIconContainerEl.querySelectorAll(GLOBAL_ADD_ON_ICON_SELECTOR))
           .forEach(addonIconEl => {
             makeMutationObserverChunkedStream(addonIconEl, {
               attributes: true,
@@ -208,7 +210,7 @@ class GmailAppSidebarView {
             .map(() => addonIconEl.classList.contains(ACTIVE_GLOBAL_ADD_ON_CLASS_NAME))
             .onValue((isActive) => {
               if(isActive) {
-                lastActiveGlobalAddOn = addonIconEl;
+                lastActiveNativeGlobalAddOnIconEl = addonIconEl;
               }
             });
           });
@@ -316,8 +318,11 @@ class GmailAppSidebarView {
       }
 
       if(companionSidebarContentContainerEl){
-        if(companionSidebarContentContainerEl.classList.contains('companion_app_sidebar_visible') && lastActiveGlobalAddOn){
-          simulateClick(lastActiveGlobalAddOn);
+        // we are leaving the thread so if the SDK sidebar is open and we have
+        // a global addon that was active before the sidebar openeed then lets
+        // open up that global add-on again
+        if(companionSidebarContentContainerEl.classList.contains('companion_app_sidebar_visible') && lastActiveNativeGlobalAddOnIconEl){
+          simulateClick(lastActiveNativeGlobalAddOnIconEl);
         }
 
         companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
@@ -403,7 +408,7 @@ class GmailAppSidebarView {
 
             buttonContainers.set(appName, buttonContainer);
 
-            querySelector(buttonContainer, 'button').addEventListener('click', async (event: MouseEvent) => {
+            querySelector(buttonContainer, 'button').addEventListener('click', (event: MouseEvent) => {
               event.stopPropagation();
 
               const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
@@ -556,7 +561,12 @@ class GmailAppSidebarView {
           render();
         }
 
-        if((!addonSidebarContainerEl && !companionSidebarContentContainerEl) || !iconArea) return;
+        if(!addonSidebarContainerEl && !companionSidebarContentContainerEl) return;
+        if(addonSidebarContainerEl){
+          iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
+          if(!iconArea) return;
+        }
+
         if(widthManager) widthManager.fixWidths();
 
         const appName = event.detail.appName;
@@ -569,8 +579,17 @@ class GmailAppSidebarView {
             container.remove();
             buttonContainers.delete(appName);
             if(container === activeButtonContainer){
-              if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-              if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
+              if(addonSidebarContainerEl){
+                addonSidebarContainerEl.classList.remove('app_sidebar_visible');
+                if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
+              }
+
+              if(companionSidebarContentContainerEl){
+                companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
+                const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+                if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
+              }
+
               this._setShouldAppSidebarOpen(false);
             }
           } else if (currentCount === 2) {
@@ -619,13 +638,16 @@ class GmailAppSidebarView {
         });
     }
     else if(companionSidebarContentContainerEl){
-      // listen for companion sidebar contents to become visible which can happen in 1 of two cases
-      //  1. user clicks on an Add-Icon icon
-
       // at this point the companionSidebar has 3 children
       // first child is SDK sidebar element
       // 2nd child is global add-on content
       // 3rd is thread add-on content (may not exist)
+
+      // listen for companion sidebar contents to become visible
+      // this happens when ONE of the global add-on content element
+      // or the thread add-on content element are visible
+      // if they are both display: '' or display: none then the native sidebar
+      // contents are not visible
       const globalAddOnContentContainer = companionSidebarContentContainerEl.children[1];
       const threadAddOnContentContainer = companionSidebarContentContainerEl.children[2];
 
