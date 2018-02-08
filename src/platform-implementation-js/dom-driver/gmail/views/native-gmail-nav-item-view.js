@@ -213,8 +213,14 @@ export default class NativeGmailNavItemView {
 			e.stopImmediatePropagation();
 		}, true);
 
-		const insertionPoint = this._element.querySelector('.nU');
-		if(insertionPoint) (insertionPoint: any).insertAdjacentElement('beforebegin', expandoElement);
+		if(this._driver.isUsingMaterialUI()){
+			const insertionPoint = this._element.querySelector('.TN');
+			if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
+		}
+		else {
+			const insertionPoint = this._element.querySelector('.nU');
+			if(insertionPoint) (insertionPoint: any).insertAdjacentElement('beforebegin', expandoElement);
+		}
 
 		if(localStorage['inboxsdk__nativeNavItem__state_' + this._navItemName] === 'collapsed'){
 			this._collapse();
