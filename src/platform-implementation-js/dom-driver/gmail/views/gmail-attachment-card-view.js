@@ -15,7 +15,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-import simulateClick from '../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 

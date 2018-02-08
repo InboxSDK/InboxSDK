@@ -2,7 +2,7 @@
 
 import RSVP from 'rsvp';
 
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import setValueAndDispatchEvent from '../../../../lib/dom/set-value-and-dispatch-event';
 
 import type GmailComposeView from '../gmail-compose-view';

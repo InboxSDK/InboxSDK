@@ -1,7 +1,7 @@
 /* @flow */
 
 import Logger from '../../../../lib/logger';
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
 const cache: {[key: string]: ?{

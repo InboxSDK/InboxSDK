@@ -13,16 +13,16 @@ import type GmailComposeView from '../gmail-compose-view';
 
 export default function addButton(gmailComposeView: GmailComposeView, buttonDescriptorStream: Kefir.Observable<?Object>, groupOrderHint: string, extraOnClickOptions: Object){
 	return new RSVP.Promise(function(resolve, reject){
-		var buttonViewController;
+		let buttonViewController;
 
 		buttonDescriptorStream
 			.takeUntilBy(gmailComposeView.getStopper())
-			.onValue((buttonDescriptor) => {
-				var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
+			.onValue((buttonDescriptor: ?Object) => {
+				const buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
 
 				if(!buttonViewController){
 					if (buttonOptions) {
-						buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint, extraOnClickOptions);
+						buttonViewController = _addButton(gmailComposeView, buttonOptions, groupOrderHint);
 						resolve({
 							buttonViewController: buttonViewController,
 							buttonDescriptor: buttonDescriptor
@@ -30,7 +30,7 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 					}
 				}
 				else{
-					buttonViewController.getView().update(buttonOptions);
+					buttonViewController.update(buttonOptions);
 				}
 			})
 			.onEnd(() => {
@@ -41,15 +41,12 @@ export default function addButton(gmailComposeView: GmailComposeView, buttonDesc
 
 }
 
-function _addButton(gmailComposeView: GmailComposeView, buttonDescriptor: Object, groupOrderHint: string, extraOnClickOptions: Object){
+function _addButton(gmailComposeView: GmailComposeView, buttonOptions: Object, groupOrderHint: string){
 	if(!gmailComposeView.getElement() || !gmailComposeView.getFormattingToolbar()){
 		return;
 	}
 
-	var buttonOptions = _processButtonDescriptor(buttonDescriptor, extraOnClickOptions);
-	if (!buttonOptions) throw new Error("Should not happen");
-	var buttonViewController;
-
+	let buttonViewController;
 	if(buttonOptions.type === 'MODIFIER'){
 		buttonViewController = _addButtonToModifierArea(gmailComposeView, buttonOptions, groupOrderHint);
 	}
@@ -135,11 +132,11 @@ function _processButtonDescriptor(buttonDescriptor: ?Object, extraOnClickOptions
 		oldOnClick({...extraOnClickOptions, ...event});
 	};
 
-	if(buttonDescriptor.hasDropdown){
-		buttonOptions.dropdownShowFunction = buttonDescriptor.onClick;
+	if(buttonOptions.hasDropdown){
+		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
 	}
 	else{
-		buttonOptions.activateFunction = buttonDescriptor.onClick;
+		buttonOptions.activateFunction = buttonOptions.onClick;
 	}
 
 	buttonOptions.noArrow = true;

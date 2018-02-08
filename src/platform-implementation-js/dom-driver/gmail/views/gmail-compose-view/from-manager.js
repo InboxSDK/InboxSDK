@@ -1,7 +1,7 @@
 /* @flow */
 
 import find from 'lodash/find';
-import simulateClick from '../../../../lib/dom/simulate-click';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import type GmailDriver from '../../gmail-driver';
 import type GmailComposeView from '../../views/gmail-compose-view';
 
