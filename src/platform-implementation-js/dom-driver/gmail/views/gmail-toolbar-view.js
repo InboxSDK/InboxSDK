@@ -210,10 +210,10 @@ class GmailToolbarView {
 	}
 
 	_createButtonViewController(buttonDescriptor: Object): DropdownButtonViewController|BasicButtonViewController {
-		var buttonView = this._getButtonView(buttonDescriptor);
+		const buttonView = this._getButtonView(buttonDescriptor);
 		buttonDescriptor.buttonView = buttonView;
 
-		var buttonViewController = null;
+		let buttonViewController = null;
 		if(buttonDescriptor.hasDropdown){
 			buttonViewController = new DropdownButtonViewController({
 				buttonView: buttonView,
@@ -233,7 +233,7 @@ class GmailToolbarView {
 	}
 
 	_getButtonView(buttonDescriptor: Object): Object {
-		var buttonView = new ButtonView(buttonDescriptor);
+		const buttonView = new ButtonView(buttonDescriptor);
 
 		if(this._rowListViewDriver){
 			buttonView.getElement().setAttribute('data-rowlist-toolbar', 'true');
@@ -359,11 +359,11 @@ class GmailToolbarView {
 				element.setAttribute('data-toolbar-expanded', 'false');
 			}
 
-			var buttons = element.querySelectorAll('.G-Ni > [role=button]');
+			const buttons = element.querySelectorAll('.G-Ni > [role=button]');
 
 			Array.prototype.forEach.call(buttons, (button) => {
-				var current = button;
-				for(var ii=0; ii<100000; ii++){
+				let current = button;
+				for(let ii=0; ii<100000; ii++){
 					if(current.previousElementSibling){
 						if(current.previousElementSibling.classList.contains('inboxsdk__button')){
 							if(isElementVisible(current.previousElementSibling)){
@@ -386,7 +386,7 @@ class GmailToolbarView {
 				}
 
 				current = button;
-				for(ii=0; ii<100000; ii++){
+				for(let ii=0; ii<100000; ii++){
 					if(current.nextElementSibling){
 						if(current.nextElementSibling.classList.contains('inboxsdk__button')){
 							if(isElementVisible(current.nextElementSibling)){
@@ -467,7 +467,7 @@ class GmailToolbarView {
 	}
 
 	_getMoreMenuItemElement(buttonDescriptor: Object): HTMLElement {
-		var itemElement = document.createElement('div');
+		const itemElement = document.createElement('div');
 		itemElement.setAttribute('class', 'J-N inboxsdk__menuItem');
 		itemElement.setAttribute('role', 'menuitem');
 		itemElement.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
@@ -492,7 +492,7 @@ class GmailToolbarView {
 	}
 
 	destroy() {
-		var element = this._element;
+		const element = this._element;
 
 		if(this._threadViewDriver){
 			this._element.removeAttribute('data-thread-toolbar');
