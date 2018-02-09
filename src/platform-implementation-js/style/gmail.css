@@ -680,8 +680,6 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
 .inboxsdk__menuItem img, .inboxsdk__menuItem .inboxsdk__icon {
   height: 16px;
   width: 16px;
-  margin-left: -20px;
-  position: absolute;
   margin-top: -1px;
 }
 
