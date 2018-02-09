@@ -687,6 +687,10 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   margin-top: -1px;
 }
 
+body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
+  margin-top: 0;
+}
+
 /* end */
 
 /* modal */
