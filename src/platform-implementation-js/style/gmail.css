@@ -105,6 +105,10 @@ div.T-I.inboxsdk__button {
   height: 16px;
 }
 
+body.inboxsdk__gmailv1css .J-N:not(.J-N-JT) .f4.J-N-JX.inboxsdk__message_more_icon {
+  margin-top: 0;
+}
+
 body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
   margin-top: 1px;
 }
