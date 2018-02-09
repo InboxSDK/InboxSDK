@@ -105,6 +105,10 @@ div.T-I.inboxsdk__button {
   height: 16px;
 }
 
+body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
+  margin-top: 1px;
+}
+
 /* end */
 
 /* compose buttons */
