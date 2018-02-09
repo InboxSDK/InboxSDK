@@ -361,7 +361,7 @@ class GmailToolbarView {
 
 			var buttons = element.querySelectorAll('.G-Ni > [role=button]');
 
-			Array.prototype.forEach.call(buttons, function(button){
+			Array.prototype.forEach.call(buttons, (button) => {
 				var current = button;
 				for(var ii=0; ii<100000; ii++){
 					if(current.previousElementSibling){
@@ -480,15 +480,9 @@ class GmailToolbarView {
 			'</div>'
 		].join('');
 
-		itemElement.addEventListener('mouseenter', function(e: MouseEvent){
-			itemElement.classList.add('J-N-JT');
-		});
-
-		itemElement.addEventListener('mouseleave', function(e: MouseEvent){
-			itemElement.classList.remove('J-N-JT');
-		});
-
-		itemElement.addEventListener('click', function(e: MouseEvent){
+		itemElement.addEventListener('mouseenter', (e: MouseEvent) => itemElement.classList.add('J-N-JT'));
+		itemElement.addEventListener('mouseleave', (e: MouseEvent) => itemElement.classList.remove('J-N-JT'));
+		itemElement.addEventListener('click', (e: MouseEvent) => {
 			if(buttonDescriptor.onClick){
 				buttonDescriptor.onClick({});
 			}
