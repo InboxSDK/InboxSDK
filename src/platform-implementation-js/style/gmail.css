@@ -1217,11 +1217,19 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq > div:first-child
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
 }
-.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ .aio * {
-  color: inherit !important;
-}
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nU:not(.n1) .n0 {
   font-weight: normal;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ .aio * {
+  color: inherit !important;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .bsU {
+  font-weight: normal;
+}
+body:not(.inboxsdk__gmailv1css) .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .TO {
+  background: none;
 }
 
 .inboxsdk__hide_addon_container {
