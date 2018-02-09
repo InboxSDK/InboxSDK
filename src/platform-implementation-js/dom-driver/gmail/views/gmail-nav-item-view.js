@@ -590,7 +590,12 @@ export default class GmailNavItemView {
 		const indentationFactor = (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()) ? (this._level - 1) : this._level;
 
 		const element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * indentationFactor) + 'px';
+		if (this._driver.isUsingMaterialUI()) {
+			querySelector(element, '.TN').style.marginLeft = (getLeftIndentationPaddingValue(this._driver) * indentationFactor) + 'px';
+		}
+		else {
+			querySelector(element, '.TO').style.paddingLeft = (getLeftIndentationPaddingValue(this._driver) * indentationFactor) + 'px';
+		}
 
 		this._setHeights();
 	}
