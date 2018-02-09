@@ -233,7 +233,10 @@ class GmailToolbarView {
 	}
 
 	_getButtonView(buttonDescriptor: Object): Object {
-		const buttonView = new ButtonView(buttonDescriptor);
+		const buttonView = new ButtonView({
+			...buttonDescriptor,
+			...(this._driver.isUsingMaterialUI() ? {noArrow: true} : {})
+		});
 
 		if(this._rowListViewDriver){
 			buttonView.getElement().setAttribute('data-rowlist-toolbar', 'true');
