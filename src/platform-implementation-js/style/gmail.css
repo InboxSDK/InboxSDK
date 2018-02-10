@@ -217,6 +217,12 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__button:foc
   padding: 5px 15px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar {
+  margin-bottom: 7px;
+  padding: 7px 15px;
+  background: white;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__button:first-child {
   margin-left: 0px;
   margin-right: 0px;
@@ -226,12 +232,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionButton {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .btC .J-Z-I::before,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionButton::before {
-    bottom: -3px;
-    left: -3px;
-    right: -3px;
-    top: -3px;
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .J-Z-I::before {
+    bottom: -4px;
+    left: -4px;
+    right: -4px;
+    top: -4px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar {
@@ -1112,7 +1117,7 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
   margin: 16px 16px 0px 16px;
   border: none;
   background: #fff;
-  height: 25px;
+  height: 24px;
   width: 24px;
   overflow: hidden;
   padding: 0;
@@ -1123,6 +1128,7 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
   width: 24px;
   height: 24px;
+  margin-top: 0px;
 }
 
 .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
@@ -1169,6 +1175,14 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_con
 
 body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use:not(.companion_app_sidebar_visible) .addon_sidebar {
   display: none;
+}
+
+body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel_title_icon_container {
+  margin-left: 0px;
+}
+
+body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel .IDMAP_app_sidebar_content_panel_top_line {
+  padding: 0px 16px;
 }
 
 /* make the native addon icon container for thread add-ons (div.bvq) always visible */

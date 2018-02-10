@@ -35,6 +35,7 @@ const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 const ACTIVE_GLOBAL_ADD_ON_CLASS_NAME = 'bse-bvF-I-KO';
 const ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR = `.${ACTIVE_GLOBAL_ADD_ON_CLASS_NAME}`;
 const GLOBAL_ADD_ON_ICON_SELECTOR = '.bse-bvF-I';
+const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
 import type WidthManager from './gmail-thread-view/width-manager';
 
@@ -247,6 +248,7 @@ class GmailAppSidebarView {
 
     updateHighlightedAppIconBus
       .bufferWithTimeOrCount(150, 100)
+      .filter(events => events.length > 0)
       .takeUntilBy(this._stopper)
       .onValue(() => {
         const elBoundingBox = el.getBoundingClientRect();
@@ -406,6 +408,10 @@ class GmailAppSidebarView {
               <div class="inboxsdk__button_selectedIndicator"></div>
             `;
 
+            if(event.detail.primaryColor){
+              querySelector(buttonContainer, '.inboxsdk__button_selectedIndicator').style.backgroundColor = event.detail.primaryColor;
+            }
+
             buttonContainers.set(appName, buttonContainer);
 
             querySelector(buttonContainer, 'button').addEventListener('click', (event: MouseEvent) => {
@@ -422,6 +428,7 @@ class GmailAppSidebarView {
 
                 if(companionSidebarContentContainerEl){
                   companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
+                  companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
                   const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
                   if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
 
@@ -445,6 +452,7 @@ class GmailAppSidebarView {
                   if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
                   companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
+                  companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
                   const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
                   if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
 

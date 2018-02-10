@@ -12,11 +12,13 @@ class DropdownButtonViewController {
 	_dropdownView: ?DropdownView;
 	_DropdownViewDriverClass: Class<any>;
 	_dropdownPositionOptions: Object;
+	_dropdownElementClassName: ?string = null;
 	_stopper = kefirStopper();
 
 	constructor(options: Object){
 		this._dropdownShowFunction = options.dropdownShowFunction;
 		this._DropdownViewDriverClass = options.dropdownViewDriverClass;
+		this._dropdownElementClassName = options.dropdownElementClassName;
 
 		const view = this._view = options.buttonView;
 		this._dropdownPositionOptions = options.dropdownPositionOptions;
@@ -64,7 +66,10 @@ class DropdownButtonViewController {
 		if (!view) throw new Error("Already destroyed");
 		view.activate();
 
-		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), view.getElement(), null);
+		const dropdownView = this._dropdownView = new DropdownView(new this._DropdownViewDriverClass(), view.getElement(), {
+			dropdownElementClassName: this._dropdownElementClassName
+		});
+
 		if (this._dropdownPositionOptions) {
 			dropdownView.setPlacementOptions(this._dropdownPositionOptions);
 		}

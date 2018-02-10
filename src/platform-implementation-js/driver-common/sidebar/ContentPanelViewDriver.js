@@ -52,7 +52,7 @@ class ContentPanelViewDriver {
       .flatMap(x => afterAsap.map(()=>x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl} = descriptor;
+        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
         appName = descriptor.appName;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
@@ -73,7 +73,9 @@ class ContentPanelViewDriver {
               appName: appName || this._driver.getOpts().appName || title,
               appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
               hideTitleBar: Boolean(hideTitleBar),
-              orderHint: typeof orderHint === 'number' ? orderHint : 0
+              orderHint: typeof orderHint === 'number' ? orderHint : 0,
+              primaryColor: primaryColor || this._driver.getOpts().primaryColor,
+              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor
             }
           }
         ));

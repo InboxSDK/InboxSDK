@@ -84,6 +84,7 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
 	buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
 	buttonViewController.getView().addClass('aoO');
+	if(gmailComposeView.isInlineReplyForm()) buttonViewController.getView().addClass('Uo');
 	buttonViewController.getView().getElement().setAttribute('tabindex', '1');
 
 	var sendButtonElement = gmailComposeView.getSendButton();
@@ -105,8 +106,10 @@ function _getButtonViewController(buttonDescriptor: Object){
 	if(buttonDescriptor.hasDropdown){
 		Object.assign(options, {
 			dropdownViewDriverClass: GmailDropdownView,
+			dropdownElementClassName: buttonDescriptor.type === 'MODIFIER' ? 'inboxsdk__compose_modifierArea_dropdown' : null,
 			dropdownPositionOptions: {vAlign: 'top'}
 		});
+
 		buttonViewController = new DropdownButtonViewController(options);
 	}
 	else{

@@ -15,6 +15,7 @@ import type {Options as ContainByScreenOptions} from 'contain-by-screen';
 type Options = {
 	manualPosition?: boolean;
 	extraElementsToIgnore?: HTMLElement[];
+	dropdownElementClassName?: ?string;
 };
 
 // documented in src/docs/
@@ -56,6 +57,10 @@ class DropdownView extends EventEmitter {
 		const elementsToIgnore = [anchorElement, containerEl];
 		if (this._options.extraElementsToIgnore) {
 			elementsToIgnore.push(...this._options.extraElementsToIgnore);
+		}
+
+		if(options && options.dropdownElementClassName){
+			containerEl.classList.add(options.dropdownElementClassName);
 		}
 
 		outsideClicksAndEscape(elementsToIgnore)
