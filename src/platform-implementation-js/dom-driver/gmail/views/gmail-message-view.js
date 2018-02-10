@@ -248,7 +248,7 @@ class GmailMessageView {
 				const itemEl = document.createElement('div');
 				itemEl.className = 'J-N';
 				itemEl.setAttribute('role', 'menuitem');
-				itemEl.innerHTML = autoHtml `<div class="J-N-Jz">${options.title}</div>`
+				itemEl.innerHTML = autoHtml `<div class="J-N-Jz">${options.title}</div>`;
 
 				itemEl.addEventListener('mouseenter', (event: MouseEvent) => itemEl.classList.add('J-N-JT'));
 				itemEl.addEventListener('mouseleave', (event: MouseEvent) => itemEl.classList.remove('J-N-JT'));
