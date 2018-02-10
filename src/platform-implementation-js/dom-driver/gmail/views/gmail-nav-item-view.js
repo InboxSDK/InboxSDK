@@ -246,7 +246,8 @@ export default class GmailNavItemView {
 			case 'mouseenter':
 
 				if (this._navItemDescriptor.routeID ||
-						typeof this._navItemDescriptor.onClick === 'function') {
+						typeof this._navItemDescriptor.onClick === 'function' ||
+						this._driver.isUsingMaterialUI() ) {
 					this._setHighlight(true);
 				}
 
@@ -352,7 +353,11 @@ export default class GmailNavItemView {
 
 		if (navItemDescriptor.type === NAV_ITEM_TYPES.LINK
 			|| navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
-			|| (!navItemDescriptor.routeID && typeof navItemDescriptor.onClick !== 'function')) {
+			|| (
+				!navItemDescriptor.routeID &&
+				typeof navItemDescriptor.onClick !== 'function' &&
+				!this._driver.isUsingMaterialUI()
+			)) {
 
 			this._element.classList.add('inboxsdk__navItem_nonClickable');
 		}
