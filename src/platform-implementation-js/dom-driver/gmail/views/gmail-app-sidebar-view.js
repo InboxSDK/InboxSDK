@@ -330,6 +330,8 @@ class GmailAppSidebarView {
         companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
         const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
         if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
+
+        if(companionSidebarIconContainerEl) companionSidebarIconContainerEl.classList.remove(idMap('app_sidebar_in_use'));
       }
     });
 
