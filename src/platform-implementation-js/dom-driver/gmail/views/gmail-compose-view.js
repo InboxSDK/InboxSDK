@@ -551,6 +551,9 @@ class GmailComposeView {
 	insertBodyHTMLAtCursor(html: string): ?HTMLElement {
 		var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
 		this._triggerDraftSave();
+
+		simulateKey(this.getBodyElement(), 13, 13);
+
 		return retVal;
 	}
 
