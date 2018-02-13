@@ -639,6 +639,18 @@ td.gH div.gK span:first-child > img:last-child {
   max-height: 3px;
 }
 
+body:not(.inboxsdk__gmailv1css) .aQw .inboxsdk__button_icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+}
+
+body:not(.inboxsdk__gmailv1css) .aQw .inboxsdk__button_iconImg {
+  height: 18px;
+  width: 18px;
+}
+
 .aQw .inboxsdk__button_iconImg {
   margin-top: 2px;
 }
