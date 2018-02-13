@@ -111,7 +111,7 @@ div.T-I.inboxsdk__button {
 
 /* in material Gmail reduce padding between buttons  */
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .gU:not(:first-child) {
-  padding-left: 10px;
+  padding-left: 5px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__compose_actionToolbar {
@@ -225,7 +225,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__composeButton
     border: none;
   }
 
-  .T-I + .inboxsdk__compose_sendButton {
+  .T-I ~ .inboxsdk__compose_sendButton {
     margin-left: -6px;
   }
 
@@ -734,10 +734,19 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
 }
 
 .inboxsdk__recipient_row td.ok {
-  height: 23px;
+  height: 20px;
+  padding: 0px;
 }
 
 .inboxsdk__recipient_row td.az3 {
+  padding: 0px 3px 0px 3px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__recipient_row td.ok {
+  height: 23px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__recipient_row td.az3 {
   padding: 0px 3px 3px 3px;
 }
 

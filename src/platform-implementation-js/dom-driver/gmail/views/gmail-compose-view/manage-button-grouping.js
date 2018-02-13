@@ -123,7 +123,8 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 
 function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 	if(
-		!_doButtonsMakeBottomBarTableTooWide(gmailComposeView) ||
+		gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth &&
+		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 0 &&
 		gmailComposeView.getElement().classList.contains(('inboxsdk__compose_narrow_buttons'))
 	) return;
 
@@ -133,14 +134,10 @@ function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 }
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
-	return !gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
-			_doButtonsMakeBottomBarTableTooWide(gmailComposeView);
-}
-
-function _doButtonsMakeBottomBarTableTooWide(gmailComposeView: GmailComposeView): boolean {
 	return (
+		!gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
 		gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth &&
-		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 2
+		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 1
 	);
 }
 
