@@ -549,8 +549,23 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   height: 16px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icon {
+  vertical-align: middle;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
   max-width: inherit;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper {
+  align-self: flex-start;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__button_icon,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__button_iconImg {
+  height: 18px;
+  width: 18px;
 }
 
 .inboxsdk__thread_row_icon_wrapper {
@@ -1212,7 +1227,7 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
-  margin: 16px 16px 0px 16px;
+  margin: 16px 16px 8px 16px;
   border: none;
   background: #fff;
   height: 24px;
@@ -1223,6 +1238,10 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
   position: relative;
 }
 
+body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  margin-bottom: 0px;
+}
+
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
   width: 24px;
   height: 24px;
@@ -1230,12 +1249,18 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
 }
 
 .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
-  height: 24px;
+  height: 40px;
   width: 4px;
   position: absolute;
   right: 0px;
   bottom: 0px;
   background-color: rgb(66, 133, 244);
+  border-radius: 3px 0 0 3px
+}
+
+body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+  height: 24px;
+  border-radius: 0px;
 }
 
 body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
@@ -1281,6 +1306,11 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel_title_icon_cont
 
 body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel .IDMAP_app_sidebar_content_panel_top_line {
   padding: 0px 16px;
+}
+
+/* hide thread addon icons when in custom view */
+body:not(.inboxsdk__gmailv1css).inboxsdk__custom_view_active .brC-aT5-aOt-ato-Kp-Jw [role=tablist] > div:not(:last-child) {
+  display: none;
 }
 
 /* make the native addon icon container for thread add-ons (div.bvq) always visible */
@@ -1666,6 +1696,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSect
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_label {
   align-self: flex-end;
+}
+
+/* label in vertical preview pane */
+body:not(.inboxsdk__gmailv1css) .apv .inboxsdk__thread_row_label {
+  align-self: flex-start;
 }
 
 .inboxsdk__resultsSection_label_icon {
