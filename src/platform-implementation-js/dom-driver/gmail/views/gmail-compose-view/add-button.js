@@ -3,7 +3,7 @@
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
 
-import ButtonView from '../../widgets/buttons/button-view';
+import GmailComposeButtonView from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
@@ -63,7 +63,6 @@ function _addButton(gmailComposeView: GmailComposeView, buttonOptions: Object, g
 
 function _addButtonToModifierArea(gmailComposeView: GmailComposeView, buttonDescriptor: Object, groupOrderHint: string){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
-	buttonViewController.getView().addClass('wG');
 	buttonViewController.getView().getElement().setAttribute('tabindex', '1');
 	buttonViewController.getView().getElement().setAttribute('data-order-hint', String(buttonDescriptor.orderHint||0));
 	buttonViewController.getView().getElement().setAttribute('data-group-order-hint', groupOrderHint);
@@ -82,9 +81,8 @@ function _addButtonToModifierArea(gmailComposeView: GmailComposeView, buttonDesc
 
 function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 	var buttonViewController = _getButtonViewController(buttonDescriptor);
+	buttonViewController.getView().removeClass('inboxsdk__composeButton');
 	buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
-	buttonViewController.getView().addClass('aoO');
-	if(gmailComposeView.isInlineReplyForm()) buttonViewController.getView().addClass('Uo');
 	buttonViewController.getView().getElement().setAttribute('tabindex', '1');
 
 	var sendButtonElement = gmailComposeView.getSendButton();
@@ -99,14 +97,13 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor){
 }
 
 function _getButtonViewController(buttonDescriptor: Object){
-	const buttonView = new ButtonView(buttonDescriptor);
+	const buttonView = new GmailComposeButtonView(buttonDescriptor);
 	const options = {buttonView, ...buttonDescriptor};
 
 	let buttonViewController;
 	if(buttonDescriptor.hasDropdown){
 		Object.assign(options, {
 			dropdownViewDriverClass: GmailDropdownView,
-			dropdownElementClassName: buttonDescriptor.type === 'MODIFIER' ? 'inboxsdk__compose_modifierArea_dropdown' : null,
 			dropdownPositionOptions: {vAlign: 'top'}
 		});
 

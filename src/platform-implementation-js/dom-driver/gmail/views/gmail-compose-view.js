@@ -106,6 +106,8 @@ class GmailComposeView {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
+		if(options.isInlineReplyForm) this._element.classList.add('inboxsdk__compose_inlineReply');
+
 		this._isInlineReplyForm = options.isInlineReplyForm;
 		this._isStandalone = options.isStandalone;
 		this._isFullscreen = false;
