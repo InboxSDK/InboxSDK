@@ -10,31 +10,22 @@ import {simulateHover} from '../../../../lib/dom/simulate-mouse-event';
 import keyboardShortcutStream from '../../../../lib/dom/keyboard-shortcut-stream';
 import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 
-import BUTTON_COLOR_CLASSES from './button-color-classes';
-
 export type ButtonViewOptions = {
-	hasButtonToLeft?: ?boolean;
-	hasButtonToRight?: ?boolean;
 	iconClass?: ?string;
 	iconUrl?: ?string;
-	text?: ?string;
 	title?: ?string;
 	tooltip?: ?string;
 	enabled?: ?boolean;
 	hasDropdown?: ?boolean;
-	buttonColor?: ?string;
 	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
 };
 
-const ButtonView = ud.defn(module, class ButtonView {
+const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 	_element: HTMLElement;
-	_innerElement: any;
-	_textElement: any;
-	_iconElement: ?HTMLElement;
-	_iconImgElement: ?HTMLImageElement;
+  _iconElement: HTMLDivElement;
+  _iconImgElement: ?HTMLImageElement;
 	_iconClass: ?string;
 	_iconUrl: ?string;
-	_title: ?string;
 	_tooltip: ?string;
 	_hasDropdown: boolean;
 	_buttonColor: string;
@@ -49,12 +40,9 @@ const ButtonView = ud.defn(module, class ButtonView {
 		this._iconClass = options.iconClass;
 		this._iconUrl = options.iconUrl;
 
-		this._title = options.text || options.title;
 		this._tooltip = options.tooltip || options.title;
 
 		this._hasDropdown = !!options.hasDropdown;
-
-		this._buttonColor = options.buttonColor || 'default';
 
 		this._keyboardShortcutHandle = options.keyboardShortcutHandle;
 
@@ -77,13 +65,11 @@ const ButtonView = ud.defn(module, class ButtonView {
 	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
 	activate(){
-		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
-		this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
+    this.addClass('inboxsdk__composeButton_active');
 	}
 
 	deactivate(){
-		this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
-		this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
+    this.removeClass('inboxsdk__composeButton_active');
 	}
 
 	addClass(className: string){
@@ -114,16 +100,9 @@ const ButtonView = ud.defn(module, class ButtonView {
 			this._element.style.display = "";
 		}
 
-		if(options.buttonColor != this._buttonColor && this._buttonColor){
-			this._updateButtonColor(options.buttonColor);
-		}
-
-		if(options.title != this._title){
-			this._updateTitle(options.title);
-		}
-
-		if(options.tooltip != this._tooltip){
-			this._updateTooltip(options.tooltip);
+    const newTooltip = options.tooltip || options.title;
+		if(newTooltip != this._tooltip){
+			this._updateTooltip(newTooltip);
 		}
 
 		if(options.iconUrl != this._iconUrl){
@@ -141,29 +120,17 @@ const ButtonView = ud.defn(module, class ButtonView {
 
 	_createElement(options: ButtonViewOptions){
 		this._createMainElement(options);
-
-		this._createInnerElement(options);
-
-		this._createTextElement();
-		this._createIconElement();
+    this._createIconElement();
 	}
 
 	_createMainElement(options: ButtonViewOptions){
 		this._element = document.createElement('div');
-		this._element.setAttribute('class', 'T-I J-J5-Ji ar7 L3 inboxsdk__button ' + BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
+		this._element.setAttribute('class', 'inboxsdk__composeButton');
 		if (options.tooltip) {
 			this._element.setAttribute('aria-label', options.tooltip);
 		}
 		this._element.setAttribute('role', 'button');
 		this._element.setAttribute('tabindex', '0');
-
-		if (options.hasButtonToRight) {
-			this._element.classList.add('T-I-Js-IF');
-		}
-
-		if (options.hasButtonToLeft) {
-			this._element.classList.add('T-I-Js-Gs');
-		}
 
 		if (options.tooltip || options.title) {
 			this._element.setAttribute('data-tooltip', String(options.tooltip || options.title));
@@ -174,63 +141,25 @@ const ButtonView = ud.defn(module, class ButtonView {
 		}
 	}
 
-	_createInnerElement(options: ButtonViewOptions){
-		this._innerElement = document.createElement('div');
-
-		if(this._hasDropdown && !options.noArrow){
-			this._innerElement.innerHTML = '<div class="G-asx T-I-J3 - J-J5-Ji">&nbsp;</div>';
-		}
-
-		this._element.appendChild(this._innerElement);
-	}
-
-	_createTextElement(){
-		if(!this._title){
-			return;
-		}
-
-		this._textElement = document.createElement('span');
-		this._textElement.setAttribute('class', 'inboxsdk__button_text');
-		this._textElement.textContent = this._title;
-
-		if(this._iconElement){
-			const parent = this._iconElement.parentElement;
-			if (!parent) throw new Error("Could not find parent");
-			parent.insertBefore(this._textElement, this._iconElement.nextSibling);
-		} else {
-			this._innerElement.insertBefore(this._textElement, this._innerElement.firstElementChild);
-		}
-	}
-
 	_createIconElement(){
-		if(!this._iconClass && !this._iconUrl){
-			return;
-		}
-
 		const iconElement = this._iconElement = document.createElement('div');
-		iconElement.classList.add('inboxsdk__button_icon');
 
 		if(this._iconClass){
-			iconElement.innerHTML = '&nbsp;';
-			iconElement.setAttribute('class', 'inboxsdk__button_icon ' + this._iconClass);
+      iconElement.innerHTML = '&nbsp;';
+			iconElement.setAttribute('class', this._iconClass);
 		}
+
+    iconElement.classList.add('inboxsdk__button_icon');
+
+    this._element.appendChild(iconElement);
 
 		if(this._iconUrl){
 			this._createIconImgElement();
 		}
-
-		this._innerElement.insertBefore(iconElement, this._innerElement.firstElementChild);
 	}
 
 	_createIconImgElement(){
-		if (!this._iconElement) {
-			this._createIconElement();
-		}
-		const iconElement = this._iconElement;
-		if (!iconElement) throw new Error("Should not happen");
-		if(iconElement.innerHTML !== ''){
-			iconElement.innerHTML = '';
-		}
+		this._iconElement.innerHTML = '';
 
 		const iconImgElement = this._iconImgElement = document.createElement('img');
 		iconImgElement.classList.add('inboxsdk__button_iconImg');
@@ -241,30 +170,7 @@ const ButtonView = ud.defn(module, class ButtonView {
 			Logger.error(new Error('_createIconImgElement should not be called with null _iconUrl'));
 		}
 
-		iconElement.appendChild(iconImgElement);
-	}
-
-	_updateButtonColor(newButtonColor: string){
-		this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
-		this._buttonColor = newButtonColor;
-
-		this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS);
-	}
-
-	_updateTitle(newTitle: ?string){
-		if(!this._title && newTitle){
-			this._title = newTitle;
-			this._createTextElement();
-		}
-		else if(this._title && !newTitle && this._textElement){
-			(this._textElement:Object).remove();
-			this._textElement = null;
-			this._title = newTitle;
-		}
-		else if (this._textElement){
-			this._textElement.textContent = newTitle;
-			this._title = newTitle;
-		}
+		this._iconElement.appendChild(iconImgElement);
 	}
 
 	_updateTooltip(newTooltip: ?string){
@@ -280,28 +186,22 @@ const ButtonView = ud.defn(module, class ButtonView {
 
 	_updateIconUrl(newIconUrl: ?string){
 		this._iconUrl = newIconUrl;
-		if (this._iconImgElement && !newIconUrl) {
-			(this._iconImgElement:Object).remove();
+
+		if (!newIconUrl && this._iconImgElement) {
+			this._iconImgElement.remove();
 			this._iconImgElement = null;
-		} else if (!this._iconImgElement && newIconUrl) {
+		}
+		else if (newIconUrl && !this._iconImgElement) {
 			this._createIconImgElement();
 		}
-		if (this._iconImgElement && newIconUrl) {
+		else if (newIconUrl && this._iconImgElement) {
 			this._iconImgElement.src = newIconUrl;
 		}
 	}
 
 	_updateIconClass(newIconClass: ?string){
-		if (this._iconElement && !newIconClass && !this._iconUrl) {
-			(this._iconElement:Object).remove();
-			this._iconElement = null;
-		} else if (!this._iconElement && newIconClass) {
-			this._createIconElement();
-		}
 		this._iconClass = newIconClass;
-		if (this._iconElement) {
-			this._iconElement.setAttribute('class', 'inboxsdk__button_icon '+(newIconClass||''));
-		}
+		this._iconElement.setAttribute('class', 'inboxsdk__button_icon '+(newIconClass||''));
 	}
 
 	_setEnabled(value: boolean){
@@ -388,16 +288,14 @@ const ButtonView = ud.defn(module, class ButtonView {
 		Kefir.fromEvents(this._element, 'mouseenter')
 			.filter(() => this.isEnabled())
 			.onValue(event => {
-				this._element.classList.add(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
 				this._element.classList.add('inboxsdk__button_hover');
 			});
 
 
 		Kefir.fromEvents(this._element, 'mouseleave')
 			.onValue(event => {
-				this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
 				this._element.classList.remove('inboxsdk__button_hover');
 			});
 	}
 });
-export default ButtonView;
+export default GmailComposeButtonView;

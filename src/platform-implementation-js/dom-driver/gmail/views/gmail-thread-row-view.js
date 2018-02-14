@@ -306,10 +306,25 @@ class GmailThreadRowView {
         labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
 
         const labelParentDiv = this._getLabelParent();
+
+
         if (labelParentDiv !== labelMod.gmailLabelView.getElement().parentElement) {
-          labelParentDiv.insertBefore(
-            labelMod.gmailLabelView.getElement(), labelParentDiv.querySelector('.y6'));
+          if(this._driver.isUsingMaterialUI()){
+            labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
+          }
+          else {
+            //we are vertical preview pane
+            if(this._elements.length > 1){
+              labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
+            }
+            else {
+              labelParentDiv.insertBefore(
+                labelMod.gmailLabelView.getElement(), labelParentDiv.querySelector('.y6')
+              );
+            }
+          }
         }
+
         this._getImageFixer().emit();
       }
     });
@@ -362,13 +377,21 @@ class GmailThreadRowView {
           iconSettings.iconElement.setAttribute('data-tooltip', iconDescriptor.tooltip);
         }
 
-        if(!this._elements[0].contains(iconWrapper)) {
-          const insertionPoint = this._elements.length > 1 ?
-                                this._getLabelParent() :
-                                querySelector(this._getLabelParent(), '.y6');
+        const labelParent = this._getLabelParent();
 
-          insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+        if(!labelParent.contains(iconWrapper)) {
+          if(this._driver.isUsingMaterialUI()){
+            querySelector(labelParent, '.y6').insertAdjacentElement('beforebegin', iconWrapper);
+          }
+          else if(this._elements.length > 1){
+            labelParent.insertAdjacentElement('beforeend', iconWrapper);
+          }
+          else {
+            const insertionPoint = querySelector(labelParent, '.y6');
+            insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+          }
         }
+
         this._getImageFixer().emit();
       }
     });

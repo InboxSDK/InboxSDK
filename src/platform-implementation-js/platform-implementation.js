@@ -65,6 +65,8 @@ export type PiOpts = {
 	eventTracking: boolean;
 	inboxBeta: boolean;
 	REQUESTED_API_VERSION: number;
+	primaryColor?: string;
+	secondaryColor?: string;
 };
 
 export class PlatformImplementation extends SafeEventEmitter {

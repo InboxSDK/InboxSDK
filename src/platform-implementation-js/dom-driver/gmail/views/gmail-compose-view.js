@@ -106,6 +106,8 @@ class GmailComposeView {
 		this._element = element;
 		this._element.classList.add('inboxsdk__compose');
 
+		if(options.isInlineReplyForm) this._element.classList.add('inboxsdk__compose_inlineReply');
+
 		this._isInlineReplyForm = options.isInlineReplyForm;
 		this._isStandalone = options.isStandalone;
 		this._isFullscreen = false;
@@ -549,6 +551,11 @@ class GmailComposeView {
 	insertBodyHTMLAtCursor(html: string): ?HTMLElement {
 		var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
 		this._triggerDraftSave();
+
+		// sometimes the html inserted can be quite large, so we need ot make sure that GMail resizes the compose window
+		// triggering an enter press forces Gmail to resize compose
+		simulateKey(this.getBodyElement(), 13, 13);
+
 		return retVal;
 	}
 

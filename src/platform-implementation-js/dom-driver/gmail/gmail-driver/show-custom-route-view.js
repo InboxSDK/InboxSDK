@@ -3,6 +3,9 @@
 import {defn} from 'ud';
 import GmailElementGetter from '../gmail-element-getter';
 
+const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
+import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
+
 const showCustomRouteView = defn(module, function showCustomRouteView(gmailDriver: any, element: HTMLElement) {
 	const contentSectionElement = GmailElementGetter.getContentSectionElement();
 	if(!contentSectionElement){
@@ -29,6 +32,15 @@ const showCustomRouteView = defn(module, function showCustomRouteView(gmailDrive
 
 		child.style.display = 'none';
 	});
+
+	//if any thread sidebar addons are enabled then we need to turn them off
+	const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
+	if(companionSidebarIconContainerEl){
+		const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
+		if(activeThreadAddOnIcon){
+			simulateClick(activeThreadAddOnIcon);
+		}
+	}
 
 	((document.body:any):HTMLElement).classList.add('inboxsdk__custom_view_active');
 });
