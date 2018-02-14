@@ -2,6 +2,7 @@
 
 import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
+import autoHtml from 'auto-html';
 import asap from 'asap';
 import {defn} from 'ud';
 import Kefir from 'kefir';
@@ -247,23 +248,23 @@ class GmailMessageView {
 				const itemEl = document.createElement('div');
 				itemEl.className = 'J-N';
 				itemEl.setAttribute('role', 'menuitem');
-				itemEl.textContent = options.title;
-				itemEl.addEventListener('mouseenter', (event: MouseEvent) => {
-					itemEl.classList.add('J-N-JT');
-				});
-				itemEl.addEventListener('mouseleave', (event: MouseEvent) => {
-					itemEl.classList.remove('J-N-JT');
-				});
+				itemEl.innerHTML = autoHtml `<div class="J-N-Jz">${options.title}</div>`;
+
+				itemEl.addEventListener('mouseenter', (event: MouseEvent) => itemEl.classList.add('J-N-JT'));
+				itemEl.addEventListener('mouseleave', (event: MouseEvent) => itemEl.classList.remove('J-N-JT'));
 				itemEl.addEventListener('click', (event: MouseEvent) => {
 					this._closeActiveEmailMenu();
 					options.onClick();
 				});
 
+
 				if (options.iconUrl || options.iconClass) {
 					const iconEl = document.createElement('img');
 					iconEl.className = `f4 J-N-JX inboxsdk__message_more_icon ${options.iconClass||''}`;
 					iconEl.src = options.iconUrl || 'images/cleardot.gif';
-					itemEl.insertBefore(iconEl, itemEl.firstChild);
+
+					const insertionPoint = itemEl.firstElementChild;
+					if (insertionPoint) insertionPoint.appendChild(iconEl);
 				}
 
 				this._moreMenuAddedElements.push(itemEl);
