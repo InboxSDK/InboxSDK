@@ -1683,6 +1683,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSect
   display: flex;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA > .xW {
+  max-width: none;
+  flex-basis: auto;
+}
+
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
   -webkit-align-items:  center;
