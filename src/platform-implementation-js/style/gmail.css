@@ -557,15 +557,32 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
   max-width: inherit;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper {
-  align-self: flex-start;
+/* narrow vertical preview pane */
+body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_attachment_icons_present {
+  flex-grow: 0;
 }
 
+body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_label {
+  order: 1;
+}
+
+body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_icon_wrapper {
+  order: 1;
+  margin-left: 3px;
+  margin-right: 0px;
+}
+/* end narrow vertical preview pane */
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__button_icon,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__button_iconImg {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
+body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   height: 18px;
   width: 18px;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA:hover .inboxsdk__thread_row_icon_wrapper {
+  align-self: flex-start;
+  margin-top: 1px;
 }
 
 .inboxsdk__thread_row_icon_wrapper {
@@ -575,14 +592,13 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__button_iconImg {
   height: 20px;
 }
 
-.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
+body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
+body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   height: 20px;
   width: 20px;
 }
 
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
-  height: 20px;
-  width: 20px;
   vertical-align: top;
 }
 

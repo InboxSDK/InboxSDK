@@ -307,15 +307,21 @@ class GmailThreadRowView {
 
         const labelParentDiv = this._getLabelParent();
 
+
         if (labelParentDiv !== labelMod.gmailLabelView.getElement().parentElement) {
-          //we are vertical preview pane
-          if(this._elements.length > 1){
+          if(this._driver.isUsingMaterialUI()){
             labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
           }
           else {
-            labelParentDiv.insertBefore(
-              labelMod.gmailLabelView.getElement(), labelParentDiv.querySelector('.y6')
-            );
+            //we are vertical preview pane
+            if(this._elements.length > 1){
+              labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
+            }
+            else {
+              labelParentDiv.insertBefore(
+                labelMod.gmailLabelView.getElement(), labelParentDiv.querySelector('.y6')
+              );
+            }
           }
         }
 
@@ -371,13 +377,19 @@ class GmailThreadRowView {
           iconSettings.iconElement.setAttribute('data-tooltip', iconDescriptor.tooltip);
         }
 
-        if(this._elements.length > 1){
-          const insertionPoint = this._getLabelParent();
-          if(!insertionPoint.contains(iconWrapper)) insertionPoint.insertAdjacentElement('beforeend', iconWrapper);
-        }
-        else {
-          const insertionPoint = querySelector(this._getLabelParent(), '.y6');
-          if(!insertionPoint.contains(iconWrapper)) insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+        const labelParent = this._getLabelParent();
+
+        if(!labelParent.contains(iconWrapper)) {
+          if(this._driver.isUsingMaterialUI()){
+            querySelector(labelParent, '.y6').insertAdjacentElement('beforebegin', iconWrapper);
+          }
+          else if(this._elements.length > 1){
+            labelParent.insertAdjacentElement('beforeend', iconWrapper);
+          }
+          else {
+            const insertionPoint = querySelector(labelParent, '.y6');
+            insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+          }
         }
 
         this._getImageFixer().emit();
