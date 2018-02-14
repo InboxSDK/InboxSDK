@@ -91,12 +91,14 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__menu > .inboxsdk__menuContent {
   padding: 0;
-  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  -webkit-transition: opacity .218s;
+  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
   transition: opacity .218s;
   border: 1px solid rgba(0,0,0,.2);
   background: #fff;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__menu > .inboxsdk__menuContent {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .f4.J-N-JX.inboxsdk__message_more_icon {
