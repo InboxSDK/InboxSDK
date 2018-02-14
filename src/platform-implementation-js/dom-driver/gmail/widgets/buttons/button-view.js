@@ -394,7 +394,6 @@ const ButtonView = ud.defn(module, class ButtonView {
 
 
 		Kefir.fromEvents(this._element, 'mouseleave')
-			.filter(() => this.isEnabled())
 			.onValue(event => {
 				this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
 				this._element.classList.remove('inboxsdk__button_hover');

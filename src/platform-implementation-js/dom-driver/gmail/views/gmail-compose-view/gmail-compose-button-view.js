@@ -187,14 +187,15 @@ const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 	_updateIconUrl(newIconUrl: ?string){
 		this._iconUrl = newIconUrl;
 
-		if (this._iconImgElement && !newIconUrl) {
-			(this._iconImgElement:Object).remove();
+		if (!newIconUrl && this._iconImgElement) {
+			this._iconImgElement.remove();
 			this._iconImgElement = null;
-		} else if (!this._iconImgElement && newIconUrl) {
+		}
+		else if (newIconUrl && !this._iconImgElement) {
 			this._createIconImgElement();
 		}
-		if (this._iconImgElement && newIconUrl) {
-			(this._iconImgElement: Object).src = newIconUrl;
+		else if (newIconUrl && this._iconImgElement) {
+			this._iconImgElement.src = newIconUrl;
 		}
 	}
 
@@ -292,7 +293,6 @@ const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 
 
 		Kefir.fromEvents(this._element, 'mouseleave')
-			.filter(() => this.isEnabled())
 			.onValue(event => {
 				this._element.classList.remove('inboxsdk__button_hover');
 			});

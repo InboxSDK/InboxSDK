@@ -29,6 +29,12 @@ InboxSDK.load(1, 'simple-example', {
 			}
 		});
 
+		var s1 = composeView.addStatusBar({height:20});
+		s1.el.innerHTML = 's1 foo <b>bar</b>';
+		s1.on('destroy', function() {
+			console.log('s1 destroyed');
+		});
+
 		composeView.addButton({
 			title: 'Monkeys 2',
 			iconUrl: chrome.runtime.getURL('monkey.png'),
@@ -44,6 +50,12 @@ InboxSDK.load(1, 'simple-example', {
 					});
 				}
 			}
+		});
+
+		var s2 = composeView.addStatusBar({orderHint:2});
+		s2.el.innerHTML = 's2 foo <b>bar</b>';
+		s2.on('destroy', function() {
+			console.log('s2 destroyed');
 		});
 
 		composeView.addButton({

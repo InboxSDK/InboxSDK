@@ -552,6 +552,8 @@ class GmailComposeView {
 		var retVal = insertHTMLatCursor(this.getBodyElement(), html, this._lastSelectionRange);
 		this._triggerDraftSave();
 
+		// sometimes the html inserted can be quite large, so we need ot make sure that GMail resizes the compose window
+		// triggering an enter press forces Gmail to resize compose
 		simulateKey(this.getBodyElement(), 13, 13);
 
 		return retVal;
