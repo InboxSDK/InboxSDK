@@ -52,6 +52,10 @@ function _createRecipientRowElement(gmailComposeView: GmailComposeView, options:
 
 		labelTD.appendChild(span);
 		span.textContent = options.labelText;
+
+		if(options.labelTextClass){
+			span.classList.add(options.labelTextClass);
+		}
 	}
 
 	if(options.el){
