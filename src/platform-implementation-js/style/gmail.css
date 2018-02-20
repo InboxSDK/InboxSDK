@@ -1455,10 +1455,14 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .bsU:empty {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj[style*="border-color"]:empty::after {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj:empty::after {
   content: '';
   border: 8px solid;
   border-radius: 50%;
+  border-color: rgb(118, 118, 118)
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj[style*="border-color"]:empty::after {
   border-color: inherit;
 }
 
