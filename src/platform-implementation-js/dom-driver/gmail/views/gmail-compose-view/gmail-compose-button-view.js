@@ -14,6 +14,7 @@ export type ButtonViewOptions = {
 	iconClass?: ?string;
 	iconUrl?: ?string;
 	title?: ?string;
+	text?: ?string;
 	tooltip?: ?string;
 	enabled?: ?boolean;
 	hasDropdown?: ?boolean;
@@ -40,7 +41,7 @@ const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 		this._iconClass = options.iconClass;
 		this._iconUrl = options.iconUrl;
 
-		this._tooltip = options.tooltip || options.title;
+		this._tooltip = options.tooltip || options.title || options.text;
 
 		this._hasDropdown = !!options.hasDropdown;
 
@@ -100,7 +101,7 @@ const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 			this._element.style.display = "";
 		}
 
-    const newTooltip = options.tooltip || options.title;
+    const newTooltip = options.tooltip || options.title || options.text;
 		if(newTooltip != this._tooltip){
 			this._updateTooltip(newTooltip);
 		}
@@ -132,8 +133,9 @@ const GmailComposeButtonView = ud.defn(module, class GmailComposeButtonView {
 		this._element.setAttribute('role', 'button');
 		this._element.setAttribute('tabindex', '0');
 
-		if (options.tooltip || options.title) {
-			this._element.setAttribute('data-tooltip', String(options.tooltip || options.title));
+		const newTooltip = options.tooltip || options.title || options.text;
+		if (newTooltip) {
+			this._element.setAttribute('data-tooltip', newTooltip);
 		}
 
 		if (options.enabled === false) {
