@@ -179,6 +179,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__com
   margin-left: 8px;
 }
 
+body.inboxsdk__gmailv1css .inboxsdk__composeButton + .inboxsdk__composeButton {
+  margin-left: 4px;
+}
+
 .inboxsdk__composeButton .inboxsdk__button_icon {
   opacity: 0.55;
 }
@@ -212,6 +216,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__composeButton
 
 .inboxsdk__compose_actionToolbar .inboxsdk__composeButton:last-child {
   margin-right: 6px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeButton:last-child {
+  margin-right: 2px;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__compose_groupedActionToolbar div.inboxsdk__composeButton:last-child {
