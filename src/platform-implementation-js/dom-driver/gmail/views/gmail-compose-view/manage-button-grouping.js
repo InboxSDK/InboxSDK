@@ -123,8 +123,8 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 
 function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 	if(
-		gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth &&
-		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 0 &&
+		gmailComposeView.getElement().clientWidth > gmailComposeView.getBottomBarTable().clientWidth ||
+		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length === 0 ||
 		gmailComposeView.getElement().classList.contains(('inboxsdk__compose_narrow_buttons'))
 	) return;
 
