@@ -11,6 +11,7 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type {Bus} from 'kefir-bus';
 
+import findParent from '../../../../common/find-parent';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
@@ -79,6 +80,8 @@ class GmailThreadView {
 			this._setupToolbarView();
 			this._setupMessageViewStream();
 		}
+
+		this._listenToExpandCollapseAll();
 	}
 
 	// TODO use livesets eventually
@@ -531,6 +534,42 @@ class GmailThreadView {
 		this._driver.getLogger().eventSdkPassive('gmailSidebarElementInfo', eventData);
 
 		hasLoggedAddonInfo = true;
+	}
+
+	_listenToExpandCollapseAll() {
+		//expand all
+		const expandAllElementImg = querySelector(this._element, 'img.gx');
+		const expandAllElement = findParent(expandAllElementImg, (el) => el.getAttribute('role') === 'button');
+
+		if(expandAllElement){
+			Kefir.merge([
+				Kefir.fromEvents(expandAllElement, 'click'),
+				Kefir.fromEvents(expandAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
+			])
+			.takeUntilBy(this._stopper)
+			.onValue(() => {
+				for(let customMessageView of this._customMessageViews){
+					customMessageView.expand();
+				}
+			});
+		}
+
+
+		//collapse all
+		const collapseAllElementImg = querySelector(this._element, 'img.gq');
+		const collapseAllElement = findParent(collapseAllElementImg, (el) => el.getAttribute('role') === 'button');
+		if(collapseAllElement){
+			Kefir.merge([
+				Kefir.fromEvents(collapseAllElement, 'click'),
+				Kefir.fromEvents(collapseAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
+			])
+			.takeUntilBy(this._stopper)
+			.onValue(() => {
+				for(let customMessageView of this._customMessageViews){
+					customMessageView.collapse();
+				}
+			});
+		}
 	}
 }
 
