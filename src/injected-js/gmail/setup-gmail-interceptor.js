@@ -11,6 +11,8 @@ import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
+import * as messageTimeHolder from '../message-time-holder';
+import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import quotedSplit from '../../common/quoted-split';
 import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
@@ -52,6 +54,7 @@ export default function setupGmailInterceptor() {
   }
 
   threadIdentifier.setup();
+  messageTimeHolder.setup();
 
   //email sending modifier/notifier
   {
@@ -347,6 +350,25 @@ export default function setupGmailInterceptor() {
         }
       }
     });
+  }
+
+  // intercept and process conversation view responses to get message dates
+  {
+    // do this for gmail v1
+    {
+      js_frame_wrappers.push({
+        isRelevantTo(connection) {
+          return connection.params.view === 'cv';
+        },
+
+        originalResponseTextLogger(connection) {
+          if(connection.status === 200) {
+            const groupedMessages = GmailResponseProcessor.extractMessages(connection.originalResponseText);
+            messageTimeHolder.add(groupedMessages);
+          }
+        }
+      });
+    }
   }
 
   // Search suggestions modifier

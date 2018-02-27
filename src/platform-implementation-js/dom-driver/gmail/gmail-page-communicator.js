@@ -14,6 +14,24 @@ import Logger from '../../lib/logger';
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
 
+  getMessageDate(threadId: string, message: HTMLElement): ?number {
+    let date = message.getAttribute('data-inboxsdk-sortdate');
+    if(!date){
+      message.dispatchEvent(new CustomEvent('inboxSDKtellMeThisMessageDate', {
+        bubbles: true,
+        cancelable: false,
+        detail: {
+          threadId
+        }
+      }));
+
+      date = message.getAttribute('data-inboxsdk-sortdate');
+    }
+
+    if(date) return +date;
+    else return null;
+  }
+
   getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {

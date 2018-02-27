@@ -559,6 +559,72 @@ function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[
   return t.toArray(threadResponseArray, _extractThreadArraysFromResponseArrayXf);
 }
 
+
+export type Message = {
+  date: number;
+  messageId: string;
+  threadId: string;
+}
+
+
+
+const _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf = t.compose(
+  t.cat,
+  t.filter(item => item[0] === 'cs'),
+  t.map(item => ({
+    threadId: item[1],
+    messageIds: item[8]
+  }))
+);
+
+const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
+  t.cat,
+  _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf
+);
+
+const _extractMessagesFromResponseArrayFromRefreshXf = t.compose(
+  t.cat,
+  t.filter(item => item[0] === 'ms'),
+  t.map(item => ({
+    messageId: item[1],
+    date: item[7]
+  }))
+);
+
+const _extractMessagesFromResponseArrayXf = t.compose(
+  t.cat,
+  _extractMessagesFromResponseArrayFromRefreshXf
+);
+
+export function extractMessages(response: string): Array<{threadId: string; messages: Message[]}> {
+ const {value} = deserialize(response);
+
+ // regular view=cv requests have a top level array length of 0
+ // whereas view=cv requests when you refresh Gmail while looking at a thread
+ // have a top level array with more elements
+ let threadExtractionFunction = value.length === 1 ?
+    _extractThreadsFromConversationViewResponseArrayXf :
+    _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf;
+
+ const threads = t.toArray(value, threadExtractionFunction);
+
+
+ let messageExtractionFunction = value.length === 1 ?
+  _extractMessagesFromResponseArrayXf :
+  _extractMessagesFromResponseArrayFromRefreshXf;
+
+ const messages = t.toArray(value, messageExtractionFunction);
+ const messageMap = {};
+ messages.forEach(message => {
+   messageMap[message.messageId] = message;
+ });
+
+ return threads.map(({threadId, messageIds}) => ({
+   threadId,
+   messages: messageIds.map(messageId => messageMap[messageId])
+ }));
+}
+
 function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
   const _threadsToTbGroupsXf = t.compose(
     t.map(thread => thread._originalGmailFormat),

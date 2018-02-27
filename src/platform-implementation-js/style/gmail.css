@@ -2065,3 +2065,38 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 /* end app toolbar */
+
+
+/* custom message views */
+
+.inboxsdk__custom_message_view {
+  display: flex;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top: 1px solid rgb(216, 216, 216);
+}
+
+.inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+  background-color: rgb(245, 245, 245);
+  cursor: pointer;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 8px;
+  padding-right: 12px;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  height: 32px;
+  width: 32px;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
+
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_header {
+  cursor: pointer;
+}
+
+/* end custom message views */

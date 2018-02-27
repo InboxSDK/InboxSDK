@@ -153,6 +153,11 @@ class GmailMessageView {
 		return querySelector(this._element, '.ads .gK .g3').title;
 	}
 
+	async getDate(): Promise<?number> {
+		const threadId = await this._threadViewDriver.getThreadIDAsync();
+		return this._driver.getPageCommunicator().getMessageDate(threadId, this._element);
+	}
+
 	getAttachmentCardViewDrivers() {
 		if(!this._gmailAttachmentAreaView){
 			return [];
@@ -420,7 +425,7 @@ class GmailMessageView {
 	}
 
 	getViewState(): VIEW_STATE {
-		if(this._element.classList.contains('kQ')){
+		if(this._element.classList.contains('kQ') || this._element.classList.contains('kx')){
 			return 'HIDDEN';
 		}
 		else if(this._element.classList.contains('kv')){

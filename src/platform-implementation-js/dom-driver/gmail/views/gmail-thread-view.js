@@ -16,6 +16,7 @@ import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
+import CustomMessageView from '../../../views/conversations/custom-message-view';
 
 import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
@@ -24,6 +25,8 @@ import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
 import WidthManager from './gmail-thread-view/width-manager';
+
+import type {CustomMessageDescriptor} from '../../../views/conversations/custom-message-view';
 
 let hasLoggedAddonInfo = false;
 
@@ -43,6 +46,7 @@ class GmailThreadView {
 	_readyStream: Kefir.Observable<any>;
 	_threadID: ?string;
 	_syncThreadID: ?string;
+	_customMessageViews: Set<CustomMessageView> = new Set();
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
 		this._element = element;
@@ -107,6 +111,10 @@ class GmailThreadView {
 		if (this._newMessageMutationObserver) {
 			this._newMessageMutationObserver.disconnect();
 		}
+
+		for(let customMessageView of this._customMessageViews){
+			customMessageView.destroy();
+		}
 	}
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>){
@@ -146,6 +154,44 @@ class GmailThreadView {
 			.onValue(() => view.destroy());
 
 		return view;
+	}
+
+	addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
+		const customMessageView = new CustomMessageView(descriptorStream);
+		this._readyStream.onValue(() => {
+			descriptorStream.take(1).onValue(async descriptor => {
+				const messageContainer = this._element.querySelector('[role=list]');
+				if(!messageContainer) return;
+
+				let mostRecentDate = Number.MIN_SAFE_INTEGER;
+				let insertBeforeMessage;
+
+				let isInHidden = false;
+
+				for(let messageView of this._messageViewDrivers) {
+					const currentDate = await messageView.getDate();
+					isInHidden = messageView.getViewState() === 'HIDDEN';
+					if(descriptor.sortDate.getTime() >= mostRecentDate && descriptor.sortDate.getTime() <= currentDate){
+						insertBeforeMessage = messageView.getElement();
+						break;
+					}
+
+					mostRecentDate = currentDate;
+				}
+
+				if(insertBeforeMessage) insertBeforeMessage.insertAdjacentElement('beforebegin', customMessageView.getElement());
+				else messageContainer.insertAdjacentElement('afterend', customMessageView.getElement());
+
+				if(isInHidden){
+					// nothing for now
+				}
+			});
+		});
+
+		this._customMessageViews.add(customMessageView);
+		customMessageView.on('destroy', () => this._customMessageViews.delete(customMessageView));
+
+		return customMessageView;
 	}
 
 	getSubject(): string {
