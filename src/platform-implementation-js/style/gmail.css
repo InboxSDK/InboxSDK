@@ -2074,6 +2074,22 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   padding-top: 12px;
   padding-bottom: 12px;
   border-top: 1px solid rgb(216, 216, 216);
+  border-collapse: collapse;
+}
+
+.inboxsdk__custom_message_view_hidden {
+  display: none;
+}
+
+/* when cusotm message is right after the last message with its reply */
+.h7.ie + .inboxsdk__custom_message_view {
+  margin-top: 5px;
+}
+
+/* when custom message is after the super collapsed message elements */
+.kQ + .inboxsdk__custom_message_view,
+.kx + .inboxsdk__custom_message_view {
+  margin-top: 1px;
 }
 
 .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
@@ -2084,6 +2100,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
   padding-left: 8px;
   padding-right: 12px;
+  flex-shrink: 0;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
@@ -2092,11 +2109,32 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
-
+  width: 100%;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_header {
   cursor: pointer;
+}
+
+.inboxsdk__custom_message_view_app_notice {
+  position: relative;
+  top: -8px;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+}
+
+.inboxsdk__custom_message_view_app_notice > * {
+  background-color: rgb(245, 245, 245);
+  padding: 0px 8px;
+  font-size: 80%;
+  color: #555;
+}
+
+.adv .inboxsdk__custom_message_view_app_notice {
+  display: inline-flex;
+  margin-left: 10px;
+  top: -7px;
 }
 
 /* end custom message views */

@@ -100,6 +100,11 @@ export default class CustomMessageView extends SafeEventEmitter {
     return this._el;
   }
 
+  getSortDate() {
+    if(this._lastDescriptor) return this._lastDescriptor.sortDate;
+    else return null;
+  }
+
   _setupElement(){
     this._el = document.createElement('div');
     this._el.classList.add('inboxsdk__custom_message_view');

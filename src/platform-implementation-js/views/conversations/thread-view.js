@@ -47,6 +47,11 @@ class ThreadView extends EventEmitter {
 		return members.threadViewImplementation.addNoticeBar();
 	}
 
+	registerHiddenCustomMessageNoticeProvider(provider: (numMessages: number) => HTMLElement) {
+		const members = get(memberMap, this);
+		return members.threadViewImplementation.registerHiddenCustomMessageNoticeProvider(provider);
+	}
+
 	addCustomMessage(descriptor: Object): CustomMessageView {
 		const descriptorPropertyStream = kefirCast((Kefir: any), descriptor).toProperty();
 		const members = get(memberMap, this);

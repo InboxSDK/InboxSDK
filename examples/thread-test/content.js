@@ -1,3 +1,18 @@
+function addCustomMessage(sortDate){
+	const collapsedEl = document.createElement('div');
+	const headerEl = document.createElement('div');
+	const bodyEl = document.createElement('div');
+
+	collapsedEl.innerHTML = 'collapsed element';
+	headerEl.innerHTML = 'header element';
+	bodyEl.innerHTML = 'body element';
+
+	window._lastThreadView.addCustomMessage({
+		iconUrl: 'http://www.pvhc.net/img152/gohqnjgtktwlztooxcbj.jpg',
+		collapsedEl, bodyEl, headerEl, sortDate
+	});
+}
+
 InboxSDK.load(2, 'thread-example').then(sdk => {
 	'use strict';
 
@@ -16,18 +31,11 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				console.log('threadView destroy');
 			});
 
-			const collapsedEl = document.createElement('div');
-			const headerEl = document.createElement('div');
-			const bodyEl = document.createElement('div');
+			threadView.registerHiddenCustomMessageNoticeProvider(number => {
+				const span = document.createElement('span');
+				span.innerText = 'There are ' + (number) + ' lights.';
 
-			collapsedEl.innerHTML = 'collapsed element';
-			headerEl.innerHTML = 'header element';
-			bodyEl.innerHTML = 'body element';
-
-			threadView.addCustomMessage({
-				iconUrl: 'http://www.pvhc.net/img152/gohqnjgtktwlztooxcbj.jpg',
-				collapsedEl, bodyEl, headerEl,
-				sortDate: new Date('2017-12-30')
+				return span;
 			});
 
 		})();

@@ -11,6 +11,7 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type {Bus} from 'kefir-bus';
 
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
@@ -47,6 +48,9 @@ class GmailThreadView {
 	_threadID: ?string;
 	_syncThreadID: ?string;
 	_customMessageViews: Set<CustomMessageView> = new Set();
+	_hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
+	_hiddenCustomMessageNoticeProvider: ?(numHidden: number) => HTMLElement;
+	_hiddenCustomMessageNoticeElement: ?HTMLElement;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
 		this._element = element;
@@ -156,10 +160,15 @@ class GmailThreadView {
 		return view;
 	}
 
+	registerHiddenCustomMessageNoticeProvider(provider: (numHidden: number) => HTMLElement) {
+		this._hiddenCustomMessageNoticeProvider = provider;
+	}
+
 	addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
 		const customMessageView = new CustomMessageView(descriptorStream);
 		this._readyStream.onValue(() => {
 			descriptorStream.take(1).onValue(async descriptor => {
+
 				const messageContainer = this._element.querySelector('[role=list]');
 				if(!messageContainer) return;
 
@@ -168,22 +177,40 @@ class GmailThreadView {
 
 				let isInHidden = false;
 
-				for(let messageView of this._messageViewDrivers) {
-					const currentDate = await messageView.getDate();
-					isInHidden = messageView.getViewState() === 'HIDDEN';
-					if(descriptor.sortDate.getTime() >= mostRecentDate && descriptor.sortDate.getTime() <= currentDate){
-						insertBeforeMessage = messageView.getElement();
+				const messages = [
+					...await Promise.all(this._messageViewDrivers.map(async messageView => ({
+							sortDatetime: (await messageView.getDate()) || 0,
+							isHidden: messageView.getViewState() === 'HIDDEN',
+							element: messageView.getElement()
+						}))),
+					...Array.from(this._customMessageViews).filter(cmv => cmv !== customMessageView).map(cmv => {
+						const date = cmv.getSortDate();
+						const datetime = date ? date.getTime() : null;
+
+						return {
+							sortDatetime: datetime || 0,
+							isHidden: cmv.getElement().classList.contains('inboxsdk__custom_message_view_hidden'),
+							element: cmv.getElement()
+						};
+					})
+				].sort((a, b) => a.sortDatetime - b.sortDatetime);
+
+				for(let message of messages) {
+					isInHidden = message.isHidden;
+
+					if(descriptor.sortDate.getTime() >= mostRecentDate && descriptor.sortDate.getTime() <= message.sortDatetime){
+						insertBeforeMessage = message.element;
 						break;
 					}
 
-					mostRecentDate = currentDate;
+					mostRecentDate = message.sortDatetime;
 				}
 
 				if(insertBeforeMessage) insertBeforeMessage.insertAdjacentElement('beforebegin', customMessageView.getElement());
-				else messageContainer.insertAdjacentElement('afterend', customMessageView.getElement());
+				else messageContainer.insertAdjacentElement('beforeend', customMessageView.getElement());
 
 				if(isInHidden){
-					// nothing for now
+					this._setupHiddenCustomMessage(customMessageView);
 				}
 			});
 		});
@@ -192,6 +219,81 @@ class GmailThreadView {
 		customMessageView.on('destroy', () => this._customMessageViews.delete(customMessageView));
 
 		return customMessageView;
+	}
+
+	_setupHiddenCustomMessage(customMessageView: CustomMessageView) {
+		this._hiddenCustomMessageViews.add(customMessageView);
+
+		// hide the element
+		customMessageView.getElement().classList.add('inboxsdk__custom_message_view_hidden');
+
+		// get the message element that contains the hidden messages notice
+		let hiddenNoticeMessageElement = this._element.querySelector('.adv');
+		let nativeHiddenNoticePresent = true;
+		if(!hiddenNoticeMessageElement) {
+			nativeHiddenNoticePresent = false;
+			const superCollapsedMessageElements = Array.from(this._element.querySelectorAll('.kQ'));
+			if(superCollapsedMessageElements.length < 2) return;
+
+			hiddenNoticeMessageElement = superCollapsedMessageElements[1];
+		};
+
+		// listen for a class change on that message which occurs when it becomes visible
+		makeMutationObserverChunkedStream(
+			hiddenNoticeMessageElement,
+			{
+				attributes: true,
+				attributeFilter: ['class']
+			}
+		)
+		.takeUntilBy(Kefir.merge([
+			this._stopper,
+			Kefir.fromEvents(customMessageView, 'destroy')
+		]))
+		.filter(() => hiddenNoticeMessageElement && !hiddenNoticeMessageElement.classList.contains('kQ')) //when kQ is gone, message is visible
+		.onValue(() => {
+			customMessageView.getElement().classList.remove('inboxsdk__custom_message_view_hidden');
+			if(this._hiddenCustomMessageNoticeElement) this._hiddenCustomMessageNoticeElement.remove();
+			this._hiddenCustomMessageNoticeElement = null;
+		});
+
+		this._updateHiddenNotice(hiddenNoticeMessageElement, nativeHiddenNoticePresent);
+
+		Kefir
+			.fromEvents(customMessageView, 'destroy')
+			.takeUntilBy(this._stopper)
+			.take(1)
+			.onValue(() => {
+				this._hiddenCustomMessageViews.delete(customMessageView);
+				if(hiddenNoticeMessageElement) this._updateHiddenNotice(hiddenNoticeMessageElement, nativeHiddenNoticePresent);
+			});
+	}
+
+	_updateHiddenNotice(hiddenNoticeMessageElement: HTMLElement, nativeHiddenNoticePresent: boolean) {
+		const existingAppNoticeElement = this._hiddenCustomMessageNoticeElement;
+		if(existingAppNoticeElement){
+			existingAppNoticeElement.remove();
+			this._hiddenCustomMessageNoticeElement = null;
+		}
+
+		const noticeProvider = this._hiddenCustomMessageNoticeProvider;
+		if(!noticeProvider) return;
+
+		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('div');
+		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice');
+
+		const appNoticeElement = noticeProvider(this._hiddenCustomMessageViews.size);
+		appNoticeContainerElement.appendChild(appNoticeElement);
+
+		if(nativeHiddenNoticePresent){
+			const nativeHiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
+			nativeHiddenNoticeElement.insertAdjacentElement('afterend', appNoticeContainerElement);
+		}
+		else {
+			appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_noNative');
+			const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
+			insertionPoint.appendChild(appNoticeContainerElement);
+		}
 	}
 
 	getSubject(): string {
@@ -331,7 +433,7 @@ class GmailThreadView {
 		var self = this;
 		mutations.forEach(function(mutation){
 			Array.prototype.forEach.call(mutation.addedNodes, function(addedNode){
-				self._createMessageView(addedNode);
+				if(!addedNode.classList.contains('inboxsdk__custom_message_view')) self._createMessageView(addedNode);
 			});
 		});
 	}
