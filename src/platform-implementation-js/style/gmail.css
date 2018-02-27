@@ -2131,10 +2131,27 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   color: #555;
 }
 
+/* hidden message notice beside native notice */
 .adv .inboxsdk__custom_message_view_app_notice {
   display: inline-flex;
   margin-left: 10px;
   top: -7px;
+}
+
+/* compact density setting */
+
+.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  height: 24px;
+  width: 24px;
+}
+
+.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view  {
+  padding-top: 6px;
+}
+
+.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 4px;
+  padding-right: 8px;
 }
 
 /* end custom message views */
