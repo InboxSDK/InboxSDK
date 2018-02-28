@@ -353,7 +353,7 @@ class GmailThreadView {
 			}
 		}
 
-		if(this._driver.isUsingSyncAPI() && !this._isPreviewedThread){
+		if(this._driver.isUsingSyncAPI()){
 			this._syncThreadID = threadID;
 			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
 		}

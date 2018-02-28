@@ -18,9 +18,9 @@ export default function setupGmonkeyHandler() {
     if((event:any).detail.isPreviewedThread){
       const rows = Array.from(document.querySelectorAll('[gh=tl] tr.aps'));
       if(rows.length > 0){
-        const elementWithId = rows.map(row => row.querySelector('[data-legacy-thread-id]')).filter(Boolean)[0];
+        const elementWithId = rows.map(row => row.querySelector('[data-thread-id]')).filter(Boolean)[0];
         if(elementWithId){
-          threadId = elementWithId.getAttribute('data-legacy-thread-id');
+          threadId = elementWithId.getAttribute('data-thread-id');
         }
         else {
           threadId = rows[0].getAttribute('data-inboxsdk-threadid');
