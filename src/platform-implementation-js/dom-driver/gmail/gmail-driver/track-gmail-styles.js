@@ -3,10 +3,11 @@
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
 const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
 
-function getDensity(): string {
+function getDensity(driver: GmailDriver): string {
   // get the padding amount on the left-nav-menu entries to find the active
   // density setting value.
   const navItemOuter = document.querySelector('.TO .TN');
@@ -24,7 +25,7 @@ function getDensity(): string {
   }
 }
 
-function isDarkTheme(): boolean {
+function isDarkTheme(driver: GmailDriver): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
   const navItem = document.querySelector('.aio');
@@ -45,7 +46,7 @@ function isDarkTheme(): boolean {
   return r > 128;
 }
 
-export default function trackGmailStyles() {
+export default function trackGmailStyles(driver: GmailDriver) {
   if (
     (document.head:any).hasAttribute('data-inboxsdk-gmail-style-tracker') ||
     GmailElementGetter.isStandalone()
@@ -58,7 +59,7 @@ export default function trackGmailStyles() {
   let currentDarkTheme = null;
 
   function checkStyles() {
-    const newDensity = getDensity();
+    const newDensity = getDensity(driver);
     if (currentDensity !== newDensity) {
       if (currentDensity) {
         ((document.body:any):HTMLElement).classList.remove('inboxsdk__gmail_density_' + currentDensity);
@@ -67,7 +68,7 @@ export default function trackGmailStyles() {
       ((document.body:any):HTMLElement).classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
-    const newDarkTheme = isDarkTheme();
+    const newDarkTheme = isDarkTheme(driver);
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
       if (currentDarkTheme) {

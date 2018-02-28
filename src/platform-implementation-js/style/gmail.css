@@ -2071,9 +2071,9 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__custom_message_view {
   display: flex;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-top: 1px solid rgb(216, 216, 216);
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-top: 1px solid #efefef;
   border-collapse: collapse;
 }
 
@@ -2093,19 +2093,19 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
-  background-color: rgb(245, 245, 245);
   cursor: pointer;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
-  padding-left: 8px;
-  padding-right: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
   flex-shrink: 0;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
   height: 32px;
   width: 32px;
+  border-radius: 50%;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
@@ -2125,7 +2125,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 .inboxsdk__custom_message_view_app_notice > * {
-  background-color: rgb(245, 245, 245);
+  background-color: white;
   padding: 0px 8px;
   font-size: 80%;
   color: #555;
@@ -2140,18 +2140,44 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* compact density setting */
 
-.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+body.inboxsdk__gmailv1css .inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
   height: 24px;
   width: 24px;
 }
 
-.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view  {
+body.inboxsdk__gmailv1css .inboxsdk__gmail_density_compact .inboxsdk__custom_message_view  {
   padding-top: 6px;
 }
 
-.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+body.inboxsdk__gmailv1css .inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
   padding-left: 4px;
   padding-right: 8px;
 }
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top-color: rgb(216, 216, 216);
+}
+
+/* end compact density setting */
+
+/* gmail v1 specific ui */
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice > *,
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+  background-color: rgb(245, 245, 245);
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 8px;
+  padding-right: 12px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  border-radius: 0%;
+}
+
+/* end v1 specific ui */
 
 /* end custom message views */

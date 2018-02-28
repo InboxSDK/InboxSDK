@@ -170,7 +170,7 @@ class GmailThreadView {
 	addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
 		const customMessageView = new CustomMessageView(descriptorStream);
 		this._readyStream.onValue(() => {
-			descriptorStream.take(1).onValue(async descriptor => {
+			descriptorStream.take(1).onValue(async (descriptor): any => {
 
 				const messageContainer = this._element.querySelector('[role=list]');
 				if(!messageContainer) return;
