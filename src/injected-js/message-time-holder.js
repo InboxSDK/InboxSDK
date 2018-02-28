@@ -20,8 +20,8 @@ export function setup() {
   });
 }
 
-export function add(groupedMessages: Array<{threadId: string; messages: Message[]}>) {
+export function add(groupedMessages: Array<{threadID: string; messages: Message[]}>) {
   groupedMessages.forEach(group => {
-    threadIdToMessages.set(group.threadId, group.messages);
+    threadIdToMessages.set(group.threadID, group.messages);
   });
 }

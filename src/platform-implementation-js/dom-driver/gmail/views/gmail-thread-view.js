@@ -309,6 +309,10 @@ class GmailThreadView {
 		}
 	}
 
+	getInternalID(): string {
+		return this._syncThreadID || this.getThreadID();
+	}
+
 	getThreadID(): string {
 		if(this._threadID) return this._threadID;
 

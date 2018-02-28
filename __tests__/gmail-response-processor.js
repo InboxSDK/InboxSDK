@@ -496,10 +496,10 @@ describe('extractMessage', () => {
     const response = GmailResponseProcessor.extractMessages(rawResponse);
 
     expect(response.length).toBe(1);
-    expect(response[0].threadId).toBe('160ead0eedc0a679');
+    expect(response[0].threadID).toBe('160ead0eedc0a679');
     expect(response[0].messages.length).toBe(24);
-    expect(response[0].messages[0].messageId).toBe('160ead0eedc0a679');
-    expect(response[0].messages[23].messageId).toBe('161c535d6934d7c0');
+    expect(response[0].messages[0].messageID).toBe('160ead0eedc0a679');
+    expect(response[0].messages[23].messageID).toBe('161c535d6934d7c0');
   });
 
   it('can handle response where multiple thread messages are in one response', async () => {
@@ -507,9 +507,9 @@ describe('extractMessage', () => {
     const response = GmailResponseProcessor.extractMessages(rawResponse);
 
     expect(response.length).toBe(5);
-    expect(response[0].threadId).toBe('161d4a33bb999821');
+    expect(response[0].threadID).toBe('161d4a33bb999821');
     expect(response[0].messages.length).toBe(3);
-    expect(response[4].threadId).toBe('161ba46a8807e7ad');
+    expect(response[4].threadID).toBe('161ba46a8807e7ad');
     expect(response[4].messages.length).toBe(5);
   });
 
@@ -518,10 +518,10 @@ describe('extractMessage', () => {
     const response = GmailResponseProcessor.extractMessages(rawResponse);
 
     expect(response.length).toBe(1);
-    expect(response[0].threadId).toBe('1619be4d87a1bfe5');
+    expect(response[0].threadID).toBe('1619be4d87a1bfe5');
     expect(response[0].messages.length).toBe(18);
-    expect(response[0].messages[0].messageId).toBe('1619be4d87a1bfe5');
-    expect(response[0].messages[17].messageId).toBe('161d49f1cce83d66');
+    expect(response[0].messages[0].messageID).toBe('1619be4d87a1bfe5');
+    expect(response[0].messages[17].messageID).toBe('161d49f1cce83d66');
   });
 
 });

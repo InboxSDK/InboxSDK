@@ -36,6 +36,10 @@ export default async function getThreadFromSyncThreadId(driver: GmailDriver, syn
   });
 
   const threadDescriptors = extractThreadsFromThreadResponse(text);
-  if(threadDescriptors.length > 0) return threadDescriptors[0];
-  else throw new Error('thread not available');
+  if(threadDescriptors.length > 0) {
+    const thread = threadDescriptors[0];
+    if(thread.oldGmailThreadID) return (thread: any);
+  }
+
+  throw new Error('thread not available');
 }

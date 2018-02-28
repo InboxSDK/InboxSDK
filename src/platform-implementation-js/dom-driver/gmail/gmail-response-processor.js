@@ -562,8 +562,7 @@ function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[
 
 export type Message = {
   date: number;
-  messageId: string;
-  threadId: string;
+  messageID?: string;
 }
 
 
@@ -572,8 +571,8 @@ const _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf = 
   t.cat,
   t.filter(item => item[0] === 'cs'),
   t.map(item => ({
-    threadId: item[1],
-    messageIds: item[8]
+    threadID: item[1],
+    messageIDs: item[8]
   }))
 );
 
@@ -586,7 +585,7 @@ const _extractMessagesFromResponseArrayFromRefreshXf = t.compose(
   t.cat,
   t.filter(item => item[0] === 'ms'),
   t.map(item => ({
-    messageId: item[1],
+    messageID: item[1],
     date: item[7]
   }))
 );
@@ -596,7 +595,7 @@ const _extractMessagesFromResponseArrayXf = t.compose(
   _extractMessagesFromResponseArrayFromRefreshXf
 );
 
-export function extractMessages(response: string): Array<{threadId: string; messages: Message[]}> {
+export function extractMessages(response: string): Array<{threadID: string; messages: Message[]}> {
  const {value} = deserialize(response);
 
  // regular view=cv requests have a top level array length of 0
@@ -616,12 +615,12 @@ export function extractMessages(response: string): Array<{threadId: string; mess
  const messages = t.toArray(value, messageExtractionFunction);
  const messageMap = {};
  messages.forEach(message => {
-   messageMap[message.messageId] = message;
+   messageMap[message.messageID] = message;
  });
 
- return threads.map(({threadId, messageIds}) => ({
-   threadId,
-   messages: messageIds.map(messageId => messageMap[messageId])
+ return threads.map(({threadID, messageIDs}) => ({
+   threadID,
+   messages: messageIDs.map(messageID => messageMap[messageID])
  }));
 }
 
