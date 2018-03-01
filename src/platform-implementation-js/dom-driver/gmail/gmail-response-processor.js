@@ -565,9 +565,7 @@ export type Message = {
   messageID?: string;
 }
 
-
-
-const _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf = t.compose(
+const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
   t.cat,
   t.filter(item => item[0] === 'cs'),
   t.map(item => ({
@@ -576,12 +574,7 @@ const _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf = 
   }))
 );
 
-const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
-  t.cat,
-  _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf
-);
-
-const _extractMessagesFromResponseArrayFromRefreshXf = t.compose(
+const _extractMessagesFromResponseArrayXf = t.compose(
   t.cat,
   t.filter(item => item[0] === 'ms'),
   t.map(item => ({
@@ -590,29 +583,16 @@ const _extractMessagesFromResponseArrayFromRefreshXf = t.compose(
   }))
 );
 
-const _extractMessagesFromResponseArrayXf = t.compose(
-  t.cat,
-  _extractMessagesFromResponseArrayFromRefreshXf
-);
-
 export function extractMessages(response: string): Array<{threadID: string; messages: Message[]}> {
- const {value} = deserialize(response);
+  // regular view=cv requests have a top level array length of 1
+  // whereas view=cv requests when you refresh Gmail while looking at a thread
+  // have a top level array with more elements
+ let {value} = deserialize(response);
+ if(value.length === 1) value = value[0];
 
- // regular view=cv requests have a top level array length of 0
- // whereas view=cv requests when you refresh Gmail while looking at a thread
- // have a top level array with more elements
- let threadExtractionFunction = value.length === 1 ?
-    _extractThreadsFromConversationViewResponseArrayXf :
-    _extractThreadsFromConversationViewResponseArrayFromThreadViewRefreshXf;
+ const threads = t.toArray(value, _extractThreadsFromConversationViewResponseArrayXf);
+ const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
 
- const threads = t.toArray(value, threadExtractionFunction);
-
-
- let messageExtractionFunction = value.length === 1 ?
-  _extractMessagesFromResponseArrayXf :
-  _extractMessagesFromResponseArrayFromRefreshXf;
-
- const messages = t.toArray(value, messageExtractionFunction);
  const messageMap = {};
  messages.forEach(message => {
    messageMap[message.messageID] = message;
