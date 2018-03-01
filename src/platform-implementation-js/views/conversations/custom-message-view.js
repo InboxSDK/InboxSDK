@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import once from 'lodash/once';
 
 import SafeEventEmitter from '../../lib/safe-event-emitter';
 
@@ -24,7 +25,7 @@ export default class CustomMessageView extends SafeEventEmitter {
   _isCollapsed: boolean = true;
   _lastDescriptor: ?CustomMessageDescriptor;
 
-  constructor(descriptorStream: Kefir.Observable<CustomMessageDescriptor>) {
+  constructor(descriptorStream: Kefir.Observable<CustomMessageDescriptor>, onReady: () => any) {
     super();
 
     this._setupElement();
@@ -56,8 +57,8 @@ export default class CustomMessageView extends SafeEventEmitter {
         if(previousDescriptor) previousDescriptor.bodyEl.remove();
         this._contentBodyEl.appendChild(descriptor.bodyEl);
       }
-
-    });
+    })
+    .take(1).onValue(onReady);
   }
 
   destroy() {

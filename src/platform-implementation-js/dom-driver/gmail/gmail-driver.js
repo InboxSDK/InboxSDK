@@ -184,7 +184,7 @@ class GmailDriver {
 			trackEvents(this);
 			gmailLoadEvent(this);
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
-			trackGmailStyles(this);
+			trackGmailStyles();
 		}).catch(err => {
 			this._logger.error(err);
 		});

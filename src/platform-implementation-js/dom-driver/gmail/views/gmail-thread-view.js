@@ -168,10 +168,8 @@ class GmailThreadView {
 	}
 
 	addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
-		const customMessageView = new CustomMessageView(descriptorStream);
-		this._readyStream.onValue(() => {
-			descriptorStream.take(1).onValue(async (descriptor): any => {
-
+		const customMessageView = new CustomMessageView(descriptorStream, () => {
+			this._readyStream.onValue(async (): any => {
 				const messageContainer = this._element.querySelector('[role=list]');
 				if(!messageContainer) return;
 
@@ -198,10 +196,13 @@ class GmailThreadView {
 					})
 				].sort((a, b) => a.sortDatetime - b.sortDatetime);
 
+				const messageDate = customMessageView.getSortDate();
+				if(!messageDate) return;
+
 				for(let message of messages) {
 					isInHidden = message.isHidden;
 
-					if(descriptor.sortDate.getTime() >= mostRecentDate && descriptor.sortDate.getTime() <= message.sortDatetime){
+					if(messageDate.getTime() >= mostRecentDate && messageDate.getTime() <= message.sortDatetime){
 						insertBeforeMessage = message.element;
 						break;
 					}
@@ -353,7 +354,7 @@ class GmailThreadView {
 			}
 		}
 
-		if(this._driver.isUsingSyncAPI()){
+		if(this._driver.isUsingSyncAPI() && !this._isPreviewedThread){
 			this._syncThreadID = threadID;
 			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
 		}
