@@ -30,35 +30,38 @@ export default class CustomMessageView extends SafeEventEmitter {
 
     this._setupElement();
 
-    descriptorStream.onValue(descriptor => {
-      this._el.setAttribute('data-inboxsdk-sortdate', String(descriptor.sortDate.getTime()));
+    descriptorStream
+      .takeUntilBy(this._stopper)
+      .onValue(descriptor => {
+        this._el.setAttribute('data-inboxsdk-sortdate', String(descriptor.sortDate.getTime()));
 
-      const previousDescriptor = this._lastDescriptor;
-      this._lastDescriptor = descriptor;
+        const previousDescriptor = this._lastDescriptor;
+        this._lastDescriptor = descriptor;
 
-      if(!previousDescriptor || previousDescriptor.iconUrl !== descriptor.iconUrl){
-        const img = document.createElement('img');
-        img.src = descriptor.iconUrl;
-        this._iconEl.innerHTML = '';
-        this._iconEl.appendChild(img);
-      }
+        if(!previousDescriptor || previousDescriptor.iconUrl !== descriptor.iconUrl){
+          const img = document.createElement('img');
+          img.src = descriptor.iconUrl;
+          this._iconEl.innerHTML = '';
+          this._iconEl.appendChild(img);
+        }
 
-      if((!previousDescriptor || previousDescriptor.collapsedEl !== descriptor.collapsedEl) && this._isCollapsed) {
-        if (previousDescriptor) previousDescriptor.collapsedEl.remove();
-        this._contentEl.appendChild(descriptor.collapsedEl);
-      }
+        if((!previousDescriptor || previousDescriptor.collapsedEl !== descriptor.collapsedEl) && this._isCollapsed) {
+          if (previousDescriptor) previousDescriptor.collapsedEl.remove();
+          this._contentEl.appendChild(descriptor.collapsedEl);
+        }
 
-      if(!previousDescriptor || previousDescriptor.headerEl !== descriptor.headerEl){
-        if(previousDescriptor) previousDescriptor.headerEl.remove();
-        this._contentHeaderEl.appendChild(descriptor.headerEl);
-      }
+        if(!previousDescriptor || previousDescriptor.headerEl !== descriptor.headerEl){
+          if(previousDescriptor) previousDescriptor.headerEl.remove();
+          this._contentHeaderEl.appendChild(descriptor.headerEl);
+        }
 
-      if(!previousDescriptor || previousDescriptor.bodyEl !== descriptor.bodyEl) {
-        if(previousDescriptor) previousDescriptor.bodyEl.remove();
-        this._contentBodyEl.appendChild(descriptor.bodyEl);
-      }
-    })
-    .take(1).onValue(onReady);
+        if(!previousDescriptor || previousDescriptor.bodyEl !== descriptor.bodyEl) {
+          if(previousDescriptor) previousDescriptor.bodyEl.remove();
+          this._contentBodyEl.appendChild(descriptor.bodyEl);
+        }
+      })
+      .take(1)
+      .onValue(onReady);
   }
 
   destroy() {
