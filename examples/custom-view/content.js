@@ -67,7 +67,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     name: 'Monkeys',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     routeID: 'example/:monkeyName',
-    routeParams: 'george {} {} {}',
+    routeParams: {monkeyName: 'george {} {} {}'},
     type: sdk.NavMenu.NavItemTypes.LINK,
     accessory: {
       type: 'CREATE',
@@ -132,7 +132,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     // All the following options should be ignored in Gmailv2
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     routeID: 'example/:monkeyName',
-    routeParams: 'george {} {} {}',
+    routeParams: {monkeyName: 'george {} {} {}'},
     onClick: () => {
       console.log('GROUPER ITEM WAS CLICKED');
     },
