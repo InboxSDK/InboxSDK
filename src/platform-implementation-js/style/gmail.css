@@ -2162,7 +2162,7 @@ body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_mess
   padding-top: 4px;
 }
 
-body.inboxsdk__gmailv1css.inboxsdk__custom_message_view {
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
   padding-top: 12px;
   padding-bottom: 12px;
   border-top-color: rgb(216, 216, 216);
