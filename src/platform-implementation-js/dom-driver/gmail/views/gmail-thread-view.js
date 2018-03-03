@@ -168,6 +168,8 @@ class GmailThreadView {
 	}
 
 	addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
+		const parentElement = this._element.parentElement;
+		if(!parentElement) throw new Error('missing parent element');
 		const customMessageView = new CustomMessageView(descriptorStream, () => {
 			this._readyStream.onValue(async (): any => {
 				const messageContainer = this._element.querySelector('[role=list]');
@@ -216,11 +218,17 @@ class GmailThreadView {
 				if(isInHidden){
 					this._setupHiddenCustomMessage(customMessageView);
 				}
+
+				parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
 			});
 		});
 
 		this._customMessageViews.add(customMessageView);
-		customMessageView.on('destroy', () => this._customMessageViews.delete(customMessageView));
+		customMessageView.on('destroy', () => {
+			this._customMessageViews.delete(customMessageView);
+			if(this._customMessageViews.size > 0) parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
+			else parentElement.classList.remove('inboxsdk__thread_view_with_custom_view');
+		});
 
 		return customMessageView;
 	}

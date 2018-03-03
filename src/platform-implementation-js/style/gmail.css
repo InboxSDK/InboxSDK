@@ -2110,6 +2110,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
   width: 100%;
+  min-width: 0px;
 }
 
 .inboxsdk__custom_message_view .inboxsdk__custom_message_view_header {
@@ -2129,6 +2130,10 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   padding: 0px 8px;
   font-size: 80%;
   color: #555;
+}
+
+table[role=presentation].inboxsdk__thread_view_with_custom_view {
+  table-layout: fixed;
 }
 
 /* hidden message notice beside native notice */
@@ -2151,7 +2156,7 @@ body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_mess
 
 body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
   padding-left: 5px;
-  padding-right: 8px;
+  padding-right: 7px;
 }
 
 body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
