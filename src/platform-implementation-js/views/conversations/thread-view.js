@@ -11,6 +11,8 @@ import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type {Driver, ThreadViewDriver} from '../../driver-interfaces/driver';
 
+import type CustomMessageView, {CustomMessageDescriptor} from '../../views/conversations/custom-message-view';
+
 const memberMap = defonce(module, () => new WeakMap());
 
 // documented in src/docs/
@@ -43,6 +45,20 @@ class ThreadView extends EventEmitter {
 	addNoticeBar(): SimpleElementView {
 		const members = get(memberMap, this);
 		return members.threadViewImplementation.addNoticeBar();
+	}
+
+	registerHiddenCustomMessageNoticeProvider(provider: (numMessages: number) => HTMLElement) {
+		const members = get(memberMap, this);
+		return members.threadViewImplementation.registerHiddenCustomMessageNoticeProvider(provider);
+	}
+
+	addCustomMessage(descriptor: Object): CustomMessageView {
+		const descriptorPropertyStream = kefirCast((Kefir: any), descriptor).toProperty();
+		const members = get(memberMap, this);
+
+		members.driver.getLogger().eventSdkPassive('threadView.addCustomMessage');
+
+		return members.threadViewImplementation.addCustomMessage(descriptorPropertyStream);
 	}
 
 	getMessageViews(): Array<MessageView> {

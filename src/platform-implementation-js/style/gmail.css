@@ -2065,3 +2065,132 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 }
 
 /* end app toolbar */
+
+
+/* custom message views */
+
+.inboxsdk__custom_message_view {
+  display: flex;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-top: 1px solid #efefef;
+  border-collapse: collapse;
+}
+
+.inboxsdk__custom_message_view_hidden {
+  display: none;
+}
+
+/* when cusotm message is right after the last message with its reply */
+.h7.ie + .inboxsdk__custom_message_view {
+  margin-top: 5px;
+}
+
+/* when custom message is after the super collapsed message elements */
+.kQ + .inboxsdk__custom_message_view,
+.kx + .inboxsdk__custom_message_view {
+  margin-top: 1px;
+}
+
+.inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+  cursor: pointer;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 16px;
+  padding-right: 16px;
+  flex-shrink: 0;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
+  width: 100%;
+  min-width: 0px;
+}
+
+.inboxsdk__custom_message_view .inboxsdk__custom_message_view_header {
+  cursor: pointer;
+}
+
+.inboxsdk__custom_message_view_app_notice {
+  position: relative;
+  top: -8px;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+}
+
+.inboxsdk__custom_message_view_app_notice > * {
+  background-color: white;
+  padding: 0px 8px;
+  font-size: 80%;
+  color: #555;
+}
+
+table[role=presentation].inboxsdk__thread_view_with_custom_view {
+  table-layout: fixed;
+}
+
+/* hidden message notice beside native notice */
+.adv .inboxsdk__custom_message_view_app_notice {
+  display: inline-flex;
+  margin-left: 10px;
+  top: -7px;
+}
+
+/* compact density setting */
+
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  height: 24px;
+  width: 24px;
+}
+
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view  {
+  padding-top: 6px;
+}
+
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 5px;
+  padding-right: 7px;
+}
+
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+  padding-bottom: 2px;
+}
+
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
+  padding-top: 4px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top-color: rgb(216, 216, 216);
+}
+
+/* end compact density setting */
+
+/* gmail v1 specific ui */
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice > *,
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+  background-color: rgb(245, 245, 245);
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+  padding-left: 8px;
+  padding-right: 12px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+  border-radius: 0%;
+}
+
+/* end v1 specific ui */
+
+/* end custom message views */

@@ -11,6 +11,9 @@ import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
+import * as messageTimeHolder from '../message-time-holder';
+import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import * as GmailSyncResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-sync-response-processor';
 import quotedSplit from '../../common/quoted-split';
 import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
@@ -52,6 +55,7 @@ export default function setupGmailInterceptor() {
   }
 
   threadIdentifier.setup();
+  messageTimeHolder.setup();
 
   //email sending modifier/notifier
   {
@@ -347,6 +351,70 @@ export default function setupGmailInterceptor() {
         }
       }
     });
+  }
+
+  // intercept and process conversation view responses to get message dates
+  {
+    // do this for gmail v1
+    {
+      js_frame_wrappers.push({
+        isRelevantTo(connection) {
+          return connection.params.view === 'cv';
+        },
+
+        originalResponseTextLogger(connection) {
+          if(connection.status === 200) {
+            const groupedMessages = GmailResponseProcessor.extractMessages(connection.originalResponseText);
+            messageTimeHolder.add(groupedMessages);
+          }
+        }
+      });
+    }
+
+    // sync API based
+    {
+      // Sync API-based custom thread list interception
+      main_wrappers.push({
+        isRelevantTo: function(connection) {
+          return /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url);
+        },
+
+        originalResponseTextLogger(connection) {
+          if(connection.status === 200) {
+            const threads = GmailSyncResponseProcessor.extractThreadsFromSearchResponse(connection.originalResponseText);
+            messageTimeHolder.add(
+              threads.map((syncThread) => ({
+                threadID: syncThread.syncThreadID,
+                messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
+                  date: syncMessage.date
+                }))
+              }))
+            );
+          }
+        }
+      });
+
+      // Sync API-based custom thread list interception
+      main_wrappers.push({
+        isRelevantTo: function(connection) {
+          return /sync(?:\/u\/\d+)?\/i\/fd/.test(connection.url);
+        },
+
+        originalResponseTextLogger(connection) {
+          if(connection.status === 200) {
+            const threads = GmailSyncResponseProcessor.extractThreadsFromThreadResponse(connection.originalResponseText);
+            messageTimeHolder.add(
+              threads.map((syncThread) => ({
+                threadID: syncThread.syncThreadID,
+                messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
+                  date: syncMessage.date
+                }))
+              }))
+            );
+          }
+        }
+      });
+    }
   }
 
   // Search suggestions modifier

@@ -16,8 +16,10 @@ import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import SimpleElementView from '../../../views/SimpleElementView';
+import CustomMessageView from '../../../views/conversations/custom-message-view';
 import parser from '../detection/thread/parser';
 import type {Parsed} from '../detection/thread/parser';
+import type {CustomMessageDescriptor} from '../../../views/conversations/custom-message-view';
 
 class InboxThreadView {
   _element: HTMLElement;
@@ -131,6 +133,14 @@ class InboxThreadView {
       if (!m) throw new Error('Should not happen');
       return new BigNumber(m[0]).toString(16);
     }
+  }
+
+  registerHiddenCustomMessageNoticeProvider(provider: (numHidden: number) => HTMLElement) {
+    throw new Error('not supported');
+  }
+
+  addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
+    throw new Error('not supported');
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {

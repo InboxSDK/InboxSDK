@@ -87,8 +87,8 @@ class ThreadRowIdentifier {
       if(!syncThreadID) return null;
 
       const syncThread = await getSyncThreadFromSyncThreadId(this._driver, syncThreadID);
-      if(syncThread.extraMetaData.syncMessageIDs.length > 0){
-        return syncThread.extraMetaData.syncMessageIDs[0].replace('msg-a:', '');
+      if(syncThread.extraMetaData.syncMessageData.length > 0){
+        return syncThread.extraMetaData.syncMessageData[0].syncMessageID.replace('msg-a:', '');
       }
       else {
         return null;

@@ -10,7 +10,20 @@ export type SyncThread = {
   rawResponse: Object;
   extraMetaData: {
     snippet: string;
-    syncMessageIDs: string[];
+    syncMessageData: Array<{
+      syncMessageID: string;
+      date: number;
+    }>;
+  };
+};
+
+export type MinimalSyncThread = {
+  syncThreadID: string;
+  extraMetaData: {
+    syncMessageData: Array<{
+      syncMessageID: string;
+      date: number;
+    }>;
   };
 };
 
@@ -40,7 +53,10 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
           parsedResponse[15][1] &&
           parsedResponse[15][1][index]
         ) || '',
-        syncMessageIDs: descriptor[5].map(md => md[1])
+        syncMessageData: descriptor[5].map(md => ({
+          syncMessageID: md[1],
+          date: +md[7]
+        }))
       }
     };
 
@@ -50,7 +66,7 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
 }
 
 
-export function extractThreadsFromThreadResponse(response: string): SyncThread[] {
+export function extractThreadsFromThreadResponse(response: string): Array<SyncThread | MinimalSyncThread> {
   const parsedResponse = JSON.parse(response);
 
   const threadDescriptors = (
@@ -61,35 +77,45 @@ export function extractThreadsFromThreadResponse(response: string): SyncThread[]
   if(!threadDescriptors) throw new Error('Failed to process thread response');
 
   return threadDescriptors.map(descriptorWrapper => {
-    const descriptor = (
-      descriptorWrapper[2]
-    );
+    if(typeof descriptorWrapper[1] === 'string' && Array.isArray(descriptorWrapper[3])) {
+      return {
+        syncThreadID: descriptorWrapper[1],
+        extraMetaData: {
+          syncMessageData: (descriptorWrapper[3] || []).map(md => ({
+            syncMessageID: md[1],
+            date: +md[2][17]
+          }))
+        }
+      };
+    }
+    else {
+      const threadDescriptor = (
+        descriptorWrapper[2] &&
+        descriptorWrapper[2][1]
+      );
 
-    const threadDescriptor = (
-      descriptorWrapper[2] &&
-      descriptorWrapper[2][1]
-    );
+      const messageDescriptors = (
+          descriptorWrapper[2] &&
+          descriptorWrapper[2][2]
+        );
 
-    const messageDescriptors = (
-      descriptorWrapper[2] &&
-      descriptorWrapper[2][2]
-    ) || [];
+      if(!threadDescriptor) return null;
 
-    if(!threadDescriptor) return null;
-
-    return {
-      subject: threadDescriptor[2],
-      snippet: threadDescriptor[3],
-      syncThreadID: threadDescriptor[1],
-      oldGmailThreadID: new BigNumber(threadDescriptor[14]).toString(16),
-      rawResponse: descriptorWrapper,
-      extraMetaData: {
-        snippet: '',
-        syncMessageIDs: messageDescriptors.map(md => (
-          md[1]
-        ))
-      }
-    };
+      return {
+        subject: threadDescriptor[2],
+        snippet: threadDescriptor[3],
+        syncThreadID: threadDescriptor[1],
+        oldGmailThreadID: new BigNumber(threadDescriptor[14]).toString(16),
+        rawResponse: descriptorWrapper,
+        extraMetaData: {
+          snippet: '',
+          syncMessageData: messageDescriptors.map(md => ({
+            syncMessageId: md[1],
+            date: +md[2][17]
+          }))
+        }
+      };
+    }
   })
   .filter(Boolean);
 
@@ -106,7 +132,7 @@ export function replaceThreadsInSearchResponse(
 
   parsedResponse[3] = replacementThreads.map(({rawResponse}, index) => ({...rawResponse, '2': index}));
   parsedResponse[15][1] = replacementThreads.map(({extraMetaData}) => extraMetaData.snippet);
-  parsedResponse[15][2] = replacementThreads.map(({extraMetaData}) => extraMetaData.syncMessageIDs);
+  parsedResponse[15][2] = replacementThreads.map(({extraMetaData}) => extraMetaData.syncMessageData.map(({syncMessageID}) => syncMessageID));
 
   return JSON.stringify(parsedResponse);
 
