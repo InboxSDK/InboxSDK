@@ -186,7 +186,7 @@ class GmailThreadView {
 							isHidden: messageView.getViewState() === 'HIDDEN',
 							element: messageView.getElement()
 						}))),
-					...Array.from(this._customMessageViews).filter(cmv => cmv !== customMessageView).map(cmv => {
+					...Array.from(this._customMessageViews).filter(cmv => cmv !== customMessageView && cmv.getElement().parentElement /* it has been inserted into dom */).map(cmv => {
 						const date = cmv.getSortDate();
 						const datetime = date ? date.getTime() : null;
 
