@@ -172,7 +172,11 @@ export default class NativeGmailNavItemView {
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
 		var element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		if (this._driver.isUsingMaterialUI()) {
+			querySelector(element, '.TN').style.marginLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		} else {
+			querySelector(element, '.TO').style.paddingLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		}
 
 		this._setHeights();
 	}
