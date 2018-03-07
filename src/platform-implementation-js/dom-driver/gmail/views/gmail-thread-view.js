@@ -248,7 +248,7 @@ class GmailThreadView {
 			if(superCollapsedMessageElements.length < 2) return;
 
 			hiddenNoticeMessageElement = superCollapsedMessageElements[1];
-		};
+		}
 
 		// listen for a class change on that message which occurs when it becomes visible
 		makeMutationObserverChunkedStream(
