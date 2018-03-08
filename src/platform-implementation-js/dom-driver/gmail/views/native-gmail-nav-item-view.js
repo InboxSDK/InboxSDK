@@ -88,7 +88,7 @@ export default class NativeGmailNavItemView {
 	}
 
 	addNavItem(orderGroup: number, navItemDescriptor: Object): GmailNavItemView {
-		var gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
+		const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
 
 		Kefir.merge([
 			gmailNavItemView
@@ -144,8 +144,8 @@ export default class NativeGmailNavItemView {
 
 	_monitorElementForActiveChanges() {
 		this._element.classList.add('inboxsdk__navItem_claimed');
-		var element = this._element;
-		var classChangeStream = makeMutationObserverChunkedStream(element, {
+		const element = this._element;
+		const classChangeStream = makeMutationObserverChunkedStream(element, {
 			attributes: true, attributeFilter: ['class']
 		})
 			.takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
@@ -166,13 +166,17 @@ export default class NativeGmailNavItemView {
 	}
 
 	_addNavItemElement(gmailNavItemView: GmailNavItemView){
-		var itemContainerElement = this._getItemContainerElement();
+		const itemContainerElement = this._getItemContainerElement();
 
-		var insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
+		const insertBeforeElement = getInsertBeforeElement(gmailNavItemView.getElement(), itemContainerElement.children, ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']);
 		itemContainerElement.insertBefore(gmailNavItemView.getElement(), insertBeforeElement);
 
-		var element = gmailNavItemView.getElement();
-		querySelector(element, '.TO').style.paddingLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		const element = gmailNavItemView.getElement();
+		if (this._driver.isUsingMaterialUI()) {
+			querySelector(element, '.TN').style.marginLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		} else {
+			querySelector(element, '.TO').style.paddingLeft = getLeftIndentationPaddingValue(this._driver) + 'px';
+		}
 
 		this._setHeights();
 	}
