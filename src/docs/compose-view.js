@@ -479,6 +479,13 @@ var ComposeView = /** @lends ComposeView */ {
 	 */
 
 	/**
+	 * Fires whenever the message body's contents change.
+	 * ^gmail
+	 * ^inbox
+	 * @event ComposeView#bodyChanged
+	 */
+
+	/**
 	 * Fires when the From value is changed.
 	 * ^gmail
 	 * ^inbox
