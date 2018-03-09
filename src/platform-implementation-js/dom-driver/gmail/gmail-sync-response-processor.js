@@ -77,7 +77,10 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
   if(!threadDescriptors) throw new Error('Failed to process thread response');
 
   return threadDescriptors.map(descriptorWrapper => {
-    if(typeof descriptorWrapper[1] === 'string' && Array.isArray(descriptorWrapper[3])) {
+    if(
+      typeof descriptorWrapper[1] === 'string' && Array.isArray(descriptorWrapper[3]) &&
+      !(descriptorWrapper[2] && descriptorWrapper[2][1] && descriptorWrapper[2][1][14] && Array.isArray(descriptorWrapper[2][2]))
+    ) {
       return {
         syncThreadID: descriptorWrapper[1],
         extraMetaData: {
