@@ -244,6 +244,12 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
 var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
   /**
+  * Text of the label.
+  * @type {string}
+  */
+ title:null,
+
+  /**
   * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
   * @type {string}
   */
