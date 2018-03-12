@@ -244,7 +244,7 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
 var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
   /**
-  * Text of the label.
+  * Text to show when the user hovers the mouse over the button.
   * @type {string}
   */
  title:null,
