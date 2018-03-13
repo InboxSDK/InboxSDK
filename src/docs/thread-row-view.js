@@ -244,6 +244,12 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
 var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
 
   /**
+  * Text to show when the user hovers the mouse over the button.
+  * @type {string}
+  */
+ title:null,
+
+  /**
   * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
   * @type {string}
   */

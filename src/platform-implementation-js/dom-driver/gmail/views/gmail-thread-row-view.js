@@ -463,6 +463,12 @@ class GmailThreadRowView {
             }
 
             buttonSpan.classList.add('inboxsdk__thread_row_button');
+
+            if (buttonDescriptor.title) {
+              buttonSpan.setAttribute('title', buttonDescriptor.title);
+            } else {
+              buttonSpan.removeAttribute('title');
+            }
             buttonSpan.setAttribute('tabindex', "-1");
             buttonSpan.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
             (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);

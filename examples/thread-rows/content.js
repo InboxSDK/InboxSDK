@@ -1,136 +1,137 @@
 function log() {
-	console.log.apply(console, ['thread-rows'].concat(Array.prototype.slice.call(arguments)));
+  console.log.apply(console, ['thread-rows'].concat(Array.prototype.slice.call(arguments)));
 }
 
 InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
-	window._sdk = inboxSDK;
-	var i = 0;
+  window._sdk = inboxSDK;
+  var i = 0;
 
-	inboxSDK.Router.handleAllRoutes(function(routeView) {
-		console.log('routeID', routeView.getRouteID());
-		routeView.on('destroy', function() {
-			console.log('routeView destroyed', routeView.getRouteID());
-		});
-	});
+  inboxSDK.Router.handleAllRoutes(function(routeView) {
+    console.log('routeID', routeView.getRouteID());
+    routeView.on('destroy', function() {
+      console.log('routeView destroyed', routeView.getRouteID());
+    });
+  });
 
-	inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
-		var threadId = threadRowView.getThreadID();
-		//console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
-		console.log('got threadRowView', new Date().toString());
-		if (threadRowView.getVisibleMessageCount() == 0) {
-			threadRowView.addLabel(Kefir.fromPromise(threadRowView.getDraftID()).map(id => ({
-				title: ''+id
-			})));
-		}
+  inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
+    var threadId = threadRowView.getThreadID();
+    //console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
+    console.log('got threadRowView', new Date().toString());
+    if (threadRowView.getVisibleMessageCount() == 0) {
+      threadRowView.addLabel(Kefir.fromPromise(threadRowView.getDraftID()).map(id => ({
+        title: ''+id
+      })));
+    }
 
-		threadRowView.addImage(Kefir.constant({
-			imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
-			tooltip: 'Monkeys'
-		}));
+    threadRowView.addImage(Kefir.constant({
+      imageUrl: 'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+      tooltip: 'Monkeys'
+    }));
 
-		threadRowView.addLabel(Kefir.repeatedly(5000, [
-			{title:'A'},
-			{title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
-			{title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
-		]).toProperty({title:'0'}));
-		threadRowView.addLabel({
-			title:'a'+(i++),
-			iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
-			backgroundColor: 'white',
-			foregroundColor: 'blue',
-			iconBackgroundColor: 'green'
-		});
-		threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
-			{
-				iconClass: 'test_icon_thing',
-				title: 'thing'
-			},
-			{
-				iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
-				title: 'blah blah'
-			}
-		]));
-		threadRowView.replaceDraftLabel(Kefir.repeatedly(1000, [
-			{
-				text: 'Mail Merge',
-				count: 420
-			},
-			{
-				text: 'foo'
-			},
-			null
-		]));
-		var r = Math.random();
-		threadRowView.replaceDate(r > 0.33 ? {
-			text: r > 0.66 ? 'Returning in: 6 months' : 'aaa',
-			tooltip: 'foo of bar',
-			textColor: 'green'
-		} : null);
-		threadRowView.replaceDate(null);
+    threadRowView.addLabel(Kefir.repeatedly(5000, [
+      {title:'A'},
+      {title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
+      {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
+    ]).toProperty({title:'0'}));
+    threadRowView.addLabel({
+      title:'a'+(i++),
+      iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
+      backgroundColor: 'white',
+      foregroundColor: 'blue',
+      iconBackgroundColor: 'green'
+    });
+    threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
+      {
+        iconClass: 'test_icon_thing',
+        title: 'thing'
+      },
+      {
+        iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
+        title: 'blah blah'
+      }
+    ]));
+    threadRowView.replaceDraftLabel(Kefir.repeatedly(1000, [
+      {
+        text: 'Mail Merge',
+        count: 420
+      },
+      {
+        text: 'foo'
+      },
+      null
+    ]));
+    var r = Math.random();
+    threadRowView.replaceDate(r > 0.33 ? {
+      text: r > 0.66 ? 'Returning in: 6 months' : 'aaa',
+      tooltip: 'foo of bar',
+      textColor: 'green'
+    } : null);
+    threadRowView.replaceDate(null);
 
-		// threadRowView.addButton(Kefir.repeatedly(5000, [
-		// 	{
-		// 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
-		// 		iconClass: 'buttonLight'
-		// 	},
-		// 	{
-		// 		iconClass: 'test_button_thing',
-		// 	}
-		// ]));
+    // threadRowView.addButton(Kefir.repeatedly(5000, [
+    // 	{
+    // 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+    // 		iconClass: 'buttonLight'
+    // 	},
+    // 	{
+    // 		iconClass: 'test_button_thing',
+    // 	}
+    // ]));
 
-		threadRowView.addButton({
-			iconClass: 'test_button_thing',
-		});
+    threadRowView.addButton({
+      iconClass: 'test_button_thing',
+    });
 
-		var buttonBus = new Kefir.Bus();
-		threadRowView.addButton(buttonBus.toProperty());
-		buttonBus.emit({
-			iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
-			className: 'buttonLight',
-			hasDropdown: true,
-			onClick: function(event) {
-				event.dropdown.el.innerHTML += 'beep <b>beep</b><br>aaa<br>aaaaaa';
+    var buttonBus = new Kefir.Bus();
+    threadRowView.addButton(buttonBus.toProperty());
+    buttonBus.emit({
+      title: 'listIndicatorDark.png',
+      iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',
+      className: 'buttonLight',
+      hasDropdown: true,
+      onClick: function(event) {
+        event.dropdown.el.innerHTML += 'beep <b>beep</b><br>aaa<br>aaaaaa';
 
-				buttonBus.plug(Kefir.sequentially(1000, [
-					null,
-					{
-						iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicator.png',
-						hasDropdown: true,
-						onClick: function(event) {
-							event.dropdown.el.innerHTML += 'something new<p>new<p><b>more new';
+        buttonBus.plug(Kefir.sequentially(1000, [
+          null,
+          {
+            iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicator.png',
+            hasDropdown: true,
+            onClick: function(event) {
+              event.dropdown.el.innerHTML += 'something new<p>new<p><b>more new';
 
-							event.dropdown.on('unload', function() {
-								console.log('thread row button dropdown closed');
-							});
-							setTimeout(function() {
-								event.dropdown.close();
-							}, 10000);
-						}
-					}
-				]));
-			}
-		});
+              event.dropdown.on('unload', function() {
+                console.log('thread row button dropdown closed');
+              });
+              setTimeout(function() {
+                event.dropdown.close();
+              }, 10000);
+            }
+          }
+        ]));
+      }
+    });
 
-		threadRowView.addActionButton(Kefir.repeatedly(5000, [
-			{
-				type: inboxSDK.Lists.ActionButtonTypes.LINK,
-				title: 'Take action',
-				className: 'my-special-class',
-				url: 'https://google.com',
-				onClick(event) {
-					console.log('onClick fired: ', event);
-				}
-		  },
-			{
-				type: inboxSDK.Lists.ActionButtonTypes.LINK,
-				title: 'Actions woo!',
-				className: 'new-class',
-				url: 'https://www.streak.com',
-				onClick(event) {
-					console.log('modified onClick fired: ', event);
-				}
-		  }
-	  ]));
-	});
+    threadRowView.addActionButton(Kefir.repeatedly(5000, [
+      {
+        type: inboxSDK.Lists.ActionButtonTypes.LINK,
+        title: 'Take action',
+        className: 'my-special-class',
+        url: 'https://google.com',
+        onClick(event) {
+          console.log('onClick fired: ', event);
+        }
+      },
+      {
+        type: inboxSDK.Lists.ActionButtonTypes.LINK,
+        title: 'Actions woo!',
+        className: 'new-class',
+        url: 'https://www.streak.com',
+        onClick(event) {
+          console.log('modified onClick fired: ', event);
+        }
+      }
+    ]));
+  });
 
 });
