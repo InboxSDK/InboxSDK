@@ -934,6 +934,15 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
     padding-bottom: 0px;
   }
 
+  .inboxsdk__modal_toprow.inboxsdk__modal_toprow--constrain-title-width {
+    display: flex;
+  }
+
+  .inboxsdk__modal_title--constrain-title-width {
+    flex: 1;
+    width: 0;
+  }
+
 /* end modal */
 
 /* mole */

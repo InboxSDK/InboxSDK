@@ -62,6 +62,14 @@ var ModalOptions = /** @lends ModalOptions */{
   chrome:null,
 
   /**
+  * Whether to wrap the modal title based on the modal content.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  constrainTitleWidth:null,
+
+  /**
   * When chrome is set to false, this option controls whether a close (X) button should be added to the modal anyway.
   * If chrome is set to true then this property doesn't do anything.
   * ^optional

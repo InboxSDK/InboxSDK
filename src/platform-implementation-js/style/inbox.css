@@ -483,6 +483,14 @@
 .inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_toprow .inboxsdk__close_button {
   display: none;
 }
+.inboxsdk__modal_toprow.inboxsdk__modal_toprow--constrain-title-width {
+  display: flex;
+}
+
+.inboxsdk__modal_title--constrain-title-width {
+  flex: 1;
+  width: 0;
+}
 
 .inboxsdk__attachment_card {
   cursor: pointer;
