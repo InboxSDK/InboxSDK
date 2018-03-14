@@ -104,7 +104,6 @@ class InboxModalView {
 
   _setupModalContainerElement(options: Object) {
     const constrainTitleWidthTopRowClass = options.constrainTitleWidth ? 'inboxsdk__modal_toprow--constrain-title-width' : '';
-    const constrainTitleWidthTitleClass = options.constrainTitleWidth ? 'inboxsdk__modal_title--constrain-title-width' : '';
 
     this._modalContainerElement = document.createElement('div');
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
@@ -112,7 +111,7 @@ class InboxModalView {
     var htmlString = `
     <div class="inboxsdk__modal_container" tabindex="0" role="alertdialog">
       <div class="inboxsdk__modal_toprow ${constrainTitleWidthTopRowClass}">
-        <span class="${constrainTitleWidthTitleClass}" role="heading"></span>
+        <span role="heading"></span>
         <button title="Close" class="inboxsdk__close_button"></button>
       </div>
       <div class="inboxsdk__modal_content">

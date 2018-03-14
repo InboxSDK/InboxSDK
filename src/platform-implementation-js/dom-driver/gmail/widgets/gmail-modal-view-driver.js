@@ -92,7 +92,6 @@ class GmailModalViewDriver {
 
   _setupModalContainerElement(options: Object) {
     const constrainTitleWidthTopRowClass = options.constrainTitleWidth ? 'inboxsdk__modal_toprow--constrain-title-width' : '';
-    const constrainTitleWidthTitleClass = options.constrainTitleWidth ? 'inboxsdk__modal_title--constrain-title-width' : '';
 
     this._modalContainerElement = document.createElement('div');
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
@@ -100,7 +99,7 @@ class GmailModalViewDriver {
     var htmlString = `
     <div class="Kj-JD inboxsdk__modal_container" tabindex="0" role="alertdialog">
       <div class="Kj-JD-K7 Kj-JD-K7-GIHV4 inboxsdk__modal_toprow ${constrainTitleWidthTopRowClass}">
-        <span class="Kj-JD-K7-K0 ${constrainTitleWidthTitleClass}" role="heading"></span>
+        <span class="Kj-JD-K7-K0" role="heading"></span>
         <span class="Kj-JD-K7-Jq inboxsdk__modal_close" tabindex="0" role="button"></span>
       </div>
       <div class="Kj-JD-Jz inboxsdk__modal_content">
