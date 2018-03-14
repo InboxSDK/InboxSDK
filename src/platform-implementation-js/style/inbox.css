@@ -489,6 +489,7 @@
 }
 
 .inboxsdk__modal_toprow--constrain-title-width > span[role="heading"] {
+  -webkit-flex: 1;
   flex: 1;
   width: 0;
 }

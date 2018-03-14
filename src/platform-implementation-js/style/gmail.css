@@ -940,6 +940,7 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
   }
 
   .inboxsdk__modal_toprow--constrain-title-width > span[role="heading"] {
+    -webkit-flex: 1;
     flex: 1;
     width: 0;
   }
