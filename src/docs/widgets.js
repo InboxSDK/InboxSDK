@@ -131,6 +131,14 @@ var ModalButtonDescriptor = /** @lends ModalButtonDescriptor */{
   type:null,
 
   /**
+  * Color of the modal button. Only 'blue', 'red', or 'green' string values are valid.
+  * ^optional
+  * ^default=null
+  * @type {string}
+  */
+  color:null,
+
+  /**
   * If multiple buttons are placed next to each other, then they will be ordered by this value.
   * ^optional
   * ^default=0
