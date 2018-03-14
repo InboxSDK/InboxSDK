@@ -10,7 +10,11 @@ import Marker from '../../../common/marker';
 import findParent from '../../../common/find-parent';
 
 export function setup() {
-  processPreloadedThreads();
+  try {
+    processPreloadedThreads();
+  } catch (err) {
+    logger.error(err, 'Failed to process preloaded thread identifiers');
+  }
 
   document.addEventListener('inboxSDKtellMeThisThreadIdByDatabase', function(event:any) {
     const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
