@@ -62,6 +62,14 @@ var ModalOptions = /** @lends ModalOptions */{
   chrome:null,
 
   /**
+  * If true, then the modal's width is determined solely by the content and not the title's width, and the title's text is line-wrapped if necessary.
+  * ^optional
+  * ^default=false
+  * @type {boolean}
+  */
+  constrainTitleWidth:null,
+
+  /**
   * When chrome is set to false, this option controls whether a close (X) button should be added to the modal anyway.
   * If chrome is set to true then this property doesn't do anything.
   * ^optional
