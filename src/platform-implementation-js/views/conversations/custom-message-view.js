@@ -129,12 +129,17 @@ export default class CustomMessageView extends SafeEventEmitter {
     this._el.appendChild(this._iconEl);
     this._el.appendChild(this._contentEl);
 
-    this._el.addEventListener('click', () => {
-      if(this._isCollapsed) this.expand();
+    this._el.addEventListener('click', (e: MouseEvent) => {
+      if(this._isCollapsed) {
+        this.expand();
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
 
     this._contentHeaderEl.addEventListener('click', (e: MouseEvent) => {
       this.collapse();
+      e.preventDefault();
       e.stopPropagation();
     });
   }
