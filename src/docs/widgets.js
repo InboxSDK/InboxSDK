@@ -62,7 +62,7 @@ var ModalOptions = /** @lends ModalOptions */{
   chrome:null,
 
   /**
-  * Whether to wrap the modal title based on the modal content.
+  * If true, then the modal's width is determined solely by the content and not the title's width, and the title's text is line-wrapped if necessary.
   * ^optional
   * ^default=false
   * @type {boolean}
