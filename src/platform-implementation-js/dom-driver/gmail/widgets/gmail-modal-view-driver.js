@@ -111,8 +111,7 @@ class GmailModalViewDriver {
 
   _addButton(buttonContainer: HTMLElement, buttonDescriptor: Object) {
     const buttonOptions = Object.assign({}, buttonDescriptor);
-    const color = buttonDescriptor.color && buttonDescriptor.color.toLowerCase().trim();
-    const buttonColor = ['blue', 'red', 'green'].includes(color) && color;
+    const buttonColor = ['blue', 'red', 'green'].includes(buttonDescriptor.color) && buttonDescriptor.color;
     buttonOptions.buttonColor = buttonColor || (buttonDescriptor.type === 'PRIMARY_ACTION' ? 'blue' : 'default');
 
     const buttonView = new ButtonView(buttonOptions);
