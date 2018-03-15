@@ -7,6 +7,10 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 		var view1 = listRouteView.addCollapsibleSection({
 			title: 'Monkeys',
 			subtitle: 'chunkeys',
+			hasDropdown: true,
+			onDropdownClick: (event) => {
+				event.dropdown.el.innerHTML = 'Hello world!';
+			},
 			tableRows: [
 				{
 					title: 'title',
@@ -39,6 +43,10 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function(inboxSDK){
 		var view2 = listRouteView.addCollapsibleSection({
 			title: 'Lions',
 			subtitle: 'lions',
+			hasDropdown: true,
+			onDropdownClick: (event) => {
+				event.dropdown.el.innerHTML = 'Hello world!';
+			},
 			titleLinkText: 'click me',
 			onTitleLinkClick: function(){
 				console.log('clicked!');
