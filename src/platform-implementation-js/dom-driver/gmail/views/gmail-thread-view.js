@@ -476,7 +476,10 @@ class GmailThreadView {
 
 			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
-			makeElementChildStream(querySelector(iconContainerElement, '.J-KU-Jg'))
+			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg');
+			if (!elementToWatch) return;
+
+			makeElementChildStream(elementToWatch)
 				.filter(({el}) =>
 						el.getAttribute('role') === 'tab' &&
 						el.getAttribute('data-tooltip') === addonTitle
