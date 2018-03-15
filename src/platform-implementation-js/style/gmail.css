@@ -1630,14 +1630,59 @@ body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div {
   display: inline;
 }
 
+/* lone collapsed SectionView in Gmailv1 */
+/* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
+
+body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child {
+  display: block;
+  margin-right: 0;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header > .Cr {
+  display: block;
+}
+
+/* end lone collapsed SectionView in Gmailv1 */
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer.Wg {
   height: auto;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
   display: flex;
+  display: -webkit-flex;
   flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  flex: 1 0 100%;
+  -webkit-flex: 1 0 100%;
 }
+
+/* lone collapsed SectionView in Gmailv2 */
+/* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child {
+  flex: 1;
+  -webkit-flex: 1;
+  margin-right: 0;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header {
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items:  center;
+  flex: 1;
+  -webkit-flex: 1;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header > .Cr {
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items:  center;
+  margin-left: auto;
+}
+
+/* end lone collapsed SectionView in Gmailv2 */
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-block;
@@ -1681,6 +1726,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
   min-height: 40px;
   line-height: 40px;
+}
+
+body.inboxsdk__gmailv1css .inboxsdk__resultsSection_header > .Cr > .J-J5-Ji {
+  padding-top: 3px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title .Wp {
