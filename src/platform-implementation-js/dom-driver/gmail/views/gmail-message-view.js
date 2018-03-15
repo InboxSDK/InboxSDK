@@ -154,8 +154,8 @@ class GmailMessageView {
 	}
 
 	async getDate(): Promise<?number> {
-		const threadID = await this._threadViewDriver.getInternalID();
-		return this._driver.getPageCommunicator().getMessageDate(threadID, this._element);
+		const threadID = this._threadViewDriver.getInternalID();
+		return await this._driver.getPageCommunicator().getMessageDate(threadID, this._element);
 	}
 
 	getAttachmentCardViewDrivers() {

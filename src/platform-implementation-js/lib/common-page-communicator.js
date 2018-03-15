@@ -55,7 +55,7 @@ export default class CommonPageCommunicator {
         .toPromise();
 
       const newHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
-      if (!newHeader) throw new Error("Failed to look up BTAI header");
+      if (!newHeader) throw new Error("Failed to look up XSRF token");
       return newHeader;
     }
   }

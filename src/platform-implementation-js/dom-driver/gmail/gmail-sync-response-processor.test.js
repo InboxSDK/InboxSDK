@@ -62,6 +62,32 @@ describe('extractThreadsFromThreadResponse', function() {
     expect(threads.length).toEqual(1);
     expect((threads[0]: any).oldGmailThreadID).toBe('16207922dbd860d9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594407458713395417');
+    expect(threads[0].extraMetaData).toEqual({
+      snippet: '',
+      syncMessageData: [
+        {syncMessageId: 'msg-f:1594407458713395417', date: 1520545443261},
+      ]
+    });
+  });
+
+  it('works for getThreadFromSyncThreadId response', () => {
+    const data = fs.readFileSync(
+      __dirname+'/../../../../__tests__/gmail-sync-response-processor/thread-response-2018-03-14.json',
+      'utf8'
+    );
+    const threads = GSRP.extractThreadsFromThreadResponse(data);
+    expect(threads.length).toEqual(1);
+    expect((threads[0]: any).oldGmailThreadID).toBe('1620d2f175a1a6c9');
+    expect(threads[0].syncThreadID).toBe('thread-f:1594506202591635145');
+    expect(threads[0].extraMetaData).toEqual({
+      snippet: '',
+      syncMessageData: [
+        {syncMessageId: 'msg-f:1594506202591635145', date: 1520639612762},
+        {syncMessageId: 'msg-f:1594508744604132981', date: 1520642037014},
+        {syncMessageId: 'msg-f:1594509071530617554', date: 1520642348795},
+        {syncMessageId: 'msg-f:1594959172652759326', date: 1521071598675},
+      ]
+    });
   });
 
 });

@@ -2,7 +2,7 @@
 
 import BigNumber from 'bignumber.js';
 
-export type SyncThread = {
+export type SyncThread = {|
   subject: string;
   snippet: string;
   syncThreadID: string;
@@ -15,9 +15,9 @@ export type SyncThread = {
       date: number;
     }>;
   };
-};
+|};
 
-export type MinimalSyncThread = {
+export type MinimalSyncThread = {|
   syncThreadID: string;
   extraMetaData: {
     syncMessageData: Array<{
@@ -25,7 +25,7 @@ export type MinimalSyncThread = {
       date: number;
     }>;
   };
-};
+|};
 
 export function extractThreadsFromSearchResponse(response: string): SyncThread[] {
 
@@ -114,7 +114,7 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
           snippet: '',
           syncMessageData: messageDescriptors.map(md => ({
             syncMessageId: md[1],
-            date: +md[2][17]
+            date: +md[16]
           }))
         }
       };

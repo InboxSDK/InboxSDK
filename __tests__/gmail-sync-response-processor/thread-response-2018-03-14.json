@@ -1,0 +1,361 @@
+{
+  "1": 0,
+  "2": [{
+    "1": "thread-f:1594506202591635145",
+    "2": {
+      "1": {
+        "1": "thread-f:1594506202591635145",
+        "2": "Validate emails within Streak",
+        "3": "Sara, It's called ZERO BOUNCE\u1427",
+        "4": "1521071598683",
+        "10": 0.006351284,
+        "13": 0,
+        "14": "1594506202591635145"
+      },
+      "2": [{
+        "1": "msg-f:1594506202591635145",
+        "2": {
+          "1": 1,
+          "2": "sara@streak.com",
+          "3": "Sara Eichelberger"
+        },
+        "3": "1520639612694",
+        "4": ["^all", "^i", "^io_lr", "^io_unim", "^o", "^oc_unsub", "^p_mtunsub", "^smartlabel_group", "^sq_ig_i_personal", "^unsub"],
+        "7": "1520639612762",
+        "8": "\u003ceng.streak.com\u003e",
+        "11": "User: mike@answeringlegal.com (944 MRR) User wants to use Streak to verify the validity of an email address / whether it's still active before sending an email.",
+        "15": {
+          "4": {
+            "1": 1
+          },
+          "5": {
+            "1": 0.0051884037
+          },
+          "7": {
+            "1": "21660142"
+          },
+          "8": [21660150, 21660051, 21660142],
+          "10": 1
+        },
+        "16": "1520639612762",
+        "17": 0,
+        "22": 0,
+        "25": "1594506202591635145"
+      }, {
+        "1": "msg-f:1594508744604132981",
+        "2": {
+          "1": 1,
+          "2": "michael@streak.com",
+          "3": "Mike Nguyen"
+        },
+        "3": "1520642037229",
+        "4": ["^all", "^i", "^io_lr", "^io_unim", "^o", "^oc_unsub", "^p_ag", "^p_mtunsub", "^smartlabel_group", "^sq_ig_i_personal", "^unsub"],
+        "7": "1520642037014",
+        "8": "\u003ceng.streak.com\u003e",
+        "11": "Another customer of mine thebusinessguru.com uses a service to \"clean\" a list of emails for only \"active\" ones. I just asked and will let you know once I know.\u1427",
+        "12": "\u003cCAOOPFq220_FW0eca5es\u003dOtQOOdCW0FoRD_wVcsPi7JHyZP64Og@mail.gmail.com\u003e",
+        "15": {
+          "4": {
+            "1": 1
+          },
+          "5": {
+            "1": 0.006351284
+          },
+          "7": {
+            "1": "21660142"
+          },
+          "8": [21660150, 21660051, 21660142],
+          "10": 1
+        },
+        "16": "1520642037014",
+        "17": 0,
+        "22": 0,
+        "25": "1594508744604132981"
+      }, {
+        "1": "msg-f:1594509071530617554",
+        "2": {
+          "1": 1,
+          "2": "sara@streak.com",
+          "3": "Sara Eichelberger"
+        },
+        "3": "1520642348669",
+        "4": ["^all", "^i", "^io_lr", "^io_unim", "^o", "^oc_unsub", "^p_mtunsub", "^smartlabel_group", "^sq_ig_i_personal", "^unsub"],
+        "7": "1520642348795",
+        "8": "\u003ceng.streak.com\u003e",
+        "11": "Thanks, Mike! \u1427",
+        "12": "\u003cCAKPA8ht\u003d8Td-Qdf9kt1pu6BKnGF8bwuo4yFeKvz2Xyw0TbXVxA@mail.gmail.com\u003e",
+        "15": {
+          "4": {
+            "1": 1
+          },
+          "5": {
+            "1": 0.0061276257
+          },
+          "7": {
+            "1": "21660142"
+          },
+          "8": [21660150, 21660051, 21660142],
+          "10": 1
+        },
+        "16": "1520642348795",
+        "17": 0,
+        "22": 0,
+        "25": "1594509071530617554"
+      }, {
+        "1": "msg-f:1594959172652759326",
+        "2": {
+          "1": 1,
+          "2": "michael@streak.com",
+          "3": "Mike Nguyen"
+        },
+        "3": "1521071598683",
+        "4": ["^all", "^i", "^io_lr", "^io_unim", "^o", "^oc_unsub", "^p_ag", "^p_mtunsub", "^smartlabel_group", "^sq_ig_i_personal", "^unsub"],
+        "7": "1521071598675",
+        "8": "\u003ceng.streak.com\u003e",
+        "11": "Sara, It's called ZERO BOUNCE\u1427",
+        "12": "\u003cCAOOPFq2bQjTP4u1tOMVdwUfwffYg\u003dJTn1v22UJC8U31ifT_wPg@mail.gmail.com\u003e",
+        "15": {
+          "4": {
+            "1": 1
+          },
+          "5": {
+            "1": 0.0039876015
+          },
+          "7": {
+            "1": "21660142"
+          },
+          "8": [21660150, 21660051, 21660142],
+          "10": 1
+        },
+        "16": "1521071598675",
+        "17": 0,
+        "22": 0,
+        "25": "1594959172652759326"
+      }]
+    },
+    "3": [{
+      "1": "msg-f:1594506202591635145",
+      "2": {
+        "1": [{
+          "1": 1,
+          "2": "eng@streak.com",
+          "3": "eng"
+        }],
+        "5": "Validate emails within Streak",
+        "6": {
+          "2": [{
+            "1": 0,
+            "3": {
+              "2": "\u003cdiv dir\u003d\"ltr\"\u003eUser: \u003ca href\u003d\"mailto:mike@answeringlegal.com\" target\u003d\"_blank\"\u003emike@answeringlegal.com\u003c/a\u003e (944 MRR)\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eUser wants to use Streak to verify the validity of an email address / whether it\u0026#39;s still active before sending an email.\u00a0\u003c/div\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eTheir use case is outbound sales.\u00a0\u003c/div\u003e"
+            },
+            "4": 245386839
+          }, {
+            "1": 3,
+            "3": {
+              "2": "\u003cdiv\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_-2035661165631336286gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger |\u00a0\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442437000\u0026amp;usg\u003dAFQjCNF_CvSNmVU8dwFMqbm0OFu5Zmg3BA\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e"
+            },
+            "4": -1788988066
+          }, {
+            "1": 0,
+            "3": {
+              "2": "\u003c/div\u003e"
+            },
+            "4": 1025632406
+          }, {
+            "1": 3,
+            "3": {
+              "2": "\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci5.googleusercontent.com/proxy/BtsH65etgT21VZ0YKg1uNYzLlcIXOcCw4TjMYXhHmlq0YtDGiozGykj8BMO5A6VS1GfSiZbOo8jvV-4zZnRGljOvGEQvBif-ncHnM9VK4prZBie5On7Xhey8lR5pUO265TBhrW14vPgHZllzJf-G7tLc_6VRkX-Ogv260RZTxFNpCMGr-vqZHmUNHC1Gjg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d0ed4cc08-c25d-4ce6-b814-a07773c27c10\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\r\n"
+            },
+            "4": 572113517
+          }],
+          "3": 0,
+          "7": 1,
+          "8": 1
+        },
+        "7": "User: mike@answeringlegal.com (944 MRR) User wants to use Streak to verify the validity of an email address / whether it's still active before sending an email.",
+        "8": "\u003cCAOOPFq220_FW0eca5es\u003dOtQOOdCW0FoRD_wVcsPi7JHyZP64Og@mail.gmail.com\u003e",
+        "11": {
+          "1": 0,
+          "2": 1,
+          "3": "",
+          "4": -1,
+          "8": "streak.com",
+          "9": "streak.com"
+        },
+        "17": "1520639612762",
+        "20": {
+          "5": 2
+        },
+        "29": "1594506202591635145"
+      }
+    }, {
+      "1": "msg-f:1594508744604132981",
+      "2": {
+        "1": [{
+          "1": 1,
+          "2": "sara@streak.com",
+          "3": "Sara Eichelberger"
+        }],
+        "2": [{
+          "1": 1,
+          "2": "eng@streak.com",
+          "3": "eng"
+        }],
+        "5": "Re: Validate emails within Streak",
+        "6": {
+          "2": [{
+            "1": 0,
+            "3": {
+              "2": "\u003cdiv dir\u003d\"ltr\"\u003eAnother customer of mine \u003ca href\u003d\"http://thebusinessguru.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://thebusinessguru.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442446000\u0026amp;usg\u003dAFQjCNFmd0tCS-L0h1WQXg3tw9omJVXtGQ\"\u003ethebusinessguru.com\u003c/a\u003e uses a service to \u0026quot;clean\u0026quot; a list of emails for only \u0026quot;active\u0026quot; ones. I just asked and will let you know once I know.\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci3.googleusercontent.com/proxy/rrwRldMEDG5XGrYwKhqaXnXExokXR6KETThxN0V_tcNqqruZI5A3HKSgec5kSC2z-cYQWvuO0t2ZHItJowlHmXmceR2jdHCVWVirsZ-VQbhylEFoOWyTNV7Q1zgF3wjvg7zU-EBSUxVGhW95cIW2K8__dWzYeddijKU6v_acS0B4WzuloIVDEnXWz6MRiVxc3Tg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dabWljaGFlbEBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d9a67edda-ca93-458f-953b-13cfeba57932\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\u003cdiv class\u003d\"gmail_extra\"\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_-8253203380606573573gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv style\u003d\"font-size:small\"\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e--\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003eMike Nguyen\u00a0\u003c/span\u003e| Sr. AE\u003c/div\u003e\u003cdiv\u003e\u003ca href\u003d\"http://www.streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://www.streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442446000\u0026amp;usg\u003dAFQjCNGN_RMEwU-CO4uYKTqFf5tuMeqQNQ\"\u003eStreak\u003c/a\u003e\u00a0- Do it all inside Gmail\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(0,51,187)\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e650-784-0298\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cfont color\u003d\"#0033bb\"\u003e\u003cu\u003e\u003ca href\u003d\"https://calendly.com/michaelnguyen/15min\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://calendly.com/michaelnguyen/15min\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442446000\u0026amp;usg\u003dAFQjCNGDiBmoxGjt5lXssLYTckLuBXsoYQ\"\u003eMy Calendar\u003c/a\u003e\u003c/u\u003e\u003c/font\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://www.linkedin.com/in/ask4hoang\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://www.linkedin.com/in/ask4hoang\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442446000\u0026amp;usg\u003dAFQjCNEr4_S1aJZ-sTqDDGTXY9FrYPgnqw\"\u003eLet\u0026#39;s connect on LinkedIn!\u003c/a\u003e\u00a0\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv style\u003d\"color:rgb(136,136,136);font-size:12.8px\"\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/WxTrk7donqq9STHaalDfbAAoDed2k9gHxHyj_wWb3G0jvvI3GDuGnTW4WbNWkQzpHMA0AB71xSpVERgysJ44Nt4XpGKXwFept7GQNTlvqR0SiZCApaZ3zrs_V12tLW0rgc2q1XvYmYT9XttONnRLRn_KDBAhT8S0YX4I_aE--_5kHZWfb_NMWlkRErwwH1XQFn2vf_3VPCa03sA\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B6BdhqhkJt9vZlY1U1RMSHlLcjQ\u0026amp;revid\u003d0B6BdhqhkJt9vQS93RnJLQUl5eFdSNkwwR2JnOXJOUXNUSHdjPQ\" width\u003d\"96\" height\u003d\"24\" style\u003d\"font-size:12.8px\"\u003e\u003c/div\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e221 Main St.\u003c/font\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u00a0\u003c/span\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e|\u00a0\u003c/span\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003eSan\u00a0Francisco, CA 94105\u003cbr\u003e\u003cbr\u003e\u003c/font\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e"
+            },
+            "4": -1792605843
+          }, {
+            "1": 2,
+            "3": {
+              "2": "\r\n\u003cbr\u003e\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 3:53 PM, Sara Eichelberger \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eUser: \u003ca href\u003d\"mailto:mike@answeringlegal.com\" target\u003d\"_blank\"\u003emike@answeringlegal.com\u003c/a\u003e (944 MRR)\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eUser wants to use Streak to verify the validity of an email address / whether it\u0026#39;s still active before sending an email.\u00a0\u003c/div\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eTheir use case is outbound sales.\u00a0\u003c/div\u003e\u003cspan class\u003d\"m_-8253203380606573573HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_-8253203380606573573m_5788933358042832314gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger |\u00a0\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442446000\u0026amp;usg\u003dAFQjCNEYblyUuB2AFvbTbmvyEprJmNmIVA\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/font\u003e\u003c/span\u003e\u003c/div\u003e\u003cspan class\u003d\"m_-8253203380606573573HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci5.googleusercontent.com/proxy/BtsH65etgT21VZ0YKg1uNYzLlcIXOcCw4TjMYXhHmlq0YtDGiozGykj8BMO5A6VS1GfSiZbOo8jvV-4zZnRGljOvGEQvBif-ncHnM9VK4prZBie5On7Xhey8lR5pUO265TBhrW14vPgHZllzJf-G7tLc_6VRkX-Ogv260RZTxFNpCMGr-vqZHmUNHC1Gjg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d0ed4cc08-c25d-4ce6-b814-a07773c27c10\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\r\n\u003c/font\u003e\u003c/span\u003e\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e"
+            },
+            "4": 113657893
+          }, {
+            "1": 0,
+            "3": {
+              "2": "\u003c/div\u003e\r\n"
+            },
+            "4": -396257300
+          }],
+          "3": 0,
+          "7": 1,
+          "8": 1
+        },
+        "7": "Another customer of mine thebusinessguru.com uses a service to \"clean\" a list of emails for only \"active\" ones. I just asked and will let you know once I know.\u1427",
+        "8": "\u003cCAKPA8ht\u003d8Td-Qdf9kt1pu6BKnGF8bwuo4yFeKvz2Xyw0TbXVxA@mail.gmail.com\u003e",
+        "9": ["\u003cCAOOPFq220_FW0eca5es\u003dOtQOOdCW0FoRD_wVcsPi7JHyZP64Og@mail.gmail.com\u003e"],
+        "10": "\u003cCAOOPFq220_FW0eca5es\u003dOtQOOdCW0FoRD_wVcsPi7JHyZP64Og@mail.gmail.com\u003e",
+        "11": {
+          "1": 0,
+          "2": 1,
+          "3": "",
+          "4": -1,
+          "8": "streak.com",
+          "9": "streak.com"
+        },
+        "17": "1520642037014",
+        "20": {
+          "5": 2
+        },
+        "29": "1594508744604132981"
+      }
+    }, {
+      "1": "msg-f:1594509071530617554",
+      "2": {
+        "1": [{
+          "1": 1,
+          "2": "michael@streak.com",
+          "3": "Mike Nguyen"
+        }],
+        "2": [{
+          "1": 1,
+          "2": "eng@streak.com",
+          "3": "eng"
+        }],
+        "5": "Re: Validate emails within Streak",
+        "6": {
+          "2": [{
+            "1": 0,
+            "3": {
+              "2": "\u003cdiv dir\u003d\"ltr\"\u003eThanks, Mike!\u00a0\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci3.googleusercontent.com/proxy/WX--MMDSliPJzoL5QwG8MitZIXKpIFo1hYWQCLGIv_SveYA1cGkj5prngCJTKd1ITSA_AKZOpYv75NXETRYWxApRiUTf2hr1HoIoOVmg0PqvKE-xwfSiMlwpTQOkwo-JAE7cW-G6fVX5ngvKSbNYHazpaMIHk2tOnhObzMk6ad5A4meiK7KSH7esP-psXQ\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003db1f011d4-db40-4cc9-9e94-c2132bef870b\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e"
+            },
+            "4": 694322411
+          }, {
+            "1": 2,
+            "3": {
+              "2": "\u003cdiv class\u003d\"gmail_extra\"\u003e\u003cbr\u003e\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 4:33 PM, Mike Nguyen \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:michael@streak.com\" target\u003d\"_blank\"\u003emichael@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eAnother customer of mine \u003ca href\u003d\"http://thebusinessguru.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://thebusinessguru.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442457000\u0026amp;usg\u003dAFQjCNHD-C9vSxrGgbiubZdNnh3TcfHJ1w\"\u003ethebusinessguru.com\u003c/a\u003e uses a service to \u0026quot;clean\u0026quot; a list of emails for only \u0026quot;active\u0026quot; ones. I just asked and will let you know once I know.\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci3.googleusercontent.com/proxy/rrwRldMEDG5XGrYwKhqaXnXExokXR6KETThxN0V_tcNqqruZI5A3HKSgec5kSC2z-cYQWvuO0t2ZHItJowlHmXmceR2jdHCVWVirsZ-VQbhylEFoOWyTNV7Q1zgF3wjvg7zU-EBSUxVGhW95cIW2K8__dWzYeddijKU6v_acS0B4WzuloIVDEnXWz6MRiVxc3Tg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dabWljaGFlbEBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d9a67edda-ca93-458f-953b-13cfeba57932\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\u003cdiv class\u003d\"gmail_extra\"\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_2095483270320340075m_8295403326023477467gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv style\u003d\"font-size:small\"\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e--\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003eMike Nguyen\u00a0\u003c/span\u003e| Sr. AE\u003c/div\u003e\u003cdiv\u003e\u003ca href\u003d\"http://www.streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://www.streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNHRAFMWE7XnjwtVZzIKGCG1_zgiPA\"\u003eStreak\u003c/a\u003e\u00a0- Do it all inside Gmail\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(0,51,187)\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003ca href\u003d\"tel:(650)%20784-0298\" value\u003d\"+16507840298\" target\u003d\"_blank\"\u003e650-784-0298\u003c/a\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cfont color\u003d\"#0033bb\"\u003e\u003cu\u003e\u003ca href\u003d\"https://calendly.com/michaelnguyen/15min\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://calendly.com/michaelnguyen/15min\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNH3O3moMMdxiu4wMtCD4mEAhB6ibA\"\u003eMy Calendar\u003c/a\u003e\u003c/u\u003e\u003c/font\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://www.linkedin.com/in/ask4hoang\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://www.linkedin.com/in/ask4hoang\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNF0S-2UqpIykOxTbfjpfSzjPlQIrQ\"\u003eLet\u0026#39;s connect on LinkedIn!\u003c/a\u003e\u00a0\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv style\u003d\"color:rgb(136,136,136);font-size:12.8px\"\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/WxTrk7donqq9STHaalDfbAAoDed2k9gHxHyj_wWb3G0jvvI3GDuGnTW4WbNWkQzpHMA0AB71xSpVERgysJ44Nt4XpGKXwFept7GQNTlvqR0SiZCApaZ3zrs_V12tLW0rgc2q1XvYmYT9XttONnRLRn_KDBAhT8S0YX4I_aE--_5kHZWfb_NMWlkRErwwH1XQFn2vf_3VPCa03sA\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B6BdhqhkJt9vZlY1U1RMSHlLcjQ\u0026amp;revid\u003d0B6BdhqhkJt9vQS93RnJLQUl5eFdSNkwwR2JnOXJOUXNUSHdjPQ\" width\u003d\"96\" height\u003d\"24\" style\u003d\"font-size:12.8px\"\u003e\u003c/div\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNFBmGzkOURlkgH9HR0JZ0_hRFMoJQ\"\u003e221 Main St.\u003c/a\u003e\u003c/font\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNFBmGzkOURlkgH9HR0JZ0_hRFMoJQ\"\u003e\u00a0\u003c/a\u003e\u003c/span\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNFBmGzkOURlkgH9HR0JZ0_hRFMoJQ\"\u003e|\u00a0\u003c/a\u003e\u003c/span\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNFBmGzkOURlkgH9HR0JZ0_hRFMoJQ\"\u003eSan\u00a0Francisco, CA 94105\u003c/a\u003e\u003cbr\u003e\u003cbr\u003e\u003c/font\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_2095483270320340075h5\"\u003e\r\n\u003cbr\u003e\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 3:53 PM, Sara Eichelberger \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eUser: \u003ca href\u003d\"mailto:mike@answeringlegal.com\" target\u003d\"_blank\"\u003emike@answeringlegal.com\u003c/a\u003e (944 MRR)\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eUser wants to use Streak to verify the validity of an email address / whether it\u0026#39;s still active before sending an email.\u00a0\u003c/div\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eTheir use case is outbound sales.\u00a0\u003c/div\u003e\u003cspan class\u003d\"m_2095483270320340075m_8295403326023477467HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_2095483270320340075m_8295403326023477467m_5788933358042832314gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger |\u00a0\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNEmbVKbEkzjGgFUNgEOz0dAfKsmqg\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/font\u003e\u003c/span\u003e\u003c/div\u003e\u003cspan class\u003d\"m_2095483270320340075m_8295403326023477467HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci5.googleusercontent.com/proxy/BtsH65etgT21VZ0YKg1uNYzLlcIXOcCw4TjMYXhHmlq0YtDGiozGykj8BMO5A6VS1GfSiZbOo8jvV-4zZnRGljOvGEQvBif-ncHnM9VK4prZBie5On7Xhey8lR5pUO265TBhrW14vPgHZllzJf-G7tLc_6VRkX-Ogv260RZTxFNpCMGr-vqZHmUNHC1Gjg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d0ed4cc08-c25d-4ce6-b814-a07773c27c10\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\r\n\u003c/font\u003e\u003c/span\u003e\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_2095483270320340075gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger |\u00a0\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442458000\u0026amp;usg\u003dAFQjCNEmbVKbEkzjGgFUNgEOz0dAfKsmqg\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\r\n"
+            },
+            "4": 1747756899
+          }],
+          "3": 0,
+          "7": 1,
+          "8": 1
+        },
+        "7": "Thanks, Mike! \u1427",
+        "8": "\u003cCAOOPFq2bQjTP4u1tOMVdwUfwffYg\u003dJTn1v22UJC8U31ifT_wPg@mail.gmail.com\u003e",
+        "9": ["\u003cCAKPA8ht\u003d8Td-Qdf9kt1pu6BKnGF8bwuo4yFeKvz2Xyw0TbXVxA@mail.gmail.com\u003e"],
+        "10": "\u003cCAKPA8ht\u003d8Td-Qdf9kt1pu6BKnGF8bwuo4yFeKvz2Xyw0TbXVxA@mail.gmail.com\u003e",
+        "11": {
+          "1": 0,
+          "2": 1,
+          "3": "",
+          "4": -1,
+          "8": "streak.com",
+          "9": "streak.com"
+        },
+        "17": "1520642348795",
+        "20": {
+          "5": 2
+        },
+        "29": "1594509071530617554"
+      }
+    }, {
+      "1": "msg-f:1594959172652759326",
+      "2": {
+        "1": [{
+          "1": 1,
+          "2": "sara@streak.com",
+          "3": "Sara Eichelberger"
+        }],
+        "2": [{
+          "1": 1,
+          "2": "eng@streak.com",
+          "3": "eng"
+        }],
+        "5": "Re: Validate emails within Streak",
+        "6": {
+          "2": [{
+            "1": 0,
+            "3": {
+              "2": "\u003cdiv dir\u003d\"ltr\"\u003eSara, It\u0026#39;s called ZERO BOUNCE\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci5.googleusercontent.com/proxy/qGL_4qNeELQd_-ahSotdQKkbXDZYJp3PMoqT1kHC0d5VM8VP0AWrkrhY7BV41FchejK-67pj1jYvIGZh7aEgCFCqOrty1E6l8lw7f3OEiMYtFzUmYAD64q4FV4RVMVsoosFO-hHNf2jy40ibuG7gyOybikUPENUTXpNMe1McE3SmTQADkQvCKx4GxkEPZpkI1DY\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dabWljaGFlbEBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d72e47326-8c34-4feb-a7af-d350ce7ca979\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\u003cdiv class\u003d\"gmail_extra\"\u003e"
+            },
+            "4": -2035464996
+          }, {
+            "1": 1,
+            "3": {
+              "2": "\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_3249214133378121212gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv style\u003d\"font-size:small\"\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e--\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003eMike Nguyen\u00a0\u003c/span\u003e| Sr. AE\u003c/div\u003e\u003cdiv\u003e\u003ca href\u003d\"http://www.streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://www.streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNFuwlzhGURsTypvGMxT6fUR-mlHjQ\"\u003eStreak\u003c/a\u003e\u00a0- Do it all inside Gmail\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(0,51,187)\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e650-784-0298\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cfont color\u003d\"#0033bb\"\u003e\u003cu\u003e\u003ca href\u003d\"https://calendly.com/michaelnguyen/15min\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://calendly.com/michaelnguyen/15min\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNHxa_I40JfTdemVw14JN01m4tH1KQ\"\u003eMy Calendar\u003c/a\u003e\u003c/u\u003e\u003c/font\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://www.linkedin.com/in/ask4hoang\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://www.linkedin.com/in/ask4hoang\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNE0sTJuy3xRU9hmRlzruw3NsGrfwg\"\u003eLet\u0026#39;s connect on LinkedIn!\u003c/a\u003e\u00a0\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv style\u003d\"color:rgb(136,136,136);font-size:12.8px\"\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/WxTrk7donqq9STHaalDfbAAoDed2k9gHxHyj_wWb3G0jvvI3GDuGnTW4WbNWkQzpHMA0AB71xSpVERgysJ44Nt4XpGKXwFept7GQNTlvqR0SiZCApaZ3zrs_V12tLW0rgc2q1XvYmYT9XttONnRLRn_KDBAhT8S0YX4I_aE--_5kHZWfb_NMWlkRErwwH1XQFn2vf_3VPCa03sA\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B6BdhqhkJt9vZlY1U1RMSHlLcjQ\u0026amp;revid\u003d0B6BdhqhkJt9vQS93RnJLQUl5eFdSNkwwR2JnOXJOUXNUSHdjPQ\" width\u003d\"96\" height\u003d\"24\" style\u003d\"font-size:12.8px\"\u003e\u003c/div\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e221 Main St.\u003c/font\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u00a0\u003c/span\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e|\u00a0\u003c/span\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003eSan\u00a0Francisco, CA 94105\u003cbr\u003e\u003cbr\u003e\u003c/font\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003cbr\u003e"
+            },
+            "4": 923830800
+          }, {
+            "1": 2,
+            "3": {
+              "2": "\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 4:38 PM, Sara Eichelberger \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eThanks, Mike!\u00a0\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci3.googleusercontent.com/proxy/WX--MMDSliPJzoL5QwG8MitZIXKpIFo1hYWQCLGIv_SveYA1cGkj5prngCJTKd1ITSA_AKZOpYv75NXETRYWxApRiUTf2hr1HoIoOVmg0PqvKE-xwfSiMlwpTQOkwo-JAE7cW-G6fVX5ngvKSbNYHazpaMIHk2tOnhObzMk6ad5A4meiK7KSH7esP-psXQ\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003db1f011d4-db40-4cc9-9e94-c2132bef870b\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\u003cdiv class\u003d\"m_3249214133378121212HOEnZb\"\u003e\u003cdiv class\u003d\"m_3249214133378121212h5\"\u003e\u003cdiv class\u003d\"gmail_extra\"\u003e\u003cbr\u003e\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 4:33 PM, Mike Nguyen \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:michael@streak.com\" target\u003d\"_blank\"\u003emichael@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eAnother customer of mine \u003ca href\u003d\"http://thebusinessguru.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://thebusinessguru.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNH2SJcofBIpEraSFPMewl2lYUGIdw\"\u003ethebusinessguru.com\u003c/a\u003e uses a service to \u0026quot;clean\u0026quot; a list of emails for only \u0026quot;active\u0026quot; ones. I just asked and will let you know once I know.\u003c/div\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci3.googleusercontent.com/proxy/rrwRldMEDG5XGrYwKhqaXnXExokXR6KETThxN0V_tcNqqruZI5A3HKSgec5kSC2z-cYQWvuO0t2ZHItJowlHmXmceR2jdHCVWVirsZ-VQbhylEFoOWyTNV7Q1zgF3wjvg7zU-EBSUxVGhW95cIW2K8__dWzYeddijKU6v_acS0B4WzuloIVDEnXWz6MRiVxc3Tg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dabWljaGFlbEBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d9a67edda-ca93-458f-953b-13cfeba57932\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\u003cdiv class\u003d\"gmail_extra\"\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_3249214133378121212m_-588208597798373505m_8295403326023477467gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cdiv style\u003d\"font-size:small\"\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e--\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003eMike Nguyen\u00a0\u003c/span\u003e| Sr. AE\u003c/div\u003e\u003cdiv\u003e\u003ca href\u003d\"http://www.streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://www.streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNFuwlzhGURsTypvGMxT6fUR-mlHjQ\"\u003eStreak\u003c/a\u003e\u00a0- Do it all inside Gmail\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(0,51,187)\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003cspan title\u003d\"Call with Google Voice\"\u003e\u003ca href\u003d\"tel:(650)%20784-0298\" value\u003d\"+16507840298\" target\u003d\"_blank\"\u003e650-784-0298\u003c/a\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cfont color\u003d\"#0033bb\"\u003e\u003cu\u003e\u003ca href\u003d\"https://calendly.com/michaelnguyen/15min\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://calendly.com/michaelnguyen/15min\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNHxa_I40JfTdemVw14JN01m4tH1KQ\"\u003eMy Calendar\u003c/a\u003e\u003c/u\u003e\u003c/font\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://www.linkedin.com/in/ask4hoang\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://www.linkedin.com/in/ask4hoang\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442472000\u0026amp;usg\u003dAFQjCNE0sTJuy3xRU9hmRlzruw3NsGrfwg\"\u003eLet\u0026#39;s connect on LinkedIn!\u003c/a\u003e\u00a0\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv style\u003d\"color:rgb(136,136,136);font-size:12.8px\"\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/WxTrk7donqq9STHaalDfbAAoDed2k9gHxHyj_wWb3G0jvvI3GDuGnTW4WbNWkQzpHMA0AB71xSpVERgysJ44Nt4XpGKXwFept7GQNTlvqR0SiZCApaZ3zrs_V12tLW0rgc2q1XvYmYT9XttONnRLRn_KDBAhT8S0YX4I_aE--_5kHZWfb_NMWlkRErwwH1XQFn2vf_3VPCa03sA\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B6BdhqhkJt9vZlY1U1RMSHlLcjQ\u0026amp;revid\u003d0B6BdhqhkJt9vQS93RnJLQUl5eFdSNkwwR2JnOXJOUXNUSHdjPQ\" width\u003d\"96\" height\u003d\"24\" style\u003d\"font-size:12.8px\"\u003e\u003c/div\u003e\u003cdiv style\u003d\"font-size:12.8px\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003e221 Main St.\u003c/a\u003e\u003c/font\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003e\u00a0\u003c/a\u003e\u003c/span\u003e\u003cspan style\u003d\"font-size:12.8px\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003e|\u00a0\u003c/a\u003e\u003c/span\u003e\u003cfont size\u003d\"1\" face\u003d\"arial narrow, sans-serif\"\u003e\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003eSan\u00a0Francisco, CA 94105\u003c/a\u003e\u003cbr\u003e\u003cbr\u003e\u003c/font\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003cdiv\u003e\u003cdiv class\u003d\"m_3249214133378121212m_-588208597798373505h5\"\u003e\r\n\u003cbr\u003e\u003cdiv class\u003d\"gmail_quote\"\u003eOn Fri, Mar 9, 2018 at 3:53 PM, Sara Eichelberger \u003cspan dir\u003d\"ltr\"\u003e\u0026lt;\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u0026gt;\u003c/span\u003e wrote:\u003cbr\u003e\u003cblockquote class\u003d\"gmail_quote\" style\u003d\"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex\"\u003e\u003cdiv dir\u003d\"ltr\"\u003eUser: \u003ca href\u003d\"mailto:mike@answeringlegal.com\" target\u003d\"_blank\"\u003emike@answeringlegal.com\u003c/a\u003e (944 MRR)\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eUser wants to use Streak to verify the validity of an email address / whether it\u0026#39;s still active before sending an email.\u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003e\u00a0\u003c/a\u003e\u003c/div\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e\u003cdiv\u003eTheir use case is outbound sales.\u00a0\u003c/div\u003e\u003cspan class\u003d\"m_3249214133378121212m_-588208597798373505m_8295403326023477467HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cdiv\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_3249214133378121212m_-588208597798373505m_8295403326023477467m_5788933358042832314gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger \u003ca href\u003d\"https://maps.google.com/?q\u003d221+Main+St.+%C2%A0+%7C%C2%A0+San%C2%A0Francisco,+CA+94105\u0026amp;entry\u003dgmail\u0026amp;source\u003dg\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttps://maps.google.com/?q%3D221%2BMain%2BSt.%2B%25C2%25A0%2B%257C%25C2%25A0%2BSan%25C2%25A0Francisco,%2BCA%2B94105%26entry%3Dgmail%26source%3Dg\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNH2za2HqaPZLlmwnAMpCogp8DjfDw\"\u003e|\u00a0\u003c/a\u003e\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNFJIXwil4Zqa6YGICtHo8GPwCJLCw\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/font\u003e\u003c/span\u003e\u003c/div\u003e\u003cspan class\u003d\"m_3249214133378121212m_-588208597798373505m_8295403326023477467HOEnZb\"\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cdiv hspace\u003d\"streak-pt-mark\" style\u003d\"max-height:1px\"\u003e\u003cimg alt\u003d\"\" style\u003d\"width:0px;max-height:0px;overflow:hidden\" src\u003d\"https://ci5.googleusercontent.com/proxy/BtsH65etgT21VZ0YKg1uNYzLlcIXOcCw4TjMYXhHmlq0YtDGiozGykj8BMO5A6VS1GfSiZbOo8jvV-4zZnRGljOvGEQvBif-ncHnM9VK4prZBie5On7Xhey8lR5pUO265TBhrW14vPgHZllzJf-G7tLc_6VRkX-Ogv260RZTxFNpCMGr-vqZHmUNHC1Gjg\u003ds0-d-e1-ft#https://mailfoogae.appspot.com/t?sender\u003dac2FyYUBzdHJlYWsuY29t\u0026amp;type\u003dzerocontent\u0026amp;guid\u003d0ed4cc08-c25d-4ce6-b814-a07773c27c10\"\u003e\u003cfont color\u003d\"#ffffff\" size\u003d\"1\"\u003e\u1427\u003c/font\u003e\u003c/div\u003e\r\n\u003c/font\u003e\u003c/span\u003e\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e\u003cbr clear\u003d\"all\"\u003e\u003cdiv\u003e\u003cbr\u003e\u003c/div\u003e-- \u003cbr\u003e\u003cdiv class\u003d\"m_3249214133378121212m_-588208597798373505gmail_signature\" data-smartmail\u003d\"gmail_signature\"\u003e\u003cdiv dir\u003d\"ltr\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003cfont style\u003d\"color:rgb(136,136,136)\"\u003eSara Eichelberger |\u00a0\u003c/font\u003e\u003cspan style\u003d\"color:rgb(136,136,136)\"\u003eCustomer Success\u003c/span\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\"\u003e\u003cfont size\u003d\"1\" face\u003d\"arial, helvetica, sans-serif\"\u003e\u003ca href\u003d\"mailto:sara@streak.com\" target\u003d\"_blank\"\u003esara@streak.com\u003c/a\u003e\u003c/font\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cfont color\u003d\"#888888\" size\u003d\"1\"\u003e\u003cbr\u003e\u003c/font\u003e\u003cdiv\u003e\u003cspan style\u003d\"color:rgb(136,136,136);font-size:x-small\"\u003e\u003ca href\u003d\"http://streak.com\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://streak.com\u0026amp;source\u003dgmail\u0026amp;ust\u003d1521161442473000\u0026amp;usg\u003dAFQjCNFJIXwil4Zqa6YGICtHo8GPwCJLCw\"\u003e\u003cimg src\u003d\"https://ci3.googleusercontent.com/proxy/9H4tvEgud4hO6LIqSPGaDObzYRuGootRd9257fS09FEIvtNM3N-p3pNEUzw8OFZj-6Oe4JlME55uiBKAwwLAa_dzV3XUvi0tU2bBTZOrWLKdX7cVYs_ZI_coUXmYjS03CLiEblNYnYYAMkBDyz3AcyZL94SXK1FimnTg5dkJTlJtP0ivolza4Fq3mvIktZrDfSpiWu2Ei_1IX_Y\u003ds0-d-e1-ft#https://docs.google.com/uc?export\u003ddownload\u0026amp;id\u003d0B9hZoJ8tfsU0RUdzNXhoTmpFRkE\u0026amp;revid\u003d0B9hZoJ8tfsU0Ym1wbFJhZ1JQMHg0N001MmhZRUtYTDc0M0FjPQ\" width\u003d\"96\" height\u003d\"77\"\u003e\u003c/a\u003e\u003cbr\u003e\u003c/span\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\u003c/div\u003e\r\n\u003c/div\u003e\r\n\u003c/div\u003e\u003c/div\u003e\u003c/blockquote\u003e\u003c/div\u003e\u003cbr\u003e"
+            },
+            "4": 255594091
+          }, {
+            "1": 0,
+            "3": {
+              "2": "\u003c/div\u003e\r\n"
+            },
+            "4": 936221625
+          }],
+          "3": 0,
+          "7": 1,
+          "8": 1
+        },
+        "7": "Sara, It's called ZERO BOUNCE\u1427",
+        "8": "\u003cCAKPA8hvkzgSw40i6Vo0maouJvqH+FwiBeOB_iLHrOMaggfcDGw@mail.gmail.com\u003e",
+        "9": ["\u003cCAOOPFq2bQjTP4u1tOMVdwUfwffYg\u003dJTn1v22UJC8U31ifT_wPg@mail.gmail.com\u003e"],
+        "10": "\u003cCAOOPFq2bQjTP4u1tOMVdwUfwffYg\u003dJTn1v22UJC8U31ifT_wPg@mail.gmail.com\u003e",
+        "11": {
+          "1": 0,
+          "2": 1,
+          "3": "",
+          "4": -1,
+          "8": "streak.com",
+          "9": "streak.com"
+        },
+        "17": "1521071598675",
+        "20": {
+          "5": 2
+        },
+        "29": "1594959172652759326"
+      }
+    }]
+  }]
+}
