@@ -468,28 +468,35 @@ class GmailThreadView {
 	}
 
 	_waitForAddonTitleAndSuppress(addonTitle: string){
-		const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
-		const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
+		try {
+			const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
+			const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
 
-		if(!iconContainerElement) return;
+			if(!iconContainerElement) return;
 
-		const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
+			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
-		makeElementChildStream(querySelector(iconContainerElement, '.J-KU-Jg'))
-			.filter(({el}) =>
-					el.getAttribute('role') === 'tab' &&
-					el.getAttribute('data-tooltip') === addonTitle
-			)
-			.takeUntilBy(this._stopper)
-			.onValue(({el}) => {
-				if(el.classList.contains('.J-KU-KO')){
-					// it is currently open, so let's close
-					simulateClick(el);
-				}
+			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg');
+			if (!elementToWatch) return;
 
-				el.style.display = 'none';
-				if(widthManager) widthManager.fixWidths();
-			});
+			makeElementChildStream(elementToWatch)
+				.filter(({el}) =>
+						el.getAttribute('role') === 'tab' &&
+						el.getAttribute('data-tooltip') === addonTitle
+				)
+				.takeUntilBy(this._stopper)
+				.onValue(({el}) => {
+					if(el.classList.contains('.J-KU-KO')){
+						// it is currently open, so let's close
+						simulateClick(el);
+					}
+
+					el.style.display = 'none';
+					if(widthManager) widthManager.fixWidths();
+				});
+		} catch (err) {
+			this._driver.getLogger().error(err, 'Failure in suppressing addon title');
+		}
 	}
 
 	_setupWidthManager(){
