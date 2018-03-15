@@ -18,12 +18,17 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   async getMessageDate(threadId: string, message: HTMLElement): Promise<?number> {
     let date = message.getAttribute('data-inboxsdk-sortdate');
     if(!date){
+      const [btaiHeader, xsrfToken] = this.isUsingSyncAPI() ?
+        await Promise.all([this.getBtaiHeader(), this.getXsrfToken()]) :
+        [null, null];
       message.dispatchEvent(new CustomEvent('inboxSDKtellMeThisMessageDate', {
         bubbles: true,
         cancelable: false,
         detail: {
           threadId,
-          ikValue: this.getIkValue()
+          ikValue: this.getIkValue(),
+          btaiHeader,
+          xsrfToken
         }
       }));
 

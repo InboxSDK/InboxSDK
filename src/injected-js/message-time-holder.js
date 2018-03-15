@@ -1,8 +1,10 @@
 /* @flow */
 
 import querystring from 'querystring';
+import startsWith from 'lodash/startsWith';
 import type {Message} from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import {extractMessages} from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import {getThreadFromSyncThreadIdUsingHeaders} from '../platform-implementation-js/dom-driver/gmail/gmail-driver/getSyncThreadFromSyncThreadId';
 import * as logger from './injected-logger';
 import requestGmailThread from '../platform-implementation-js/driver-common/requestGmailThread';
 
@@ -10,7 +12,7 @@ const threadIdToMessages: Map<string, Message[]> = new Map();
 
 export function setup() {
   document.addEventListener('inboxSDKtellMeThisMessageDate', function(event: Object) {
-    const {target, detail: {threadId, ikValue}} = event;
+    const {target, detail: {threadId, ikValue, btaiHeader, xsrfToken}} = event;
 
     (async () => {
       const messageIndex = Array.from(target.parentElement.children)
@@ -24,7 +26,7 @@ export function setup() {
 
       if (date == null) {
         try {
-          await addDataForThread(ikValue, threadId);
+          await addDataForThread(threadId, ikValue, btaiHeader, xsrfToken);
         } catch (err) {
           logger.error(err);
         }
@@ -61,7 +63,9 @@ export function add(groupedMessages: Array<{threadID: string; messages: Message[
 
 const activeThreadRequestPromises: Map<string, Promise<void>> = new Map();
 
-function addDataForThread(ikValue: string, threadId: string): Promise<void> {
+function addDataForThread(
+  threadId: string, ikValue: string, btaiHeader: ?string, xsrfToken: ?string
+): Promise<void> {
   const existingRequestPromise = activeThreadRequestPromises.get(threadId);
   if (existingRequestPromise) {
     return existingRequestPromise;
@@ -69,8 +73,21 @@ function addDataForThread(ikValue: string, threadId: string): Promise<void> {
 
   const newPromise = (async () => {
     try {
-      const text = await requestGmailThread(ikValue, threadId);
-      add(extractMessages(text));
+      if (startsWith(threadId, 'thread')) { // new data layer
+        if (!btaiHeader || !xsrfToken) {
+          throw new Error('Need btaiHeader and xsrfToken when in new data layer');
+        }
+        const syncThread = await getThreadFromSyncThreadIdUsingHeaders(threadId, btaiHeader, xsrfToken);
+        add([{
+          threadID: syncThread.syncThreadID,
+          messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
+            date: syncMessage.date
+          }))
+        }]);
+      } else { // legacy gmail
+        const text = await requestGmailThread(ikValue, threadId);
+        add(extractMessages(text));
+      }
     } catch (err) {
       logger.error(err);
     } finally {
