@@ -1683,6 +1683,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
   line-height: 40px;
 }
 
+body.inboxsdk__gmailv1css .inboxsdk__resultsSection_header > .Cr > .J-J5-Ji {
+  padding-top: 3px;
+}
+
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title .Wp {
   float: left;
   height: 10px;
