@@ -2,6 +2,7 @@
 
 import type {AutocompleteSearchResultWithId} from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 import asap from 'asap';
 import RSVP from 'rsvp';
@@ -14,21 +15,30 @@ import Logger from '../../lib/logger';
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
 
-  getMessageDate(threadId: string, message: HTMLElement): ?number {
+  async getMessageDate(threadId: string, message: HTMLElement): Promise<?number> {
     let date = message.getAttribute('data-inboxsdk-sortdate');
     if(!date){
       message.dispatchEvent(new CustomEvent('inboxSDKtellMeThisMessageDate', {
         bubbles: true,
         cancelable: false,
         detail: {
-          threadId
+          threadId,
+          ikValue: this.getIkValue()
         }
       }));
 
       date = message.getAttribute('data-inboxsdk-sortdate');
+      if (!date) {
+        await makeMutationObserverChunkedStream(
+          message, {attributes: true, attributeFilter: ['data-inboxsdk-sortdate']}
+        )
+          .take(1)
+          .toPromise();
+        date = message.getAttribute('data-inboxsdk-sortdate');
+      }
     }
 
-    if(date) return +date;
+    if(date && date !== 'error') return +date;
     else return null;
   }
 
