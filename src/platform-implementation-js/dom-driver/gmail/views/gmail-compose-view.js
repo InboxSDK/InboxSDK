@@ -1189,6 +1189,7 @@ class GmailComposeView {
 		}
 		else {
 			let i = -1;
+			let lastDebugData = null;
 
 			try {
 				// If this compose view doesn't have a message id yet, wait until it gets
@@ -1235,7 +1236,8 @@ class GmailComposeView {
 					}
 					lastMessageId = messageId;
 
-					const draftID = await this._driver.getDraftIDForMessageID(messageId);
+					const {draftID, debugData} = await this._driver.getDraftIDForMessageID(messageId);
+					lastDebugData = debugData;
 					if (draftID) {
 						return draftID;
 					}
@@ -1243,7 +1245,7 @@ class GmailComposeView {
 			} catch(err) {
 				this._driver.getLogger().error(err, {
 					message: 'getDraftID error',
-					i
+					i, lastDebugData
 				});
 				throw err;
 			}
