@@ -39,6 +39,7 @@ import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessa
 import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
+import type {GetDraftIdResult} from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
@@ -639,7 +640,7 @@ class GmailDriver {
 		return get(this._messageIDsToThreadIDs, messageID);
 	}
 
-	getDraftIDForMessageID(messageID: string): Promise<?string> {
+	getDraftIDForMessageID(messageID: string): Promise<GetDraftIdResult> {
 		return getDraftIDForMessageID(this, messageID);
 	}
 

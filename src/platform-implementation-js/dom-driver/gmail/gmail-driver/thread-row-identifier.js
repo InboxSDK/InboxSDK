@@ -95,7 +95,8 @@ class ThreadRowIdentifier {
       }
     }
     else {
-      return this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+      const {draftID} = await this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+      return draftID;
     }
   }
 

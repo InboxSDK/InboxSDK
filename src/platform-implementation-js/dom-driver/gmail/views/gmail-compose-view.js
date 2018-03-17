@@ -1189,6 +1189,7 @@ class GmailComposeView {
 		}
 		else {
 			let i = -1;
+			let lastDebugData = null;
 
 			try {
 				// If this compose view doesn't have a message id yet, wait until it gets
@@ -1231,11 +1232,30 @@ class GmailComposeView {
 								.toPromise();
 							continue;
 						}
+
+						// maaaaybe the draft is saving, but we failed to detect that.
+						// Let's log whether things would've worked out a little in the future.
+						setTimeout(async () => {
+							const newMessageId = this._messageId;
+							if (!newMessageId) {
+								throw new Error('Should not happen');
+							}
+							const {draftID, debugData} = await this._driver.getDraftIDForMessageID(newMessageId);
+							const err = new Error('Failed to read draft ID -- after check');
+							this._driver.getLogger().error(err, {
+								message: 'getDraftID error -- after check',
+								messageIdChanged: messageId !== newMessageId,
+								gotDraftID: draftID != null,
+								debugData: draftID ? null : debugData
+							});
+						}, 10*1000);
+
 						throw new Error("Failed to read draft ID");
 					}
 					lastMessageId = messageId;
 
-					const draftID = await this._driver.getDraftIDForMessageID(messageId);
+					const {draftID, debugData} = await this._driver.getDraftIDForMessageID(messageId);
+					lastDebugData = debugData;
 					if (draftID) {
 						return draftID;
 					}
@@ -1243,7 +1263,12 @@ class GmailComposeView {
 			} catch(err) {
 				this._driver.getLogger().error(err, {
 					message: 'getDraftID error',
-					i
+					removedFromDOM: !document.contains(this._element),
+					destroyed: this._destroyed,
+					isFullscreen: this._isFullscreen,
+					isStandalone: this._isStandalone,
+					emailWasSent: this._emailWasSent,
+					i, lastDebugData,
 				});
 				throw err;
 			}

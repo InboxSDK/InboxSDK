@@ -7,8 +7,13 @@ import {readDraftId} from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/is-streak-app-id';
 
-const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<?string> =
-  memoize(async function(driver: GmailDriver, messageID: string): Promise<?string> {
+export type GetDraftIdResult = {
+  draftID: ?string;
+  debugData: ?Object;
+};
+
+const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<GetDraftIdResult> =
+  memoize(async (driver: GmailDriver, messageID: string) => {
     const response = await gmailAjax({
       method: 'GET',
       url: (document.location:any).origin+document.location.pathname,
@@ -25,7 +30,9 @@ const getDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promis
       }
     });
     try {
-      return readDraftId(response.text, messageID);
+      const draftID = readDraftId(response.text, messageID);
+      const debugData = {responseText: response.text};
+      return {draftID, debugData};
     } catch (err) {
       if (isStreakAppId(driver.getAppId())) {
         driver.getLogger().error(err, {
