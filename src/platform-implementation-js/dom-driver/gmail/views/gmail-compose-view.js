@@ -1232,6 +1232,24 @@ class GmailComposeView {
 								.toPromise();
 							continue;
 						}
+
+						// maaaaybe the draft is saving, but we failed to detect that.
+						// Let's log whether things would've worked out a little in the future.
+						setTimeout(async () => {
+							const newMessageId = this._messageId;
+							if (!newMessageId) {
+								throw new Error('Should not happen');
+							}
+							const {draftID, debugData} = await this._driver.getDraftIDForMessageID(newMessageId);
+							const err = new Error('Failed to read draft ID -- after check');
+							this._driver.getLogger().error(err, {
+								message: 'getDraftID error -- after check',
+								messageIdChanged: messageId !== newMessageId,
+								gotDraftID: draftID != null,
+								debugData: draftID ? null : debugData
+							});
+						}, 10*1000);
+
 						throw new Error("Failed to read draft ID");
 					}
 					lastMessageId = messageId;
