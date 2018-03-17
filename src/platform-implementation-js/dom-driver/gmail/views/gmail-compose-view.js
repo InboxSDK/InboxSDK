@@ -1245,7 +1245,12 @@ class GmailComposeView {
 			} catch(err) {
 				this._driver.getLogger().error(err, {
 					message: 'getDraftID error',
-					i, lastDebugData
+					removedFromDOM: !document.contains(this._element),
+					destroyed: this._destroyed,
+					isFullscreen: this._isFullscreen,
+					isStandalone: this._isStandalone,
+					emailWasSent: this._emailWasSent,
+					i, lastDebugData,
 				});
 				throw err;
 			}
