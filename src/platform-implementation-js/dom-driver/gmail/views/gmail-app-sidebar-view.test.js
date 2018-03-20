@@ -7,7 +7,7 @@ import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
 import fs from 'fs';
 import idMap from '../../../lib/idMap';
-import GmailAppSidebarView from './gmail-app-sidebar-view';
+import GmailThreadSidebarView from './gmail-thread-sidebar-view';
 import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailElementGetter from '../gmail-element-getter';
 import MockWebStorage from 'mock-webstorage';
@@ -46,13 +46,13 @@ global._APP_SIDEBAR_TEST = true;
 describe('Without add-ons', function(){
   it('construction works', () => {
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'));
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'));
   });
 
   it('sidebar is added', async () => {
     const container = document.createElement('div');
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), container);
+      new GmailThreadSidebarView(makeDriver(), container);
 
     const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
@@ -68,7 +68,7 @@ describe('Without add-ons', function(){
   it('multiple sidebars can be added', async () => {
     const container = document.createElement('div');
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), container);
+      new GmailThreadSidebarView(makeDriver(), container);
 
     gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       title: 'foo1', iconUrl: '/bar.png', el: document.createElement('div')
@@ -87,13 +87,13 @@ describe('With new add-ons html', function(){
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
   });
 
   it('sidebar is added', async () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
 
     const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
@@ -111,7 +111,7 @@ describe('With new add-ons html', function(){
   it('icons get grouped by appName', async () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
 
     gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       appName: 'foo', title: 'foo 1', iconUrl: '/bar.png', el: document.createElement('div')
@@ -135,13 +135,13 @@ describe('With old add-ons html', function(){
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
   });
 
   it('sidebar is added', async () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
 
     const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
@@ -159,7 +159,7 @@ describe('With old add-ons html', function(){
   it('icons get grouped by appName', async () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
     const gmailAppSidebarView =
-      new GmailAppSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
 
     gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
       appName: 'foo', title: 'foo 1', iconUrl: '/bar.png', el: document.createElement('div')

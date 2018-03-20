@@ -17,7 +17,7 @@ As of Feb 6th, 2018.
 
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 
-function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement, stopper: Kefir.Observable<*>){
+function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
   const sidebarIconArea = companionSidebarIconContainerEl.querySelector('.brC-aT5-aOt-ato-Kp-Jw');
   if(!sidebarIconArea) return;
   const nativeIconArea = sidebarIconArea.firstElementChild;
@@ -50,11 +50,10 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
     loadingDivDisplayValueStream.filter(Boolean),
     tabListRoleStream
   ])
-  .takeUntilBy(stopper)
   .take(1)
   .onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
-    maintainIconArea(iconArea, tabList, stopper);
+    maintainIconArea(iconArea, tabList);
   });
 
   // if the addon loading div becomes visible then we create a clone of it and put the clone in a
@@ -63,17 +62,13 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   loadingDivDisplayValueStream
     .filter(isDisplayNone => !isDisplayNone)
     .take(1)
-    .takeUntilBy(stopper)
     .onValue(() => {
       const loadingClone = document.createElement('div');
       loadingClone.innerHTML = loadingHolder.innerHTML;
       loadingClone.classList.add('inboxsdk__addon_icon_loading');
       iconArea.insertAdjacentElement('afterend', loadingClone);
 
-      Kefir.merge([
-        loadingDivDisplayValueStream.filter(Boolean),
-        stopper
-      ])
+      loadingDivDisplayValueStream.filter(Boolean)
       .take(1)
       .onValue(() => {
         loadingClone.remove();
@@ -83,10 +78,9 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
 
 // Gmail periodically clears the children of this element before it's
 // visible, so we fight back.
-function maintainIconArea(iconArea, tabList, stopper){
+function maintainIconArea(iconArea, tabList){
   makeMutationObserverChunkedStream(tabList, {childList: true})
     .filter(() => iconArea.parentElement !== tabList)
-    .takeUntilBy(stopper)
     .onValue(() => {
       tabList.insertAdjacentElement('afterbegin', iconArea);
     });

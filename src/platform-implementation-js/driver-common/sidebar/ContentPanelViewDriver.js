@@ -20,7 +20,7 @@ class ContentPanelViewDriver {
   _instanceId: string = `${Date.now()}-${Math.random()}`;
   _sidebarId: string;
 
-  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string) {
+  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string, isGlobal?: boolean) {
     this._driver = driver;
     this._sidebarId = sidebarId;
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
@@ -65,7 +65,7 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
-              title, iconUrl, iconClass,
+              title, iconUrl, iconClass, isGlobal,
               sidebarId: this._sidebarId,
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),

@@ -26,6 +26,7 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailAppSidebarView from './gmail-app-sidebar-view';
+import GmailThreadSidebarView from './gmail-thread-sidebar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 
 import type {CustomMessageDescriptor} from '../../../views/conversations/custom-message-view';
@@ -39,7 +40,7 @@ class GmailThreadView {
 	_isPreviewedThread: boolean;
 	_eventStream: Bus<any>;
 	_stopper = kefirStopper();
-	_sidebar: ?GmailAppSidebarView = null;
+	_threadSidebar: ?GmailThreadSidebarView = null;
 	_widthManager: ?WidthManager = null;
 
 	_toolbarView: any;
@@ -109,7 +110,7 @@ class GmailThreadView {
 		this._eventStream.end();
 		this._stopper.destroy();
 		this._toolbarView.destroy();
-		if (this._sidebar) this._sidebar.destroy();
+		if (this._threadSidebar) this._threadSidebar.destroy();
 
 		this._messageViewDrivers.forEach(messageView => {
 			messageView.destroy();
@@ -125,27 +126,33 @@ class GmailThreadView {
 	}
 
 	addSidebarContentPanel(descriptor: Kefir.Observable<Object>){
-		const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-		const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
-		const companionSidebarContentContainerElement = GmailElementGetter.getCompanionSidebarContentContainerElement();
-		if (!sidebarElement && !addonSidebarElement) {
-			console.warn('This view does not have a sidebar'); //eslint-disable-line no-console
-			return;
+		if(this._driver.isUsingMaterialUI()){
+			const sidebar = this._driver.getGlobalSidebar();
+			return sidebar.addThreadSidebarContentPanel(descriptor, this);
 		}
-		let sidebar = this._sidebar;
-		if (!sidebar) {
-			let widthManager;
-			if(addonSidebarElement){
-				widthManager = this._setupWidthManager();
+		else {
+			const sidebarElement = GmailElementGetter.getSidebarContainerElement();
+			const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+			const companionSidebarContentContainerElement = GmailElementGetter.getCompanionSidebarContentContainerElement();
+			if (!sidebarElement && !addonSidebarElement) {
+				console.warn('This view does not have a sidebar'); //eslint-disable-line no-console
+				return;
 			}
-			sidebar = this._sidebar = new GmailAppSidebarView(this._driver, sidebarElement, addonSidebarElement, companionSidebarContentContainerElement, widthManager);
-			sidebar.getStopper().onValue(() => {
-				if (this._sidebar === sidebar) {
-					this._sidebar = null;
+			let sidebar = this._threadSidebar;
+			if (!sidebar) {
+				let widthManager;
+				if(addonSidebarElement){
+					widthManager = this._setupWidthManager();
 				}
-			});
+				sidebar = this._threadSidebar = new GmailThreadSidebarView(this._driver, sidebarElement, addonSidebarElement, widthManager);
+				sidebar.getStopper().onValue(() => {
+					if (this._threadSidebar === sidebar) {
+						this._threadSidebar = null;
+					}
+				});
+			}
+			return sidebar.addSidebarContentPanel(descriptor);
 		}
-		return sidebar.addSidebarContentPanel(descriptor);
 	}
 
 	addNoticeBar(): SimpleElementView {
