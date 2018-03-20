@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
@@ -29,6 +30,8 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   const tabList = sidebarIconArea.querySelector(TAB_LIST_SELECTOR);
   if(!tabList) return;
 
+  let stopMaintaining;
+
   // emits when the loading div style becomes display none
   const loadingDivDisplayValueStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
@@ -53,7 +56,7 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   .take(1)
   .onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
-    maintainIconArea(iconArea, tabList);
+    stopMaintaining = maintainIconArea(iconArea, tabList);
   });
 
   // if the addon loading div becomes visible then we create a clone of it and put the clone in a
@@ -61,29 +64,41 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
   // but the style attribute still gets modified by gmail so we know when the loading should go away
   loadingDivDisplayValueStream
     .filter(isDisplayNone => !isDisplayNone)
-    .take(1)
     .onValue(() => {
       const loadingClone = document.createElement('div');
       loadingClone.innerHTML = loadingHolder.innerHTML;
       loadingClone.classList.add('inboxsdk__addon_icon_loading');
+      tabList.insertAdjacentElement('beforebegin', iconArea);
       iconArea.insertAdjacentElement('afterend', loadingClone);
 
-      loadingDivDisplayValueStream.filter(Boolean)
-      .take(1)
-      .onValue(() => {
-        loadingClone.remove();
-      });
+      if(stopMaintaining) {
+        stopMaintaining();
+        stopMaintaining = null;
+      }
+
+      loadingDivDisplayValueStream
+        .filter(Boolean)
+        .take(1)
+        .onValue(() => {
+          loadingClone.remove();
+          tabList.insertAdjacentElement('afterbegin', iconArea);
+          stopMaintaining = maintainIconArea(iconArea, tabList);
+        });
     });
 }
 
 // Gmail periodically clears the children of this element before it's
 // visible, so we fight back.
 function maintainIconArea(iconArea, tabList){
+  const stopper = kefirStopper();
   makeMutationObserverChunkedStream(tabList, {childList: true})
     .filter(() => iconArea.parentElement !== tabList)
+    .takeUntilBy(stopper)
     .onValue(() => {
       tabList.insertAdjacentElement('afterbegin', iconArea);
     });
+
+  return () => stopper.destroy();
 }
 
 export default defn(module, addCompanionIconArea);
