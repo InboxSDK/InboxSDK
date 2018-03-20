@@ -32,7 +32,7 @@ function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContain
 
   let stopMaintaining;
 
-  // emits when the loading div style becomes display none
+  // emits when the loading div display style changes
   const loadingDivDisplayValueStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
       .toProperty(() => null)

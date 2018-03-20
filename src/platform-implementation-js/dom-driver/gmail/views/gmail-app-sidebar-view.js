@@ -367,6 +367,7 @@ class GmailAppSidebarView {
       }
     });
 
+    // thread sidebar content panels
     Kefir.fromEvents(window, 'storage')
       .filter(e => e.key === 'inboxsdk__sidebar_ordering')
       .takeUntilBy(this._stopper)
