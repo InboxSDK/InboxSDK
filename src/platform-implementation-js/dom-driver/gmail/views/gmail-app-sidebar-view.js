@@ -27,7 +27,8 @@ import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
 import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailElementGetter from '../gmail-element-getter';
 
-import addCompanionIconArea from './gmail-app-sidebar-view/add-companion-icon-area';
+import addCompanionThreadIconArea from './gmail-app-sidebar-view/add-companion-thread-icon-area';
+import addCompanionGlobalIconArea from './gmail-app-sidebar-view/add-companion-global-icon-area';
 import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
 
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
@@ -112,13 +113,11 @@ class GmailAppSidebarView {
     const createThreadSidebar = () => {
       if(threadSidebarContainerEl) return threadSidebarContainerEl;
 
-      threadSidebarContainerEl = document.createElement('div');
-      threadSidebarContainerEl.className = idMap('app_sidebar_container');
-
       const updateHighlightedAppThreadIconBus = kefirBus();
-
       const container = () => threadSidebarContainerEl;
-      threadSidebarContainerEl.classList.add('addon_sidebar');
+
+      threadSidebarContainerEl = document.createElement('div');
+      threadSidebarContainerEl.classList.add('thread_app_sidebar', idMap('app_sidebar_container'), 'addon_sidebar');
 
       companionSidebarContentContainerEl.insertBefore(threadSidebarContainerEl, companionSidebarContentContainerEl.firstElementChild);
 
@@ -191,7 +190,7 @@ class GmailAppSidebarView {
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
-        const existingButtonContainer = threadButtonContainers.get(appName);
+        const existingButtonContainer = isGlobal ? globalButtonContainers.get(appName) : threadButtonContainers.get(appName);
 
         let buttonContainer;
         if (existingButtonContainer) {
@@ -213,21 +212,27 @@ class GmailAppSidebarView {
             querySelector(buttonContainer, '.inboxsdk__button_selectedIndicator').style.backgroundColor = event.detail.primaryColor;
           }
 
-          threadButtonContainers.set(appName, buttonContainer);
+          if(isGlobal) globalButtonContainers.set(appName, buttonContainer);
+          else threadButtonContainers.set(appName, buttonContainer);
 
           querySelector(buttonContainer, 'button').addEventListener('click', (event: MouseEvent) => {
             event.stopPropagation();
 
-            const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
+            let activeButtonContainer;
+            if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+            if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+
             if(activeButtonContainer){
               activeButtonContainer.classList.remove('sidebar_button_container_active');
             }
 
+            companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
+
             if(activeButtonContainer === buttonContainer) {
-              companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
               companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
+
               const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
+              if(contentContainer)  contentContainer.classList.remove('companion_container_app_sidebar_visible');
 
               //fake resize to get gmail to fix any heights that are messed up
               fakeWindowResize();
@@ -235,6 +240,11 @@ class GmailAppSidebarView {
               lastActiveNativeGlobalAddOnIconEl = null;
 
               this._setShouldAppSidebarOpen(false);
+
+              if(isGlobal){
+                const contentEl = contentContainers.get(appName);
+                if(contentEl) contentEl.style.display = 'none';
+              }
             }
             else {
               this._setShouldAppSidebarOpen(true);
@@ -252,7 +262,15 @@ class GmailAppSidebarView {
               const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
               if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
 
-              if(lastActiveNativeGlobalAddOnIconEl) shouldRestoreGlobal = true;
+              if(isGlobal){
+                lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
+                const contentEl = contentContainers.get(appName);
+                if(contentEl) contentEl.style.display = '';
+                companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
+              }
+              else {
+                if(lastActiveNativeGlobalAddOnIconEl) shouldRestoreGlobal = true;
+              }
 
               //fake resize to get gmail to fix any heights that are messed up
               fakeWindowResize();
@@ -265,7 +283,10 @@ class GmailAppSidebarView {
           if(this._getShouldAppSidebarOpen()){
             // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
             // panel gets added
-            const activeButtonContainer = iconArea.querySelector('.sidebar_button_container_active');
+            let activeButtonContainer;
+            if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+            if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+
             if(!activeButtonContainer){
               buttonContainer.classList.add('sidebar_button_container_active');
 
@@ -278,6 +299,14 @@ class GmailAppSidebarView {
               companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
               const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
               if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+
+              const contentEl = contentContainers.get(appName);
+              if(contentEl) contentEl.style.display = '';
+
+              if(isGlobal) {
+                lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
+                companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
+              }
 
               //fake resize to get gmail to fix any heights that are messed up
               fakeWindowResize();
@@ -368,88 +397,133 @@ class GmailAppSidebarView {
     });
 
     // thread sidebar content panels
-    Kefir.fromEvents(window, 'storage')
-      .filter(e => e.key === 'inboxsdk__sidebar_ordering')
-      .takeUntilBy(this._stopper)
-      .onValue(() => {
-        orderManager.reload();
-        if(renderThreadSidebar) renderThreadSidebar();
-      });
+    {
+      Kefir.fromEvents(window, 'storage')
+        .filter(e => e.key === 'inboxsdk__sidebar_ordering')
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          orderManager.reload();
+          if(renderThreadSidebar) renderThreadSidebar();
+        });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        createThreadSidebar();
-        let id = event.detail.id;
-        while (currentIds.has(id)) {
-          id = incrementName(id);
-        }
-        currentIds.add(id);
+      Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          createThreadSidebar();
+          let id = event.detail.id;
+          while (currentIds.has(id)) {
+            id = incrementName(id);
+          }
+          currentIds.add(id);
 
-        const appName = event.detail.appName;
-        orderManager.addItem({
-          groupId: event.detail.appId,
-          id,
-          orderHint: event.detail.orderHint,
-          value: {
-            id, appName,
+          const appName = event.detail.appName;
+          orderManager.addItem({
+            groupId: event.detail.appId,
+            id,
+            orderHint: event.detail.orderHint,
+            value: {
+              id, appName,
+              appId: event.detail.appId,
+              instanceId: event.detail.instanceId,
+              title: event.detail.title,
+              iconClass: event.detail.iconClass,
+              iconUrl: event.detail.iconUrl,
+              hideTitleBar: event.detail.hideTitleBar,
+              el: event.target
+            }
+          });
+          if(renderThreadSidebar) renderThreadSidebar();
+
+          threadIconArea = companionSidebarIconContainerEl.querySelector('.sidebar_thread_iconArea');
+          if (!threadIconArea) {
+            threadIconArea = document.createElement('div');
+            threadIconArea.className = idMap('sidebar_iconArea');
+            threadIconArea.classList.add('sidebar_thread_iconArea');
+            addCompanionThreadIconArea(threadIconArea, companionSidebarIconContainerEl);
+          }
+
+          addButton(threadIconArea, event, false);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          const orderedItems = orderManager.getOrderedItems();
+          const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
+          if (index === -1) throw new Error('should not happen: failed to find orderItem');
+          orderManager.updateItemValueByIndex(index, {
+            id: orderedItems[index].value.id,
             appId: event.detail.appId,
+            appName: event.detail.appName || event.detail.title,
             instanceId: event.detail.instanceId,
             title: event.detail.title,
             iconClass: event.detail.iconClass,
             iconUrl: event.detail.iconUrl,
             hideTitleBar: event.detail.hideTitleBar,
             el: event.target
+          });
+          if(renderThreadSidebar) renderThreadSidebar();
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          const orderedItems = orderManager.getOrderedItems();
+          const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
+          if (index === -1) throw new Error('should not happen: failed to find orderItem');
+          currentIds.delete(orderedItems[index].id);
+          orderManager.removeItemByIndex(index);
+
+          if(renderThreadSidebar) renderThreadSidebar();
+          removeButton(event, threadButtonContainers, threadIconArea);
+        });
+    }
+
+
+    // global sidebar content panels
+    {
+      Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          let id = event.detail.id;
+          while (currentIds.has(id)) {
+            id = incrementName(id);
           }
+          currentIds.add(id);
+
+          const appName = event.detail.appName;
+
+          globalIconArea = companionSidebarIconContainerEl.querySelector('.sidebar_global_iconArea');
+          if (!globalIconArea) {
+            globalIconArea = document.createElement('div');
+            globalIconArea.className = idMap('sidebar_iconArea');
+            globalIconArea.classList.add('sidebar_global_iconArea');
+            addCompanionGlobalIconArea(globalIconArea, companionSidebarIconContainerEl);
+          }
+
+          const sdkContentContainerEl = document.createElement('div');
+          sdkContentContainerEl.classList.add('addon_sidebar', idMap('app_sidebar_container'), 'global_app_sidebar');
+          companionSidebarContentContainerEl.insertAdjacentElement('afterbegin', sdkContentContainerEl);
+          contentContainers.set(appName, sdkContentContainerEl);
+
+          sdkContentContainerEl.appendChild(event.target);
+          sdkContentContainerEl.style.display = 'none';
+
+          addButton(globalIconArea, event, true);
         });
-        if(renderThreadSidebar) renderThreadSidebar();
 
-        threadIconArea = companionSidebarIconContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
-        if (!threadIconArea) {
-          threadIconArea = document.createElement('div');
-          threadIconArea.className = idMap('sidebar_iconArea');
-          addCompanionIconArea(threadIconArea, companionSidebarIconContainerEl);
-        }
-
-        addButton(threadIconArea, event, false);
-      });
-
-    Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
-        orderManager.updateItemValueByIndex(index, {
-          id: orderedItems[index].value.id,
-          appId: event.detail.appId,
-          appName: event.detail.appName || event.detail.title,
-          instanceId: event.detail.instanceId,
-          title: event.detail.title,
-          iconClass: event.detail.iconClass,
-          iconUrl: event.detail.iconUrl,
-          hideTitleBar: event.detail.hideTitleBar,
-          el: event.target
+      Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          currentIds.delete(event.detail.id);
+          removeButton(event, globalButtonContainers, globalIconArea);
         });
-        if(renderThreadSidebar) renderThreadSidebar();
-      });
-
-    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
-        currentIds.delete(orderedItems[index].id);
-        orderManager.removeItemByIndex(index);
-
-        if(renderThreadSidebar) renderThreadSidebar();
-        removeButton(event, threadButtonContainers, threadIconArea);
-      });
-
+    }
 
     // at this point the companionSidebar has 2 children
     // 1st child is global add-on content
@@ -495,38 +569,6 @@ class GmailAppSidebarView {
         activeButtonContainer.classList.remove('sidebar_button_container_active');
       }
     });
-
-
-    // global content panels
-    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        let id = event.detail.id;
-        while (currentIds.has(id)) {
-          id = incrementName(id);
-        }
-        currentIds.add(id);
-
-        const appName = event.detail.appName;
-
-        threadIconArea = companionSidebarIconContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
-        if (!threadIconArea) {
-          threadIconArea = document.createElement('div');
-          threadIconArea.className = idMap('sidebar_iconArea');
-          addCompanionIconArea(threadIconArea, companionSidebarIconContainerEl);
-        }
-
-        addButton(threadIconArea, event, true);
-      });
-
-    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
-      .takeUntilBy(this._stopper)
-      .onValue(event => {
-        currentIds.delete(event.detail.id);
-        removeButton(event, globalButtonContainers, globalIconArea);
-      });
 
   }
 

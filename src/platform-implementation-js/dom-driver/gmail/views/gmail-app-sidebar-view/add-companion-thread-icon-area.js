@@ -17,9 +17,10 @@ As of Feb 6th, 2018.
 */
 
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
+const THREAD_ICON_AREA_SELECTOR = '.brC-aT5-aOt-ato-Kp-Jw';
 
-function addCompanionIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
-  const sidebarIconArea = companionSidebarIconContainerEl.querySelector('.brC-aT5-aOt-ato-Kp-Jw');
+function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
+  const sidebarIconArea = companionSidebarIconContainerEl.querySelector(THREAD_ICON_AREA_SELECTOR);
   if(!sidebarIconArea) return;
   const nativeIconArea = sidebarIconArea.firstElementChild;
   if(!nativeIconArea) return;
@@ -101,4 +102,4 @@ function maintainIconArea(iconArea, tabList){
   return () => stopper.destroy();
 }
 
-export default defn(module, addCompanionIconArea);
+export default defn(module, addCompanionThreadIconArea);

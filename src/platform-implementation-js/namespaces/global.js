@@ -12,7 +12,7 @@ import type {Driver} from '../driver-interfaces/driver';
 
 const memberMap = new WeakMap();
 
-class Global {
+export default class Global {
 
   constructor(appId: string, driver: Driver, piOpts: PiOpts) {
     const members = {};
@@ -29,7 +29,7 @@ class Global {
 
 		members.driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
 
-		const contentPanelImplementation = members.addGlobalSidebarContentPanel(descriptorPropertyStream);
+		const contentPanelImplementation = members.driver.addGlobalSidebarContentPanel(descriptorPropertyStream);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}

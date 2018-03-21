@@ -1292,6 +1292,10 @@ body.inboxsdk__gmailv1css .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .ID
   position: relative;
 }
 
+  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .inboxsdk__button_icon {
+    margin-bottom: 16px;
+  }
+
   body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
     overflow: visible;
   }
@@ -1340,6 +1344,10 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   border-radius: 3px 0 0 3px
 }
 
+  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+    bottom: 8px;
+  }
+
 body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
   height: 24px;
   border-radius: 0px;
@@ -1361,11 +1369,19 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
   display: block !important;
 }
 
+  .companion_global_app_sidebar_visible .thread_app_sidebar {
+    display: none;
+  }
+
+  .companion_container_app_sidebar_visible:not(.companion_global_app_sidebar_visible) .global_app_sidebar {
+    display: none;
+  }
+
 .nH.companion_container_app_sidebar_visible {
   width: calc(100% - 300px) !important;
 }
 
-.companion_app_sidebar_visible .addon_sidebar ~ div {
+.companion_app_sidebar_visible .addon_sidebar ~ div:not(.addon_sidebar) {
   display: none !important;
 }
 
