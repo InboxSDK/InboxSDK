@@ -54,13 +54,11 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   const tabList = addonSidebarContainerEl.querySelector(TAB_LIST_SELECTOR);
   if(!tabList) return;
 
-  let stopMaintaining;
-
   // emits when the loading div display style changes
-  const loadingDivDisplayValueStream =
+  const loadingDivIsDisplayedStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
       .toProperty(() => null)
-      .map(() => loadingHolder.style.display === 'none');
+      .map(() => loadingHolder.style.display !== 'none');
 
   // emits when the tablist div gets role=tablist
   const tabListRoleStream =
@@ -71,25 +69,26 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   // first we add sdk icon container as previous sibling to native tablist
   tabList.insertAdjacentElement('beforebegin', iconArea);
 
-  // now we wait for loading to be gone and tablist to be formed, and then we
+  // now we wait for loading to be hidden and tablist to be formed, and then we
   // add sdk icon container to tablist
   Kefir.combine([
-    loadingDivDisplayValueStream.filter(Boolean),
+    loadingDivIsDisplayedStream.filter((value) => !value),
     tabListRoleStream
   ])
-  .takeUntilBy(stopper)
-  .take(1)
   .onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
-    stopMaintaining = maintainIconArea(iconArea, tabList, stopper);
+    maintainIconArea(
+      iconArea,
+      tabList,
+      Kefir.merge([loadingDivIsDisplayedStream.filter(Boolean), stopper])
+    );
   });
 
-  // if the addon loading div is visible then we create a clone of it and put the clone in a
+  // if the addon loading div becomes visible then we create a clone of it and put the clone in a
   // better place that works with our icons better. the native addon loading div is hidden with css
   // but the style attribute still gets modified by gmail so we know when the loading should go away
-  loadingDivDisplayValueStream
-    .filter(isDisplayNone => !isDisplayNone)
-    .takeUntilBy(stopper)
+  loadingDivIsDisplayedStream
+    .filter(Boolean)
     .onValue(() => {
       const loadingClone = document.createElement('div');
       loadingClone.innerHTML = loadingHolder.innerHTML;
@@ -97,34 +96,24 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
       tabList.insertAdjacentElement('beforebegin', iconArea);
       iconArea.insertAdjacentElement('afterend', loadingClone);
 
-      if(stopMaintaining) {
-        stopMaintaining();
-        stopMaintaining = null;
-      }
-
-      loadingDivDisplayValueStream
-        .filter(Boolean)
+      loadingDivIsDisplayedStream
+        .filter((value) => !value)
         .take(1)
         .onValue(() => {
           loadingClone.remove();
-          tabList.insertAdjacentElement('afterbegin', iconArea);
-          stopMaintaining = maintainIconArea(iconArea, tabList, stopper);
         });
     });
 }
 
 // Gmail periodically clears the children of this element before it's
 // visible, so we fight back.
-function maintainIconArea(iconArea, tabList, threadRemovedStopper){
-  const stopper = kefirStopper();
+function maintainIconArea(iconArea, tabList, stopper){
   makeMutationObserverChunkedStream(tabList, {childList: true})
     .filter(() => iconArea.parentElement !== tabList)
-    .takeUntilBy(Kefir.merge([stopper, threadRemovedStopper]))
+    .takeUntilBy(stopper)
     .onValue(() => {
       tabList.insertAdjacentElement('afterbegin', iconArea);
     });
-
-  return () => stopper.destroy();
 }
 
 export default defn(module, addIconArea);

@@ -174,7 +174,7 @@ class GmailAppSidebarView {
         ): any);
       };
       renderThreadSidebar();
-    }
+    };
 
     const addButton = (iconArea, event, isGlobal) => {
       // we put adding the content panel icon in the iconArea in an asap so that we
@@ -315,7 +315,7 @@ class GmailAppSidebarView {
         }
 
       });
-    }
+    };
 
     const removeButton = (event, buttonContainers, iconArea) => {
       const appName = event.detail.appName;

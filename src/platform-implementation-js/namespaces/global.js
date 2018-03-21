@@ -15,21 +15,17 @@ const memberMap = new WeakMap();
 export default class Global {
 
   constructor(appId: string, driver: Driver, piOpts: PiOpts) {
-    const members = {};
+    const members = {appId, driver, piOpts};
     memberMap.set(this, members);
-
-    members.appId = appId;
-    members.driver = driver;
-    members.piOpts = piOpts;
   }
 
-  addSidebarContentPanel(descriptor: Object): ?ContentPanelView {
+  async addSidebarContentPanel(descriptor: Object): Promise<?ContentPanelView> {
     const descriptorPropertyStream = kefirCast((Kefir: any), descriptor).toProperty();
 		const members = get(memberMap, this);
 
 		members.driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
 
-		const contentPanelImplementation = members.driver.addGlobalSidebarContentPanel(descriptorPropertyStream);
+		const contentPanelImplementation = await members.driver.addGlobalSidebarContentPanel(descriptorPropertyStream);
 		if(contentPanelImplementation){
 			return new ContentPanelView(contentPanelImplementation);
 		}

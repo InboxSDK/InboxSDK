@@ -21,6 +21,7 @@ import type {ThreadRowViewDriver} from './thread-row-view-driver';
 import type {MoleViewDriver} from './mole-view-driver';
 
 import type {MessageViewDriver} from './message-view-driver';
+import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';
 
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
 import type InboxAttachmentCardView from '../dom-driver/inbox/views/inbox-attachment-card-view';
@@ -74,7 +75,7 @@ export type Driver = {
 	registerSearchSuggestionsProvider(handler: Function): void;
 	registerSearchQueryRewriter(obj: Object): void;
 	addToolbarButtonForApp(buttonDescriptor: Kefir.Observable<Object>): Promise<Object>;
-	addGlobalSidebarContentPanel(buttonDescriptor: Kefir.Observable<Object>): Promise<?Object>;
+	addGlobalSidebarContentPanel(buttonDescriptor: Kefir.Observable<Object>): Promise<?ContentPanelViewDriver>;
 	getButterBarDriver(): any;
 	setButterBar(butterBar: any): void;
 	isRunningInPageContext(): boolean;

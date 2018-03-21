@@ -3,7 +3,6 @@
 import {defn} from 'ud';
 
 import Kefir from 'kefir';
-import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
@@ -31,13 +30,11 @@ function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconC
   const tabList = sidebarIconArea.querySelector(TAB_LIST_SELECTOR);
   if(!tabList) return;
 
-  let stopMaintaining;
-
   // emits when the loading div display style changes
-  const loadingDivDisplayValueStream =
+  const loadingDivIsDisplayedStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
       .toProperty(() => null)
-      .map(() => loadingHolder.style.display === 'none');
+      .map(() => loadingHolder.style.display !== 'none');
 
   // emits when the tablist div gets role=tablist
   const tabListRoleStream =
@@ -48,23 +45,22 @@ function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconC
   // first we add sdk icon container as previous sibling to native tablist
   tabList.insertAdjacentElement('beforebegin', iconArea);
 
-  // now we wait for loading to be gone and tablist to be formed, and then we
+  // now we wait for loading to be hidden and tablist to be formed, and then we
   // add sdk icon container to tablist
   Kefir.combine([
-    loadingDivDisplayValueStream.filter(Boolean),
+    loadingDivIsDisplayedStream.filter((value) => !value),
     tabListRoleStream
   ])
-  .take(1)
   .onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
-    stopMaintaining = maintainIconArea(iconArea, tabList);
+    maintainIconArea(iconArea, tabList, loadingDivIsDisplayedStream.filter(Boolean));
   });
 
   // if the addon loading div becomes visible then we create a clone of it and put the clone in a
   // better place that works with our icons better. the native addon loading div is hidden with css
   // but the style attribute still gets modified by gmail so we know when the loading should go away
-  loadingDivDisplayValueStream
-    .filter(isDisplayNone => !isDisplayNone)
+  loadingDivIsDisplayedStream
+    .filter(Boolean)
     .onValue(() => {
       const loadingClone = document.createElement('div');
       loadingClone.innerHTML = loadingHolder.innerHTML;
@@ -72,34 +68,24 @@ function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconC
       tabList.insertAdjacentElement('beforebegin', iconArea);
       iconArea.insertAdjacentElement('afterend', loadingClone);
 
-      if(stopMaintaining) {
-        stopMaintaining();
-        stopMaintaining = null;
-      }
-
-      loadingDivDisplayValueStream
-        .filter(Boolean)
+      loadingDivIsDisplayedStream
+        .filter((value) => !value)
         .take(1)
         .onValue(() => {
           loadingClone.remove();
-          tabList.insertAdjacentElement('afterbegin', iconArea);
-          stopMaintaining = maintainIconArea(iconArea, tabList);
         });
     });
 }
 
 // Gmail periodically clears the children of this element before it's
 // visible, so we fight back.
-function maintainIconArea(iconArea, tabList){
-  const stopper = kefirStopper();
+function maintainIconArea(iconArea, tabList, stopper){
   makeMutationObserverChunkedStream(tabList, {childList: true})
     .filter(() => iconArea.parentElement !== tabList)
     .takeUntilBy(stopper)
     .onValue(() => {
       tabList.insertAdjacentElement('afterbegin', iconArea);
     });
-
-  return () => stopper.destroy();
 }
 
 export default defn(module, addCompanionThreadIconArea);

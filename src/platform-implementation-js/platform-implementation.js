@@ -86,7 +86,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 	Toolbars: Toolbars;
 	ButterBar: ButterBar;
 	Widgets: Widgets;
-	Global: Global;
+	Global: ?Global;
 	Modal: ?Modal;
 	Logger: AppLogger;
 
@@ -133,12 +133,16 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.Search = new Search(appId, driver);
 		this.Toolbars = new Toolbars(appId, driver, membrane, piOpts);
 		this.Widgets = new Widgets(appId, driver);
-		this.Global = new Global(appId, driver, piOpts);
 
 		if (piOpts.REQUESTED_API_VERSION === 1) {
 			// Modal is deprecated; just drop it when apps switch to the next version
 			// whenever we start that.
 			this.Modal = new Modal(appId, driver, piOpts);
+		}
+
+		if (piOpts.REQUESTED_API_VERSION >= 2) {
+			// new Global namespace only available in v2 or above
+			this.Global = new Global(appId, driver, piOpts);
 		}
 		this.Logger = driver.getLogger().getAppLogger();
 	}

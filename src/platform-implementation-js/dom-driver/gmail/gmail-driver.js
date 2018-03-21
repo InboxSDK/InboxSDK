@@ -80,6 +80,8 @@ import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
+import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
+
 class GmailDriver {
 	_appId: string;
 	_logger: Logger;
@@ -614,7 +616,7 @@ class GmailDriver {
 		).takeUntilBy(this._stopper);
 	}
 
-	addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>): Promise<?Object> {
+	addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>): Promise<?ContentPanelViewDriver> {
 		if(this.isUsingMaterialUI()){
 			const appSidebar = this.getGlobalSidebar();
 			return Promise.resolve(appSidebar.addGlobalSidebarContentPanel(descriptor));
