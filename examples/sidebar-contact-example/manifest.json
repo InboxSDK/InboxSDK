@@ -1,5 +1,5 @@
 {
-  "name": "Sidebar Example Extension",
+  "name": "Sidebar Contact Hover Example Extension",
   "description": "Sidebar example!",
   "version": "0.1",
   "content_scripts": [

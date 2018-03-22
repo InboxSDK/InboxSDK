@@ -1280,19 +1280,6 @@ body.inboxsdk__gmailv1css .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .ID
   opacity: 0.6;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container.sidebar_button_container_active::before,
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:hover::before {
-  background-color: #e8eaed;
-  border-radius: 50%;
-  height: 40px;
-  width: 40px;
-  display: block;
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 8px;
-}
-
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin: 16px 16px 8px 16px;
   border: none;
@@ -1305,6 +1292,31 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconAr
   position: relative;
 }
 
+  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .inboxsdk__button_icon {
+    margin-bottom: 16px;
+  }
+
+  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+    overflow: visible;
+  }
+
+  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_icon::before,
+  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover:before {
+    content: '';
+    background: #f1f3f4;
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_icon::before {
+    background: #e8eaed;
+  }
+
 body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin-bottom: 0px;
 }
@@ -1315,6 +1327,13 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin-top: 0px;
 }
 
+  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon .inboxsdk__button_iconImg {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1;
+  }
+
 .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
   height: 40px;
   width: 4px;
@@ -1324,6 +1343,10 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   background-color: rgb(66, 133, 244);
   border-radius: 3px 0 0 3px
 }
+
+  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+    bottom: 8px;
+  }
 
 body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
   height: 24px;
@@ -1346,11 +1369,19 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
   display: block !important;
 }
 
+  .companion_global_app_sidebar_visible .thread_app_sidebar {
+    display: none;
+  }
+
+  .companion_container_app_sidebar_visible:not(.companion_global_app_sidebar_visible) .global_app_sidebar {
+    display: none;
+  }
+
 .nH.companion_container_app_sidebar_visible {
   width: calc(100% - 300px) !important;
 }
 
-.companion_app_sidebar_visible .addon_sidebar ~ div {
+.companion_app_sidebar_visible .addon_sidebar ~ div:not(.addon_sidebar) {
   display: none !important;
 }
 
@@ -1387,7 +1418,7 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq > div:last-child 
 }
 
 /* hide the native addon loading div */
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq > div:first-child {
+body:not(.inboxsdk__gmailv1css) .IDMAP_companion_container_app_sidebar_in_use .bvq > div:first-child {
   display: none !important;
 }
 

@@ -19,10 +19,12 @@ class ContentPanelViewDriver {
   // unique identifier used to manage a specific instance.
   _instanceId: string = `${Date.now()}-${Math.random()}`;
   _sidebarId: string;
+  _isGlobal: boolean;
 
-  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string) {
+  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string, isGlobal?: boolean) {
     this._driver = driver;
     this._sidebarId = sidebarId;
+    this._isGlobal = Boolean(isGlobal);
     this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
 
     const document = global.document; //fix for unit test
@@ -65,7 +67,7 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
-              title, iconUrl, iconClass,
+              title, iconUrl, iconClass, isGlobal,
               sidebarId: this._sidebarId,
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
@@ -105,6 +107,13 @@ class ContentPanelViewDriver {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
       bubbles: true, cancelable: false,
       detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
+    }));
+  }
+
+  close() {
+    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelClose', {
+      bubbles: true, cancelable: false,
+      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
     }));
   }
 

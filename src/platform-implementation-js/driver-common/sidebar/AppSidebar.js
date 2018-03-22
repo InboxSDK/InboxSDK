@@ -78,9 +78,37 @@ export default class AppSidebar extends React.Component {
     const getContainer = this.props.container;
     panel.scrollIntoView(useContainer, getContainer && getContainer());
   }
+  closePanel(instanceId: string){
+    const panelDescriptor = this.props.panels.find(desc => desc.instanceId === instanceId);
+    if(panelDescriptor){
+      this._expandedToggle(panelDescriptor.appId, panelDescriptor.id, false);
+    }
+  }
+  openPanel(instanceId: string){
+    const panelDescriptor = this.props.panels.find(desc => desc.instanceId === instanceId);
+    if(panelDescriptor){
+      this._expandedToggle(panelDescriptor.appId, panelDescriptor.id, true);
+    }
+  }
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     return this.props.panels !== nextProps.panels ||
       this.state.expansionSettings !== nextState.expansionSettings;
+  }
+  _expandedToggle(appId: string, id: string, expanded: boolean) {
+    // Operate on the latest value from localStorage
+    let expansionSettings = this._readExpansionSettings();
+    if (!Object.prototype.hasOwnProperty.call(expansionSettings.apps, appId)) {
+      expansionSettings.apps[appId] = {
+        ids: {}
+      };
+    }
+    const appSettings = expansionSettings.apps[appId];
+    appSettings.ids[id] = {
+      lastUse: Date.now(),
+      expanded
+    };
+    this.setState({expansionSettings}, this.props.onExpandedToggle);
+    this._saveExpansionSettings(expansionSettings);
   }
   _readExpansionSettings(): ExpansionSettings {
     let data;
@@ -115,22 +143,6 @@ export default class AppSidebar extends React.Component {
     } catch (err) {
       console.error('Failed to save sidebar settings', err); //eslint-disable-line no-console
     }
-  }
-  _expandedToggle(appId: string, id: string, expanded: boolean) {
-    // Operate on the latest value from localStorage
-    let expansionSettings = this._readExpansionSettings();
-    if (!Object.prototype.hasOwnProperty.call(expansionSettings.apps, appId)) {
-      expansionSettings.apps[appId] = {
-        ids: {}
-      };
-    }
-    const appSettings = expansionSettings.apps[appId];
-    appSettings.ids[id] = {
-      lastUse: Date.now(),
-      expanded
-    };
-    this.setState({expansionSettings}, this.props.onExpandedToggle);
-    this._saveExpansionSettings(expansionSettings);
   }
   render() {
     const {expansionSettings} = this.state;

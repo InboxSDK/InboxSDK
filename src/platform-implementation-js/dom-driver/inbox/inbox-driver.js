@@ -860,6 +860,11 @@ class InboxDriver {
     return view.waitForReady();
   }
 
+  addGlobalSidebarContentPanel(buttonDescriptor: Kefir.Observable<Object>): Promise<?Object> {
+    // stub
+    return Promise.resolve(null);
+  }
+
   isRunningInPageContext(): boolean {
     return !!(global.gbar && global.gbar._CONFIG);
   }

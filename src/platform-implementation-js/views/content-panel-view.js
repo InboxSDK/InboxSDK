@@ -3,12 +3,14 @@
 import Kefir from 'kefir';
 import EventEmitter from '../lib/safe-event-emitter';
 
+import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';
+
 // documented in src/docs/
 export default class ContentPanelView extends EventEmitter {
   destroyed: boolean = false;
-  _contentPanelViewImplementation: Object;
+  _contentPanelViewImplementation: ContentPanelViewDriver;
 
-  constructor(contentPanelViewImplementation: Object){
+  constructor(contentPanelViewImplementation: ContentPanelViewDriver){
     super();
 
     this._contentPanelViewImplementation = contentPanelViewImplementation;
@@ -17,6 +19,10 @@ export default class ContentPanelView extends EventEmitter {
 
   remove(){
     this._contentPanelViewImplementation.remove();
+  }
+
+  close(){
+    this._contentPanelViewImplementation.close();
   }
 
   _bindToStreamEvents(){

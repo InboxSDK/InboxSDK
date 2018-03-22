@@ -58,6 +58,7 @@ import getNativeNavItem from './gmail-driver/get-native-nav-item';
 import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
+import GmailAppSidebarView from './views/gmail-app-sidebar-view';
 
 import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
 import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
@@ -78,6 +79,8 @@ import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
+
+import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
 
 class GmailDriver {
 	_appId: string;
@@ -113,6 +116,7 @@ class GmailDriver {
 	_timestampOnready: ?number;
 	_lastCustomThreadListActivity: ?{customRouteID: string, timestamp: Date};
 	_currentRouteViewDriver: GmailRouteView;
+	_appSidebarView: ?GmailAppSidebarView = null;
 
 	getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
 	getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
@@ -610,6 +614,27 @@ class GmailDriver {
 		this._messageViewDriverStream = this.getThreadViewDriverStream().flatMap(gmailThreadView =>
 			gmailThreadView.getMessageViewDriverStream()
 		).takeUntilBy(this._stopper);
+	}
+
+	addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>): Promise<?ContentPanelViewDriver> {
+		if(this.isUsingMaterialUI()){
+			const appSidebar = this.getGlobalSidebar();
+			return Promise.resolve(appSidebar.addGlobalSidebarContentPanel(descriptor));
+		}
+		else {
+			return Promise.resolve(null);
+		}
+	}
+
+	getGlobalSidebar(): GmailAppSidebarView {
+		let appSidebarView = this._appSidebarView;
+		if(!appSidebarView){
+			const companionSidebarContentContainerEl = GmailElementGetter.getCompanionSidebarContentContainerElement();
+			if(!companionSidebarContentContainerEl) throw new Error('did not find companionSidebarContentContainerEl');
+			appSidebarView = this._appSidebarView = new GmailAppSidebarView(this, companionSidebarContentContainerEl);
+		}
+
+		return appSidebarView;
 	}
 
 	isRunningInPageContext(): boolean {
