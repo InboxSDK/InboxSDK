@@ -58,13 +58,15 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
   const loadingDivIsDisplayedStream =
     makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
       .toProperty(() => null)
-      .map(() => loadingHolder.style.display !== 'none');
+      .map(() => loadingHolder.style.display !== 'none')
+      .takeUntilBy(stopper);
 
   // emits when the tablist div gets role=tablist
   const tabListRoleStream =
     makeMutationObserverChunkedStream(tabList, {attributes: true, attributeFilter: ['role']})
       .toProperty(() => null)
-      .filter(() => tabList.getAttribute('role') === 'tablist');
+      .filter(() => tabList.getAttribute('role') === 'tablist')
+      .takeUntilBy(stopper);
 
   // first we add sdk icon container as previous sibling to native tablist
   tabList.insertAdjacentElement('beforebegin', iconArea);
@@ -96,8 +98,10 @@ function addIconArea(iconArea: HTMLElement, addonSidebarContainerEl: HTMLElement
       tabList.insertAdjacentElement('beforebegin', iconArea);
       iconArea.insertAdjacentElement('afterend', loadingClone);
 
-      loadingDivIsDisplayedStream
-        .filter((value) => !value)
+      Kefir.merge([
+          loadingDivIsDisplayedStream.filter((value) => !value),
+          stopper
+        ])
         .take(1)
         .onValue(() => {
           loadingClone.remove();

@@ -224,13 +224,14 @@ class GmailAppSidebarView {
             if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
             if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
 
-            if(activeButtonContainer){
-              activeButtonContainer.classList.remove('sidebar_button_container_active');
+            if(activeButtonContainer && activeButtonContainer !== buttonContainer){
+              simulateClick(querySelector(activeButtonContainer, 'button'));
             }
 
             companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
 
             if(activeButtonContainer === buttonContainer) {
+              if(activeButtonContainer) activeButtonContainer.classList.remove('sidebar_button_container_active');
               companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
 
               const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
