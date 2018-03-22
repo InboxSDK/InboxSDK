@@ -416,6 +416,7 @@ class GmailAppSidebarView {
                   }
                 }
 
+                component.openPanel(instanceId);
                 component.scrollPanelIntoView(instanceId, true);
               }
             }, true);
@@ -510,6 +511,18 @@ class GmailAppSidebarView {
             container.setAttribute('data-count', String(currentCount-1));
           }
         }
+      });
+
+    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        component.scrollPanelIntoView(event.detail.instanceId);
+      });
+
+    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelClose')
+      .takeUntilBy(this._stopper)
+      .onValue(event => {
+        component.closePanel(event.detail.instanceId);
       });
 
     if(addonSidebarContainerEl){

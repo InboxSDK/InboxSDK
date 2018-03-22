@@ -101,6 +101,8 @@ class GmailAppSidebarView {
     let threadIconArea, globalIconArea;
     let shouldRestoreGlobal = false;
     let lastActiveNativeGlobalAddOnIconEl = null;
+    let threadSidebarComponent: ?AppSidebar;
+    const instanceIdsToDescriptors: Map<string, Object> = new Map();
 
     const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
     if(!companionSidebarIconContainerEl) throw new Error('Could not find companion sidebar icon container element');
@@ -159,7 +161,7 @@ class GmailAppSidebarView {
 
       // handle rendering thread sidebar contents
       renderThreadSidebar = () => {
-        const component = (ReactDOM.render(
+        threadSidebarComponent = (ReactDOM.render(
           <AppSidebar
             panels={orderManager.getOrderedItems().map(x => x.value)}
             onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
@@ -270,6 +272,10 @@ class GmailAppSidebarView {
               }
               else {
                 if(lastActiveNativeGlobalAddOnIconEl) shouldRestoreGlobal = true;
+                if(threadSidebarComponent) {
+                  threadSidebarComponent.openPanel(instanceId);
+                  threadSidebarComponent.scrollPanelIntoView(instanceId, true);
+                }
               }
 
               //fake resize to get gmail to fix any heights that are messed up
@@ -480,6 +486,20 @@ class GmailAppSidebarView {
           if(renderThreadSidebar) renderThreadSidebar();
           removeButton(event, threadButtonContainers, threadIconArea);
         });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          if(threadSidebarComponent) threadSidebarComponent.scrollPanelIntoView(event.detail.instanceId);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelClose')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          if(threadSidebarComponent) threadSidebarComponent.closePanel(event.detail.instanceId);
+        });
     }
 
 
@@ -522,6 +542,50 @@ class GmailAppSidebarView {
         .onValue(event => {
           currentIds.delete(event.detail.id);
           removeButton(event, globalButtonContainers, globalIconArea);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelClose')
+        .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          const descriptor = instanceIdsToDescriptors.get(event.detail.instanceId);
+          if(!descriptor) return;
+
+          const buttonContainer = globalButtonContainers.get(descriptor.appName);
+          if(!buttonContainer) return;
+
+          let activeButtonContainer;
+          if(globalIconArea){
+            activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+          }
+
+          if(activeButtonContainer === buttonContainer){
+            simulateClick(querySelector(buttonContainer, 'button'));
+          }
+        });
+    }
+
+    // instance id to descriptor management
+    {
+      Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          instanceIdsToDescriptors.delete(event.detail.instanceId);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
         });
     }
 
