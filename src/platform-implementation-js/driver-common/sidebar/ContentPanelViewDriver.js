@@ -55,7 +55,7 @@ class ContentPanelViewDriver {
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        appName = descriptor.appName;
+        appName = descriptor.appName || this._driver.getOpts().appName || title;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -67,12 +67,11 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
-              title, iconUrl, iconClass, isGlobal,
+              title, iconUrl, iconClass, isGlobal, appName,
               sidebarId: this._sidebarId,
               instanceId: this._instanceId,
               appId: this._driver.getAppId(),
               id: String(id || title),
-              appName: appName || this._driver.getOpts().appName || title,
               appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
               hideTitleBar: Boolean(hideTitleBar),
               orderHint: typeof orderHint === 'number' ? orderHint : 0,
@@ -87,9 +86,9 @@ class ContentPanelViewDriver {
       ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
         detail: {
+          appName,
           sidebarId: this._sidebarId,
-          instanceId: this._instanceId,
-          appName: appName || this._driver.getOpts().appName
+          instanceId: this._instanceId
         }
       }));
     });
