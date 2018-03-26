@@ -327,6 +327,12 @@ class GmailAppSidebarView {
               if(isGlobal) {
                 lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
                 companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
+                ((document.body:any):HTMLElement).dispatchEvent(
+                  new CustomEvent('inboxsdkSidebarPanelActivated', {
+                    bubbles: true, cancelable: false,
+                    detail: {instanceId}
+                  })
+                );
               }
 
               //fake resize to get gmail to fix any heights that are messed up
