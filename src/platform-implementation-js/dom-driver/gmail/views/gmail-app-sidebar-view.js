@@ -247,6 +247,13 @@ class GmailAppSidebarView {
               if(isGlobal){
                 const contentEl = contentContainers.get(appName);
                 if(contentEl) contentEl.style.display = 'none';
+
+                ((document.body:any):HTMLElement).dispatchEvent(
+                  new CustomEvent('inboxsdkSidebarPanelDeactivated', {
+                    bubbles: true, cancelable: false,
+                    detail: {instanceId}
+                  })
+                );
               }
             }
             else {
@@ -270,6 +277,13 @@ class GmailAppSidebarView {
                 const contentEl = contentContainers.get(appName);
                 if(contentEl) contentEl.style.display = '';
                 companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
+
+                ((document.body:any):HTMLElement).dispatchEvent(
+                  new CustomEvent('inboxsdkSidebarPanelActivated', {
+                    bubbles: true, cancelable: false,
+                    detail: {instanceId}
+                  })
+                );
               }
               else {
                 if(lastActiveNativeGlobalAddOnIconEl) shouldRestoreGlobal = true;
