@@ -22,7 +22,7 @@ class User {
 		return get(memberMap, this).driver.isConversationViewDisabled();
 	}
 
-	isUsingMaterialUI() {
+	isUsingGmailMaterialUI() {
 		return get(memberMap, this).driver.isUsingMaterialUI();
 	}
 
