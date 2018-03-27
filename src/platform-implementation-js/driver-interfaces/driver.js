@@ -58,6 +58,7 @@ export type Driver = {
 	getGmailActionToken(): Promise<string>;
 	getUserEmailAddress(): string;
 	isConversationViewDisabled(): Promise<boolean>;
+	isUsingMaterialUI(): boolean;
 	getUserLanguage(): string;
 	getUserContact(): Contact;
 	getAccountSwitcherContactList(): Contact[];
