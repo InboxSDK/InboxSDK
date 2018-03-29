@@ -278,12 +278,18 @@ class GmailAppSidebarView {
                 if(contentEl) contentEl.style.display = '';
                 companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
 
-                ((document.body:any):HTMLElement).dispatchEvent(
-                  new CustomEvent('inboxsdkSidebarPanelActivated', {
-                    bubbles: true, cancelable: false,
-                    detail: {instanceId}
-                  })
-                );
+                // let app listen for activate event
+                setTimeout(() => {
+                  const activeButtonContainer = globalIconArea && globalIconArea.querySelector('.sidebar_button_container_active');
+                  if(activeButtonContainer === buttonContainer){
+                    ((document.body:any):HTMLElement).dispatchEvent(
+                      new CustomEvent('inboxsdkSidebarPanelActivated', {
+                        bubbles: true, cancelable: false,
+                        detail: {instanceId}
+                      })
+                    );
+                  }
+                }, 1);
               }
               else {
                 if(lastActiveNativeGlobalAddOnIconEl) shouldRestoreGlobal = true;
