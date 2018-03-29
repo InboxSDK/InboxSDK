@@ -116,6 +116,13 @@ class ContentPanelViewDriver {
     }));
   }
 
+  open() {
+    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
+      bubbles: true, cancelable: false,
+      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
+    }));
+  }
+
   remove() {
     this._eventStream.end();
   }
