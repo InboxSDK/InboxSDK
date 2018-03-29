@@ -29,6 +29,10 @@ export default class ContentPanelView extends EventEmitter {
     this._contentPanelViewImplementation.open();
   }
 
+  isActive(): boolean {
+    return this._contentPanelViewImplementation.isActive();
+  }
+
   _bindToStreamEvents(){
     const stream: Kefir.Observable<any> = this._contentPanelViewImplementation.getEventStream();
     stream.onValue(({eventName}) => {this.emit(eventName);});

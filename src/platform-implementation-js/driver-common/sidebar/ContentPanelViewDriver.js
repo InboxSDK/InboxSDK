@@ -14,6 +14,7 @@ class ContentPanelViewDriver {
   _driver: Driver;
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
+  _isActive: boolean = false;
 
   // This is not the `id` property passed by the application, but a random
   // unique identifier used to manage a specific instance.
@@ -32,14 +33,18 @@ class ContentPanelViewDriver {
     this._eventStream.plug(
       Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
-        .map(() => ({eventName: 'activate'}))
-        .flatMap(delayAsap)
+        .map(() => {
+          this._isActive = true;
+          return {eventName: 'activate'};
+        })
     );
     this._eventStream.plug(
       Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelDeactivated')
         .filter(e => e.detail.instanceId === this._instanceId)
-        .map(() => ({eventName: 'deactivate'}))
-        .flatMap(delayAsap)
+        .map(() => {
+          this._isActive = false;
+          return {eventName: 'deactivate'};
+        })
     );
 
     // Attach a value-listener so that it immediately subscribes and the
@@ -121,6 +126,10 @@ class ContentPanelViewDriver {
       bubbles: true, cancelable: false,
       detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
     }));
+  }
+
+  isActive(): boolean {
+    return this._isActive;
   }
 
   remove() {

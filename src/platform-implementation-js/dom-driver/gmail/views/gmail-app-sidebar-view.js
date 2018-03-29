@@ -278,6 +278,7 @@ class GmailAppSidebarView {
                 if(contentEl) contentEl.style.display = '';
                 companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
 
+                // let app listen for activate event
                 ((document.body:any):HTMLElement).dispatchEvent(
                   new CustomEvent('inboxsdkSidebarPanelActivated', {
                     bubbles: true, cancelable: false,
