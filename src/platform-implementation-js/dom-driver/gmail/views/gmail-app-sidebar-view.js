@@ -584,6 +584,26 @@ class GmailAppSidebarView {
             simulateClick(querySelector(buttonContainer, 'button'));
           }
         });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelOpen')
+        .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          const descriptor = instanceIdsToDescriptors.get(event.detail.instanceId);
+          if(!descriptor) return;
+
+          const buttonContainer = globalButtonContainers.get(descriptor.appName);
+          if(!buttonContainer) return;
+
+          let activeButtonContainer;
+          if(globalIconArea){
+            activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+          }
+
+          if(activeButtonContainer !== buttonContainer){
+            simulateClick(querySelector(buttonContainer, 'button'));
+          }
+        });
     }
 
     // instance id to descriptor management
