@@ -119,11 +119,18 @@ class GmailAttachmentCardView {
 	}
 
 	_getDownloadLink(): ?string {
-		// download_url attribute may not be available yet. Use the a link href.
 		const firstChild: ?HTMLAnchorElement = (this._element.firstElementChild: any);
 		if (!firstChild) throw new Error("Failed to find link");
-		if (firstChild.tagName !== 'A') return null;
-		return firstChild.href;
+		if (firstChild.tagName !== 'A') {
+			const download_url = this._element.getAttribute('download_url');
+			if (download_url) {
+				const m = /:(https:\/\/[^:]+)/.exec(download_url);
+				return m ? m[1] : null;
+			}
+		}
+		else {
+			return firstChild.href;
+		}
 	}
 
 	// Resolves the short-lived cookie-less download URL
