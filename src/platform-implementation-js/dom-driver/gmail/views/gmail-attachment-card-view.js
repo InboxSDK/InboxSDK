@@ -121,7 +121,7 @@ class GmailAttachmentCardView {
 	_getDownloadLink(): ?string {
 		const firstChild: ?HTMLAnchorElement = (this._element.firstElementChild: any);
 		if (!firstChild) throw new Error("Failed to find link");
-		if (firstChild.tagName !== 'A') {
+		if (firstChild.tagName !== 'A' || !firstChild.href) {
 			const download_url = this._element.getAttribute('download_url');
 			if (download_url) {
 				const m = /:(https:\/\/[^:]+)/.exec(download_url);
