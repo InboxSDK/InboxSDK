@@ -420,6 +420,10 @@ class GmailComposeView {
 
 	getEventStream(): Kefir.Observable<Object> {return this._eventStream;}
 
+	getGmailDriver(): GmailDriver {
+		return this._driver;
+	}
+
 	isDestroyed(): boolean { return this._destroyed;}
 
 	_setupStreams() {

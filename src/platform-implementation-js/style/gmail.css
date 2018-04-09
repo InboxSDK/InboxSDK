@@ -123,6 +123,11 @@ body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
 
 /* compose buttons */
 
+/* fix native button wrapping */
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose .a8X > .bAK {
+  flex-wrap: nowrap;
+}
+
 /* in material Gmail reduce padding between buttons  */
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .gU:not(:first-child) {
   padding-left: 5px;
@@ -151,8 +156,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__com
 .inboxsdk__compose_sendButton {
   height: 20px;
   width: 20px;
+  padding: 4px;
   display: inline-flex;
-  padding: 6px;
   align-items: center;
   justify-content: center;
   vertical-align: middle;
@@ -161,7 +166,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__com
 }
 
   body.inboxsdk__gmailv1css .inboxsdk__composeButton {
-    padding: 4px;
     border-radius: 2px;
     border-width: 1px;
     border-style: solid;
@@ -176,7 +180,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__com
   }
 
 .inboxsdk__composeButton + .inboxsdk__composeButton {
-  margin-left: 8px;
+  margin-left: 4px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__composeButton + .inboxsdk__composeButton {
@@ -212,10 +216,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton:focus::before,
 body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
   background: transparent radial-gradient(ellipse closest-corner,rgba(0,0,0,0.161) 0%,transparent 100%) no-repeat center/100%;
   background-size: 200%;
-}
-
-.inboxsdk__compose_actionToolbar .inboxsdk__composeButton:last-child {
-  margin-right: 6px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeButton:last-child {
@@ -274,6 +274,10 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeBut
   white-space: nowrap;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_actionToolbar {
+  padding-left: 6px;
+}
+
 body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar {
   padding: 0px 0px 0px 5px;
 }
@@ -306,7 +310,7 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeBut
 }
 
 .inboxsdk__compose_actionToolbar + .gU:not(.inboxsdk__compose_separator) {
-  padding-left: 10px;
+  padding-left: 8px;
 }
 
 /* grouped action toolbar */
@@ -336,8 +340,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsd
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionButton {
-  margin-right: 6px;
+body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__compose_groupedActionButton {
+  margin-right: 0px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
