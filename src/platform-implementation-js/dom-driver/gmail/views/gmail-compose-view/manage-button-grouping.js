@@ -123,7 +123,7 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView){
 
 function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 	if(
-		gmailComposeView.getElement().clientWidth > gmailComposeView.getBottomBarTable().clientWidth ||
+		gmailComposeView.getElement().clientWidth > _getBottomBarTableWidth(gmailComposeView) ||
 		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length === 0 ||
 		gmailComposeView.getElement().classList.contains(('inboxsdk__compose_narrow_buttons'))
 	) return;
@@ -136,9 +136,19 @@ function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 	return (
 		!gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
-		gmailComposeView.getElement().clientWidth < gmailComposeView.getBottomBarTable().clientWidth &&
+		gmailComposeView.getElement().clientWidth < _getBottomBarTableWidth(gmailComposeView) &&
 		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 1
 	);
+}
+
+function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
+	const bottomBarTable = gmailComposeView.getBottomBarTable();
+	if(gmailComposeView.getGmailDriver().isUsingMaterialUI()){
+		return Array.from(bottomBarTable.querySelectorAll('.btC > td')).reduce((total, el) => total+el.clientWidth, 0);
+	}
+	else {
+		return buttonBarTable.clientWidth;
+	}
 }
 
 function _createGroupedActionToolbarContainer(gmailComposeView: GmailComposeView): HTMLElement {
