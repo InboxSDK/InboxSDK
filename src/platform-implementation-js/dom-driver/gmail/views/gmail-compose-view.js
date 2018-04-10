@@ -491,15 +491,11 @@ class GmailComposeView {
 
 	_setupIDs() {
 		if(this._driver.isUsingSyncAPI()){
-			let targetMessageIDPromise;
-
 			const syncTargetMessageID = this._getTargetMessageID();
 			if(syncTargetMessageID){
-				targetMessageIDPromise = this._driver.getGmailMessageIdForSyncMessageId(syncTargetMessageID)
-					.then(gmailMessageId => this._targetMessageID = gmailMessageId);
-			}
-			else {
-				targetMessageIDPromise = Promise.resolve(null);
+				this._driver
+						.getGmailMessageIdForSyncMessageId(syncTargetMessageID)
+						.then(gmailMessageId => this._targetMessageID = gmailMessageId);
 			}
 
 			const syncMessageId = this._getMessageIDfromForm();
