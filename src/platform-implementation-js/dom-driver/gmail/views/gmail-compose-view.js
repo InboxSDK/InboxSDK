@@ -517,7 +517,7 @@ class GmailComposeView {
 			}
 
 			const legacyThreadIdElement = this._element.querySelector('input[name="lts"]');
-			if(legacyThreadIdElement) this._threadID = legacyThreadIdElement.value;
+			if(legacyThreadIdElement && typeof legacyThreadIdElement.value === 'string') this._threadID = legacyThreadIdElement.value;
 		}
 		else {
 			this._targetMessageID = this._getTargetMessageID();

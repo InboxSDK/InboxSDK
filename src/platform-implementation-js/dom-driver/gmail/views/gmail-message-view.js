@@ -361,18 +361,23 @@ class GmailMessageView {
 			// so we wait until the message has been synced to the server before saying this is ready
 			const messageIdElement = this._element.querySelector('[data-message-id]');
 			if(messageIdElement){
+				const syncMessageId = messageIdElement.getAttribute('data-message-id');
+				if(!syncMessageId) throw new Error('data-message-id attribute has no value');
+
 				if(messageIdElement.hasAttribute('data-legacy-message-id')){
-					return messageIdElement.getAttribute('data-legacy-message-id');
+					const legacyMessageId = messageIdElement.getAttribute('data-legacy-message-id');
+					if(!legacyMessageId) throw new Error('data-legacy-message-id attribute has no value');
+					return legacyMessageId;
 				}
 				else {
 					// we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
-					return waitFor(
+					return (waitFor(
 						() => (
 							this._driver
-									.getGmailMessageIdForSyncMessageId(messageIdElement.getAttribute('data-message-id'))
+									.getGmailMessageIdForSyncMessageId(syncMessageId)
 									.catch(() => null)
 						)
-					);
+					): any);
 				}
 			}
 			else {
