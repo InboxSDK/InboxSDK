@@ -516,20 +516,8 @@ class GmailComposeView {
 					});
 			}
 
-			targetMessageIDPromise.then(targetMessageId => {
-				const syncThreadId = this._getThreadID();
-				if(syncThreadId){
-					this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadId)
-						.then(
-							gmailThreadId => {
-								this._threadID = gmailThreadId;
-							}
-						)
-						.catch(() => {
-							//do nothing because this means the message hasn't been saved yet
-						});
-				}
-			});
+			const legacyThreadIdElement = this._element.querySelector('input[name="lts"]');
+			if(legacyThreadIdElement) this._threadID = legacyThreadIdElement.value;
 		}
 		else {
 			this._targetMessageID = this._getTargetMessageID();
