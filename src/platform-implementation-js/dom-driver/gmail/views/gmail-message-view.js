@@ -17,6 +17,7 @@ import GmailAttachmentCardView from './gmail-attachment-card-view';
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
 
 import delayAsap from '../../../lib/delay-asap';
+import waitFor from '../../../lib/wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -352,7 +353,35 @@ class GmailMessageView {
 	}
 
 	async getMessageIDAsync(): Promise<string> {
-		return this.getMessageID();
+		if(this._driver.isUsingSyncAPI()){
+			// handle the case that the data-message-id is available, but the data-legacy-message-id is not
+			// this happens when you're looking at a thread, and then you reply to a message, the message id is generated
+			// client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
+			// because it hasn't been synced to the server it does not have a data-legacy-messag-id
+			// so we wait until the message has been synced to the server before saying this is ready
+			const messageIdElement = this._element.querySelector('[data-message-id]');
+			if(messageIdElement){
+				if(messageIdElement.hasAttribute('data-legacy-message-id')){
+					return messageIdElement.getAttribute('data-legacy-message-id');
+				}
+				else {
+					// we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
+					return waitFor(
+						() => (
+							this._driver
+									.getGmailMessageIdForSyncMessageId(messageIdElement.getAttribute('data-message-id'))
+									.catch(() => null)
+						)
+					);
+				}
+			}
+			else {
+				return this.getMessageID();
+			}
+		}
+		else {
+			return this.getMessageID();
+		}
 	}
 
 	addAttachmentIcon(iconDescriptor: Object) {
@@ -516,7 +545,7 @@ class GmailMessageView {
 		this._checkMessageOpenState(this._element.classList);
 	}
 
-	_checkMessageOpenState(classList: Object){
+	async _checkMessageOpenState(classList: Object){
 		if(!classList.contains('h7')){
 			return;
 		}
@@ -527,7 +556,7 @@ class GmailMessageView {
 
 		let messageId;
 		try {
-			messageId = this.getMessageID(true);
+			messageId = await this.getMessageIDAsync();
 		} catch(err) {
 			this._driver.getLogger().error(err);
 			return;
@@ -669,7 +698,7 @@ class GmailMessageView {
 	}
 
 	getReadyStream() {
-		return Kefir.constant(null);
+		return Kefir.fromPromise(this.getMessageIDAsync());
 	}
 }
 
