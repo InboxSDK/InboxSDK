@@ -77,27 +77,14 @@ class ThreadRowIdentifier {
     ) {
       return Promise.resolve(null);
     }
+
     const composeView = this._findComposeForThreadRow(gmailThreadRowView);
     if (composeView) {
       return composeView.getDraftID();
     }
 
-    if(this._driver.getPageCommunicator().isUsingSyncAPI()){
-      const syncThreadID = await gmailThreadRowView.getSyncThreadID();
-      if(!syncThreadID) return null;
-
-      const syncThread = await getSyncThreadFromSyncThreadId(this._driver, syncThreadID);
-      if(syncThread.extraMetaData.syncMessageData.length > 0){
-        return syncThread.extraMetaData.syncMessageData[0].syncMessageID.replace('msg-a:', '');
-      }
-      else {
-        return null;
-      }
-    }
-    else {
-      const {draftID} = await this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
-      return draftID;
-    }
+    const {draftID} = await this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+    return draftID;
   }
 
   _findComposeForThreadRow(gmailThreadRowView: GmailThreadRowView): ?GmailComposeView {
