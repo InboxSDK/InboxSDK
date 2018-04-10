@@ -44,6 +44,7 @@ class GmailMessageView {
 	_moreMenuItemDescriptors: Array<Object>;
 	_moreMenuAddedElements: Array<HTMLElement>;
 	_replyElementStream: Kefir.Observable<ElementWithLifetime>;
+	_readyStream: Kefir.Observable<null>;
 	_replyElement: ?HTMLElement;
 	_gmailAttachmentAreaView: ?GmailAttachmentAreaView;
 	_messageLoaded: boolean = false;
@@ -68,7 +69,50 @@ class GmailMessageView {
 		this._setupMessageStateStream();
 		this._monitorEmailAddressHovering();
 		this._setupMoreMenuWatching();
-		this._processInitialState();
+
+		let partialReadyStream;
+		if(driver.isUsingSyncAPI()){
+			// handle the case that the data-message-id is available, but the data-legacy-message-id is not
+			// this happens when you're looking at a thread, and then you reply to a message, the message id is generated
+			// client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
+			// because it hasn't been synced to the server it does not have a data-legacy-messag-id
+			// so we wait until the message has been synced to the server before saying this is ready
+			const messageIdElement = this._element.querySelector('[data-message-id]');
+			if(messageIdElement){
+				const syncMessageId = messageIdElement.getAttribute('data-message-id');
+				if(!syncMessageId) throw new Error('data-message-id attribute has no value');
+
+				if(messageIdElement.hasAttribute('data-legacy-message-id')){
+					partialReadyStream = Kefir.constant(null);
+				}
+				else {
+					// we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
+					partialReadyStream = Kefir.fromPromise((async () => {
+						for(let ii=0; ii<10; ii++){
+							try{
+								const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(syncMessageId.replace('#', ''));
+								// set the legacy message id attribute so subsequent calls to getMessageId find the legacy message id in the dom
+								messageIdElement.setAttribute('data-legacy-message-id', gmailMessageId);
+								return null;
+							}
+							catch(e){
+								await new Promise(resolve => setTimeout(resolve, ii*200));
+							}
+						}
+
+						throw new Error('gmail message id never became available');
+					})());
+				}
+			}
+			else {
+				partialReadyStream = Kefir.constant(null);
+			}
+		}
+		else {
+			partialReadyStream = Kefir.constant(null);
+		}
+
+		this._readyStream = partialReadyStream.takeUntilBy(this._stopper).onValue(() => this._processInitialState());
 	}
 
 	destroy() {
@@ -353,40 +397,7 @@ class GmailMessageView {
 	}
 
 	async getMessageIDAsync(): Promise<string> {
-		if(this._driver.isUsingSyncAPI()){
-			// handle the case that the data-message-id is available, but the data-legacy-message-id is not
-			// this happens when you're looking at a thread, and then you reply to a message, the message id is generated
-			// client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
-			// because it hasn't been synced to the server it does not have a data-legacy-messag-id
-			// so we wait until the message has been synced to the server before saying this is ready
-			const messageIdElement = this._element.querySelector('[data-message-id]');
-			if(messageIdElement){
-				const syncMessageId = messageIdElement.getAttribute('data-message-id');
-				if(!syncMessageId) throw new Error('data-message-id attribute has no value');
-
-				if(messageIdElement.hasAttribute('data-legacy-message-id')){
-					const legacyMessageId = messageIdElement.getAttribute('data-legacy-message-id');
-					if(!legacyMessageId) throw new Error('data-legacy-message-id attribute has no value');
-					return legacyMessageId;
-				}
-				else {
-					// we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
-					return (waitFor(
-						() => (
-							this._driver
-									.getGmailMessageIdForSyncMessageId(syncMessageId)
-									.catch(() => null)
-						)
-					): any);
-				}
-			}
-			else {
-				return this.getMessageID();
-			}
-		}
-		else {
-			return this.getMessageID();
-		}
+		return this.getMessageID();
 	}
 
 	addAttachmentIcon(iconDescriptor: Object) {
@@ -550,7 +561,7 @@ class GmailMessageView {
 		this._checkMessageOpenState(this._element.classList);
 	}
 
-	async _checkMessageOpenState(classList: Object){
+	_checkMessageOpenState(classList: Object){
 		if(!classList.contains('h7')){
 			return;
 		}
@@ -561,7 +572,7 @@ class GmailMessageView {
 
 		let messageId;
 		try {
-			messageId = await this.getMessageIDAsync();
+			messageId = this.getMessageID(true);
 		} catch(err) {
 			this._driver.getLogger().error(err);
 			return;
@@ -703,7 +714,7 @@ class GmailMessageView {
 	}
 
 	getReadyStream() {
-		return Kefir.fromPromise(this.getMessageIDAsync());
+		return this._readyStream;
 	}
 }
 
