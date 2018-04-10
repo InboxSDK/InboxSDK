@@ -669,10 +669,13 @@ td.gH div.gK span:first-child > img:last-child {
   margin-right: 6px;
 }
 
+body.inboxsdk__gmailv1css .inboxsdk__message_attachment_icon {
+  margin-top: -3px;
+}
+
 .inboxsdk__message_attachment_icon {
   width: 21px;
   height: 21px;
-  margin-top: -3px;
 }
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this
