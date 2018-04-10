@@ -86,6 +86,7 @@ class GmailThreadRowView {
   _userView: ?Object;
   _cachedThreadID: ?string;
   _cachedSyncThreadID: ?string;
+  _cachedSyncDraftIDPromise: ?Promise<?string>;
   _imageFixer: ?Bus<any>;
   _imageFixerTask: ?Kefir.Observable<any>;
   _stopper = kefirStopper();
@@ -847,7 +848,7 @@ class GmailThreadRowView {
       const elementWithId =
         flatten(
           this._elements.map(
-            el => Array.from(el.querySelectorAll('[data-thread-id]'))
+            el => Array.from(el.querySelectorAll('[data-thread-id][data-legacy-thread-id]'))
           )
         ).filter(Boolean)[0];
 
@@ -900,7 +901,26 @@ class GmailThreadRowView {
   }
 
   getDraftID(): Promise<?string> {
-    return this._driver.getThreadRowIdentifier().getDraftIdForThreadRow(this);
+    if(this._cachedSyncDraftIDPromise) return this._cachedSyncDraftIDPromise;
+
+    if(this._driver.isUsingSyncAPI()){
+      const elementWithId =
+        flatten(
+          this._elements.map(
+            el => Array.from(el.querySelectorAll('[data-standalone-draft-id]'))
+          )
+        ).filter(Boolean)[0];
+
+      this._cachedSyncDraftIDPromise = Promise.resolve(
+        elementWithId ?
+        elementWithId.getAttribute('data-standalone-draft-id').replace('#msg-a:', '') : null
+      );
+    }
+    else {
+      this._cachedSyncDraftIDPromise = this._driver.getThreadRowIdentifier().getDraftIdForThreadRow(this);
+    }
+
+    return this._cachedSyncDraftIDPromise;
   }
 
   getVisibleDraftCount(): number {
