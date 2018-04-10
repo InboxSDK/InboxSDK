@@ -147,7 +147,7 @@ function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
 		return Array.from(bottomBarTable.querySelectorAll('.btC > td')).reduce((total, el) => total+el.clientWidth, 0);
 	}
 	else {
-		return buttonBarTable.clientWidth;
+		return bottomBarTable.clientWidth;
 	}
 }
 
