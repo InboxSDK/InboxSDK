@@ -82,16 +82,28 @@ class GmailAppSidebarView {
     return this._stopper;
   }
 
+  _getShouldThreadAppSidebarOpen(): boolean {
+    return global.localStorage.getItem('inboxsdk__thread_app_sidebar_should_open') !== 'false';
+  }
+
+  _setShouldThreadAppSidebarOpen(open: boolean) {
+    try {
+      global.localStorage.setItem('inboxsdk__thread_app_sidebar_should_open', String(open));
+    } catch(err) {
+      console.error('error saving', err); //eslint-disable-line no-console
+    }
+  }
+
   // This value controls whether the app sidebar should automatically open
   // itself when available when the chat sidebar isn't present. It's only set
   // if the user interacts with the app sidebar button.
-  _getShouldAppSidebarOpen(): boolean {
-    return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') !== 'false';
+  _getShouldGlobalAppSidebarOpen(): boolean {
+    return global.localStorage.getItem('inboxsdk__global_app_sidebar_should_open') !== 'false';
   }
 
-  _setShouldAppSidebarOpen(open: boolean) {
+  _setShouldGlobalAppSidebarOpen(open: boolean) {
     try {
-      global.localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
+      global.localStorage.setItem('inboxsdk__global_app_sidebar_should_open', String(open));
     } catch(err) {
       console.error('error saving', err); //eslint-disable-line no-console
     }
@@ -224,27 +236,14 @@ class GmailAppSidebarView {
             if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
             if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
 
-            if(activeButtonContainer && activeButtonContainer !== buttonContainer){
-              simulateClick(querySelector(activeButtonContainer, 'button'));
-            }
-
-            companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
+            if(activeButtonContainer) closeSidebarAndDeactivateButton(activeButtonContainer);
 
             if(activeButtonContainer === buttonContainer) {
-              if(activeButtonContainer) activeButtonContainer.classList.remove('sidebar_button_container_active');
-              companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
-
-              const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer)  contentContainer.classList.remove('companion_container_app_sidebar_visible');
-
-              //fake resize to get gmail to fix any heights that are messed up
-              fakeWindowResize();
-              shouldRestoreGlobal = false;
-              lastActiveNativeGlobalAddOnIconEl = null;
-
-              this._setShouldAppSidebarOpen(false);
-
               if(isGlobal){
+                shouldRestoreGlobal = false;
+                lastActiveNativeGlobalAddOnIconEl = null;
+                this._setShouldGlobalAppSidebarOpen(false);
+
                 const contentEl = contentContainers.get(appName);
                 if(contentEl) contentEl.style.display = 'none';
 
@@ -255,9 +254,13 @@ class GmailAppSidebarView {
                   })
                 );
               }
+              else {
+                this._setShouldThreadAppSidebarOpen(false);
+              }
             }
             else {
-              this._setShouldAppSidebarOpen(true);
+              if(isGlobal) this._setShouldGlobalAppSidebarOpen(true);
+              else this._setShouldThreadAppSidebarOpen(true);
 
               const activeGlobalAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR);
               if(activeGlobalAddOnIcon) simulateClick(activeGlobalAddOnIcon);
@@ -265,12 +268,7 @@ class GmailAppSidebarView {
               const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
               if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
-              buttonContainer.classList.add('sidebar_button_container_active');
-
-              companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
-              companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
-              const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+              openSidebarAndActivateButton(buttonContainer, isGlobal);
 
               if(isGlobal){
                 lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
@@ -293,51 +291,27 @@ class GmailAppSidebarView {
                   threadSidebarComponent.scrollPanelIntoView(instanceId, true);
                 }
               }
-
-              //fake resize to get gmail to fix any heights that are messed up
-              fakeWindowResize();
             }
+
+            //fake resize to get gmail to fix any heights that are messed up
+            fakeWindowResize();
           }, true);
 
 
           if(iconArea) addToIconArea(orderManager, appName, buttonContainer, iconArea);
 
-          if(this._getShouldAppSidebarOpen()){
-            // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
-            // panel gets added
+          // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
+          // panel gets added
+          {
             let activeButtonContainer;
-            if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
-            if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
-
-            if(!activeButtonContainer){
-              buttonContainer.classList.add('sidebar_button_container_active');
-
-              const activeGlobalAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR);
-              if(activeGlobalAddOnIcon) simulateClick(activeGlobalAddOnIcon);
-
-              const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
-              if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
-
-              companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
-              const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
-
-              const contentEl = contentContainers.get(appName);
-              if(contentEl) contentEl.style.display = '';
-
-              if(isGlobal) {
-                lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
-                companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
-                ((document.body:any):HTMLElement).dispatchEvent(
-                  new CustomEvent('inboxsdkSidebarPanelActivated', {
-                    bubbles: true, cancelable: false,
-                    detail: {instanceId}
-                  })
-                );
-              }
-
-              //fake resize to get gmail to fix any heights that are messed up
-              fakeWindowResize();
+            if(isGlobal && this._getShouldGlobalAppSidebarOpen()){
+              if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+              if(!activeButtonContainer && globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+              if(!activeButtonContainer) simulateClick(querySelector(buttonContainer, 'button'));
+            }
+            else if(!isGlobal && this._getShouldThreadAppSidebarOpen()){
+              if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+              if(!activeButtonContainer) simulateClick(querySelector(buttonContainer, 'button'));
             }
           }
         }
@@ -368,6 +342,23 @@ class GmailAppSidebarView {
       } else {
         container.setAttribute('data-count', String(currentCount-1));
       }
+    };
+
+    const closeSidebarAndDeactivateButton = (activeButtonContainer) => {
+      activeButtonContainer.classList.remove('sidebar_button_container_active');
+      companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
+      companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
+      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+      if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
+    };
+
+    const openSidebarAndActivateButton = (buttonContainer, isGlobal) => {
+      buttonContainer.classList.add('sidebar_button_container_active');
+      companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
+      companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
+      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+      if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+      if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
 
     const globalButtonContainers: Map<string, HTMLElement> = new Map();
@@ -656,24 +647,11 @@ class GmailAppSidebarView {
     ))
     .takeUntilBy(this._stopper)
     .onValue(() => {
-      companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
-      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-      if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
-
-      this._setShouldAppSidebarOpen(false);
-
       let activeButtonContainer;
-      if(threadIconArea){
-        activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
-      }
+      if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+      if(!activeButtonContainer && globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
 
-      if(!activeButtonContainer && globalIconArea){
-        activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
-      }
-
-      if(activeButtonContainer){
-        activeButtonContainer.classList.remove('sidebar_button_container_active');
-      }
+      if(activeButtonContainer) simulateClick(querySelector(activeButtonContainer, 'button'));
     });
 
   }
