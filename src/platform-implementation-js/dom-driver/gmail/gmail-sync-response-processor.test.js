@@ -65,7 +65,7 @@ describe('extractThreadsFromThreadResponse', function() {
     expect(threads[0].extraMetaData).toEqual({
       snippet: '',
       syncMessageData: [
-        {syncMessageId: 'msg-f:1594407458713395417', date: 1520545443261},
+        {syncMessageID: 'msg-f:1594407458713395417', date: 1520545443261, "recipients": [{"emailAddress": "billingchanges@streak.com", "name": "Billing Changes"}, {"emailAddress": "sales@streak.com", "name": "Sales Team"}]},
       ]
     });
   });
@@ -79,13 +79,13 @@ describe('extractThreadsFromThreadResponse', function() {
     expect(threads.length).toEqual(1);
     expect((threads[0]: any).oldGmailThreadID).toBe('1620d2f175a1a6c9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594506202591635145');
-    expect(threads[0].extraMetaData).toEqual({
+    expect(threads[0].extraMetaData).toMatchObject({
       snippet: '',
       syncMessageData: [
-        {syncMessageId: 'msg-f:1594506202591635145', date: 1520639612762},
-        {syncMessageId: 'msg-f:1594508744604132981', date: 1520642037014},
-        {syncMessageId: 'msg-f:1594509071530617554', date: 1520642348795},
-        {syncMessageId: 'msg-f:1594959172652759326', date: 1521071598675},
+        {syncMessageID: 'msg-f:1594506202591635145', date: 1520639612762},
+        {syncMessageID: 'msg-f:1594508744604132981', date: 1520642037014},
+        {syncMessageID: 'msg-f:1594509071530617554', date: 1520642348795},
+        {syncMessageID: 'msg-f:1594959172652759326', date: 1521071598675},
       ]
     });
   });
