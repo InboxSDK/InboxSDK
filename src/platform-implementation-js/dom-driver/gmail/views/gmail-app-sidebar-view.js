@@ -647,24 +647,11 @@ class GmailAppSidebarView {
     ))
     .takeUntilBy(this._stopper)
     .onValue(() => {
-      companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
-      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-      if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
-
-      this._setShouldAppSidebarOpen(false);
-
       let activeButtonContainer;
-      if(threadIconArea){
-        activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
-      }
+      if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+      if(!activeButtonContainer && globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
 
-      if(!activeButtonContainer && globalIconArea){
-        activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
-      }
-
-      if(activeButtonContainer){
-        activeButtonContainer.classList.remove('sidebar_button_container_active');
-      }
+      if(activeButtonContainer) simulateClick(querySelector(activeButtonContainer, 'button'));
     });
 
   }
