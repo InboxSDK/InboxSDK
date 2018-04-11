@@ -11,7 +11,7 @@ import cssSelectorEscape from '../../../../lib/css-selector-escape';
 import type GmailComposeView from '../gmail-compose-view';
 
 const OLD_GMAIL_STATUS_HEIGHT = 42;
-const MATERIAL_UI_GMAIL_STATUS_HEIGHT = 56;
+const MATERIAL_UI_GMAIL_STATUS_HEIGHT = 60;
 
 var getSizeFixerSheet: () => CSSStyleSheet = once(() => {
   const style: HTMLStyleElement = (document.createElement('style'):any);
