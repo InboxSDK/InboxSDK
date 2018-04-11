@@ -397,7 +397,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar_arrow {
   vertical-align: middle;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__compose_customSendContainer {
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_customSendContainer {
   height: 36px;
   line-height: 36px;
 }
