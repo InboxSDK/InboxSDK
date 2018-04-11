@@ -236,19 +236,9 @@ class GmailAppSidebarView {
             if(globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
             if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
 
-            if(activeButtonContainer && activeButtonContainer !== buttonContainer){
-              simulateClick(querySelector(activeButtonContainer, 'button'));
-            }
-
-            companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
+            if(activeButtonContainer) closeSidebarAndDeactivateButton(activeButtonContainer);
 
             if(activeButtonContainer === buttonContainer) {
-              if(activeButtonContainer) activeButtonContainer.classList.remove('sidebar_button_container_active');
-              companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
-
-              const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer)  contentContainer.classList.remove('companion_container_app_sidebar_visible');
-
               if(isGlobal){
                 shouldRestoreGlobal = false;
                 lastActiveNativeGlobalAddOnIconEl = null;
@@ -278,12 +268,7 @@ class GmailAppSidebarView {
               const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
               if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
-              buttonContainer.classList.add('sidebar_button_container_active');
-
-              companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
-              companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
-              const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
-              if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+              openSidebarAndActivateButton(buttonContainer, isGlobal);
 
               if(isGlobal){
                 lastActiveNativeGlobalAddOnIconEl = querySelector(buttonContainer, 'button');
@@ -322,12 +307,12 @@ class GmailAppSidebarView {
             if(isGlobal && this._getShouldGlobalAppSidebarOpen()){
               if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
               if(!activeButtonContainer && globalIconArea) activeButtonContainer = globalIconArea.querySelector('.sidebar_button_container_active');
+              if(!activeButtonContainer) simulateClick(querySelector(buttonContainer, 'button'));
             }
             else if(!isGlobal && this._getShouldThreadAppSidebarOpen()){
               if(threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
+              if(!activeButtonContainer) simulateClick(querySelector(buttonContainer, 'button'));
             }
-
-            if(!activeButtonContainer) simulateClick(querySelector(buttonContainer, 'button'));
           }
         }
 
@@ -357,6 +342,23 @@ class GmailAppSidebarView {
       } else {
         container.setAttribute('data-count', String(currentCount-1));
       }
+    };
+
+    const closeSidebarAndDeactivateButton = (activeButtonContainer) => {
+      activeButtonContainer.classList.remove('sidebar_button_container_active');
+      companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
+      companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
+      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+      if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
+    };
+
+    const openSidebarAndActivateButton = (buttonContainer, isGlobal) => {
+      buttonContainer.classList.add('sidebar_button_container_active');
+      companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
+      companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
+      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+      if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+      if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
 
     const globalButtonContainers: Map<string, HTMLElement> = new Map();
