@@ -200,7 +200,11 @@ class GmailMessageView {
 
 		if(this._driver.isUsingSyncAPI()){
 			const threadID = this._threadViewDriver.getInternalID();
-			recipients = this._recipients = (await this._driver.getPageCommunicator().getMessageRecipients(threadID, this._element)) || this.getRecipients();
+			recipients = this._recipients = await this._driver.getPageCommunicator().getMessageRecipients(threadID, this._element);
+			if(!recipients){
+				this._driver.getLogger().error(new Error('Failed to find message recipients from response'), {threadID});
+				recipients = this._recipients = this.getRecipients();
+			}
 		}
 		else {
 			const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));

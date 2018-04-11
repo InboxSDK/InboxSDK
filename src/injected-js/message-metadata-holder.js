@@ -17,8 +17,8 @@ export function setup() {
 
   document.addEventListener('inboxSDKtellMeThisMessageRecipients', function(event: Object) {
     exposeMetadata(event, 'data-inboxsdk-recipients', m => {
-      if(m.recipients) return JSON.stringify(m.recipients);
-      else return '';
+      if(m.recipients) return m.recipients;
+      else return null;
     });
   });
 }
@@ -48,7 +48,7 @@ function exposeMetadata(event, attribute, processor){
       }
     }
 
-    target.setAttribute(attribute, processor(message));
+    target.setAttribute(attribute, JSON.stringify(processor(message)));
 
   })().catch(err => {
     target.setAttribute(attribute, 'error');

@@ -20,8 +20,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       threadId,
       message,
       'data-inboxsdk-sortdate',
-      'inboxSDKtellMeThisMessageDate',
-      (value) => +value
+      'inboxSDKtellMeThisMessageDate'
     );
   }
 
@@ -30,12 +29,11 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       threadId,
       message,
       'data-inboxsdk-recipients',
-      'inboxSDKtellMeThisMessageRecipients',
-      (value) => JSON.parse(value)
+      'inboxSDKtellMeThisMessageRecipients'
     );
   }
 
-  async _getMessageData<T>(threadId: string, message: HTMLElement, attribute: string, eventName: string, processor: (attributeValue: string) => T): Promise<?T> {
+  async _getMessageData<T>(threadId: string, message: HTMLElement, attribute: string, eventName: string): Promise<?T> {
     let data = message.getAttribute(attribute);
     if(!data){
       const [btaiHeader, xsrfToken] = this.isUsingSyncAPI() ?
@@ -63,7 +61,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       }
     }
 
-    if(data && data !== 'error') return processor(data);
+    if(data && data !== 'error') return JSON.parse(data);
     else return null;
   }
 
