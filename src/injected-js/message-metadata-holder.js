@@ -12,45 +12,56 @@ const threadIdToMessages: Map<string, Message[]> = new Map();
 
 export function setup() {
   document.addEventListener('inboxSDKtellMeThisMessageDate', function(event: Object) {
-    const {target, detail: {threadId, ikValue, btaiHeader, xsrfToken}} = event;
+    exposeMetadata(event, 'data-inboxsdk-sortdate', m => m.date);
+  });
 
-    (async () => {
-      const messageIndex = Array.from(target.parentElement.children)
-        .filter(el => !el.classList.contains('inboxsdk__custom_message_view'))
-        .indexOf(target);
-      if (messageIndex < 0) {
-        throw new Error('Should not happen');
-      }
-
-      let date: ?number = getDate(threadId, messageIndex);
-
-      if (date == null) {
-        try {
-          await addDataForThread(threadId, ikValue, btaiHeader, xsrfToken);
-        } catch (err) {
-          logger.error(err);
-        }
-        date = getDate(threadId, messageIndex);
-        if (date == null) {
-          throw new Error('Failed to find message date after re-requesting thread');
-        }
-      }
-
-      target.setAttribute('data-inboxsdk-sortdate', date);
-
-    })().catch(err => {
-      target.setAttribute('data-inboxsdk-sortdate', 'error');
-      logger.error(err);
+  document.addEventListener('inboxSDKtellMeThisMessageRecipients', function(event: Object) {
+    exposeMetadata(event, 'data-inboxsdk-recipients', m => {
+      if(m.recipients) return JSON.stringify(m.recipients);
+      else return '';
     });
   });
 }
 
-function getDate(threadId: string, messageIndex: number): ?number {
+function exposeMetadata(event, attribute, processor){
+  const {target, detail: {threadId, ikValue, btaiHeader, xsrfToken}} = event;
+
+  (async () => {
+    const messageIndex = Array.from(target.parentElement.children)
+      .filter(el => !el.classList.contains('inboxsdk__custom_message_view'))
+      .indexOf(target);
+    if (messageIndex < 0) {
+      throw new Error('Should not happen');
+    }
+
+    let message = getMessage(threadId, messageIndex);
+
+    if (message == null) {
+      try {
+        await addDataForThread(threadId, ikValue, btaiHeader, xsrfToken);
+      } catch (err) {
+        logger.error(err);
+      }
+      message = getMessage(threadId, messageIndex);
+      if (message == null) {
+        throw new Error('Failed to find message date after re-requesting thread');
+      }
+    }
+
+    target.setAttribute(attribute, processor(message));
+
+  })().catch(err => {
+    target.setAttribute(attribute, 'error');
+    logger.error(err);
+  });
+}
+
+function getMessage(threadId: string, messageIndex: number): ?Message {
   const messages = threadIdToMessages.get(threadId);
   if(messages){
     const message = messages[messageIndex];
     if(message){
-      return message.date;
+      return message;
     }
   }
 }
@@ -81,7 +92,8 @@ function addDataForThread(
         add([{
           threadID: syncThread.syncThreadID,
           messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
-            date: syncMessage.date
+            date: syncMessage.date,
+            recipients: syncMessage.recipients
           }))
         }]);
       } else { // legacy gmail

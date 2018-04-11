@@ -1,3 +1,4 @@
+
 /* @flow */
 
 import BigNumber from 'bignumber.js';
@@ -13,6 +14,10 @@ export type SyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string;
       date: number;
+      recipients?: Array<{
+        emailAddress: string;
+        name: ?string;
+      }>;
     }>;
   };
 |};
@@ -23,6 +28,10 @@ export type MinimalSyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string;
       date: number;
+      recipients?: Array<{
+        emailAddress: string;
+        name: ?string;
+      }>;
     }>;
   };
 |};
@@ -86,7 +95,15 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
         extraMetaData: {
           syncMessageData: (descriptorWrapper[3] || []).map(md => ({
             syncMessageID: md[1],
-            date: +md[2][17]
+            date: +md[2][17],
+            recipients: (
+              md[2] &&
+              md[2][1] &&
+              md[2][1].map(recipientDescriptor => ({
+                emailAddress: recipientDescriptor[2],
+                name: recipientDescriptor[3]
+              }))
+            )
           }))
         }
       };
@@ -97,12 +114,39 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
         descriptorWrapper[2][1]
       );
 
-      const messageDescriptors = (
+      if(!threadDescriptor) return null;
+
+      let syncMessageData;
+      const fullMessageDescriptors = (
+        Array.isArray(descriptorWrapper[3]) &&
+        descriptorWrapper[3]
+      );
+
+      if(fullMessageDescriptors){
+        syncMessageData = fullMessageDescriptors.map(md => ({
+          syncMessageID: md[1],
+          date: +md[2][17],
+          recipients: (
+            md[2] &&
+            md[2][1] &&
+            md[2][1].map(recipientDescriptor => ({
+              emailAddress: recipientDescriptor[2],
+              name: recipientDescriptor[3]
+            }))
+          )
+        }));
+      }
+      else {
+        const messageDescriptors = (
           descriptorWrapper[2] &&
           descriptorWrapper[2][2]
         );
 
-      if(!threadDescriptor) return null;
+        syncMessageData = messageDescriptors.map(md => ({
+          syncMessageId: md[1],
+          date: +md[16]
+       }));
+     }
 
       return {
         subject: threadDescriptor[2],
@@ -111,11 +155,8 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
         oldGmailThreadID: new BigNumber(threadDescriptor[14]).toString(16),
         rawResponse: descriptorWrapper,
         extraMetaData: {
-          snippet: '',
-          syncMessageData: messageDescriptors.map(md => ({
-            syncMessageId: md[1],
-            date: +md[16]
-          }))
+          syncMessageData,
+          snippet: ''
         }
       };
     }

@@ -194,6 +194,27 @@ class GmailMessageView {
 		return recipients;
 	}
 
+	async getRecipientsAsync(): Promise<Array<Contact>> {
+		let recipients = this._recipients;
+		if(recipients) return recipients;
+
+		if(this._driver.isUsingSyncAPI()){
+			const threadID = this._threadViewDriver.getInternalID();
+			recipients = this._recipients = (await this._driver.getPageCommunicator().getMessageRecipients(threadID, this._element)) || this.getRecipients();
+		}
+		else {
+			const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));
+			recipients = this._recipients = receipientSpans.map(span => {
+				return this._getUpdatedContact({
+					name: span.getAttribute('name'),
+					emailAddress: span.getAttribute('email') || ''
+				});
+			});
+		}
+
+		return recipients;
+	}
+
 	getDateString(): string {
 		return querySelector(this._element, '.ads .gK .g3').title;
 	}

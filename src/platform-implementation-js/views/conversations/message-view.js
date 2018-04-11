@@ -141,7 +141,12 @@ class MessageView extends EventEmitter {
 	}
 
 	getRecipients(): Array<Contact> {
+		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.getRecipients');
 		return get(memberMap, this).messageViewImplementation.getRecipients();
+	}
+
+	getRecipientsAsync(): Promise<Array<Contact>> {
+		return get(memberMap, this).messageViewImplementation.getRecipientsAsync();
 	}
 
 	getThreadView(): ThreadView {
