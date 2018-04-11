@@ -279,6 +279,10 @@ class InboxMessageView {
     );
   }
 
+  async getRecipientsAsync(): Promise<Array<Contact>> {
+    return this.getRecipients();
+  }
+
   getThreadViewDriver() {
     if (!this._threadViewDriver) throw new Error('failed to find threadView');
     return this._threadViewDriver;

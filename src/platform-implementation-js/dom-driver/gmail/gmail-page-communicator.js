@@ -16,12 +16,30 @@ import Logger from '../../lib/logger';
 export default class GmailPageCommunicator extends CommonPageCommunicator {
 
   async getMessageDate(threadId: string, message: HTMLElement): Promise<?number> {
-    let date = message.getAttribute('data-inboxsdk-sortdate');
-    if(!date){
+    return this._getMessageData(
+      threadId,
+      message,
+      'data-inboxsdk-sortdate',
+      'inboxSDKtellMeThisMessageDate'
+    );
+  }
+
+  async getMessageRecipients(threadId: string, message: HTMLElement): Promise<?Array<{emailAddress: string; name: ?string}>> {
+    return this._getMessageData(
+      threadId,
+      message,
+      'data-inboxsdk-recipients',
+      'inboxSDKtellMeThisMessageRecipients'
+    );
+  }
+
+  async _getMessageData<T>(threadId: string, message: HTMLElement, attribute: string, eventName: string): Promise<?T> {
+    let data = message.getAttribute(attribute);
+    if(!data){
       const [btaiHeader, xsrfToken] = this.isUsingSyncAPI() ?
         await Promise.all([this.getBtaiHeader(), this.getXsrfToken()]) :
         [null, null];
-      message.dispatchEvent(new CustomEvent('inboxSDKtellMeThisMessageDate', {
+      message.dispatchEvent(new CustomEvent(eventName, {
         bubbles: true,
         cancelable: false,
         detail: {
@@ -32,18 +50,18 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         }
       }));
 
-      date = message.getAttribute('data-inboxsdk-sortdate');
-      if (!date) {
+      data = message.getAttribute(attribute);
+      if (!data) {
         await makeMutationObserverChunkedStream(
-          message, {attributes: true, attributeFilter: ['data-inboxsdk-sortdate']}
+          message, {attributes: true, attributeFilter: [attribute]}
         )
           .take(1)
           .toPromise();
-        date = message.getAttribute('data-inboxsdk-sortdate');
+        data = message.getAttribute(attribute);
       }
     }
 
-    if(date && date !== 'error') return +date;
+    if(data && data !== 'error') return JSON.parse(data);
     else return null;
   }
 

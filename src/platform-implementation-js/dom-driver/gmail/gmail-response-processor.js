@@ -563,6 +563,10 @@ function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[
 export type Message = {
   date: number;
   messageID?: string;
+  recipients?: Array<{
+    emailAddress: string;
+    name: ?string;
+  }>;
 }
 
 const _extractThreadsFromConversationViewResponseArrayXf = t.compose(

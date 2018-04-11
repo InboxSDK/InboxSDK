@@ -11,7 +11,7 @@ import * as logger from '../injected-logger';
 import XHRProxyFactory from '../xhr-proxy-factory';
 import querystring, {stringify} from 'querystring';
 import * as threadIdentifier from './thread-identifier';
-import * as messageTimeHolder from '../message-time-holder';
+import * as messageMetadataHolder from '../message-metadata-holder';
 import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import * as GmailSyncResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-sync-response-processor';
 import quotedSplit from '../../common/quoted-split';
@@ -55,7 +55,7 @@ export default function setupGmailInterceptor() {
   }
 
   threadIdentifier.setup();
-  messageTimeHolder.setup();
+  messageMetadataHolder.setup();
 
   //email sending modifier/notifier
   {
@@ -353,7 +353,7 @@ export default function setupGmailInterceptor() {
     });
   }
 
-  // intercept and process conversation view responses to get message dates
+  // intercept and process conversation view responses to get message metadata
   {
     // do this for gmail v1
     {
@@ -365,7 +365,7 @@ export default function setupGmailInterceptor() {
         originalResponseTextLogger(connection) {
           if(connection.status === 200) {
             const groupedMessages = GmailResponseProcessor.extractMessages(connection.originalResponseText);
-            messageTimeHolder.add(groupedMessages);
+            messageMetadataHolder.add(groupedMessages);
           }
         }
       });
@@ -382,11 +382,12 @@ export default function setupGmailInterceptor() {
         originalResponseTextLogger(connection) {
           if(connection.status === 200) {
             const threads = GmailSyncResponseProcessor.extractThreadsFromSearchResponse(connection.originalResponseText);
-            messageTimeHolder.add(
+            messageMetadataHolder.add(
               threads.map((syncThread) => ({
                 threadID: syncThread.syncThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
-                  date: syncMessage.date
+                  date: syncMessage.date,
+                  recipients: syncMessage.recipients
                 }))
               }))
             );
@@ -403,11 +404,12 @@ export default function setupGmailInterceptor() {
         originalResponseTextLogger(connection) {
           if(connection.status === 200) {
             const threads = GmailSyncResponseProcessor.extractThreadsFromThreadResponse(connection.originalResponseText);
-            messageTimeHolder.add(
+            messageMetadataHolder.add(
               threads.map((syncThread) => ({
                 threadID: syncThread.syncThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
-                  date: syncMessage.date
+                  date: syncMessage.date,
+                  recipients: syncMessage.recipients
                 }))
               }))
             );
