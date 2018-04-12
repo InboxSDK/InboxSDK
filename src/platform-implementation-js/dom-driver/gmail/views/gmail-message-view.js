@@ -51,7 +51,7 @@ class GmailMessageView {
 	_openMoreMenu: ?HTMLElement;
 	_sender: ?Contact = null;
 	_recipients: ?Contact[] = null;
-	_recipientEmailAddresses: ?Contact[] = null;
+	_recipientEmailAddresses: ?string[] = null;
 	_recipientsFull: ?Contact[] = null;
 
 	constructor(element: HTMLElement, gmailThreadView: GmailThreadView, driver: GmailDriver){
@@ -196,17 +196,11 @@ class GmailMessageView {
 		return recipients;
 	}
 
-	getRecipientEmailAddresses(): Array<Contact> {
+	getRecipientEmailAddresses(): Array<string> {
 		let recipients = this._recipientEmailAddresses;
 		if(recipients) return recipients;
 		const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));
-		recipients = this._recipientEmailAddresses = receipientSpans.map(span => {
-			return {
-				name: null,
-				emailAddress: span.getAttribute('email') || ''
-			};
-		});
-
+		recipients = this._recipientEmailAddresses = receipientSpans.map(span => span.getAttribute('email') || '');
 		return recipients;
 	}
 

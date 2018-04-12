@@ -279,8 +279,8 @@ class InboxMessageView {
     );
   }
 
-  getRecipientEmailAddresses(): Array<Contact> {
-		return this.getRecipients();
+  getRecipientEmailAddresses(): Array<string> {
+		return this.getRecipients().map(({emailAddress}) => emailAddress);
 	}
 
   async getRecipientsFull(): Promise<Array<Contact>> {
