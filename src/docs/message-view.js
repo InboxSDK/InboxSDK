@@ -119,7 +119,7 @@ var MessageView = /** @lends MessageView */{
 	getRecipientEmailAddresses: function(){},
 
 	/**
-	* Get all the recipients of this message (to, cc, bcc). Returns a promise for an array contact objects.
+	* Get all the recipients of this message (to, cc, bcc). Returns a promise for an array of contact objects.
 	* ^gmail
 	* ^inbox
 	* @return {Promise.<Contact[]>}
