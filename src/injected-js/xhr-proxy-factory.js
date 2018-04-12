@@ -14,6 +14,8 @@ export type Opts = {
   logError: (error: Error, details: any) => void;
 };
 
+const WARNING_TIMEOUT = 60*1000;
+
 /**
  * Object with information about the connection in progress. Its fields are
  * populated as the connection goes on. The object is passed as the first
@@ -61,6 +63,12 @@ export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails&
  * @param {XHRProxyConnectionDetails} connection
  */
 
+type Request = {|
+  method: string;
+  url: string;
+  body: string;
+|};
+
 /**
  * Wrapper object contains optional callbacks that get run for completed
  * requests, and a required isRelevantTo method that filters what types of
@@ -89,13 +97,9 @@ export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails&
 export type Wrapper = {|
   isRelevantTo: (connection: XHRProxyConnectionDetails) => boolean;
   originalSendBodyLogger?: (connection: XHRProxyConnectionDetails, body: string) => void;
-  requestChanger?: (connection: XHRProxyConnectionDetails, request: Object) => Promise<{|
-    method: string;
-    url: string;
-    body: string;
-  |}>;
+  requestChanger?: (connection: XHRProxyConnectionDetails, request: Object) => Request|Promise<Request>;
   originalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => void;
-  responseTextChanger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => Promise<string>;
+  responseTextChanger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => string|Promise<string>;
   finalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, finalResponseText: string) => void;
   afterListeners?: (connection: XHRProxyConnectionDetailsAfterListeners) => void;
 |};
@@ -111,7 +115,7 @@ export type Wrapper = {|
  * @returns {function} wrapped XMLHttpRequest-like constructor
  */
 export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wrapper[], opts: Opts): typeof XMLHttpRequest {
-  var logError = opts && opts.logError || function(error, label) {
+  const logError = opts && opts.logError || function(error, label) {
     setTimeout(function() {
       // let window.onerror log this
       throw error;
@@ -119,7 +123,7 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
   };
 
   function transformEvent(oldTarget, newTarget, event) {
-    var newEvent = {};
+    const newEvent = {};
     Object.keys(event).concat([
       'bubbles', 'cancelBubble', 'cancelable',
       'defaultPrevented',
@@ -175,25 +179,25 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       // error here.
       this._realxhr = new XHR();
     }
-    var self = this;
+    const self = this;
 
-    function triggerEventListeners(name, event) {
-      if (self['on'+name]) {
+    const triggerEventListeners = (name, event) => {
+      if (this['on'+name]) {
         try {
-          wrapEventListener(self._realxhr, self, self['on'+name]).call(self, event);
+          wrapEventListener(this._realxhr, this, this['on'+name]).call(this, event);
         } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
       }
 
-      each(self._boundListeners[name], function(boundListener) {
+      each(this._boundListeners[name], boundListener => {
         try {
           boundListener(event);
         } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
       });
-    }
+    };
 
-    function runRscListeners(event) {
+    const runRscListeners = (event) => {
       triggerEventListeners('readystatechange', event);
-    }
+    };
 
     this._fakeRscEvent = function() {
       runRscListeners(Object.freeze({
@@ -210,23 +214,23 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       }));
     };
 
-    function deliverFinalRsc(event) {
-      self.readyState = 4;
+    const deliverFinalRsc = (event) => {
+      this.readyState = 4;
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
-      var wasSuccess = self.status == 200;
-      var progressEvent = Object.assign({}, transformEvent(self._realxhr, self, event), {
+      var wasSuccess = this.status == 200;
+      var progressEvent = Object.assign({}, transformEvent(this._realxhr, this, event), {
         lengthComputable: false, loaded: 0, total: 0
       });
 
-      var supportsResponseText = !self._realxhr.responseType || self._realxhr.responseType == 'text';
+      var supportsResponseText = !this._realxhr.responseType || this._realxhr.responseType == 'text';
 
       if (supportsResponseText) {
-        each(self._activeWrappers, function(wrapper) {
+        each(this._activeWrappers, wrapper => {
           if (wrapper.finalResponseTextLogger) {
             try {
               wrapper.finalResponseTextLogger(
-                self._connection, self.responseText);
+                this._connection, this.responseText);
             } catch(e) { logError(e); }
           }
         });
@@ -240,53 +244,53 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       }
       triggerEventListeners('loadend', progressEvent);
 
-      each(self._activeWrappers, function(wrapper) {
+      each(this._activeWrappers, wrapper => {
         if (wrapper.afterListeners) {
           try {
-            wrapper.afterListeners(self._connection);
+            wrapper.afterListeners(this._connection);
           } catch(e) { logError(e); }
         }
       });
-    }
+    };
 
-    this._realxhr.addEventListener('readystatechange', function(event) {
-      if (!self._connection) {
+    this._realxhr.addEventListener('readystatechange', event => {
+      if (!this._connection) {
         return;
       }
-      if (self._realxhr.readyState >= 2) {
-        self._connection.status = self._realxhr.status;
+      if (this._realxhr.readyState >= 2) {
+        this._connection.status = this._realxhr.status;
       }
 
-      var supportsResponseText = !self._realxhr.responseType || self._realxhr.responseType == 'text';
+      const supportsResponseText = !this._realxhr.responseType || this._realxhr.responseType == 'text';
 
       // Process the response text.
-      if (self._realxhr.readyState == 4) {
+      if (this._realxhr.readyState == 4) {
         if (supportsResponseText) {
-          Object.defineProperty(self._connection, 'originalResponseText', {
+          Object.defineProperty(this._connection, 'originalResponseText', {
             enumerable: true, writable: false, configurable: false,
             value: self._realxhr.responseText
           });
 
-          each(self._activeWrappers, function(wrapper) {
+          each(this._activeWrappers, wrapper => {
             if (wrapper.originalResponseTextLogger) {
               try {
                 wrapper.originalResponseTextLogger(
-                  self._connection, self._connection.originalResponseText);
+                  this._connection, this._connection.originalResponseText);
               } catch (e) { logError(e); }
             }
           });
 
-          var finish = once(deliverFinalRsc.bind(null, event));
-          if (self._connection.async) {
+          const finish = once(deliverFinalRsc.bind(null, event));
+          if (this._connection.async) {
             // If the XHR object is re-used for another connection, then we need
             // to make sure that our upcoming async calls here do nothing.
             // Remember the current connection object, and do nothing in our async
             // calls if it no longer matches.
-            var startConnection = self._connection;
+            const startConnection = this._connection;
 
-            self._responseTextChangers.reduce(function(promise, nextResponseTextChanger) {
-              return promise.then(function(modifiedResponseText) {
-                if (startConnection === self._connection) {
+            this._responseTextChangers.reduce((promise, nextResponseTextChanger) => {
+              return promise.then(modifiedResponseText => {
+                if (startConnection === this._connection) {
                   self._connection.modifiedResponseText = modifiedResponseText;
                   return nextResponseTextChanger(self._connection, modifiedResponseText);
                 }
@@ -519,9 +523,9 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       // to make sure that our upcoming async calls here do nothing.
       // Remember the current connection object, and do nothing in our async
       // calls if it no longer matches. Also check for aborts.
-      var startConnection = this._connection;
+      const startConnection = this._connection;
 
-      var request = {
+      const request = {
         method: this._connection.method,
         url: this._connection.url,
         body: body
