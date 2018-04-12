@@ -293,6 +293,7 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar {
   display: inline-block;
   vertical-align: middle;
   position: relative;
+  user-select: none;
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
