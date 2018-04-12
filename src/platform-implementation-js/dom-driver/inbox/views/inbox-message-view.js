@@ -279,7 +279,11 @@ class InboxMessageView {
     );
   }
 
-  async getRecipientsAsync(): Promise<Array<Contact>> {
+  getRecipientEmailAddresses(): Array<Contact> {
+		return this.getRecipients();
+	}
+
+  async getRecipientsFull(): Promise<Array<Contact>> {
     return this.getRecipients();
   }
 

@@ -38,7 +38,8 @@ export type MessageViewDriver = {
 	getSender(): Contact;
 	getReadyStream(): Kefir.Observable<any>;
 	getRecipients(): Array<Contact>;
-	getRecipientsAsync(): Promise<Array<Contact>>;
+	getRecipientEmailAddresses(): Array<Contact>;
+	getRecipientsFull(): Promise<Array<Contact>>;
 	getThreadViewDriver(): Object;
 	isLoaded(): boolean;
 	hasOpenReply(): boolean;
