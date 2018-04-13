@@ -293,7 +293,14 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
               startConnection.modifiedResponseText = modifiedResponseText;
 
               for (let responseTextChanger of this._responseTextChangers) {
-                modifiedResponseText = await responseTextChanger(startConnection, modifiedResponseText);
+                const longRunWarningTimer = setTimeout(() => {
+                  console.warn('responseTextChanger is taking too long', responseTextChanger, startConnection); // eslint-disable-line no-console
+                }, WARNING_TIMEOUT);
+                try {
+                  modifiedResponseText = await responseTextChanger(startConnection, modifiedResponseText);
+                } finally {
+                  clearTimeout(longRunWarningTimer);
+                }
                 if (typeof modifiedResponseText !== 'string') {
                   throw new Error("responseTextChanger returned non-string value "+modifiedResponseText);
                 }
@@ -536,7 +543,14 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       (async () => {
         let modifiedRequest = request;
         for (let requestChanger of this._requestChangers) {
-          modifiedRequest = await requestChanger(this._connection, Object.freeze(modifiedRequest));
+          const longRunWarningTimer = setTimeout(() => {
+            console.warn('requestChanger is taking too long', requestChanger, startConnection); // eslint-disable-line no-console
+          }, WARNING_TIMEOUT);
+          try {
+            modifiedRequest = await requestChanger(this._connection, Object.freeze(modifiedRequest));
+          } finally {
+            clearTimeout(longRunWarningTimer);
+          }
 
           assert(has(modifiedRequest, 'method'), 'modifiedRequest has method');
           assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
