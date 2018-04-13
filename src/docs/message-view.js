@@ -111,12 +111,20 @@ var MessageView = /** @lends MessageView */{
 	getSender: function(){},
 
 	/**
-	* Get all the recipients of this message (to, cc, bcc).
+	* Get all the recipient email addresses of this message (to, cc, bcc).
 	* ^gmail
 	* ^inbox
-	* @return {Contact[]}
+	* @return {string[]}
 	*/
-	getRecipients: function(){},
+	getRecipientEmailAddresses: function(){},
+
+	/**
+	* Get all the recipients of this message (to, cc, bcc). Returns a promise for an array of contact objects.
+	* ^gmail
+	* ^inbox
+	* @return {Promise.<Contact[]>}
+	*/
+	getRecipientsFull: function(){},
 
 	/**
 	* Get the {ThreadView} that this MessageView is in.

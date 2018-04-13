@@ -51,6 +51,8 @@ class GmailMessageView {
 	_openMoreMenu: ?HTMLElement;
 	_sender: ?Contact = null;
 	_recipients: ?Contact[] = null;
+	_recipientEmailAddresses: ?string[] = null;
+	_recipientsFull: ?Contact[] = null;
 
 	constructor(element: HTMLElement, gmailThreadView: GmailThreadView, driver: GmailDriver){
 		this._element = element;
@@ -172,10 +174,10 @@ class GmailMessageView {
 		const emailAddress = senderSpan.getAttribute('email');
 		if (!emailAddress) throw new Error('Could not find email address');
 
-		sender = this._sender = this._getUpdatedContact({
+		sender = this._sender = {
 			name: senderSpan.getAttribute('name'),
 			emailAddress
-		});
+		};
 
 		return sender;
 	}
@@ -194,21 +196,29 @@ class GmailMessageView {
 		return recipients;
 	}
 
-	async getRecipientsAsync(): Promise<Array<Contact>> {
-		let recipients = this._recipients;
+	getRecipientEmailAddresses(): Array<string> {
+		let recipients = this._recipientEmailAddresses;
+		if(recipients) return recipients;
+		const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));
+		recipients = this._recipientEmailAddresses = receipientSpans.map(span => span.getAttribute('email') || '');
+		return recipients;
+	}
+
+	async getRecipientsFull(): Promise<Array<Contact>> {
+		let recipients = this._recipientsFull;
 		if(recipients) return recipients;
 
 		if(this._driver.isUsingSyncAPI()){
 			const threadID = this._threadViewDriver.getInternalID();
-			recipients = this._recipients = await this._driver.getPageCommunicator().getMessageRecipients(threadID, this._element);
+			recipients = this._recipientsFull = await this._driver.getPageCommunicator().getMessageRecipients(threadID, this._element);
 			if(!recipients){
 				this._driver.getLogger().error(new Error('Failed to find message recipients from response'), {threadID});
-				recipients = this._recipients = this.getRecipients();
+				recipients = this._recipientsFull = this.getRecipients();
 			}
 		}
 		else {
 			const receipientSpans = Array.from(this._element.querySelectorAll('.hb span[email]'));
-			recipients = this._recipients = receipientSpans.map(span => {
+			recipients = this._recipientsFull = receipientSpans.map(span => {
 				return this._getUpdatedContact({
 					name: span.getAttribute('name'),
 					emailAddress: span.getAttribute('email') || ''
