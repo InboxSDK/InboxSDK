@@ -288,28 +288,30 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
             // calls if it no longer matches.
             const startConnection = this._connection;
 
-            this._responseTextChangers.reduce((promise, nextResponseTextChanger) => {
-              return promise.then(modifiedResponseText => {
-                if (startConnection === this._connection) {
-                  self._connection.modifiedResponseText = modifiedResponseText;
-                  return nextResponseTextChanger(self._connection, modifiedResponseText);
-                }
-              }).then(function(modifiedResponseText) {
-                if (typeof modifiedResponseText != 'string') {
+            (async () => {
+              let modifiedResponseText: string = startConnection.originalResponseText;
+              startConnection.modifiedResponseText = modifiedResponseText;
+
+              for (let responseTextChanger of this._responseTextChangers) {
+                modifiedResponseText = await responseTextChanger(startConnection, modifiedResponseText);
+                if (typeof modifiedResponseText !== 'string') {
                   throw new Error("responseTextChanger returned non-string value "+modifiedResponseText);
-                } else {
-                  return modifiedResponseText;
                 }
-              });
-            }, Promise.resolve(self._connection.originalResponseText)).then(function(modifiedResponseText) {
+                startConnection.modifiedResponseText = modifiedResponseText;
+
+                if (startConnection !== this._connection) break;
+              }
+
+              return modifiedResponseText;
+            })().then(modifiedResponseText => {
               if (startConnection === self._connection) {
-                self.responseText = self._connection.modifiedResponseText = modifiedResponseText;
+                this.responseText = modifiedResponseText;
                 finish();
               }
-            }, function(err) {
+            }, err => {
               logError(err);
-              if (startConnection === self._connection) {
-                self.responseText = self._realxhr.responseText;
+              if (startConnection === this._connection) {
+                this.responseText = this._realxhr.responseText;
                 finish();
               }
             }).catch(logError);
@@ -530,29 +532,27 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
         url: this._connection.url,
         body: body
       };
-      this._requestChangers.reduce(function(promise, nextRequestChanger) {
-        return promise.then(function(modifiedRequest) {
-          if (startConnection === self._connection && !self._realStartedSend) {
-            assert(has(modifiedRequest, 'method'), 'modifiedRequest has method');
-            assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
-            assert(has(modifiedRequest, 'body'), 'modifiedRequest has body');
-            return nextRequestChanger(self._connection, Object.freeze(modifiedRequest));
-          }
-        });
-      }, Promise.resolve(request)).then(function(modifiedRequest) {
-        if (startConnection === self._connection && !self._realStartedSend) {
+
+      (async () => {
+        let modifiedRequest = request;
+        for (let requestChanger of this._requestChangers) {
+          modifiedRequest = await requestChanger(this._connection, Object.freeze(modifiedRequest));
+
           assert(has(modifiedRequest, 'method'), 'modifiedRequest has method');
           assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
           assert(has(modifiedRequest, 'body'), 'modifiedRequest has body');
-          return modifiedRequest;
+
+          if (startConnection !== this._connection || this._realStartedSend) break;
         }
-      }).catch(function(err) {
+
+        return modifiedRequest;
+      })().catch(err => {
         logError(err);
         return request;
-      }).then(function(modifiedRequest) {
-        if (startConnection === self._connection && !self._realStartedSend) {
-          self._realxhr.open(modifiedRequest.method, modifiedRequest.url);
-          self._events.emit('realOpen');
+      }).then(modifiedRequest => {
+        if (startConnection === this._connection && !this._realStartedSend) {
+          this._realxhr.open(modifiedRequest.method, modifiedRequest.url);
+          this._events.emit('realOpen');
           finish(modifiedRequest.body);
         }
       });
