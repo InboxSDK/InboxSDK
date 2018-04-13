@@ -1459,6 +1459,9 @@ class GmailComposeView {
 		const modifierId = this._driver.getPageCommunicator().registerComposeRequestModifier(keyId, this._driver.getAppId());
 		this._requestModifiers[modifierId] = modifier;
 		this._startListeningForModificationRequests();
+		this._stopper.onValue(() => {
+			this._driver.getPageCommunicator().unregisterComposeRequestModifier(keyId, modifierId);
+		});
 	}
 
 	_startListeningForModificationRequests(){
