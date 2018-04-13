@@ -71,6 +71,14 @@ export default function setupGmailInterceptor() {
             modifiers[keyId].push(detail.modifierId);
           });
 
+    Kefir.fromEvents(document, 'inboxSDKunregisterComposeRequestModifier')
+          .onValue(({detail}) => {
+            const {keyId, modifierId} = detail;
+            modifiers[keyId] = modifiers[keyId].filter(item => item !== modifierId);
+            if (modifiers[keyId].length === 0) {
+              delete modifiers[keyId];
+            }
+          });
 
     js_frame_wrappers.push({
       isRelevantTo: function(connection) {

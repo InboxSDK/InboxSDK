@@ -213,6 +213,14 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return modifierId;
   }
 
+  unregisterComposeRequestModifier(keyId: string, modifierId: string) {
+    document.dispatchEvent(new CustomEvent('inboxSDKunregisterComposeRequestModifier', {
+      detail: {keyId, modifierId},
+      bubbles: false,
+      cancelable: false
+    }));
+  }
+
   modifyComposeRequest(keyId: string, modifierId: string, composeParams: Object){
     const detail: Object = {modifierId, composeParams};
     if(this.isUsingSyncAPI()) detail.draftID = keyId;
