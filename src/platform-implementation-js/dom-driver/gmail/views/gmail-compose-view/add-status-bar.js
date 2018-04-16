@@ -35,7 +35,16 @@ class StatusBar extends SimpleElementView {
 	_prependContainer: ?HTMLElement = null;
 
 	constructor(gmailComposeView: GmailComposeView, height: number, orderHint: number, addAboveNativeStatusBar: boolean) {
-		const el = document.createElement('div');
+    const divNode = document.createElement('div');
+    let el;
+
+    if (gmailComposeView._driver.isUsingMaterialUI()) {
+      const trNode = document.createElement('tr');
+      el = trNode.appendChild(divNode);
+    } else {
+      el = divNode;
+    }
+
 		super(el);
 		this._gmailComposeView = gmailComposeView;
 		this._currentHeight = height;

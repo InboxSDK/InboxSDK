@@ -786,6 +786,7 @@ div.inboxsdk__compose_statusbar {
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_statusbar {
   background: none;
+  padding: 0 16px 16px 16px;
 }
 
 body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {

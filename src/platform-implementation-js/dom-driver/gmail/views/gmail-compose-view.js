@@ -1010,7 +1010,12 @@ class GmailComposeView {
 	}
 
 	getStatusArea(): HTMLElement {
-		var statusArea = this._element.querySelector('.aDg .aDj > .aDh');
+    let statusArea = this._element.querySelector('.aDg .aDj > .aDh');
+
+    if (this._driver.isUsingMaterialUI()) {
+      statusArea = this._element.querySelector('.iN > tbody');
+    }
+    
 		if (!statusArea) {
 			throw new Error("Failed to find status area");
 		}
