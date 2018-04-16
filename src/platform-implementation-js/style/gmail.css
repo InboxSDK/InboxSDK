@@ -95,6 +95,7 @@ div.T-I.inboxsdk__button {
   transition: opacity .218s;
   border: 1px solid rgba(0,0,0,.2);
   background: #fff;
+  outline: none;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__menu > .inboxsdk__menuContent {
