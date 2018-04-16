@@ -9,91 +9,100 @@ import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function addStatusBar(
-	gmailComposeView: GmailComposeView,
-	options: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}
+  gmailComposeView: GmailComposeView,
+  options: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}
 ) {
-	const {height, orderHint, addAboveNativeStatusBar} = {
-		height: 40,
-		orderHint: 0,
-		addAboveNativeStatusBar: false,
-		...options
-	};
+  const {height, orderHint, addAboveNativeStatusBar} = {
+    height: 40,
+    orderHint: 0,
+    addAboveNativeStatusBar: false,
+    ...options
+  };
 
-	const statusbar = new StatusBar(gmailComposeView, height, orderHint, addAboveNativeStatusBar);
+  const statusbar = new StatusBar(gmailComposeView, height, orderHint, addAboveNativeStatusBar);
 
-	gmailComposeView.getStopper()
-		.takeUntilBy(Kefir.fromEvents(statusbar, 'destroy'))
-		.onValue(() => statusbar.destroy());
+  gmailComposeView.getStopper()
+    .takeUntilBy(Kefir.fromEvents(statusbar, 'destroy'))
+    .onValue(() => statusbar.destroy());
 
-	return statusbar;
+  return statusbar;
 }
 
 class StatusBar extends SimpleElementView {
-	_gmailComposeView: GmailComposeView;
-	_currentHeight: number;
-	_orderHint: number;
-	_prependContainer: ?HTMLElement = null;
+  _gmailComposeView: GmailComposeView;
+  _currentHeight: number;
+  _orderHint: number;
+  _prependContainer: ?HTMLElement = null;
 
-	constructor(gmailComposeView: GmailComposeView, height: number, orderHint: number, addAboveNativeStatusBar: boolean) {
-		const el = document.createElement('div');
-		super(el);
-		this._gmailComposeView = gmailComposeView;
-		this._currentHeight = height;
-		this._orderHint = orderHint;
+  constructor(gmailComposeView: GmailComposeView, height: number, orderHint: number, addAboveNativeStatusBar: boolean) {
+    const divNode = document.createElement('div');
+    let el;
 
-		el.className = 'aDh inboxsdk__compose_statusbar';
-		el.setAttribute('data-order-hint', String(orderHint));
-		el.style.height = this._currentHeight + 'px';
+    if (gmailComposeView._driver.isUsingMaterialUI()) {
+      const trNode = document.createElement('tr');
+      el = trNode.appendChild(divNode);
+    } else {
+      el = divNode;
+    }
 
-		try {
-			const statusArea = gmailComposeView.getStatusArea();
-			gmailComposeView.getElement().classList.add('inboxsdk__compose_statusbarActive');
+    super(el);
+    this._gmailComposeView = gmailComposeView;
+    this._currentHeight = height;
+    this._orderHint = orderHint;
 
-			if (addAboveNativeStatusBar) {
-				const prependContainer = this._prependContainer = (
-					statusArea.querySelector('.inboxsdk__compose_statusBarPrependContainer') ||
-					document.createElement('div')
-				);
-				prependContainer.classList.add('inboxsdk__compose_statusBarPrependContainer');
-				statusArea.insertAdjacentElement('afterbegin', prependContainer);
+    el.className = 'aDh inboxsdk__compose_statusbar';
+    el.setAttribute('data-order-hint', String(orderHint));
+    el.style.height = this._currentHeight + 'px';
 
-				insertElementInOrder(prependContainer, el);
-			} else {
-				insertElementInOrder(statusArea, el);
-			}
+    try {
+      const statusArea = gmailComposeView.getStatusArea();
+      gmailComposeView.getElement().classList.add('inboxsdk__compose_statusbarActive');
 
-			if (this._gmailComposeView.isInlineReplyForm()) {
-				const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
-				this._gmailComposeView.getElement().style.paddingBottom = (currentPad + this._currentHeight) + 'px';
-			}
-		} catch (err) {
-			Logger.error(err);
-		}
-	}
+      if (addAboveNativeStatusBar) {
+        const prependContainer = this._prependContainer = (
+          statusArea.querySelector('.inboxsdk__compose_statusBarPrependContainer') ||
+          document.createElement('div')
+        );
+        prependContainer.classList.add('inboxsdk__compose_statusBarPrependContainer');
+        statusArea.insertAdjacentElement('afterbegin', prependContainer);
 
-	destroy() {
-		if (this.destroyed) return;
-		super.destroy();
+        insertElementInOrder(prependContainer, el);
+      } else {
+        insertElementInOrder(statusArea, el);
+      }
 
-		if (
-			this._prependContainer &&
-			this._prependContainer.children.length === 0
-		) {
-			this._prependContainer.remove();
-		}
+      if (this._gmailComposeView.isInlineReplyForm()) {
+        const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
+        this._gmailComposeView.getElement().style.paddingBottom = (currentPad + this._currentHeight) + 'px';
+      }
+    } catch (err) {
+      Logger.error(err);
+    }
+  }
 
-		if (this._gmailComposeView.isInlineReplyForm()) {
-			const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
-			this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight) + 'px';
-		}
-	}
+  destroy() {
+    if (this.destroyed) return;
+    super.destroy();
 
-	setHeight(newHeight: number) {
-		this.el.style.height = newHeight + 'px';
-		if (this._gmailComposeView.isInlineReplyForm()) {
-			const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
-			this._gmailComposeView.getElement().style.paddingBottom = ((currentPad - this._currentHeight) + newHeight) + 'px';
-		}
-		this._currentHeight = newHeight;
-	}
+    if (
+      this._prependContainer &&
+      this._prependContainer.children.length === 0
+    ) {
+      this._prependContainer.remove();
+    }
+
+    if (this._gmailComposeView.isInlineReplyForm()) {
+      const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
+      this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight) + 'px';
+    }
+  }
+
+  setHeight(newHeight: number) {
+    this.el.style.height = newHeight + 'px';
+    if (this._gmailComposeView.isInlineReplyForm()) {
+      const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
+      this._gmailComposeView.getElement().style.paddingBottom = ((currentPad - this._currentHeight) + newHeight) + 'px';
+    }
+    this._currentHeight = newHeight;
+  }
 }
