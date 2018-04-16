@@ -145,7 +145,7 @@ class MessageView extends EventEmitter {
 		return get(memberMap, this).messageViewImplementation.getRecipients();
 	}
 
-	getRecipientEmailAddresses(): Array<Contact> {
+	getRecipientEmailAddresses(): Array<string> {
 		return get(memberMap, this).messageViewImplementation.getRecipientEmailAddresses();
 	}
 
