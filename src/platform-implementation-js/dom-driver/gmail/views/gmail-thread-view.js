@@ -363,7 +363,7 @@ class GmailThreadView {
 
 			this._threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 			if(!threadID){
-				this._threadID = threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
+				this._threadID = threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
 			}
 		}
 		else {
