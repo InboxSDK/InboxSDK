@@ -308,8 +308,9 @@ class GmailCollapsibleSectionView {
 				summaryTextElement.innerHTML = [
 					'<span class="Di">&nbsp;',
 						'<div class="J-J5-Ji amH">',
-							'<span class="Dj"><b>',
-							'</b></span>',
+							'<span class="Dj">',
+								(this._driver.isUsingMaterialUI() ? '<span></span>' : '<b></b>'),
+							'</span>',
 							'&nbsp;',
 						'</div>',
 					'</span>'
@@ -335,7 +336,7 @@ class GmailCollapsibleSectionView {
 				if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', summaryTextElement);
 			}
 
-			querySelector(summaryTextElement, 'b').textContent = collapsibleSectionDescriptor.titleLinkText;
+			querySelector(summaryTextElement, '.Dj > *').textContent = collapsibleSectionDescriptor.titleLinkText;
 		}
 	}
 
