@@ -1773,6 +1773,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection.inboxsdk__resultsSecti
 }
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   display: flex;
+  height: 48px;
 }
 
   .Wc .inboxsdk__resultsSection_title {
