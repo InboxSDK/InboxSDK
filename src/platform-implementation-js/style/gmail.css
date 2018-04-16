@@ -240,8 +240,17 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeBut
   border-radius: 4px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_sendButton {
+  padding: 6px 4px;
+  margin-left: 2px;
+}
+
 .inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
   height: 20px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
+  height: 24px;
 }
 
 .inboxsdk__compose_sendButton:focus,
