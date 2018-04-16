@@ -1789,8 +1789,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
-  min-height: 40px;
-  line-height: 40px;
+  min-height: 48px;
+  line-height: 48px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_header > .Cr > .J-J5-Ji {
