@@ -354,10 +354,19 @@ class GmailThreadView {
 
 	async getThreadIDAsync(): Promise<string> {
 		let threadID;
-		if(this._isPreviewedThread){
-			threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+		if(this._driver.isUsingSyncAPI()){
+			const idElement = this._element.querySelector('[data-thread-perm-id]');
+			if(!idElement) throw new Error('threadID element not found');
+
+			const syncThreadID = this._syncThreadID = idElement.getAttribute('data-thread-perm-id');
+			if(!syncThreadID) throw new Error('syncThreadID attribute with no value');
+
+			this._threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
+			if(!threadID){
+				this._threadID = threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
+			}
 		}
-		else{
+		else {
 			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
 			if(params && params.threadID){
@@ -367,13 +376,7 @@ class GmailThreadView {
 				this._driver.getLogger().error(err);
 				throw err;
 			}
-		}
 
-		if(this._driver.isUsingSyncAPI() && !this._isPreviewedThread){
-			this._syncThreadID = threadID;
-			this._threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(threadID);
-		}
-		else{
 			this._threadID = threadID;
 		}
 

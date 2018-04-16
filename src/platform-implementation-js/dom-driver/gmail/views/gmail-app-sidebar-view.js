@@ -263,7 +263,17 @@ class GmailAppSidebarView {
               else this._setShouldThreadAppSidebarOpen(true);
 
               const activeGlobalAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR);
-              if(activeGlobalAddOnIcon) simulateClick(activeGlobalAddOnIcon);
+              if(activeGlobalAddOnIcon) {
+                simulateClick(activeGlobalAddOnIcon);
+                // we put this in a setTimeout because the simulate click will
+                // trigger a mutation observer that is listening to native sidebar visibility
+                // and will set lastActiveNativeGlobalAddOnIconEl to null
+                // which we don't actually want to do, so we set it back
+                setTimeout(() => {
+                  lastActiveNativeGlobalAddOnIconEl = activeGlobalAddOnIcon;
+                  shouldRestoreGlobal = true;
+                }, 1);
+              }
 
               const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
               if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
@@ -393,6 +403,10 @@ class GmailAppSidebarView {
           if(isActive){
             lastActiveNativeGlobalAddOnIconEl = addonIconEl;
             shouldRestoreGlobal = true;
+          }
+          else if(lastActiveNativeGlobalAddOnIconEl === addonIconEl) {
+            lastActiveNativeGlobalAddOnIconEl = null;
+            shouldRestoreGlobal = false;
           }
         });
       });

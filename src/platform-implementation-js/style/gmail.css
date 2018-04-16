@@ -827,14 +827,14 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose table.GS {
   display: table;
 }
-  
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose tbody.bze {
   display: table-row-group;
 }
-  
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose td.ok,
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose td.az3 {
-  display: table-cell;    
+  display: table-cell;
 }
 
 .inboxsdk__recipient_row td.ok {
@@ -1416,7 +1416,7 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
     display: none;
   }
 
-  .companion_container_app_sidebar_visible:not(.companion_global_app_sidebar_visible) .global_app_sidebar {
+  .companion_app_sidebar_visible:not(.companion_global_app_sidebar_visible) .global_app_sidebar {
     display: none;
   }
 
