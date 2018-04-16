@@ -1779,12 +1779,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
     padding: 3px 0 3px 8px;
   }
 
-.inboxsdk__resultsSection_title_subtitle {
+body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title_subtitle {
   opacity: 0.5;
   margin-left: 5px;
 }
 
-  .Wc .inboxsdk__resultsSection_title_subtitle {
+body.inboxsdk__gmailv1css .Wc .inboxsdk__resultsSection_title_subtitle {
     font-size: 80%;
   }
 
