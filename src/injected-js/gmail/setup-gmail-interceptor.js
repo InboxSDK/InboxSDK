@@ -315,7 +315,14 @@ export default function setupGmailInterceptor() {
                 sendUpdateMatch[1][3][7][1]
               );
 
-              const sendUpdate = sendUpdateWrapper[5][0];
+              const sendUpdate = sendUpdateWrapper[5].find(message => (
+                message[1].includes(draftID)
+              ));
+
+              if(!sendUpdate){
+                sendFailed();
+                return;
+              }
 
               triggerEvent({
                 draftID: draftID,
