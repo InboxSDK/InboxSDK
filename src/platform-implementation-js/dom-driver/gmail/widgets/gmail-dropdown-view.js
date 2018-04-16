@@ -1,6 +1,8 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 import BasicClass from '../../../lib/basic-class';
+import blockAndReemiteKeyboardEvents from '../../../lib/dom/block-and-reemit-keyboard-events';
+
 
 export default function GmailDropdownView() {
 	BasicClass.call(this);
@@ -25,5 +27,7 @@ Object.assign(GmailDropdownView.prototype, {
 		this._contentElement.setAttribute('class', 'inboxsdk__menuContent');
 
 		this._containerElement.appendChild(this._contentElement);
+
+		blockAndReemiteKeyboardEvents(this._containerElement);
 	}
 });
