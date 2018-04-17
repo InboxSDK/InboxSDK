@@ -367,14 +367,19 @@ class GmailThreadView {
 			}
 		}
 		else {
-			const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
+			if(this._isPreviewedThread){
+				threadID = this._driver.getPageCommunicator().getCurrentThreadID(this._element, true);
+			}
+			else {
+				const params = this._routeViewDriver ? this._routeViewDriver.getParams() : null;
 
-			if(params && params.threadID){
-				threadID = params.threadID;
-			} else {
-				const err = new Error('Failed to get id for thread');
-				this._driver.getLogger().error(err);
-				throw err;
+				if(params && params.threadID){
+					threadID = params.threadID;
+				} else {
+					const err = new Error('Failed to get id for thread');
+					this._driver.getLogger().error(err);
+					throw err;
+				}
 			}
 
 			this._threadID = threadID;
