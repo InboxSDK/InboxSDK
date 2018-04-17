@@ -45,6 +45,7 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
+  noticeContainer.classList.remove('bAp');
   sdkNotice.style.display = 'none';
   sdkNotice.removeAttribute('data-inboxsdk-id');
 }
@@ -87,6 +88,7 @@ export default class GmailButterBarDriver {
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
       noticeContainer.style.visibility = 'visible';
       noticeContainer.style.top = '';
+      noticeContainer.classList.add('bAp');
 
       googleNotice.style.display = 'none';
       sdkNotice.className = googleNotice.className;
