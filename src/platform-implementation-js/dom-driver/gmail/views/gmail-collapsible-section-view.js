@@ -151,8 +151,11 @@ class GmailCollapsibleSectionView {
 
 		this._setupFooter(collapsibleSectionDescriptor);
 
-		if(this._isCollapsible && this._titleElement){
-			Kefir.fromEvents(this._titleElement, 'click').onValue(() => this._toggleCollapseState());
+		if(this._isCollapsible){
+			const clickTarget = this._driver.isUsingMaterialUI() ? this._headerElement : this._titleElement;
+			if (clickTarget) {
+				Kefir.fromEvents(clickTarget, 'click').onValue(() => this._toggleCollapseState());
+			}
 		}
 
 		Kefir.fromEvents(element, 'removeCollapsedContainer').onValue(() => this._destroyCollapsedContainer());
@@ -204,9 +207,11 @@ class GmailCollapsibleSectionView {
 		titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
 
 		titleElement.innerHTML = [
-			'<h3 class="Wr">',
+			'<h3 class="Wr iR">',
 				'<img alt="" src="//ssl.gstatic.com/ui/v1/icons/mail/images/cleardot.gif" class="qi Wp Wq">',
-				'<div class="Wn">' + escape(collapsibleSectionDescriptor.title) + '</div>',
+				'<div class="Wn">',
+					escape(collapsibleSectionDescriptor.title),
+				'</div>',
 			'</h3>'
 		].join('');
 
@@ -271,14 +276,15 @@ class GmailCollapsibleSectionView {
 				subtitleElement = document.createElement('span');
 				if(subtitleElement && titleElement){
 					subtitleElement.classList.add('inboxsdk__resultsSection_title_subtitle');
-					const h3 = titleElement.querySelector('h3');
-					if(h3) {
+
+					const insertionPoint = this._driver.isUsingMaterialUI() ? titleElement.querySelector('.Wn') : titleElement.querySelector('h3');
+
+					if(insertionPoint) {
 						if (this._driver.isUsingMaterialUI()) {
-							(h3: any).insertAdjacentElement('afterend', subtitleElement);
+							subtitleElement.classList.add('aw5');
 						}
-						else {
-							(h3: any).appendChild(subtitleElement);
-						}
+
+						(insertionPoint: any).appendChild(subtitleElement);
 					}
 				}
 			}
@@ -305,8 +311,9 @@ class GmailCollapsibleSectionView {
 				summaryTextElement.innerHTML = [
 					'<span class="Di">&nbsp;',
 						'<div class="J-J5-Ji amH">',
-							'<span class="Dj"><b>',
-							'</b></span>',
+							'<span class="Dj">',
+								(this._driver.isUsingMaterialUI() ? '<span></span>' : '<b></b>'),
+							'</span>',
 							'&nbsp;',
 						'</div>',
 					'</span>'
@@ -332,7 +339,7 @@ class GmailCollapsibleSectionView {
 				if(insertionPoint) (insertionPoint: any).insertAdjacentElement('afterbegin', summaryTextElement);
 			}
 
-			querySelector(summaryTextElement, 'b').textContent = collapsibleSectionDescriptor.titleLinkText;
+			querySelector(summaryTextElement, '.Dj > *').textContent = collapsibleSectionDescriptor.titleLinkText;
 		}
 	}
 
