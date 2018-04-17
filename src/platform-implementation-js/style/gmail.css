@@ -825,17 +825,8 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   height: auto;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose table.GS {
-  display: table;
-}
-
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose tbody.bze {
-  display: table-row-group;
-}
-
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose td.ok,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose td.az3 {
-  display: table-cell;
+body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
+  display: flex;
 }
 
 .inboxsdk__recipient_row td.ok {
