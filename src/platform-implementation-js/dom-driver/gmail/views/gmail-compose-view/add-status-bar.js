@@ -4,6 +4,7 @@ import once from 'lodash/once';
 import Kefir from 'kefir';
 
 import Logger from '../../../../lib/logger';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
@@ -68,7 +69,14 @@ class StatusBar extends SimpleElementView {
 
         insertElementInOrder(prependContainer, el);
       } else {
-        insertElementInOrder(statusArea, el);
+        if(gmailComposeView.getGmailDriver().isUsingMaterialUI() && gmailComposeView.isInlineReplyForm()){
+          //append to body
+          const composeTable = querySelector(gmailComposeView.getElement(), '.iN > tbody');
+          insertElementInOrder(composeTable, el);
+        }
+        else {
+          insertElementInOrder(statusArea, el);
+        }
       }
 
       if (this._gmailComposeView.isInlineReplyForm()) {
