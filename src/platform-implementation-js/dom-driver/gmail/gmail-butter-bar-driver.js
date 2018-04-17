@@ -45,6 +45,7 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
+  noticeContainer.classList.remove('bAp');
   sdkNotice.style.display = 'none';
   sdkNotice.removeAttribute('data-inboxsdk-id');
 }
@@ -84,9 +85,26 @@ export default class GmailButterBarDriver {
   showMessage(rawOptions: Object): {destroy(): void} {
     const instanceId = Date.now()+'-'+Math.random();
 
+    const destroy = () => {
+        elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
+          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
+            if (rawOptions.className) sdkNotice.classList.remove(rawOptions.className);
+            hideMessage(noticeContainer, googleNotice, sdkNotice);
+          }
+        });
+      };
+
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
       noticeContainer.style.visibility = 'visible';
       noticeContainer.style.top = '';
+      // The bAp css class is added to noticeContainer whenever a native butter is active in both
+      // Gmailv1 and Material Gmail. We replicate this native behavior by adding bAp to
+      // noticeContainer when we show an SDK butter and removing it when the butter expires (see the
+      // hideMessage function above).
+      // When in Material Gmail, the bAp class also causes butters to be styled and positioned as
+      // Snack Bars instead (as opposed to butters). When in Gmailv1, is added and removed with the
+      // same logic, but does not actually apply any styling.
+      noticeContainer.classList.add('bAp');
 
       googleNotice.style.display = 'none';
       sdkNotice.className = googleNotice.className;
@@ -99,6 +117,23 @@ export default class GmailButterBarDriver {
         sdkNotice.appendChild(rawOptions.el);
       } else {
         sdkNotice.textContent = rawOptions.text;
+
+        // Set up the close button shown in most Snack Bars in Material Gmail.
+        // This button is hidden by css in Gmailv1.
+        let noticeCloseButton = sdkNotice.querySelector('div.bBe[role="button"]');
+        if (!noticeCloseButton) {
+          noticeCloseButton = document.createElement('div');
+          noticeCloseButton.classList.add('bBe');
+          noticeCloseButton.setAttribute('role', 'button');
+          noticeCloseButton.tabIndex = 0;
+          noticeCloseButton.innerHTML = '<div class="bBf"></div>';
+
+          sdkNotice.appendChild(noticeCloseButton);
+        }
+
+        Kefir.fromEvents(noticeCloseButton, 'click')
+          .take(1)
+          .onValue(destroy);
       }
 
       if (rawOptions.className) {
@@ -109,16 +144,7 @@ export default class GmailButterBarDriver {
       sdkNotice.setAttribute('data-inboxsdk-id', instanceId);
     });
 
-    return {
-      destroy() {
-        elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
-            if (rawOptions.className) sdkNotice.classList.remove(rawOptions.className);
-            hideMessage(noticeContainer, googleNotice, sdkNotice);
-          }
-        });
-      }
-    };
+    return {destroy};
   }
 
   hideGmailMessage() {

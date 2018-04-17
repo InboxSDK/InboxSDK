@@ -2331,3 +2331,12 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_messa
 /* end v1 specific ui */
 
 /* end custom message views */
+
+
+/* butter/snack bar */
+
+body.inboxsdk__gmailv1css .inboxsdk__butterbar div[role="button"].bBe {
+  display: none;
+}
+
+/* end butter/snack bar */
