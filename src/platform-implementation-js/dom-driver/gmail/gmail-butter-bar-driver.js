@@ -97,6 +97,13 @@ export default class GmailButterBarDriver {
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
       noticeContainer.style.visibility = 'visible';
       noticeContainer.style.top = '';
+      // The bAp css class is added to noticeContainer whenever a native butter is active in both
+      // Gmailv1 and Material Gmail. We replicate this native behavior by adding bAp to
+      // noticeContainer when we show an SDK butter and removing it when the butter expires (see the
+      // hideMessage function above).
+      // When in Material Gmail, the bAp class also causes butters to be styled and positioned as
+      // Snack Bars instead (as opposed to butters). When in Gmailv1, is added and removed with the
+      // same logic, but does not actually apply any styling.
       noticeContainer.classList.add('bAp');
 
       googleNotice.style.display = 'none';
