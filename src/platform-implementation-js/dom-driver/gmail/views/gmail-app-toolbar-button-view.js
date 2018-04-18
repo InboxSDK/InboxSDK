@@ -9,6 +9,9 @@ import updateIcon from '../../../driver-common/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
+
+import monitorTopBannerSizeAndReact from './gmail-app-toolbar-button-view/monitor-top-banner-size-and-react';
+
 import type Driver from '../gmail-driver';
 
 export default class GmailAppToolbarButtonView {
@@ -32,6 +35,8 @@ export default class GmailAppToolbarButtonView {
           this._driver.getLogger().error(err);
         }
       });
+
+    if(driver.isUsingMaterialUI()) monitorTopBannerSizeAndReact();
   }
 
   destroy() {

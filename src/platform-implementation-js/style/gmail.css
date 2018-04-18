@@ -2192,8 +2192,15 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   margin-top: 9px;
 }
 
-/* end app toolbar */
+/* resize based on width */
 
+.inboxsdk__searchIsNarrow .streak__appToolbarButton_title {
+  display: none;
+}
+
+/* end resize based on width */
+
+/* end app toolbar */
 
 /* custom message views */
 
