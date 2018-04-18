@@ -2273,6 +2273,10 @@ table[role=presentation].inboxsdk__thread_view_with_custom_view {
   table-layout: fixed;
 }
 
+  table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
+    display: block;
+  }
+
 /* hidden message notice beside native notice */
 .adv .inboxsdk__custom_message_view_app_notice {
   display: inline-flex;
