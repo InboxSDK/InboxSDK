@@ -5,7 +5,7 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import {defn} from 'ud';
-import ButtonView from './buttons/button-view';
+import ModalButtonView from './buttons/modal-button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
@@ -112,11 +112,11 @@ class GmailModalViewDriver {
   }
 
   _addButton(buttonContainer: HTMLElement, buttonDescriptor: Object) {
-    const buttonOptions = Object.assign({}, buttonDescriptor);
+    const buttonOptions = {...buttonDescriptor};
     const buttonColor = ['blue', 'red', 'green'].includes(buttonDescriptor.color) && buttonDescriptor.color;
-    buttonOptions.buttonColor = buttonColor || (buttonDescriptor.type === 'PRIMARY_ACTION' ? 'blue' : 'default');
+    buttonOptions.isPrimary = buttonDescriptor.type === 'PRIMARY_ACTION';
 
-    const buttonView = new ButtonView(buttonOptions);
+    const buttonView = new ModalButtonView(buttonOptions);
 
     buttonOptions.buttonView = buttonView;
     const buttonViewController = new BasicButtonViewController(buttonOptions);
