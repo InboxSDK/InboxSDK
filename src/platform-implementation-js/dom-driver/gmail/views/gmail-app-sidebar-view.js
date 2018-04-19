@@ -98,7 +98,7 @@ class GmailAppSidebarView {
   // itself when available when the chat sidebar isn't present. It's only set
   // if the user interacts with the app sidebar button.
   _getShouldGlobalAppSidebarOpen(): boolean {
-    return global.localStorage.getItem('inboxsdk__global_app_sidebar_should_open') !== 'false';
+    return global.localStorage.getItem('inboxsdk__global_app_sidebar_should_open') === 'true';
   }
 
   _setShouldGlobalAppSidebarOpen(open: boolean) {
@@ -199,8 +199,9 @@ class GmailAppSidebarView {
         if(!iconArea) throw new Error('should not happen');
 
         const instanceId = event.detail.instanceId;
-        const appIconUrl = event.detail.appIconUrl;
+        const iconUrl = isGlobal && event.detail.iconUrl ? event.detail.iconUrl : event.detail.appIconUrl;
         const appName = event.detail.appName;
+        const iconClass = event.detail.iconClass || '';
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
@@ -216,8 +217,8 @@ class GmailAppSidebarView {
           buttonContainer.className = idMap('sidebar_button_container');
           buttonContainer.setAttribute('data-app-name', appName);
           buttonContainer.innerHTML = autoHtml `
-            <button class="inboxsdk__button_icon" type="button" data-tooltip="${appName}">
-              <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
+            <button class="inboxsdk__button_icon ${iconClass}" type="button" data-tooltip="${appName}">
+              <img class="inboxsdk__button_iconImg" src="${iconUrl}">
             </button>
             <div class="inboxsdk__button_selectedIndicator"></div>
           `;
@@ -237,7 +238,7 @@ class GmailAppSidebarView {
             if(!activeButtonContainer && threadIconArea) activeButtonContainer = threadIconArea.querySelector('.sidebar_button_container_active');
 
             if(activeButtonContainer === buttonContainer) {
-              closeSidebarAndDeactivateButton(activeButtonContainer);
+              if(activeButtonContainer) closeSidebarAndDeactivateButton(activeButtonContainer);
               if(isGlobal){
                 shouldRestoreGlobal = false;
                 lastActiveNativeGlobalAddOnIconEl = null;
@@ -572,6 +573,23 @@ class GmailAppSidebarView {
           sdkContentContainerEl.style.display = 'none';
 
           addButton(globalIconArea, event, true);
+        });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
+        .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(event => {
+          const buttonContainer = globalButtonContainers.get(event.detail.appName);
+          if(!buttonContainer) return;
+
+          const iconClass = event.detail.iconClass || '';
+          const iconUrl = event.detail.iconUrl || event.detail.appIconUrl;
+
+          const imgElement = querySelector(buttonContainer, 'img');
+          imgElement.setAttribute('src', iconUrl);
+
+          const button = querySelector(buttonContainer, 'button');
+          button.setAttribute('class', `inboxsdk__button_icon ${iconClass}`);
         });
 
       Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
