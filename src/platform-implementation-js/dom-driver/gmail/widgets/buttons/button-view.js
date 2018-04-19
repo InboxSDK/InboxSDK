@@ -176,6 +176,7 @@ const ButtonView = ud.defn(module, class ButtonView {
 
 	_createInnerElement(options: ButtonViewOptions){
 		this._innerElement = document.createElement('div');
+		this._innerElement.classList.add('asa');
 
 		if(this._hasDropdown && !options.noArrow){
 			this._innerElement.innerHTML = '<div class="G-asx T-I-J3 - J-J5-Ji">&nbsp;</div>';
@@ -397,6 +398,16 @@ const ButtonView = ud.defn(module, class ButtonView {
 			.onValue(event => {
 				this._element.classList.remove(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
 				this._element.classList.remove('inboxsdk__button_hover');
+			});
+
+		Kefir.fromEvents(this._element, 'focus')
+			.onValue(event => {
+				this._element.classList.add('T-I-JO');
+			});
+
+		Kefir.fromEvents(this._element, 'blur')
+			.onValue(event => {
+				this._element.classList.remove('T-I-JO');
 			});
 	}
 });
