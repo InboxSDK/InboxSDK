@@ -134,11 +134,10 @@ function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 }
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
-	return (
-		!gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar') &&
-		gmailComposeView.getBodyElement().clientWidth < _getBottomBarTableWidth(gmailComposeView) &&
-		gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length > 1
-	);
+	if(gmailComposeView.getElement().querySelector('.inboxsdk__compose_groupedActionToolbar')) return false;
+	if(gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton').length < 2) return false;
+
+	return _getBottomBarTableWidth(gmailComposeView) > gmailComposeView.getBottomToolbarContainer().clientWidth;
 }
 
 function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
