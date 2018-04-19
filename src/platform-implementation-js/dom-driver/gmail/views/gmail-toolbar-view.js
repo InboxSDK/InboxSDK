@@ -221,7 +221,7 @@ class GmailToolbarView {
 				dropdownShowFunction: buttonDescriptor.onClick,
 				dropdownPositionOptions: {
 					position: 'bottom',
-					hAlign: 'right'
+					hAlign: 'left'
 				}
 			});
 		}
