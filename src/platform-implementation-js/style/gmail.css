@@ -816,8 +816,8 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   max-height: inherit !important;
 }
 
-/* .dw means not fullscreen */
-.dw .inboxsdk__compose_statusbarActive .aDj.aDi {
+/* aDi is initially position: fixed, which messes things up, so we make static */
+.inboxsdk__size_fixer .aDj.aDi {
   position: static !important;
 }
 

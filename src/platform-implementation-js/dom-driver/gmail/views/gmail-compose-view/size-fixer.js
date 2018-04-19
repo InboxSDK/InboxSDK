@@ -13,6 +13,9 @@ import type GmailComposeView from '../gmail-compose-view';
 const OLD_GMAIL_STATUS_HEIGHT = 42;
 const MATERIAL_UI_GMAIL_STATUS_HEIGHT = 60;
 
+const OLD_GMAIL_TOP_FORM_HEIGHT = 84;
+const MATERIAL_UI_TOP_FORM_HEIGHT = 72;
+
 var getSizeFixerSheet: () => CSSStyleSheet = once(() => {
   const style: HTMLStyleElement = (document.createElement('style'):any);
   style.type = 'text/css';
@@ -37,6 +40,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
   gmailComposeView.getElement().classList.add('inboxsdk__size_fixer');
 
   const expectedStatusBarHeight = driver.isUsingMaterialUI() ? MATERIAL_UI_GMAIL_STATUS_HEIGHT : OLD_GMAIL_STATUS_HEIGHT;
+  const expectedTopFormHeight = driver.isUsingMaterialUI() ? MATERIAL_UI_TOP_FORM_HEIGHT : OLD_GMAIL_TOP_FORM_HEIGHT;
 
   var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
@@ -81,7 +85,7 @@ export default function sizeFixer(driver: Object, gmailComposeView: GmailCompose
     .takeUntilBy(stopper)
     .onValue(() => {
       var statusUnexpectedHeight = Math.max(statusAreaParent.offsetHeight - expectedStatusBarHeight, 0);
-      var topFormUnexpectedHeight = Math.max(topForm.offsetHeight - 84, 0);
+      var topFormUnexpectedHeight = Math.max(topForm.offsetHeight - expectedTopFormHeight, 0);
       var unexpectedHeight = statusUnexpectedHeight+topFormUnexpectedHeight;
 
       setRuleForSelector(byId(scrollBody.id), `
