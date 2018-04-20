@@ -17,6 +17,7 @@ export type AutocompleteSearchResult = {
   externalURL?: ?string;
   searchTerm?: ?string;
   iconUrl?: ?string;
+  iconClass?: ?string;
   onClick?: ?()=>void;
 };
 
@@ -97,7 +98,7 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
       0,
 
       (null: ?[string, string]),
-      "asor inboxsdk__custom_suggestion "+modification.providerId,
+      "asor inboxsdk__custom_suggestion "+modification.providerId + " " + (modification.iconClass || ''),
       0
     ];
     if (descriptionHTML != null) {
