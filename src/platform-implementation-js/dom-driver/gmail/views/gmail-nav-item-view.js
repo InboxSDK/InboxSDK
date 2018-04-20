@@ -5,9 +5,12 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 
+import GmailElementGetter from '../gmail-element-getter';
+
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import eventNameFilter from '../../../lib/event-name-filter';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
 import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
 
@@ -490,7 +493,40 @@ export default class GmailNavItemView {
 		buttonOptions.dropdownPositionOptions = {
 			position: 'bottom', hAlign: 'left', vAlign: 'top'
 		};
-		buttonOptions.dropdownShowFunction = buttonOptions.onClick;
+
+		if(this._driver.isUsingMaterialUI()){
+			const container = GmailElementGetter.getLeftNavContainerElement();
+			if(!container) throw new Error('leftNavContainer not found');
+
+			// bym is class to show expanded when the left nav is collapsible
+			// we check if the container contains this class because you wouldn't be able to access
+			// this dropdown unless the left nav is expanded or the left nav isn't in a collapsible state
+			if(container.classList.contains('bym')){
+				buttonOptions.dropdownShowFunction = (event) => {
+					const stopper = Kefir.fromEvents(event.dropdown, 'destroy');
+
+					// monitor class on the container and keep re-adding bym until dropdown closes
+					makeMutationObserverChunkedStream(container, {attributes: true, attributeFilter: ['class']})
+						.takeUntilBy(stopper)
+						.toProperty(() => null)
+						.onValue(() => {
+							if(!container.classList.contains('bym')) container.classList.add('bym');
+						});
+
+					stopper.onValue(() => {
+						container.classList.remove('bym');
+					});
+
+					buttonOptions.onClick(event);
+				};
+			}
+			else {
+				buttonOptions.dropdownShowFunction = buttonOptions.onClick;
+			}
+		}
+		else {
+			buttonOptions.dropdownShowFunction = buttonOptions.onClick;
+		}
 
 		const accessoryViewController = new DropdownButtonViewController(buttonOptions);
 		this._accessoryViewController = accessoryViewController;
