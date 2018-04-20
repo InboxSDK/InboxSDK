@@ -498,11 +498,10 @@ export default class GmailNavItemView {
 			const container = GmailElementGetter.getLeftNavContainerElement();
 			if(!container) throw new Error('leftNavContainer not found');
 
-			// bym is class to show expanded when the left nav is collapsible
-			// we check if the container contains this class because you wouldn't be able to access
-			// this dropdown unless the left nav is expanded or the left nav isn't in a collapsible state
-			if(container.classList.contains('bym')){
-				buttonOptions.dropdownShowFunction = (event) => {
+			buttonOptions.dropdownShowFunction = (event) => {
+				// bhZ is the class to indicate the left nav is collapsible mode
+				// bym is class to show expanded when the left nav is collapsible
+				if(container.classList.contains('bhZ')){
 					const stopper = Kefir.fromEvents(event.dropdown, 'destroy');
 
 					// monitor class on the container and keep re-adding bym until dropdown closes
@@ -516,13 +515,11 @@ export default class GmailNavItemView {
 					stopper.onValue(() => {
 						container.classList.remove('bym');
 					});
+				}
+				
+				buttonOptions.onClick(event);
+			};
 
-					buttonOptions.onClick(event);
-				};
-			}
-			else {
-				buttonOptions.dropdownShowFunction = buttonOptions.onClick;
-			}
 		}
 		else {
 			buttonOptions.dropdownShowFunction = buttonOptions.onClick;
