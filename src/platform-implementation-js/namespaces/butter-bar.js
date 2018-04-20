@@ -134,7 +134,8 @@ export default class ButterBar {
 
   showError(options: Object): Message {
     defaults(options, {
-      priority: 100
+      priority: 100,
+      className: 'inboxsdk__butterbar_error'
     });
     return this.showMessage(options);
   }
