@@ -927,6 +927,11 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
   margin-bottom: 0px;
 }
 
+  body:not(.inboxsdk__gmailv1css) .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons:not(.inboxsdk__modal_hideBottom) .inboxsdk__modal_content {
+    margin-bottom: 0px;
+    padding-bottom: 24px;
+  }
+
 .inboxsdk__modal_close {
   outline: none;
   cursor: pointer;
