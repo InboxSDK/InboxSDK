@@ -963,9 +963,11 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
 
 .inboxsdk__modal_fullscreen.inboxsdk__modal_hideTop .Kj-JD-K7 {
   margin: 0px;
+  display: none;
 }
 
-.inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides .inboxsdk__modal_container {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides .inboxsdk__modal_container,
+.inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides .inboxsdk__modal_content {
   padding-left: 0px;
   padding-right: 0px
 }
