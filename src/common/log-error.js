@@ -101,6 +101,8 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       extensionId: getExtensionId(),
       loaderVersion: loaderVersion,
       implementationVersion: implVersion,
+      isUsingSyncAPI,
+      isUsingMaterialGmailUI,
       origin: (document.location: any).origin,
       timestamp: Date.now()*1000
     };
