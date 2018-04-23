@@ -46,7 +46,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       err = new Error("Logger.error called with non-error: "+err);
       markErrorAsSeen(err);
     }
-    var {appId, appIds, implVersion, isUsingSyncAPI, isUsingMaterialGmailUI, isUsingSyncAPI, userEmailHash} = context;
+    var {appId, appIds, implVersion, isUsingSyncAPI, isUsingMaterialGmailUI, userEmailHash} = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 

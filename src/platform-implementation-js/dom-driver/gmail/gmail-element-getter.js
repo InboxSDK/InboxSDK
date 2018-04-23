@@ -168,6 +168,7 @@ const GmailElementGetter = {
 	},
 
 	isUsingMaterialUI(): boolean {
+		if(!(document.head:any).hasAttribute('data-inboxsdk-using-material-ui')) return false;
 		const s = (document.head:any).getAttribute('data-inboxsdk-using-material-ui');
     if (s == null) throw new Error('Failed to read value');
     return s === 'true';
