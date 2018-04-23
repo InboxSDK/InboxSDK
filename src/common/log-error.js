@@ -15,6 +15,8 @@ export type LogErrorContext = {
   loaderVersion?: ?string;
   implVersion?: ?string;
   userEmailHash?: ?string;
+  isUsingSyncAPI?: ?boolean;
+  isUsingMaterialGmailUI?: ?boolean;
 };
 
 const sessionId = getSessionId();
@@ -44,7 +46,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       err = new Error("Logger.error called with non-error: "+err);
       markErrorAsSeen(err);
     }
-    var {appId, appIds, implVersion, userEmailHash} = context;
+    var {appId, appIds, implVersion, isUsingSyncAPI, isUsingMaterialGmailUI, isUsingSyncAPI, userEmailHash} = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
@@ -82,6 +84,8 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", loaderVersion]);
     stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", implVersion]);
+    stuffToLog = stuffToLog.concat(["\nIs Using Sync API:", isUsingSyncAPI]);
+    stuffToLog = stuffToLog.concat(["\nIs Using Material Gmail UI:", isUsingMaterialGmailUI]);
 
     console.error.apply(console, stuffToLog); //eslint-disable-line no-console
 

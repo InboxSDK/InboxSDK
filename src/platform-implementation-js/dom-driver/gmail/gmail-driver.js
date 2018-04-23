@@ -526,6 +526,8 @@ class GmailDriver {
 			this._timestampGlobalsFound = Date.now();
 			this._pageCommunicator = pageCommunicator;
 			this._logger.setUserEmailAddress(this.getUserEmailAddress());
+			this._logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
+			this._logger.setIsUsingMaterialGmailUI(GmailElementGetter.isUsingMaterialUI());
 			this._userInfo = new UserInfo(this);
 
 			return this._userInfo.waitForAccountSwitcherReady();
