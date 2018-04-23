@@ -1040,6 +1040,10 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
   min-height: 36px;
 }
 
+body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_inner {
+  min-height: 40px;
+}
+
 .inboxsdk__mole_view_titlebar {
   position: absolute;
   left: 0;
@@ -1056,6 +1060,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
   border-radius: 4px 4px 0 0;
+  height: 40px;
+  padding-top: 9px;
 }
 
 .inboxsdk__mole_view_titlebar h2 {
