@@ -19,6 +19,9 @@ let _extensionImplVersion: ?string;
 let _extensionUserEmailHash: ?string;
 let _extensionUseEventTracking: boolean = false;
 
+let _isUsingMaterialGmailUI: ?boolean = null;
+let _isUsingSyncAPI: ?boolean = null;
+
 const _sessionId = getSessionId();
 const _loggedDeprecatedMessages = new Set();
 
@@ -92,6 +95,14 @@ class Logger {
 
   shouldTrackEverything(): boolean {
     return _extensionUserEmailHash === 'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785';
+  }
+
+  setIsUsingMaterialGmailUI(isUsing: boolean) {
+    _isUsingMaterialGmailUI = isUsing;
+  }
+
+  setIsUsingSyncAPI(isUsing: boolean) {
+    _isUsingSyncAPI = isUsing;
   }
 
   static run<T>(cb: () => T, details?: any): T {
@@ -349,7 +360,9 @@ function _logError(err: Error, details: any, appId: ?string, sentByApp: boolean)
     appIds: getAppIdsProperty(appId),
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
-    userEmailHash: _extensionUserEmailHash
+    userEmailHash: _extensionUserEmailHash,
+    isUsingSyncAPI: _isUsingSyncAPI,
+    isUsingMaterialGmailUI: _isUsingMaterialGmailUI
   });
 }
 
@@ -385,6 +398,8 @@ function _trackEvent(appId: ?string, type: string, eventName: string, properties
     emailHash: _extensionUserEmailHash,
     loaderVersion: _extensionLoaderVersion,
     implementationVersion: _extensionImplVersion,
+    isUsingSyncAPI: _isUsingSyncAPI,
+    isUsingMaterialGmailUI: _isUsingMaterialGmailUI,
     properties: properties
   };
 

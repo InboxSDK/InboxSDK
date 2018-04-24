@@ -21,6 +21,7 @@ const _ = require('lodash');
 // don't try to inject ajax interceptor
 (document.head:any).setAttribute('data-inboxsdk-script-injected', 'true');
 (document.head:any).setAttribute('data-inboxsdk-user-email-address', 'cowan@streak.com');
+(document.head:any).setAttribute('data-inboxsdk-using-sync-api', 'false');
 (document.head:any).setAttribute('data-inboxsdk-using-material-ui', 'false');
 
 const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
