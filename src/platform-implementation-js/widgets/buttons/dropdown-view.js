@@ -88,11 +88,7 @@ class DropdownView extends EventEmitter {
 				})
 					.throttle(200)
 					.takeUntilBy(onDestroy)
-					.onValue(event => {
-						if (this._scrollableContainByScreen) {
-							this._scrollableContainByScreen.reposition();
-						}
-					});
+					.onValue(event => this.reposition());
 			});
 		}
 
@@ -126,6 +122,12 @@ class DropdownView extends EventEmitter {
 				this._dropdownViewDriver.getContainerElement().remove();
 			}
 			this._dropdownViewDriver.destroy();
+		}
+	}
+
+	reposition() {
+		if (this._scrollableContainByScreen) {
+			this._scrollableContainByScreen.reposition();
 		}
 	}
 }
