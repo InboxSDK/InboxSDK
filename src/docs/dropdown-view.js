@@ -26,6 +26,12 @@ var DropdownView = /** @lends DropdownView */ {
 	close: function() {},
 
 	/**
+	 * Causes the dropdown element to recalculate its position relative to its button anchor. Use this method if you've changed the height of the dropdown while it is displayed.
+	 * @return {void}
+	 */
+	reposition: function() {},
+
+	/**
 	 * This property is set to true once the view is destroyed.
 	 * @type {boolean}
 	 */
