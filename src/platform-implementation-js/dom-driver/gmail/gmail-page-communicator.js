@@ -114,7 +114,6 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   isUsingSyncAPI(): boolean {
-    if(!(document.head:any).hasAttribute('data-inboxsdk-using-sync-api')) return false;
     const s = (document.head:any).getAttribute('data-inboxsdk-using-sync-api');
     if (s == null) throw new Error('Failed to read value');
     return s === 'true';
