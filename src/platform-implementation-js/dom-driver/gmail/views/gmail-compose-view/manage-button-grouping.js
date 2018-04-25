@@ -239,6 +239,15 @@ function _collapseGroupButtonToolbar(gmailComposeView, buttonViewController) {
 
 	const bottomToolbarTable = gmailComposeView.getBottomBarTable();
 	bottomToolbarTable.style.position = '';
+
+	// when expanding the group button this can change how the body is scrolled
+	// in gmail v2 when the body is scrolled Gmail puts a shadow border between the
+	// toolbar and the content. We "jiggle" the scroll position by 1px to trigger Gmails
+	// logic to show/hide the shadow border
+	const bodyScrollContainer = gmailComposeView.getElement().querySelector('.qz');
+	if(bodyScrollContainer){
+		bodyScrollContainer.scrollTop = bodyScrollContainer.scrollTop - 1;
+	}
 }
 
 function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
@@ -253,6 +262,15 @@ function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
 	const formattingToolbar = gmailComposeView.getFormattingToolbar();
 	if(formattingToolbar && formattingToolbar.style.display === ''){
 		simulateClick(gmailComposeView.getFormattingToolbarToggleButton());
+	}
+
+	// when expanding the group button this can change how the body is scrolled
+	// in gmail v2 when the body is scrolled Gmail puts a shadow border between the
+	// toolbar and the content. We "jiggle" the scroll position by 1px to trigger Gmails
+	// logic to show/hide the shadow border
+	const bodyScrollContainer = gmailComposeView.getElement().querySelector('.qz');
+	if(bodyScrollContainer){
+		bodyScrollContainer.scrollTop = bodyScrollContainer.scrollTop + 1;
 	}
 }
 
