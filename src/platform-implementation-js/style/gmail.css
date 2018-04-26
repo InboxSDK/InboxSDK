@@ -348,6 +348,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar {
   margin-bottom: 7px;
   padding: 4px 5px;
   background: white;
+  left: -3px;
+}
+
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_inlineReply .inboxsdk__compose_groupedActionToolbar {
+  left: 14px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton:first-child {
@@ -361,6 +366,15 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__compose_group
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
   padding: 4px;
+}
+
+/*
+there's an element that gets a height of 40px when the gmail formatting toolbar
+is visible. This rule makes that same element get the 40px height when
+the actionToolbar is visible
+*/
+body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar_visible .bA3 {
+  height: 40px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
