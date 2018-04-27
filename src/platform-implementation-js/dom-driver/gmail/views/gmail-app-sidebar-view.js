@@ -140,16 +140,51 @@ class GmailAppSidebarView {
         .filter(events => events.length > 0)
         .takeUntilBy(this._stopper)
         .onValue(() => {
-          const elBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
-          const boundingTop = elBoundingBox.top + threadSidebarContainerEl.scrollTop;
-          const boundingBottom = boundingTop + elBoundingBox.height;
+          // Before touching this code, make sure you understand the meaning of the clientRect
+          // values and of scrollTop. In particular, make sure you understand the distinction of
+          // absolute (the scroll[Top|Bottom|Height] values) vs relative (the BoundingRect top
+          // and bottom values) scroll values.
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop
 
+          const containerBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
           const titleBars = Array.from(threadSidebarContainerEl.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
 
-          const titleBar = titleBars.find(t => {
+          const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
+          const absoluteScrollOfViewportMidpoint = absoluteScrollOfViewportTop + (containerBoundingBox.height / 2);
+
+          let titleBar = titleBars.find(t => {
             const tBoundingBox = t.getBoundingClientRect();
-            return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom;
+
+            const relativeScrollOfTitleBottom = tBoundingBox.bottom;
+            const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
+
+            // Return true for an element that is below the top of the viewport but above its midpoint
+            return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
+              && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
           });
+
+          // If titleBar is falsey then there isn't a title element in the top half of the viewport.
+          // In this case, find the first title element above the viewport.
+          if (!titleBar) {
+            // We make the assumption here that ordering of the elements in titleBars matches the
+            // ordering of how they appear in the sidebar (i.e. their ordering from top to bottom).
+            let lastElementAboveViewPort;
+            for (let i = 0; i < titleBars.length; i++) {
+              const tElement = titleBars[i];
+              const tBoundingBox = tElement.getBoundingClientRect();
+
+              const relativeScrollOfTitleBottom = tBoundingBox.bottom;
+              if (relativeScrollOfTitleBottom < 0) {
+                lastElementAboveViewPort = tElement;
+              }
+              else if (relativeScrollOfTitleBottom > 0) {
+                break;
+              }
+            }
+
+            titleBar = lastElementAboveViewPort;
+          }
 
           if(titleBar){
             const instanceId = titleBar.getAttribute('data-instance-id');
