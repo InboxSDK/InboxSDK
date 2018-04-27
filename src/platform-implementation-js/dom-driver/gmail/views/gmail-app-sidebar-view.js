@@ -159,7 +159,7 @@ class GmailAppSidebarView {
             const relativeScrollOfTitleBottom = tBoundingBox.bottom;
             const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
 
-            // Return true for an element that is below the top of the viewport, but above its midpoint
+            // Return true for an element that is below the top of the viewport but above its midpoint
             return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
               && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
           });
