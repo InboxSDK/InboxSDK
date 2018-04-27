@@ -140,15 +140,28 @@ class GmailAppSidebarView {
         .filter(events => events.length > 0)
         .takeUntilBy(this._stopper)
         .onValue(() => {
-          const elBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
-          const boundingTop = elBoundingBox.top + threadSidebarContainerEl.scrollTop;
-          const boundingBottom = boundingTop + elBoundingBox.height;
+          // Before touching this code, make sure you understand the meaning of the clientRect
+          // values and of scrollTop. In particular, make sure you understand the distinction
+          // absolute (the scroll[Top|Bottom|Height] values) and relative (the bounding rect top
+          // and bottom values) scroll values.
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop
 
+          const containerBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
           const titleBars = Array.from(threadSidebarContainerEl.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
+
+          const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
+          const absoluteScrollOfViewportMidpoint = absoluteScrollOfViewportTop + (containerBoundingBox.height / 2);
 
           const titleBar = titleBars.find(t => {
             const tBoundingBox = t.getBoundingClientRect();
-            return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom;
+
+            const relativeScrollOfTitleBottom = tBoundingBox.top;
+            const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
+
+            // Return true for an element that is below the top of the viewport, but above its midpoint
+            return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
+              && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
           });
 
           if(titleBar){
