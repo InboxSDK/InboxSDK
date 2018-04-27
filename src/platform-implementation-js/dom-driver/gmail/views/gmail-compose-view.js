@@ -201,12 +201,25 @@ class GmailComposeView {
                 getThreadID: (): Promise<string> => Promise.resolve(response.threadID),
                 getMessageID: (): Promise<string> => Promise.resolve(response.messageID)
               };
-              // These properties are nonenumerable. TODO use getter functions
-              // that trigger deprecation warnings.
-              Object.defineProperty((data:any), 'threadID', {value: response.threadID});
-              Object.defineProperty((data:any), 'messageID', {value: response.messageID});
-              Object.defineProperty((data:any), 'gmailThreadId', {value: response.threadID});
-              Object.defineProperty((data:any), 'gmailMessageId', {value: response.messageID});
+              ['threadID', 'gmailThreadId'].forEach(prop => {
+                // These properties are nonenumerable.
+                Object.defineProperty((data:any), prop, {
+                  get: () => {
+                    this._driver.getLogger().deprecationWarning(
+                      `composeView sent event.${prop}`, 'composeView sent event.getThreadID()');
+                    return response.threadID;
+                  }
+                });
+              });
+              ['messageID', 'gmailMessageId'].forEach(prop => {
+                Object.defineProperty((data:any), prop, {
+                  get: () => {
+                    this._driver.getLogger().deprecationWarning(
+                      `composeView sent event.${prop}`, 'composeView sent event.getMessageID()');
+                    return response.messageID;
+                  }
+                });
+              });
               return [{eventName: 'sent', data}];
             }
             case 'emailDraftSaveSending': {
