@@ -10,13 +10,12 @@ import type GmailDriver from '../gmail-driver';
 export default async function openDraftByMessageID(driver: GmailDriver, messageID: string) {
   let newHash;
   if(driver.isUsingSyncAPI()){
-    if(!messageID.includes('msg-a:')) messageID = 'msg-a:' + messageID;
-    const rfcMessageID = await getRfcMessageIDForSyncMessageID(driver, messageID);
+    const rfcMessageID = await driver.getRfcMessageIdForGmailThreadId(messageID);
     const threads = await getSyncThreadsForSearch(driver, 'rfc822msgid:' + rfcMessageID);
 
     if(threads.length === 0) return;
 
-    newHash = makeNewSyncHash(window.location.hash, threads[0].syncThreadID, messageID);
+    newHash = makeNewSyncHash(window.location.hash, threads[0].syncThreadID, threads[0].extraMetaData.syncMessageData[0].syncMessageID);
   }
   else {
     newHash = makeNewHash(window.location.hash, messageID);
@@ -40,12 +39,7 @@ export function makeNewSyncHash(oldHash: string, syncThreadID: string, syncMessa
   oldHash = '#' + oldHash.replace(/^#/, '');
   const [pre, query] = oldHash.split('?');
   const params = qs.parse(query);
-  const newAddition = `#${syncThreadID}+#${syncMessageID}`;
-  if (params.compose) {
-    params.compose +=  `,${newAddition}`;
-  } else {
-    params.compose = newAddition;
-  }
+  params.compose = `#${syncThreadID}+#${syncMessageID}`;
 
   return pre + '?' + qs.stringify(params);
 }
