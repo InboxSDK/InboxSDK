@@ -170,8 +170,7 @@ class GmailCollapsibleSectionView {
 
 	_setupHeader(collapsibleSectionDescriptor: Object){
 		const headerElement = this._headerElement = document.createElement('div');
-		headerElement.classList.add('inboxsdk__resultsSection_header');
-		if (!this._isSearch) headerElement.classList.add('Wg');
+		headerElement.classList.add('inboxsdk__resultsSection_header', 'Wg');
 
 		if (this._driver.isUsingMaterialUI()) {
 			this._setupGmailv2Header(headerElement, collapsibleSectionDescriptor);

@@ -283,20 +283,13 @@ class GmailRouteView {
 		const main = GmailElementGetter.getMainContentContainer();
 		if (!main) throw new Error('should not happen');
 		let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
-		if(!sectionsContainer){
+		if (!sectionsContainer) {
 			sectionsContainer = this._sectionsContainer = document.createElement('div');
 			sectionsContainer.classList.add('inboxsdk__custom_sections');
 
-			if(this._isSearchRoute()){
-				sectionsContainer.classList.add('Wc');
-			}
-
 			main.insertBefore(sectionsContainer, main.firstChild);
 		}
-		else if(!sectionsContainer.classList.contains('Wc') && this._isSearchRoute()){
-			sectionsContainer.classList.add('Wc');
-		}
-		else if(sectionsContainer.classList.contains('Wc') && !this._isSearchRoute()){
+		else if (sectionsContainer.classList.contains('Wc') && !this._isSearchRoute()) {
 			sectionsContainer.classList.remove('Wc');
 		}
 
