@@ -156,7 +156,7 @@ class GmailAppSidebarView {
           let titleBar = titleBars.find(t => {
             const tBoundingBox = t.getBoundingClientRect();
 
-            const relativeScrollOfTitleBottom = tBoundingBox.top;
+            const relativeScrollOfTitleBottom = tBoundingBox.bottom;
             const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
 
             // Return true for an element that is below the top of the viewport, but above its midpoint
