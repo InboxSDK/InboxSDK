@@ -204,7 +204,7 @@ class GmailComposeView {
               ['threadID', 'gmailThreadId'].forEach(prop => {
                 // These properties are nonenumerable.
                 Object.defineProperty((data:any), prop, {
-                  get() {
+                  get: () => {
                     this._driver.getLogger().deprecationWarning(
                       `composeView sent event.${prop}`, 'composeView sent event.getThreadID()');
                     return response.threadID;
@@ -213,7 +213,7 @@ class GmailComposeView {
               });
               ['messageID', 'gmailMessageId'].forEach(prop => {
                 Object.defineProperty((data:any), prop, {
-                  get() {
+                  get: () => {
                     this._driver.getLogger().deprecationWarning(
                       `composeView sent event.${prop}`, 'composeView sent event.getMessageID()');
                     return response.messageID;
