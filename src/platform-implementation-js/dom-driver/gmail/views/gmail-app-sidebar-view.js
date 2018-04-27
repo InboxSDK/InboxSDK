@@ -141,8 +141,8 @@ class GmailAppSidebarView {
         .takeUntilBy(this._stopper)
         .onValue(() => {
           // Before touching this code, make sure you understand the meaning of the clientRect
-          // values and of scrollTop. In particular, make sure you understand the distinction
-          // absolute (the scroll[Top|Bottom|Height] values) and relative (the bounding rect top
+          // values and of scrollTop. In particular, make sure you understand the distinction of
+          // absolute (the scroll[Top|Bottom|Height] values) vs relative (the BoundingRect top
           // and bottom values) scroll values.
           // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
           // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop
