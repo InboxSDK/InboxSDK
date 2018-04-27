@@ -153,7 +153,7 @@ class GmailAppSidebarView {
           const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
           const absoluteScrollOfViewportMidpoint = absoluteScrollOfViewportTop + (containerBoundingBox.height / 2);
 
-          const titleBar = titleBars.find(t => {
+          let titleBar = titleBars.find(t => {
             const tBoundingBox = t.getBoundingClientRect();
 
             const relativeScrollOfTitleBottom = tBoundingBox.top;
@@ -163,6 +163,28 @@ class GmailAppSidebarView {
             return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
               && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
           });
+
+          // If titleBar is falsey then there isn't a title element in the top half of the viewport.
+          // In this case, find the first title element above the viewport.
+          if (!titleBar) {
+            // We make the assumption here that ordering of the elements in titleBars matches the
+            // ordering of how they appear in the sidebar (i.e. their ordering from top to bottom).
+            let lastElementAboveViewPort;
+            for (let i = 0; i < titleBars.length; i++) {
+              const tElement = titleBars[i];
+              const tBoundingBox = tElement.getBoundingClientRect();
+
+              const relativeScrollOfTitleBottom = tBoundingBox.bottom;
+              if (relativeScrollOfTitleBottom < 0) {
+                lastElementAboveViewPort = tElement;
+              }
+              else if (relativeScrollOfTitleBottom > 0) {
+                break;
+              }
+            }
+
+            titleBar = lastElementAboveViewPort;
+          }
 
           if(titleBar){
             const instanceId = titleBar.getAttribute('data-instance-id');
