@@ -51,15 +51,17 @@ class StatusBar extends SimpleElementView {
     el.setAttribute('data-order-hint', String(orderHint));
     el.style.height = this._currentHeight + 'px';
 
-    const gmailStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
-    makeMutationObserverChunkedStream(gmailStatusContainer, {
+    const nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
+    makeMutationObserverChunkedStream(nativeStatusContainer, {
       attributeFilter: ['class'],
       attributes: true,
     })
       .takeUntilBy(gmailComposeView.getStopper())
       .toProperty(() => null)
+      .map(() => nativeStatusContainer.className)
+      .skipDuplicates()
       .onValue(() => {
-        this.setStatusBar();
+        this.setStatusBar(nativeStatusContainer);
       });
   }
 
@@ -89,7 +91,7 @@ class StatusBar extends SimpleElementView {
     this._currentHeight = newHeight;
   }
 
-  setStatusBar(stickyGmailStatusContainer) {
+  setStatusBar(nativeStatusContainer: HTMLElement) {
     try {
       const statusArea = this._gmailComposeView.getStatusArea();
       this._gmailComposeView.getElement().classList.add('inboxsdk__compose_statusbarActive');
@@ -107,23 +109,22 @@ class StatusBar extends SimpleElementView {
         if (this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
           //append to body
           const composeTable = querySelector(this._gmailComposeView.getElement(), '.iN > tbody');
-
-          let stickyGmailStatusContainer;
-          try {
-            stickyGmailStatusContainer = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi');
-          } catch (err) {
-            stickyGmailStatusContainer = false;
-          }
-
-          if (stickyGmailStatusContainer) {
+    
+          if (nativeStatusContainer.classList.contains('aDi')) {
+            // the class .aDi can have both absolute or fixed positioning, adjust
+            // the positioning via Javascript to not trigger a stream event
+            if (nativeStatusContainer.style.position === 'absolute') {
+              nativeStatusContainer.style.bottom = '351px';
+            }
+    
             const gmailStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh');
-            stickyGmailStatusContainer.insertBefore(this.el, gmailStatusBar.nextSibling);
-          } else {
+            nativeStatusContainer.insertBefore(this.el, gmailStatusBar.nextSibling);
+          } else {   
             insertElementInOrder(composeTable, this.el);
           }
         } else {
           insertElementInOrder(statusArea, this.el);
-        }
+        }        
       }
 
       if (this._gmailComposeView.isInlineReplyForm()) {
