@@ -43,10 +43,7 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
     parsedResponse[3]
   );
 
-  if(!threadDescriptors) {
-    debugger;
-    throw new Error('Failed to process search response');
-  }
+  if(!threadDescriptors) return [];
 
   return threadDescriptors.map((descriptorWrapper, index) => {
     const descriptor = descriptorWrapper[1];
