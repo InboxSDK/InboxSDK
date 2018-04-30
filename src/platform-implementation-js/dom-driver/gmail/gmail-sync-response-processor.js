@@ -3,6 +3,11 @@
 
 import BigNumber from 'bignumber.js';
 
+type Recipient = {
+  emailAddress: string;
+  name: ?string;
+};
+
 export type SyncThread = {|
   subject: string;
   snippet: string;
@@ -14,10 +19,7 @@ export type SyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string;
       date: number;
-      recipients?: Array<{
-        emailAddress: string;
-        name: ?string;
-      }>;
+      recipients?: Recipient[];
     }>;
   };
 |};
@@ -28,10 +30,7 @@ export type MinimalSyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string;
       date: number;
-      recipients?: Array<{
-        emailAddress: string;
-        name: ?string;
-      }>;
+      recipients?: Recipient[];
     }>;
   };
 |};
@@ -44,7 +43,7 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
     parsedResponse[3]
   );
 
-  if(!threadDescriptors) throw new Error('Failed to process search response');
+  if(!threadDescriptors) return [];
 
   return threadDescriptors.map((descriptorWrapper, index) => {
     const descriptor = descriptorWrapper[1];
@@ -96,14 +95,7 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
           syncMessageData: (descriptorWrapper[3] || []).map(md => ({
             syncMessageID: md[1],
             date: +md[2][17],
-            recipients: (
-              md[2] &&
-              md[2][1] &&
-              md[2][1].map(recipientDescriptor => ({
-                emailAddress: recipientDescriptor[2],
-                name: recipientDescriptor[3]
-              }))
-            )
+            recipients: getRecipientsFromMessageDescriptor(md)
           }))
         }
       };
@@ -126,14 +118,7 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
         syncMessageData = fullMessageDescriptors.map(md => ({
           syncMessageID: md[1],
           date: +md[2][17],
-          recipients: (
-            md[2] &&
-            md[2][1] &&
-            md[2][1].map(recipientDescriptor => ({
-              emailAddress: recipientDescriptor[2],
-              name: recipientDescriptor[3]
-            }))
-          )
+          recipients: getRecipientsFromMessageDescriptor(md)
         }));
       }
       else {
@@ -163,6 +148,19 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
   })
   .filter(Boolean);
 
+}
+
+function getRecipientsFromMessageDescriptor(messageDescriptor: Array<Object>): Recipient[] | void {
+  if(!messageDescriptor[2]) return;
+
+  const to = messageDescriptor[2][1] || [];
+  const cc = messageDescriptor[2][2] || [];
+  const bcc = messageDescriptor[2][3] || [];
+
+  return to.concat(cc).concat(bcc).map(recipientDescriptor => ({
+    emailAddress: recipientDescriptor[2],
+    name: recipientDescriptor[3]
+  }));
 }
 
 

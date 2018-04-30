@@ -388,7 +388,7 @@ export default function setupGmailInterceptor() {
 
     // sync API based
     {
-      // Sync API-based custom thread list interception
+      // search response
       main_wrappers.push({
         isRelevantTo: function(connection) {
           return /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url);
@@ -410,7 +410,7 @@ export default function setupGmailInterceptor() {
         }
       });
 
-      // Sync API-based custom thread list interception
+      // thread response
       main_wrappers.push({
         isRelevantTo: function(connection) {
           return /sync(?:\/u\/\d+)?\/i\/fd/.test(connection.url);

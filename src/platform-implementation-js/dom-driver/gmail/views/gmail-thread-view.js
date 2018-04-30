@@ -573,37 +573,40 @@ class GmailThreadView {
 
 	_listenToExpandCollapseAll() {
 		//expand all
-		const expandAllElementImg = querySelector(this._element, 'img.gx');
-		const expandAllElement = findParent(expandAllElementImg, (el) => el.getAttribute('role') === 'button');
+		const expandAllElementImg = this._element.querySelector('img.gx');
+		if(expandAllElementImg){
+			const expandAllElement = findParent(expandAllElementImg, (el) => el.getAttribute('role') === 'button');
 
-		if(expandAllElement){
-			Kefir.merge([
-				Kefir.fromEvents(expandAllElement, 'click'),
-				Kefir.fromEvents(expandAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
-			])
-			.takeUntilBy(this._stopper)
-			.onValue(() => {
-				for(let customMessageView of this._customMessageViews){
-					customMessageView.expand();
-				}
-			});
+			if(expandAllElement){
+				Kefir.merge([
+					Kefir.fromEvents(expandAllElement, 'click'),
+					Kefir.fromEvents(expandAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
+				])
+				.takeUntilBy(this._stopper)
+				.onValue(() => {
+					for(let customMessageView of this._customMessageViews){
+						customMessageView.expand();
+					}
+				});
+			}
 		}
 
-
 		//collapse all
-		const collapseAllElementImg = querySelector(this._element, 'img.gq');
-		const collapseAllElement = findParent(collapseAllElementImg, (el) => el.getAttribute('role') === 'button');
-		if(collapseAllElement){
-			Kefir.merge([
-				Kefir.fromEvents(collapseAllElement, 'click'),
-				Kefir.fromEvents(collapseAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
-			])
-			.takeUntilBy(this._stopper)
-			.onValue(() => {
-				for(let customMessageView of this._customMessageViews){
-					customMessageView.collapse();
-				}
-			});
+		const collapseAllElementImg = this._element.querySelector('img.gq');
+		if(collapseAllElementImg){
+			const collapseAllElement = findParent(collapseAllElementImg, (el) => el.getAttribute('role') === 'button');
+			if(collapseAllElement){
+				Kefir.merge([
+					Kefir.fromEvents(collapseAllElement, 'click'),
+					Kefir.fromEvents(collapseAllElement, 'keydown').filter(e => e.which === 13 /* enter */)
+				])
+				.takeUntilBy(this._stopper)
+				.onValue(() => {
+					for(let customMessageView of this._customMessageViews){
+						customMessageView.collapse();
+					}
+				});
+			}
 		}
 	}
 }

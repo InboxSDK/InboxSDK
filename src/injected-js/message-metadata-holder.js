@@ -36,7 +36,7 @@ function exposeMetadata(event, attribute, processor){
 
     let message = getMessage(threadId, messageIndex);
 
-    if (message == null) {
+    if (message == null || !message.recipients) {
       try {
         await addDataForThread(threadId, ikValue, btaiHeader, xsrfToken);
       } catch (err) {
