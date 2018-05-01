@@ -56,13 +56,9 @@ class StatusBar extends SimpleElementView {
       attributeFilter: ['class'],
       attributes: true,
     })
-      .takeUntilBy(gmailComposeView.getStopper())
       .toProperty(() => null)
-      .map(() => nativeStatusContainer.className)
-      .skipDuplicates()
-      .onValue(() => {
-        this.setStatusBar(nativeStatusContainer);
-      });
+      .takeUntilBy(gmailComposeView.getStopper())
+      .onValue(() => this.setStatusBar(nativeStatusContainer));
   }
 
   destroy() {
@@ -109,16 +105,19 @@ class StatusBar extends SimpleElementView {
         if (this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
           //append to body
           const composeTable = querySelector(this._gmailComposeView.getElement(), '.iN > tbody');
-    
+
           if (nativeStatusContainer.classList.contains('aDi')) {
-            // the class .aDi can have both absolute or fixed positioning, adjust
-            // the positioning via Javascript to not trigger a stream event
+            // the class .aDi can have both absolute or fixed positioning,
+            // adjust bottom style for absolute
             if (nativeStatusContainer.style.position === 'absolute') {
-              nativeStatusContainer.style.bottom = '351px';
+              nativeStatusContainer.style.bottom = `${311 + this._currentHeight}px`;
             }
+
+            // nativeStatusContainer height (60) + bottom padding (16) = 76
+            nativeStatusContainer.style.height = `${76 + this._currentHeight}px`;
     
-            const gmailStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh');
-            nativeStatusContainer.insertBefore(this.el, gmailStatusBar.nextSibling);
+            const nativeStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh');
+            nativeStatusContainer.insertBefore(this.el, nativeStatusBar.nextSibling);
           } else {   
             insertElementInOrder(composeTable, this.el);
           }

@@ -807,11 +807,6 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   margin-top: -8px;
 }
 
-/* adjust height when there is a streak status bar and gmail status bar is fixed  */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_statusbarActive .aDi {
-  height: 116px;
-}
-
 .inboxsdk__compose_statusbarActive .aoI {
   height: auto !important;
 }
