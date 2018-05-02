@@ -1,6 +1,7 @@
 /* @flow */
 
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import once from 'lodash/once';
 
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
@@ -10,6 +11,7 @@ import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 
 import type GmailComposeView from '../gmail-compose-view';
+import type {Stopper} from 'kefir-stopper';
 
 export default function addStatusBar(
   gmailComposeView: GmailComposeView,
@@ -37,6 +39,7 @@ class StatusBar extends SimpleElementView {
   _gmailComposeView: GmailComposeView;
   _orderHint: number;
   _prependContainer: ?HTMLElement = null;
+  _stopper: Stopper;
 
   constructor(gmailComposeView: GmailComposeView, height: number, orderHint: number, addAboveNativeStatusBar: boolean) {
     let el = document.createElement('div');
@@ -46,6 +49,7 @@ class StatusBar extends SimpleElementView {
     this._currentHeight = height;
     this._gmailComposeView = gmailComposeView;
     this._orderHint = orderHint;
+    this._stopper = kefirStopper();
 
     el.className = 'aDh inboxsdk__compose_statusbar';
     el.setAttribute('data-order-hint', String(orderHint));
@@ -57,13 +61,14 @@ class StatusBar extends SimpleElementView {
       attributes: true,
     })
       .toProperty(() => null)
-      .takeUntilBy(gmailComposeView.getStopper())
+      .takeUntilBy(this._stopper)
       .onValue(() => this.setStatusBar(nativeStatusContainer));
   }
 
   destroy() {
     if (this.destroyed) return;
     super.destroy();
+    this._stopper.destroy();
 
     if (
       this._prependContainer &&
