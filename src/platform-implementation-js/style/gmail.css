@@ -840,6 +840,7 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
 }
 
 .inboxsdk__compose_statusbarActive .aDj > .aDh {
+  background-color: white;
   height: auto;
 }
 
