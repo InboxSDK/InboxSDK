@@ -608,6 +608,13 @@ export default class GmailNavItemView {
 				e.stopPropagation();
 				this._toggleCollapse();
 			});
+
+			if(this._isCollapsed){
+				this._collapse();
+			}
+			else{
+				this._expand();
+			}
 		}
 
 		const iconContainerElement = querySelector(this._element, '.qj');
