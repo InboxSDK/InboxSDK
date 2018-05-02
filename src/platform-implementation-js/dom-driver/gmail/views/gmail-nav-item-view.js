@@ -161,7 +161,7 @@ export default class GmailNavItemView {
 	setCollapsed(value: boolean){
 		this._isCollapsed = value;
 
-		if(!this._expandoElement){
+		if(!this._isCollapsible()){
 			return;
 		}
 
@@ -516,7 +516,7 @@ export default class GmailNavItemView {
 						container.classList.remove('bym');
 					});
 				}
-				
+
 				buttonOptions.onClick(event);
 			};
 
@@ -692,7 +692,7 @@ export default class GmailNavItemView {
 	}
 
 	_toggleCollapse(){
-		if(!this._expandoElement && !(this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI())){
+		if(!this._isCollapsible()){
 			this._isCollapsed = !this._isCollapsed;
 			return;
 		}
@@ -703,6 +703,10 @@ export default class GmailNavItemView {
 		else{
 			this._collapse();
 		}
+	}
+
+	_isCollapsible() {
+		return Boolean(this._expandoElement) || (this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI());
 	}
 
 	_collapse(){
