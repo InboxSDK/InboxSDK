@@ -151,11 +151,8 @@ class GmailCollapsibleSectionView {
 
     this._setupFooter(collapsibleSectionDescriptor);
 
-    if(this._isCollapsible){
-      const clickTarget = this._driver.isUsingMaterialUI() ? this._headerElement : this._titleElement;
-      if (clickTarget) {
-        Kefir.fromEvents(clickTarget, 'click').onValue(() => this._toggleCollapseState());
-      }
+    if(this._isCollapsible && this._titleElement){
+      Kefir.fromEvents(this._titleElement, 'click').onValue(() => this._toggleCollapseState());
     }
 
     Kefir.fromEvents(element, 'removeCollapsedContainer').onValue(() => this._destroyCollapsedContainer());
