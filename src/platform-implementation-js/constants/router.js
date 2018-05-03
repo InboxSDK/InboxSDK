@@ -6,7 +6,7 @@ export const NATIVE_ROUTE_IDS: {[k:string]: string} = Object.freeze({
 	'SENT': 'sent/:page',
 	'STARRED': 'starred/:page',
 	'DRAFTS': 'drafts/:page',
-	'SNOOZED': 'snoozed',
+	'SNOOZED': 'snoozed/:page',
 	'DONE': 'done',
 	'REMINDERS': 'reminders',
 	'LABEL': 'label/:labelName/:page',
