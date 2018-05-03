@@ -285,7 +285,7 @@ class GmailToolbarView {
 	_determineToolbarIconMode(){
 		const moveSectionElement = this._getMoveSectionElement();
 		if (!moveSectionElement) throw new Error("No move section element");
-		const isIconMode = Array.from(moveSectionElement.querySelectorAll('[role=button]'))
+		const isIconMode = Array.from(moveSectionElement.querySelectorAll('[role=button]:not(.inboxsdk__button)'))
 			.some(buttonElement =>
 				buttonElement.hasAttribute('title') || buttonElement.hasAttribute('data-tooltip')
 			);
