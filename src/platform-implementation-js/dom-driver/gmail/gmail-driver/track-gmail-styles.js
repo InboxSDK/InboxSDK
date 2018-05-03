@@ -39,6 +39,10 @@ function isDarkTheme(): boolean {
     return false;
   }
   const r = +colorMatch[1], g = +colorMatch[2], b = +colorMatch[3];
+  // rgb(32, 33, 36) is the default color of nav items in Material Gmail
+  if (r === 32 && g === 33, b === 36) {
+    return false;
+  }
   if (r !== g || r !== b) {
     Logger.error(new Error("Nav item color not grayscale"), {r,g,b});
   }

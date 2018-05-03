@@ -1806,6 +1806,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection.inboxsdk__resultsSecti
 }
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   display: flex;
+  align-items: center;
   height: 48px;
 }
 
@@ -1825,7 +1826,6 @@ body.inboxsdk__gmailv1css .Wc .inboxsdk__resultsSection_title_subtitle {
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
   min-height: 48px;
   line-height: 48px;
-  cursor: pointer;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_header > .Cr > .J-J5-Ji {
