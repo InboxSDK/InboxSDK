@@ -374,8 +374,11 @@ class GmailAppSidebarView {
               // if the global sidebar we're putting back is tasks then tasks puts focus on it
               // when you click the button, so we keep putting back focus on the element that had focus
               // before restoring that global sidebar
+              // we add the delay because if we restore focus synchronously then the focus that the gmail tasks
+              // sidebar calls fires AFTER the 'blur' event loop, and so activeElementToRestore.focus doesn't
+              // do anything
               Kefir.fromEvents(activeElementToRestore, 'blur')
-                .delay(5) //add the delay because doing it synchronously didn't work but adding a delay does *shrug*
+                .delay(5)
                 .takeUntilBy(Kefir.later(300))
                 .onValue(() => {
                   activeElementToRestore.focus();
