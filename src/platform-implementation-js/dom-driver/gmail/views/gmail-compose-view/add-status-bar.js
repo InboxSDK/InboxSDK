@@ -39,7 +39,7 @@ class StatusBar extends SimpleElementView {
   _gmailComposeView: GmailComposeView;
   _orderHint: number;
   _prependContainer: ?HTMLElement = null;
-  _stopper: Stopper;
+  _stopper = kefirStopper();
 
   constructor(gmailComposeView: GmailComposeView, height: number, orderHint: number, addAboveNativeStatusBar: boolean) {
     let el = document.createElement('div');
@@ -49,7 +49,6 @@ class StatusBar extends SimpleElementView {
     this._currentHeight = height;
     this._gmailComposeView = gmailComposeView;
     this._orderHint = orderHint;
-    this._stopper = kefirStopper();
 
     el.className = 'aDh inboxsdk__compose_statusbar';
     el.setAttribute('data-order-hint', String(orderHint));
