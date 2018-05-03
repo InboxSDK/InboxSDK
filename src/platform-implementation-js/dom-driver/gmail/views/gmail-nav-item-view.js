@@ -660,6 +660,13 @@ export default class GmailNavItemView {
 		itemContainerElement.classList.add('inboxsdk__navItem_container');
 
 		this._element.appendChild(itemContainerElement);
+
+		// If this is a collapsible nav-item, run collapse or expand to set the container styling
+		if (this._isCollapsible()) {
+			if(this._isCollapsed) this._collapse();
+			else this._expand();
+		}
+
 		return itemContainerElement;
 	}
 
