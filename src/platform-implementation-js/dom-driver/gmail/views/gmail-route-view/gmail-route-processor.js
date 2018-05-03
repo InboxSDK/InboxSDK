@@ -69,6 +69,7 @@ Object.assign(GmailRouteProcessor.prototype, {
 			'contact': this.NativeRouteIDs.CONTACT,
 			'sent': this.NativeRouteIDs.SENT,
 			'starred': this.NativeRouteIDs.STARRED,
+			'snoozed': this.NativeRouteIDs.SNOOZED,
 			'drafts': this.NativeRouteIDs.DRAFTS,
 			'label': this.NativeRouteIDs.LABEL,
 			'category': this.NativeRouteIDs.LABEL,
