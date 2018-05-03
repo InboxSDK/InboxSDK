@@ -23,26 +23,49 @@ function getSettingValue(settings: any[], name: string): boolean {
   return entry ? stupidToBool(entry[1]) : false;
 }
 
+function getContext() {
+
+  let context = global;
+  try{
+    if(global.opener && global.opener.top){
+      // try to get href
+      // if the opener is not gmail (i.e. you clicked on a mailto link on craigslist) then this will throw an error
+      global.opener.top.location.href;
+      context = global.opener.top;
+    }
+  }
+  catch(err){
+    context = global; //we got an error from requesting global.opener.top.location.href;
+  }
+
+  return context;
+}
+
 module.exports = function() {
-  waitFor(() => global.GLOBALS || global.gbar).then(() => {
-    var userEmail = global.GLOBALS ?
-      GLOBALS[10] : gbar._CONFIG[0][10][5];
+  let context;
+  waitFor(() => {
+    context = getContext();
+    return context && (context.GLOBALS || context.gbar);
+  }).then(() => {
+    if(!context) return;
+    var userEmail = context.GLOBALS ?
+      context.GLOBALS[10] : context.gbar._CONFIG[0][10][5];
     (document.head:any).setAttribute('data-inboxsdk-user-email-address', userEmail);
 
-    var userLanguage: string = global.GLOBALS ?
-      GLOBALS[4].split('.')[1] : gbar._CONFIG[0][0][4];
+    var userLanguage: string = context.GLOBALS ?
+      context.GLOBALS[4].split('.')[1] : context.gbar._CONFIG[0][0][4];
     (document.head:any).setAttribute('data-inboxsdk-user-language', userLanguage);
 
 
-    (document.head:any).setAttribute('data-inboxsdk-using-sync-api', global.GM_SPT_ENABLED);
-    (document.head:any).setAttribute('data-inboxsdk-using-material-ui', global.GM_RFT_ENABLED);
+    (document.head:any).setAttribute('data-inboxsdk-using-sync-api', context.GM_SPT_ENABLED);
+    (document.head:any).setAttribute('data-inboxsdk-using-material-ui', context.GM_RFT_ENABLED);
 
 
-    if (global.GLOBALS) { // Gmail
-      (document.head:any).setAttribute('data-inboxsdk-ik-value', GLOBALS[9]);
-      (document.head:any).setAttribute('data-inboxsdk-action-token-value', global.GM_ACTION_TOKEN);
+    if (context.GLOBALS) { // Gmail
+      (document.head:any).setAttribute('data-inboxsdk-ik-value', context.GLOBALS[9]);
+      (document.head:any).setAttribute('data-inboxsdk-action-token-value', context.GM_ACTION_TOKEN);
 
-      var globalSettingsHolder = find(GLOBALS[17], (item) => item[0] === 'p');
+      var globalSettingsHolder = find(context.GLOBALS[17], (item) => item[0] === 'p');
 
       if(!globalSettingsHolder){
         // global settings doesn't exist on gmail v2, so we don't need to log this anymore
@@ -99,8 +122,8 @@ module.exports = function() {
   }).catch(err => {
     function getStatus() {
       return {
-        hasGLOBALS: !!global.GLOBALS,
-        hasGbar: !!global.gbar
+        hasGLOBALS: !!context.GLOBALS,
+        hasGbar: !!context.gbar
       };
     }
     var startStatus = getStatus();
