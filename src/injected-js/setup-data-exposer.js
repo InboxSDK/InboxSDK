@@ -28,7 +28,8 @@ function getContext() {
   let context = global;
   try{
     if(global.opener && global.opener.top){
-      //try to get href
+      // try to get href
+      // if the opener is not gmail (i.e. you clicked on a mailto link on craigslist) then this will throw an error
       global.opener.top.location.href;
       context = global.opener.top;
     }
