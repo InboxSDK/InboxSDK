@@ -60,6 +60,18 @@ class DropdownView extends EventEmitter {
 
 		outsideClicksAndEscape(elementsToIgnore)
 			.takeUntilBy(onDestroy)
+			.filter(event => {
+				let isCanceled = false;
+				const appEvent = {
+					type: event.type,
+					cause: event.cause,
+					cancel: () => {
+						isCanceled = true;
+					}
+				};
+				this.emit('preautoclose', appEvent);
+				return !isCanceled;
+			})
 			.onValue(() => {
 				this.close();
 			});
