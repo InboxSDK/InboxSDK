@@ -1,6 +1,6 @@
 /**
  * @class
- * Object that represents a visible thread view that the user has navigated to
+ * Object that represents a visible thread view that the user has navigated to.
  */
 var ThreadView = /** @lends ThreadView */ {
 
@@ -18,7 +18,7 @@ var ThreadView = /** @lends ThreadView */ {
 	/**
 	 * Inserts a content panel into the sidebar of a thread view. A content panel
 	 * simply displays your content to the user, typically in the form of a
-	 * sidebar. ThreadViewss can have multiple content panels added to them and
+	 * sidebar. ThreadViews can have multiple content panels added to them and
 	 * the SDK will handle creating a tabbed interface if needed.
 	 * ^gmail
 	 * ^inbox
