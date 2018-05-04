@@ -15,14 +15,14 @@ var User = /** @lends User */ {
 	/**
 	 * Is the currently tab the new material Gmail interface
 	 * ^gmail
-	 * @return {string}
+	 * @return {boolean}
 	 */
 	isUsingGmailMaterialUI: function(){},
 
 	/**
 	 * Is conversation view disabled by the user
 	 * ^gmail
-	 * @return {string}
+	 * @return {boolean}
 	 */
 	isConversationViewDisabled: function(){},
 
