@@ -31,9 +31,10 @@ test('outside click works', () => {
     .onValue(onValue);
 
   expect(onValue).toHaveBeenCalledTimes(0);
-  const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  querySelector(div2, 'p').dispatchEvent(evt);
+  const event = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
+  querySelector(div2, 'p').dispatchEvent(event);
   expect(onValue).toHaveBeenCalledTimes(1);
+  expect(onValue.mock.calls[0]).toEqual([{type: 'outsideInteraction', cause: event}]);
 });
 
 test('inside click ignored', () => {
@@ -43,8 +44,8 @@ test('inside click ignored', () => {
     .onValue(onValue);
 
   expect(onValue).toHaveBeenCalledTimes(0);
-  const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  querySelector(div2, 'p').dispatchEvent(evt);
+  const event = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
+  querySelector(div2, 'p').dispatchEvent(event);
   expect(onValue).toHaveBeenCalledTimes(0);
 });
 
@@ -55,7 +56,7 @@ test('float anchor click ignored', () => {
     .onValue(onValue);
 
   expect(onValue).toHaveBeenCalledTimes(0);
-  const evt = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
-  querySelector(float, 'p').dispatchEvent(evt);
+  const event = Object.assign(new MouseEvent('click'), ({__testAllow: true}: any));
+  querySelector(float, 'p').dispatchEvent(event);
   expect(onValue).toHaveBeenCalledTimes(0);
 });
