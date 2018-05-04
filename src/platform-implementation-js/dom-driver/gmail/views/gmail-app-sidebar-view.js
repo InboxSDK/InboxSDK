@@ -382,7 +382,7 @@ class GmailAppSidebarView {
                 .takeUntilBy(Kefir.later(300))
                 .onValue(() => {
                   activeElementToRestore.focus();
-                })
+                });
             }
             simulateClick(lastActiveNativeGlobalAddOnIconEl);
           }
