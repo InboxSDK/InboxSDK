@@ -45,13 +45,11 @@ OS X, you can install it through brew (`brew install flow`). You can use the
 
 This project has different kinds of unit tests and integration tests.
 
+All .js files under `__tests__` and all `*.test.js` files are tests executed by
+Jest. All new (non-integration) tests should be Jest tests.
+
 There are many unit tests which run under a single Javascript environment in
 `test/*.js` files. These are executed by Mocha.
-
-There are tests which each run under their own Javascript environments in
-`test/jsdom/*.js` files. These are executed by the gulp task "test-jsdom".
-Running `gulp test` will execute the jsdom tests and the above unit tests
-together.
 
 There are Selenium-based browser integration tests in `test/chrome/*.js` files.
 These are the only tests which test the InboxSDK against the live Gmail and
