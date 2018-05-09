@@ -89,13 +89,15 @@ function addDataForThread(
           throw new Error('Need btaiHeader and xsrfToken when in new data layer');
         }
         const syncThread = await getThreadFromSyncThreadIdUsingHeaders(threadId, btaiHeader, xsrfToken);
-        add([{
-          threadID: syncThread.syncThreadID,
-          messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
-            date: syncMessage.date,
-            recipients: syncMessage.recipients
-          }))
-        }]);
+        if(syncThread){
+          add([{
+            threadID: syncThread.syncThreadID,
+            messages: syncThread.extraMetaData.syncMessageData.map(syncMessage => ({
+              date: syncMessage.date,
+              recipients: syncMessage.recipients
+            }))
+          }]);
+        }
       } else { // legacy gmail
         const text = await requestGmailThread(ikValue, threadId);
         add(extractMessages(text));
