@@ -303,8 +303,32 @@ export default function setupGmailInterceptor() {
                 update[1][3][7][1][5][0] &&
                 update[1][3][7][1][5][0][14]
               ));
+
               if (!sendUpdateMatch) {
-                sendFailed();
+                if(currentSendConnectionIDs.has(connection)){
+                  const minimalSendUpdates = updateList.filter(update => (
+                    update[1] &&
+                    update[1][3] &&
+                    update[1][3][5] &&
+                    update[1][3][5][3]
+                  ));
+
+                  if(minimalSendUpdates.length > 0){
+                    triggerEvent({
+                      draftID,
+                      type: 'emailSent',
+                      threadID: minimalSendUpdates[0][1][1],
+                      messageID: minimalSendUpdates[0][1][3][5][5][0]
+                    });
+                  }
+                  else {
+                    sendFailed();
+                  }
+                }
+                else {
+                  sendFailed();
+                }
+
                 return;
               }
 

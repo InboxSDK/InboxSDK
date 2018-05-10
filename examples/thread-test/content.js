@@ -51,6 +51,10 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 					console.log('messageView', name, messageView.getBodyElement().textContent.slice(0,20), event);
 				});
 			});
+
+			messageView.getRecipientsFull().then(recipients => {
+				console.log('recipients', recipients);
+			});
 		})();
 	});
 });

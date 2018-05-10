@@ -142,15 +142,45 @@ class GmailComposeView {
               // `data` will get filled in with getMessageID + getThreadID props from
               // intercept stream as soon as they are made available in the sync API response.
 
-              this._messageId = event.oldMessageID;
-              this._threadID = event.oldThreadID;
+              let syncThreadID = event.threadID;
+              let syncMessageID = event.messageID;
+
+              if(event.oldMessageID) this._messageId = event.oldMessageID;
+              if(event.oldThreadID) this._threadID = event.oldThreadID;
 
               return {eventName: 'sent', data: {
-                getThreadID() {
-                  return Promise.resolve(event.oldThreadID);
+                async getThreadID() {
+                  await waitFor(
+                    () => {
+                      if(!this._threadID){
+                        try{
+                          this._threadID = driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+                        }
+                        catch(err){
+                          // do nothing
+                        }
+                      }
+                      return Boolean(this._threadID);
+                    }
+                  );
+
+                  return this._threadID;
                 },
-                getMessageID() {
-                  return Promise.resolve(event.oldMessageID);
+                async getMessageID() {
+                  await waitFor(
+                    () => {
+                      if(!this._messageId){
+                        try{
+                          this._messageId = driver.getGmailMessageIdForSyncMessageId(syncMessageID);
+                        }
+                        catch(err){
+                          // do nothing
+                        }
+                      }
+                      return Boolean(this._messageId);
+                    }
+                  );
+                  return this._messageId;
                 }
               }};
             }
