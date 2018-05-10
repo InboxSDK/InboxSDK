@@ -155,7 +155,10 @@ class GmailDriver {
 					return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(({syncThreadID}) => syncThreadID);
 				},
 				getBfromA: (syncThreadID: string) => {
-					return getSyncThreadFromSyncThreadId(this, syncThreadID).then(({oldGmailThreadID}) => oldGmailThreadID);
+					return getSyncThreadFromSyncThreadId(this, syncThreadID).then(syncThread => {
+						if(syncThread) return syncThread.oldGmailThreadID;
+						else throw new Error('syncThread not found');
+					});
 				}
 			});
 			this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>

@@ -8,7 +8,7 @@ import type {SyncThread} from '../gmail-sync-response-processor';
 
 export default async function getThreadFromSyncThreadId(
   driver: GmailDriver, syncThreadId: string
-): Promise<SyncThread> {
+): Promise<?SyncThread> {
   const [btaiHeader, xsrfToken] = await Promise.all([
     driver.getPageCommunicator().getBtaiHeader(), driver.getPageCommunicator().getXsrfToken()
   ]);
@@ -17,7 +17,7 @@ export default async function getThreadFromSyncThreadId(
 
 export async function getThreadFromSyncThreadIdUsingHeaders(
   syncThreadId: string, btaiHeader: string, xsrfToken: string
-): Promise<SyncThread> {
+): Promise<?SyncThread> {
   const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
   const accountParam = accountParamMatch ? accountParamMatch[1] : '';
 
@@ -48,5 +48,5 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
     }
   }
 
-  throw new Error('thread not available');
+  return null;
 }

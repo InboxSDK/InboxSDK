@@ -92,7 +92,7 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
       return {
         syncThreadID: descriptorWrapper[1],
         extraMetaData: {
-          syncMessageData: (descriptorWrapper[3] || []).map(md => ({
+          syncMessageData: (descriptorWrapper[3] || []).filter(md => Boolean(md[2])).map(md => ({
             syncMessageID: md[1],
             date: +md[2][17],
             recipients: getRecipientsFromMessageDescriptor(md)
