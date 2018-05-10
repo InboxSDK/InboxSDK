@@ -142,15 +142,24 @@ class GmailComposeView {
               // `data` will get filled in with getMessageID + getThreadID props from
               // intercept stream as soon as they are made available in the sync API response.
 
-              this._messageId = event.oldMessageID;
-              this._threadID = event.oldThreadID;
+              let syncThreadID = event.threadID;
+              let syncMessageID = event.messageID;
+
+              if(event.oldMessageID) this._messageId = event.oldMessageID;
+              if(event.oldThreadID) this._threadID = event.oldThreadID;
 
               return {eventName: 'sent', data: {
-                getThreadID() {
-                  return Promise.resolve(event.oldThreadID);
+                async getThreadID() {
+                  if(!this._threadID){
+                    this._threadID = await driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+                  }
+                  return this._threadID;
                 },
-                getMessageID() {
-                  return Promise.resolve(event.oldMessageID);
+                async getMessageID() {
+                  if(!this._messageId){
+                    this._messageId = driver.getGmailMessageIdForSyncMessageId(syncMessageID);
+                  }
+                  return this._messageId;
                 }
               }};
             }
