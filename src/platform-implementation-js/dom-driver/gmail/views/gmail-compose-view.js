@@ -150,36 +150,15 @@ class GmailComposeView {
 
               return {eventName: 'sent', data: {
                 async getThreadID() {
-                  await waitFor(
-                    () => {
-                      if(!this._threadID){
-                        try{
-                          this._threadID = driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
-                        }
-                        catch(err){
-                          // do nothing
-                        }
-                      }
-                      return Boolean(this._threadID);
-                    }
-                  );
-
+                  if(!this._threadID){
+                    this._threadID = await driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+                  }
                   return this._threadID;
                 },
                 async getMessageID() {
-                  await waitFor(
-                    () => {
-                      if(!this._messageId){
-                        try{
-                          this._messageId = driver.getGmailMessageIdForSyncMessageId(syncMessageID);
-                        }
-                        catch(err){
-                          // do nothing
-                        }
-                      }
-                      return Boolean(this._messageId);
-                    }
-                  );
+                  if(!this._messageId){
+                    this._messageId = driver.getGmailMessageIdForSyncMessageId(syncMessageID);
+                  }
                   return this._messageId;
                 }
               }};
