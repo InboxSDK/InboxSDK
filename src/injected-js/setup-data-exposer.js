@@ -27,6 +27,10 @@ function getContext() {
 
   let context = global;
   try{
+    // our current tab has globals defined
+    if(context.GLOBALS) return context;
+
+    // we don't, let's see if we have access to opener (i.e. we are a new compose/thread view)
     if(global.opener && global.opener.top){
       // try to get href
       // if the opener is not gmail (i.e. you clicked on a mailto link on craigslist) then this will throw an error
