@@ -1248,7 +1248,7 @@ class GmailComposeView {
               if (!newMessageId) {
                 throw new Error('Should not happen');
               }
-              const {draftID, debugData} = await this._driver.getDraftIDForMessageID(newMessageId);
+              const {draftID, debugData} = await this._driver.getDraftIDForMessageID(newMessageId, true);
               const err = new Error('Failed to read draft ID -- after check');
               this._driver.getLogger().error(err, {
                 message: 'getDraftID error -- after check',
