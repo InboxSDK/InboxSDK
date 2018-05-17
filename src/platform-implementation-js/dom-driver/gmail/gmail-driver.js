@@ -670,8 +670,8 @@ class GmailDriver {
 		return get(this._messageIDsToThreadIDs, messageID);
 	}
 
-	getDraftIDForMessageID(messageID: string): Promise<GetDraftIdResult> {
-		return getDraftIDForMessageID(this, messageID);
+	getDraftIDForMessageID(messageID: string, skipCache=false): Promise<GetDraftIdResult> {
+		return getDraftIDForMessageID(this, messageID, skipCache);
 	}
 
 }
