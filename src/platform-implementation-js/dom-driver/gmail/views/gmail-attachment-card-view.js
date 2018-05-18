@@ -134,23 +134,21 @@ class GmailAttachmentCardView {
 	}
 
 	// Resolves the short-lived cookie-less download URL
-	getDownloadURL(): Promise<?string> {
-		return RSVP.Promise.resolve().then(() => {
+	async getDownloadURL(): Promise<?string> {
+		try {
 			if (this._isStandardAttachment()) {
-				const p = waitFor(() => this._getDownloadLink()).then(downloadUrl => {
-					if (!downloadUrl) return null;
-					return this._driver.resolveUrlRedirects(downloadUrl);
-				});
-				p.catch(err => {
-					this._driver.getLogger().error(err);
-				});
-				return p;
+				const downloadUrl = await waitFor(() => this._getDownloadLink());
+				if (!downloadUrl) return null;
+				return this._driver.resolveUrlRedirects(downloadUrl);
 			} else {
 				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
 				return downloadButton ?
 					downloadButton.getAttribute('data-inboxsdk-download-url') : null;
 			}
-		});
+		} catch (err) {
+			this._driver.getLogger().error(err);
+			throw err;
+		}
 	}
 
 	_extractFileNameFromElement(): string {
