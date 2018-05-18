@@ -18,7 +18,10 @@ export default function xhrHelper() {
     // xhr.responseURL to have the wrong value (possibly a Chrome bug).
     if (global.fetch) {
       (async () => {
-        const response = await fetch(opts.url, {credentials: 'include'});
+        const response = await fetch(opts.url, {
+          method: opts.method || 'GET',
+          credentials: 'include'
+        });
         document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
           bubbles: false, cancelable: false,
           detail: {
