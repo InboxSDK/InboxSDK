@@ -29,27 +29,5 @@ export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
         });
         return;
       }
-
-      try{
-        const response = await fetch(downloadUrl);
-        if(response.ok){
-          // see if it's actually a file (check if it's HTML and then check if HTML contains certain string)
-        }
-        else {
-          driver.getLogger().getAppLogger().event('downloadUrlFailed', {
-            status: response.status,
-            responseBody: await response.text()
-          });
-        }
-      }
-      catch(err){
-        driver.getLogger().error(err, {
-          downloadUrl,
-          reason: 'problem downloading file from download url',
-          downloadLink: cardView._getDownloadLink()
-        });
-      }
-
     });
-
 }
