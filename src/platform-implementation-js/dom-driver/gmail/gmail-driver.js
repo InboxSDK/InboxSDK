@@ -33,6 +33,7 @@ import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles from './gmail-driver/track-gmail-styles';
+import temporaryTrackDownloadUrlValidity from './gmail-driver/temporary-track-download-url-validity';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
 import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
@@ -193,6 +194,7 @@ class GmailDriver {
 			gmailLoadEvent(this);
 			overrideGmailBackButton(this, this._gmailRouteProcessor);
 			trackGmailStyles();
+			temporaryTrackDownloadUrlValidity(this);
 		}).catch(err => {
 			this._logger.error(err);
 		});
