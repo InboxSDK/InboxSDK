@@ -13,9 +13,15 @@ export default function xhrHelper() {
       data: event.detail.data
     };
 
+    // It's important to use fetch when possible because it's needed for
+    // getDownloadURL() in Gmail v2: Gmail v2's ServiceWorker in Chrome causes
+    // xhr.responseURL to have the wrong value (possibly a Chrome bug).
     if (global.fetch) {
       (async () => {
-        const response = await fetch(opts.url, {credentials: 'include'});
+        const response = await fetch(opts.url, {
+          method: opts.method || 'GET',
+          credentials: 'include'
+        });
         document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
           bubbles: false, cancelable: false,
           detail: {
