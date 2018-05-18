@@ -139,7 +139,15 @@ class GmailAttachmentCardView {
 			if (this._isStandardAttachment()) {
 				const downloadUrl = await waitFor(() => this._getDownloadLink());
 				if (!downloadUrl) return null;
-				return this._driver.resolveUrlRedirects(downloadUrl);
+				const finalUrl: string = await this._driver.resolveUrlRedirects(downloadUrl);
+				if (!/^https:\/\/mail-attachment\.googleusercontent\.com\/attachment\//.test(finalUrl)) {
+					console.error('getDownloadURL returned unexpected url', finalUrl); //eslint-disable-line
+					const err = new Error('getDownloadURL returned unexpected url');
+					this._driver.getLogger().error(err, {
+						finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]')
+					});
+				}
+				return finalUrl;
 			} else {
 				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
 				return downloadButton ?
