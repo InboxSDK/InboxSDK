@@ -2,13 +2,19 @@
 
 import type GmailDriver from '../gmail-driver';
 
-export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
+let isTrackingValidity = false;
 
-  //if(!(driver._appId || '').includes('streak') && global.fetch) return;
+export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
+  if(
+    driver.getAppId() !== 'sdk_streak_21e9788951' || !global.fetch || isTrackingValidity
+  ) {
+    return;
+  }
+  isTrackingValidity = true;
 
   driver.getAttachmentCardViewDriverStream()
     .filter(cardView => cardView.getAttachmentType() === 'FILE')
-    //.filter(() => Math.random() < 0.01)
+    .filter(() => Math.random() < 0.01)
     .onValue(async (cardView) => {
 
       const downloadLinkBefore = cardView._getDownloadLink();
