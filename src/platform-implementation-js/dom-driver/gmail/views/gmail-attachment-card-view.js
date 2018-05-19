@@ -129,7 +129,11 @@ class GmailAttachmentCardView {
 			}
 		}
 		else {
-			return firstChild.href;
+			const firstChildHref = firstChild.href;
+			if (firstChildHref) {
+				return firstChildHref.replace(/([?&])disp=inline(?=&|$)/, '$1disp=safe');
+			}
+			return firstChildHref;
 		}
 	}
 
