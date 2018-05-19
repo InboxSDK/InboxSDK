@@ -11,6 +11,7 @@ export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
     //.filter(() => Math.random() < 0.01)
     .onValue(async (cardView) => {
 
+      const downloadLinkBefore = cardView._getDownloadLink();
       let downloadUrl;
       try{
         downloadUrl = await cardView.getDownloadURL();
@@ -18,14 +19,16 @@ export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
       catch(err){
         driver.getLogger().error(err, {
           reason: 'problem getting download url',
-          downloadLink: cardView._getDownloadLink()
+          downloadLinkBefore,
+          downloadLinkAfter: cardView._getDownloadLink()
         });
         return;
       }
 
       if(!downloadUrl){
         driver.getLogger().error(new Error('no download url found'), {
-          downloadLink: cardView._getDownloadLink()
+          downloadLinkBefore,
+          downloadLinkAfter: cardView._getDownloadLink()
         });
         return;
       }
