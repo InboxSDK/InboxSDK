@@ -38,5 +38,7 @@ export default function temporaryTrackDownloadUrlValidity(driver: GmailDriver) {
         });
         return;
       }
+
+      driver.getLogger().eventSdkPassive('testing.getDownloadURL success');
     });
 }
