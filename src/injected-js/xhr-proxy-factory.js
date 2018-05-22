@@ -169,6 +169,7 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     this._boundListeners = {};
     this._events = new EventEmitter(); // used for internal stuff, not user-visible events
     this.responseText = '';
+    this._openState = false;
 
     if (XHR.bind && XHR.bind.apply) {
       // call constructor with variable number of arguments
@@ -416,7 +417,10 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
   XHRProxy.prototype.setRequestHeader = function(name, value) {
     var self = this;
     if (this.readyState != 1) {
-      throw new Error("Can't set headers now at readyState "+this.readyState);
+      console.warn("setRequestHeader improperly called at readyState "+this.readyState); //eslint-disable-line no-console
+    }
+    if (!this._openState) {
+      throw new Error("Can only set headers after open and before send");
     }
 
     this._connection.headers[name] = value;
@@ -483,6 +487,7 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
     }).filter(Boolean);
     this.responseText = '';
+    this._openState = true;
 
     function finish(method, url) {
       return self._realxhr.open(method, url, self._connection.async);
@@ -508,6 +513,7 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
   XHRProxy.prototype.send = function(body) {
     var self = this;
     this._clientStartedSend = true;
+    this._openState = false;
     Object.defineProperty(this._connection, 'originalSendBody', {
       enumerable: true, writable: false, configurable: false, value: body
     });
