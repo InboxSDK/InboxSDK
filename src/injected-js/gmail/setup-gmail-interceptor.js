@@ -318,7 +318,18 @@ export default function setupGmailInterceptor() {
                       draftID,
                       type: 'emailSent',
                       threadID: minimalSendUpdates[0][1][1],
-                      messageID: minimalSendUpdates[0][1][3][5][5][0]
+                      messageID: (
+                        minimalSendUpdates[0][1][3] &&
+                        minimalSendUpdates[0][1][3][5] &&
+                        ( //new compose
+                          minimalSendUpdates[0][1][3][5][5] &&
+                          minimalSendUpdates[0][1][3][5][5][0]
+                        ) ||
+                        ( //replies
+                          minimalSendUpdates[0][1][3][5][3] &&
+                          minimalSendUpdates[0][1][3][5][3][0]
+                        )
+                      )
                     });
                   }
                   else {
