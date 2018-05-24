@@ -32,6 +32,7 @@ import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThread
 import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
 import getThreadIdFromMessageId from '../../driver-common/getThreadIdFromMessageId';
 import gmailAjax from '../../driver-common/gmailAjax';
+import getAccountUrlPart from '../../driver-common/getAccountUrlPart';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import querySelector from '../../lib/dom/querySelectorOrFail';
@@ -609,10 +610,8 @@ class InboxDriver {
   }
 
   getGmailActionToken = once(async () => {
-    const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
-    const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
     const response = await gmailAjax({
-      url: `https://mail.google.com/mail${accountParam}/`,
+      url: `https://mail.google.com/mail${getAccountUrlPart()}/`,
       xhrFields: {
         withCredentials: true
       },

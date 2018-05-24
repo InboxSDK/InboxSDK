@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
 import {extractThreadsFromThreadResponse} from '../gmail-sync-response-processor';
+import getAccountUrlPart from '../../../driver-common/getAccountUrlPart';
 import type GmailDriver from '../gmail-driver';
 import type {SyncThread} from '../gmail-sync-response-processor';
 
@@ -18,12 +19,9 @@ export default async function getThreadFromSyncThreadId(
 export async function getThreadFromSyncThreadIdUsingHeaders(
   syncThreadId: string, btaiHeader: string, xsrfToken: string
 ): Promise<?SyncThread> {
-  const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
-  const accountParam = accountParamMatch ? accountParamMatch[1] : '';
-
   const {text} = await gmailAjax({
     method: 'POST',
-    url: `https://mail.google.com/sync${accountParam}/i/fd`,
+    url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
     headers: {
       'Content-Type': 'application/json',
       'X-Framework-Xsrf-Token': xsrfToken,

@@ -2,6 +2,7 @@
 
 import {defn} from 'ud';
 import gmailAjax from './gmailAjax';
+import getAccountUrlPart from './getAccountUrlPart';
 import type {Driver} from '../driver-interfaces/driver';
 
 
@@ -14,11 +15,6 @@ type Options =
   };
 
 async function getOriginalMessagePage(driver: Driver, options: Options): Promise<string> {
-  const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
-  // Inbox omits the account param if there is only one logged in account,
-  // but this page is backed by Gmail's backend which will always include it.
-  const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
-
   const data = {
     ik: driver.getPageCommunicator().getIkValue(),
     view: 'om'
@@ -33,7 +29,7 @@ async function getOriginalMessagePage(driver: Driver, options: Options): Promise
 
   const {text} = await gmailAjax({
     method: 'GET',
-    url: `https://mail.google.com/mail${accountParam}`,
+    url: `https://mail.google.com/mail${getAccountUrlPart()}`,
     canRetry: true,
     data
   });
