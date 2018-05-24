@@ -4,6 +4,7 @@ import {defn} from 'ud';
 import {extractThreads} from '../dom-driver/gmail/gmail-response-processor';
 import getSyncThreadsForSearch from './getSyncThreadsForSearch';
 import gmailAjax from './gmailAjax';
+import getAccountUrlPart from './getAccountUrlPart';
 import type {Driver} from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: string): Promise<string> {
@@ -17,14 +18,9 @@ async function getGmailThreadIdForRfcMessageId(driver: Driver, rfcMessageId: str
 }
 
 async function forOldAPI(driver: Driver, rfcMessageId: string): Promise<string> {
-  const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
-  // Inbox omits the account param if there is only one logged in account,
-  // but this page is backed by Gmail's backend which will always include it.
-  const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
-
   const response = await gmailAjax({
     method: 'POST',
-    url: `https://mail.google.com/mail${accountParam}/`,
+    url: `https://mail.google.com/mail${getAccountUrlPart()}/`,
     data: {
       ik: driver.getPageCommunicator().getIkValue(),
       at: await driver.getGmailActionToken(),

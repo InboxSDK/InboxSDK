@@ -890,14 +890,7 @@ class GmailThreadRowView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    if(this._driver.isUsingSyncAPI()){
-      const syncThreadID = await this.getSyncThreadID();
-      if(!syncThreadID) throw new Error('Should not happen: syncThreadID should not be null here');
-      return this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
-    }
-    else {
-      return this.getThreadID();
-    }
+    return this.getThreadID();
   }
 
   getDraftID(): Promise<?string> {
