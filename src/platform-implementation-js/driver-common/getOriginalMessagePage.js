@@ -27,9 +27,22 @@ async function getOriginalMessagePage(driver: Driver, options: Options): Promise
     (data: Object).permmsgid = options.syncMessageID;
   }
 
+  let url;
+  const delegatedAccountMatch = document.location.pathname.match(/\/b\/(.+?)\/u\/(\d+)/);
+  if(delegatedAccountMatch){
+    url = document.location.origin + document.location.pathname;
+  }
+  else {
+    const accountParamMatch = document.location.pathname.match(/(\/u\/\d+)\//i);
+     //no match happens in inbox when user only has one account
+    const accountParam = accountParamMatch ? accountParamMatch[1] : '/u/0';
+    url = `https://mail.google.com/mail${accountParam}`;
+  }
+
+
   const {text} = await gmailAjax({
+    url,
     method: 'GET',
-    url: `https://mail.google.com/mail${getAccountUrlPart()}`,
     canRetry: true,
     data
   });
