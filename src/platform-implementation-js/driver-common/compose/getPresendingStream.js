@@ -5,6 +5,7 @@ import Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
 const dispatchCancel = (element) => (
+  // asap necessary so we don't emit this event during the click/keydown event dispatch
   asap(() => (
     element.dispatchEvent(new CustomEvent('inboxSDKsendCanceled', {
       bubbles: false,

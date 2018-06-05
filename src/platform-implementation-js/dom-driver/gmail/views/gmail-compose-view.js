@@ -829,13 +829,17 @@ class GmailComposeView {
   }
 
   send({sendAndArchive}: {sendAndArchive: boolean}) {
-    const sendAndArchiveButton = this.getSendAndArchiveButton();
+    // asap necessary so if send() is called after presending event.cancel(), the new presending event
+    // must happen after the sendCanceled event (which is also delayed by asap).
+    asap(() => {
+      const sendAndArchiveButton = this.getSendAndArchiveButton();
 
-    if (sendAndArchive && sendAndArchiveButton) {
-      simulateClick(sendAndArchiveButton);
-    } else {
-      simulateClick(this.getSendButton());
-    }
+      if (sendAndArchive && sendAndArchiveButton) {
+        simulateClick(sendAndArchiveButton);
+      } else {
+        simulateClick(this.getSendButton());
+      }
+    });
   }
 
   discard() {
