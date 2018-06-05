@@ -401,11 +401,11 @@ class GmailComposeView {
               .toProperty(() => true)
           ),
 
-          Kefir.combine([
-            this._removedFromDOMStopper,
-            this._eventStream
-              .filter(({eventName}) => eventName === 'sent')
-          ])
+        Kefir.combine([
+          this._removedFromDOMStopper,
+          this._eventStream
+            .filter(({eventName}) => eventName === 'sent')
+        ])
       ])
       .take(1)
       // we delay asap here so that the event stream is not destroyed before listeners here the sent event
