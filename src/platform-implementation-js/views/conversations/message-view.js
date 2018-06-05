@@ -142,7 +142,7 @@ class MessageView extends EventEmitter {
 
 	getRecipients(): Array<Contact> {
 		get(memberMap, this).driver.getLogger().deprecationWarning('MessageView.getRecipients', 'MessageView.getRecipientEmailAddresses() or MessageView.getRecipientsFull()');
-		return get(memberMap, this).messageViewImplementation.getRecipients();
+		return this.getRecipientEmailAddresses().map(emailAddress => ({emailAddress, name: null}));
 	}
 
 	getRecipientEmailAddresses(): Array<string> {
