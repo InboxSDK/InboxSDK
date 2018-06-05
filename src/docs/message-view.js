@@ -576,7 +576,7 @@ var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDesc
 
 	/**
 	* Used to specify the order of added menu items.
-	* @type {function}
+	* @type {number}
 	*/
 	orderHint: null
 };
