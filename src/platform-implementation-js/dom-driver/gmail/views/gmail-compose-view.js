@@ -401,11 +401,11 @@ class GmailComposeView {
               .toProperty(() => true)
           ),
 
-          Kefir.combine([
-            this._removedFromDOMStopper,
-            this._eventStream
-              .filter(({eventName}) => eventName === 'sent')
-          ])
+        Kefir.combine([
+          this._removedFromDOMStopper,
+          this._eventStream
+            .filter(({eventName}) => eventName === 'sent')
+        ])
       ])
       .take(1)
       // we delay asap here so that the event stream is not destroyed before listeners here the sent event
@@ -829,13 +829,17 @@ class GmailComposeView {
   }
 
   send({sendAndArchive}: {sendAndArchive: boolean}) {
-    const sendAndArchiveButton = this.getSendAndArchiveButton();
+    // asap necessary so if send() is called after presending event.cancel(), the new presending event
+    // must happen after the sendCanceled event (which is also delayed by asap).
+    asap(() => {
+      const sendAndArchiveButton = this.getSendAndArchiveButton();
 
-    if (sendAndArchive && sendAndArchiveButton) {
-      simulateClick(sendAndArchiveButton);
-    } else {
-      simulateClick(this.getSendButton());
-    }
+      if (sendAndArchive && sendAndArchiveButton) {
+        simulateClick(sendAndArchiveButton);
+      } else {
+        simulateClick(this.getSendButton());
+      }
+    });
   }
 
   discard() {
