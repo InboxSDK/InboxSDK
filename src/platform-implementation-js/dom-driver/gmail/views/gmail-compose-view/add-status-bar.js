@@ -54,6 +54,11 @@ class StatusBar extends SimpleElementView {
     el.setAttribute('data-order-hint', String(orderHint));
     el.style.height = this._currentHeight + 'px';
 
+    if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
+      const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
+      this._gmailComposeView.getElement().style.paddingBottom = (currentPad + this._currentHeight) + 'px';
+    }
+
     const nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
     makeMutationObserverChunkedStream(nativeStatusContainer, {
       attributeFilter: ['class'],
@@ -76,7 +81,7 @@ class StatusBar extends SimpleElementView {
       this._prependContainer.remove();
     }
 
-    if (this._gmailComposeView.isInlineReplyForm()) {
+    if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
       const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
       this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight) + 'px';
     }
@@ -128,11 +133,6 @@ class StatusBar extends SimpleElementView {
         } else {
           insertElementInOrder(statusArea, this.el);
         }        
-      }
-
-      if (this._gmailComposeView.isInlineReplyForm()) {
-        const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
-        this._gmailComposeView.getElement().style.paddingBottom = (currentPad + this._currentHeight) + 'px';
       }
     } catch (err) {
       Logger.error(err);
