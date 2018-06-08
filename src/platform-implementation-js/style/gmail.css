@@ -810,7 +810,6 @@ div.inboxsdk__compose_statusbar {
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_statusbar {
   background: none;
-  margin-bottom: 8px;
 }
 
 /* only include padding when in thread inline view */
