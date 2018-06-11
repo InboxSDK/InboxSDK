@@ -2398,9 +2398,9 @@
       "integrity": "sha1-wguW2MYXdIqvHBYCF2DNJ/y4y3U="
     },
     "contain-by-screen": {
-      "version": "1.2.0",
-      "resolved": "https://registry.npmjs.org/contain-by-screen/-/contain-by-screen-1.2.0.tgz",
-      "integrity": "sha512-IVNlMIDiM8wag6AGcTXt7/Hs16sjJSaABq7m36hSlpp485xvHJ29e/z9YZyk8mqY8JAd+oFLNTu6Br58VJ+HNA==",
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/contain-by-screen/-/contain-by-screen-1.2.1.tgz",
+      "integrity": "sha512-7PiFWw6ikr9vRCdowLf8u8iMo6gWVwG5aHd0qA5PM8KD8KL7Yseylst/Ge5IiZhfCcM4TGfmXpQSh0y80Yn3Qw==",
       "requires": {
         "babel-runtime": "^6.23.0",
         "envify": "^4.1.0",
@@ -8303,21 +8303,21 @@
       }
     },
     "react-draggable-list": {
-      "version": "3.5.3",
-      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.5.3.tgz",
-      "integrity": "sha512-T+w01+UWC6lgUigg8+HtMFSTvTejGhRJAwJE49PYCzjmePFHp/zdKMyzY9mqlXYrRPcaC6QHLiKCmY97DPXEiw==",
+      "version": "3.3.1",
+      "resolved": "https://registry.npmjs.org/react-draggable-list/-/react-draggable-list-3.3.1.tgz",
+      "integrity": "sha1-Da5LSjIUTn8UDvjSUHhidY5WDZM=",
       "requires": {
-        "babel-runtime": "^6.26.0",
+        "babel-runtime": "^6.23.0",
         "immutability-helper": "^2.1.2",
-        "prop-types": "^15.6.0",
-        "react-motion": "^0.5.2",
+        "prop-types": "^15.5.8",
+        "react-motion": "^0.5.0",
         "react-save-refs": "^1.0.1"
       }
     },
     "react-float-anchor": {
-      "version": "1.5.0",
-      "resolved": "https://registry.npmjs.org/react-float-anchor/-/react-float-anchor-1.5.0.tgz",
-      "integrity": "sha512-O2CZ+oYbSOMCPjQHm3QTlDFf69UGZhF5+09n7554licS/HQKkhBuyqIswPWccmLJGLjnopzuBz9JMVnsVXmI3A==",
+      "version": "1.4.3",
+      "resolved": "https://registry.npmjs.org/react-float-anchor/-/react-float-anchor-1.4.3.tgz",
+      "integrity": "sha512-OtuKa/OxFPChHxaa6OFiOF5JvNYvm5VrRacFL42ZEs4XU94ZC8aQT1MoincjSym6jOn3Q4tdMpkWwxBBRCkHkg==",
       "requires": {
         "babel-runtime": "^6.23.0",
         "contain-by-screen": "^1.0.4",
@@ -8329,9 +8329,9 @@
       }
     },
     "react-menu-list": {
-      "version": "3.5.0",
-      "resolved": "https://registry.npmjs.org/react-menu-list/-/react-menu-list-3.5.0.tgz",
-      "integrity": "sha512-DTXQJ5xmWSs/9pP+23xgrzn4fBWBet8ksXqrZV14Y2Z3FsDQaqdf/qLDJz7Sb56Ut5zw8zzAXvco/4c+vFsKmA==",
+      "version": "3.4.0",
+      "resolved": "https://registry.npmjs.org/react-menu-list/-/react-menu-list-3.4.0.tgz",
+      "integrity": "sha1-8OllCZ5xu6ddGegl4mWLGcpegWE=",
       "requires": {
         "array-find-index": "1.0.2",
         "babel-runtime": "^6.23.0",
@@ -8339,13 +8339,13 @@
         "kefir-bus": "^2.2.0",
         "kefir-stopper": "^2.1.0",
         "prop-types": "^15.5.8",
-        "react-float-anchor": "^1.5.0"
+        "react-float-anchor": "^1.4.1"
       }
     },
     "react-motion": {
-      "version": "0.5.2",
-      "resolved": "https://registry.npmjs.org/react-motion/-/react-motion-0.5.2.tgz",
-      "integrity": "sha512-9q3YAvHoUiWlP3cK0v+w1N5Z23HXMj4IF4YuvjvWegWqNPfLXsOBE/V7UvQGpXxHFKRQQcNcVQE31g9SB/6qgQ==",
+      "version": "0.5.0",
+      "resolved": "https://registry.npmjs.org/react-motion/-/react-motion-0.5.0.tgz",
+      "integrity": "sha1-Fwj8Ku5VKQDSHB5r7Sg0aGPgF7Y=",
       "requires": {
         "performance-now": "^0.2.0",
         "prop-types": "^15.5.8",
@@ -8377,14 +8377,14 @@
       }
     },
     "react-smooth-collapse": {
-      "version": "1.5.0",
-      "resolved": "https://registry.npmjs.org/react-smooth-collapse/-/react-smooth-collapse-1.5.0.tgz",
-      "integrity": "sha512-wHmqqWvNIPLyx/eOzduRTrknfcPBqSEGqZje+MWnJTSbn9zykERODj/fFRsXoeek7tRk1WJzUuNxk0sYZeOx4w==",
+      "version": "1.2.0",
+      "resolved": "https://registry.npmjs.org/react-smooth-collapse/-/react-smooth-collapse-1.2.0.tgz",
+      "integrity": "sha1-fpmIqY4XKzZYHfbQp9ihRug32ZA=",
       "requires": {
         "babel-runtime": "^6.23.0",
         "kefir": "^3.5.1",
         "kefir-bus": "^2.2.0",
-        "prop-types": "^15.6.0"
+        "prop-types": "^15.5.8"
       }
     },
     "react-test-renderer": {
