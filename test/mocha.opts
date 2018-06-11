@@ -1,1 +1,1 @@
---check-leaks --compilers js:babel-register
+--check-leaks --require babel-register
