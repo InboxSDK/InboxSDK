@@ -7,7 +7,7 @@ import waitFor from '../../../lib/wait-for';
 
 import type GmailDriver from '../gmail-driver';
 
-export default async function openComposeWindow(gmailDriver: GmailDriver){
+export default async function openComposeWindow(gmailDriver: GmailDriver) {
 	await GmailElementGetter.waitForGmailModeToSettle();
 
 	if(GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow()){
@@ -22,4 +22,4 @@ export default async function openComposeWindow(gmailDriver: GmailDriver){
 	const composeButton = GmailElementGetter.getComposeButton();
 	if (!composeButton) throw new Error('Could not find compose button');
 	simulateClick(composeButton);
-};
+}
