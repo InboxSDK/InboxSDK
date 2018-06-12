@@ -48,21 +48,21 @@ class StatusBar extends SimpleElementView {
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._currentHeight = 0;
     this._gmailComposeView = gmailComposeView;
-    this._nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
     this._orderHint = orderHint;
 
     el.className = 'aDh inboxsdk__compose_statusbar';
     el.setAttribute('data-order-hint', String(orderHint));
 
     this.setHeight(height);
-
-    makeMutationObserverChunkedStream(this._nativeStatusContainer, {
+    
+    nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
+    makeMutationObserverChunkedStream(nativeStatusContainer, {
       attributeFilter: ['class'],
       attributes: true,
     })
       .toProperty(() => null)
       .takeUntilBy(this._stopper)
-      .onValue(() => this.setStatusBar(this._nativeStatusContainer));
+      .onValue(() => this.setStatusBar(nativeStatusContainer));
   }
 
   destroy() {
