@@ -55,7 +55,7 @@ class StatusBar extends SimpleElementView {
 
     this.setHeight(height);
     
-    nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
+    const nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
     makeMutationObserverChunkedStream(nativeStatusContainer, {
       attributeFilter: ['class'],
       attributes: true,
