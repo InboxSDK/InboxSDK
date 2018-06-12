@@ -48,6 +48,7 @@ class StatusBar extends SimpleElementView {
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._currentHeight = height;
     this._gmailComposeView = gmailComposeView;
+    this._nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
     this._orderHint = orderHint;
 
     el.className = 'aDh inboxsdk__compose_statusbar';
@@ -55,14 +56,13 @@ class StatusBar extends SimpleElementView {
 
     this.setHeight(this._currentHeight);
 
-    const nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
-    makeMutationObserverChunkedStream(nativeStatusContainer, {
+    makeMutationObserverChunkedStream(this._nativeStatusContainer, {
       attributeFilter: ['class'],
       attributes: true,
     })
       .toProperty(() => null)
       .takeUntilBy(this._stopper)
-      .onValue(() => this.setStatusBar(nativeStatusContainer));
+      .onValue(() => this.setStatusBar(this._nativeStatusContainer));
   }
 
   destroy() {
@@ -85,11 +85,12 @@ class StatusBar extends SimpleElementView {
 
   setHeight(newHeight: number) {
     this.el.style.height = newHeight + 'px';
+    this._currentHeight = newHeight;
+
     if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
       const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
-      this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight + (newHeight * 2)) + 'px';
+      this._gmailComposeView.getElement().style.paddingBottom = (currentPad + this._currentHeight) + 'px';
     }
-    this._currentHeight = newHeight;
   }
 
   setStatusBar(nativeStatusContainer: HTMLElement) {
