@@ -150,6 +150,13 @@ class GmailAttachmentCardView {
 					this._driver.getLogger().error(err, {
 						finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]')
 					});
+					if (/^https:\/\/mail\.google\.com\//.test(finalUrl)) {
+						// This URL definitely isn't right: these URLs generally require
+						// authentication and shouldn't be returned by getDownloadURL.
+						throw err;
+					}
+					// Otherwise, don't throw; only log. Maybe Gmail has changed the URL
+					// structure and things will just work.
 				}
 				return finalUrl;
 			} else {
