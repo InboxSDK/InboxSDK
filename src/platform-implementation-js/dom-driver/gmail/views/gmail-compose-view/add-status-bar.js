@@ -49,24 +49,27 @@ class StatusBar extends SimpleElementView {
     this._currentHeight = 0;
     this._gmailComposeView = gmailComposeView;
     this._orderHint = orderHint;
+    this._nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
 
     el.className = 'aDh inboxsdk__compose_statusbar';
     el.setAttribute('data-order-hint', String(orderHint));
 
     this.setHeight(height);
     
-    const nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
-    makeMutationObserverChunkedStream(nativeStatusContainer, {
+    makeMutationObserverChunkedStream(this._nativeStatusContainer, {
       attributeFilter: ['class'],
       attributes: true,
     })
       .toProperty(() => null)
       .takeUntilBy(this._stopper)
-      .onValue(() => this.setStatusBar(nativeStatusContainer));
+      .onValue(() => this.setStatusBar(this._nativeStatusContainer));
   }
 
   destroy() {
-    if (this.destroyed) return;
+    if (this.destroyed) {
+      return;
+    }
+
     super.destroy();
     this._stopper.destroy();
 
@@ -80,6 +83,13 @@ class StatusBar extends SimpleElementView {
     if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
       const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
       this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight) + 'px';
+    } else if (this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
+      if (this._nativeStatusContainer.classList.contains('aDi')) {
+        const nativeStatusContainerHeight = parseInt(window.getComputedStyle(this._nativeStatusContainer).height, 10);
+        const nativeStatusContainerPaddingBottom = 16;
+        
+        this._nativeStatusContainer.style.height = `${nativeStatusContainerHeight - this._currentHeight - nativeStatusContainerPaddingBottom}px`;
+      }
     }
   }
 
@@ -110,22 +120,27 @@ class StatusBar extends SimpleElementView {
         insertElementInOrder(prependContainer, this.el);
       } else {
         if (this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
-          //append to body
-          const composeTable = querySelector(this._gmailComposeView.getElement(), '.iN > tbody');
-
           if (nativeStatusContainer.classList.contains('aDi')) {
-            // the class .aDi can have both absolute or fixed positioning,
-            // adjust bottom style for absolute
+            const nativeStatusContainerPaddingBottom = 16;
+            let nativeStatusContainerHeight;
+
+            // the class .aDi can have both absolute or fixed positioning, adjust bottom for absolute
             if (nativeStatusContainer.style.position === 'absolute') {
-              nativeStatusContainer.style.bottom = `${311 + this._currentHeight}px`;
+              const replyBody = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .Ap');
+              const replyBodyHeight = parseInt(window.getComputedStyle(replyBody).height, 10);
+
+              nativeStatusContainerHeight = parseInt(window.getComputedStyle(nativeStatusContainer).height, 10);
+              nativeStatusContainer.style.bottom = `${replyBodyHeight - 64 - nativeStatusContainerHeight}px`;
             }
 
-            // nativeStatusContainer height (60) + bottom padding (16) = 76
-            nativeStatusContainer.style.height = `${76 + this._currentHeight}px`;
-    
+            nativeStatusContainerHeight = parseInt(window.getComputedStyle(nativeStatusContainer).height, 10);
+            nativeStatusContainer.style.height = `${nativeStatusContainerHeight + nativeStatusContainerPaddingBottom + this._currentHeight}px`;
+
             const nativeStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh');
-            nativeStatusContainer.insertBefore(this.el, nativeStatusBar.nextSibling);
-          } else {   
+            insertElementInOrder(nativeStatusBar, this.el);
+          } else {
+            //append to body
+            const composeTable = querySelector(this._gmailComposeView.getElement(), '.iN > tbody');
             insertElementInOrder(composeTable, this.el);
           }
         } else {
