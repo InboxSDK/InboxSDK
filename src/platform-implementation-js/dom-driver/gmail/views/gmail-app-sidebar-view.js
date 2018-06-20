@@ -129,6 +129,8 @@ class GmailAppSidebarView {
       ? companionSidebarContentContainerEl
       : companionSidebarContentContainerEl.parentElement;
 
+    if (!companionSidebarOuterWrapper) throw new Error('should not happen: failed to find companionSidebarOuterWrapper');
+
     let threadSidebarContainerEl, renderThreadSidebar;
     const createThreadSidebar = () => {
       if(threadSidebarContainerEl) return threadSidebarContainerEl;
