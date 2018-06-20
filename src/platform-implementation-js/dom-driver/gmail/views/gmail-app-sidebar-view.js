@@ -123,6 +123,12 @@ class GmailAppSidebarView {
 
     companionSidebarContentContainerEl.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
 
+    // TODO: Once the changes to the GMail DOM have been entirely ramped, drop the ternary here and
+    // always get the parentElement. (Jun 20, 2018)
+    const companionSidebarOuterWrapper = companionSidebarContentContainerEl.classList.contains('bq9')
+      ? companionSidebarContentContainerEl
+      : companionSidebarContentContainerEl.parentElement;
+
     let threadSidebarContainerEl, renderThreadSidebar;
     const createThreadSidebar = () => {
       if(threadSidebarContainerEl) return threadSidebarContainerEl;
@@ -364,8 +370,9 @@ class GmailAppSidebarView {
         container.remove();
         buttonContainers.delete(appName);
         if(container === activeButtonContainer){
+          companionSidebarOuterWrapper.classList.remove('companion_app_sidebar_wrapper_visible');
           companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible');
-          const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+          const contentContainer = companionSidebarOuterWrapper.previousElementSibling;
           if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
 
           if(shouldRestoreGlobal && lastActiveNativeGlobalAddOnIconEl) {
@@ -396,9 +403,11 @@ class GmailAppSidebarView {
 
     const closeSidebarAndDeactivateButton = (activeButtonContainer) => {
       activeButtonContainer.classList.remove('sidebar_button_container_active');
+      companionSidebarOuterWrapper.classList.remove('companion_app_sidebar_wrapper_visible');
       companionSidebarContentContainerEl.classList.add(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
       companionSidebarContentContainerEl.classList.remove('companion_app_sidebar_visible', 'companion_global_app_sidebar_visible');
-      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+
+      const contentContainer = companionSidebarOuterWrapper.previousElementSibling;
       if(contentContainer) contentContainer.classList.remove('companion_container_app_sidebar_visible');
     };
 
@@ -428,9 +437,11 @@ class GmailAppSidebarView {
       if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
       buttonContainer.classList.add('sidebar_button_container_active');
+      companionSidebarOuterWrapper.classList.add('companion_app_sidebar_wrapper_visible');
       companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
       companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
-      const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+
+      const contentContainer = companionSidebarOuterWrapper.previousElementSibling;
       if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
       if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
@@ -439,7 +450,7 @@ class GmailAppSidebarView {
     const threadButtonContainers: Map<string, HTMLElement> = new Map();
     const contentContainers: Map<string, HTMLElement> = new Map();
 
-    const contentContainer = companionSidebarContentContainerEl.previousElementSibling;
+    const contentContainer = companionSidebarOuterWrapper.previousElementSibling;
     if(contentContainer) contentContainer.classList.add(idMap('companion_container_app_sidebar_in_use'));
     companionSidebarContentContainerEl.classList.add(idMap('app_sidebar_in_use'));
 
