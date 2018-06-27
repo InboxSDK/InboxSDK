@@ -11,21 +11,27 @@ jobs:
           username: $DOCKER_HUB_USERNAME
           password: $DOCKER_HUB_PASSWORD
     steps:
-    - checkout
-    - run:
-        working_directory: ~/StreakYC/GmailSDK
-        command: nvm install 6.1.0 && nvm alias default 6.1.0
-    - restore_cache:
-        keys:
-          - v1-dep-{{ .Branch }}-
-          - v1-dep-master-
-          - v1-dep-
-    - run: npm i -g npm
-    - run: ./tools/install-deps.sh
-    - save_cache:
-        key: v1-dep-{{ .Branch }}-{{ epoch }}
-        paths:
-          - ./node_modules
-    - run: npm test
-    - store_artifacts:
-        path: chromeTestOutput
+      - checkout
+      - run:
+          working_directory: ~/StreakYC/GmailSDK
+          command: nvm install 6.1.0 && nvm alias default 6.1.0
+      - restore_cache:
+          keys:
+            - v1-dep-{{ .Branch }}-
+            - v1-dep-master-
+            - v1-dep-
+      - run: npm i -g npm
+      - run: ./tools/install-deps.sh
+      - save_cache:
+          key: v1-dep-{{ .Branch }}-{{ epoch }}
+          paths:
+            - ./node_modules
+      - run: npm test
+      - store_artifacts:
+          path: chromeTestOutput
+
+workflows:
+  version: 2
+  all_workflow:
+    jobs:
+      - build
