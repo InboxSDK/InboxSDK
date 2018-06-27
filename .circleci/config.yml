@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/StreakYC/GmailSDK
+    parallelism: 1
+    shell: /bin/bash --login
+
+    docker:
+      - image: streak/circleci:1
+        auth:
+          username: $DOCKER_HUB_USERNAME
+          password: $DOCKER_HUB_PASSWORD
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dep-{{ .Branch }}-{{ checksum "npm-shrinkwrap.json" }}
+            - v1-dep-{{ .Branch }}-
+            - v1-dep-master-
+            - v1-dep-
+      - run: ./tools/install-deps.sh
+      - save_cache:
+          key: v1-dep-{{ .Branch }}-{{ checksum "npm-shrinkwrap.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Unit Tests
+          command: npm test
+
+      # TODO fix and re-enable
+      # - run:
+      #     name: Integration Test
+      #     command: if [ -n "$INBOXSDK_TEST_SECRET" ]; then ./node_modules/.bin/gulp -s && ./node_modules/.bin/wdio; fi
+
+      - store_artifacts:
+          path: chromeTestOutput
+
+workflows:
+  version: 2
+  all_workflow:
+    jobs:
+      - build
