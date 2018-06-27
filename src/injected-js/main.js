@@ -18,13 +18,13 @@ if (!global.__InboxSDKInjected) {
     const setupErrorSilencer = require('./setup-error-silencer');
     const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin');
     const setupPushStateListener = require('./setupPushStateListener');
+    const setupInboxCustomViewLinkFixer = require('./setupInboxCustomViewLinkFixer');
 
     const gmailInterceptor = require('./gmail/setup-gmail-interceptor');
     const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler');
 
     const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
     const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener');
-    const setupInboxCustomViewLinkSmuggler = require('./inbox/setupInboxCustomViewLinkSmuggler');
     const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder');
     const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
@@ -34,7 +34,6 @@ if (!global.__InboxSDKInjected) {
     } else if (document.location.origin === 'https://inbox.google.com') {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
-      setupInboxCustomViewLinkSmuggler();
       setupComposeViewDraftIDFinder();
       setupInboxAjaxInterceptor();
     } else {
@@ -47,6 +46,7 @@ if (!global.__InboxSDKInjected) {
     setupErrorSilencer();
     setupCustomViewEventAssassin();
     setupPushStateListener();
+    setupInboxCustomViewLinkFixer();
   } catch(err) {
     logger.error(err);
   } finally {

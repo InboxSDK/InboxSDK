@@ -16,20 +16,25 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     customRouteView.setFullWidth(false);
 
     customRouteView.getElement().textContent = 'hello world! ' + customRouteView.getParams().monkeyName;
-    var list = document.createElement('ul');
-    threadIds.forEach(function(threadId) {
-      var link = document.createElement('a');
-      link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-      link.onclick = function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        sdk.Router.goto(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-      };
-      link.textContent = threadId;
-      var item = document.createElement('li');
+    const list = document.createElement('ul');
+    // threadIds.forEach(function(threadId) {
+    //   const link = document.createElement('a');
+    //   link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+    //   link.textContent = threadId;
+    //   const item = document.createElement('li');
+    //   item.appendChild(link);
+    //   list.appendChild(item);
+    // });
+
+    {
+      const link = document.createElement('a');
+      link.href = sdk.Router.createLink('example/:monkeyName', {monkeyName: 'linktest'});
+      link.textContent = 'linktest';
+      const item = document.createElement('li');
       item.appendChild(link);
       list.appendChild(item);
-    });
+    }
+
     customRouteView.getElement().appendChild(list);
   });
 

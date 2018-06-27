@@ -358,6 +358,7 @@ class GmailDriver {
 
 	addCustomRouteID(routeID: string): () => void {
 		this._customRouteIDs.add(routeID);
+		this._pageCommunicator.registerAllowedHashLinkStartTerm(routeID.split('/')[0]);
 		return () => {
 			this._customRouteIDs.delete(routeID);
 		};
@@ -365,6 +366,7 @@ class GmailDriver {
 
 	addCustomListRouteID(routeID: string, handler: Function): () => void {
 		this._customListRouteIDs.set(routeID, handler);
+		this._pageCommunicator.registerAllowedHashLinkStartTerm(routeID.split('/')[0]);
 		return () => {
 			this._customListRouteIDs.delete(routeID);
 		};
