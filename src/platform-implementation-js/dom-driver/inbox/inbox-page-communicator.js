@@ -35,13 +35,6 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       detail: null
     }));
   }
-  registerAllowedHashLinkStartTerm(term: string) {
-    document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
-      bubbles: false,
-      cancelable: false,
-      detail: {term}
-    }));
-  }
 
   clickAndGetNewIframeSrc(el: HTMLElement): Promise<string> {
     const pr = Kefir.fromEvents(el, 'inboxSDKclickAndGetNewIframeSrcResult')

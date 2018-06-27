@@ -2,7 +2,7 @@
 
 import closest from 'closest-ng';
 
-export default function setupInboxCustomViewLinkSmuggler() {
+export default function setupInboxCustomViewLinkFixer() {
   const allowedStartTerms = new Set();
 
   document.addEventListener('inboxSDKregisterAllowedHashLinkStartTerm', function(event) {

@@ -135,4 +135,12 @@ export default class CommonPageCommunicator {
     });
     return unsilence;
   }
+
+  registerAllowedHashLinkStartTerm(term: string) {
+    document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
+      bubbles: false,
+      cancelable: false,
+      detail: {term}
+    }));
+  }
 }
