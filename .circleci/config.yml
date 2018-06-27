@@ -14,12 +14,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
+            - v1-dep-{{ .Branch }}-{{ checksum "npm-shrinkwrap.json" }}
             - v1-dep-{{ .Branch }}-
             - v1-dep-master-
             - v1-dep-
       - run: ./tools/install-deps.sh
       - save_cache:
-          key: v1-dep-{{ .Branch }}-{{ epoch }}
+          key: v1-dep-{{ .Branch }}-{{ checksum "npm-shrinkwrap.json" }}
           paths:
             - ./node_modules
       - run: npm test
