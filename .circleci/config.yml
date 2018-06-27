@@ -23,7 +23,15 @@ jobs:
           key: v1-dep-{{ .Branch }}-{{ checksum "npm-shrinkwrap.json" }}
           paths:
             - ./node_modules
-      - run: npm test
+      - run:
+          name: Unit Tests
+          command: npm test
+
+      # TODO fix and re-enable
+      # - run:
+      #     name: Integration Test
+      #     command: if [ -n "$INBOXSDK_TEST_SECRET" ]; then ./node_modules/.bin/gulp -s && ./node_modules/.bin/wdio; fi
+
       - store_artifacts:
           path: chromeTestOutput
 
