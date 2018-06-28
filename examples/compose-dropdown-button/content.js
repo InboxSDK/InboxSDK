@@ -29,7 +29,7 @@ InboxSDK.load(1, 'simple-example', {
 			}
 		});
 
-		var s1 = composeView.addStatusBar({height:20});
+		var s1 = window._s1 = composeView.addStatusBar({height:20});
 		s1.el.innerHTML = 's1 foo <b>bar</b>';
 		s1.on('destroy', function() {
 			console.log('s1 destroyed');
@@ -43,7 +43,7 @@ InboxSDK.load(1, 'simple-example', {
 					s1.destroy();
 					s1 = null;
 				} else {
-					s1 = composeView.addStatusBar({height:20});
+					s1 = window._s1 = composeView.addStatusBar({height:20});
 					s1.el.innerHTML = 's1 foo <b>bar</b>';
 					s1.on('destroy', function() {
 						console.log('s1 destroyed');

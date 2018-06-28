@@ -80,6 +80,11 @@ class StatusBar extends SimpleElementView {
       this._prependContainer.remove();
     }
 
+    this._undoStatusContainerHeightChange();
+  }
+
+  _undoStatusContainerHeightChange() {
+    if (this._currentHeight == 0) return;
     if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
       const currentPad = parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) || 0;
       this._gmailComposeView.getElement().style.paddingBottom = (currentPad - this._currentHeight) + 'px';
@@ -94,6 +99,8 @@ class StatusBar extends SimpleElementView {
   }
 
   setHeight(newHeight: number) {
+    this._undoStatusContainerHeightChange();
+
     this.el.style.height = newHeight + 'px';
 
     if (!this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
