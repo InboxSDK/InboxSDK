@@ -37,6 +37,7 @@ class StatusBar extends SimpleElementView {
   _addAboveNativeStatusBar: boolean;
   _currentHeight: number;
   _gmailComposeView: GmailComposeView;
+  _nativeStatusContainer: HTMLElement;
   _orderHint: number;
   _prependContainer: ?HTMLElement = null;
   _stopper = kefirStopper();
@@ -48,8 +49,8 @@ class StatusBar extends SimpleElementView {
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._currentHeight = 0;
     this._gmailComposeView = gmailComposeView;
-    this._orderHint = orderHint;
     this._nativeStatusContainer = querySelector(gmailComposeView.getElement(), '.iN > tbody .aDj');
+    this._orderHint = orderHint;
 
     el.className = 'aDh inboxsdk__compose_statusbar';
     el.setAttribute('data-order-hint', String(orderHint));
@@ -60,9 +61,8 @@ class StatusBar extends SimpleElementView {
       attributeFilter: ['class'],
       attributes: true,
     })
-      .toProperty(() => null)
       .takeUntilBy(this._stopper)
-      .onValue(() => this.setStatusBar(this._nativeStatusContainer));
+      .onValue(() => this._setStatusBar(this._nativeStatusContainer));
   }
 
   destroy() {
@@ -102,9 +102,10 @@ class StatusBar extends SimpleElementView {
     }
 
     this._currentHeight = newHeight;
+    this._setStatusBar(this._nativeStatusContainer);
   }
 
-  setStatusBar(nativeStatusContainer: HTMLElement) {
+  _setStatusBar(nativeStatusContainer: HTMLElement) {
     try {
       const statusArea = this._gmailComposeView.getStatusArea();
       this._gmailComposeView.getElement().classList.add('inboxsdk__compose_statusbarActive');
@@ -120,11 +121,11 @@ class StatusBar extends SimpleElementView {
         insertElementInOrder(prependContainer, this.el);
       } else {
         if (this._gmailComposeView.getGmailDriver().isUsingMaterialUI() && this._gmailComposeView.isInlineReplyForm()) {
+          // 'aDi' is added to the to the nativeStatusContainer when it is position: fixed or position: absolute 
           if (nativeStatusContainer.classList.contains('aDi')) {
             const nativeStatusContainerPaddingBottom = 16;
             let nativeStatusContainerHeight;
 
-            // the class .aDi can have both absolute or fixed positioning, adjust bottom for absolute
             if (nativeStatusContainer.style.position === 'absolute') {
               const replyBody = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .Ap');
               const replyBodyHeight = parseInt(window.getComputedStyle(replyBody).height, 10);
@@ -136,7 +137,7 @@ class StatusBar extends SimpleElementView {
             nativeStatusContainerHeight = parseInt(window.getComputedStyle(nativeStatusContainer).height, 10);
             nativeStatusContainer.style.height = `${nativeStatusContainerHeight + nativeStatusContainerPaddingBottom + this._currentHeight}px`;
 
-            const nativeStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh');
+            const nativeStatusBar = querySelector(this._gmailComposeView.getElement(), '.iN > tbody .aDj.aDi .aDh .IZ');
             insertElementInOrder(nativeStatusBar, this.el);
           } else {
             //append to body
