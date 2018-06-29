@@ -850,7 +850,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
 
 .inboxsdk__recipient_row td.ok {
   height: 20px;
-  padding: 0px;
+  padding: 0px !important;
 }
 
 .inboxsdk__recipient_row td.az3 {
