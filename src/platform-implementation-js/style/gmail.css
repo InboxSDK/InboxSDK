@@ -1468,7 +1468,6 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
 
 .bq9:not(.brC-brG).companion_app_sidebar_wrapper_visible {
   display: block !important;
-  box-shadow: none;
 }
 
   .companion_global_app_sidebar_visible .thread_app_sidebar {
