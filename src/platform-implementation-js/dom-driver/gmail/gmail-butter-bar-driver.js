@@ -121,16 +121,13 @@ export default class GmailButterBarDriver {
 
       // Set up the close button shown in most Snack Bars in Material Gmail.
       // This button is hidden by css in Gmailv1.
-      let noticeCloseButton = sdkNotice.querySelector('div.bBe[role="button"]');
-      if (!noticeCloseButton) {
-        noticeCloseButton = document.createElement('div');
-        noticeCloseButton.classList.add('bBe');
-        noticeCloseButton.setAttribute('role', 'button');
-        noticeCloseButton.tabIndex = 0;
-        noticeCloseButton.innerHTML = '<div class="bBf"></div>';
+      noticeCloseButton = document.createElement('div');
+      noticeCloseButton.classList.add('bBe');
+      noticeCloseButton.setAttribute('role', 'button');
+      noticeCloseButton.tabIndex = 0;
+      noticeCloseButton.innerHTML = '<div class="bBf"></div>';
 
-        sdkNotice.appendChild(noticeCloseButton);
-      }
+      sdkNotice.appendChild(noticeCloseButton);
 
       Kefir.fromEvents(noticeCloseButton, 'click')
         .take(1)
