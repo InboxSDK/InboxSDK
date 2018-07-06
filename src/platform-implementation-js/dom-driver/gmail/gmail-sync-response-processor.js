@@ -53,7 +53,9 @@ export function extractThreadsFromSearchResponse(response: string): SyncThread[]
       subject: descriptor[1],
       snippet: descriptor[2],
       syncThreadID: descriptor[4],
-      oldGmailThreadID: new BigNumber(descriptor[18]).toString(16),
+      // It seems Gmail is A/B testing including gmailThreadID in descriptor[20] and not including
+      // the encoded version of it in descriptor[18], so pull it from [20] if [18] is not set.
+      oldGmailThreadID: descriptor[18] != null ? new BigNumber(descriptor[18]).toString(16) : descriptor[20],
       rawResponse: descriptorWrapper,
       extraMetaData: {
         snippet: (
