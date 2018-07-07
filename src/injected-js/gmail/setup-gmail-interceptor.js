@@ -366,7 +366,9 @@ export default function setupGmailInterceptor() {
                 messageID: sendUpdate[1],
                 oldMessageID: new BigNumber(sendUpdate[48]).toString(16),
                 threadID: sendUpdateWrapper[4],
-                oldThreadID: new BigNumber(sendUpdateWrapper[18]).toString(16)
+                // It seems Gmail is A/B testing including gmailThreadID in response[20] and not including
+                // the encoded version of it in response[18], so pull it from [20] if [18] is not set.
+                oldThreadID: sendUpdateWrapper[18] != null ? new BigNumber(sendUpdateWrapper[18]).toString(16) : sendUpdateWrapper[20]
               });
             }
 
