@@ -90,6 +90,22 @@ describe('extractThreadsFromThreadResponse', function() {
     });
   });
 
+  it('works on 2018-07-09 data', () => {
+    const data = fs.readFileSync(
+      __dirname+'/../../../../__tests__/gmail-sync-response-processor/fd-response-20180709.json',
+      'utf8'
+    );
+    const threads = GSRP.extractThreadsFromThreadResponse(data);
+    expect(threads.length).toEqual(1);
+    expect((threads[0]: any).oldGmailThreadID).toBe('1636109e7816ac5d');
+    expect(threads[0].syncThreadID).toBe('thread-f:1600484990382419037');
+    expect(threads[0].extraMetaData).toMatchObject({
+      snippet: 'Aleem M commented: is it currently implemented but not documented or is it implemwented on the streak side but not in sdk? on the threadRowView.addStatusText() ',
+      syncMessageData: [
+        {syncMessageID: 'msg-f:1600484990382419037', date: 1526341429121}
+      ]
+    });
+  });
 });
 
 it('replaceThreadsInSearchResponse works', () => {
