@@ -1,0 +1,101 @@
+{
+  "1": 0,
+  "2": [{
+    "1": "thread-f:1600484990382419037",
+    "2": {
+      "1": {
+        "1": "thread-f:1600484990382419037",
+        "2": "Update on: threadRowView.addStatusText() should be added to SDK",
+        "3": "Aleem M commented: is it currently implemented but not documented or is it implemwented on the streak side but not in sdk? on the threadRowView.addStatusText() ",
+        "4": "1526341429157",
+        "10": 0.8496206,
+        "13": 0,
+        "16": "1636109e7816ac5d"
+      },
+      "2": [{
+        "1": "msg-f:1600484990382419037",
+        "2": {
+          "1": 1,
+          "2": "notifications@streak.com",
+          "3": "Streak"
+        },
+        "3": "1526341429157",
+        "4": ["^all", "^i", "^io_lr", "^io_unim", "^o", "^smartlabel_notification", "^sq_ig_i_personal"],
+        "7": "1526341429121",
+        "11": "Aleem M commented: is it currently implemented but not documented or is it implemwented on the streak side but not in sdk? on the threadRowView.addStatusText() ",
+        "15": {
+          "3": {
+            "1": 3
+          },
+          "4": {
+            "1": 1
+          },
+          "5": {
+            "1": 0.8496206
+          },
+          "7": {
+            "1": "21660102"
+          },
+          "8": [21660150, 21660161, 21660102],
+          "10": 1
+        },
+        "16": "1526341429121",
+        "22": 0,
+        "28": "1636109e7816ac5d"
+      }]
+    },
+    "3": [{
+      "1": "msg-f:1600484990382419037",
+      "2": {
+        "1": [{
+          "1": 1,
+          "2": "cowan@streak.com"
+        }],
+        "4": [{
+          "1": 1,
+          "2": "notifications+comment+reply+agxzfm1haWxmb29nYWVyMwsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIHQ29tbWVudBjBx7lpDA+agxzfm1haWxmb29nYWVyLQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEgRVc2VyGICAgKDAqIIKDA@mailfoogae.appspotmail.com",
+          "3": "Streak"
+        }],
+        "5": "Update on: threadRowView.addStatusText() should be added to SDK",
+        "6": {
+          "2": [{
+            "1": 0,
+            "3": {
+              "2": "\r\n    \r\n    \r\n\r\n\u003cdiv\u003e\r\n    \u003cdiv class\u003d\"m_-4468863597637056753template\"\u003e\r\n        \u003cdiv class\u003d\"m_-4468863597637056753streakImg\"\u003e\r\n            \u003ca href\u003d\"http://email.streak.com/e/c/eyJlbWFpbF9pZCI6IlpNX3lBUUFCWTJFSjNTbzVVeURYUTJSMk0yUzYiLCJocmVmIjoiaHR0cHM6Ly93d3cuc3RyZWFrLmNvbT91dG1fY29udGVudD1OZXcrQ29tbWVudCtFbWFpbFx1MDAyNnV0bV9tZWRpdW09ZW1haWxfYWN0aW9uXHUwMDI2dXRtX25hbWU9QXBwK1RyYW5zYWN0aW9uYWwrLStOZXcrQ29tbWVudFx1MDAyNnV0bV9zb3VyY2U9Y3VzdG9tZXIuaW8iLCJsaW5rX2lkIjoxODAxMjg1MywicG9zaXRpb24iOjB9/fcd4d2f2926204067b0de17b74f79914f1afb597b2592050082f1b70acd59843\" target\u003d\"_blank\" data-saferedirecturl\u003d\"https://www.google.com/url?q\u003dhttp://email.streak.com/e/c/eyJlbWFpbF9pZCI6IlpNX3lBUUFCWTJFSjNTbzVVeURYUTJSMk0yUzYiLCJocmVmIjoiaHR0cHM6Ly93d3cuc3RyZWFrLmNvbT91dG1fY29udGVudD1OZXcrQ29tbWVudCtFbWFpbFx1MDAyNnV0bV9tZWRpdW09ZW1haWxfYWN0aW9uXHUwMDI2dXRtX25hbWU9QXBwK1RyYW5zYWN0aW9uYWwrLStOZXcrQ29tbWVudFx1MDAyNnV0bV9zb3VyY2U9Y3VzdG9tZXIuaW8iLCJsaW5rX2lkIjoxODAxMjg1MywicG9zaXRpb24iOjB9/fcd4d2f2926204067b0de17b74f79914f1afb597b2592050082f1b70acd59843\u0026amp;source\u003dgmail\u0026amp;ust\u003d1531259053599000\u0026amp;usg\u003dAFQjCNEcCRkbUQCSl2barZK2qi26HkHsbw\"\u003e\u003cimg alt\u003d\"\" style\u003d\"height:22px;width:auto\" src\u003d\"https://ci5.googleusercontent.com/proxy/ahgCkv-nBMDQdBwkx0_auI-Al7HihooZtbCcO_VERK7x0cFqQ4mo8trHw4M1TLtMmvPnjWuZWpzLkcj8w5ZQUgxk2JTOtBJEtXbI0jddS_ot2nlGjWGzu_ctu0unqc-cVoQ_Xwcj\u003ds0-d-e1-ft#https://storage.googleapis.com/emailimages.streak.com/email-template/streak2.png\"\u003e\u003c/a\u003e\r\n        \u003c/div\u003e\r\n        \r\n        \r\n\r\n\r\n\r\n\r\n\r\n\r\n    \r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n    \r\n      \u003cdiv class\u003d\"m_-4468863597637056753bigText\"\u003e\r\n        \u003cb\u003e\r\n    Aleem M commented:\r\n\u003c/b\u003e\r\n      \u003c/div\u003e\r\n    \r\n\r\n    \r\n\r\n    \r\n      \u003cdiv class\u003d\"m_-4468863597637056753midText m_-4468863597637056753largeMarginTop\"\u003e\u003ci\u003e\r\n        \r\n    is it currently implemented but not documented or is it implemwented on the streak side but not in sdk?\r\n    \r\n    \u003cbr\u003e\r\n    \u003cbr\u003e\r\n    \u003cspan style\u003d\"font-style:normal\"\u003eon the \u003cspan class\u003d\"m_-4468863597637056753orangeColor\" hspace\u003d\"streak-box-agxzfm1haWxmb29nYWVyMAsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIEQ2FzZRixqpRiDA\" style\u003d\"color:#fead1e;text-decoration:none\"\u003ethreadRowView.addStatusText() should be added to SDK\u003c/span\u003e box.\u003c/span\u003e\r\n\r\n      \u003c/i\u003e\u003c/div\u003e\r\n    \r\n\r\n    \r\n      \u003cdiv class\u003d\"m_-4468863597637056753smallText m_-4468863597637056753largeMarginTop m_-4468863597637056753grayBox\"\u003e\r\n        \r\n            \u003cb\u003ePipeline: \u003c/b\u003e\u003cspan\u003eEng - S48\u003c/span\u003e\u003cbr\u003e\r\n            \u003cb\u003eBox: \u003c/b\u003e\u003cspan\u003ethreadRowView.addStatusText() should be added to SDK\u003c/span\u003e\u003cbr\u003e\r\n            \u003cb\u003eStage: \u003c/b\u003e\u003cspan\u003eScheduled\u003c/span\u003e\u003cbr\u003e\r\n            \u003cb\u003eAssigned To: \u003c/b\u003e\u003cspan\u003eHenry W, Omar I, Chris C\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eCategories: \u003c/b\u003e\u003cspan\u003eInboxSDK\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eIncomplete From: \u003c/b\u003e\u003cspan\u003e\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eNormalized Estimated (days): \u003c/b\u003e\u003cspan\u003e0.3333333333333333\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eSprint: \u003c/b\u003e\u003cspan\u003eSprint 48\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eType: \u003c/b\u003e\u003cspan\u003eFeature\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eActual Size (days): \u003c/b\u003e\u003cspan\u003e\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eEstimated Size (days): \u003c/b\u003e\u003cspan\u003e1\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003ePriority: \u003c/b\u003e\u003cspan\u003e2\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eLinked Boxes Count: \u003c/b\u003e\u003cspan\u003e0.0\u003c/span\u003e\u003cbr\u003e\r\n            \r\n              \u003cb\u003eNormalized Actual (days): \u003c/b\u003e\u003cspan\u003e0.3333333333333333\u003c/span\u003e\u003cbr\u003e\r\n            \r\n            \r\n        \r\n        \r\n      \u003c/div\u003e\r\n    \r\n\r\n    \r\n    \r\n\r\n    \r\n      \u003cdiv class\u003d\"m_-4468863597637056753smallText m_-4468863597637056753largeMarginTop m_-4468863597637056753centerText m_-4468863597637056753footerText\"\u003e\r\n        \r\n    Want to respond to this comment? Just reply to this email.\r\n\r\n      \u003c/div\u003e\r\n    \r\n    \r\n    \r\n\r\n\r\n    \u003c/div\u003e \r\n\r\n\u003cimg src\u003d\"https://ci4.googleusercontent.com/proxy/lIVHGyqYGnFEFeSvxYIg9YV-PVNlmWi_ElaUE6NQZmO6-GLHoimh65GsM-HktWXQ-gisfcMQo09NJ_7eVSdRaZlQZPkgiE7Yz9hbefUZU-8yUlHJ58vMT9jVXEf4mqahWNP_HqJt30nfcWKYJP0\u003ds0-d-e1-ft#http://email.streak.com/e/o/eyJlbWFpbF9pZCI6IlpNX3lBUUFCWTJFSjNTbzVVeURYUTJSMk0yUzYifQ\u003d\u003d\" style\u003d\"height:1px!important;max-height:1px!important;max-width:1px!important;width:1px!important\"\u003e\u003c/div\u003e"
+            },
+            "4": 974589769
+          }],
+          "3": 0,
+          "5": {
+            "7": ".msg-4468863597637056753 em{color:#00acff}.msg-4468863597637056753 .m_-4468863597637056753grayColor{color:#b5b5b5;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753orangeColor{color:#fead1e;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753template{padding:1em 1em;font-family:'Helvetica Neue',Helvetica,Arial,Sans-Serif;background-color:#fafafa;color:#696d6f;letter-spacing:0.3px;font-weight:200;max-width:600px;margin:auto}.msg-4468863597637056753 .m_-4468863597637056753bigText{font-size:24px;line-height:28px;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753midText{font-size:17px;line-height:24px;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753smallText{font-size:13px;line-height:20px;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753seeTeamDeets{font-size:13px;font-weight:700;color:#fead1e}.msg-4468863597637056753 body{background-color:#fafafa}.msg-4468863597637056753 .m_-4468863597637056753streakImg{padding-bottom:1.5em}.msg-4468863597637056753 .m_-4468863597637056753streakCareers{padding-top:1.5em;text-align:center}.msg-4468863597637056753 .m_-4468863597637056753largeMarginTop{margin-top:1.5em}.msg-4468863597637056753 .m_-4468863597637056753teensyMarginTop{margin-top:.1em}.msg-4468863597637056753 .m_-4468863597637056753midMarginTop{margin-top:1em}.msg-4468863597637056753 .m_-4468863597637056753grayBox{max-width:100%;background:#f1f1f1;padding:1.25em 1.5625em}.msg-4468863597637056753 .m_-4468863597637056753noTextDec{text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753mainActionText{max-width:100%;background-color:#fead1e;text-align:center;color:white;border-radius:4px;font-size:20.5px;line-height:200%}.msg-4468863597637056753 .m_-4468863597637056753centerText{text-align:center}.msg-4468863597637056753 .m_-4468863597637056753footerText{color:#9aa2a9}.msg-4468863597637056753 .m_-4468863597637056753bulletPoints{margin:0px 0px 12px 0}.msg-4468863597637056753 .m_-4468863597637056753redColor{color:#de5e5e;text-decoration:none}.msg-4468863597637056753 .m_-4468863597637056753blueColor{color:#2d9cdb;text-decoration:none}@media only screen and (min-width:360px){.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.5em 1.25em}}@media only screen and (min-width:375px){.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.5em 1.25em}}@media only screen and (min-width:412px){.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.5em 1.5em}.msg-4468863597637056753 .m_-4468863597637056753smallText{font-weight:400}.msg-4468863597637056753 .m_-4468863597637056753midText{font-weight:400}}@media only screen and (min-width:414px){.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.5em 1.5em}.msg-4468863597637056753 .m_-4468863597637056753smallText{font-weight:300}.msg-4468863597637056753 .m_-4468863597637056753midText{font-weight:300}}@media only screen and (min-width:600px){.msg-4468863597637056753 .m_-4468863597637056753streakImg{padding-bottom:1.25em}.msg-4468863597637056753 .m_-4468863597637056753streakCareers{padding-top:1.25em;text-align:center}.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.25em 3.5em}.msg-4468863597637056753 .m_-4468863597637056753teensyMarginTop{margin-top:.3em}}@media only screen and (min-width:800px){.msg-4468863597637056753 .m_-4468863597637056753streakImg{padding-bottom:1.25em}.msg-4468863597637056753 .m_-4468863597637056753streakCareers{padding-top:1.25em;text-align:center}.msg-4468863597637056753 .m_-4468863597637056753template{padding:1.25em 3.5em}.msg-4468863597637056753 .m_-4468863597637056753teensyMarginTop{margin-top:.3em}.msg-4468863597637056753 .m_-4468863597637056753mainActionText{font-size:24px;line-height:300%}}@media only screen and (min-width:1000px){.msg-4468863597637056753 .m_-4468863597637056753streakImg{padding-bottom:2.5em}.msg-4468863597637056753 .m_-4468863597637056753streakCareers{padding-top:2.5em;text-align:center}.msg-4468863597637056753 .m_-4468863597637056753template{padding:2.5em 5em}.msg-4468863597637056753 .m_-4468863597637056753teensyMarginTop{margin-top:.5em}.msg-4468863597637056753 .m_-4468863597637056753mainActionText{font-size:24px;line-height:300%}}@media only screen and (min-width:1200px){.msg-4468863597637056753 .m_-4468863597637056753streakImg{padding-bottom:3em}.msg-4468863597637056753 .m_-4468863597637056753streakCareers{padding-top:3em;text-align:center}.msg-4468863597637056753 .m_-4468863597637056753template{padding:3em 6em}.msg-4468863597637056753 .m_-4468863597637056753mainActionText{font-size:24px;line-height:300%}}"
+          },
+          "6": "msg-4468863597637056753",
+          "7": 1,
+          "8": 1
+        },
+        "7": "Aleem M commented: is it currently implemented but not documented or is it implemwented on the streak side but not in sdk? on the threadRowView.addStatusText() ",
+        "8": "\u003cZM_yAQABY2EJ3So5UyDXQ2R2M2S6.1526341426@streak.com\u003e",
+        "11": {
+          "1": 0,
+          "2": 1,
+          "3": "",
+          "4": -1,
+          "8": "delivery.customeriomail.com",
+          "9": "streak.com",
+          "11": 0,
+          "17": "notifications@streak.com"
+        },
+        "12": {
+          "1": 1,
+          "2": "cowan@streak.com"
+        },
+        "17": "1526341429121",
+        "20": {
+          "5": 2
+        },
+        "30": ["en"],
+        "35": "1636109e7816ac5d"
+      }
+    }]
+  }]
+}

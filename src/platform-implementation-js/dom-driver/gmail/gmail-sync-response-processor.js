@@ -93,7 +93,9 @@ export function extractThreadsFromThreadResponse(response: string): Array<SyncTh
     ) {
       return {
         syncThreadID: descriptorWrapper[1],
+        oldGmailThreadID: descriptorWrapper[2] && descriptorWrapper[2][1] && descriptorWrapper[2][1][16] || undefined,
         extraMetaData: {
+          snippet: descriptorWrapper[2] && descriptorWrapper[2][1] && descriptorWrapper[2][1][3] || undefined,
           syncMessageData: (descriptorWrapper[3] || []).filter(md => Boolean(md[2])).map(md => ({
             syncMessageID: md[1],
             date: +md[2][17],

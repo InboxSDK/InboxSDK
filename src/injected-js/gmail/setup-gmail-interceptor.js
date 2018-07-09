@@ -278,7 +278,7 @@ export default function setupGmailInterceptor() {
                     type: 'emailDraftReceived',
                     rfcID: saveUpdate[14],
                     messageID: saveUpdate[1],
-                    oldMessageID: new BigNumber(saveUpdate[48]).toString(16),
+                    oldMessageID: saveUpdate[48] ? new BigNumber(saveUpdate[48]).toString(16) : saveUpdate[56],
                     syncThreadID: wrapper[1]
                   });
                 }
@@ -364,7 +364,7 @@ export default function setupGmailInterceptor() {
                 type: currentSendConnectionIDs.has(connection) ? 'emailSent' : 'emailDraftReceived',
                 rfcID: sendUpdate[14],
                 messageID: sendUpdate[1],
-                oldMessageID: new BigNumber(sendUpdate[48]).toString(16),
+                oldMessageID: sendUpdate[48] ? new BigNumber(sendUpdate[48]).toString(16) : sendUpdate[56],
                 threadID: sendUpdateWrapper[4],
                 // It seems Gmail is A/B testing including gmailThreadID in response[20] and not including
                 // the encoded version of it in response[18], so pull it from [20] if [18] is not set.
