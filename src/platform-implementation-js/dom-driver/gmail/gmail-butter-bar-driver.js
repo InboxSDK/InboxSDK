@@ -46,7 +46,9 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
   noticeContainer.classList.remove('bAp');
-  sdkNotice.firstChild.classList.remove('bAq');
+  if (sdkNotice.firstElementChild) {
+    sdkNotice.firstElementChild.classList.remove('bAq');
+  }
   sdkNotice.style.display = 'none';
   sdkNotice.removeAttribute('data-inboxsdk-id');
 }
@@ -115,7 +117,9 @@ export default class GmailButterBarDriver {
 
       if (rawOptions.html) {
         sdkNotice.innerHTML = rawOptions.html;
-        sdkNotice.firstChild.classList.add('bAq');
+        if (sdkNotice.firstElementChild) {
+          sdkNotice.firstElementChild.classList.add('bAq');
+        }
       } else if (rawOptions.el) {
         sdkNotice.innerHTML = '';
         rawOptions.el.classList.add('bAq');
