@@ -545,9 +545,20 @@ class GmailComposeView {
   }
 
   _updateComposeFullscreenState() {
-    this._isFullscreen = !this._isInlineReplyForm &&
-      (this._isStandalone ||
-        (GmailElementGetter.getFullscreenComposeWindowContainer():any).contains(this._element));
+    if (this._isInlineReplyForm) {
+      this._isFullscreen = false;
+    } else {
+      if (this._isStandalone) {
+        this._isFullscreen = true;
+      } else {
+        const fullScreenContainer = GmailElementGetter.getFullscreenComposeWindowContainer();
+        if (!fullScreenContainer) {
+          this._isFullscreen = false;
+        } else {
+          this._isFullscreen = fullScreenContainer.contains(this._element);
+        }
+      }
+    }
   }
 
   focus() {

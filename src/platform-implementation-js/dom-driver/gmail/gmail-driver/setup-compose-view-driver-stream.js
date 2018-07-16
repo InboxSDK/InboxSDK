@@ -74,26 +74,25 @@ function _setupStandardComposeElementStream() {
 			return Kefir.never();
 		}
 	}).merge(
-		_waitForContainerAndMonitorChildrenStream(() =>
-			GmailElementGetter.getFullscreenComposeWindowContainer()
-		)
-		.map(_informElement('composeFullscreenStateChanged'))
-		.map(({el, removalStream}) => {
-			// If you close a fullscreen compose while it's still saving, Gmail never
-			// removes it from the DOM, and instead only removes a specific child
-			// element. Ugh. Watch for its removal too.
-			const targetEl = el.querySelector('[role=dialog] div.aaZ');
-			if (!targetEl) return null;
-			var hiddenStream = kefirMakeMutationObserverChunkedStream(
-					targetEl, {childList: true}
-				)
-				.filter(() => targetEl.childElementCount === 0)
-				.map(() => null);
-			return {
-				el, removalStream: removalStream.merge(hiddenStream).take(1)
-			};
-		})
-		.filter(Boolean)
+		GmailElementGetter.getFullscreenComposeWindowContainerStream()
+			.flatMap(({el, removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+			.map(_informElement('composeFullscreenStateChanged'))
+			.map(({el, removalStream}) => {
+				// If you close a fullscreen compose while it's still saving, Gmail never
+				// removes it from the DOM, and instead only removes a specific child
+				// element. Ugh. Watch for its removal too.
+				const targetEl = el.querySelector('[role=dialog] div.aaZ');
+				if (!targetEl) return null;
+				var hiddenStream = kefirMakeMutationObserverChunkedStream(
+						targetEl, {childList: true}
+					)
+					.filter(() => targetEl.childElementCount === 0)
+					.map(() => null);
+				return {
+					el, removalStream: removalStream.merge(hiddenStream).take(1)
+				};
+			})
+			.filter(Boolean)
 	).flatMap(event => {
 		if (!event) throw new Error("Should not happen");
 		const el = event.el.querySelector('[role=dialog]');

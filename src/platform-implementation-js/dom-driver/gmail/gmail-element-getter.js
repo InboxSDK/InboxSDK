@@ -2,6 +2,9 @@
 
 import once from 'lodash/once';
 import RSVP from 'rsvp';
+import Kefir from 'kefir';
+import makeElementChildStream from '../../lib/dom/make-element-child-stream';
+import type {ElementWithLifetime} from '../../lib/dom/make-element-child-stream';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import {defobj} from 'ud';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
@@ -33,6 +36,18 @@ const GmailElementGetter = {
 
 	getComposeWindowContainer(): ?HTMLElement {
 		return document.querySelector('.dw .nH > .nH > .no');
+	},
+
+	getFullscreenComposeWindowContainerStream(): Kefir.Observable<ElementWithLifetime> {
+		if (!document.body) throw new Error();
+		return makeElementChildStream(document.body)
+			.filter(({el}) => el.classList.contains('aSs'))
+			.flatMap(({el, removalStream}) => makeElementChildStream(el).takeUntilBy(removalStream))
+			.filter(({el}) => el.classList.contains('aSt'))
+			// Assume that only one element will come through and will never be removed from the page.
+			.take(1)
+			.map(({el}) => ({el, removalStream: Kefir.never()}))
+			.toProperty();
 	},
 
 	getFullscreenComposeWindowContainer(): ?HTMLElement {
