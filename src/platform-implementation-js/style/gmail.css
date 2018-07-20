@@ -2408,10 +2408,6 @@ body.inboxsdk__gmailv1css .inboxsdk__butterbar div[role="button"].bBe {
   display: none;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__butterbar .a8k {
-  margin-left: 8px;
-}
-
 .inboxsdk__butterbar.inboxsdk__butterbar_error {
   background-color: #c53929 !important;
 }
