@@ -71,7 +71,7 @@ var ButterBar = /** @lends ButterBar */ {
 
 /**
 * @class
-* This type is used to describe a message for ButterBar to show.
+* This type is used to describe a message for ButterBar to show
 */
 var MessageDescriptor = /** @lends MessageDescriptor */{
   /**
@@ -141,34 +141,8 @@ var MessageDescriptor = /** @lends MessageDescriptor */{
   * ^optional
   * @type {Object}
   */
-  messageKey: null,
-
-  /**
-  * An array of buttons to support functionality in addition to the preview functionality
-  * ^optional
-  * @type {Array.<ButterBarButtonDescriptor>}
-  */
-  buttons: null
+  messageKey: null
 };
-
-/**
-* @class
-* This type is used to describe the messages for {ButterBar.showSaving} to show
-*/
-var ButterBarButtonDescriptor = /** @lends ButterBarButtonDescriptor */{
-	/**
-	 * This is called when a button is clicked and gets passed an event object.
-	 * @type {func(event)}
-	 */
-  onClick: null,
-
-   /**
-	 * Text of the button.
-	 * @type {string}
-	 */
-	title: null,
-}
-
 
 /**
 * @class

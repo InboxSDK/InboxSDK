@@ -46,9 +46,6 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   noticeContainer.style.top = '-10000px';
   noticeContainer.style.position = 'relative';
   noticeContainer.classList.remove('bAp');
-  if (sdkNotice.firstElementChild) {
-    sdkNotice.firstElementChild.classList.remove('bAq');
-  }
   sdkNotice.style.display = 'none';
   sdkNotice.removeAttribute('data-inboxsdk-id');
 }
@@ -89,15 +86,13 @@ export default class GmailButterBarDriver {
     const instanceId = Date.now()+'-'+Math.random();
 
     const destroy = () => {
-      elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-        if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
-          if (rawOptions.className) {
-            sdkNotice.classList.remove(rawOptions.className);
+        elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
+          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
+            if (rawOptions.className) sdkNotice.classList.remove(rawOptions.className);
+            hideMessage(noticeContainer, googleNotice, sdkNotice);
           }
-          hideMessage(noticeContainer, googleNotice, sdkNotice);
-        }
-      });
-    };
+        });
+      };
 
     elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
       noticeContainer.style.visibility = 'visible';
@@ -117,34 +112,11 @@ export default class GmailButterBarDriver {
 
       if (rawOptions.html) {
         sdkNotice.innerHTML = rawOptions.html;
-        if (sdkNotice.firstElementChild) {
-          sdkNotice.firstElementChild.classList.add('bAq');
-        }
       } else if (rawOptions.el) {
         sdkNotice.innerHTML = '';
-        rawOptions.el.classList.add('bAq');
         sdkNotice.appendChild(rawOptions.el);
       } else {
-        const textContainer = document.createElement('span');
-        textContainer.classList.add('bAq');
-        textContainer.innerText = rawOptions.text;
-        sdkNotice.appendChild(textContainer);
-      }
-
-      if (rawOptions.buttons) {
-        const outerButton = document.createElement('span');
-        outerButton.classList.add('bAo');
-        outerButton.innerHTML = '&nbsp;&nbsp;';
-
-        rawOptions.buttons.forEach(button => {
-          const innerButton = document.createElement('span');
-          innerButton.classList.add('ag', 'a8k');
-          innerButton.textContent = button.title;
-          innerButton.onclick = e => button.onClick(e);
-          outerButton.appendChild(innerButton);
-        });
-
-        sdkNotice.appendChild(outerButton);
+        sdkNotice.textContent = rawOptions.text;
       }
 
       // Set up the close button shown in most Snack Bars in Material Gmail.
