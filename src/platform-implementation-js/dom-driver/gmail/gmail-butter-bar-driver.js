@@ -125,19 +125,19 @@ export default class GmailButterBarDriver {
         rawOptions.el.classList.add('bAq');
         sdkNotice.appendChild(rawOptions.el);
       } else {
-        let textContainer = document.createElement('span');
+        const textContainer = document.createElement('span');
         textContainer.classList.add('bAq');
         textContainer.innerText = rawOptions.text;
         sdkNotice.appendChild(textContainer);
       }
 
       if (rawOptions.buttons) {
-        let outerButton = document.createElement('span');
+        const outerButton = document.createElement('span');
         outerButton.classList.add('bAo');
         outerButton.innerHTML = '&nbsp;&nbsp;';
 
         rawOptions.buttons.forEach(button => {
-          let innerButton = document.createElement('span');
+          const innerButton = document.createElement('span');
           innerButton.classList.add('ag', 'a8k');
           innerButton.textContent = button.title;
           innerButton.onclick = e => button.onClick(e);
