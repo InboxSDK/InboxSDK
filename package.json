@@ -126,7 +126,7 @@
   "scripts": {
     "flow_check": "flow check",
     "jest": "jest",
-    "start": "gulp default --single --watch --reloader",
+    "start": "gulp default --singleBundle --watch --reloader",
     "test": "npm run lint && npm run flow_check && mocha && jest",
     "test-browser": "wdio",
     "lint": "eslint .",
