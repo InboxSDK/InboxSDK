@@ -9,6 +9,7 @@ import RSVP from 'rsvp';
 import get from '../../common/get-or-fail';
 import ComposeButtonView from './compose-button-view';
 
+import type Membrane from '../lib/Membrane';
 import type {Driver} from '../driver-interfaces/driver';
 import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
 
@@ -18,14 +19,13 @@ const memberMap = ud.defonce(module, ()=>new WeakMap());
 class ComposeView extends EventEmitter {
 	destroyed: boolean = false;
 
-	constructor(driver: Driver, composeViewImplementation: ComposeViewDriver, appId: string, composeViewStream: Kefir.Observable<ComposeView>) {
+	constructor(driver: Driver, composeViewImplementation: ComposeViewDriver, membrane: Membrane) {
 		super();
 
 		const members = {
 			driver,
-			composeViewImplementation,
-			appId,
-			composeViewStream
+			membrane,
+			composeViewImplementation
 		};
 		memberMap.set(this, members);
 
@@ -63,7 +63,7 @@ class ComposeView extends EventEmitter {
 		const members = get(memberMap, this);
 		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 
-		const optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.appId, {composeView: this});
+		const optionsPromise = members.composeViewImplementation.addButton(buttonDescriptorStream, members.driver.getAppId(), {composeView: this});
 		return new ComposeButtonView(optionsPromise, members.composeViewImplementation, members.driver);
 	}
 
@@ -248,9 +248,11 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.setTitleBarText(text);
 	}
 
-	popOut(): Promise<ComposeView> {
+	async popOut(): Promise<ComposeView> {
+		const nextComposeViewDriverPromise = get(memberMap, this).driver.getNextComposeViewDriver();
 		get(memberMap, this).composeViewImplementation.popOut();
-		return get(memberMap, this).composeViewStream.take(1).toPromise(RSVP.Promise);
+		const nextComposeViewDriver = await nextComposeViewDriverPromise;
+		return get(memberMap, this).membrane.get(nextComposeViewDriver);
 	}
 
 	isReply(){

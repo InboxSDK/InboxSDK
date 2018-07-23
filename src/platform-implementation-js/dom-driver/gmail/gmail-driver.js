@@ -419,8 +419,20 @@ class GmailDriver {
 		return addToolbarButtonForApp(this, buttonDescriptor);
 	}
 
-	openComposeWindow() {
-		openComposeWindow(this).catch(err => this._logger.error(err));
+	async openNewComposeViewDriver(): Promise<GmailComposeView> {
+		try {
+			const composeViewDriverPromise = this.getNextComposeViewDriver();
+			await openComposeWindow(this);
+			const composeViewDriver = await composeViewDriverPromise;
+			return composeViewDriver;
+		} catch (err) {
+			this._logger.error(err);
+			throw err;
+		}
+	}
+
+	getNextComposeViewDriver(): Promise<GmailComposeView> {
+		return this._composeViewDriverStream.take(1).toPromise();
 	}
 
 	openDraftByMessageID(messageID: string) {
@@ -432,7 +444,7 @@ class GmailDriver {
 	}
 
 	createMoleViewDriver(options: Object): GmailMoleViewDriver {
-		return new GmailMoleViewDriver(options);
+		return new GmailMoleViewDriver(this, options);
 	}
 
 	createDrawerViewDriver(options) {

@@ -11,8 +11,7 @@ export default async function openComposeWindow(gmailDriver: GmailDriver) {
 	await GmailElementGetter.waitForGmailModeToSettle();
 
 	if(GmailElementGetter.isStandaloneComposeWindow() || GmailElementGetter.isStandaloneThreadWindow()){
-		//do nothing
-		return;
+		throw new Error("Can not open new compose while in standalone window");
 	}
 
 	if (!GmailElementGetter.getComposeButton()) {

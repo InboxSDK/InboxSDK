@@ -11,14 +11,17 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
 class GmailMoleViewDriver {
+  _driver: GmailDriver;
   _eventStream = kefirBus();
   _stopper = kefirStopper();
   _element: HTMLElement;
 
-  constructor(options: MoleOptions) {
+  constructor(driver: GmailDriver, options: MoleOptions) {
     (this: MoleViewDriver); // interface check
+    this._driver = driver;
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view '+(options.className||''),
       innerHTML: getHTMLString(options)

@@ -47,7 +47,8 @@ export type Driver = {
 	getOpts(): PiOpts;
 	getRouteViewDriverStream(): Kefir.Observable<RouteViewDriver>; // should be a property
 	getRowListViewDriverStream(): Kefir.Observable<Object>;
-	openComposeWindow(): void;
+	openNewComposeViewDriver(): Promise<ComposeViewDriver>;
+	getNextComposeViewDriver(): Promise<ComposeViewDriver>;
 	getComposeViewDriverStream(): Kefir.Observable<ComposeViewDriver>;
 	openDraftByMessageID(messageID: string): void;
 	getThreadViewDriverStream(): Kefir.Observable<ThreadViewDriver>;

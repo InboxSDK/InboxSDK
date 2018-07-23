@@ -600,9 +600,32 @@ class InboxDriver {
     }
   }
 
-  openComposeWindow(): void {
+  openNewComposeViewDriver(): Promise<InboxComposeView> {
+    const composeViewDriverPromise = this.getNextComposeViewDriver();
     const fabButton = querySelectorOne((document.body:any), 'nav[role=banner] ~ div[aria-expanded] button:not([tabindex="-1"])');
     fabButton.click();
+    return composeViewDriverPromise;
+  }
+
+  getNextComposeViewDriver(): Promise<InboxComposeView> {
+    return new Promise((resolve, reject) => {
+      const subscription = this._composeViewDriverLiveSet.subscribe({
+        next: changes => {
+          const newComposeChange = changes.filter(change => change.type === 'add')[0];
+          if (newComposeChange) {
+            subscription.unsubscribe();
+
+            // make flow happy
+            if (newComposeChange.type !== 'add') throw new Error('should not happen');
+
+            resolve(newComposeChange.value);
+          }
+        },
+        complete: () => {
+          reject(new Error('Driver was shutdown before a new compose was found'));
+        }
+      });
+    });
   }
 
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {
