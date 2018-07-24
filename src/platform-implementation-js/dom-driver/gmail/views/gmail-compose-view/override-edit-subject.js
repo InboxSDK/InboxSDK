@@ -52,10 +52,9 @@ function _cloneContentToNewCompose(gmailDriver, gmailComposeView){
 
   gmailComposeView.discard();
 
-  (gmailDriver: any)
-    .getComposeViewDriverStream()
-    .take(1)
-    .onValue((newComposeView: GmailComposeView) => {
+  gmailDriver
+    .openNewComposeViewDriver()
+    .then((newComposeView: GmailComposeView) => {
 
       if(toRecipients.length > 0) newComposeView.setToRecipients(toRecipients.map(c => c.emailAddress));
       if(ccRecipients.length > 0) newComposeView.setCcRecipients(ccRecipients.map(c => c.emailAddress));
@@ -69,8 +68,6 @@ function _cloneContentToNewCompose(gmailDriver, gmailComposeView){
         newComposeView.getSubjectInput().select();
       }, 1);
     });
-
-  gmailDriver.openComposeWindow();
 }
 
 function _ensureExtraContentIsVisible(gmailComposeView){

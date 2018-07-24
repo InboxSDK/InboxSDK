@@ -23,6 +23,10 @@ import ThreadRowView from './views/thread-row-view';
 import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
 import InboxThreadRowView from './dom-driver/inbox/views/inbox-thread-row-view';
 
+import ComposeView from './views/compose-view';
+import GmailComposeView from './dom-driver/gmail/views/gmail-compose-view';
+import InboxComposeView from './dom-driver/inbox/views/inbox-compose-view';
+
 import DummyRouteViewDriver from './views/route-view/dummy-route-view-driver';
 import RouteView from './views/route-view/route-view';
 import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
@@ -102,6 +106,8 @@ export class PlatformImplementation extends SafeEventEmitter {
 		}
 
 		const membrane = new Membrane([
+			[GmailComposeView, viewDriver => new ComposeView(driver, viewDriver, membrane)],
+			[InboxComposeView, viewDriver => new ComposeView(driver, viewDriver, membrane)],
 			[GmailAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
 			[InboxAttachmentCardView, viewDriver => new AttachmentCardView(viewDriver, driver, membrane)],
 			[GmailMessageView, viewDriver => new MessageView(viewDriver, appId, membrane, this.Conversations, driver)],
@@ -123,7 +129,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 		this.ButterBar = new ButterBar(appId, driver);
 		driver.setButterBar(this.ButterBar);
 
-		this.Compose = new Compose(appId, driver, piOpts);
+		this.Compose = new Compose(driver, membrane);
 		this.Conversations = new Conversations(appId, driver, membrane);
 		this.Keyboard = new Keyboard(appId, appName, appIconUrl, driver);
 		this.User = new User(driver, piOpts);
