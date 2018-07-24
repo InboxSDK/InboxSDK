@@ -19,16 +19,16 @@ const elements = streamWaitFor(() => ((document.body:any):HTMLElement).querySele
       textAndButtonsContainer.classList.add('aT');
 
       const textContainer = document.createElement('span');
-      textContainer.classList.add('bAq');
+      textContainer.classList.add('inboxsdk__butterbar-text', 'bAq');
 
       const buttonsContainer = document.createElement('span');
-      buttonsContainer.classList.add('bAo');
+      buttonsContainer.classList.add('inboxsdk__butterbar-buttons', 'bAo');
       buttonsContainer.innerHTML = '&nbsp;&nbsp;';
 
       // Set up the close button shown in most Snack Bars in Material Gmail.
       // This button is hidden by css in Gmailv1.
       const noticeCloseButton = document.createElement('div');
-      noticeCloseButton.classList.add('bBe');
+      noticeCloseButton.classList.add('inboxsdk__butterbar-close', 'bBe');
       noticeCloseButton.innerHTML = '<div class="bBf"></div>';
       noticeCloseButton.setAttribute('role', 'button');
       noticeCloseButton.tabIndex = 0;
@@ -139,39 +139,42 @@ export default class GmailButterBarDriver {
       sdkNotice.className = googleNotice.className;
       sdkNotice.classList.add('inboxsdk__butterbar');
 
-      const textContainer = sdkNotice.firstChild.firstChild;
+      const textContainer = querySelector(sdkNotice, '.inboxsdk__butterbar-text');
       while (textContainer.firstChild) {
         textContainer.removeChild(textContainer.firstChild);
       }
 
-      const buttonsContainer = sdkNotice.firstChild.lastChild;
+      const buttonsContainer = querySelector(sdkNotice, '.inboxsdk__butterbar-buttons');
       while (buttonsContainer.firstChild) {
         buttonsContainer.removeChild(buttonsContainer.firstChild);
       }
 
       if (rawOptions.html) {
-        textContainer.innerHTML = rawOptions.html;
+        textContainer && (textContainer.innerHTML = rawOptions.html);
       } else if (rawOptions.el) {
-        textContainer.appendChild(rawOptions.el);
+        textContainer && textContainer.appendChild(rawOptions.el);
       } else {
-        textContainer.textContent = rawOptions.text;
+        textContainer && (textContainer.textContent = rawOptions.text);
       }
 
       if (rawOptions.buttons) {
         rawOptions.buttons.forEach(buttonDescriptor => {
           const button = document.createElement('span');
           button.classList.add('ag', 'a8k');
-          button.textContent = buttonDescriptor.title;
           button.onclick = e => buttonDescriptor.onClick(e);
-          buttonsContainer.appendChild(button);
+          button.setAttribute('role', 'button');
+          button.tabIndex = 0; 
+          button.textContent = buttonDescriptor.title;
+          buttonsContainer && buttonsContainer.appendChild(button);
         });
       }
 
-
-      const closeButton = sdkNotice.lastChild;
-      Kefir.fromEvents(closeButton, 'click')
+      const closeButton = querySelector(sdkNotice, '.inboxsdk__butterbar-close');
+      if (closeButton) {
+        Kefir.fromEvents(closeButton, 'click')
         .take(1)
         .onValue(destroy);
+      }
 
       if (rawOptions.className) {
         sdkNotice.classList.add(rawOptions.className);
