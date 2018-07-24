@@ -248,6 +248,10 @@ class GmailDriver {
 	getStopper(): Kefir.Observable<null> {return this._stopper;}
 	getEnvData(): EnvData {return this._envData;}
 
+	getTimestampOnReady(): ?number {
+		return this._timestampOnready;
+	}
+
 	getTimings(): {[ix:string]:?number} {
 		return {
 			piMainStarted: this._envData.piMainStarted,

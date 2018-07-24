@@ -104,9 +104,31 @@ class GmailMoleViewDriver {
     if (moleParent) {
       doShow(moleParent);
     } else {
-      streamWaitFor(() => GmailElementGetter.getMoleParent())
+      const moleParentReadyEvent = streamWaitFor(() => GmailElementGetter.getMoleParent())
         .takeUntilBy(this._stopper)
         .onValue(doShow);
+
+      // For some users, the mole parent element seems to be lazily loaded by
+      // Gmail only once the user has used a compose view or a thread view.
+      // If the gmail mode has settled, we've been loaded for 10 seconds, and
+      // we don't have the mole parent yet, then force the mole parent to load
+      // by opening a compose view and then closing it.
+
+      Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+        .flatMap(() => {
+          // delay until we've passed TimestampOnReady + 10 seconds
+          const targetTime = (this._driver.getTimestampOnReady() || Date.now()) + 10*1000;
+          const timeToWait = Math.max(0, targetTime - Date.now());
+          return Kefir.later(timeToWait);
+        })
+        .takeUntilBy(moleParentReadyEvent)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._driver.getLogger().eventSdkActive('mole parent force load');
+          this._driver.openNewComposeViewDriver().then(gmailComposeView => {
+            gmailComposeView.close();
+          });
+        });
     }
   }
 
