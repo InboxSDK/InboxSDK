@@ -10,7 +10,7 @@ var Global = /** @lends Global */ {
    * Only works in material Gmail UI.
 	 * ^gmail
 	 * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the global sidebar.
-	 * @return {ContentPanelView}
+	 * @return {Promise.<ContentPanelView>}
 	 */
 	addSidebarContentPanel: function(){},
 
