@@ -3,66 +3,71 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view.js';
 import type InboxThreadRowView from '../dom-driver/inbox/views/inbox-thread-row-view.js';
+import get from '../../common/get-or-fail';
+
+const membersMap = new WeakMap();
 
 // documented in src/docs/
 export default class ThreadRowView extends EventEmitter {
   destroyed: boolean;
-  _threadRowViewDriver: GmailThreadRowView|InboxThreadRowView;
 
   constructor(threadRowViewDriver: GmailThreadRowView|InboxThreadRowView){
     super();
+    const members = {threadRowViewDriver};
+    membersMap.set(this, members);
+
     this.destroyed = false;
-    this._threadRowViewDriver = threadRowViewDriver;
-    this._threadRowViewDriver.getEventStream().onEnd(() => {
+
+    threadRowViewDriver.getEventStream().onEnd(() => {
       this.destroyed = true;
       this.emit('destroy');
     });
-    this._threadRowViewDriver.setUserView(this);
+    threadRowViewDriver.setUserView(this);
   }
 
   addLabel(labelDescriptor: Object) {
-    this._threadRowViewDriver.addLabel(labelDescriptor);
+    get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 
   addImage(imageDescriptor: Object){
-    this._threadRowViewDriver.addImage(imageDescriptor);
+    get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
   }
 
   addButton(buttonDescriptor: Object) {
-    this._threadRowViewDriver.addButton(buttonDescriptor);
+    get(membersMap, this).threadRowViewDriver.addButton(buttonDescriptor);
   }
 
   addActionButton(actionButtonDescriptor: Object) {
-    this._threadRowViewDriver.addActionButton(actionButtonDescriptor);
+    get(membersMap, this).threadRowViewDriver.addActionButton(actionButtonDescriptor);
   }
 
   addAttachmentIcon(threadRowAttachmentIconDescriptor: Object) {
-    this._threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
+    get(membersMap, this).threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
   }
 
   replaceDate(threadRowDateDescriptor: Object) {
-    this._threadRowViewDriver.replaceDate(threadRowDateDescriptor);
+    get(membersMap, this).threadRowViewDriver.replaceDate(threadRowDateDescriptor);
   }
 
   replaceDraftLabel(draftLabelDescriptor: Object) {
-    this._threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
+    get(membersMap, this).threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
   }
 
   getSubject(): string {
-    return this._threadRowViewDriver.getSubject();
+    return get(membersMap, this).threadRowViewDriver.getSubject();
   }
 
   getDateString(): string {
-    return this._threadRowViewDriver.getDateString();
+    return get(membersMap, this).threadRowViewDriver.getDateString();
   }
 
   getThreadID(): string {
     // TODO mark deprecated
-    return this._threadRowViewDriver.getThreadID();
+    return get(membersMap, this).threadRowViewDriver.getThreadID();
   }
 
   getThreadIDAsync(): Promise<string> {
-    return this._threadRowViewDriver.getThreadIDAsync();
+    return get(membersMap, this).threadRowViewDriver.getThreadIDAsync();
   }
 
   getThreadIDIfStable(): ?string {
@@ -83,18 +88,18 @@ export default class ThreadRowView extends EventEmitter {
   }
 
   getDraftID(): Promise<?string> {
-    return this._threadRowViewDriver.getDraftID();
+    return get(membersMap, this).threadRowViewDriver.getDraftID();
   }
 
   getVisibleDraftCount(): number {
-    return this._threadRowViewDriver.getVisibleDraftCount();
+    return get(membersMap, this).threadRowViewDriver.getVisibleDraftCount();
   }
 
   getVisibleMessageCount(): number {
-    return this._threadRowViewDriver.getVisibleMessageCount();
+    return get(membersMap, this).threadRowViewDriver.getVisibleMessageCount();
   }
 
   getContacts(): Contact[] {
-    return this._threadRowViewDriver.getContacts();
+    return get(membersMap, this).threadRowViewDriver.getContacts();
   }
 }
