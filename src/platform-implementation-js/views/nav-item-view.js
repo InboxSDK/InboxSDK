@@ -56,7 +56,7 @@ export default class NavItemView extends EventEmitter {
 	setNavItemViewDriver(navItemViewDriver: Object){
 		const members = get(memberMap, this);
 
-		if(!members.driver){
+		if(this.destroyed){
 			members.deferred.resolve(navItemViewDriver);
 			return; //we have been removed already
 		}
@@ -81,11 +81,11 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	remove(){
-		const members = memberMap.get(this);
-		if(!members || !members.navItemViews || !members.driver || !members.navItemViews){
+		if(this.destroyed){
 			return;
 		}
-		const {appId, navItemViews} = members;
+		const members = get(memberMap, this);
+		const {navItemViews} = members;
 
 		this.destroyed = true;
 		this.emit('destroy');
@@ -100,10 +100,7 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	isCollapsed(): boolean {
-		const members = memberMap.get(this);
-		if(!members){
-			return false;
-		}
+		const members = get(memberMap, this);
 		const navItemViewDriver = members.navItemViewDriver;
 
 		if(navItemViewDriver){
