@@ -33,8 +33,9 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
-		const members = memberMap.get(this);
-		if(!members || !members.driver || !members.appId || !members.navItemViews) throw new Error('this nav item view does not exist');
+		if (this.destroyed) throw new Error('this nav item view does not exist');
+
+		const members = get(memberMap, this);
 		const driver = members.driver;
 		const appId = members.appId;
 		const navItemViews = members.navItemViews;
