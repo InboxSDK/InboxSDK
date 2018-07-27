@@ -21,14 +21,13 @@ export default class NavItemView extends EventEmitter {
 	constructor(appId: string, driver: Driver, navItemDescriptorPropertyStream: Object){
 		super();
 
-		var members = {};
+		const members = {
+			appId, driver, navItemDescriptorPropertyStream,
+			deferred: RSVP.defer(),
+			navItemViews: [],
+			navItemViewDriver: (null: ?Object)
+		};
 		memberMap.set(this, members);
-
-		members.appId = appId;
-		members.driver = driver;
-		members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
-		members.deferred = RSVP.defer();
-		members.navItemViews = [];
 
 		driver.getStopper().onValue(this.remove.bind(this));
 	}
@@ -94,14 +93,8 @@ export default class NavItemView extends EventEmitter {
 			navItemView.remove();
 		});
 
-		members.navItemViews = null;
-
-		members.appId = null;
-		members.driver = null;
-
 		members.deferred.promise.then(navItemViewDriver => {
 			navItemViewDriver.destroy();
-			members.navItemViewDriver = null;
 		});
 	}
 
