@@ -67,6 +67,8 @@ import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOld
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import toLiveSet from '../../lib/toLiveSet';
 
+import waitFor from '../../lib/stream-wait-for';
+
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type {RouteParams} from '../../namespaces/router';
@@ -641,13 +643,21 @@ class GmailDriver {
 		).takeUntilBy(this._stopper);
 	}
 
-	addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>): Promise<?ContentPanelViewDriver> {
+	async addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>): Promise<?ContentPanelViewDriver> {
 		if(this.isUsingMaterialUI()){
+			// TODO move this waitFor into this.getGlobalSidebar() if possible so it's done on all calls to it.
+			await waitFor(() => GmailElementGetter.getCompanionSidebarContentContainerElement())
+				.merge(this._stopper.flatMap(() =>
+	        Kefir.constantError(new Error('Driver instance was destroyed early'))
+	      ))
+				.take(1)
+				.takeErrors(1)
+				.toPromise();
 			const appSidebar = this.getGlobalSidebar();
-			return Promise.resolve(appSidebar.addGlobalSidebarContentPanel(descriptor));
+			return appSidebar.addGlobalSidebarContentPanel(descriptor);
 		}
 		else {
-			return Promise.resolve(null);
+			return null;
 		}
 	}
 
