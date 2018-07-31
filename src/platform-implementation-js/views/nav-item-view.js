@@ -21,21 +21,21 @@ export default class NavItemView extends EventEmitter {
 	constructor(appId: string, driver: Driver, navItemDescriptorPropertyStream: Object){
 		super();
 
-		var members = {};
+		const members = {
+			appId, driver, navItemDescriptorPropertyStream,
+			deferred: RSVP.defer(),
+			navItemViews: [],
+			navItemViewDriver: (null: ?Object)
+		};
 		memberMap.set(this, members);
-
-		members.appId = appId;
-		members.driver = driver;
-		members.navItemDescriptorPropertyStream = navItemDescriptorPropertyStream;
-		members.deferred = RSVP.defer();
-		members.navItemViews = [];
 
 		driver.getStopper().onValue(this.remove.bind(this));
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {
-		const members = memberMap.get(this);
-		if(!members || !members.driver || !members.appId || !members.navItemViews) throw new Error('this nav item view does not exist');
+		if (this.destroyed) throw new Error('this nav item view does not exist');
+
+		const members = get(memberMap, this);
 		const driver = members.driver;
 		const appId = members.appId;
 		const navItemViews = members.navItemViews;
@@ -56,7 +56,7 @@ export default class NavItemView extends EventEmitter {
 	setNavItemViewDriver(navItemViewDriver: Object){
 		const members = get(memberMap, this);
 
-		if(!members.driver){
+		if(this.destroyed){
 			members.deferred.resolve(navItemViewDriver);
 			return; //we have been removed already
 		}
@@ -81,11 +81,11 @@ export default class NavItemView extends EventEmitter {
 	}
 
 	remove(){
-		const members = memberMap.get(this);
-		if(!members || !members.navItemViews || !members.driver || !members.navItemViews){
+		if(this.destroyed){
 			return;
 		}
-		const {appId, navItemViews} = members;
+		const members = get(memberMap, this);
+		const {navItemViews} = members;
 
 		this.destroyed = true;
 		this.emit('destroy');
@@ -94,22 +94,13 @@ export default class NavItemView extends EventEmitter {
 			navItemView.remove();
 		});
 
-		members.navItemViews = null;
-
-		members.appId = null;
-		members.driver = null;
-
 		members.deferred.promise.then(navItemViewDriver => {
 			navItemViewDriver.destroy();
-			members.navItemViewDriver = null;
 		});
 	}
 
 	isCollapsed(): boolean {
-		const members = memberMap.get(this);
-		if(!members){
-			return false;
-		}
+		const members = get(memberMap, this);
 		const navItemViewDriver = members.navItemViewDriver;
 
 		if(navItemViewDriver){

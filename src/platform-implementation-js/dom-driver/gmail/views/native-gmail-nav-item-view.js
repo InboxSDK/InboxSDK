@@ -13,7 +13,6 @@ import findParent from '../../../../common/find-parent';
 
 import GmailElementGetter from '../gmail-element-getter';
 
-import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
 import GmailNavItemView, {getLeftIndentationPaddingValue} from './gmail-nav-item-view';
 
 import type GmailDriver from '../gmail-driver';
