@@ -117,9 +117,7 @@ class GmailMoleViewDriver {
       Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
         .flatMap(() => {
           // delay until we've passed TimestampOnReady + 10 seconds
-          const targetTime = (this._driver.getTimestampOnReady() || Date.now()) + 10*1000;
-          const timeToWait = Math.max(0, targetTime - Date.now());
-          return Kefir.later(timeToWait);
+          return this._driver.delayToTimeAfterReady(10*1000);
         })
         .takeUntilBy(moleParentReadyEvent)
         .takeUntilBy(this._stopper)

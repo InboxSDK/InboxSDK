@@ -309,8 +309,20 @@ class GmailDriver {
     return this._envData;
   }
 
-  getTimestampOnReady(): ?number {
+  getTimestampOnReady(): number {
+    if (this._timestampOnready == null) {
+      this._logger.error(new Error('getTimestampOnReady called before ready'));
+      return Date.now();
+    }
     return this._timestampOnready;
+  }
+
+  // Returns a stream that emits an event once at least `time` milliseconds has
+  // passed since the GmailDriver's ready event.
+  delayToTimeAfterReady(time: number): Kefir.Observable<void> {
+    const targetTime = this.getTimestampOnReady() + time;
+    const timeToWait = Math.max(0, targetTime - Date.now());
+    return Kefir.later(timeToWait);
   }
 
   getTimings(): { [ix: string]: ?number } {
