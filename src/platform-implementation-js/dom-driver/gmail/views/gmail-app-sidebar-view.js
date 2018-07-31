@@ -550,7 +550,7 @@ class GmailAppSidebarView {
             threadIconArea = document.createElement('div');
             threadIconArea.className = idMap('sidebar_iconArea');
             threadIconArea.classList.add('sidebar_thread_iconArea');
-            addCompanionThreadIconArea(threadIconArea, companionSidebarIconContainerEl);
+            addCompanionThreadIconArea(this._driver.getLogger(), threadIconArea, companionSidebarIconContainerEl);
           }
 
           addButton(threadIconArea, event, false);
@@ -626,7 +626,7 @@ class GmailAppSidebarView {
             globalIconArea = document.createElement('div');
             globalIconArea.className = idMap('sidebar_iconArea');
             globalIconArea.classList.add('sidebar_global_iconArea');
-            addCompanionGlobalIconArea(globalIconArea, companionSidebarIconContainerEl);
+            addCompanionGlobalIconArea(this._driver.getLogger(), globalIconArea, companionSidebarIconContainerEl);
           }
 
           const sdkContentContainerEl = document.createElement('div');

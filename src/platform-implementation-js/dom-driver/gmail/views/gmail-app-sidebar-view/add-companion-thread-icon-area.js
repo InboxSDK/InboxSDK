@@ -5,7 +5,7 @@ import {defn} from 'ud';
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
-
+import type Logger from '../../../../lib/logger';
 
 /*
 As of Feb 6th, 2018.
@@ -16,16 +16,16 @@ As of Feb 6th, 2018.
 
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 
-function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
+function addCompanionThreadIconArea(logger: Logger, iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
   const tabList = companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
   if(!tabList) {
-    console.warn('no tablist');
+    logger.error(new Error('addCompanionThreadIconArea: no tablist'));
     return;
   }
 
   const separator = companionSidebarIconContainerEl.querySelector('[role=separator]');
   if (!separator) {
-    console.warn('failed to find separator');
+    logger.error(new Error('addCompanionThreadIconArea: failed to find separator'));
     tabList.insertAdjacentElement('beforebegin', iconArea);
   } else {
     if (!separator.parentElement) throw new Error();
