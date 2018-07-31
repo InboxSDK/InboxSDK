@@ -773,13 +773,16 @@ class GmailAppSidebarView {
       threadView.getStopper(),
       this._stopper
     ]).take(1)
+      .takeUntilBy(panel.getStopper())
       .onValue(() => panel.remove());
     return panel;
   }
 
   addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const panel = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId, true);
-    this._stopper.onValue(() => panel.remove());
+    this._stopper
+      .takeUntilBy(panel.getStopper())
+      .onValue(() => panel.remove());
     return panel;
   }
 }
