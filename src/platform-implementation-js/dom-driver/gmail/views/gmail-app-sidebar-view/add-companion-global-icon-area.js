@@ -16,9 +16,15 @@ const GLOBAL_ICON_AREA_SELECTOR = '.brC-aT5-aOt-bsf-Jw';
 
 function addCompanionGlobalIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
   const sidebarIconArea = companionSidebarIconContainerEl.querySelector(GLOBAL_ICON_AREA_SELECTOR);
-  if(!sidebarIconArea) return;
+  if(!sidebarIconArea) {
+    console.warn('no sidebarIconArea');
+    return;
+  }
   const nativeIconArea = sidebarIconArea.firstElementChild;
-  if(!nativeIconArea) return;
+  if(!nativeIconArea) {
+    console.warn('no nativeIconArea');
+    return;
+  }
 
   nativeIconArea.insertAdjacentElement('beforebegin', iconArea);
 }

@@ -16,19 +16,20 @@ As of Feb 6th, 2018.
 */
 
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
-const THREAD_ICON_AREA_SELECTOR = '.brC-aT5-aOt-ato-Kp-Jw';
+const LOADING_AREA_SELECTOR = '.brC-aT5-aOt-awd-avS,div[role=presentation][aria-disabled=true]';
 
 function addCompanionThreadIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
-  const sidebarIconArea = companionSidebarIconContainerEl.querySelector(THREAD_ICON_AREA_SELECTOR);
-  if(!sidebarIconArea) return;
-  const nativeIconArea = sidebarIconArea.firstElementChild;
-  if(!nativeIconArea) return;
-  const loadingHolderAsAny: any = nativeIconArea.firstElementChild;
-  const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
-  if(!loadingHolder) return;
+  const loadingHolder = companionSidebarIconContainerEl.querySelector(LOADING_AREA_SELECTOR);
+  if(!loadingHolder) {
+    console.warn('no loadingHolder');
+    return;
+  }
 
-  const tabList = sidebarIconArea.querySelector(TAB_LIST_SELECTOR);
-  if(!tabList) return;
+  const tabList = companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
+  if(!tabList) {
+    console.warn('no tablist');
+    return;
+  }
 
   // emits when the loading div display style changes
   const loadingDivIsDisplayedStream =
