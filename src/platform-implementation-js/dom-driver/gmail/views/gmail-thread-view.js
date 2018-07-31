@@ -487,21 +487,33 @@ class GmailThreadView {
 			const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
 			const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
 
-			if(!iconContainerElement) return;
+			if (!iconContainerElement) {
+				if (this._driver.isUsingMaterialUI()) {
+					this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: iconContainerElement not found'));
+				}
+				return;
+			}
 
 			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
-			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg');
-			if (!elementToWatch) return;
+			// .J-KU-Jg is pre-2018-07-30 element?
+			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist]');
+			if (!elementToWatch) {
+				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: elementToWatch not found'));
+				return;
+			}
 
 			makeElementChildStream(elementToWatch)
 				.filter(({el}) =>
 						el.getAttribute('role') === 'tab' &&
-						el.getAttribute('data-tooltip') === addonTitle
+						(el.getAttribute('data-tooltip') || el.getAttribute('aria-label')) === addonTitle
 				)
 				.takeUntilBy(this._stopper)
 				.onValue(({el}) => {
-					if(el.classList.contains('.J-KU-KO')){
+					if (
+						el.classList.contains('.J-KU-KO') || // old pre-2018-07-30 classname?
+						el.classList.contains('.bse-bvF-I-KO')
+					){
 						// it is currently open, so let's close
 						simulateClick(el);
 					}

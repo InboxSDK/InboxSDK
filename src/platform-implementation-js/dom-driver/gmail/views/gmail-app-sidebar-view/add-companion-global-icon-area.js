@@ -3,6 +3,7 @@
 import {defn} from 'ud';
 
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
+import type Logger from '../../../../lib/logger';
 
 /*
 As of Feb 6th, 2018.
@@ -14,11 +15,17 @@ As of Feb 6th, 2018.
 
 const GLOBAL_ICON_AREA_SELECTOR = '.brC-aT5-aOt-bsf-Jw';
 
-function addCompanionGlobalIconArea(iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
+function addCompanionGlobalIconArea(logger: Logger, iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
   const sidebarIconArea = companionSidebarIconContainerEl.querySelector(GLOBAL_ICON_AREA_SELECTOR);
-  if(!sidebarIconArea) return;
+  if(!sidebarIconArea) {
+    logger.error(new Error('addCompanionGlobalIconArea: no sidebarIconArea'));
+    return;
+  }
   const nativeIconArea = sidebarIconArea.firstElementChild;
-  if(!nativeIconArea) return;
+  if(!nativeIconArea) {
+    logger.error(new Error('addCompanionGlobalIconArea: no nativeIconArea'));
+    return;
+  }
 
   nativeIconArea.insertAdjacentElement('beforebegin', iconArea);
 }
