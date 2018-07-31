@@ -487,8 +487,10 @@ class GmailThreadView {
 			const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
 			const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
 
-			if(this._driver.isUsingMaterialUI() && !iconContainerElement) {
-				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: iconContainerElement not found'));
+			if (!iconContainerElement) {
+				if (this._driver.isUsingMaterialUI()) {
+					this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: iconContainerElement not found'));
+				}
 				return;
 			}
 
@@ -497,7 +499,7 @@ class GmailThreadView {
 			// .J-KU-Jg is pre-2018-07-30 element?
 			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist]');
 			if (!elementToWatch) {
-				console.warn('elementToWatch not found');
+				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: elementToWatch not found'));
 				return;
 			}
 
