@@ -124,7 +124,7 @@ const GmailElementGetter = {
 		return document.querySelector('.aeN');
 	},
 
-	getAddonSidebarContainerElement(): ?HTMLElement {
+	getAddonSidebarContainerElement(): ?HTMLElement { // only for Gmailv1 + Gmailv2-before-2018-07-30?
 		return document.querySelector('.no > .nn.bnl');
 	},
 
