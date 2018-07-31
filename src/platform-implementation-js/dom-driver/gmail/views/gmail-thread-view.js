@@ -487,12 +487,18 @@ class GmailThreadView {
 			const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
 			const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
 
-			if(!iconContainerElement) return;
+			if(!iconContainerElement) {
+				console.warn('iconContainerElement not found');
+				return;
+			}
 
 			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
 			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg');
-			if (!elementToWatch) return;
+			if (!elementToWatch) {
+				console.warn('elementToWatch not found');
+				return;
+			}
 
 			makeElementChildStream(elementToWatch)
 				.filter(({el}) =>
