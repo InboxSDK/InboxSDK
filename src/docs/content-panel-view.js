@@ -17,6 +17,12 @@ var ContentPanelView = /** @lends ContentPanelView */ {
     destroyed: false,
 
     /**
+     * Returns whether the content panel is currently visible.
+     * @return {boolean}
+     */
+    isActive: function(){},
+
+    /**
     * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent
     * times if the panel is presented in a tabbed interface and the ContentPanels tab is selected.
     * @event ContentPanelView#activate
