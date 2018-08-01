@@ -781,10 +781,7 @@ class GmailDriver {
     descriptor: Kefir.Observable<Object>
   ): Promise<?ContentPanelViewDriver> {
     if (this.isUsingMaterialUI()) {
-      // TODO move this waitFor into this.getGlobalSidebar() if possible so it's done on all calls to it.
-      await waitFor(() =>
-        GmailElementGetter.getCompanionSidebarContentContainerElement()
-      )
+      await this.waitForGlobalSidebarReady()
         .merge(
           this._stopper.flatMap(() =>
             Kefir.constantError(
@@ -800,6 +797,20 @@ class GmailDriver {
     } else {
       return null;
     }
+  }
+
+  waitForGlobalSidebarReady(): Kefir.Observable<void> {
+    if (!this.isUsingMaterialUI()) {
+      throw new Error(
+        'Should not happen: waitForGlobalSidebarReady called in Gmail v1'
+      );
+    }
+    if (GmailElementGetter.getCompanionSidebarContentContainerElement()) {
+      return Kefir.constant(undefined);
+    }
+    return waitFor(() =>
+      GmailElementGetter.getCompanionSidebarContentContainerElement()
+    ).map(() => undefined);
   }
 
   getGlobalSidebar(): GmailAppSidebarView {
