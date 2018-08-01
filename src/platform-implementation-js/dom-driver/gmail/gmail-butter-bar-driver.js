@@ -150,11 +150,11 @@ export default class GmailButterBarDriver {
       }
 
       if (rawOptions.html) {
-        textContainer && (textContainer.innerHTML = rawOptions.html);
+        textContainer.innerHTML = rawOptions.html;
       } else if (rawOptions.el) {
-        textContainer && textContainer.appendChild(rawOptions.el);
+        textContainer.appendChild(rawOptions.el);
       } else {
-        textContainer && (textContainer.textContent = rawOptions.text);
+        textContainer.textContent = rawOptions.text;
       }
 
       if (rawOptions.buttons) {
@@ -165,7 +165,7 @@ export default class GmailButterBarDriver {
           button.setAttribute('role', 'button');
           button.tabIndex = 0; 
           button.textContent = buttonDescriptor.title;
-          buttonsContainer && buttonsContainer.appendChild(button);
+          buttonsContainer.appendChild(button);
         });
       }
 
