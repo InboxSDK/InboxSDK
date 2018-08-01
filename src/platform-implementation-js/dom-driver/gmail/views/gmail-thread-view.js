@@ -76,6 +76,7 @@ class GmailThreadView {
 					Kefir.constantError(new Error('15 second timeout while waiting for sidebar fired'))
 				)
 			)
+			.toProperty()
 			.take(1)
 			.takeErrors(1)
 			.onError(err => {
@@ -516,7 +517,7 @@ class GmailThreadView {
 			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
 			// .J-KU-Jg is pre-2018-07-30 element?
-			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist]');
+			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt');
 			if (!elementToWatch) {
 				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: elementToWatch not found'));
 				return;

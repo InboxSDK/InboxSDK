@@ -805,12 +805,14 @@ class GmailDriver {
         'Should not happen: waitForGlobalSidebarReady called in Gmail v1'
       );
     }
-    if (GmailElementGetter.getCompanionSidebarContentContainerElement()) {
+    const condition = () =>
+      GmailElementGetter.getCompanionSidebarContentContainerElement() &&
+      (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
+        GmailElementGetter.getAddonSidebarContainerElement());
+    if (condition()) {
       return Kefir.constant(undefined);
     }
-    return waitFor(() =>
-      GmailElementGetter.getCompanionSidebarContentContainerElement()
-    ).map(() => undefined);
+    return waitFor(condition).map(() => undefined);
   }
 
   getGlobalSidebar(): GmailAppSidebarView {
