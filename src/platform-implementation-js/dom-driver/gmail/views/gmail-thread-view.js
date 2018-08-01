@@ -25,7 +25,7 @@ import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
-import GmailAppSidebarView from './gmail-app-sidebar-view';
+import type GmailAppSidebarView from './gmail-app-sidebar-view';
 import GmailThreadSidebarView from './gmail-thread-sidebar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 
@@ -67,9 +67,29 @@ class GmailThreadView {
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
+		let waitForSidebarReady = (
+			this._driver.isUsingMaterialUI() ?
+			this._driver.waitForGlobalSidebarReady() : Kefir.constant(null)
+		)
+			.merge(
+				this._driver.delayToTimeAfterReady(15*1000).flatMap(() =>
+					Kefir.constantError(new Error('15 second timeout while waiting for sidebar fired'))
+				)
+			)
+			.toProperty()
+			.take(1)
+			.takeErrors(1)
+			.onError(err => {
+				this._driver.getLogger().error(err);
+			})
+			.mapErrors(() => null);
+
 		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.isUsingSyncAPI()){
 			this._readyStream =
-				Kefir.fromPromise(this.getThreadIDAsync())
+				Kefir.combine([
+					waitForSidebarReady,
+					Kefir.fromPromise(this.getThreadIDAsync())
+				])
 					.map(() => {
 						this._setupToolbarView();
 						this._setupMessageViewStream();
@@ -77,7 +97,7 @@ class GmailThreadView {
 					});
 		}
 		else {
-			this._readyStream = Kefir.constant(null);
+			this._readyStream = waitForSidebarReady;
 			this._setupToolbarView();
 			this._setupMessageViewStream();
 		}
@@ -497,7 +517,7 @@ class GmailThreadView {
 			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
 
 			// .J-KU-Jg is pre-2018-07-30 element?
-			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist]');
+			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt');
 			if (!elementToWatch) {
 				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: elementToWatch not found'));
 				return;

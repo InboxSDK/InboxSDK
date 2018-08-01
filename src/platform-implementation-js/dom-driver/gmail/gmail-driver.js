@@ -309,8 +309,20 @@ class GmailDriver {
     return this._envData;
   }
 
-  getTimestampOnReady(): ?number {
+  getTimestampOnReady(): number {
+    if (this._timestampOnready == null) {
+      this._logger.error(new Error('getTimestampOnReady called before ready'));
+      return Date.now();
+    }
     return this._timestampOnready;
+  }
+
+  // Returns a stream that emits an event once at least `time` milliseconds has
+  // passed since the GmailDriver's ready event.
+  delayToTimeAfterReady(time: number): Kefir.Observable<void> {
+    const targetTime = this.getTimestampOnReady() + time;
+    const timeToWait = Math.max(0, targetTime - Date.now());
+    return Kefir.later(timeToWait);
   }
 
   getTimings(): { [ix: string]: ?number } {
@@ -769,10 +781,7 @@ class GmailDriver {
     descriptor: Kefir.Observable<Object>
   ): Promise<?ContentPanelViewDriver> {
     if (this.isUsingMaterialUI()) {
-      // TODO move this waitFor into this.getGlobalSidebar() if possible so it's done on all calls to it.
-      await waitFor(() =>
-        GmailElementGetter.getCompanionSidebarContentContainerElement()
-      )
+      await this.waitForGlobalSidebarReady()
         .merge(
           this._stopper.flatMap(() =>
             Kefir.constantError(
@@ -788,6 +797,22 @@ class GmailDriver {
     } else {
       return null;
     }
+  }
+
+  waitForGlobalSidebarReady(): Kefir.Observable<void> {
+    if (!this.isUsingMaterialUI()) {
+      throw new Error(
+        'Should not happen: waitForGlobalSidebarReady called in Gmail v1'
+      );
+    }
+    const condition = () =>
+      GmailElementGetter.getCompanionSidebarContentContainerElement() &&
+      (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
+        GmailElementGetter.getAddonSidebarContainerElement());
+    if (condition()) {
+      return Kefir.constant(undefined);
+    }
+    return waitFor(condition).map(() => undefined);
   }
 
   getGlobalSidebar(): GmailAppSidebarView {
