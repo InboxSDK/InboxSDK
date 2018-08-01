@@ -550,7 +550,7 @@ class GmailAppSidebarView {
             threadIconArea = document.createElement('div');
             threadIconArea.className = idMap('sidebar_iconArea');
             threadIconArea.classList.add('sidebar_thread_iconArea');
-            addCompanionThreadIconArea(threadIconArea, companionSidebarIconContainerEl);
+            addCompanionThreadIconArea(this._driver.getLogger(), threadIconArea, companionSidebarIconContainerEl);
           }
 
           addButton(threadIconArea, event, false);
@@ -626,7 +626,7 @@ class GmailAppSidebarView {
             globalIconArea = document.createElement('div');
             globalIconArea.className = idMap('sidebar_iconArea');
             globalIconArea.classList.add('sidebar_global_iconArea');
-            addCompanionGlobalIconArea(globalIconArea, companionSidebarIconContainerEl);
+            addCompanionGlobalIconArea(this._driver.getLogger(), globalIconArea, companionSidebarIconContainerEl);
           }
 
           const sdkContentContainerEl = document.createElement('div');
@@ -773,13 +773,16 @@ class GmailAppSidebarView {
       threadView.getStopper(),
       this._stopper
     ]).take(1)
+      .takeUntilBy(panel.getStopper())
       .onValue(() => panel.remove());
     return panel;
   }
 
   addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
     const panel = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId, true);
-    this._stopper.onValue(() => panel.remove());
+    this._stopper
+      .takeUntilBy(panel.getStopper())
+      .onValue(() => panel.remove());
     return panel;
   }
 }

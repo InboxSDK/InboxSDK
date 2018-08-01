@@ -12,8 +12,6 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import eventNameFilter from '../../../lib/event-name-filter';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
-import NavItemViewDriver from '../../../driver-interfaces/nav-item-view-driver';
-
 import ButtonView from '../widgets/buttons/button-view';
 import ArrowDropdownButtonView from '../widgets/buttons/arrow-dropdown-button-view';
 import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';

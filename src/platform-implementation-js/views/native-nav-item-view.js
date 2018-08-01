@@ -16,15 +16,13 @@ export default class NativeNavItemView extends EventEmitter {
 	constructor(appId: string, driver: Driver, labelName: string){
 		super();
 
-		var members = {};
+		const members = {
+			appId, driver, labelName,
+			deferred: RSVP.defer(),
+			navItemViews: [],
+			navItemViewDriver: (null: ?Object)
+		};
 		memberMap.set(this, members);
-
-		members.appId = appId;
-		members.driver = driver;
-		members.labelName = labelName;
-		members.deferred = RSVP.defer();
-
-		members.navItemViews = [];
 	}
 
 	addNavItem(navItemDescriptor: Object): NavItemView {

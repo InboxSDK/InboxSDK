@@ -41,7 +41,7 @@ var args = stdio.getopt({
   'watch': {key: 'w', description: 'Automatic rebuild'},
   'reloader': {key: 'r', description: 'Automatic extension reloader'},
   'hot': {key: 'h', description: 'hot module replacement'},
-  'single': {key: 's', description: 'Single bundle build (for development)'},
+  'singleBundle': {key: 's', description: 'Single bundle build (for development)'},
   'minify': {key: 'm', description: 'Minify build'},
   'production': {key: 'p', description: 'Production build'},
   'copy': {key: 'c', description: 'Also copy to Streak'},
@@ -57,8 +57,8 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (args.production && (args.watch || args.single || args.fullPaths)) {
-  throw new Error("--production can not be used with --watch, --single, or --fullPaths");
+if (args.production && (args.watch || args.singleBundle || args.fullPaths)) {
+  throw new Error("--production can not be used with --watch, --singleBundle, or --fullPaths");
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
@@ -125,7 +125,7 @@ async function getBrowserifyHmrOptions(port: number) {
 }
 
 function browserifyTask(name, deps, entry, destname, port: ?number) {
-  var willMinify = args.minify && (args.single || name !== "sdk");
+  var willMinify = args.minify && (args.singleBundle || name !== "sdk");
 
   gulp.task(name, deps, async function() {
     process.env.VERSION = await getVersion();
@@ -202,11 +202,11 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
   });
 }
 
-if (args.single) {
+if (args.singleBundle) {
   gulp.task('default', ['sdk', 'examples']);
   browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename, 3140);
   gulp.task('imp', function() {
-    throw new Error("No separate imp bundle in single bundle mode");
+    throw new Error("No separate imp bundle in singleBundle bundle mode");
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
@@ -219,7 +219,7 @@ browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js', 3142)
 
 gulp.task('examples', ['sdk'], setupExamples);
 
-gulp.task('server', [args.single ? 'sdk' : 'imp'], function() {
+gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], function() {
   return require('./live/app').run();
 });
 

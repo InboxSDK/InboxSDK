@@ -7,6 +7,7 @@ import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
 
+import type Membrane from '../lib/Membrane';
 import type {PiOpts} from '../platform-implementation';
 import type {Handler} from '../lib/handler-registry';
 import type {Driver} from '../driver-interfaces/driver';
@@ -18,21 +19,20 @@ const SAMPLE_RATE = 0.01;
 // documented in src/docs/
 class Compose {
 
-  constructor(appId: string, driver: Driver, piOpts: PiOpts) {
-    const members = {};
+  constructor(driver: Driver, membrane: Membrane) {
+    const members = {
+      driver,
+      membrane,
+      handlerRegistry: new HandlerRegistry(),
+      composeViewStream: driver.getComposeViewDriverStream().map(viewDriver =>
+        (membrane.get(viewDriver): ComposeView)
+      )
+    };
     memberMap.set(this, members);
 
-    members.appId = appId;
-    members.driver = driver;
-    members.piOpts = piOpts;
-
-    members.handlerRegistry = new HandlerRegistry();
     driver.getStopper().onValue(() => {
       members.handlerRegistry.dumpHandlers();
     });
-    members.composeViewStream = members.driver.getComposeViewDriverStream().map(viewDriver =>
-      new ComposeView(driver, viewDriver, members.appId, members.composeViewStream)
-    );
 
     members.composeViewStream.onValue(view => {
       driver.getLogger().trackFunctionPerformance(() => {
@@ -48,11 +48,10 @@ class Compose {
     return get(memberMap, this).handlerRegistry.registerHandler(handler);
   }
 
-  openNewComposeView(): Promise<ComposeView> {
+  async openNewComposeView(): Promise<ComposeView> {
     const members = get(memberMap, this);
-    const promise = members.composeViewStream.take(1).toPromise(RSVP.Promise);
-    members.driver.openComposeWindow();
-    return promise;
+    const composeViewDriver = await members.driver.openNewComposeViewDriver();
+    return members.membrane.get(composeViewDriver);
   }
 
   openDraftByMessageID(messageID: string): Promise<ComposeView> {
@@ -69,9 +68,9 @@ class Compose {
   }
 
   getComposeView(): Promise<ComposeView> {
-    const {driver, piOpts} = get(memberMap, this);
+    const {driver} = get(memberMap, this);
     driver.getLogger().deprecationWarning('Compose.getComposeView', 'Compose.openNewComposeView');
-    if (piOpts.REQUESTED_API_VERSION !== 1) {
+    if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
     return this.openNewComposeView();

@@ -71,7 +71,7 @@ InboxSDK.load(2, 'sidebar-example', {
 			return contentPanel;
 		};
 
-		//window._firstPanel = window.activate();
+		window._firstPanel = window.activate();
 	});
 
 

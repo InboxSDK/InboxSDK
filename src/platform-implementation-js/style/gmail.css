@@ -1907,12 +1907,6 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   width: 15px;
 }
 
-.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA  {
-  /* For reasons not entirely clear to me, the position of this element can't be "relative" (which
-  the zA class sets it to) or "border-radius" does not work on any of the children */
-  position: initial;
-}
-
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA:hover > .xW {
   /* Gmailv2 tries to hide the "xW" element when a "zA" element is hovered. This prevent that. */
   display: flex;

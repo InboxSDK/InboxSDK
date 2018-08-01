@@ -11,14 +11,17 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
 class GmailMoleViewDriver {
+  _driver: GmailDriver;
   _eventStream = kefirBus();
   _stopper = kefirStopper();
   _element: HTMLElement;
 
-  constructor(options: MoleOptions) {
+  constructor(driver: GmailDriver, options: MoleOptions) {
     (this: MoleViewDriver); // interface check
+    this._driver = driver;
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view '+(options.className||''),
       innerHTML: getHTMLString(options)
@@ -101,9 +104,29 @@ class GmailMoleViewDriver {
     if (moleParent) {
       doShow(moleParent);
     } else {
-      streamWaitFor(() => GmailElementGetter.getMoleParent())
+      const moleParentReadyEvent = streamWaitFor(() => GmailElementGetter.getMoleParent())
         .takeUntilBy(this._stopper)
         .onValue(doShow);
+
+      // For some users, the mole parent element seems to be lazily loaded by
+      // Gmail only once the user has used a compose view or a thread view.
+      // If the gmail mode has settled, we've been loaded for 10 seconds, and
+      // we don't have the mole parent yet, then force the mole parent to load
+      // by opening a compose view and then closing it.
+
+      Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+        .flatMap(() => {
+          // delay until we've passed TimestampOnReady + 10 seconds
+          return this._driver.delayToTimeAfterReady(10*1000);
+        })
+        .takeUntilBy(moleParentReadyEvent)
+        .takeUntilBy(this._stopper)
+        .onValue(() => {
+          this._driver.getLogger().eventSdkActive('mole parent force load');
+          this._driver.openNewComposeViewDriver().then(gmailComposeView => {
+            gmailComposeView.close();
+          });
+        });
     }
   }
 
