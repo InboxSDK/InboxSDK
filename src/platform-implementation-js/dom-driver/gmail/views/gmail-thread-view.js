@@ -67,7 +67,7 @@ class GmailThreadView {
 		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
-		let waitForSidebarReady = (
+		const waitForSidebarReady = (
 			this._driver.isUsingMaterialUI() ?
 			this._driver.waitForGlobalSidebarReady() : Kefir.constant(null)
 		)
@@ -76,31 +76,33 @@ class GmailThreadView {
 					Kefir.constantError(new Error('15 second timeout while waiting for sidebar fired'))
 				)
 			)
-			.toProperty()
 			.take(1)
 			.takeErrors(1)
-			.onError(err => {
+			.flatMapErrors(err => {
 				this._driver.getLogger().error(err);
+				return Kefir.constant(null);
 			})
-			.mapErrors(() => null);
+			.toProperty();
 
+		let combinedReadyStream;
 		if(driver.getOpts().REQUESTED_API_VERSION === 1 && driver.isUsingSyncAPI()){
-			this._readyStream =
+			combinedReadyStream =
 				Kefir.combine([
 					waitForSidebarReady,
 					Kefir.fromPromise(this.getThreadIDAsync())
-				])
-					.map(() => {
-						this._setupToolbarView();
-						this._setupMessageViewStream();
-						return null;
-					});
+				]);
 		}
 		else {
-			this._readyStream = waitForSidebarReady;
-			this._setupToolbarView();
-			this._setupMessageViewStream();
+			combinedReadyStream = waitForSidebarReady;
 		}
+		this._readyStream = combinedReadyStream
+			.map(() => {
+				this._setupToolbarView();
+				this._setupMessageViewStream();
+				return null;
+			})
+			.takeUntilBy(this._stopper)
+			.toProperty();
 
 		this._listenToExpandCollapseAll();
 	}
@@ -129,7 +131,7 @@ class GmailThreadView {
 	destroy() {
 		this._eventStream.end();
 		this._stopper.destroy();
-		this._toolbarView.destroy();
+		if (this._toolbarView) this._toolbarView.destroy();
 		if (this._threadSidebar) this._threadSidebar.destroy();
 
 		this._messageViewDrivers.forEach(messageView => {
