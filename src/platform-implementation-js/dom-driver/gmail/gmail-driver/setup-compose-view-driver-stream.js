@@ -111,8 +111,11 @@ function _setupStandaloneComposeElementStream() {
 	);
 }
 
-function _waitForContainerAndMonitorChildrenStream(containerFn) {
-	return streamWaitFor(containerFn)
+function _waitForContainerAndMonitorChildrenStream(containerFn: () => ?HTMLElement) {
+	return Kefir.interval(2000) // TODO replace this with page-parser-tree
+		.map(containerFn)
+		.filter()
+		.take(1)
 		.flatMap(containerEl => makeElementChildStream(containerEl));
 }
 
