@@ -26,7 +26,7 @@ export default function streamWaitFor<T>(condition:() => ?T, timeout:number=60*1
 
   return Kefir.later(0, null)
     .merge(Kefir.interval(steptime, null))
-    .map(() => (condition():any))
+    .map(() => condition())
     .filter(Boolean)
     .merge(timeoutStream)
     .take(1)
