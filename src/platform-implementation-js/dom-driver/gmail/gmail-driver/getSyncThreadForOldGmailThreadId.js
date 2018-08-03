@@ -14,5 +14,10 @@ import type {SyncThread} from '../gmail-sync-response-processor';
 
 export default async function getSyncThreadForOldGmailThreadId(driver: GmailDriver, oldGmailThreadId: string): Promise<SyncThread> {
   const threadDescriptors = await getSyncThreadsForSearch(driver, 'threadid:' + new BigNumber(oldGmailThreadId, 16).toString(10));
-  return threadDescriptors[0];
+  const firstThread = threadDescriptors[0];
+  if (firstThread == null) {
+    console.error(`Thread with ID ${oldGmailThreadId} not found by Gmail`); //eslint-disable-line
+    throw new Error('Thread not found by getSyncThreadForOldGmailThreadId');
+  }
+  return firstThread;
 }
