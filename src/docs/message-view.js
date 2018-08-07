@@ -111,7 +111,10 @@ var MessageView = /** @lends MessageView */{
 	getSender: function(){},
 
 	/**
-	* Get all the recipient email addresses of this message (to, cc, bcc).
+	* Get all the recipient email addresses of this message (to, cc, bcc). This
+	* only reads the values directly present in the page, which may be truncated if
+	* there are many items. The asynchronous method getRecipientsFull() should be used
+	* instead if the full list is desired.
 	* ^gmail
 	* ^inbox
 	* @return {string[]}
