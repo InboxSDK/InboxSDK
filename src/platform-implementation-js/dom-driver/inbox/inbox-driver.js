@@ -607,25 +607,32 @@ class InboxDriver {
     return composeViewDriverPromise;
   }
 
-  getNextComposeViewDriver(): Promise<InboxComposeView> {
-    return new Promise((resolve, reject) => {
+  getNextComposeViewDriver(timeout = 10 * 1000): Promise<InboxComposeView> {
+    const s = Kefir.stream(em => {
       const subscription = this._composeViewDriverLiveSet.subscribe({
         next: changes => {
           const newComposeChange = changes.filter(change => change.type === 'add')[0];
           if (newComposeChange) {
-            subscription.unsubscribe();
-
             // make flow happy
             if (newComposeChange.type !== 'add') throw new Error('should not happen');
 
-            resolve(newComposeChange.value);
+            em.value(newComposeChange.value);
           }
         },
-        complete: () => {
-          reject(new Error('Driver was shutdown before a new compose was found'));
-        }
+        complete: em.end
       });
+      return () => subscription.unsubscribe();
     });
+
+    return s
+      .merge(
+        Kefir.later(timeout, new Error('Reached timeout while waiting for getNextComposeViewDriver'))
+      )
+      .beforeEnd(() => new Error('Driver was shut down before a new compose was found'))
+      .flatMap(x => x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x))
+      .take(1)
+      .takeErrors(1)
+      .toPromise();
   }
 
   activateShortcut(keyboardShortcutHandle: KeyboardShortcutHandle, appName: ?string, appIconUrl: ?string): void {

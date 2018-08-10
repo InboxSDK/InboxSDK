@@ -539,8 +539,16 @@ class GmailDriver {
     }
   }
 
-  getNextComposeViewDriver(): Promise<GmailComposeView> {
-    return this._composeViewDriverStream.take(1).toPromise();
+  getNextComposeViewDriver(timeout = 10 * 1000): Promise<GmailComposeView> {
+    return this._composeViewDriverStream
+      .merge(
+        Kefir.later(timeout, new Error('Reached timeout while waiting for getNextComposeViewDriver'))
+      )
+      .beforeEnd(() => new Error('Driver was shut down before a new compose was found'))
+      .flatMap(x => x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x))
+      .take(1)
+      .takeErrors(1)
+      .toPromise();
   }
 
   openDraftByMessageID(messageID: string) {
