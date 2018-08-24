@@ -17,16 +17,24 @@ export function setup() {
   }
 
   document.addEventListener('inboxSDKtellMeThisThreadIdByDatabase', function(event:any) {
-    const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
-    if (threadId) {
-      event.target.setAttribute('data-inboxsdk-threadid', threadId);
+    try {
+      const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
+      if (threadId) {
+        event.target.setAttribute('data-inboxsdk-threadid', threadId);
+      }
+    } catch (err) {
+      logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByDatabase');
     }
   });
 
   document.addEventListener('inboxSDKtellMeThisThreadIdByClick', function(event:any) {
-    const threadId = getGmailThreadIdForThreadRowByClick(event.target);
-    if (threadId) {
-      event.target.setAttribute('data-inboxsdk-threadid', threadId);
+    try {
+      const threadId = getGmailThreadIdForThreadRowByClick(event.target);
+      if (threadId) {
+        event.target.setAttribute('data-inboxsdk-threadid', threadId);
+      }
+    } catch (err) {
+      logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByClick');
     }
   });
 }
