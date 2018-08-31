@@ -65,4 +65,10 @@ module.exports = {
       },
     },
   ],
+  "settings": {
+    "react": {
+      "version": "15.3",
+      "flowVersion": "0.79.1"
+    },
+  },
 };
