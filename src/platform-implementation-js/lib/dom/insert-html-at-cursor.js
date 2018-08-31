@@ -19,7 +19,7 @@ var insertHTMLatCursor = ud.defn(module, function insertHTMLatCursor(element: HT
 		(element:any).selectionEnd = oldStart + html.length;
 	} else {
 		var editable = null;
-		if (element.getSelection) {
+		if ((element: any).getSelection) {
 			editable = element;
 		} else if (element.ownerDocument && element.ownerDocument.getSelection) {
 			editable = element.ownerDocument;

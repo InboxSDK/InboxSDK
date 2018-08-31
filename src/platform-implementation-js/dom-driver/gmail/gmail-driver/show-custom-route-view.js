@@ -15,7 +15,7 @@ const showCustomRouteView = defn(module, function showCustomRouteView(gmailDrive
 	const selection = (document:any).getSelection();
 	for (let i=0; i<selection.rangeCount; i++) {
 		const range: Range = selection.getRangeAt(i);
-		if (typeof range.intersectsNode === 'function' && range.intersectsNode(contentSectionElement)) {
+		if (typeof (range: any).intersectsNode === 'function' && (range: any).intersectsNode(contentSectionElement)) {
 			selection.removeAllRanges();
 			break;
 		}

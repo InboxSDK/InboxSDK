@@ -24,6 +24,7 @@ export type ButtonViewOptions = {
 	hasDropdown?: ?boolean;
 	buttonColor?: ?string;
 	keyboardShortcutHandle?: ?KeyboardShortcutHandle;
+	noArrow?: ?boolean;
 };
 
 const ButtonView = ud.defn(module, class ButtonView {

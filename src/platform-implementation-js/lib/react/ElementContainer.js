@@ -6,11 +6,11 @@ type Props = {
   className?: ?string;
   el: HTMLElement;
 };
-export default class ElementContainer extends React.Component {
+export default class ElementContainer extends React.Component<Props> {
   props: Props;
   _content: HTMLElement;
-  _contentRefCb = (el: HTMLElement) => {
-    this._content = el;
+  _contentRefCb = (el: ?HTMLElement) => {
+    if (el) this._content = el;
   };
   componentDidMount() {
     this._content.appendChild(this.props.el);

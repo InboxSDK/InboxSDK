@@ -946,7 +946,7 @@ class InboxDriver {
 
     // If a nativeDrawer is opened while the new SDK drawer is open, then close
     // the SDK drawer.
-    Kefir.fromESObservable(this._page.tree.getAllByTag('nativeDrawer'))
+    Kefir.fromESObservable((this._page.tree.getAllByTag('nativeDrawer'): any))
       .takeUntilBy(drawerView.getClosingStream())
       .onValue(changes => {
         for (let change of changes) {

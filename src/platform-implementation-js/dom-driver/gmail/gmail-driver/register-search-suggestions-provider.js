@@ -130,9 +130,13 @@ export default function registerSearchSuggestionsProvider(driver: GmailDriver, h
     ]).toProperty();
 
   Kefir.combine([rowSelectionEvents, searchBoxStream], [activeSuggestionsStream])
-    .onValue(([{event, row}, searchBox, suggestions]) => {
+    .onValue((
+      tuple: any
+    ) => {
+      const [{event, row}, searchBox, suggestions] = (tuple: [{event: Object, row: HTMLElement}, HTMLInputElement, Array<AutocompleteSearchResultWithId>]);
+
       const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
-      const itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion')) : null;
+      const itemData = itemDataSpan ? JSON.parse(itemDataSpan.getAttribute('data-inboxsdk-suggestion') || 'null') : null;
 
       const clearSearch = once(() => {
         event.stopImmediatePropagation();

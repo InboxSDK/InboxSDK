@@ -384,7 +384,7 @@ export default class InboxNavItemView {
     Kefir.fromEvents(this._elements.accessory, 'click')
       .takeUntilBy(this._stopper)
       .takeUntilBy(destroyStopper)
-      .onValue(() => {
+      .onValue(event => {
         event.preventDefault();
         event.stopPropagation();
         if (hasDropdown) {

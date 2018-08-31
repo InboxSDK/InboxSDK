@@ -80,12 +80,10 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
 export default class GmailButterBarDriver {
   constructor() {
     Kefir.combine([elements, googleAddedNotice])
-      .onValue(({googleNotice, sdkNotice}) => {
-        if(googleNotice) googleNotice.style.display = '';
-        if(sdkNotice){
-          sdkNotice.style.display = 'none';
-          sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
-        }
+      .onValue(([{googleNotice, sdkNotice}]) => {
+        googleNotice.style.display = '';
+        sdkNotice.style.display = 'none';
+        sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
       });
 
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
@@ -163,7 +161,7 @@ export default class GmailButterBarDriver {
           button.classList.add('ag', 'a8k');
           button.onclick = e => buttonDescriptor.onClick(e);
           button.setAttribute('role', 'button');
-          button.tabIndex = 0; 
+          button.tabIndex = 0;
           button.textContent = buttonDescriptor.title;
           buttonsContainer.appendChild(button);
         });

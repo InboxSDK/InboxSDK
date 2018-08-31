@@ -48,8 +48,8 @@ const injectScript: () => Promise<null> = once(function() {
     .toPromise(RSVP.Promise);
 });
 
-if (module.hot) {
-  (module.hot:any).accept();
+if ((module: any).hot) {
+  (module: any).hot.accept();
 }
 
 export default injectScript;

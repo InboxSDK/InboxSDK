@@ -18,7 +18,7 @@ class MockMutationObserver {
     assert(element);
     assert(options);
 
-    if (element._emitsMutations) {
+    if ((element: any)._emitsMutations) {
       Kefir
         .fromEvents(element, 'mutation')
         .takeUntilBy( Kefir.fromEvents(element, 'removed') )

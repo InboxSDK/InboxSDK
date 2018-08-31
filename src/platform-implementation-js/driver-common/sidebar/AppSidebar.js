@@ -48,10 +48,8 @@ type Props = {
 type State = {
   expansionSettings: ExpansionSettings;
 };
-export default class AppSidebar extends React.Component {
-  props: Props;
-  state: State;
-  _list: DraggableList;
+export default class AppSidebar extends React.Component<Props, State> {
+  _list: DraggableList<*>;
   _main: HTMLElement;
   _stopper = kefirStopper();
   constructor(props: Props) {
@@ -171,12 +169,16 @@ export default class AppSidebar extends React.Component {
       })}>
         <div
           className={idMap('app_sidebar_main')}
-          ref={el => this._main = el}
+          ref={el => {
+            if (el) this._main = el;
+          }}
         >
           <div className={idMap('app_sidebar_content_area')}>
             <DraggableList
               padding={0}
-              ref={el => this._list = el}
+              ref={el => {
+                if (el) this._list = el;
+              }}
               itemKey={x => x.panelDescriptor.instanceId}
               template={Panel}
               list={panelList}
@@ -220,8 +222,7 @@ type PanelProps = {
   dragHandle: Function;
   itemSelected: number;
 };
-class Panel extends React.Component {
-  props: PanelProps;
+class Panel extends React.Component<PanelProps> {
   _el: HTMLElement;
   scrollIntoView(useContainer: boolean, container?: ?HTMLElement) {
     if(useContainer && container) {
@@ -290,7 +291,9 @@ class Panel extends React.Component {
 
     return (
       <div
-        ref={el => this._el = el}
+        ref={el => {
+          if (el) this._el = el;
+        }}
         className={cx(idMap('app_sidebar_content_panel'), {
           [idMap('dragged')]: itemSelected > 0.2,
           [idMap('expanded')]: expanded,

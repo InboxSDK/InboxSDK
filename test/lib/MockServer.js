@@ -102,7 +102,7 @@ export default class MockServer {
       _statusText: ?string = undefined;
 
       _responder: Object;
-      _timer: ?number = undefined;
+      _timer: ?TimeoutID = undefined;
       _method: string;
       _path: string;
       _async: boolean;
@@ -110,6 +110,8 @@ export default class MockServer {
       _loaded: number = 0;
       _total: number = 0;
       _lengthComputable: boolean;
+
+      responseType: ?string;
 
       constructor() {
         [
@@ -161,7 +163,7 @@ export default class MockServer {
       }
 
       _terminate() {
-        clearTimeout(this._timer);
+        if (this._timer != null) clearTimeout(this._timer);
       }
 
       abort() {
