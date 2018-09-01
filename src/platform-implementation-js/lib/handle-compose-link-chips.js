@@ -84,8 +84,10 @@ const doPresendFixing = defn(module, function(composeView: ComposeViewDriver, bo
 
 function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   const chipInnerEls = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
-  return Array.from(chipInnerEls).map(x => (x.parentElement: any))
-    .concat(Array.from(bodyElement.querySelectorAll('[hspace=inboxsdk__chip_main]')));
+  return [
+    ...Array.from(chipInnerEls).map(x => (x.parentElement: any)),
+    ...Array.from(bodyElement.querySelectorAll('[hspace=inboxsdk__chip_main]'))
+  ];
 }
 
 function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
