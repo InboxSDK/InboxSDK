@@ -20,7 +20,6 @@ class InboxBackdrop {
       .filter(event => {
         let isCanceled = false;
         const appEvent = {
-          eventName: 'preautoclose',
           type: event.type,
           cause: event.cause,
           cancel: () => {
