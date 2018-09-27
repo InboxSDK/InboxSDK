@@ -20,8 +20,8 @@ class InboxBackdrop {
       .filter(event => {
         let isCanceled = false;
         const appEvent = {
-          type: event.type,
-          cause: event.cause,
+          type: 'outsideInteraction',
+          cause: event,
           cancel: () => {
             isCanceled = true;
           }

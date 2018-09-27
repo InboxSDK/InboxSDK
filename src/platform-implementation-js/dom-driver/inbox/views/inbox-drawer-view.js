@@ -74,11 +74,11 @@ class InboxDrawerView {
     Kefir.fromEvents(document, 'keydown')
       .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
       .filter(e => !e._defaultPreventedInContext)
-      .filter(e => {
+      .filter(event => {
         let isCanceled = false;
         const appEvent = {
-          type: event.type,
-          cause: event.cause || '',
+          type: 'escape',
+          cause: event,
           cancel: () => {
             isCanceled = true;
           }
