@@ -23,6 +23,7 @@ class InboxDrawerView {
   _closing = kefirStopper();
   _closed = kefirStopper();
   _composeChanges = kefirBus();
+  _preAutoCloseStream = kefirBus();
 
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
@@ -169,8 +170,9 @@ class InboxDrawerView {
   }
 
   _setupElement(options: DrawerViewOptions, insertionTarget: HTMLElement) {
-    this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
-    this._backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
+    const backdrop = this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
+    this._preAutoCloseStream.plug(backdrop.getPreAutoCloseStream());
+    backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
       this.close();
     });
 
@@ -305,6 +307,10 @@ class InboxDrawerView {
 
   getClosedStream() {
     return this._closed;
+  }
+
+  getPreAutoCloseStream() {
+    return this._preAutoCloseStream;
   }
 
   close() {
