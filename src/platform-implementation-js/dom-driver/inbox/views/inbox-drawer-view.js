@@ -74,6 +74,18 @@ class InboxDrawerView {
     Kefir.fromEvents(document, 'keydown')
       .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
       .filter(e => !e._defaultPreventedInContext)
+      .filter(e => {
+        let isCanceled = false;
+        const appEvent = {
+          type: event.type,
+          cause: event.cause || '',
+          cancel: () => {
+            isCanceled = true;
+          }
+        };
+        this._preAutoCloseStream.emit(appEvent);
+        return !isCanceled;
+      })
       .takeUntilBy(this._closing)
       .onValue(() => {
         this.close();
