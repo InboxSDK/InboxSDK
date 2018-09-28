@@ -48,4 +48,20 @@ var DrawerView = /** @lends DrawerView */{
    * Fires when this DrawerView instance is closed and not visible.
    * @event DrawerView#destroy
    */
+
+  /**
+   * Fires when this DrawerView instance is about to close itself in response
+   * to a user clicking outside of the drawer or pressing escape. This event
+   * may be canceled in order to stop the drawer from closing itself. You may
+   * want to do this if you want to show a confirmation dialog before the
+   * drawer closes.
+   * @event DrawerView#preautoclose
+   * @param {string} type - This will be "outsideInteraction" if the cause is a
+   * click or focus outside of the DrawerView, or "escape" if the cause is the
+   * user pressing the Escape key.
+   * @param {Event} cause - This is the DOM event that is triggering the DrawerView
+   * to auto-close.
+   * @param {function} cancel - Calling this method will prevent this DrawerView
+   * from closing itself.
+   */
 };

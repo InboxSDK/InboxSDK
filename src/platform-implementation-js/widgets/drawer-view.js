@@ -25,6 +25,10 @@ class DrawerView extends EventEmitter {
       this.destroyed = true;
       this.emit('destroy');
     });
+    this._driver.getPreAutoCloseStream().onValue((event) => {
+      this.emit('preautoclose', event);
+    });
+
     document.dispatchEvent(new CustomEvent('inboxSDKcloseDrawers', {
       bubbles: false, cancelable: false, detail: null
     }));
