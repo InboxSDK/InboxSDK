@@ -1,9 +1,31 @@
 {
+  "name": "inboxsdk",
   "author": "Streak",
+  "version": "0.7.24",
+  "description": "Library for browser extensions to interact with Gmail.",
+  "license": "All Rights Reserved",
+  "main": "src/inboxsdk-js/inboxsdk.js",
+  "private": true,
+  "scripts": {
+    "flow_check": "flow check",
+    "jest": "jest",
+    "start": "gulp default --singleBundle --watch --reloader",
+    "test": "npm run lint && npm run flow_check && mocha && jest",
+    "test-browser": "wdio",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
+  },
+  "redirectify": {
+    "base": ".",
+    "dir": "overrides"
+  },
   "browserify": {
     "transform": [
       "brfs"
     ]
+  },
+  "optionalDependencies": {
+    "browserify-hmr": "^0.3.1"
   },
   "dependencies": {
     "add-accessors": "^2.0.0",
@@ -109,27 +131,5 @@
     "wdio-mocha-framework": "^0.5.4",
     "wdio-selenium-standalone-service": "0.0.7",
     "webdriverio": "^4.1.0"
-  },
-  "description": "Library for browser extensions to interact with Gmail.",
-  "license": "All Rights Reserved",
-  "main": "src/inboxsdk-js/inboxsdk.js",
-  "name": "inboxsdk",
-  "optionalDependencies": {
-    "browserify-hmr": "^0.3.1"
-  },
-  "private": true,
-  "redirectify": {
-    "base": ".",
-    "dir": "overrides"
-  },
-  "scripts": {
-    "flow_check": "flow check",
-    "jest": "jest",
-    "start": "gulp default --singleBundle --watch --reloader",
-    "test": "npm run lint && npm run flow_check && mocha && jest",
-    "test-browser": "wdio",
-    "lint": "eslint .",
-    "lint-fix": "eslint . --fix"
-  },
-  "version": "0.7.24"
+  }
 }
