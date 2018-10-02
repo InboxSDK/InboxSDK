@@ -358,8 +358,8 @@ class ComposeView extends EventEmitter {
 		if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
 			throw new Error('This method was discontinued after API version 1');
 		}
-		if (typeof composeViewImplementation.overrideEditSubject === 'function')
-			composeViewImplementation.overrideEditSubject();
+		if (typeof (composeViewImplementation: any).overrideEditSubject === 'function')
+			(composeViewImplementation: any).overrideEditSubject();
 	}
 }
 

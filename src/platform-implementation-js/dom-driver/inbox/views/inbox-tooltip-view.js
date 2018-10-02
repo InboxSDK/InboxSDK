@@ -65,7 +65,7 @@ class InboxTooltipView {
         buttonEl.addEventListener('click', (event: MouseEvent) => {
           event.preventDefault();
           event.stopPropagation();
-          button.onClick.call(null);
+          if (button.onClick) button.onClick.call(null);
         });
         this._contentEl.appendChild(buttonEl);
       }

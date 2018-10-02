@@ -1,12 +1,12 @@
 declare module "transducers.js" {
   declare type Transform = {
-    @@transducer_init: () => any;
-    @@transducer_step: (result: any, input: any) => any;
-    @@transducer_result: (result: any) => any;
+    '@@transducer_init': () => any;
+    '@@transducer_step': (result: any, input: any) => any;
+    '@@transducer_result': (result: any) => any;
   };
   declare type Transducer = (xform: Transform) => Transform;
 
-  declare var exports: {
+  declare export default {
     reduce: Function;
     transformer: Function;
     Reduced: Function;

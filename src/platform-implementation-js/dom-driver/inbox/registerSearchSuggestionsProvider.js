@@ -170,7 +170,7 @@ export default function registerSearchSuggestionsProvider(
         // to avoid rendering too soon.
         suggestionsResponse.take(1)
       ]).takeUntilBy(removalStream).map((
-        [results]: [Array<AutocompleteSearchResult>]
+        [results, _ignored]: [Array<AutocompleteSearchResult>, any]
       ) => ({
         ...item,
         removalStream,

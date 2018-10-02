@@ -30,8 +30,8 @@ export default function copyAndValidateAutocompleteResults(
         'searchTerm, or onClick property'
       );
     }
-    if (typeof resultCopy.iconURL === 'string') {
-      const iconURL = resultCopy.iconURL;
+    if (typeof (resultCopy: any).iconURL === 'string') {
+      const iconURL = (resultCopy: any).iconURL;
       driver.getLogger().deprecationWarning(
         'AutocompleteSearchResult "iconURL" property',
         'AutocompleteSearchResult.iconUrl'
@@ -45,7 +45,7 @@ export default function copyAndValidateAutocompleteResults(
           );
         }
       }
-      delete resultCopy.iconURL;
+      delete (resultCopy: any).iconURL;
     }
     return resultCopy;
   });

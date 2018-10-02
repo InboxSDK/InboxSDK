@@ -1,9 +1,31 @@
 {
+  "name": "inboxsdk",
   "author": "Streak",
+  "version": "0.7.24",
+  "description": "Library for browser extensions to interact with Gmail.",
+  "license": "All Rights Reserved",
+  "main": "src/inboxsdk-js/inboxsdk.js",
+  "private": true,
+  "scripts": {
+    "flow_check": "flow check",
+    "jest": "jest",
+    "start": "gulp default --singleBundle --watch --reloader",
+    "test": "npm run lint && npm run flow_check && mocha && jest",
+    "test-browser": "wdio",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
+  },
+  "redirectify": {
+    "base": ".",
+    "dir": "overrides"
+  },
   "browserify": {
     "transform": [
       "brfs"
     ]
+  },
+  "optionalDependencies": {
+    "browserify-hmr": "^0.3.1"
   },
   "dependencies": {
     "add-accessors": "^2.0.0",
@@ -39,7 +61,7 @@
     "eslint-plugin-flowtype": "^2.34.1",
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.3",
-    "flow-bin": "^0.50.0",
+    "flow-bin": "^0.82.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",
@@ -57,7 +79,7 @@
     "jest": "^20.0.1",
     "jsdoc": "~3.4.3",
     "jsdom": "^9.2.1",
-    "kefir": "~3.6.1",
+    "kefir": "^3.8.3",
     "kefir-bus": "^2.2.0",
     "kefir-cast": "^3.2.2",
     "kefir-stopper": "^2.1.0",
@@ -77,12 +99,11 @@
     "prop-types": "^15.5.10",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
-    "react-draggable-list": "~3.3.1",
-    "react-float-anchor": "~1.4.1",
-    "react-menu-list": "~3.4.0",
-    "react-motion": "0.5.0",
+    "react-draggable-list": "^3.6.0",
+    "react-float-anchor": "^1.4.3",
+    "react-menu-list": "^3.5.0",
     "react-save-refs": "^1.0.1",
-    "react-smooth-collapse": "~1.2.0",
+    "react-smooth-collapse": "^1.5.0",
     "react-test-renderer": "^15.3.2",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
@@ -110,27 +131,5 @@
     "wdio-mocha-framework": "^0.5.4",
     "wdio-selenium-standalone-service": "0.0.7",
     "webdriverio": "^4.1.0"
-  },
-  "description": "Library for browser extensions to interact with Gmail.",
-  "license": "All Rights Reserved",
-  "main": "src/inboxsdk-js/inboxsdk.js",
-  "name": "inboxsdk",
-  "optionalDependencies": {
-    "browserify-hmr": "^0.3.1"
-  },
-  "private": true,
-  "redirectify": {
-    "base": ".",
-    "dir": "overrides"
-  },
-  "scripts": {
-    "flow_check": "flow check",
-    "jest": "jest",
-    "start": "gulp default --singleBundle --watch --reloader",
-    "test": "npm run lint && npm run flow_check && mocha && jest",
-    "test-browser": "wdio",
-    "lint": "eslint .",
-    "lint-fix": "eslint . --fix"
-  },
-  "version": "0.7.24"
+  }
 }

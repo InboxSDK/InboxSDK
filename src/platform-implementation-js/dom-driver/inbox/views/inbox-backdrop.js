@@ -11,7 +11,7 @@ class InboxBackdrop {
   _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
   _el: HTMLElement;
 
-  constructor(zIndex=500, target=document.body) {
+  constructor(zIndex: number = 500, target: HTMLElement = (document.body: any)) {
     const el = this._el = document.createElement('div');
     el.className = 'inboxsdk__inbox_backdrop';
     el.style.zIndex = String(zIndex);

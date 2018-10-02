@@ -82,7 +82,7 @@ class GmailComposeView {
   _isTriggeringADraftSavePending: boolean;
   _buttonViewControllerTooltipMap: WeakMap<Object, Object>;
   _composeID: string;
-  _messageIDElement: HTMLElement;
+  _messageIDElement: HTMLInputElement;
   _messageId: ?string;
   _finalMessageId: ?string; // Set only after the message is sent.
   _initialMessageId: ?string;
@@ -340,7 +340,7 @@ class GmailComposeView {
         if (!this._messageIDElement) {
           driver.getLogger().error(new Error("Could not find compose message id field"));
           // stub so other things don't fail
-          this._messageIDElement = document.createElement('div');
+          this._messageIDElement = document.createElement('input');
         }
 
         this._setupIDs();
@@ -534,7 +534,7 @@ class GmailComposeView {
           });
       }
 
-      const legacyThreadIdElement = this._element.querySelector('input[name="lts"]');
+      const legacyThreadIdElement: ?HTMLInputElement = (this._element.querySelector('input[name="lts"]'): any);
       if(legacyThreadIdElement && typeof legacyThreadIdElement.value === 'string') this._threadID = legacyThreadIdElement.value;
     }
     else {
@@ -1454,7 +1454,7 @@ class GmailComposeView {
   // If this compose is a reply, then this gets the message ID of the message
   // we're replying to.
   _getTargetMessageID(): ?string {
-    const input = this._element.querySelector('input[name="rm"]');
+    const input: ?HTMLInputElement = (this._element.querySelector('input[name="rm"]'): any);
     return input && typeof input.value === 'string' && input.value != 'undefined' ? input.value.replace('#', '') : null;
   }
 

@@ -2,7 +2,9 @@
 
 import constant from 'lodash/constant';
 
-export default function Marker(description?: string): {name: ?string} {
+export type MarkerObj = {name: ?string};
+
+export default function Marker(description?: string): MarkerObj {
   if (this instanceof Marker) {
     throw new TypeError("Can't use new with Marker function");
   }

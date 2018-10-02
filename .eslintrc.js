@@ -65,4 +65,9 @@ module.exports = {
       },
     },
   ],
+  "settings": {
+    "react": {
+      "version": "15.3"
+    },
+  },
 };
