@@ -7,6 +7,7 @@ import * as logger from '../../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
 import Marker from '../../../common/marker';
+import type {MarkerObj} from '../../../common/marker';
 import findParent from '../../../common/find-parent';
 
 export function setup() {
@@ -47,8 +48,8 @@ function processThreads(threads: GmailResponseProcessor.Thread[]) {
   threads.forEach(storeThreadMetadata);
 }
 
-var AMBIGUOUS = Marker('AMBIGUOUS');
-var threadIdsByKey: Map<string, string|Marker> = new Map();
+const AMBIGUOUS = Marker('AMBIGUOUS');
+const threadIdsByKey: Map<string, string|MarkerObj> = new Map();
 function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
   if (threadIdsByKey.has(key)) {
