@@ -334,8 +334,6 @@ class GmailThreadView {
 			}
 		} 
 
-		const numberNativeHiddenMessages = 0;
-
 		const appNoticeElement = noticeProvider(numberCustomHiddenMessages, numberNativeHiddenMessages);
 		appNoticeContainerElement.appendChild(appNoticeElement);
 
