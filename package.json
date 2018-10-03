@@ -10,7 +10,7 @@
     "flow_check": "flow check",
     "jest": "jest",
     "start": "gulp default --singleBundle --watch --reloader",
-    "test": "npm run lint && npm run flow_check && mocha && jest",
+    "test": "yarn run lint && yarn run flow_check && mocha && jest",
     "test-browser": "wdio",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
@@ -130,6 +130,7 @@
     "watchify": "^3.4.0",
     "wdio-mocha-framework": "^0.5.4",
     "wdio-selenium-standalone-service": "0.0.7",
-    "webdriverio": "^4.1.0"
+    "webdriverio": "^4.1.0",
+    "yarn-deps-check": "^1.0.0"
   }
 }

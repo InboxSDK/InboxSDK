@@ -1,6 +1,6 @@
 # Build
 
-Run `npm install` to install the necessary dependencies, and run `npm start` to
+Run `yarn` to install the necessary dependencies, and run `yarn start` to
 start the automatic builder. Then load `examples/hello-world/` as an unpacked
 extension into Google Chrome.
 
@@ -11,15 +11,14 @@ any changes are made to any SDK files, so that you don't have to click reload on
 the test extension yourself on every change. (You'll still need to refresh
 Gmail!)
 
-By default, `npm start` runs the following command:
+By default, `yarn start` runs the following command:
 
-    gulp default --singleBundle --watch --reloader
+    yarn gulp default --singleBundle --watch --reloader
 
 which builds the SDK into a single bundle (`--singleBundle`), watches all of its
 source files for changes to trigger rebuilds of the bundle automatically
 (`--watch`), and tells Chrome to reload its extensions after SDK rebuilds
-(`--reload`). (Note that in order to run gulp manually, you'll need to install
-it globally by running `npm install -g gulp` first.)
+(`--reload`).
 
 The `-h` (`--hot`) flag is also available, which uses
 [Browserify-HMR](https://github.com/AgentME/browserify-hmr) to make code
@@ -28,7 +27,7 @@ changes be hot-reloadable into a running extension.
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
 
-    gulp default server --watch --reloader
+    yarn gulp default server --watch --reloader
 
 Building separate SDK and implementation bundles represents how the production
 builds will work. When using the local test server to host the
@@ -58,7 +57,7 @@ have broken support with us, and our CI system runs these for us. These tests
 require that the InboxSDK has been built first and that the
 ".inboxsdk_test_secret" file or the INBOXSDK_TEST_SECRET environment variable
 contains the decryption key for the Google test account credentials. These
-tests can be run with `npm run test-browser`.
+tests can be run with `yarn run test-browser`.
 
 # Implementation Notes
 
