@@ -130,6 +130,7 @@
     "watchify": "^3.4.0",
     "wdio-mocha-framework": "^0.5.4",
     "wdio-selenium-standalone-service": "0.0.7",
-    "webdriverio": "^4.1.0"
+    "webdriverio": "^4.1.0",
+    "yarn-deps-check": "^1.0.0"
   }
 }

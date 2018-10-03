@@ -1,6 +1,8 @@
 /* @flow */
 /* eslint-disable no-console */
 
+import 'yarn-deps-check';
+
 var fs = require('fs');
 const packageJson = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
 
