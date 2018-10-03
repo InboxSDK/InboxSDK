@@ -51,7 +51,7 @@ class GmailThreadView {
 	_syncThreadID: ?string;
 	_customMessageViews: Set<CustomMessageView> = new Set();
 	_hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
-	_hiddenCustomMessageNoticeProvider: ?(numHidden: number) => HTMLElement;
+	_hiddenCustomMessageNoticeProvider: ?(numberCustomMessagesHidden: number, numberNativeMessagesHidden: number) => HTMLElement;
 	_hiddenCustomMessageNoticeElement: ?HTMLElement;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
@@ -192,7 +192,7 @@ class GmailThreadView {
 		return view;
 	}
 
-	registerHiddenCustomMessageNoticeProvider(provider: (numHidden: number) => HTMLElement) {
+	registerHiddenCustomMessageNoticeProvider(provider: (numberCustomMessagesHidden: number, numberNativeMessagesHidden: number) => HTMLElement) {
 		this._hiddenCustomMessageNoticeProvider = provider;
 	}
 
@@ -323,7 +323,20 @@ class GmailThreadView {
 		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('div');
 		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice');
 
-		const appNoticeElement = noticeProvider(this._hiddenCustomMessageViews.size);
+		const numberCustomHiddenMessages = this._hiddenCustomMessageViews.size;
+
+		let numberNativeHiddenMessages = 0;
+		if (nativeHiddenNoticePresent) {
+			const nativeHiddenNoticeCountSpan = querySelector(hiddenNoticeMessageElement, '.adx span');
+			numberNativeHiddenMessages = Number(nativeHiddenNoticeCountSpan.innerHTML);
+			if (isNaN(number)) {
+				throw new Error('Couldn\'t find number of native hidden messages in dom structure');
+			}
+		} 
+
+		const numberNativeHiddenMessages = 0;
+
+		const appNoticeElement = noticeProvider(numberCustomHiddenMessages, numberNativeHiddenMessages);
 		appNoticeContainerElement.appendChild(appNoticeElement);
 
 		if(nativeHiddenNoticePresent){
