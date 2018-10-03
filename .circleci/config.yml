@@ -25,7 +25,7 @@ jobs:
             - ./node_modules
       - run:
           name: Unit Tests
-          command: npm test
+          command: yarn test
 
       # TODO fix and re-enable
       # - run:
