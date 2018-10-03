@@ -2,10 +2,7 @@
 /* eslint-disable no-console */
 
 var fs = require('fs');
-var checkDependencies = require('./src/build/check-dependencies');
 const packageJson = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
-
-checkDependencies(packageJson);
 
 var _ = require('lodash');
 var gulp = require('gulp');
