@@ -329,7 +329,7 @@ class GmailThreadView {
 		if (nativeHiddenNoticePresent) {
 			const nativeHiddenNoticeCountSpan = querySelector(hiddenNoticeMessageElement, '.adx span');
 			numberNativeHiddenMessages = Number(nativeHiddenNoticeCountSpan.innerHTML);
-			if (isNaN(number)) {
+			if (isNaN(numberNativeHiddenMessages)) {
 				throw new Error('Couldn\'t find number of native hidden messages in dom structure');
 			}
 		} 
