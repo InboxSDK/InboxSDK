@@ -615,6 +615,20 @@ body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
 
 body:not(.inboxsdk__gmailv1css) .zA td.apU.xY .inboxsdk__thread_row_button {
     margin: 0 10px;
+    opacity: 0.16;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY .inboxsdk__thread_row_button {
+    opacity: 0.54;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY .inboxsdk__thread_row_button:hover {
+    opacity: 1;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA td.apU.xY .inboxsdk__thread_row_button::before {
+    width: 0px;
+    height: 0px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icon {
