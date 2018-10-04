@@ -92,7 +92,7 @@ export default function trackGmailStyles() {
         childList: true
       };
       Array.from(document.styleSheets).forEach(sheet => {
-        if (sheet.ownerNode.tagName == 'STYLE') {
+        if ((sheet.ownerNode: any).tagName == 'STYLE') {
           observer.observe(sheet.ownerNode, options);
         }
       });

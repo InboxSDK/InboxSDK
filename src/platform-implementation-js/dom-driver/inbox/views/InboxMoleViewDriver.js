@@ -256,9 +256,7 @@ type MoleViewContentsProps = {
   onSetMinimize: (minimized: boolean)=>void;
 };
 
-class MoleViewContents extends React.Component {
-  props: MoleViewContentsProps;
-
+class MoleViewContents extends React.Component<MoleViewContentsProps> {
   render() {
     let titlebar = null;
     if (this.props.chrome !== false) {

@@ -72,8 +72,13 @@ export default function parser(el: HTMLElement) {
 
   const inboxThreadId: ?string = ec.run(
     'thread id',
-    () =>
-      /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '')[0]
+    () => {
+      const m = /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '');
+      if (!m) {
+        throw new Error('thread row id regex failed');
+      }
+      return m[0];
+    }
   );
 
   const messageCountParent = ec.run(

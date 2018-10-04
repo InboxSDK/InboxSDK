@@ -195,7 +195,7 @@ class InboxMessageView {
       // id.
       for (let inboxComposeView of this._driver.getComposeViewDriverLiveSet().values()) {
         const draftId = await inboxComposeView.getDraftID();
-        if (`msg-a:${draftId}` === inboxMessageId) {
+        if (draftId && `msg-a:${draftId}` === inboxMessageId) {
           await inboxComposeView.getStopper().take(1).toPromise();
           break;
         }

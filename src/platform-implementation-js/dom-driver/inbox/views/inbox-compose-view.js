@@ -43,7 +43,7 @@ class InboxComposeView {
   _driver: InboxDriver;
   _eventStream: Bus<any> = kefirBus();
   _ajaxInterceptStream: Kefir.Observable<Object>;
-  _sendingStream: ?Kefir.Observable<Object>;
+  _sendingStream: ?Kefir.Observable<any>;
   _stopper = kefirStopper();
   _queueDraftSave: () => void;
   _modifierButtonContainer: ?HTMLElement;

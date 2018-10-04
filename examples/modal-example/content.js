@@ -179,6 +179,9 @@ function showDrawer1() {
     });
   });
 
+  drawer.on('preautoclose', (event) => {
+    console.log('preautoclose');
+  });
   drawer.on('slideAnimationDone', () => {
     console.log('slideAnimationDone');
   });

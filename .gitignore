@@ -5,6 +5,7 @@
 /examples/*/inboxsdk.js*
 *~
 npm-debug.log
+yarn-debug.log
 .atom-build.json
 /chromeTestOutput
 /.inboxsdk_test_secret

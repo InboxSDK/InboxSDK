@@ -13,8 +13,13 @@ export default function parser(el: HTMLElement) {
 
   const inboxMessageId: ?string = ec.run(
     'message id',
-    () =>
-      /msg-[^:]+:[^:\d]*\d+/.exec(el.getAttribute('data-msg-id') || '')[0]
+    () => {
+      const m = /msg-[^:]+:[^:\d]*\d+/.exec(el.getAttribute('data-msg-id') || '');
+      if (!m) {
+        throw new Error('message id regex failed');
+      }
+      return m[0];
+    }
   );
 
   const heading = ec.run(
