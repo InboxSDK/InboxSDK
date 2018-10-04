@@ -461,6 +461,7 @@ class GmailThreadRowView {
             }
             else {
               buttonSpan = document.createElement('span');
+              buttonSpan.classList.add('T-KT');
             }
 
             buttonSpan.classList.add('inboxsdk__thread_row_button');
