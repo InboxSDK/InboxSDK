@@ -13,10 +13,6 @@ function addCustomMessage(sortDate){
 	});
 }
 
-function makeMessageHidden(customMessage){
-	customMessage.getElement().classList.add('inboxsdk__custom_message_view_hidden')
-}
-
 InboxSDK.load(2, 'thread-example').then(sdk => {
 	'use strict';
 
