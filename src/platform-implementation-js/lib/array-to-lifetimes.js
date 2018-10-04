@@ -12,6 +12,9 @@ import type {ItemWithLifetime} from './dom/make-element-child-stream';
 // element, or when the output stream is unsubscribed from, similar to
 // makeElementChildStream.
 
+// TODO replace usages of this with https://www.npmjs.com/package/live-set,
+// and then remove this.
+
 export default function arrayToLifetimes<T>(
   input: Kefir.Observable<Array<T>|NodeList<T>>,
   keyFn?: (value: T) => any
