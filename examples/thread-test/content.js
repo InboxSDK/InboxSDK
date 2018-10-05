@@ -33,9 +33,8 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 
 			threadView.registerHiddenCustomMessageNoticeProvider((customHiddenCount, nativeHiddenCount) => {
 				const span = document.createElement('span');
-				span.innerText = 'There are ' + (customHiddenCount) + ' custom hides, and ' + 
-				(nativeHiddenCount) + 'native hides.';
-				console.log(span.innerText);
+				span.textContent = `${nativeHiddenCount != null ? ', ' : ''}${customHiddenCount} custom hides`;
+				console.log('args', customHiddenCount, nativeHiddenCount);
 				return span;
 			});
 
