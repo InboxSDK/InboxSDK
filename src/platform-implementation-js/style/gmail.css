@@ -609,6 +609,34 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   height: 16px;
 }
 
+/* .zA td.apU.xy refers to the <td/> element that houses the favorite star in thread row view.
+ The <span> element is what inboxSDK will render threadRowButtons as when Gmail hover actions are disabled.
+ The following rules fix the issue where threadRowButtons were spilling over into the thread row email text. 
+ */
+body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
+    width: initial;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA td.apU.xY span.inboxsdk__thread_row_button {
+    margin: 0 10px;
+    opacity: 0.16;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY span.inboxsdk__thread_row_button {
+    opacity: 0.54;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY span.inboxsdk__thread_row_button:hover {
+    opacity: 1;
+}
+
+body:not(.inboxsdk__gmailv1css) .zA td.apU.xY span.inboxsdk__thread_row_button::before {
+  /* Google adds in a pseduo ::before element to span elems with the T-KT class applied.
+  Explicity setting this width and height to zero as remove weird positioning that results */
+    width: 0px;
+    height: 0px;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icon {
   vertical-align: middle;
 }
