@@ -2313,18 +2313,30 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   cursor: pointer;
 }
 
-.inboxsdk__custom_message_view_app_notice {
+.inboxsdk__custom_message_view_app_notice_content {
   position: relative;
-  top: -8px;
   display: flex;
   justify-content: center;
   z-index: 1;
 }
 
-.inboxsdk__custom_message_view_app_notice > * {
-  background-color: white;
-  padding: 0px 8px;
-  font-size: 80%;
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
+  position: relative;
+  width: auto;
+  min-width: 32px;
+  padding: 0px 10px;
+}
+
+.inboxsdk__custom_message_view_app_notice_container::before{
+  position: absolute;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container:hover span{
+  visibility: hidden;
+  font-size: 12px;
+}
+
+.inboxsdk__custom_message_view_app_notice_content > * {
   color: #555;
 }
 
@@ -2337,10 +2349,8 @@ table[role=presentation].inboxsdk__thread_view_with_custom_view {
   }
 
 /* hidden message notice beside native notice */
-.adv .inboxsdk__custom_message_view_app_notice {
+.adv .inboxsdk__custom_message_view_app_notice_content {
   display: inline-flex;
-  margin-left: 10px;
-  top: -7px;
 }
 
 /* compact density setting */
@@ -2377,7 +2387,7 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
 
 /* gmail v1 specific ui */
 
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice > *,
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice_content > *,
 body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
   background-color: rgb(245, 245, 245);
 }
