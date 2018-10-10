@@ -131,7 +131,7 @@ class ContentPanelViewDriver {
     }));
   }
 
-  open(isOpenManual: boolean = false) {
+  open() {
     checkInUserInputEvent();
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
       bubbles: true,
@@ -139,7 +139,6 @@ class ContentPanelViewDriver {
       detail: {
         instanceId: this._instanceId,
         isGlobal: this._isGlobal,
-        isOpenManual,
         sidebarId: this._sidebarId
       }
     }));

@@ -609,9 +609,11 @@ class GmailAppSidebarView {
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(e => {
-          if (threadSidebarComponent && !this._getShouldThreadAppSidebarOpen() && e.detail.isOpenManual) {
+          if (threadSidebarComponent && e.detail.isOpenManual) {
             this._setShouldThreadAppSidebarOpen(true);
+            openSidebarAndActivateButton(threadButtonContainers, e.detail.isGlobal);
             threadSidebarComponent.openPanel(e.detail.instanceId);
+            threadSidebarComponent.scrollPanelIntoView(instanceId, true);
           }
         });
     }

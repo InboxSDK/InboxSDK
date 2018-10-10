@@ -29,8 +29,8 @@ export default class ContentPanelView extends EventEmitter {
     get(membersMap, this).contentPanelViewImplementation.close();
   }
 
-  open(isOpenManual: boolean = false) {
-    get(membersMap, this).contentPanelViewImplementation.open(isOpenManual);
+  open() {
+    get(membersMap, this).contentPanelViewImplementation.open();
   }
 
   isActive(): boolean {
