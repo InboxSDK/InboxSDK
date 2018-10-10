@@ -5,22 +5,34 @@
 var ContentPanelView = /** @lends ContentPanelView */ {
 
     /**
-     * Removes the content panel from its host
-     * @return {void}
-     */
-    remove: function(){},
-
-    /**
      * This property is set to true once the view is destroyed.
      * @type {boolean}
      */
     destroyed: false,
 
     /**
+     * Closes material Gmail's sidebar.
+     * @return {void}
+     */
+    close: function(){},
+
+    /**
      * Returns whether the content panel is currently visible.
      * @return {boolean}
      */
     isActive: function(){},
+
+    /**
+     * Opens material Gmail's sidebar.
+     * @return {void}
+     */
+    open: function(){},
+
+    /**
+     * Removes the content panel from its host.
+     * @return {void}
+     */
+    remove: function(){},
 
     /**
     * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent
