@@ -9,6 +9,7 @@ import delayAsap from '../../lib/delay-asap';
 import type {Driver} from '../../driver-interfaces/driver';
 import idMap from '../../lib/idMap';
 import querySelector from '../../lib/dom/querySelectorOrFail';
+import checkInUserInputEvent from '../../lib/checkInUserInputEvent';
 
 class ContentPanelViewDriver {
   _driver: Driver;
@@ -131,6 +132,7 @@ class ContentPanelViewDriver {
   }
 
   open(isOpenManual: boolean = false) {
+    checkInUserInputEvent();
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
       bubbles: true,
       cancelable: false,
