@@ -604,6 +604,16 @@ class GmailAppSidebarView {
         .onValue(event => {
           if(threadSidebarComponent) threadSidebarComponent.closePanel(event.detail.instanceId);
         });
+
+      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelOpen')
+        .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
+        .takeUntilBy(this._stopper)
+        .onValue(e => {
+          if (threadSidebarComponent && !this._getShouldThreadAppSidebarOpen() && e.detail.isOpenManual) {
+            this._setShouldThreadAppSidebarOpen(true);
+            threadSidebarComponent.openPanel(e.detail.instanceId);
+          }
+        });
     }
 
 

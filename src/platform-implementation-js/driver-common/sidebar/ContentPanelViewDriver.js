@@ -109,22 +109,37 @@ class ContentPanelViewDriver {
 
   scrollIntoView() {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
   close() {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelClose', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        isGlobal: this._isGlobal,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
-  open() {
+  open(isOpenManual: boolean = false) {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        isGlobal: this._isGlobal,
+        isOpenManual,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
