@@ -23,7 +23,7 @@ var ContentPanelView = /** @lends ContentPanelView */ {
     isActive: function(){},
 
     /**
-     * Opens material Gmail's sidebar.
+     * Opens material Gmail's sidebar. It may only be called during a user input event.
      * @return {void}
      */
     open: function(){},
