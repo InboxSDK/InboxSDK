@@ -216,19 +216,24 @@ class GmailAppSidebarView {
 
       // handle rendering thread sidebar contents
       renderThreadSidebar = () => {
-        threadSidebarComponent = (ReactDOM.render(
-          <AppSidebar
-            panels={orderManager.getOrderedItems().map(x => x.value)}
-            onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
-              orderManager.moveItem(oldIndex, newIndex);
-              renderThreadSidebar();
-            }}
-            onExpandedToggle={() => {updateHighlightedAppThreadIconBus.emit(null);}}
-            container={container}
-          />,
-          threadSidebarContainerEl,
-          () => {updateHighlightedAppThreadIconBus.emit(null);}
-        ): any);
+        return new Promise((resolve) => {
+          threadSidebarComponent = (ReactDOM.render(
+            <AppSidebar
+              panels={orderManager.getOrderedItems().map(x => x.value)}
+              onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
+                orderManager.moveItem(oldIndex, newIndex);
+                renderThreadSidebar();
+              }}
+              onExpandedToggle={() => {updateHighlightedAppThreadIconBus.emit(null);}}
+              container={container}
+            />,
+            threadSidebarContainerEl,
+            () => {
+              resolve();
+              updateHighlightedAppThreadIconBus.emit(null);
+            }
+          ): any);
+        });
       };
       renderThreadSidebar();
     };
@@ -250,7 +255,7 @@ class GmailAppSidebarView {
         // data-count attribute instead of adding a new button.
         const existingButtonContainer = isGlobal ? globalButtonContainers.get(appName) : threadButtonContainers.get(appName);
 
-        let buttonContainer;
+        buttonContainer;
         if (existingButtonContainer) {
           const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
           existingButtonContainer.setAttribute('data-count', String(currentCount+1));
@@ -448,6 +453,7 @@ class GmailAppSidebarView {
       if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
 
+    let buttonContainer: HTMLElement;
     const globalButtonContainers: Map<string, HTMLElement> = new Map();
     const threadButtonContainers: Map<string, HTMLElement> = new Map();
     const contentContainers: Map<string, HTMLElement> = new Map();
@@ -609,11 +615,14 @@ class GmailAppSidebarView {
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(e => {
-          if (threadSidebarComponent && e.detail.isOpenManual) {
-            this._setShouldThreadAppSidebarOpen(true);
-            openSidebarAndActivateButton(threadButtonContainers, e.detail.isGlobal);
-            threadSidebarComponent.openPanel(e.detail.instanceId);
-            threadSidebarComponent.scrollPanelIntoView(instanceId, true);
+          if (threadSidebarComponent && buttonContainer && renderThreadSidebar) {
+            renderThreadSidebar()
+              .then(() => {
+                this._setShouldThreadAppSidebarOpen(true);
+                openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
+                threadSidebarComponent.openPanel(e.detail.instanceId);
+                threadSidebarComponent.scrollPanelIntoView(e.detail.instanceId, true);
+              });
           }
         });
     }
