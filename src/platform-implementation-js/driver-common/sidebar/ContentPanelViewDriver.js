@@ -12,7 +12,6 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import checkInUserInputEvent from '../../lib/checkInUserInputEvent';
 
 class ContentPanelViewDriver {
-  _appName: string;
   _driver: Driver;
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
@@ -25,7 +24,6 @@ class ContentPanelViewDriver {
   _isGlobal: boolean;
 
   constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string, isGlobal?: boolean) {
-    this._appName = this._appName = descriptor.appName || driver.getOpts().appName || descriptor.title;
     this._driver = driver;
     this._sidebarId = sidebarId;
     this._isGlobal = Boolean(isGlobal);
@@ -55,6 +53,7 @@ class ContentPanelViewDriver {
     const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
+    let appName;
     const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
 
     descriptor
@@ -62,7 +61,7 @@ class ContentPanelViewDriver {
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        
+        const appName = descriptor.appName || driver.getOpts().appName || descriptor.title
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -98,7 +97,7 @@ class ContentPanelViewDriver {
       ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
         detail: {
-          appName: this._appName,
+          appName,
           sidebarId: this._sidebarId,
           instanceId: this._instanceId
         }
@@ -143,7 +142,6 @@ class ContentPanelViewDriver {
       bubbles: true,
       cancelable: false,
       detail: {
-        appName: this._appName,
         instanceId: this._instanceId,
         isGlobal: this._isGlobal,
         sidebarId: this._sidebarId
