@@ -442,16 +442,16 @@ class GmailAppSidebarView {
       }
 
       const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
-      if(activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
+      if (activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
-      buttonContainer.classList.add('sidebar_button_container_active');
+      if (buttonContainer) buttonContainer.classList.add('sidebar_button_container_active');
       companionSidebarOuterWrapper.classList.add('companion_app_sidebar_wrapper_visible');
       companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
       companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
 
       const contentContainer = companionSidebarOuterWrapper.previousElementSibling;
-      if(contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
-      if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
+      if (contentContainer) contentContainer.classList.add('companion_container_app_sidebar_visible');
+      if (isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
 
     const globalButtonContainers: Map<string, HTMLElement> = new Map();
