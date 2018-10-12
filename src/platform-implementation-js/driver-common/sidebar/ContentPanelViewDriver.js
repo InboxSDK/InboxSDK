@@ -12,6 +12,7 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import checkInUserInputEvent from '../../lib/checkInUserInputEvent';
 
 class ContentPanelViewDriver {
+  _appName: string;
   _driver: Driver;
   _stopper: Kefir.Observable<null>;
   _eventStream = kefirBus();
@@ -24,6 +25,7 @@ class ContentPanelViewDriver {
   _isGlobal: boolean;
 
   constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string, isGlobal?: boolean) {
+    this._appName = this._appName = descriptor.appName || driver.getOpts().appName || descriptor.title;
     this._driver = driver;
     this._sidebarId = sidebarId;
     this._isGlobal = Boolean(isGlobal);
@@ -53,7 +55,6 @@ class ContentPanelViewDriver {
     const afterAsap = delayAsap().toProperty().onValue(()=>{});
 
     let hasPlacedAlready = false;
-    let appName;
     const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
 
     descriptor
@@ -61,7 +62,7 @@ class ContentPanelViewDriver {
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        appName = descriptor.appName || this._driver.getOpts().appName || title;
+        
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -73,26 +74,31 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
-              title, iconUrl, iconClass, isGlobal, appName,
-              sidebarId: this._sidebarId,
-              instanceId: this._instanceId,
-              appId: this._driver.getAppId(),
-              id: String(id || title),
               appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
+              appId: this._driver.getAppId(),
+              appName: this._appName,
               hideTitleBar: Boolean(hideTitleBar),
+              iconClass,
+              iconUrl,
+              id: String(id || title),
+              instanceId: this._instanceId,
+              isGlobal,
               orderHint: typeof orderHint === 'number' ? orderHint : 0,
               primaryColor: primaryColor || this._driver.getOpts().primaryColor,
-              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor
+              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor,
+              sidebarId: this._sidebarId,
+              title
             }
           }
         ));
       });
+
     this._stopper.onValue(() => {
       if (!hasPlacedAlready) return;
       ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
         bubbles: true, cancelable: false,
         detail: {
-          appName,
+          appName: this._appName,
           sidebarId: this._sidebarId,
           instanceId: this._instanceId
         }
@@ -137,6 +143,7 @@ class ContentPanelViewDriver {
       bubbles: true,
       cancelable: false,
       detail: {
+        appName: this._appName,
         instanceId: this._instanceId,
         isGlobal: this._isGlobal,
         sidebarId: this._sidebarId

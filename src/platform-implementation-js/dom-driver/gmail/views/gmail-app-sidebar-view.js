@@ -255,7 +255,7 @@ class GmailAppSidebarView {
         // data-count attribute instead of adding a new button.
         const existingButtonContainer = isGlobal ? globalButtonContainers.get(appName) : threadButtonContainers.get(appName);
 
-        buttonContainer;
+        let buttonContainer;
         if (existingButtonContainer) {
           const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
           existingButtonContainer.setAttribute('data-count', String(currentCount+1));
@@ -453,7 +453,6 @@ class GmailAppSidebarView {
       if(isGlobal) companionSidebarContentContainerEl.classList.add('companion_global_app_sidebar_visible');
     };
 
-    let buttonContainer: HTMLElement;
     const globalButtonContainers: Map<string, HTMLElement> = new Map();
     const threadButtonContainers: Map<string, HTMLElement> = new Map();
     const contentContainers: Map<string, HTMLElement> = new Map();
@@ -615,10 +614,12 @@ class GmailAppSidebarView {
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(e => {
-          if (buttonContainer && renderThreadSidebar) {
+          if (renderThreadSidebar) {
             renderThreadSidebar()
               .then(() => {
                 this._setShouldThreadAppSidebarOpen(true);
+
+                const buttonContainer = querySelector(`div[data-app-name="${e.detail.appName}"]`);
                 openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
                 if (threadSidebarComponent) {
                   threadSidebarComponent.openPanel(e.detail.instanceId);
