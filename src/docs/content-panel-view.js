@@ -11,19 +11,13 @@ var ContentPanelView = /** @lends ContentPanelView */ {
     destroyed: false,
 
     /**
-     * Closes material Gmail's sidebar.
-     * @return {void}
-     */
-    close: function(){},
-
-    /**
      * Returns whether the content panel is currently visible.
      * @return {boolean}
      */
     isActive: function(){},
 
     /**
-     * Opens material Gmail's sidebar. It may only be called during a user input event.
+     * Makes the content panel visible, opening the sidebar if necessary. It may only be called in response to a user input event such as a click or key press.
      * @return {void}
      */
     open: function(){},
