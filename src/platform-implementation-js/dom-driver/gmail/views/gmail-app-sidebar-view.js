@@ -443,7 +443,7 @@ class GmailAppSidebarView {
       const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
       if (activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
 
-      if (buttonContainer) buttonContainer.classList.add('sidebar_button_container_active');
+      buttonContainer.classList.add('sidebar_button_container_active');
       companionSidebarOuterWrapper.classList.add('companion_app_sidebar_wrapper_visible');
       companionSidebarContentContainerEl.classList.add('companion_app_sidebar_visible');
       companionSidebarContentContainerEl.classList.remove(COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS);
