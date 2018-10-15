@@ -12,23 +12,24 @@ const membersMap = new WeakMap();
 export default class ContentPanelView extends EventEmitter {
   destroyed: boolean = false;
 
-  constructor(contentPanelViewImplementation: ContentPanelViewDriver){
+  constructor(contentPanelViewImplementation: ContentPanelViewDriver) {
     super();
+
     const members = {contentPanelViewImplementation};
     membersMap.set(this, members);
 
     this._bindToStreamEvents();
   }
 
-  remove(){
+  remove() {
     get(membersMap, this).contentPanelViewImplementation.remove();
   }
 
-  close(){
+  close() {
     get(membersMap, this).contentPanelViewImplementation.close();
   }
 
-  open(){
+  open() {
     get(membersMap, this).contentPanelViewImplementation.open();
   }
 
@@ -36,12 +37,14 @@ export default class ContentPanelView extends EventEmitter {
     return get(membersMap, this).contentPanelViewImplementation.isActive();
   }
 
-  _bindToStreamEvents(){
+  _bindToStreamEvents() {
     const stream: Kefir.Observable<any> = get(membersMap, this).contentPanelViewImplementation.getEventStream();
-    stream.onValue(({eventName}) => {this.emit(eventName);});
+    stream.onValue(({eventName}) => {
+      this.emit(eventName);
+    });
     stream.onEnd(() => {
-        this.destroyed = true;
-        this.emit('destroy');
+      this.destroyed = true;
+      this.emit('destroy');
     });
   }
 

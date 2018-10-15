@@ -5,12 +5,6 @@
 var ContentPanelView = /** @lends ContentPanelView */ {
 
     /**
-     * Removes the content panel from its host
-     * @return {void}
-     */
-    remove: function(){},
-
-    /**
      * This property is set to true once the view is destroyed.
      * @type {boolean}
      */
@@ -21,6 +15,18 @@ var ContentPanelView = /** @lends ContentPanelView */ {
      * @return {boolean}
      */
     isActive: function(){},
+
+    /**
+     * Makes the content panel visible, opening the sidebar if necessary. It may only be called in response to a user input event such as a click or key press.
+     * @return {void}
+     */
+    open: function(){},
+
+    /**
+     * Removes the content panel from its host.
+     * @return {void}
+     */
+    remove: function(){},
 
     /**
     * Fires when the content panel becomes visisble. This can happen the first time the Panel is shown or subsequent

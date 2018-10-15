@@ -9,6 +9,7 @@ import delayAsap from '../../lib/delay-asap';
 import type {Driver} from '../../driver-interfaces/driver';
 import idMap from '../../lib/idMap';
 import querySelector from '../../lib/dom/querySelectorOrFail';
+import checkInUserInputEvent from '../../lib/checkInUserInputEvent';
 
 class ContentPanelViewDriver {
   _driver: Driver;
@@ -60,7 +61,7 @@ class ContentPanelViewDriver {
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        appName = descriptor.appName || this._driver.getOpts().appName || title;
+        appName = descriptor.appName || driver.getOpts().appName || descriptor.title;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
@@ -72,20 +73,25 @@ class ContentPanelViewDriver {
           {
             bubbles: true, cancelable: false,
             detail: {
-              title, iconUrl, iconClass, isGlobal, appName,
-              sidebarId: this._sidebarId,
-              instanceId: this._instanceId,
-              appId: this._driver.getAppId(),
-              id: String(id || title),
               appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
+              appId: this._driver.getAppId(),
+              appName,
               hideTitleBar: Boolean(hideTitleBar),
+              iconClass,
+              iconUrl,
+              id: String(id || title),
+              instanceId: this._instanceId,
+              isGlobal,
               orderHint: typeof orderHint === 'number' ? orderHint : 0,
               primaryColor: primaryColor || this._driver.getOpts().primaryColor,
-              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor
+              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor,
+              sidebarId: this._sidebarId,
+              title
             }
           }
         ));
       });
+
     this._stopper.onValue(() => {
       if (!hasPlacedAlready) return;
       ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
@@ -109,22 +115,37 @@ class ContentPanelViewDriver {
 
   scrollIntoView() {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
   close() {
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelClose', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        isGlobal: this._isGlobal,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
   open() {
+    checkInUserInputEvent();
     ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
-      bubbles: true, cancelable: false,
-      detail: {sidebarId: this._sidebarId, instanceId: this._instanceId, isGlobal: this._isGlobal}
+      bubbles: true,
+      cancelable: false,
+      detail: {
+        instanceId: this._instanceId,
+        isGlobal: this._isGlobal,
+        sidebarId: this._sidebarId
+      }
     }));
   }
 
