@@ -61,7 +61,7 @@ class ContentPanelViewDriver {
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
         const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        appName = descriptor.appName || driver.getOpts().appName || descriptor.title
+        appName = descriptor.appName || driver.getOpts().appName || descriptor.title;
         if (!((document.body:any):HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
