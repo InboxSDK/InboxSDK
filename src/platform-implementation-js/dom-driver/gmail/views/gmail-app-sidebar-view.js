@@ -264,7 +264,6 @@ class GmailAppSidebarView {
           buttonContainer = document.createElement('div');
           buttonContainer.className = idMap('sidebar_button_container');
           buttonContainer.setAttribute('data-app-name', appName);
-          buttonContainer.setAttribute('data-instance-id', instanceId);
           buttonContainer.innerHTML = autoHtml `
             <button class="inboxsdk__button_icon ${iconClass}" type="button" data-tooltip="${appName}">
               <img class="inboxsdk__button_iconImg" src="${iconUrl}">
@@ -620,8 +619,22 @@ class GmailAppSidebarView {
               .then(() => {
                 this._setShouldThreadAppSidebarOpen(true);
 
-                const buttonContainer = companionSidebarIconContainerEl.querySelector(`div[data-instance-id="${e.detail.instanceId}"]`);
-                openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
+                let appName;
+                let i = orderManager.getOrderedItems().length;
+                while (i--) {
+                  if (orderManager.getOrderedItems()[i].value.instanceId = e.detail.instanceId) {
+                    appName = orderManager.getOrderedItems()[i].value.appName;
+                    break;
+                  }
+                }
+
+                if (appName) {
+                  const buttonContainer = companionSidebarIconContainerEl.querySelector(`div[data-instance-id="${appName}"]`);
+                  if (buttonContainer) {
+                    openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
+                  }
+                }
+
                 if (threadSidebarComponent) {
                   threadSidebarComponent.openPanel(e.detail.instanceId);
                   threadSidebarComponent.scrollPanelIntoView(e.detail.instanceId, true);
