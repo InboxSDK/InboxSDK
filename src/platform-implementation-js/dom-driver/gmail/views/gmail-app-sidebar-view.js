@@ -1,5 +1,6 @@
 /* @flow */
 
+import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import asap from 'asap';
 import {defn} from 'ud';
@@ -619,20 +620,12 @@ class GmailAppSidebarView {
               .then(() => {
                 this._setShouldThreadAppSidebarOpen(true);
 
-                let appName;
-                let i = orderManager.getOrderedItems().length;
-                while (i--) {
-                  if (orderManager.getOrderedItems()[i].value.instanceId = e.detail.instanceId) {
-                    appName = orderManager.getOrderedItems()[i].value.appName;
-                    break;
-                  }
-                }
-
-                if (appName) {
-                  const buttonContainer = companionSidebarIconContainerEl.querySelector(`div[data-instance-id="${appName}"]`);
-                  if (buttonContainer) {
-                    openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
-                  }
+                const appName = find(orderManager.getOrderedItems(), item => item.value.instanceId === e.detail.instanceId).value.appName;
+                const buttonContainer = threadButtonContainers.get(appName);
+                if (buttonContainer) {
+                  openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
+                } else {
+                  throw new Error('missing button container');
                 }
 
                 if (threadSidebarComponent) {
