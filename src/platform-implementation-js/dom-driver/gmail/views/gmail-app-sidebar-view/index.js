@@ -1,12 +1,15 @@
 /* @flow */
 
 import {defn} from 'ud';
+import udKefir from 'ud-kefir';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import GmailAppSidebarPrimary from './primary';
 import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 import type GmailDriver from '../../gmail-driver';
 import type GmailThreadView from '../gmail-thread-view';
+
+const updates: Kefir.Observable<null> = udKefir(module, null);
 
 class GmailAppSidebarView {
   _stopper = kefirStopper();
@@ -30,8 +33,15 @@ class GmailAppSidebarView {
     if (instanceId != null) {
       this._instanceId = instanceId;
     } else {
-      const primary = new GmailAppSidebarPrimary(driver, companionSidebarContentContainerElement);
+      let primary = new GmailAppSidebarPrimary(driver, companionSidebarContentContainerElement);
       this._instanceId = primary.getInstanceId();
+
+      // hot reloading support. Not perfect; this will break any existing panels.
+      updates.changes().onValue(() => {
+        primary.destroy();
+        primary = new GmailAppSidebarPrimary(driver, companionSidebarContentContainerElement);
+        this._instanceId = primary.getInstanceId();
+      });
     }
   }
 

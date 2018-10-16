@@ -3,7 +3,6 @@
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import {defn} from 'ud';
-import udKefir from 'ud-kefir';
 import autoHtml from 'auto-html';
 import asap from 'asap';
 import Kefir from 'kefir';
@@ -36,8 +35,6 @@ const ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR = `.${ACTIVE_GLOBAL_ADD_ON_CLASS_NAME}`
 const GLOBAL_ADD_ON_ICON_SELECTOR = '.bse-bvF-I';
 const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
-const updates: Kefir.Observable<null> = udKefir(module, null);
-
 // Only one instance of this Primary is ever created within a page, even if
 // there are multiple InboxSDK instances and/or extensions. All other InboxSDK
 // instances (including from other extensions) communicate with this Primary
@@ -68,18 +65,17 @@ class GmailAppSidebarPrimary {
     this._driver = driver;
     this._companionSidebarContentContainerEl = companionSidebarContentContainerElement;
     this._setupElement();
-
-    // hot reloading support
-    updates.changes().onValue(() => {
-      this._stopper.destroy();
-      this._stopper = kefirStopper();
-
-      this._setupElement();
-    });
   }
 
   getInstanceId(): string {
     return this._instanceId;
+  }
+
+  // Only use this if a different Primary needs to take over this one's elements.
+  // Currently this is only done when hot-reloading in dev. Don't use this when
+  // a threadview exits, the sdk.destroy() is called, etc.
+  destroy() {
+    this._stopper.destroy();
   }
 
   // This value controls whether the app sidebar should automatically open
