@@ -611,15 +611,16 @@ class GmailAppSidebarPrimary {
           if (renderThreadSidebar) {
             renderThreadSidebar()
               .then(() => {
+                const descriptor = this._instanceIdsToDescriptors.get(e.detail.instanceId);
+                if (!descriptor) return;
+
                 this._setShouldThreadAppSidebarOpen(true);
 
-                const appName = find(orderManager.getOrderedItems(), item => item.value.instanceId === e.detail.instanceId).value.appName;
-                const buttonContainer = threadButtonContainers.get(appName);
-                if (buttonContainer) {
-                  openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
-                } else {
+                const buttonContainer = threadButtonContainers.get(descriptor.appName);
+                if (!buttonContainer) {
                   throw new Error('missing button container');
                 }
+                openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
 
                 if (threadSidebarComponent) {
                   threadSidebarComponent.openPanel(e.detail.instanceId);
