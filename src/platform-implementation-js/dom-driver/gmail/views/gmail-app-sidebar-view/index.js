@@ -11,26 +11,26 @@ import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import findParent from '../../../../common/find-parent';
-import delayAsap from '../../../lib/delay-asap';
-import fromEventTargetCapture from '../../../lib/from-event-target-capture';
+import findParent from '../../../../../common/find-parent';
+import delayAsap from '../../../../lib/delay-asap';
+import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
 import OrderManager from 'order-manager';
-import idMap from '../../../lib/idMap';
-import incrementName from '../../../lib/incrementName';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
-import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
-import fakeWindowResize from '../../../lib/fake-window-resize';
-import type GmailDriver from '../gmail-driver';
+import idMap from '../../../../lib/idMap';
+import incrementName from '../../../../lib/incrementName';
+import querySelector from '../../../../lib/dom/querySelectorOrFail';
+import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
+import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
+import fakeWindowResize from '../../../../lib/fake-window-resize';
+import type GmailDriver from '../../gmail-driver';
 
-import AppSidebar from '../../../driver-common/sidebar/AppSidebar';
-import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
-import GmailElementGetter from '../gmail-element-getter';
+import AppSidebar from '../../../../driver-common/sidebar/AppSidebar';
+import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
+import GmailElementGetter from '../../gmail-element-getter';
 
-import addCompanionThreadIconArea from './gmail-app-sidebar-view/add-companion-thread-icon-area';
-import addCompanionGlobalIconArea from './gmail-app-sidebar-view/add-companion-global-icon-area';
-import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
+import addCompanionThreadIconArea from './add-companion-thread-icon-area';
+import addCompanionGlobalIconArea from './add-companion-global-icon-area';
+import addToIconArea from './add-to-icon-area';
 
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 const ACTIVE_GLOBAL_ADD_ON_CLASS_NAME = 'bse-bvF-I-KO';
@@ -38,7 +38,7 @@ const ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR = `.${ACTIVE_GLOBAL_ADD_ON_CLASS_NAME}`
 const GLOBAL_ADD_ON_ICON_SELECTOR = '.bse-bvF-I';
 const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
-import type GmailThreadView from './gmail-thread-view';
+import type GmailThreadView from '../gmail-thread-view';
 
 const updates: Kefir.Observable<null> = udKefir(module, null);
 

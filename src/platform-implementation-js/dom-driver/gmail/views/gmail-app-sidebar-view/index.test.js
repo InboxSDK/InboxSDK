@@ -6,10 +6,10 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
 import fs from 'fs';
-import idMap from '../../../lib/idMap';
-import GmailThreadSidebarView from './gmail-thread-sidebar-view';
-import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
-import GmailElementGetter from '../gmail-element-getter';
+import idMap from '../../../../lib/idMap';
+import GmailThreadSidebarView from '../gmail-thread-sidebar-view';
+import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
+import GmailElementGetter from '../../gmail-element-getter';
 import MockWebStorage from 'mock-webstorage';
 
 const mockKefirBus = kefirBus;
