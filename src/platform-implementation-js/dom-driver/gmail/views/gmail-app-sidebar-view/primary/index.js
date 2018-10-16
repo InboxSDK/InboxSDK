@@ -57,6 +57,7 @@ class GmailAppSidebarPrimary {
   _instanceId: string = `${Date.now()}-${Math.random()}`;
 
   _companionSidebarContentContainerEl: HTMLElement;
+  _instanceIdsToDescriptors: Map<string, Object> = new Map();
 
   constructor(
     driver: GmailDriver,
@@ -110,7 +111,6 @@ class GmailAppSidebarPrimary {
     let shouldRestoreGlobal = false;
     let lastActiveNativeGlobalAddOnIconEl = null;
     let threadSidebarComponent: ?AppSidebar;
-    const instanceIdsToDescriptors: Map<string, Object> = new Map();
 
     const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
     if(!companionSidebarIconContainerEl) throw new Error('Could not find companion sidebar icon container element');
@@ -695,7 +695,7 @@ class GmailAppSidebarPrimary {
         .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          const descriptor = instanceIdsToDescriptors.get(event.detail.instanceId);
+          const descriptor = this._instanceIdsToDescriptors.get(event.detail.instanceId);
           if(!descriptor) return;
 
           const buttonContainer = globalButtonContainers.get(descriptor.appName);
@@ -715,7 +715,7 @@ class GmailAppSidebarPrimary {
         .filter(e => e.detail.sidebarId === this._instanceId && e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          const descriptor = instanceIdsToDescriptors.get(event.detail.instanceId);
+          const descriptor = this._instanceIdsToDescriptors.get(event.detail.instanceId);
           if(!descriptor) return;
 
           const buttonContainer = globalButtonContainers.get(descriptor.appName);
@@ -738,21 +738,21 @@ class GmailAppSidebarPrimary {
         .filter(e => e.detail.sidebarId === this._instanceId)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
+          this._instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
         });
 
       Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
         .filter(e => e.detail.sidebarId === this._instanceId)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          instanceIdsToDescriptors.delete(event.detail.instanceId);
+          this._instanceIdsToDescriptors.delete(event.detail.instanceId);
         });
 
       Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
         .filter(e => e.detail.sidebarId === this._instanceId)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
+          this._instanceIdsToDescriptors.set(event.detail.instanceId, event.detail);
         });
     }
 
