@@ -115,8 +115,6 @@ class GmailAppSidebarPrimary {
     const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
     if(!companionSidebarIconContainerEl) throw new Error('Could not find companion sidebar icon container element');
 
-    this._instanceId = `${Date.now()}-${Math.random()}`;
-
     this._companionSidebarContentContainerEl.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
 
     // TODO: Once the changes to the GMail DOM have been entirely ramped, drop the ternary here and
