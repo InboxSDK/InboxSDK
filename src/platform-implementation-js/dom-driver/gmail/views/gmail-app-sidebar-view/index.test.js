@@ -14,11 +14,11 @@ import MockWebStorage from 'mock-webstorage';
 
 const mockKefirBus = kefirBus;
 
-jest.mock('../../../lib/dom/make-element-child-stream', () => {
+jest.mock('../../../../lib/dom/make-element-child-stream', () => {
   return () => mockKefirBus();
 });
 
-jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
+jest.mock('../../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => mockKefirBus();
 });
 
@@ -199,7 +199,7 @@ function makeDriver(appId, opts): any {
 function makeAddonSidebarWithV1HTML(): HTMLElement {
   const mainContainer = document.createElement('div');
 
-  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../test/data/gmail-2017-06-22-gmail-addon-sidebar.html', 'utf8');
+  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../../test/data/gmail-2017-06-22-gmail-addon-sidebar.html', 'utf8');
 
   (GmailElementGetter: any).getMainContentBodyContainerElement = () => mainContainer.querySelector('.bkK');
 
@@ -209,7 +209,7 @@ function makeAddonSidebarWithV1HTML(): HTMLElement {
 function makeAddonSidebarWithV2HTML(): HTMLElement {
   const mainContainer = document.createElement('div');
 
-  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../test/data/gmail-2017-09-08-gmail-addon-sidebar.html', 'utf8');
+  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../../test/data/gmail-2017-09-08-gmail-addon-sidebar.html', 'utf8');
 
   (GmailElementGetter: any).getMainContentBodyContainerElement = () => mainContainer.querySelector('.bkK');
 
