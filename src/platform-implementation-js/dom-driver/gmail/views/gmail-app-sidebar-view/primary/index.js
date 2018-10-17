@@ -7,6 +7,7 @@ import autoHtml from 'auto-html';
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import type {Bus} from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import OrderManager from 'order-manager';
 
@@ -70,6 +71,28 @@ class GmailAppSidebarPrimary {
   _threadButtonContainers: Map<string, HTMLElement> = new Map();
   _contentContainers: Map<string, HTMLElement> = new Map();
 
+  _threadSidebarContainerEl: ?HTMLElement = null;
+
+  _orderManager = new OrderManager({
+    get() {
+      try {
+        return JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+      } catch (err) {
+        console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
+      }
+    },
+    set(data) {
+      try {
+        global.localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+      } catch (err) {
+        console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
+      }
+    }
+  });
+
+  _containerProp: () => HTMLElement;
+  _updateHighlightedAppThreadIconBus: Bus<null> = kefirBus();
+
   constructor(
     driver: GmailDriver,
     companionSidebarContentContainerElement: HTMLElement
@@ -117,6 +140,127 @@ class GmailAppSidebarPrimary {
     }
   }
 
+  _createThreadSidebarIfNeeded(): HTMLElement {
+    if(this._threadSidebarContainerEl) return this._threadSidebarContainerEl;
+
+    const threadSidebarContainerEl = this._threadSidebarContainerEl = document.createElement('div');
+    threadSidebarContainerEl.classList.add('thread_app_sidebar', idMap('app_sidebar_container'), 'addon_sidebar');
+
+    this._companionSidebarContentContainerEl.insertBefore(threadSidebarContainerEl, this._companionSidebarContentContainerEl.firstElementChild);
+
+    this._containerProp = () => threadSidebarContainerEl;
+
+    // Kefir flow type def has wrong type for bufferWithTimeOrCount
+    (this._updateHighlightedAppThreadIconBus: any)
+      .bufferWithTimeOrCount(150, 100)
+      .filter(events => events.length > 0)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        // Before touching this code, make sure you understand the meaning of the clientRect
+        // values and of scrollTop. In particular, make sure you understand the distinction of
+        // absolute (the scroll[Top|Bottom|Height] values) vs relative (the BoundingRect top
+        // and bottom values) scroll values.
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop
+
+        const containerBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
+        const titleBars = Array.from(threadSidebarContainerEl.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
+
+        const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
+        const absoluteScrollOfViewportMidpoint = absoluteScrollOfViewportTop + (containerBoundingBox.height / 2);
+
+        let titleBar = titleBars.find(t => {
+          const tBoundingBox = t.getBoundingClientRect();
+
+          const relativeScrollOfTitleBottom = tBoundingBox.bottom;
+          const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
+
+          // Return true for an element that is below the top of the viewport but above its midpoint
+          return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
+            && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
+        });
+
+        // If titleBar is falsey then there isn't a title element in the top half of the viewport.
+        // In this case, find the first title element above the viewport.
+        if (!titleBar) {
+          // We make the assumption here that ordering of the elements in titleBars matches the
+          // ordering of how they appear in the sidebar (i.e. their ordering from top to bottom).
+          let lastElementAboveViewPort;
+          for (let i = 0; i < titleBars.length; i++) {
+            const tElement = titleBars[i];
+            const tBoundingBox = tElement.getBoundingClientRect();
+
+            const relativeScrollOfTitleBottom = tBoundingBox.bottom;
+            if (relativeScrollOfTitleBottom < 0) {
+              lastElementAboveViewPort = tElement;
+            }
+            else if (relativeScrollOfTitleBottom > 0) {
+              break;
+            }
+          }
+
+          titleBar = lastElementAboveViewPort;
+        }
+
+        if(titleBar){
+          const instanceId = titleBar.getAttribute('data-instance-id');
+          const appName = titleBar.getAttribute('data-app-name');
+          if(!appName) return;
+          const appButton = this._threadButtonContainers.get(appName);
+          if(!appButton || !this._threadIconArea) return;
+
+          const activeButtonContainer = this._threadIconArea.querySelector('.sidebar_button_container_active');
+          if(activeButtonContainer){
+            activeButtonContainer.classList.remove('sidebar_button_container_active');
+          }
+
+          appButton.classList.add('sidebar_button_container_active');
+        }
+      });
+
+    //listen for scroll and update active icon if needed
+    this._updateHighlightedAppThreadIconBus.plug(
+      Kefir.fromEvents(threadSidebarContainerEl, 'scroll')
+        .map(() => null)
+    );
+
+    // handle rendering thread sidebar contents
+    this._renderThreadSidebar();
+    return threadSidebarContainerEl;
+  }
+
+  _renderThreadSidebarIfPresent() {
+    if (!this._threadSidebarContainerEl) {
+      return;
+    }
+    this._renderThreadSidebar();
+  }
+
+  _renderThreadSidebar(): Promise<AppSidebar> {
+    const threadSidebarContainerEl = this._threadSidebarContainerEl;
+    if (!threadSidebarContainerEl) {
+      throw new Error('_renderThreadSidebar should not be called when _threadSidebarContainerEl is unset');
+    }
+    return new Promise((resolve) => {
+      const threadSidebarComponent = this._threadSidebarComponent = (ReactDOM.render(
+        <AppSidebar
+          panels={this._orderManager.getOrderedItems().map(x => x.value)}
+          onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
+            this._orderManager.moveItem(oldIndex, newIndex);
+            this._renderThreadSidebar();
+          }}
+          onExpandedToggle={() => {this._updateHighlightedAppThreadIconBus.emit(null);}}
+          container={this._containerProp}
+        />,
+        threadSidebarContainerEl,
+        () => {
+          resolve(threadSidebarComponent);
+          this._updateHighlightedAppThreadIconBus.emit(null);
+        }
+      ): any);
+    });
+  }
+
   _setupElement() {
     const companionSidebarIconContainerEl = GmailElementGetter.getCompanionSidebarIconContainerElement();
     if(!companionSidebarIconContainerEl) throw new Error('Could not find companion sidebar icon container element');
@@ -130,113 +274,6 @@ class GmailAppSidebarPrimary {
       : this._companionSidebarContentContainerEl.parentElement;
 
     if (!companionSidebarOuterWrapper) throw new Error('should not happen: failed to find companionSidebarOuterWrapper');
-
-    let threadSidebarContainerEl, renderThreadSidebar;
-    const createThreadSidebar = () => {
-      if(threadSidebarContainerEl) return threadSidebarContainerEl;
-
-      const updateHighlightedAppThreadIconBus = kefirBus();
-      const container = () => threadSidebarContainerEl;
-
-      threadSidebarContainerEl = document.createElement('div');
-      threadSidebarContainerEl.classList.add('thread_app_sidebar', idMap('app_sidebar_container'), 'addon_sidebar');
-
-      this._companionSidebarContentContainerEl.insertBefore(threadSidebarContainerEl, this._companionSidebarContentContainerEl.firstElementChild);
-
-      updateHighlightedAppThreadIconBus
-        .bufferWithTimeOrCount(150, 100)
-        .filter(events => events.length > 0)
-        .takeUntilBy(this._stopper)
-        .onValue(() => {
-          // Before touching this code, make sure you understand the meaning of the clientRect
-          // values and of scrollTop. In particular, make sure you understand the distinction of
-          // absolute (the scroll[Top|Bottom|Height] values) vs relative (the BoundingRect top
-          // and bottom values) scroll values.
-          // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
-          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop
-
-          const containerBoundingBox = threadSidebarContainerEl.getBoundingClientRect();
-          const titleBars = Array.from(threadSidebarContainerEl.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
-
-          const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
-          const absoluteScrollOfViewportMidpoint = absoluteScrollOfViewportTop + (containerBoundingBox.height / 2);
-
-          let titleBar = titleBars.find(t => {
-            const tBoundingBox = t.getBoundingClientRect();
-
-            const relativeScrollOfTitleBottom = tBoundingBox.bottom;
-            const absoluteScrollOfTitleBottom = relativeScrollOfTitleBottom + absoluteScrollOfViewportTop;
-
-            // Return true for an element that is below the top of the viewport but above its midpoint
-            return absoluteScrollOfTitleBottom > absoluteScrollOfViewportTop
-              && absoluteScrollOfTitleBottom < absoluteScrollOfViewportMidpoint;
-          });
-
-          // If titleBar is falsey then there isn't a title element in the top half of the viewport.
-          // In this case, find the first title element above the viewport.
-          if (!titleBar) {
-            // We make the assumption here that ordering of the elements in titleBars matches the
-            // ordering of how they appear in the sidebar (i.e. their ordering from top to bottom).
-            let lastElementAboveViewPort;
-            for (let i = 0; i < titleBars.length; i++) {
-              const tElement = titleBars[i];
-              const tBoundingBox = tElement.getBoundingClientRect();
-
-              const relativeScrollOfTitleBottom = tBoundingBox.bottom;
-              if (relativeScrollOfTitleBottom < 0) {
-                lastElementAboveViewPort = tElement;
-              }
-              else if (relativeScrollOfTitleBottom > 0) {
-                break;
-              }
-            }
-
-            titleBar = lastElementAboveViewPort;
-          }
-
-          if(titleBar){
-            const instanceId = titleBar.getAttribute('data-instance-id');
-            const appName = titleBar.getAttribute('data-app-name');
-            if(!appName) return;
-            const appButton = this._threadButtonContainers.get(appName);
-            if(!appButton || !this._threadIconArea) return;
-
-            const activeButtonContainer = this._threadIconArea.querySelector('.sidebar_button_container_active');
-            if(activeButtonContainer){
-              activeButtonContainer.classList.remove('sidebar_button_container_active');
-            }
-
-            appButton.classList.add('sidebar_button_container_active');
-          }
-        });
-
-      //listen for scroll and update active icon if needed
-      Kefir.fromEvents(threadSidebarContainerEl, 'scroll')
-        .onValue(() => {updateHighlightedAppThreadIconBus.emit(null);});
-
-      // handle rendering thread sidebar contents
-      renderThreadSidebar = () => {
-        return new Promise((resolve) => {
-          this._threadSidebarComponent = (ReactDOM.render(
-            <AppSidebar
-              panels={orderManager.getOrderedItems().map(x => x.value)}
-              onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
-                orderManager.moveItem(oldIndex, newIndex);
-                renderThreadSidebar();
-              }}
-              onExpandedToggle={() => {updateHighlightedAppThreadIconBus.emit(null);}}
-              container={container}
-            />,
-            threadSidebarContainerEl,
-            () => {
-              resolve();
-              updateHighlightedAppThreadIconBus.emit(null);
-            }
-          ): any);
-        });
-      };
-      renderThreadSidebar();
-    };
 
     const addButton = (iconArea: HTMLElement, event: Object, isGlobal: boolean) => {
       // we put adding the content panel icon in the iconArea in an asap so that we
@@ -341,7 +378,7 @@ class GmailAppSidebarPrimary {
           }, true);
 
 
-          if(iconArea) addToIconArea(orderManager, appName, buttonContainer, iconArea);
+          if(iconArea) addToIconArea(this._orderManager, appName, buttonContainer, iconArea);
 
           // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
           // panel gets added
@@ -491,22 +528,6 @@ class GmailAppSidebarPrimary {
       });
 
     const currentIds = new Set();
-    const orderManager = new OrderManager({
-      get() {
-        try {
-          return JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
-        } catch (err) {
-          console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
-        }
-      },
-      set(data) {
-        try {
-          global.localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
-        } catch (err) {
-          console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
-        }
-      }
-    });
 
     // thread sidebar content panels
     {
@@ -514,15 +535,15 @@ class GmailAppSidebarPrimary {
         .filter(e => e.key === 'inboxsdk__sidebar_ordering')
         .takeUntilBy(this._stopper)
         .onValue(() => {
-          orderManager.reload();
-          if(renderThreadSidebar) renderThreadSidebar();
+          this._orderManager.reload();
+          this._renderThreadSidebarIfPresent();
         });
 
       Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          createThreadSidebar();
+          this._createThreadSidebarIfNeeded();
           let id = event.detail.id;
           while (currentIds.has(id)) {
             id = incrementName(id);
@@ -530,7 +551,7 @@ class GmailAppSidebarPrimary {
           currentIds.add(id);
 
           const appName = event.detail.appName;
-          orderManager.addItem({
+          this._orderManager.addItem({
             groupId: event.detail.appId,
             id,
             orderHint: event.detail.orderHint,
@@ -545,7 +566,7 @@ class GmailAppSidebarPrimary {
               el: event.target
             }
           });
-          if(renderThreadSidebar) renderThreadSidebar();
+          this._renderThreadSidebar();
 
           let threadIconArea = this._threadIconArea = companionSidebarIconContainerEl.querySelector('.sidebar_thread_iconArea');
           if (!threadIconArea) {
@@ -562,10 +583,10 @@ class GmailAppSidebarPrimary {
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          const orderedItems = orderManager.getOrderedItems();
+          const orderedItems = this._orderManager.getOrderedItems();
           const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
           if (index === -1) throw new Error('should not happen: failed to find orderItem');
-          orderManager.updateItemValueByIndex(index, {
+          this._orderManager.updateItemValueByIndex(index, {
             id: orderedItems[index].value.id,
             appId: event.detail.appId,
             appName: event.detail.appName || event.detail.title,
@@ -576,20 +597,20 @@ class GmailAppSidebarPrimary {
             hideTitleBar: event.detail.hideTitleBar,
             el: event.target
           });
-          if(renderThreadSidebar) renderThreadSidebar();
+          this._renderThreadSidebar();
         });
 
       Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          const orderedItems = orderManager.getOrderedItems();
+          const orderedItems = this._orderManager.getOrderedItems();
           const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
           if (index === -1) throw new Error('should not happen: failed to find orderItem');
           currentIds.delete(orderedItems[index].id);
-          orderManager.removeItemByIndex(index);
+          this._orderManager.removeItemByIndex(index);
 
-          if(renderThreadSidebar) renderThreadSidebar();
+          this._renderThreadSidebar();
           removeButton(event, this._threadButtonContainers, this._threadIconArea);
         });
 
@@ -611,27 +632,21 @@ class GmailAppSidebarPrimary {
         .filter(e => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal)
         .takeUntilBy(this._stopper)
         .onValue(e => {
-          if (renderThreadSidebar) {
-            renderThreadSidebar()
-              .then(() => {
-                const descriptor = this._instanceIdsToDescriptors.get(e.detail.instanceId);
-                if (!descriptor) return;
+          this._renderThreadSidebar().then(threadSidebarComponent => {
+            const descriptor = this._instanceIdsToDescriptors.get(e.detail.instanceId);
+            if (!descriptor) return;
 
-                this._setShouldThreadAppSidebarOpen(true);
+            this._setShouldThreadAppSidebarOpen(true);
 
-                const buttonContainer = this._threadButtonContainers.get(descriptor.appName);
-                if (!buttonContainer) {
-                  throw new Error('missing button container');
-                }
-                openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
+            const buttonContainer = this._threadButtonContainers.get(descriptor.appName);
+            if (!buttonContainer) {
+              throw new Error('missing button container');
+            }
+            openSidebarAndActivateButton(buttonContainer, e.detail.isGlobal);
 
-                const threadSidebarComponent = this._threadSidebarComponent;
-                if (threadSidebarComponent) {
-                  threadSidebarComponent.openPanel(e.detail.instanceId);
-                  threadSidebarComponent.scrollPanelIntoView(e.detail.instanceId, true);
-                }
-              });
-          }
+            threadSidebarComponent.openPanel(e.detail.instanceId);
+            threadSidebarComponent.scrollPanelIntoView(e.detail.instanceId, true);
+          });
         });
     }
 
