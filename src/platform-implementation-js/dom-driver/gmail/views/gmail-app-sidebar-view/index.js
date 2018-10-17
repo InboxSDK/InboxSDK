@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import udKefir from 'ud-kefir';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -29,17 +29,25 @@ class GmailAppSidebarView {
     // GmailAppSidebarView is instantiated, we check the element for an
     // attribute to see whether a previous extension's GmailAppSidebarView has
     // already set up the sidebar or not.
-    const instanceId = companionSidebarContentContainerElement.getAttribute('data-sdk-sidebar-instance-id');
+    const instanceId = companionSidebarContentContainerElement.getAttribute(
+      'data-sdk-sidebar-instance-id'
+    );
     if (instanceId != null) {
       this._instanceId = instanceId;
     } else {
-      let primary = new GmailAppSidebarPrimary(driver, companionSidebarContentContainerElement);
+      let primary = new GmailAppSidebarPrimary(
+        driver,
+        companionSidebarContentContainerElement
+      );
       this._instanceId = primary.getInstanceId();
 
       // hot reloading support. Not perfect; this will break any existing panels.
       updates.changes().onValue(() => {
         primary.destroy();
-        primary = new GmailAppSidebarPrimary(driver, companionSidebarContentContainerElement);
+        primary = new GmailAppSidebarPrimary(
+          driver,
+          companionSidebarContentContainerElement
+        );
         this._instanceId = primary.getInstanceId();
       });
     }
@@ -54,13 +62,20 @@ class GmailAppSidebarView {
   }
 
   _getShouldThreadAppSidebarOpen(): boolean {
-    return global.localStorage.getItem('inboxsdk__thread_app_sidebar_should_open') !== 'false';
+    return (
+      global.localStorage.getItem(
+        'inboxsdk__thread_app_sidebar_should_open'
+      ) !== 'false'
+    );
   }
 
   _setShouldThreadAppSidebarOpen(open: boolean) {
     try {
-      global.localStorage.setItem('inboxsdk__thread_app_sidebar_should_open', String(open));
-    } catch(err) {
+      global.localStorage.setItem(
+        'inboxsdk__thread_app_sidebar_should_open',
+        String(open)
+      );
+    } catch (err) {
       console.error('error saving', err); //eslint-disable-line no-console
     }
   }
@@ -69,33 +84,48 @@ class GmailAppSidebarView {
   // itself when available when the chat sidebar isn't present. It's only set
   // if the user interacts with the app sidebar button.
   _getShouldGlobalAppSidebarOpen(): boolean {
-    return global.localStorage.getItem('inboxsdk__global_app_sidebar_should_open') === 'true';
+    return (
+      global.localStorage.getItem(
+        'inboxsdk__global_app_sidebar_should_open'
+      ) === 'true'
+    );
   }
 
   _setShouldGlobalAppSidebarOpen(open: boolean) {
     try {
-      global.localStorage.setItem('inboxsdk__global_app_sidebar_should_open', String(open));
-    } catch(err) {
+      global.localStorage.setItem(
+        'inboxsdk__global_app_sidebar_should_open',
+        String(open)
+      );
+    } catch (err) {
       console.error('error saving', err); //eslint-disable-line no-console
     }
   }
 
-  addThreadSidebarContentPanel(descriptor: Kefir.Observable<Object>, threadView: GmailThreadView) {
-    const panel = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId);
-    Kefir.merge([
-      threadView.getStopper(),
-      this._stopper
-    ]).take(1)
+  addThreadSidebarContentPanel(
+    descriptor: Kefir.Observable<Object>,
+    threadView: GmailThreadView
+  ) {
+    const panel = new ContentPanelViewDriver(
+      this._driver,
+      descriptor,
+      this._instanceId
+    );
+    Kefir.merge([threadView.getStopper(), this._stopper])
+      .take(1)
       .takeUntilBy(panel.getStopper())
       .onValue(() => panel.remove());
     return panel;
   }
 
   addGlobalSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const panel = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId, true);
-    this._stopper
-      .takeUntilBy(panel.getStopper())
-      .onValue(() => panel.remove());
+    const panel = new ContentPanelViewDriver(
+      this._driver,
+      descriptor,
+      this._instanceId,
+      true
+    );
+    this._stopper.takeUntilBy(panel.getStopper()).onValue(() => panel.remove());
     return panel;
   }
 }

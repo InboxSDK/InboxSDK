@@ -26,164 +26,288 @@ global.localStorage = new MockWebStorage();
 global._APP_SIDEBAR_TEST = true;
 
 (Element: any).prototype.insertAdjacentElement = function(position, el) {
-  switch(position){
+  switch (position) {
     case 'beforebegin':
       this.parentElement.insertBefore(el, this);
-    break;
+      break;
     case 'afterbegin':
       this.insertBefore(el, this.firstElementChild);
-    break;
+      break;
     case 'beforeend':
       this.appendChild(el);
-    break;
+      break;
     case 'afterend':
       this.parentElement.insertBefore(el, this);
       this.parentElement.insertBefore(this, el);
-    break;
+      break;
   }
 };
 
-describe('Without add-ons', function(){
+describe('Without add-ons', function() {
   it('construction works', () => {
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'));
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div')
+    );
   });
 
   it('sidebar is added', async () => {
     const container = document.createElement('div');
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), container);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      container
+    );
 
-    const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    const panel = gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        title: 'foo',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(container.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(1);
+    expect(
+      container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
+        .length
+    ).toBe(1);
 
     panel.remove();
-    expect(container.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(0);
+    expect(
+      container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
+        .length
+    ).toBe(0);
   });
 
   it('multiple sidebars can be added', async () => {
     const container = document.createElement('div');
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), container);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      container
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo1', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        title: 'foo1',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo2', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        title: 'foo2',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(container.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(2);
+    expect(
+      container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
+        .length
+    ).toBe(2);
   });
 });
 
-describe('With new add-ons html', function(){
+describe('With new add-ons html', function() {
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
   });
 
   it('sidebar is added', async () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
 
-    const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    const panel = gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        title: 'foo',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(1);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(1);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(1);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(1);
 
     panel.remove();
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(0);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(0);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(0);
   });
 
   it('icons get grouped by appName', async () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'foo', title: 'foo 1', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'foo',
+        title: 'foo 1',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'foo', title: 'foo 2', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'foo',
+        title: 'foo 2',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'bar', title: 'bar 2', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'bar',
+        title: 'bar 2',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(3);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(2);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(3);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(2);
   });
 });
 
-describe('With old add-ons html', function(){
+describe('With old add-ons html', function() {
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
   });
 
   it('sidebar is added', async () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
 
-    const panel = gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    const panel = gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        title: 'foo',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(1);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(1);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(1);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(1);
 
     panel.remove();
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(0);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(0);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(0);
   });
 
   it('icons get grouped by appName', async () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
-    const gmailAppSidebarView =
-      new GmailThreadSidebarView(makeDriver(), document.createElement('div'), sidebarContainer);
+    const gmailAppSidebarView = new GmailThreadSidebarView(
+      makeDriver(),
+      document.createElement('div'),
+      sidebarContainer
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'foo', title: 'foo 1', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'foo',
+        title: 'foo 1',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'foo', title: 'foo 2', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'foo',
+        title: 'foo 2',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
-    gmailAppSidebarView.addSidebarContentPanel(Kefir.constant({
-      appName: 'bar', title: 'bar 2', iconUrl: '/bar.png', el: document.createElement('div')
-    }));
+    gmailAppSidebarView.addSidebarContentPanel(
+      Kefir.constant({
+        appName: 'bar',
+        title: 'bar 2',
+        iconUrl: '/bar.png',
+        el: document.createElement('div')
+      })
+    );
 
     await delay(0);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('app_sidebar_content_panel')).length).toBe(3);
-    expect(sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container')).length).toBe(2);
+    expect(
+      sidebarContainer.querySelectorAll(
+        '.' + idMap('app_sidebar_content_panel')
+      ).length
+    ).toBe(3);
+    expect(
+      sidebarContainer.querySelectorAll('.' + idMap('sidebar_button_container'))
+        .length
+    ).toBe(2);
   });
 });
-
 
 function makeDriver(appId, opts): any {
   return {
     getAppId: () => appId || 'test',
-    getOpts: () => opts || ({appName: 'Test', appIconUrl: 'testImage.png'}),
+    getOpts: () => opts || { appName: 'Test', appIconUrl: 'testImage.png' },
     getLogger() {
       return {
         eventSdkPassive() {},
@@ -199,9 +323,14 @@ function makeDriver(appId, opts): any {
 function makeAddonSidebarWithV1HTML(): HTMLElement {
   const mainContainer = document.createElement('div');
 
-  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../../test/data/gmail-2017-06-22-gmail-addon-sidebar.html', 'utf8');
+  mainContainer.innerHTML = fs.readFileSync(
+    __dirname +
+      '/../../../../../../test/data/gmail-2017-06-22-gmail-addon-sidebar.html',
+    'utf8'
+  );
 
-  (GmailElementGetter: any).getMainContentBodyContainerElement = () => mainContainer.querySelector('.bkK');
+  (GmailElementGetter: any).getMainContentBodyContainerElement = () =>
+    mainContainer.querySelector('.bkK');
 
   return (mainContainer.querySelector('.bnl'): any);
 }
@@ -209,9 +338,14 @@ function makeAddonSidebarWithV1HTML(): HTMLElement {
 function makeAddonSidebarWithV2HTML(): HTMLElement {
   const mainContainer = document.createElement('div');
 
-  mainContainer.innerHTML = fs.readFileSync(__dirname+'/../../../../../../test/data/gmail-2017-09-08-gmail-addon-sidebar.html', 'utf8');
+  mainContainer.innerHTML = fs.readFileSync(
+    __dirname +
+      '/../../../../../../test/data/gmail-2017-09-08-gmail-addon-sidebar.html',
+    'utf8'
+  );
 
-  (GmailElementGetter: any).getMainContentBodyContainerElement = () => mainContainer.querySelector('.bkK');
+  (GmailElementGetter: any).getMainContentBodyContainerElement = () =>
+    mainContainer.querySelector('.bkK');
 
   return (mainContainer.querySelector('.bnl'): any);
 }
