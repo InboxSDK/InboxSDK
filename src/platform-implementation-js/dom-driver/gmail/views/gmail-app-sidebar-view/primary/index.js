@@ -74,6 +74,8 @@ class GmailAppSidebarPrimary {
   _threadSidebarContainerEl: ?HTMLElement = null;
   _companionSidebarOuterWrapper: HTMLElement;
 
+  _currentIds: Set<string> = new Set();
+
   _orderManager = new OrderManager({
     get() {
       try {
@@ -700,8 +702,6 @@ class GmailAppSidebarPrimary {
         });
     });
 
-    const currentIds = new Set();
-
     // thread sidebar content panels
     {
       Kefir.fromEvents(window, 'storage')
@@ -720,10 +720,10 @@ class GmailAppSidebarPrimary {
         .onValue(event => {
           this._createThreadSidebarIfNeeded();
           let id = event.detail.id;
-          while (currentIds.has(id)) {
+          while (this._currentIds.has(id)) {
             id = incrementName(id);
           }
-          currentIds.add(id);
+          this._currentIds.add(id);
 
           const appName = event.detail.appName;
           this._orderManager.addItem({
@@ -803,7 +803,7 @@ class GmailAppSidebarPrimary {
           );
           if (index === -1)
             throw new Error('should not happen: failed to find orderItem');
-          currentIds.delete(orderedItems[index].id);
+          this._currentIds.delete(orderedItems[index].id);
           this._orderManager.removeItemByIndex(index);
 
           this._renderThreadSidebar();
@@ -882,10 +882,10 @@ class GmailAppSidebarPrimary {
         .takeUntilBy(this._stopper)
         .onValue(event => {
           let id = event.detail.id;
-          while (currentIds.has(id)) {
+          while (this._currentIds.has(id)) {
             id = incrementName(id);
           }
-          currentIds.add(id);
+          this._currentIds.add(id);
 
           const appName = event.detail.appName;
 
@@ -950,7 +950,7 @@ class GmailAppSidebarPrimary {
         )
         .takeUntilBy(this._stopper)
         .onValue(event => {
-          currentIds.delete(event.detail.id);
+          this._currentIds.delete(event.detail.id);
           this._removeButton(
             event,
             this._globalButtonContainers,
