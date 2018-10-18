@@ -644,17 +644,19 @@ class GmailAppSidebarPrimary {
       ? this._companionSidebarContentContainerEl
       : (this._companionSidebarContentContainerEl.parentElement: any);
 
-    if (!this._companionSidebarOuterWrapper)
+    if (!this._companionSidebarOuterWrapper) {
       throw new Error(
         'should not happen: failed to find companionSidebarOuterWrapper'
       );
+    }
 
     const contentContainer = this._companionSidebarOuterWrapper
       .previousElementSibling;
-    if (contentContainer)
+    if (contentContainer) {
       contentContainer.classList.add(
         idMap('companion_container_app_sidebar_in_use')
       );
+    }
     this._companionSidebarContentContainerEl.classList.add(
       idMap('app_sidebar_in_use')
     );
