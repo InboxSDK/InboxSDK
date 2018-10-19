@@ -30,10 +30,7 @@ import addCompanionThreadIconArea from './add-companion-thread-icon-area';
 import addCompanionGlobalIconArea from './add-companion-global-icon-area';
 import addToIconArea from './add-to-icon-area';
 
-const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
-const ACTIVE_GLOBAL_ADD_ON_CLASS_NAME = 'bse-bvF-I-KO';
-const ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR = `.${ACTIVE_GLOBAL_ADD_ON_CLASS_NAME}`;
-const GLOBAL_ADD_ON_ICON_SELECTOR = '.bse-bvF-I';
+const ACTIVE_ADD_ON_ICON_SELECTOR = '.aT5-aOt-I-KO';
 const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
 // Only one instance of this Primary is ever created within a page, even if
@@ -60,8 +57,6 @@ class GmailAppSidebarPrimary {
   _companionSidebarContentContainerEl: HTMLElement;
   _instanceIdsToDescriptors: Map<string, Object> = new Map();
 
-  _shouldRestoreGlobal = false;
-  _lastActiveNativeGlobalAddOnIconEl: ?HTMLElement = null;
   _threadSidebarComponent: ?AppSidebar = null;
 
   _threadIconArea: ?HTMLElement = null;
@@ -368,9 +363,11 @@ class GmailAppSidebarPrimary {
             event.detail.primaryColor;
         }
 
-        if (isGlobal)
+        if (isGlobal) {
           this._globalButtonContainers.set(appName, buttonContainer);
-        else this._threadButtonContainers.set(appName, buttonContainer);
+        } else {
+          this._threadButtonContainers.set(appName, buttonContainer);
+        }
 
         querySelector(buttonContainer, 'button').addEventListener(
           'click',
@@ -388,11 +385,13 @@ class GmailAppSidebarPrimary {
               );
 
             if (activeButtonContainer === buttonContainer) {
-              if (activeButtonContainer)
-                this._closeSidebarAndDeactivateButton(activeButtonContainer);
+              // button was clicked while its panel was open, so close it.
+
+              if (!activeButtonContainer) throw new Error(); // for flow
+
+              this._closeSidebarAndDeactivateButton(activeButtonContainer);
+
               if (isGlobal) {
-                this._shouldRestoreGlobal = false;
-                this._lastActiveNativeGlobalAddOnIconEl = null;
                 this._setShouldGlobalAppSidebarOpen(false);
 
                 const contentEl = this._contentContainers.get(appName);
@@ -409,16 +408,14 @@ class GmailAppSidebarPrimary {
                 this._setShouldThreadAppSidebarOpen(false);
               }
             } else {
+              // button was clicked while its panel wasn't open, so open it.
+
               if (isGlobal) this._setShouldGlobalAppSidebarOpen(true);
               else this._setShouldThreadAppSidebarOpen(true);
 
               this._openSidebarAndActivateButton(buttonContainer, isGlobal);
 
               if (isGlobal) {
-                this._lastActiveNativeGlobalAddOnIconEl = querySelector(
-                  buttonContainer,
-                  'button'
-                );
                 const contentEl = this._contentContainers.get(appName);
                 if (contentEl) contentEl.style.display = '';
                 this._companionSidebarContentContainerEl.classList.add(
@@ -434,13 +431,12 @@ class GmailAppSidebarPrimary {
                   })
                 );
               } else {
-                if (this._lastActiveNativeGlobalAddOnIconEl)
-                  this._shouldRestoreGlobal = true;
                 const threadSidebarComponent = this._threadSidebarComponent;
-                if (threadSidebarComponent) {
-                  threadSidebarComponent.openPanel(instanceId);
-                  threadSidebarComponent.scrollPanelIntoView(instanceId, true);
+                if (!threadSidebarComponent) {
+                  throw new Error('sidebar not mounted');
                 }
+                threadSidebarComponent.openPanel(instanceId);
+                threadSidebarComponent.scrollPanelIntoView(instanceId, true);
               }
             }
 
@@ -450,8 +446,9 @@ class GmailAppSidebarPrimary {
           true
         );
 
-        if (iconArea)
+        if (iconArea) {
           addToIconArea(this._orderManager, appName, buttonContainer, iconArea);
+        }
 
         // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
         // panel gets added
@@ -475,9 +472,6 @@ class GmailAppSidebarPrimary {
               );
             if (!activeButtonContainer) {
               this._openSidebarAndActivateButton(buttonContainer, isGlobal);
-
-              if (this._lastActiveNativeGlobalAddOnIconEl)
-                this._shouldRestoreGlobal = true;
             }
           }
         }
@@ -519,28 +513,6 @@ class GmailAppSidebarPrimary {
           contentContainer.classList.remove(
             'companion_container_app_sidebar_visible'
           );
-
-        if (
-          this._shouldRestoreGlobal &&
-          this._lastActiveNativeGlobalAddOnIconEl
-        ) {
-          const activeElementToRestore = document.activeElement;
-          if (activeElementToRestore) {
-            // if the global sidebar we're putting back is tasks then tasks puts focus on it
-            // when you click the button, so we keep putting back focus on the element that had focus
-            // before restoring that global sidebar
-            // we add the delay because if we restore focus synchronously then the focus that the gmail tasks
-            // sidebar calls fires AFTER the 'blur' event loop, and so activeElementToRestore.focus doesn't
-            // do anything
-            Kefir.fromEvents(activeElementToRestore, 'blur')
-              .delay(5)
-              .takeUntilBy(Kefir.later(300))
-              .onValue(() => {
-                activeElementToRestore.focus();
-              });
-          }
-          simulateClick(this._lastActiveNativeGlobalAddOnIconEl);
-        }
       }
     } else if (currentCount === 2) {
       container.removeAttribute('data-count');
@@ -581,39 +553,29 @@ class GmailAppSidebarPrimary {
       );
 
     let activeButtonContainer;
-    if (this._globalIconArea)
+    if (this._globalIconArea) {
       activeButtonContainer = this._globalIconArea.querySelector(
         '.sidebar_button_container_active'
       );
-    if (!activeButtonContainer && this._threadIconArea)
+    }
+    if (!activeButtonContainer && this._threadIconArea) {
       activeButtonContainer = this._threadIconArea.querySelector(
         '.sidebar_button_container_active'
       );
-
-    if (activeButtonContainer)
-      this._closeSidebarAndDeactivateButton(activeButtonContainer);
-
-    const activeGlobalAddOnIcon = companionSidebarIconContainerEl.querySelector(
-      ACTIVE_GLOBAL_ADD_ON_ICON_SELECTOR
-    );
-    if (activeGlobalAddOnIcon) {
-      simulateClick(activeGlobalAddOnIcon);
-      // we put this in a setTimeout because the simulate click will
-      // trigger a mutation observer that is listening to native sidebar visibility
-      // and will set this._lastActiveNativeGlobalAddOnIconEl to null
-      // which we don't actually want to do, so we set it back
-      if (!isGlobal) {
-        setTimeout(() => {
-          this._lastActiveNativeGlobalAddOnIconEl = activeGlobalAddOnIcon;
-          this._shouldRestoreGlobal = true;
-        }, 1);
-      }
     }
 
-    const activeThreadAddOnIcon = companionSidebarIconContainerEl.querySelector(
-      ACTIVE_ADD_ON_ICON_SELECTOR
-    );
-    if (activeThreadAddOnIcon) simulateClick(activeThreadAddOnIcon);
+    if (activeButtonContainer) {
+      this._closeSidebarAndDeactivateButton(activeButtonContainer);
+    }
+
+    {
+      const activeAddOnIcon = companionSidebarIconContainerEl.querySelector(
+        ACTIVE_ADD_ON_ICON_SELECTOR
+      );
+      if (activeAddOnIcon) {
+        simulateClick(activeAddOnIcon);
+      }
+    }
 
     buttonContainer.classList.add('sidebar_button_container_active');
     this._companionSidebarOuterWrapper.classList.add(
@@ -682,35 +644,6 @@ class GmailAppSidebarPrimary {
       waitingPlatform.className = idMap('app_sidebar_waiting_platform');
       ((document.body: any): HTMLElement).appendChild(waitingPlatform);
     }
-
-    // keep track of what is the last active native global addon
-    // so that we can restore that state if they leave the thread while the SDK sidebar
-    // is open
-    Array.from(
-      companionSidebarIconContainerEl.querySelectorAll(
-        GLOBAL_ADD_ON_ICON_SELECTOR
-      )
-    ).forEach(addonIconEl => {
-      makeMutationObserverChunkedStream(addonIconEl, {
-        attributes: true,
-        attributeFilter: ['class']
-      })
-        .takeUntilBy(this._stopper)
-        .toProperty(() => null)
-        .onValue(() => {
-          const isActive = addonIconEl.classList.contains(
-            ACTIVE_GLOBAL_ADD_ON_CLASS_NAME
-          );
-
-          if (isActive) {
-            this._lastActiveNativeGlobalAddOnIconEl = addonIconEl;
-            this._shouldRestoreGlobal = true;
-          } else if (this._lastActiveNativeGlobalAddOnIconEl === addonIconEl) {
-            this._lastActiveNativeGlobalAddOnIconEl = null;
-            this._shouldRestoreGlobal = false;
-          }
-        });
-    });
 
     // thread sidebar content panels
     {
