@@ -247,9 +247,16 @@ class GmailAppSidebarView {
         }
       });
 
+    const _appSidebarRefSetter = threadSidebarComponent => {
+      if (threadSidebarComponent) {
+        component = threadSidebarComponent;
+      }
+    };
+
     const render = () => {
-      component = (ReactDOM.render(
+      ReactDOM.render(
         <AppSidebar
+          ref={_appSidebarRefSetter}
           panels={orderManager.getOrderedItems().map(x => x.value)}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
             orderManager.moveItem(oldIndex, newIndex);
@@ -260,7 +267,7 @@ class GmailAppSidebarView {
         />,
         el,
         () => {updateHighlightedAppIconBus.emit(null);}
-      ): any);
+      );
     };
     render();
 
