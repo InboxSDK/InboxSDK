@@ -279,6 +279,12 @@ class GmailAppSidebarPrimary {
     this._renderThreadSidebar();
   }
 
+  _appSidebarRefSetter = threadSidebarComponent => {
+    if (threadSidebarComponent) {
+      this._threadSidebarComponent = threadSidebarComponent;
+    }
+  };
+
   _renderThreadSidebar(): Promise<AppSidebar> {
     const threadSidebarContainerEl = this._threadSidebarContainerEl;
     if (!threadSidebarContainerEl) {
@@ -287,8 +293,9 @@ class GmailAppSidebarPrimary {
       );
     }
     return new Promise(resolve => {
-      const threadSidebarComponent = (this._threadSidebarComponent = (ReactDOM.render(
+      ReactDOM.render(
         <AppSidebar
+          ref={this._appSidebarRefSetter}
           panels={this._orderManager.getOrderedItems().map(x => x.value)}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
             this._orderManager.moveItem(oldIndex, newIndex);
@@ -301,10 +308,13 @@ class GmailAppSidebarPrimary {
         />,
         threadSidebarContainerEl,
         () => {
-          resolve(threadSidebarComponent);
+          if (!this._threadSidebarComponent) {
+            throw new Error('Should not happen');
+          }
+          resolve(this._threadSidebarComponent);
           this._updateHighlightedAppThreadIconBus.emit(null);
         }
-      ): any));
+      );
     });
   }
 
