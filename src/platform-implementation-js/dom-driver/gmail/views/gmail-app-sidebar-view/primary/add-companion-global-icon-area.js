@@ -2,8 +2,8 @@
 
 import {defn} from 'ud';
 
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
-import type Logger from '../../../../lib/logger';
+import querySelector from '../../../../../lib/dom/querySelectorOrFail';
+import type Logger from '../../../../../lib/logger';
 
 /*
 As of Feb 6th, 2018.

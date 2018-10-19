@@ -170,9 +170,16 @@ class InboxAppSidebarView {
     });
     let component: AppSidebar;
 
+    const _appSidebarRefSetter = threadSidebarComponent => {
+      if (threadSidebarComponent) {
+        component = threadSidebarComponent;
+      }
+    };
+
     const render = () => {
-      component = (ReactDOM.render(
+      ReactDOM.render(
         <AppSidebar
+          ref={_appSidebarRefSetter}
           panels={orderManager.getOrderedItems().map(x => x.value)}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);
@@ -187,7 +194,7 @@ class InboxAppSidebarView {
           }}
         />,
         el
-      ): any);
+      );
     };
     render();
 

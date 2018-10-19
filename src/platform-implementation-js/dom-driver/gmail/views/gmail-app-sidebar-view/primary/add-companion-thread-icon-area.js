@@ -3,9 +3,9 @@
 import {defn} from 'ud';
 
 import Kefir from 'kefir';
-import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
-import type Logger from '../../../../lib/logger';
+import makeMutationObserverChunkedStream from '../../../../../lib/dom/make-mutation-observer-chunked-stream';
+import querySelector from '../../../../../lib/dom/querySelectorOrFail';
+import type Logger from '../../../../../lib/logger';
 
 /*
 As of Feb 6th, 2018.

@@ -5,7 +5,7 @@ import type OrderManager from 'order-manager';
 import {defn} from 'ud';
 import findIndex from 'lodash/findIndex';
 
-import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
+import insertElementInOrder from '../../../../../lib/dom/insert-element-in-order';
 
 function addToIconArea(orderManager: OrderManager<*>, appName: string, container: HTMLElement, iconArea: HTMLElement){
   //first set icon order hints

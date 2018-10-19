@@ -34,7 +34,7 @@ import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelV
 import GmailElementGetter from '../gmail-element-getter';
 
 import addIconArea from './gmail-thread-sidebar-view/add-icon-area';
-import addToIconArea from './gmail-app-sidebar-view/add-to-icon-area';
+import addToIconArea from './gmail-app-sidebar-view/primary/add-to-icon-area';
 
 const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
@@ -247,9 +247,16 @@ class GmailAppSidebarView {
         }
       });
 
+    const _appSidebarRefSetter = threadSidebarComponent => {
+      if (threadSidebarComponent) {
+        component = threadSidebarComponent;
+      }
+    };
+
     const render = () => {
-      component = (ReactDOM.render(
+      ReactDOM.render(
         <AppSidebar
+          ref={_appSidebarRefSetter}
           panels={orderManager.getOrderedItems().map(x => x.value)}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
             orderManager.moveItem(oldIndex, newIndex);
@@ -260,7 +267,7 @@ class GmailAppSidebarView {
         />,
         el,
         () => {updateHighlightedAppIconBus.emit(null);}
-      ): any);
+      );
     };
     render();
 
