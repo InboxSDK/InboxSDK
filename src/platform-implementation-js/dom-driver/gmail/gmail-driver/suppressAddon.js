@@ -34,8 +34,9 @@ export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
     .takeUntilBy(driver.getStopper())
     .onValue(({ el }) => {
       if (
-        el.classList.contains('.J-KU-KO') || // old pre-2018-07-30 classname?
-        el.classList.contains('.bse-bvF-I-KO')
+        el.classList.contains('J-KU-KO') || // old pre-2018-07-30 classname?
+        el.classList.contains('bse-bvF-I-KO') || // old pre-2018-10-15 classname?
+        el.classList.contains('aT5-aOt-I-KO')
       ) {
         // it is currently open, so let's close
         simulateClick(el);
