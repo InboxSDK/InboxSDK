@@ -207,7 +207,6 @@ class GmailDriver {
 
     this.onready
       .then(() => {
-        this._timestampOnready = Date.now();
         trackEvents(this);
         gmailLoadEvent(this);
         overrideGmailBackButton(this, this._gmailRouteProcessor);
@@ -736,6 +735,8 @@ class GmailDriver {
         this._setupComposeViewDriverStream();
 
         this._threadRowIdentifier = new ThreadRowIdentifier(this);
+
+        this._timestampOnready = Date.now();
       });
   }
 
