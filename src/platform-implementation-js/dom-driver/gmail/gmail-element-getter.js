@@ -132,6 +132,7 @@ const GmailElementGetter = {
 		return document.querySelector('.brC-brG');
 	},
 
+	// <div class="brC-aT5-aOt-Jw" role="navigation" aria-label="Side panel">
 	getCompanionSidebarIconContainerElement(): ?HTMLElement {
 		return document.querySelector('.brC-aT5-aOt-Jw');
 	},
