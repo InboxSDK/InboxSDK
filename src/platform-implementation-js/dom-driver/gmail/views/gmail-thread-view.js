@@ -14,8 +14,6 @@ import type {Bus} from 'kefir-bus';
 import findParent from '../../../../common/find-parent';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
@@ -63,8 +61,6 @@ class GmailThreadView {
 		this._eventStream = kefirBus();
 		this._messageViewDrivers = [];
 
-		const suppressAddonTitle = driver.getOpts().suppressAddonTitle;
-		if(suppressAddonTitle) this._waitForAddonTitleAndSuppress(suppressAddonTitle);
 		this._logAddonElementInfo().catch(err => this._driver.getLogger().error(err));
 
 		const waitForSidebarReady = (
@@ -502,50 +498,6 @@ class GmailThreadView {
 			eventName: 'messageCreated',
 			view: messageView
 		});
-	}
-
-	_waitForAddonTitleAndSuppress(addonTitle: string){
-		try {
-			const addonSidebarContainerEl = GmailElementGetter.getAddonSidebarContainerElement();
-			const iconContainerElement = GmailElementGetter.getCompanionSidebarIconContainerElement() || addonSidebarContainerEl;
-
-			if (!iconContainerElement) {
-				if (this._driver.isUsingMaterialUI()) {
-					this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: iconContainerElement not found'));
-				}
-				return;
-			}
-
-			const widthManager = addonSidebarContainerEl ? this._setupWidthManager() : null;
-
-			// .J-KU-Jg is pre-2018-07-30 element?
-			const elementToWatch = iconContainerElement.querySelector('.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt');
-			if (!elementToWatch) {
-				this._driver.getLogger().error(new Error('_waitForAddonTitleAndSuppress: elementToWatch not found'));
-				return;
-			}
-
-			makeElementChildStream(elementToWatch)
-				.filter(({el}) =>
-						el.getAttribute('role') === 'tab' &&
-						(el.getAttribute('data-tooltip') || el.getAttribute('aria-label')) === addonTitle
-				)
-				.takeUntilBy(this._stopper)
-				.onValue(({el}) => {
-					if (
-						el.classList.contains('.J-KU-KO') || // old pre-2018-07-30 classname?
-						el.classList.contains('.bse-bvF-I-KO')
-					){
-						// it is currently open, so let's close
-						simulateClick(el);
-					}
-
-					el.style.display = 'none';
-					if(widthManager) widthManager.fixWidths();
-				});
-		} catch (err) {
-			this._driver.getLogger().error(err, 'Failure in suppressing addon title');
-		}
 	}
 
 	_setupWidthManager(){
