@@ -27,7 +27,9 @@ const InboxSDK = {
   }
 };
 
-if (['https://mail.google.com', 'https://inbox.google.com'].indexOf(document.location.origin) != -1) {
+const pageOrigin: string = (process.env.NODE_ENV === 'test' && global.__test_origin) || document.location.origin;
+
+if (['https://mail.google.com', 'https://inbox.google.com'].indexOf(pageOrigin) != -1) {
   PlatformImplementationLoader.preload();
 }
 

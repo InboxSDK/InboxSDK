@@ -201,7 +201,7 @@ export function makePlatformImplementation(appId: string, _opts: Object, envData
 	const IMPL_VERSION: string = BUILD_VERSION;
 	const logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
 
-	const origin: string = (document.location: any).origin;
+	const origin: string = (process.env.NODE_ENV === 'test' && global.__test_origin) || document.location.origin;
 	const DriverClass = DRIVERS_BY_ORIGIN[origin];
 	if (!DriverClass) {
 		console.log("InboxSDK: Unsupported origin", origin);

@@ -28,10 +28,12 @@ if (!global.__InboxSDKInjected) {
     const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder');
     const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
-    if (document.location.origin === 'https://mail.google.com') {
+    const pageOrigin: string = (process.env.NODE_ENV === 'test' && global.__test_origin) || document.location.origin;
+
+    if (pageOrigin === 'https://mail.google.com') {
       gmailInterceptor();
       setupGmonkeyHandler();
-    } else if (document.location.origin === 'https://inbox.google.com') {
+    } else if (pageOrigin === 'https://inbox.google.com') {
       setupClickAndGetNewIframeSrc();
       setupInboxFakeWindowResizeListener();
       setupComposeViewDraftIDFinder();

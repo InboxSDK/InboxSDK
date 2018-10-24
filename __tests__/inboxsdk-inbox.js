@@ -10,7 +10,8 @@ global.MutationObserver = MockMutationObserver;
 <body>
 <div id="canvas"></div>
 </body>`;
-Object.defineProperty(document.location, 'origin', {value:'https://inbox.google.com'});
+
+global.__test_origin = 'https://inbox.google.com';
 
 // don't try to inject ajax interceptor
 (document.head:any).setAttribute('data-inboxsdk-script-injected', 'true');
